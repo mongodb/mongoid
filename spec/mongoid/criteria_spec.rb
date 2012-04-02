@@ -1326,9 +1326,607 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#includes"
-  pending "#inclusions"
-  pending "#inclusions="
+  describe "#includes" do
+
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
+    let!(:person) do
+      Person.create
+    end
+
+    context "when providing inclusions to the default scope" do
+
+      before do
+        Person.default_scope(Person.includes(:posts))
+      end
+
+      after do
+        Person.default_scoping = nil
+      end
+
+      let!(:post_one) do
+        person.posts.create(title: "one")
+      end
+
+      let!(:post_two) do
+        person.posts.create(title: "two")
+      end
+
+      context "when the criteria has no options" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.all.entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
+      context "when calling first on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.first
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
+      context "when calling last on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.last
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
+      context "when the criteria has limiting options" do
+
+        let!(:person_two) do
+          Person.create
+        end
+
+        let!(:post_three) do
+          person_two.posts.create(title: "three")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.asc(:_id).limit(1).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+
+        it "does not insert the third post into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_three.id].should be_nil
+        end
+      end
+    end
+
+    context "when including a has and belongs to many" do
+
+      let!(:preference_one) do
+        person.preferences.create(name: "one")
+      end
+
+      let!(:preference_two) do
+        person.preferences.create(name: "two")
+      end
+
+      context "when the criteria has no options" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:preferences).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+      end
+
+      context "when calling first on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:preferences).first
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+      end
+
+      context "when calling last on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:preferences).last
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+      end
+
+      context "when the criteria has limiting options" do
+
+        let!(:person_two) do
+          Person.create
+        end
+
+        let!(:preference_three) do
+          person_two.preferences.create(name: "three")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:preferences).asc(:_id).limit(1).entries
+        end
+
+        let(:preference_map) do
+          Mongoid::IdentityMap[Preference.collection_name]
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "inserts the first document into the identity map" do
+          preference_map[preference_one.id].should eq(preference_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          preference_map[preference_two.id].should eq(preference_two)
+        end
+
+        it "does not insert the third preference into the identity map" do
+          preference_map[preference_three.id].should be_nil
+        end
+      end
+    end
+
+    context "when including a has many" do
+
+      let!(:post_one) do
+        person.posts.create(title: "one")
+      end
+
+      let!(:post_two) do
+        person.posts.create(title: "two")
+      end
+
+      context "when the criteria has no options" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:posts).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
+      context "when calling first on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:posts).first
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
+      context "when calling last on the criteria" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:from_db) do
+          Person.includes(:posts).last
+        end
+
+        it "returns the correct documents" do
+          from_db.should eq(person)
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+      end
+
+      context "when the criteria has limiting options" do
+
+        let!(:person_two) do
+          Person.create
+        end
+
+        let!(:post_three) do
+          person_two.posts.create(title: "three")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:posts).asc(:_id).limit(1).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+
+        it "does not insert the third post into the identity map" do
+          Mongoid::IdentityMap[Post.collection_name][post_three.id].should be_nil
+        end
+      end
+    end
+
+    context "when including a has one" do
+
+      let!(:game_one) do
+        person.create_game(name: "one")
+      end
+
+      let!(:game_two) do
+        person.create_game(name: "two")
+      end
+
+      context "when the criteria has no options" do
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:game).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "deletes the replaced document from the identity map" do
+          Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+        end
+
+        context "when asking from map or db" do
+
+          let(:in_map) do
+            Mongoid::IdentityMap[Game.collection_name][game_two.id]
+          end
+
+          let(:game) do
+            Game.where("person_id" => person.id).from_map_or_db
+          end
+
+          it "returns the document from the map" do
+            game.should equal(in_map)
+          end
+        end
+      end
+
+      context "when the criteria has limiting options" do
+
+        let!(:person_two) do
+          Person.create
+        end
+
+        let!(:game_three) do
+          person_two.create_game(name: "Skyrim")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:criteria) do
+          Person.includes(:game).asc(:_id).limit(1).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ person ])
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+        end
+
+        it "does not load the extra child into the map" do
+          Mongoid::IdentityMap[Game.collection_name][game_three.id].should be_nil
+        end
+      end
+    end
+
+    context "when including a belongs to" do
+
+      let(:person_two) do
+        Person.create
+      end
+
+      let!(:game_one) do
+        person.create_game(name: "one")
+      end
+
+      let!(:game_two) do
+        person_two.create_game(name: "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      context "when providing no options" do
+
+        let!(:criteria) do
+          Game.includes(:person).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ game_one, game_two ])
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
+        end
+
+        it "inserts the second document into the identity map" do
+          Mongoid::IdentityMap[Person.collection_name][person_two.id].should eq(person_two)
+        end
+      end
+
+      context "when the criteria has limiting options" do
+
+        let!(:criteria) do
+          Game.includes(:person).asc(:_id).limit(1).entries
+        end
+
+        it "returns the correct documents" do
+          criteria.should eq([ game_one ])
+        end
+
+        it "inserts the first document into the identity map" do
+          Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
+        end
+
+        it "does not load the documents outside of the limit" do
+          Mongoid::IdentityMap[Person.collection_name][person_two.id].should be_nil
+        end
+      end
+    end
+
+    context "when including multiples in the same criteria" do
+
+      let!(:post_one) do
+        person.posts.create(title: "one")
+      end
+
+      let!(:post_two) do
+        person.posts.create(title: "two")
+      end
+
+      let!(:game_one) do
+        person.create_game(name: "one")
+      end
+
+      let!(:game_two) do
+        person.create_game(name: "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:criteria) do
+        Person.includes(:posts, :game).entries
+      end
+
+      it "returns the correct documents" do
+        criteria.should eq([ person ])
+      end
+
+      it "inserts the first has many document into the identity map" do
+        Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+      end
+
+      it "inserts the second has many document into the identity map" do
+        Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+      end
+
+      it "removes the first has one document from the identity map" do
+        Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+      end
+
+      it "inserts the second has one document into the identity map" do
+        Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+      end
+    end
+  end
+
+  describe "#inclusions" do
+
+    let(:criteria) do
+      Band.includes(:records)
+    end
+
+    let(:metadata) do
+      Band.relations["records"]
+    end
+
+    it "returns the inclusions" do
+      criteria.inclusions.should eq([ metadata ])
+    end
+  end
+
+  describe "#inclusions=" do
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:metadata) do
+      Band.relations["records"]
+    end
+
+    before do
+      criteria.inclusions = [ metadata ]
+    end
+
+    it "sets the inclusions" do
+      criteria.inclusions.should eq([ metadata ])
+    end
+  end
 
   pending "#lt"
   pending "#lte"
