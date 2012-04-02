@@ -438,8 +438,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#execute_or_raise"
-
   describe "#exists" do
 
     let!(:match) do
@@ -2096,7 +2094,24 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#mod"
+  describe "#mod" do
+
+    let!(:match) do
+      Band.create(member_count: 5)
+    end
+
+    let!(:non_match) do
+      Band.create(member_count: 2)
+    end
+
+    let(:criteria) do
+      Band.mod(member_count: [ 4, 1 ])
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
 
   describe "#ne" do
 
@@ -2230,7 +2245,83 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#respond_to?"
+  describe "#respond_to?" do
+
+    let(:criteria) do
+      described_class.new(Person)
+    end
+
+    before do
+      class Person
+        def self.ages; self; end
+      end
+    end
+
+    context "when asking about a model public class method" do
+
+      it "returns true" do
+        criteria.should respond_to(:ages)
+      end
+    end
+
+    context "when asking about a model private class method" do
+
+      context "when including private methods" do
+
+        it "returns true" do
+          criteria.respond_to?(:for_ids, true).should be_true
+        end
+      end
+    end
+
+    context "when asking about a model class public instance method" do
+
+      it "returns true" do
+        criteria.respond_to?(:join).should be_true
+      end
+    end
+
+    context "when asking about a model private instance method" do
+
+      context "when not including private methods" do
+
+        it "returns false" do
+          criteria.should_not respond_to(:fork)
+        end
+      end
+
+      context "when including private methods" do
+
+        it "returns true" do
+          criteria.respond_to?(:fork, true).should be_true
+        end
+      end
+    end
+
+    context "when asking about a criteria instance method" do
+
+      it "returns true" do
+        criteria.should respond_to(:context)
+      end
+    end
+
+    context "when asking about a private criteria instance method" do
+
+      context "when not including private methods" do
+
+        it "returns false" do
+          criteria.should_not respond_to(:puts)
+        end
+      end
+
+      context "when including private methods" do
+
+        it "returns true" do
+          criteria.respond_to?(:puts, true).should be_true
+        end
+      end
+    end
+  end
 
   describe "#to_ary" do
 
@@ -2273,7 +2364,38 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#type"
+  describe "#type" do
+
+    context "when the type is a string" do
+
+      let!(:browser) do
+        Browser.create
+      end
+
+      let(:criteria) do
+        Canvas.all.type("Browser")
+      end
+
+      it "returns documents with the provided type" do
+        criteria.should eq([ browser ])
+      end
+    end
+
+    context "when the type is an Array of type" do
+
+      let!(:browser) do
+        Firefox.create
+      end
+
+      let(:criteria) do
+        Canvas.all.type([ "Browser", "Firefox" ])
+      end
+
+      it "returns documents with the provided types" do
+        criteria.should eq([ browser ])
+      end
+    end
+  end
 
   describe "#where" do
 
