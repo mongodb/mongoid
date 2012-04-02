@@ -278,6 +278,22 @@ module Mongoid #:nodoc:
       selector["_id"]
     end
 
+    # Get the list of included fields.
+    #
+    # @example Get the field list.
+    #   criteria.field_list
+    #
+    # @return [ Array<String> ] The fields.
+    #
+    # @since 2.0.0
+    def field_list
+      if options[:fields]
+        options[:fields].keys.reject!{ |key| key == "_type" }
+      else
+        []
+      end
+    end
+
     # Find the matchind document(s) in the criteria for the provided ids.
     #
     # @example Find by an id.

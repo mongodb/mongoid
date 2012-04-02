@@ -526,7 +526,16 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#field_list"
+  describe "#field_list" do
+
+    let(:criteria) do
+      Band.only(:name)
+    end
+
+    it "returns the fields minus type" do
+      criteria.field_list.should eq([ "name" ])
+    end
+  end
 
   describe "#find" do
 
