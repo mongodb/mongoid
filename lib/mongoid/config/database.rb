@@ -155,12 +155,13 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.1
       def optional(slave = false)
-        ({
+        {
           pool_size: pool_size,
           logger: logger? ? Mongoid::Logger.new : nil,
           slave_ok: slave
-        }).merge(self).reject { |k,v| Config.blacklisted_options.include?(k) }.
-          inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo} # mongo likes symbols
+        }.merge(self).reject { |k,v|
+          Config.blacklisted_options.include?(k)
+        }.symbolize_keys! # mongo likes symbols
       end
 
       # Get a Mongo compliant URI for the database connection.
