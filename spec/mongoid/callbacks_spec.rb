@@ -248,6 +248,32 @@ describe Mongoid::Callbacks do
 
   context "when cascading callbacks" do
 
+    context "when the parent has a custom callback" do
+
+      before(:all) do
+        Band.define_model_callbacks(:rearrange)
+      end
+
+      after(:all) do
+        Band.reset_callbacks(:rearrange)
+      end
+
+      context "when the child does not have the same callback defined" do
+
+        let(:band) do
+          Band.new
+        end
+
+        let!(:record) do
+          band.records.build
+        end
+
+        it "does not cascade to the child" do
+          band.run_callbacks(:rearrange).should be_true
+        end
+      end
+    end
+
     context "when a document can exist in more than 1 level" do
 
       let(:band) do

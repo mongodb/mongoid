@@ -535,6 +535,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1887 Don't cascade callbacks to children that don't have the callback
+  defined.
+
 * \#1874 Fixed the reject all blank proc constant to handle values
   properly with a destroy non blank value. (Stefan Daschek)
 
