@@ -45,6 +45,20 @@ For instructions on upgrading to newer versions, visit
 
         band.albums.find_or_create_by({ name: "101" }, LP)
 
+* \#1818 Add capability to choose the key where you `embed_many` relation
+  is store. (Cyril Mougel)
+
+        class User
+          include Mongoid::Document
+          field :name, type: String
+          embeds_many :prefs, class_name: "Preference", store_as: 'my_preferences'
+        end
+
+        user.prefs.build({value: 'ok})
+        user.save
+        # document save in MongoDB like { 'name' => 'foo', 'my_preferences' => [{'value' => 'ok'}]}
+
+
 * \#1774 Relations now have a :restrict option for dependent relations
   which will raise an error when attempting to delete a parent that
   still has children on it. (Hans Hasselberg)
