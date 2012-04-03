@@ -483,7 +483,7 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def only(*args)
       return clone if args.empty?
-      super(*args, :_type)
+      super(*(args + [:_type]))
     end
 
     # Returns true if criteria responds to the given method.
