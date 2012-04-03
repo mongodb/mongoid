@@ -105,7 +105,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def cascadable_child?(kind, child)
-      return false if kind == :initialize
+      return false if kind == :initialize || !child.respond_to?("_#{kind}_callbacks")
       [ :create, :destroy ].include?(kind) || child.changed? || child.new_record?
     end
 
