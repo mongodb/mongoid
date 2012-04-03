@@ -84,9 +84,9 @@ module Mongoid #:nodoc
       #
       # @since 2.1.8
       def prohibited_methods
-        @prohibited_methods ||= MODULES.map do |mod|
+        @prohibited_methods ||= MODULES.flat_map do |mod|
           mod.instance_methods.map{ |m| m.to_sym }
-        end.flatten
+        end
       end
     end
   end
