@@ -84,11 +84,9 @@ module Mongoid #:nodoc
       #
       # @since 2.1.8
       def prohibited_methods
-        @prohibited_methods ||= MODULES.inject([]) do |methods, mod|
-          methods.tap do |mets|
-            mets << mod.instance_methods.map{ |m| m.to_sym }
-          end
-        end.flatten
+        @prohibited_methods ||= MODULES.flat_map do |mod|
+          mod.instance_methods.map{ |m| m.to_sym }
+        end
       end
     end
   end
