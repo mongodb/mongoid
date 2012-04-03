@@ -62,11 +62,9 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def changes
-      changed.inject({}.with_indifferent_access) do |changes, attr|
-        changes.tap do |hash|
-          hash[attr] = attribute_change(attr)
-        end
-      end
+      Hash[changed.map do |attr|
+        [attr, attribute_change(attr)]
+      end].with_indifferent_access
     end
 
     # Call this method after save, so the changes can be properly switched.
