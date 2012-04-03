@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Mongoid now uses Origin for its Criteria API. See the Origin repo
+  and API docs for the documentation.
+
 * \#1861 Mongoid now raises an `AmbiguousRelationship` error when it
   cannot determine the inverse of a relation and there are multiple
   potential candidates. (Hans Hasselberg)
