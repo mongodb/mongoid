@@ -225,20 +225,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def execute_or_raise(ids, multi)
-      if multi
-        entries.tap do |result|
-          if (entries.size < ids.size) && Mongoid.raise_not_found_error
-            missing = ids - entries.map(&:_id)
-            raise Errors::DocumentNotFound.new(klass, ids, missing)
-          end
-        end
-      else
-        from_map_or_db.tap do |result|
-          if result.nil? && ids && Mongoid.raise_not_found_error
-            raise Errors::DocumentNotFound.new(klass, ids, ids)
-          end
-        end
-      end
+      multi ? execute_multi(ids) : execute_single(ids)
     end
 
     # Return true if the criteria has some Document or not.
@@ -580,6 +567,52 @@ module Mongoid #:nodoc:
     # @since 2.2.0
     def driver
       collection.driver
+    end
+
+    # Find documents based on the provided ids, and return an array of the
+    # documents.
+    #
+    # @api private
+    #
+    # @example Find multiple.
+    #   criteria.execute_multi([ 1, 2, 3 ])
+    #
+    # @param [ Array ] ids The ids to find.
+    #
+    # @raise [ Errors::Document ] If not all ids are found.
+    #
+    # @return [ Array<Document> ] The matching documents.
+    #
+    # @since 3.0.0
+    def execute_multi(ids)
+      entries.tap do |result|
+        if (entries.size < ids.size) && Mongoid.raise_not_found_error
+          missing = ids - entries.map(&:_id)
+          raise Errors::DocumentNotFound.new(klass, ids, missing)
+        end
+      end
+    end
+
+    # Find a document based on the provided ids, and return the document.
+    #
+    # @api private
+    #
+    # @example Find one.
+    #   criteria.execute_single([ 1 ])
+    #
+    # @param [ Array ] ids The id to find.
+    #
+    # @raise [ Errors::Document ] If no document is found.
+    #
+    # @return [ Document ] The matching document.
+    #
+    # @since 3.0.0
+    def execute_single(ids)
+      from_map_or_db.tap do |result|
+        if result.nil? && Mongoid.raise_not_found_error
+          raise Errors::DocumentNotFound.new(klass, ids, ids)
+        end
+      end
     end
 
     # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
