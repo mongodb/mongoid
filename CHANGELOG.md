@@ -45,8 +45,8 @@ For instructions on upgrading to newer versions, visit
 
         band.albums.find_or_create_by({ name: "101" }, LP)
 
-* \#1818 Add capability to choose the key where you `embed_many` relation
-  is store. (Cyril Mougel)
+* \#1818 Add capability to choose the key where your `embeds_many` relation
+  is stores. (Cyril Mougel)
 
         class User
           include Mongoid::Document
@@ -54,9 +54,10 @@ For instructions on upgrading to newer versions, visit
           embeds_many :prefs, class_name: "Preference", store_as: 'my_preferences'
         end
 
-        user.prefs.build({value: 'ok})
+        user.prefs.build(value: "ok")
         user.save
-        # document save in MongoDB like { 'name' => 'foo', 'my_preferences' => [{'value' => 'ok'}]}
+        # document saves in MongoDB as:
+        # { "name" => "foo", "my_preferences" => [{ "value" => "ok" }]}
 
 
 * \#1774 Relations now have a :restrict option for dependent relations
