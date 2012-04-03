@@ -76,6 +76,16 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Evolve the field for criteria.
+      #
+      # @example Evolve the field.
+      #   field.evolve("1")
+      #
+      # @param [ Object ] object The object to evolve.
+      #
+      # @return [ Object ] The evolved object.
+      #
+      # @since 3.0.0
       def evolve(object)
         type.evolve(object)
       end
