@@ -81,6 +81,7 @@ module Mongoid #:nodoc:
           def serialize(object)
             object ? constraint.convert(object) : []
           end
+          alias :evolve :serialize
         end
       end
     end

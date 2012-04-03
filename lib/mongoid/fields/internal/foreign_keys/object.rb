@@ -49,6 +49,7 @@ module Mongoid #:nodoc:
               end
             end
           end
+          alias :evolve :serialize
         end
       end
     end
