@@ -189,9 +189,9 @@ module Mongoid #:nodoc:
       #
       # @since 2.2.0
       def includes(*relations)
-        relations.flatten.each do |name|
-          inclusions.push(klass.reflect_on_association(name))
-        end
+        inclusions.concat(relations.flatten.map do |name|
+          klass.reflect_on_association(name)
+        end)
         clone
       end
 
