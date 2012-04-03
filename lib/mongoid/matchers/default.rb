@@ -63,7 +63,7 @@ module Mongoid #:nodoc:
       #
       # @since 1.0.0
       def determine(value, operator)
-        Array(attribute).any? {|attr|
+        attribute.__array__.any? {|attr|
           attr ? attr.send(operator, first(value)) : false
         }
       end

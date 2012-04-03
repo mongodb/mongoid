@@ -113,7 +113,7 @@ module Mongoid #:nodoc:
         def append_with(name)
           prepare do
             document[field] = [] unless document[field]
-            document.send(field).concat(Array(value)).tap { execute(name) }
+            document.send(field).concat(value.__array__).tap { execute(name) }
           end
         end
       end

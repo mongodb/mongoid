@@ -49,7 +49,7 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def query?
-        obj = Array(object).first
+        obj = object.__array__.first
         !obj.is_a?(Mongoid::Document) && !obj.nil?
       end
     end
