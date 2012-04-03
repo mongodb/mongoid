@@ -1015,6 +1015,30 @@ describe Mongoid::Relations::Referenced::In do
         }.to raise_error(Mongoid::Errors::EagerLoad)
       end
     end
+
+    context "when the ids has been duplicated" do
+
+      let!(:person) do
+        Person.create
+      end
+
+      let!(:posts) do
+        2.times {|i| person.posts.create(title: "testing#{i}") }
+        person.posts
+      end
+
+      let(:metadata) do
+        Post.relations["person"]
+      end
+
+      let(:eager) do
+        described_class.eager_load(metadata, posts.map(&:person_id))
+      end
+
+      it "duplication should be removed" do
+        eager.selector["_id"]["$in"].count.should eq 1
+      end
+    end
   end
 
   describe ".embedded?" do
