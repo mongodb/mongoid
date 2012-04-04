@@ -52,17 +52,16 @@ describe Mongoid::MultiParameterAttributes do
 
       context "with an invalid DOB" do
 
-        it "raises an exception" do
-          expect {
-            Multi.new({
-              "dob(1i)" => "1980",
-              "dob(2i)" => "2",
-              "dob(3i)" => "31"
-            })
-          }.to raise_exception(
-            Mongoid::MultiParameterAttributes::Errors::MultiparameterAssignmentErrors,
-            "1 error(s) on assignment of multiparameter attributes"
-          )
+        let(:invalid_multi) do
+          Multi.new({
+            "dob(1i)" => "1980",
+            "dob(2i)" => "2",
+            "dob(3i)" => "31"
+          })
+        end
+
+        it "uses Time's logic to convert the invalid date to valid" do
+          invalid_multi.dob.should eq(Time.new(1980, 2, 31).to_date)
         end
       end
     end
