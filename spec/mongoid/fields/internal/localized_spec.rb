@@ -152,27 +152,6 @@ describe Mongoid::Fields::Internal::Localized do
     end
   end
 
-  describe "#selection" do
-
-    context "when providing a single value" do
-
-      it "converts the value based on the locale" do
-        field.selection("testing").should eq({ "en" => "testing" })
-      end
-    end
-
-    context "when providing a complex criteria" do
-
-      let(:criteria) do
-        { "$ne" => "test" }
-      end
-
-      it "returns the criteria" do
-        field.selection(criteria).should eq(criteria)
-      end
-    end
-  end
-
   describe "#serialize" do
 
     context "when no locale is defined" do

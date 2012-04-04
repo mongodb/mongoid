@@ -23,27 +23,6 @@ describe Mongoid::Fields::Internal::Symbol do
     end
   end
 
-  describe "#selection" do
-
-    context "when providing a single value" do
-
-      it "converts the value to a symbol" do
-        field.selection("test").should eq(:test)
-      end
-    end
-
-    context "when providing a complex criteria" do
-
-      let(:criteria) do
-        { "$ne" => "test" }
-      end
-
-      it "returns the criteria" do
-        field.selection(criteria).should eq(criteria)
-      end
-    end
-  end
-
   describe "#serialize" do
 
     context "when given nil" do

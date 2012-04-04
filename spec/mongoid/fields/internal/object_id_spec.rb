@@ -17,33 +17,6 @@ describe Mongoid::Fields::Internal::ObjectId do
     end
   end
 
-  describe "#selection" do
-
-    let(:object_id_string) do
-      "4c52c439931a90ab29000003"
-    end
-
-    context "when providing a single value" do
-
-      it "converts the value to an object id" do
-        field.selection(object_id_string).should eq(
-          BSON::ObjectId.from_string(object_id_string)
-        )
-      end
-    end
-
-    context "when providing a complex criteria" do
-
-      let(:criteria) do
-        { "$ne" => "test" }
-      end
-
-      it "returns the criteria" do
-        field.selection(criteria).should eq(criteria)
-      end
-    end
-  end
-
   describe "#serialize" do
 
     let(:object_id_string) do

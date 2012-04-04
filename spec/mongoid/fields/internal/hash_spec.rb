@@ -54,16 +54,6 @@ describe Mongoid::Fields::Internal::Hash do
     end
   end
 
-  describe "#selection" do
-
-    context "when providing a single value" do
-
-      it "returns the value" do
-        field.selection({ "field" => "value" }).should eq({ "field" => "value" })
-      end
-    end
-  end
-
   describe "#serialize" do
 
     context "when the value is not a hash" do

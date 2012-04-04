@@ -174,18 +174,6 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def serialize(object); object; end
 
-      # Convert the provided object to a Mongoid criteria friendly value.
-      #
-      # @example Convert the field.
-      #   field.selection(object)
-      #
-      # @param [ Object ] The object to convert.
-      #
-      # @return [ Object ] The converted object.
-      #
-      # @since 2.4.0
-      def selection(object); object; end
-
       # Get the type of this field - inferred from the class name.
       #
       # @example Get the type.

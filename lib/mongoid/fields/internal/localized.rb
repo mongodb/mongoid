@@ -28,21 +28,6 @@ module Mongoid #:nodoc:
           end
         end
 
-        # Special case to serialize the object.
-        #
-        # @example Convert to a selection.
-        #   field.selection(object)
-        #
-        # @param [ Object ] The object to convert.
-        #
-        # @return [ Object ] The converted object.
-        #
-        # @since 2.4.0
-        def selection(object)
-          return object if object.is_a?(::Hash)
-          serialize(object)
-        end
-
         # Convert the provided string into a hash for the locale.
         #
         # @example Serialize the value.

@@ -22,21 +22,6 @@ module Mongoid #:nodoc:
           ::Set.new(object)
         end
 
-        # Special case to serialize the object.
-        #
-        # @example Convert to a selection.
-        #   field.selection(object)
-        #
-        # @param [ Object ] The object to convert.
-        #
-        # @return [ Object ] The converted object.
-        #
-        # @since 2.4.0
-        def selection(object)
-          return object unless object.is_a?(::Set)
-          serialize(object)
-        end
-
         # Serialize the object from the type defined in the model to a MongoDB
         # compatible object to store.
         #
