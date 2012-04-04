@@ -561,6 +561,12 @@ For instructions on upgrading to newer versions, visit
 * \#1887 Don't cascade callbacks to children that don't have the callback
   defined.
 
+* \#1882 Don't expand duplicate id criterion into an $and with duplicate
+  selections.
+
+* \#1878 Fixed default application values not to apply in certain `only`
+  or `without` selection on iteration, not just `first` and `last`.
+
 * \#1874 Fixed the reject all blank proc constant to handle values
   properly with a destroy non blank value. (Stefan Daschek)
 
