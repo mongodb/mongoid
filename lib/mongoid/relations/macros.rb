@@ -133,7 +133,9 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
-          reference_one_to_one(name, options, Referenced::In, &block)
+          reference_one_to_one(name, options, Referenced::In, &block).tap do |meta|
+            aliased_fields[name.to_s] = meta.foreign_key
+          end
         end
 
         # Adds a relational association from a parent Document to many

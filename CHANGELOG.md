@@ -62,6 +62,11 @@ For instructions on upgrading to newer versions, visit
         # document saves in MongoDB as:
         # { "name" => "foo", "my_preferences" => [{ "value" => "ok" }]}
 
+* \#1806 `Model.find_or_create_by` and `Model.find_or_initialize_by` can now
+  take documents as paramters for belongs_to relations.
+
+        person = Person.first
+        Game.find_or_create_by(person: person)
 
 * \#1774 Relations now have a :restrict option for dependent relations
   which will raise an error when attempting to delete a parent that

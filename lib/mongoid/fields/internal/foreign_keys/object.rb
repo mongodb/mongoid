@@ -49,7 +49,20 @@ module Mongoid #:nodoc:
               end
             end
           end
-          alias :evolve :serialize
+
+          # Evolve the object into the MongoDB friendly value used for querying it
+          #
+          # @example Evolve the object
+          #   field.evolve(object)
+          #
+          # @param [ Object ] The object to evolve.
+          #
+          # @return [ Object ] The evolved object.
+          #
+          # @since 3.0.0
+          def evolve(object)
+            object.is_a?(Document) ? object.id : serialize(object)
+          end
         end
       end
     end
