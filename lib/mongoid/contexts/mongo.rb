@@ -166,14 +166,12 @@ module Mongoid #:nodoc:
       # @return [ Cursor ] An enumerable +Cursor+ of results.
       def execute
         collection, options = klass.collection, process_options
-        selecting do
-          if criteria.inclusions.any?
-            collection.find(selector, options).entries.tap do |docs|
-              eager_load(docs)
-            end
-          else
-            collection.find(selector, options)
+        if criteria.inclusions.any?
+          collection.find(selector, options).entries.tap do |docs|
+            eager_load(docs)
           end
+        else
+          collection.find(selector, options)
         end
       end
 
@@ -256,9 +254,11 @@ module Mongoid #:nodoc:
       # @example Iterate over the results.
       #   context.iterate { |doc| p doc }
       def iterate(&block)
-        return caching(&block) if cached?
-        if block_given?
-          execute.each { |doc| yield doc }
+        selecting do
+          return caching(&block) if cached?
+          if block_given?
+            execute.each { |doc| yield doc }
+          end
         end
       end
 

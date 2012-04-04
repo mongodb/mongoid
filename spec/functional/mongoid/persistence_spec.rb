@@ -391,6 +391,19 @@ describe Mongoid::Persistence do
           limited.reload.age.should eq(20)
         end
       end
+
+      context "when iterating over the documents" do
+
+        let(:limited) do
+          Person.only(:_id)
+        end
+
+        it "does not flag any changes" do
+          limited.each do |person|
+            person.changes.should be_empty
+          end
+        end
+      end
     end
 
     context "when saving with a hash field with invalid keys" do
