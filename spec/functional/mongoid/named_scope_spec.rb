@@ -9,6 +9,9 @@ describe Mongoid::NamedScope do
         scope :doctors, {:where => {:title => 'Dr.'} }
         scope :old, criteria.where(:age.gt => 50)
         scope :alki, where(:blood_alcohol_content.gt => 0.3).order_by(:blood_alcohol_content.asc)
+
+        scope :by_ids, lambda { |ids| where(:_id.in => ids) }
+        scope :limited, lambda { only(:_id, :title) }
       end
     end
 
@@ -36,17 +39,35 @@ describe Mongoid::NamedScope do
       end
     end
 
-    context "accessing a single named scope" do
+    context "when accessing a single named scope" do
 
       it "returns the document" do
-        Person.doctors.first.should == document
+        Person.doctors.first.should eq(document)
       end
     end
 
-    context "chaining named scopes" do
+    context "when chaining named scopes" do
 
       it "returns the document" do
-        Person.old.doctors.first.should == document
+        Person.old.doctors.first.should eq(document)
+      end
+
+      context "when the named scopes are lambdas" do
+
+        context "when a scope has id criterion" do
+
+          let(:id) do
+            BSON::ObjectId.new
+          end
+
+          let(:scoped) do
+            Person.by_ids([ id ]).limited
+          end
+
+          it "does not double merge the id criterion" do
+            scoped.selector.should eq({ :_id => { "$in" => [ id ] }})
+          end
+        end
       end
     end
 

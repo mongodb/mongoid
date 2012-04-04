@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::NamedScope do
 
+  before(:all) do
+    Mongoid.scope_overwrite_exception = false
+  end
+
   describe ".scope" do
 
     it "adds a class method for the scope" do

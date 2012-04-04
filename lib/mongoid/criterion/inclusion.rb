@@ -268,7 +268,7 @@ module Mongoid #:nodoc:
               if key.mongoid_id?
                 if crit.selector.has_key?("$and")
                   crit.selector["$and"] << { key => value }
-                else
+                elsif crit.selector[key] != value
                   crit.selector["$and"] = [{ key => crit.selector.delete(key) }, { key => value }]
                 end
               elsif crit.selector[key].respond_to?(:merge) && value.respond_to?(:merge)

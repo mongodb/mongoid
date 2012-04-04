@@ -56,7 +56,8 @@ module Mongoid #:nodoc:
         (class << self; self; end).class_eval <<-EOT
           def #{name}(*args)
             scope = scopes[:#{name}]
-            scope.extend(criteria.fuse(scope.conditions.as_conditions(*args)))
+            conditions = scope.conditions.as_conditions(*args)
+            scope.extend(criteria.fuse(conditions))
           end
         EOT
       end
