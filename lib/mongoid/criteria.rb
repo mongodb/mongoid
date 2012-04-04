@@ -586,9 +586,8 @@ module Mongoid #:nodoc:
     # @since 3.0.0
     def execute_multi(ids)
       entries.tap do |result|
-        if (entries.size < ids.size) && Mongoid.raise_not_found_error
-          missing = ids - entries.map(&:_id)
-          raise Errors::DocumentNotFound.new(klass, ids, missing)
+        if (result.size < ids.size) && Mongoid.raise_not_found_error
+          raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
         end
       end
     end
