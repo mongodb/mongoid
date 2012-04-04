@@ -42,7 +42,15 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def convert_to_time(value)
           value = ::Date.parse(value) if value.is_a?(::String)
-          value = ::Date.civil(*value) if value.is_a?(::Array)
+
+          if value.is_a?(::Array)
+            begin
+              value = ::Date.civil(*value)
+            rescue ArgumentError
+              value = ::Time.new(*value).to_date
+            end
+          end
+
           ::Time.utc(value.year, value.month, value.day)
         end
       end
