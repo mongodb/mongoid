@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "uri"
 require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
@@ -153,10 +152,18 @@ module Mongoid #:nodoc
       true
     end
 
+    # Set the configuration options. Will validate each one individually.
+    #
+    # @example Set the options.
+    #   config.options = { raise_not_found_error: true }
+    #
+    # @param [ Hash ] options The configuration options.
+    #
+    # @since 3.0.0
     def options=(options)
-      # @todo: Durran: Validate options.
       if options
         options.each_pair do |option, value|
+          Validators::Option.validate(option)
           send("#{option}=", value)
         end
       end

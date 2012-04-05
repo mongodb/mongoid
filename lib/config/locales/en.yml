@@ -83,6 +83,15 @@ en:
           resolution: "For access to the collection that the embedded document is
             in, use %{klass}#_root.collection, or do not attempt to persist an
             embedded document without a parent set."
+        invalid_config_option:
+          message: "Invalid configuration option: %{name}."
+          summary: "A invalid configuration option was provided in your
+            mongoid.yml, or a typo is potentially present. The valid configuration
+            options are: %{options}."
+          resolution: "Remove the invalid option or fix the typo. If you were
+            expecting the option to be there, please consult the following page
+            with repect to Mongoid's configuration:\n\n
+            \_\_http://mongoid.org/docs/installation.html"
         invalid_database:
           message: "Database should be a Mongo::DB, not %{name}."
           summary: "When setting a master database in the Mongoid configuration

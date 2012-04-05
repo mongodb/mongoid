@@ -296,6 +296,15 @@ describe Mongoid::Config do
         described_class.allow_dynamic_fields.should be_true
       end
     end
+
+    context "when provided a non-existant option" do
+
+      it "raises an error" do
+        expect {
+          described_class.options = { bad_option: true }
+        }.to raise_error(Mongoid::Errors::InvalidConfigOption)
+      end
+    end
   end
 
   describe "#sessions=" do
