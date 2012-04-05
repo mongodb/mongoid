@@ -297,4 +297,32 @@ describe Mongoid::Config do
       end
     end
   end
+
+  describe "#sessions=" do
+
+    context "when no default session exists" do
+
+      it "raises an error" do
+        expect {
+          described_class.sessions = {}
+        }.to raise_error(Mongoid::Errors::NoDefaultSession)
+      end
+    end
+
+    context "when a default session exists" do
+
+      context "when no hosts are provided" do
+
+        let(:sessions) do
+          { "default" => {}}
+        end
+
+        it "raises an error" do
+          expect {
+            described_class.sessions = sessions
+          }.to raise_error(Mongoid::Errors::NoSessionHosts)
+        end
+      end
+    end
+  end
 end

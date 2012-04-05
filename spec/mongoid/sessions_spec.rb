@@ -178,7 +178,10 @@ describe Mongoid::Sessions do
     context "when overriding the default with store_in" do
 
       let(:config) do
-        { secondary: { hosts: [ "localhost:27017" ] }}
+        {
+          default: { hosts: [ "localhost:27017" ] },
+          secondary: { hosts: [ "localhost:27017" ] }
+        }
       end
 
       let(:database_config) do

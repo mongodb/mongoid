@@ -7,8 +7,8 @@ test:
         consistency: :strong
     replica:
       hosts:
-          - localhost:27018
-          - localhost:27019
+        - localhost:27018
+        - localhost:27019
       options:
         consistency: :eventual
   databases:

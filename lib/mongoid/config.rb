@@ -40,6 +40,14 @@ module Mongoid #:nodoc
       @databases ||= {}
     end
 
+    # Set the database configuration options.
+    #
+    # @example Set the database configuration options.
+    #   config.databases = { default: { name: "test" }}
+    #
+    # @param [ Hash ] databases The configuration options.
+    #
+    # @since 3.0.0
     def databases=(databases)
       databases.with_indifferent_access.tap do |dbs|
         Validators::Database.validate(dbs)
@@ -126,6 +134,8 @@ module Mongoid #:nodoc
 
     # Purge all data in all collections, including indexes.
     #
+    # @todo Durran: clean up.
+    #
     # @example Purge all data.
     #   Mongoid::Config.purge!
     #
@@ -134,7 +144,7 @@ module Mongoid #:nodoc
     # @since 2.0.2
     def purge!
       session = Sessions.default
-      session.use Mongoid.databases[:default][:name]
+      session.use databases[:default][:name]
       collections = session["system.namespaces"].find(name: { "$not" => /system|\$/ }).to_a
       collections.each do |collection|
         _, name = collection["name"].split(".", 2)
@@ -164,9 +174,19 @@ module Mongoid #:nodoc
       @sessions ||= {}
     end
 
+    # Set the session configuration options.
+    #
+    # @example Set the session configuration options.
+    #   config.sessions = { default: { hosts: [ "localhost:27017" ] }}
+    #
+    # @param [ Hash ] sessions The configuration options.
+    #
+    # @since 3.0.0
     def sessions=(sessions)
-      # @todo: Durran: Validate session options.
-      @sessions = sessions.with_indifferent_access
+      sessions.with_indifferent_access.tap do |sess|
+        Validators::Session.validate(sess)
+        @sessions = sess
+      end
     end
 
     private

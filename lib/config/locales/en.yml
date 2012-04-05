@@ -237,6 +237,18 @@ en:
             \_\_\_\_\_\_default:\n
             \_\_\_\_\_\_\_\_name: mongoid_test\n
             \_\_\_\_\_\_\_\_session: default\n\n"
+        no_default_session:
+          message: "No default session configuration is defined."
+          summary: "The configuration provided settings for: %{keys}, but
+            Mongoid requires a :default to be defined at minimum."
+          resolution: "If configuring via a mongoid.yml, ensure that within
+            your :sessions section a :default session is defined.\n
+            Example:\n
+            \_\_development:\n
+            \_\_\_\_sessions:\n
+            \_\_\_\_\_\_default:\n
+            \_\_\_\_\_\_\_\_hosts:\n
+            \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."
@@ -270,6 +282,20 @@ en:
             sessions key that a configuration exists for '%{name}'. If you
             have set the configuration programatically, ensure that '%{name}'
             exists in the configuration hash."
+        no_session_hosts:
+          message: "No hosts provided for session configuration: :%{name}."
+          summary: "Each session configuration must provide hosts so Mongoid
+            knows where the database server is located. What was provided
+            was: %{config}."
+          resolution: "If configuring via a mongoid.yml, ensure that within
+            your :%{name} section a :hosts value for the session hosts is
+            defined.\n
+            Example:\n
+            \_\_development:\n
+            \_\_\_\_sessions:\n
+            \_\_\_\_\_\_%{name}:\n
+            \_\_\_\_\_\_\_\_hosts:\n
+            \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
         readonly_attribute:
           message: "Attempted to set the readonly attribute '%{name}' with
             the value: %{value}."

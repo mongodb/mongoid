@@ -9,7 +9,10 @@ describe Mongoid::Sessions::Factory do
       context "when the configuration exists" do
 
         let(:config) do
-          { secondary: { hosts: [ "localhost:27017" ] }}
+          {
+            default: { hosts: [ "localhost:27017" ] },
+            secondary: { hosts: [ "localhost:27017" ] }
+          }
         end
 
         before do
