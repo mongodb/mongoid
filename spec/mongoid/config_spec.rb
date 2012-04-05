@@ -9,6 +9,47 @@ describe Mongoid::Config do
     end
   end
 
+  describe "#databases=" do
+
+    context "when no default database exists" do
+
+      it "raises an error" do
+        expect {
+          described_class.databases = {}
+        }.to raise_error(Mongoid::Errors::NoDefaultDatabase)
+      end
+    end
+
+    context "when a default database exists" do
+
+      context "when no name is defined" do
+
+        let(:databases) do
+          { "default" => {}}
+        end
+
+        it "raises an error" do
+          expect {
+            described_class.databases = databases
+          }.to raise_error(Mongoid::Errors::NoDatabaseName)
+        end
+      end
+
+      context "when no session is provided" do
+
+        let(:databases) do
+          { "default" => { name: "mongoid_test" }}
+        end
+
+        it "raises an error" do
+          expect {
+            described_class.databases = databases
+          }.to raise_error(Mongoid::Errors::NoDatabaseSession)
+        end
+      end
+    end
+  end
+
   describe "#destructive_fields" do
 
     Mongoid::Components.prohibited_methods.each do |method|
@@ -171,32 +212,8 @@ describe Mongoid::Config do
               default["options"]
             end
 
-            it "sets the default connect timeout" do
-              options["connect_timeout"].should eq(10)
-            end
-
-            it "sets the default op timeout" do
-              options["op_timeout"].should eq(30)
-            end
-
-            it "sets the default pool size" do
-              options["pool_size"].should eq(1)
-            end
-
-            it "sets the default pool timeout" do
-              options["pool_timeout"].should eq(5.0)
-            end
-
-            it "sets the default safe mode" do
-              options["safe"].should be_false
-            end
-
-            it "sets the default slave ok option" do
-              options["slave_ok"].should be_true
-            end
-
-            it "sets the default ssl option" do
-              options["ssl"].should be_false
+            it "sets the consistency option" do
+              options["consistency"].should eq(:strong)
             end
           end
         end
@@ -208,7 +225,7 @@ describe Mongoid::Config do
           end
 
           let(:secondary) do
-            described_class.sessions["secondary"]
+            described_class.sessions["replica"]
           end
 
           it "sets the secondary host" do
@@ -221,12 +238,8 @@ describe Mongoid::Config do
               secondary["options"]
             end
 
-            it "sets the secondary logger" do
-              options["logger"].should be_true
-            end
-
-            it "sets the secondary read option" do
-              options["read"].should eq(:secondary)
+            it "sets the consistency option" do
+              options["consistency"].should eq(:eventual)
             end
           end
         end
@@ -256,37 +269,15 @@ describe Mongoid::Config do
         context "when a secondary is provided" do
 
           let(:secondary) do
-            described_class.databases[:secondary]
+            described_class.databases[:replica]
           end
 
           it "sets the secondary session" do
-            secondary[:session].should eq("secondary")
+            secondary[:session].should eq("replica")
           end
 
           it "sets the database name" do
-            secondary[:name].should eq("mongoid_replica_set")
-          end
-
-          context "when secondary options are provided" do
-
-            let(:options) do
-              secondary[:options]
-            end
-
-            it "sets the secondary safe option" do
-              options[:safe].should be_true
-            end
-          end
-        end
-
-        context "when a tertiary is provided" do
-
-          let(:tertiary) do
-            described_class.databases[:tertiary]
-          end
-
-          it "sets the tertiary session" do
-            tertiary[:session].should eq("default")
+            secondary[:name].should eq("mongoid_test")
           end
         end
       end

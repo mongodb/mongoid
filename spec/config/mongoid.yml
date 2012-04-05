@@ -4,32 +4,20 @@ test:
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
-        connect_timeout: 10
-        op_timeout: 30
-        pool_size: 1
-        pool_timeout: 5.0
-        safe: false
-        slave_ok: true
-        ssl: false
-    secondary:
+        consistency: :strong
+    replica:
       hosts:
           - localhost:27018
           - localhost:27019
       options:
-        logger: true
-        read: :secondary
+        consistency: :eventual
   databases:
     default:
       name: mongoid_test
       session: default
-    secondary:
-      name: mongoid_replica_set
-      session: secondary
-      options:
-        safe: true
-    tertiary:
-      name: mongoid_tertiary
-      session: default
+    replica:
+      name: mongoid_test
+      session: replica
   options:
     allow_dynamic_fields: false
     autocreate_indexes: true

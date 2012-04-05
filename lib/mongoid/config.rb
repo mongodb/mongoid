@@ -2,6 +2,7 @@
 require "uri"
 require "mongoid/config/environment"
 require "mongoid/config/options"
+require "mongoid/config/validators"
 
 module Mongoid #:nodoc
 
@@ -40,8 +41,10 @@ module Mongoid #:nodoc
     end
 
     def databases=(databases)
-      # @todo: Durran: Validate database options.
-      @databases = databases.with_indifferent_access
+      databases.with_indifferent_access.tap do |dbs|
+        Validators::Database.validate(dbs)
+        @databases = dbs
+      end
     end
 
     # Return field names that could cause destructive things to happen if
@@ -81,9 +84,18 @@ module Mongoid #:nodoc
       defined?(Rails) && Rails.respond_to?(:logger) ? Rails.logger : ::Logger.new($stdout)
     end
 
+    # Connect to the provided database name on the default session.
+    #
+    # @note Use only in development or test environments for convenience.
+    #
+    # @example Set the database to connect to.
+    #   config.connect_to("mongoid_test")
+    #
+    # @param [ String ] name The database name.
+    #
+    # @since 3.0.0
     def connect_to(name)
-      # @todo: Durran: Validate.
-      self.databases = { default: { name: name }}.with_indifferent_access
+      self.databases = { default: { name: name, session: :default }}
     end
 
     # Returns the logger, or defaults to Rails logger or stdout logger.

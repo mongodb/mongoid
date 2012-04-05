@@ -9,7 +9,7 @@ describe Mongoid::Sessions do
     end
 
     let(:database_config) do
-      { default: { name: database_id }}
+      { default: { name: database_id, session: :default }}
     end
 
     let(:session) do
@@ -182,7 +182,7 @@ describe Mongoid::Sessions do
       end
 
       let(:database_config) do
-        { default: { name: database_id }}
+        { default: { name: database_id, session: :default }}
       end
 
       let(:session) do
@@ -223,7 +223,7 @@ describe Mongoid::Sessions do
       end
 
       let(:database_config) do
-        { default: { name: database_id }}
+        { default: { name: database_id, session: :default }}
       end
 
       let(:session) do

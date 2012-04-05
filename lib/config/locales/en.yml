@@ -198,6 +198,45 @@ en:
             \_\_\_\_has_many :albums\n
             \_\_\_\_accepts_nested_attributes_for :albums\n
             \_\_end\n\n"
+        no_database_name:
+          message: "No name provided for database configuration: :%{name}."
+          summary: "Each database configuration must provide a name so Mongoid
+            knows what database to persist your data to on the server. What was
+            provided was: %{config}."
+          resolution: "If configuring via a mongoid.yml, ensure that within
+            your :%{name} section a :name value for the database name is defined.\n
+            Example:\n
+            \_\_development:\n
+            \_\_\_\_databases:\n
+            \_\_\_\_\_\_%{name}:\n
+            \_\_\_\_\_\_\_\_name: mongoid_test\n
+            \_\_\_\_\_\_\_\_session: default\n\n"
+        no_database_session:
+          message: "No session provided for database configuration: :%{name}."
+          summary: "Each database configuration must provide a session so Mongoid
+            knows what session to persist your data to on the server. What was
+            provided was: %{config}."
+          resolution: "If configuring via a mongoid.yml, ensure that within
+            your :%{name} section a :session value for the database session
+            is defined.\n
+            Example:\n
+            \_\_development:\n
+            \_\_\_\_databases:\n
+            \_\_\_\_\_\_%{name}:\n
+            \_\_\_\_\_\_\_\_name: mongoid_test\n
+            \_\_\_\_\_\_\_\_session: default\n\n"
+        no_default_database:
+          message: "No default database configuration is defined."
+          summary: "The configuration provided settings for: %{keys}, but
+            Mongoid requires a :default to be defined at minimum."
+          resolution: "If configuring via a mongoid.yml, ensure that within
+            your :databases section a :default database is defined.\n
+            Example:\n
+            \_\_development:\n
+            \_\_\_\_databases:\n
+            \_\_\_\_\_\_default:\n
+            \_\_\_\_\_\_\_\_name: mongoid_test\n
+            \_\_\_\_\_\_\_\_session: default\n\n"
         no_environment:
           message: "Could not load the configuration since no environment
             was defined."
