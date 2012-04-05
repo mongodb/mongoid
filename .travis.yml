@@ -1,7 +1,6 @@
 rvm:
   - 1.9.2
   - 1.9.3
-  - ruby-head
   - jruby
   - jruby-head
 env:
@@ -12,8 +11,6 @@ matrix:
     - rvm: 1.9.2
       env: JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
     - rvm: 1.9.3
-      env: JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
-    - rvm: ruby-head
       env: JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
     - rvm: jruby
       env:
