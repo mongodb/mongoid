@@ -42,7 +42,6 @@ module Mongoid #:nodoc
     include Mongoid::Timestamps::Timeless
     include Mongoid::Validations
     include Mongoid::Callbacks
-    include Mongoid::MultiDatabase
 
     MODULES = [
       Mongoid::Atomic,
@@ -54,6 +53,7 @@ module Mongoid #:nodoc
       Mongoid::Indexes,
       Mongoid::Inspection,
       Mongoid::JSON,
+      Mongoid::Loggable,
       Mongoid::Matchers,
       Mongoid::NestedAttributes,
       Mongoid::Persistence,
@@ -65,8 +65,7 @@ module Mongoid #:nodoc
       Mongoid::Sharding,
       Mongoid::State,
       Mongoid::Validations,
-      Mongoid::Callbacks,
-      Mongoid::MultiDatabase,
+      Mongoid::Callbacks
     ]
 
     class << self
