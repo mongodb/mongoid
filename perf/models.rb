@@ -11,7 +11,7 @@ class Person
   has_one :game, :validate => false
   has_and_belongs_to_many :preferences, :validate => false
 
-  index "preference_ids"
+  index preference_ids: 1
 end
 
 class Name
@@ -41,7 +41,7 @@ class Post
   field :content, :type => String
   belongs_to :person
 
-  index "person_id"
+  index person_id: 1
 end
 
 class Game
@@ -50,7 +50,7 @@ class Game
   field :name, :type => String
   belongs_to :person
 
-  index "person_id"
+  index person_id: 1
 end
 
 class Preference
@@ -59,5 +59,5 @@ class Preference
   field :name, :type => String
   has_and_belongs_to_many :people, :validate => false
 
-  index "person_ids"
+  index person_ids: 1
 end

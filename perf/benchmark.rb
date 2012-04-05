@@ -2,8 +2,7 @@ require "benchmark"
 require "mongoid"
 require "./perf/models"
 
-Mongoid.databases = { :default => { :name => "mongoid_perf_test" }}
-Mongoid::Sessions::Factory.default
+Mongoid.connect_to("mongoid_perf_test")
 
 Mongoid.purge!
 
