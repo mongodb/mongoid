@@ -403,6 +403,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* The `autocreate_indexes` configuration option has been removed.
+
 * `Model.defaults` no longer exists. You may get all defaults with a
   combination of `Model.pre_processed_defaults` and
   `Model.post_processed_defaults`.
