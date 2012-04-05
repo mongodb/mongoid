@@ -56,7 +56,7 @@ require "mongoid/indexes"
 require "mongoid/inspection"
 require "mongoid/javascript"
 require "mongoid/json"
-require "mongoid/logger"
+require "mongoid/loggable"
 require "mongoid/matchers"
 require "mongoid/multi_parameter_attributes"
 require "mongoid/multi_database"
@@ -94,6 +94,7 @@ end
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
 module Mongoid #:nodoc
+  extend Loggable
   extend UnitOfWork
   extend self
 

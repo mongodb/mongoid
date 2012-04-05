@@ -81,16 +81,6 @@ module Mongoid #:nodoc
       end
     end
 
-    # Returns the default logger, which is either a Rails logger of stdout logger
-    #
-    # @example Get the default logger
-    #   config.default_logger
-    #
-    # @return [ Logger ] The default Logger instance.
-    def default_logger
-      defined?(Rails) && Rails.respond_to?(:logger) ? Rails.logger : ::Logger.new($stdout)
-    end
-
     # Connect to the provided database name on the default session.
     #
     # @note Use only in development or test environments for convenience.
@@ -103,32 +93,6 @@ module Mongoid #:nodoc
     # @since 3.0.0
     def connect_to(name)
       self.databases = { default: { name: name, session: :default }}
-    end
-
-    # Returns the logger, or defaults to Rails logger or stdout logger.
-    #
-    # @example Get the logger.
-    #   config.logger
-    #
-    # @return [ Logger ] The configured logger or a default Logger instance.
-    def logger
-      @logger = default_logger unless defined?(@logger)
-      @logger
-    end
-
-    # Sets the logger for Mongoid to use.
-    #
-    # @example Set the logger.
-    #   config.logger = Logger.new($stdout, :warn)
-    #
-    # @return [ Logger ] The newly set logger.
-    def logger=(logger)
-      case logger
-      when false, nil then @logger = nil
-      when true then @logger = default_logger
-      else
-        @logger = logger if logger.respond_to?(:info)
-      end
     end
 
     # Purge all data in all collections, including indexes.

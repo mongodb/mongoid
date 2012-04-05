@@ -21,6 +21,7 @@ HOST = ENV["MONGOID_SPEC_HOST"]
 PORT = ENV["MONGOID_SPEC_PORT"].to_i
 
 # Moped.logger.level = Logger::DEBUG
+# Mongoid.logger.level = Logger::DEBUG
 
 # When testing locally we use the database named mongoid_test. However when
 # tests are running in parallel on Travis we need to use different database
