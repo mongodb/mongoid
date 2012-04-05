@@ -87,10 +87,6 @@ describe Mongoid::Config do
         described_class.allow_dynamic_fields.should be_false
       end
 
-      it "sets the autocreate indexes option" do
-        described_class.autocreate_indexes.should be_true
-      end
-
       it "sets the identity map option" do
         described_class.identity_map_enabled.should be_true
       end
@@ -147,10 +143,6 @@ describe Mongoid::Config do
 
         it "sets the allow dynamic fields option" do
           described_class.allow_dynamic_fields.should be_false
-        end
-
-        it "sets the autocreate indexes option" do
-          described_class.autocreate_indexes.should be_true
         end
 
         it "sets the identity map option" do

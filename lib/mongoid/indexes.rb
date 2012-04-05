@@ -14,6 +14,8 @@ module Mongoid #:nodoc
       #
       # @example Create the indexes for the class.
       #   Person.create_indexes
+      #
+      # @since 1.0.0
       def create_indexes
         return unless index_options
         index_options.each_pair do |spec, options|
@@ -26,6 +28,8 @@ module Mongoid #:nodoc
       #
       # @example Remove the indexes for the class.
       #   Person.remove_indexes
+      #
+      # @since 3.0.0
       def remove_indexes
         collection.indexes.each do |spec|
           next if spec["name"] == "_id_"
@@ -38,11 +42,12 @@ module Mongoid #:nodoc
       #
       # @example Add Mongoid internal indexes.
       #   Person.add_indexes
+      #
+      # @since 1.0.0
       def add_indexes
         if hereditary? && !index_options[{ _type: 1 }]
           index _type: 1, options: { unique: false, background: true }
         end
-        create_indexes if Mongoid.autocreate_indexes
       end
 
       # Adds an index on the field specified. Options can be :unique => true or
@@ -57,11 +62,12 @@ module Mongoid #:nodoc
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The index options.
+      #
+      # @since 1.0.0
       def index(spec)
         # @todo: Durran: Validate options.
         options = spec.delete(:options)
         index_options[spec] = { unique: false }.merge(options || {})
-        create_indexes if Mongoid.autocreate_indexes
       end
     end
   end

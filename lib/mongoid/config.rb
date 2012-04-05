@@ -13,7 +13,6 @@ module Mongoid #:nodoc
     include ActiveModel::Observing
 
     option :allow_dynamic_fields, default: true
-    option :autocreate_indexes, default: false
     option :identity_map_enabled, default: false
     option :include_root_in_json, default: false
     option :include_type_for_serialization, default: false
