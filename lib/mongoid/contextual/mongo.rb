@@ -132,6 +132,18 @@ module Mongoid #:nodoc:
         count > 0
       end
 
+      # Run an explain on the criteria.
+      #
+      # @example Explain the criteria.
+      #   Band.where(name: "Depeche Mode").explain
+      #
+      # @return [ Hash ] The explain result.
+      #
+      # @since 3.0.0
+      def explain
+        # query.explain
+      end
+
       # Get the first document in the database for the criteria's selector.
       #
       # @example Get the first document.
@@ -264,8 +276,17 @@ module Mongoid #:nodoc:
         end
       end
 
-      # Map the sort symbols to the correct MongoDB values.
-      SORT_MAPPINGS = { asc: 1, ascending: 1, desc: -1, descending: -1 }
+      def apply_skip
+        if spec = criteria.options[:skip]
+          query.skip(spec)
+        end
+      end
+
+      def apply_limit
+        if spec = criteria.options[:limit]
+          query.limit(spec)
+        end
+      end
 
       # Map the sort symbols to the correct MongoDB values.
       #
@@ -277,13 +298,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def apply_sorting
         if spec = criteria.options[:sort]
-          normalized = Hash[spec]
-          normalized.each_pair do |field, direction|
-            unless direction.is_a?(::Integer)
-              normalized[field] = SORT_MAPPINGS[direction.to_sym]
-            end
-          end
-          query.sort(normalized)
+          query.sort(spec)
         end
       end
 
@@ -347,6 +362,8 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def apply_options
         apply_fields
+        apply_limit
+        apply_skip
         apply_sorting
       end
 

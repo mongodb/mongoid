@@ -58,7 +58,7 @@ describe Mongoid::Persistence do
         end
 
         let(:document) do
-          user.collection.find_one(:_id => user.id)
+          user.collection.find(:_id => user.id).first
         end
 
         it "should not persist in address key on User document" do
@@ -516,11 +516,8 @@ describe Mongoid::Persistence do
 
       context "when combining modifications and pushes" do
 
-        let!(:person) do
-          Person.create(
-            title: "Blah",
-            addresses: [ address ]
-          )
+        let!(:location) do
+          Location.new(name: 'Work')
         end
 
         let!(:address) do
@@ -531,8 +528,11 @@ describe Mongoid::Persistence do
           )
         end
 
-        let!(:location) do
-          Location.new(name: 'Work')
+        let!(:person) do
+          Person.create(
+            title: "Blah",
+            addresses: [ address ]
+          )
         end
 
         let(:from_db) do

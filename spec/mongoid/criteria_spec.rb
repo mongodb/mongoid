@@ -270,17 +270,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#collection" do
-
-    let(:criteria) do
-      Band.where(name: "Depeche Mode")
-    end
-
-    it "returns the model collection" do
-      criteria.collection.should eq(Band.collection)
-    end
-  end
-
   describe "#cache" do
 
     let(:criteria) do
@@ -303,7 +292,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the embedded context" do
-        criteria.context.should be_a(Mongoid::Contexts::Enumerable)
+        criteria.context.should be_a(Mongoid::Contextual::Memory)
       end
     end
 
@@ -314,7 +303,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the mongo context" do
-        criteria.context.should be_a(Mongoid::Contexts::Mongo)
+        criteria.context.should be_a(Mongoid::Contextual::Mongo)
       end
     end
   end
@@ -486,7 +475,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#explain" do
+  pending "#explain" do
 
     let(:criteria) do
       Band.where(name: "Depeche Mode")
@@ -499,16 +488,20 @@ describe Mongoid::Criteria do
 
   describe "#extract_id" do
 
+    let(:id) do
+      BSON::ObjectId.new
+    end
+
     context "when an id exists" do
 
       let(:criteria) do
         described_class.new(Band) do |criteria|
-          criteria.selector[:id] = 1
+          criteria.selector[:id] = id
         end
       end
 
       it "returns the id" do
-        criteria.extract_id.should eq(1)
+        criteria.extract_id.should eq(id)
       end
     end
 
@@ -516,12 +509,12 @@ describe Mongoid::Criteria do
 
       let(:criteria) do
         described_class.new(Band) do |criteria|
-          criteria.selector[:_id] = 1
+          criteria.selector[:_id] = id
         end
       end
 
       it "returns the _id" do
-        criteria.extract_id.should eq(1)
+        criteria.extract_id.should eq(id)
       end
     end
   end

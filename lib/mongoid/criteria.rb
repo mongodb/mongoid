@@ -65,18 +65,6 @@ module Mongoid #:nodoc:
       create_document(:new, attrs)
     end
 
-    # Get the collection associated with the criteria.
-    #
-    # @example Get the collection.
-    #   criteria.collection
-    #
-    # @return [ Collection ] The collection.
-    #
-    # @since 2.2.0
-    def collection
-      klass.collection
-    end
-
     # Tells the criteria that the cursor that gets returned needs to be
     # cached. This is so multiple iterations don't hit the database multiple
     # times, however this is not advisable when working with large data sets
@@ -190,18 +178,6 @@ module Mongoid #:nodoc:
     # @since 1.0.0
     def exists?
       context.count > 0
-    end
-
-    # Run an explain on the criteria.
-    #
-    # @example Explain the criteria.
-    #   Band.where(name: "Depeche Mode").explain
-    #
-    # @return [ Hash ] The explain result.
-    #
-    # @since 3.0.0
-    def explain
-      driver.find(selector, options).explain
     end
 
     # Extract a single id from the provided criteria. Could be in an $and

@@ -1583,10 +1583,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         Mongoid::IdentityMap.get(Preference, ids)
       end
 
-      it "returns the appropriate criteria" do
-        eager.selector.should eq({ "_id" => { "$in" => ids }})
-      end
-
       it "puts the documents in the identity map" do
         map.should eq([ preference ])
       end

@@ -342,9 +342,6 @@ module Mongoid # :nodoc:
               docs = replacement.compact
               proxy.target = docs
               self._unscoped = docs.dup
-              if _assigning?
-                base.delayed_atomic_sets[metadata.name.to_s] = proxy.as_document
-              end
               proxy.target.each_with_index do |doc, index|
                 integrate(doc)
                 doc._index = index
@@ -363,10 +360,10 @@ module Mongoid # :nodoc:
                   doc.run_after_callbacks(:create, :save)
                   doc.post_persist
                 end
-                if _assigning?
-                  name = proxy.first.atomic_path
-                  base.delayed_atomic_sets[name] = proxy.as_document
-                end
+              end
+              if _assigning?
+                name = proxy.first.atomic_path
+                base.delayed_atomic_sets[name] = proxy.as_document
               end
             end
           end

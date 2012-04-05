@@ -1036,7 +1036,7 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       it "duplication should be removed" do
-        eager.selector["_id"]["$in"].count.should eq 1
+        eager.count.should eq(1)
       end
     end
   end

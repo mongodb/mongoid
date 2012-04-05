@@ -369,7 +369,7 @@ describe Mongoid::Contextual::Mongo do
     end
 
     it "sets the query selector" do
-      context.query.selector.should eq({ name: "Depeche Mode" })
+      context.query.selector.should eq({ "name" => "Depeche Mode" })
     end
   end
 

@@ -56,6 +56,19 @@ describe Mongoid::Relations::Builders::Referenced::In do
 
       context "when the object is an integer" do
 
+        before do
+          Person.field :_id, type: Integer
+        end
+
+        after do
+          Person.field(
+            :_id,
+            type: BSON::ObjectId,
+            pre_processed: true,
+            default: ->{ BSON::ObjectId.new }
+          )
+        end
+
         let(:object_id) do
           666
         end
@@ -86,6 +99,10 @@ describe Mongoid::Relations::Builders::Referenced::In do
 
       let(:object) do
         Person.new
+      end
+
+      let(:builder) do
+        described_class.new(base, nil, object)
       end
 
       let(:document) do
