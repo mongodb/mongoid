@@ -1,3 +1,0 @@
-test:
-  use_utc: true
-  database: mongoid_config_test

@@ -1,6 +1,0 @@
-development:
-  uri: "mongodb://#{ENV["MONGOID_SPEC_HOST"]}/sushi"
-
-test:
-  uri: "mongodb://#{ENV["MONGOID_SPEC_HOST"]}/sushi"
-  database: sushi_test

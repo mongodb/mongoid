@@ -1,6 +1,0 @@
-test:
-  host: flame.mongohq.com
-  port: 27040
-  username: <%= ENV["MONGOHQ_USER_MONGOID"] %>
-  password: <%= ENV["MONGOHQ_PASSWORD_MONGOID"] %>
-  database: mongoid

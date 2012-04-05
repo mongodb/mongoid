@@ -20,7 +20,6 @@ test:
       session: replica
   options:
     allow_dynamic_fields: false
-    autocreate_indexes: true
     identity_map_enabled: true
     include_root_in_json: true
     include_type_for_serialization: true
