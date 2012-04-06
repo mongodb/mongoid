@@ -7,7 +7,7 @@ module Mongoid #:nodoc:
     extend Origin::Forwardable
 
     select_with :with_default_scope
-    delegate :avg, :extras, :includes, :max, :min, :sum,
+    delegate :avg, :extras, :includes, :map_reduce, :max, :min, :sum,
       :update, :update_all, to: :with_default_scope
 
     # Returns a count of records in the database.
