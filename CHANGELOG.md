@@ -7,6 +7,13 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* A DSL off the criteria API is now provided for map/reduce operations
+  as a convenience.
+
+        Band.where(name: "Tool").map_reduce(map, reduce).out(inline: 1)
+        Band.map_reduce(map, reduce).out(replace: "coll-name")
+        Band.map_reduce(map, reduce).out(inline: 1).finalize(finalize)
+
 * Mongoid now uses Origin for its Criteria API. See the Origin repo
   and API docs for the documentation.
 

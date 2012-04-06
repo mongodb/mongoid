@@ -2082,6 +2082,46 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#map_reduce" do
+
+    let(:map) do
+      %Q{
+      function() {
+        emit(this.name, { likes: this.likes });
+      }}
+    end
+
+    let(:reduce) do
+      %Q{
+      function(key, values) {
+        var result = { likes: 0 };
+        values.forEach(function(value) {
+          result.likes += value.likes;
+        });
+        return result;
+      }}
+    end
+
+    let!(:depeche_mode) do
+      Band.create(name: "Depeche Mode", likes: 200)
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool", likes: 100)
+    end
+
+    let(:map_reduce) do
+      Band.limit(2).map_reduce(map, reduce).out(inline: 1)
+    end
+
+    it "returns the map/reduce results" do
+      map_reduce.should eq([
+        { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
+        { "_id" => "Tool", "value" => { "likes" => 100 }}
+      ])
+    end
+  end
+
   describe "#max_distance" do
 
     before do

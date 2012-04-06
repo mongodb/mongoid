@@ -419,6 +419,354 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#map_reduce" do
+
+    let!(:depeche_mode) do
+      Band.create(name: "Depeche Mode", likes: 200)
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool", likes: 100)
+    end
+
+    let(:map) do
+      %Q{
+      function() {
+        emit(this.name, { likes: this.likes });
+      }}
+    end
+
+    let(:reduce) do
+      %Q{
+      function(key, values) {
+        var result = { likes: 0 };
+        values.forEach(function(value) {
+          result.likes += value.likes;
+        });
+        return result;
+      }}
+    end
+
+    context "when no selection is provided" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(inline: 1)
+      end
+
+      it "returns the first aggregate result" do
+        results.should include(
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        )
+      end
+
+      it "returns the second aggregate result" do
+        results.should include(
+          { "_id" => "Tool", "value" => { "likes" => 100 }}
+        )
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(2)
+      end
+
+      it "contains the entire raw results" do
+        results["results"].should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
+          { "_id" => "Tool", "value" => { "likes" => 100 }}
+        ])
+      end
+
+      it "contains the execution time" do
+        results.time.should_not be_nil
+      end
+
+      it "contains the count statistics" do
+        results["counts"].should eq({
+          "input" => 2, "emit" => 2, "reduce" => 0, "output" => 2
+        })
+      end
+
+      it "contains the input count" do
+        results.input.should eq(2)
+      end
+
+      it "contains the emitted count" do
+        results.emitted.should eq(2)
+      end
+
+      it "contains the reduced count" do
+        results.reduced.should eq(0)
+      end
+
+      it "contains the output count" do
+        results.output.should eq(2)
+      end
+    end
+
+    context "when selection is provided" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(inline: 1)
+      end
+
+      it "includes the aggregate result" do
+        results.should include(
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        )
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(1)
+      end
+
+      it "contains the entire raw results" do
+        results["results"].should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        ])
+      end
+
+      it "contains the execution time" do
+        results.time.should_not be_nil
+      end
+
+      it "contains the count statistics" do
+        results["counts"].should eq({
+          "input" => 1, "emit" => 1, "reduce" => 0, "output" => 1
+        })
+      end
+
+      it "contains the input count" do
+        results.input.should eq(1)
+      end
+
+      it "contains the emitted count" do
+        results.emitted.should eq(1)
+      end
+
+      it "contains the reduced count" do
+        results.reduced.should eq(0)
+      end
+
+      it "contains the output count" do
+        results.output.should eq(1)
+      end
+    end
+
+    context "when sorting is provided" do
+
+      let(:criteria) do
+        Band.desc(:name)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(inline: 1)
+      end
+
+      it "returns the first aggregate result" do
+        results.should include(
+          { "_id" => "Tool", "value" => { "likes" => 100 }}
+        )
+      end
+
+      it "returns the second aggregate result" do
+        results.should include(
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        )
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(2)
+      end
+
+      it "contains the entire raw results" do
+        results["results"].should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
+          { "_id" => "Tool", "value" => { "likes" => 100 }}
+        ])
+      end
+    end
+
+    context "when limiting is provided" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(inline: 1)
+      end
+
+      it "returns the first aggregate result" do
+        results.should include(
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        )
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(1)
+      end
+
+      it "contains the entire raw results" do
+        results["results"].should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        ])
+      end
+    end
+
+    context "when the output is replace" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(replace: "mr-output")
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(1)
+      end
+
+      it "contains the entire results" do
+        results.should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        ])
+      end
+    end
+
+    context "when the output is reduce" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(reduce: :mr_output)
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(1)
+      end
+
+      it "contains the entire results" do
+        results.should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        ])
+      end
+    end
+
+    context "when the output is merge" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(merge: :mr_output)
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(1)
+      end
+
+      it "contains the entire results" do
+        results.should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+        ])
+      end
+    end
+
+    context "when providing no output" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce)
+      end
+
+      it "raises an error" do
+        expect {
+          results.entries
+        }.to raise_error(Mongoid::Errors::NoMapReduceOutput)
+      end
+    end
+
+    context "when providing a finalize" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:finalize) do
+        %Q{
+        function(key, value) {
+          value.extra = true;
+          return value;
+        }}
+      end
+
+      let(:results) do
+        context.map_reduce(map, reduce).out(inline: 1).finalize(finalize)
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(1)
+      end
+
+      it "contains the entire results" do
+        results.should eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200, "extra" => true }}
+        ])
+      end
+    end
+  end
+
   describe "#skip" do
 
     let!(:depeche_mode) do

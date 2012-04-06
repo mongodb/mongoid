@@ -200,6 +200,21 @@ module Mongoid #:nodoc:
         query.limit(value) and self
       end
 
+      # Initiate a map/reduce operation from the context.
+      #
+      # @example Initiate a map/reduce.
+      #   context.map_reduce(map, reduce)
+      #
+      # @param [ String ] map The map js function.
+      # @param [ String ] reduce The reduce js function.
+      #
+      # @return [ MapReduce ] The map/reduce lazy wrapper.
+      #
+      # @since 3.0.0
+      def map_reduce(map, reduce)
+        MapReduce.new(criteria, map, reduce)
+      end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.

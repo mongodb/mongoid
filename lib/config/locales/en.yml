@@ -126,7 +126,7 @@ en:
           summary: "Scopes in Mongoid must be either criteria objects or procs
             that wrap criteria objects."
           resolution: "Change the scope to be a criteria or proc wrapped
-            critera.\n
+            critera.\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
@@ -157,7 +157,7 @@ en:
             on the relation. If the inverse is needed, most likely the
             inverse cannot be figured out from the names of the relations and
             you will need to explicitly tell Mongoid on the relation what
-            the inverse is.\n
+            the inverse is.\n\n
             Example:\n
             \_\_class Lush\n
             \_\_\_\_include Mongoid::Document\n
@@ -200,7 +200,7 @@ en:
           resolution: "Make sure that there is a relation defined named
             '%{name}' on %{klass} or that the relation definition comes before
             the accepts_nested_attributes_for macro in the model - order
-            matters so that Mongoid has access to the metadata.\n
+            matters so that Mongoid has access to the metadata.\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
@@ -213,7 +213,7 @@ en:
             knows what database to persist your data to on the server. What was
             provided was: %{config}."
           resolution: "If configuring via a mongoid.yml, ensure that within
-            your :%{name} section a :name value for the database name is defined.\n
+            your :%{name} section a :name value for the database name is defined.\n\n
             Example:\n
             \_\_development:\n
             \_\_\_\_databases:\n
@@ -227,7 +227,7 @@ en:
             provided was: %{config}."
           resolution: "If configuring via a mongoid.yml, ensure that within
             your :%{name} section a :session value for the database session
-            is defined.\n
+            is defined.\n\n
             Example:\n
             \_\_development:\n
             \_\_\_\_databases:\n
@@ -239,7 +239,7 @@ en:
           summary: "The configuration provided settings for: %{keys}, but
             Mongoid requires a :default to be defined at minimum."
           resolution: "If configuring via a mongoid.yml, ensure that within
-            your :databases section a :default database is defined.\n
+            your :databases section a :default database is defined.\n\n
             Example:\n
             \_\_development:\n
             \_\_\_\_databases:\n
@@ -251,7 +251,7 @@ en:
           summary: "The configuration provided settings for: %{keys}, but
             Mongoid requires a :default to be defined at minimum."
           resolution: "If configuring via a mongoid.yml, ensure that within
-            your :sessions section a :default session is defined.\n
+            your :sessions section a :default session is defined.\n\n
             Example:\n
             \_\_development:\n
             \_\_\_\_sessions:\n
@@ -269,6 +269,20 @@ en:
             knowing which environment it is in, and we have considered
             defaulting to development an undesireable side effect of this not
             being defined."
+        no_map_reduce_output:
+          message: "No output location was specified for the map/reduce
+            operation."
+          summary: "When executing a map/reduce, you must provide the output
+            location of the results. The attempted command was: %{command}."
+          resolution: "Provide the location that the output of the operation
+            is to go by chaining an #out call to the map/reduce.\n\n
+            Example:\n
+            \_\_Band.map_reduce(map, reduce).out(inline: 1)\n\n
+            Valid options for the out function are:\n
+            \_\_inline:  1\n
+            \_\_merge:   'collection-name'\n
+            \_\_replace: 'collection-name'\n
+            \_\_reduce:  'collection-name'\n\n"
         no_parent:
           message: "Cannot persist embedded document %{klass} without a
             parent document."
@@ -298,7 +312,7 @@ en:
             was: %{config}."
           resolution: "If configuring via a mongoid.yml, ensure that within
             your :%{name} section a :hosts value for the session hosts is
-            defined.\n
+            defined.\n\n
             Example:\n
             \_\_development:\n
             \_\_\_\_sessions:\n
