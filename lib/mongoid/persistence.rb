@@ -164,7 +164,17 @@ module Mongoid
     end
     alias :save :upsert
 
-    module ClassMethods
+    # change the updated_at field to now
+    #
+    def touch
+      if is_a?(Mongoid::Timestamps::Updated)
+        collection.update( self.atomic_selector,
+                          {'$set' => { updated_at: Time.now.utc}} )
+      end
+      true
+    end
+
+    module ClassMethods #:nodoc:
 
       # Create a new document. This will instantiate a new document and
       # insert it in a single call. Will always return the document
