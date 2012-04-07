@@ -45,9 +45,7 @@ module Mongoid #:nodoc:
     #
     # @since 3.0.0
     def create_context
-      (embedded ? Memory.new(self) : Mongo.new(self)).tap do |context|
-        # @todo: Durran: Apply the options here?
-      end
+      embedded ? Memory.new(self) : Mongo.new(self)
     end
   end
 end
