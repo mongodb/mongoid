@@ -134,6 +134,18 @@ en:
             \_\_\_\_scope :active, where(active: true)\n
             \_\_\_\_scope :inactive, ->{ where(active: false) }\n
             \_\_end\n\n"
+        invalid_storage_options:
+          message: "Invalid options passed to Model.store_in: %{options}."
+          summary: "The :store_in macro takes only a hash of parameters with
+            the keys :database, :collection, or :session."
+          resolution: "Change the options passed to store_in to match the
+            documented API, and ensure all keys in the options hash are
+            symbols.\n\n
+            Example:\n
+            \_\_class Band\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_store_in collection: 'artists', database: 'secondary'\n
+            \_\_end\n\n"
         invalid_time:
           message: "'%{value}' is not a valid Time."
           summary: "Mongoid tries to serialize the values for Date, DateTime, and

@@ -255,4 +255,28 @@ describe Mongoid::Sessions do
       end
     end
   end
+
+  describe ".store_in" do
+
+    context "when provided a non hash" do
+
+      it "raises an error" do
+        expect {
+          Band.store_in :artists
+        }.to raise_error(Mongoid::Errors::InvalidStorageOptions)
+      end
+    end
+
+    context "when provided a hash" do
+
+      context "when the hash is not valid" do
+
+        it "raises an error" do
+          expect {
+            Band.store_in coll: "artists"
+          }.to raise_error(Mongoid::Errors::InvalidStorageOptions)
+        end
+      end
+    end
+  end
 end

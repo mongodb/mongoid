@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/sessions/factory"
+require "mongoid/sessions/validators"
 
 module Mongoid #:nodoc:
   module Sessions
@@ -182,7 +183,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def store_in(options)
-        # @todo: Durran: Validate the options.
+        Validators::Storage.validate(options)
         self.storage_options = options
       end
 
