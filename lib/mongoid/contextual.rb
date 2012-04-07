@@ -6,7 +6,7 @@ require "mongoid/contextual/mongo"
 module Mongoid #:nodoc:
   module Contextual
 
-    # The atomic operations provided in the atomic context get delegated
+    # The aggregate operations provided in the aggregate module get delegated
     # through to the context from the criteria.
     delegate *Aggregable.public_instance_methods(false), to: :context
 
