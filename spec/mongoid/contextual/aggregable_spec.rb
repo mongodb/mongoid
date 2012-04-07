@@ -22,28 +22,73 @@ describe Mongoid::Contextual::Aggregable do
         Mongoid::Contextual::Mongo.new(criteria)
       end
 
-      let(:aggregates) do
-        context.aggregates(:likes)
+      context "when aggregating on a field that exists" do
+
+        let(:aggregates) do
+          context.aggregates(:likes)
+        end
+
+        it "returns an avg" do
+          aggregates["avg"].should eq(750)
+        end
+
+        it "returns a count" do
+          aggregates["count"].should eq(2)
+        end
+
+        it "returns a max" do
+          aggregates["max"].should eq(1000)
+        end
+
+        it "returns a min" do
+          aggregates["min"].should eq(500)
+        end
+
+        it "returns a sum" do
+          aggregates["sum"].should eq(1500)
+        end
       end
 
-      it "returns an avg" do
-        aggregates["avg"].should eq(750)
+      context "when the field does not exist" do
+
+        let(:aggregates) do
+          context.aggregates(:non_existant)
+        end
+
+        it "returns an avg" do
+          aggregates["avg"].should eq(0)
+        end
+
+        it "returns a count" do
+          aggregates["count"].should eq(2)
+        end
+
+        it "returns a max" do
+          aggregates["max"].should be_nil
+        end
+
+        it "returns a min" do
+          aggregates["min"].should be_nil
+        end
+
+        it "returns a sum" do
+          aggregates["sum"].should eq(0)
+        end
       end
 
-      it "returns a count" do
-        aggregates["count"].should eq(2)
-      end
+      context "when there are no matching documents" do
 
-      it "returns a max" do
-        aggregates["max"].should eq(1000)
-      end
+        let(:criteria) do
+          Band.where(name: "New Order")
+        end
 
-      it "returns a min" do
-        aggregates["min"].should eq(500)
-      end
+        let(:aggregates) do
+          context.aggregates(:non_existant)
+        end
 
-      it "returns a sum" do
-        aggregates["sum"].should eq(1500)
+        it "returns nil" do
+          aggregates.should be_nil
+        end
       end
     end
   end
@@ -52,28 +97,54 @@ describe Mongoid::Contextual::Aggregable do
 
     context "when provided a single field" do
 
-      let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+      context "when there are matching documents" do
+
+        let!(:depeche) do
+          Band.create(name: "Depeche Mode", likes: 1000)
+        end
+
+        let!(:tool) do
+          Band.create(name: "Tool", likes: 500)
+        end
+
+        let(:criteria) do
+          Band.all
+        end
+
+        let(:context) do
+          Mongoid::Contextual::Mongo.new(criteria)
+        end
+
+        let(:avg) do
+          context.avg(:likes)
+        end
+
+        it "returns the avg of the provided field" do
+          avg.should eq(750)
+        end
       end
 
-      let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
-      end
+      context "when no documents match" do
 
-      let(:criteria) do
-        Band.all
-      end
+        let!(:depeche) do
+          Band.create(name: "Depeche Mode", likes: 1000)
+        end
 
-      let(:context) do
-        Mongoid::Contextual::Mongo.new(criteria)
-      end
+        let(:criteria) do
+          Band.where(name: "New Order")
+        end
 
-      let(:avg) do
-        context.avg(:likes)
-      end
+        let(:context) do
+          Mongoid::Contextual::Mongo.new(criteria)
+        end
 
-      it "returns the avg of the provided field" do
-        avg.should eq(750)
+        let(:avg) do
+          context.avg(:likes)
+        end
+
+        it "returns nil" do
+          avg.should be_nil
+        end
       end
     end
   end
@@ -106,6 +177,25 @@ describe Mongoid::Contextual::Aggregable do
 
         it "returns the max of the provided field" do
           max.should eq(1000)
+        end
+
+        context "when no documents match" do
+
+          let(:criteria) do
+            Band.where(name: "New Order")
+          end
+
+          let(:context) do
+            Mongoid::Contextual::Mongo.new(criteria)
+          end
+
+          let(:max) do
+            context.max(:likes)
+          end
+
+          it "returns nil" do
+            max.should be_nil
+          end
         end
       end
 
@@ -153,6 +243,25 @@ describe Mongoid::Contextual::Aggregable do
         it "returns the min of the provided field" do
           min.should eq(500)
         end
+
+        context "when no documents match" do
+
+          let(:criteria) do
+            Band.where(name: "New Order")
+          end
+
+          let(:context) do
+            Mongoid::Contextual::Mongo.new(criteria)
+          end
+
+          let(:min) do
+            context.min(:likes)
+          end
+
+          it "returns nil" do
+            min.should be_nil
+          end
+        end
       end
 
       context "when provided a block" do
@@ -198,6 +307,25 @@ describe Mongoid::Contextual::Aggregable do
 
         it "returns the sum of the provided field" do
           sum.should eq(1500)
+        end
+
+        context "when no documents match" do
+
+          let(:criteria) do
+            Band.where(name: "New Order")
+          end
+
+          let(:context) do
+            Mongoid::Contextual::Mongo.new(criteria)
+          end
+
+          let(:sum) do
+            context.sum(:likes)
+          end
+
+          it "returns nil" do
+            sum.should be_nil
+          end
         end
       end
 

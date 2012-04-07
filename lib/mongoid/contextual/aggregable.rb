@@ -24,7 +24,8 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def aggregates(field)
         map_reduce(mapper(field), reducer(field)).
-          out(inline: 1).finalize(finalizer).first["value"]
+          out(inline: 1).finalize(finalizer).first.
+          try{ |results| results["value"] }
       end
 
       # Get the average value of the provided field.
@@ -38,7 +39,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def avg(field)
-        aggregates(field)["avg"]
+        aggregates(field).try{ |res| res["avg"] }
       end
 
       # Get the max value of the provided field. If provided a block, will
@@ -60,7 +61,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def max(field = nil)
-        block_given? ? super() : aggregates(field)["max"]
+        block_given? ? super() : aggregates(field).try{ |res| res["max"] }
       end
 
       # Get the min value of the provided field. If provided a block, will
@@ -82,7 +83,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def min(field = nil)
-        block_given? ? super() : aggregates(field)["min"]
+        block_given? ? super() : aggregates(field).try{ |res| res["min"] }
       end
 
       # Get the sum value of the provided field. If provided a block, will
@@ -100,7 +101,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def sum(field = nil)
-        block_given? ? super() : aggregates(field)["sum"]
+        block_given? ? super() : aggregates(field).try{ |res| res["sum"] }
       end
 
       private
@@ -157,9 +158,9 @@ module Mongoid #:nodoc:
       def reducer(field)
         %Q{
         function(key, values) {
-          var agg = { count: 0, max: 0, min: null, sum: 0 };
+          var agg = { count: 0, max: null, min: null, sum: 0 };
           values.forEach(function(val) {
-            if (val.#{field} > agg.max) agg.max = val.#{field};
+            if (agg.max == null || val.#{field} > agg.max) agg.max = val.#{field};
             if (agg.min == null || val.#{field} < agg.min) agg.min = val.#{field};
             agg.sum += val.#{field};
             agg.count += 1;
