@@ -5,7 +5,7 @@ module Mongoid #:nodoc:
       include Enumerable
 
       delegate :[], to: :results
-      delegate :==, :inspect, to: :entries
+      delegate :==, :empty?, :inspect, to: :entries
 
       # The database command that is being built to send to the db.
       #

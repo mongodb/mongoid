@@ -139,6 +139,43 @@ describe Mongoid::Contextual::MapReduce do
     end
   end
 
+  describe "#empty?" do
+
+    let(:map_reduce) do
+      described_class.new(criteria, map, reduce)
+    end
+
+    context "when the map/reduce has results" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:results) do
+        map_reduce.out(inline: 1)
+      end
+
+      it "returns false" do
+        results.should_not be_empty
+      end
+    end
+
+    context "when the map/reduce has no results" do
+
+      let(:criteria) do
+        Band.where(name: "Pet Shop Boys")
+      end
+
+      let(:results) do
+        map_reduce.out(inline: 1)
+      end
+
+      it "returns true" do
+        results.should be_empty
+      end
+    end
+  end
+
   describe "#finalize" do
 
     let(:criteria) do
