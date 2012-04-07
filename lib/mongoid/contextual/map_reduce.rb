@@ -109,6 +109,12 @@ module Mongoid #:nodoc:
         counts["input"]
       end
 
+      def js_mode
+        tap do |mr|
+          mr.command[:jsMode] = true
+        end
+      end
+
       # Specifies where the map/reduce output is to be stored.
       #
       # @example Store output in memory.

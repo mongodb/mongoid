@@ -177,6 +177,25 @@ describe Mongoid::Contextual::MapReduce do
     end
   end
 
+  describe "#js_mode" do
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:map_reduce) do
+      described_class.new(criteria, map, reduce)
+    end
+
+    let(:results) do
+      map_reduce.out(inline: 1).js_mode
+    end
+
+    it "adds the jsMode flag to the command" do
+      results.command[:jsMode].should be_true
+    end
+  end
+
   describe "#out" do
 
     let(:criteria) do
