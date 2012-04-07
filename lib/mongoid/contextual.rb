@@ -8,6 +8,10 @@ module Mongoid #:nodoc:
 
     # The atomic operations provided in the atomic context get delegated
     # through to the context from the criteria.
+    delegate *Aggregable.public_instance_methods(false), to: :context
+
+    # The atomic operations provided in the atomic context get delegated
+    # through to the context from the criteria.
     delegate *Atomic.public_instance_methods(false), to: :context
 
     # The methods in the contexts themselves should all get delegated to,

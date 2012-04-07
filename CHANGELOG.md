@@ -7,6 +7,42 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Aggregations now adhere to both a Mongoid API and their enumerable
+  counterparts where applicable.
+
+        Band.min(:likes)
+        Band.min do |a, b|
+          a.likes <=> b.likes
+        end
+
+        Band.max(:likes)
+        Band.max do |a, b|
+          a.likes <=> b.likes
+        end
+
+    Note that when providing a field name and no block, a single numeric
+    value will be returned, but when providing a block, a document will
+    be returned which has the min/max value. This is since Ruby's
+    Enumerable API dictates when providing a block, the matching element
+    is returned.
+
+    When providing a block, all documents will be loaded into memory.
+    When providing a symbol, the execution is handled via map/reduce on
+    the server.
+
+* A kitchen sink aggregation method is now provided, to get everything in
+  in a single call for a field.
+
+        Band.aggregates(:likes)
+        # =>
+        #   {
+        #     "count" => 2.0,
+        #     "max" => 1000.0,
+        #     "min" => 500.0,
+        #     "sum" => 1500.0,
+        #     "avg" => 750.0
+        #   }
+
 * A DSL off the criteria API is now provided for map/reduce operations
   as a convenience.
 

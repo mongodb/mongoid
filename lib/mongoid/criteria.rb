@@ -11,8 +11,8 @@ module Mongoid #:nodoc:
   # can be chained in order to create a readable criterion to be executed
   # against the database.
   class Criteria
-    include Contextual
     include Enumerable
+    include Contextual
     include Origin::Queryable
     include Criterion::Inspection
     include Criterion::Scoping
