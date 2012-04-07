@@ -174,6 +174,22 @@ module Mongoid #:nodoc:
         counts["reduce"]
       end
 
+      # Adds a javascript object to the global scope of the map/reduce.
+      #
+      # @example Add an object to the global scope.
+      #   map_reduce.scope(name: value)
+      #
+      # @param [ Hash ] object A hash of key/values for the global scope.
+      #
+      # @return [ MapReduce ]
+      #
+      # @since 3.0.0
+      def scope(object)
+        tap do |mr|
+          mr.command[:scope] = object
+        end
+      end
+
       # Get the execution time of the map/reduce.
       #
       # @example Get the execution time.

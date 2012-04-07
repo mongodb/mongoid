@@ -251,6 +251,33 @@ describe Mongoid::Contextual::MapReduce do
     end
   end
 
+  describe "#scope" do
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:map_reduce) do
+      described_class.new(criteria, map, reduce)
+    end
+
+    let(:finalize) do
+      %Q{
+      function(key, value) {
+        value.global = test;
+        return value;
+      }}
+    end
+
+    let(:results) do
+      map_reduce.out(inline: 1).scope(test: 5).finalize(finalize)
+    end
+
+    it "adds the variables to the global js scope" do
+      results.first["value"]["global"].should eq(5)
+    end
+  end
+
   describe "#time" do
 
     let(:criteria) do
