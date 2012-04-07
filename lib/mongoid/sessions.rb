@@ -183,7 +183,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def store_in(options)
-        Validators::Storage.validate(options)
+        Validators::Storage.validate(self, options)
         self.storage_options = options
       end
 

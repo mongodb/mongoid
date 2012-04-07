@@ -5,12 +5,12 @@ describe Mongoid::Errors::InvalidStorageOptions do
   describe "#message" do
 
     let(:error) do
-      described_class.new(:bad_option)
+      described_class.new(Band, :bad_option)
     end
 
     it "contains the problem in the message" do
       error.message.should include(
-        "Invalid options passed to Model.store_in: bad_option."
+        "Invalid options passed to Band.store_in: bad_option."
       )
     end
 

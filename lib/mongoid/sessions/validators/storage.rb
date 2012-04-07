@@ -14,12 +14,13 @@ module Mongoid
         # @example Validate the options.
         #   Storage.validate(:collection_name)
         #
+        # @param [ Class ] klass The model class.
         # @param [ Hash, String, Symbol ] options The provided options.
         #
         # @since 3.0.0
-        def validate(options)
+        def validate(klass, options)
           if !options.is_a?(::Hash) || !valid_keys?(options)
-            raise Errors::InvalidStorageOptions.new(options)
+            raise Errors::InvalidStorageOptions.new(klass, options)
           end
         end
 

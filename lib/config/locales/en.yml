@@ -135,7 +135,7 @@ en:
             \_\_\_\_scope :inactive, ->{ where(active: false) }\n
             \_\_end\n\n"
         invalid_storage_options:
-          message: "Invalid options passed to Model.store_in: %{options}."
+          message: "Invalid options passed to %{klass}.store_in: %{options}."
           summary: "The :store_in macro takes only a hash of parameters with
             the keys :database, :collection, or :session."
           resolution: "Change the options passed to store_in to match the

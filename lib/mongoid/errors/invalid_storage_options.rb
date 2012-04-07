@@ -10,12 +10,16 @@ module Mongoid #:nodoc
       # @example Create the new error.
       #   InvalidStorageOptions.new(:collection_name)
       #
+      # @param [ Class ] klass The model class.
       # @param [ Hash, String, Symbol ] options The provided options.
       #
       # @since 3.0.0
-      def initialize(options)
+      def initialize(klass, options)
         super(
-          compose_message("invalid_storage_options", { options: options })
+          compose_message(
+            "invalid_storage_options",
+            { klass: klass, options: options }
+          )
         )
       end
     end
