@@ -87,7 +87,7 @@ describe Mongoid::Contextual::Aggregable do
         end
 
         it "returns nil" do
-          aggregates.should be_nil
+          aggregates.should eq({ "count" => 0 })
         end
       end
     end

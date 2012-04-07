@@ -23,9 +23,12 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def aggregates(field)
-        map_reduce(mapper(field), reducer(field)).
-          out(inline: 1).finalize(finalizer).first.
-          try{ |results| results["value"] }
+        if query.count > 0
+          map_reduce(mapper(field), reducer(field)).
+            out(inline: 1).finalize(finalizer).first["value"]
+        else
+          { "count" => 0 }
+        end
       end
 
       # Get the average value of the provided field.
@@ -39,7 +42,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def avg(field)
-        aggregates(field).try{ |res| res["avg"] }
+        aggregates(field)["avg"]
       end
 
       # Get the max value of the provided field. If provided a block, will
@@ -61,7 +64,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def max(field = nil)
-        block_given? ? super() : aggregates(field).try{ |res| res["max"] }
+        block_given? ? super() : aggregates(field)["max"]
       end
 
       # Get the min value of the provided field. If provided a block, will
@@ -83,7 +86,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def min(field = nil)
-        block_given? ? super() : aggregates(field).try{ |res| res["min"] }
+        block_given? ? super() : aggregates(field)["min"]
       end
 
       # Get the sum value of the provided field. If provided a block, will
@@ -101,7 +104,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def sum(field = nil)
-        block_given? ? super() : aggregates(field).try{ |res| res["sum"] }
+        block_given? ? super() : aggregates(field)["sum"]
       end
 
       private
