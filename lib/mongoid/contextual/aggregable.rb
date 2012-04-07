@@ -24,7 +24,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def aggregates(field)
         if query.count > 0
-          map_reduce(mapper(field), reducer(field)).
+          map_reduce(mapper(field), reducer).
             out(inline: 1).finalize(finalizer).first["value"]
         else
           { "count" => 0 }
@@ -142,7 +142,13 @@ module Mongoid #:nodoc:
       def mapper(field)
         %Q{
         function() {
-          emit("#{field}", { #{field}: this.#{field} });
+          var agg = {
+            count: 1,
+            max: this.#{field},
+            min: this.#{field},
+            sum: this.#{field}
+          };
+          emit("#{field}", agg);
         }}
       end
 
@@ -153,20 +159,18 @@ module Mongoid #:nodoc:
       # @example Get the reduce function.
       #   aggregable.reducer(:likes)
       #
-      # @param [ String, Symbol ] field The name of the field.
-      #
       # @return [ String ] The reduce JS function.
       #
       # @since 3.0.0
-      def reducer(field)
+      def reducer
         %Q{
         function(key, values) {
           var agg = { count: 0, max: null, min: null, sum: 0 };
           values.forEach(function(val) {
-            if (agg.max == null || val.#{field} > agg.max) agg.max = val.#{field};
-            if (agg.min == null || val.#{field} < agg.min) agg.min = val.#{field};
-            agg.sum += val.#{field};
+            if (agg.max == null || val.max > agg.max) agg.max = val.max;
+            if (agg.min == null || val.max < agg.min) agg.min = val.max;
             agg.count += 1;
+            agg.sum += val.sum;
           });
           return agg;
         }}

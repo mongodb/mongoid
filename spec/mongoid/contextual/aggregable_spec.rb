@@ -24,28 +24,62 @@ describe Mongoid::Contextual::Aggregable do
 
       context "when aggregating on a field that exists" do
 
-        let(:aggregates) do
-          context.aggregates(:likes)
+        context "when more than 1 document is emitted" do
+
+          let(:aggregates) do
+            context.aggregates(:likes)
+          end
+
+          it "returns an avg" do
+            aggregates["avg"].should eq(750)
+          end
+
+          it "returns a count" do
+            aggregates["count"].should eq(2)
+          end
+
+          it "returns a max" do
+            aggregates["max"].should eq(1000)
+          end
+
+          it "returns a min" do
+            aggregates["min"].should eq(500)
+          end
+
+          it "returns a sum" do
+            aggregates["sum"].should eq(1500)
+          end
         end
 
-        it "returns an avg" do
-          aggregates["avg"].should eq(750)
-        end
+        context "when only 1 document is emitted" do
 
-        it "returns a count" do
-          aggregates["count"].should eq(2)
-        end
+          let(:criteria) do
+            Band.where(name: "Depeche Mode")
+          end
 
-        it "returns a max" do
-          aggregates["max"].should eq(1000)
-        end
+          let(:aggregates) do
+            context.aggregates(:likes)
+          end
 
-        it "returns a min" do
-          aggregates["min"].should eq(500)
-        end
+          it "returns an avg" do
+            aggregates["avg"].should eq(1000)
+          end
 
-        it "returns a sum" do
-          aggregates["sum"].should eq(1500)
+          it "returns a count" do
+            aggregates["count"].should eq(1)
+          end
+
+          it "returns a max" do
+            aggregates["max"].should eq(1000)
+          end
+
+          it "returns a min" do
+            aggregates["min"].should eq(1000)
+          end
+
+          it "returns a sum" do
+            aggregates["sum"].should eq(1000)
+          end
         end
       end
 
