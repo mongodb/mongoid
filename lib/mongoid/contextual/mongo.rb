@@ -281,7 +281,7 @@ module Mongoid #:nodoc:
 
       # Apply the field limitations.
       #
-      # @todo: Durran: Temporary.
+      # @api private
       #
       # @example Apply the field limitations.
       #   context.apply_fields
@@ -293,12 +293,28 @@ module Mongoid #:nodoc:
         end
       end
 
+      # Apply the skip option.
+      #
+      # @api private
+      #
+      # @example Apply the skip option.
+      #   context.apply_skip
+      #
+      # @since 3.0.0
       def apply_skip
         if spec = criteria.options[:skip]
           query.skip(spec)
         end
       end
 
+      # Apply the limit option.
+      #
+      # @api private
+      #
+      # @example Apply the limit option.
+      #   context.apply_limit
+      #
+      # @since 3.0.0
       def apply_limit
         if spec = criteria.options[:limit]
           query.limit(spec)

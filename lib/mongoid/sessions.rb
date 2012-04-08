@@ -84,10 +84,28 @@ module Mongoid #:nodoc:
 
     class << self
 
+      # Get a session with the provided name.
+      #
+      # @example Get a session with the name.
+      #   Mongoid::Sessions.with_name(:replica)
+      #
+      # @param [ Symbol ] name The name of the session.
+      #
+      # @return [ Moped::Session ] The named session.
+      #
+      # @since 3.0.0
       def with_name(name)
         Threaded.sessions[name.to_sym] ||= Sessions::Factory.create(name)
       end
 
+      # Get the default session.
+      #
+      # @example Get the default session.
+      #   Mongoid::Sessions.default
+      #
+      # @return [ Moped::Session ] The default session.
+      #
+      # @since 3.0.0
       def default
         Threaded.sessions[:default] ||= Sessions::Factory.default
       end

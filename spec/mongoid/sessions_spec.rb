@@ -221,36 +221,86 @@ describe Mongoid::Sessions do
 
     context "when no default is overridden" do
 
-      let(:config) do
-        { default: { hosts: [ "localhost:27017" ] }}
-      end
+      context "when no options are provided" do
 
-      let(:database_config) do
-        { default: { name: database_id, session: :default }}
-      end
+        let(:config) do
+          { default: { hosts: [ "localhost:27017" ] }}
+        end
 
-      let(:session) do
-        Mongoid::Sessions::Factory.default
-      end
+        let(:database_config) do
+          { default: { name: database_id, session: :default }}
+        end
 
-      before do
-        Mongoid::Config.sessions = config
-        Mongoid::Config.databases = database_config
-        Mongoid::Threaded.sessions[:default] = session
-      end
+        let(:session) do
+          Mongoid::Sessions::Factory.default
+        end
 
-      let(:band) do
-        Band.new
-      end
+        before do
+          Mongoid::Config.sessions = config
+          Mongoid::Config.databases = database_config
+          Mongoid::Threaded.sessions[:default] = session
+        end
 
-      it "returns the default session" do
-        band.mongo_session.should eq(session)
-      end
-
-      context "when accessing from the class level" do
+        let(:band) do
+          Band.new
+        end
 
         it "returns the default session" do
-          Band.mongo_session.should eq(session)
+          band.mongo_session.should eq(session)
+        end
+
+        context "when accessing from the class level" do
+
+          it "returns the default session" do
+            Band.mongo_session.should eq(session)
+          end
+        end
+      end
+
+      context "when options are provided" do
+
+        let(:config) do
+          {
+            default: {
+              hosts: [ "localhost:27017" ],
+              options: {
+                consistency: :strong
+              }
+            }
+          }
+        end
+
+        let(:database_config) do
+          { default: { name: database_id, session: :default }}
+        end
+
+        let(:session) do
+          Mongoid::Sessions::Factory.default
+        end
+
+        before do
+          Mongoid::Config.sessions = config
+          Mongoid::Config.databases = database_config
+          Mongoid::Threaded.sessions[:default] = session
+        end
+
+        let(:band) do
+          Band.new
+        end
+
+        it "returns the default session" do
+          band.mongo_session.should eq(session)
+        end
+
+        it "sets the options" do
+          band.mongo_session.options[:consistency].should eq(:strong)
+        end
+
+        context "when accessing from the class level" do
+
+          it "returns the default session" do
+            Band.mongo_session.should eq(session)
+          end
         end
       end
     end
