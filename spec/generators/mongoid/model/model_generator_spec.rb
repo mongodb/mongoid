@@ -42,7 +42,7 @@ describe Mongoid::Generators::ModelGenerator do
       end
 
       it "adds the fields to the model" do
-        model.should contain("field :name, :type => String")
+        model.should contain("field :name, type: String")
       end
     end
 
