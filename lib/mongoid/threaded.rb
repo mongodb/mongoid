@@ -22,6 +22,14 @@ module Mongoid #:nodoc:
       stack(name).push(true)
     end
 
+    # Get the database sessions from the current thread.
+    #
+    # @example Get the database sessions.
+    #   Threaded.sessions
+    #
+    # @return [ Hash ] The sessions.
+    #
+    # @since 3.0.0
     def sessions
       Thread.current[:"[mongoid]:sessions"] ||= {}
     end
@@ -92,16 +100,19 @@ module Mongoid #:nodoc:
       validations_for(document.class).push(document.id)
     end
 
-    # Clear out all the safety options set using the safely proxy.
+    # Clear out all the persistence options.
     #
-    # @example Clear out the options.
-    #   Threaded.clear_safety_options!
+    # @example Clear out the persistence options.
+    #   Threaded.clear_persistence_options(Band)
     #
-    # @return [ nil ] nil
+    # @param [ Class ] klass The model class.
     #
-    # @since 2.1.0
-    def clear_safety_options!
-      Thread.current[:"[mongoid]:safety-options"] = nil
+    # @return [ true ] true.
+    #
+    # @since 2.0.0
+    def clear_persistence_options(klass)
+      Thread.current[:"[mongoid][#{klass}]:persistence-options"] = nil
+      true
     end
 
     # Clear out all options set on a one-time basis.
@@ -111,7 +122,6 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def clear_options!
-      clear_safety_options!
       self.timeless = false
     end
 
@@ -231,30 +241,33 @@ module Mongoid #:nodoc:
       Thread.current[:"[mongoid][#{name}]:insert-consumer"] = consumer
     end
 
-    # Get the safety options for the current thread.
+    # Get the persistence options for the current thread.
     #
-    # @example Get the safety options.
-    #   Threaded.safety_options
+    # @example Get the persistence options.
+    #   Threaded.persistence_options(Band)
     #
-    # @return [ Hash ] The current safety options.
+    # @param [ Class ] klass The model class.
+    #
+    # @return [ Hash ] The current persistence options.
     #
     # @since 2.1.0
-    def safety_options
-      Thread.current[:"[mongoid]:safety-options"]
+    def persistence_options(klass)
+      Thread.current[:"[mongoid][#{klass}]:persistence-options"]
     end
 
-    # Set the safety options on the current thread.
+    # Set the persistence options on the current thread.
     #
-    # @example Set the safety options.
-    #   Threaded.safety_options = { :fsync => true }
+    # @example Set the persistence options.
+    #   Threaded.set_persistence_options(Band, { safe: { fsync: true }})
     #
-    # @param [ Hash ] options The safety options.
+    # @param [ Class ] klass The model class.
+    # @param [ Hash ] options The persistence options.
     #
-    # @return [ Hash ] The safety options.
+    # @return [ Hash ] The persistence options.
     #
     # @since 2.1.0
-    def safety_options=(options)
-      Thread.current[:"[mongoid]:safety-options"] = options
+    def set_persistence_options(klass, options)
+      Thread.current[:"[mongoid][#{klass}]:persistence-options"] = options
     end
 
     # Get the field selection options from the current thread.

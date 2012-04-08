@@ -37,19 +37,19 @@ describe Mongoid::Config::Options do
     context "when a default is provided" do
 
       after do
-        config.persist_in_safe_mode = false
+        config.preload_models = false
       end
 
       it "defines a getter" do
-        config.persist_in_safe_mode.should be_false
+        config.preload_models.should be_false
       end
 
       it "defines a setter" do
-        (config.persist_in_safe_mode = true).should be_true
+        (config.preload_models = true).should be_true
       end
 
       it "defines a presence check" do
-        config.should_not be_persist_in_safe_mode
+        config.should_not be_preload_models
       end
     end
   end
@@ -57,12 +57,12 @@ describe Mongoid::Config::Options do
   describe "#reset" do
 
     before do
-      config.persist_in_safe_mode = true
+      config.preload_models = true
       config.reset
     end
 
     it "resets the settings to the defaults" do
-      config.persist_in_safe_mode.should be_false
+      config.preload_models.should be_false
     end
   end
 

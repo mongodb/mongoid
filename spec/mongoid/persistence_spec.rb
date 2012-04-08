@@ -2,14 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Persistence do
 
-  before(:all) do
-    Mongoid.persist_in_safe_mode = true
-  end
-
-  after(:all) do
-    Mongoid.persist_in_safe_mode = false
-  end
-
   describe ".create" do
 
     context "when providing attributes" do
@@ -178,7 +170,7 @@ describe Mongoid::Persistence do
 
         it "raises an error" do
           expect {
-            Person.create!(ssn: "555-55-9999")
+            Person.with(safe: true).create!(ssn: "555-55-9999")
           }.to raise_error
         end
       end
@@ -597,7 +589,7 @@ describe Mongoid::Persistence do
         end
 
         it "raises an error" do
-          expect { person.save! }.to raise_error
+          expect { person.with(safe: true).save! }.to raise_error
         end
       end
     end
@@ -867,7 +859,7 @@ describe Mongoid::Persistence do
 
       it "raises an error" do
         expect {
-          person.update_attributes(map: { "bad.key" => "value" })
+          person.with(safe: true).update_attributes(map: { "bad.key" => "value" })
         }.to raise_error(Moped::Errors::OperationFailure)
       end
     end

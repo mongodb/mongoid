@@ -171,8 +171,7 @@ module Mongoid #:nodoc:
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
         add_type_selection
-        session = klass.mongo_session
-        @query = session[klass.collection_name].find(criteria.selector)
+        @query = klass.collection.find(criteria.selector)
         apply_options
       end
 

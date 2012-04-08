@@ -106,15 +106,22 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#clear_safety_options!" do
+  describe "#clear_persistence_options" do
 
     before do
-      described_class.safety_options = { w: 3 }
-      described_class.clear_safety_options!
+      described_class.set_persistence_options(Band, { safe: { w: 3 }})
     end
 
-    it "removes all safety options" do
-      described_class.safety_options.should be_nil
+    let!(:cleared) do
+      described_class.clear_persistence_options(Band)
+    end
+
+    it "removes all persistence options" do
+      described_class.persistence_options(Band).should be_nil
+    end
+
+    it "returns true" do
+      cleared.should be_true
     end
   end
 
@@ -167,22 +174,22 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#safety_options" do
+  describe "#persistence_options" do
 
     before do
-      described_class.safety_options = { w: 3 }
+      described_class.set_persistence_options(Band, { safe: { w: 3 }})
     end
 
     after do
-      described_class.safety_options = nil
+      described_class.set_persistence_options(Band, nil)
     end
 
     let(:options) do
-      described_class.safety_options
+      described_class.persistence_options(Band)
     end
 
-    it "sets the safety options" do
-      options.should eq({ w: 3 })
+    it "sets the persistence options" do
+      options.should eq({ safe: { w: 3 }})
     end
   end
 

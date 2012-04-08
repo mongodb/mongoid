@@ -346,8 +346,8 @@ describe Mongoid::Paranoia do
         }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
 
-      it "clears out the safety options" do
-        Mongoid::Threaded.safety_options.should be_nil
+      it "clears out the persistence options" do
+        Mongoid::Threaded.persistence_options(ParanoidPost).should be_nil
       end
 
       it "clears out the identity map" do

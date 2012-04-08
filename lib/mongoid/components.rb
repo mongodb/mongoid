@@ -32,7 +32,6 @@ module Mongoid #:nodoc
     include Mongoid::Persistence
     include Mongoid::Relations
     include Mongoid::Reloading
-    include Mongoid::Safety
     include Mongoid::Scoping
     include Mongoid::Sessions
     include Mongoid::Serialization
@@ -59,7 +58,6 @@ module Mongoid #:nodoc
       Mongoid::Persistence,
       Mongoid::Relations,
       Mongoid::Relations::Proxy,
-      Mongoid::Safety,
       Mongoid::Scoping,
       Mongoid::Serialization,
       Mongoid::Sharding,

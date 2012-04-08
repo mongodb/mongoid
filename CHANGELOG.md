@@ -362,6 +362,34 @@ For instructions on upgrading to newer versions, visit
         band = Band.find(id)
         band.remove_attribute(:label) # Uses $unset when the document is saved.
 
+* \#1291 Mongoid database sessions are now connected to lazily, and are
+  completely thread safe. If a new thread is created, then a new database
+  session will be created for it.
+
+* \#1291 Mongoid now supports any number of database connections as defined in
+  the mongoid.yml. For example you could have a local single server db, a
+  multi availablity zone replica set, and a shard cluster all in the same
+  application environment. Mongoid can connect to any session at any point in
+  time.
+
+* \#1291 Mongoid now allows you to persist to whatever database or collection
+  you like at runtime, on a per-query or persistence operation basis by using
+  `with`.
+
+        Band.with(collection: "artists").create(name: "Depeche Mode")
+        band.with(database: "secondary).save!
+        Band.with(collection: "artists").where(name: "Depeche Mode")
+
+* \#1291 You can now configure on a per-model basis where it's documents are
+  stored with the new and improved `store_in` macro.
+
+        class Band
+          include Mongoid::Document
+          store_in collection: "artists", database: "secondary", session: "replica"
+        end
+
+    This can be overridden, of course, at runtime via the `with` method.
+
 * \#1212 Embedded documents can now be popped off a relation with persistence.
 
         band.albums.pop # Pop 1 document and persist the removal.
@@ -502,6 +530,33 @@ For instructions on upgrading to newer versions, visit
 
 * \#1342 `Model.find` and `model.relation.find` now only take a single or
   multiple ids. The first/last/all with a conditions hash has been removed.
+
+* \#1291 The mongoid.yml has been revamped completely, and upgrading
+  existing applications will greet you with some lovely Mongoid specific
+  configuration errors. You can re-generate a new mongoid.yml via the
+  existing rake task, which is commented to an insane degree to help you
+  with all the configuration possibilities.
+
+* \#1291 The `persist_in_safe_mode` configuration option has been removed.
+  You must now tell a database session in the mongoid.yml whether or not
+  it should persist in safe mode by default.
+
+        production:
+          sessions:
+            default:
+              hosts:
+                - db.app.com:27018
+                - db.app.com:27019
+              options:
+                consistency: :eventual
+                safe: true
+
+* \#1291 `safely` and `unsafely` have been removed. Please now use `with`
+  to provide safe mode options at runtime.
+
+        Band.with(safe: true).create
+        band.with(safe: { w: 3 }).save!
+        Band.with(safe: false).create!
 
 * \#1270 Relation macros have been changed to match their AR counterparts:
   only :has_one, :has_many, :has_and_belongs_to_many, and :belongs_to

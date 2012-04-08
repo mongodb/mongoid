@@ -11,7 +11,11 @@ defaults: &defaults
         # Change the default consistency model to :eventual or :strong.
         # :eventual will send reads to secondaries, :strong sends everything
         # to master. (default: :eventual)
-        consistency: :strong
+        # consistency: :strong
+
+        # Change whether the session persists in safe mode by default.
+        # (default: false)
+        # safe: false
 
 development:
   <<: *defaults
@@ -37,9 +41,6 @@ development:
 
     # Include the _type field in serializaion. (default: false)
     # include_type_for_serialization: false
-
-    # Perform all operations in safe mode by default. (default: false)
-    # persist_in_safe_mode: false
 
     # Preload all models in development, needed when models use
     # inheritance. (default: false)

@@ -79,10 +79,24 @@ module Mongoid #:nodoc:
     #
     # @since 3.0.0
     def with(options)
-
+      tap do
+        Threaded.set_persistence_options(self.class, options)
+      end
     end
 
     class << self
+
+      # Get the default session.
+      #
+      # @example Get the default session.
+      #   Mongoid::Sessions.default
+      #
+      # @return [ Moped::Session ] The default session.
+      #
+      # @since 3.0.0
+      def default
+        Threaded.sessions[:default] ||= Sessions::Factory.default
+      end
 
       # Get a session with the provided name.
       #
@@ -97,21 +111,21 @@ module Mongoid #:nodoc:
       def with_name(name)
         Threaded.sessions[name.to_sym] ||= Sessions::Factory.create(name)
       end
-
-      # Get the default session.
-      #
-      # @example Get the default session.
-      #   Mongoid::Sessions.default
-      #
-      # @return [ Moped::Session ] The default session.
-      #
-      # @since 3.0.0
-      def default
-        Threaded.sessions[:default] ||= Sessions::Factory.default
-      end
     end
 
     module ClassMethods
+
+      # Clear all persistence options from the current thread.
+      #
+      # @example Clear the persistence options.
+      #   Mongoid::Sessions.clear_persistence_options
+      #
+      # @return [ true ] True.
+      #
+      # @since 3.0.0
+      def clear_persistence_options
+        Threaded.clear_persistence_options(self)
+      end
 
       # Get the collection for this model from the session. Will check for an
       # overridden collection name from the store_in macro or the collection
@@ -124,9 +138,9 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def collection
-        if Safety.options
-          mongo_session.with(safe: Safety.options)[collection_name].tap do
-            Safety.clear
+        if opts = persistence_options
+          mongo_session.with(opts)[opts[:collection] || collection_name].tap do
+            clear_persistence_options
           end
         else
           mongo_session[collection_name]
@@ -163,6 +177,18 @@ module Mongoid #:nodoc:
           database = __database__
           session.use(database[:name])
         end
+      end
+
+      # Get the persistence options from the current thread.
+      #
+      # @example Get the persistence options.
+      #   Model.persistence_options
+      #
+      # @return [ Hash ] The persistence options.
+      #
+      # @since 3.0.0
+      def persistence_options
+        Threaded.persistence_options(self)
       end
 
       # Give this model specific custom default storage options.
@@ -230,7 +256,9 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def with(options)
-
+        tap do
+          Threaded.set_persistence_options(self, options)
+        end
       end
 
       private

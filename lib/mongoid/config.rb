@@ -16,7 +16,6 @@ module Mongoid #:nodoc
     option :identity_map_enabled, default: false
     option :include_root_in_json, default: false
     option :include_type_for_serialization, default: false
-    option :persist_in_safe_mode, default: false
     option :preload_models, default: false
     option :protect_sensitive_fields, default: true
     option :raise_not_found_error, default: true

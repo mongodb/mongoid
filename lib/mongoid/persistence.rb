@@ -223,8 +223,9 @@ module Mongoid #:nodoc:
         conds = conditions || {}
         selector = conds[:conditions] || conds
         selector.merge!(_type: name) if hereditary?
-        collection.find(selector).count.tap do
-          collection.find(selector).remove_all
+        coll = collection
+        coll.find(selector).count.tap do
+          coll.find(selector).remove_all
           Threaded.clear_options!
         end
       end

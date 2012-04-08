@@ -11,6 +11,7 @@ test:
         - localhost:27019
       options:
         consistency: :eventual
+        safe: true
   databases:
     default:
       name: mongoid_test

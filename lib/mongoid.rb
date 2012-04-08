@@ -36,7 +36,6 @@ BSON = Moped::BSON
 
 require "mongoid/extensions"
 require "mongoid/errors"
-require "mongoid/safety"
 require "mongoid/threaded"
 require "mongoid/relations"
 require "mongoid/atomic"
