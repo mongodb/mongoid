@@ -544,6 +544,7 @@ For instructions on upgrading to newer versions, visit
         production:
           sessions:
             default:
+              database: my_app_prod
               hosts:
                 - db.app.com:27018
                 - db.app.com:27019
