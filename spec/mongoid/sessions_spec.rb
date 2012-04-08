@@ -421,7 +421,7 @@ describe Mongoid::Sessions do
     context "when sending operations to a different collection" do
 
       after do
-        Band.with(collection: "peeps").delete_all
+        Band.with(collection: "artists").delete_all
       end
 
       describe ".create" do
