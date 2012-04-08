@@ -203,8 +203,12 @@ describe Mongoid::Sessions do
 
       let(:config) do
         {
-          default: { hosts: [ "localhost:27017" ], database: database_id },
-          secondary: { hosts: [ "localhost:27017" ] }
+          default: {
+            hosts: [ "localhost:27017" ], database: database_id
+          },
+          secondary: {
+            hosts: [ "localhost:27017" ], database: database_id
+          }
         }
       end
 

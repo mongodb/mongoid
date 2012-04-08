@@ -336,6 +336,21 @@ en:
             sessions key that a configuration exists for '%{name}'. If you
             have set the configuration programatically, ensure that '%{name}'
             exists in the configuration hash."
+        no_session_database:
+          message: "No database provided for session configuration: :%{name}."
+          summary: "Each session configuration must provide a database so Mongoid
+            knows where the default database to persist to. What was provided
+            was: %{config}."
+          resolution: "If configuring via a mongoid.yml, ensure that within
+            your :%{name} section a :database value for the session's default
+            database is defined.\n\n
+            Example:\n
+            \_\_development:\n
+            \_\_\_\_sessions:\n
+            \_\_\_\_\_\_%{name}:\n
+            \_\_\_\_\_\_\_\_database: my_app_db\n
+            \_\_\_\_\_\_\_\_hosts:\n
+            \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
         no_session_hosts:
           message: "No hosts provided for session configuration: :%{name}."
           summary: "Each session configuration must provide hosts so Mongoid
@@ -348,6 +363,7 @@ en:
             \_\_development:\n
             \_\_\_\_sessions:\n
             \_\_\_\_\_\_%{name}:\n
+            \_\_\_\_\_\_\_\_database: my_app_db\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
         readonly_attribute:

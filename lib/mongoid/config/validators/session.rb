@@ -20,11 +20,29 @@ module Mongoid
             raise Errors::NoDefaultSession.new(sessions.keys)
           end
           sessions.each_pair do |name, config|
+            validate_session_database(name, config)
             validate_session_hosts(name, config)
           end
         end
 
         private
+
+        # Validate that the session config has database.
+        #
+        # @api private
+        #
+        # @example Validate the session has database.
+        #   validator.validate_session_database(:default, {})
+        #
+        # @param [ String, Symbol ] name The config key.
+        # @param [ Hash ] config The configuration.
+        #
+        # @since 3.0.0
+        def validate_session_database(name, config)
+          unless config.has_key?(:database)
+            raise Errors::NoSessionDatabase.new(name, config)
+          end
+        end
 
         # Validate that the session config has hosts.
         #

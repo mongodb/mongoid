@@ -83,13 +83,11 @@ module Mongoid #:nodoc
     # @since 2.0.2
     def purge!
       session = Sessions.default
-      session.use sessions[:default][:database]
       collections = session["system.namespaces"].find(name: { "$not" => /system|\$/ }).to_a
       collections.each do |collection|
         _, name = collection["name"].split(".", 2)
         session[name].drop
-      end
-      true
+      end and true
     end
 
     # Set the configuration options. Will validate each one individually.

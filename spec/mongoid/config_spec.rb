@@ -237,13 +237,26 @@ describe Mongoid::Config do
       context "when no hosts are provided" do
 
         let(:sessions) do
-          { "default" => {}}
+          { "default" => { database: database_id }}
         end
 
         it "raises an error" do
           expect {
             described_class.sessions = sessions
           }.to raise_error(Mongoid::Errors::NoSessionHosts)
+        end
+      end
+
+      context "when no database is provided" do
+
+        let(:sessions) do
+          { "default" => { hosts: [ "localhost:27017" ] }}
+        end
+
+        it "raises an error" do
+          expect {
+            described_class.sessions = sessions
+          }.to raise_error(Mongoid::Errors::NoSessionDatabase)
         end
       end
     end
