@@ -1,20 +1,74 @@
+defaults: &defaults
+  # Configure available database sessions. (required)
+  sessions:
+    # Defines the default session. (required)
+    default:
+      # Provides the hosts the default session can connect to. Must be an array
+      # of host:port pairs. (required)
+      hosts:
+        - localhost:27017
+      options:
+        # Change the default consistency model to :eventual or :strong.
+        # :eventual will send reads to secondaries, :strong sends everything
+        # to master. (default: :eventual)
+        consistency: :strong
+
 development:
-  host: localhost
-  database: <%= database_name || app_name %>_development
+  <<: *defaults
+  # Configure available databases. (required)
+  databases:
+    # Defines the default database. (required)
+    default:
+      # Provides a name for the default database. (required)
+      name: <%= database_name || app_name %>_development
+      # Tell the database which session to use by default. (required)
+      session: default
+  # Configure Mongoid specific options. (optional)
+  options:
+    # Configuration for whether or not to allow access to fields that do
+    # not have a field definition on the model. (default: true)
+    # allow_dynamic_fields: true
+
+    # Enable the identity map, needed for eager loading. (default: false)
+    # identity_map_enabled: false
+
+    # Includes the root model name in json serialization. (default: false)
+    # include_root_in_json: false
+
+    # Include the _type field in serializaion. (default: false)
+    # include_type_for_serialization: false
+
+    # Perform all operations in safe mode by default. (default: false)
+    # persist_in_safe_mode: false
+
+    # Preload all models in development, needed when models use
+    # inheritance. (default: false)
+    # preload_models: false
+
+    # Protect id and type from mass assignment. (default: true)
+    # protect_sensitive_fields: true
+
+    # Raise an error when performing a #find and the document is not found.
+    # (default: true)
+    # raise_not_found_error: true
+
+    # Raise an error when defining a scope with the same name as an
+    # existing method. (default: false)
+    # scope_overwrite_exception: false
+
+    # Skip the database version check, used when connecting to a db without
+    # admin access. (default: false)
+    # skip_version_check: false
+
+    # User Active Support's time zone in conversions. (default: true)
+    # use_activesupport_time_zone: true
+
+    # Ensure all times are UTC in the app side. (default: false)
+    # use_utc: false
 
 test:
-  host: localhost
-  database: <%= database_name || app_name %>_test
-
-# set these environment variables on your prod server
-production:
-  host: <%%= ENV['MONGOID_HOST'] %>
-  port: <%%= ENV['MONGOID_PORT'] %>
-  username: <%%= ENV['MONGOID_USERNAME'] %>
-  password: <%%= ENV['MONGOID_PASSWORD'] %>
-  database: <%%= ENV['MONGOID_DATABASE'] %>
-  # slaves:
-  #   - host: slave1.local
-  #     port: 27018
-  #   - host: slave2.local
-  #     port: 27019
+  <<: *defaults
+  databases:
+    default:
+      name: <%= database_name || app_name %>_test
+      session: default
