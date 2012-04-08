@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/indexes/validators/options"
+
 module Mongoid #:nodoc
   module Indexes #:nodoc
     extend ActiveSupport::Concern
@@ -15,12 +17,14 @@ module Mongoid #:nodoc
       # @example Create the indexes for the class.
       #   Person.create_indexes
       #
+      # @return [ true ] If the operation succeeded.
+      #
       # @since 1.0.0
       def create_indexes
         return unless index_options
         index_options.each_pair do |spec, options|
           collection.indexes.create(spec, options)
-        end
+        end and true
       end
 
       # Send the actual index removal comments to the MongoDB driver,
@@ -29,12 +33,14 @@ module Mongoid #:nodoc
       # @example Remove the indexes for the class.
       #   Person.remove_indexes
       #
+      # @return [ true ] If the operation succeeded.
+      #
       # @since 3.0.0
       def remove_indexes
         collection.indexes.each do |spec|
           next if spec["name"] == "_id_"
           collection.indexes.drop(spec["key"])
-        end
+        end and true
       end
 
       # Add the default indexes to the root document if they do not already
@@ -43,11 +49,14 @@ module Mongoid #:nodoc
       # @example Add Mongoid internal indexes.
       #   Person.add_indexes
       #
+      # @return [ true ] If the operation succeeded.
+      #
       # @since 1.0.0
       def add_indexes
         if hereditary? && !index_options[{ _type: 1 }]
           index _type: 1, options: { unique: false, background: true }
         end
+        true
       end
 
       # Adds an index on the field specified. Options can be :unique => true or
@@ -63,11 +72,32 @@ module Mongoid #:nodoc
       # @param [ Symbol ] name The name of the field.
       # @param [ Hash ] options The index options.
       #
+      # @return [ Hash ] The index options.
+      #
       # @since 1.0.0
       def index(spec)
-        # @todo: Durran: Validate options.
-        options = spec.delete(:options)
-        index_options[spec] = { unique: false }.merge(options || {})
+        Validators::Options.validate(self, spec)
+        index_options[spec] = normalize_index_options(spec)
+      end
+
+      private
+
+      # Normalize the index options, if any are provided.
+      #
+      # @api private
+      #
+      # @example Normalize the index options.
+      #   Model.normalize_index_options(name: 1)
+      #
+      # @param [ Hash ] spec The index specification.
+      #
+      # @return [ Hash ] The normalized options.
+      #
+      # @since 3.0.0
+      def normalize_index_options(spec)
+        (spec.delete(:options) || {}).tap do |opts|
+          opts[:dropDups] = opts.delete(:drop_dups) if opts.has_key?(:drop_dups)
+        end
       end
     end
   end

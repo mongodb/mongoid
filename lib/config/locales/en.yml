@@ -113,6 +113,25 @@ en:
             allowed, and don't use these names. These include names that also
             conflict with core Ruby methods on Object, Module, Enumerable, or
             included gems that inject methods into these or Mongoid internals."
+        invalid_index:
+          message: "Invalid index specification on %{klass}: %{spec}"
+          summary: "Indexes in Mongoid are defined as a hash of field name and
+            direction/2d pairs, with an :options hash for any additional options."
+          resolution: "Ensure that the index conforms to the correct syntax and
+            has the correct options.\n\n
+            Valid options are:\n
+            \_\_background: true|false\n
+            \_\_drop_dups: true|false\n
+            \_\_name: 'index_name'\n
+            \_\_sparse: true|false\n
+            \_\_unique: true|false\n\n
+            Valid types are: 1, -1, '2d'\n\n
+            Example:\n
+            \_\_class Band\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_index name: 1, label: -1, options: { sparse: true }\n
+            \_\_\_\_index location: '2d', options: { background: true }\n
+            \_\_end\n\n"
         invalid_options:
           message: "Invalid option :%{invalid} provided to relation :%{name}."
           summary: "Mongoid checks the options that are passed to the relation

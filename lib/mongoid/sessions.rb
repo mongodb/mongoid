@@ -242,7 +242,6 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def __database__
-        # @todo: Durran: Raise error if name not defined.
         if storage_options && name = storage_options[:database]
           Mongoid.databases[name.to_sym]
         else
