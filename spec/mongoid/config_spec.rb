@@ -9,47 +9,6 @@ describe Mongoid::Config do
     end
   end
 
-  describe "#databases=" do
-
-    context "when no default database exists" do
-
-      it "raises an error" do
-        expect {
-          described_class.databases = {}
-        }.to raise_error(Mongoid::Errors::NoDefaultDatabase)
-      end
-    end
-
-    context "when a default database exists" do
-
-      context "when no name is defined" do
-
-        let(:databases) do
-          { "default" => {}}
-        end
-
-        it "raises an error" do
-          expect {
-            described_class.databases = databases
-          }.to raise_error(Mongoid::Errors::NoDatabaseName)
-        end
-      end
-
-      context "when no session is provided" do
-
-        let(:databases) do
-          { "default" => { name: "mongoid_test" }}
-        end
-
-        it "raises an error" do
-          expect {
-            described_class.databases = databases
-          }.to raise_error(Mongoid::Errors::NoDatabaseSession)
-        end
-      end
-    end
-  end
-
   describe "#destructive_fields" do
 
     Mongoid::Components.prohibited_methods.each do |method|
@@ -217,7 +176,7 @@ describe Mongoid::Config do
           end
 
           let(:secondary) do
-            described_class.sessions["replica"]
+            described_class.sessions[:drei]
           end
 
           it "sets the secondary host" do
@@ -233,43 +192,6 @@ describe Mongoid::Config do
             it "sets the consistency option" do
               options["consistency"].should eq(:eventual)
             end
-          end
-        end
-      end
-
-      context "when database configurations are provided" do
-
-        before do
-          described_class.load!(file)
-        end
-
-        context "when a default is provided" do
-
-          let(:default) do
-            described_class.databases[:default]
-          end
-
-          it "sets the default session" do
-            default[:session].should eq("default")
-          end
-
-          it "sets the database name" do
-            default[:name].should eq("mongoid_test")
-          end
-        end
-
-        context "when a secondary is provided" do
-
-          let(:secondary) do
-            described_class.databases[:replica]
-          end
-
-          it "sets the secondary session" do
-            secondary[:session].should eq("replica")
-          end
-
-          it "sets the database name" do
-            secondary[:name].should eq("mongoid_test")
           end
         end
       end

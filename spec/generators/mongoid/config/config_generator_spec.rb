@@ -26,7 +26,7 @@ describe Mongoid::Generators::ConfigGenerator do
       end
 
       it "generates with a default database name" do
-        config.should contain("name: my_app_development")
+        config.should contain("database: my_app_development")
       end
     end
   end
@@ -48,7 +48,7 @@ describe Mongoid::Generators::ConfigGenerator do
       end
 
       it "generates with the provided database name" do
-        config.should contain("name: my_database_development")
+        config.should contain("database: my_database_development")
       end
     end
   end

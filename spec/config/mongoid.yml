@@ -1,24 +1,26 @@
 test:
   sessions:
     default:
+      database: mongoid_test
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
         consistency: :strong
-    replica:
+    zwei:
+      database: mongoid_zwei
+      hosts:
+        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+      options:
+        consistency: :strong
+        safe: :true
+    drei:
+      database: mongoid_drei
       hosts:
         - localhost:27018
         - localhost:27019
       options:
         consistency: :eventual
         safe: true
-  databases:
-    default:
-      name: mongoid_test
-      session: default
-    replica:
-      name: mongoid_test
-      session: replica
   options:
     allow_dynamic_fields: false
     identity_map_enabled: true

@@ -10,8 +10,8 @@ describe Mongoid::Sessions::Factory do
 
         let(:config) do
           {
-            default: { hosts: [ "localhost:27017" ] },
-            secondary: { hosts: [ "localhost:27017" ] }
+            default: { hosts: [ "localhost:27017" ], database: database_id },
+            secondary: { hosts: [ "localhost:27017" ], database: database_id }
           }
         end
 
@@ -49,7 +49,7 @@ describe Mongoid::Sessions::Factory do
     context "when no name is provided" do
 
       let(:config) do
-        { default: { hosts: ["localhost:27017"] }}
+        { default: { hosts: ["localhost:27017"], database: database_id }}
       end
 
       before do
@@ -77,7 +77,7 @@ describe Mongoid::Sessions::Factory do
   describe ".default" do
 
     let(:config) do
-      { default: { hosts: ["localhost:27017"] }}
+      { default: { hosts: ["localhost:27017"], database: database_id }}
     end
 
     before do

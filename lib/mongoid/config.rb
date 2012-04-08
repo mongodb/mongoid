@@ -25,33 +25,6 @@ module Mongoid #:nodoc
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
 
-    # Get the database configurations or an empty hash.
-    #
-    # @example Get the databases configuration.
-    #   config.databases
-    #
-    # @return [ Hash ] The databases configuration.
-    #
-    # @since 3.0.0
-    def databases
-      @databases ||= {}
-    end
-
-    # Set the database configuration options.
-    #
-    # @example Set the database configuration options.
-    #   config.databases = { default: { name: "test" }}
-    #
-    # @param [ Hash ] databases The configuration options.
-    #
-    # @since 3.0.0
-    def databases=(databases)
-      databases.with_indifferent_access.tap do |dbs|
-        Validators::Database.validate(dbs)
-        @databases = dbs
-      end
-    end
-
     # Return field names that could cause destructive things to happen if
     # defined in a Mongoid::Document.
     #
@@ -90,7 +63,12 @@ module Mongoid #:nodoc
     #
     # @since 3.0.0
     def connect_to(name)
-      self.databases = { default: { name: name, session: :default }}
+      self.sessions = {
+        default: {
+          database: name,
+          hosts: [ "localhost:27017" ]
+        }
+      }
     end
 
     # Purge all data in all collections, including indexes.
@@ -105,7 +83,7 @@ module Mongoid #:nodoc
     # @since 2.0.2
     def purge!
       session = Sessions.default
-      session.use databases[:default][:name]
+      session.use sessions[:default][:database]
       collections = session["system.namespaces"].find(name: { "$not" => /system|\$/ }).to_a
       collections.each do |collection|
         _, name = collection["name"].split(".", 2)
@@ -170,7 +148,6 @@ module Mongoid #:nodoc
     # @since 3.0.0
     def load_configuration(settings)
       configuration = settings.with_indifferent_access
-      self.databases = configuration[:databases]
       self.options = configuration[:options]
       self.sessions = configuration[:sessions]
     end

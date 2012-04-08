@@ -174,8 +174,9 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def mongo_session
         __session__.tap do |session|
-          database = __database__
-          session.use(database[:name])
+          if storage_options && name = storage_options[:database]
+            session.use(name)
+          end
         end
       end
 
@@ -279,22 +280,6 @@ module Mongoid #:nodoc:
         end
       end
 
-      # Get the database configuration.
-      #
-      # @example Get the database configuration.
-      #   Model.__database__
-      #
-      # @return [ Hash ] The db config.
-      #
-      # @since 3.0.0
-      def __database__
-        if storage_options && name = storage_options[:database]
-          Mongoid.databases[name.to_sym]
-        else
-          Mongoid.databases[:default]
-        end
-      end
-
       # Get the session for this class.
       #
       # @example Get the session.
@@ -304,7 +289,9 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def __session__
-        if storage_options && name = storage_options[:session]
+        if persistence_options && name = persistence_options[:session]
+          Sessions.with_name(name)
+        elsif storage_options && name = storage_options[:session]
           Sessions.with_name(name)
         else
           Sessions.default

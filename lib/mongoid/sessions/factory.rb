@@ -23,7 +23,7 @@ module Mongoid #:nodoc:
         return default unless name
         config = Mongoid.sessions[name]
         raise Errors::NoSessionConfig.new(name) unless config
-        Moped::Session.new(config[:hosts], config[:options] || {})
+        create_session(config)
       end
 
       # Get the default session.
@@ -39,7 +39,30 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def default
         config = Mongoid.sessions[:default] || { hosts: [ "localhost:27017" ] }
-        Moped::Session.new(config[:hosts], config[:options] || {})
+        create_session(config)
+      end
+
+      private
+
+      # Create the session for the provided config.
+      #
+      # @api private
+      #
+      # @example Create the session.
+      #   Factory.create_session(config)
+      #
+      # @param [ Hash ] config The session config.
+      #
+      # @return [ Moped::Session ] The session.
+      #
+      # @since 3.0.0
+      def create_session(config)
+        Moped::Session.new(
+          config[:hosts],
+          config[:options] || {}
+        ).tap do |session|
+          session.use(config[:database])
+        end
       end
     end
   end

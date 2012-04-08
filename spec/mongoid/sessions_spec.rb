@@ -34,11 +34,7 @@ describe Mongoid::Sessions do
   describe "#collection" do
 
     let(:config) do
-      { default: { hosts: [ "localhost:27017" ] }}
-    end
-
-    let(:database_config) do
-      { default: { name: database_id, session: :default }}
+      { default: { hosts: [ "localhost:27017" ], database: database_id }}
     end
 
     let(:session) do
@@ -47,7 +43,6 @@ describe Mongoid::Sessions do
 
     before do
       Mongoid::Config.sessions = config
-      Mongoid::Config.databases = database_config
       Mongoid::Threaded.sessions[:default] = session
     end
 
@@ -208,13 +203,9 @@ describe Mongoid::Sessions do
 
       let(:config) do
         {
-          default: { hosts: [ "localhost:27017" ] },
+          default: { hosts: [ "localhost:27017" ], database: database_id },
           secondary: { hosts: [ "localhost:27017" ] }
         }
-      end
-
-      let(:database_config) do
-        { default: { name: database_id, session: :default }}
       end
 
       let(:session) do
@@ -223,7 +214,6 @@ describe Mongoid::Sessions do
 
       before do
         Mongoid::Config.sessions = config
-        Mongoid::Config.databases = database_config
         Mongoid::Threaded.sessions[:secondary] = session
         Band.store_in(session: "secondary")
       end
@@ -253,11 +243,7 @@ describe Mongoid::Sessions do
       context "when no options are provided" do
 
         let(:config) do
-          { default: { hosts: [ "localhost:27017" ] }}
-        end
-
-        let(:database_config) do
-          { default: { name: database_id, session: :default }}
+          { default: { hosts: [ "localhost:27017" ], database: database_id }}
         end
 
         let(:session) do
@@ -266,7 +252,6 @@ describe Mongoid::Sessions do
 
         before do
           Mongoid::Config.sessions = config
-          Mongoid::Config.databases = database_config
           Mongoid::Threaded.sessions[:default] = session
         end
 
@@ -291,6 +276,7 @@ describe Mongoid::Sessions do
         let(:config) do
           {
             default: {
+              database: database_id,
               hosts: [ "localhost:27017" ],
               options: {
                 consistency: :strong
@@ -299,17 +285,12 @@ describe Mongoid::Sessions do
           }
         end
 
-        let(:database_config) do
-          { default: { name: database_id, session: :default }}
-        end
-
         let(:session) do
           Mongoid::Sessions::Factory.default
         end
 
         before do
           Mongoid::Config.sessions = config
-          Mongoid::Config.databases = database_config
           Mongoid::Threaded.sessions[:default] = session
         end
 
@@ -446,6 +427,52 @@ describe Mongoid::Sessions do
 
         it "persists the correct number of documents" do
           Band.with(collection: "artists").count.should eq(1)
+        end
+      end
+    end
+
+    context "when sending operations to a different session" do
+
+      let(:config) do
+        {
+          default: {
+            database: database_id,
+            hosts: [ "localhost:27017" ],
+            options: {
+              consistency: :strong
+            }
+          },
+          zwei: {
+            database: database_id,
+            hosts: [ "localhost:27017" ],
+            options: {
+              consistency: :strong
+            }
+          }
+        }
+      end
+
+      let(:session) do
+        Mongoid::Sessions::Factory.default
+      end
+
+      before do
+        Mongoid::Config.sessions = config
+        Mongoid::Threaded.sessions[:default] = session
+      end
+
+      describe ".create" do
+
+        let!(:band) do
+          Band.with(session: "zwei").create
+        end
+
+        let(:from_db) do
+          Band.with(session: "zwei").find(band.id)
+        end
+
+        it "persists to the specified database" do
+          from_db.should eq(band)
         end
       end
     end

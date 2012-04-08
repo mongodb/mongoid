@@ -1,32 +1,24 @@
-defaults: &defaults
+development:
   # Configure available database sessions. (required)
   sessions:
     # Defines the default session. (required)
     default:
+      # Defines the name of the default database that Mongoid can connect to.
+      # (required).
+      database: <%= database_name || app_name %>_development
       # Provides the hosts the default session can connect to. Must be an array
       # of host:port pairs. (required)
       hosts:
         - localhost:27017
       options:
-        # Change the default consistency model to :eventual or :strong.
-        # :eventual will send reads to secondaries, :strong sends everything
-        # to master. (default: :eventual)
-        # consistency: :strong
-
         # Change whether the session persists in safe mode by default.
         # (default: false)
         # safe: false
 
-development:
-  <<: *defaults
-  # Configure available databases. (required)
-  databases:
-    # Defines the default database. (required)
-    default:
-      # Provides a name for the default database. (required)
-      name: <%= database_name || app_name %>_development
-      # Tell the database which session to use by default. (required)
-      session: default
+        # Change the default consistency model to :eventual or :strong.
+        # :eventual will send reads to secondaries, :strong sends everything
+        # to master. (default: :eventual)
+        consistency: :strong
   # Configure Mongoid specific options. (optional)
   options:
     # Configuration for whether or not to allow access to fields that do
@@ -66,10 +58,3 @@ development:
 
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
-
-test:
-  <<: *defaults
-  databases:
-    default:
-      name: <%= database_name || app_name %>_test
-      session: default
