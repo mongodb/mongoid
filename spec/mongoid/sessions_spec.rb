@@ -206,6 +206,7 @@ describe Mongoid::Sessions do
     before(:all) do
       described_class.clear
       Mongoid.load!(file, :test)
+      Mongoid.sessions[:default][:database] = database_id
     end
 
     after do
@@ -292,6 +293,7 @@ describe Mongoid::Sessions do
     before(:all) do
       described_class.clear
       Mongoid.load!(file, :test)
+      Mongoid.sessions[:default][:database] = database_id
     end
 
     after do
