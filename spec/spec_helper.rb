@@ -31,6 +31,11 @@ def database_id
   ENV["CI"] ? "mongoid_#{Process.pid}" : "mongoid_test"
 end
 
+# Can we connect to MongoHQ from this box?
+def mongohq_connectable?
+  ENV["MONGOHQ_REPL_PASS"].present?
+end
+
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.connect_to(database_id)
@@ -76,14 +81,10 @@ RSpec.configure do |config|
     end
   end
 
-  # We filter out specs that require authentication to MongoHQ if the
-  # environment variables have not been set up locally.
-  # mongohq_configured = Support::MongoHQ.configured?
-  # warn(Support::MongoHQ.message) unless mongohq_configured
-
-  # config.filter_run_excluding(:config => lambda { |value|
-    # return true if value == :mongohq && !mongohq_configured
-  # })
+  # Filter out MongoHQ specs if we can't connect to it.
+  config.filter_run_excluding(config: ->(value){
+    return true if value == :mongohq && !mongohq_connectable?
+  })
 end
 
 ActiveSupport::Inflector.inflections do |inflect|

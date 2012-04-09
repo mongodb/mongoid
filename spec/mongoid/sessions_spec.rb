@@ -2,11 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Sessions do
 
-  after(:all) do
-    Band.with(session: :mongohq_single, database: :mongoid).delete_all
-    Band.with(session: :mongohq_repl, database: :"mongoid-test").delete_all
-  end
-
   describe ".clear_persistence_options" do
 
     context "when options exist on the current thread" do
@@ -232,7 +227,7 @@ describe Mongoid::Sessions do
       end
     end
 
-    context "when overriding to a monghq single server" do
+    context "when overriding to a monghq single server", config: :mongohq do
 
       before(:all) do
         Band.store_in(session: :mongohq_single)
@@ -251,7 +246,7 @@ describe Mongoid::Sessions do
       end
     end
 
-    context "when overriding to a mongohq replica set" do
+    context "when overriding to a mongohq replica set", config: :mongohq do
 
       before(:all) do
         Band.store_in(session: :mongohq_repl)
@@ -314,7 +309,7 @@ describe Mongoid::Sessions do
       end
     end
 
-    context "when overriding to a monghq single server" do
+    context "when overriding to a monghq single server", config: :mongohq do
 
       before(:all) do
         Band.store_in(session: :mongohq_single)
@@ -329,7 +324,7 @@ describe Mongoid::Sessions do
       end
     end
 
-    context "when overriding to a mongohq replica set" do
+    context "when overriding to a mongohq replica set", config: :mongohq do
 
       before(:all) do
         Band.store_in(session: :mongohq_repl)
@@ -482,7 +477,7 @@ describe Mongoid::Sessions do
 
       describe ".create" do
 
-        context "when sending to a mongohq single server" do
+        context "when sending to a mongohq single server", config: :mongohq do
 
           let!(:band) do
             Band.with(
@@ -503,7 +498,7 @@ describe Mongoid::Sessions do
           end
         end
 
-        context "when sending to a mongohq replica set" do
+        context "when sending to a mongohq replica set", config: :mongohq do
 
           let!(:band) do
             Band.with(

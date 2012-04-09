@@ -169,7 +169,7 @@ describe Mongoid::Config do
           end
         end
 
-        context "when a secondary is provided" do
+        context "when a secondary is provided", config: :mongohq do
 
           before do
             described_class.load!(file)
