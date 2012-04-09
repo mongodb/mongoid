@@ -43,43 +43,43 @@ describe Mongoid::Config do
       end
 
       it "sets the allow dynamic fields option" do
-        described_class.allow_dynamic_fields.should be_false
+        described_class.allow_dynamic_fields.should be_true
       end
 
       it "sets the identity map option" do
-        described_class.identity_map_enabled.should be_true
+        described_class.identity_map_enabled.should be_false
       end
 
       it "sets the include root in json option" do
-        described_class.include_root_in_json.should be_true
+        described_class.include_root_in_json.should be_false
       end
 
       it "sets the include type with serialization option" do
-        described_class.include_type_for_serialization.should be_true
+        described_class.include_type_for_serialization.should be_false
       end
 
       it "sets the scope overwrite option" do
-        described_class.scope_overwrite_exception.should be_true
+        described_class.scope_overwrite_exception.should be_false
       end
 
       it "sets the preload models option" do
-        described_class.preload_models.should be_true
+        described_class.preload_models.should be_false
       end
 
       it "sets the raise not found error option" do
-        described_class.raise_not_found_error.should be_false
+        described_class.raise_not_found_error.should be_true
       end
 
       it "sets the skip version check option" do
-        described_class.skip_version_check.should be_false
+        described_class.skip_version_check.should be_true
       end
 
       it "sets the use activesupport time zone option" do
-        described_class.use_activesupport_time_zone.should be_false
+        described_class.use_activesupport_time_zone.should be_true
       end
 
       it "sets the use utc option" do
-        described_class.use_utc.should be_true
+        described_class.use_utc.should be_false
       end
     end
 
@@ -101,43 +101,43 @@ describe Mongoid::Config do
         end
 
         it "sets the allow dynamic fields option" do
-          described_class.allow_dynamic_fields.should be_false
+          described_class.allow_dynamic_fields.should be_true
         end
 
         it "sets the identity map option" do
-          described_class.identity_map_enabled.should be_true
+          described_class.identity_map_enabled.should be_false
         end
 
         it "sets the include root in json option" do
-          described_class.include_root_in_json.should be_true
+          described_class.include_root_in_json.should be_false
         end
 
         it "sets the include type with serialization option" do
-          described_class.include_type_for_serialization.should be_true
+          described_class.include_type_for_serialization.should be_false
         end
 
         it "sets the scope overwrite option" do
-          described_class.scope_overwrite_exception.should be_true
+          described_class.scope_overwrite_exception.should be_false
         end
 
         it "sets the preload models option" do
-          described_class.preload_models.should be_true
+          described_class.preload_models.should be_false
         end
 
         it "sets the raise not found error option" do
-          described_class.raise_not_found_error.should be_false
+          described_class.raise_not_found_error.should be_true
         end
 
         it "sets the skip version check option" do
-          described_class.skip_version_check.should be_false
+          described_class.skip_version_check.should be_true
         end
 
         it "sets the use activesupport time zone option" do
-          described_class.use_activesupport_time_zone.should be_false
+          described_class.use_activesupport_time_zone.should be_true
         end
 
         it "sets the use utc option" do
-          described_class.use_utc.should be_true
+          described_class.use_utc.should be_false
         end
       end
 
@@ -176,22 +176,11 @@ describe Mongoid::Config do
           end
 
           let(:secondary) do
-            described_class.sessions[:drei]
+            described_class.sessions[:mongohq_single]
           end
 
           it "sets the secondary host" do
-            secondary["hosts"].should eq(["localhost:27018","localhost:27019"])
-          end
-
-          context "when the secondary has options" do
-
-            let(:options) do
-              secondary["options"]
-            end
-
-            it "sets the consistency option" do
-              options["consistency"].should eq(:eventual)
-            end
+            secondary["hosts"].should eq([ ENV["MONGOHQ_SINGLE_URL"] ])
           end
         end
       end

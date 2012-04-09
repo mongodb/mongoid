@@ -2,6 +2,11 @@ require "spec_helper"
 
 describe Mongoid::Sessions do
 
+  after(:all) do
+    Band.with(session: :mongohq_single, database: :mongoid).delete_all
+    Band.with(session: :mongohq_repl, database: :"mongoid-test").delete_all
+  end
+
   describe ".clear_persistence_options" do
 
     context "when options exist on the current thread" do
@@ -199,123 +204,156 @@ describe Mongoid::Sessions do
 
   describe "#mongo_session" do
 
-    context "when overriding the default with store_in" do
+    let(:file) do
+      File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+    end
 
-      let(:config) do
-        {
-          default: {
-            hosts: [ "localhost:27017" ], database: database_id
-          },
-          secondary: {
-            hosts: [ "localhost:27017" ], database: database_id
-          }
-        }
+    before(:all) do
+      described_class.clear
+      Mongoid.load!(file, :test)
+    end
+
+    after do
+      Band.storage_options = nil
+    end
+
+    context "when getting the default" do
+
+      let!(:band) do
+        Band.new
       end
 
-      let(:session) do
-        Mongoid::Sessions::Factory.create(:secondary)
+      let!(:mongo_session) do
+        band.mongo_session
       end
 
-      before do
-        Mongoid::Config.sessions = config
-        Mongoid::Threaded.sessions[:secondary] = session
-        Band.store_in(session: "secondary")
+      it "returns the default session" do
+        mongo_session.options[:database].should eq(database_id)
       end
+    end
 
-      after do
-        Band.storage_options = nil
+    context "when overriding to a monghq single server" do
+
+      before(:all) do
+        Band.store_in(session: :mongohq_single)
       end
 
       let(:band) do
         Band.new
       end
 
-      it "returns the overridden session" do
-        band.mongo_session.should eq(session)
+      let(:session) do
+        band.mongo_session
       end
 
-      context "when accessing from the class level" do
-
-        it "returns the overridden session" do
-          Band.mongo_session.should eq(session)
-        end
+      it "returns the default session" do
+        session.options[:database].should eq(ENV["MONGOHQ_SINGLE_NAME"])
       end
     end
 
-    context "when no default is overridden" do
+    context "when overriding to a mongohq replica set" do
 
-      context "when no options are provided" do
-
-        let(:config) do
-          { default: { hosts: [ "localhost:27017" ], database: database_id }}
-        end
-
-        let(:session) do
-          Mongoid::Sessions::Factory.default
-        end
-
-        before do
-          Mongoid::Config.sessions = config
-          Mongoid::Threaded.sessions[:default] = session
-        end
-
-        let(:band) do
-          Band.new
-        end
-
-        it "returns the default session" do
-          band.mongo_session.should eq(session)
-        end
-
-        context "when accessing from the class level" do
-
-          it "returns the default session" do
-            Band.mongo_session.should eq(session)
-          end
-        end
+      before(:all) do
+        Band.store_in(session: :mongohq_repl)
       end
 
-      context "when options are provided" do
+      let(:band) do
+        Band.new
+      end
 
-        let(:config) do
-          {
-            default: {
-              database: database_id,
-              hosts: [ "localhost:27017" ],
-              options: {
-                consistency: :strong
-              }
-            }
-          }
-        end
+      let(:repl_session) do
+        band.mongo_session
+      end
 
-        let(:session) do
-          Mongoid::Sessions::Factory.default
-        end
+      it "returns the default session" do
+        repl_session.options[:database].should eq(ENV["MONGOHQ_REPL_NAME"])
+      end
+    end
 
-        before do
-          Mongoid::Config.sessions = config
-          Mongoid::Threaded.sessions[:default] = session
-        end
+    context "when no session exists with the key" do
 
-        let(:band) do
-          Band.new
-        end
+      before(:all) do
+        Band.store_in(session: :nonexistant)
+      end
 
-        it "returns the default session" do
-          band.mongo_session.should eq(session)
-        end
+      let(:band) do
+        Band.new
+      end
 
-        it "sets the options" do
-          band.mongo_session.options[:consistency].should eq(:strong)
-        end
+      it "raises an error" do
+        expect {
+          band.mongo_session
+        }.to raise_error(Mongoid::Errors::NoSessionConfig)
+      end
+    end
+  end
 
-        context "when accessing from the class level" do
+  describe ".mongo_session" do
 
-          it "returns the default session" do
-            Band.mongo_session.should eq(session)
-          end
-        end
+    let(:file) do
+      File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+    end
+
+    before(:all) do
+      described_class.clear
+      Mongoid.load!(file, :test)
+    end
+
+    after do
+      Band.storage_options = nil
+    end
+
+    context "when getting the default" do
+
+      let!(:mongo_session) do
+        Band.mongo_session
+      end
+
+      it "returns the default session" do
+        mongo_session.options[:database].should eq(database_id)
+      end
+    end
+
+    context "when overriding to a monghq single server" do
+
+      before(:all) do
+        Band.store_in(session: :mongohq_single)
+      end
+
+      let(:session) do
+        Band.mongo_session
+      end
+
+      it "returns the default session" do
+        session.options[:database].should eq(ENV["MONGOHQ_SINGLE_NAME"])
+      end
+    end
+
+    context "when overriding to a mongohq replica set" do
+
+      before(:all) do
+        Band.store_in(session: :mongohq_repl)
+      end
+
+      let(:repl_session) do
+        Band.mongo_session
+      end
+
+      it "returns the default session" do
+        repl_session.options[:database].should eq(ENV["MONGOHQ_REPL_NAME"])
+      end
+    end
+
+    context "when no session exists with the key" do
+
+      before(:all) do
+        Band.store_in(session: :nonexistant)
+      end
+
+      it "raises an error" do
+        expect {
+          Band.mongo_session
+        }.to raise_error(Mongoid::Errors::NoSessionConfig)
       end
     end
   end
@@ -405,10 +443,6 @@ describe Mongoid::Sessions do
 
     context "when sending operations to a different collection" do
 
-      after do
-        Band.with(collection: "artists").delete_all
-      end
-
       describe ".create" do
 
         let!(:band) do
@@ -437,46 +471,57 @@ describe Mongoid::Sessions do
 
     context "when sending operations to a different session" do
 
-      let(:config) do
-        {
-          default: {
-            database: database_id,
-            hosts: [ "localhost:27017" ],
-            options: {
-              consistency: :strong
-            }
-          },
-          zwei: {
-            database: database_id,
-            hosts: [ "localhost:27017" ],
-            options: {
-              consistency: :strong
-            }
-          }
-        }
+      let(:file) do
+        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
       end
 
-      let(:session) do
-        Mongoid::Sessions::Factory.default
-      end
-
-      before do
-        Mongoid::Config.sessions = config
-        Mongoid::Threaded.sessions[:default] = session
+      before(:all) do
+        described_class.clear
+        Mongoid.load!(file, :test)
       end
 
       describe ".create" do
 
-        let!(:band) do
-          Band.with(session: "zwei").create
+        context "when sending to a mongohq single server" do
+
+          let!(:band) do
+            Band.with(
+              session: "mongohq_single",
+              database: "mongoid"
+            ).create
+          end
+
+          let(:from_db) do
+            Band.with(
+              session: "mongohq_single",
+              database: "mongoid"
+            ).find(band.id)
+          end
+
+          it "persists to the specified database" do
+            from_db.should eq(band)
+          end
         end
 
-        let(:from_db) do
-          Band.with(session: "zwei").find(band.id)
-        end
+        context "when sending to a mongohq replica set" do
 
-        it "persists to the specified database" do
-          from_db.should eq(band)
+          let!(:band) do
+            Band.with(
+              session: "mongohq_repl",
+              database: "mongoid-test"
+            ).create
+          end
+
+          let(:from_db) do
+            Band.with(
+              session: "mongohq_repl",
+              database: "mongoid-test"
+            ).find(band.id)
+          end
+
+          it "persists to the specified database" do
+            from_db.should eq(band)
+          end
         end
       end
     end

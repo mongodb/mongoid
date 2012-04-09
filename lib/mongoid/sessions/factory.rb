@@ -38,8 +38,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def default
-        config = Mongoid.sessions[:default] || { hosts: [ "localhost:27017" ] }
-        create_session(config)
+        create_session(Mongoid.sessions[:default])
       end
 
       private
@@ -57,12 +56,29 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def create_session(config)
-        Moped::Session.new(
-          config[:hosts],
-          config[:options] || {}
-        ).tap do |session|
+        options = (config[:options] || {}).dup
+        Moped::Session.new(config[:hosts], options).tap do |session|
           session.use(config[:database])
+          if authenticated?(config)
+            session.login(config[:username], config[:password])
+          end
         end
+      end
+
+      # Are we authenticated with this session config?
+      #
+      # @api private
+      #
+      # @example Is this session authenticated?
+      #   Factory.authenticated?(config)
+      #
+      # @param [ Hash ] config The session config.
+      #
+      # @return [ true, false ] If we are authenticated.
+      #
+      # @since 3.0.0
+      def authenticated?(config)
+        config.has_key?(:username) && config.has_key?(:password)
       end
     end
   end

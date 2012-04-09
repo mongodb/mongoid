@@ -6,29 +6,32 @@ test:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
         consistency: :strong
-    zwei:
-      database: mongoid_zwei
+    mongohq_single:
+      database: <%=ENV["MONGOHQ_SINGLE_NAME"]%>
+      username: <%=ENV["MONGOHQ_SINGLE_USER"]%>
+      password: <%=ENV["MONGOHQ_SINGLE_PASS"]%>
       hosts:
-        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+        - <%=ENV["MONGOHQ_SINGLE_URL"]%>
       options:
-        consistency: :strong
-        safe: :true
-    drei:
-      database: mongoid_drei
+        safe: true
+    mongohq_repl:
+      database: <%=ENV["MONGOHQ_REPL_NAME"]%>
+      username: <%=ENV["MONGOHQ_REPL_USER"]%>
+      password: <%=ENV["MONGOHQ_REPL_PASS"]%>
       hosts:
-        - localhost:27018
-        - localhost:27019
+        - <%=ENV["MONGOHQ_REPL_1_URL"]%>
+        - <%=ENV["MONGOHQ_REPL_2_URL"]%>
       options:
         consistency: :eventual
         safe: true
   options:
-    allow_dynamic_fields: false
-    identity_map_enabled: true
-    include_root_in_json: true
-    include_type_for_serialization: true
-    preload_models: true
-    scope_overwrite_exception: true
-    raise_not_found_error: false
-    skip_version_check: false
-    use_activesupport_time_zone: false
-    use_utc: true
+    allow_dynamic_fields: true
+    identity_map_enabled: false
+    include_root_in_json: false
+    include_type_for_serialization: false
+    preload_models: false
+    scope_overwrite_exception: false
+    raise_not_found_error: true
+    skip_version_check: true
+    use_activesupport_time_zone: true
+    use_utc: false

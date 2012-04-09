@@ -86,6 +86,18 @@ module Mongoid #:nodoc:
 
     class << self
 
+      # Clear all sessions from the current thread.
+      #
+      # @example Clear all sessions.
+      #   Mongoid::Sessions.clear
+      #
+      # @return [ Array ] The empty sessions.
+      #
+      # @since 3.0.0
+      def clear
+        Threaded.sessions.clear
+      end
+
       # Get the default session.
       #
       # @example Get the default session.
@@ -154,11 +166,23 @@ module Mongoid #:nodoc:
       # @example Get the collection name.
       #   Model.collection_name
       #
-      # @return [ String ] The name of the collection.
+      # @return [ Symbol ] The name of the collection.
       #
       # @since 3.0.0
       def collection_name
         @collection_name ||= __collection_name__
+      end
+
+      # Get the default database name for this model.
+      #
+      # @example Get the default database name.
+      #   Model.database_name
+      #
+      # @return [ Symbol ] The name of the database.
+      #
+      # @since 3.0.0
+      def database_name
+        @database_name ||= __database_name__
       end
 
       # Get the session for this model. This is determined in the following order:
@@ -174,8 +198,10 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def mongo_session
         __session__.tap do |session|
-          if storage_options && name = storage_options[:database]
+          if persistence_options && name = persistence_options[:database]
             session.use(name)
+          else
+            session.use(database_name)
           end
         end
       end
@@ -229,6 +255,7 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def store_in(options)
         Validators::Storage.validate(self, options)
+        @collection_name, @database_name = nil, nil
         self.storage_options = options
       end
 
@@ -269,7 +296,7 @@ module Mongoid #:nodoc:
       # @example Get the collection name.
       #   Model.__collection_name__
       #
-      # @return [ String ] The name of the collection.
+      # @return [ Symbol ] The name of the collection.
       #
       # @since 3.0.0
       def __collection_name__
@@ -277,6 +304,38 @@ module Mongoid #:nodoc:
           name.to_sym
         else
           default_collection_name
+        end
+      end
+
+      # Get the database name for the model.
+      #
+      # @example Get the database name.
+      #   Model.__database_name__
+      #
+      # @return [ Symbol ] The name of the database.
+      #
+      # @since 3.0.0
+      def __database_name__
+        if storage_options && name = storage_options[:database]
+          name.to_sym
+        else
+          Mongoid.sessions[__session_name__][:database]
+        end
+      end
+
+      # Get the session name for the model.
+      #
+      # @example Get the session name.
+      #   Model.__session_name__
+      #
+      # @return [ Symbol ] The name of the session.
+      #
+      # @since 3.0.0
+      def __session_name__
+        if storage_options && name = storage_options[:session]
+          name.to_sym
+        else
+          :default
         end
       end
 
