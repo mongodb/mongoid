@@ -3,7 +3,7 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.4.8 (branch: 2.4.0-stable)
+## 2.4.8
 
 ### Resolved Issues
 
