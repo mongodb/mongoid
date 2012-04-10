@@ -8,7 +8,7 @@ module Mongoid #:nodoc:
 
     # The aggregate operations provided in the aggregate module get delegated
     # through to the context from the criteria.
-    delegate *Aggregable.public_instance_methods(false), to: :context
+    delegate *Aggregable::Mongo.public_instance_methods(false), to: :context
 
     # The atomic operations provided in the atomic context get delegated
     # through to the context from the criteria.

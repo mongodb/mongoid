@@ -1,8 +1,11 @@
 # encoding: utf-8
+require "mongoid/contextual/aggregable/memory"
+
 module Mongoid #:nodoc:
   module Contextual
     class Memory
       include Enumerable
+      include Aggregable::Memory
 
       # @attribute [r] criteria The criteria for the context.
       # @attribute [r] klass The criteria class.

@@ -1,131 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Contextual::Aggregable do
-
-  describe "#aggregates" do
-
-    context "when provided a single field" do
-
-      let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
-      end
-
-      let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
-      end
-
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        Mongoid::Contextual::Mongo.new(criteria)
-      end
-
-      context "when aggregating on a field that exists" do
-
-        context "when more than 1 document is emitted" do
-
-          let(:aggregates) do
-            context.aggregates(:likes)
-          end
-
-          it "returns an avg" do
-            aggregates["avg"].should eq(750)
-          end
-
-          it "returns a count" do
-            aggregates["count"].should eq(2)
-          end
-
-          it "returns a max" do
-            aggregates["max"].should eq(1000)
-          end
-
-          it "returns a min" do
-            aggregates["min"].should eq(500)
-          end
-
-          it "returns a sum" do
-            aggregates["sum"].should eq(1500)
-          end
-        end
-
-        context "when only 1 document is emitted" do
-
-          let(:criteria) do
-            Band.where(name: "Depeche Mode")
-          end
-
-          let(:aggregates) do
-            context.aggregates(:likes)
-          end
-
-          it "returns an avg" do
-            aggregates["avg"].should eq(1000)
-          end
-
-          it "returns a count" do
-            aggregates["count"].should eq(1)
-          end
-
-          it "returns a max" do
-            aggregates["max"].should eq(1000)
-          end
-
-          it "returns a min" do
-            aggregates["min"].should eq(1000)
-          end
-
-          it "returns a sum" do
-            aggregates["sum"].should eq(1000)
-          end
-        end
-      end
-
-      context "when the field does not exist" do
-
-        let(:aggregates) do
-          context.aggregates(:non_existant)
-        end
-
-        it "returns an avg" do
-          aggregates["avg"].should eq(0)
-        end
-
-        it "returns a count" do
-          aggregates["count"].should eq(2)
-        end
-
-        it "returns a max" do
-          aggregates["max"].should be_nil
-        end
-
-        it "returns a min" do
-          aggregates["min"].should be_nil
-        end
-
-        it "returns a sum" do
-          aggregates["sum"].should eq(0)
-        end
-      end
-
-      context "when there are no matching documents" do
-
-        let(:criteria) do
-          Band.where(name: "New Order")
-        end
-
-        let(:aggregates) do
-          context.aggregates(:non_existant)
-        end
-
-        it "returns nil" do
-          aggregates.should eq({ "count" => 0 })
-        end
-      end
-    end
-  end
+describe Mongoid::Contextual::Aggregable::Memory do
 
   describe "#avg" do
 
@@ -142,11 +17,13 @@ describe Mongoid::Contextual::Aggregable do
         end
 
         let(:criteria) do
-          Band.all
+          Band.all.tap do |criteria|
+            criteria.documents = [ depeche, tool ]
+          end
         end
 
         let(:context) do
-          Mongoid::Contextual::Mongo.new(criteria)
+          Mongoid::Contextual::Memory.new(criteria)
         end
 
         let(:avg) do
@@ -169,7 +46,7 @@ describe Mongoid::Contextual::Aggregable do
         end
 
         let(:context) do
-          Mongoid::Contextual::Mongo.new(criteria)
+          Mongoid::Contextual::Memory.new(criteria)
         end
 
         let(:avg) do
@@ -196,11 +73,13 @@ describe Mongoid::Contextual::Aggregable do
       end
 
       let(:criteria) do
-        Band.all
+        Band.all.tap do |crit|
+          crit.documents = [ depeche, tool ]
+        end
       end
 
       let(:context) do
-        Mongoid::Contextual::Mongo.new(criteria)
+        Mongoid::Contextual::Memory.new(criteria)
       end
 
       context "when provided a symbol" do
@@ -220,7 +99,7 @@ describe Mongoid::Contextual::Aggregable do
           end
 
           let(:context) do
-            Mongoid::Contextual::Mongo.new(criteria)
+            Mongoid::Contextual::Memory.new(criteria)
           end
 
           let(:max) do
@@ -261,11 +140,13 @@ describe Mongoid::Contextual::Aggregable do
       end
 
       let(:criteria) do
-        Band.all
+        Band.all.tap do |crit|
+          crit.documents = [ depeche, tool ]
+        end
       end
 
       let(:context) do
-        Mongoid::Contextual::Mongo.new(criteria)
+        Mongoid::Contextual::Memory.new(criteria)
       end
 
       context "when provided a symbol" do
@@ -285,7 +166,7 @@ describe Mongoid::Contextual::Aggregable do
           end
 
           let(:context) do
-            Mongoid::Contextual::Mongo.new(criteria)
+            Mongoid::Contextual::Memory.new(criteria)
           end
 
           let(:min) do
@@ -326,11 +207,13 @@ describe Mongoid::Contextual::Aggregable do
       end
 
       let(:criteria) do
-        Band.all
+        Band.all.tap do |crit|
+          crit.documents = [ depeche, tool ]
+        end
       end
 
       let(:context) do
-        Mongoid::Contextual::Mongo.new(criteria)
+        Mongoid::Contextual::Memory.new(criteria)
       end
 
       context "when provided a symbol" do
@@ -350,7 +233,7 @@ describe Mongoid::Contextual::Aggregable do
           end
 
           let(:context) do
-            Mongoid::Contextual::Mongo.new(criteria)
+            Mongoid::Contextual::Memory.new(criteria)
           end
 
           let(:sum) do

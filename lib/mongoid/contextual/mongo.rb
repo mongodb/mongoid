@@ -1,12 +1,12 @@
 # encoding: utf-8
 require "mongoid/contextual/atomic"
-require "mongoid/contextual/aggregable"
+require "mongoid/contextual/aggregable/mongo"
 
 module Mongoid #:nodoc:
   module Contextual
     class Mongo
       include Enumerable
-      include Aggregable
+      include Aggregable::Mongo
       include Atomic
 
       # @attribute [r] criteria The criteria for the context.
