@@ -35,14 +35,24 @@ module Mongoid #:nodoc:
       # @example Get the number of matching documents.
       #   context.count
       #
+      # @example Get the count of documents matching the provided.
+      #   context.count(document)
+      #
+      # @example Get the count for where the provided block is true.
+      #   context.count do |doc|
+      #     doc.likes > 1
+      #   end
+      #
+      # @param [ Document ] document A document ot match.
+      #
       # @return [ Integer ] The number of matches.
       #
       # @since 3.0.0
-      def count
-        query.count
+      def count(document = nil, &block)
+        return super(&block) if block_given?
+        return query.count unless document
+        klass.collection.find(criteria.and(_id: document.id).selector).count
       end
-      alias :length :count
-      alias :size :count
 
       # Delete all documents in the database that match the selector.
       #
@@ -186,6 +196,19 @@ module Mongoid #:nodoc:
       def last
         with_eager_loading(query.sort(_id: -1).first)
       end
+
+      # Get's the number of documents matching the query selector.
+      #
+      # @example Get the length.
+      #   context.length
+      #
+      # @return [ Integer ] The number of documents.
+      #
+      # @since 3.0.0
+      def length
+        query.count
+      end
+      alias :size :length
 
       # Limits the number of documents that are returned from the database.
       #

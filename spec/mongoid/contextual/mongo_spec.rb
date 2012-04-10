@@ -42,25 +42,60 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  [ :count, :length, :size ].each do |method|
+  describe "#count" do
 
-    describe "##{method}" do
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
 
-      before do
-        Band.create(name: "Depeche Mode")
-        Band.create(name: "New Order")
-      end
+    let!(:new_order) do
+      Band.create(name: "New Order")
+    end
 
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    context "when no arguments are provided" do
 
       let(:context) do
         described_class.new(criteria)
       end
 
       it "returns the number of documents that match" do
-        context.send(method).should eq(1)
+        context.count.should eq(1)
+      end
+    end
+
+    context "when provided a document" do
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:count) do
+        context.count(depeche)
+      end
+
+      it "returns the number of documents that match" do
+        count.should eq(1)
+      end
+    end
+
+    context "when provided a block" do
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:count) do
+        context.count do |doc|
+          doc.likes.nil?
+        end
+      end
+
+      it "returns the number of documents that match" do
+        count.should eq(1)
       end
     end
   end
@@ -393,6 +428,29 @@ describe Mongoid::Contextual::Mongo do
 
     it "returns the last matching document" do
       context.last.should eq(new_order)
+    end
+  end
+
+  [ :length, :size ].each do |method|
+
+    describe "##{method}" do
+
+      before do
+        Band.create(name: "Depeche Mode")
+        Band.create(name: "New Order")
+      end
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the number of documents that match" do
+        context.send(method).should eq(1)
+      end
     end
   end
 

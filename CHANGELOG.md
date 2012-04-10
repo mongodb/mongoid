@@ -474,6 +474,25 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* \#1865 `count` on the memory and mongo contexts now behave exactly the
+  same as Ruby's `count` on enumerable, and can take an object or a block.
+  This is optimized on the mongo context not to load everything in memory
+  with the exception of passing a block.
+
+        Band.where(name: "Tool").count
+        Band.where(name: "Tool").count(tool) # redundant.
+        Band.where(name: "Tool") do |doc|
+          doc.likes > 0
+        end
+
+    Note that although the signatures are the same for both the memory and
+    mongo contexts, it's recommended you only use the block syntax for the
+    memory context since the embedded documents are already loaded into
+    memory.
+
+    Also note that passing a boolean to take skip and limit into account
+    is no longer supported, as this is not necessarily a useful feature.
+
 * The `autocreate_indexes` configuration option has been removed.
 
 * `Model.defaults` no longer exists. You may get all defaults with a

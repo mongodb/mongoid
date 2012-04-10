@@ -50,49 +50,83 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
-  [ :count, :length, :size ].each do |method|
+  describe "#count" do
 
-    describe "##{method}" do
+    let!(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
 
-      let(:hobrecht) do
-        Address.new(street: "hobrecht")
+    let!(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.where(street: "hobrecht").tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "context when no arguments are provided" do
+
+      it "returns the number of matches" do
+        context.count.should eq(1)
+      end
+    end
+
+    context "when provided a document" do
+
+      context "when the document matches" do
+
+        let(:count) do
+          context.count(hobrecht)
+        end
+
+        it "returns 1" do
+          count.should eq(1)
+        end
       end
 
-      let(:friedel) do
-        Address.new(street: "friedel")
+      context "when the document does not match" do
+
+        let(:count) do
+          context.count(friedel)
+        end
+
+        it "returns 0" do
+          count.should eq(0)
+        end
       end
+    end
 
-      context "when there are matching documents" do
+    context "when provided a block" do
 
-        let(:criteria) do
-          Address.where(street: "hobrecht").tap do |crit|
-            crit.documents = [ hobrecht, friedel ]
+      context "when the block evals 1 to true" do
+
+        let(:count) do
+          context.count do |doc|
+            doc.street == "hobrecht"
           end
         end
 
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns the number of matches" do
-          context.send(method).should eq(1)
+        it "returns 1" do
+          count.should eq(1)
         end
       end
 
-      context "when there are no matching documents" do
+      context "when the block evals none to true" do
 
-        let(:criteria) do
-          Address.where(street: "pfluger").tap do |crit|
-            crit.documents = [ hobrecht, friedel ]
+        let(:count) do
+          context.count do |doc|
+            doc.street == "friedel"
           end
         end
 
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        it "returns zero" do
-          context.send(method).should eq(0)
+        it "returns 0" do
+          count.should eq(0)
         end
       end
     end
@@ -465,6 +499,54 @@ describe Mongoid::Contextual::Memory do
 
     it "returns the last matching document" do
       context.last.should eq(friedel)
+    end
+  end
+
+  [ :length, :size ].each do |method|
+
+    describe "##{method}" do
+
+      let(:hobrecht) do
+        Address.new(street: "hobrecht")
+      end
+
+      let(:friedel) do
+        Address.new(street: "friedel")
+      end
+
+      context "when there are matching documents" do
+
+        let(:criteria) do
+          Address.where(street: "hobrecht").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns the number of matches" do
+          context.send(method).should eq(1)
+        end
+      end
+
+      context "when there are no matching documents" do
+
+        let(:criteria) do
+          Address.where(street: "pfluger").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns zero" do
+          context.send(method).should eq(0)
+        end
+      end
     end
   end
 

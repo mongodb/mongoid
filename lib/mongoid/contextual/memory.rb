@@ -26,20 +26,6 @@ module Mongoid #:nodoc:
       end
       alias :empty? :blank?
 
-      # Get the count of matching documents in the context.
-      #
-      # @example Get the count of matching documents.
-      #   context.count
-      #
-      # @return [ Integer ] The matching count.
-      #
-      # @since 3.0.0
-      def count
-        documents.count
-      end
-      alias :length :count
-      alias :size :count
-
       # Delete all documents in the database that match the selector.
       #
       # @example Delete all the documents.
@@ -165,6 +151,19 @@ module Mongoid #:nodoc:
       def last
         documents.last
       end
+
+      # Get the length of matching documents in the context.
+      #
+      # @example Get the length of matching documents.
+      #   context.length
+      #
+      # @return [ Integer ] The matching length.
+      #
+      # @since 3.0.0
+      def length
+        documents.length
+      end
+      alias :size :length
 
       # Limits the number of documents that are returned.
       #
