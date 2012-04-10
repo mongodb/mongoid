@@ -32,6 +32,7 @@ module Mongoid #:nodoc:
           retry
         rescue Mongo::OperationFailure => ex
           if ex.message =~ /not master/
+            Mongoid.reconnect!
             retries = increase_retry_attempts(retries, ex)
             retry
           else

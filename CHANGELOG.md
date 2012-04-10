@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1892 When getting not master operation error, Mongoid should reconnect
+  before retrying the operation.
+
 * \#1887 Don't cascade callbacks to children that don't have the callback
   defined.
 
