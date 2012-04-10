@@ -50,7 +50,7 @@ module Mongoid # :nodoc:
           without_autobuild do
             value = send(name)
             if relations.has_key?(name)
-              attrs[name] = value.serializable_hash(options)
+              attrs[name] = value ? value.serializable_hash(options) : nil
             else
               attrs[name] = value
             end
