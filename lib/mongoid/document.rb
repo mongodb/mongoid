@@ -135,7 +135,7 @@ module Mongoid #:nodoc:
           yield(self) if block_given?
         end
         apply_post_processed_defaults
-        run_callbacks(:initialize) { self }
+        run_callbacks(:initialize) if _initialize_callbacks.any?
       end
     end
 
@@ -292,7 +292,7 @@ module Mongoid #:nodoc:
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
         IdentityMap.set(doc) unless _loading_revision?
-        doc.run_callbacks(:initialize) { doc }
+        doc.run_callbacks(:initialize) if doc._initialize_callbacks.any?
         doc
       end
 

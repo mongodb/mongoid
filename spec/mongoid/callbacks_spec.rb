@@ -8,12 +8,10 @@ describe Mongoid::Callbacks do
     attr_reader :before_save_called, :after_save_called
 
     before_save do |object|
-      p "before save"
       @before_save_called = true
     end
 
     after_save do |object|
-      p "after save"
       @after_save_called = true
     end
   end
@@ -365,8 +363,8 @@ describe Mongoid::Callbacks do
         person.services.create!(sid: 1)
       end
 
-      it "only executes the cascading callbacks once" do
-        Service.any_instance.expects(:after_initialize_called=).once
+      it "doesn't cascade the initialize" do
+        Service.any_instance.expects(:after_initialize_called=).never
         Person.find(person.id).should eq(person)
       end
     end

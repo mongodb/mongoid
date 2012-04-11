@@ -474,6 +474,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* `after_initialize` callbacks no longer cascade to children if the option
+  is set.
+
 * \#1865 `count` on the memory and mongo contexts now behave exactly the
   same as Ruby's `count` on enumerable, and can take an object or a block.
   This is optimized on the mongo context not to load everything in memory
