@@ -4,15 +4,13 @@ module Support #:nodoc:
     extend self
 
     def configured?
-      begin
-        user = ENV["MONGOHQ_USER_MONGOID"]
-        password = ENV["MONGOHQ_PASSWORD_MONGOID"]
-        mongohq_uri = "mongodb://#{user}:#{password}@flame.mongohq.com:27040/mongoid"
-        Mongo::Connection.from_uri(mongohq_uri)
-        true
-      rescue Mongo::MongoArgumentError, Mongo::ConnectionFailure
-        false
-      end
+      user = ENV["MONGOHQ_USER_MONGOID"]
+      password = ENV["MONGOHQ_PASSWORD_MONGOID"]
+      mongohq_uri = "mongodb://#{user}:#{password}@flame.mongohq.com:27040/mongoid"
+      Mongo::Connection.from_uri(mongohq_uri)
+      true
+    rescue Mongo::MongoArgumentError, Mongo::ConnectionFailure
+      false
     end
 
     def message
