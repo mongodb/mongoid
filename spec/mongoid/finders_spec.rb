@@ -2,6 +2,19 @@ require "spec_helper"
 
 describe Mongoid::Finders do
 
+  describe ".each" do
+
+    let!(:band) do
+      Band.create
+    end
+
+    it "iterates through all documents" do
+      Band.each do |band|
+        band.should be_a(Band)
+      end
+    end
+  end
+
   describe ".find_or_create_by" do
 
     context "when the document is found" do
