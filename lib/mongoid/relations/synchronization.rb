@@ -133,15 +133,14 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def synced_save(metadata)
-          tap do
-            set_callback(
-              :save,
-              :after,
-              if: ->(doc){ doc.syncable?(metadata) }
-            ) do |doc|
-              doc.update_inverse_keys(metadata)
-            end
+          set_callback(
+            :save,
+            :after,
+            if: ->(doc){ doc.syncable?(metadata) }
+          ) do |doc|
+            doc.update_inverse_keys(metadata)
           end
+          self
         end
 
         # Set up the sync of inverse keys that needs to happen on a destroy.
@@ -155,14 +154,13 @@ module Mongoid # :nodoc:
         #
         # @since 2.2.1
         def synced_destroy(metadata)
-          tap do
-            set_callback(
-              :destroy,
-              :after
-            ) do |doc|
-              doc.remove_inverse_keys(metadata)
-            end
+          set_callback(
+            :destroy,
+            :after
+          ) do |doc|
+            doc.remove_inverse_keys(metadata)
           end
+          self
         end
       end
     end
