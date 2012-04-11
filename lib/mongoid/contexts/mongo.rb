@@ -200,11 +200,11 @@ module Mongoid #:nodoc:
       #
       # @return [ Document ] The first document in the collection.
       def first
-        attributes = klass.collection.find_one(selector, options_with_default_sorting)
-        return nil unless attributes
-        selecting do
-          Mongoid::Factory.from_db(klass, attributes).tap do |doc|
-            eager_load([ doc ]) if criteria.inclusions.any?
+        if attributes = klass.collection.find_one(selector, options_with_default_sorting)
+          selecting do
+            Mongoid::Factory.from_db(klass, attributes).tap do |doc|
+              eager_load([ doc ]) if criteria.inclusions.any?
+            end
           end
         end
       end
@@ -273,11 +273,11 @@ module Mongoid #:nodoc:
       def last
         opts = options_with_default_sorting
         opts[:sort] = opts[:sort].map{ |option| [ option[0], -(option[1]) ] }.uniq
-        attributes = klass.collection.find_one(selector, opts)
-        return nil unless attributes
-        selecting do
-          Mongoid::Factory.from_db(klass, attributes).tap do |doc|
-            eager_load([ doc ]) if criteria.inclusions.any?
+        if attributes = klass.collection.find_one(selector, opts)
+          selecting do
+            Mongoid::Factory.from_db(klass, attributes).tap do |doc|
+              eager_load([ doc ]) if criteria.inclusions.any?
+            end
           end
         end
       end

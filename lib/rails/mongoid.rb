@@ -132,13 +132,11 @@ module Rails #:nodoc:
         parts = model_path.map { |path| path.camelize }
         name = parts.join("::")
         klass = name.constantize
-      rescue NameError, LoadError => e
+      rescue NameError, LoadError
         logger.info("Attempted to constantize #{name}, trying without namespacing.")
         klass = parts.last.constantize
       end
-      if klass.ancestors.include?(::Mongoid::Document)
-        return klass
-      end
+      klass if klass.ancestors.include?(::Mongoid::Document)
     end
   end
 end

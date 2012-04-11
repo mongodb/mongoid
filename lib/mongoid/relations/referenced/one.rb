@@ -59,8 +59,7 @@ module Mongoid # :nodoc:
               save if persisted?
             end
           end
-          return nil unless replacement
-          One.new(base, replacement, metadata)
+          One.new(base, replacement, metadata) if replacement
         end
 
         private
