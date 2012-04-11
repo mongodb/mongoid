@@ -32,7 +32,6 @@ module Mongoid #:nodoc:
               if parent.new_record?
                 parent.insert
               else
-                # collection.update(parent.atomic_selector, inserts, options)
                 collection.find(parent.atomic_selector).update(inserts)
               end
             end

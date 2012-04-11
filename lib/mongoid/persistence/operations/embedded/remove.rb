@@ -29,7 +29,6 @@ module Mongoid #:nodoc:
             prepare do |doc|
               parent.remove_child(doc) if notifying_parent?
               if parent.persisted?
-                # collection.update(parent.atomic_selector, deletes, options)
                 collection.find(parent.atomic_selector).update(deletes)
               end
             end
