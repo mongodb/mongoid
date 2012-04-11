@@ -76,10 +76,8 @@ module Mongoid #:nodoc:
         end
 
         unless errors.empty?
-          raise(
-            Errors::MultiparameterAssignmentErrors.new(errors),
+          raise Errors::MultiparameterAssignmentErrors.new(errors),
             "#{errors.size} error(s) on assignment of multiparameter attributes"
-          )
         end
 
         super attributes, role, guard_protected_attributes
