@@ -863,8 +863,8 @@ module Mongoid # :nodoc:
         if inverse_class_name.present? && name.present?
           parts = inverse_class_name.split('::')
           parts.size.times.map do |i|
-            parts.combination(i).first
-          end.map{ |p| p.join('::') }.reverse.find do |mod|
+            parts.first(i).join('::')
+          end.reverse.find do |mod|
             ActiveSupport::Inflector.constantize(mod).constants.include?(name.to_s.classify.to_sym)
           end
         end
