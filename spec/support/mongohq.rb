@@ -10,9 +10,7 @@ module Support #:nodoc:
         mongohq_uri = "mongodb://#{user}:#{password}@flame.mongohq.com:27040/mongoid"
         Mongo::Connection.from_uri(mongohq_uri)
         true
-      rescue Mongo::ConnectionFailure => e
-        false
-      rescue Mongo::MongoArgumentError => e
+      rescue Mongo::MongoArgumentError, Mongo::ConnectionFailure
         false
       end
     end

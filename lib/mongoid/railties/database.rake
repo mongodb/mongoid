@@ -71,7 +71,7 @@ namespace :db do
           if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
             documents << klass
           end
-        rescue => e
+        rescue
           # Just for non-mongoid objects that dont have the embedded
           # attribute at the class level.
         end
