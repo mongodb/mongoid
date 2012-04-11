@@ -63,18 +63,16 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def builder(name, metadata)
-          tap do
-            meth = "build_#{name}"
-            re_define_method(meth) do |*args|
-              attributes, options = parse_args(*args)
-              document = Factory.build(metadata.klass, attributes, options)
-              _building do
-                send("#{name}=", document).tap do |child|
-                  child.run_callbacks(:build)
-                end
+          re_define_method("build_#{name}") do |*args|
+            attributes, options = parse_args(*args)
+            document = Factory.build(metadata.klass, attributes, options)
+            _building do
+              send("#{name}=", document).tap do |child|
+                child.run_callbacks(:build)
               end
             end
           end
+          self
         end
 
         # Defines a creator method for an embeds_one relation. This is
@@ -90,17 +88,15 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def creator(name, metadata)
-          tap do
-            meth = "create_#{name}"
-            re_define_method(meth) do |*args|
-              attributes, options = parse_args(*args)
-              document = Factory.build(metadata.klass, attributes, options)
-              send("#{name}=", document).tap do |doc|
-                doc.save
-                save if new_record? && metadata.stores_foreign_key?
-              end
+          re_define_method("create_#{name}") do |*args|
+            attributes, options = parse_args(*args)
+            document = Factory.build(metadata.klass, attributes, options)
+            send("#{name}=", document).tap do |doc|
+              doc.save
+              save if new_record? && metadata.stores_foreign_key?
             end
           end
+          self
         end
       end
     end
