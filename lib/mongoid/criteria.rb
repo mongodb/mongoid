@@ -338,9 +338,7 @@ module Mongoid #:nodoc:
     # database.
     #
     # @example Get the document from the map or criteria.
-    #   criteria.from_map_or_db(criteria)
-    #
-    # @param [ Criteria ] The cloned criteria.
+    #   criteria.from_map_or_db
     #
     # @return [ Document ] The found document.
     #
