@@ -16,14 +16,15 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def get(klass, identifier)
-      return nil unless Mongoid.using_identity_map? && klass
-      if identifier.is_a?(::Array)
-        documents = documents_for(klass)
-        identifier.map do |id|
-          documents[id] || (return nil)
+      if Mongoid.using_identity_map? && klass
+        if identifier.is_a?(::Array)
+          documents = documents_for(klass)
+          identifier.map do |id|
+            documents[id] || (return nil)
+          end
+        else
+          documents_for(klass)[identifier]
         end
-      else
-        documents_for(klass)[identifier]
       end
     end
 
@@ -38,8 +39,9 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def remove(document)
-      return nil unless Mongoid.using_identity_map? && document && document.id
-      documents_for(document.class).delete(document.id)
+      if Mongoid.using_identity_map? && document && document.id
+        documents_for(document.class).delete(document.id)
+      end
     end
 
     # Puts a document in the identity map, accessed by it's id.
@@ -53,8 +55,9 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def set(document)
-      return nil unless Mongoid.using_identity_map? && document && document.id
-      documents_for(document.class)[document.id] = document
+      if Mongoid.using_identity_map? && document && document.id
+        documents_for(document.class)[document.id] = document
+      end
     end
 
     # Set a document in the identity map for the provided selector.
@@ -100,8 +103,9 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def documents_for(klass)
-      return nil unless klass
-      self[klass.collection_name] ||= {}
+      if klass
+        self[klass.collection_name] ||= {}
+      end
     end
 
     class << self

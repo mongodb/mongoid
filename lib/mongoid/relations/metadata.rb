@@ -94,9 +94,9 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def cascade_strategy
-        return nil unless dependent?
-
-        "Mongoid::Relations::Cascading::#{dependent.to_s.classify}".constantize
+        if dependent?
+          "Mongoid::Relations::Cascading::#{dependent.to_s.classify}".constantize
+        end
       end
 
       # Is this an embedded relations that allows callbacks to cascade down to
@@ -407,8 +407,7 @@ module Mongoid # :nodoc:
       # @since 2.0.0.rc.1
       def inverse(other = nil)
         invs = inverses(other)
-        return nil unless invs.count == 1
-        invs.first
+        invs.first if invs.count == 1
       end
 
       # Returns the inverse_class_name option of the relation.
@@ -861,14 +860,13 @@ module Mongoid # :nodoc:
       #
       # @return [String] The module.
       def find_module
-        return nil unless inverse_class_name.present?
-        return nil unless name.present?
-
-        parts = inverse_class_name.split('::')
-        parts.size.times.map do |i|
-          parts.combination(i).first
-        end.map{ |p| p.join('::') }.reverse.find do |mod|
-          ActiveSupport::Inflector.constantize(mod).constants.include?(name.to_s.classify.to_sym)
+        if inverse_class_name.present? && name.present?
+          parts = inverse_class_name.split('::')
+          parts.size.times.map do |i|
+            parts.combination(i).first
+          end.map{ |p| p.join('::') }.reverse.find do |mod|
+            ActiveSupport::Inflector.constantize(mod).constants.include?(name.to_s.classify.to_sym)
+          end
         end
       end
 
@@ -1035,9 +1033,10 @@ module Mongoid # :nodoc:
       #
       # @return [ Array<String> ] The inverse names.
       def lookup_inverses(other)
-        return nil unless other
-        matching_metas = other.class.relations.find_all { |key, meta| meta.as == name }
-        return matching_metas.map { |meta| meta[1].name }
+        if other
+          matching_metas = other.class.relations.find_all { |key, meta| meta.as == name }
+          matching_metas.map { |meta| meta[1].name }
+        end
       end
 
       # For polymorphic children, we need to figure out the inverse from the
@@ -1053,9 +1052,9 @@ module Mongoid # :nodoc:
       #
       # @since 2.0.0.rc.1
       def lookup_inverse(other)
-        return nil unless invs = lookup_inverses(other)
-        return nil unless invs.count == 1
-        invs.first
+        if invs = lookup_inverses(other) && invs.count == 1
+          invs.first
+        end
       end
     end
   end

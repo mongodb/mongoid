@@ -297,9 +297,9 @@ module Mongoid # :nodoc:
         # @since 3.0.0
         def pop(count = nil)
           if count
-            docs = target[target.size - count, target.size]
-            return nil unless docs
-            docs.each { |doc| delete(doc) }
+            if docs = target[target.size - count, target.size]
+              docs.each { |doc| delete(doc) }
+            end
           else
             delete(target[-1])
           end

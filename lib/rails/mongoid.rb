@@ -136,9 +136,7 @@ module Rails #:nodoc:
         logger.info("Attempted to constantize #{name}, trying without namespacing.")
         klass = parts.last.constantize
       end
-      if klass.ancestors.include?(::Mongoid::Document)
-        return klass
-      end
+      klass if klass.ancestors.include?(::Mongoid::Document)
     end
   end
 end
