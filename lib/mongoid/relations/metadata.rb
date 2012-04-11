@@ -865,10 +865,8 @@ module Mongoid # :nodoc:
         return nil unless name.present?
 
         parts = inverse_class_name.split('::')
-        [].tap do |combinations|
-          parts.size.times do |i|
-            combinations << parts.combination(i).first
-          end
+        parts.size.times.map do |i|
+          parts.combination(i).first
         end.map{ |p| p.join('::') }.reverse.find do |mod|
           ActiveSupport::Inflector.constantize(mod).constants.include?(name.to_s.classify.to_sym)
         end
