@@ -75,7 +75,9 @@ module Mongoid #:nodoc:
     #
     # @return [ Criteria ] The cloned criteria.
     def cache
-      clone.tap { |crit| crit.options.merge!(cache: true) }
+      crit = clone
+      crit.options.merge!(cache: true)
+      crit
     end
 
     # Will return true if the cache option has been set.
@@ -205,9 +207,9 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def extras(extras)
-      clone.tap do |crit|
-        crit.options.merge!(extras)
-      end
+      crit = clone
+      crit.options.merge!(extras)
+      crit
     end
 
     # Get the list of included fields.
@@ -398,9 +400,9 @@ module Mongoid #:nodoc:
     #
     # @return [ Criteria ] A cloned self.
     def merge(other)
-      clone.tap do |criteria|
-        criteria.merge!(other)
-      end
+      crit = clone
+      crit.merge!(other)
+      crit
     end
 
     # Merge the other criteria into this one.
@@ -415,13 +417,12 @@ module Mongoid #:nodoc:
     # @since 3.0.0
     def merge!(other)
       criteria = other.to_criteria
-      tap do |crit|
-        crit.selector.update(criteria.selector)
-        crit.options.update(criteria.options)
-        crit.documents = criteria.documents.dup if criteria.documents.any?
-        crit.scoping_options = criteria.scoping_options
-        crit.inclusions = (crit.inclusions + criteria.inclusions.dup).uniq
-      end
+      selector.update(criteria.selector)
+      options.update(criteria.options)
+      self.documents = criteria.documents.dup if criteria.documents.any?
+      self.scoping_options = criteria.scoping_options
+      self.inclusions = (inclusions + criteria.inclusions.dup).uniq
+      self
     end
 
     # Overriden to include _type in the fields.
@@ -511,12 +512,11 @@ module Mongoid #:nodoc:
     # @since 3.0.0
     def create_document(method, attrs = {})
       klass.__send__(method,
-        selector.inject(attrs) do |hash, (key, value)|
-          hash.tap do |_attrs|
-            unless key.to_s =~ /\$/ || value.is_a?(Hash)
-              _attrs[key] = value
-            end
+        selector.reduce(attrs) do |hash, (key, value)|
+          unless key.to_s =~ /\$/ || value.is_a?(Hash)
+            hash[key] = value
           end
+          hash
         end
       )
     end

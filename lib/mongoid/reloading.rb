@@ -16,18 +16,16 @@ module Mongoid #:nodoc:
     #
     # @since 1.0.0
     def reload
-      _reload.tap do |reloaded|
-        if Mongoid.raise_not_found_error && reloaded.empty?
-          raise Errors::DocumentNotFound.new(self.class, id, id)
-        end
-        @attributes = reloaded
+      reloaded = _reload
+      if Mongoid.raise_not_found_error && reloaded.empty?
+        raise Errors::DocumentNotFound.new(self.class, id, id)
       end
-      tap do |doc|
-        doc.changed_attributes.clear
-        doc.apply_defaults
-        doc.reload_relations
-        doc.run_callbacks(:initialize)
-      end
+      @attributes = reloaded
+      changed_attributes.clear
+      apply_defaults
+      reload_relations
+      run_callbacks(:initialize)
+      self
     end
 
     private

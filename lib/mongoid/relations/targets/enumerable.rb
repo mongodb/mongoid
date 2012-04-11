@@ -94,15 +94,15 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def delete(document)
-          (loaded.delete(document) || added.delete(document)).tap do |doc|
-            unless doc
-              if unloaded && unloaded.where(_id: document.id).exists?
-                yield(document) if block_given?
-                return document
-              end
+          doc = (loaded.delete(document) || added.delete(document))
+          unless doc
+            if unloaded && unloaded.where(_id: document.id).exists?
+              yield(document) if block_given?
+              return document
             end
-            yield(doc) if block_given?
           end
+          yield(doc) if block_given?
+          doc
         end
 
         # Deletes every document in the enumerable for where the block returns
@@ -250,9 +250,9 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def in_memory
-          (loaded + added).tap do |docs|
-            docs.each { |doc| yield(doc) } if block_given?
-          end
+          docs = (loaded + added)
+          docs.each { |doc| yield(doc) } if block_given?
+          docs
         end
 
         # Get the last document in the enumerable. Will check the new

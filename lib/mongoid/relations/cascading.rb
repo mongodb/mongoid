@@ -48,7 +48,8 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def cascade(metadata)
-          tap { self.cascades += [ metadata.name.to_s ] if metadata.dependent? }
+          self.cascades += [ metadata.name.to_s ] if metadata.dependent?
+          self
         end
       end
     end

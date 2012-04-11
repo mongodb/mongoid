@@ -20,13 +20,13 @@ module Mongoid #:nodoc:
       # @since 2.1.0
       def prepare(&block)
         return false if validating? && document.invalid?(:update)
-        document.run_callbacks(:save) do
+        result = document.run_callbacks(:save) do
           document.run_callbacks(:update) do
             yield(document); true
           end
-        end.tap do |result|
-          document.post_persist unless result == false
         end
+        document.post_persist unless result == false
+        result
       end
     end
   end

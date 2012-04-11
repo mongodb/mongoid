@@ -50,12 +50,11 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          tap do |proxy|
-            proxy.unbind_one
-            return nil unless replacement
-            proxy.target = replacement
-            proxy.bind_one
-          end
+          unbind_one
+          return nil unless replacement
+          self.target = replacement
+          bind_one
+          self
         end
 
         private

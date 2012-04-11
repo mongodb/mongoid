@@ -21,7 +21,8 @@ module Mongoid #:nodoc:
             if document[field]
               values = document.send(field)
               values.delete(value)
-              values.tap { execute("$pull") }
+              execute("$pull")
+              values
             end
           end
         end

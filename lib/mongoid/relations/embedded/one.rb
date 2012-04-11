@@ -35,17 +35,16 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          tap do |proxy|
-            if _assigning?
-              base.atomic_unsets.push(proxy.atomic_path)
-            else
-              proxy.delete if persistable?
-            end
-            proxy.unbind_one
-            return nil unless replacement
-            proxy.target = replacement
-            proxy.bind_one
+          if _assigning?
+            base.atomic_unsets.push(atomic_path)
+          else
+            delete if persistable?
           end
+          unbind_one
+          return nil unless replacement
+          self.target = replacement
+          bind_one
+          self
         end
 
         private

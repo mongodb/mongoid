@@ -47,9 +47,9 @@ module Mongoid
     #
     # @since 3.0.0
     def default_logger
-      Logger.new($stdout).tap do |logger|
-        logger.level = Logger::INFO
-      end
+      logger = Logger.new($stdout)
+      logger.level = Logger::INFO
+      logger
     end
 
     # Get the Rails logger if it's defined.

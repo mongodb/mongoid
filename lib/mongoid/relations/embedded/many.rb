@@ -37,11 +37,11 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def as_document
-          [].tap do |attributes|
-            _unscoped.each do |doc|
-              attributes.push(doc.as_document)
-            end
+          attributes = []
+          _unscoped.each do |doc|
+            attributes.push(doc.as_document)
           end
+          attributes
         end
 
         # Appends an array of documents to the relation. Performs a batch
@@ -121,10 +121,9 @@ module Mongoid # :nodoc:
         #
         # @return [ Many ] The empty relation.
         def clear
-          tap do |proxy|
-            proxy.delete_all
-            _unscoped.clear
-          end
+          delete_all
+          _unscoped.clear
+          self
         end
 
         # Returns a count of the number of documents in the association that have
@@ -158,7 +157,9 @@ module Mongoid # :nodoc:
         #
         # @return [ Document ] The newly created document.
         def create(attributes = {}, options = {}, type = nil, &block)
-          build(attributes, options, type, &block).tap { |doc| doc.save }
+          doc = build(attributes, options, type, &block)
+          doc.save
+          doc
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -181,7 +182,9 @@ module Mongoid # :nodoc:
         #
         # @return [ Document ] The newly created document.
         def create!(attributes = {}, options = {}, type = nil, &block)
-          build(attributes, options, type, &block).tap { |doc| doc.save! }
+          doc = build(attributes, options, type, &block)
+          doc.save!
+          doc
         end
 
         # Delete the supplied document from the target. This method is proxied
@@ -196,18 +199,18 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def delete(document)
-          target.delete_one(document).tap do |doc|
-            _unscoped.delete_one(doc)
-            if doc && !_binding?
-              if _assigning? && !doc.paranoid?
-                base.add_atomic_pull(doc)
-              else
-                doc.delete(suppress: true)
-              end
-              unbind_one(doc)
+          doc = target.delete_one(document)
+          _unscoped.delete_one(doc)
+          if doc && !_binding?
+            if _assigning? && !doc.paranoid?
+              base.add_atomic_pull(doc)
+            else
+              doc.delete(suppress: true)
             end
-            reindex
+            unbind_one(doc)
           end
+          reindex
+          doc
         end
 
         # Delete all the documents in the association without running callbacks.
@@ -379,10 +382,10 @@ module Mongoid # :nodoc:
         #
         # @since 2.4.0
         def unscoped
-          klass.unscoped.tap do |criterion|
-            criterion.embedded = true
-            criterion.documents = _unscoped
-          end
+          criterion = klass.unscoped
+          criterion.embedded = true
+          criterion.documents = _unscoped
+          criterion
         end
 
         private
@@ -425,10 +428,10 @@ module Mongoid # :nodoc:
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          klass.scoped.tap do |criterion|
-            criterion.embedded = true
-            criterion.documents = target
-          end
+          criterion = klass.scoped
+          criterion.embedded = true
+          criterion.documents = target
+          criterion
         end
 
         # Deletes one document from the target and unscoped.
@@ -517,10 +520,10 @@ module Mongoid # :nodoc:
         # @since 2.4.0
         def scope(docs)
           return docs unless metadata.order || metadata.klass.default_scoping?
-          metadata.klass.order_by(metadata.order).tap do |crit|
-            crit.embedded = true
-            crit.documents = docs
-          end.entries
+          crit = metadata.klass.order_by(metadata.order)
+          crit.embedded = true
+          crit.documents = docs
+          crit.entries
         end
 
         # Remove all documents from the relation, either with a delete or a
@@ -536,39 +539,39 @@ module Mongoid # :nodoc:
         def remove_all(conditions = {}, method = :delete)
           # @todo: Durran: test all examples and refactor.
           criteria = where(conditions || {})
-          criteria.size.tap do
-            docs = criteria.map do |doc|
-              target.delete_one(doc)
-              _unscoped.delete_one(doc)
-              if !_assigning? && !metadata.versioned?
-                doc.cascade!
-                doc.run_before_callbacks(:destroy) if method == :destroy
-              end
-              unbind_one(doc)
-              doc
+          removed = criteria.size
+          docs = criteria.map do |doc|
+            target.delete_one(doc)
+            _unscoped.delete_one(doc)
+            if !_assigning? && !metadata.versioned?
+              doc.cascade!
+              doc.run_before_callbacks(:destroy) if method == :destroy
             end
-            if !docs.empty? && !_assigning?
-              query = collection.find(base.atomic_selector)
-              # @todo: Durran: Versioned docs have no atomic path?
-              if metadata.versioned?
-                query.update("$pull" => { metadata.name => conditions || {}})
-              else
-                query.update(
-                  "$pullAll" => { docs.first.atomic_path => docs.map(&:as_document) }
-                )
-              end
-            end
-            unless _assigning?
-              docs.each do |doc|
-                doc.run_after_callbacks(:destroy) if method == :destroy
-                doc.freeze
-                doc.destroyed = true
-                IdentityMap.remove(doc)
-              end
-              Threaded.clear_options!
-            end
-            reindex
+            unbind_one(doc)
+            doc
           end
+          if !docs.empty? && !_assigning?
+            query = collection.find(base.atomic_selector)
+            # @todo: Durran: Versioned docs have no atomic path?
+            if metadata.versioned?
+              query.update("$pull" => { metadata.name => conditions || {}})
+            else
+              query.update(
+                "$pullAll" => { docs.first.atomic_path => docs.map(&:as_document) }
+              )
+            end
+          end
+          unless _assigning?
+            docs.each do |doc|
+              doc.run_after_callbacks(:destroy) if method == :destroy
+              doc.freeze
+              doc.destroyed = true
+              IdentityMap.remove(doc)
+            end
+            Threaded.clear_options!
+          end
+          reindex
+          removed
         end
 
         # Get the internal unscoped documents.

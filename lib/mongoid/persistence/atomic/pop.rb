@@ -21,7 +21,8 @@ module Mongoid #:nodoc:
             if document[field]
               values = document.send(field)
               value > 0 ? values.pop : values.shift
-              values.tap { execute("$pop") }
+              execute("$pop")
+              values
             end
           end
         end

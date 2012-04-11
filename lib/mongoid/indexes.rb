@@ -95,9 +95,9 @@ module Mongoid #:nodoc
       #
       # @since 3.0.0
       def normalize_index_options(spec)
-        (spec.delete(:options) || {}).tap do |opts|
-          opts[:dropDups] = opts.delete(:drop_dups) if opts.has_key?(:drop_dups)
-        end
+        opts = (spec.delete(:options) || {})
+        opts[:dropDups] = opts.delete(:drop_dups) if opts.has_key?(:drop_dups)
+        opts
       end
     end
   end

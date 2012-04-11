@@ -47,9 +47,9 @@ module Mongoid #:nodoc
     #
     # @since 2.0.1
     def load!(path, environment = nil)
-      Environment.load_yaml(path, environment).tap do |settings|
-        load_configuration(settings) if settings.present?
-      end
+      settings = Environment.load_yaml(path, environment)
+      load_configuration(settings) if settings.present?
+      settings
     end
 
     # Connect to the provided database name on the default session.
@@ -128,10 +128,10 @@ module Mongoid #:nodoc
     #
     # @since 3.0.0
     def sessions=(sessions)
-      sessions.with_indifferent_access.tap do |sess|
-        Validators::Session.validate(sess)
-        @sessions = sess
-      end
+      sess = sessions.with_indifferent_access
+      Validators::Session.validate(sess)
+      @sessions = sess
+      sess
     end
 
     private

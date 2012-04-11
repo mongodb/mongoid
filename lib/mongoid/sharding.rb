@@ -31,11 +31,11 @@ module Mongoid #:nodoc
     #
     # @since 2.0.0
     def shard_key_selector
-      {}.tap do |selector|
-        shard_key_fields.each do |field|
-          selector[field.to_s] = send(field)
-        end
+      selector = {}
+      shard_key_fields.each do |field|
+        selector[field.to_s] = send(field)
       end
+      selector
     end
 
     module ClassMethods #:nodoc

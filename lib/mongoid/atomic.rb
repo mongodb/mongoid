@@ -99,12 +99,12 @@ module Mongoid #:nodoc:
     #
     # @since 2.1.0
     def atomic_updates
-      Modifiers.new.tap do |mods|
-        generate_atomic_updates(mods, self)
-        _children.each do |child|
-          generate_atomic_updates(mods, child)
-        end
+      mods = Modifiers.new
+      generate_atomic_updates(mods, self)
+      _children.each do |child|
+        generate_atomic_updates(mods, child)
       end
+      mods
     end
     alias :_updates :atomic_updates
 
@@ -170,14 +170,13 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def atomic_pulls
-      delayed_atomic_pulls.inject({}) do |pulls, (_, docs)|
-        pulls.tap do |pull|
-          docs.each do |doc|
-            (pull[doc.atomic_path] ||= []).push(doc.as_document)
-            doc.destroyed = true
-            doc.flagged_for_destroy = false
-          end
+      delayed_atomic_pulls.reduce({}) do |pulls, (_, docs)|
+        docs.each do |doc|
+          (pulls[doc.atomic_path] ||= []).push(doc.as_document)
+          doc.destroyed = true
+          doc.flagged_for_destroy = false
         end
+        pulls
       end
     end
 

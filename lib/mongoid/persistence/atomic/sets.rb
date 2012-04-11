@@ -18,7 +18,8 @@ module Mongoid #:nodoc:
         def persist
           prepare do
             document[field] = value
-            document[field].tap { execute("$set") }
+            execute("$set")
+            document[field]
           end
         end
       end

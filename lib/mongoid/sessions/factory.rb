@@ -57,12 +57,12 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def create_session(config)
         options = (config[:options] || {}).dup
-        Moped::Session.new(config[:hosts], options).tap do |session|
-          session.use(config[:database])
-          if authenticated?(config)
-            session.login(config[:username], config[:password])
-          end
+        session = Moped::Session.new(config[:hosts], options)
+        session.use(config[:database])
+        if authenticated?(config)
+          session.login(config[:username], config[:password])
         end
+        session
       end
 
       # Are we authenticated with this session config?

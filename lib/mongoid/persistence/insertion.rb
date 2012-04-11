@@ -19,18 +19,17 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def prepare(&block)
-        document.tap do |doc|
-          unless validating? && document.invalid?(:create)
-            result = doc.run_callbacks(:save) do
-              doc.run_callbacks(:create) do
-                yield(doc)
-                doc.new_record = false
-                true
-              end
+        unless validating? && document.invalid?(:create)
+          result = document.run_callbacks(:save) do
+            document.run_callbacks(:create) do
+              yield(document)
+              document.new_record = false
+              true
             end
-            document.post_persist unless result == false
           end
+          document.post_persist unless result == false
         end
+        document
       end
     end
   end

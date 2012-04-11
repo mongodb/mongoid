@@ -134,29 +134,29 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] A +Hash+ of atomic setters.
     def setters
-      {}.tap do |modifications|
-        changes.each_pair do |name, changes|
-          if changes
-            old, new = changes
-            field = fields[name]
-            key = atomic_attribute_name(name) 
-            if field && field.resizable?
-              field.add_atomic_changes(
-                self,
-                name,
-                key,
-                modifications,
-                new,
-                old
-              )
-            else
-              unless atomic_unsets.include?(key)
-                modifications[key] = new
-              end
+      modifications = {}
+      changes.each_pair do |name, changes|
+        if changes
+          old, new = changes
+          field = fields[name]
+          key = atomic_attribute_name(name) 
+          if field && field.resizable?
+            field.add_atomic_changes(
+              self,
+              name,
+              key,
+              modifications,
+              new,
+              old
+            )
+          else
+            unless atomic_unsets.include?(key)
+              modifications[key] = new
             end
           end
         end
       end
+      modifications
     end
 
     private

@@ -16,7 +16,8 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.0
       def timeless
-        tap { Threaded.timeless = true }
+        Threaded.timeless = true
+        self
       end
 
       # Are we currently timestamping?
@@ -42,7 +43,8 @@ module Mongoid #:nodoc:
         #
         # @since 2.3.0
         def timeless
-          tap { Threaded.timeless = true }
+          Threaded.timeless = true
+          self
         end
       end
     end

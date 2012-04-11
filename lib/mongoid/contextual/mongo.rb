@@ -78,11 +78,11 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def destroy
-        query.count.tap do
-          each do |doc|
-            doc.destroy
-          end
+        destroyed = query.count
+        each do |doc|
+          doc.destroy
         end
+        destroyed
       end
       alias :destroy_all :destroy
 
@@ -115,12 +115,12 @@ module Mongoid #:nodoc:
         if block_given?
           selecting do
             if eager_loadable?
-              query.map{ |doc| Factory.from_db(klass, doc) }.tap do |docs|
-                eager_load(docs)
-                docs.each do |doc|
-                  yield doc
-                end
+              docs = query.map{ |doc| Factory.from_db(klass, doc) }
+              eager_load(docs)
+              docs.each do |doc|
+                yield doc
               end
+              docs
             else
               query.each do |doc|
                 yield Factory.from_db(klass, doc)
@@ -458,9 +458,9 @@ module Mongoid #:nodoc:
       def with_eager_loading(document)
         selecting do
           return nil unless document
-          Factory.from_db(klass, document).tap do |doc|
-            eager_load([ doc ]) if eager_loadable?
-          end
+          doc = Factory.from_db(klass, document)
+          eager_load([ doc ]) if eager_loadable?
+          doc
         end
       end
     end

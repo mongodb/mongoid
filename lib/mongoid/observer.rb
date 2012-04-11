@@ -176,6 +176,5 @@ module Mongoid #:nodoc:
       return false unless klass.respond_to?(:observers)
       klass.observers.disabled_for?(self) || Mongoid.observers.disabled_for?(self)
     end
-
   end
 end

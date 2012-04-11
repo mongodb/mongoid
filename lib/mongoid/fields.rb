@@ -203,11 +203,11 @@ module Mongoid #:nodoc
       def field(name, options = {})
         named = name.to_s
         check_field_name!(name)
-        add_field(named, options).tap do
-          descendants.each do |subclass|
-            subclass.add_field(named, options)
-          end
+        added = add_field(named, options)
+        descendants.each do |subclass|
+          subclass.add_field(named, options)
         end
+        added
       end
 
       # When inheriting, we want to copy the fields from the parent class and
@@ -306,15 +306,15 @@ module Mongoid #:nodoc
         aliased = options[:as]
         aliased_fields[aliased.to_s] = name if aliased
         type = options[:localize] ? Fields::Internal::Localized : options[:type]
-        Mappings.for(type, options[:identity]).instantiate(name, options).tap do |field|
-          fields[name] = field
-          add_defaults(field)
-          create_accessors(name, name, options)
-          create_accessors(name, aliased, options) if aliased
-          process_options(field)
-          create_dirty_methods(name, name)
-          create_dirty_methods(name, aliased) if aliased
-        end
+        field = Mappings.for(type, options[:identity]).instantiate(name, options)
+        fields[name] = field
+        add_defaults(field)
+        create_accessors(name, name, options)
+        create_accessors(name, aliased, options) if aliased
+        process_options(field)
+        create_dirty_methods(name, name)
+        create_dirty_methods(name, aliased) if aliased
+        field
       end
 
       # Run through all custom options stored in Mongoid::Fields.options and
@@ -400,11 +400,11 @@ module Mongoid #:nodoc
             end
           else
             re_define_method(meth) do
-              read_attribute(name).tap do |value|
-                if value.is_a?(Array) || value.is_a?(Hash)
-                  attribute_will_change!(name)
-                end
+              value = read_attribute(name)
+              if value.is_a?(Array) || value.is_a?(Hash)
+                attribute_will_change!(name)
               end
+              value
             end
           end
         end
@@ -490,7 +490,9 @@ module Mongoid #:nodoc
       # @since 2.0.0
       def generated_methods
         @generated_methods ||= begin
-          Module.new.tap { |mod| include(mod) }
+          mod = Module.new
+          include(mod)
+          mod
         end
       end
 

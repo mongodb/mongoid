@@ -104,12 +104,11 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def convert_from_hash(klass, object, reject_blank=true)
-        object.tap do |hash|
-          hash.each_pair do |key, value|
-            next unless klass.object_id_field?(key)
-            hash[key] = convert(klass, value, reject_blank)
-          end
+        object.each_pair do |key, value|
+          next unless klass.object_id_field?(key)
+          object[key] = convert(klass, value, reject_blank)
         end
+        object
       end
 
       def evolve(object)

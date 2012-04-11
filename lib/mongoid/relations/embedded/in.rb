@@ -37,16 +37,15 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          tap do |proxy|
-            proxy.unbind_one
-            unless replacement
-              base.delete if persistable?
-              return nil
-            end
-            base.new_record = true
-            proxy.target = replacement
-            proxy.bind_one
+          unbind_one
+          unless replacement
+            base.delete if persistable?
+            return nil
           end
+          base.new_record = true
+          self.target = replacement
+          bind_one
+          self
         end
 
         private

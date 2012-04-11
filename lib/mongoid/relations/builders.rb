@@ -67,9 +67,9 @@ module Mongoid # :nodoc:
             attributes, options = parse_args(*args)
             document = Factory.build(metadata.klass, attributes, options)
             _building do
-              send("#{name}=", document).tap do |child|
-                child.run_callbacks(:build)
-              end
+              child = send("#{name}=", document)
+              child.run_callbacks(:build)
+              child
             end
           end
           self
@@ -91,10 +91,10 @@ module Mongoid # :nodoc:
           re_define_method("create_#{name}") do |*args|
             attributes, options = parse_args(*args)
             document = Factory.build(metadata.klass, attributes, options)
-            send("#{name}=", document).tap do |doc|
-              doc.save
-              save if new_record? && metadata.stores_foreign_key?
-            end
+            doc = send("#{name}=", document)
+            doc.save
+            save if new_record? && metadata.stores_foreign_key?
+            doc
           end
           self
         end

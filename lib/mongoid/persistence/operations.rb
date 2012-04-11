@@ -141,9 +141,9 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def init_updates
-        document.atomic_updates.tap do |updates|
-          @conflicts = updates.delete(:conflicts) || {}
-        end
+        updates = document.atomic_updates
+        @conflicts = updates.delete(:conflicts) || {}
+        updates
       end
 
       class << self

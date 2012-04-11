@@ -277,9 +277,9 @@ module Mongoid #:nodoc:
           def #{name}(*args)
             scoping = scopes[:#{name}]
             scope, extension = scoping[:scope][*args], scoping[:extension]
-            with_default_scope.merge(scope).tap do |criteria|
-              criteria.extend(extension)
-            end
+            criteria = with_default_scope.merge(scope)
+            criteria.extend(extension)
+            criteria
           end
         SCOPE
       end

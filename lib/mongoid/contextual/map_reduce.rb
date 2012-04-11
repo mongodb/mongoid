@@ -75,9 +75,8 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def finalize(function)
-        tap do |mr|
-          mr.command[:finalize] = function
-        end
+        command[:finalize] = function
+        self
       end
 
       # Initialize the new map/reduce directive.
@@ -110,9 +109,8 @@ module Mongoid #:nodoc:
       end
 
       def js_mode
-        tap do |mr|
-          mr.command[:jsMode] = true
-        end
+        command[:jsMode] = true
+        self
       end
 
       # Specifies where the map/reduce output is to be stored.
@@ -135,13 +133,12 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def out(location)
-        tap do |mr|
-          normalized = location.dup
-          normalized.update_values do |value|
-            value.is_a?(::Symbol) ? value.to_s : value
-          end
-          mr.command[:out] = normalized
+        normalized = location.dup
+        normalized.update_values do |value|
+          value.is_a?(::Symbol) ? value.to_s : value
         end
+        command[:out] = normalized
+        self
       end
 
       # Get the number of documents output by the map/reduce.
@@ -191,9 +188,8 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def scope(object)
-        tap do |mr|
-          mr.command[:scope] = object
-        end
+        command[:scope] = object
+        self
       end
 
       # Get the execution time of the map/reduce.

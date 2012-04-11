@@ -30,19 +30,18 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def remove_scoping(other)
-        tap do |criteria|
-          if other
-            criteria.selector.reject! do |key, value|
-              other.selector[key] == value
-            end
-            criteria.options.reject! do |key, value|
-              other.options[key] == value
-            end
-            other.inclusions.each do |meta|
-              criteria.inclusions.delete_one(meta)
-            end
+        if other
+          selector.reject! do |key, value|
+            other.selector[key] == value
+          end
+          options.reject! do |key, value|
+            other.options[key] == value
+          end
+          other.inclusions.each do |meta|
+            inclusions.delete_one(meta)
           end
         end
+        self
       end
 
       # Forces the criteria to be scoped, unless it's inside an unscoped block.
@@ -56,12 +55,12 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def scoped(options = nil)
-        clone.tap do |criteria|
-          criteria.options.merge!(options || {})
-          if klass.default_scopable? && !scoped?
-            criteria.apply_default_scope
-          end
+        crit = clone
+        crit.options.merge!(options || {})
+        if klass.default_scopable? && !scoped?
+          crit.apply_default_scope
         end
+        crit
       end
 
       # Has the criteria had the default scope applied?
@@ -85,12 +84,12 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def unscoped
-        clone.tap do |criteria|
-          unless unscoped?
-            criteria.scoping_options = false, true
-            criteria.selector.clear; criteria.options.clear
-          end
+        crit = clone
+        unless unscoped?
+          crit.scoping_options = false, true
+          crit.selector.clear; crit.options.clear
         end
+        crit
       end
 
       # Is the criteria unscoped?
@@ -143,11 +142,11 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def with_default_scope
-        clone.tap do |criteria|
-          if klass.default_scopable? && !unscoped? && !scoped?
-            criteria.apply_default_scope
-          end
+        crit = clone
+        if klass.default_scopable? && !unscoped? && !scoped?
+          crit.apply_default_scope
         end
+        crit
       end
     end
   end

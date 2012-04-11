@@ -25,7 +25,8 @@ module Mongoid #:nodoc:
               result = result | val if bit.to_s == "or"
               result
             end
-            document[field].tap { execute("$bit") }
+            execute("$bit")
+            document[field]
           end
         end
       end

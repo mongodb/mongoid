@@ -23,7 +23,8 @@ module Mongoid #:nodoc:
             Array.wrap(value).each do |val|
               values.push(val) unless values.include?(val)
             end
-            values.tap { execute("$addToSet") }
+            execute("$addToSet")
+            values
           end
         end
 

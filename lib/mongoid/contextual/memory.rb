@@ -36,12 +36,12 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def delete
         # @todo: Durran: Optimize to a single db call.
-        count.tap do
-          each do |doc|
-            documents.delete_one(doc)
-            doc.delete
-          end
+        deleted = count
+        each do |doc|
+          documents.delete_one(doc)
+          doc.delete
         end
+        deleted
       end
       alias :delete_all :delete
 
@@ -55,12 +55,12 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def destroy
         # @todo: Durran: Optimize to a single db call.
-        count.tap do
-          each do |doc|
-            documents.delete_one(doc)
-            doc.destroy
-          end
+        deleted = count
+        each do |doc|
+          documents.delete_one(doc)
+          doc.destroy
         end
+        deleted
       end
       alias :destroy_all :destroy
 

@@ -75,9 +75,8 @@ module Mongoid # :nodoc:
       #
       # @since 3.0.0
       def with(options)
-        tap do
-          Threaded.set_persistence_options(klass, options)
-        end
+        Threaded.set_persistence_options(klass, options)
+        self
       end
 
       protected

@@ -89,12 +89,12 @@ module Mongoid #:nodoc:
             options, type = {}, options
           end
 
-          Factory.build(type || klass, attributes, options).tap do |doc|
-            append(doc)
-            doc.apply_post_processed_defaults
-            yield(doc) if block_given?
-            doc.run_callbacks(:build) { doc }
-          end
+          doc = Factory.build(type || klass, attributes, options)
+          append(doc)
+          doc.apply_post_processed_defaults
+          yield(doc) if block_given?
+          doc.run_callbacks(:build) { doc }
+          doc
         end
         alias :new :build
 
@@ -117,9 +117,9 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def create(attributes = nil, options = {}, type = nil, &block)
-          build(attributes, options, type, &block).tap do |doc|
-            base.persisted? ? doc.save : raise_unsaved(doc)
-          end
+          doc = build(attributes, options, type, &block)
+          base.persisted? ? doc.save : raise_unsaved(doc)
+          doc
         end
 
         # Creates a new document on the references many relation. This will
@@ -144,9 +144,9 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.beta.1
         def create!(attributes = nil, options = {}, type = nil, &block)
-          build(attributes, options, type, &block).tap do |doc|
-            base.persisted? ? doc.save! : raise_unsaved(doc)
-          end
+          doc = build(attributes, options, type, &block)
+          base.persisted? ? doc.save! : raise_unsaved(doc)
+          doc
         end
 
         # Delete the document from the relation. This will set the foreign key
@@ -309,19 +309,18 @@ module Mongoid #:nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          tap do |proxy|
-            if replacement
-              new_docs, docs = replacement.compact.uniq, []
-              new_ids = new_docs.map { |doc| doc.id }
-              remove_not_in(new_ids)
-              new_docs.each do |doc|
-                docs.push(doc) if doc.send(metadata.foreign_key) != base.id
-              end
-              proxy.concat(docs)
-            else
-              proxy.purge
+          if replacement
+            new_docs, docs = replacement.compact.uniq, []
+            new_ids = new_docs.map { |doc| doc.id }
+            remove_not_in(new_ids)
+            new_docs.each do |doc|
+              docs.push(doc) if doc.send(metadata.foreign_key) != base.id
             end
+            concat(docs)
+          else
+            purge
           end
+          self
         end
 
         # Get a criteria for the documents without the default scoping
@@ -467,13 +466,13 @@ module Mongoid #:nodoc:
         # @since 2.1.0
         def remove_all(conditions = nil, method = :delete_all)
           selector = conditions || {}
-          klass.send(method, selector.merge!(criteria.selector)).tap do
-            target.delete_if do |doc|
-              if doc.matches?(selector)
-                unbind_one(doc) and true
-              end
+          removed = klass.send(method, selector.merge!(criteria.selector))
+          target.delete_if do |doc|
+            if doc.matches?(selector)
+              unbind_one(doc) and true
             end
           end
+          removed
         end
 
         # Remove all the documents in the proxy that do not have the provided

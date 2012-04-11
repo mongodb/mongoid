@@ -93,11 +93,11 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.0
       def criterion(document, attribute, value)
-        { attribute => filter(value) }.tap do |selector|
-          if document.persisted? && !document.embedded?
-            selector.merge!(_id: { "$ne" => document.id })
-          end
+        selector = { attribute => filter(value) }
+        if document.persisted? && !document.embedded?
+          selector.merge!(_id: { "$ne" => document.id })
         end
+        selector
       end
 
       # Filter the value based on whether the check is case sensitive or not.

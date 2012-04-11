@@ -75,9 +75,9 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def prepare
-          yield(document).tap do
-            Threaded.clear_options!
-          end
+          doc = yield(document)
+          Threaded.clear_options!
+          doc
         end
 
         private
@@ -113,7 +113,9 @@ module Mongoid #:nodoc:
         def append_with(name)
           prepare do
             document[field] = [] unless document[field]
-            document.send(field).concat(value.__array__).tap { execute(name) }
+            docs = document.send(field).concat(value.__array__)
+            execute(name)
+            docs
           end
         end
       end

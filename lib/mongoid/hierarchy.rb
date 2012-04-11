@@ -19,20 +19,23 @@ module Mongoid #:nodoc
     #
     # @return [ Array<Document> ] All child documents in the hierarchy.
     def _children
-      @_children ||=
-        [].tap do |children|
-          relations.each_pair do |name, metadata|
-            if metadata.embedded?
-              without_autobuild do
-                child = send(name)
-                Array.wrap(child).each do |doc|
-                  children.push(doc)
-                  children.concat(doc._children) unless metadata.versioned?
-                end if child
-              end
-            end
+      @_children ||= collect_children
+    end
+
+    def collect_children
+      children = []
+      relations.each_pair do |name, metadata|
+        if metadata.embedded?
+          without_autobuild do
+            child = send(name)
+            Array.wrap(child).each do |doc|
+              children.push(doc)
+              children.concat(doc._children) unless metadata.versioned?
+            end if child
           end
         end
+      end
+      children
     end
 
     # Determines if the document is a subclass of another document.

@@ -19,10 +19,9 @@ module Mongoid #:nodoc:
           prepare do
             @value = value.to_s
             document[value] = document.attributes.delete(field)
-            document[value].tap do
-              execute("$rename")
-              document.remove_change(value)
-            end
+            execute("$rename")
+            document.remove_change(value)
+            document[value]
           end
         end
       end

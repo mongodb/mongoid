@@ -29,11 +29,11 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if successful, false if not.
     def destroy(options = {})
       self.flagged_for_destroy = true
-      run_callbacks(:destroy) do
+      result = run_callbacks(:destroy) do
         remove(options)
-      end.tap do
-        self.flagged_for_destroy = false
       end
+      self.flagged_for_destroy = false
+      result
     end
 
     # Insert a new document into the database. Will return the document
@@ -138,12 +138,12 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] True if validation passed.
     def update_attributes!(attributes = {}, options = {})
-      update_attributes(attributes, options).tap do |result|
-        unless result
-          self.class.fail_validate!(self) if errors.any?
-          self.class.fail_callback!(self, :update_attributes!)
-        end
+      result = update_attributes(attributes, options)
+      unless result
+        self.class.fail_validate!(self) if errors.any?
+        self.class.fail_callback!(self, :update_attributes!)
       end
+      result
     end
 
     # Upsert the document - will perform an insert if the document is new, and
@@ -180,7 +180,9 @@ module Mongoid #:nodoc:
       # @return [ Document ] The newly created document.
       def create(attributes = {}, options = {}, &block)
         _creating do
-          new(attributes, options, &block).tap { |doc| doc.save }
+          doc = new(attributes, options, &block)
+          doc.save
+          doc
         end
       end
 
@@ -199,10 +201,10 @@ module Mongoid #:nodoc:
       # @return [ Document ] The newly created document.
       def create!(attributes = {}, options = {}, &block)
         _creating do
-          new(attributes, options, &block).tap do |doc|
-            fail_validate!(doc) if doc.insert.errors.any?
-            fail_callback!(doc, :create!) if doc.new_record?
-          end
+          doc = new(attributes, options, &block)
+          fail_validate!(doc) if doc.insert.errors.any?
+          fail_callback!(doc, :create!) if doc.new_record?
+          doc
         end
       end
 
@@ -224,10 +226,10 @@ module Mongoid #:nodoc:
         selector = conds[:conditions] || conds
         selector.merge!(_type: name) if hereditary?
         coll = collection
-        coll.find(selector).count.tap do
-          coll.find(selector).remove_all
-          Threaded.clear_options!
-        end
+        deleted = coll.find(selector).count
+        coll.find(selector).remove_all
+        Threaded.clear_options!
+        deleted
       end
 
       # Delete all documents given the supplied conditions. If no conditions
@@ -246,9 +248,9 @@ module Mongoid #:nodoc:
       def destroy_all(conditions = nil)
         conds = conditions || {}
         documents = where(conds[:conditions] || conds)
-        documents.count.tap do
-          documents.each { |doc| doc.destroy }
-        end
+        destroyed = documents.count
+        documents.each { |doc| doc.destroy }
+        destroyed
       end
 
       # Raise an error if validation failed.

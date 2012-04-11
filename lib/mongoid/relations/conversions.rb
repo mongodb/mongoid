@@ -23,11 +23,10 @@ module Mongoid #:nodoc:
         if inverse.using_object_ids? || object.is_a?(BSON::ObjectId)
           object
         else
-          object.tap do |obj|
-            if obj.is_a?(String)
-              obj.unconvertable_to_bson = true
-            end
+          if object.is_a?(String)
+            object.unconvertable_to_bson = true
           end
+          object
         end
       end
     end

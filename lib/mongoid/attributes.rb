@@ -123,16 +123,16 @@ module Mongoid #:nodoc:
       if attribute_writable?(access)
         _assigning do
           localized = fields[access].try(:localized?)
-          typed_value_for(access, value).tap do |typed_value|
-            unless attributes[access] == typed_value || attribute_changed?(access)
-              attribute_will_change!(access)
-            end
-            if localized
-              (attributes[access] ||= {}).merge!(typed_value)
-            else
-              attributes[access] = typed_value
-            end
+          typed_value = typed_value_for(access, value)
+          unless attributes[access] == typed_value || attribute_changed?(access)
+            attribute_will_change!(access)
           end
+          if localized
+            (attributes[access] ||= {}).merge!(typed_value)
+          else
+            attributes[access] = typed_value
+          end
+          typed_value
         end
       end
     end

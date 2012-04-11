@@ -19,7 +19,8 @@ module Mongoid #:nodoc:
           prepare do
             current = document[field] || 0
             document[field] = current + value
-            document[field].tap { execute("$inc") }
+            execute("$inc")
+            document[field]
           end
         end
       end

@@ -52,11 +52,11 @@ module Mongoid # :nodoc:
           if ancestors.include?(Mongoid::Versioning)
             raise Errors::VersioningNotOnRoot.new(self)
           end
-          characterize(name, Embedded::In, options, &block).tap do |meta|
-            self.embedded = true
-            relate(name, meta)
-            builder(name, meta).creator(name, meta)
-          end
+          meta = characterize(name, Embedded::In, options, &block)
+          self.embedded = true
+          relate(name, meta)
+          builder(name, meta).creator(name, meta)
+          meta
         end
 
         # Adds the relation from a parent document to its children. The name
@@ -79,11 +79,11 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
-          characterize(name, Embedded::Many, options, &block).tap do |meta|
-            self.cyclic = true if options[:cyclic]
-            relate(name, meta)
-            validates_relation(meta)
-          end
+          meta = characterize(name, Embedded::Many, options, &block)
+          self.cyclic = true if options[:cyclic]
+          relate(name, meta)
+          validates_relation(meta)
+          meta
         end
 
         # Adds the relation from a parent document to its child. The name
@@ -106,12 +106,12 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
-          characterize(name, Embedded::One, options, &block).tap do |meta|
-            self.cyclic = true if options[:cyclic]
-            relate(name, meta)
-            builder(name, meta).creator(name, meta)
-            validates_relation(meta)
-          end
+          meta = characterize(name, Embedded::One, options, &block)
+          self.cyclic = true if options[:cyclic]
+          relate(name, meta)
+          builder(name, meta).creator(name, meta)
+          validates_relation(meta)
+          meta
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -133,9 +133,9 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
-          reference_one_to_one(name, options, Referenced::In, &block).tap do |meta|
-            aliased_fields[name.to_s] = meta.foreign_key
-          end
+          meta = reference_one_to_one(name, options, Referenced::In, &block)
+          aliased_fields[name.to_s] = meta.foreign_key
+          meta
         end
 
         # Adds a relational association from a parent Document to many
@@ -157,13 +157,13 @@ module Mongoid # :nodoc:
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def has_many(name, options = {}, &block)
-          characterize(name, Referenced::Many, options, &block).tap do |meta|
-            relate(name, meta)
-            ids_getter(name, meta).ids_setter(name, meta)
-            reference(meta)
-            autosave(meta)
-            validates_relation(meta)
-          end
+          meta = characterize(name, Referenced::Many, options, &block)
+          relate(name, meta)
+          ids_getter(name, meta).ids_setter(name, meta)
+          reference(meta)
+          autosave(meta)
+          validates_relation(meta)
+          meta
         end
 
         # Adds a relational many-to-many association between many of this
@@ -187,13 +187,13 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def has_and_belongs_to_many(name, options = {}, &block)
-          characterize(name, Referenced::ManyToMany, options, &block).tap do |meta|
-            relate(name, meta)
-            reference(meta, Array)
-            autosave(meta)
-            validates_relation(meta)
-            synced(meta)
-          end
+          meta = characterize(name, Referenced::ManyToMany, options, &block)
+          relate(name, meta)
+          reference(meta, Array)
+          autosave(meta)
+          validates_relation(meta)
+          synced(meta)
+          meta
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -310,12 +310,12 @@ module Mongoid # :nodoc:
         #
         # @since 3.0.0
         def reference_one_to_one(name, options, relation, &block)
-          characterize(name, relation, options, &block).tap do |meta|
-            relate(name, meta)
-            reference(meta)
-            builder(name, meta).creator(name, meta).autosave(meta)
-            validates_relation(meta)
-          end
+          meta = characterize(name, relation, options, &block)
+          relate(name, meta)
+          reference(meta)
+          builder(name, meta).creator(name, meta).autosave(meta)
+          validates_relation(meta)
+          meta
         end
 
         # Creates a relation for the given name, metadata and relation. It adds

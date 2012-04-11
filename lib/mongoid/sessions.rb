@@ -79,9 +79,8 @@ module Mongoid #:nodoc:
     #
     # @since 3.0.0
     def with(options)
-      tap do
-        Threaded.set_persistence_options(self.class, options)
-      end
+      Threaded.set_persistence_options(self.class, options)
+      self
     end
 
     class << self
@@ -151,9 +150,9 @@ module Mongoid #:nodoc:
       # @since 3.0.0
       def collection
         if opts = persistence_options
-          mongo_session.with(opts)[opts[:collection] || collection_name].tap do
-            clear_persistence_options
-          end
+          coll = mongo_session.with(opts)[opts[:collection] || collection_name]
+          clear_persistence_options
+          coll
         else
           mongo_session[collection_name]
         end
@@ -197,13 +196,13 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def mongo_session
-        __session__.tap do |session|
-          if persistence_options && name = persistence_options[:database]
-            session.use(name)
-          else
-            session.use(database_name)
-          end
+        session = __session__
+        if persistence_options && name = persistence_options[:database]
+          session.use(name)
+        else
+          session.use(database_name)
         end
+        session
       end
 
       # Get the persistence options from the current thread.
@@ -284,9 +283,8 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def with(options)
-        tap do
-          Threaded.set_persistence_options(self, options)
-        end
+        Threaded.set_persistence_options(self, options)
+        self
       end
 
       private

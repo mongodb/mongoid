@@ -12,11 +12,11 @@ module Mongoid #:nodoc:
       #
       # @since 2.4.0
       def _deep_copy
-        [].tap do |copy|
-          each do |value|
-            copy.push(value._deep_copy)
-          end
+        copy = []
+        each do |value|
+          copy.push(value._deep_copy)
         end
+        copy
       end
 
       # Delete the first object in the array that is equal to the supplied

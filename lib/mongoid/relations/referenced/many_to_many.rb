@@ -72,13 +72,13 @@ module Mongoid # :nodoc:
             options, type = {}, options
           end
 
-          Factory.build(type || klass, attributes, options).tap do |doc|
-            base.send(metadata.foreign_key).push(doc.id)
-            append(doc)
-            doc.apply_post_processed_defaults
-            doc.synced[metadata.inverse_foreign_key] = false
-            yield(doc) if block_given?
-          end
+          doc = Factory.build(type || klass, attributes, options)
+          base.send(metadata.foreign_key).push(doc.id)
+          append(doc)
+          doc.apply_post_processed_defaults
+          doc.synced[metadata.inverse_foreign_key] = false
+          yield(doc) if block_given?
+          doc
         end
         alias :new :build
 
@@ -95,12 +95,12 @@ module Mongoid # :nodoc:
         #
         # @since 2.1.0
         def delete(document)
-          super.tap do |doc|
-            if doc && persistable?
-              base.pull(metadata.foreign_key, doc.id)
-              base.synced[metadata.foreign_key] = false
-            end
+          doc = super
+          if doc && persistable?
+            base.pull(metadata.foreign_key, doc.id)
+            base.synced[metadata.foreign_key] = false
           end
+          doc
         end
 
         # Removes all associations between the base document and the target
@@ -142,10 +142,9 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          tap do |proxy|
-            proxy.purge
-            proxy.push(replacement.compact.uniq) unless replacement.blank?
-          end
+          purge
+          push(replacement.compact.uniq) unless replacement.blank?
+          self
         end
 
         # Get a criteria for the documents without the default scoping

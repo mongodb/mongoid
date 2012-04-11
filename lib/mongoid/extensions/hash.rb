@@ -12,11 +12,11 @@ module Mongoid #:nodoc:
       #
       # @since 2.4.0
       def _deep_copy
-        {}.tap do |copy|
-          each_pair do |key, value|
-            copy[key] = value._deep_copy
-          end
+        copy = {}
+        each_pair do |key, value|
+          copy[key] = value._deep_copy
         end
+        copy
       end
 
       # Get the id attribute from this hash, whether it's prefixed with an

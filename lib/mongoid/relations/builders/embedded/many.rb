@@ -19,15 +19,15 @@ module Mongoid # :nodoc:
           def build(type = nil)
             return [] if object.blank?
             return object if object.first.is_a?(Document)
-            [].tap do |docs|
-              object.each do |attrs|
-                if _loading? && base.persisted?
-                  docs.push(Factory.from_db(klass, attrs))
-                else
-                  docs.push(Factory.build(klass, attrs))
-                end
+            docs = []
+            object.each do |attrs|
+              if _loading? && base.persisted?
+                docs.push(Factory.from_db(klass, attrs))
+              else
+                docs.push(Factory.build(klass, attrs))
               end
             end
+            docs
           end
         end
       end

@@ -251,13 +251,13 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def instantiate(name, options = {})
-          allocate.tap do |field|
-            field.name = name
-            field.options = options
-            field.label = options[:label]
-            field.localize = options[:localize]
-            field.default_val = options[:default]
-          end
+          field = allocate
+          field.name = name
+          field.options = options
+          field.label = options[:label]
+          field.localize = options[:localize]
+          field.default_val = options[:default]
+          field
         end
 
         private

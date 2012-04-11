@@ -68,7 +68,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def freeze
-      tap { |doc| doc.as_document.freeze }
+      as_document.freeze and self
     end
 
     # Checks if the document is frozen
@@ -170,17 +170,16 @@ module Mongoid #:nodoc:
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
-      attributes.tap do |attrs|
-        return attrs if frozen?
-        relations.each_pair do |name, meta|
-          if meta.embedded?
-            without_autobuild do
-              relation = send(name)
-              attrs[meta.store_as] = relation.as_document unless relation.blank?
-            end
+      return attributes if frozen?
+      relations.each_pair do |name, meta|
+        if meta.embedded?
+          without_autobuild do
+            relation = send(name)
+            attributes[meta.store_as] = relation.as_document unless relation.blank?
           end
         end
       end
+      attributes
     end
 
     # Returns an instance of the specified class with the attributes
@@ -198,12 +197,12 @@ module Mongoid #:nodoc:
       unless klass.include?(Mongoid::Document)
         raise ArgumentError, "A class which includes Mongoid::Document is expected"
       end
-      klass.instantiate(frozen? ? attributes.dup : attributes).tap do |became|
-        became.instance_variable_set(:@errors, errors)
-        became.instance_variable_set(:@new_record, new_record?)
-        became.instance_variable_set(:@destroyed, destroyed?)
-        became._type = klass.to_s
-      end
+      became = klass.instantiate(frozen? ? attributes.dup : attributes)
+      became.instance_variable_set(:@errors, errors)
+      became.instance_variable_set(:@new_record, new_record?)
+      became.instance_variable_set(:@destroyed, destroyed?)
+      became._type = klass.to_s
+      became
     end
 
     # Print out the cache key. This will append different values on the
@@ -289,12 +288,12 @@ module Mongoid #:nodoc:
       # @return [ Document ] A new document.
       def instantiate(attrs = nil)
         attributes = attrs || {}
-        allocate.tap do |doc|
-          doc.instance_variable_set(:@attributes, attributes)
-          doc.apply_defaults
-          IdentityMap.set(doc) unless _loading_revision?
-          doc.run_callbacks(:initialize) { doc }
-        end
+        doc = allocate
+        doc.instance_variable_set(:@attributes, attributes)
+        doc.apply_defaults
+        IdentityMap.set(doc) unless _loading_revision?
+        doc.run_callbacks(:initialize) { doc }
+        doc
       end
 
       # Returns all types to query for when using this class as the base.

@@ -45,19 +45,19 @@ module Mongoid # :nodoc:
         name.to_s if respond_to?(name)
       end.compact
 
-      {}.tap do |attrs|
-        (attribute_names + method_names).each do |name|
-          without_autobuild do
-            value = send(name)
-            if relations.has_key?(name)
-              attrs[name] = value ? value.serializable_hash(options) : nil
-            else
-              attrs[name] = value
-            end
+      attrs = {}
+      (attribute_names + method_names).each do |name|
+        without_autobuild do
+          value = send(name)
+          if relations.has_key?(name)
+            attrs[name] = value ? value.serializable_hash(options) : nil
+          else
+            attrs[name] = value
           end
         end
-        serialize_relations(attrs, options) if options[:include]
       end
+      serialize_relations(attrs, options) if options[:include]
+      attrs
     end
 
     class << self
