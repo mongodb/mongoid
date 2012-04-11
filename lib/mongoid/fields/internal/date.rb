@@ -20,11 +20,12 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def deserialize(object)
-          return nil if object.blank?
-          if Mongoid::Config.use_utc?
-            object.to_date
-          else
-            ::Date.new(object.year, object.month, object.day)
+          if object
+            if Mongoid::Config.use_utc?
+              object.to_date
+            else
+              ::Date.new(object.year, object.month, object.day)
+            end
           end
         end
 
@@ -44,11 +45,12 @@ module Mongoid #:nodoc:
           value = ::Date.parse(value) if value.is_a?(::String)
 
           if value.is_a?(::Array)
-            begin
-              value = ::Date.civil(*value)
-            rescue ArgumentError
-              value = ::Time.new(*value).to_date
-            end
+            value =
+              begin
+                ::Date.civil(*value)
+              rescue ArgumentError
+                ::Time.new(*value).to_date
+              end
           end
 
           ::Time.utc(value.year, value.month, value.day)
