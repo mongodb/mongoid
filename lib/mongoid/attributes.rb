@@ -96,11 +96,12 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True if it does, false if not.
     #
     # @since 1.0.0
-    def respond_to?(name, include_private=false)
-      (Mongoid.allow_dynamic_fields &&
+    def respond_to?(name, include_private = false)
+      super || (
+        Mongoid.allow_dynamic_fields &&
         attributes &&
         attributes.has_key?(name.to_s.reader)
-      ) || super
+      )
     end
 
     # Write a single attribute to the document attribute hash. This will
@@ -177,7 +178,43 @@ module Mongoid #:nodoc:
     end
     alias :attributes= :write_attributes
 
-    protected
+    private
+
+    # Define a reader method for a dynamic attribute.
+    #
+    # @api private
+    #
+    # @example Define a reader method.
+    #   model.define_dynamic_reader(:field)
+    #
+    # @param [ String ] name The name of the field.
+    #
+    # @since 3.0.0
+    def define_dynamic_reader(name)
+      class_eval <<-READER
+        def #{name}
+          read_attribute(#{name.inspect})
+        end
+      READER
+    end
+
+    # Define a writer method for a dynamic attribute.
+    #
+    # @api private
+    #
+    # @example Define a writer method.
+    #   model.define_dynamic_writer(:field)
+    #
+    # @param [ String ] name The name of the field.
+    #
+    # @since 3.0.0
+    def define_dynamic_writer(name)
+      class_eval <<-WRITER
+        def #{name}=(value)
+          write_attribute(#{name.inspect}, value)
+        end
+      WRITER
+    end
 
     # Used for allowing accessor methods for dynamic attributes.
     #
@@ -187,9 +224,13 @@ module Mongoid #:nodoc:
       attr = name.to_s
       return super unless attributes.has_key?(attr.reader)
       if attr.writer?
-        write_attribute(attr.reader, args.first)
+        getter = attr.reader
+        define_dynamic_writer(getter)
+        write_attribute(getter, args.first)
       else
-        read_attribute(attr.reader)
+        getter = attr.reader
+        define_dynamic_reader(getter)
+        read_attribute(getter)
       end
     end
 
