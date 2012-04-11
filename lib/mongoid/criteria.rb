@@ -225,7 +225,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def execute_or_raise(ids, multi)
-      multi ? execute_multi(ids) : execute_single(ids)
+      result = multiple_from_map_or_db(ids)
+      if (result.size < ids.size) && Mongoid.raise_not_found_error
+        raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
+      end
+      multi ? result : result.first
     end
 
     # Return true if the criteria has some Document or not.
@@ -346,6 +350,23 @@ module Mongoid #:nodoc:
     def from_map_or_db
       doc = IdentityMap.get(klass, extract_id || selector)
       doc && doc.matches?(selector) ? doc : first
+    end
+
+    # Get the documents from the identity map, and if not found hit the
+    # database.
+    #
+    # @example Get the documents from the map or criteria.
+    #   criteria.multiple_from_map_or_db(ids)
+    #
+    # @param [ ids ] The searched ids.
+    #
+    # @return [ Array<Document> ] The found documents.
+    def multiple_from_map_or_db(ids)
+      return entries if klass.embedded?
+
+      result = ids.map{ |id| IdentityMap.get(klass, id) || id }
+      result += klass.where(:_id.in => result.reject{ |e| e.is_a?(klass) }).entries
+      result.select{ |e| e.is_a?(klass) && e.matches?(selector) }
     end
 
     # Initialize the new criteria.
