@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * \#1906 Mongoid will retrieve documents from the identity map when
   providing multiple ids to find. (Hans Hasselberg)
 
+* \#1903 Mongoid raises an error if provided a javascript expression
+  to a where clause on an embedded collection. (Sebastien Azimi)
+
 * Aggregations now adhere to both a Mongoid API and their enumerable
   counterparts where applicable.
 

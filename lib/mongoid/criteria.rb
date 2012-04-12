@@ -494,6 +494,31 @@ module Mongoid #:nodoc:
       any_in(_type: types)
     end
 
+    # This is the general entry point for most MongoDB queries. This either
+    # creates a standard field: value selection, and expanded selection with
+    # the use of hash methods, or a $where selection if a string is provided.
+    #
+    # @example Add a standard selection.
+    #   criteria.where(name: "syd")
+    #
+    # @example Add a javascript selection.
+    #   criteria.where("this.name == 'syd'")
+    #
+    # @param [ String, Hash ] criterion The javascript or standard selection.
+    #
+    # @raise [ UnsupportedJavascript ] If provided a string and the criteria
+    #   is embedded.
+    #
+    # @return [ Criteria ] The cloned selectable.
+    #
+    # @since 1.0.0
+    def where(expression)
+      if expression.is_a?(::String) && embedded?
+        raise Errors::UnsupportedJavascript.new(klass, expression)
+      end
+      super
+    end
+
     private
 
     # Create a document given the provided method and attributes from the
