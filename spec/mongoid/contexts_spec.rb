@@ -5,7 +5,7 @@ describe Mongoid::Contexts do
   context ".context_for" do
 
     let(:criteria) do
-      stub(klass: Person)
+      Mongoid::Criteria.new(Person)
     end
 
     context "when criteria is for a top-level document" do
