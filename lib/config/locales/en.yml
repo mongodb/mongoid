@@ -274,6 +274,12 @@ en:
             on version %{version}."
           resolution: "Upgrade your MongoDB instances or keep Mongoid on your
             previous version."
+        unsupported_javascript_criteria:
+          message: "Unsupported Javascript selector in the embedded document %{embedded}."
+          summary: "Javascript criteria selector is only supported in native MongoDB queries.
+            Since the embedded document parent is already loaded, there are no more
+            MongoDB queries to get embedded documents that match criteria."
+          resolution: "Use a Hash selector in your criteria."
         validations:
           message: "Validation of %{document} failed."
           summary: "The following errors were found: %{errors}"

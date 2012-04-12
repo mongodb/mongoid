@@ -208,40 +208,58 @@ describe Mongoid::Contexts::Enumerable do
 
   describe ".initialize" do
 
-    let(:selector) do
-      { "field" => "value"  }
+    context "when using a Javascript selector" do
+      let(:selector) do
+        "this.field == 'value'"
+      end
+
+      let(:crit) do
+        criteria.where(selector)
+      end
+
+      it "raises a Javascript support error" do
+        expect {
+          described_class.new(crit)
+        }.to raise_error(Mongoid::Errors::UnsupportedJavascriptSelector)
+      end
     end
 
-    let(:options) do
-      { skip: 20 }
-    end
+    context "when using a non-Javascript selector" do
+      let(:selector) do
+        { "field" => "value"  }
+      end
 
-    let(:documents) do
-      [ stub ]
-    end
+      let(:options) do
+        { skip: 20 }
+      end
 
-    let(:crit) do
-      criteria.where(selector).skip(20)
-    end
+      let(:documents) do
+        [ stub ]
+      end
 
-    let(:context) do
-      described_class.new(crit)
-    end
+      let(:crit) do
+        criteria.where(selector).skip(20)
+      end
 
-    before do
-      crit.documents = documents
-    end
+      let(:context) do
+        described_class.new(crit)
+      end
 
-    it "sets the selector" do
-      context.selector.should eq(selector)
-    end
+      before do
+        crit.documents = documents
+      end
 
-    it "sets the options" do
-      context.options.should eq(options)
-    end
+      it "sets the selector" do
+        context.selector.should eq(selector)
+      end
 
-    it "sets the documents" do
-      context.documents.should eq(documents)
+      it "sets the options" do
+        context.options.should eq(options)
+      end
+
+      it "sets the documents" do
+        context.documents.should eq(documents)
+      end
     end
   end
 

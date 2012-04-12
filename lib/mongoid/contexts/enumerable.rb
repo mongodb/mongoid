@@ -123,7 +123,13 @@ module Mongoid #:nodoc:
       #   Mongoid::Contexts::Enumerable.new(criteria)
       #
       # @param [ Criteria ] criteria The criteria for the context.
+      #
+      # @raise [ Errors::UnsupportedJavascriptSelector ] when a Javascript selector
+      # is passed to criteria.
       def initialize(criteria)
+        if criteria.selector['$where'].is_a?(String)
+          raise Errors::UnsupportedJavascriptSelector.new(criteria.klass)
+        end
         @criteria = criteria
       end
 
