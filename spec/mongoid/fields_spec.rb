@@ -474,6 +474,13 @@ describe Mongoid::Fields do
     end
 
     context "when the field name conflicts with mongoid's internals" do
+      context "when the field is named identity" do
+        it "raises an error" do
+          expect {
+            Person.field(:identity)
+          }.to raise_error(Mongoid::Errors::InvalidField)
+        end
+      end
 
       context "when the field is named metadata" do
 
