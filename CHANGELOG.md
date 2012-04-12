@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1906 Mongoid will retrieve documents from the identity map when
+  providing multiple ids to find. (Hans Hasselberg)
+
 * Aggregations now adhere to both a Mongoid API and their enumerable
   counterparts where applicable.
 
