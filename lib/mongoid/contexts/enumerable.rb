@@ -127,8 +127,9 @@ module Mongoid #:nodoc:
       # @raise [ Errors::UnsupportedJavascriptSelector ] when a Javascript selector
       # is passed to criteria.
       def initialize(criteria)
-        if criteria.selector['$where'].is_a?(String)
-          raise Errors::UnsupportedJavascriptSelector.new(criteria.klass)
+        where = criteria.selector["$where"]
+        if where.is_a?(String)
+          raise Errors::UnsupportedJavascript.new(criteria.klass, where)
         end
         @criteria = criteria
       end

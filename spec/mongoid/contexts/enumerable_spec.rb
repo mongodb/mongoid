@@ -220,7 +220,7 @@ describe Mongoid::Contexts::Enumerable do
       it "raises a Javascript support error" do
         expect {
           described_class.new(crit)
-        }.to raise_error(Mongoid::Errors::UnsupportedJavascriptSelector)
+        }.to raise_error(Mongoid::Errors::UnsupportedJavascript)
       end
     end
 
