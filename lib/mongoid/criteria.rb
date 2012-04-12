@@ -364,9 +364,11 @@ module Mongoid #:nodoc:
     def multiple_from_map_or_db(ids)
       return entries if klass.embedded?
 
-      result = ids.map{ |id| IdentityMap.get(klass, id) || id }
-      result += klass.where(:_id.in => result.reject{ |e| e.is_a?(klass) }).entries
-      result.select{ |e| e.is_a?(klass) && e.matches?(selector) }
+      result, not_in_map = ids.
+        map{ |id| IdentityMap.get(klass, id) || id }.
+        partition{ |id| id.is_a?(klass) }
+      result += klass.where(:_id.in => not_in_map).entries
+      result.select{ |e| e.matches?(selector) }
     end
 
     # Initialize the new criteria.
