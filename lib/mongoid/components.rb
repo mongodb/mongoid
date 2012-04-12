@@ -44,6 +44,7 @@ module Mongoid #:nodoc
     include Mongoid::Validations
     include Mongoid::Callbacks
     include Mongoid::MultiDatabase
+    include Mongoid::Base
 
     MODULES = [
       Mongoid::Atomic,
@@ -70,6 +71,7 @@ module Mongoid #:nodoc
       Mongoid::Validations,
       Mongoid::Callbacks,
       Mongoid::MultiDatabase,
+      Mongoid::Base
     ]
 
     class << self
