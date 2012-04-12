@@ -1265,6 +1265,111 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#multiple_from_map_or_db" do
+
+    before(:all) do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after(:all) do
+      Mongoid.identity_map_enabled = false
+    end
+
+    context "when the document is in the identity map" do
+
+      let!(:band) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let!(:band_two) do
+        Band.create(name: "Tool")
+      end
+
+      context "when providing a single id" do
+
+        let(:criteria) do
+          Band.where(_id: band.id)
+        end
+
+        let(:from_map) do
+          criteria.multiple_from_map_or_db([ band.id ])
+        end
+
+        it "returns the document from the map" do
+          from_map.should include(band)
+        end
+      end
+
+      context "when providing multiple ids" do
+
+        let(:criteria) do
+          Band.where(:_id.in => [ band.id, band_two.id ])
+        end
+
+        let(:from_map) do
+          criteria.multiple_from_map_or_db([ band.id, band_two.id ])
+        end
+
+        it "returns the documents from the map" do
+          from_map.should include(band, band_two)
+        end
+      end
+    end
+
+    context "when the document is not in the identity map" do
+
+      let!(:band) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let!(:band_two) do
+        Band.create(name: "Tool")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      context "when providing a single id" do
+
+        let(:criteria) do
+          Band.where(_id: band.id)
+        end
+
+        let(:from_db) do
+          criteria.multiple_from_map_or_db([ band.id ])
+        end
+
+        it "returns the document from the database" do
+          from_db.first.should_not equal(band)
+        end
+
+        it "returns the correct document" do
+          from_db.first.should eq(band)
+        end
+      end
+
+      context "when providing multiple ids" do
+
+        let(:criteria) do
+          Band.where(:_id.in => [ band.id, band_two.id ])
+        end
+
+        let(:from_db) do
+          criteria.multiple_from_map_or_db([ band.id, band_two.id ])
+        end
+
+        it "returns the document from the database" do
+          from_db.first.should_not equal(band)
+        end
+
+        it "returns the correct document" do
+          from_db.first.should eq(band)
+        end
+      end
+    end
+  end
+
   describe "$gt" do
 
     let!(:match) do

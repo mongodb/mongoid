@@ -225,7 +225,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.0.0
     def execute_or_raise(ids, multi)
-      multi ? execute_multi(ids) : execute_single(ids)
+      result = multiple_from_map_or_db(ids)
+      if (result.size < ids.size) && Mongoid.raise_not_found_error
+        raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
+      end
+      multi ? result : result.first
     end
 
     # Return true if the criteria has some Document or not.
@@ -338,9 +342,7 @@ module Mongoid #:nodoc:
     # database.
     #
     # @example Get the document from the map or criteria.
-    #   criteria.from_map_or_db(criteria)
-    #
-    # @param [ Criteria ] The cloned criteria.
+    #   criteria.from_map_or_db
     #
     # @return [ Document ] The found document.
     #
@@ -348,6 +350,25 @@ module Mongoid #:nodoc:
     def from_map_or_db
       doc = IdentityMap.get(klass, extract_id || selector)
       doc && doc.matches?(selector) ? doc : first
+    end
+
+    # Get the documents from the identity map, and if not found hit the
+    # database.
+    #
+    # @example Get the documents from the map or criteria.
+    #   criteria.multiple_from_map_or_db(ids)
+    #
+    # @param [ ids ] The searched ids.
+    #
+    # @return [ Array<Document> ] The found documents.
+    def multiple_from_map_or_db(ids)
+      return entries if klass.embedded?
+
+      result, not_in_map = ids.
+        map{ |id| IdentityMap.get(klass, id) || id }.
+        partition{ |id| id.is_a?(klass) }
+      result += klass.where(:_id.in => not_in_map).entries
+      result.select{ |e| e.matches?(selector) }
     end
 
     # Initialize the new criteria.
@@ -567,51 +588,6 @@ module Mongoid #:nodoc:
     # @since 2.2.0
     def driver
       collection.driver
-    end
-
-    # Find documents based on the provided ids, and return an array of the
-    # documents.
-    #
-    # @api private
-    #
-    # @example Find multiple.
-    #   criteria.execute_multi([ 1, 2, 3 ])
-    #
-    # @param [ Array ] ids The ids to find.
-    #
-    # @raise [ Errors::Document ] If not all ids are found.
-    #
-    # @return [ Array<Document> ] The matching documents.
-    #
-    # @since 3.0.0
-    def execute_multi(ids)
-      entries.tap do |result|
-        if (result.size < ids.size) && Mongoid.raise_not_found_error
-          raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
-        end
-      end
-    end
-
-    # Find a document based on the provided ids, and return the document.
-    #
-    # @api private
-    #
-    # @example Find one.
-    #   criteria.execute_single([ 1 ])
-    #
-    # @param [ Array ] ids The id to find.
-    #
-    # @raise [ Errors::Document ] If no document is found.
-    #
-    # @return [ Document ] The matching document.
-    #
-    # @since 3.0.0
-    def execute_single(ids)
-      from_map_or_db.tap do |result|
-        if result.nil? && Mongoid.raise_not_found_error
-          raise Errors::DocumentNotFound.new(klass, ids, ids)
-        end
-      end
     end
 
     # Adds a criterion to the +Criteria+ that specifies an id that must be matched.

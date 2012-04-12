@@ -107,7 +107,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
               context "when the field has not changed" do
 
-                let(:from_db) do
+                let!(:from_db) do
                   Dictionary.find(dictionary.id)
                 end
 
