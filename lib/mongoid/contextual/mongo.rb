@@ -153,7 +153,7 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def explain
-        # query.explain
+        query.explain
       end
 
       # Get the first document in the database for the criteria's selector.

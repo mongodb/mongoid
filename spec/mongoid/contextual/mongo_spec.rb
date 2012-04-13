@@ -355,6 +355,21 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#explain" do
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it "returns the criteria explain path" do
+      context.explain["cursor"].should eq("BasicCursor")
+    end
+  end
+
   [ :first, :one ].each do |method|
 
     describe "##{method}" do

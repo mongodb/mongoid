@@ -543,7 +543,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#explain" do
+  describe "#explain" do
 
     let(:criteria) do
       Band.where(name: "Depeche Mode")
