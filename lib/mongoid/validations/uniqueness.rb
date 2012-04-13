@@ -56,7 +56,7 @@ module Mongoid #:nodoc:
             )
           end
         else
-          criteria = klass.where(criterion(document, attrib, val))
+          criteria = klass.unscoped.where(criterion(document, attrib, val))
           criteria = scope(criteria, document, attrib)
           if criteria.exists?
             document.errors.add(
@@ -146,7 +146,7 @@ module Mongoid #:nodoc:
         !document._parent || document.embedded_one?
       end
 
-      # Scope reference has changed? 
+      # Scope reference has changed?
       #
       # @example Has scope reference changed?
       #   validator.scope_value_changed?(doc)
@@ -155,7 +155,7 @@ module Mongoid #:nodoc:
       #
       # @return [ true, false ] If the scope reference has changed.
       #
-      # @since 
+      # @since
       def scope_value_changed?(document)
         Array.wrap(options[:scope]).any? do |item|
           document.send("attribute_changed?", item.to_s)
