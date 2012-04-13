@@ -62,10 +62,11 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def changes
-      changed.reduce({}) do |_changes, attr|
+      _changes = {}
+      changed.each do |attr|
         _changes[attr] = attribute_change(attr)
-        _changes
       end
+      _changes
     end
 
     # Call this method after save, so the changes can be properly switched.

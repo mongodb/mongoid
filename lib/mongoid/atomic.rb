@@ -170,14 +170,15 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def atomic_pulls
-      delayed_atomic_pulls.reduce({}) do |pulls, (_, docs)|
+      pulls = {}
+      delayed_atomic_pulls.each_pair do |_, docs|
         docs.each do |doc|
           (pulls[doc.atomic_path] ||= []).push(doc.as_document)
           doc.destroyed = true
           doc.flagged_for_destroy = false
         end
-        pulls
       end
+      pulls
     end
 
     # Get all the push attributes that need to occur.
