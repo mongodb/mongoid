@@ -232,7 +232,7 @@ module Mongoid #:nodoc:
         if default_val.respond_to?(:call)
           serialize(doc.instance_exec(&default_val))
         else
-          serialize(default_val.duplicable? ? default_val.dup : default_val)
+          serialize(default_val.__deep_copy__)
         end
       end
 
