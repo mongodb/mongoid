@@ -367,7 +367,7 @@ module Mongoid #:nodoc:
       result, not_in_map = ids.
         map{ |id| IdentityMap.get(klass, id) || id }.
         partition{ |id| id.is_a?(klass) }
-      result += klass.where(:_id.in => not_in_map).entries
+      result += for_ids(not_in_map).entries
       result.select{ |e| e.matches?(selector) }
     end
 
