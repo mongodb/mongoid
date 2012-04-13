@@ -695,7 +695,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns a hash with indifferent access" do
-        person.changes[:title].should eq(
+        person.changes["title"].should eq(
           [ nil, "Captain Obvious" ]
         )
       end

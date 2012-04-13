@@ -62,9 +62,10 @@ module Mongoid #:nodoc:
     #
     # @since 2.4.0
     def changes
-      Hash[changed.map do |attr|
-        [attr, attribute_change(attr)]
-      end].with_indifferent_access
+      changed.reduce({}) do |_changes, attr|
+        _changes[attr] = attribute_change(attr)
+        _changes
+      end
     end
 
     # Call this method after save, so the changes can be properly switched.

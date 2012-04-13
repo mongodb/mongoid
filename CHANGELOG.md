@@ -480,6 +480,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* `Document#changes` is no longer a hash with indifferent access.
+
 * `after_initialize` callbacks no longer cascade to children if the option
   is set.
 
