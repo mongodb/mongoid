@@ -22,10 +22,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.2.0
       def _assigning
-        Threaded.begin(:assign)
+        Threaded.begin("assign")
         yield
       ensure
-        Threaded.exit(:assign)
+        Threaded.exit("assign")
       end
 
       # Is the current thread in assigning mode?
@@ -37,7 +37,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def _assigning?
-        Threaded.executing?(:assign)
+        Threaded.executing?("assign")
       end
 
       # Execute a block in binding mode.
@@ -51,10 +51,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def _binding
-        Threaded.begin(:bind)
+        Threaded.begin("bind")
         yield
       ensure
-        Threaded.exit(:bind)
+        Threaded.exit("bind")
       end
 
       # Is the current thread in binding mode?
@@ -66,7 +66,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def _binding?
-        Threaded.executing?(:bind)
+        Threaded.executing?("bind")
       end
 
       # Execute a block in building mode.
@@ -80,10 +80,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def _building
-        Threaded.begin(:build)
+        Threaded.begin("build")
         yield
       ensure
-        Threaded.exit(:build)
+        Threaded.exit("build")
       end
 
       # Is the current thread in building mode?
@@ -95,7 +95,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def _building?
-        Threaded.executing?(:build)
+        Threaded.executing?("build")
       end
 
       # Is the current thread in creating mode?
@@ -107,7 +107,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.1.0
       def _creating?
-        Threaded.executing?(:create)
+        Threaded.executing?("create")
       end
 
       # Execute a block in loading mode.
@@ -121,10 +121,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.2
       def _loading
-        Threaded.begin(:load)
+        Threaded.begin("load")
         yield
       ensure
-        Threaded.exit(:load)
+        Threaded.exit("load")
       end
 
       # Is the current thread in loading mode?
@@ -136,7 +136,7 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.2
       def _loading?
-        Threaded.executing?(:load)
+        Threaded.executing?("load")
       end
 
       # Execute a block in loading revision mode.
@@ -150,10 +150,10 @@ module Mongoid #:nodoc:
       #
       # @since 2.3.4
       def _loading_revision
-        Threaded.begin(:load_revision)
+        Threaded.begin("load_revision")
         yield
       ensure
-        Threaded.exit(:load_revision)
+        Threaded.exit("load_revision")
       end
 
       module ClassMethods #:nodoc:
@@ -169,10 +169,10 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def _creating
-          Threaded.begin(:create)
+          Threaded.begin("create")
           yield
         ensure
-          Threaded.exit(:create)
+          Threaded.exit("create")
         end
 
         # Is the current thread in loading revision mode?
@@ -184,7 +184,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.3.4
         def _loading_revision?
-          Threaded.executing?(:load_revision)
+          Threaded.executing?("load_revision")
         end
       end
     end

@@ -13,7 +13,7 @@ module Mongoid #:nodoc:
     # @example Begin entry into the stack.
     #   Threaded.begin(:create)
     #
-    # @param [ Symbol ] name The name of the stack
+    # @param [ String ] name The name of the stack
     #
     # @return [ true ] True.
     #

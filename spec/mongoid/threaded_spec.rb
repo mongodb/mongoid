@@ -9,15 +9,15 @@ describe Mongoid::Threaded do
   describe "#begin" do
 
     before do
-      described_class.begin(:load)
+      described_class.begin("load")
     end
 
     after do
-      described_class.stack(:load).clear
+      described_class.stack("load").clear
     end
 
     it "adds a boolen to the load stack" do
-      described_class.stack(:load).should eq([ true ])
+      described_class.stack("load").should eq([ true ])
     end
   end
 
@@ -62,7 +62,7 @@ describe Mongoid::Threaded do
     context "when no stack has been initialized" do
 
       let(:loading) do
-        described_class.stack(:load)
+        described_class.stack("load")
       end
 
       it "returns an empty stack" do
@@ -77,7 +77,7 @@ describe Mongoid::Threaded do
       end
 
       let(:loading) do
-        described_class.stack(:load)
+        described_class.stack("load")
       end
 
       after do
@@ -93,16 +93,16 @@ describe Mongoid::Threaded do
   describe "#exit" do
 
     before do
-      described_class.begin(:load)
-      described_class.exit(:load)
+      described_class.begin("load")
+      described_class.exit("load")
     end
 
     after do
-      described_class.stack(:load).clear
+      described_class.stack("load").clear
     end
 
     it "removes a boolen from the stack" do
-      described_class.stack(:load).should be_empty
+      described_class.stack("load").should be_empty
     end
   end
 

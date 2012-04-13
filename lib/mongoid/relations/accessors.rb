@@ -99,10 +99,10 @@ module Mongoid # :nodoc:
       #
       # @since 3.0.0
       def without_autobuild
-        Threaded.begin(:without_autobuild)
+        Threaded.begin("without_autobuild")
         yield
       ensure
-        Threaded.exit(:without_autobuild)
+        Threaded.exit("without_autobuild")
       end
 
       module ClassMethods #:nodoc:

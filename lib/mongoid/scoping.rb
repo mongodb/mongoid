@@ -204,10 +204,10 @@ module Mongoid #:nodoc:
       #
       # @since 3.0.0
       def without_default_scope
-        Threaded.begin(:without_default_scope)
+        Threaded.begin("without_default_scope")
         yield
       ensure
-        Threaded.exit(:without_default_scope)
+        Threaded.exit("without_default_scope")
       end
 
       private
