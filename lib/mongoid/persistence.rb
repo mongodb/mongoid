@@ -19,7 +19,7 @@ module Mongoid #:nodoc:
     extend ActiveSupport::Concern
     include Atomic
 
-    # Remove the document from the datbase with callbacks.
+    # Remove the document from the database with callbacks.
     #
     # @example Destroy a document.
     #   document.destroy
@@ -49,7 +49,7 @@ module Mongoid #:nodoc:
       Operations.insert(self, options).persist
     end
 
-    # Remove the document from the datbase.
+    # Remove the document from the database.
     #
     # @example Remove the document.
     #   document.remove
@@ -79,7 +79,7 @@ module Mongoid #:nodoc:
       return true
     end
 
-    # Update the document in the datbase.
+    # Update the document in the database.
     #
     # @example Update an existing document.
     #   document.update
@@ -114,7 +114,7 @@ module Mongoid #:nodoc:
       save(validate: false)
     end
 
-    # Update the document attributes in the datbase.
+    # Update the document attributes in the database.
     #
     # @example Update the document's attributes
     #   document.update_attributes(:title => "Sir")
