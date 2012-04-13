@@ -324,6 +324,27 @@ module Mongoid #:nodoc:
       for_ids(ids).execute_or_raise(ids, multi)
     end
 
+    # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
+    #
+    # @example Add a single id criteria.
+    #   criteria.for_ids([ 1 ])
+    #
+    # @example Add multiple id criteria.
+    #   criteria.for_ids([ 1, 2 ])
+    #
+    # @param [ Array ] ids The array of ids.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    def for_ids(ids)
+      field = klass.fields["_id"]
+      method = extract_id ? :all_of : :where
+      if ids.size > 1
+        send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
+      else
+        send(method, { _id: field.serialize(ids.first) })
+      end
+    end
+
     # When freezing a criteria we need to initialize the context first
     # otherwise the setting of the context on attempted iteration will raise a
     # runtime error.
@@ -588,29 +609,6 @@ module Mongoid #:nodoc:
     # @since 2.2.0
     def driver
       collection.driver
-    end
-
-    # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
-    #
-    # @api private
-    #
-    # @example Add a single id criteria.
-    #   criteria.for_ids([ 1 ])
-    #
-    # @example Add multiple id criteria.
-    #   criteria.for_ids([ 1, 2 ])
-    #
-    # @param [ Array ] ids The array of ids.
-    #
-    # @return [ Criteria ] The cloned criteria.
-    def for_ids(ids)
-      field = klass.fields["_id"]
-      method = extract_id ? :all_of : :where
-      if ids.size > 1
-        send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
-      else
-        send(method, { _id: field.serialize(ids.first) })
-      end
     end
 
     # Clone or dup the current +Criteria+. This will return a new criteria with
