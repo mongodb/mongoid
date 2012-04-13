@@ -3,18 +3,6 @@ module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Object
 
-      # Make a deep copy of the object.
-      #
-      # @example Make a deep copy.
-      #   "testing"._deep_copy
-      #
-      # @return [ Object ] The deep copy.
-      #
-      # @since 2.4.0
-      def _deep_copy
-        duplicable? ? dup : self
-      end
-
       # Do or do not, there is no try. -- Yoda.
       #
       # @example Do or do not.

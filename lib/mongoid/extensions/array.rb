@@ -3,22 +3,6 @@ module Mongoid #:nodoc:
   module Extensions #:nodoc:
     module Array #:nodoc:
 
-      # Make a deep copy of the array.
-      #
-      # @example Make a deep copy.
-      #   [ 1, 2, 3 ]._deep_copy
-      #
-      # @return [ Array ] The deep copy.
-      #
-      # @since 2.4.0
-      def _deep_copy
-        copy = []
-        each do |value|
-          copy.push(value._deep_copy)
-        end
-        copy
-      end
-
       # Delete the first object in the array that is equal to the supplied
       # object and return it. This is much faster than performing a standard
       # delete for large arrays ince it attempt to delete multiple in the
