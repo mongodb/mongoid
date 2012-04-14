@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Matchers #:nodoc:
+module Mongoid
+  module Matchers
 
     # Contains all the default behavior for checking for matching documents
     # given MongoDB expressions.

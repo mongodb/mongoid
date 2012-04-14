@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # Superclass for all builder objects. Builders are responsible for either
     # looking up a relation's target from the database, or creating them from a

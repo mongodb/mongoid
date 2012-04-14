@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Extensions #:nodoc:
+module Mongoid
+  module Extensions
     module Hash
 
       # Get the id attribute from this hash, whether it's prefixed with an

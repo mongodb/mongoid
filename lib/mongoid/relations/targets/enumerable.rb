@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Relations #:nodoc:
-    module Targets #:nodoc:
+module Mongoid
+  module Relations
+    module Targets
 
       # This class is the wrapper for all relational associations that have a
       # target that can be a criteria or array of loaded documents. This

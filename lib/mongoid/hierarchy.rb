@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Hierarchy #:nodoc
+module Mongoid
+  module Hierarchy
     extend ActiveSupport::Concern
 
     included do
@@ -109,7 +109,7 @@ module Mongoid #:nodoc
       object || self
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       # Determines if the document is a subclass of another document.
       #

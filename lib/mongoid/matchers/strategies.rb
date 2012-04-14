@@ -13,8 +13,8 @@ require "mongoid/matchers/nin"
 require "mongoid/matchers/or"
 require "mongoid/matchers/size"
 
-module Mongoid #:nodoc:
-  module Matchers #:nodoc:
+module Mongoid
+  module Matchers
 
     # This module is responsible for returning the correct matcher given a
     # MongoDB query expression.

@@ -6,9 +6,9 @@ require "mongoid/railties/document"
 require "rails"
 require "rails/mongoid"
 
-module Rails #:nodoc:
-  module Mongoid #:nodoc:
-    class Railtie < Rails::Railtie #:nodoc:
+module Rails
+  module Mongoid
+    class Railtie < Rails::Railtie
 
       # Determine which generator to use. app_generators was introduced after
       # 3.0.0.

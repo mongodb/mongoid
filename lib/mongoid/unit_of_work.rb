@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module handles unit of work functionality with regards to the identity
   # map.

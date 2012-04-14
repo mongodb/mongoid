@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Extensions #:nodoc:
+module Mongoid
+  module Extensions
     module NilClass
 
       # Get the name of a nil collection.

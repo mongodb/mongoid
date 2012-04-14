@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
+module Mongoid
+  module Persistence
 
     # Contains common logic for modification operations.
     module Modification

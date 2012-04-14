@@ -1,7 +1,7 @@
 # encoding: utf-8
 require "mongoid/matchers/strategies"
 
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module contains all the behavior for ruby implementations of MongoDB
   # selectors.

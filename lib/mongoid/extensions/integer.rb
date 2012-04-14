@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Extensions #:nodoc:
+module Mongoid
+  module Extensions
     module Integer
 
       # Is the object not to be converted to bson on criteria creation?

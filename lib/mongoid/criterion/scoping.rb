@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Criterion #:nodoc:
+module Mongoid
+  module Criterion
     module Scoping
 
       # Applies the default scope to the criteria.

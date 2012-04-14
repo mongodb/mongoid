@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # Contains utility methods for object id conversion.
     module Conversions

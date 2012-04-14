@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module contains behaviour for all Mongoid scoping - named scopes,
   # default scopes, and criteria accessors via scoped and unscoped.
@@ -12,7 +12,7 @@ module Mongoid #:nodoc:
       self.scopes = {}
     end
 
-    module ClassMethods #:nodoc
+    module ClassMethods
 
       # Add a default scope to the model. This scope will be applied to all
       # criteria unless #unscoped is specified.

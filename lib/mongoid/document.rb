@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # This is the base module for all domain objects that need to be persisted to
   # the database as documents.
@@ -259,7 +259,7 @@ module Mongoid #:nodoc:
       nil
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       # Performs class equality checking.
       #

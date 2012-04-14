@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Validations #:nodoc:
+module Mongoid
+  module Validations
 
     # Validates whether or not a field is unique against the documents in the
     # database.

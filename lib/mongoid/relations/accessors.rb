@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module contains all the behaviour related to accessing relations
     # through the getters and setters, and how to delegate to builders to
@@ -105,7 +105,7 @@ module Mongoid # :nodoc:
         Threaded.exit("without_autobuild")
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Adds the existence check for relations.
         #

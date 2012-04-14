@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This is the superclass for one to one relations and defines the common
     # behaviour or those proxies.

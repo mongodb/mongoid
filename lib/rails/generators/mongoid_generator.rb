@@ -2,9 +2,9 @@
 require "rails/generators/named_base"
 require "rails/generators/active_model"
 
-module Mongoid #:nodoc:
-  module Generators #:nodoc:
-    class Base < ::Rails::Generators::NamedBase #:nodoc:
+module Mongoid
+  module Generators
+    class Base < ::Rails::Generators::NamedBase
 
       def self.source_root
         @_mongoid_source_root ||=
@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
       end
     end
 
-    class ActiveModel < ::Rails::Generators::ActiveModel #:nodoc:
+    class ActiveModel < ::Rails::Generators::ActiveModel
       def self.all(klass)
         "#{klass}.all"
       end
@@ -59,7 +59,7 @@ end
 
 module Rails
   module Generators
-    class GeneratedAttribute #:nodoc:
+    class GeneratedAttribute
       def type_class
         return "Time" if type.to_s == "datetime"
         return "String" if type.to_s == "text"

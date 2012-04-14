@@ -5,8 +5,8 @@ require "mongoid/persistence/operations/update"
 require "mongoid/persistence/operations/embedded/insert"
 require "mongoid/persistence/operations/embedded/remove"
 
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
+module Mongoid
+  module Persistence
 
     # Persistence operations include this module to get basic functionality
     # on initialization.

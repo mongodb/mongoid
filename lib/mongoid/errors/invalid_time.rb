@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # This exception is raised when a bad value is attempted to be converted to
     # a date or time.

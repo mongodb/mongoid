@@ -2,7 +2,7 @@
 require "mongoid/attributes/processing"
 require "mongoid/attributes/readonly"
 
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module contains the logic for handling the internal attributes hash,
   # and how to get and set values.
@@ -249,7 +249,7 @@ module Mongoid #:nodoc:
       fields.has_key?(key) ? fields[key].serialize(value) : value
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       # Alias the provided name to the original field. This will provide an
       # aliased getter, setter, existance check, and all dirty attribute

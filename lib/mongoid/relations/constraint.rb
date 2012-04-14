@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # Used for converting foreign key values to the correct type based on the
     # types of ids that the document stores.

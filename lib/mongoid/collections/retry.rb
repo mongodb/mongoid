@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Collections #:nodoc:
+module Mongoid
+  module Collections
 
     # Provides behaviour for retrying commands on connection failure.
     module Retry

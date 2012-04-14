@@ -4,7 +4,7 @@ require "mongoid/validations/uniqueness"
 require "mongoid/validations/presence"
 require "mongoid/validations/format"
 
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module provides additional validations that ActiveModel does not
   # provide: validates_associated and validates_uniqueness_of.
@@ -87,7 +87,7 @@ module Mongoid #:nodoc:
       Threaded.validated?(self)
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       # Validates whether or not an association is valid or not. Will correctly
       # handle has one and has many associations.

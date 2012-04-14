@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module contains the core macros for defining relations between
     # documents. They can be either embedded or referenced (relational).
@@ -28,7 +28,7 @@ module Mongoid # :nodoc:
         self.relations
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Adds the relation back to the parent document. This macro is
         # necessary to set the references from the child back to the parent

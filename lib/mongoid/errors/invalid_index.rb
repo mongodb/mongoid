@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # Raised when an invalid index is defined.
     class InvalidIndex < MongoidError

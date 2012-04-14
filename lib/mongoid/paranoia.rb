@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # Include this module to get soft deletion of root level documents.
   # This will add a deleted_at field to the +Document+, managed automatically.
@@ -119,7 +119,7 @@ module Mongoid #:nodoc:
       embedded? ? "#{atomic_position}.deleted_at" : "deleted_at"
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       # Override the default +Criteria+ accessor to only get existing
       # documents.

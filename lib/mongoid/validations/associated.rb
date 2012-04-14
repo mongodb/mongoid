@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Validations #:nodoc:
+module Mongoid
+  module Validations
 
     # Validates whether or not an association is valid or not. Will correctly
     # handle has one and has many associations.

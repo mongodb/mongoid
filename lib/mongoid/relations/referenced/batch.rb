@@ -1,9 +1,9 @@
 # encoding: utf-8
 require "mongoid/relations/referenced/batch/insert"
 
-module Mongoid #:nodoc:
-  module Relations #:nodoc:
-    module Referenced #:nodoc:
+module Mongoid
+  module Relations
+    module Referenced
 
       # This module provides the ability for single insert calls to be batch
       # inserted.

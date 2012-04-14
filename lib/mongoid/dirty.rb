@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Dirty #:nodoc:
+module Mongoid
+  module Dirty
     extend ActiveSupport::Concern
 
     # Get the changed attributes for the document.
@@ -250,7 +250,7 @@ module Mongoid #:nodoc:
       attributes[attr] = changed_attributes[attr] if attribute_changed?(attr)
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       private
 

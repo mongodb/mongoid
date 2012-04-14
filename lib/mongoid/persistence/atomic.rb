@@ -12,8 +12,8 @@ require "mongoid/persistence/atomic/rename"
 require "mongoid/persistence/atomic/sets"
 require "mongoid/persistence/atomic/unset"
 
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
+module Mongoid
+  module Persistence
 
     # This module provides the explicit atomic operations helpers on the
     # document itself.

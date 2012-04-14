@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Rack #:nodoc:
-  module Mongoid #:nodoc:
-    module Middleware #:nodoc:
+module Rack
+  module Mongoid
+    module Middleware
 
       # This middleware contains the behaviour needed to properly use the
       # identity map in Rack based applications.

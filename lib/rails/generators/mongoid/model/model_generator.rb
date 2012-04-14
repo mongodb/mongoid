@@ -1,9 +1,9 @@
 # encoding: utf-8
 require "rails/generators/mongoid_generator"
 
-module Mongoid #:nodoc:
-  module Generators #:nodoc:
-    class ModelGenerator < Base #:nodoc:
+module Mongoid
+  module Generators
+    class ModelGenerator < Base
 
       desc "Creates a Mongoid model"
       argument :attributes, type: :array, default: [], banner: "field:type field:type"

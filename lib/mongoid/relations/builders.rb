@@ -11,8 +11,8 @@ require "mongoid/relations/builders/referenced/many"
 require "mongoid/relations/builders/referenced/many_to_many"
 require "mongoid/relations/builders/referenced/one"
 
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module is responsible for defining the build and create methods used
     # in one to one relations.
@@ -49,7 +49,7 @@ module Mongoid # :nodoc:
         [ args.first || {}, args.size > 1 ? args[1] : {} ]
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Defines a builder method for an embeds_one relation. This is
         # defined as #build_name.

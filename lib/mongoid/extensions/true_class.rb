@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Extensions #:nodoc:
+module Mongoid
+  module Extensions
     module TrueClass
 
       # Is the passed value a boolean?

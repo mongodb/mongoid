@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Cascading #:nodoc:
+module Mongoid
+  module Relations
+    module Cascading
       class Delete
 
         attr_accessor :document, :relation, :metadata

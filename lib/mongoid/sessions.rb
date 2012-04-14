@@ -2,7 +2,7 @@
 require "mongoid/sessions/factory"
 require "mongoid/sessions/validators"
 
-module Mongoid #:nodoc:
+module Mongoid
   module Sessions
     extend ActiveSupport::Concern
 

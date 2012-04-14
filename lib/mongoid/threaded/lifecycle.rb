@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Threaded #:nodoc:
+module Mongoid
+  module Threaded
 
     # This module contains convenience methods for document lifecycle that
     # resides on thread locals.
@@ -156,7 +156,7 @@ module Mongoid #:nodoc:
         Threaded.exit("load_revision")
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Execute a block in creating mode.
         #

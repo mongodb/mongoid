@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
-    module Operations #:nodoc:
+module Mongoid
+  module Persistence
+    module Operations
 
       # Insert is a persistence command responsible for taking a document that
       # has not been saved to the database and saving it.

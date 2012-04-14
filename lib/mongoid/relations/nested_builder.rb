@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This is the superclass for builders that are in charge of handling
     # creation, deletion, and updates of documents through that ever so lovely

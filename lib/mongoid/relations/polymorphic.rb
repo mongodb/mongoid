@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module contains the behaviour for handling polymorphic relational
     # associations.
@@ -11,7 +11,7 @@ module Mongoid # :nodoc:
         class_attribute :polymorphic
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Attempts to set up the information needed to handle a polymorphic
         # relation, if the metadata checks out.

@@ -1,11 +1,11 @@
 # encoding: utf-8
-class Binary; end #:nodoc:
+class Binary; end
 
 unless defined?(Boolean)
   class Boolean; end
 end
 
-class BSON::ObjectId #:nodoc
+class BSON::ObjectId
   undef :as_json
   def as_json(options = nil)
     to_s
@@ -15,7 +15,7 @@ class BSON::ObjectId #:nodoc
   end
 end
 
-class Symbol #:nodoc
+class Symbol
   remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
 end
 

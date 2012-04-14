@@ -1,9 +1,9 @@
 # encoding: utf-8
 require "rails/generators/mongoid_generator"
 
-module Mongoid #:nodoc:
-  module Generators #:nodoc:
-    class ObserverGenerator < Base #:nodoc:
+module Mongoid
+  module Generators
+    class ObserverGenerator < Base
 
       check_class_collision suffix: "Observer"
 

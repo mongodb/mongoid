@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Atomic #:nodoc:
-    module Paths #:nodoc:
-      module Embedded #:nodoc:
+module Mongoid
+  module Atomic
+    module Paths
+      module Embedded
 
         # This class encapsulates behaviour for locating and updating
         # documents that are defined as an embedded 1-1.

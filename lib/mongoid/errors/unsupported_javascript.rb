@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # Raised when Javascript criteria selector is passed for embedded document.
     class UnsupportedJavascript < MongoidError

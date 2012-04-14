@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc
+module Mongoid
   module Config
 
     # Encapsulates logic for getting environment information.

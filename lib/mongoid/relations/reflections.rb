@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # The reflections module provides convenience methods that can retrieve
     # useful information about associations.
@@ -31,7 +31,7 @@ module Mongoid # :nodoc:
         self.class.reflect_on_all_associations(*macros)
       end
 
-      module ClassMethods #:nodoc
+      module ClassMethods
 
         # Returns the relation metadata for the supplied name.
         #

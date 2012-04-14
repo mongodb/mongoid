@@ -2,9 +2,9 @@
 require "mongoid/atomic/paths/embedded/one"
 require "mongoid/atomic/paths/embedded/many"
 
-module Mongoid #:nodoc:
-  module Atomic #:nodoc:
-    module Paths #:nodoc:
+module Mongoid
+  module Atomic
+    module Paths
 
       # Common functionality between the two different embedded paths.
       module Embedded

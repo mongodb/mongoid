@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module contains the behaviour of Mongoid's clone/dup of documents.
   module Copyable

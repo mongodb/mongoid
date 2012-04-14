@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Validations #:nodoc:
+module Mongoid
+  module Validations
 
     # Validates that the specified attributes do or do not match a certain 
     # regular expression.

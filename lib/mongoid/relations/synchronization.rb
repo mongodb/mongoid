@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module handles the behaviour for synchronizing foreign keys between
     # both sides of a many to many relations.
@@ -99,7 +99,7 @@ module Mongoid # :nodoc:
         end
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Set up the syncing of many to many foreign keys.
         #

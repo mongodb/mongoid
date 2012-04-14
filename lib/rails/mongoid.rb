@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Rails #:nodoc:
-  module Mongoid #:nodoc:
+module Rails
+  module Mongoid
     extend self
 
     # Create indexes for each model given the provided pattern and the class is

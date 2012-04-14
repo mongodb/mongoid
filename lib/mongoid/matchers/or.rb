@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Matchers #:nodoc:
+module Mongoid
+  module Matchers
 
     # Defines behavior for handling $or expressions in embedded documents.
     class Or < Default

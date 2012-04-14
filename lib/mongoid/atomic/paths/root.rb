@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Atomic #:nodoc:
-    module Paths #:nodoc:
+module Mongoid
+  module Atomic
+    module Paths
 
       # This class encapsulates behaviour for locating and updating root
       # documents atomically.

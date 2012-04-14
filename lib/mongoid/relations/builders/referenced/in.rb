@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Builders #:nodoc:
-      module Referenced #:nodoc:
+module Mongoid
+  module Relations
+    module Builders
+      module Referenced
         class In < Builder
 
           # This builder either takes a foreign key and queries for the

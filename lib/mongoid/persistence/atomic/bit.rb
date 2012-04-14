@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
-    module Atomic #:nodoc:
+module Mongoid
+  module Persistence
+    module Atomic
 
       # This operation is for performing $bit atomic operations against the
       # database.

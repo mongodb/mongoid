@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # This error is raised when a bad configuration option is attempted to be
     # set.

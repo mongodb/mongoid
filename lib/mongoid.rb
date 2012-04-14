@@ -91,7 +91,7 @@ end
 # add english load path by default
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
-module Mongoid #:nodoc
+module Mongoid
   extend Loggable
   extend UnitOfWork
   extend self

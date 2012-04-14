@@ -1,12 +1,12 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # Adds Rails' multi-parameter attribute support to Mongoid.
   #
   # @todo: Durran: This module needs an overhaul.
   module MultiParameterAttributes
 
-    module Errors #:nodoc:
+    module Errors
 
       # Raised when an error occurred while doing a mass assignment to an
       # attribute through the <tt>attributes=</tt> method. The exception

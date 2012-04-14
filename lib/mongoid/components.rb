@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Components #:nodoc
+module Mongoid
+  module Components
     extend ActiveSupport::Concern
 
     # All modules that a +Document+ is composed of are defined in this

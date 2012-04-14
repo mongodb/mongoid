@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
+module Mongoid
 
   # This module provides the extra behaviour for including relations in JSON
   # and XML serialization.

@@ -29,7 +29,7 @@ require "mongoid/fields/internal/true_class"
 require "mongoid/fields/internal/foreign_keys/array"
 require "mongoid/fields/internal/foreign_keys/object"
 
-module Mongoid #:nodoc
+module Mongoid
 
   # This module defines behaviour for fields.
   module Fields
@@ -168,7 +168,7 @@ module Mongoid #:nodoc
       end
     end
 
-    module ClassMethods #:nodoc
+    module ClassMethods
 
       # Returns an array of names for the attributes available on this object.
       #

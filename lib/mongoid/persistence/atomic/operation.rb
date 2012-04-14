@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
-    module Atomic #:nodoc:
+module Mongoid
+  module Persistence
+    module Atomic
 
       # This is the included module for all atomic operation objects.
       module Operation

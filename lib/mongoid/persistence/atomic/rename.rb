@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
-    module Atomic #:nodoc:
+module Mongoid
+  module Persistence
+    module Atomic
 
       # Performs an atomic rename operation.
       class Rename

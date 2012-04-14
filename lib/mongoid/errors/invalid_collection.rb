@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # This error is raised when trying to access a Mongo::Collection from an
     # embedded document.

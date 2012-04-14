@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # Raised when trying to set a polymorphic "references in" relation to a 
     # model with multiple "references many/one" relations pointing to that 

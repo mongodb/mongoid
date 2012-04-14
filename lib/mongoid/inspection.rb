@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc
+module Mongoid
 
   # Contains the bahviour around inspecting documents via
   # <tt>Object#inspect</tt>.

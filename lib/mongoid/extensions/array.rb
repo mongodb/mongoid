@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Extensions #:nodoc:
-    module Array #:nodoc:
+module Mongoid
+  module Extensions
+    module Array
 
       # Delete the first object in the array that is equal to the supplied
       # object and return it. This is much faster than performing a standard

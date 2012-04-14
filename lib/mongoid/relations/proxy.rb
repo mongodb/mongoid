@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This class is the superclass for all relation proxy objects, and contains
     # common behaviour for all of them.

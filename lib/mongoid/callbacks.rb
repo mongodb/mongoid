@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module contains all the callback hooks for Mongoid.
   module Callbacks

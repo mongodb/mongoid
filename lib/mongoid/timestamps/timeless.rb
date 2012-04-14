@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
   module Timestamps
 
     # This module adds behaviour for turning off timestamping in single or
@@ -32,7 +32,7 @@ module Mongoid #:nodoc:
         Threaded.timestamping?
       end
 
-      module ClassMethods #:nodoc
+      module ClassMethods
 
         # Begin an execution that should skip timestamping.
         #

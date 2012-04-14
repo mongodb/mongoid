@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Relations #:nodoc:
-    module Referenced #:nodoc:
-      module Batch #:nodoc:
+module Mongoid
+  module Relations
+    module Referenced
+      module Batch
 
         # Handles all the batch insert collection.
         class Insert

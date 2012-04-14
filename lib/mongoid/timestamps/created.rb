@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
   module Timestamps
     # This module handles the behaviour for setting up document created at
     # timestamp.

@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Attributes #:nodoc:
+module Mongoid
+  module Attributes
 
     # This module contains the behavior for processing attributes.
     module Processing

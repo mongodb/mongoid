@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # This error is raised when trying to set a value in Mongoid that is not
     # already set with dynamic attributes or the field is not defined.

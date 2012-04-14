@@ -3,7 +3,7 @@ require "mongoid/config/environment"
 require "mongoid/config/options"
 require "mongoid/config/validators"
 
-module Mongoid #:nodoc
+module Mongoid
 
   # This module defines all the configuration options for Mongoid, including the
   # database connections.

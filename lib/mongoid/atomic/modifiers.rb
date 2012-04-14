@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Atomic #:nodoc:
+module Mongoid
+  module Atomic
 
     # This class contains the logic for supporting atomic operations against the
     # database.

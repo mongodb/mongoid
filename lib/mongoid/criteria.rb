@@ -2,7 +2,7 @@
 require "mongoid/criterion/inspection"
 require "mongoid/criterion/scoping"
 
-module Mongoid #:nodoc:
+module Mongoid
 
   # The +Criteria+ class is the core object needed in Mongoid to retrieve
   # objects from the database. It is a DSL that essentially sets up the

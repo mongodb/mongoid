@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module provides convenience macros for using cyclic embedded
     # relations.
@@ -11,7 +11,7 @@ module Mongoid # :nodoc:
         class_attribute :cyclic
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Create a cyclic embedded relation that creates a tree hierarchy for
         # the document and many embedded child documents.

@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module contains the behaviour for getting the various states a
   # document can transition through.

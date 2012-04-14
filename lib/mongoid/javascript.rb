@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
   class Javascript
     # Constant for the file that defines all the js functions.
     FUNCTIONS = File.join(File.dirname(__FILE__), "javascript", "functions.yml")

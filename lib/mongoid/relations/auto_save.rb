@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module contains the behaviour for auto-saving relations in
     # different collections.
@@ -44,7 +44,7 @@ module Mongoid # :nodoc:
         Threaded.exit_autosave(self)
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Set up the autosave behaviour for references many and references one
         # relations. When the option is set to true, these relations will get

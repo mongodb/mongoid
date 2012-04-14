@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # This error is raised when calling #save! or .create! on a model when one
     # of the callbacks returns false.

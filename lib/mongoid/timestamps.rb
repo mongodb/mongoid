@@ -3,7 +3,7 @@ require "mongoid/timestamps/created"
 require "mongoid/timestamps/updated"
 require "mongoid/timestamps/timeless"
 
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module handles the behaviour for setting up document created at and
   # updated at timestamps.

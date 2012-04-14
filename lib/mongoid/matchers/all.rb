@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Matchers #:nodoc:
+module Mongoid
+  module Matchers
 
     # Checks that all values match.
     class All < Default

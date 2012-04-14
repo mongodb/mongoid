@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # Mongoid's implementation of Rails' nested attributes.
   module NestedAttributes
@@ -10,7 +10,7 @@ module Mongoid #:nodoc:
       self.nested_attributes = {}
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       REJECT_ALL_BLANK_PROC = ->(attributes){
         attributes.all? { |key, value| key == '_destroy' || value.blank? }

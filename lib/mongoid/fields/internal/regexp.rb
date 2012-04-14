@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Fields #:nodoc:
-    module Internal #:nodoc:
+module Mongoid
+  module Fields
+    module Internal
       # Defines the behaviour for regex fields.
       class Regexp
         include Serializable

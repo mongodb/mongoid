@@ -4,8 +4,8 @@ require "mongoid/relations/cascading/destroy"
 require "mongoid/relations/cascading/nullify"
 require "mongoid/relations/cascading/restrict"
 
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # This module defines the behaviour for setting up cascading deletes and
     # nullifies for relations, and how to delegate to the approriate strategy.
@@ -34,7 +34,7 @@ module Mongoid # :nodoc:
         end
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Attempt to add the cascading information for the document to know how
         # to handle associated documents on a removal.

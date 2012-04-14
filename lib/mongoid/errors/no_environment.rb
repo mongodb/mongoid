@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # Raised when trying to load configuration with no RACK_ENV set
     class NoEnvironment < MongoidError

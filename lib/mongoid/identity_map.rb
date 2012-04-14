@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # Defines behaviour for the identity map in Mongoid.
   class IdentityMap < Hash

@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
 
     # The "Grand Poobah" of information about any relation is this class. It
     # contains everything you could ever possible want to know.

@@ -26,7 +26,7 @@ require "mongoid/relations/synchronization"
 require "mongoid/relations/metadata"
 require "mongoid/relations/macros"
 
-module Mongoid # :nodoc:
+module Mongoid
 
   # All classes and modules under the relations namespace handle the
   # functionality that has to do with embedded and referenced (relational)
@@ -125,7 +125,7 @@ module Mongoid # :nodoc:
       end
     end
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       # This is convenience for librarys still on the old API.
       #

@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Fields #:nodoc:
-    module Internal #:nodoc:
-      module ForeignKeys #:nodoc:
+module Mongoid
+  module Fields
+    module Internal
+      module ForeignKeys
 
         # Defines the behaviour for array foreign key fields.
         class Array

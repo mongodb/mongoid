@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
   # This module handles reloading behaviour of documents.
   module Reloading
 

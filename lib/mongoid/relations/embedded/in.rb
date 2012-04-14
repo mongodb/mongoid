@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
+module Mongoid
+  module Relations
     module Embedded
 
       # This class defines the behaviour necessary to handle relations that are

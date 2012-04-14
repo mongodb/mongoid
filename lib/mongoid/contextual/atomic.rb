@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Contextual #:nodoc:
+module Mongoid
+  module Contextual
     module Atomic
 
       # Execute an atomic $addToSet on the matching documents.

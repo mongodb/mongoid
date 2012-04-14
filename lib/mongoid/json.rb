@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
   # This module is for hooking in to +ActiveModel+s serialization to let
   # configuring the ability to include the root in JSON happen from the Mongoid
   # config.

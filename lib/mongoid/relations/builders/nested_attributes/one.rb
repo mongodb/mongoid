@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Builders #:nodoc:
-      module NestedAttributes #:nodoc:
+module Mongoid
+  module Relations
+    module Builders
+      module NestedAttributes
         class One < NestedBuilder
 
           attr_accessor :destroy

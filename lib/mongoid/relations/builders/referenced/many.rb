@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Builders #:nodoc:
-      module Referenced #:nodoc:
+module Mongoid
+  module Relations
+    module Builders
+      module Referenced
         class Many < Builder
 
           # This builder either takes a hash and queries for the

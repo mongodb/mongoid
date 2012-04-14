@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Bindings #:nodoc:
-      module Referenced #:nodoc:
+module Mongoid
+  module Relations
+    module Bindings
+      module Referenced
 
         # Binding class for all references_and_referenced_in_many relations.
         class ManyToMany < Binding

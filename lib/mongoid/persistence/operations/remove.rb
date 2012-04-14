@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Persistence #:nodoc:
-    module Operations #:nodoc:
+module Mongoid
+  module Persistence
+    module Operations
 
       # Remove is a persistence command responsible for deleting a document from
       # the database.

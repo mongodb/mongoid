@@ -1,5 +1,5 @@
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # This error is raised when trying to create set nested records above the
     # specified :limit

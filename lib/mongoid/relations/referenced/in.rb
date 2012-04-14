@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Referenced #:nodoc:
+module Mongoid
+  module Relations
+    module Referenced
 
       # This class handles all behaviour for relations that are either
       # one-to-many or one-to-one, where the foreign key is store on this side

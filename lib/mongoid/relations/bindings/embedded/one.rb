@@ -1,8 +1,8 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Bindings #:nodoc:
-      module Embedded #:nodoc:
+module Mongoid
+  module Relations
+    module Bindings
+      module Embedded
 
         # Binding class for embeds_one relations.
         class One < Binding

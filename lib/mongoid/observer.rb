@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
+module Mongoid
 
   # Observer classes respond to life cycle callbacks to implement trigger-like
   # behavior outside the original class. This is a great way to reduce the

@@ -2,7 +2,7 @@
 require "mongoid/atomic/modifiers"
 require "mongoid/atomic/paths"
 
-module Mongoid #:nodoc:
+module Mongoid
 
   # This module contains the logic for supporting atomic operations against the
   # database.

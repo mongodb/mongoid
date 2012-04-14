@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Indexes #:nodoc
+module Mongoid
+  module Indexes
     module Validators
 
       # Validates the options passed to the index macro.

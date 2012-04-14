@@ -1,8 +1,8 @@
 # encoding: utf-8
 require "mongoid/indexes/validators/options"
 
-module Mongoid #:nodoc
-  module Indexes #:nodoc
+module Mongoid
+  module Indexes
     extend ActiveSupport::Concern
 
     included do
@@ -10,7 +10,7 @@ module Mongoid #:nodoc
       self.index_options = {}
     end
 
-    module ClassMethods #:nodoc
+    module ClassMethods
 
       # Send the actual index creation comments to the MongoDB driver
       #

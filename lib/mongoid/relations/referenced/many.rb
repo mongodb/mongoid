@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Relations #:nodoc:
-    module Referenced #:nodoc:
+module Mongoid
+  module Relations
+    module Referenced
 
       # This class defines the behaviour for all relations that are a
       # one-to-many between documents in different collections.

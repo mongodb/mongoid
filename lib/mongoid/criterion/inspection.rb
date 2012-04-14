@@ -1,7 +1,7 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Criterion #:nodoc:
-    module Inspection #:nodoc:
+module Mongoid
+  module Criterion
+    module Inspection
 
       # Get a pretty string representation of the criteria, including the
       # selector, options, matching count and documents for inspection.

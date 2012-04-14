@@ -1,9 +1,9 @@
 # encoding: utf-8
-module Mongoid # :nodoc:
-  module Relations #:nodoc:
-    module Builders #:nodoc:
-      module Embedded #:nodoc:
-        class Many < Builder #:nodoc:
+module Mongoid
+  module Relations
+    module Builders
+      module Embedded
+        class Many < Builder
 
           # Builds the document out of the attributes using the provided
           # metadata on the relation. Instantiates through the factory in order

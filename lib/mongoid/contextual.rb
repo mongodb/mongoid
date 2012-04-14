@@ -3,7 +3,7 @@ require "mongoid/contextual/map_reduce"
 require "mongoid/contextual/memory"
 require "mongoid/contextual/mongo"
 
-module Mongoid #:nodoc:
+module Mongoid
   module Contextual
 
     # The aggregate operations provided in the aggregate module get delegated

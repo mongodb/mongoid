@@ -2,7 +2,7 @@
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 
-module Mongoid #:nodoc:
+module Mongoid
   module Contextual
     class Mongo
       include Enumerable

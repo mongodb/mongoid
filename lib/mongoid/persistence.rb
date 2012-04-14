@@ -5,7 +5,7 @@ require "mongoid/persistence/insertion"
 require "mongoid/persistence/modification"
 require "mongoid/persistence/operations"
 
-module Mongoid #:nodoc:
+module Mongoid
 
   # The persistence module is a mixin to provide database accessor methods for
   # the document. These correspond to the appropriate accessors on a
@@ -164,7 +164,7 @@ module Mongoid #:nodoc:
     end
     alias :save :upsert
 
-    module ClassMethods #:nodoc:
+    module ClassMethods
 
       # Create a new document. This will instantiate a new document and
       # insert it in a single call. Will always return the document

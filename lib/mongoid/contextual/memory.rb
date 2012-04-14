@@ -1,7 +1,7 @@
 # encoding: utf-8
 require "mongoid/contextual/aggregable/memory"
 
-module Mongoid #:nodoc:
+module Mongoid
   module Contextual
     class Memory
       include Enumerable

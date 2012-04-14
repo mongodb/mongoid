@@ -1,5 +1,5 @@
 # encoding: utf-8
-module Mongoid #:nodoc
+module Mongoid
 
   # This module contains behaviour for adding shard key fields to updates.
   module Sharding
@@ -38,7 +38,7 @@ module Mongoid #:nodoc
       selector
     end
 
-    module ClassMethods #:nodoc
+    module ClassMethods
 
       # Specifies a shard key with the field(s) specified.
       #

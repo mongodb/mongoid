@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Attributes #:nodoc:
+module Mongoid
+  module Attributes
 
     # This module defines behaviour for readonly attributes.
     module Readonly
@@ -26,7 +26,7 @@ module Mongoid #:nodoc:
         new_record? || !readonly_attributes.include?(name.to_s)
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Defines an attribute as readonly. This will ensure that the value for
         # the attribute is only set when the document is new or we are

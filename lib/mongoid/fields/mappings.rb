@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Fields #:nodoc:
+module Mongoid
+  module Fields
 
     # This module maps classes used in field type definitions to the custom
     # definable field in Mongoid.

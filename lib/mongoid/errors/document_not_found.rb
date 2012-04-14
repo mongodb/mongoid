@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc
-  module Errors #:nodoc
+module Mongoid
+  module Errors
 
     # Raised when querying the database for a document by a specific id or by
     # set of attributes which does not exist. If multiple ids were passed then

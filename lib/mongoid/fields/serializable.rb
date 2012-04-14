@@ -1,6 +1,6 @@
 # encoding: utf-8
-module Mongoid #:nodoc:
-  module Fields #:nodoc:
+module Mongoid
+  module Fields
 
     # Defines the behaviour for defined fields in the document.
     #
@@ -268,7 +268,7 @@ module Mongoid #:nodoc:
         serialize(object)
       end
 
-      module ClassMethods #:nodoc:
+      module ClassMethods
 
         # Create the new field with a name and optional additional options.
         #
