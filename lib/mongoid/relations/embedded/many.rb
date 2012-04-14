@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/relations/embedded/batchable"
+
 module Mongoid
   module Relations
     module Embedded
@@ -6,6 +8,7 @@ module Mongoid
       # This class handles the behaviour for a document that embeds many other
       # documents within in it as an array.
       class Many < Relations::Many
+        include Batchable
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
@@ -47,11 +50,6 @@ module Mongoid
         # Appends an array of documents to the relation. Performs a batch
         # insert of the documents instead of persisting one at a time.
         #
-        # @note When performing batch inserts the *after* callbacks will get
-        #   executed before the documents have actually been persisted to the
-        #   database due to an issue with Active Support's callback system - we
-        #   cannot explicitly fire the after callbacks by themselves.
-        #
         # @example Concat with other documents.
         #   person.addresses.concat([ address_one, address_two ])
         #
@@ -61,25 +59,7 @@ module Mongoid
         #
         # @since 2.4.0
         def concat(docs)
-          # @todo: Durran: Test all conditions, then refactor.
-          docs.each do |doc|
-            next unless doc
-            append(doc)
-            if persistable?
-              doc.valid?(:create)
-              doc.run_before_callbacks(:save, :create)
-            end
-          end
-          if persistable?
-            collection.find(base.atomic_selector).update(
-              "$pushAll" => { docs.first.atomic_path => docs.map(&:as_document) }
-            )
-            docs.each do |doc|
-              doc.new_record = false
-              doc.run_after_callbacks(:create, :save)
-              doc.post_persist
-            end
-          end
+          batch_insert(docs)
           self
         end
 
