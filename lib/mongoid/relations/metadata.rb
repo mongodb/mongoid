@@ -855,18 +855,39 @@ module Mongoid
       # This is done by starting at the inverse_class_name's
       # module and stepping down to see where it is defined.
       #
+      # @api private
+      #
       # @example Find the module.
       #   metadata.find_module
       #
-      # @return [String] The module.
+      # @return [ String ] The module.
+      #
+      # @since 3.0.0
       def find_module
         if inverse_class_name.present?
           parts = inverse_class_name.split('::')
-          parts.size.times.map do |i|
-            parts.first(i).join('::')
-          end.reverse.find do |mod|
-            ActiveSupport::Inflector.constantize(mod).constants.include?(name.to_s.classify.to_sym)
-          end
+          modules = parts.size.times.map { |i| parts.first(i).join('::') }.reverse
+          find_from_parts(modules)
+        end
+      end
+
+      # Find the modules from a reversed list.
+      #
+      # @api private
+      #
+      # @example Find the module from the parts.
+      #   metadata.find_from_parts([ "Namespace", "Module" ])
+      #
+      # @param [ Array<String> ] The modules.
+      #
+      # @return [ String ] The matching module.
+      #
+      # @since 3.0.0
+      def find_from_parts(modules)
+        modules.find do |mod|
+          ActiveSupport::Inflector.constantize(mod).constants.include?(
+            name.to_s.classify.to_sym
+          )
         end
       end
 
