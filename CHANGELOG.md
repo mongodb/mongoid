@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.4.9 (branch: 2.4.0-stable)
+
+### Resolved Issues
+
+* \#1916/\#1913 Uniqueness validation no longer is affected by the default
+  scope. (Hans Hasselberg)
+
 ## 2.4.8
 
 ### Resolved Issues

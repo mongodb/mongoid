@@ -136,7 +136,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           after do
-            Dictionary.send(:strip_default_scope, Dictionary.where(year: 1990))
+            Dictionary.default_scoping = nil
             Dictionary.reset_callbacks(:validate)
           end
 

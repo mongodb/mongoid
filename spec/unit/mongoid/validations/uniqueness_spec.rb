@@ -28,8 +28,13 @@ describe Mongoid::Validations::UniquenessValidator do
           { :attributes => dictionary.attributes }
         end
 
+        let(:unscoped) do
+          stub
+        end
+
         before do
-          Dictionary.expects(:where).with(:name => "Oxford").returns(criteria)
+          Dictionary.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:name => "Oxford").returns(criteria)
           criteria.expects(:exists?).returns(true)
           validator.validate_each(dictionary, :name, "Oxford")
         end
@@ -45,8 +50,13 @@ describe Mongoid::Validations::UniquenessValidator do
           { :attributes => dictionary.attributes }
         end
 
+        let(:unscoped) do
+          stub
+        end
+
         before do
-          Dictionary.expects(:where).with(:name => "Oxford").returns(criteria)
+          Dictionary.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:name => "Oxford").returns(criteria)
           criteria.expects(:exists?).returns(true)
           validator.validate_each(dictionary, :name, "Oxford")
         end
@@ -62,8 +72,13 @@ describe Mongoid::Validations::UniquenessValidator do
           { :attributes => dictionary.attributes, :case_sensitive => false }
         end
 
+        let(:unscoped) do
+          stub
+        end
+
         before do
-          Dictionary.expects(:where).with(:name => /^Oxford$/i).returns(criteria)
+          Dictionary.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:name => /^Oxford$/i).returns(criteria)
           criteria.expects(:exists?).returns(true)
           validator.validate_each(dictionary, :name, "Oxford")
         end
@@ -79,8 +94,13 @@ describe Mongoid::Validations::UniquenessValidator do
           { :attributes => dictionary.attributes, :scope => :year }
         end
 
+        let(:unscoped) do
+          stub
+        end
+
         before do
-          Dictionary.expects(:where).with(:name => "Oxford").returns(criteria)
+          Dictionary.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:name => "Oxford").returns(criteria)
           criteria.expects(:where).with(:year => dictionary.year).returns(criteria)
           criteria.expects(:exists?).returns(true)
           validator.validate_each(dictionary, :name, "Oxford")
@@ -97,8 +117,13 @@ describe Mongoid::Validations::UniquenessValidator do
           { :attributes => dictionary.attributes, :message => "my test message" }
         end
 
+        let(:unscoped) do
+          stub
+        end
+
         before do
-          Dictionary.expects(:where).with(:name => "Oxford").returns(criteria)
+          Dictionary.expects(:unscoped).returns(unscoped)
+          unscoped.expects(:where).with(:name => "Oxford").returns(criteria)
           criteria.expects(:exists?).returns(true)
           validator.validate_each(dictionary, :name, "Oxford")
         end
