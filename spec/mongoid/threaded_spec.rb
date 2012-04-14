@@ -33,11 +33,11 @@ describe Mongoid::Threaded do
     context "when the stack has elements" do
 
       before do
-        Thread.current[:"[mongoid]:load-stack"] = [ true ]
+        Thread.current["[mongoid]:load-stack"] = [ true ]
       end
 
       after do
-        Thread.current[:"[mongoid]:load-stack"] = []
+        Thread.current["[mongoid]:load-stack"] = []
       end
 
       it "returns true" do
@@ -48,7 +48,7 @@ describe Mongoid::Threaded do
     context "when the stack has no elements" do
 
       before do
-        Thread.current[:"[mongoid]:load-stack"] = []
+        Thread.current["[mongoid]:load-stack"] = []
       end
 
       it "returns false" do
@@ -73,7 +73,7 @@ describe Mongoid::Threaded do
     context "when a stack has been initialized" do
 
       before do
-        Thread.current[:"[mongoid]:load-stack"] = [ true ]
+        Thread.current["[mongoid]:load-stack"] = [ true ]
       end
 
       let(:loading) do
@@ -81,7 +81,7 @@ describe Mongoid::Threaded do
       end
 
       after do
-        Thread.current[:"[mongoid]:load-stack"] = []
+        Thread.current["[mongoid]:load-stack"] = []
       end
 
       it "returns the stack" do
@@ -128,11 +128,11 @@ describe Mongoid::Threaded do
   describe "#identity_map" do
 
     before do
-      Thread.current[:"[mongoid]:identity-map"] = object
+      Thread.current["[mongoid]:identity-map"] = object
     end
 
     after do
-      Thread.current[:"[mongoid]:identity-map"] = nil
+      Thread.current["[mongoid]:identity-map"] = nil
     end
 
     it "returns the object with the identity map key" do
@@ -143,11 +143,11 @@ describe Mongoid::Threaded do
   describe "#insert" do
 
     before do
-      Thread.current[:"[mongoid][test]:insert-consumer"] = object
+      Thread.current["[mongoid][test]:insert-consumer"] = object
     end
 
     after do
-      Thread.current[:"[mongoid][test]:insert-consumer"] = nil
+      Thread.current["[mongoid][test]:insert-consumer"] = nil
     end
 
     it "returns the object with the insert key" do
