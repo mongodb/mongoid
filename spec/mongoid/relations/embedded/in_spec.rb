@@ -384,6 +384,13 @@ describe Mongoid::Relations::Embedded::In do
     end
   end
 
+  describe ".foreign_key_suffix" do
+
+    it "returns nil" do
+      described_class.foreign_key_suffix.should be_nil
+    end
+  end
+
   describe ".macro" do
 
     it "returns embeds_one" do
