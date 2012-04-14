@@ -230,10 +230,42 @@ module Mongoid #:nodoc:
       # @since 2.4.4
       def evaluated_default(doc)
         if default_val.respond_to?(:call)
-          serialize(doc.instance_exec(&default_val))
+          evaluate_default_proc(doc)
         else
-          serialize(default_val.__deep_copy__)
+          serialize_default(default_val.__deep_copy__)
         end
+      end
+
+      # Evaluate the default proc. In some cases we need to instance exec,
+      # in others we don't.
+      #
+      # @example Eval the default proc.
+      #   field.evaluate_default_proc(band)
+      #
+      # @param [ Document ] doc The document.
+      #
+      # @return [ Object ] The called proc.
+      #
+      # @since 3.0.0
+      def evaluate_default_proc(doc)
+        serialize_default(doc.instance_exec(&default_val))
+      end
+
+      # This is used when default values need to be serialized. Most of the
+      # time just return the object.
+      #
+      # @api private
+      #
+      # @example Serialize the default value.
+      #   field.serialize_default(obj)
+      #
+      # @param [ Object ] object The default.
+      #
+      # @return [ Object ] The serialized default.
+      #
+      # @since 3.0.0
+      def serialize_default(object)
+        serialize(object)
       end
 
       module ClassMethods #:nodoc:

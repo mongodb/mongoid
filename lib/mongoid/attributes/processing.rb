@@ -20,10 +20,12 @@ module Mongoid #:nodoc:
       # @since 2.0.0.rc.7
       def process_attributes(attrs = nil, role = :default, guard_protected_attributes = true)
         attrs ||= {}
-        attrs = sanitize_for_mass_assignment(attrs, role) if guard_protected_attributes
-        attrs.each_pair do |key, value|
-          next if pending_attribute?(key, value)
-          process_attribute(key, value)
+        if attrs.any?
+          attrs = sanitize_for_mass_assignment(attrs, role) if guard_protected_attributes
+          attrs.each_pair do |key, value|
+            next if pending_attribute?(key, value)
+            process_attribute(key, value)
+          end
         end
         yield self if block_given?
         process_pending
@@ -50,7 +52,7 @@ module Mongoid #:nodoc:
           pending_relations[name] = value
           return true
         end
-        if nested_attributes.include?("#{name}=")
+        if nested_attributes.has_key?(name)
           pending_nested[name] = value
           return true
         end

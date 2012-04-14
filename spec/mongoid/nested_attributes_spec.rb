@@ -22,7 +22,9 @@ describe Mongoid::NestedAttributes do
     end
 
     it "adds the method name to the nested attributes list" do
-      Person.nested_attributes.should eq([ "favorites_attributes=" ])
+      Person.nested_attributes.should eq({
+        "favorites_attributes" => "favorites_attributes="
+      })
     end
   end
 

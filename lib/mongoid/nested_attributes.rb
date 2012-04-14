@@ -7,12 +7,14 @@ module Mongoid #:nodoc:
 
     included do
       class_attribute :nested_attributes
-      self.nested_attributes = []
+      self.nested_attributes = {}
     end
 
     module ClassMethods #:nodoc:
 
-      REJECT_ALL_BLANK_PROC = proc { |attributes| attributes.all? { |key, value| key == '_destroy' || value.blank? } }
+      REJECT_ALL_BLANK_PROC = ->(attributes){
+        attributes.all? { |key, value| key == '_destroy' || value.blank? }
+      }
 
       # Used when needing to update related models from a parent relation. Can
       # be used on embedded or referenced relations.
@@ -42,13 +44,13 @@ module Mongoid #:nodoc:
         options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
         args.each do |name|
           meth = "#{name}_attributes="
-          self.nested_attributes += [ meth ]
+          self.nested_attributes["#{name}_attributes"] = meth
           metadata = relations[name.to_s]
           unless metadata
             raise Errors::NestedAttributesMetadataNotFound.new(self, name)
           end
           autosave(metadata.merge!(autosave: true))
-          re_define_method("#{name}_attributes=") do |attrs|
+          re_define_method(meth) do |attrs|
             _assigning do
               metadata.nested_builder(attrs, options).build(self)
             end

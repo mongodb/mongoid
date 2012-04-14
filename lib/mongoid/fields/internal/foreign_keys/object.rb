@@ -63,6 +63,38 @@ module Mongoid #:nodoc:
           def evolve(object)
             object.is_a?(Document) ? object.id : serialize(object)
           end
+
+          private
+
+          # Evaluate the default proc. In some cases we need to instance exec,
+          # in others we don't.
+          #
+          # @example Eval the default proc.
+          #   field.evaluate_default_proc(band)
+          #
+          # @param [ Document ] doc The document.
+          #
+          # @return [ Object ] The called proc.
+          #
+          # @since 3.0.0
+          def evaluate_default_proc(doc)
+            serialize_default(default_val[])
+          end
+
+          # This is used when default values need to be serialized. Most of the
+          # time just return the object.
+          #
+          # @api private
+          #
+          # @example Serialize the default value.
+          #   field.serialize_default(obj)
+          #
+          # @param [ Object ] object The default.
+          #
+          # @return [ Object ] The serialized default.
+          #
+          # @since 3.0.0
+          def serialize_default(object); object; end
         end
       end
     end
