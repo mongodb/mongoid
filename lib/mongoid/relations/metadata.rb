@@ -827,12 +827,11 @@ module Mongoid
       # @example Get the class name.
       #   metadata.classify
       #
-      # @return [ String ] If embedded_in, the camelized, else classified.
+      # @return [ String ] The classified name.
       #
       # @since 2.0.0.rc.1
       def classify
-        return name.to_s.camelize if macro == :embedded_in
-        "#{find_module}::#{name.to_s.classify}"
+        @classify ||= "#{find_module}::#{name.to_s.classify}"
       end
 
       # Get the name for the inverse field.
@@ -995,6 +994,16 @@ module Mongoid
         candidates.first
       end
 
+      # Get the candidates for inverse relations.
+      #
+      # @api private
+      #
+      # @example Get the candidates.
+      #   metadata.inverse_relation_candidates
+      #
+      # @return [ Array<Symbol> ] The candidates.
+      #
+      # @since 3.0.0
       def inverse_relation_candidates
         klass.relations.select do |_, meta|
           next if meta.versioned? || meta.name == name

@@ -210,21 +210,9 @@ describe Mongoid::Relations::Metadata do
       Mongoid::Relations::Options.expects(:validate!).at_least_once
     end
 
-    context "when relation is embedded_in" do
-
-      it "returns camelized name" do
-        metadata.expects(:macro).returns(:embedded_in).once
-        classified.should eq(name.camelize)
-      end
-    end
-
-    context "when relation is not embedded_in" do
-
-      it "concatenates the result from #find_module and name.classify" do
-        metadata.expects(:macro).returns(:has_many).once
-        metadata.expects(:find_module).returns("Fruit").once
-        classified.should eq("Fruit::Name")
-      end
+    it "concatenates the result from #find_module and name.classify" do
+      metadata.expects(:find_module).returns("Fruit").once
+      classified.should eq("Fruit::Name")
     end
   end
 
