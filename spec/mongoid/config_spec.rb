@@ -212,6 +212,15 @@ describe Mongoid::Config do
 
   describe "#sessions=" do
 
+    context "when no sessions configuration exists" do
+
+      it "raises an error" do
+        expect {
+          described_class.sessions = nil
+        }.to raise_error(Mongoid::Errors::NoSessionsConfig)
+      end
+    end
+
     context "when no default session exists" do
 
       it "raises an error" do

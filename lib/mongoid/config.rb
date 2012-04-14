@@ -128,6 +128,7 @@ module Mongoid #:nodoc
     #
     # @since 3.0.0
     def sessions=(sessions)
+      raise Errors::NoSessionsConfig.new unless sessions
       sess = sessions.with_indifferent_access
       Validators::Session.validate(sess)
       @sessions = sess
