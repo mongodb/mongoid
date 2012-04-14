@@ -20,7 +20,26 @@ module Mongoid
         #
         # @since 3.0.0
         def batch_insert(docs)
-          execute_batch(docs, "$pushAll")
+          execute_batch_insert(docs, "$pushAll")
+        end
+
+        # Batch remove the provided documents as a $pullAll.
+        #
+        # @example Batch remove the documents.
+        #   batchable.batch_remove([ doc_one, doc_two ])
+        #
+        # @param [ Array<Document> ] docs The docs to remove.
+        # @param [ Symbol ] method Delete or destroy.
+        #
+        # @since 3.0.0
+        def batch_remove(docs, method = :delete)
+          removals = pre_process_batch_remove(docs, method)
+          if !docs.empty? && !_assigning?
+            collection.find(selector).update("$pullAll" => { path => removals })
+            post_process_batch_remove(docs, method)
+          end
+          Threaded.clear_options!
+          reindex
         end
 
         # Batch replace the provided documents as a $set.
@@ -43,7 +62,7 @@ module Mongoid
             base.delayed_atomic_sets.clear
             docs = normalize_docs(docs).compact
             target.clear and _unscoped.clear
-            inserts = execute_batch(docs, "$set")
+            inserts = execute_batch_insert(docs, "$set")
             base.delayed_atomic_sets[path] = inserts if _assigning?
           end
         end
@@ -70,12 +89,12 @@ module Mongoid
         # @return [ Array<Hash> ] The inserts.
         #
         # @since 3.0.0
-        def execute_batch(docs, operation)
+        def execute_batch_insert(docs, operation)
           self.inserts_valid = true
-          inserts = pre_process_batch(docs)
+          inserts = pre_process_batch_insert(docs)
           if insertable?
             collection.find(selector).update(operation => { path => inserts })
-            post_process_batch(docs)
+            post_process_batch_insert(docs)
           end
           inserts
         end
@@ -148,14 +167,14 @@ module Mongoid
         # @api private
         #
         # @example Pre process the documents.
-        #   batchable.pre_process_batch(docs)
+        #   batchable.pre_process_batch_insert(docs)
         #
         # @param [ Array<Document> ] docs The documents.
         #
         # @return [ Array<Hash> ] The documents as an array of hashes.
         #
         # @since 3.0.0
-        def pre_process_batch(docs)
+        def pre_process_batch_insert(docs)
           docs.map do |doc|
             next unless doc
             append(doc)
@@ -171,23 +190,72 @@ module Mongoid
           end
         end
 
+        # Pre process the batch removal.
+        #
+        # @api private
+        #
+        # @example Pre process the documents.
+        #   batchable.pre_process_batch_remove(docs, :delete)
+        #
+        # @param [ Array<Document> ] docs The documents.
+        # @param [ Symbol ] method Delete or destroy.
+        #
+        # @return [ Array<Hash> ] The documents as hashes.
+        #
+        # @since 3.0.0
+        def pre_process_batch_remove(docs, method)
+          docs.map do |doc|
+            self.path = doc.atomic_path unless path
+            if !_assigning? && !metadata.versioned?
+              doc.cascade!
+              doc.run_before_callbacks(:destroy) if method == :destroy
+            end
+            target.delete_one(doc)
+            _unscoped.delete_one(doc)
+            unbind_one(doc)
+            doc.as_document
+          end
+        end
+
         # Post process the documents after batch insert.
         #
         # @api private
         #
         # @example Post process the documents.
-        #   batchable.post_process_batch(docs)
+        #   batchable.post_process_batch_insert(docs)
         #
         # @param [ Array<Documents> ] docs The inserted docs.
         #
         # @return [ Enumerable ] The document enum.
         #
         # @since 3.0.0
-        def post_process_batch(docs)
+        def post_process_batch_insert(docs)
           docs.each do |doc|
             doc.new_record = false
             doc.run_after_callbacks(:create, :save)
             doc.post_persist
+          end
+        end
+
+        # Post process the batch removal.
+        #
+        # @api private
+        #
+        # @example Post process the documents.
+        #   batchable.post_process_batch_remove(docs, :delete)
+        #
+        # @param [ Array<Document> ] docs The documents.
+        # @param [ Symbol ] method Delete or destroy.
+        #
+        # @return [ Array<Document> ] The documents.
+        #
+        # @since 3.0.0
+        def post_process_batch_remove(docs, method)
+          docs.each do |doc|
+            doc.run_after_callbacks(:destroy) if method == :destroy
+            doc.freeze
+            doc.destroyed = true
+            IdentityMap.remove(doc)
           end
         end
       end

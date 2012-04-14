@@ -478,40 +478,9 @@ module Mongoid
         #
         # @return [ Integer ] The number of documents removed.
         def remove_all(conditions = {}, method = :delete)
-          # @todo: Durran: test all examples and refactor.
           criteria = where(conditions || {})
           removed = criteria.size
-          docs = criteria.map do |doc|
-            target.delete_one(doc)
-            _unscoped.delete_one(doc)
-            if !_assigning? && !metadata.versioned?
-              doc.cascade!
-              doc.run_before_callbacks(:destroy) if method == :destroy
-            end
-            unbind_one(doc)
-            doc
-          end
-          if !docs.empty? && !_assigning?
-            query = collection.find(base.atomic_selector)
-            # @todo: Durran: Versioned docs have no atomic path?
-            if metadata.versioned?
-              query.update("$pull" => { metadata.name => conditions || {}})
-            else
-              query.update(
-                "$pullAll" => { docs.first.atomic_path => docs.map(&:as_document) }
-              )
-            end
-          end
-          unless _assigning?
-            docs.each do |doc|
-              doc.run_after_callbacks(:destroy) if method == :destroy
-              doc.freeze
-              doc.destroyed = true
-              IdentityMap.remove(doc)
-            end
-            Threaded.clear_options!
-          end
-          reindex
+          batch_remove(criteria, method)
           removed
         end
 
