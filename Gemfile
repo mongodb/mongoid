@@ -5,6 +5,7 @@ gem "rake"
 
 platforms :mri_19 do
   unless ENV["CI"]
-    gem 'debugger'
+    gem "debugger"
+    gem "perftools.rb"
   end
 end
