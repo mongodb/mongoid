@@ -106,7 +106,7 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def cascadable_children(kind, children = Set.new)
-      relations.each_pair do |name, metadata|
+      embedded_relations.each_pair do |name, metadata|
         next unless metadata.cascading_callbacks?
         without_autobuild do
           delayed_pulls = delayed_atomic_pulls[name]

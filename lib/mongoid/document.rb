@@ -171,12 +171,10 @@ module Mongoid #:nodoc:
     # @return [ Hash ] A hash of all attributes in the hierarchy.
     def as_document
       return attributes if frozen?
-      relations.each_pair do |name, meta|
-        if meta.embedded?
-          without_autobuild do
-            relation = send(name)
-            attributes[meta.store_as] = relation.as_document unless relation.blank?
-          end
+      embedded_relations.each_pair do |name, meta|
+        without_autobuild do
+          relation = send(name)
+          attributes[meta.store_as] = relation.as_document unless relation.blank?
         end
       end
       attributes

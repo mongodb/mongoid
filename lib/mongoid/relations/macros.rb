@@ -9,8 +9,10 @@ module Mongoid # :nodoc:
 
       included do
         class_attribute :embedded, instance_reader: false
+        class_attribute :embedded_relations
         class_attribute :relations
         self.embedded = false
+        self.embedded_relations = {}
         self.relations = {}
       end
 
@@ -82,6 +84,7 @@ module Mongoid # :nodoc:
           meta = characterize(name, Embedded::Many, options, &block)
           self.cyclic = true if options[:cyclic]
           relate(name, meta)
+          embed(name, meta)
           validates_relation(meta)
           meta
         end
@@ -109,6 +112,7 @@ module Mongoid # :nodoc:
           meta = characterize(name, Embedded::One, options, &block)
           self.cyclic = true if options[:cyclic]
           relate(name, meta)
+          embed(name, meta)
           builder(name, meta).creator(name, meta)
           validates_relation(meta)
           meta
@@ -264,6 +268,22 @@ module Mongoid # :nodoc:
             end
             "#{self}::#{extension_module_name}".constantize
           end
+        end
+
+        # Add an embedded relation metadata to the embedded relations.
+        #
+        # @api private
+        #
+        # @example Add the metadata to embedded relations.
+        #   Person.embed("addresses", metadata)
+        #
+        # @param [ String ] name The name of the relation.
+        # @param [ Metadata ] metadata The relation metadata.
+        #
+        # @since 3.0.0
+        def embed(name, metadata)
+          self.embedded_relations =
+            embedded_relations.merge(name.to_s => metadata)
         end
 
         # Defines a field to be used as a foreign key in the relation and

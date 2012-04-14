@@ -24,15 +24,13 @@ module Mongoid #:nodoc
 
     def collect_children
       children = []
-      relations.each_pair do |name, metadata|
-        if metadata.embedded?
-          without_autobuild do
-            child = send(name)
-            Array.wrap(child).each do |doc|
-              children.push(doc)
-              children.concat(doc._children) unless metadata.versioned?
-            end if child
-          end
+      embedded_relations.each_pair do |name, metadata|
+        without_autobuild do
+          child = send(name)
+          Array.wrap(child).each do |doc|
+            children.push(doc)
+            children.concat(doc._children) unless metadata.versioned?
+          end if child
         end
       end
       children
