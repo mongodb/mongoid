@@ -132,7 +132,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
           before do
             Dictionary.validates_uniqueness_of :name
-            Dictionary.default_scope(Dictionary.where(year: 1990))
+            Dictionary.default_scope(Dictionary.where(:year => 1990))
           end
 
           after do
@@ -144,11 +144,11 @@ describe Mongoid::Validations::UniquenessValidator do
             context "when the attribute is not unique" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.create(:name => "Oxford")
               end
 
               let(:dictionary) do
-                Dictionary.new(name: "Oxford")
+                Dictionary.new(:name => "Oxford")
               end
 
               it "returns false" do
