@@ -860,7 +860,7 @@ module Mongoid
       #
       # @return [String] The module.
       def find_module
-        if inverse_class_name.present? && name.present?
+        if inverse_class_name.present?
           parts = inverse_class_name.split('::')
           parts.size.times.map do |i|
             parts.first(i).join('::')
