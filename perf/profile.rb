@@ -2,10 +2,7 @@ require "perftools"
 require "mongoid"
 require "./perf/models"
 
-# For 1.9.3 profiling add the following to Gemfile:
-# gem 'perftools.rb', :git => 'git://github.com/bearded/perftools.rb.git', :branch => 'perftools-1.8'
-Mongoid.databases = { :default => { :name => "mongoid_perf_test" }}
-Mongoid::Sessions::Factory.default
+Mongoid.connect_to("mongoid_perf_test")
 
 Mongoid.purge!
 
@@ -19,9 +16,18 @@ def without_gc
 end
 
 without_gc do
+  puts "[ Root Document #new ]"
+  PerfTools::CpuProfiler.start("perf/root_new.profile") do
+    10000.times do |n|
+      Person.new
+    end
+  end
+end
+
+without_gc do
   puts "[ Root Document #create ]"
   PerfTools::CpuProfiler.start("perf/root_create.profile") do
-    1000.times do |n|
+    10000.times do |n|
       Person.create(:birth_date => Date.new(1970, 1, 1))
     end
   end
@@ -56,7 +62,7 @@ person = Person.create(:title => "Sir")
 without_gc do
   puts "[ Embedded 1-n #build ]"
   PerfTools::CpuProfiler.start("perf/embedded_n_build.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.addresses.build(
         :street => "Wienerstr. #{n}",
         :city => "Berlin",
@@ -76,7 +82,7 @@ end
 without_gc do
   puts "[ Embedded 1-n #create ]"
   PerfTools::CpuProfiler.start("perf/embedded_n_create.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.addresses.create(
         :street => "Wienerstr. #{n}",
         :city => "Berlin",
@@ -103,7 +109,7 @@ end
 without_gc do
   puts "[ Embedded 1-n #push ]"
   PerfTools::CpuProfiler.start("perf/embedded_n_push.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.addresses.push(
         Address.new(
           :street => "Wienerstr. #{n}",
@@ -155,7 +161,7 @@ person.addresses.delete_all
 without_gc do
   puts "[ Embedded 1-1 #relation= ]"
   PerfTools::CpuProfiler.start("perf/embedded_1_relation.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.name = Name.new(:given => "Name #{n}")
     end
   end
@@ -164,7 +170,7 @@ end
 without_gc do
   puts "[ Referenced 1-n #build ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_build.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.posts.build(:title => "Posting #{n}")
     end
   end
@@ -180,7 +186,7 @@ end
 without_gc do
   puts "[ Referenced 1-n #create ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_create.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.posts.create(:title => "Posting #{n}")
     end
   end
@@ -203,7 +209,7 @@ end
 without_gc do
   puts "[ Referenced 1-n #push ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_push.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.posts.push(Post.new(:title => "Posting #{n}"))
     end
   end
@@ -258,7 +264,7 @@ end
 without_gc do
   puts "[ Referenced n-n #build ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_n_build.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.preferences.build(:name => "Preference #{n}")
     end
   end
@@ -274,7 +280,7 @@ end
 without_gc do
   puts "[ Referenced n-n #create ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_n_create.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.preferences.create(:name => "Preference #{n}")
     end
   end
@@ -297,7 +303,7 @@ end
 without_gc do
   puts "[ Referenced n-n #push ]"
   PerfTools::CpuProfiler.start("perf/referenced_n_n_push.profile") do
-    1000.times do |n|
+    5000.times do |n|
       person.preferences.push(Preference.new(:name => "Preference #{n}"))
     end
   end

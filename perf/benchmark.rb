@@ -22,6 +22,12 @@ Benchmark.bm do |bm|
 
       puts "[ #{i} ]"
 
+      bm.report("#new              ") do
+        i.times do |n|
+          Person.new
+        end
+      end
+
       bm.report("#create           ") do
         i.times do |n|
           Person.create(:birth_date => Date.new(1970, 1, 1))
