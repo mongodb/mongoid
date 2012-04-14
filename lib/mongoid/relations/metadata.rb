@@ -922,11 +922,7 @@ module Mongoid
         return self[:foreign_key].to_s if self[:foreign_key]
         suffix = relation.foreign_key_suffix
         if relation.stores_foreign_key?
-          if relation.macro == :has_and_belongs_to_many
-            "#{name.to_s.singularize}#{suffix}"
-          else
-            "#{name}#{suffix}"
-          end
+          relation.foreign_key(name)
         else
           if polymorphic?
             "#{self[:as]}#{suffix}"

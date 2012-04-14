@@ -167,6 +167,20 @@ module Mongoid
             false
           end
 
+          # Get the foreign key for the provided name.
+          #
+          # @example Get the foreign key.
+          #   Referenced::One.foreign_key(:person)
+          #
+          # @param [ Symbol ] name The name.
+          #
+          # @return [ String ] The foreign key.
+          #
+          # @since 3.0.0
+          def foreign_key(name)
+            "#{name}#{foreign_key_suffix}"
+          end
+
           # Get the default value for the foreign key.
           #
           # @example Get the default.
