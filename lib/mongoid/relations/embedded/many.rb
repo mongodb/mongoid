@@ -80,16 +80,15 @@ module Mongoid
         #
         # @return [ Document ] The new document.
         def build(attributes = {}, options = {}, type = nil)
-          if options.is_a? Class
+          if options.is_a?(Class)
             options, type = {}, options
           end
-
-          Factory.build(type || metadata.klass, attributes, options).tap do |doc|
-            append(doc)
-            doc.apply_post_processed_defaults
-            yield(doc) if block_given?
-            doc.run_callbacks(:build) { doc }
-          end
+          doc = Factory.build(type || metadata.klass, attributes, options)
+          append(doc)
+          doc.apply_post_processed_defaults
+          yield(doc) if block_given?
+          doc.run_callbacks(:build) { doc }
+          doc
         end
         alias :new :build
 
@@ -137,9 +136,7 @@ module Mongoid
         #
         # @return [ Document ] The newly created document.
         def create(attributes = {}, options = {}, type = nil, &block)
-          doc = build(attributes, options, type, &block)
-          doc.save
-          doc
+          build(attributes, options, type, &block).tap(&:save)
         end
 
         # Create a new document in the relation. This is essentially the same
@@ -162,9 +159,7 @@ module Mongoid
         #
         # @return [ Document ] The newly created document.
         def create!(attributes = {}, options = {}, type = nil, &block)
-          doc = build(attributes, options, type, &block)
-          doc.save!
-          doc
+          build(attributes, options, type, &block).tap(&:save!)
         end
 
         # Delete the supplied document from the target. This method is proxied
