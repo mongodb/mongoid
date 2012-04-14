@@ -1327,7 +1327,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#count" do
 
     let(:person) do
-      Person.new
+      Person.create
     end
 
     before do
@@ -1345,7 +1345,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when providing scoped mass assignment" do
 
       let(:person) do
-        Person.new
+        Person.create
       end
 
       let(:video) do
@@ -1442,7 +1442,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#create!" do
 
     let(:person) do
-      Person.new
+      Person.create
     end
 
     context "when providing scoped mass assignment" do
@@ -1908,7 +1908,7 @@ describe Mongoid::Relations::Embedded::Many do
   describe "#find_or_create_by" do
 
     let(:person) do
-      Person.new
+      Person.create
     end
 
     let!(:address) do

@@ -383,8 +383,8 @@ en:
             expect to be writing values for undefined fields often."
         unsaved_document:
           message: "Attempted to save %{document} before the parent %{base}."
-          summary: "You cannot call create or create! through a relational
-            association relation (%{document}) who's parent (%{base}) is
+          summary: "You cannot call create or create! through the
+            relation (%{document}) who's parent (%{base}) is
             not already saved. This would case the database to be out of sync
             since the child could potentially reference a nonexistant parent."
           resolution: "Make sure to only use create or create! when the parent

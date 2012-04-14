@@ -21,6 +21,57 @@ module Mongoid
         size == 0
       end
 
+        # Creates a new document on the references many relation. This will
+        # save the document if the parent has been persisted.
+        #
+        # @example Create and save the new document.
+        #   person.posts.create(:text => "Testing")
+      #
+      # @overload create(attributes = nil, options = {}, type = nil)
+      #   @param [ Hash ] attributes The attributes to create with.
+      #   @param [ Hash ] options The scoped assignment options.
+      #   @param [ Class ] type The optional type of document to create.
+      #
+      # @overload create(attributes = nil, type = nil)
+      #   @param [ Hash ] attributes The attributes to create with.
+      #   @param [ Class ] type The optional type of document to create.
+      #
+      # @return [ Document ] The newly created document.
+      #
+      # @since 2.0.0.beta.1
+      def create(attributes = nil, options = {}, type = nil, &block)
+        doc = build(attributes, options, type, &block)
+        base.persisted? ? doc.save : raise_unsaved(doc)
+        doc
+      end
+
+      # Creates a new document on the references many relation. This will
+      # save the document if the parent has been persisted and will raise an
+      # error if validation fails.
+      #
+      # @example Create and save the new document.
+      #   person.posts.create!(:text => "Testing")
+      #
+      # @overload create!(attributes = nil, options = {}, type = nil)
+      #   @param [ Hash ] attributes The attributes to create with.
+      #   @param [ Hash ] options The scoped assignment options.
+      #   @param [ Class ] type The optional type of document to create.
+      #
+      # @overload create!(attributes = nil, type = nil)
+      #   @param [ Hash ] attributes The attributes to create with.
+      #   @param [ Class ] type The optional type of document to create.
+      #
+      # @raise [ Errors::Validations ] If validation failed.
+      #
+      # @return [ Document ] The newly created document.
+      #
+      # @since 2.0.0.beta.1
+      def create!(attributes = nil, options = {}, type = nil, &block)
+        doc = build(attributes, options, type, &block)
+        base.persisted? ? doc.save! : raise_unsaved(doc)
+        doc
+      end
+
       # Determine if any documents in this relation exist in the database.
       #
       # @example Are there persisted documents?

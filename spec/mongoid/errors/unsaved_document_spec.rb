@@ -24,7 +24,7 @@ describe Mongoid::Errors::UnsavedDocument do
 
     it "contains the summary in the message" do
       error.message.should include(
-        "You cannot call create or create! through a relational association"
+        "You cannot call create or create! through the relation"
       )
     end
 

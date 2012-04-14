@@ -119,49 +119,6 @@ module Mongoid
           target.select { |doc| doc.persisted? }.size
         end
 
-        # Create a new document in the relation. This is essentially the same
-        # as doing a #build then #save on the new document.
-        #
-        # @example Create a new document in the relation.
-        #   person.movies.create(:name => "Bozo")
-        #
-        # @overload create(attributes = {}, options = {}, type = nil)
-        #   @param [ Hash ] attributes The attributes to build the document with.
-        #   @param [ Hash ] options The scoped assignment options.
-        #   @param [ Class ] type Optional class to create the document with.
-        #
-        # @overload create(attributes = {}, type = nil)
-        #   @param [ Hash ] attributes The attributes to build the document with.
-        #   @param [ Class ] type Optional class to create the document with.
-        #
-        # @return [ Document ] The newly created document.
-        def create(attributes = {}, options = {}, type = nil, &block)
-          build(attributes, options, type, &block).tap(&:save)
-        end
-
-        # Create a new document in the relation. This is essentially the same
-        # as doing a #build then #save on the new document. If validation
-        # failed on the document an error will get raised.
-        #
-        # @example Create the document.
-        #   person.addresses.create!(:street => "Unter der Linden")</tt>
-        #
-        # @overload create!(attributes = {}, options = {}, type = nil)
-        #   @param [ Hash ] attributes The attributes to build the document with.
-        #   @param [ Hash ] options The scoped assignment options.
-        #   @param [ Class ] type Optional class to create the document with.
-        #
-        # @overload create!(attributes = {}, type = nil)
-        #   @param [ Hash ] attributes The attributes to build the document with.
-        #   @param [ Class ] type Optional class to create the document with.
-        #
-        # @raise [ Errors::Validations ] If a validation error occured.
-        #
-        # @return [ Document ] The newly created document.
-        def create!(attributes = {}, options = {}, type = nil, &block)
-          build(attributes, options, type, &block).tap(&:save!)
-        end
-
         # Delete the supplied document from the target. This method is proxied
         # in order to reindex the array after the operation occurs.
         #

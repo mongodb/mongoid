@@ -391,7 +391,7 @@ describe Mongoid::Persistence do
   describe "#save" do
 
     let(:person) do
-      Person.new
+      Person.create
     end
 
     context "when the document has been instantiated with limited fields" do
