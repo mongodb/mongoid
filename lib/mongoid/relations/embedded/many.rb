@@ -303,53 +303,14 @@ module Mongoid
         # @example Substitute the relation's target.
         #   person.addresses.substitute([ address ])
         #
-        # @param [ Array<Document> ] new_target The replacement array.
-        # @param [ true, false ] building Are we in build mode?
+        # @param [ Array<Document> ] docs The replacement docs.
         #
         # @return [ Many ] The proxied relation.
         #
         # @since 2.0.0.rc.1
-        def substitute(replacement)
-          # @todo: Durran: Test all conditions and refactor.
-          tap do |proxy|
-            if replacement.blank?
-              if _assigning? && !proxy.empty?
-                base.atomic_unsets.push(proxy.first.atomic_path)
-              end
-              proxy.clear
-            else
-              base.delayed_atomic_sets.clear
-              if replacement.first.is_a?(Hash)
-                replacement = Many.builder(base, metadata, replacement).build
-              end
-              docs = replacement.compact
-              proxy.target = docs
-              self._unscoped = docs.dup
-              proxy.target.each_with_index do |doc, index|
-                integrate(doc)
-                doc._index = index
-                if base.persisted? && !_assigning?
-                  doc.valid?(:create)
-                  doc.run_before_callbacks(:save, :create)
-                end
-                # doc.save if base.persisted? && !_assigning?
-              end
-              if base.persisted? && !_assigning?
-                collection.find(base.atomic_selector).update(
-                  "$set" => { docs.first.atomic_path => proxy.as_document }
-                )
-                proxy.target.each do |doc|
-                  doc.new_record = false
-                  doc.run_after_callbacks(:create, :save)
-                  doc.post_persist
-                end
-              end
-              if _assigning?
-                name = proxy.first.atomic_path
-                base.delayed_atomic_sets[name] = proxy.as_document
-              end
-            end
-          end
+        def substitute(docs)
+          batch_replace(docs)
+          self
         end
 
         # Return the relation with all previous scoping removed. This is the
