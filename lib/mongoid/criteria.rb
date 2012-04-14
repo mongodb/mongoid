@@ -546,29 +546,6 @@ module Mongoid #:nodoc:
       )
     end
 
-    # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
-    #
-    # @api private
-    #
-    # @example Add a single id criteria.
-    #   criteria.for_ids([ 1 ])
-    #
-    # @example Add multiple id criteria.
-    #   criteria.for_ids([ 1, 2 ])
-    #
-    # @param [ Array ] ids The array of ids.
-    #
-    # @return [ Criteria ] The cloned criteria.
-    def for_ids(ids)
-      field = klass.fields["_id"]
-      method = extract_id ? :all_of : :where
-      if ids.size > 1
-        send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
-      else
-        send(method, { _id: field.serialize(ids.first) })
-      end
-    end
-
     # Clone or dup the current +Criteria+. This will return a new criteria with
     # the selector, options, klass, embedded options, etc intact.
     #
