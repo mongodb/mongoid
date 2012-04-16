@@ -160,4 +160,30 @@ describe Mongoid::Collection do
       end
     end
   end
+
+  describe "#drop" do
+
+    it "delegates drop to master" do
+      master.expects(:drop).returns(true)
+      collection.drop
+    end
+
+    context "drop succeeds" do
+
+      it "sets @master to nil" do
+        master.expects(:drop).returns(true)
+        collection.drop
+        collection.instance_variable_get(:@master).should be_nil
+      end
+    end
+
+    context "drop fails" do
+
+      it "leaves master unchanged" do
+        master.expects(:drop).returns(false)
+        collection.drop
+        collection.instance_variable_get(:@master).should_not be_nil
+      end
+    end
+  end
 end
