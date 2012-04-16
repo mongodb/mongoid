@@ -622,6 +622,35 @@ describe Mongoid::Persistence do
     end
   end
 
+  describe "#touch" do
+
+    context "with a document include Mongoid::Timestamps::Updated" do
+      let(:updated_at) { 2.days.ago }
+      let(:agent) { Agent.create(:updated_at => updated_at) }
+      before { agent.touch }
+      let(:agent_updated_at) { Agent.find(agent.id).updated_at }
+
+      it 'should update updated_at field' do
+        agent_updated_at.should_not be_within(1).of(updated_at)
+      end
+
+      it 'should define updated_at field to now' do
+        agent_updated_at.should be_within(1).of(Time.now.utc)
+      end
+
+    end
+
+    context "with a document not include Mongoid::Timestamps::Updated" do
+      let(:person) { Person.create }
+      before { person.touch }
+      it 'should not update updated_at field' do
+        Person.collection.find_one({:_id => person.id}).keys.should_not include("updated_at")
+      end
+
+    end
+
+  end
+
   describe "#update_attribute" do
 
     let(:post) do
