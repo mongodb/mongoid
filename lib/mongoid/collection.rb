@@ -149,5 +149,9 @@ module Mongoid #:nodoc
         master(options).update(selector, document, options)
       end
     end
+
+    def drop(*args)
+      @master = nil if master.drop
+    end
   end
 end
