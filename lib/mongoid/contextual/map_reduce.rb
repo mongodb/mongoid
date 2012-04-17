@@ -108,6 +108,14 @@ module Mongoid
         counts["input"]
       end
 
+      # Sets the map/reduce to use jsMode.
+      #
+      # @example Set the map/reduce to jsMode.
+      #   map_reduce.js_mode
+      #
+      # @return [ MapReduce ] The map/reduce.
+      #
+      # @since 3.0.0
       def js_mode
         command[:jsMode] = true
         self
