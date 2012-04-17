@@ -56,8 +56,8 @@ namespace :db do
     task :create_indexes => "mongoid:create_indexes"
   end
 
-  unless Rake::Task.task_defined?("db:force_remove_indexes")
-    task :force_remove_indexes => "mongoid:force_remove_indexes"
+  unless Rake::Task.task_defined?("db:remove_indexes")
+    task :remove_indexes => "mongoid:remove_indexes"
   end
 
   namespace :mongoid do
@@ -93,7 +93,7 @@ namespace :db do
     end
 
     desc 'Remove the indexes defined on your mongoid models without questions!'
-    task :force_remove_indexes => :environment do
+    task :remove_indexes => :environment do
       engines_models_paths = Rails.application.railties.engines.map do |engine|
         engine.paths["app/models"].expanded
       end
