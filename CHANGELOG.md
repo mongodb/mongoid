@@ -691,6 +691,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1924/\#1917 Fix pushing to embedded relations with default scopes not
+  scoping on the new document. (Hans Hasselberg)
+
 * \#1922/\#1919 Dropping collections unmemoizes the internally wrapped
   collection, in order to ensure when defining capped collections that
   they are always recreated as capped. (Hans Hasselberg)
