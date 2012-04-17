@@ -300,7 +300,7 @@ module Mongoid # :nodoc:
           tap do |proxy|
             if replacement.blank?
               if _assigning? && !proxy.empty?
-                base.atomic_unsets.push(proxy.first.atomic_path)
+                base.atomic_unsets.push(_unscoped.first.atomic_path)
               end
               proxy.clear
             else
@@ -318,7 +318,7 @@ module Mongoid # :nodoc:
                   doc.save if base.persisted? && !_assigning?
                 end
                 if _assigning?
-                  name = proxy.first.atomic_path
+                  name = _unscoped.first.atomic_path
                   base.delayed_atomic_sets[name] = proxy.as_document
                 end
               end
@@ -353,10 +353,10 @@ module Mongoid # :nodoc:
         #
         # @since 2.0.0.rc.1
         def append(document)
-          target.push(document)
+          target.push(*scope([document]))
           _unscoped.push(document)
           integrate(document)
-          document._index = target.size - 1
+          document._index = _unscoped.size - 1
         end
 
         # Instantiate the binding associated with this relation.

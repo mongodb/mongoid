@@ -84,8 +84,8 @@ describe Mongoid::Relations::Embedded::Many do
               person.appointments.send(method, inactive)
             end
 
-            it "appends to the target" do
-              person.appointments.target.should eq([ inactive ])
+            it "doesn't append to the target" do
+              person.appointments.target.should_not eq([ inactive ])
             end
 
             it "appends to the _unscoped" do
