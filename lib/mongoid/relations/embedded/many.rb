@@ -293,10 +293,10 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
-          target.push(document)
+          target.push(*scope([document]))
           _unscoped.push(document)
           integrate(document)
-          document._index = target.size - 1
+          document._index = _unscoped.size - 1
         end
 
         # Instantiate the binding associated with this relation.

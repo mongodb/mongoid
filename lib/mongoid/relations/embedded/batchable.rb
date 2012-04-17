@@ -145,7 +145,7 @@ module Mongoid
         #
         # @since 3.0.0
         def path
-          @path ||= first.atomic_path
+          @path ||= _unscoped.first.atomic_path
         end
 
         # Get the selector for executing atomic operations on the collection.
