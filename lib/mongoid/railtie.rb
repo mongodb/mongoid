@@ -77,10 +77,18 @@ module Rails
       #
       initializer "setup database" do
         config_file = Rails.root.join("config", "mongoid.yml")
-        # @todo: Durran: Remove extra check when #1291 complete.
-        if config_file.file? &&
-          YAML.load(ERB.new(File.read(config_file)).result)[Rails.env].values.flatten.any?
-          ::Mongoid.load!(config_file)
+        if config_file.file?
+          begin
+            ::Mongoid.load!(config_file)
+          rescue ::Mongoid::Errors::NoSessionsConfig => e
+            handle_configuration_error(e)
+          rescue ::Mongoid::Errors::NoDefaultSession => e
+            handle_configuration_error(e)
+          rescue ::Mongoid::Errors::NoSessionDatabase => e
+            handle_configuration_error(e)
+          rescue ::Mongoid::Errors::NoSessionHosts => e
+            handle_configuration_error(e)
+          end
         end
       end
 
@@ -137,6 +145,15 @@ module Rails
             ::Mongoid.instantiate_observers
           end
         end
+      end
+
+      # Rails runs all initializers first before getting into any generator
+      # code, so we have no way in the intitializer to know if we are
+      # generating a mongoid.yml. So instead of failing, we catch all the
+      # errors and print them out.
+      def handle_configuration_error(e)
+        puts "There is a configuration error with the current mongoid.yml."
+        puts e.message
       end
     end
   end
