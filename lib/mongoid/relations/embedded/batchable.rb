@@ -23,6 +23,25 @@ module Mongoid
           execute_batch_insert(docs, "$pushAll")
         end
 
+        # Clear all of the docs out of the relation in a single swipe.
+        #
+        # @example Clear all docs.
+        #   batchable.batch_clear(docs)
+        #
+        # @param [ Array<Document> ] docs The docs to clear.
+        #
+        # @return [ Array ] The empty array.
+        #
+        # @since 3.0.0
+        def batch_clear(docs)
+          pre_process_batch_remove(docs, :delete)
+          unless docs.empty?
+            collection.find(selector).update("$unset" => { path => true })
+            post_process_batch_remove(docs, :delete)
+          end
+          _unscoped.clear
+        end
+
         # Batch remove the provided documents as a $pullAll.
         #
         # @example Batch remove the documents.
@@ -57,7 +76,7 @@ module Mongoid
             if _assigning? && !empty?
               base.atomic_unsets.push(first.atomic_path)
             end
-            clear
+            batch_remove(target.dup)
           else
             base.delayed_atomic_sets.clear
             docs = normalize_docs(docs).compact

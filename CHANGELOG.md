@@ -662,6 +662,8 @@ For instructions on upgrading to newer versions, visit
 * \#1876/\#1782 Allow dot notation in embeds many criteria queries.
   (Cyril Mougel)
 
+* \#1745 Fixed batch clear to work within attribute setting.
+
 * \#1718 Ensure consistency of #first/#last in relations - they now always
   match first/last in the database, but opts for in memory first.
 

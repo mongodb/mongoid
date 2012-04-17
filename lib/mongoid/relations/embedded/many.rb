@@ -100,8 +100,7 @@ module Mongoid
         #
         # @return [ Many ] The empty relation.
         def clear
-          delete_all
-          _unscoped.clear
+          batch_clear(target.dup)
           self
         end
 
