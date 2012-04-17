@@ -513,10 +513,7 @@ module Mongoid
           #
           # @since 2.2.0
           def eager_load(metadata, ids)
-            klass, foreign_key = metadata.klass, metadata.foreign_key
-            klass.any_in(foreign_key => ids).each do |doc|
-              IdentityMap.set_many(doc, foreign_key => doc.send(foreign_key))
-            end
+            eager_load_ids(metadata, ids) { |doc, key| IdentityMap.set_many(doc, key) }
           end
 
           # Returns true if the relation is an embedded one. In this case

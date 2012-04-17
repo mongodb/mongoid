@@ -170,6 +170,28 @@ module Mongoid
       def root_class
         @root_class ||= base._root.class
       end
+
+      class << self
+
+        # Get the criteria that is used to eager load a relation of this
+        # type.
+        #
+        # @example Get the eager load criteria.
+        #   Proxy.eager_load(metadata, criteria)
+        #
+        # @param [ Metadata ] metadata The relation metadata.
+        # @param [ Array<Object> ] ids The ids of the base docs.
+        #
+        # @return [ Criteria ] The criteria to eager load the relation.
+        #
+        # @since 2.2.0
+        def eager_load_ids(metadata, ids)
+          klass, foreign_key = metadata.klass, metadata.foreign_key
+          klass.any_in(foreign_key => ids).each do |doc|
+            yield(doc, foreign_key => doc.send(foreign_key))
+          end
+        end
+      end
     end
   end
 end
