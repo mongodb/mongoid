@@ -689,6 +689,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1922/\#1919 Dropping collections unmemoizes the internally wrapped
+  collection, in order to ensure when defining capped collections that
+  they are always recreated as capped. (Hans Hasselberg)
+
 * \#1916/\#1913 Uniqueness validation no longer is affected by the default
   scope. (Hans Hasselberg)
 
