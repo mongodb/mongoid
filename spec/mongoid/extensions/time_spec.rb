@@ -6,6 +6,7 @@ describe Mongoid::Extensions::Time do
 
     after(:all) do
       Mongoid.use_utc = false
+      Mongoid.use_activesupport_time_zone = true
     end
 
     let!(:time) do
@@ -56,13 +57,13 @@ describe Mongoid::Extensions::Time do
       context "when using the ActiveSupport time zone" do
 
         before do
-          Mongoid::Config.use_activesupport_time_zone = true
+          Mongoid.use_activesupport_time_zone = true
           Time.zone = "Stockholm"
         end
 
         after do
           Time.zone = nil
-          Mongoid::Config.use_activesupport_time_zone = false
+          Mongoid.use_activesupport_time_zone = false
         end
 
         it "returns an ActiveSupport::TimeWithZone" do
@@ -113,11 +114,11 @@ describe Mongoid::Extensions::Time do
     context "when the time zone is defined as UTC" do
 
       before do
-        Mongoid::Config.use_utc = true
+        Mongoid.use_utc = true
       end
 
       after do
-        Mongoid::Config.use_utc = false
+        Mongoid.use_utc = false
       end
 
       it "returns utc" do
@@ -131,13 +132,13 @@ describe Mongoid::Extensions::Time do
         end
 
         before do
-          Mongoid::Config.use_activesupport_time_zone = true
+          Mongoid.use_activesupport_time_zone = true
           Time.zone = "Stockholm"
         end
 
         after do
           Time.zone = nil
-          Mongoid::Config.use_activesupport_time_zone = false
+          Mongoid.use_activesupport_time_zone = false
         end
 
         it "returns utc" do
@@ -213,14 +214,14 @@ describe Mongoid::Extensions::Time do
       context "when using the ActiveSupport time zone" do
 
         before do
-          Mongoid::Config.use_activesupport_time_zone = true
+          Mongoid.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
         end
 
         after do
           Time.zone = nil
-          Mongoid::Config.use_activesupport_time_zone = false
+          Mongoid.use_activesupport_time_zone = false
         end
 
         context "when the local time is not observing daylight saving" do
@@ -266,14 +267,14 @@ describe Mongoid::Extensions::Time do
         end
 
         before do
-          Mongoid::Config.use_activesupport_time_zone = true
+          Mongoid.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
         end
 
         after do
           Time.zone = nil
-          Mongoid::Config.use_activesupport_time_zone = false
+          Mongoid.use_activesupport_time_zone = false
         end
 
         it "assumes the given time is local" do
@@ -337,14 +338,14 @@ describe Mongoid::Extensions::Time do
         end
 
         before do
-          Mongoid::Config.use_activesupport_time_zone = true
+          Mongoid.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
         end
 
         after do
           Time.zone = nil
-          Mongoid::Config.use_activesupport_time_zone = false
+          Mongoid.use_activesupport_time_zone = false
         end
 
         it "assumes the given time is local" do
@@ -366,14 +367,14 @@ describe Mongoid::Extensions::Time do
       context "when using the ActiveSupport time zone" do
 
         before do
-          Mongoid::Config.use_activesupport_time_zone = true
+          Mongoid.use_activesupport_time_zone = true
           # if this is actually your time zone, the following tests are useless
           Time.zone = "Stockholm"
         end
 
         after do
           Time.zone = nil
-          Mongoid::Config.use_activesupport_time_zone = false
+          Mongoid.use_activesupport_time_zone = false
         end
 
         it "assumes the given time is local" do
