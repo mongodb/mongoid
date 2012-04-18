@@ -3,6 +3,10 @@ module Mongoid
   module Extensions
     module Object
 
+      def __mongoize_time__
+        self
+      end
+
       # Do or do not, there is no try. -- Yoda.
       #
       # @example Do or do not.

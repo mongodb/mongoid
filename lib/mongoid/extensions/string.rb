@@ -18,6 +18,11 @@ module Mongoid
         "descending" => "ascending"
       }
 
+      def __mongoize_time__
+        time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
+        time.parse(self)
+      end
+
       # Convert the string to a collection friendly name.
       #
       # @example Collectionize the string.
