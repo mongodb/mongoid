@@ -31,19 +31,6 @@ module Mongoid
         def demongoize(object)
           object ? ::BigDecimal.new(object) : object
         end
-
-        # Turn the object from the ruby type we deal with to a Mongo friendly
-        # type.
-        #
-        # @example Mongoize the object.
-        #   BigDecimal.mongoize("123.11")
-        #
-        # @return [ String ] The object mongoized.
-        #
-        # @since 3.0.0
-        def mongoize(object)
-          object.mongoize
-        end
       end
     end
   end

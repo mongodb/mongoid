@@ -111,7 +111,19 @@ module Mongoid
         def demongoize(object)
           object
         end
-        alias :mongoize :demongoize
+
+        # Turn the object from the ruby type we deal with to a Mongo friendly
+        # type.
+        #
+        # @example Mongoize the object.
+        #   Object.mongoize("123.11")
+        #
+        # @return [ Object ] The object mongoized.
+        #
+        # @since 3.0.0
+        def mongoize(object)
+          object.mongoize
+        end
       end
     end
   end

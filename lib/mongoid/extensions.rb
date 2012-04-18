@@ -22,6 +22,8 @@ end
 require "mongoid/extensions/array"
 require "mongoid/extensions/big_decimal"
 require "mongoid/extensions/boolean"
+require "mongoid/extensions/date"
+require "mongoid/extensions/date_time"
 require "mongoid/extensions/false_class"
 require "mongoid/extensions/hash"
 require "mongoid/extensions/integer"
