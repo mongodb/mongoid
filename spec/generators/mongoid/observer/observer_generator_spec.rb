@@ -3,7 +3,7 @@ require "rails/generators/mongoid/observer/observer_generator"
 
 describe Mongoid::Generators::ObserverGenerator do
 
-  destination File.expand_path("../../../../../../tmp", __FILE__)
+  destination Dir.tmpdir
 
   before do
     Rails.stubs(:application).returns(mock)
