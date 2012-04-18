@@ -2,6 +2,17 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Object do
 
+  describe ".demongoize" do
+
+    let(:object) do
+      "testing"
+    end
+
+    it "returns the provided object" do
+      Object.demongoize(object).should eq(object)
+    end
+  end
+
   describe "#do_or_do_not" do
 
     context "when the object is nil" do
@@ -38,6 +49,28 @@ describe Mongoid::Extensions::Object do
           result.should be_nil
         end
       end
+    end
+  end
+
+  describe ".mongoize" do
+
+    let(:object) do
+      "testing"
+    end
+
+    it "returns the provided object" do
+      Object.mongoize(object).should eq(object)
+    end
+  end
+
+  describe "#mongoize" do
+
+    let(:object) do
+      "testing"
+    end
+
+    it "returns the object" do
+      object.mongoize.should eq(object)
     end
   end
 

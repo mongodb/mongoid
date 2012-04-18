@@ -37,6 +37,19 @@ module Mongoid
         end
       end
 
+      # Turn the object from the ruby type we deal with to a Mongo friendly
+      # type.
+      #
+      # @example Mongoize the object.
+      #   object.mongoize
+      #
+      # @return [ Object ] The object.
+      #
+      # @since 3.0.0
+      def mongoize
+        self
+      end
+
       # Remove the instance variable for the provided name.
       #
       # @example Remove the instance variable
@@ -82,8 +95,27 @@ module Mongoid
       def you_must(name, *args)
         frozen? ? nil : do_or_do_not(name, *args)
       end
+
+      module ClassMethods
+
+        # Convert the object from it's mongo friendly ruby type to this type.
+        #
+        # @example Demongoize the object.
+        #   Object.demongoize(object)
+        #
+        # @param [ Object ] object The object to demongoize.
+        #
+        # @return [ Object ] The object.
+        #
+        # @since 3.0.0
+        def demongoize(object)
+          object
+        end
+        alias :mongoize :demongoize
+      end
     end
   end
 end
 
 ::Object.__send__(:include, Mongoid::Extensions::Object)
+::Object.__send__(:extend, Mongoid::Extensions::Object::ClassMethods)
