@@ -25,6 +25,23 @@ describe Mongoid::Extensions::String do
     end
   end
 
+  describe ".demongoize" do
+
+    context "when the object is not a string" do
+
+      it "returns the string" do
+        String.demongoize(:test).should eq("test")
+      end
+    end
+
+    context "when the object is nil" do
+
+      it "returns nil" do
+        String.demongoize(nil).should be_nil
+      end
+    end
+  end
+
   describe "#mongoid_id?" do
 
     context "when the string is id" do
@@ -53,6 +70,30 @@ describe Mongoid::Extensions::String do
       it "returns false" do
         "something_id".should_not be_mongoid_id
       end
+    end
+  end
+
+  describe ".mongoize" do
+
+    context "when the object is not a string" do
+
+      it "returns the string" do
+        String.mongoize(:test).should eq("test")
+      end
+    end
+
+    context "when the object is nil" do
+
+      it "returns nil" do
+        String.mongoize(nil).should be_nil
+      end
+    end
+  end
+
+  describe "#mongoize" do
+
+    it "returns self" do
+      "test".mongoize.should eq("test")
     end
   end
 

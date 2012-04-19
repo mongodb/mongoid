@@ -89,8 +89,41 @@ module Mongoid
       def unconvertable_to_bson?
         @unconvertable_to_bson ||= false
       end
+
+      module ClassMethods
+
+        # Convert the object from it's mongo friendly ruby type to this type.
+        #
+        # @example Demongoize the object.
+        #   String.demongoize(object)
+        #
+        # @param [ Object ] object The object to demongoize.
+        #
+        # @return [ String ] The object.
+        #
+        # @since 3.0.0
+        def demongoize(object)
+          object.try(:to_s)
+        end
+
+        # Turn the object from the ruby type we deal with to a Mongo friendly
+        # type.
+        #
+        # @example Mongoize the object.
+        #   String.mongoize("123.11")
+        #
+        # @param [ Object ] object The object to mongoize.
+        #
+        # @return [ String ] The object mongoized.
+        #
+        # @since 3.0.0
+        def mongoize(object)
+          demongoize(object)
+        end
+      end
     end
   end
 end
 
 ::String.__send__(:include, Mongoid::Extensions::String)
+::String.__send__(:extend, Mongoid::Extensions::String::ClassMethods)
