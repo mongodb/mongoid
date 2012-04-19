@@ -3,6 +3,10 @@ module Mongoid
   module Extensions
     module Integer
 
+      def __mongoize_time__
+        ::Time.at(self)
+      end
+
       # Is the object not to be converted to bson on criteria creation?
       #
       # @example Is the object unconvertable?

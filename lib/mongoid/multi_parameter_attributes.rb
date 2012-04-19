@@ -93,7 +93,7 @@ module Mongoid
       values = values_with_empty_parameters.collect { |v| v.nil? ? 1 : v }
       klass = field.type
       if klass == DateTime || klass == Date || klass == Time
-        field.serialize(values)
+        field.mongoize(values)
       elsif klass
         klass.new(*values)
       else

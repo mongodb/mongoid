@@ -1,33 +1,7 @@
 # encoding: utf-8
-require "mongoid/fields/mappings"
-require "mongoid/fields/serializable"
-require "mongoid/fields/internal/timekeeping"
-require "mongoid/fields/internal/array"
-require "mongoid/fields/internal/big_decimal"
-require "mongoid/fields/internal/binary"
-require "mongoid/fields/internal/boolean"
-require "mongoid/fields/internal/date"
-require "mongoid/fields/internal/date_time"
-require "mongoid/fields/internal/false_class"
-require "mongoid/fields/internal/float"
-require "mongoid/fields/internal/hash"
-require "mongoid/fields/internal/integer"
-require "mongoid/fields/internal/bignum"
-require "mongoid/fields/internal/fixnum"
-require "mongoid/fields/internal/localized"
-require "mongoid/fields/internal/nil_class"
-require "mongoid/fields/internal/object"
-require "mongoid/fields/internal/object_id"
-require "mongoid/fields/internal/range"
-require "mongoid/fields/internal/regexp"
-require "mongoid/fields/internal/set"
-require "mongoid/fields/internal/string"
-require "mongoid/fields/internal/symbol"
-require "mongoid/fields/internal/time"
-require "mongoid/fields/internal/time_with_zone"
-require "mongoid/fields/internal/true_class"
-require "mongoid/fields/internal/foreign_keys/array"
-require "mongoid/fields/internal/foreign_keys/object"
+require "mongoid/fields/standard"
+require "mongoid/fields/foreign_key"
+require "mongoid/fields/localized"
 
 module Mongoid
 
@@ -305,8 +279,7 @@ module Mongoid
       def add_field(name, options = {})
         aliased = options[:as]
         aliased_fields[aliased.to_s] = name if aliased
-        type = options[:localize] ? Fields::Internal::Localized : options[:type]
-        field = Mappings.for(type, options[:identity]).instantiate(name, options)
+        field = field_for(name, options)
         fields[name] = field
         add_defaults(field)
         create_accessors(name, name, options)
@@ -394,18 +367,10 @@ module Mongoid
       # @since 2.4.0
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
-          if field.cast_on_read?
-            re_define_method(meth) do
-              fields[name].deserialize(read_attribute(name))
-            end
-          else
-            re_define_method(meth) do
-              value = read_attribute(name)
-              if value.is_a?(Array) || value.is_a?(Hash)
-                attribute_will_change!(name)
-              end
-              value
-            end
+          re_define_method(meth) do
+            value = fields[name].demongoize(read_attribute(name))
+            attribute_will_change!(name) if value.resizable?
+            value
           end
         end
       end
@@ -507,6 +472,12 @@ module Mongoid
       def remove_defaults(name)
         pre_processed_defaults.delete_one(name)
         post_processed_defaults.delete_one(name)
+      end
+
+      def field_for(name, options)
+        return Fields::Localized.new(name, options) if options[:localize]
+        return Fields::ForeignKey.new(name, options) if options[:identity]
+        Fields::Standard.new(name, options)
       end
     end
   end

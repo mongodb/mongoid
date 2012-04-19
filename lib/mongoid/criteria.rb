@@ -265,9 +265,9 @@ module Mongoid
       field = klass.fields["_id"]
       method = extract_id ? :all_of : :where
       if ids.size > 1
-        send(method, { _id: { "$in" => ids.map{ |id| field.serialize(id) }}})
+        send(method, { _id: { "$in" => ids.map{ |id| field.mongoize(id) }}})
       else
-        send(method, { _id: field.serialize(ids.first) })
+        send(method, { _id: field.mongoize(ids.first) })
       end
     end
 

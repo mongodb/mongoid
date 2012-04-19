@@ -1,12 +1,15 @@
 class LatLng
-  include Mongoid::Fields::Serializable
+  attr_accessor :lat, :lng
 
-  def deserialize(object)
-    { lat: object[1], lng: object[0] }.with_indifferent_access
+  def self.demongoize(object)
+    LatLng.new(object[1], object[0])
   end
 
-  def serialize(object)
-    latlng = object.with_indifferent_access
-    [ latlng[:lng], latlng[:lat] ]
+  def initialize(lat, lng)
+    @lat, @lng = lat, lng
+  end
+
+  def mongoize
+    [ lng, lat ]
   end
 end

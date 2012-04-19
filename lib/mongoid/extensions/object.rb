@@ -76,6 +76,10 @@ module Mongoid
         end
       end
 
+      def resizable?
+        false
+      end
+
       # Get the substitutable version of an object.
       #
       # @example Get the substitutable.
@@ -105,6 +109,10 @@ module Mongoid
       end
 
       module ClassMethods
+
+        def __mongoize_fk__(constraint, object, using_object_ids)
+          object ? constraint.convert(object) : nil
+        end
 
         # Convert the object from it's mongo friendly ruby type to this type.
         #

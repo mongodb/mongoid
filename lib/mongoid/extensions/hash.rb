@@ -33,6 +33,10 @@ module Mongoid
         ::Hash.mongoize(self)
       end
 
+      def resizable?
+        true
+      end
+
       module ClassMethods
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

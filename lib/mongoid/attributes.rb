@@ -246,7 +246,7 @@ module Mongoid
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].serialize(value) : value
+      fields.has_key?(key) ? fields[key].mongoize(value) : value
     end
 
     module ClassMethods

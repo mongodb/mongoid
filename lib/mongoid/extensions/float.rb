@@ -3,6 +3,10 @@ module Mongoid
   module Extensions
     module Float
 
+      def __mongoize_time__
+        ::Time.at(self)
+      end
+
       module ClassMethods
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -24,4 +28,5 @@ module Mongoid
   end
 end
 
+::Float.__send__(:include, Mongoid::Extensions::Float)
 ::Float.__send__(:extend, Mongoid::Extensions::Float::ClassMethods)

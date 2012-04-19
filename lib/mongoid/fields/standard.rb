@@ -1,36 +1,13 @@
 # encoding: utf-8
 module Mongoid
   module Fields
+    class Standard
 
-    # Defines the behaviour for defined fields in the document.
-    #
-    # For people who want to have custom field types in their
-    # applications and want control over the serialization process
-    # to and from the domain model and MongoDB you will need to include
-    # this module in your custom type class. You will also need to define
-    # either a #serialize and #deserialize instance method, where previously
-    # these were a .set and .get class method respectively.
-    #
-    #   class MyCustomType
-    #     include Mongoid::Fields::Serializable
-    #
-    #     def deserialize(object)
-    #       # Do something to convert it from Mongo to my type.
-    #     end
-    #
-    #     def serialize(object)
-    #       # Do something to convert from my type to MongoDB friendly.
-    #     end
-    #   end
-    module Serializable
-      extend ActiveSupport::Concern
-
-      included do
-        class_attribute :cast_on_read
-      end
-
+      # Defines the behaviour for defined fields in the document.
       # Set readers for the instance variables.
-      attr_accessor :default_val, :label, :localize, :name, :options
+      attr_accessor :default_val, :label, :name, :options
+
+      delegate :demongoize, :evolve, :mongoize, to: :type
 
       # Get the constraint from the metadata once.
       #
@@ -43,19 +20,6 @@ module Mongoid
       def constraint
         @constraint ||= metadata.constraint
       end
-
-      # Deserialize this field from the type stored in MongoDB to the type
-      # defined on the model
-      #
-      # @example Deserialize the field.
-      #   field.deserialize(object)
-      #
-      # @param [ Object ] object The object to cast.
-      #
-      # @return [ Object ] The converted object.
-      #
-      # @since 2.1.0
-      def deserialize(object); object; end
 
       # Evaluate the default value and return it. Will handle the
       # serialization, proc calls, and duplication if necessary.
@@ -76,20 +40,6 @@ module Mongoid
         end
       end
 
-      # Evolve the field for criteria.
-      #
-      # @example Evolve the field.
-      #   field.evolve("1")
-      #
-      # @param [ Object ] object The object to evolve.
-      #
-      # @return [ Object ] The evolved object.
-      #
-      # @since 3.0.0
-      def evolve(object)
-        type.evolve(object)
-      end
-
       # Is this field a foreign key?
       #
       # @example Is the field a foreign key?
@@ -99,7 +49,26 @@ module Mongoid
       #
       # @since 2.4.0
       def foreign_key?
-        !!options[:identity]
+        false
+      end
+
+      # Create the new field with a name and optional additional options.
+      #
+      # @example Create the new field.
+      #   Field.new(:name, :type => String)
+      #
+      # @param [ Hash ] options The field options.
+      #
+      # @option options [ Class ] :type The class of the field.
+      # @option options [ Object ] :default The default value for the field.
+      # @option options [ String ] :label The field's label.
+      #
+      # @since 3.0.0
+      def initialize(name, options = {})
+        @name = name
+        @options = options
+        @label = options[:label]
+        @default_val = options[:default]
       end
 
       # Is the field localized or not?
@@ -111,7 +80,7 @@ module Mongoid
       #
       # @since 2.3.0
       def localized?
-        !!@localize
+        false
       end
 
       # Get the metadata for the field if its a foreign key.
@@ -135,7 +104,7 @@ module Mongoid
       #
       # @since 2.2.0
       def object_id_field?
-        @object_id_field ||= (type == BSON::ObjectId)
+        @object_id_field ||= (type == Moped::BSON::ObjectId)
       end
 
       # Does the field pre-process it's default value?
@@ -150,29 +119,6 @@ module Mongoid
         @pre_processed ||=
           (options[:pre_processed] || (default_val && !default_val.is_a?(::Proc)))
       end
-
-      # Can the field vary in size, similar to arrays.
-      #
-      # @example Is the field varying in size?
-      #   field.resizable?
-      #
-      # @return [ false ] false by default.
-      #
-      # @since 2.4.0
-      def resizable?; false; end
-
-      # Serialize the object from the type defined in the model to a MongoDB
-      # compatible object to store.
-      #
-      # @example Serialize the field.
-      #   field.serialize(object)
-      #
-      # @param [ Object ] object The object to cast.
-      #
-      # @return [ Object ] The converted object.
-      #
-      # @since 2.1.0
-      def serialize(object); object; end
 
       # Get the type of this field - inferred from the class name.
       #
@@ -265,47 +211,7 @@ module Mongoid
       #
       # @since 3.0.0
       def serialize_default(object)
-        serialize(object)
-      end
-
-      module ClassMethods
-
-        # Create the new field with a name and optional additional options.
-        #
-        # @example Create the new field.
-        #   Field.new(:name, :type => String)
-        #
-        # @param [ Hash ] options The field options.
-        #
-        # @option options [ Class ] :type The class of the field.
-        # @option options [ Object ] :default The default value for the field.
-        # @option options [ String ] :label The field's label.
-        #
-        # @since 2.1.0
-        def instantiate(name, options = {})
-          field = allocate
-          field.name = name
-          field.options = options
-          field.label = options[:label]
-          field.localize = options[:localize]
-          field.default_val = options[:default]
-          field
-        end
-
-        private
-
-        # If we define a method called deserialize then we need to cast on
-        # read.
-        #
-        # @example Hook into method added.
-        #   method_added(:deserialize)
-        #
-        # @param [ Symbol ] method The method name.
-        #
-        # @since 2.3.4
-        def method_added(method)
-          self.cast_on_read = true if method == :deserialize
-        end
+        mongoize(object)
       end
     end
   end

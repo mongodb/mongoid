@@ -99,6 +99,8 @@ describe Mongoid::Extensions::Date do
       end
     end
 
+    pending "when provided an array"
+
     context "when provided nil" do
 
       it "returns nil" do

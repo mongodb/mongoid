@@ -1,18 +1,16 @@
 class Image
-  include Mongoid::Fields::Serializable
-
   attr_reader :name
 
   def initialize(name)
     @name = name
   end
 
-  def deserialize(value)
-    self.class.new(value)
+  def self.demongoize(value)
+    Image.new(value)
   end
 
-  def serialize(value)
-    value.name.to_s
+  def mongoize
+    name
   end
 
   def hash_is_hash

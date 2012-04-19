@@ -12,11 +12,8 @@ module Mongoid
       end
 
       def __evolve_object_id__
-        if BSON::ObjectId.legal?(self)
-          BSON::ObjectId.from_string(self)
-        else
-          blank? ? nil : self
-        end
+        return nil if blank?
+        BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
       end
 
       def __mongoize_time__

@@ -1,24 +1,19 @@
 # encoding: utf-8
 module Mongoid
   module Extensions
-    module Date
-
-      def __mongoize_time__
-        time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
-        time.local(year, month, day)
-      end
+    module TimeWithZone
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
       # @example Mongoize the object.
-      #   date.mongoize
+      #   date_time.mongoize
       #
       # @return [ Time ] The object mongoized.
       #
       # @since 3.0.0
       def mongoize
-        ::Date.mongoize(self)
+        ::ActiveSupport::TimeWithZone.mongoize(self)
       end
 
       module ClassMethods
@@ -26,38 +21,35 @@ module Mongoid
         # Convert the object from it's mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
-        #   Date.demongoize(object)
+        #   TimeWithZone.demongoize(object)
         #
         # @param [ Time ] object The time from Mongo.
         #
-        # @return [ Date ] The object as a date.
+        # @return [ TimeWithZone ] The object as a date.
         #
         # @since 3.0.0
         def demongoize(object)
-          ::Date.new(object.year, object.month, object.day) if object
+          ::Time.demongoize(object).in_time_zone
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
         #
         # @example Mongoize the object.
-        #   Date.mongoize("2012-1-1")
+        #   TimeWithZone.mongoize("2012-1-1")
         #
-        # @param [ Object ] object The object to mongoize.
+        # @param [ Object ] object The object to convert.
         #
         # @return [ Time ] The object mongoized.
         #
         # @since 3.0.0
         def mongoize(object)
-          if object
-            time = object.__mongoize_time__
-            ::Time.utc(time.year, time.month, time.day)
-          end
+          ::Time.mongoize(object)
         end
       end
     end
   end
 end
 
-::Date.__send__(:include, Mongoid::Extensions::Date)
-::Date.__send__(:extend, Mongoid::Extensions::Date::ClassMethods)
+::ActiveSupport::TimeWithZone.__send__(:include, Mongoid::Extensions::TimeWithZone)
+::ActiveSupport::TimeWithZone.__send__(:extend, Mongoid::Extensions::TimeWithZone::ClassMethods)

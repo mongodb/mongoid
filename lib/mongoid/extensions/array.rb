@@ -44,7 +44,15 @@ module Mongoid
         position ? delete_at(position) : nil
       end
 
+      def resizable?
+        true
+      end
+
       module ClassMethods
+
+        def __mongoize_fk__(constraint, object, using_object_ids)
+          object ? constraint.convert(object) : []
+        end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
         # type.
