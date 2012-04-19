@@ -820,6 +820,15 @@ module Mongoid
         !!order
       end
 
+      # This relation can be touch or not
+      #
+      # @return [ Boolean ] If the relation can be touch or not
+      #
+      # @since 3.0.0
+      def touch?
+        !!self[:touch]
+      end
+
       private
 
       # Returns the class name for the relation.
@@ -1082,6 +1091,7 @@ module Mongoid
           invs.first
         end
       end
+
     end
   end
 end
