@@ -168,8 +168,9 @@ module Mongoid
     #
     def touch
       if is_a?(Mongoid::Timestamps::Updated)
-        collection.update( self.atomic_selector,
-                          {'$set' => { updated_at: Time.now.utc}} )
+        collection.find(self.atomic_selector).update(
+          {'$set' => { updated_at: Time.now.utc}}
+        )
       end
       true
     end

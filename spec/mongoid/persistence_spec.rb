@@ -644,7 +644,7 @@ describe Mongoid::Persistence do
       let(:person) { Person.create }
       before { person.touch }
       it 'should not update updated_at field' do
-        Person.collection.find_one({:_id => person.id}).keys.should_not include("updated_at")
+        Person.collection.find({:_id => person.id}).first.keys.should_not include("updated_at")
       end
 
     end
