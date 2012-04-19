@@ -16,12 +16,13 @@ module Mongoid #:nodoc:
         # @since 1.0.0
         def expand_complex_criteria
           {}.tap do |hsh|
-            each_pair do |k,v|
+            each_pair do |k, v|
               if k.respond_to?(:key) && k.respond_to?(:to_mongo_query)
                 hsh[k.key] ||= {}
                 v = v.expand_complex_criteria if v.is_a?(::Hash)
                 hsh[k.key].merge!(k.to_mongo_query(v))
               else
+                v.map!{|e| e.is_a?(::Hash) ? e.expand_complex_criteria : e } if v.is_a?(::Array)
                 hsh[k] = v
               end
             end
