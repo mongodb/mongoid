@@ -2,33 +2,19 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Symbol do
 
-  describe "invert" do
+  describe ".demongoize" do
 
-    context "when :asc" do
+    context "when the object is not a symbol" do
 
-      it "returns :desc" do
-        :asc.invert.should eq(:desc)
+      it "returns the symbol" do
+        Symbol.demongoize("test").should eq(:test)
       end
     end
 
-    context "when :ascending" do
+    context "when the object is nil" do
 
-      it "returns :descending" do
-        :ascending.invert.should eq(:descending)
-      end
-    end
-
-    context "when :desc" do
-
-      it "returns :asc" do
-        :desc.invert.should eq(:asc)
-      end
-    end
-
-    context "when :descending" do
-
-      it "returns :ascending" do
-        :descending.invert.should eq(:ascending)
+      it "returns nil" do
+        Symbol.demongoize(nil).should be_nil
       end
     end
   end
@@ -61,6 +47,30 @@ describe Mongoid::Extensions::Symbol do
       it "returns false" do
         :something_id.should_not be_mongoid_id
       end
+    end
+  end
+
+  describe ".mongoize" do
+
+    context "when the object is not a symbol" do
+
+      it "returns the symbol" do
+        Symbol.mongoize("test").should eq(:test)
+      end
+    end
+
+    context "when the object is nil" do
+
+      it "returns nil" do
+        Symbol.mongoize(nil).should be_nil
+      end
+    end
+  end
+
+  describe "#mongoize" do
+
+    it "returns self" do
+      :test.mongoize.should eq(:test)
     end
   end
 end
