@@ -25,37 +25,6 @@ describe Mongoid::Extensions::String do
     end
   end
 
-  describe "#invert" do
-
-    context "when asc" do
-
-      it "returns desc" do
-        "asc".invert.should eq("desc")
-      end
-    end
-
-    context "when ascending" do
-
-      it "returns descending" do
-        "ascending".invert.should eq("descending")
-      end
-    end
-
-    context "when desc" do
-
-      it "returns asc" do
-        "desc".invert.should eq("asc")
-      end
-    end
-
-    context "when descending" do
-
-      it "returns ascending" do
-        "descending".invert.should eq("ascending")
-      end
-    end
-  end
-
   describe "#mongoid_id?" do
 
     context "when the string is id" do

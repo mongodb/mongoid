@@ -11,13 +11,6 @@ module Mongoid
         inflect.irregular("canvas", "canvases")
       end
 
-      REVERSALS = {
-        "asc" => "desc",
-        "ascending" => "descending",
-        "desc" => "asc",
-        "descending" => "ascending"
-      }
-
       def __evolve_object_id__
         if BSON::ObjectId.legal?(self)
           BSON::ObjectId.from_string(self)
@@ -39,16 +32,6 @@ module Mongoid
       # @return [ String ] The string in collection friendly form.
       def collectionize
         tableize.gsub("/", "_")
-      end
-
-      # Get the inverted sorting option.
-      #
-      # @example Get the inverted option.
-      #   "asc".invert
-      #
-      # @return [ String ] The string inverted.
-      def invert
-        REVERSALS[self]
       end
 
       # Is the string a valid value for a Mongoid id?
