@@ -27,16 +27,16 @@ module Mongoid
       # @return [ BSON::ObjectId, Array, Hash ] The converted object ids.
       #
       # @since 2.0.0.rc.7
-      def convert(klass, object, reject_blank = true)
+      def convert(klass, object)
         return object if object.is_a?(BSON::ObjectId) || !klass.using_object_ids?
 
         case object
         when ::String
           convert_from_string(klass, object)
         when ::Array
-          convert_from_array(klass, object, reject_blank)
+          convert_from_array(klass, object)
         when ::Hash
-          convert_from_hash(klass, object, reject_blank)
+          convert_from_hash(klass, object)
         else
           object
         end
@@ -82,9 +82,9 @@ module Mongoid
       # @return [ Array ] The converted object ids.
       #
       # @since 3.0.0
-      def convert_from_array(klass, object, reject_blank=true)
-        object.delete_if { |arg| arg.blank? } if reject_blank
-        object.replace(object.map { |arg| convert(klass, arg, reject_blank) })
+      def convert_from_array(klass, object)
+        object.delete_if { |arg| arg.blank? }
+        object.replace(object.map { |arg| convert(klass, arg) })
       end
 
       # Convert the supplied arguments to hash ids based on the class
@@ -103,10 +103,10 @@ module Mongoid
       # @return [ Hash ] The converted object ids.
       #
       # @since 3.0.0
-      def convert_from_hash(klass, object, reject_blank=true)
+      def convert_from_hash(klass, object)
         object.each_pair do |key, value|
           next unless klass.object_id_field?(key)
-          object[key] = convert(klass, value, reject_blank)
+          object[key] = convert(klass, value)
         end
         object
       end
