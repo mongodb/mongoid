@@ -122,6 +122,8 @@ module Mongoid
         # @example Mongoize the object.
         #   Object.mongoize("123.11")
         #
+        # @param [ Object ] object The object to mongoize.
+        #
         # @return [ Object ] The object mongoized.
         #
         # @since 3.0.0

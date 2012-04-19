@@ -57,4 +57,61 @@ describe Mongoid::Extensions::Array do
       end
     end
   end
+
+  describe ".demongoize" do
+
+    let(:array) do
+      [ 1, 2, 3 ]
+    end
+
+    it "returns the array" do
+      Array.demongoize(array).should eq(array)
+    end
+  end
+
+  describe ".mongoize" do
+
+    let(:date) do
+      Date.new(2012, 1, 1)
+    end
+
+    let(:array) do
+      [ date ]
+    end
+
+    let(:mongoized) do
+      Array.mongoize(array)
+    end
+
+    it "mongoizes each element in the array" do
+      mongoized.first.should be_a(Time)
+    end
+
+    it "converts the elements properly" do
+      mongoized.first.should eq(date)
+    end
+  end
+
+  describe "#mongoize" do
+
+    let(:date) do
+      Date.new(2012, 1, 1)
+    end
+
+    let(:array) do
+      [ date ]
+    end
+
+    let(:mongoized) do
+      array.mongoize
+    end
+
+    it "mongoizes each element in the array" do
+      mongoized.first.should be_a(Time)
+    end
+
+    it "converts the elements properly" do
+      mongoized.first.should eq(date)
+    end
+  end
 end

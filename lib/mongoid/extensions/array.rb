@@ -8,6 +8,19 @@ module Mongoid
         time.local(*self)
       end
 
+      # Turn the object from the ruby type we deal with to a Mongo friendly
+      # type.
+      #
+      # @example Mongoize the object.
+      #   object.mongoize
+      #
+      # @return [ Array ] The object.
+      #
+      # @since 3.0.0
+      def mongoize
+        ::Array.mongoize(self)
+      end
+
       # Delete the first object in the array that is equal to the supplied
       # object and return it. This is much faster than performing a standard
       # delete for large arrays ince it attempt to delete multiple in the
@@ -25,8 +38,27 @@ module Mongoid
         position = index(object)
         position ? delete_at(position) : nil
       end
+
+      module ClassMethods
+
+        # Turn the object from the ruby type we deal with to a Mongo friendly
+        # type.
+        #
+        # @example Mongoize the object.
+        #   Array.mongoize([ 1, 2, 3 ])
+        #
+        # @param [ Object ] object The object to mongoize.
+        #
+        # @return [ Array ] The object mongoized.
+        #
+        # @since 3.0.0
+        def mongoize(object)
+          evolve(object)
+        end
+      end
     end
   end
 end
 
 ::Array.__send__(:include, Mongoid::Extensions::Array)
+::Array.__send__(:extend, Mongoid::Extensions::Array::ClassMethods)
