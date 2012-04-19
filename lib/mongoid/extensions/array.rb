@@ -3,6 +3,11 @@ module Mongoid
   module Extensions
     module Array
 
+      def __evolve_object_id__
+        map!(&:__evolve_object_id__).compact!
+        self
+      end
+
       def __mongoize_time__
         time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
         time.local(*self)

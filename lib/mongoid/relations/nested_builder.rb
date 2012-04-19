@@ -69,7 +69,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.6
       def convert_id(klass, id)
-        BSON::ObjectId.convert(klass, id)
+        klass.using_object_ids? ? BSON::ObjectId.mongoize(id) : id
       end
     end
   end

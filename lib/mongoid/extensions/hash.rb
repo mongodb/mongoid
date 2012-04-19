@@ -3,6 +3,10 @@ module Mongoid
   module Extensions
     module Hash
 
+      def __evolve_object_id__
+        update_values(&:__evolve_object_id__)
+      end
+
       # Get the id attribute from this hash, whether it's prefixed with an
       # underscore or is a symbol.
       #

@@ -3,6 +3,10 @@ module Mongoid
   module Extensions
     module Object
 
+      def __evolve_object_id__
+        self
+      end
+
       def __mongoize_time__
         self
       end

@@ -18,6 +18,14 @@ module Mongoid
         "descending" => "ascending"
       }
 
+      def __evolve_object_id__
+        if BSON::ObjectId.legal?(self)
+          BSON::ObjectId.from_string(self)
+        else
+          blank? ? nil : self
+        end
+      end
+
       def __mongoize_time__
         time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
         time.parse(self)
