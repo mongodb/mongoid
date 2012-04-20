@@ -691,6 +691,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1930 Ensure complex criteria are expanded in all where clauses.
+  (Hans Hasselberg)
+
 * \#1924/\#1917 Fix pushing to embedded relations with default scopes not
   scoping on the new document. (Hans Hasselberg)
 
