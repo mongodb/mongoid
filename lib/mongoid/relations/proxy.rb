@@ -5,13 +5,15 @@ module Mongoid # :nodoc:
     # This class is the superclass for all relation proxy objects, and contains
     # common behaviour for all of them.
     class Proxy
-      include Threaded::Lifecycle
+      alias :extend_proxy :extend
 
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
-          method =~ /(^__|^send$|^object_id$|^extend$|^respond_to\?$|^tap$)/
+          method =~ /(^__|^send|^object_id|^respond_to|^tap|extend_proxy)/
       end
+
+      include Threaded::Lifecycle
 
       attr_accessor :base, :loaded, :metadata, :target
 
@@ -34,7 +36,7 @@ module Mongoid # :nodoc:
       def init(base, target, metadata)
         @base, @target, @metadata = base, target, metadata
         yield(self) if block_given?
-        extend metadata.extension if metadata.extension?
+        extend_proxy(metadata.extension) if metadata.extension?
       end
 
       # The default substitutable object for a relation proxy is the clone of
