@@ -9,6 +9,23 @@ module Mongoid
 
       delegate :demongoize, :evolve, :mongoize, to: :type
 
+      # Adds the atomic changes for this type of resizable field.
+      #
+      # @example Add the atomic changes.
+      # field.add_atomic_changes(doc, "key", {}, [], [])
+      #
+      # @param [ Document ] document The document to add to.
+      # @param [ String ] name The name of the field.
+      # @param [ String ] key The atomic location of the field.
+      # @param [ Hash ] mods The current modifications.
+      # @param [ Array ] new The new elements to add.
+      # @param [ Array ] old The old elements getting removed.
+      #
+      # @since 2.4.0
+      def add_atomic_changes(document, name, key, mods, new, old)
+        mods[key] = new
+      end
+
       # Get the constraint from the metadata once.
       #
       # @example Get the constraint.
@@ -118,6 +135,10 @@ module Mongoid
       def pre_processed?
         @pre_processed ||=
           (options[:pre_processed] || (default_val && !default_val.is_a?(::Proc)))
+      end
+
+      def resizable?
+        @resizable ||= (type == Array)
       end
 
       # Get the type of this field - inferred from the class name.

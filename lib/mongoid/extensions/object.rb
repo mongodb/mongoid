@@ -110,7 +110,7 @@ module Mongoid
 
       module ClassMethods
 
-        def __mongoize_fk__(constraint, object, using_object_ids)
+        def __mongoize_fk__(constraint, object)
           object ? constraint.convert(object) : nil
         end
 
