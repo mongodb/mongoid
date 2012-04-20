@@ -480,6 +480,39 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* Custom serializable fields have revamped. Your object no longer should
+  include `Mongoid::Fields::Serializable` - instead it only needs to
+  implement 3 methods: `#mongoize`, `.demongoize` and `.evolve`.
+
+      `#mongoize` is an instance method that transforms your object into
+      a mongo-friendly value.
+
+      `.demongoize` is a class method, that can take some data from mongo
+      and instantiate and object of your custom type.
+
+      `.evolve` is a class method, that can take any object, and
+      transform it for use in a `Mongoid::Criteria`.
+
+      An example of an implementation of this for `Range`:
+
+        class Range
+
+          def mongoize
+            { "min" => first, "max" => last }
+          end
+
+          class << self
+
+            def demongoize(object)
+              Range.new(object["min"], object["max"])
+            end
+
+            def evolve(object)
+              { "$gte" => object.first, "$lte" => object.last }
+            end
+          end
+        end
+
 * `Document#changes` is no longer a hash with indifferent access.
 
 * `after_initialize` callbacks no longer cascade to children if the option
