@@ -18,5 +18,10 @@ describe Mongoid::Extensions::Hash::CriteriaHelpers do
       hash = { "person.videos".to_sym.matches => { :year.gt => 2000 } }
       hash.expand_complex_criteria.should eq({:"person.videos"=>{"$elemMatch"=>{:year=>{"$gt"=>2000}}}})
     end
+
+    it "expands nested complex criteria in an array to form a valid `where` hash" do
+      hash = { "$or" => [{:year.gt => 2000}]}
+      hash.expand_complex_criteria.should eq({"$or" => [:year => {"$gt" => 2000}]})
+    end
   end
 end
