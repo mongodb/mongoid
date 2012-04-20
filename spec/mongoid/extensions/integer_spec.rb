@@ -91,8 +91,8 @@ describe Mongoid::Extensions::Integer do
 
       context "when the string is empty" do
 
-        it "returns 0" do
-          Integer.mongoize("").should eq(0)
+        it "returns nil" do
+          Integer.mongoize("").should be_nil
         end
       end
 

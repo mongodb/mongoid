@@ -3,6 +3,42 @@ module Mongoid
   module Fields
     class ForeignKey < Standard
 
+      # Adds the atomic changes for this type of resizable field.
+      #
+      # @example Add the atomic changes.
+      #   field.add_atomic_changes(doc, "key", {}, [], [])
+      #
+      # @todo: Durran: Refactor, big time.
+      #
+      # @param [ Document ] document The document to add to.
+      # @param [ String ] name The name of the field.
+      # @param [ String ] key The atomic location of the field.
+      # @param [ Hash ] mods The current modifications.
+      # @param [ Array ] new The new elements to add.
+      # @param [ Array ] old The old elements getting removed.
+      #
+      # @since 2.4.0
+      def add_atomic_changes(document, name, key, mods, new_elements, old_elements)
+        old = (old_elements || [])
+        new = (new_elements || [])
+        if new.length > old.length
+          if new.first(old.length) == old
+            document.atomic_array_add_to_sets[key] = new.drop(old.length)
+          else
+            mods[key] = document.attributes[name]
+          end
+        elsif new.length < old.length
+          pulls = old - new
+          if new == old - pulls
+            document.atomic_array_pulls[key] = pulls
+          else
+            mods[key] = document.attributes[name]
+          end
+        elsif new != old
+          mods[key] = document.attributes[name]
+        end
+      end
+
       # Is this field a foreign key?
       #
       # @example Is the field a foreign key?
@@ -13,6 +49,10 @@ module Mongoid
       # @since 2.4.0
       def foreign_key?
         true
+      end
+
+      def evolve(object)
+        object.is_a?(Document) ? object.id : mongoize(object)
       end
 
       def mongoize(object)

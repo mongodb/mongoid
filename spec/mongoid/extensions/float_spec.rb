@@ -91,8 +91,8 @@ describe Mongoid::Extensions::Float do
 
       context "when the string is empty" do
 
-        it "returns 0" do
-          Float.mongoize("").should eq(0)
+        it "returns nil" do
+          Float.mongoize("").should be_nil
         end
       end
 

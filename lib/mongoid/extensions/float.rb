@@ -21,7 +21,11 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
-          object ? (__numeric__(object) rescue 0.0) : object
+          unless object.blank?
+            __numeric__(object) rescue 0.0
+          else
+            nil
+          end
         end
       end
     end
