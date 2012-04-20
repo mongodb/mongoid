@@ -49,7 +49,7 @@ class Person
       "Testing"
     end
     def find_by_street(street)
-      where(street: street).first
+      where(:street => street).first
     end
   end
   embeds_many :address_components, :validate => false

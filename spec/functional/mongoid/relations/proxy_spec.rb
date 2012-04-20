@@ -32,7 +32,7 @@ describe Mongoid::Relations::Proxy do
     context "when extending from the relation definition" do
 
       let!(:address) do
-        person.addresses.create(street: "hobrecht")
+        person.addresses.create(:street => "hobrecht")
       end
 
       let(:found) do
