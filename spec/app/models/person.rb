@@ -45,7 +45,7 @@ class Person
       "Testing"
     end
     def find_by_street(street)
-      @target.select { |doc| doc.street == street }
+      where(street: street).first
     end
   end
 
