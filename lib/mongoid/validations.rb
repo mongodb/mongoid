@@ -1,8 +1,10 @@
 # encoding: utf-8
+require "mongoid/validations/localizable"
 require "mongoid/validations/associated"
 require "mongoid/validations/format"
-require "mongoid/validations/uniqueness"
+require "mongoid/validations/length"
 require "mongoid/validations/presence"
+require "mongoid/validations/uniqueness"
 
 module Mongoid #:nodoc:
 
