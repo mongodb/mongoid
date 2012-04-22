@@ -11,7 +11,7 @@ describe Mongoid::Validations::LengthValidator do
     context "when the field is not localized" do
 
       let(:validator) do
-        described_class.new(attributes: [:brand_name], in: 1..5)
+        described_class.new(:attributes => [:brand_name], :in => 1..5)
       end
 
       context "when the value is valid" do
@@ -42,7 +42,7 @@ describe Mongoid::Validations::LengthValidator do
     context "when the field is localized" do
 
       let(:validator) do
-        described_class.new(attributes: [:website], in: 1..5)
+        described_class.new(:attributes => [:website], :in => 1..5)
       end
 
       context "when the localized value is valid" do
