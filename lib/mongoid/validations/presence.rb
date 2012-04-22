@@ -27,9 +27,13 @@ module Mongoid
       # @since 2.4.0
       def validate_each(document, attribute, value)
         field = document.fields[attribute.to_s]
-        if field && field.localized? && !value.blank?
+        if field.try(:localized?) && !value.blank?
           value.each_pair do |_locale, _value|
-            document.errors.add(attribute, :blank_in_locale, options.merge(in_locale: _locale)) if _value.blank?
+            document.errors.add(
+              attribute,
+              :blank_in_locale,
+              options.merge(location: _locale)
+            ) if _value.blank?
           end
         else
           document.errors.add(attribute, :blank, options) if value.blank?

@@ -691,6 +691,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1938 Length validation now works with localized fields.
+
 * \#1933 `Proxy#extend` should delegate through to the target, where
   extending the proxy itself is now handled through `Proxy#proxy_extend`.
 

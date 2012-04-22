@@ -1,8 +1,10 @@
 # encoding: utf-8
+require "mongoid/validations/localizable"
 require "mongoid/validations/associated"
-require "mongoid/validations/uniqueness"
-require "mongoid/validations/presence"
 require "mongoid/validations/format"
+require "mongoid/validations/length"
+require "mongoid/validations/presence"
+require "mongoid/validations/uniqueness"
 
 module Mongoid
 
@@ -51,7 +53,7 @@ module Mongoid
         relation = send(attr)
         exit_validate
         relation.do_or_do_not(:in_memory) || relation
-      elsif fields[attribute] && fields[attribute].localized?
+      elsif fields[attribute].try(:localized?)
         attributes[attribute]
       else
         send(attr)
@@ -139,21 +141,6 @@ module Mongoid
       # @since 2.4.0
       def validates_presence_of(*args)
         validates_with(PresenceValidator, _merge_attributes(args))
-      end
-
-      # Validates whether or not a field matches a certain regular expression.
-      #
-      # @example
-      #   class Person
-      #     include Mongoid::Document
-      #     field :website
-      #
-      #     validates_format_of :website, :with => URI.regexp
-      #   end
-      #
-      # @param [ Array ] *args The arguments to pass to the validator.
-      def validates_format_of(*args)
-        validates_with(FormatValidator, _merge_attributes(args))
       end
 
       # Add validation with the supplied validators forthe provided fields

@@ -20,7 +20,7 @@ en:
         blank:
           "can't be blank"
         blank_in_locale:
-          "can't be blank in %{in_locale}"
+          "can't be blank in %{location}"
         ambiguous_relationship:
           message: "Ambiguous relations %{candidates} defined on %{klass}."
           summary:

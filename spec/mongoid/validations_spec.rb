@@ -291,39 +291,4 @@ describe Mongoid::Validations do
       end
     end
   end
-  
-  describe ".validates_format_of" do
-
-    let(:klass) do
-      Class.new do
-        include Mongoid::Document
-      end
-    end
-
-    context "when adding via the traditional macro" do
-
-      before do
-        klass.validates_format_of(:website, with: URI.regexp)
-      end
-
-      it "adds the validator" do
-        klass.validators.first.should be_a(
-          Mongoid::Validations::FormatValidator
-        )
-      end
-    end
-
-    context "when adding via the new syntax" do
-
-      before do
-        klass.validates(:website, format: { with: URI.regexp })
-      end
-
-      it "adds the validator" do
-        klass.validators.first.should be_a(
-          Mongoid::Validations::FormatValidator
-        )
-      end
-    end
-  end
 end

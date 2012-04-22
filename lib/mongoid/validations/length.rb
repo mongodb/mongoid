@@ -3,17 +3,17 @@ module Mongoid
   module Validations
 
     # Validates that the specified attributes do or do not match a certain
-    # regular expression.
+    # length.
     #
-    # @example Set up the format validator.
+    # @example Set up the length validator.
     #
     #   class Person
     #     include Mongoid::Document
     #     field :website
     #
-    #     validates_format_of :website, :with => URI.regexp
+    #     validates_length_of :website, in: 1..10
     #   end
-    class FormatValidator < ActiveModel::Validations::FormatValidator
+    class LengthValidator < ActiveModel::Validations::LengthValidator
       include Localizable
     end
   end
