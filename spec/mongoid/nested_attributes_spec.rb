@@ -1183,6 +1183,61 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
+                context "when the child has defaults" do
+
+                  before(:all) do
+                    Person.accepts_nested_attributes_for :appointments, allow_destroy: true
+                  end
+
+                  after(:all) do
+                    Person.send(:undef_method, :appointments_attributes=)
+                  end
+
+                  context "when the parent is persisted" do
+
+                    let!(:persisted) do
+                      Person.create
+                    end
+
+                    context "when only 1 child has the default persisted" do
+
+                      let!(:app_one) do
+                        persisted.appointments.create
+                      end
+
+                      let!(:app_two) do
+                        persisted.appointments.create.tap do |app|
+                          app.unset(:timed)
+                        end
+                      end
+
+                      context "when destroying both children" do
+
+                        let(:from_db) do
+                          Person.find(persisted.id)
+                        end
+
+                        before do
+                          from_db.appointments_attributes =
+                            {
+                              "bar" => { "id" => app_one.id, "_destroy" => true },
+                              "foo" => { "id" => app_two.id, "_destroy" => true }
+                            }
+                          from_db.save
+                        end
+
+                        it "destroys both children" do
+                          from_db.appointments.should be_empty
+                        end
+
+                        it "persists the deletes" do
+                          from_db.reload.appointments.should be_empty
+                        end
+                      end
+                    end
+                  end
+                end
+
                 context "when the child is not paranoid" do
 
                   before(:all) do

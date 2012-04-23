@@ -172,11 +172,14 @@ module Mongoid
     def atomic_pulls
       pulls = {}
       delayed_atomic_pulls.each_pair do |_, docs|
-        docs.each do |doc|
-          (pulls[doc.atomic_path] ||= []).push(doc.as_document)
+        path = nil
+        ids = docs.map do |doc|
+          path ||= doc.atomic_path
           doc.destroyed = true
           doc.flagged_for_destroy = false
+          doc.id
         end
+        pulls[path] = { "_id" => { "$in" => ids }} and path = nil
       end
       pulls
     end
@@ -283,7 +286,7 @@ module Mongoid
       mods.push(doc.atomic_pushes)
       mods.push(doc.atomic_array_pushes)
       mods.add_to_set(doc.atomic_array_add_to_sets)
-      mods.pull(doc.atomic_array_pulls)
+      mods.pull_all(doc.atomic_array_pulls)
     end
   end
 end

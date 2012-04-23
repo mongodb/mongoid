@@ -699,6 +699,12 @@ For instructions on upgrading to newer versions, visit
 * \#1930 Ensure complex criteria are expanded in all where clauses.
   (Hans Hasselberg)
 
+* \#1928 Deletion of embedded documents via nested attributes now performs
+  a $pull with id match criteria instead of a $pullAll to cover all cases.
+  Previously newly added defaults to documents that had already persisted
+  could not be deleted in this matter since the doc did not match what was
+  in the database.
+
 * \#1924/\#1917 Fix pushing to embedded relations with default scopes not
   scoping on the new document. (Hans Hasselberg)
 

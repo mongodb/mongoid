@@ -26,17 +26,32 @@ module Mongoid
         end
       end
 
-      # Adds pull modifiers to the modifiers hash.
+      # Adds pull all modifiers to the modifiers hash.
       #
-      # @example Add pull operations.
-      #   modifiers.pull({ "addresses" => { "street" => "Bond" }})
+      # @example Add pull all operations.
+      #   modifiers.pull_all({ "addresses" => { "street" => "Bond" }})
       #
-      # @param [ Hash ] modifications The pull modifiers.
+      # @param [ Hash ] modifications The pull all modifiers.
       #
-      # @since 2.2.0
+      # @since 3.0.0
+      def pull_all(modifications)
+        modifications.each_pair do |field, value|
+          add_operation(pull_alls, field, value)
+          pull_fields << field.split(".", 2)[0]
+        end
+      end
+
+      # Adds pull all modifiers to the modifiers hash.
+      #
+      # @example Add pull all operations.
+      #   modifiers.pull({ "addresses" => { "_id" => { "$in" => [ 1, 2, 3 ]}}})
+      #
+      # @param [ Hash ] modifications The pull all modifiers.
+      #
+      # @since 3.0.0
       def pull(modifications)
         modifications.each_pair do |field, value|
-          add_operation(pulls, field, value)
+          pulls[field] = value
           pull_fields << field.split(".", 2)[0]
         end
       end
@@ -226,13 +241,25 @@ module Mongoid
       # Get the $pullAll operations or intialize a new one.
       #
       # @example Get the $pullAll operations.
-      #   modifiers.pulls
+      #   modifiers.pull_alls
       #
       # @return [ Hash ] The $pullAll operations.
       #
-      # @since 2.1.0
-      def pulls
+      # @since 3.0.0
+      def pull_alls
         self["$pullAll"] ||= {}
+      end
+
+      # Get the $pull operations or intialize a new one.
+      #
+      # @example Get the $pull operations.
+      #   modifiers.pulls
+      #
+      # @return [ Hash ] The $pull operations.
+      #
+      # @since 3.0.0
+      def pulls
+        self["$pull"] ||= {}
       end
 
       # Get the $pushAll operations or intialize a new one.
