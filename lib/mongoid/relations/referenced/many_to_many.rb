@@ -26,22 +26,12 @@ module Mongoid
         # @since 2.0.0.beta.1
         def <<(*args)
           batched do
-            ids = []
-            args.flatten.each do |doc|
-              next unless doc
-              append(doc)
-              if persistable? || _creating?
-                ids.push(doc.id)
-                doc.save
-              else
-                base.send(metadata.foreign_key).push(doc.id)
-                base.synced[metadata.foreign_key] = false
-              end
-            end
-            if persistable? || _creating?
-              base.push_all(metadata.foreign_key, ids)
-              base.synced[metadata.foreign_key] = false
-            end
+            docs = args.flatten.compact
+
+            docs.map{ |doc| append(doc) }
+            docs.map(&:save) if persistable? || _creating?
+            base.push_all(metadata.foreign_key, docs.map(&:id))
+            base.synced[metadata.foreign_key] = false
           end
           self
         end
