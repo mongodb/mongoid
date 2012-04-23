@@ -1152,7 +1152,7 @@ describe Mongoid::NestedAttributes do
                 context "when the child has defaults" do
 
                   before(:all) do
-                    Person.accepts_nested_attributes_for :appointments, allow_destroy: true
+                    Person.accepts_nested_attributes_for :appointments, :allow_destroy => true
                   end
 
                   after(:all) do
