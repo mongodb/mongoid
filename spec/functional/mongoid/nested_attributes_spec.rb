@@ -4049,8 +4049,8 @@ describe Mongoid::NestedAttributes do
               { addresses_attributes:
                 { "0" =>
                   {
-                    street: "Alexanderstr",
-                    locations_attributes: { "0" => { name: "Home" } }
+                    :street => "Alexanderstr",
+                    :locations_attributes => { "0" => { :name => "Home" } }
                   }
                 }
               }
