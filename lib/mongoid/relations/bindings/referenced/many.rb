@@ -17,12 +17,12 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind_one(doc)
+            doc.you_must(metadata.foreign_key_setter, base.id)
+            if metadata.type
+              doc.you_must(metadata.type_setter, base.class.model_name)
+            end
             unless _binding?
               _binding do
-                doc.you_must(metadata.foreign_key_setter, base.id)
-                if metadata.type
-                  doc.you_must(metadata.type_setter, base.class.model_name)
-                end
                 doc.send(metadata.inverse_setter, base)
               end
             end
@@ -37,12 +37,12 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind_one(doc)
+            doc.you_must(metadata.foreign_key_setter, nil)
+            if metadata.type
+              doc.you_must(metadata.type_setter, nil)
+            end
             unless _binding?
               _binding do
-                doc.you_must(metadata.foreign_key_setter, nil)
-                if metadata.type
-                  doc.you_must(metadata.type_setter, nil)
-                end
                 doc.send(metadata.inverse_setter, nil)
               end
             end

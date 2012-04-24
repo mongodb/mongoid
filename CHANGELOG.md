@@ -33,6 +33,8 @@ For instructions on upgrading to newer versions, visit
 * \#1916/\#1913 Uniqueness validation no longer is affected by the default
   scope. (Hans Hasselberg)
 
+* \#1778 Ensure foreign keys are always set regardless of binding state.
+
 ## 2.4.8
 
 ### Resolved Issues

@@ -19,13 +19,13 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def bind
+            base.you_must(metadata.foreign_key_setter, target.id)
+            if metadata.inverse_type
+              base.you_must(metadata.inverse_type_setter, target.class.model_name)
+            end
             unless _binding?
               _binding do
                 inverse = metadata.inverse(target)
-                base.you_must(metadata.foreign_key_setter, target.id)
-                if metadata.inverse_type
-                  base.you_must(metadata.inverse_type_setter, target.class.model_name)
-                end
                 if inverse
                   if set_base_metadata
                     if base.referenced_many?
@@ -49,13 +49,13 @@ module Mongoid # :nodoc:
           #
           # @since 2.0.0.rc.1
           def unbind
+            base.you_must(metadata.foreign_key_setter, nil)
+            if metadata.inverse_type
+              base.you_must(metadata.inverse_type_setter, nil)
+            end
             unless _binding?
               _binding do
                 inverse = metadata.inverse(target)
-                base.you_must(metadata.foreign_key_setter, nil)
-                if metadata.inverse_type
-                  base.you_must(metadata.inverse_type_setter, nil)
-                end
                 if inverse
                   set_base_metadata
                   if base.referenced_many?
