@@ -181,10 +181,32 @@ describe Mongoid::Finders do
 
     context "when the document is not found" do
 
-      it "raises an error" do
-        expect {
-          Person.find_by(ssn: "333-22-1111")
-        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      context "when raising a not found error" do
+
+        before do
+          Mongoid.raise_not_found_error = true
+        end
+
+        it "raises an error" do
+          expect {
+            Person.find_by(ssn: "333-22-1111")
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+      end
+
+      context "when raising no error" do
+
+        before do
+          Mongoid.raise_not_found_error = false
+        end
+
+        after do
+          Mongoid.raise_not_found_error = true
+        end
+
+        it "returns nil" do
+          Person.find_by(ssn: "333-22-1111").should be_nil
+        end
       end
     end
   end
