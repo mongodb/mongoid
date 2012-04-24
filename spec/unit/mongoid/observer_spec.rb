@@ -37,7 +37,7 @@ describe Mongoid::Observer do
       actress and observer.last_after_create_record.try(:name).should == actress.name
     end
   end
-  
+
   context "when the observer is disabled" do
     let!(:observer) do
       ActorObserver.instance

@@ -202,10 +202,10 @@ describe Mongoid::Validations::UniquenessValidator do
 
             let(:personal_folder) { Folder.create!(:name => "Personal") }
             let(:public_folder)   { Folder.create!(:name => "Public") }
-            
+
             before do
-              personal_folder.folder_items << FolderItem.new(:name => "non-unique") 
-              public_folder.folder_items   << FolderItem.new(:name => "non-unique") 
+              personal_folder.folder_items << FolderItem.new(:name => "non-unique")
+              public_folder.folder_items   << FolderItem.new(:name => "non-unique")
             end
 
             let(:item) { public_folder.folder_items.last }
