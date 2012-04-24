@@ -4046,7 +4046,7 @@ describe Mongoid::NestedAttributes do
           context "when no documents has previously existed" do
 
             let(:attributes) do
-              { addresses_attributes:
+              { :addresses_attributes =>
                 { "0" =>
                   {
                     :street => "Alexanderstr",
@@ -4089,7 +4089,7 @@ describe Mongoid::NestedAttributes do
 
             let(:attributes) do
               {
-                addresses_attributes: {
+                :addresses_attributes => {
                   :a => {
                     :id => address.id, :locations_attributes => { :b => { :name => "home" }}
                   },
