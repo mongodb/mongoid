@@ -996,7 +996,7 @@ describe Mongoid::Attributes do
     end
 
     context "when the attribute exists in embedded document" do
-     
+
      let(:pet) do
        Animal.new(name: "Cat")
      end
@@ -1019,7 +1019,7 @@ describe Mongoid::Attributes do
      end
 
      context "when saving after the removal" do
-       
+
        before do
          person.save
        end

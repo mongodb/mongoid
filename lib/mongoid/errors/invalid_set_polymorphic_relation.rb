@@ -2,28 +2,28 @@
 module Mongoid
   module Errors
 
-    # Raised when trying to set a polymorphic "references in" relation to a 
-    # model with multiple "references many/one" relations pointing to that 
+    # Raised when trying to set a polymorphic "references in" relation to a
+    # model with multiple "references many/one" relations pointing to that
     # first model.
-    # 
+    #
     # @example Invalid setting of a polymorphic relation.
     #   class Face
     #     include Mongoid::Document
-    #     
+    #
     #     has_one :left_eye, class_name: "Eye", as: :eyeable
     #     has_one :right_eye, class_name: "Eye", as: :eyeable
     #   end
-    #   
+    #
     #   class Eye
     #     include Mongoid::Document
-    #     
+    #
     #     belongs_to :eyeable, polymorphic: true
     #   end
-    #   
+    #
     #   eye = Eye.new
     #   face = Face.new
     #   eye.eyeable = face # Raises error
-        
+
     class InvalidSetPolymorphicRelation < MongoidError
 
       # Create the new invalid set polymorphic relation error.

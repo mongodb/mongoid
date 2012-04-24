@@ -99,7 +99,7 @@ module Mongoid
 
     # A Document's is identified absolutely by it's class and database id:
     #
-    # Person.first.identity #=> [Person, BSON::ObjectId('4f775130a04745933a000003')] 
+    # Person.first.identity #=> [Person, BSON::ObjectId('4f775130a04745933a000003')]
     #
     # @example Get the identity
     #   document.identity

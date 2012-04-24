@@ -62,7 +62,7 @@ describe Mongoid::Relations::Polymorphic do
         it "does not add the foreign key type field" do
           klass.fields["ratable_type"].should be_nil
         end
-        
+
         it "does not add the foreign key inverse field field" do
           klass.fields["ratable_field"].should be_nil
         end
@@ -89,7 +89,7 @@ describe Mongoid::Relations::Polymorphic do
       it "does not add the foreign key type field" do
         klass.fields["ratable_type"].should be_nil
       end
-      
+
       it "does not add the foreign key inverse field field" do
         klass.fields["ratable_field"].should be_nil
       end

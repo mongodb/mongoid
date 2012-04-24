@@ -59,14 +59,14 @@ describe Mongoid::Matchers::Default do
       context "when the attribute contains the value" do
 
         context "when the value is a string" do
-          
+
           it "returns true" do
             matcher.matches?("Test1").should be_true
           end
         end
-        
+
         context "when the value is a regexp" do
-          
+
           it "returns true" do
             matcher.matches?(/^Test[3-5]$/).should be_true
           end
