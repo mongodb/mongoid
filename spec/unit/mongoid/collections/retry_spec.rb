@@ -21,7 +21,6 @@ describe Mongoid::Collections::Retry do
   let(:logger) { stub.quacks_like(Logger.allocate) }
 
   before do
-    Kernel.stubs(:sleep)
     logger.expects(:warn).at_least(0)
     Mongoid.stubs(:logger => logger)
   end
@@ -46,7 +45,7 @@ describe Mongoid::Collections::Retry do
     describe "and Mongoid.max_retries_on_connection_failure is greater than 0" do
 
       let :max_retries do
-        5
+        2
       end
 
       before do
@@ -87,7 +86,7 @@ describe Mongoid::Collections::Retry do
     describe "and Mongoid.max_retries_on_connection_failure is greater than 0" do
 
       let :max_retries do
-        5
+        2
       end
 
       before do
@@ -135,7 +134,7 @@ describe Mongoid::Collections::Retry do
       describe "and Mongoid.max_retries_on_connection_failure is greater than 0" do
 
         let :max_retries do
-          5
+          2
         end
 
         before do
@@ -176,7 +175,7 @@ describe Mongoid::Collections::Retry do
       describe "and Mongoid.max_retries_on_connection_failure is greater than 0" do
 
         let :max_retries do
-          5
+          2
         end
 
         before do
