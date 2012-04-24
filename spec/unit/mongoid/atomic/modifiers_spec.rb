@@ -330,7 +330,7 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.should eq(
             { "$pushAll" => {
               "addresses.0.locations" => [{ "street" => "Bond St" }]},
-              conflicts: { "$pushAll" =>
+              :conflicts => { "$pushAll" =>
                 { "addresses" => [
                     { "street" => "Oxford St" }
                   ]
