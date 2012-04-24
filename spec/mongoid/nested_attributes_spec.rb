@@ -4112,35 +4112,74 @@ describe Mongoid::NestedAttributes do
 
       context "when second level is a one to many" do
 
-        let(:attributes) do
-          { addresses_attributes:
-            { "0" =>
-              {
-                street: "Alexanderstr",
-                locations_attributes: { "0" => { name: "Home" } }
+        context "when adding new documents in both levels" do
+
+          context "when no documents has previously existed" do
+
+            let(:attributes) do
+              { addresses_attributes:
+                { "0" =>
+                  {
+                    street: "Alexanderstr",
+                    locations_attributes: { "0" => { name: "Home" } }
+                  }
+                }
               }
-            }
-          }
-        end
+            end
 
-        before do
-          person.with(safe: true).update_attributes(attributes)
-        end
+            before do
+              person.with(safe: true).update_attributes(attributes)
+            end
 
-        let(:address) do
-          person.addresses.first
-        end
+            let(:address) do
+              person.addresses.first
+            end
 
-        let(:location) do
-          address.locations.first
-        end
+            let(:location) do
+              address.locations.first
+            end
 
-        it "adds the new first level embedded document" do
-          address.street.should eq("Alexanderstr")
-        end
+            it "adds the new first level embedded document" do
+              address.street.should eq("Alexanderstr")
+            end
 
-        it "adds the nested embedded document" do
-          location.name.should eq("Home")
+            it "adds the nested embedded document" do
+              location.name.should eq("Home")
+            end
+          end
+
+          context "when adding to an existing document in the first level" do
+
+            let!(:address) do
+              person.addresses.create(street: "hobrecht")
+            end
+
+            let!(:location) do
+              address.locations.create(name: "work")
+            end
+
+            let(:attributes) do
+              {
+                addresses_attributes: {
+                  a: { id: address.id, locations_attributes: { b: { name: "home" }}},
+                  c: { street: "pfluger" }
+                }
+              }
+            end
+
+            before do
+              person.with(safe: true).update_attributes(attributes)
+              person.reload
+            end
+
+            it "adds the new location to the existing address" do
+              person.addresses.first.locations.count.should eq(2)
+            end
+
+            it "adds the new address" do
+              person.addresses.count.should eq(2)
+            end
+          end
         end
       end
 

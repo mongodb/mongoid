@@ -310,6 +310,36 @@ describe Mongoid::Atomic::Modifiers do
           )
         end
       end
+
+      context "when the conflicting modification is a push" do
+
+        let(:nested) do
+          { "addresses.0.locations" => { "street" => "Bond St" } }
+        end
+
+        let(:pushes) do
+          { "addresses" => { "street" => "Oxford St" } }
+        end
+
+        before do
+          modifiers.push(nested)
+          modifiers.push(pushes)
+        end
+
+        it "adds the push all modifiers to the conflicts hash" do
+          modifiers.should eq(
+            { "$pushAll" => {
+              "addresses.0.locations" => [{ "street" => "Bond St" }]},
+              conflicts: { "$pushAll" =>
+                { "addresses" => [
+                    { "street" => "Oxford St" }
+                  ]
+                }
+              }
+            }
+          )
+        end
+      end
     end
   end
 

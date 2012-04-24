@@ -37,7 +37,7 @@ module Mongoid
       def pull_all(modifications)
         modifications.each_pair do |field, value|
           add_operation(pull_alls, field, value)
-          pull_fields << field.split(".", 2)[0]
+          pull_fields[field.split(".", 2)[0]] = field
         end
       end
 
@@ -52,7 +52,7 @@ module Mongoid
       def pull(modifications)
         modifications.each_pair do |field, value|
           pulls[field] = value
-          pull_fields << field.split(".", 2)[0]
+          pull_fields[field.split(".", 2)[0]] = field
         end
       end
 
@@ -66,6 +66,7 @@ module Mongoid
       # @since 2.1.0
       def push(modifications)
         modifications.each_pair do |field, value|
+          push_fields[field] = field
           mods = push_conflict?(field) ? conflicting_pushes : pushes
           add_operation(mods, field, Array.wrap(value))
         end
@@ -84,7 +85,7 @@ module Mongoid
           next if field == "_id"
           mods = set_conflict?(field) ? conflicting_sets : sets
           add_operation(mods, field, value)
-          set_fields << field.split(".", 2)[0]
+          set_fields[field.split(".", 2)[0]] = field
         end
       end
 
@@ -148,7 +149,7 @@ module Mongoid
       #
       # @since 2.2.0
       def set_conflict?(field)
-        pull_fields.include?(field.split(".", 2)[0])
+        pull_fields.has_key?(field.split(".", 2)[0])
       end
 
       # Is the operation going to be a conflict for a $push?
@@ -163,7 +164,8 @@ module Mongoid
       # @since 2.2.0
       def push_conflict?(field)
         name = field.split(".", 2)[0]
-        set_fields.include?(name) || pull_fields.include?(name)
+        set_fields.has_key?(name) || pull_fields.has_key?(name) ||
+          (push_fields.keys.count { |item| item =~ /#{name}/ } > 1)
       end
 
       # Get the conflicting pull modifications.
@@ -223,7 +225,19 @@ module Mongoid
       #
       # @since 2.2.0
       def pull_fields
-        @pull_fields ||= []
+        @pull_fields ||= {}
+      end
+
+      # Get the names of the fields that need to be pushed.
+      #
+      # @example Get the push fields.
+      #   modifiers.push_fields
+      #
+      # @return [ Array<String> ] The push fields.
+      #
+      # @since 2.2.0
+      def push_fields
+        @push_fields ||= {}
       end
 
       # Get the names of the fields that need to be set.
@@ -235,7 +249,7 @@ module Mongoid
       #
       # @since 2.2.0
       def set_fields
-        @set_fields ||= []
+        @set_fields ||= {}
       end
 
       # Get the $pullAll operations or intialize a new one.
