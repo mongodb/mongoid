@@ -720,6 +720,8 @@ For instructions on upgrading to newer versions, visit
 * \#1916/\#1913 Uniqueness validation no longer is affected by the default
   scope. (Hans Hasselberg)
 
+* \#1943 Ensure numericality validation works for big decimals.
+
 ## 2.4.8
 
 ### Resolved Issues
