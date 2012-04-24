@@ -19,7 +19,13 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def deserialize(object)
-          object ? ::BigDecimal.new(object) : object
+          return object unless object
+          begin
+            Float(object)
+            ::BigDecimal.new(object)
+          rescue ArgumentError, TypeError
+            object
+          end
         end
 
         # Special case to serialize the object.
