@@ -1,7 +1,7 @@
-
 require "spec_helper"
 
 describe Mongoid::Collections::Retry do
+
   class SomeCollection
     include Mongoid::Collections::Retry
 
@@ -22,7 +22,6 @@ describe Mongoid::Collections::Retry do
 
   before do
     Kernel.stubs(:sleep)
-
     logger.expects(:warn).at_least(0)
     Mongoid.stubs(:logger => logger)
   end
