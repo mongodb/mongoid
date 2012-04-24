@@ -7,8 +7,8 @@ describe ActiveModel::Validations::NumericalityValidator do
     before(:all) do
       class TestModel
         include Mongoid::Document
-        field :amount, type: BigDecimal
-        validates_numericality_of :amount, allow_blank: false
+        field :amount, :type => BigDecimal
+        validates_numericality_of :amount, :allow_blank => false
       end
     end
 
@@ -19,7 +19,7 @@ describe ActiveModel::Validations::NumericalityValidator do
     context "when the value is non numeric" do
 
       let(:model) do
-        TestModel.new(amount: "asdf")
+        TestModel.new(:amount => "asdf")
       end
 
       it "returns false" do
