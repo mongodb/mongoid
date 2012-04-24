@@ -649,6 +649,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1941/#1939 `Model.find_by` now returns nil if raise not found error is
+  set to false. (Hans Hasselberg)
+
 * \#1859/#1860 `Model#remove_attribute` now properly unsets on embedded
   documents. (Anton Onyshchenko)
 
