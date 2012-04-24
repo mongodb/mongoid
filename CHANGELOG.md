@@ -691,6 +691,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1943 Ensure numericality validation works for big decimals.
+
 * \#1938 Length validation now works with localized fields.
 
 * \#1933 `Proxy#extend` should delegate through to the target, where
