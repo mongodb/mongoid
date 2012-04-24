@@ -8,6 +8,7 @@ class Band
   field :members, type: Array
   field :likes, type: Integer
   field :views, type: Integer
+  field :rating, type: Float
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false

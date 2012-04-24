@@ -16,7 +16,7 @@ module Mongoid
         #
         # @since 3.0.0
         def avg(field)
-          count > 0 ? sum(field) / count : nil
+          count > 0 ? sum(field).to_f / count.to_f : nil
         end
 
         # Get the max value of the provided field. If provided a block, will

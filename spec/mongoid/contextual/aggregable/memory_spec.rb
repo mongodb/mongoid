@@ -8,30 +8,62 @@ describe Mongoid::Contextual::Aggregable::Memory do
 
       context "when there are matching documents" do
 
-        let!(:depeche) do
-          Band.create(name: "Depeche Mode", likes: 1000)
-        end
+        context "when the types are integers" do
 
-        let!(:tool) do
-          Band.create(name: "Tool", likes: 500)
-        end
+          let!(:depeche) do
+            Band.create(name: "Depeche Mode", likes: 1000)
+          end
 
-        let(:criteria) do
-          Band.all.tap do |criteria|
-            criteria.documents = [ depeche, tool ]
+          let!(:tool) do
+            Band.create(name: "Tool", likes: 500)
+          end
+
+          let(:criteria) do
+            Band.all.tap do |criteria|
+              criteria.documents = [ depeche, tool ]
+            end
+          end
+
+          let(:context) do
+            Mongoid::Contextual::Memory.new(criteria)
+          end
+
+          let(:avg) do
+            context.avg(:likes)
+          end
+
+          it "returns the avg of the provided field" do
+            avg.should eq(750)
           end
         end
 
-        let(:context) do
-          Mongoid::Contextual::Memory.new(criteria)
-        end
+        context "when the types are floats" do
 
-        let(:avg) do
-          context.avg(:likes)
-        end
+          let!(:depeche) do
+            Band.create(name: "Depeche Mode", rating: 10)
+          end
 
-        it "returns the avg of the provided field" do
-          avg.should eq(750)
+          let!(:tool) do
+            Band.create(name: "Tool", rating: 5)
+          end
+
+          let(:criteria) do
+            Band.all.tap do |criteria|
+              criteria.documents = [ depeche, tool ]
+            end
+          end
+
+          let(:context) do
+            Mongoid::Contextual::Memory.new(criteria)
+          end
+
+          let(:avg) do
+            context.avg(:rating)
+          end
+
+          it "returns the avg of the provided field" do
+            avg.should eq(7.5)
+          end
         end
       end
 
