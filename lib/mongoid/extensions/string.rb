@@ -43,6 +43,10 @@ module Mongoid
         self =~ /^(|_)id$/
       end
 
+      def numeric?
+        true if Float(self) rescue false
+      end
+
       # Get the string as a getter string.
       #
       # @example Get the reader/getter

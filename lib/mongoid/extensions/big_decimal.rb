@@ -29,7 +29,9 @@ module Mongoid
         #
         # @since 3.0.0
         def demongoize(object)
-          object ? ::BigDecimal.new(object) : object
+          if object
+            object.numeric? ? ::BigDecimal.new(object) : object
+          end
         end
       end
     end
