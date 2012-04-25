@@ -293,6 +293,7 @@ describe Mongoid::Extensions::Array do
 
       after do
         Mongoid.use_activesupport_time_zone = true
+        Time.zone = nil
       end
 
       let(:array) do
