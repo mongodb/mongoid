@@ -63,19 +63,48 @@ namespace :db do
   namespace :mongoid do
     # gets a list of the mongoid models defined in the app/models directory
     def get_mongoid_models
-      documents = []
+    # try to agressively load the app for Rails 3 or 2
+    # 
+      if defined?(Rails) && Rails.respond_to?(:application)
+        Rails.application.eager_load!
+      elsif defined?(Rails::Initializer)
+        # Rails 2.3
+        $rails_rake_task = false
+        Rails::Initializer.run(:load_application_classes)
+      end
+      
+    # look hard for document classes in object_space and in app/models/
+    #
+      klasses = []
+      
+      Object.constants.each do |const|
+        object = const.to_s.constantize rescue next
+        next unless object.is_a?(Class)
+        klasses << klass
+      end
+      
       Dir.glob("app/models/**/*.rb").sort.each do |file|
         model_path = file[0..-4].split('/')[2..-1]
+        klass = model_path.map { |path| path.camelize }.join('::').constantize
+        klasses << klass
+      end
+      
+      klasses.uniq!
+      
+    # select the klasses that descend from mongoid
+    #
+      documents = []
+      
+      klasses.each do |klass|
         begin
-          klass = model_path.map { |path| path.camelize }.join('::').constantize
           if klass.ancestors.include?(Mongoid::Document) && !klass.embedded
             documents << klass
           end
         rescue
-          # Just for non-mongoid objects that dont have the embedded
-          # attribute at the class level.
+          next
         end
       end
+      
       documents
     end
 
