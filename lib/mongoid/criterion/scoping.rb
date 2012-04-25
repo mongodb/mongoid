@@ -72,7 +72,7 @@ module Mongoid
       #
       # @since 3.0.0
       def scoped?
-        !!@scoped
+        !!(defined?(@scoped) ? @scoped : nil)
       end
 
       # Clears all scoping from the criteria.
@@ -101,7 +101,7 @@ module Mongoid
       #
       # @since 3.0.0
       def unscoped?
-        !!@unscoped
+        !!(defined?(@unscoped) ? @unscoped : nil)
       end
 
       # Get the criteria scoping options, as a pair (scoped, unscoped).
@@ -113,7 +113,7 @@ module Mongoid
       #
       # @since 3.0.0
       def scoping_options
-        [ @scoped, @unscoped ]
+        [ (defined?(@scoped) ? @scoped : nil), (defined?(@unscoped) ? @unscoped : nil) ]
       end
 
       # Set the criteria scoping options, as a pair (scoped, unscoped).
