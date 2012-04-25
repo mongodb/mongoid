@@ -307,10 +307,6 @@ describe Mongoid::Extensions::Array do
       it "converts to a time" do
         time.should eq(Time.local(*array))
       end
-
-      it "converts to the local time zone" do
-        time.zone.should eq("CET")
-      end
     end
   end
 
