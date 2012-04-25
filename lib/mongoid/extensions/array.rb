@@ -44,14 +44,37 @@ module Mongoid
         position ? delete_at(position) : nil
       end
 
+      # Is the object's size changable?
+      #
+      # @example Is the object resizable?
+      #   object.resizable?
+      #
+      # @return [ true ] true.
+      #
+      # @since 3.0.0
       def resizable?
         true
       end
 
       module ClassMethods
 
+        # Convert the provided object to a propery array of foreign keys.
+        #
+        # @example Mongoize the object.
+        #   Array.__mongoize_fk__(constraint, object)
+        #
+        # @param [ Constraint ] constraint The metadata constraint.
+        # @param [ Object ] object The object to convert.
+        #
+        # @return [ Array ] The array of ids.
+        #
+        # @since 3.0.0
         def __mongoize_fk__(constraint, object)
-          object ? constraint.convert(object) : []
+          if object.resizable?
+            object.blank? ? object : constraint.convert(object)
+          else
+            object.blank? ? [] : constraint.convert(Array(object))
+          end
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -69,6 +92,14 @@ module Mongoid
           evolve(object)
         end
 
+        # Is the object's size changable?
+        #
+        # @example Is the object resizable?
+        #   Array.resizable?
+        #
+        # @return [ true ] true.
+        #
+        # @since 3.0.0
         def resizable?
           true
         end
