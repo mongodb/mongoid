@@ -55,6 +55,10 @@ describe Mongoid::Extensions::DateTime do
 
     context "when the string is an invalid time" do
 
+      before do
+        Time.zone = nil
+      end
+
       it "raises an error" do
         expect {
           DateTime.mongoize("shitty time")

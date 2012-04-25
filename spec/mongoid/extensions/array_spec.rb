@@ -2,6 +2,105 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Array do
 
+  describe "#__evolve_object_id__" do
+
+    context "when provided an array of strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:other) do
+        "blah"
+      end
+
+      let(:array) do
+        [ object_id.to_s, other ]
+      end
+
+      let(:evolved) do
+        array.__evolve_object_id__
+      end
+
+      it "converts the convertible ones to object ids" do
+        evolved.should eq([ object_id, other ])
+      end
+
+      it "returns the same instance" do
+        evolved.should equal(array)
+      end
+    end
+
+    context "when provided an array of object ids" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:array) do
+        [ object_id ]
+      end
+
+      let(:evolved) do
+        array.__evolve_object_id__
+      end
+
+      it "returns the array" do
+        evolved.should eq(array)
+      end
+
+      it "returns the same instance" do
+        evolved.should equal(array)
+      end
+    end
+
+    context "when some values are nil" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:array) do
+        [ object_id, nil ]
+      end
+
+      let(:evolved) do
+        array.__evolve_object_id__
+      end
+
+      it "returns the array without the nils" do
+        evolved.should eq([ object_id ])
+      end
+
+      it "returns the same instance" do
+        evolved.should equal(array)
+      end
+    end
+
+    context "when some values are empty strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:array) do
+        [ object_id, "" ]
+      end
+
+      let(:evolved) do
+        array.__evolve_object_id__
+      end
+
+      it "returns the array without the empty strings" do
+        evolved.should eq([ object_id ])
+      end
+
+      it "returns the same instance" do
+        evolved.should equal(array)
+      end
+    end
+  end
+
   describe ".__mongoize_fk__" do
 
     context "when the related model uses object ids" do
@@ -152,6 +251,64 @@ describe Mongoid::Extensions::Array do
         it "returns an empty array" do
           fk.should be_empty
         end
+      end
+    end
+  end
+
+  describe "#__mongoize_time__" do
+
+    context "when using active support's time zone" do
+
+      before do
+        Mongoid.use_activesupport_time_zone = true
+        ::Time.zone = "Tokyo"
+      end
+
+      after do
+        ::Time.zone = "Berlin"
+      end
+
+      let(:array) do
+        [ 2010, 11, 19, 00, 24, 49 ]
+      end
+
+      let(:time) do
+        array.__mongoize_time__
+      end
+
+      it "converts to a time" do
+        time.should eq(::Time.zone.local(*array))
+      end
+
+      it "converts to the as time zone" do
+        time.zone.should eq("JST")
+      end
+    end
+
+    context "when not using active support's time zone" do
+
+      before do
+        Mongoid.use_activesupport_time_zone = false
+      end
+
+      after do
+        Mongoid.use_activesupport_time_zone = true
+      end
+
+      let(:array) do
+        [ 2010, 11, 19, 00, 24, 49 ]
+      end
+
+      let(:time) do
+        array.__mongoize_time__
+      end
+
+      it "converts to a time" do
+        time.should eq(Time.local(*array))
+      end
+
+      it "converts to the local time zone" do
+        time.zone.should eq("CET")
       end
     end
   end

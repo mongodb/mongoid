@@ -3,11 +3,27 @@ module Mongoid
   module Extensions
     module Array
 
+      # Evolve the array into an array of object ids.
+      #
+      # @example Evolve the array to object ids.
+      #   [ id ].__evolve_object_id__
+      #
+      # @return [ Array<Moped::BSON::ObjectId> ] The converted array.
+      #
+      # @since 3.0.0
       def __evolve_object_id__
         map!(&:__evolve_object_id__).compact!
         self
       end
 
+      # Converts the array for storing as a time.
+      #
+      # @example Convert the array to a time.
+      #   [ 2010, 1, 1 ].__mongoize_time__
+      #
+      # @return [ Time ] The time.
+      #
+      # @since 3.0.0
       def __mongoize_time__
         time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
         time.local(*self)
