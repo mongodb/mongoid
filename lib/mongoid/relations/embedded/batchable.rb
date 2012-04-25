@@ -89,10 +89,18 @@ module Mongoid
         private
 
         # @attribute [rw] inserts_valid If all inserts are valid.
-        attr_accessor :inserts_valid
+        def inserts_valid
+          @inserts_valid
+        end
+
+        def inserts_valid=(value)
+          @inserts_valid = value
+        end
 
         # @attribute [w] path The atomic path
-        attr_writer :path
+        def path=(value)
+          @path = value
+        end
 
         # Perform a batch persist of the provided documents with the supplied
         # operation.

@@ -230,8 +230,22 @@ module Mongoid
       private
 
       # @attribute [rw] limiting The number of documents to return.
+      def limiting
+        defined?(@limiting) ? @limiting : nil
+      end
+
+      def limiting=(value)
+        @limiting = value
+      end
+
       # @attribute [rw] skipping The number of documents to skip.
-      attr_accessor :limiting, :skipping
+      def skipping
+        defined?(@skipping) ? @skipping : nil
+      end
+
+      def skipping=(value)
+        @skipping = value
+      end
 
       # Map the sort symbols to the correct MongoDB values.
       SORT_MAPPINGS = { asc: 1, ascending: 1, desc: -1, descending: -1 }

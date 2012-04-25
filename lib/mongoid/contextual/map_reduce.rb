@@ -215,7 +215,9 @@ module Mongoid
       private
 
       # @attribute [r] criteria The criteria for the map/reduce.
-      attr_reader :criteria
+      def criteria
+        @criteria
+      end
 
       # Apply criteria specific options - query, sort, limit.
       #
