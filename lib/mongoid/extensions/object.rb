@@ -3,10 +3,26 @@ module Mongoid
   module Extensions
     module Object
 
+      # Evolve a plain object into an object id.
+      #
+      # @example Evolve the object.
+      #   object.__evolve_object_id__
+      #
+      # @return [ Object ] self.
+      #
+      # @since 3.0.0
       def __evolve_object_id__
         self
       end
 
+      # Mongoize a plain object into a time.
+      #
+      # @example Mongoize the object.
+      #   object.__mongoize_time__
+      #
+      # @return [ Object ] self.
+      #
+      # @since 3.0.0
       def __mongoize_time__
         self
       end
@@ -76,6 +92,15 @@ module Mongoid
         end
       end
 
+      # Is the object's size changable? Only returns true for arrays and hashes
+      # currently.
+      #
+      # @example Is the object resizable?
+      #   object.resizable?
+      #
+      # @return [ false ] false.
+      #
+      # @since 3.0.0
       def resizable?
         false
       end
@@ -110,8 +135,20 @@ module Mongoid
 
       module ClassMethods
 
+        # Convert the provided object to a foreign key, given the metadata key
+        # contstraint.
+        #
+        # @example Convert the object to a fk.
+        #   Object.__mongoize_fk__(constraint, object)
+        #
+        # @param [ Constraint ] constraint The constraint.
+        # @param [ Object ] object The object to convert.
+        #
+        # @return [ Object ] The converted object.
+        #
+        # @since 3.0.0
         def __mongoize_fk__(constraint, object)
-          object ? constraint.convert(object) : nil
+          object.blank? ? nil : constraint.convert(object)
         end
 
         # Convert the object from it's mongo friendly ruby type to this type.

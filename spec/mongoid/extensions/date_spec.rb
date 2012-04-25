@@ -44,20 +44,34 @@ describe Mongoid::Extensions::Date do
 
     context "when provided a string" do
 
-      let(:date) do
-        Date.parse("1st Jan 2010")
+      context "when the string is a valid date" do
+
+        let(:date) do
+          Date.parse("1st Jan 2010")
+        end
+
+        let(:evolved) do
+          Date.mongoize(date.to_s)
+        end
+
+        let(:expected) do
+          Time.utc(2010, 1, 1, 0, 0, 0, 0)
+        end
+
+        it "returns the string as a time" do
+          evolved.should eq(expected)
+        end
       end
 
-      let(:evolved) do
-        Date.mongoize(date.to_s)
-      end
+      context "when the string is empty" do
 
-      let(:expected) do
-        Time.utc(2010, 1, 1, 0, 0, 0, 0)
-      end
+        let(:evolved) do
+          Date.mongoize("")
+        end
 
-      it "returns the string as a time" do
-        evolved.should eq(expected)
+        it "returns nil" do
+          evolved.should be_nil
+        end
       end
     end
 

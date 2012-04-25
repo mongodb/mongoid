@@ -56,7 +56,7 @@ module Mongoid
       end
 
       def mongoize(object)
-        if type == Array || object_id_field?
+        if type.resizable? || object_id_field?
           type.__mongoize_fk__(constraint, object)
         else
           metadata.klass.fields["_id"].mongoize(object)

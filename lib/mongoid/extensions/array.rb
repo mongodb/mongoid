@@ -68,6 +68,10 @@ module Mongoid
         def mongoize(object)
           evolve(object)
         end
+
+        def resizable?
+          true
+        end
       end
     end
   end

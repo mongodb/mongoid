@@ -49,7 +49,7 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
-          if object
+          unless object.blank?
             time = object.__mongoize_time__
             ::Time.utc(time.year, time.month, time.day)
           end

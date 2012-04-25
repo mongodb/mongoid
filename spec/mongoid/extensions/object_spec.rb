@@ -2,6 +2,112 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Object do
 
+  describe "#__evolve_object_id__" do
+
+    let(:object) do
+      Object.new
+    end
+
+    it "returns self" do
+      object.__evolve_object_id__.should eq(object)
+    end
+  end
+
+  describe ".__mongoize_fk__" do
+
+    context "when the related model uses object ids" do
+
+      let(:metadata) do
+        Game.relations["person"]
+      end
+
+      let(:constraint) do
+        metadata.constraint
+      end
+
+      context "when provided an object id" do
+
+        let(:object_id) do
+          BSON::ObjectId.new
+        end
+
+        let(:fk) do
+          Object.__mongoize_fk__(constraint, object_id)
+        end
+
+        it "returns the object id" do
+          fk.should eq(object_id)
+        end
+      end
+
+      context "when provided a string" do
+
+        context "when the string is a legal object id" do
+
+          let(:object_id) do
+            BSON::ObjectId.new
+          end
+
+          let(:fk) do
+            Object.__mongoize_fk__(constraint, object_id.to_s)
+          end
+
+          it "returns the object id" do
+            fk.should eq(object_id)
+          end
+        end
+
+        context "when the string is not a legal object id" do
+
+          let(:string) do
+            "blah"
+          end
+
+          let(:fk) do
+            Object.__mongoize_fk__(constraint, string)
+          end
+
+          it "returns the string" do
+            fk.should eq(string)
+          end
+        end
+
+        context "when the string is blank" do
+
+          let(:fk) do
+            Object.__mongoize_fk__(constraint, "")
+          end
+
+          it "returns nil" do
+            fk.should be_nil
+          end
+        end
+      end
+
+      context "when provided nil" do
+
+        let(:fk) do
+          Object.__mongoize_fk__(constraint, nil)
+        end
+
+        it "returns nil" do
+          fk.should be_nil
+        end
+      end
+    end
+  end
+
+  describe "#__mongoize_time__" do
+
+    let(:object) do
+      Object.new
+    end
+
+    it "returns self" do
+      object.__mongoize_time__.should eq(object)
+    end
+  end
+
   describe ".demongoize" do
 
     let(:object) do
@@ -71,6 +177,13 @@ describe Mongoid::Extensions::Object do
 
     it "returns the object" do
       object.mongoize.should eq(object)
+    end
+  end
+
+  describe "#resizable?" do
+
+    it "returns false" do
+      Object.new.should_not be_resizable
     end
   end
 
