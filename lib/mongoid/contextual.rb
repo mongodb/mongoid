@@ -8,15 +8,15 @@ module Mongoid
 
     # The aggregate operations provided in the aggregate module get delegated
     # through to the context from the criteria.
-    delegate *Aggregable::Mongo.public_instance_methods(false), to: :context
+    delegate(*Aggregable::Mongo.public_instance_methods(false), to: :context)
 
     # The atomic operations provided in the atomic context get delegated
     # through to the context from the criteria.
-    delegate *Atomic.public_instance_methods(false), to: :context
+    delegate(*Atomic.public_instance_methods(false), to: :context)
 
     # The methods in the contexts themselves should all get delegated to,
     # including destructive, modification, and optional methods.
-    delegate *(Mongo.public_instance_methods(false) - [ :skip, :limit ]), to: :context
+    delegate(*(Mongo.public_instance_methods(false) - [ :skip, :limit ]), to: :context)
 
     # Get the context in which criteria queries should execute. This is either
     # in memory (for embedded documents) or mongo (for root level documents.)
