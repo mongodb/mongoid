@@ -14,8 +14,11 @@ module Mongoid
       #
       # @return [ true, false ] If the values match.
       def matches?(value)
+        first = first(value)
+        return false if first.is_a?(Array) && first.empty?
+
         attribute_array = Array.wrap(@attribute)
-        first(value).all? do |e|
+        first.all? do |e|
           attribute_array.any? { |_attribute| e === _attribute }
         end
       end
