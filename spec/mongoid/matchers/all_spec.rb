@@ -21,5 +21,11 @@ describe Mongoid::Matchers::All do
         matcher.matches?("$all" => ["second", "third", "fourth"]).should be_false
       end
     end
+
+    context "when the value is empty" do
+      it "returns false" do
+        matcher.matches?("$all" => []).should be_false
+      end
+    end
   end
 end
