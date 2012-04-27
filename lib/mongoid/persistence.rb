@@ -168,10 +168,13 @@ module Mongoid
     #
     def touch
       if is_a?(Mongoid::Timestamps::Updated)
+        self.updated_at = Time.now.utc
+        remove_change(:updated_at)
         collection.find(self.atomic_selector).update(
-          {'$set' => { updated_at: Time.now.utc}}
+          { '$set' => { updated_at: self.updated_at } }
         )
       end
+      cascade_touch!
       true
     end
 

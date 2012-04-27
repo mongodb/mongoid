@@ -626,16 +626,32 @@ describe Mongoid::Persistence do
 
     context "with a document include Mongoid::Timestamps::Updated" do
       let(:updated_at) { 2.days.ago }
-      let(:agent) { Agent.create(:updated_at => updated_at) }
-      before { agent.touch }
+      let(:agent) {
+        a = Agent.create
+        a.updated_at = updated_at # can't mass_assign because protection
+        a
+      }
+      let(:touch) { agent.touch }
       let(:agent_updated_at) { Agent.find(agent.id).updated_at }
 
       it 'should update updated_at field' do
+        touch
         agent_updated_at.should_not be_within(1).of(updated_at)
       end
 
       it 'should define updated_at field to now' do
+        touch
         agent_updated_at.should be_within(1).of(Time.now.utc)
+      end
+
+      it 'should update document updated_at' do
+        touch
+        agent.updated_at.should be_within(1).of(Time.now.utc)
+      end
+
+      it 'should not mark updated_at field changed' do
+        touch
+        agent.changed?.should be_false
       end
 
     end
