@@ -2,6 +2,64 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Date do
 
+  describe "__mongoize_time__" do
+
+    context "when using active support's time zone" do
+
+      before do
+        Mongoid.use_activesupport_time_zone = true
+        ::Time.zone = "Tokyo"
+      end
+
+      after do
+        ::Time.zone = "Berlin"
+      end
+
+      let(:date) do
+        Date.new(2010, 1, 1)
+      end
+
+      let(:expected) do
+        ::Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+      end
+
+      let(:mongoized) do
+        date.__mongoize_time__
+      end
+
+      it "returns the date as a local time" do
+        mongoized.should eq(expected)
+      end
+    end
+
+    context "when not using active support's time zone" do
+
+      before do
+        Mongoid.use_activesupport_time_zone = false
+      end
+
+      after do
+        Mongoid.use_activesupport_time_zone = true
+      end
+
+      let(:date) do
+        Date.new(2010, 1, 1)
+      end
+
+      let(:expected) do
+        ::Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+      end
+
+      let(:mongoized) do
+        date.__mongoize_time__
+      end
+
+      it "returns the date as a local time" do
+        mongoized.should eq(expected)
+      end
+    end
+  end
+
   describe ".demongoize" do
 
     let(:time) do

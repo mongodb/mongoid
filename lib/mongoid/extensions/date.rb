@@ -3,6 +3,14 @@ module Mongoid
   module Extensions
     module Date
 
+      # Convert the date into a time.
+      #
+      # @example Convert the date to a time.
+      #   date.__mongoize_time__
+      #
+      # @return [ Time ] The converted time.
+      #
+      # @since 3.0.0
       def __mongoize_time__
         time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
         time.local(year, month, day)
