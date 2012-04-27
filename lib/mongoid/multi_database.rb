@@ -26,6 +26,11 @@ module Mongoid #:nodoc:
       def set_database(name)
         @database = name.to_s
       end
+
+      def inherited(subclass)
+        super
+        subclass.set_database(database.dup) if database
+      end
     end
   end
 end
