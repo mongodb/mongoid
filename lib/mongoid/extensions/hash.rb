@@ -3,6 +3,14 @@ module Mongoid
   module Extensions
     module Hash
 
+      # Evolves each value in the hash to an object id if it is convertable.
+      #
+      # @example Convert the hash values.
+      #   { field: id }.__evolve_object_id__
+      #
+      # @return [ Hash ] The converted hash.
+      #
+      # @since 3.0.0
       def __evolve_object_id__
         update_values(&:__evolve_object_id__)
       end
@@ -33,6 +41,14 @@ module Mongoid
         ::Hash.mongoize(self)
       end
 
+      # Can the size of this object change?
+      #
+      # @example Is the hash resizable?
+      #   {}.resizable?
+      #
+      # @return [ true ] true.
+      #
+      # @since 3.0.0
       def resizable?
         true
       end
@@ -52,6 +68,18 @@ module Mongoid
         # @since 3.0.0
         def mongoize(object)
           evolve(object).update_values { |value| value.mongoize }
+        end
+
+        # Can the size of this object change?
+        #
+        # @example Is the hash resizable?
+        #   {}.resizable?
+        #
+        # @return [ true ] true.
+        #
+        # @since 3.0.0
+        def resizable?
+          true
         end
       end
     end

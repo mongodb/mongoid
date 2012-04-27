@@ -2,6 +2,25 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Hash do
 
+  describe "#__evolve_object_id__" do
+
+    let(:object_id) do
+      BSON::ObjectId.new
+    end
+
+    let(:hash) do
+      { field: object_id.to_s }
+    end
+
+    let(:evolved) do
+      hash.__evolve_object_id__
+    end
+
+    it "converts each value in the hash" do
+      evolved[:field].should eq(object_id)
+    end
+  end
+
   describe ".demongoize" do
 
     let(:hash) do
@@ -56,6 +75,20 @@ describe Mongoid::Extensions::Hash do
 
     it "converts the elements properly" do
       mongoized[:date].should eq(date)
+    end
+  end
+
+  describe "#resizable?" do
+
+    it "returns true" do
+      {}.should be_resizable
+    end
+  end
+
+  describe ".resizable?" do
+
+    it "returns true" do
+      Hash.should be_resizable
     end
   end
 end
