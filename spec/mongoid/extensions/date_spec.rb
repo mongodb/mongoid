@@ -8,11 +8,11 @@ describe Mongoid::Extensions::Date do
 
       before do
         Mongoid.use_activesupport_time_zone = true
-        ::Time.zone = "Tokyo"
+        Time.zone = "Tokyo"
       end
 
       after do
-        ::Time.zone = "Berlin"
+        Time.zone = "Berlin"
       end
 
       let(:date) do
@@ -20,7 +20,7 @@ describe Mongoid::Extensions::Date do
       end
 
       let(:expected) do
-        ::Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+        Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
       end
 
       let(:mongoized) do
@@ -40,6 +40,7 @@ describe Mongoid::Extensions::Date do
 
       after do
         Mongoid.use_activesupport_time_zone = true
+        Time.zone = nil
       end
 
       let(:date) do
@@ -47,7 +48,7 @@ describe Mongoid::Extensions::Date do
       end
 
       let(:expected) do
-        ::Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+        Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
       end
 
       let(:mongoized) do
