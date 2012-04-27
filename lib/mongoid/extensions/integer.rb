@@ -3,6 +3,14 @@ module Mongoid
   module Extensions
     module Integer
 
+      # Returns the integer as a time.
+      #
+      # @example Convert the integer to a time.
+      #   1335532685.__mongoize_time__
+      #
+      # @return [ Time ] The converted time.
+      #
+      # @since 3.0.0
       def __mongoize_time__
         ::Time.at(self)
       end

@@ -6,6 +6,21 @@ describe Mongoid::Extensions::Integer do
     118347652312341
   end
 
+  describe "#__mongoize_time__" do
+
+    let(:integer) do
+      1335532685
+    end
+
+    let(:mongoized) do
+      integer.__mongoize_time__
+    end
+
+    it "returns the float as a time" do
+      mongoized.should eq(Time.at(integer))
+    end
+  end
+
   describe ".demongoize" do
 
     context "when the the value is an integer" do
