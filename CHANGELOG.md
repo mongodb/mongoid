@@ -649,6 +649,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1952/#1950 `#all_in` behaviour on embedded documents now properly matches
+  root documents when passing an empty array. (Hans Hasselberg)
+
 * \#1941/#1939 `Model.find_by` now returns nil if raise not found error is
   set to false. (Hans Hasselberg)
 
