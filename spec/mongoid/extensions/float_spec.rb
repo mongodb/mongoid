@@ -6,6 +6,21 @@ describe Mongoid::Extensions::Float do
     118.345
   end
 
+  describe "#__mongoize_time__" do
+
+    let(:float) do
+      1335532685.117847
+    end
+
+    let(:mongoized) do
+      float.__mongoize_time__
+    end
+
+    it "returns the float as a time" do
+      mongoized.should eq(Time.at(float))
+    end
+  end
+
   describe ".demongoize" do
 
     context "when the the value is an float" do

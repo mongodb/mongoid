@@ -3,6 +3,14 @@ module Mongoid
   module Extensions
     module Float
 
+      # Convert the float into a time.
+      #
+      # @example Convert the float into a time.
+      #   1335532685.117847.__mongoize_time__
+      #
+      # @return [ Time ] The float as a time.
+      #
+      # @since 3.0.0
       def __mongoize_time__
         ::Time.at(self)
       end
