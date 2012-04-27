@@ -63,17 +63,13 @@ namespace :db do
   namespace :mongoid do
     # gets a list of the mongoid models defined in the app/models directory
     def get_mongoid_models
-    # try to agressively load the app for Rails 3 or 2
+    # try to agressively load the app (including models in engines, etc)
     # 
       if defined?(Rails) && Rails.respond_to?(:application)
         Rails.application.eager_load!
-      elsif defined?(Rails::Initializer)
-        # Rails 2.3
-        $rails_rake_task = false
-        Rails::Initializer.run(:load_application_classes)
       end
       
-    # look hard for document classes in object_space and in app/models/
+    # look hard for document classes in object_space and/or app/models/
     #
       klasses = []
       
