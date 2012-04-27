@@ -164,14 +164,18 @@ module Mongoid
     end
     alias :save :upsert
 
-    # change the updated_at field to now
+    # change the field pass like args to now. By default
+    # it's the updated_at field
     #
-    def touch
-      if is_a?(Mongoid::Timestamps::Updated)
-        self.updated_at = Time.now.utc
-        remove_change(:updated_at)
+    # @params [ Symbol ] field field to update to now
+    # @return [ Boolean ] true if done
+    #
+    def touch(field=:updated_at)
+      if fields.has_key?(field.to_s)
+        update_attribute(field, Time.now.utc)
+        remove_change(field)
         collection.find(self.atomic_selector).update(
-          { '$set' => { updated_at: self.updated_at } }
+          { '$set' => { field => read_attribute(field) } }
         )
       end
       cascade_touch!
