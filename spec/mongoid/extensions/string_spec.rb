@@ -114,6 +114,37 @@ describe Mongoid::Extensions::String do
     end
   end
 
+  describe "#numeric?" do
+
+    context "when the string is an integer" do
+
+      it "returns true" do
+        "1234".should be_numeric
+      end
+    end
+
+    context "when string is a float" do
+
+      it "returns true" do
+        "1234.123".should be_numeric
+      end
+    end
+
+    context "when the string is has exponents" do
+
+      it "returns true" do
+        "1234.123123E4".should be_numeric
+      end
+    end
+
+    context "when the string is non numeric" do
+
+      it "returns false" do
+        "blah".should_not be_numeric
+      end
+    end
+  end
+
   describe "#singularize" do
 
     context "when string is address" do

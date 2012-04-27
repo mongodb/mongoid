@@ -3,6 +3,7 @@ module Mongoid
   module Extensions
     module String
 
+      # @attribute [rw] unconvertable_to_bson If the document is unconvetable.
       attr_accessor :unconvertable_to_bson
 
       ActiveSupport::Inflector.inflections do |inflect|
@@ -43,6 +44,14 @@ module Mongoid
         self =~ /^(|_)id$/
       end
 
+      # Is the string a number?
+      #
+      # @example Is the string a number.
+      #   "1234.23".numeric?
+      #
+      # @return [ true, false ] If the string is a number.
+      #
+      # @since 3.0.0
       def numeric?
         true if Float(self) rescue false
       end
