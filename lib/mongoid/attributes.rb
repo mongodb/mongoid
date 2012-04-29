@@ -26,7 +26,7 @@ module Mongoid
     # @since 1.0.0
     def attribute_present?(name)
       attribute = read_attribute(name)
-      ! attribute.blank? || attribute == false
+      !attribute.blank? || attribute == false
     end
 
     # Does the document have the provided attribute?
