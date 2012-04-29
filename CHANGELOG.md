@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1957/\#1954 Ensure database name is set with inheritance.
+  (Hans Hasselberg)
+
 ## 2.4.9
 
 ### Resolved Issues
