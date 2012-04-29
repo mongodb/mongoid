@@ -172,7 +172,24 @@ describe Mongoid::Extensions::Date do
       end
     end
 
-    pending "when provided an array"
+    context "when provided an array" do
+
+      let(:time) do
+        Time.utc(2010, 1, 1, 0, 0, 0, 0)
+      end
+
+      let(:array) do
+        [ 2010, 1, 1, 0, 0, 0, 0 ]
+      end
+
+      let(:evolved) do
+        Date.mongoize(array)
+      end
+
+      it "returns the array as a time" do
+        evolved.should eq(time)
+      end
+    end
 
     context "when provided nil" do
 
