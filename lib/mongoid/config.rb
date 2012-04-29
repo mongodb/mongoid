@@ -22,7 +22,6 @@ module Mongoid
     option :raise_not_found_error, default: true
     option :scope_overwrite_exception, default: false
     option :skip_version_check, default: false
-    option :time_zone, default: nil
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
 
@@ -134,6 +133,18 @@ module Mongoid
       Validators::Session.validate(sess)
       @sessions = sess
       sess
+    end
+
+    # Get the time zone to use.
+    #
+    # @example Get the time zone.
+    #   Config.time_zone
+    #
+    # @return [ String ] The time zone.
+    #
+    # @since 3.0.0
+    def time_zone
+      use_utc? ? "UTC" : ::Time.zone
     end
 
     private

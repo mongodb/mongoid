@@ -45,8 +45,7 @@ module Mongoid
           return nil if object.blank?
           object = object.getlocal unless Mongoid::Config.use_utc?
           if Mongoid::Config.use_activesupport_time_zone?
-            time_zone = Mongoid::Config.use_utc? ? "UTC" : ::Time.zone
-            object = object.in_time_zone(time_zone)
+            object = object.in_time_zone(Mongoid.time_zone)
           end
           object
         end
