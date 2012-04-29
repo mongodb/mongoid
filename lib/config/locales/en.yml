@@ -1,6 +1,11 @@
 en:
   mongoid:
     inspection:
+      criteria: "#<Mongoid::Criteria\n
+        \_\_selector: %{selector},\n
+        \_\_options:  %{options},\n
+        \_\_class:    %{klass},\n
+        \_\_embedded: %{embedded}>\n"
       metadata: "#<Mongoid::Relations::Metadata\n
         \_\_autobuild:    %{autobuild},\n
         \_\_class_name:   %{class_name},\n

@@ -10,12 +10,18 @@ module Mongoid
       #   criteria.inspect
       #
       # @return [ String ] The inspection string.
+      #
+      # @since 1.0.0
       def inspect
-        "#<Mongoid::Criteria\n" <<
-        "  selector: #{selector.inspect},\n" <<
-        "  options:  #{options.inspect},\n" <<
-        "  class:    #{klass},\n" <<
-        "  embedded: #{embedded}>\n"
+        ::I18n.translate(
+          "mongoid.inspection.criteria",
+          {
+            selector: selector.inspect,
+            options: options.inspect,
+            klass: klass,
+            embedded: embedded?
+          }
+        )
       end
     end
   end
