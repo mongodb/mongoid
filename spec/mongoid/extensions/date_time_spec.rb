@@ -12,7 +12,7 @@ describe Mongoid::Extensions::DateTime do
       end
 
       after do
-        Time.zone = "Berlin"
+        Time.zone = nil
       end
 
       let(:date_time) do
@@ -48,14 +48,14 @@ describe Mongoid::Extensions::DateTime do
       end
 
       let(:expected) do
-        Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+        Time.local(2010, 1, 1, 0, 0, 0, 0)
       end
 
       let(:mongoized) do
         date_time.__mongoize_time__
       end
 
-      it "returns the date as a local time" do
+      it "returns the date as a utc time" do
         mongoized.should eq(expected)
       end
     end

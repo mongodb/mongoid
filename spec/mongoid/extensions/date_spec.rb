@@ -12,7 +12,7 @@ describe Mongoid::Extensions::Date do
       end
 
       after do
-        Time.zone = "Berlin"
+        Time.zone = nil
       end
 
       let(:date) do
@@ -48,7 +48,7 @@ describe Mongoid::Extensions::Date do
       end
 
       let(:expected) do
-        Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+        Time.local(2010, 1, 1, 0, 0, 0, 0)
       end
 
       let(:mongoized) do
