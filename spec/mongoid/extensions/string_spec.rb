@@ -2,6 +2,93 @@ require "spec_helper"
 
 describe Mongoid::Extensions::String do
 
+  describe "#__evolve_object_id__" do
+
+    context "when the string is blank" do
+
+      it "returns nil" do
+        "".__evolve_object_id__.should be_nil
+      end
+    end
+
+    context "when the string is a legal object id" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      it "returns the object id" do
+        object_id.to_s.__evolve_object_id__.should eq(object_id)
+      end
+    end
+
+    context "when the string is not a legal object id" do
+
+      let(:string) do
+        "testing"
+      end
+
+      it "returns the string" do
+        string.__evolve_object_id__.should eq(string)
+      end
+    end
+  end
+
+  describe "#__mongoize_time__" do
+
+    context "when using active support's time zone" do
+
+      before do
+        Mongoid.use_activesupport_time_zone = true
+        ::Time.zone = "Tokyo"
+      end
+
+      after do
+        ::Time.zone = "Berlin"
+      end
+
+      let(:string) do
+        "2010-11-19 00:24:49 +0900"
+      end
+
+      let(:time) do
+        string.__mongoize_time__
+      end
+
+      it "converts to a time" do
+        time.should eq(Time.parse(string))
+      end
+
+      it "converts to the as time zone" do
+        time.zone.should eq("JST")
+      end
+    end
+
+    context "when not using active support's time zone" do
+
+      before do
+        Mongoid.use_activesupport_time_zone = false
+      end
+
+      after do
+        Mongoid.use_activesupport_time_zone = true
+        Time.zone = nil
+      end
+
+      let(:string) do
+        "2010-11-19 00:24:49 +0900"
+      end
+
+      let(:time) do
+        string.__mongoize_time__
+      end
+
+      it "converts to a time" do
+        time.should eq(Time.parse(string))
+      end
+    end
+  end
+
   describe "#collectionize" do
 
     context "when class is namepaced" do

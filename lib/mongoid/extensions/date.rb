@@ -12,8 +12,7 @@ module Mongoid
       #
       # @since 3.0.0
       def __mongoize_time__
-        time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
-        time.local(year, month, day)
+        ::Time.configured.local(year, month, day)
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly

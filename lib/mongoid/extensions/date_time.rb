@@ -3,10 +3,17 @@ module Mongoid
   module Extensions
     module DateTime
 
+      # Mongoize the date time into a time.
+      #
+      # @example Mongoize the date time.
+      #   date_time.__mongoize_time__
+      #
+      # @return [ Time ] The mongoized time.
+      #
+      # @since 3.0.0
       def __mongoize_time__
-        time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
         return self if utc? && Mongoid.use_utc?
-        time.local(year, month, day, hour, min, sec)
+        ::Time.configured.local(year, month, day, hour, min, sec)
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly

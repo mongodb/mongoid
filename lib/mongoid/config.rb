@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/config/environment"
+require "mongoid/config/inflections"
 require "mongoid/config/options"
 require "mongoid/config/validators"
 

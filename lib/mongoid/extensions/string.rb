@@ -6,20 +6,30 @@ module Mongoid
       # @attribute [rw] unconvertable_to_bson If the document is unconvetable.
       attr_accessor :unconvertable_to_bson
 
-      ActiveSupport::Inflector.inflections do |inflect|
-        inflect.singular(/address$/, "address")
-        inflect.singular("addresses", "address")
-        inflect.irregular("canvas", "canvases")
-      end
-
+      # Evolve the string into an object id if possible.
+      #
+      # @example Evolve the string.
+      #   "test".__evolve_object_id__
+      #
+      # @return [ String, Moped::BSON::ObjectId, nil ] The evolved string.
+      #
+      # @since 3.0.0
       def __evolve_object_id__
-        return nil if blank?
-        BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
+        unless blank?
+          BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
+        end
       end
 
+      # Mongoize the string for storage.
+      #
+      # @example Mongoize the string.
+      #   "2012-01-01".__mongoize_time__
+      #
+      # @return [ Time ] The time.
+      #
+      # @since 3.0.0
       def __mongoize_time__
-        time = Mongoid::Config.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
-        time.parse(self)
+        ::Time.configured.parse(self)
       end
 
       # Convert the string to a collection friendly name.
@@ -28,6 +38,8 @@ module Mongoid
       #   "namespace/model".collectionize
       #
       # @return [ String ] The string in collection friendly form.
+      #
+      # @since 1.0.0
       def collectionize
         tableize.gsub("/", "_")
       end
@@ -62,6 +74,8 @@ module Mongoid
       #   "model=".reader
       #
       # @return [ String ] The string stripped of "=".
+      #
+      # @since 1.0.0
       def reader
         delete("=")
       end
@@ -84,6 +98,8 @@ module Mongoid
       #   "model=".writer?
       #
       # @return [ true, false ] If the string contains "=".
+      #
+      # @since 1.0.0
       def writer?
         include?("=")
       end
