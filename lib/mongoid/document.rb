@@ -17,6 +17,8 @@ module Mongoid
     # @param [ Document ] other The document to compare with.
     #
     # @return [ Integer ] -1, 0, 1.
+    #
+    # @since 1.0.0
     def <=>(other)
       attributes["_id"].to_s <=> other.attributes["_id"].to_s
     end
@@ -30,6 +32,8 @@ module Mongoid
     # @param [ Document, Object ] other The other object to compare with.
     #
     # @return [ true, false ] True if the ids are equal, false if not.
+    #
+    # @since 1.0.0
     def ==(other)
       self.class == other.class &&
         attributes["_id"] == other.attributes["_id"]
@@ -43,6 +47,8 @@ module Mongoid
     # @param [ Document, Object ] other The other object to compare with.
     #
     # @return [ true, false ] True if the classes are equal, false if not.
+    #
+    # @since 1.0.0
     def ===(other)
       other.class == Class ? self.class === other : self == other
     end
@@ -55,6 +61,8 @@ module Mongoid
     # @param [ Document, Object ] other The object to check against.
     #
     # @return [ true, false ] True if equal, false if not.
+    #
+    # @since 1.0.0
     def eql?(other)
       self == (other)
     end
@@ -93,6 +101,8 @@ module Mongoid
     #   document.hash
     #
     # @return [ Integer ] The hash of the document's identity.
+    #
+    # @since 1.0.0
     def hash
       identity.hash
     end
@@ -106,8 +116,9 @@ module Mongoid
     #
     # @return [ Array ] An array containing [document.class, document.id]
     #
+    # @since 3.0.0
     def identity
-      [self.class, self.id]
+      [ self.class, self.id ]
     end
 
     # Instantiate a new +Document+, setting the Document's attributes if
@@ -125,6 +136,8 @@ module Mongoid
     #   :as and :without_protection
     #
     # @return [ Document ] A new document.
+    #
+    # @since 1.0.0
     def initialize(attrs = nil, options = nil)
       _building do
         @new_record = true
@@ -157,6 +170,8 @@ module Mongoid
     #   document.to_a
     #
     # @return [ Array<Document> ] An array with the document as its only item.
+    #
+    # @since 1.0.0
     def to_a
       [ self ]
     end
@@ -169,6 +184,8 @@ module Mongoid
     #   person.as_document
     #
     # @return [ Hash ] A hash of all attributes in the hierarchy.
+    #
+    # @since 1.0.0
     def as_document
       return attributes if frozen?
       embedded_relations.each_pair do |name, meta|
@@ -191,6 +208,8 @@ module Mongoid
     # @param [ Class ] klass The class to become.
     #
     # @return [ Document ] An instance of the specified class.
+    #
+    # @since 2.0.0
     def becomes(klass)
       unless klass.include?(Mongoid::Document)
         raise ArgumentError, "A class which includes Mongoid::Document is expected"
@@ -284,6 +303,8 @@ module Mongoid
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
       #
       # @return [ Document ] A new document.
+      #
+      # @since 1.0.0
       def instantiate(attrs = nil)
         attributes = attrs || {}
         doc = allocate
@@ -300,13 +321,17 @@ module Mongoid
       #   document._types
       #
       # @return [ Array<Class> ] All subclasses of the current document.
+      #
+      # @since 1.0.0
       def _types
-        @_type ||= (descendants + [self]).uniq.map { |t| t.to_s }
+        @_type ||= (descendants + [ self ]).uniq.map { |t| t.to_s }
       end
 
       # Set the i18n scope to overwrite ActiveModel.
       #
       # @return [ Symbol ] :mongoid
+      #
+      # @since 2.0.0
       def i18n_scope
         :mongoid
       end
