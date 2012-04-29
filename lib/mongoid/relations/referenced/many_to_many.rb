@@ -27,8 +27,7 @@ module Mongoid
         def <<(*args)
           batched do
             ids = []
-            args.flatten.each do |doc|
-              next unless doc
+            args.flatten.compact.each do |doc|
               append(doc)
               if persistable? || _creating?
                 ids.push(doc.id)
