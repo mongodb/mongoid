@@ -31,14 +31,10 @@ module Mongoid
             docs.map{ |doc| append(doc) }
             if persistable? || _creating?
               docs.map(&:save)
+              base.push_all(metadata.foreign_key, docs.map(&:_id))
+              base.synced[metadata.foreign_key] = false
             else
               base.send(metadata.foreign_key).push(*docs.map(&:_id))
-              base.synced[metadata.foreign_key] = false
-            end
-            if persistable? || _creating?
-              ids = []
-              ids = args.flatten.compact.map(&:_id)
-              base.push_all(metadata.foreign_key, ids)
               base.synced[metadata.foreign_key] = false
             end
           end
