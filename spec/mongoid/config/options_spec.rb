@@ -15,25 +15,6 @@ describe Mongoid::Config::Options do
 
   describe "#option" do
 
-    context "when no default is provided" do
-
-      after do
-        config.time_zone = nil
-      end
-
-      it "defines a getter" do
-        config.time_zone.should be_nil
-      end
-
-      it "defines a setter" do
-        (config.time_zone = "Berlin").should eq("Berlin")
-      end
-
-      it "defines a presence check" do
-        config.should_not be_time_zone
-      end
-    end
-
     context "when a default is provided" do
 
       after do
