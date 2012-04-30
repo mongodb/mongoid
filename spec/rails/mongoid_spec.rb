@@ -424,5 +424,27 @@ describe "Rails::Mongoid" do
         Rails::Mongoid.load_models(app)
       end
     end
+
+    context "when list of models to load was configured" do
+
+      let(:files) do
+        [
+          "/rails/root/app/models/user.rb",
+          "/rails/root/app/models/address.rb"
+        ]
+      end
+
+      before(:all) do
+        Mongoid.preload_models = ["user"]
+        Dir.stubs(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+      end
+
+      it "loads selected models only" do
+        Rails::Mongoid.expects(:load_model).with("user")
+        Rails::Mongoid.expects(:load_model).with("address").never
+        Rails::Mongoid.load_models(app)
+      end
+    end
+
   end
 end

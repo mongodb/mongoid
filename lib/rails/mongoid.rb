@@ -82,7 +82,13 @@ module Rails
     # @param [ Application ] app The rails application.
     def load_models(app)
       app.config.paths["app/models"].each do |path|
-        Dir.glob("#{path}/**/*.rb").sort.each do |file|
+        files = if ::Mongoid.preload_models.is_a? Array
+                  ::Mongoid.preload_models.map { |model| "#{path}/#{model}.rb" }
+                else
+                  Dir.glob("#{path}/**/*.rb")
+                end
+
+        files.sort.each do |file|
           load_model(file.gsub("#{path}/" , "").gsub(".rb", ""))
         end
       end
