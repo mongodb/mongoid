@@ -82,5 +82,9 @@ describe Mongoid::Config::Environment do
     it 'return an Hash if env unknow' do
       described_class.load_yaml(file, :unknown).should == {}
     end
+
+    it 'return a with indifferent_access' do
+      described_class.load_yaml(file, :test).should be_a(HashWithIndifferentAccess)
+    end
   end
 end
