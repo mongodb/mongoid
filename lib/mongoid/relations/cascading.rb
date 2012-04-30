@@ -48,7 +48,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def cascade(metadata)
-          self.cascades += [ metadata.name.to_s ] if metadata.dependent?
+          cascades.push(metadata.name.to_s) if metadata.dependent?
           self
         end
       end
