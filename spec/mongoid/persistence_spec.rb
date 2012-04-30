@@ -624,71 +624,118 @@ describe Mongoid::Persistence do
 
   describe "#touch" do
 
-    context "with a document with updated_at field" do
-      let(:updated_at) { 2.days.ago }
-      let(:agent) {
-        a = Agent.create
-        a.updated_at = updated_at # can't mass_assign because protection
-        a
-      }
-      let(:touch) { agent.touch }
-      let(:agent_updated_at) { Agent.find(agent.id).updated_at }
+    context "when no relations have touch options" do
 
-      it 'should update updated_at field' do
-        touch
-        agent_updated_at.should_not be_within(1).of(updated_at)
-      end
+      context "when no updated at is defined" do
 
-      it 'should define updated_at field to now' do
-        touch
-        agent_updated_at.should be_within(1).of(Time.now.utc)
-      end
-
-      it 'should update document updated_at' do
-        touch
-        agent.updated_at.should be_within(1).of(Time.now.utc)
-      end
-
-      it 'should not mark updated_at field changed' do
-        touch
-        agent.changed?.should be_false
-      end
-
-    end
-
-    context "with a document without updated_at field" do
-      let(:person) { Person.create }
-      before { person.touch }
-      it 'should not update updated_at field' do
-        Person.collection.find({:_id => person.id}).first.keys.should_not include("updated_at")
-      end
-    end
-
-    context "with params pass to touch" do
-      context "with a document with field to touch" do
-        let(:person) { Person.create(:lunch_time => 1.day.ago ) }
-        let(:touch) { person.touch(:lunch_time) }
-        it 'should update and persist lunch_time' do
-          touch
-          Person.find(person.id).lunch_time.should be_within(1).of(Time.now.utc)
+        let(:person) do
+          Person.create
         end
-        it 'should update lunch_time in current_instance' do
-          touch
-          person.lunch_time.should be_within(1).of(Time.now.utc)
+
+        context "when no attribute is provided" do
+
+          let!(:touched) do
+            person.touch
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+
+          it "does not set the updated at field" do
+            person[:updated_at].should be_nil
+          end
+        end
+
+        context "when an attribute is provided" do
+
+          let!(:touched) do
+            person.touch(:lunch_time)
+          end
+
+          it "sets the attribute to the current time" do
+            person.lunch_time.should be_within(5).of(Time.now)
+          end
+
+          it "persists the change" do
+            person.reload.lunch_time.should be_within(5).of(Time.now)
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
         end
       end
 
-      context "with a document without field to touch" do
-        let(:person) { Person.create }
-        before { person.touch(:my_field) }
-        it 'should not update my)_field field' do
-          Person.collection.find({:_id => person.id}).first.keys.should_not include("my_field")
+      context "when an updated at is defined" do
+
+        let!(:agent) do
+          Agent.create(updated_at: 2.days.ago)
+        end
+
+        context "when no attribute is provided" do
+
+          let!(:touched) do
+            agent.touch
+          end
+
+          it "sets the updated at to the current time" do
+            agent.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "persists the change" do
+            agent.reload.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+
+          it "clears the dirty tracking" do
+            agent.changes.should be_empty
+          end
+        end
+
+        context "when an attribute is provided" do
+
+          let!(:touched) do
+            agent.touch(:dob)
+          end
+
+          it "sets the updated at to the current time" do
+            agent.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "sets the attribute to the current time" do
+            agent.dob.should be_within(5).of(Time.now)
+          end
+
+          it "sets both attributes to the exact same time" do
+            agent.updated_at.should eq(agent.dob)
+          end
+
+          it "persists the updated at change" do
+            agent.reload.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "persists the attribute change" do
+            agent.reload.dob.should be_within(5).of(Time.now)
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+
+          it "clears the dirty tracking" do
+            agent.changes.should be_empty
+          end
         end
       end
-
     end
 
+    pending "when relations have touch options" do
 
+    end
   end
 
   describe "#update_attribute" do

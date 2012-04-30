@@ -334,7 +334,6 @@ module Mongoid
           relate(name, meta)
           reference(meta)
           builder(name, meta).creator(name, meta).autosave(meta)
-          touch(meta)
           validates_relation(meta)
           meta
         end

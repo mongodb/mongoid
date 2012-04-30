@@ -25,7 +25,6 @@ require "mongoid/relations/reflections"
 require "mongoid/relations/synchronization"
 require "mongoid/relations/metadata"
 require "mongoid/relations/macros"
-require "mongoid/relations/touch"
 
 module Mongoid
 
@@ -43,7 +42,6 @@ module Mongoid
     include Polymorphic
     include Reflections
     include Synchronization
-    include Touch
 
     attr_accessor :metadata
 

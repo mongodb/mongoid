@@ -79,6 +79,14 @@ module Mongoid
       return true
     end
 
+    def touch(field = nil)
+      current = Time.now
+      write_attribute(:updated_at, current) if fields["updated_at"]
+      write_attribute(field, current) if field
+      collection.find(atomic_selector).update(atomic_updates)
+      move_changes and true
+    end
+
     # Update the document in the database.
     #
     # @example Update an existing document.
@@ -163,24 +171,6 @@ module Mongoid
       end
     end
     alias :save :upsert
-
-    # change the field pass like args to now. By default
-    # it's the updated_at field
-    #
-    # @params [ Symbol ] field field to update to now
-    # @return [ Boolean ] true if done
-    #
-    def touch(field=:updated_at)
-      if fields.has_key?(field.to_s)
-        update_attribute(field, Time.now.utc)
-        remove_change(field)
-        collection.find(self.atomic_selector).update(
-          { '$set' => { field => read_attribute(field) } }
-        )
-      end
-      cascade_touch!
-      true
-    end
 
     module ClassMethods #:nodoc:
 
