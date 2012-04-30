@@ -1748,8 +1748,10 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-  describe "touch?" do
-    context "with touch false" do
+  describe "touchable?" do
+
+    context "when touch is false" do
+
       let(:metadata) do
         described_class.new(
           name: :versions,
@@ -1758,11 +1760,13 @@ describe Mongoid::Relations::Metadata do
         )
       end
 
-      it 'should be false' do
-        metadata.touch?.should be_false
+      it "returns false" do
+        metadata.should_not be_touchable
       end
     end
-    context "with touch true" do
+
+    context "when touch is true" do
+
       let(:metadata) do
         described_class.new(
           name: :versions,
@@ -1771,11 +1775,13 @@ describe Mongoid::Relations::Metadata do
         )
       end
 
-      it 'should be true' do
-        metadata.touch?.should be_true
+      it "returns true" do
+        metadata.should be_touchable
       end
     end
-    context "with touch nil" do
+
+    context "when touch is nil" do
+
       let(:metadata) do
         described_class.new(
           name: :versions,
@@ -1783,8 +1789,8 @@ describe Mongoid::Relations::Metadata do
         )
       end
 
-      it 'should be false' do
-        metadata.touch?.should be_false
+      it "returns false" do
+        metadata.should_not be_touchable
       end
     end
   end

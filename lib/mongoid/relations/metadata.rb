@@ -820,12 +820,15 @@ module Mongoid
         !!order
       end
 
-      # This relation can be touch or not
+      # Is this relation touchable?
       #
-      # @return [ Boolean ] If the relation can be touch or not
+      # @example Is the relation touchable?
+      #   metadata.touchable?
+      #
+      # @return [ true, false ] If the relation can be touched.
       #
       # @since 3.0.0
-      def touch?
+      def touchable?
         !!self[:touch]
       end
 

@@ -7,6 +7,25 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1958/\#1798 Documents and `belongs_to` relations now support touch.
+
+        class Band
+          include Mongoid::Document
+          include Mongoid::Timestamps::Updated
+          belongs_to :label, touch: true
+        end
+
+    Update the document's updated_at timestamp to the current time. This
+    will also update any touchable relation's timestamp as well.
+
+        Band.first.touch
+
+    Update a specific time field along with the udpated_at.
+
+        Band.first.touch(:founded)
+
+    This fires no validations or callbacks.
+
 * Mongoid now supports MongoDB's $findAndModify command.
 
         Band.find_and_modify("$inc" => { likes: 1 })

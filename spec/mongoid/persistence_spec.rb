@@ -733,8 +733,46 @@ describe Mongoid::Persistence do
       end
     end
 
-    pending "when relations have touch options" do
+    context "when relations have touch options" do
 
+      let!(:agent) do
+        Agent.create
+      end
+
+      context "when the relation is nil" do
+
+        context "when the relation autobuilds" do
+
+          let!(:touched) do
+            agent.touch
+          end
+
+          it "does nothing to the relation" do
+            agent.instance_variable_get(:@agency).should be_nil
+          end
+        end
+      end
+
+      context "when the relation is not nil" do
+
+        let!(:agency) do
+          agent.create_agency.tap do |a|
+            a.unset(:updated_at)
+          end
+        end
+
+        let!(:touched) do
+          agent.touch
+        end
+
+        it "sets the parent updated at to the current time" do
+          agency.updated_at.should be_within(5).of(Time.now)
+        end
+
+        it "persists the change" do
+          agency.reload.updated_at.should be_within(5).of(Time.now)
+        end
+      end
     end
   end
 

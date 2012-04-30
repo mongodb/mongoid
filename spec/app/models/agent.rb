@@ -5,7 +5,8 @@ class Agent
   field :number, type: String
   field :dob, type: Time
   embeds_many :names, as: :namable
-  belongs_to :game, touch: true
+  belongs_to :game
+  belongs_to :agency, touch: true, autobuild: true
 
   has_and_belongs_to_many :accounts
 end

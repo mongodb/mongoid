@@ -139,6 +139,7 @@ module Mongoid
         def belongs_to(name, options = {}, &block)
           meta = reference_one_to_one(name, options, Referenced::In, &block)
           aliased_fields[name.to_s] = meta.foreign_key
+          touchable(meta)
           meta
         end
 
