@@ -96,22 +96,6 @@ module Mongoid
         root.collection unless root.embedded?
       end
 
-      # Return a new document for the type of class we want to instantiate.
-      # If the type is provided use that, otherwise the klass from the
-      # metadata.
-      #
-      # @example Get an instantiated document.
-      #   proxy.instantiated(Person)
-      #
-      # @param [ Class ] type The type of class to instantiate.
-      #
-      # @return [ Document ] The freshly created document.
-      #
-      # @since 2.0.0.rc.1
-      def instantiated(type = nil)
-        type ? type.new : metadata.klass.new
-      end
-
       # Takes the supplied document and sets the metadata on it.
       #
       # @example Set the metadata.
@@ -159,18 +143,6 @@ module Mongoid
       # @since 2.0.0.rc.6
       def raise_unsaved(doc)
         raise Errors::UnsavedDocument.new(base, doc)
-      end
-
-      # Get the class of the root document in the hierarchy.
-      #
-      # @example Get the root's class.
-      #   proxy.root_class
-      #
-      # @return [ Class ] The root class.
-      #
-      # @since 2.1.8
-      def root_class
-        @root_class ||= base._root.class
       end
 
       class << self

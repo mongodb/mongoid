@@ -137,10 +137,6 @@ module Mongoid
           (options[:pre_processed] || (default_val && !default_val.is_a?(::Proc)))
       end
 
-      def resizable?
-        @resizable ||= (type == Array)
-      end
-
       # Get the type of this field - inferred from the class name.
       #
       # @example Get the type.
