@@ -15,6 +15,17 @@ describe Mongoid::Finders do
     end
   end
 
+  describe ".find_and_modify" do
+
+    let!(:person) do
+      Person.create(title: "Senior")
+    end
+
+    it "returns the document" do
+      Person.find_and_modify(title: "Junior").should eq(person)
+    end
+  end
+
   describe ".find_or_create_by" do
 
     context "when the document is found" do

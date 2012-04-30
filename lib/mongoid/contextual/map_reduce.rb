@@ -3,21 +3,10 @@ module Mongoid
   module Contextual
     class MapReduce
       include Enumerable
+      include Command
 
       delegate :[], to: :results
       delegate :==, :empty?, :inspect, to: :entries
-
-      # The database command that is being built to send to the db.
-      #
-      # @example Get the command.
-      #   map_reduce.command
-      #
-      # @return [ Hash ] The db command.
-      #
-      # @since 3.0.0
-      def command
-        @command ||= {}
-      end
 
       # Get all the counts returned by the map/reduce.
       #
@@ -214,17 +203,14 @@ module Mongoid
 
       private
 
-      # @attribute [r] criteria The criteria for the map/reduce.
-      def criteria
-        @criteria
-      end
-
       # Apply criteria specific options - query, sort, limit.
       #
       # @api private
       #
       # @example Apply the criteria options
       #   map_reduce.apply_criteria_options
+      #
+      # @return [ nil ] Nothing.
       #
       # @since 3.0.0
       def apply_criteria_options
@@ -281,20 +267,6 @@ module Mongoid
       def results
         raise Errors::NoMapReduceOutput.new(command) unless command[:out]
         @results ||= session.command(command)
-      end
-
-      # Get the database session.
-      #
-      # @api private
-      #
-      # @example Get the session.
-      #   map_reduce.session
-      #
-      # @return [ Session ] The Moped session.
-      #
-      # @since 3.0.0
-      def session
-        criteria.klass.mongo_session
       end
     end
   end

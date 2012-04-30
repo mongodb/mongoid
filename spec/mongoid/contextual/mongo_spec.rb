@@ -370,6 +370,160 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#find_and_modify" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool")
+    end
+
+    context "when the selector matches" do
+
+      context "when not providing options" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_and_modify("$inc" => { likes: 1 })
+        end
+
+        it "returns the first matching document" do
+          result.should eq(depeche)
+        end
+
+        it "updates the document in the database" do
+          depeche.reload.likes.should eq(1)
+        end
+      end
+
+      context "when sorting" do
+
+        let(:criteria) do
+          Band.desc(:name)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_and_modify("$inc" => { likes: 1 })
+        end
+
+        it "returns the first matching document" do
+          result.should eq(tool)
+        end
+
+        it "updates the document in the database" do
+          tool.reload.likes.should eq(1)
+        end
+      end
+
+      context "when limiting fields" do
+
+        let(:criteria) do
+          Band.only(:_id)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_and_modify("$inc" => { likes: 1 })
+        end
+
+        it "returns the first matching document" do
+          result.should eq(depeche)
+        end
+
+        it "limits the returned fields" do
+          result.name.should be_nil
+        end
+
+        it "updates the document in the database" do
+          depeche.reload.likes.should eq(1)
+        end
+      end
+
+      context "when returning new" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_and_modify({ "$inc" => { likes: 1 }}, new: true)
+        end
+
+        it "returns the first matching document" do
+          result.should eq(depeche)
+        end
+
+        it "returns the updated document" do
+          result.likes.should eq(1)
+        end
+      end
+
+      context "when removing" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_and_modify({}, remove: true)
+        end
+
+        it "returns the first matching document" do
+          result.should eq(depeche)
+        end
+
+        it "deletes the document from the database" do
+          expect {
+            depeche.reload
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+      end
+    end
+
+    context "when the selector does not match" do
+
+      let(:criteria) do
+        Band.where(name: "Placebo")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:result) do
+        context.find_and_modify("$inc" => { likes: 1 })
+      end
+
+      it "returns nil" do
+        result.should be_nil
+      end
+    end
+  end
+
   [ :first, :one ].each do |method|
 
     describe "##{method}" do

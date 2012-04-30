@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/contextual/map_reduce"
 require "mongoid/contextual/memory"
 require "mongoid/contextual/mongo"
 

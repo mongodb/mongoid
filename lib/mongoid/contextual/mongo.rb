@@ -1,6 +1,9 @@
 # encoding: utf-8
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
+require "mongoid/contextual/command"
+require "mongoid/contextual/find_and_modify"
+require "mongoid/contextual/map_reduce"
 
 module Mongoid
   module Contextual
@@ -154,6 +157,27 @@ module Mongoid
       # @since 3.0.0
       def explain
         query.explain
+      end
+
+      # Execute the find and modify command, used for MongoDB's
+      # $findAndModify.
+      #
+      # @example Execute the command.
+      #   context.find_and_modify({ "$inc" => { likes: 1 }}, new: true)
+      #
+      # @param [ Hash ] update The updates.
+      # @param [ Hash ] options The command options.
+      #
+      # @option options [ true, false ] :new Return the updated document.
+      # @option options [ true, false ] :remove Delete the first document.
+      #
+      # @return [ Document ] The result of the command.
+      #
+      # @since 3.0.0
+      def find_and_modify(update, options = {})
+        if doc = FindAndModify.new(criteria, update, options).result
+          Factory.from_db(klass, doc)
+        end
       end
 
       # Get the first document in the database for the criteria's selector.

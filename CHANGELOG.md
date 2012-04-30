@@ -7,6 +7,14 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Mongoid now supports MongoDB's $findAndModify command.
+
+        Band.find_and_modify("$inc" => { likes: 1 })
+
+        Band.desc(:name).only(:name).find_and_modify(
+          { "$inc" => { likes: 1 }}, new: true
+        )
+
 * \#1906 Mongoid will retrieve documents from the identity map when
   providing multiple ids to find. (Hans Hasselberg)
 
