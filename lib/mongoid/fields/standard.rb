@@ -181,20 +181,6 @@ module Mongoid
         @default_name ||= "__#{name}_default__"
       end
 
-      # Has the default method been defined?
-      #
-      # @api private
-      #
-      # @example Is the default method defined?
-      #   field.default_defined?
-      #
-      # @return [ true, false, nil ] If the default is defined.
-      #
-      # @since 3.0.0
-      def default_defined?
-        @default_defined
-      end
-
       # Define the method for getting the default on the document.
       #
       # @api private
@@ -208,9 +194,8 @@ module Mongoid
       #
       # @since 3.0.0
       def define_default_method(doc)
-        unless default_defined?
+        unless doc.respond_to?(default_name)
           doc.class.__send__(:define_method, default_name, default_val)
-          @default_defined = true
         end
       end
 
