@@ -1748,6 +1748,47 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "touch?" do
+    context "with touch false" do
+      let(:metadata) do
+        described_class.new(
+          name: :versions,
+          relation: Mongoid::Relations::Referenced::In,
+          touch: false
+        )
+      end
+
+      it 'should be false' do
+        metadata.touch?.should be_false
+      end
+    end
+    context "with touch true" do
+      let(:metadata) do
+        described_class.new(
+          name: :versions,
+          relation: Mongoid::Relations::Referenced::In,
+          touch: true
+        )
+      end
+
+      it 'should be true' do
+        metadata.touch?.should be_true
+      end
+    end
+    context "with touch nil" do
+      let(:metadata) do
+        described_class.new(
+          name: :versions,
+          relation: Mongoid::Relations::Referenced::In,
+        )
+      end
+
+      it 'should be false' do
+        metadata.touch?.should be_false
+      end
+    end
+  end
+
   context "properties" do
 
     PROPERTIES = [
@@ -1804,4 +1845,5 @@ describe Mongoid::Relations::Metadata do
       end
     end
   end
+
 end

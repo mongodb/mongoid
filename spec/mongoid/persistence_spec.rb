@@ -622,6 +622,75 @@ describe Mongoid::Persistence do
     end
   end
 
+  describe "#touch" do
+
+    context "with a document with updated_at field" do
+      let(:updated_at) { 2.days.ago }
+      let(:agent) {
+        a = Agent.create
+        a.updated_at = updated_at # can't mass_assign because protection
+        a
+      }
+      let(:touch) { agent.touch }
+      let(:agent_updated_at) { Agent.find(agent.id).updated_at }
+
+      it 'should update updated_at field' do
+        touch
+        agent_updated_at.should_not be_within(1).of(updated_at)
+      end
+
+      it 'should define updated_at field to now' do
+        touch
+        agent_updated_at.should be_within(1).of(Time.now.utc)
+      end
+
+      it 'should update document updated_at' do
+        touch
+        agent.updated_at.should be_within(1).of(Time.now.utc)
+      end
+
+      it 'should not mark updated_at field changed' do
+        touch
+        agent.changed?.should be_false
+      end
+
+    end
+
+    context "with a document without updated_at field" do
+      let(:person) { Person.create }
+      before { person.touch }
+      it 'should not update updated_at field' do
+        Person.collection.find({:_id => person.id}).first.keys.should_not include("updated_at")
+      end
+    end
+
+    context "with params pass to touch" do
+      context "with a document with field to touch" do
+        let(:person) { Person.create(:lunch_time => 1.day.ago ) }
+        let(:touch) { person.touch(:lunch_time) }
+        it 'should update and persist lunch_time' do
+          touch
+          Person.find(person.id).lunch_time.should be_within(1).of(Time.now.utc)
+        end
+        it 'should update lunch_time in current_instance' do
+          touch
+          person.lunch_time.should be_within(1).of(Time.now.utc)
+        end
+      end
+
+      context "with a document without field to touch" do
+        let(:person) { Person.create }
+        before { person.touch(:my_field) }
+        it 'should not update my)_field field' do
+          Person.collection.find({:_id => person.id}).first.keys.should_not include("my_field")
+        end
+      end
+
+    end
+
+
+  end
+
   describe "#update_attribute" do
 
     let(:post) do

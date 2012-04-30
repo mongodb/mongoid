@@ -164,7 +164,25 @@ module Mongoid
     end
     alias :save :upsert
 
-    module ClassMethods
+    # change the field pass like args to now. By default
+    # it's the updated_at field
+    #
+    # @params [ Symbol ] field field to update to now
+    # @return [ Boolean ] true if done
+    #
+    def touch(field=:updated_at)
+      if fields.has_key?(field.to_s)
+        update_attribute(field, Time.now.utc)
+        remove_change(field)
+        collection.find(self.atomic_selector).update(
+          { '$set' => { field => read_attribute(field) } }
+        )
+      end
+      cascade_touch!
+      true
+    end
+
+    module ClassMethods #:nodoc:
 
       # Create a new document. This will instantiate a new document and
       # insert it in a single call. Will always return the document
