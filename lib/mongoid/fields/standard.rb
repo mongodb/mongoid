@@ -167,6 +167,53 @@ module Mongoid
 
       private
 
+      # Get the name of the default method for this field.
+      #
+      # @api private
+      #
+      # @example Get the default name.
+      #   field.default_name
+      #
+      # @return [ String ] The method name.
+      #
+      # @since 3.0.0
+      def default_name
+        @default_name ||= "__#{name}_default__"
+      end
+
+      # Has the default method been defined?
+      #
+      # @api private
+      #
+      # @example Is the default method defined?
+      #   field.default_defined?
+      #
+      # @return [ true, false, nil ] If the default is defined.
+      #
+      # @since 3.0.0
+      def default_defined?
+        @default_defined
+      end
+
+      # Define the method for getting the default on the document.
+      #
+      # @api private
+      #
+      # @example Define the method.
+      #   field.define_default_method(doc)
+      #
+      # @note Ruby's instance_exec was just too slow.
+      #
+      # @param [ Document ] doc The document.
+      #
+      # @since 3.0.0
+      def define_default_method(doc)
+        unless default_defined?
+          doc.class.__send__(:define_method, default_name, default_val)
+          @default_defined = true
+        end
+      end
+
       # Is the field included in the fields that were returned from the
       # database? We can apply the default if:
       #   1. The field is included in an only limitation (field: 1)
@@ -215,7 +262,8 @@ module Mongoid
       #
       # @since 3.0.0
       def evaluate_default_proc(doc)
-        serialize_default(doc.instance_exec(&default_val))
+        define_default_method(doc)
+        serialize_default(doc.__send__(default_name))
       end
 
       # This is used when default values need to be serialized. Most of the
