@@ -185,6 +185,19 @@ describe Mongoid::Config do
         end
       end
     end
+
+    context "when use a environment without config" do
+
+      after do
+        described_class.reset
+      end
+
+      it 'should raise a NoSessionsConfig error' do
+        expect {
+          described_class.load!(file, :unknown)
+        }.to raise_error(Mongoid::Errors::NoSessionsConfig)
+      end
+    end
   end
 
   describe "#options=" do

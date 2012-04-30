@@ -73,4 +73,18 @@ describe Mongoid::Config::Environment do
       end
     end
   end
+
+  describe "#load_yaml" do
+    let(:file) do
+      File.join(File.dirname(__FILE__), "../..", "config", "mongoid.yml")
+    end
+
+    it 'return an Hash if env unknow' do
+      described_class.load_yaml(file, :unknown).should == {}
+    end
+
+    it 'return a with indifferent_access' do
+      described_class.load_yaml(file, :test).should be_a(HashWithIndifferentAccess)
+    end
+  end
 end

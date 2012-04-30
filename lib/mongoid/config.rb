@@ -47,9 +47,7 @@ module Mongoid
     #
     # @since 2.0.1
     def load!(path, environment = nil)
-      settings = Environment.load_yaml(path, environment)
-      load_configuration(settings) if settings.present?
-      settings
+      load_configuration( Environment.load_yaml(path, environment) )
     end
 
     # Connect to the provided database name on the default session.
@@ -158,9 +156,9 @@ module Mongoid
     #
     # @since 3.0.0
     def load_configuration(settings)
-      configuration = settings.with_indifferent_access
-      self.options = configuration[:options]
-      self.sessions = configuration[:sessions]
+      self.options = settings[:options]
+      self.sessions = settings[:sessions]
+      settings
     end
   end
 end

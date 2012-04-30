@@ -76,28 +76,30 @@ describe Mongoid::Sessions::Factory do
 
   describe ".default" do
 
-    let(:config) do
-      { default: { hosts: ["localhost:27017"], database: database_id }}
-    end
 
-    before do
-      Mongoid::Config.sessions = config
-    end
+    context "with a config" do
+      let(:config) do
+        { default: { hosts: ["localhost:27017"], database: database_id }}
+      end
+      before do
+        Mongoid::Config.sessions = config
+      end
 
-    let(:session) do
-      described_class.default
-    end
+      let(:session) do
+        described_class.default
+      end
 
-    let(:cluster) do
-      session.cluster
-    end
+      let(:cluster) do
+        session.cluster
+      end
 
-    it "returns the default session" do
-      session.should be_a(Moped::Session)
-    end
+      it "returns the default session" do
+        session.should be_a(Moped::Session)
+      end
 
-    it "sets the cluster's seeds" do
-      cluster.seeds.should eq([ "localhost:27017" ])
+      it "sets the cluster's seeds" do
+        cluster.seeds.should eq([ "localhost:27017" ])
+      end
     end
   end
 end
