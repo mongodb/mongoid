@@ -16,7 +16,7 @@ module Mongoid
         # @attribute [rw] unloaded A criteria representing persisted docs.
         attr_accessor :added, :loaded, :unloaded
 
-        delegate :===, :is_a?, :kind_of?, to: :added
+        delegate :===, :is_a?, :kind_of?, to: []
 
         # Check if the enumerable is equal to the other object.
         #
@@ -44,7 +44,8 @@ module Mongoid
         #
         # @since 2.1.0
         def <<(document)
-          added.push(document)
+          added[document.id] = document
+          self
         end
         alias :push :<<
 
@@ -94,7 +95,7 @@ module Mongoid
         #
         # @since 2.1.0
         def delete(document)
-          doc = (loaded.delete(document) || added.delete(document))
+          doc = (loaded.delete(document.id) || added.delete(document.id))
           unless doc
             if unloaded && unloaded.where(_id: document.id).exists?
               yield(document) if block_given?
@@ -120,8 +121,11 @@ module Mongoid
         # @since 2.1.0
         def delete_if(&block)
           load_all!
-          loaded.delete_if(&block)
-          added.delete_if(&block)
+          deleted = in_memory.select(&block)
+          deleted.each do |doc|
+            loaded.delete(doc.id)
+            added.delete(doc.id)
+          end
           self
         end
 
@@ -145,17 +149,17 @@ module Mongoid
         # @since 2.1.0
         def each
           if loaded?
-            loaded.each do |doc|
+            loaded.each_pair do |id, doc|
               yield(doc)
             end
           else
             unloaded.each do |doc|
-              document = added.delete_one(doc) || loaded.delete_one(doc) || doc
+              document = added.delete(doc.id) || loaded.delete(doc.id) || doc
               yield(document)
-              loaded.push(document)
+              loaded[document.id] = document
             end
           end
-          added.each do |doc|
+          added.each_pair do |id, doc|
             yield(doc)
           end
           @executed = true
@@ -204,9 +208,13 @@ module Mongoid
         # @since 2.1.0
         def initialize(target)
           if target.is_a?(Criteria)
-            @added, @executed, @loaded, @unloaded = [], false, [], target
+            @added, @executed, @loaded, @unloaded = {}, false, {}, target
           else
-            @added, @executed, @loaded = [], true, target
+            @added, @executed = {}, true
+            @loaded = target.inject({}) do |_target, doc|
+              _target[doc.id] = doc
+              _target
+            end
           end
         end
 
@@ -222,7 +230,7 @@ module Mongoid
         # @since 3.0.0
         def include?(doc)
           return super unless unloaded
-          unloaded.where(_id: doc.id).exists? || added.include?(doc)
+          unloaded.where(_id: doc.id).exists? || added.has_key?(doc.id)
         end
 
         # Inspection will just inspect the entries for nice array-style
@@ -250,7 +258,7 @@ module Mongoid
         #
         # @since 2.1.0
         def in_memory
-          docs = (loaded + added)
+          docs = (loaded.values + added.values)
           docs.each { |doc| yield(doc) } if block_given?
           docs
         end
@@ -334,7 +342,7 @@ module Mongoid
           if count.zero?
             count + added.count
           else
-            count + added.count{ |d| d.new_record? }
+            count + added.values.count{ |d| d.new_record? }
           end
         end
         alias :length :size
@@ -388,10 +396,10 @@ module Mongoid
         end
 
         def matching_document(location)
-          loaded.try(location) ||
-            added.detect { |doc| doc == unloaded.try(location) } ||
+          loaded.try(:values).try(location) ||
+            added[unloaded.try(location).try(:id)] ||
             unloaded.try(location) ||
-            added.send(location)
+            added.values.try(location)
         end
       end
     end
