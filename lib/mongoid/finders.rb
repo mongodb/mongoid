@@ -102,7 +102,10 @@ module Mongoid
     # @since 3.0.0
     def find_by(attrs = {})
       result = where(attrs).first
-      raise(Errors::DocumentNotFound.new(self, attrs)) if result.nil? && Mongoid.raise_not_found_error
+      if result.nil? && Mongoid.raise_not_found_error
+        raise(Errors::DocumentNotFound.new(self, attrs))
+      end
+      yield(result) if result && block_given?
       result
     end
 

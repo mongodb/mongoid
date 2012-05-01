@@ -7,6 +7,13 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* `Model.find_by` now accepts a block and will yield to the found document if
+  it is not nil.
+
+        Band.find_by(name: "Depeche Mode") do |band|
+          band.likes = 100
+        end
+
 * \#1958/\#1798 Documents and `belongs_to` relations now support touch.
 
         class Band

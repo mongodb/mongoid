@@ -185,8 +185,24 @@ describe Mongoid::Finders do
         Person.create(title: "sir")
       end
 
-      it "returns the document" do
-        Person.find_by(title: "sir").should eq(person)
+      context "when no block is provided" do
+
+        it "returns the document" do
+          Person.find_by(title: "sir").should eq(person)
+        end
+      end
+
+      context "when a block is provided" do
+
+        let(:result) do
+          Person.find_by(title: "sir") do |peep|
+            peep.age = 50
+          end
+        end
+
+        it "yields the returned document" do
+          result.age.should eq(50)
+        end
       end
     end
 
@@ -215,8 +231,24 @@ describe Mongoid::Finders do
           Mongoid.raise_not_found_error = true
         end
 
-        it "returns nil" do
-          Person.find_by(ssn: "333-22-1111").should be_nil
+        context "when no block is provided" do
+
+          it "returns nil" do
+            Person.find_by(ssn: "333-22-1111").should be_nil
+          end
+        end
+
+        context "when a block is provided" do
+
+          let(:result) do
+            Person.find_by(ssn: "333-22-1111") do |peep|
+              peep.age = 50
+            end
+          end
+
+          it "returns nil" do
+            result.should be_nil
+          end
         end
       end
     end
