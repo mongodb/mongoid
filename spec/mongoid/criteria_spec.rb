@@ -2903,12 +2903,34 @@ describe Mongoid::Criteria do
 
     context "when provided criterion" do
 
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
+      context "when the criteria is standard" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        it "returns the matching documents" do
+          criteria.should eq([ match ])
+        end
       end
 
-      it "returns the matching documents" do
-        criteria.should eq([ match ])
+      context "when the criteria is an exact fk array match" do
+
+        let(:id_one) do
+          BSON::ObjectId.new
+        end
+
+        let(:id_two) do
+          BSON::ObjectId.new
+        end
+
+        let(:criteria) do
+          Account.where(agent_ids: [ id_one, id_two ])
+        end
+
+        it "does not wrap the array in another array" do
+          criteria.selector.should eq({ "agent_ids" => [ id_one, id_two ]})
+        end
       end
     end
   end

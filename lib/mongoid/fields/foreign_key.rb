@@ -51,10 +51,32 @@ module Mongoid
         true
       end
 
+      # Evolve the object into an id compatible object.
+      #
+      # @example Evolve the object.
+      #   field.evolve(object)
+      #
+      # @param [ Object ] object The object to evolve.
+      #
+      # @return [ Object ] The evolved object.
+      #
+      # @since 3.0.0
       def evolve(object)
-        object.is_a?(Document) ? object.id : mongoize(object)
+        return object.id if object.is_a?(Document)
+        evolved = mongoize(object)
+        type.resizable? ? evolved.first : evolved
       end
 
+      # Mongoize the object into the Mongo friendly value.
+      #
+      # @example Mongoize the object.
+      #   field.mongoize(object)
+      #
+      # @param [ Object ] object The object to Mongoize.
+      #
+      # @return [ Object ] The mongoized object.
+      #
+      # @since 3.0.0
       def mongoize(object)
         if type.resizable? || object_id_field?
           type.__mongoize_fk__(constraint, object)
