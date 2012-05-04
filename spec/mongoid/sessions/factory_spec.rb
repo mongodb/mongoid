@@ -125,4 +125,31 @@ describe Mongoid::Sessions::Factory do
       end
     end
   end
+
+  describe ".expand_uri" do
+
+    let(:config) do
+      { uri: "mongodb://user:pass@example.com:100/db" }
+    end
+
+    let(:expanded) do
+      described_class.send(:expand_uri, config)
+    end
+
+    it "sets username" do
+      expanded[:username].should eq("user")
+    end
+
+    it "sets password" do
+      expanded[:password].should eq("pass")
+    end
+
+    it "sets hosts" do
+      expanded[:hosts].should eq(["example.com:100"])
+    end
+
+    it "sets database" do
+      expanded[:database].should eq("db")
+    end
+  end
 end

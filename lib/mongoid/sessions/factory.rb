@@ -84,6 +84,16 @@ module Mongoid
       def uri?(config)
         config.has_key?(:uri)
       end
+
+      def expand_uri(config)
+        uri = URI::parse(config[:uri][/[^(mongodb:)].*/])
+        {
+          username: uri.user,
+          password: uri.password,
+          hosts: ["#{uri.host}:#{uri.port}"],
+          database: uri.path[1..-1]
+        }
+      end
     end
   end
 end
