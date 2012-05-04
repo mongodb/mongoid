@@ -57,6 +57,9 @@ module Mongoid
       # @since 3.0.0
       def create_session(config)
         options = (config[:options] || {}).dup
+        if uri?(config)
+          config = expand_uri(config)
+        end
         session = Moped::Session.new(config[:hosts], options)
         session.use(config[:database])
         if authenticated?(config)
@@ -79,6 +82,20 @@ module Mongoid
       # @since 3.0.0
       def authenticated?(config)
         config.has_key?(:username) && config.has_key?(:password)
+      end
+
+      def uri?(config)
+        config.has_key?(:uri)
+      end
+
+      def expand_uri(config)
+        uri = URI::parse(config[:uri][/[^(mongodb:)].*/])
+        {
+          username: uri.user,
+          password: uri.password,
+          hosts: ["#{uri.host}:#{uri.port}"],
+          database: uri.path[1..-1]
+        }
       end
     end
   end

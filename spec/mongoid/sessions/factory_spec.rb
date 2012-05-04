@@ -8,31 +8,64 @@ describe Mongoid::Sessions::Factory do
 
       context "when the configuration exists" do
 
-        let(:config) do
-          {
-            default: { hosts: [ "localhost:27017" ], database: database_id },
-            secondary: { hosts: [ "localhost:27017" ], database: database_id }
-          }
+        context "when no uri provided" do
+
+          let(:config) do
+            {
+              default: { hosts: [ "localhost:27017" ], database: database_id },
+              secondary: { hosts: [ "localhost:27017" ], database: database_id }
+            }
+          end
+
+          before do
+            Mongoid::Config.sessions = config
+          end
+
+          let(:session) do
+            described_class.create(:secondary)
+          end
+
+          let(:cluster) do
+            session.cluster
+          end
+
+          it "returns a session" do
+            session.should be_a(Moped::Session)
+          end
+
+          it "sets the cluster's seeds" do
+            cluster.seeds.should eq([ "localhost:27017" ])
+          end
         end
 
-        before do
-          Mongoid::Config.sessions = config
-        end
+        context "when uri provided" do
 
-        let(:session) do
-          described_class.create(:secondary)
-        end
+          let(:config) do
+            {
+              default: { uri: "mongodb://localhost:27017/#{database_id}" },
+              secondary: { uri: "mongodb://localhost:27017/#{database_id}" }
+            }
+          end
 
-        let(:cluster) do
-          session.cluster
-        end
+          before do
+            Mongoid::Config.sessions = config
+          end
 
-        it "returns a session" do
-          session.should be_a(Moped::Session)
-        end
+          let(:session) do
+            described_class.create(:secondary)
+          end
 
-        it "sets the cluster's seeds" do
-          cluster.seeds.should eq([ "localhost:27017" ])
+          let(:cluster) do
+            session.cluster
+          end
+
+          it "returns a session" do
+            session.should be_a(Moped::Session)
+          end
+
+          it "sets the cluster's seeds" do
+            cluster.seeds.should eq([ "localhost:27017" ])
+          end
         end
       end
 
@@ -98,6 +131,58 @@ describe Mongoid::Sessions::Factory do
 
     it "sets the cluster's seeds" do
       cluster.seeds.should eq([ "localhost:27017" ])
+    end
+  end
+
+  describe ".uri?" do
+
+    context "when no uri provided" do
+
+      let(:config) do
+        {}
+      end
+
+      it "returns false" do
+        described_class.send(:uri?, config).should be_false
+      end
+    end
+
+    context "when uri provided" do
+
+      let(:config) do
+        { uri: "mongodb://user:pass@example.com:port/db" }
+      end
+
+      it "returns true" do
+        described_class.send(:uri?, config).should be_true
+      end
+    end
+  end
+
+  describe ".expand_uri" do
+
+    let(:config) do
+      { uri: "mongodb://user:pass@example.com:100/db" }
+    end
+
+    let(:expanded) do
+      described_class.send(:expand_uri, config)
+    end
+
+    it "sets username" do
+      expanded[:username].should eq("user")
+    end
+
+    it "sets password" do
+      expanded[:password].should eq("pass")
+    end
+
+    it "sets hosts" do
+      expanded[:hosts].should eq(["example.com:100"])
+    end
+
+    it "sets database" do
+      expanded[:database].should eq("db")
     end
   end
 end
