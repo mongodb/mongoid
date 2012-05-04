@@ -12,7 +12,7 @@ module Mongoid
       # document is nil, then sets the relation on this document.
       #
       # @example Build the relation.
-      #   person.build(:addresses, { :id => 1 }, metadata)
+      #   person.__build__(:addresses, { :id => 1 }, metadata)
       #
       # @param [ String, Symbol ] name The name of the relation.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
@@ -22,7 +22,7 @@ module Mongoid
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def build(name, object, metadata)
+      def __build__(name, object, metadata)
         relation = create_relation(object, metadata)
         set_relation(name, relation)
       end
@@ -153,7 +153,7 @@ module Mongoid
               instance_variable_get(variable)
             else
               _building do
-                _loading { build(name, attributes[metadata.key], metadata) }
+                _loading { __build__(name, attributes[metadata.key], metadata) }
               end
             end
             if value.nil? && metadata.autobuilding? && !without_autobuild?
@@ -205,7 +205,7 @@ module Mongoid
                 (object.blank? && send(name))
                 set_relation(name, send(name).substitute(object.substitutable))
               else
-                build(name, object.substitutable, metadata)
+                __build__(name, object.substitutable, metadata)
               end
             end
           end
