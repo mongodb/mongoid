@@ -80,6 +80,10 @@ module Mongoid
       def authenticated?(config)
         config.has_key?(:username) && config.has_key?(:password)
       end
+
+      def uri?(config)
+        config.has_key?(:uri)
+      end
     end
   end
 end

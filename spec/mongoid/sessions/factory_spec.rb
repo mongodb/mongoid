@@ -100,4 +100,29 @@ describe Mongoid::Sessions::Factory do
       cluster.seeds.should eq([ "localhost:27017" ])
     end
   end
+
+  describe ".uri?" do
+
+    context "when no uri provided" do
+
+      let(:config) do
+        {}
+      end
+
+      it "returns false" do
+        described_class.send(:uri?, config).should be_false
+      end
+    end
+
+    context "when uri provided" do
+
+      let(:config) do
+        { uri: "mongodb://user:pass@example.com:port/db" }
+      end
+
+      it "returns true" do
+        described_class.send(:uri?, config).should be_true
+      end
+    end
+  end
 end
