@@ -36,7 +36,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "returns the equality check" do
-          enumerable.loaded.values.should eq([ post ])
+          enumerable._loaded.values.should eq([ post ])
         end
       end
 
@@ -86,7 +86,7 @@ describe Mongoid::Relations::Targets::Enumerable do
 
             before do
               post.save
-              enumerable.added[post.id] = post
+              enumerable._added[post.id] = post
             end
 
             it "returns the equality check" do
@@ -130,7 +130,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "adds the document to the added target" do
-        enumerable.added.should eq({ post.id => post })
+        enumerable._added.should eq({ post.id => post })
       end
 
       it "returns the added documents" do
@@ -219,7 +219,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     before do
-      enumerable.loaded[post.id] = post
+      enumerable._loaded[post.id] = post
       enumerable << post
     end
 
@@ -230,15 +230,15 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     it "clears out the loaded docs" do
-      enumerable.loaded.should be_empty
+      enumerable._loaded.should be_empty
     end
 
     it "clears out the added docs" do
-      enumerable.added.should be_empty
+      enumerable._added.should be_empty
     end
 
     it "retains its loaded state" do
-      enumerable.should_not be_loaded
+      enumerable.should_not be__loaded
     end
   end
 
@@ -303,7 +303,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "deletes the document from the enumerable" do
-        enumerable.loaded.should be_empty
+        enumerable._loaded.should be_empty
       end
 
       it "returns the document" do
@@ -334,7 +334,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "removes the document from the added docs" do
-        enumerable.added.should be_empty
+        enumerable._added.should be_empty
       end
 
       it "returns the document" do
@@ -361,7 +361,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "does not load the document" do
-        enumerable.loaded.should be_empty
+        enumerable._loaded.should be_empty
       end
 
       it "returns the document" do
@@ -416,7 +416,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "deletes the document from the enumerable" do
-        enumerable.loaded.should be_empty
+        enumerable._loaded.should be_empty
       end
 
       it "returns the remaining docs" do
@@ -447,7 +447,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "removes the document from the added docs" do
-        enumerable.added.should be_empty
+        enumerable._added.should be_empty
       end
 
       it "returns the remaining docs" do
@@ -474,7 +474,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "does not load the document" do
-        enumerable.loaded.should be_empty
+        enumerable._loaded.should be_empty
       end
 
       it "returns the remaining docs" do
@@ -533,11 +533,11 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "loads each document" do
-        enumerable.loaded.should eq({ post.id => post })
+        enumerable._loaded.should eq({ post.id => post })
       end
 
       it "becomes loaded" do
-        enumerable.should be_loaded
+        enumerable.should be__loaded
       end
     end
 
@@ -554,11 +554,11 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "does not alter the loaded docs" do
-        enumerable.loaded.should eq({ post.id => post })
+        enumerable._loaded.should eq({ post.id => post })
       end
 
       it "stays loaded" do
-        enumerable.should be_loaded
+        enumerable.should be__loaded
       end
     end
 
@@ -589,15 +589,15 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "adds the unloaded to the loaded docs" do
-          enumerable.loaded.should eq({ post.id => post })
+          enumerable._loaded.should eq({ post.id => post })
         end
 
         it "keeps the appended in the added docs" do
-          enumerable.added.should eq({ post_two.id => post_two })
+          enumerable._added.should eq({ post_two.id => post_two })
         end
 
         it "stays loaded" do
-          enumerable.should be_loaded
+          enumerable.should be__loaded
         end
       end
 
@@ -614,11 +614,11 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "adds the persisted added doc to the loaded" do
-          enumerable.loaded.should eq({ post.id => post })
+          enumerable._loaded.should eq({ post.id => post })
         end
 
         it "stays loaded" do
-          enumerable.should be_loaded
+          enumerable.should be__loaded
         end
       end
     end
@@ -691,7 +691,7 @@ describe Mongoid::Relations::Targets::Enumerable do
           end
 
           it "does not load the enumerable" do
-            enumerable.should_not be_loaded
+            enumerable.should_not be__loaded
           end
         end
 
@@ -720,7 +720,7 @@ describe Mongoid::Relations::Targets::Enumerable do
             end
 
             it "does not load the enumerable" do
-              enumerable.should_not be_loaded
+              enumerable.should_not be__loaded
             end
           end
         end
@@ -745,7 +745,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "does not load the enumerable" do
-          enumerable.should_not be_loaded
+          enumerable.should_not be__loaded
         end
       end
 
@@ -760,7 +760,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "does not load the enumerable" do
-          enumerable.should_not be_loaded
+          enumerable.should_not be__loaded
         end
       end
     end
@@ -949,11 +949,11 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "sets the criteria" do
-        enumerable.unloaded.should eq(criteria)
+        enumerable._unloaded.should eq(criteria)
       end
 
       it "is not loaded" do
-        enumerable.should_not be_loaded
+        enumerable.should_not be__loaded
       end
     end
 
@@ -968,11 +968,11 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "does not set a criteria" do
-        enumerable.unloaded.should be_nil
+        enumerable._unloaded.should be_nil
       end
 
       it "is loaded" do
-        enumerable.should be_loaded
+        enumerable.should be__loaded
       end
     end
   end
@@ -1111,7 +1111,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "does not load the enumerable" do
-          enumerable.should_not be_loaded
+          enumerable.should_not be__loaded
         end
       end
 
@@ -1134,7 +1134,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "does not load the enumerable" do
-          enumerable.should_not be_loaded
+          enumerable.should_not be__loaded
         end
       end
 
@@ -1149,7 +1149,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "does not load the enumerable" do
-          enumerable.should_not be_loaded
+          enumerable.should_not be__loaded
         end
       end
 
@@ -1281,7 +1281,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     it "loads all the unloaded documents" do
-      enumerable.loaded.should eq({ post.id => post })
+      enumerable._loaded.should eq({ post.id => post })
     end
 
     it "returns true" do
@@ -1289,7 +1289,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     it "sets loaded to true" do
-      enumerable.should be_loaded
+      enumerable.should be__loaded
     end
   end
 
@@ -1320,15 +1320,15 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     it "is not loaded" do
-      enumerable.should_not be_loaded
+      enumerable.should_not be__loaded
     end
 
     it "clears out the loaded docs" do
-      enumerable.loaded.should be_empty
+      enumerable._loaded.should be_empty
     end
 
     it "clears out the added docs" do
-      enumerable.added.should be_empty
+      enumerable._added.should be_empty
     end
   end
 
@@ -1590,7 +1590,7 @@ describe Mongoid::Relations::Targets::Enumerable do
 
     before do
       enumerable << post
-      enumerable.loaded[post.id] = post
+      enumerable._loaded[post.id] = post
     end
 
     let!(:uniq) do
@@ -1602,7 +1602,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     it "sets loaded to true" do
-      enumerable.should be_loaded
+      enumerable.should be__loaded
     end
   end
 end

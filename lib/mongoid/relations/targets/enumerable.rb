@@ -4,17 +4,17 @@ module Mongoid
     module Targets
 
       # This class is the wrapper for all relational associations that have a
-      # target that can be a criteria or array of loaded documents. This
+      # target that can be a criteria or array of _loaded documents. This
       # handles both cases or a combination of the two.
       class Enumerable
         include ::Enumerable
 
         # The three main instance variables are collections of documents.
         #
-        # @attribute [rw] added Documents that have been appended.
-        # @attribute [rw] loaded Persisted documents that have been loaded.
-        # @attribute [rw] unloaded A criteria representing persisted docs.
-        attr_accessor :added, :loaded, :unloaded
+        # @attribute [rw] _added Documents that have been appended.
+        # @attribute [rw] _loaded Persisted documents that have been _loaded.
+        # @attribute [rw] _unloaded A criteria representing persisted docs.
+        attr_accessor :_added, :_loaded, :_unloaded
 
         delegate :===, :is_a?, :kind_of?, to: []
 
@@ -44,7 +44,7 @@ module Mongoid
         #
         # @since 2.1.0
         def <<(document)
-          added[document.id] = document
+          _added[document.id] = document
           self
         end
         alias :push :<<
@@ -60,14 +60,14 @@ module Mongoid
         #     doc.unbind
         #   end
         #
-        # @return [ Array<Document> ] The cleared out added docs.
+        # @return [ Array<Document> ] The cleared out _added docs.
         #
         # @since 2.1.0
         def clear
           if block_given?
             in_memory { |doc| yield(doc) }
           end
-          loaded.clear and added.clear
+          _loaded.clear and _added.clear
         end
 
         # Clones each document in the enumerable.
@@ -95,9 +95,9 @@ module Mongoid
         #
         # @since 2.1.0
         def delete(document)
-          doc = (loaded.delete(document.id) || added.delete(document.id))
+          doc = (_loaded.delete(document.id) || _added.delete(document.id))
           unless doc
-            if unloaded && unloaded.where(_id: document.id).exists?
+            if _unloaded && _unloaded.where(_id: document.id).exists?
               yield(document) if block_given?
               return document
             end
@@ -123,8 +123,8 @@ module Mongoid
           load_all!
           deleted = in_memory.select(&block)
           deleted.each do |doc|
-            loaded.delete(doc.id)
-            added.delete(doc.id)
+            _loaded.delete(doc.id)
+            _added.delete(doc.id)
           end
           self
         end
@@ -132,41 +132,41 @@ module Mongoid
         # Iterating over this enumerable has to handle a few different
         # scenarios.
         #
-        # If the enumerable has its criteria loaded into memory then it yields
-        # to all the loaded docs and all the added docs.
+        # If the enumerable has its criteria _loaded into memory then it yields
+        # to all the _loaded docs and all the _added docs.
         #
-        # If the enumerable has not loaded the criteria then it iterates over
+        # If the enumerable has not _loaded the criteria then it iterates over
         # the cursor while loading the documents and then iterates over the
-        # added docs.
+        # _added docs.
         #
         # @example Iterate over the enumerable.
         #   enumerable.each do |doc|
         #     puts doc
         #   end
         #
-        # @return [ true ] That the enumerable is now loaded.
+        # @return [ true ] That the enumerable is now _loaded.
         #
         # @since 2.1.0
         def each
-          if loaded?
-            loaded.each_pair do |id, doc|
+          if _loaded?
+            _loaded.each_pair do |id, doc|
               yield(doc)
             end
           else
-            unloaded.each do |doc|
-              document = added.delete(doc.id) || loaded.delete(doc.id) || doc
+            _unloaded.each do |doc|
+              document = _added.delete(doc.id) || _loaded.delete(doc.id) || doc
               yield(document)
-              loaded[document.id] = document
+              _loaded[document.id] = document
             end
           end
-          added.each_pair do |id, doc|
+          _added.each_pair do |id, doc|
             yield(doc)
           end
           @executed = true
         end
 
         # Is the enumerable empty? Will determine if the count is zero based on
-        # whether or not it is loaded.
+        # whether or not it is _loaded.
         #
         # @example Is the enumerable empty?
         #   enumerable.empty?
@@ -175,10 +175,10 @@ module Mongoid
         #
         # @since 2.1.0
         def empty?
-          if loaded?
+          if _loaded?
             in_memory.count == 0
           else
-            unloaded.count + added.count == 0
+            _unloaded.count + _added.count == 0
           end
         end
 
@@ -208,10 +208,10 @@ module Mongoid
         # @since 2.1.0
         def initialize(target)
           if target.is_a?(Criteria)
-            @added, @executed, @loaded, @unloaded = {}, false, {}, target
+            @_added, @executed, @_loaded, @_unloaded = {}, false, {}, target
           else
-            @added, @executed = {}, true
-            @loaded = target.inject({}) do |_target, doc|
+            @_added, @executed = {}, true
+            @_loaded = target.inject({}) do |_target, doc|
               _target[doc.id] = doc
               _target
             end
@@ -229,8 +229,8 @@ module Mongoid
         #
         # @since 3.0.0
         def include?(doc)
-          return super unless unloaded
-          unloaded.where(_id: doc.id).exists? || added.has_key?(doc.id)
+          return super unless _unloaded
+          _unloaded.where(_id: doc.id).exists? || _added.has_key?(doc.id)
         end
 
         # Inspection will just inspect the entries for nice array-style
@@ -246,8 +246,8 @@ module Mongoid
           entries.inspect
         end
 
-        # Return all the documents in the enumerable that have been loaded or
-        # added.
+        # Return all the documents in the enumerable that have been _loaded or
+        # _added.
         #
         # @note When passed a block it yields to each document.
         #
@@ -258,7 +258,7 @@ module Mongoid
         #
         # @since 2.1.0
         def in_memory
-          docs = (loaded.values + added.values)
+          docs = (_loaded.values + _added.values)
           docs.each { |doc| yield(doc) } if block_given?
           docs
         end
@@ -281,21 +281,21 @@ module Mongoid
         # @example Load all the documents.
         #   enumerable.load_all!
         #
-        # @return [ true ] That the enumerable is loaded.
+        # @return [ true ] That the enumerable is _loaded.
         #
         # @since 2.1.0
         alias :load_all! :entries
 
-        # Has the enumerable been loaded? This will be true if the criteria has
+        # Has the enumerable been _loaded? This will be true if the criteria has
         # been executed or we manually load the entire thing.
         #
-        # @example Is the enumerable loaded?
-        #   enumerable.loaded?
+        # @example Is the enumerable _loaded?
+        #   enumerable._loaded?
         #
-        # @return [ true, false ] If the enumerable has been loaded.
+        # @return [ true, false ] If the enumerable has been _loaded.
         #
         # @since 2.1.0
-        def loaded?
+        def _loaded?
           !!@executed
         end
 
@@ -308,7 +308,7 @@ module Mongoid
         #
         # @since 2.1.0
         def reset
-          loaded.clear and added.clear
+          _loaded.clear and _added.clear
           @executed = false
         end
 
@@ -338,11 +338,11 @@ module Mongoid
         #
         # @since 2.1.0
         def size
-          count = (unloaded ? unloaded.count : loaded.count)
+          count = (_unloaded ? _unloaded.count : _loaded.count)
           if count.zero?
-            count + added.count
+            count + _added.count
           else
-            count + added.values.count{ |d| d.new_record? }
+            count + _added.values.count{ |d| d.new_record? }
           end
         end
         alias :length :size
@@ -354,7 +354,7 @@ module Mongoid
         #
         # @param [ Hash ] options Optional parameters.
         #
-        # @return [ String ] The entries all loaded as a string.
+        # @return [ String ] The entries all _loaded as a string.
         #
         # @since 2.2.0
         def to_json(options = {})
@@ -368,7 +368,7 @@ module Mongoid
         #
         # @param [ Hash ] options Optional parameters.
         #
-        # @return [ Hash ] The entries all loaded as a hash.
+        # @return [ Hash ] The entries all _loaded as a hash.
         #
         # @since 2.2.0
         def as_json(options = {})
@@ -396,10 +396,10 @@ module Mongoid
         end
 
         def matching_document(location)
-          loaded.try(:values).try(location) ||
-            added[unloaded.try(location).try(:id)] ||
-            unloaded.try(location) ||
-            added.values.try(location)
+          _loaded.try(:values).try(location) ||
+            _added[_unloaded.try(location).try(:id)] ||
+            _unloaded.try(location) ||
+            _added.values.try(location)
         end
       end
     end

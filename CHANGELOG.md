@@ -716,6 +716,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1972 `added`, `loaded`, and `unloaded` can now be valid scope names on a
+  document that is part of a 1-n relation.
+
 * \#1952/#1950 `#all_in` behaviour on embedded documents now properly matches
   root documents when passing an empty array. (Hans Hasselberg)
 
