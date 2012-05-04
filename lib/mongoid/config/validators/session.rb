@@ -20,8 +20,10 @@ module Mongoid
             raise Errors::NoDefaultSession.new(sessions.keys)
           end
           sessions.each_pair do |name, config|
-            validate_session_database(name, config)
-            validate_session_hosts(name, config)
+            unless config.has_key?(:uri)
+              validate_session_database(name, config)
+              validate_session_hosts(name, config)
+            end
           end
         end
 

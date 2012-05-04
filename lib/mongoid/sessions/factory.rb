@@ -57,6 +57,9 @@ module Mongoid
       # @since 3.0.0
       def create_session(config)
         options = (config[:options] || {}).dup
+        if uri?(config)
+          config = expand_uri(config)
+        end
         session = Moped::Session.new(config[:hosts], options)
         session.use(config[:database])
         if authenticated?(config)

@@ -8,31 +8,64 @@ describe Mongoid::Sessions::Factory do
 
       context "when the configuration exists" do
 
-        let(:config) do
-          {
-            default: { hosts: [ "localhost:27017" ], database: database_id },
-            secondary: { hosts: [ "localhost:27017" ], database: database_id }
-          }
+        context "when no uri provided" do
+
+          let(:config) do
+            {
+              default: { hosts: [ "localhost:27017" ], database: database_id },
+              secondary: { hosts: [ "localhost:27017" ], database: database_id }
+            }
+          end
+
+          before do
+            Mongoid::Config.sessions = config
+          end
+
+          let(:session) do
+            described_class.create(:secondary)
+          end
+
+          let(:cluster) do
+            session.cluster
+          end
+
+          it "returns a session" do
+            session.should be_a(Moped::Session)
+          end
+
+          it "sets the cluster's seeds" do
+            cluster.seeds.should eq([ "localhost:27017" ])
+          end
         end
 
-        before do
-          Mongoid::Config.sessions = config
-        end
+        context "when uri provided" do
 
-        let(:session) do
-          described_class.create(:secondary)
-        end
+          let(:config) do
+            {
+              default: { uri: "mongodb://localhost:27017/#{database_id}" },
+              secondary: { uri: "mongodb://localhost:27017/#{database_id}" }
+            }
+          end
 
-        let(:cluster) do
-          session.cluster
-        end
+          before do
+            Mongoid::Config.sessions = config
+          end
 
-        it "returns a session" do
-          session.should be_a(Moped::Session)
-        end
+          let(:session) do
+            described_class.create(:secondary)
+          end
 
-        it "sets the cluster's seeds" do
-          cluster.seeds.should eq([ "localhost:27017" ])
+          let(:cluster) do
+            session.cluster
+          end
+
+          it "returns a session" do
+            session.should be_a(Moped::Session)
+          end
+
+          it "sets the cluster's seeds" do
+            cluster.seeds.should eq([ "localhost:27017" ])
+          end
         end
       end
 
