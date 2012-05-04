@@ -33,7 +33,7 @@ module Mongoid
                 parent.insert
               else
                 collection.find(parent.atomic_selector).update(inserts)
-                if document.metadata.macro == :embeds_one
+                if document.metadata.embeds_one?
                   document._parent.attributes[document.metadata.key] = document.attributes
                 else
                   document._parent.attributes[document.metadata.key] ||= []

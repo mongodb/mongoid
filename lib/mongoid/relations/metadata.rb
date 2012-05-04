@@ -226,7 +226,19 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def embedded?
-        @embedded ||= (macro == :embeds_one || macro == :embeds_many)
+        @embedded ||= (embeds_one? || macro == :embeds_many)
+      end
+
+      # Will determine if the relation is an embedded one or not
+      #
+      # @example Is the document embedded.
+      #   metadata.embeds_one?
+      #
+      # @return [ true, false ] True if embedded, false if not.
+      #
+      # @since 3.0.0
+      def embeds_one?
+        macro == :embeds_one
       end
 
       # Returns the extension of the relation.

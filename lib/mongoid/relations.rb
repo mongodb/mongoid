@@ -119,10 +119,22 @@ module Mongoid
     # @since 2.1.6
     def reload_relations
       relations.each_pair do |name, meta|
-        if instance_variable_defined?("@#{name}")
-          if _parent.nil? || instance_variable_get("@#{name}") != _parent
-            remove_instance_variable("@#{name}")
-          end
+        reload_relation(name)
+      end
+    end
+
+    # Convenience method for reloading a relation
+    #
+    # @example Reload the relations.
+    #   document.reload_relation('addresses')
+    #
+    # @return [ String ] The name of relation
+    #
+    # @since 3.0.0
+    def reload_relation(name)
+      if instance_variable_defined?("@#{name}")
+        if _parent.nil? || instance_variable_get("@#{name}") != _parent
+          remove_instance_variable("@#{name}")
         end
       end
     end

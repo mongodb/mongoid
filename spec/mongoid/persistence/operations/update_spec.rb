@@ -135,7 +135,30 @@ describe Mongoid::Persistence::Operations::Update do
           embedded_set_expectation.call
           embedded.persist
         end
+
+        it 'reload the association' do
+          embedded_set_expectation.call
+          embedded.persist
+          document.attributes['addresses'].should == [address.attributes]
+        end
+
+        context "with a default_scope" do
+          let(:person) do
+            Person.create
+          end
+
+          before do
+            a = person.appointments.create
+            a.active = false
+            a.save
+          end
+
+          it "reload the embedded association" do
+            person.appointments.should eq([])
+          end
+        end
       end
+
     end
   end
 end

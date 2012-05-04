@@ -43,6 +43,15 @@ module Mongoid
           prepare do
             unless updates.empty?
               collection.find(selector).update(updates)
+              if document.embedded?
+                document._parent.reload_relation(document.metadata.name)
+                if document.metadata.embeds_one?
+                  document._parent.attributes[document.metadata.key] = document.attributes
+                else
+                  document._parent.attributes[document.metadata.key] ||= []
+                  document._parent.attributes[document.metadata.key] << document.attributes
+                end
+              end
               conflicts.each_pair do |key, value|
                 collection.find(selector).update({ key => value })
               end
