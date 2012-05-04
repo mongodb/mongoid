@@ -579,24 +579,50 @@ describe Mongoid::Contextual::Mongo do
 
   describe "#last" do
 
-    let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+    context "when no default scope" do
+
+      let!(:depeche_mode) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let!(:new_order) do
+        Band.create(name: "New Order")
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the last matching document" do
+        context.last.should eq(new_order)
+      end
     end
 
-    let!(:new_order) do
-      Band.create(name: "New Order")
-    end
+    context "when default scope" do
 
-    let(:criteria) do
-      Band.all
-    end
+      let!(:palm) do
+        Tree.create(name: "Palm")
+      end
 
-    let(:context) do
-      described_class.new(criteria)
-    end
+      let!(:maple) do
+        Tree.create(name: "Maple")
+      end
 
-    it "returns the last matching document" do
-      context.last.should eq(new_order)
+      let(:criteria) do
+        Tree.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "respects default scope" do
+        context.last.should eq(palm)
+      end
     end
   end
 
