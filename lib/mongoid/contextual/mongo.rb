@@ -218,7 +218,8 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        with_eager_loading(query.sort(_id: -1).first)
+        apply_inverse_sorting
+        with_eager_loading(query.first)
       end
 
       # Get's the number of documents matching the query selector.
@@ -378,6 +379,22 @@ module Mongoid
       def apply_sorting
         if spec = criteria.options[:sort]
           query.sort(spec)
+        end
+      end
+
+      # Map the inverse sort symbols to the correct MongoDB values.
+      #
+      # @todo: Durran: Temporary.
+      #
+      # @example Apply the inverse sorting params.
+      #   context.apply_inverse_sorting
+      #
+      # @since 3.0.0
+      def apply_inverse_sorting
+        if spec = criteria.options[:sort]
+          query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
+        else
+          query.sort({:_id => -1})
         end
       end
 
