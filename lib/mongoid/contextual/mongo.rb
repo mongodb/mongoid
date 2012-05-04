@@ -218,7 +218,7 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        with_eager_loading(query.sort(_id: -1).first)
+        with_eager_loading(query.entries.last)
       end
 
       # Get's the number of documents matching the query selector.
