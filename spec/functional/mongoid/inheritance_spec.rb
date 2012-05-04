@@ -27,7 +27,7 @@ describe Mongoid::Document do
     end
 
     it "persists the type" do
-      attributes["_type"].should == "Browser"
+      attributes["_type"].should == ["Browser", "Canvas"]
     end
 
     it "persists the attributes" do
@@ -58,7 +58,7 @@ describe Mongoid::Document do
     end
 
     it "persists the type" do
-      attributes["_type"].should == "Firefox"
+      attributes["_type"].should == ["Firefox", "Browser", "Canvas"]
     end
 
     it "persists the attributes" do

@@ -207,7 +207,15 @@ module Mongoid #:nodoc:
         became.instance_variable_set(:@errors, errors)
         became.instance_variable_set(:@new_record, new_record?)
         became.instance_variable_set(:@destroyed, destroyed?)
-        became._type = klass.to_s
+
+        became._type = []
+        became._type << klass.to_s
+        superklass = klass.superclass
+        while superklass.include?(Mongoid::Document)
+          became._type << superklass.name
+          superklass = superklass.superclass
+        end
+
       end
     end
 

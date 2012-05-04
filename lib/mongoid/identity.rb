@@ -59,7 +59,16 @@ module Mongoid #:nodoc:
     # @example Set the type.
     #   identity.type
     def type
-      document._type = document.class.name if typed?
+      if typed?
+        document._type = []
+        document._type << document.class.name
+        superklass = document.class.superclass
+        while superklass.include?(Mongoid::Document)
+          document._type << superklass.name
+          superklass = superklass.superclass
+        end
+      end
+      document._type
     end
 
     # Generates the array of keys to build the id.
