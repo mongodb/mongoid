@@ -308,7 +308,7 @@ module Mongoid # :nodoc:
                 base.delayed_atomic_sets.clear
                 if replacement.first.is_a?(Hash)
                   replacement = replacement.map do |doc|
-                    attributes = { metadata: metadata, _parent: base }
+                    attributes = { :metadata => metadata, :_parent => base }
                     attributes.merge!(doc)
                     Factory.build(klass, attributes)
                   end

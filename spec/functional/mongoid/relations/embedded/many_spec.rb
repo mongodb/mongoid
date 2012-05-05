@@ -3033,7 +3033,7 @@ describe Mongoid::Relations::Embedded::Many do
     end
 
     let(:address_one) do
-      Address.new(street: "hobrecht")
+      Address.new(:street => "hobrecht")
     end
 
     let(:first_add) do
@@ -3045,8 +3045,8 @@ describe Mongoid::Relations::Embedded::Many do
 
     let!(:person) do
       Person.create(
-        addresses: [
-          { locations: [{ name: "home" }]}
+        :addresses => [
+          { :locations => [{ :name => "home" }]}
         ]
       )
     end
@@ -3059,8 +3059,8 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         from_db.update_attributes(
-          addresses: [
-            { locations: [{ name: "work" }]}
+          :addresses => [
+            { :locations => [{ :name => "work" }]}
           ]
         )
       end
