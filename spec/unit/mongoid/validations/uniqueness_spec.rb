@@ -159,7 +159,8 @@ describe Mongoid::Validations::UniquenessValidator do
         end
 
         before do
-          word.definitions.expects(:where).with(
+          word.definitions.expects(:unscoped).returns(criteria)
+          criteria.expects(:where).with(
             :description => "Testy"
           ).returns(criteria)
           criteria.expects(:count).returns(2)
@@ -178,7 +179,8 @@ describe Mongoid::Validations::UniquenessValidator do
         end
 
         before do
-          word.definitions.expects(:where).with(
+          word.definitions.expects(:unscoped).returns(criteria)
+          criteria.expects(:where).with(
             :description => "Testy"
           ).returns(criteria)
           criteria.expects(:count).returns(2)
@@ -197,7 +199,8 @@ describe Mongoid::Validations::UniquenessValidator do
         end
 
         before do
-          word.definitions.expects(:where).with(
+          word.definitions.expects(:unscoped).returns(criteria)
+          criteria.expects(:where).with(
             :description => /^Testy$/i
           ).returns(criteria)
           criteria.expects(:count).returns(2)
@@ -216,7 +219,8 @@ describe Mongoid::Validations::UniquenessValidator do
         end
 
         before do
-          word.definitions.expects(:where).with(
+          word.definitions.expects(:unscoped).returns(criteria)
+          criteria.expects(:where).with(
             :description => "Testy"
           ).returns(criteria)
           criteria.expects(:where).with(:part => definition.part).returns(criteria)
