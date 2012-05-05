@@ -770,6 +770,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1936 Allow setting n levels deep embedded documents atomically without
+  conflicting mods when not using nested attributes or documents themselves
+  in an update call from the parent.
+
 * \#1957/\#1954 Ensure database name is set with inheritance.
   (Hans Hasselberg)
 

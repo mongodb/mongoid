@@ -82,24 +82,29 @@ module Mongoid
             docs = normalize_docs(docs).compact
             target.clear and _unscoped.clear
             inserts = execute_batch_insert(docs, "$set")
-            base.delayed_atomic_sets[path] = inserts if _assigning?
+            add_atomic_sets(inserts)
           end
         end
 
         private
 
-        # @attribute [rw] inserts_valid If all inserts are valid.
-        def inserts_valid
-          @inserts_valid
-        end
-
-        def inserts_valid=(value)
-          @inserts_valid = value
-        end
-
-        # @attribute [w] path The atomic path
-        def path=(value)
-          @path = value
+        # Add the atomic sets to the base document.
+        #
+        # @api private
+        #
+        # @example Add the atomic sets.
+        #   batchable.add_atomic_sets([{ field: value }])
+        #
+        # @param [ Array<Hash> ] sets The atomic sets.
+        #
+        # @since 3.0.0
+        def add_atomic_sets(sets)
+          if _assigning?
+            base.collect_children.each do |child|
+              child.delayed_atomic_sets.clear
+            end
+            base.delayed_atomic_sets[path] = sets
+          end
         end
 
         # Perform a batch persist of the provided documents with the supplied
@@ -140,6 +145,36 @@ module Mongoid
           persistable? && !_assigning? && inserts_valid
         end
 
+        # Are the inserts currently valid?
+        #
+        # @api private
+        #
+        # @example Are the inserts currently valid.
+        #   batchable.inserts_valid
+        #
+        # @return [ true, false ] If inserts are currently valid.
+        #
+        # @since 3.0.0
+        def inserts_valid
+          @inserts_valid
+        end
+
+        # Set the inserts valid flag.
+        #
+        # @api private
+        #
+        # @example Set the flag.
+        #   batchable.inserts_valid = true
+        #
+        # @param [ true, false ] value The flag.
+        #
+        # @return [ true, false ] The flag.
+        #
+        # @since 3.0.0
+        def inserts_valid=(value)
+          @inserts_valid = value
+        end
+
         # Normalize the documents, in case they were provided as an array of
         # hashes.
         #
@@ -155,7 +190,11 @@ module Mongoid
         # @since 3.0.0
         def normalize_docs(docs)
           if docs.first.is_a?(::Hash)
-            Many.builder(base, metadata, docs).build
+            docs.map do |doc|
+              attributes = { metadata: metadata, _parent: base }
+              attributes.merge!(doc)
+              Factory.build(klass, attributes)
+            end
           else
             docs
           end
@@ -173,6 +212,22 @@ module Mongoid
         # @since 3.0.0
         def path
           @path ||= _unscoped.first.atomic_path
+        end
+
+        # Set the atomic path.
+        #
+        # @api private
+        #
+        # @example Set the atomic path.
+        #   batchable.path = "addresses"
+        #
+        # @param [ String ] value The path.
+        #
+        # @return [ String ] The path.
+        #
+        # @since 3.0.0
+        def path=(value)
+          @path = value
         end
 
         # Get the selector for executing atomic operations on the collection.
