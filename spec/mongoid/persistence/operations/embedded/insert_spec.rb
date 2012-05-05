@@ -53,6 +53,11 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
       it "does not put the document in the identity map" do
         in_map.should be_nil
       end
+
+      it 'does update parent attributes with embed document without reload' do
+        address
+        person.attributes['addresses'].should == [address.attributes]
+      end
     end
 
     context "when no parent is set" do
@@ -114,6 +119,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
           root_insert_expectation.call
           insert.persist.should eq(email)
         end
+
       end
 
       context "when the parent is not new" do
@@ -124,11 +130,16 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
 
         before do
           document.instance_variable_set(:@new_record, false)
+          root_set_expectation.call
         end
 
         it "performs an in place $set on the embedded document" do
-          root_set_expectation.call
           insert.persist.should eq(email)
+        end
+
+        it 'update attributes of parent document' do
+          insert.persist
+          document.attributes['email'].should eq(email.attributes)
         end
       end
     end
@@ -169,6 +180,12 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
         it "performs a $push on the embedded array" do
           root_push_expectation.call
           insert.persist.should eq(address)
+        end
+
+        it 'update the attributes of parent' do
+          root_push_expectation.call
+          insert.persist
+          document.attributes['addresses'].should == [address.attributes]
         end
 
         context "when we add the parent to the child" do

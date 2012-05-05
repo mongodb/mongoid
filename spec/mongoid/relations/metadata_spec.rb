@@ -537,6 +537,35 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#embeds_one?" do
+    context "when the relation is embedded" do
+
+      let(:metadata) do
+        described_class.new(
+          relation: Mongoid::Relations::Embedded::One
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_embeds_one
+      end
+    end
+
+    context "when the relation is not embedded" do
+
+      let(:metadata) do
+        described_class.new(
+          relation: Mongoid::Relations::Embedded::Many
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_embeds_one
+      end
+    end
+
+  end
+
   describe "#extension" do
 
     let(:metadata) do
