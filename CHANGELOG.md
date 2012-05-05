@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1976 Eager loading no longer produces queries when the base query returns
+  zero results.
+
 * `Model.find_by` now accepts a block and will yield to the found document if
   it is not nil.
 

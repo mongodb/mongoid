@@ -410,12 +410,14 @@ module Mongoid
       # @since 3.0.0
       def eager_load(docs)
         criteria.inclusions.reject! do |metadata|
-          if metadata.stores_foreign_key?
-            child_ids = load_ids(metadata.foreign_key).flatten
-            metadata.eager_load(child_ids)
-          else
-            parent_ids = docs.map(&:id)
-            metadata.eager_load(parent_ids)
+          unless docs.empty?
+            if metadata.stores_foreign_key?
+              child_ids = load_ids(metadata.foreign_key).flatten
+              metadata.eager_load(child_ids)
+            else
+              parent_ids = docs.map(&:id)
+              metadata.eager_load(parent_ids)
+            end
           end
         end
         self.eager_loaded = true
