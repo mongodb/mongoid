@@ -1411,4 +1411,30 @@ describe Mongoid::Relations::Referenced::In do
       cookie.reload.jar.should eq(jar)
     end
   end
+
+  context "when setting the relation via the foreign key" do
+
+    context "when the relation exists" do
+
+      let!(:person_one) do
+        Person.create
+      end
+
+      let!(:person_two) do
+        Person.create
+      end
+
+      let!(:game) do
+        Game.create(person: person_one)
+      end
+
+      before do
+        game.person_id = person_two.id
+      end
+
+      it "sets the new document on the relation" do
+        game.person.should eq(person_two)
+      end
+    end
+  end
 end

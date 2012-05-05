@@ -329,7 +329,7 @@ module Mongoid
         field = fields[name]
 
         create_field_getter(name, meth, field)
-        create_field_setter(name, meth)
+        create_field_setter(name, meth, field)
         create_field_check(name, meth)
 
         if options[:localize]
@@ -365,12 +365,16 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
+      # @param [ Field ] field The field.
       #
       # @since 2.4.0
-      def create_field_setter(name, meth)
+      def create_field_setter(name, meth, field)
         generated_methods.module_eval do
           re_define_method("#{meth}=") do |value|
             write_attribute(name, value)
+            if field.foreign_key?
+              remove_ivar(field.metadata.name)
+            end
           end
         end
       end

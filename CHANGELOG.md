@@ -663,6 +663,19 @@ For instructions on upgrading to newer versions, visit
 * \#1268 `Model#new?` has been removed, developers must now always use
   `Model#new_record?`.
 
+* \#1182 A reload is no longer required to refresh a relation after setting
+  the value of the foreign key field for it. Note this behaves exactly as
+  Active Record.
+
+    If the id is set, but the document for it has not been persisted, accessing
+    the relation will return empty results.
+
+    If the id is set and it's document is persisted, accessing the relation
+    will return the document.
+
+    If the id is set, but the base document is not saved afterwards, then
+    reloading will return the document to it's original state.
+
 * \#1093 Field serialization strategies have changed on Array, Hash, Integer
   and Boolean to be more consistent and match AR where appropriate.
 

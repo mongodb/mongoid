@@ -2739,4 +2739,30 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
   end
+
+  context "when setting the relation via the foreign key" do
+
+    context "when the relation exists" do
+
+      let!(:person) do
+        Person.create
+      end
+
+      let!(:pref_one) do
+        person.preferences.create
+      end
+
+      let!(:pref_two) do
+        Preference.create
+      end
+
+      before do
+        person.preference_ids = [ pref_two.id ]
+      end
+
+      it "sets the new documents on the relation" do
+        person.preferences.should eq([ pref_two ])
+      end
+    end
+  end
 end
