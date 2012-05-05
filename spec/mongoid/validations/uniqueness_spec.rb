@@ -34,6 +34,40 @@ describe Mongoid::Validations::UniquenessValidator do
           end
         end
 
+        context "when the field is localized" do
+
+          before do
+            Dictionary.validates_uniqueness_of :description
+          end
+
+          after do
+            Dictionary.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is not unique" do
+
+            context "when the document is not the match" do
+
+              before do
+                Dictionary.create(description: "english")
+              end
+
+              let(:dictionary) do
+                Dictionary.new(description: "english")
+              end
+
+              it "returns false" do
+                dictionary.should_not be_valid
+              end
+
+              it "adds the uniqueness error" do
+                dictionary.valid?
+                dictionary.errors[:description].should eq([ "is already taken" ])
+              end
+            end
+          end
+        end
+
         context "when no scope is provided" do
 
           before do

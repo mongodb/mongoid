@@ -44,31 +44,35 @@ module Mongoid
         attrib, val = to_validate(document, attribute, value)
         return unless validation_required?(document, attrib)
         if document.embedded?
-          return if skip_validation?(document)
-          relation = document._parent.send(document.metadata.name)
-          criteria = relation.where(criterion(document, attrib, val))
-          criteria = scope(criteria, document, attrib)
-          if criteria.count > 1
-            document.errors.add(
-              attrib,
-              :taken,
-              options.except(:case_sensitive, :scope).merge(val: val)
-            )
-          end
+          validate_embedded(document, attrib, val)
         else
-          criteria = klass.unscoped.where(criterion(document, attrib, val))
-          criteria = scope(criteria, document, attrib)
-          if criteria.exists?
-            document.errors.add(
-              attrib, :taken, options.except(:case_sensitive, :scope).merge(val: val)
-            )
-          end
+          validate_root(document, attrib, val)
         end
       end
 
-      protected
+      private
+
+      # Add the error to the document.
+      #
+      # @api private
+      #
+      # @example Add the error.
+      #   validator.add_error(doc, :name, "test")
+      #
+      # @param [ Document ] document The document to validate.
+      # @param [ Symbol ] attribute The name of the attribute.
+      # @param [ Object ] value The value of the object.
+      #
+      # @since 2.4.10
+      def add_error(document, attribute, value)
+        document.errors.add(
+          attribute, :taken, options.except(:case_sensitive, :scope).merge(value: value)
+        )
+      end
 
       # Should the uniqueness validation be case sensitive?
+      #
+      # @api private
       #
       # @example Is the validation case sensitive?
       #   validator.case_sensitive?
@@ -80,7 +84,35 @@ module Mongoid
         !(options[:case_sensitive] == false)
       end
 
+      # Create the validation criteria.
+      #
+      # @api private
+      #
+      # @example Create the criteria.
+      #   validator.create_criteria(User, user, :name, "syd")
+      #
+      # @param [ Class, Proxy ] base The base to execute the criteria from.
+      # @param [ Document ] document The document to validate.
+      # @param [ Symbol ] attribute The name of the attribute.
+      # @param [ Object ] value The value of the object.
+      #
+      # @return [ Criteria ] The criteria.
+      #
+      # @since 2.4.10
+      def create_criteria(base, document, attribute, value)
+        field = document.fields[attribute.to_s]
+        criteria = base.unscoped
+        if field.try(:localized?)
+          criteria.selector.update(criterion(document, attribute, value))
+        else
+          criteria = criteria.where(criterion(document, attribute, value))
+        end
+        scope(criteria, document, attribute)
+      end
+
       # Get the default criteria for checking uniqueness.
+      #
+      # @api private
       #
       # @example Get the criteria.
       #   validator.criterion(person, :title, "Sir")
@@ -102,6 +134,8 @@ module Mongoid
 
       # Filter the value based on whether the check is case sensitive or not.
       #
+      # @api private
+      #
       # @example Filter the value.
       #   validator.filter("testing")
       #
@@ -115,6 +149,8 @@ module Mongoid
       end
 
       # Scope the criteria to the scope options provided.
+      #
+      # @api private
       #
       # @example Scope the criteria.
       #   validator.scope(criteria, document)
@@ -134,6 +170,8 @@ module Mongoid
 
       # Should validation be skipped?
       #
+      # @api private
+      #
       # @example Should the validation be skipped?
       #   validator.skip_validation?(doc)
       #
@@ -147,6 +185,8 @@ module Mongoid
       end
 
       # Scope reference has changed?
+      #
+      # @api private
       #
       # @example Has scope reference changed?
       #   validator.scope_value_changed?(doc)
@@ -167,6 +207,8 @@ module Mongoid
       # we need to send the key name and value to the db, not the relation
       # object.
       #
+      # @api private
+      #
       # @example Get the name and key to validate.
       #   validator.to_validate(doc, :parent, Parent.new)
       #
@@ -184,6 +226,42 @@ module Mongoid
         else
           [ attribute, value ]
         end
+      end
+
+      # Validate an embedded document.
+      #
+      # @api private
+      #
+      # @example Validate the embedded document.
+      #   validator.validate_embedded(doc, :name, "test")
+      #
+      # @param [ Document ] document The document.
+      # @param [ Symbol ] attribute The attribute name.
+      # @param [ Object ] value The value.
+      #
+      # @since 2.4.10
+      def validate_embedded(document, attribute, value)
+        return if skip_validation?(document)
+        relation = document._parent.send(document.metadata.name)
+        criteria = create_criteria(relation, document, attribute, value)
+        add_error(document, attribute, value) if criteria.count > 1
+      end
+
+      # Validate a root document.
+      #
+      # @api private
+      #
+      # @example Validate the root document.
+      #   validator.validate_root(doc, :name, "test")
+      #
+      # @param [ Document ] document The document.
+      # @param [ Symbol ] attribute The attribute name.
+      # @param [ Object ] value The value.
+      #
+      # @since 2.4.10
+      def validate_root(document, attribute, value)
+        criteria = create_criteria(klass, document, attribute, value)
+        add_error(document, attribute, value) if criteria.exists?
       end
 
       # Are we required to validate the document?
