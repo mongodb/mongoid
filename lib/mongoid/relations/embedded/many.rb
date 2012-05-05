@@ -307,7 +307,11 @@ module Mongoid # :nodoc:
               atomically(:$set) do
                 base.delayed_atomic_sets.clear
                 if replacement.first.is_a?(Hash)
-                  replacement = Many.builder(base, metadata, replacement).build
+                  replacement = replacement.map do |doc|
+                    attributes = { metadata: metadata, _parent: base }
+                    attributes.merge!(doc)
+                    Factory.build(klass, attributes)
+                  end
                 end
                 docs = replacement.compact
                 proxy.target = docs
@@ -319,6 +323,10 @@ module Mongoid # :nodoc:
                 end
                 if _assigning?
                   name = _unscoped.first.atomic_path
+                  base._children.each do |child|
+                    child.delayed_atomic_sets.clear
+                  end
+                  base.instance_variable_set(:@_children, nil)
                   base.delayed_atomic_sets[name] = proxy.as_document
                 end
               end

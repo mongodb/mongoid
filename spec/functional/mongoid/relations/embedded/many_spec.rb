@@ -3025,4 +3025,53 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when adding a document" do
+
+    let(:person) do
+      Person.new
+    end
+
+    let(:address_one) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:first_add) do
+      person.addresses.push(address_one)
+    end
+  end
+
+  context "when updating multiple levels in one update" do
+
+    let!(:person) do
+      Person.create(
+        addresses: [
+          { locations: [{ name: "home" }]}
+        ]
+      )
+    end
+
+    context "when updating with hashes" do
+
+      let(:from_db) do
+        Person.find(person.id)
+      end
+
+      before do
+        from_db.update_attributes(
+          addresses: [
+            { locations: [{ name: "work" }]}
+          ]
+        )
+      end
+
+      let(:updated) do
+        person.reload.addresses.first.locations.first
+      end
+
+      it "updates the nested document" do
+        updated.name.should eq("work")
+      end
+    end
+  end
 end
