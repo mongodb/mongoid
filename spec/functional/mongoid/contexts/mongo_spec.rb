@@ -174,6 +174,29 @@ describe Mongoid::Contexts::Mongo do
     end
   end
 
+  describe "#eager_load" do
+
+    let(:criteria) do
+      Person.includes(:game)
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when no documents are returned" do
+
+      let(:game_metadata) do
+        Person.reflect_on_association(:game)
+      end
+
+      it "does not make any additional database queries" do
+        game_metadata.expects(:eager_load).never
+        context.send(:eager_load, [])
+      end
+    end
+  end
+
   describe "#empty?" do
 
     context "when no documents are in the collection" do

@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1976 Don't execute eager load queries when base query is empty.
+
 * \#1953 Uniqueness validation now works on localized fields.
 
 * \#1936 Allow setting n levels deep embedded documents atomically without
