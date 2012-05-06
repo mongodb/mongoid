@@ -310,12 +310,12 @@ module Mongoid
     # @return [ Array<Document> ] The found documents.
     def multiple_from_map_or_db(ids)
       return entries if klass.embedded?
-
-      result, not_in_map = ids.
-        map{ |id| IdentityMap.get(klass, id) || id }.
-        partition{ |id| id.is_a?(klass) }
-      result += for_ids(not_in_map).entries
-      result.select{ |e| e.matches?(selector) }
+      result = []
+      ids.reject! do |id|
+        doc = IdentityMap.get(klass, id)
+        doc && doc.matches?(selector) ? result.push(doc) : false
+      end
+      result + any_in(id: ids).entries
     end
 
     # Initialize the new criteria.
