@@ -137,8 +137,9 @@ module Mongoid
         @documents = criteria.documents.select do |doc|
           doc.matches?(criteria.selector)
         end
-        apply_sorting
+        apply_options
       end
+
 
       # Get the last document in the database for the criteria's selector.
       #
@@ -285,6 +286,31 @@ module Mongoid
           documents.sort! do |a, b|
             dir > 0 ? a[field] <=> b[field] : b[field] <=> a[field]
           end
+        end
+      end
+
+      # Apply all the optional criterion.
+      #
+      # @example Apply the options.
+      #   context.apply_options
+      #
+      # @since 3.0.0
+      def apply_options
+        apply_sorting
+        apply_limit
+      end
+
+      # Apply the limit option.
+      #
+      # @api private
+      #
+      # @example Apply the limit option.
+      #   context.apply_limit
+      #
+      # @since 3.0.0
+      def apply_limit
+        if spec = criteria.options[:limit]
+          self.limit(spec)
         end
       end
     end

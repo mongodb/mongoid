@@ -455,7 +455,7 @@ describe Mongoid::Contextual::Memory do
     end
 
     let(:criteria) do
-      Address.where(street: "hobrecht").tap do |crit|
+      Address.where(street: "hobrecht").limit(4).tap do |crit|
         crit.documents = [ hobrecht, friedel ]
       end
     end
@@ -474,6 +474,10 @@ describe Mongoid::Contextual::Memory do
 
     it "sets the matching documents" do
       context.documents.should eq([ hobrecht ])
+    end
+
+    it 'sets the limiting' do
+      context.send(:limiting).should == 4
     end
   end
 
