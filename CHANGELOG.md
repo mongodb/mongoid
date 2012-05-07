@@ -392,10 +392,10 @@ For instructions on upgrading to newer versions, visit
 * \#1355 Associations now can have safety options provided to them on single
   document persistence operations.
 
-        band.albums.safely.push(album)
-        band.albums.safely.create(name: "Smiths")
+        band.albums.with(safe: true).push(album)
+        band.albums.with(safe: true).create(name: "Smiths")
 
-        album.safely.create_producer(name: "Flood")
+        album.with(safe: true).create_producer(name: "Flood")
 
 * \#1348 Eager loading is now supported on many-to-many relations.
 
