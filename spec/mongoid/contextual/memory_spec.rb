@@ -446,34 +446,87 @@ describe Mongoid::Contextual::Memory do
 
   describe "#initialize" do
 
-    let(:hobrecht) do
-      Address.new(street: "hobrecht")
-    end
+    context "when the criteria has no options" do
 
-    let(:friedel) do
-      Address.new(street: "friedel")
-    end
+      let(:hobrecht) do
+        Address.new(street: "hobrecht")
+      end
 
-    let(:criteria) do
-      Address.where(street: "hobrecht").tap do |crit|
-        crit.documents = [ hobrecht, friedel ]
+      let(:friedel) do
+        Address.new(street: "friedel")
+      end
+
+      let(:criteria) do
+        Address.where(street: "hobrecht").tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "sets the criteria" do
+        context.criteria.should eq(criteria)
+      end
+
+      it "sets the klass" do
+        context.klass.should eq(Address)
+      end
+
+      it "sets the matching documents" do
+        context.documents.should eq([ hobrecht ])
       end
     end
 
-    let(:context) do
-      described_class.new(criteria)
+    context "when the criteria skips" do
+
+      let(:hobrecht) do
+        Address.new(street: "hobrecht")
+      end
+
+      let(:friedel) do
+        Address.new(street: "friedel")
+      end
+
+      let(:criteria) do
+        Address.all.skip(1).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "limits the matching documents" do
+        context.should eq([ friedel ])
+      end
     end
 
-    it "sets the criteria" do
-      context.criteria.should eq(criteria)
-    end
+    context "when the criteria limits" do
 
-    it "sets the klass" do
-      context.klass.should eq(Address)
-    end
+      let(:hobrecht) do
+        Address.new(street: "hobrecht")
+      end
 
-    it "sets the matching documents" do
-      context.documents.should eq([ hobrecht ])
+      let(:friedel) do
+        Address.new(street: "friedel")
+      end
+
+      let(:criteria) do
+        Address.all.limit(1).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "limits the matching documents" do
+        context.should eq([ hobrecht ])
+      end
     end
   end
 

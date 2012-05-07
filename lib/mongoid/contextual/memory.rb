@@ -13,6 +13,21 @@ module Mongoid
       #   selector.
       attr_reader :criteria, :klass, :documents
 
+      # Check if the context is equal to the other object.
+      #
+      # @example Check equality.
+      #   context == []
+      #
+      # @param [ Array ] other The other array.
+      #
+      # @return [ true, false ] If the objects are equal.
+      #
+      # @since 3.0.0
+      def ==(other)
+        return false unless other.respond_to?(:entries)
+        entries == other.entries
+      end
+
       # Is the enumerable of matching documents empty?
       #
       # @example Is the context empty?
@@ -138,6 +153,7 @@ module Mongoid
           doc.matches?(criteria.selector)
         end
         apply_sorting
+        apply_options
       end
 
       # Get the last document in the database for the criteria's selector.
@@ -176,7 +192,8 @@ module Mongoid
       #
       # @since 3.0.0
       def limit(value)
-        self.limiting = value and self
+        self.limiting = value
+        self
       end
 
       # Skips the provided number of documents.
@@ -190,7 +207,8 @@ module Mongoid
       #
       # @since 3.0.0
       def skip(value)
-        self.skipping = value and self
+        self.skipping = value
+        self
       end
 
       # Sorts the documents by the provided spec.
@@ -229,26 +247,75 @@ module Mongoid
 
       private
 
-      # @attribute [rw] limiting The number of documents to return.
+      # Get the limiting value.
+      #
+      # @api private
+      #
+      # @example Get the limiting value.
+      #
+      # @return [ Integer ] The limit.
+      #
+      # @since 3.0.0
       def limiting
         defined?(@limiting) ? @limiting : nil
       end
 
+      # Set the limiting value.
+      #
+      # @api private
+      #
+      # @example Set the limiting value.
+      #
+      # @param [ Integer ] value The limit.
+      #
+      # @return [ Integer ] The limit.
+      #
+      # @since 3.0.0
       def limiting=(value)
         @limiting = value
       end
 
-      # @attribute [rw] skipping The number of documents to skip.
+      # Get the skiping value.
+      #
+      # @api private
+      #
+      # @example Get the skiping value.
+      #
+      # @return [ Integer ] The skip.
+      #
+      # @since 3.0.0
       def skipping
         defined?(@skipping) ? @skipping : nil
       end
 
+      # Set the skiping value.
+      #
+      # @api private
+      #
+      # @example Set the skiping value.
+      #
+      # @param [ Integer ] value The skip.
+      #
+      # @return [ Integer ] The skip.
+      #
+      # @since 3.0.0
       def skipping=(value)
         @skipping = value
       end
 
-      # Map the sort symbols to the correct MongoDB values.
-      SORT_MAPPINGS = { asc: 1, ascending: 1, desc: -1, descending: -1 }
+      # Apply criteria options.
+      #
+      # @api private
+      #
+      # @example Apply criteria options.
+      #   context.apply_options
+      #
+      # @return [ Memory ] self.
+      #
+      # @since 3.0.0
+      def apply_options
+        skip(criteria.options[:skip]).limit(criteria.options[:limit])
+      end
 
       # Map the sort symbols to the correct MongoDB values.
       #
@@ -260,13 +327,7 @@ module Mongoid
       # @since 3.0.0
       def apply_sorting
         if spec = criteria.options[:sort]
-          normalized = Hash[spec]
-          normalized.each_pair do |field, direction|
-            unless direction.is_a?(::Integer)
-              normalized[field] = SORT_MAPPINGS[direction.to_sym]
-            end
-          end
-          in_place_sort(normalized)
+          in_place_sort(spec)
         end
       end
 
