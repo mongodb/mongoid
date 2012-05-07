@@ -2935,6 +2935,42 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#limit" do
+    context "on non embed document" do
+      let!(:bands) do
+        3.times { |i|
+          Band.create(name: "Depeche Mode #{i}")
+        }
+      end
+      let(:criteria) {
+        Band.limit(2)
+      }
+
+      it 'limit result' do
+        # TODO; need merge of https://github.com/mongoid/moped/pull/7 to works
+        # criteria.count.should == 2
+        criteria.entries.size.should == 2
+      end
+    end
+
+    context "on embed document" do
+      let(:person) { Person.create }
+      let!(:videos) {
+        3.times { person.videos.create(:title => 'ok') }
+      }
+
+      let(:criteria) {
+        person.videos.limit(2)
+      }
+
+      it 'limit result' do
+        criteria.count.should == 2
+      end
+
+    end
+
+  end
+
   describe "#within_box" do
 
     before do
