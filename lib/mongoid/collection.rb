@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/collections/retry"
 require "mongoid/collections/operations"
 require "mongoid/collections/cyclic_iterator"
 require "mongoid/collections/master"
