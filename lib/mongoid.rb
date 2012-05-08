@@ -75,6 +75,7 @@ require "mongoid/versioning"
 require "mongoid/components"
 require "mongoid/paranoia"
 require "mongoid/document"
+require "mongoid/autofields"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
