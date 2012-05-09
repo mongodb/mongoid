@@ -128,6 +128,7 @@ module Mongoid
               query.each do |doc|
                 yield Factory.from_db(klass, doc)
               end
+              self
             end
           end
         else

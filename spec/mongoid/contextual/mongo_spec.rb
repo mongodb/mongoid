@@ -285,6 +285,10 @@ describe Mongoid::Contextual::Mongo do
           doc.name.should eq("Depeche Mode")
         end
       end
+
+      it "returns self" do
+        context.each{}.should be(context)
+      end
     end
 
     context "when no block is provided" do
