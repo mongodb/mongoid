@@ -786,6 +786,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2003 Don't fail on document generation when an embedded document was
+  stored as nil in the database.
+
 * \#1994 `dependent: :delete` only hits the database once now for one to
   many and many to many relations instead of once for each document.
 
