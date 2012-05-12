@@ -27,8 +27,16 @@ module Mongoid
         #
         # @example Perform the cascading delete.
         #   strategy.cascade
+        #
+        # @since 2.0.0
         def cascade
-          Array.wrap(relation).each { |doc| doc.delete } if relation
+          if relation
+            if relation.cascades.empty?
+              relation.clear
+            else
+              ::Array.wrap(relation).each { |doc| doc.delete }
+            end
+          end
         end
       end
     end

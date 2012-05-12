@@ -96,6 +96,7 @@ class Person
   has_one :account, validate: false
   has_one :cat, dependent: :nullify, validate: false
   has_one :book, autobuild: true, validate: false
+  has_one :home, dependent: :delete, validate: false
 
   has_and_belongs_to_many \
     :administrated_events,
