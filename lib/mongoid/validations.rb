@@ -126,6 +126,40 @@ module Mongoid
         validates_with(UniquenessValidator, _merge_attributes(args))
       end
 
+      # Validates the format of a field.
+      #
+      # @example
+      #   class Person
+      #     include Mongoid::Document
+      #     field :title
+      #
+      #     validates_format_of :title, with: /^[a-z0-9 \-_]*$/i
+      #   end
+      #
+      # @param [ Array ] args The names of the fields to validate.
+      #
+      # @since 2.4.0
+      def validates_format_of(*args)
+        validates_with(Mongoid::Validations::FormatValidator, _merge_attributes(args))
+      end
+
+      # Validates the length of a field.
+      #
+      # @example
+      #   class Person
+      #     include Mongoid::Document
+      #     field :title
+      #
+      #     validates_length_of :title, minimum: 100
+      #   end
+      #
+      # @param [ Array ] args The names of the fields to validate.
+      #
+      # @since 2.4.0
+      def validates_length_of(*args)
+        validates_with(Mongoid::Validations::LengthValidator, _merge_attributes(args))
+      end
+
       # Validates whether or not a field is present - meaning nil or empty.
       #
       # @example
