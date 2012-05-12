@@ -7,6 +7,18 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#1989 Criteria `count`, `size` and `length` now behave as Active Record
+  with regards to database access.
+
+    `Criteria#count` will always hit the database to get the count.
+
+    `Criteria#length` and `Criteria#size` will hit the database once if the
+    criteria has not been loaded, and subsequent calls will return the
+    cached value.
+
+    If the criteria has been iterated over or loaded, `length` and `size`
+    will never hit the db.
+
 * \#1976 Eager loading no longer produces queries when the base query returns
   zero results.
 

@@ -673,6 +673,29 @@ describe Mongoid::Contextual::Mongo do
       it "returns the number of documents that match" do
         context.send(method).should eq(1)
       end
+
+      context "when calling more than once" do
+
+        before do
+          context.query.expects(:count).once.returns(1)
+        end
+
+        it "returns the cached value for subsequent calls" do
+          2.times { context.send(method).should eq(1) }
+        end
+      end
+
+      context "when the results have been iterated over" do
+
+        before do
+          context.entries
+          context.query.expects(:count).never
+        end
+
+        it "returns the cached value for all calls" do
+          context.send(method).should eq(1)
+        end
+      end
     end
   end
 

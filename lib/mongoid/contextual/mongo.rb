@@ -122,11 +122,13 @@ module Mongoid
               eager_load(docs)
               docs.each do |doc|
                 yield doc
+                increment_length
               end
               docs
             else
               query.each do |doc|
                 yield Factory.from_db(klass, doc)
+                increment_length
               end
               self
             end
@@ -232,7 +234,7 @@ module Mongoid
       #
       # @since 3.0.0
       def length
-        query.count
+        @length ||= query.count
       end
       alias :size :length
 
@@ -434,6 +436,11 @@ module Mongoid
       # @since 3.0.0
       def eager_loadable?
         !eager_loaded && criteria.inclusions.any?
+      end
+
+      def increment_length
+        @length ||= 0
+        @length += 1
       end
 
       # Loads an array of ids only for the current criteria. Used by eager
