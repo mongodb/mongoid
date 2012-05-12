@@ -96,6 +96,21 @@ describe Mongoid::Factory do
 
   describe ".from_db" do
 
+    context "when the attributes are nil" do
+
+      let(:document) do
+        described_class.from_db(Address, nil)
+      end
+
+      it "generates based on the provided class" do
+        document.should be_a(Address)
+      end
+
+      it "sets the attributes to empty" do
+        document.attributes.should be_empty
+      end
+    end
+
     context "when a type is in the attributes" do
 
       context "when the type is a class" do

@@ -15,7 +15,7 @@ module Mongoid #:nodoc:
     # @param [ Hash ] optiosn The mass assignment scoping options.
     #
     # @return [ Document ] The instantiated document.
-    def build(klass, attributes = {}, options = {})
+    def build(klass, attributes = nil, options = {})
       type = (attributes || {})["_type"]
       if type && klass._types.include?(type)
         type.constantize.new(attributes, options)
@@ -34,8 +34,8 @@ module Mongoid #:nodoc:
     # @param [ Hash ] attributes The document attributes.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = {})
-      type = attributes["_type"]
+    def from_db(klass, attributes = nil)
+      type = (attributes || {})["_type"]
       if type.blank?
         klass.instantiate(attributes)
       else
