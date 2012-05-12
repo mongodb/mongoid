@@ -137,7 +137,7 @@ describe Mongoid::Extensions::Date do
     context "when provided a float" do
 
       let(:time) do
-        Time.utc(2010, 1, 1, 0, 0, 0, 0)
+        Time.utc(2010, 1, 1, 1, 0, 0, 0)
       end
 
       let(:float) do
@@ -148,8 +148,12 @@ describe Mongoid::Extensions::Date do
         Date.mongoize(float)
       end
 
+      let(:expected) do
+        Time.at(float)
+      end
+
       it "returns the float as a time" do
-        evolved.should eq(time)
+        evolved.should eq(Time.utc(expected.year, expected.month, expected.day))
       end
     end
 
@@ -167,8 +171,12 @@ describe Mongoid::Extensions::Date do
         Date.mongoize(integer)
       end
 
+      let(:expected) do
+        Time.at(integer)
+      end
+
       it "returns the integer as a time" do
-        evolved.should eq(time)
+        evolved.should eq(Time.utc(expected.year, expected.month, expected.day))
       end
     end
 
