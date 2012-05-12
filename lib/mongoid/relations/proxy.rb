@@ -160,8 +160,14 @@ module Mongoid
         #
         # @since 2.2.0
         def eager_load_ids(metadata, ids)
+          cleared = false
           klass, foreign_key = metadata.klass, metadata.foreign_key
           klass.any_in(foreign_key => ids).each do |doc|
+            selector = { foreign_key => doc.send(foreign_key) }
+            unless cleared
+              IdentityMap.clear_many(klass, selector)
+              cleared = true
+            end
             yield(doc, foreign_key => doc.send(foreign_key))
           end
         end

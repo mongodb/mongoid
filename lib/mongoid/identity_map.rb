@@ -4,6 +4,22 @@ module Mongoid
   # Defines behaviour for the identity map in Mongoid.
   class IdentityMap < Hash
 
+    # Clear out the loaded documents for the provided selector.
+    #
+    # @example Clear out the documents.
+    #   map.clear_many(Post, { person_id: person.id })
+    #
+    # @param [ Class ] klass The class of the relation.
+    # @param [ Hash ] selector The selector.
+    #
+    # @return [ Array ] An empty array.
+    #
+    # @since 2.4.10
+    def clear_many(klass, selector)
+      documents = documents_for(klass)[selector]
+      documents.clear if documents
+    end
+
     # Get a document from the identity map by its id.
     #
     # @example Get the document from the map.

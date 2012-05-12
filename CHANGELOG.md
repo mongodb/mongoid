@@ -789,6 +789,9 @@ For instructions on upgrading to newer versions, visit
 * \#1994 `dependent: :delete` only hits the database once now for one to
   many and many to many relations instead of once for each document.
 
+* \#1987 Don't double-insert documents into identity map when eager loading
+  twice inside the unit of work.
+
 * \#1953 Uniqueness validation now works on localized fields.
 
 * \#1936 Allow setting n levels deep embedded documents atomically without

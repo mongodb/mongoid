@@ -1693,6 +1693,25 @@ describe Mongoid::Criteria do
         it "inserts the second document into the identity map" do
           Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
         end
+
+        context "when executing the query twice" do
+
+          let!(:from_db) do
+            Person.where(id: person.id).first
+          end
+
+          let(:mapped) do
+            Mongoid::IdentityMap[Post.collection_name]["person_id" => person.id]
+          end
+
+          it "does not duplicate documents in the relation" do
+            person.posts.size.should eq(2)
+          end
+
+          it "does not duplicate documents in the map" do
+            mapped.size.should eq(2)
+          end
+        end
       end
 
       context "when calling first on the criteria" do
