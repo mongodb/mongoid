@@ -6,6 +6,18 @@ module Mongoid # :nodoc:
     # behaviour or those proxies.
     class One < Proxy
 
+      # Clear this relation - same as calling #delete on the document.
+      #
+      # @example Clear the relation.
+      #   relation.clear
+      #
+      # @return [ true, false ] If the delete suceeded.
+      #
+      # @since 3.0.0
+      def clear
+        target.delete
+      end
+
       # Get all the documents in the relation that are loaded into memory.
       #
       # @example Get the in memory documents.

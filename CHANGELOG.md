@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1994 `dependent: :delete` only hits the database once now for one to
+  many and many to many relations instead of once for each document.
+
 * \#1976 Don't execute eager load queries when base query is empty.
 
 * \#1953 Uniqueness validation now works on localized fields.
