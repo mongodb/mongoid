@@ -563,9 +563,15 @@ module Mongoid #:nodoc:
           #
           # @since 2.2.0
           def eager_load(metadata, ids)
+            cleared = false
             klass, foreign_key = metadata.klass, metadata.foreign_key
             klass.any_in(foreign_key => ids).each do |doc|
-              IdentityMap.set_many(doc, foreign_key => doc.send(foreign_key))
+              base_id = doc.send(foreign_key)
+              unless cleared
+                IdentityMap.clear_many(klass, foreign_key => base_id)
+                cleared = true
+              end
+              IdentityMap.set_many(doc, foreign_key => base_id)
             end
           end
 
