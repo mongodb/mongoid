@@ -1196,7 +1196,32 @@ describe Mongoid::NestedAttributes do
                   context "when the parent is persisted" do
 
                     let!(:persisted) do
-                      Person.create
+                      Person.create(age: 42)
+                    end
+
+                    context "when the child returns false in a before callback" do
+
+                      before(:all) do
+                        Person.accepts_nested_attributes_for :paranoid_phones, allow_destroy: true
+                      end
+
+                      after(:all) do
+                        Person.send(:undef_method, :paranoid_phones=)
+                        Person.accepts_nested_attributes_for :paranoid_phones
+                      end
+
+                      let!(:phone) do
+                        persisted.paranoid_phones.create
+                      end
+
+                      before do
+                        persisted.paranoid_phones_attributes =
+                          { "foo" => { "id" => phone.id, "number" => 42, "_destroy" => true }}
+                      end
+
+                      it "does not destroy the child" do
+                        persisted.reload.paranoid_phones.should_not be_empty
+                      end
                     end
 
                     context "when only 1 child has the default persisted" do

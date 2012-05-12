@@ -395,7 +395,7 @@ module Mongoid
         if spec = criteria.options[:sort]
           query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
         else
-          query.sort({:_id => -1})
+          query.sort({_id: -1})
         end
       end
 

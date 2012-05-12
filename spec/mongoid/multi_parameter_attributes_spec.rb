@@ -9,7 +9,7 @@ describe Mongoid::MultiParameterAttributes do
       include Mongoid::MultiParameterAttributes
       field :created_at, type: Time
       field :dob, type: Date
-      field :checked_at, :as => :last_user_checked_at, type: Time
+      field :checked_at, as: :last_user_checked_at, type: Time
     end
 
     context "creating a multi" do

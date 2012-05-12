@@ -38,7 +38,7 @@ describe Mongoid::Persistence do
         before(:all) do
           User.embeds_many(
             :addresses,
-            :class_name => "Address",
+            class_name: "Address",
             store_as: "user_adresses",
             validate: false
           )
@@ -46,11 +46,11 @@ describe Mongoid::Persistence do
         end
 
         before do
-          user.addresses.create!(:city => "nantes")
+          user.addresses.create!(city: "nantes")
         end
 
         let(:document) do
-          user.collection.find(:_id => user.id).first
+          user.collection.find(_id: user.id).first
         end
 
         it "should not persist in address key on User document" do
