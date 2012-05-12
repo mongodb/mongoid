@@ -9,6 +9,16 @@ module Mongoid
 
       delegate :demongoize, :evolve, :mongoize, to: :type
 
+      # Compute the demongoized identity of an object
+      #
+      # @example
+      #   Model.demongoized_identity_for(object)
+      # 
+      # @since 3.0.0
+      def demongoized_identity_for(object)
+        [object.object_id, object.hash]
+      end
+
       # Adds the atomic changes for this type of resizable field.
       #
       # @example Add the atomic changes.

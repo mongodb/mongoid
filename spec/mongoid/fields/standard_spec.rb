@@ -107,6 +107,67 @@ describe Mongoid::Fields::Standard do
     end
   end
 
+  context "when using a custom serializable field" do
+    let(:model) do
+      Class.new(Person) do
+        field(:image, :type => Image)
+      end
+    end
+
+    let(:doc) do
+      model.new(:image => "avatar.jpg")
+    end
+
+    let(:field) do
+      doc.fields["image"]
+    end
+
+    it "returns values based on attribute identity" do
+      doc.image.name.should eq("avatar.jpg")
+
+      object_id = doc.image.object_id
+      3.times{ doc.image.object_id.should eq(object_id) }
+
+      doc.write_attribute(:image, "new_avatar.jpg")
+
+      doc.image.name.should eq("new_avatar.jpg")
+
+      object_id = doc.image.object_id
+      3.times{ doc.image.object_id.should eq(object_id) }
+    end
+
+    it "hold just *one* reference to previously demongoized objects to prevent leaks" do
+      doc.demongoized.should be_empty
+
+      object_id = doc.image.object_id
+      3.times{ doc.image.object_id.should eq(object_id) }
+
+      attribute = doc.read_attribute("image")
+      image     = doc.image
+      identity  = [attribute.object_id, attribute.hash]
+
+      field.demongoized_identity_for(attribute).should eq(identity)
+      doc.demongoized.should eq({"image" => {identity => image}})
+
+      3.times do
+        name = doc.image.name.succ
+        doc.write_attribute(:image, name)
+
+        object_id = doc.image.object_id
+
+        object_id = doc.image.object_id
+        3.times{ doc.image.object_id.should eq(object_id) }
+
+        attribute = doc.read_attribute("image")
+        image     = doc.image
+        identity  = [attribute.object_id, attribute.hash]
+
+        field.demongoized_identity_for(attribute).should eq(identity)
+        doc.demongoized.should eq({"image" => {identity => image}})
+      end
+    end
+  end
+
   context "when subclassing a serializable field" do
 
     let(:thumbnail) do
