@@ -62,7 +62,8 @@ module Mongoid #:nodoc:
     #
     # @since 2.2.0
     def set_many(document, selector)
-      (documents_for(document.class)[selector] ||= []).push(document)
+      documents = documents_for(document.class)[selector] ||= []
+      documents.push(document) unless documents.include?(document)
     end
 
     # Set a document in the identity map for the provided selector.

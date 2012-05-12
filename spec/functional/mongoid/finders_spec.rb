@@ -4,9 +4,39 @@ describe Mongoid::Finders do
 
   before do
     Person.delete_all
+    Blog.delete_all
+    Post.delete_all
   end
 
   describe "#find" do
+
+    context "when eager loading in a default scope" do
+
+      before(:all) do
+        Mongoid.identity_map_enabled = true
+      end
+
+      after(:all) do
+        Mongoid.identity_map_enabled = false
+      end
+
+      let!(:blog) do
+        Blog.create
+      end
+
+      let!(:post_one) do
+        blog.posts.create(:title => "one")
+      end
+
+      let!(:post_two) do
+        blog.posts.create(:title => "two")
+      end
+
+      it "does not duplicate ids in the eager load query" do
+        Blog.where(_id: blog.id).first.posts.should have(2).entries
+        Blog.where(_id: blog.id).first.posts.should have(2).entries
+      end
+    end
 
     context "when using integer ids" do
 

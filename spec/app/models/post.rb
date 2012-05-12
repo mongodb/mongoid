@@ -11,6 +11,7 @@ class Post
 
   belongs_to :person
   belongs_to :author, :foreign_key => :author_id, :class_name => "User"
+  belongs_to :blog
   has_and_belongs_to_many :tags
   has_many :videos, :validate => false
 
