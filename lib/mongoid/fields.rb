@@ -105,6 +105,24 @@ module Mongoid
       self.class.using_object_ids?
     end
 
+    # Cache of demongoized field data mapping field names to all previously
+    # demongoized attributes for this object.
+    #
+    # The demongoized cache memoized values processed by field getters to
+    # provide and identiy map for a given attribute value.  That is to say,
+    # for a field named 'list' and an @attributes == {'list' => [0,1,2]}
+    # calling 'doc.list' will process '[0,1,2]' exacty once.
+    #
+    # The identity of the source attribute is calculated using
+    #
+    # @example
+    #   [attribute.object_id, attribute.hash]
+    #
+    # @since 3.0.0
+    def demongoized
+      @demongoized ||= Hash.new{|hash, name| hash[name] = Hash.new}
+    end
+
     class << self
 
       # Stores the provided block to be run when the option name specified is
@@ -348,11 +366,20 @@ module Mongoid
       # @param [ Field ] field The field.
       #
       # @since 2.4.0
+
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
-            value = fields[name].demongoize(read_attribute(name))
-            attribute_will_change!(name) if value.resizable?
+            attribute = read_attribute(name)
+            identity = [attribute.object_id, attribute.hash]
+            if demongoized[name].has_key?(identity)
+              value = demongoized[name][identity]
+            else
+              demongoized[name].clear
+              value = fields[name].demongoize(attribute)
+              demongoized[name][identity] = value
+              attribute_will_change!(name) if value.resizable?
+            end
             value
           end
         end

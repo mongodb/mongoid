@@ -22,6 +22,7 @@ module Mongoid
       end
       @attributes = reloaded
       changed_attributes.clear
+      demongoized.clear
       apply_defaults
       reload_relations
       run_callbacks(:initialize)
