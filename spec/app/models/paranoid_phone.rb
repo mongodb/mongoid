@@ -8,7 +8,7 @@ class ParanoidPhone
 
   embedded_in :person
 
-  before_destroy :before_destroy_stub
+  before_destroy :before_destroy_stub, :halt_me
   after_destroy :after_destroy_stub
 
   def before_destroy_stub
@@ -17,5 +17,9 @@ class ParanoidPhone
 
   def after_destroy_stub
     self.after_destroy_called = true
+  end
+
+  def halt_me
+    person.age == 42 ? false : true
   end
 end

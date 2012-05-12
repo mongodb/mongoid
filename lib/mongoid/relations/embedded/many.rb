@@ -189,8 +189,12 @@ module Mongoid # :nodoc:
           target.delete_one(document).tap do |doc|
             _unscoped.delete_one(doc)
             if doc && !_binding?
-              if _assigning? && !doc.paranoid?
-                base.add_atomic_pull(doc)
+              if _assigning?
+                if doc.paranoid?
+                  doc.destroy(:suppress => true)
+                else
+                  base.add_atomic_pull(doc)
+                end
               else
                 doc.delete(:suppress => true)
               end
