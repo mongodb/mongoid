@@ -529,6 +529,28 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* Indexing syntax has changed. The first parameter is now a hash of
+  name/direction pairs with an optional `options` key that specifies any
+  additional options.
+
+      Normal indexing with options, directions are either 1 or -1:
+
+        class Band
+          include Mongoid::Document
+          field :name, type: String
+
+          index name: 1, options: { unique: true, background: true }
+        end
+
+      Geospacial indexing needs "2d" as it's direction.
+
+        class Venue
+          include Mongoid::Document
+          field :location, type: Array
+
+          index location: "2d"
+        end
+
 * Custom serializable fields have revamped. Your object no longer should
   include `Mongoid::Fields::Serializable` - instead it only needs to
   implement 3 methods: `#mongoize`, `.demongoize` and `.evolve`.
