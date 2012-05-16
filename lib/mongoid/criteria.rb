@@ -315,7 +315,7 @@ module Mongoid
         doc = IdentityMap.get(klass, id)
         doc && doc.matches?(selector) ? result.push(doc) : false
       end
-      result + any_in(id: ids).entries
+      ids.empty? ? result : result + any_in(id: ids).entries
     end
 
     # Initialize the new criteria.

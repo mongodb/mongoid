@@ -600,6 +600,51 @@ describe Mongoid::Criteria do
 
   describe "#find" do
 
+    context "when the identity map is enabled" do
+
+      before(:all) do
+        Mongoid.identity_map_enabled = true
+      end
+
+      after(:all) do
+        Mongoid.identity_map_enabled = false
+      end
+
+      let!(:depeche) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let!(:placebo) do
+        Band.create(name: "Placebo")
+      end
+
+      context "when providing a single id" do
+
+        let(:from_map) do
+          Band.find(depeche.id)
+        end
+
+        it "returns the document from the map" do
+          from_map.should equal(depeche)
+        end
+      end
+
+      context "when providing multiple ids" do
+
+        let(:from_map) do
+          Band.find(depeche.id, placebo.id)
+        end
+
+        it "returns the first match from the map" do
+          from_map.first.should equal(depeche)
+        end
+
+        it "returns the second match from the map" do
+          from_map.last.should equal(placebo)
+        end
+      end
+    end
+
     context "when using object ids" do
 
       let!(:band) do
