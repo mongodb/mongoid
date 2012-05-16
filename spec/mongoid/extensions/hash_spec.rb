@@ -34,24 +34,37 @@ describe Mongoid::Extensions::Hash do
 
   describe ".mongoize" do
 
-    let(:date) do
-      Date.new(2012, 1, 1)
+    context "when object isn't nil" do
+
+      let(:date) do
+        Date.new(2012, 1, 1)
+      end
+
+      let(:hash) do
+        { date: date }
+      end
+
+      let(:mongoized) do
+        Hash.mongoize(hash)
+      end
+
+      it "mongoizes each element in the hash" do
+        mongoized[:date].should be_a(Time)
+      end
+
+      it "converts the elements properly" do
+        mongoized[:date].should eq(date)
+      end
     end
 
-    let(:hash) do
-      { date: date }
-    end
+    context "when object is nil" do
+      let(:mongoized) do
+        Hash.mongoize(nil)
+      end
 
-    let(:mongoized) do
-      Hash.mongoize(hash)
-    end
-
-    it "mongoizes each element in the hash" do
-      mongoized[:date].should be_a(Time)
-    end
-
-    it "converts the elements properly" do
-      mongoized[:date].should eq(date)
+      it "returns nil" do
+        mongoized.should be_nil
+      end
     end
   end
 
