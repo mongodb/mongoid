@@ -7,7 +7,6 @@ $LOAD_PATH.unshift(MODELS)
 require "mongoid"
 require "mocha"
 require "rspec"
-require "ammeter/init"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.

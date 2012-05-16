@@ -22,11 +22,9 @@ Gem::Specification.new do |s|
   s.add_dependency("moped", ["~> 1.0.0.beta"])
   s.add_dependency("origin", ["~> 1.0.0.beta"])
 
-  s.add_development_dependency("rdoc", ["~> 3.5.0"])
-  s.add_development_dependency("mocha", ["~> 0.10"])
-  s.add_development_dependency("rspec", ["~> 2.9"])
-  s.add_development_dependency("guard-rspec", ["~> 0.6"])
-  s.add_development_dependency("ammeter", ["~> 0.2"])
+  s.add_development_dependency("mocha", ["~> 0.11"])
+  s.add_development_dependency("rspec", ["~> 2.10"])
+  s.add_development_dependency("guard-rspec", ["~> 0.7"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.require_path = 'lib'
