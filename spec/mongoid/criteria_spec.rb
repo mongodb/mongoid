@@ -2773,6 +2773,27 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#sort" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode", likes: 1000)
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool", likes: 500)
+    end
+
+    let(:sorted) do
+      Band.all.sort do |a, b|
+        b.name <=> a.name
+      end
+    end
+
+    it "sorts the results in memory" do
+      sorted.should eq([ tool, depeche ])
+    end
+  end
+
   describe "#sum" do
 
     context "when provided a single field" do

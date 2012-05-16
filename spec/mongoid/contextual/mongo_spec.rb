@@ -1122,12 +1122,28 @@ describe Mongoid::Contextual::Mongo do
       described_class.new(criteria)
     end
 
-    it "sorts the results" do
-      context.sort(name: -1).entries.should eq([ new_order, depeche_mode ])
+    context "when providing a spec" do
+
+      it "sorts the results" do
+        context.sort(name: -1).entries.should eq([ new_order, depeche_mode ])
+      end
+
+      it "returns the context" do
+        context.sort(name: 1).should eq(context)
+      end
     end
 
-    it "returns the context" do
-      context.sort(name: 1).should eq(context)
+    context "when providing a block" do
+
+      let(:sorted) do
+        context.sort do |a, b|
+          b.name <=> a.name
+        end
+      end
+
+      it "sorts the results in memory" do
+        sorted.should eq([ new_order, depeche_mode ])
+      end
     end
   end
 

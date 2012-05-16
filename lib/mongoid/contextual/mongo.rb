@@ -293,8 +293,12 @@ module Mongoid
       # @return [ Mongo ] The context.
       #
       # @since 3.0.0
-      def sort(values)
-        query.sort(values) and self
+      def sort(values = nil, &block)
+        if block_given?
+          super(&block)
+        else
+          query.sort(values) and self
+        end
       end
 
       # Update all the matching documents atomically.
