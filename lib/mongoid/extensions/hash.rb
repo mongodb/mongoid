@@ -67,6 +67,7 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
+          return if object.nil?
           evolve(object).update_values { |value| value.mongoize }
         end
 
