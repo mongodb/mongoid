@@ -116,6 +116,7 @@ module Mongoid
       # @since 3.0.0
       def each
         if block_given?
+          reset_length
           selecting do
             if eager_loadable?
               docs = query.map{ |doc| Factory.from_db(klass, doc) }
@@ -438,9 +439,32 @@ module Mongoid
         !eager_loaded && criteria.inclusions.any?
       end
 
+      # Increment the length of the results.
+      #
+      # @api private
+      #
+      # @example Increment the length.
+      #   context.increment_length
+      #
+      # @return [ Integer ] The new length
+      #
+      # @since 3.0.0
       def increment_length
-        @length ||= 0
         @length += 1
+      end
+
+      # Reset the length to zero. This happens once before iteration.
+      #
+      # @api private
+      #
+      # @example Reset the length.
+      #   context.reset_length
+      #
+      # @return [ Integer ] zero.
+      #
+      # @since 3.0.0
+      def reset_length
+        @length = 0
       end
 
       # Loads an array of ids only for the current criteria. Used by eager

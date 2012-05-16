@@ -695,6 +695,17 @@ describe Mongoid::Contextual::Mongo do
         it "returns the cached value for all calls" do
           context.send(method).should eq(1)
         end
+
+        context "when the results have been iterated over multiple times" do
+
+          before do
+            context.entries
+          end
+
+          it "resets the length on each full iteration" do
+            context.should have(1).item
+          end
+        end
       end
     end
   end
