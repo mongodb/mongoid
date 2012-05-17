@@ -31,6 +31,10 @@ module Mongoid #:nodoc:
           value.each_pair do |locale, value|
             document.errors.add(attribute, :blank_on_locale, options.merge(:location => locale)) if value.blank?
           end
+        elsif document.relations.has_key?(attribute.to_s)
+          if value.blank? && document.send(attribute).blank?
+            document.errors.add(attribute, :blank, options)
+          end
         else
           document.errors.add(attribute, :blank, options) if value.blank?
         end
