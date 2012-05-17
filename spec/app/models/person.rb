@@ -30,7 +30,8 @@ class Person
   index dob: 1
   index name: 1
   index title: 1
-  index ssn: 1, options: { unique: true }
+
+  index({ ssn: 1 }, { unique: true })
 
   attr_reader :rescored
 

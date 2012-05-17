@@ -54,7 +54,7 @@ module Mongoid
       # @since 1.0.0
       def add_indexes
         if hereditary? && !index_options[{ _type: 1 }]
-          index _type: 1, options: { unique: false, background: true }
+          index({ _type: 1 }, { unique: false, background: true })
         end
         true
       end
@@ -66,7 +66,8 @@ module Mongoid
       #   class Person
       #     include Mongoid::Document
       #     field :name, type: String
-      #     index name: 1, options: { background: true }
+
+      #     index({ name: 1 }, { background: true })
       #   end
       #
       # @param [ Symbol ] name The name of the field.
@@ -75,9 +76,9 @@ module Mongoid
       # @return [ Hash ] The index options.
       #
       # @since 1.0.0
-      def index(spec)
-        Validators::Options.validate(self, spec)
-        index_options[spec] = normalize_index_options(spec)
+      def index(spec, options = nil)
+        Validators::Options.validate(self, spec, options || {})
+        index_options[spec] = normalize_index_options(options)
       end
 
       private
@@ -87,15 +88,15 @@ module Mongoid
       # @api private
       #
       # @example Normalize the index options.
-      #   Model.normalize_index_options(name: 1)
+      # Model.normalize_index_options(drop_dups: true)
       #
-      # @param [ Hash ] spec The index specification.
+      # @param [ Hash ] options The index options.
       #
       # @return [ Hash ] The normalized options.
       #
       # @since 3.0.0
-      def normalize_index_options(spec)
-        opts = (spec.delete(:options) || {})
+      def normalize_index_options(options)
+        opts = options || {}
         opts[:dropDups] = opts.delete(:drop_dups) if opts.has_key?(:drop_dups)
         opts
       end

@@ -45,7 +45,7 @@ describe Mongoid::Indexes do
       Class.new do
         include Mongoid::Document
         store_in collection: "test_class"
-        index _type: 1, options: { unique: false, background: true }
+        index({ _type: 1 }, { unique: false, background: true })
       end
     end
 
@@ -94,7 +94,7 @@ describe Mongoid::Indexes do
     context "when providing unique options" do
 
       before do
-        klass.index(name: 1, options: { unique: true })
+        klass.index({ name: 1 }, { unique: true })
       end
 
       let(:options) do
@@ -109,7 +109,7 @@ describe Mongoid::Indexes do
     context "when providing a drop_dups option" do
 
       before do
-        klass.index(name: 1, options: { drop_dups: true })
+        klass.index({ name: 1 }, { drop_dups: true })
       end
 
       let(:options) do
@@ -124,7 +124,7 @@ describe Mongoid::Indexes do
     context "when providing a sparse option" do
 
       before do
-        klass.index(name: 1, options: { sparse: true })
+        klass.index({ name: 1 }, { sparse: true })
       end
 
       let(:options) do
@@ -139,7 +139,7 @@ describe Mongoid::Indexes do
     context "when providing a name option" do
 
       before do
-        klass.index(name: 1, options: { name: "index_name" })
+        klass.index({ name: 1 }, { name: "index_name" })
       end
 
       let(:options) do
@@ -154,7 +154,7 @@ describe Mongoid::Indexes do
     context "when providing a background option" do
 
       before do
-        klass.index(name: 1, options: { background: true })
+        klass.index({ name: 1 }, { background: true })
       end
 
       let(:options) do
@@ -169,7 +169,7 @@ describe Mongoid::Indexes do
     context "when providing a compound index" do
 
       before do
-        klass.index(name: 1, title: -1)
+        klass.index({ name: 1, title: -1 })
       end
 
       let(:options) do
@@ -184,7 +184,7 @@ describe Mongoid::Indexes do
     context "when providing a geospacial index" do
 
       before do
-        klass.index(location: "2d")
+        klass.index({ location: "2d" })
       end
 
       let(:options) do
@@ -200,7 +200,7 @@ describe Mongoid::Indexes do
 
       it "raises an error" do
         expect {
-          klass.index(name: 1, options: { invalid: true })
+          klass.index({ name: 1 }, { invalid: true })
         }.to raise_error(Mongoid::Errors::InvalidIndex)
       end
     end
@@ -220,7 +220,7 @@ describe Mongoid::Indexes do
 
         it "raises an error" do
           expect {
-            klass.index(name: "something")
+            klass.index({ name: "something" })
           }.to raise_error(Mongoid::Errors::InvalidIndex)
         end
       end

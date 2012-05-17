@@ -12,13 +12,14 @@ module Mongoid
       #
       # @param [ Class ] klass The model class.
       # @param [ Hash ] spec The invalid specification.
+      # @param [ Hash ] options The invalid options.
       #
       # @since 3.0.0
-      def initialize(klass, spec)
+      def initialize(klass, spec, options)
         super(
           compose_message(
             "invalid_index",
-            { klass: klass.name, spec: spec }
+            { klass: klass.name, spec: spec, options: options }
           )
         )
       end
