@@ -128,37 +128,82 @@ describe Mongoid::Validations::PresenceValidator do
 
   context "when validating a relation" do
 
-    before do
-      Person.autosaved_relations.delete_one(:game)
-      Person.validates :game, presence: true
-    end
+    context "when the relation is a has one" do
 
-    after do
-      Person.autosaved_relations.clear
-      Person.reset_callbacks(:save)
-      Person.reset_callbacks(:validate)
-    end
-
-    context "when the relation is new" do
-
-      let(:person) do
-        Person.new
+      before do
+        Person.autosaved_relations.delete_one(:game)
+        Person.validates :game, presence: true
       end
 
-      context "when the base is valid" do
+      after do
+        Person.autosaved_relations.clear
+        Person.reset_callbacks(:save)
+        Person.reset_callbacks(:validate)
+      end
 
-        let!(:game) do
-          person.build_game
+      context "when the relation is new" do
+
+        let(:person) do
+          Person.new
         end
 
-        context "when saving the base" do
+        context "when the base is valid" do
 
-          before do
-            person.save
+          let!(:game) do
+            person.build_game
           end
 
-          it "saves the relation" do
-            game.reload.should eq(game)
+          context "when saving the base" do
+
+            before do
+              person.save
+            end
+
+            it "saves the relation" do
+              game.reload.should eq(game)
+            end
+          end
+        end
+      end
+    end
+
+    context "when the relation is a many to many" do
+
+      before do
+        Person.validates :houses, presence: true
+      end
+
+      after do
+        Person.autosaved_relations.clear
+        Person.reset_callbacks(:save)
+        Person.reset_callbacks(:validate)
+      end
+
+      context "when the relation has documents" do
+
+        let!(:house) do
+          House.create
+        end
+
+        let!(:person) do
+          Person.create(houses: [ house ])
+        end
+
+        context "when the relation is loaded from the db" do
+
+          let(:loaded) do
+            Person.find(person.id)
+          end
+
+          it "is valid" do
+            loaded.should be_valid
+          end
+        end
+
+        context "when the relation is in memory" do
+
+          it "is valid" do
+            person.should be_valid
           end
         end
       end

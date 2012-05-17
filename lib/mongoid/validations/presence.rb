@@ -35,6 +35,10 @@ module Mongoid
               options.merge(location: _locale)
             ) if _value.blank?
           end
+        elsif document.relations.has_key?(attribute.to_s)
+          if value.blank? && document.send(attribute).blank?
+            document.errors.add(attribute, :blank, options)
+          end
         else
           document.errors.add(attribute, :blank, options) if value.blank?
         end
