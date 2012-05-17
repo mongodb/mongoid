@@ -530,7 +530,7 @@ For instructions on upgrading to newer versions, visit
 ### Major Changes (Backwards Incompatible)
 
 * Indexing syntax has changed. The first parameter is now a hash of
-  name/direction pairs with an optional `options` key that specifies any
+  name/direction pairs with an optional second hash parameter for
   additional options.
 
       Normal indexing with options, directions are either 1 or -1:
@@ -539,7 +539,7 @@ For instructions on upgrading to newer versions, visit
           include Mongoid::Document
           field :name, type: String
 
-          index name: 1, options: { unique: true, background: true }
+          index({ name: 1 }, { unique: true, background: true })
         end
 
       Geospacial indexing needs "2d" as it's direction.
