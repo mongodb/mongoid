@@ -37,7 +37,7 @@ module Mongoid
         #   Options.validate_options(Band, name: 1)
         #
         # @param [ Class ] klass The model class.
-        # @param [ Hash ] options The index options.
+        # @param [ Hash ] spec The index specification.
         # @param [ Hash ] options The index options.
         #
         # @raise [ Errors::InvalidIndex ] If validation failed.
