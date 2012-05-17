@@ -357,7 +357,8 @@ module Mongoid
     # @since 2.2.0
     def includes(*relations)
       relations.each do |name|
-        inclusions.push(klass.reflect_on_association(name))
+        metadata = klass.reflect_on_association(name)
+        inclusions.push(metadata) unless inclusions.include?(metadata)
       end
       clone
     end

@@ -1699,6 +1699,21 @@ describe Mongoid::Criteria do
       Person.create
     end
 
+    context "when including the same metadata multiple times" do
+
+      let(:criteria) do
+        Person.all.includes(:posts, :posts).includes(:posts)
+      end
+
+      let(:metadata) do
+        Person.reflect_on_association(:posts)
+      end
+
+      it "does not duplicate the metadata in the inclusions" do
+        criteria.inclusions.should eq([ metadata ])
+      end
+    end
+
     context "when providing inclusions to the default scope" do
 
       before do
