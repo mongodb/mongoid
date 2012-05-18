@@ -352,7 +352,7 @@ module Mongoid
 
         if options[:localize]
           create_translations_getter(name, meth)
-          create_translations_setter(name, meth)
+          create_translations_setter(name, meth, field)
         end
       end
 
@@ -366,7 +366,6 @@ module Mongoid
       # @param [ Field ] field The field.
       #
       # @since 2.4.0
-
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
@@ -448,12 +447,18 @@ module Mongoid
       #
       # @param [ String ] name The name of the attribute.
       # @param [ String ] meth The name of the method.
+      # @param [ Field ] field The field.
       #
       # @since 2.4.0
-      def create_translations_setter(name, meth)
+      def create_translations_setter(name, meth, field)
         generated_methods.module_eval do
           re_define_method("#{meth}_translations=") do |value|
             attribute_will_change!(name)
+            if value
+              value.update_values do |value|
+                field.type.mongoize(value)
+              end
+            end
             attributes[name] = value
           end
         end

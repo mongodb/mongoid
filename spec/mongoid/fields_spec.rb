@@ -71,41 +71,92 @@ describe Mongoid::Fields do
       Product.new
     end
 
+    let(:dictionary) do
+      Dictionary.new
+    end
+
     context "when the field is localized" do
 
-      let(:translations) do
-        { "en" => "test", "de" => "testing" }
-      end
+      context "when the field does not require mongoizations" do
 
-      before do
-        product.description_translations = translations
-      end
-
-      it "sets the raw values of the translations" do
-        product.description_translations.should eq(translations)
-      end
-
-      context "when saving the new translations" do
+        let(:translations) do
+          { "en" => "test", "de" => "testing" }
+        end
 
         before do
-          product.save
+          product.description_translations = translations
         end
 
-        it "persists the changes" do
-          product.reload.description_translations.should eq(translations)
+        it "sets the raw values of the translations" do
+          product.description_translations.should eq(translations)
         end
 
-        context "when updating the translations" do
+        context "when saving the new translations" do
 
           before do
-            product.description_translations = { "en" => "overwritten" }
             product.save
           end
 
           it "persists the changes" do
-            product.reload.description_translations.should eq(
-              { "en" => "overwritten" }
+            product.reload.description_translations.should eq(translations)
+          end
+
+          context "when updating the translations" do
+
+            before do
+              product.description_translations = { "en" => "overwritten" }
+              product.save
+            end
+
+            it "persists the changes" do
+              product.reload.description_translations.should eq(
+                { "en" => "overwritten" }
+              )
+            end
+          end
+        end
+      end
+
+      context "when the field requires mongoization" do
+
+        let(:translations) do
+          { "en" => 1, "de" => 2 }
+        end
+
+        before do
+          dictionary.description_translations = translations
+        end
+
+        it "sets the mongoized values of the translations" do
+          dictionary.description_translations.should eq(
+            { "en" => "1", "de" => "2" }
+          )
+        end
+
+        context "when saving the new translations" do
+
+          before do
+            dictionary.save
+          end
+
+          it "persists the changes" do
+            dictionary.reload.description_translations.should eq(
+              { "en" => "1", "de" => "2" }
             )
+          end
+
+          context "when updating the translations" do
+
+            before do
+              dictionary.description_translations = { "en" => "overwritten" }
+              dictionary.save
+            end
+
+            it "persists the changes" do
+              dictionary.reload.description_translations.should eq(
+                { "en" => "overwritten" }
+              )
+            end
           end
         end
       end
