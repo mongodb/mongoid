@@ -436,7 +436,7 @@ module Mongoid
       def create_translations_getter(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_translations") do
-            attributes[name]
+            attributes[name] ||= {}
           end
         end
       end

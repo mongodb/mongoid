@@ -655,6 +655,8 @@ For instructions on upgrading to newer versions, visit
   child and marked is valid, both are persisted to ensure a correct
   state in the database.
 
+* \#1491 Ensure empty translations returns an empty hash on access.
+
 * \#1484 `Model#has_attribute?` now behaves the same as Active Record.
 
 * \#1471 Mongoid no longer strips any level of precision off of times.

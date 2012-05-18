@@ -41,8 +41,8 @@ describe Mongoid::Fields do
 
         context "when no default is provided" do
 
-          it "returns nil" do
-            product.description_translations.should be_nil
+          it "returns an empty hash" do
+            product.description_translations.should be_empty
           end
         end
 

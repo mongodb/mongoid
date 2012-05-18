@@ -15,8 +15,9 @@ module Mongoid
       #
       # @since 2.3.0
       def demongoize(object)
-        return nil if object.nil?
-        type.demongoize(lookup(object))
+        if object
+          type.demongoize(lookup(object))
+        end
       end
 
       # Is the field localized or not?
