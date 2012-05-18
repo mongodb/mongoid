@@ -13,14 +13,10 @@ module Mongoid
       #
       # @example
       #   Model.demongoized_identity_for(object)
-      #
-      # @param [ Object ] object The object to get identity for.
-      #
-      # @return [ Array ] The object's identity.
-      #
+      # 
       # @since 3.0.0
       def demongoized_identity_for(object)
-        [ object.object_id, object.hash ]
+        [object.object_id, object.hash]
       end
 
       # Adds the atomic changes for this type of resizable field.

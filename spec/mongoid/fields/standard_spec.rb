@@ -108,7 +108,6 @@ describe Mongoid::Fields::Standard do
   end
 
   context "when using a custom serializable field" do
-
     let(:model) do
       Class.new(Person) do
         field(:image, :type => Image)
@@ -123,83 +122,48 @@ describe Mongoid::Fields::Standard do
       doc.fields["image"]
     end
 
-    let(:image) do
-      doc.image
-    end
-
-    let(:image_id) do
-      doc.image.object_id
-    end
-
-    it "returns the correct value" do
+    it "returns values based on attribute identity" do
       doc.image.name.should eq("avatar.jpg")
-    end
 
-    it "retains the same instance of the value" do
+      object_id = doc.image.object_id
+      3.times{ doc.image.object_id.should eq(object_id) }
+
+      doc.write_attribute(:image, "new_avatar.jpg")
+
+      doc.image.name.should eq("new_avatar.jpg")
+
       object_id = doc.image.object_id
       3.times{ doc.image.object_id.should eq(object_id) }
     end
 
-    context "when writing a new value" do
+    it "hold just *one* reference to previously demongoized objects to prevent leaks" do
+      doc.demongoized.should be_empty
 
-      before do
-        doc.write_attribute(:image, "new_avatar.jpg")
-      end
+      object_id = doc.image.object_id
+      3.times{ doc.image.object_id.should eq(object_id) }
 
-      it "returns the correct value" do
-        doc.image.name.should eq("new_avatar.jpg")
-      end
+      attribute = doc.read_attribute("image")
+      image     = doc.image
+      identity  = [attribute.object_id, attribute.hash]
 
-      it "retains the same instance of the new value" do
+      field.demongoized_identity_for(attribute).should eq(identity)
+      doc.demongoized.should eq({"image" => {identity => image}})
+
+      3.times do
+        name = doc.image.name.succ
+        doc.write_attribute(:image, name)
+
+        object_id = doc.image.object_id
+
         object_id = doc.image.object_id
         3.times{ doc.image.object_id.should eq(object_id) }
-      end
-    end
 
-    context "when accessing the field multiple times" do
+        attribute = doc.read_attribute("image")
+        image     = doc.image
+        identity  = [attribute.object_id, attribute.hash]
 
-      context "when first accessing the map" do
-
-        it "has no demongoized values" do
-          doc.demongoized.should be_empty
-        end
-      end
-
-      let(:attribute) do
-        doc.read_attribute(:image)
-      end
-
-      let(:image) do
-        doc.image
-      end
-
-      let(:identity) do
-        [ attribute.object_id, attribute.hash ]
-      end
-
-      it "uses the proper identity" do
         field.demongoized_identity_for(attribute).should eq(identity)
-      end
-
-      it "sets the object in the demongoized map" do
-        doc.demongoized.should eq({ "image" => { identity => image }})
-      end
-
-      it "contains only one reference to previously demongoized objects" do
-        3.times do
-          name = doc.image.name.succ
-          doc.write_attribute(:image, name)
-
-          object_id = doc.image.object_id
-          3.times{ doc.image.object_id.should eq(object_id) }
-
-          attribute = doc.read_attribute("image")
-          image     = doc.image
-          identity  = [attribute.object_id, attribute.hash]
-
-          field.demongoized_identity_for(attribute).should eq(identity)
-          doc.demongoized.should eq({ "image" => { identity => image }})
-        end
+        doc.demongoized.should eq({"image" => {identity => image}})
       end
     end
   end
