@@ -107,30 +107,6 @@ describe Mongoid::Fields::Standard do
     end
   end
 
-  context "when using a custom serializable field" do
-    let(:model) do
-      Class.new(Person) do
-        field(:image, :type => Image)
-      end
-    end
-
-    let(:doc) do
-      model.new(:image => "avatar.jpg")
-    end
-
-    it "returns values based on attribute identity" do
-      doc.image.name.should eq("avatar.jpg")
-
-      3.times do
-        doc.image.object_id.should eq(doc.image.object_id)
-      end
-
-      doc.write_attribute(:image, "new_avatar.jpg")
-
-      doc.image.name.should eq("new_avatar.jpg")
-    end
-  end
-
   context "when subclassing a serializable field" do
 
     let(:thumbnail) do
