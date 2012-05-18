@@ -15,6 +15,7 @@ module Mongoid
           :localize,
           :metadata,
           :pre_processed,
+          :subtype,
           :type,
           :versioned
         ]

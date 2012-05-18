@@ -1,6 +1,4 @@
 # encoding: utf-8
-class Binary; end
-
 unless defined?(Boolean)
   class Boolean; end
 end

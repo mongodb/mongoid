@@ -263,6 +263,21 @@ describe Mongoid::Fields do
 
   describe "#getter" do
 
+    context "when the field is binary" do
+
+      let(:binary) do
+        BSON::Binary.new(:md5, "testing")
+      end
+
+      let(:registry) do
+        Registry.new(data: binary)
+      end
+
+      it "returns the binary data intact" do
+        registry.data.should eq(binary)
+      end
+    end
+
     context "when a field is localized" do
 
       let(:product) do
@@ -331,6 +346,25 @@ describe Mongoid::Fields do
 
     let(:product) do
       Product.new
+    end
+
+    context "when the field is binary" do
+
+      let(:binary) do
+        BSON::Binary.new(:md5, "testing")
+      end
+
+      let(:registry) do
+        Registry.new
+      end
+
+      before do
+        registry.data = binary
+      end
+
+      it "returns the binary data intact" do
+        registry.data.should eq(binary)
+      end
     end
 
     context "when the field is an array" do
