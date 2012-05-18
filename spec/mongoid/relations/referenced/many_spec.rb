@@ -1356,7 +1356,7 @@ describe Mongoid::Relations::Referenced::Many do
       before do
         Movie.field(
           :_id,
-          pre_processeded: true,
+          pre_processed: true,
           type: String,
           default: ->{ BSON::ObjectId.new.to_s }
         )
@@ -1366,7 +1366,7 @@ describe Mongoid::Relations::Referenced::Many do
       after do
         Movie.field(
           :_id,
-          pre_processeded: true,
+          pre_processed: true,
           type: BSON::ObjectId,
           default: ->{ BSON::ObjectId.new }
         )

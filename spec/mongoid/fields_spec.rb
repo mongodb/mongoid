@@ -213,7 +213,52 @@ describe Mongoid::Fields do
         Circle.attribute_names.should include("radius")
       end
     end
+  end
 
+  describe "#field" do
+
+    before(:all) do
+      Mongoid::Fields.option :custom do |model, field, value|
+      end
+    end
+
+    context "when the options are valid" do
+
+      context "when the options are all standard" do
+
+        before do
+          Band.field :acceptable, type: Boolean
+        end
+
+        after do
+          Band.fields.delete("acceptable")
+        end
+
+        it "adds the field to the model" do
+          Band.fields["acceptable"].should_not be_nil
+        end
+      end
+
+      context "when a custom option is provided" do
+
+        before do
+          Band.field :acceptable, type: Boolean, custom: true
+        end
+
+        it "adds the field to the model" do
+          Band.fields["acceptable"].should_not be_nil
+        end
+      end
+    end
+
+    context "when the options are not valid" do
+
+      it "raises an error" do
+        expect {
+          Band.field :unacceptable, bad: true
+        }.to raise_error(Mongoid::Errors::InvalidFieldOption)
+      end
+    end
   end
 
   describe "#getter" do

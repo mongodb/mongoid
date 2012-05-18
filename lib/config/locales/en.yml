@@ -118,6 +118,20 @@ en:
             allowed, and don't use these names. These include names that also
             conflict with core Ruby methods on Object, Module, Enumerable, or
             included gems that inject methods into these or Mongoid internals."
+        invalid_field_option:
+          message: "Invalid option :%{option} provided for field :%{name}."
+          summary: "Mongoid requires that you only provide valid options on each
+            field definition in order to prevent unexpected behaviour later on."
+          resolution: "When defining the field :%{name} on '%{klass}', please provide
+            valid options for the field. These are currently: %{valid}. If you
+            meant to define a custom field option, please do so first like so:\n\n
+            \_\_Mongoid::Fields.option :%{option} do |model, field, value|\n
+            \_\_\_\_# Your logic here...\n
+            \_\_end\n
+            \_\_class %{klass}\n
+            \_\_\_\_include Mongoid::Document\n
+            \_\_\_\_field :%{name}, %{option}: true\n
+            \_\_end\n\n"
         invalid_index:
           message: "Invalid index specification on %{klass}: %{spec}, %{options}"
           summary: "Indexes in Mongoid are defined as a hash of field name and

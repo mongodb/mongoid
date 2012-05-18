@@ -2,6 +2,7 @@
 require "mongoid/fields/standard"
 require "mongoid/fields/foreign_key"
 require "mongoid/fields/localized"
+require "mongoid/fields/validators"
 
 module Mongoid
 
@@ -176,7 +177,7 @@ module Mongoid
       # @return [ Field ] The generated field
       def field(name, options = {})
         named = name.to_s
-        check_field_name!(name)
+        Validators::Macro.validate(self, name, options)
         added = add_field(named, options)
         descendants.each do |subclass|
           subclass.add_field(named, options)
@@ -293,22 +294,6 @@ module Mongoid
           if field_options.has_key?(option_name)
             handler.call(self, field, field_options[option_name])
           end
-        end
-      end
-
-      # Determine if the field name is allowed, if not raise an error.
-      #
-      # @example Check the field name.
-      #   Model.check_field_name!(:collection)
-      #
-      # @param [ Symbol ] name The field name.
-      #
-      # @raise [ Errors::InvalidField ] If the name is not allowed.
-      #
-      # @since 2.1.8
-      def check_field_name!(name)
-        if Mongoid.destructive_fields.include?(name)
-          raise Errors::InvalidField.new(self, name)
         end
       end
 
