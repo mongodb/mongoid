@@ -48,7 +48,7 @@ describe Mongoid::Serialization do
     context "when a dynamic attribute has the same name as a ruby method" do
 
       before do
-        person[:loop] = true
+        person[:loop] = "testing"
       end
 
       let(:attributes) do
@@ -56,7 +56,7 @@ describe Mongoid::Serialization do
       end
 
       it "grabs the attribute direct from the hash" do
-        attributes["loop"].should be_true
+        attributes["loop"].should eq("testing")
       end
     end
 
