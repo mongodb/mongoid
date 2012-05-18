@@ -504,11 +504,11 @@ describe Mongoid::Relations::Accessors do
 
       context "when there's a single references many/one" do
 
-        let(:movie) do
+        let!(:movie) do
           Movie.create(title: "Inception")
         end
 
-        let(:book) do
+        let!(:book) do
           Book.create(title: "Jurassic Park")
         end
 
@@ -522,7 +522,7 @@ describe Mongoid::Relations::Accessors do
 
         context "when accessing a referenced in" do
 
-          let(:rating) do
+          let!(:rating) do
             Rating.where(value: 10).first
           end
 
