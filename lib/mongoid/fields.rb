@@ -370,7 +370,7 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method(meth) do
             attribute = read_attribute(name)
-            identity = field.demongoized_identity_for(attribute)
+            identity = [attribute.object_id, attribute.hash]
             if demongoized[name].has_key?(identity)
               value = demongoized[name][identity]
             else
