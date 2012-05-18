@@ -96,7 +96,9 @@ module Mongoid #:nodoc:
       def without(*args)
         clone.tap do |crit|
           if args.any?
-            crit.options[:fields] = {}
+            unless args == [ :id ] || args == [ :_id ]
+              crit.options[:fields] = {}
+            end
             args.flatten.each do |f|
               crit.options[:fields][f] = 0
             end

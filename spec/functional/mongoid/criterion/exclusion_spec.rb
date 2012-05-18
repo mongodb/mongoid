@@ -56,5 +56,21 @@ describe Mongoid::Criterion::Exclusion do
         documents.first.ssn.should be_nil
       end
     end
+
+    context "when chained after an only" do
+
+      let(:criteria) do
+        Person.only(:title).without(:_id)
+      end
+
+      context "when excluding only the id" do
+
+        it "allows the id exclusion" do
+          criteria.options.should eq(
+            :fields => { :_type => 1, :title => 1, :_id => 0 }
+          )
+        end
+      end
+    end
   end
 end

@@ -13,6 +13,8 @@ For instructions on upgrading to newer versions, visit
 * \#2008 Presence validation should hit the db to check validity if the
   relation in memory is blank.
 
+* \#2006 Allow excluding only the _id field post execution of an #only call.
+
 ## 2.4.10
 
 ### Resolved Issues
