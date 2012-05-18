@@ -48,11 +48,13 @@ module Mongoid
       attrs = {}
       (attribute_names + method_names).each do |name|
         without_autobuild do
-          value = send(name)
           if relations.has_key?(name)
+            value = send(name)
             attrs[name] = value ? value.serializable_hash(options) : nil
+          elsif attribute_names.include?(name.to_s)
+            attrs[name] = read_attribute(name)
           else
-            attrs[name] = value
+            attrs[name] = send(name)
           end
         end
       end

@@ -820,6 +820,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2023 Allow serilialization of dynamic types that conflict with core
+  Ruby methods to still be serialized.
+
 * \#2008 Presence validation should hit the db to check validity if the
   relation in memory is blank.
 
