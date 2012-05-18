@@ -22,7 +22,7 @@ module Rails
         config.respond_to?(:app_generators) ? :app_generators : :generators
       end
 
-      # Maping of rescued exceptions to HTTP responses
+      # Mapping of rescued exceptions to HTTP responses
       #
       # @example
       #   railtie.rescue_responses
