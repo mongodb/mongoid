@@ -19,6 +19,21 @@ describe Mongoid::Serialization do
       Person.new
     end
 
+    context "when a dynamic attribute has the same name as a ruby method" do
+
+      before do
+        person[:loop] = true
+      end
+
+      let(:attributes) do
+        person.serializable_hash
+      end
+
+      it "grabs the attribute direct from the hash" do
+        attributes["loop"].should be_true
+      end
+    end
+
     context "when the model has embedded documents" do
 
       let!(:address) do
