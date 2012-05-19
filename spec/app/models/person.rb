@@ -24,6 +24,7 @@ class Person
   field :reading, type: Object
   field :bson_id, type: BSON::ObjectId
   field :pattern, type: Regexp
+  field :override_me, type: Integer
 
   index age: 1
   index addresses: 1
@@ -140,6 +141,10 @@ class Person
 
   def set_addresses=(addresses)
     self.addresses = addresses
+  end
+
+  def override_me
+    read_attribute(:override_me).to_s
   end
 
   class << self
