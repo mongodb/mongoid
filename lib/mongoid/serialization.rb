@@ -49,8 +49,8 @@ module Mongoid # :nodoc:
         (attribute_names + method_names).each do |name|
           if relations.has_key?(name)
             value = send(name)
-            attrs[name] = value.serializable_hash(options)
-          elsif attribute_names.include?(name.to_s)
+            attrs[name] = value ? value.serializable_hash(options) : nil
+          elsif attribute_names.include?(name) && !fields.has_key?(name)
             attrs[name] = read_attribute(name)
           else
             attrs[name] = send(name)
