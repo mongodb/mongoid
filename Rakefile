@@ -1,6 +1,3 @@
-require "bundler"
-Bundler.setup
-
 require "rake"
 require "rspec/core/rake_task"
 
@@ -23,11 +20,6 @@ task :release => :build do
 end
 
 RSpec::Core::RakeTask.new("spec") do |spec|
-  spec.pattern = "spec/**/*_spec.rb"
-end
-
-RSpec::Core::RakeTask.new('spec:progress') do |spec|
-  spec.rspec_opts = %w(--format progress)
   spec.pattern = "spec/**/*_spec.rb"
 end
 
