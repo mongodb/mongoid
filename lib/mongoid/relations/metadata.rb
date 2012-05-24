@@ -991,7 +991,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def determine_inverse_relation
-        default = klass.relations[inverse_klass.name.underscore]
+        default = foreign_key_match || klass.relations[inverse_klass.name.underscore]
         return default.name if default
         candidates = inverse_relation_candidates
 
@@ -1004,6 +1004,25 @@ module Mongoid
           )
         end
         candidates.first
+      end
+
+      # Return metadata where the foreign key matches the foreign key on this
+      # relation.
+      #
+      # @api private
+      #
+      # @example Return a foreign key match.
+      #   meta.foreign_key_match
+      #
+      # @return [ Metadata ] A match, if any.
+      #
+      # @since 2.4.11
+      def foreign_key_match
+        if fk = self[:foreign_key]
+          klass.relations.values.detect do |meta|
+            fk == meta.foreign_key
+          end
+        end
       end
 
       # Get the candidates for inverse relations.
@@ -1094,7 +1113,6 @@ module Mongoid
           invs.first
         end
       end
-
     end
   end
 end

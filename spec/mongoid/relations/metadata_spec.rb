@@ -1045,9 +1045,20 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-  context "#inverse" do
+  describe "#inverse" do
 
     context "when an inverse relation exists" do
+
+      context "when the inverse has a foreign key match" do
+
+        let(:metadata) do
+          User.reflect_on_association(:account)
+        end
+
+        it "returns the name of the inverse with the matching foreign_key" do
+          metadata.inverse.should eq(:creator)
+        end
+      end
 
       context "when multiple relations against the same class exist" do
 

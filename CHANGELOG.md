@@ -822,6 +822,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2038 Allow inverse relations to be determined by foreign keys alone
+  if defined on both sides, not just an inverse_of declaration.
+
 * \#2023 Allow serilialization of dynamic types that conflict with core
   Ruby methods to still be serialized.
 
