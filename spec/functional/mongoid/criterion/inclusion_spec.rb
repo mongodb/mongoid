@@ -179,8 +179,12 @@ describe Mongoid::Criterion::Inclusion do
         Person.any_of({ :age => 7 }, { :age.lt => 3 })
       end
 
-      it "returns any matching documents" do
-        from_db.should == [ person_two, person_three ]
+      it "returns the first matching document" do
+        from_db.should include(person_two)
+      end
+
+      it "returns the last matching document" do
+        from_db.should include(person_three)
       end
     end
 
@@ -195,8 +199,12 @@ describe Mongoid::Criterion::Inclusion do
           )
         end
 
-        it "returns the matching documents" do
-          from_db.should == [ person_one, person_two ]
+        it "returns the first matching document" do
+          from_db.should include(person_one)
+        end
+
+        it "returns the last matching document" do
+          from_db.should include(person_two)
         end
       end
     end
