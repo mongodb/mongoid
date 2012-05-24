@@ -1020,7 +1020,7 @@ module Mongoid
       def foreign_key_match
         if fk = self[:foreign_key]
           klass.relations.values.detect do |meta|
-            fk == meta.foreign_key
+            fk == meta.foreign_key if meta.stores_foreign_key?
           end
         end
       end
