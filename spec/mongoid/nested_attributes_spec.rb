@@ -1201,26 +1201,50 @@ describe Mongoid::NestedAttributes do
 
                     context "when the child returns false in a before callback" do
 
-                      before(:all) do
-                        Person.accepts_nested_attributes_for :paranoid_phones, allow_destroy: true
+                      context "when the child is paranoid" do
+
+                        before(:all) do
+                          Person.accepts_nested_attributes_for :paranoid_phones, allow_destroy: true
+                        end
+
+                        after(:all) do
+                          Person.send(:undef_method, :paranoid_phones=)
+                          Person.accepts_nested_attributes_for :paranoid_phones
+                        end
+
+                        let!(:phone) do
+                          persisted.paranoid_phones.create
+                        end
+
+                        before do
+                          persisted.paranoid_phones_attributes =
+                            { "foo" => { "id" => phone.id, "number" => 42, "_destroy" => true }}
+                        end
+
+                        it "does not destroy the child" do
+                          persisted.reload.paranoid_phones.should_not be_empty
+                        end
                       end
 
-                      after(:all) do
-                        Person.send(:undef_method, :paranoid_phones=)
-                        Person.accepts_nested_attributes_for :paranoid_phones
-                      end
+                      context "when the child is not paranoid" do
 
-                      let!(:phone) do
-                        persisted.paranoid_phones.create
-                      end
+                        let(:actor) do
+                          Actor.create
+                        end
 
-                      before do
-                        persisted.paranoid_phones_attributes =
-                          { "foo" => { "id" => phone.id, "number" => 42, "_destroy" => true }}
-                      end
+                        let!(:thing) do
+                          actor.things.create
+                        end
 
-                      it "does not destroy the child" do
-                        persisted.reload.paranoid_phones.should_not be_empty
+                        before do
+                          actor.things_attributes =
+                            { "foo" => { "id" => thing.id, "_destroy" => true }}
+                          actor.save
+                        end
+
+                        it "does not destroy the child" do
+                          actor.reload.things.should_not be_empty
+                        end
                       end
                     end
 

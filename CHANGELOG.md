@@ -768,6 +768,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#1997 Cascading callbacks should be able to halt the callback chain when
+  terminating.
+
 * \#1972 `added`, `loaded`, and `unloaded` can now be valid scope names on a
   document that is part of a 1-n relation.
 

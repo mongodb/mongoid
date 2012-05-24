@@ -88,7 +88,9 @@ module Mongoid
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
       cascadable_children(kind).each do |child|
-        child.run_callbacks(child_callback_type(kind, child), *args)
+        unless child.run_callbacks(child_callback_type(kind, child), *args)
+          return false
+        end
       end
       super(kind, *args, &block)
     end
