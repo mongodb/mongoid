@@ -262,9 +262,6 @@ module Mongoid
     # @example Get the atomic paths.
     #   document.atomic_paths
     #
-    # @todo: Durran: Should probably raise error for embedded docs w/o
-    #   metadata.
-    #
     # @return [ Object ] The associated path.
     #
     # @since 2.1.0

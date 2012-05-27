@@ -73,8 +73,6 @@ module Mongoid
 
     # Purge all data in all collections, including indexes.
     #
-    # @todo Durran: clean up.
-    #
     # @example Purge all data.
     #   Mongoid::Config.purge!
     #

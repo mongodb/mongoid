@@ -127,38 +127,29 @@ module Mongoid
     # Gets all the new values for each of the changed fields, to be passed to
     # a MongoDB $set modifier.
     #
-    # @todo: Durran: Refactor 3.0
-    #
     # @example Get the setters for the atomic updates.
     #   person = Person.new(:title => "Sir")
     #   person.title = "Madam"
     #   person.setters # returns { "title" => "Madam" }
     #
     # @return [ Hash ] A +Hash+ of atomic setters.
+    #
+    # @since 2.0.0
     def setters
-      modifications = {}
+      mods = {}
       changes.each_pair do |name, changes|
         if changes
           old, new = changes
           field = fields[name]
           key = atomic_attribute_name(name)
           if field && field.resizable?
-            field.add_atomic_changes(
-              self,
-              name,
-              key,
-              modifications,
-              new,
-              old
-            )
+            field.add_atomic_changes(self, name, key, mods, new, old)
           else
-            unless atomic_unsets.include?(key)
-              modifications[key] = new
-            end
+            mods[key] = new unless atomic_unsets.include?(key)
           end
         end
       end
-      modifications
+      mods
     end
 
     private

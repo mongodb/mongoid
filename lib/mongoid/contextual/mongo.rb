@@ -378,8 +378,6 @@ module Mongoid
 
       # Map the sort symbols to the correct MongoDB values.
       #
-      # @todo: Durran: Temporary.
-      #
       # @example Apply the sorting params.
       #   context.apply_sorting
       #
@@ -391,8 +389,6 @@ module Mongoid
       end
 
       # Map the inverse sort symbols to the correct MongoDB values.
-      #
-      # @todo: Durran: Temporary.
       #
       # @example Apply the inverse sorting params.
       #   context.apply_inverse_sorting

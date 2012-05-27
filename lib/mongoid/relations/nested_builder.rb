@@ -57,8 +57,6 @@ module Mongoid
 
       # Convert an id to its appropriate type.
       #
-      # @todo Durran: Move this into a common reusable place.
-      #
       # @example Convert the id.
       #   builder.convert_id(Person, "4d371b444835d98b8b000010")
       #

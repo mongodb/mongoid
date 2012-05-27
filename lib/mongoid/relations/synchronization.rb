@@ -36,8 +36,6 @@ module Mongoid
 
       # Has the document been synced for the foreign key?
       #
-      # @todo Change the sync to be key based.
-      #
       # @example Has the document been synced?
       #   document.synced?
       #
