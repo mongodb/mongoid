@@ -545,7 +545,7 @@ describe Mongoid::Relations::Accessors do
         context "when accessing a references one" do
 
           let!(:rating) do
-            Book.first.rating
+            Book.find(book.id).rating
           end
 
           it "returns the correct document" do
