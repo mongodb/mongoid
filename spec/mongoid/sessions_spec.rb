@@ -266,6 +266,25 @@ describe Mongoid::Sessions do
       end
     end
 
+    context "when overriding to a mongohq replica set with uri config", config: :mongohq do
+
+      before(:all) do
+        Band.store_in(session: :mongohq_repl_uri)
+      end
+
+      let(:band) do
+        Band.new
+      end
+
+      let(:repl_session) do
+        band.mongo_session
+      end
+
+      it "returns the default session" do
+        repl_session.options[:database].should eq(ENV["MONGOHQ_REPL_NAME"])
+      end
+    end
+
     context "when no session exists with the key" do
 
       before(:all) do
@@ -512,6 +531,27 @@ describe Mongoid::Sessions do
           let(:from_db) do
             Band.with(
               session: "mongohq_repl",
+              database: "mongoid-test"
+            ).find(band.id)
+          end
+
+          it "persists to the specified database" do
+            from_db.should eq(band)
+          end
+        end
+
+        context "when sending to a mongohq replica set with uri config", config: :mongohq do
+
+          let!(:band) do
+            Band.with(
+              session: "mongohq_repl_uri",
+              database: "mongoid-test"
+            ).create
+          end
+
+          let(:from_db) do
+            Band.with(
+              session: "mongohq_repl_uri",
               database: "mongoid-test"
             ).find(band.id)
           end

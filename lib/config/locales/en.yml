@@ -239,6 +239,15 @@ en:
             for each parent up the hierarchy."
           resolution: "Consider not embedding %{embedded}, or do the key
             storage and access in a custom manner in the application code."
+        mixed_session_configuration:
+          message: "Both uri and standard configuration options defined for
+            session: '%{name}'."
+          summary: "Instead of simply giving uri or standard options a
+            preference order, Mongoid assumes that you have made a mistake in
+            your configuration and requires that you provide one or the other,
+            but not both. The options that were provided were: %{config}."
+          resolution: "Provide either only a uri as configuration or only
+            standard options."
         nested_attributes_metadata_not_found:
           message: "Could not find metadata for relation '%{name}' on model:
             %{klass}."

@@ -24,6 +24,8 @@ test:
       options:
         consistency: :eventual
         safe: true
+    mongohq_repl_uri:
+      uri: <%= ENV["MONGOHQ_REPL_URI"]%>
   options:
     allow_dynamic_fields: true
     identity_map_enabled: false

@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/sessions/mongo_uri"
+
 module Mongoid
   module Sessions
     module Factory
@@ -50,13 +52,13 @@ module Mongoid
       # @example Create the session.
       #   Factory.create_session(config)
       #
-      # @param [ Hash ] config The session config.
+      # @param [ Hash ] configuration The session config.
       #
       # @return [ Moped::Session ] The session.
       #
       # @since 3.0.0
-      def create_session(config)
-        options = (config[:options] || {}).dup
+      def create_session(configuration)
+        config, options = parse(configuration)
         session = Moped::Session.new(config[:hosts], options)
         session.use(config[:database])
         if authenticated?(config)
@@ -79,6 +81,25 @@ module Mongoid
       # @since 3.0.0
       def authenticated?(config)
         config.has_key?(:username) && config.has_key?(:password)
+      end
+
+      # Parse the configuration. If a uri is provided we need to extract the
+      # elements of it, otherwise the options are left alone.
+      #
+      # @api private
+      #
+      # @example Parse the config.
+      #   Factory.parse(config)
+      #
+      # @param [ Hash ] config The configuration.
+      #
+      # @return [ Array<Hash> ] The configuration, parsed.
+      #
+      # @since 3.0.0
+      def parse(config)
+        options = config[:options].try(:dup) || {}
+        parsed = config.has_key?(:uri) ? MongoUri.new(config[:uri]).to_hash : config
+        [ parsed, options ]
       end
     end
   end

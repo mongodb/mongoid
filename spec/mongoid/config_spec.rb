@@ -257,6 +257,21 @@ describe Mongoid::Config do
           }.to raise_error(Mongoid::Errors::NoSessionDatabase)
         end
       end
+
+      context "when a uri and standard options are provided" do
+
+        let(:sessions) do
+          { "default" =>
+            { hosts: [ "localhost:27017" ], uri: "mongodb://localhost:27017" }
+          }
+        end
+
+        it "raises an error" do
+          expect {
+            described_class.sessions = sessions
+          }.to raise_error(Mongoid::Errors::MixedSessionConfiguration)
+        end
+      end
     end
   end
 end
