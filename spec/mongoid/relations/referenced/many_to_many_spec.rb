@@ -14,7 +14,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     Person.reset_callbacks(:destroy)
   end
 
-  [ :<<, :push, :concat ].each do |method|
+  [ :<<, :push ].each do |method|
 
     describe "##{method}" do
 
@@ -1058,6 +1058,453 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "clears out the relation" do
           person.preferences.should be_empty
+        end
+      end
+    end
+  end
+
+  describe "#concat" do
+
+    context "when the parent is a new record" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let!(:preference) do
+        Preference.new
+      end
+
+      let(:result) do
+        person.preferences.concat([ preference ])
+      end
+
+      it "returns an array of loaded documents" do
+        result.should eq([ preference ])
+      end
+    end
+
+    context "when the parent is not a new record" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:preference) do
+        Preference.new
+      end
+
+      let(:result) do
+        person.preferences.concat([ preference ])
+      end
+
+      it "returns an array of loaded documents" do
+        result.should eq([ preference ])
+      end
+    end
+
+    context "when the relations are not polymorphic" do
+
+      context "when the inverse relation is not defined" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:house) do
+          House.new
+        end
+
+        before do
+          person.houses.concat([ house ])
+        end
+
+        it "appends the document to the relation" do
+          person.houses.should eq([ house ])
+        end
+
+        it "sets the foreign key on the relation" do
+          person.house_ids.should eq([ house.id ])
+        end
+      end
+
+      context "when appending in a parent create block" do
+
+        let!(:preference) do
+          Preference.create(name: "testing")
+        end
+
+        let!(:person) do
+          Person.create do |doc|
+            doc.preferences.concat([ preference ])
+          end
+        end
+
+        it "adds the documents to the relation" do
+          person.preferences.should eq([ preference ])
+        end
+
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should eq([ preference.id ])
+        end
+
+        it "sets the foreign key on the inverse relation" do
+          preference.person_ids.should eq([ person.id ])
+        end
+
+        it "saves the target" do
+          preference.should be_persisted
+        end
+
+        it "adds the correct number of documents" do
+          person.preferences.size.should eq(1)
+        end
+
+        it "persists the link" do
+          person.reload.preferences.should eq([ preference ])
+        end
+      end
+
+      context "when the parent is a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        context "when the child is new" do
+
+          let(:preference) do
+            Preference.new
+          end
+
+          before do
+            person.preferences.concat([ preference ])
+          end
+
+          it "adds the documents to the relation" do
+            person.preferences.should eq([ preference ])
+          end
+
+          it "sets the foreign key on the relation" do
+            person.preference_ids.should eq([ preference.id ])
+          end
+
+          it "sets the foreign key on the inverse relation" do
+            preference.person_ids.should eq([ person.id ])
+          end
+
+          it "does not save the target" do
+            preference.should be_new_record
+          end
+
+          it "adds the correct number of documents" do
+            person.preferences.size.should eq(1)
+          end
+
+          context "when appending a second time" do
+
+            before do
+              person.preferences.concat([ preference ])
+            end
+
+            it "does not allow the document to be added again" do
+              person.preferences.should eq([ preference ])
+            end
+
+            it "does not allow duplicate ids" do
+              person.preference_ids.should eq([ preference.id ])
+            end
+          end
+        end
+
+        context "when the child is already persisted" do
+
+          let!(:persisted) do
+            Preference.create(name: "testy")
+          end
+
+          let(:preference) do
+            Preference.first
+          end
+
+          before do
+            person.preferences.concat([ preference ])
+            person.save
+          end
+
+          it "adds the documents to the relation" do
+            person.preferences.should eq([ preference ])
+          end
+
+          it "sets the foreign key on the relation" do
+            person.preference_ids.should eq([ preference.id ])
+          end
+
+          it "sets the foreign key on the inverse relation" do
+            preference.person_ids.should eq([ person.id ])
+          end
+
+          it "saves the target" do
+            preference.should be_persisted
+          end
+
+          it "adds the correct number of documents" do
+            person.preferences.size.should eq(1)
+          end
+
+          it "persists the link" do
+            person.reload.preferences.should eq([ preference ])
+          end
+        end
+
+        context "when setting via the associated ids" do
+
+          let!(:persisted) do
+            Preference.create(name: "testy")
+          end
+
+          let(:preference) do
+            Preference.first
+          end
+
+          let(:person) do
+            Person.new(preference_ids: [ preference.id ])
+          end
+
+          before do
+            person.save
+          end
+
+          it "adds the documents to the relation" do
+            person.preferences.should eq([ preference ])
+          end
+
+          it "sets the foreign key on the relation" do
+            person.preference_ids.should eq([ preference.id ])
+          end
+
+          it "sets the foreign key on the inverse relation" do
+            preference.reload.person_ids.should eq([ person.id ])
+          end
+
+          it "adds the correct number of documents" do
+            person.preferences.size.should eq(1)
+          end
+
+          it "persists the link" do
+            person.reload.preferences.should eq([ preference ])
+          end
+        end
+      end
+
+      context "when the parent is not a new record" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let(:preference) do
+          Preference.new
+        end
+
+        before do
+          person.preferences.concat([ preference ])
+        end
+
+        it "adds the documents to the relation" do
+          person.preferences.should eq([ preference ])
+        end
+
+        it "sets the foreign key on the relation" do
+          person.preference_ids.should eq([ preference.id ])
+        end
+
+        it "sets the foreign key on the inverse relation" do
+          preference.person_ids.should eq([ person.id ])
+        end
+
+        it "sets the base on the inverse relation" do
+          preference.people.should eq([ person ])
+        end
+
+        it "sets the same instance on the inverse relation" do
+          preference.people.first.should eql(person)
+        end
+
+        it "saves the target" do
+          preference.should_not be_new_record
+        end
+
+        it "adds the document to the target" do
+          person.preferences.count.should eq(1)
+        end
+
+        context "when documents already exist on the relation" do
+
+          let(:preference_two) do
+            Preference.new
+          end
+
+          before do
+            person.preferences.concat([ preference_two ])
+          end
+
+          it "adds the documents to the relation" do
+            person.preferences.should eq([ preference, preference_two ])
+          end
+
+          it "sets the foreign key on the relation" do
+            person.preference_ids.should eq([ preference.id, preference_two.id ])
+          end
+
+          it "sets the foreign key on the inverse relation" do
+            preference_two.person_ids.should eq([ person.id ])
+          end
+
+          it "sets the base on the inverse relation" do
+            preference_two.people.should eq([ person ])
+          end
+
+          it "sets the same instance on the inverse relation" do
+            preference_two.people.first.should eql(person)
+          end
+
+          it "saves the target" do
+            preference.should_not be_new_record
+          end
+
+          it "adds the document to the target" do
+            person.preferences.count.should eq(2)
+          end
+        end
+      end
+
+      context "when both sides have been persisted" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let(:event) do
+          Event.create
+        end
+
+        before do
+          person.administrated_events.concat([ event ])
+        end
+
+        it "sets the front side of the relation" do
+          person.administrated_events.should eq([ event ])
+        end
+
+        it "sets the inverse side of the relation" do
+          event.administrators.should eq([ person ])
+        end
+
+        context "when reloading" do
+
+          it "sets the front side of the relation" do
+            person.reload.administrated_events.should eq([ event ])
+          end
+
+          it "sets the inverse side of the relation" do
+            event.reload.administrators.should eq([ person ])
+          end
+        end
+
+        context "when performing a new database query" do
+
+          let(:loaded_person) do
+            Person.find(person.id)
+          end
+
+          let(:loaded_event) do
+            Event.find(event.id)
+          end
+
+          it "sets the front side of the relation" do
+            loaded_person.administrated_events.should eq([ event ])
+          end
+
+          it "sets the inverse side of the relation" do
+            loaded_event.administrators.should eq([ person ])
+          end
+        end
+      end
+
+      context "when the relation also includes a has_many relation" do
+
+        let(:artwork) do
+          Artwork.create
+        end
+
+        let(:exhibition) do
+          Exhibition.create
+        end
+
+        let(:exhibitor) do
+          Exhibitor.create(exhibition: exhibition)
+        end
+
+        before do
+          artwork.exhibitors.concat([ exhibitor ])
+        end
+
+        it "creates a single artwork object" do
+          Artwork.count.should eq(1)
+        end
+      end
+
+      context "when the relation is self referencing" do
+
+        let(:tag_one) do
+          Tag.create(text: "one")
+        end
+
+        let(:tag_two) do
+          Tag.create(text: "two")
+        end
+
+        before do
+          tag_one.related.concat([ tag_two ])
+        end
+
+        it "sets the front side of the relation" do
+          tag_one.related.should eq([ tag_two ])
+        end
+
+        it "sets the inverse side of the relation" do
+          tag_two.related.should eq([ tag_one ])
+        end
+
+        context "when reloading" do
+
+          it "sets the front side of the relation" do
+            tag_one.reload.related.should eq([ tag_two ])
+          end
+
+          it "sets the inverse side of the relation" do
+            tag_two.reload.related.should eq([ tag_one ])
+          end
+        end
+
+        context "when performing a new database query" do
+
+          let(:loaded_tag_one) do
+            Tag.find(tag_one.id)
+          end
+
+          let(:loaded_tag_two) do
+            Tag.find(tag_two.id)
+          end
+
+          it "sets the front side of the relation" do
+            loaded_tag_one.related.should eq([ tag_two ])
+          end
+
+          it "sets the inverse side of the relation" do
+            loaded_tag_two.related.should eq([ tag_one ])
+          end
         end
       end
     end

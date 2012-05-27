@@ -35,7 +35,7 @@ describe Mongoid::Fields::ForeignKey do
     end
 
     before do
-      person.preferences.concat(preference_one, preference_three)
+      person.preferences.concat([ preference_one, preference_three ])
     end
 
     context "when adding and removing" do

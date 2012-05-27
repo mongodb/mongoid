@@ -18,7 +18,7 @@ module Mongoid
       attr_accessor :base, :loaded, :metadata, :target
 
       # Backwards compatibility with Mongoid beta releases.
-      delegate :klass, to: :metadata
+      delegate :klass, :foreign_key, :inverse_foreign_key, to: :metadata
       delegate :bind_one, :unbind_one, to: :binding
       delegate :collection_name, to: :base
 

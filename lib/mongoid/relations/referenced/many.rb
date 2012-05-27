@@ -6,7 +6,6 @@ module Mongoid
       # This class defines the behaviour for all relations that are a
       # one-to-many between documents in different collections.
       class Many < Relations::Many
-        include Batch
 
         delegate :count, to: :criteria
         delegate :first, :in_memory, :last, :reset, :uniq, to: :target
@@ -42,11 +41,6 @@ module Mongoid
         # Appends an array of documents to the relation. Performs a batch
         # insert of the documents instead of persisting one at a time.
         #
-        # @note When performing batch inserts the *after* callbacks will get
-        #   executed before the documents have actually been persisted to the
-        #   database due to an issue with Active Support's callback system - we
-        #   cannot explicitly fire the after callbacks by themselves.
-        #
         # @example Concat with other documents.
         #   person.posts.concat([ post_one, post_two ])
         #
@@ -56,13 +50,13 @@ module Mongoid
         #
         # @since 2.4.0
         def concat(documents)
-          batched do
-            documents.each do |doc|
-              next unless doc
-              append(doc)
-              doc.save if persistable?
-            end
+          inserts = []
+          documents.each do |doc|
+            next unless doc
+            append(doc)
+            save_or_delay(doc, inserts) if persistable?
           end
+          persist_delayed(inserts)
           self
         end
 
@@ -216,7 +210,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def nullify
-          criteria.update(metadata.foreign_key => nil)
+          criteria.update(foreign_key => nil)
           target.clear do |doc|
             unbind_one(doc)
           end
@@ -263,7 +257,7 @@ module Mongoid
             new_ids = new_docs.map { |doc| doc.id }
             remove_not_in(new_ids)
             new_docs.each do |doc|
-              docs.push(doc) if doc.send(metadata.foreign_key) != base.id
+              docs.push(doc) if doc.send(foreign_key) != base.id
             end
             concat(docs)
           else
@@ -283,7 +277,7 @@ module Mongoid
         # @since 2.4.0
         def unscoped
           klass.unscoped.where(
-            metadata.foreign_key => Conversions.flag(base.id, metadata)
+            foreign_key => Conversions.flag(base.id, metadata)
           )
         end
 
@@ -386,6 +380,27 @@ module Mongoid
           end
         end
 
+        # Persist all the delayed batch inserts.
+        #
+        # @api private
+        #
+        # @example Persist the delayed batch inserts.
+        #   relation.persist_delayed([ doc ])
+        #
+        # @param [ Array<Document> ] inserts The delayed inserts.
+        #
+        # @since 3.0.0
+        def persist_delayed(inserts)
+          if inserts.any?
+            collection.insert(inserts.map(&:as_document))
+            inserts.each do |doc|
+              doc.new_record = false
+              doc.run_after_callbacks(:create, :save)
+              doc.post_persist
+            end
+          end
+        end
+
         # Are we able to persist this relation?
         #
         # @example Can we persist the relation?
@@ -427,8 +442,6 @@ module Mongoid
         # Remove all the documents in the proxy that do not have the provided
         # ids.
         #
-        # @todo: Durran: Refactor 3.0. Temp for bug fix in 2.4.
-        #
         # @example Remove all documents without the ids.
         #   proxy.remove_not_in([ id ])
         #
@@ -440,7 +453,7 @@ module Mongoid
           if metadata.destructive?
             removed.delete_all
           else
-            removed.update(metadata.foreign_key => nil)
+            removed.update(foreign_key => nil)
           end
           in_memory.each do |doc|
             if !ids.include?(doc.id)
@@ -450,6 +463,27 @@ module Mongoid
                 doc.destroyed = true
               end
             end
+          end
+        end
+
+        # Save a persisted document immediately or delay a new document for
+        # batch insert.
+        #
+        # @api private
+        #
+        # @example Save or delay the document.
+        #   relation.save_or_delay(doc, [])
+        #
+        # @param [ Document ] doc The document.
+        # @param [ Array<Document> ] inserts The inserts.
+        #
+        # @since 3.0.0
+        def save_or_delay(doc, inserts)
+          if doc.new_record? && doc.valid?(:create)
+            inserts.push(doc)
+            doc.run_before_callbacks(:save, :create)
+          else
+            doc.save
           end
         end
 

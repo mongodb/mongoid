@@ -25,28 +25,50 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def <<(*args)
-          batched do
-            ids = []
-            args.flatten.each do |doc|
-              next if doc.nil? || target.include?(doc)
+          docs = args.flatten
+          return concat(docs) if docs.size > 1
+          if doc = docs.first
+            if !target.include?(doc)
               append(doc)
+              base.push(foreign_key, doc.id)
               if persistable? || _creating?
-                ids.push(doc.id)
                 doc.save
-              else
-                base.send(metadata.foreign_key).push(doc.id)
-                base.synced[metadata.foreign_key] = false
               end
             end
+          end
+          unsynced(base, foreign_key) and self
+        end
+        alias :push :<<
+
+        # Appends an array of documents to the relation. Performs a batch
+        # insert of the documents instead of persisting one at a time.
+        #
+        # @example Concat with other documents.
+        #   person.posts.concat([ post_one, post_two ])
+        #
+        # @param [ Array<Document> ] documents The docs to add.
+        #
+        # @return [ Array<Document> ] The documents.
+        #
+        # @since 2.4.0
+        def concat(documents)
+          ids, inserts = [], []
+          documents.each do |doc|
+            next if doc.nil? || target.include?(doc)
+            append(doc)
             if persistable? || _creating?
-              base.push_all(metadata.foreign_key, ids)
-              base.synced[metadata.foreign_key] = false
+              ids.push(doc.id)
+              save_or_delay(doc, inserts)
+            else
+              base.send(foreign_key).push(doc.id) and unsynced(base, foreign_key)
             end
           end
+          if persistable? || _creating?
+            base.push_all(foreign_key, ids)
+          end
+          persist_delayed(inserts)
           self
         end
-        alias :concat :<<
-        alias :push :<<
 
         # Build a new document from the attributes and append it to this
         # relation without saving.
@@ -73,10 +95,10 @@ module Mongoid
           end
 
           doc = Factory.build(type || klass, attributes, options)
-          base.send(metadata.foreign_key).push(doc.id)
+          base.send(foreign_key).push(doc.id)
           append(doc)
           doc.apply_post_processed_defaults
-          doc.synced[metadata.inverse_foreign_key] = false
+          unsynced(doc, inverse_foreign_key)
           yield(doc) if block_given?
           doc
         end
@@ -97,8 +119,8 @@ module Mongoid
         def delete(document)
           doc = super
           if doc && persistable?
-            base.pull(metadata.foreign_key, doc.id)
-            base.synced[metadata.foreign_key] = false
+            base.pull(foreign_key, doc.id)
+            unsynced(base, foreign_key)
           end
           doc
         end
@@ -113,12 +135,12 @@ module Mongoid
         # @since 2.0.0.rc.1
         def nullify
           unless metadata.forced_nil_inverse?
-            criteria.pull(metadata.inverse_foreign_key, base.id)
+            criteria.pull(inverse_foreign_key, base.id)
           end
           if persistable?
             base.set(
-              metadata.foreign_key,
-              base.send(metadata.foreign_key).clear
+              foreign_key,
+              base.send(foreign_key).clear
             )
           end
           target.clear do |doc|
@@ -157,7 +179,7 @@ module Mongoid
         #
         # @since 2.4.0
         def unscoped
-          klass.unscoped.any_in(_id: base.send(metadata.foreign_key))
+          klass.unscoped.any_in(_id: base.send(foreign_key))
         end
 
         private
@@ -197,7 +219,25 @@ module Mongoid
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          ManyToMany.criteria(metadata, base.send(metadata.foreign_key))
+          ManyToMany.criteria(metadata, base.send(foreign_key))
+        end
+
+        # Flag the base as unsynced with respect to the foreign key.
+        #
+        # @api private
+        #
+        # @example Flag as unsynced.
+        #   relation.unsynced(doc, :preference_ids)
+        #
+        # @param [ Document ] doc The document to flag.
+        # @param [ Symbol ] key The key to flag on the document.
+        #
+        # @return [ true ] true.
+        #
+        # @since 3.0.0
+        def unsynced(doc, key)
+          doc.synced[key] = false
+          true
         end
 
         class << self

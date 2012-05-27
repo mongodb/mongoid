@@ -1221,8 +1221,12 @@ describe Mongoid::Relations::Referenced::Many do
           Post.new
         end
 
+        let(:post_three) do
+          Post.new
+        end
+
         before do
-          person.posts.concat([ post ])
+          person.posts.concat([ post, post_three ])
         end
 
         it "sets the foreign key on the relation" do
@@ -1242,7 +1246,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         it "adds the document to the target" do
-          person.posts.count.should eq(1)
+          person.posts.count.should eq(2)
         end
 
         context "when documents already exist on the relation" do
@@ -1272,7 +1276,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "adds the document to the target" do
-            person.posts.count.should eq(2)
+            person.posts.count.should eq(3)
           end
 
           it "contains the initial document in the target" do
