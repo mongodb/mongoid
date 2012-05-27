@@ -375,7 +375,7 @@ module Mongoid
         @selector ||= root.atomic_selector
         @path ||= doc.atomic_path
         documents.delete_one(doc)
-        root.remove_child(doc)
+        doc._parent.remove_child(doc)
         doc.destroyed = true
       end
     end

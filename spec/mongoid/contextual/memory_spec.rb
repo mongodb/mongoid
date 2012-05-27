@@ -150,48 +150,100 @@ describe Mongoid::Contextual::Memory do
       person.addresses.create(street: "pfluger")
     end
 
-    let(:criteria) do
-      Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
-        crit.documents = [ hobrecht, friedel, pfluger ]
-      end
-    end
-
-    let(:context) do
-      described_class.new(criteria)
-    end
-
     describe "##{method}" do
 
-      let!(:deleted) do
-        context.send(method)
+      context "when embedded a single level" do
+
+        let(:criteria) do
+          Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
+            crit.documents = [ hobrecht, friedel, pfluger ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:deleted) do
+          context.send(method)
+        end
+
+        it "deletes the first matching document" do
+          hobrecht.should be_destroyed
+        end
+
+        it "deletes the last matching document" do
+          friedel.should be_destroyed
+        end
+
+        it "does not delete non matching docs" do
+          pfluger.should_not be_destroyed
+        end
+
+        it "removes the docs from the relation" do
+          person.addresses.should eq([ pfluger ])
+        end
+
+        it "removes the docs from the context" do
+          context.entries.should be_empty
+        end
+
+        it "persists the changes to the database" do
+          person.reload.addresses.should eq([ pfluger ])
+        end
+
+        it "returns the number of deleted documents" do
+          deleted.should eq(2)
+        end
       end
 
-      it "deletes the first matching document" do
-        hobrecht.should be_destroyed
-      end
+      context "when embedded multiple levels" do
 
-      it "deletes the last matching document" do
-        friedel.should be_destroyed
-      end
+        let!(:home) do
+          hobrecht.locations.create(name: "home")
+        end
 
-      it "does not delete non matching docs" do
-        pfluger.should_not be_destroyed
-      end
+        let!(:work) do
+          hobrecht.locations.create(name: "work")
+        end
 
-      it "removes the docs from the relation" do
-        person.addresses.should eq([ pfluger ])
-      end
+        let(:criteria) do
+          Location.where(name: "work").tap do |crit|
+            crit.documents = [ home, work ]
+          end
+        end
 
-      it "removes the docs from the context" do
-        context.entries.should be_empty
-      end
+        let(:context) do
+          described_class.new(criteria)
+        end
 
-      it "persists the changes to the database" do
-        person.reload.addresses.should eq([ pfluger ])
-      end
+        let!(:deleted) do
+          context.send(method)
+        end
 
-      it "returns the number of deleted documents" do
-        deleted.should eq(2)
+        it "deletes the first matching document" do
+          work.should be_destroyed
+        end
+
+        it "does not delete non matching docs" do
+          home.should_not be_destroyed
+        end
+
+        it "removes the docs from the relation" do
+          person.addresses.first.locations.should eq([ home ])
+        end
+
+        it "removes the docs from the context" do
+          context.entries.should be_empty
+        end
+
+        it "persists the changes to the database" do
+          person.reload.addresses.first.locations.should eq([ home ])
+        end
+
+        it "returns the number of deleted documents" do
+          deleted.should eq(1)
+        end
       end
     end
   end
@@ -839,56 +891,113 @@ describe Mongoid::Contextual::Memory do
       person.addresses.create(street: "pfluger")
     end
 
-    let(:criteria) do
-      Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
-        crit.documents = [ hobrecht, friedel, pfluger ]
-      end
-    end
-
-    let(:context) do
-      described_class.new(criteria)
-    end
-
     describe "##{method}" do
 
-      context "when attributes are provided" do
+      context "when the documents are embedded one level" do
 
-        before do
-          context.send(method, number: 5)
+        let(:criteria) do
+          Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
+            crit.documents = [ hobrecht, friedel, pfluger ]
+          end
         end
 
-        it "updates the first matching document" do
-          hobrecht.number.should eq(5)
+        let(:context) do
+          described_class.new(criteria)
         end
 
-        it "updates the last matching document" do
-          friedel.number.should eq(5)
-        end
+        context "when attributes are provided" do
 
-        it "does not update non matching docs" do
-          pfluger.number.should be_nil
-        end
-
-        context "when reloading the embedded documents" do
+          before do
+            context.send(method, number: 5)
+          end
 
           it "updates the first matching document" do
-            hobrecht.reload.number.should eq(5)
+            hobrecht.number.should eq(5)
           end
 
           it "updates the last matching document" do
-            friedel.reload.number.should eq(5)
+            friedel.number.should eq(5)
           end
 
           it "does not update non matching docs" do
-            pfluger.reload.number.should be_nil
+            pfluger.number.should be_nil
+          end
+
+          context "when reloading the embedded documents" do
+
+            it "updates the first matching document" do
+              hobrecht.reload.number.should eq(5)
+            end
+
+            it "updates the last matching document" do
+              friedel.reload.number.should eq(5)
+            end
+
+            it "does not update non matching docs" do
+              pfluger.reload.number.should be_nil
+            end
+          end
+        end
+
+        context "when no attributes are provided" do
+
+          it "returns false" do
+            context.send(method).should be_false
           end
         end
       end
 
-      context "when no attributes are provided" do
+      context "when the documents are embedded multiple levels" do
 
-        it "returns false" do
-          context.send(method).should be_false
+        let!(:home) do
+          hobrecht.locations.create(name: "home")
+        end
+
+        let!(:work) do
+          hobrecht.locations.create(name: "work")
+        end
+
+        let(:criteria) do
+          Location.where(name: "work").tap do |crit|
+            crit.documents = [ home, work ]
+          end
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when attributes are provided" do
+
+          before do
+            context.send(method, number: 5)
+          end
+
+          it "updates the first matching document" do
+            work.number.should eq(5)
+          end
+
+          it "does not update non matching docs" do
+            home.number.should be_nil
+          end
+
+          context "when reloading the embedded documents" do
+
+            it "updates the first matching document" do
+              work.reload.number.should eq(5)
+            end
+
+            it "does not update non matching docs" do
+              home.reload.number.should be_nil
+            end
+          end
+        end
+
+        context "when no attributes are provided" do
+
+          it "returns false" do
+            context.send(method).should be_false
+          end
         end
       end
     end
