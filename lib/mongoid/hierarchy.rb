@@ -22,6 +22,14 @@ module Mongoid
       @_children ||= collect_children
     end
 
+    # Collect all the children of this document.
+    #
+    # @example Collect all the children.
+    #   document.collect_children
+    #
+    # @return [ Array<Document> ] The children.
+    #
+    # @since 2.4.0
     def collect_children
       children = []
       embedded_relations.each_pair do |name, metadata|

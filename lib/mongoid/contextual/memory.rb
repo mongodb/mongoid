@@ -7,11 +7,21 @@ module Mongoid
       include Enumerable
       include Aggregable::Memory
 
+      # @attribute [r] collection The root collection.
       # @attribute [r] criteria The criteria for the context.
       # @attribute [r] klass The criteria class.
-      # @attribute [r] matching The in memory documents that match the
-      #   selector.
-      attr_reader :criteria, :klass, :documents
+      # @attribute [r] root The root document.
+      # @attribute [r] path The atomic path.
+      # @attribute [r] selector The root document selector.
+      # @attribute [r] matching The in memory documents that match the selector.
+      attr_reader \
+        :collection,
+        :criteria,
+        :documents,
+        :klass,
+        :path,
+        :root,
+        :selector
 
       # Check if the context is equal to the other object.
       #
@@ -50,11 +60,13 @@ module Mongoid
       #
       # @since 3.0.0
       def delete
-        # @todo: Durran: Optimize to a single db call.
         deleted = count
-        each do |doc|
-          documents.delete_one(doc)
-          doc.delete
+        removed = map do |doc|
+          prepare_remove(doc)
+          doc.as_document
+        end
+        unless removed.empty?
+          collection.find(selector).update("$pullAll" => { path => removed })
         end
         deleted
       end
@@ -69,7 +81,6 @@ module Mongoid
       #
       # @since 3.0.0
       def destroy
-        # @todo: Durran: Optimize to a single db call.
         deleted = count
         each do |doc|
           documents.delete_one(doc)
@@ -150,6 +161,8 @@ module Mongoid
       def initialize(criteria)
         @criteria, @klass = criteria, criteria.klass
         @documents = criteria.documents.select do |doc|
+          @root ||= doc._root
+          @collection ||= root.collection
           doc.matches?(criteria.selector)
         end
         apply_sorting
@@ -347,6 +360,24 @@ module Mongoid
             dir > 0 ? a[field] <=> b[field] : b[field] <=> a[field]
           end
         end
+      end
+
+      # Prepare the document for batch removal.
+      #
+      # @api private
+      #
+      # @example Prepare for removal.
+      #   context.prepare_remove(doc)
+      #
+      # @param [ Document ] doc The document.
+      #
+      # @since 3.0.0
+      def prepare_remove(doc)
+        @selector ||= root.atomic_selector
+        @path ||= doc.atomic_path
+        documents.delete_one(doc)
+        root.remove_child(doc)
+        doc.destroyed = true
       end
     end
   end
