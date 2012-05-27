@@ -250,11 +250,14 @@ module Mongoid
       #
       # @since 3.0.0
       def update(attributes = nil)
-        # @todo: Durran: Optimize to a single db call.
         return false unless attributes
+        updates = {}
         each do |doc|
-          doc.update_attributes(attributes)
+          @selector ||= root.atomic_selector
+          doc.write_attributes(attributes)
+          updates.merge!(doc.atomic_position => attributes)
         end
+        collection.find(selector).update("$set" => updates)
       end
       alias :update_all :update
 
@@ -332,8 +335,6 @@ module Mongoid
 
       # Map the sort symbols to the correct MongoDB values.
       #
-      # @todo: Durran: Temporary.
-      #
       # @example Apply the sorting params.
       #   context.apply_sorting
       #
@@ -345,8 +346,6 @@ module Mongoid
       end
 
       # Sort the documents in place.
-      #
-      # @todo: Durran: Temporary until sorting is all refactored.
       #
       # @example Sort the documents.
       #   context.in_place_sort(name: 1)
