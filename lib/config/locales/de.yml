@@ -58,4 +58,4 @@ de:
         scope_overwrite:
           "Scope :%{scope_name} kann nicht erzeugt werden, da bereits eine Methode
           %{model_name}.%{scope_name} existiert."
-        blank_on_locale: "can't be blank in %{in_locale}"
+        blank_on_locale: "can't be blank in %{location}"

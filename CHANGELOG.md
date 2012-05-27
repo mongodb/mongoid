@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2040 Fixed bad interpolation for locale presence validation.
+
 * \#2038 Allow inverse relations to be determined by foreign keys alone
   if defined on both sides, not just an inverse_of declaration.
 
