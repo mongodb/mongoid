@@ -36,12 +36,34 @@ module Mongoid
             ) if _value.blank?
           end
         elsif document.relations.has_key?(attribute.to_s)
-          if value.blank? && document.send(attribute).blank?
+          if relation_or_fk_missing?(document, attribute, value)
             document.errors.add(attribute, :blank, options)
           end
         else
           document.errors.add(attribute, :blank, options) if value.blank?
         end
+      end
+
+      private
+
+      # Returns true if the relation is blank or the foreign key is blank.
+      #
+      # @api private
+      #
+      # @example Check is the relation or fk is blank.
+      #   validator.relation_or_fk_mising(doc, :name, "")
+      #
+      # @param [ Document ] doc The document.
+      # @param [ Symbol ] attr The attribute.
+      # @param [ Object ] value The value.
+      #
+      # @return [ true, false ] If the doc is missing.
+      #
+      # @since 3.0.0
+      def relation_or_fk_missing?(doc, attr, value)
+        return true if value.blank? && doc.send(attr).blank?
+        metadata = doc.relations[attr.to_s]
+        metadata.stores_foreign_key? && doc.send(metadata.foreign_key).blank?
       end
     end
   end

@@ -529,6 +529,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* \#2039 Validating presence of a relation now checks both the relation and
+  the foreign key value.
+
 * Indexing syntax has changed. The first parameter is now a hash of
   name/direction pairs with an optional second hash parameter for
   additional options.

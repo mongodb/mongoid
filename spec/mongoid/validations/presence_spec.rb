@@ -167,6 +167,35 @@ describe Mongoid::Validations::PresenceValidator do
       end
     end
 
+    context "when the relation is a belongs to" do
+
+      let(:product) do
+        Product.create(name: "testing")
+      end
+
+      context "when the relation is present" do
+
+        let(:purchase) do
+          Purchase.create
+        end
+
+        let(:line_item) do
+          purchase.line_items.create(product: product)
+        end
+
+        context "when the foreign key is nil" do
+
+          before do
+            line_item.attributes["product_id"] = nil
+          end
+
+          it "is not valid" do
+            line_item.should_not be_valid
+          end
+        end
+      end
+    end
+
     context "when the relation is a many to many" do
 
       before do
