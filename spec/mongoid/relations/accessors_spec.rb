@@ -526,10 +526,6 @@ describe Mongoid::Relations::Accessors do
             Rating.where(value: 10).first
           end
 
-          it "returns the correct type" do
-            rating.ratable.should be_a(Movie)
-          end
-
           it "returns the correct document" do
             rating.ratable.should eq(movie)
           end
@@ -548,7 +544,7 @@ describe Mongoid::Relations::Accessors do
 
         context "when accessing a references one" do
 
-          let(:rating) do
+          let!(:rating) do
             Book.first.rating
           end
 
