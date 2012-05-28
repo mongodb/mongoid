@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency("activemodel", ["~> 3.1"])
   s.add_dependency("tzinfo", ["~> 0.3.22"])
   s.add_dependency("moped", ["~> 1.0.0.rc"])
-  s.add_dependency("origin", ["~> 1.0.0.beta"])
+  s.add_dependency("origin", ["~> 1.0.0.rc"])
 
   s.add_development_dependency("mocha", ["~> 0.11"])
   s.add_development_dependency("rspec", ["~> 2.10"])
