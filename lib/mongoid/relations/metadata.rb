@@ -123,7 +123,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def class_name
-        @class_name ||= (self[:class_name] || classify).sub(/^::/,"")
+        @class_name ||= (self[:class_name] || classify).sub(/\A::/,"")
       end
 
       # Get the foreign key contraint for the metadata.

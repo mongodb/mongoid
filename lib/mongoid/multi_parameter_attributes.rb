@@ -55,7 +55,7 @@ module Mongoid
         multi_parameter_attributes = {}
 
         attrs.each_pair do |key, value|
-          if key =~ /^([^\(]+)\((\d+)([if])\)$/
+          if key =~ /\A([^\(]+)\((\d+)([if])\)$/
             key, index = $1, $2.to_i
             (multi_parameter_attributes[key] ||= {})[index] = value.empty? ? nil : value.send("to_#{$3}")
           else

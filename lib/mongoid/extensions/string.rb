@@ -53,7 +53,7 @@ module Mongoid
       #
       # @since 2.3.1
       def mongoid_id?
-        self =~ /^(|_)id$/
+        self =~ /\A(|_)id$/
       end
 
       # Is the string a number?
