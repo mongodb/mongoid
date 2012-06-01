@@ -697,4 +697,35 @@ describe Mongoid::Sessions do
       end
     end
   end
+
+  context "when the default database uses a uri" do
+
+    let(:file) do
+      File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+    end
+
+    let(:config) do
+      { default: { uri: "mongodb://localhost:27017/#{database_id}" }}
+    end
+
+    before do
+      Mongoid::Threaded.sessions.clear
+      Mongoid.sessions = config
+    end
+
+    after do
+      Mongoid::Config.load!(file, :test)
+    end
+
+    context "when creating a document" do
+
+      let!(:band) do
+        Band.create(name: "Placebo")
+      end
+
+      it "persists the document to the correct database" do
+        Band.find(band.id).should eq(band)
+      end
+    end
+  end
 end
