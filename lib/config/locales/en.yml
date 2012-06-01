@@ -67,7 +67,7 @@ en:
         document_with_attributes_not_found:
           message: "Document not found for class %{klass} with attributes %{attributes}."
           summary: "When calling %{klass}.find_by with a hash of attributes, all
-            attributes provided must match a document in the database of this error
+            attributes provided must match a document in the database or this error
             will be raised."
           resolution: "Search for attributes that are in the database or set
             the Mongoid.raise_not_found_error configuration option to false,
