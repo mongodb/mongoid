@@ -7,7 +7,7 @@ module Mongoid
       module Options
         extend self
 
-        VALID_OPTIONS = [ :background, :drop_dups, :name, :sparse, :unique ]
+        VALID_OPTIONS = [ :background, :drop_dups, :name, :sparse, :unique, :max, :min ]
         VALID_TYPES = [ 1, -1, "2d" ]
 
         # Validate the index specification.

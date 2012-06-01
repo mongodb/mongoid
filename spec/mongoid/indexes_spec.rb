@@ -184,7 +184,7 @@ describe Mongoid::Indexes do
     context "when providing a geospacial index" do
 
       before do
-        klass.index({ location: "2d" })
+        klass.index({ location: "2d" }, { min: -200, max: 200 })
       end
 
       let(:options) do
@@ -192,7 +192,7 @@ describe Mongoid::Indexes do
       end
 
       it "sets the geospacial index" do
-        options.should be_empty
+        options.should eq({ min: -200, max: 200 })
       end
     end
 
