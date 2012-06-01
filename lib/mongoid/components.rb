@@ -21,7 +21,6 @@ module Mongoid
     include Mongoid::Atomic
     include Mongoid::Dirty
     include Mongoid::Attributes
-    include Mongoid::Copyable
     include Mongoid::Fields
     include Mongoid::Hierarchy
     include Mongoid::Indexes
@@ -41,6 +40,7 @@ module Mongoid
     include Mongoid::Timestamps::Timeless
     include Mongoid::Validations
     include Mongoid::Callbacks
+    include Mongoid::Copyable
 
     MODULES = [
       Mongoid::Atomic,

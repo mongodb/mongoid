@@ -43,5 +43,10 @@ module Mongoid
       @new_record = true
       apply_defaults
     end
+
+    # @note Durran: Active Model introduced a change in 3.2.4 that requires
+    #   this now from Mongoid's standpoint, otherwise their own internal
+    #   definitiion gets called.
+    alias :initialize_dup :initialize_copy
   end
 end
