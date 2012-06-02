@@ -2222,7 +2222,7 @@ describe Mongoid::Criteria do
       context "when the criteria has limiting options" do
 
         let!(:criteria) do
-          Game.includes(:person).asc(:_id).limit(1).entries
+          Game.where(id: game_one.id).includes(:person).asc(:_id).limit(1).entries
         end
 
         it "returns the correct documents" do
