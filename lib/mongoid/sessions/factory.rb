@@ -59,6 +59,7 @@ module Mongoid
       # @since 3.0.0
       def create_session(configuration)
         config, options = parse(configuration)
+        configuration.merge!(config) if configuration.delete(:uri)
         session = Moped::Session.new(config[:hosts], options)
         session.use(config[:database])
         if authenticated?(config)

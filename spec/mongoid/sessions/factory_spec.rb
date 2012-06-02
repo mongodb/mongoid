@@ -72,6 +72,21 @@ describe Mongoid::Sessions::Factory do
             it "sets the database" do
               session.options[:database].should eq("mongoid_test")
             end
+
+            it "sets the database in the configuration" do
+              session
+              Mongoid.sessions[:secondary].should include(:database)
+            end
+
+            it "sets the hosts in the configuration" do
+              session
+              Mongoid.sessions[:secondary].should include(:hosts)
+            end
+
+            it "removes the uri from the configuration" do
+              session
+              Mongoid.sessions[:secondary].should_not include(:uri)
+            end
           end
 
           context "when the uri has multiple host:port pairs" do
@@ -105,6 +120,21 @@ describe Mongoid::Sessions::Factory do
 
             it "sets the database" do
               session.options[:database].should eq("mongoid_test")
+            end
+
+            it "sets the database in the configuration" do
+              session
+              Mongoid.sessions[:secondary].should include(:database)
+            end
+
+            it "sets the hosts in the configuration" do
+              session
+              Mongoid.sessions[:secondary].should include(:hosts)
+            end
+
+            it "removes the uri from the configuration" do
+              session
+              Mongoid.sessions[:secondary].should_not include(:uri)
             end
           end
         end
