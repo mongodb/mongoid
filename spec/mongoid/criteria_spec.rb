@@ -2165,7 +2165,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:game).asc(:_id).limit(1).entries
+          Person.where(id: person.id).includes(:game).asc(:_id).limit(1).entries
         end
 
         it "returns the correct documents" do
