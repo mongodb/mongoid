@@ -72,6 +72,16 @@ describe Mongoid::Sessions::Factory do
             it "sets the database" do
               session.options[:database].should eq("mongoid_test")
             end
+
+            it "merges database into Mongoid::Config.sessions[:secondary]" do
+              session
+              Mongoid.sessions[:secondary].should include(:database)
+            end
+
+            it "merges hosts into Mongoid::Config.sessions[:secondary]" do
+              session
+              Mongoid.sessions[:secondary].should include(:hosts)
+            end
           end
 
           context "when the uri has multiple host:port pairs" do
