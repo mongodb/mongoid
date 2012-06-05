@@ -2746,12 +2746,30 @@ describe Mongoid::Criteria do
       Band.create(name: "Depeche Mode")
     end
 
-    let(:criteria) do
-      Band.only(:_id)
+    context "when not using inheritance" do
+
+      let(:criteria) do
+        Band.only(:_id)
+      end
+
+      it "limits the returned fields" do
+        criteria.first.name.should be_nil
+      end
+
+      it "does not add _type to the fields" do
+        criteria.options[:fields]["_type"].should be_nil
+      end
     end
 
-    it "limits the returned fields" do
-      criteria.first.name.should be_nil
+    context "when using inheritance" do
+
+      let(:criteria) do
+        Doctor.only(:_id)
+      end
+
+      it "adds _type to the fields" do
+        criteria.options[:fields]["_type"].should eq(1)
+      end
     end
   end
 

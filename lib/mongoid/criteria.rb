@@ -222,7 +222,7 @@ module Mongoid
     # @since 2.0.0
     def field_list
       if options[:fields]
-        options[:fields].keys.reject!{ |key| key == "_type" }
+        options[:fields].keys.reject{ |key| key == "_type" }
       else
         []
       end
@@ -438,7 +438,11 @@ module Mongoid
     # @since 1.0.0
     def only(*args)
       return clone if args.empty?
-      super(*(args + [:_type]))
+      if klass.hereditary?
+        super(*args.push(:_type))
+      else
+        super(*args)
+      end
     end
 
     # Returns true if criteria responds to the given method.
