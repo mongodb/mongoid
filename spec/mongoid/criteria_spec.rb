@@ -418,6 +418,28 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#delete" do
+
+    let(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:tool) do
+      Band.create(name: "Tool")
+    end
+
+    context "when no selector is provided" do
+
+      before do
+        Band.all.delete
+      end
+
+      it "deletes all the documents from the database" do
+        Band.count.should eq(0)
+      end
+    end
+  end
+
   describe "#documents" do
 
     let(:band) do
