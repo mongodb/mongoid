@@ -8,10 +8,12 @@ module Mongoid #:nodoc
 
       # Get the name of the environment that we are running under. This first
       # looks for Rails, then Sinatra, then a RACK_ENV environment variable,
-      # and if none of those are found returns "development".
+      # and if none of those are found raises an error.
       #
       # @example Get the env name.
       #   Environment.env_name
+      #
+      # @raise [ Errors::NoEnvironment ] If no environment was set.
       #
       # @return [ String ] The name of the current environment.
       #
