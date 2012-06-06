@@ -828,6 +828,12 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* This release forces a cap on the mongo driver version at 1.6.2 due to
+  changes in the `Mongo::Connection.from_uri` API not allowing valid
+  connection options anymore.
+
+* \#2040 Fixed bad interpolation for locale presence validation.
+
 * \#2038 Allow inverse relations to be determined by foreign keys alone
   if defined on both sides, not just an inverse_of declaration.
 
@@ -836,6 +842,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2008 Presence validation should hit the db to check validity if the
   relation in memory is blank.
+
+* \#2006 Allow excluding only the _id field post execution of an #only call.
 
 ## 2.4.10
 
