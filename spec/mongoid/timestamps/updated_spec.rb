@@ -34,6 +34,28 @@ describe Mongoid::Timestamps::Updated do
     end
   end
 
+  context "when the document is new" do
+
+    context "when providing the timestamp" do
+
+      let(:time) do
+        Time.new(2012, 1, 1)
+      end
+
+      let(:agency) do
+        Agency.create(updated_at: time)
+      end
+
+      it "does not override it with the default" do
+        agency.updated_at.should eq(time)
+      end
+
+      it "does not persist an auto value" do
+        agency.reload.updated_at.should eq(time)
+      end
+    end
+  end
+
   context "when the document has not changed" do
 
     let(:agent) do
