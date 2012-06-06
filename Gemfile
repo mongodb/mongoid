@@ -2,6 +2,8 @@ source "http://rubygems.org"
 gemspec
 
 gem "rake"
+gem "bson", "1.6.2"
+gem "bson_ext", "1.6.2"
 
 platforms :mri_18 do
   unless ENV["CI"]
