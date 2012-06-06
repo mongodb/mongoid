@@ -94,6 +94,17 @@ describe Mongoid::Extensions::Object do
           fk.should be_nil
         end
       end
+
+      context "when provided an empty array" do
+
+        let(:fk) do
+          Object.__mongoize_fk__(constraint, [])
+        end
+
+        it "returns an empty array" do
+          fk.should eq([])
+        end
+      end
     end
   end
 

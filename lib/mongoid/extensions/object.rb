@@ -148,7 +148,8 @@ module Mongoid
         #
         # @since 3.0.0
         def __mongoize_fk__(constraint, object)
-          object.blank? ? nil : constraint.convert(object)
+          return nil if !object || object == ""
+          constraint.convert(object)
         end
 
         # Convert the object from it's mongo friendly ruby type to this type.
