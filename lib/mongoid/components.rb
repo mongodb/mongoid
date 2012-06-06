@@ -22,7 +22,6 @@ module Mongoid #:nodoc
     include Mongoid::Dirty
     include Mongoid::Attributes
     include Mongoid::Collections
-    include Mongoid::Copyable
     include Mongoid::DefaultScope
     include Mongoid::Extras
     include Mongoid::Fields
@@ -45,6 +44,7 @@ module Mongoid #:nodoc
     include Mongoid::Timestamps::Timeless
     include Mongoid::Validations
     include Mongoid::Callbacks
+    include Mongoid::Copyable
     include Mongoid::MultiDatabase
 
     MODULES = [
