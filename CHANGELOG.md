@@ -774,6 +774,9 @@ For instructions on upgrading to newer versions, visit
 * \#2070 Allow for updated_at to be overridden manually for new documents that
   also have a created_at.
 
+* \#2041 Don't hit the database multiple times on relation access after an
+  eager load returned zero documents.
+
 * \#1997 Cascading callbacks should be able to halt the callback chain when
   terminating.
 

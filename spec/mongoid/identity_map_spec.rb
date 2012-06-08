@@ -116,44 +116,6 @@ describe Mongoid::IdentityMap do
           end
         end
       end
-
-      context "when getting by selector" do
-
-        let!(:post_one) do
-          Post.new(person: person)
-        end
-
-        let!(:post_two) do
-          Post.new(person: person)
-        end
-
-        context "when there are documents in the map" do
-
-          before do
-            identity_map.set_many(post_one, person_id: person.id)
-            identity_map.set_many(post_two, person_id: person.id)
-          end
-
-          let(:documents) do
-            identity_map.get(Post, person_id: person.id)
-          end
-
-          it "returns the matching documents" do
-            documents.should eq([ post_one, post_two ])
-          end
-        end
-
-        context "when there are no documents in the map" do
-
-          let(:documents) do
-            identity_map.get(Post, person_id: person.id)
-          end
-
-          it "returns nil" do
-            documents.should be_nil
-          end
-        end
-      end
     end
 
     context "inherited class" do
@@ -285,6 +247,51 @@ describe Mongoid::IdentityMap do
 
       it "returns nil" do
         get.should be_nil
+      end
+    end
+  end
+
+  describe "#get_many" do
+
+    let!(:person) do
+      Person.new
+    end
+
+    context "when getting by selector" do
+
+      let!(:post_one) do
+        Post.new(person: person)
+      end
+
+      let!(:post_two) do
+        Post.new(person: person)
+      end
+
+      context "when there are documents in the map" do
+
+        before do
+          identity_map.set_many(post_one, person_id: person.id)
+          identity_map.set_many(post_two, person_id: person.id)
+        end
+
+        let(:documents) do
+          identity_map.get_many(Post, person_id: person.id)
+        end
+
+        it "returns the matching documents" do
+          documents.should eq([ post_one, post_two ])
+        end
+      end
+
+      context "when there are no documents in the map" do
+
+        let(:documents) do
+          identity_map.get_many(Post, person_id: person.id)
+        end
+
+        it "returns nil" do
+          documents.should be_nil
+        end
       end
     end
   end
@@ -458,7 +465,9 @@ describe Mongoid::IdentityMap do
       end
 
       it "puts the documents in the map" do
-        documents.should eq([ post_one, post_two ])
+        documents.should eq({
+          post_one.id => post_one, post_two.id => post_two
+        })
       end
     end
   end

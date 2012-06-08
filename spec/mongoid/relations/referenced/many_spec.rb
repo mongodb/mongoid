@@ -2043,28 +2043,54 @@ describe Mongoid::Relations::Referenced::Many do
 
     context "when the relation is not polymorphic" do
 
-      let!(:person) do
-        Person.create
+      context "when the eager load has returned documents" do
+
+        let!(:person) do
+          Person.create
+        end
+
+        let!(:post) do
+          person.posts.create(title: "testing")
+        end
+
+        let(:metadata) do
+          Person.relations["posts"]
+        end
+
+        let!(:eager) do
+          described_class.eager_load(metadata, Person.all.map(&:_id))
+        end
+
+        let(:map) do
+          Mongoid::IdentityMap.get(Post, "person_id" => person.id)
+        end
+
+        it "puts the documents in the identity map" do
+          map.should eq({ post.id => post })
+        end
       end
 
-      let!(:post) do
-        person.posts.create(title: "testing")
-      end
+      context "when the eager load has not returned documents" do
 
-      let(:metadata) do
-        Person.relations["posts"]
-      end
+        let!(:person) do
+          Person.create
+        end
 
-      let!(:eager) do
-        described_class.eager_load(metadata, Person.all.map(&:_id))
-      end
+        let(:metadata) do
+          Person.relations["posts"]
+        end
 
-      let(:map) do
-        Mongoid::IdentityMap.get(Post, "person_id" => person.id)
-      end
+        let!(:eager) do
+          described_class.eager_load(metadata, Person.all.map(&:_id))
+        end
 
-      it "puts the documents in the identity map" do
-        map.should eq([ post ])
+        let(:map) do
+          Mongoid::IdentityMap.get(Post, "person_id" => person.id)
+        end
+
+        it "puts an empty array in the identity map" do
+          map.should be_empty
+        end
       end
     end
 
@@ -2099,7 +2125,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "puts the documents in the identity map" do
-        map.should eq([ movie_rating ])
+        map.should eq({ movie_rating.id => movie_rating })
       end
     end
   end

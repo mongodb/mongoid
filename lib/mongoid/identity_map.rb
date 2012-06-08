@@ -16,8 +16,7 @@ module Mongoid
     #
     # @since 2.4.10
     def clear_many(klass, selector)
-      documents = documents_for(klass)[selector]
-      documents.clear if documents
+      documents_for(klass)[selector] = {}
     end
 
     # Get a document from the identity map by its id.
@@ -41,6 +40,23 @@ module Mongoid
         else
           documents_for(klass)[identifier]
         end
+      end
+    end
+
+    # Get many documents from the map via the selector
+    #
+    # @example Get the document from the map.
+    #   map.get(Person, { post_id: post })
+    #
+    # @param [ Class ] klass The class of the document.
+    # @param [ Hash ] idenfier The selector.
+    #
+    # @return [ Array<Document> ] The matching documents.
+    #
+    # @since 3.0.0
+    def get_many(klass, identifier)
+      if Mongoid.using_identity_map? && klass
+        documents_for(klass)[identifier].try(:values)
       end
     end
 
@@ -88,7 +104,7 @@ module Mongoid
     #
     # @since 2.2.0
     def set_many(document, selector)
-      (documents_for(document.class)[selector] ||= []).push(document)
+      (documents_for(document.class)[selector] ||= {})[document.id] = document
     end
 
     # Set a document in the identity map for the provided selector.
