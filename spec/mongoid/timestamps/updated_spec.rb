@@ -42,16 +42,16 @@ describe Mongoid::Timestamps::Updated do
         Time.new(2012, 1, 1)
       end
 
-      let(:agency) do
-        Agency.create(updated_at: time)
+      let(:doc) do
+        Dokument.create(updated_at: time)
       end
 
       it "does not override it with the default" do
-        agency.updated_at.should eq(time)
+        doc.updated_at.should eq(time)
       end
 
       it "does not persist an auto value" do
-        agency.reload.updated_at.should eq(time)
+        doc.reload.updated_at.should eq(time)
       end
     end
   end

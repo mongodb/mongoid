@@ -771,6 +771,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2070 Allow for updated_at to be overridden manually for new documents that
+  also have a created_at.
+
 * \#1997 Cascading callbacks should be able to halt the callback chain when
   terminating.
 

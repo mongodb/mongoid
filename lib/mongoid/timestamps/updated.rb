@@ -8,7 +8,8 @@ module Mongoid
 
       included do
         field :updated_at, type: Time
-        set_callback :save, :before, :set_updated_at, if: :able_to_set_updated_at?
+        set_callback :create, :before, :set_updated_at, if: :able_to_set_updated_at?
+        set_callback :update, :before, :set_updated_at, if: :able_to_set_updated_at?
       end
 
       # Update the updated_at field on the Document to the current time.

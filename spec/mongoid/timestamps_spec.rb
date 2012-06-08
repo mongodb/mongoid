@@ -77,7 +77,7 @@ describe Mongoid::Timestamps do
 
   context "when the document is created" do
 
-    let(:document) do
+    let!(:document) do
       Dokument.create
     end
 

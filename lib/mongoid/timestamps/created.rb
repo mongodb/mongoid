@@ -19,7 +19,7 @@ module Mongoid
       def set_created_at
         if !created_at
           time = Time.now.utc
-          self.updated_at = time if is_a?(Updated)
+          self.updated_at = time if is_a?(Updated) && !updated_at_changed?
           self.created_at = time
         end
       end
