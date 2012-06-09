@@ -56,6 +56,14 @@ describe Mongoid::Copyable do
             copy.id.should_not be_nil
           end
 
+          it "flags the document as changed" do
+            copy.should be_changed
+          end
+
+          it "marks fields as dirty" do
+            copy.changes["age"].should eq([ nil, 100 ])
+          end
+
           it "has a different id from the original" do
             copy.id.should_not == person.id
           end
@@ -143,6 +151,14 @@ describe Mongoid::Copyable do
 
           before do
             person[:versions] = [ { :number => 1 } ]
+          end
+
+          it "flags the document as changed" do
+            copy.should be_changed
+          end
+
+          it "marks fields as dirty" do
+            copy.changes["age"].should eq([ nil, 100 ])
           end
 
           it "returns a new document" do
