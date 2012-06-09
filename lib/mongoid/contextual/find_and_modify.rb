@@ -16,6 +16,7 @@ module Mongoid
       #
       # @option options [ true, false ] :new Return the updated document.
       # @option options [ true, false ] :remove Delete the first document.
+      # @option options [ true, false ] :upsert Create the document if it doesn't exist.
       #
       # @since 3.0.0
       def initialize(criteria, update, options = {})
