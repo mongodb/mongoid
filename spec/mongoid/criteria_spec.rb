@@ -2743,7 +2743,7 @@ describe Mongoid::Criteria do
   describe "#only" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.create(name: "Depeche Mode", likes: 3, views: 10)
     end
 
     context "when not using inheritance" do
@@ -2758,6 +2758,13 @@ describe Mongoid::Criteria do
 
       it "does not add _type to the fields" do
         criteria.options[:fields]["_type"].should be_nil
+      end
+
+      it "can accept an array parameter" do
+        band = Band.only([:name, :likes]).first
+        band.name.should_not be_nil
+        band.likes.should_not be_nil
+        band.views.should be_nil
       end
     end
 
