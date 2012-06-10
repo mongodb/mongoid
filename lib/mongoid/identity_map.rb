@@ -25,7 +25,7 @@ module Mongoid
     #   map.get(Person, id)
     #
     # @param [ Class ] klass The class of the document.
-    # @param [ Object, Hash ] identifier The document id (as String or Moped::BSON::ObjetId) or selector.
+    # @param [ Object, Hash ] identifier The document id (as String or Moped::BSON::ObjectId) or selector.
     #
     # @return [ Document ] The matching document.
     #
