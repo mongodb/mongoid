@@ -134,6 +134,37 @@ describe Mongoid::Contextual::FindAndModify do
           }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
       end
+
+      context "when upserting" do
+
+        let(:criteria) do
+          Band.where(name: "The Mars Volta")
+        end
+
+        let(:context) do
+          described_class.new(criteria, { "$inc" => { likes: 1 }}, upsert: true)
+        end
+
+        let(:result) do
+          context.result
+        end
+
+        it "creates the document if it does not exist" do
+          expect {
+            result
+          }.to change{Band.where(name: "The Mars Volta").count}.from(0).to(1)
+        end
+
+        it "updates the document in the database if it does exist" do
+          the_mars_volta = Band.create(name: "The Mars Volta")
+
+          expect {
+            result
+          }.to_not change{Band.where(name: "The Mars Volta").count}
+
+          the_mars_volta.reload.likes.should eq(1)
+        end
+      end
     end
 
     context "when the selector does not match" do
