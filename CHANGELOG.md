@@ -771,6 +771,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2078 Calling `Model#clone` or `Model#dup` now properly sets attributes
+  as dirty.
+
 * \#2070 Allow for updated_at to be overridden manually for new documents that
   also have a created_at.
 

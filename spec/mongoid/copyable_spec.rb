@@ -31,6 +31,29 @@ describe Mongoid::Copyable do
         person.build_game(name: "Tron")
       end
 
+      context "when cloning a loaded document" do
+
+        before do
+          person.save
+        end
+
+        let!(:from_db) do
+          Person.find(person.id)
+        end
+
+        let(:copy) do
+          from_db.send(method)
+        end
+
+        it "marks the fields as dirty" do
+          copy.changes["age"].should eq([ nil, 100 ])
+        end
+
+        it "flags the document as changed" do
+          copy.should be_changed
+        end
+      end
+
       context "when the document is new" do
 
         context "when versions exist" do
@@ -105,14 +128,6 @@ describe Mongoid::Copyable do
 
           it "does not copy references one documents" do
             copy.game.should be_nil
-          end
-
-          Mongoid::Copyable::COPYABLES.each do |name|
-
-            it "dups #{name}" do
-              copy.instance_variable_get("@#{name}").should_not
-                be_eql(person.instance_variable_get("@#{name}"))
-            end
           end
 
           context "when saving the copy" do
@@ -208,14 +223,6 @@ describe Mongoid::Copyable do
             copy.game.should be_nil
           end
 
-          Mongoid::Copyable::COPYABLES.each do |name|
-
-            it "dups #{name}" do
-              copy.instance_variable_get("@#{name}").should_not
-                be_eql(person.instance_variable_get("@#{name}"))
-            end
-          end
-
           context "when saving the copy" do
 
             let(:reloaded) do
@@ -289,14 +296,6 @@ describe Mongoid::Copyable do
 
         it "keeps the original attributes frozen" do
           person.attributes.should be_frozen
-        end
-
-        Mongoid::Copyable::COPYABLES.each do |name|
-
-          it "dups #{name}" do
-            copy.instance_variable_get("@#{name}").should_not
-              be_eql(person.instance_variable_get("@#{name}"))
-          end
         end
 
         context "when saving the copy" do
