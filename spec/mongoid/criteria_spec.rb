@@ -2748,23 +2748,38 @@ describe Mongoid::Criteria do
 
     context "when not using inheritance" do
 
-      let(:criteria) do
-        Band.only(:_id)
+      context "when passing splat args" do
+
+        let(:criteria) do
+          Band.only(:_id)
+        end
+
+        it "limits the returned fields" do
+          criteria.first.name.should be_nil
+        end
+
+        it "does not add _type to the fields" do
+          criteria.options[:fields]["_type"].should be_nil
+        end
       end
 
-      it "limits the returned fields" do
-        criteria.first.name.should be_nil
-      end
+      context "when passing an array" do
 
-      it "does not add _type to the fields" do
-        criteria.options[:fields]["_type"].should be_nil
-      end
+        let(:criteria) do
+          Band.only([ :name, :likes ])
+        end
 
-      it "can accept an array parameter" do
-        band = Band.only([:name, :likes]).first
-        band.name.should_not be_nil
-        band.likes.should_not be_nil
-        band.views.should be_nil
+        it "includes the limited fields" do
+          criteria.first.name.should_not be_nil
+        end
+
+        it "excludes the non included fields" do
+          criteria.first.active.should be_nil
+        end
+
+        it "does not add _type to the fields" do
+          criteria.options[:fields]["_type"].should be_nil
+        end
       end
     end
 
