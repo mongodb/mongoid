@@ -174,6 +174,7 @@ module Mongoid
       #
       # @option options [ true, false ] :new Return the updated document.
       # @option options [ true, false ] :remove Delete the first document.
+      # @option options [ true, false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
       #
