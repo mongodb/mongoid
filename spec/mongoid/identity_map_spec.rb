@@ -55,7 +55,7 @@ describe Mongoid::IdentityMap do
         Person.new
       end
 
-      context "when getting by id" do
+      context "when getting by id as Moped::BSON::ObjectId" do
 
         context "when the document exists in the identity map" do
 
@@ -84,7 +84,36 @@ describe Mongoid::IdentityMap do
         end
       end
 
-      context "when getting by an array of ids" do
+      context "when getting by id as String" do
+
+        context "when the document exists in the identity map" do
+
+          before do
+            identity_map.set(person)
+          end
+
+          let(:get) do
+            identity_map.get(Person, person.id.to_s)
+          end
+
+          it "returns the matching person" do
+            get.should eq(person)
+          end
+        end
+
+        context "when the person does not exist in the map" do
+
+          let(:get) do
+            identity_map.get(Person, person.id.to_s)
+          end
+
+          it "returns nil" do
+            get.should be_nil
+          end
+        end
+      end
+
+      context "when getting by an array of ids as Moped::BSON::ObjectId" do
 
         context "when the document exists in the identity map" do
 
@@ -116,6 +145,39 @@ describe Mongoid::IdentityMap do
           end
         end
       end
+
+      context "when getting by an array of ids as String" do
+
+        context "when the document exists in the identity map" do
+
+          before do
+            identity_map.set(person)
+          end
+
+          let(:get) do
+            identity_map.get(Person, [ person.id.to_s ])
+          end
+
+          it "returns the matching documents" do
+            get.should eq([ person ])
+          end
+        end
+
+        context "when any id is not found in the map" do
+
+          before do
+            identity_map.set(person)
+          end
+
+          let(:get) do
+            identity_map.get(Person, [ person.id.to_s, BSON::ObjectId.new ])
+          end
+
+          it "returns nil" do
+            get.should be_nil
+          end
+        end
+      end
     end
 
     context "inherited class" do
@@ -124,7 +186,7 @@ describe Mongoid::IdentityMap do
         Firefox.new
       end
 
-      context "when getting by id" do
+      context "when getting by id as Moped::BSON::ObjectId" do
 
         context "when the document exists in the identity map" do
 
@@ -159,6 +221,42 @@ describe Mongoid::IdentityMap do
           end
         end
       end
+
+      context "when getting by id as String" do
+
+        context "when the document exists in the identity map" do
+
+          before do
+            identity_map.set(document)
+          end
+
+          it "returns the matching document by class" do
+            get = identity_map.get(Firefox, document.id.to_s)
+            get.should eq(document)
+          end
+
+          it "returns the matching document by superclass" do
+            get = identity_map.get(Browser, document.id.to_s)
+            get.should eq(document)
+          end
+
+          it "returns the matching document by class" do
+            get = identity_map.get(Canvas, document.id.to_s)
+            get.should eq(document)
+          end
+        end
+
+        context "when the document does not exist in the map" do
+
+          let(:get) do
+            identity_map.get(Firefox, document.id.to_s)
+          end
+
+          it "returns nil" do
+            get.should be_nil
+          end
+        end
+      end
     end
 
     context "embedded class" do
@@ -168,7 +266,7 @@ describe Mongoid::IdentityMap do
         circus.animals.first
       end
 
-      context "when getting by id" do
+      context "when getting by id as Moped::BSON::ObjectId" do
 
         context "when the document exists in the identity map" do
 
@@ -189,6 +287,35 @@ describe Mongoid::IdentityMap do
 
           let(:get) do
             identity_map.get(Animal, animal.id)
+          end
+
+          it "returns nil" do
+            get.should be_nil
+          end
+        end
+      end
+
+      context "when getting by id as String" do
+
+        context "when the document exists in the identity map" do
+
+          before do
+            identity_map.set(animal)
+          end
+
+          let(:get) do
+            identity_map.get(Animal, animal.id.to_s)
+          end
+
+          it "returns the matching document" do
+            get.should eq(animal)
+          end
+        end
+
+        context "when the document does not exist in the map" do
+
+          let(:get) do
+            identity_map.get(Animal, animal.id.to_s)
           end
 
           it "returns nil" do
