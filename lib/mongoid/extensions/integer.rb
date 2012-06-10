@@ -15,6 +15,18 @@ module Mongoid
         ::Time.at(self)
       end
 
+      # Is the integer a number?
+      #
+      # @example Is the object a number?.
+      #   object.numeric?
+      #
+      # @return [ true ] Always true.
+      #
+      # @since 3.0.0
+      def numeric?
+        true
+      end
+
       # Is the object not to be converted to bson on criteria creation?
       #
       # @example Is the object unconvertable?

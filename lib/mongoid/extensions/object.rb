@@ -74,6 +74,18 @@ module Mongoid
         self
       end
 
+      # Is the object a number?
+      #
+      # @example Is the object a number?.
+      #   object.numeric?
+      #
+      # @return [ false ] Always false.
+      #
+      # @since 3.0.0
+      def numeric?
+        false
+      end
+
       # Remove the instance variable for the provided name.
       #
       # @example Remove the instance variable

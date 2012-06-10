@@ -21,6 +21,28 @@ describe Mongoid::Extensions::BigDecimal do
         BigDecimal.demongoize(nil).should be_nil
       end
     end
+
+    context "when the value is a float" do
+
+      let(:float) do
+        123456.789
+      end
+
+      it "returns a big decimal" do
+        BigDecimal.demongoize(float).should eq(float)
+      end
+    end
+
+    context "when the value is an integer" do
+
+      let(:integer) do
+        123456
+      end
+
+      it "returns a big decimal" do
+        BigDecimal.demongoize(integer).should eq(integer)
+      end
+    end
   end
 
   describe ".mongoize" do

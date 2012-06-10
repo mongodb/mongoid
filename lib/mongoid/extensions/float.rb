@@ -15,6 +15,18 @@ module Mongoid
         ::Time.at(self)
       end
 
+      # Is the float a number?
+      #
+      # @example Is the object a number?.
+      #   object.numeric?
+      #
+      # @return [ true ] Always true.
+      #
+      # @since 3.0.0
+      def numeric?
+        true
+      end
+
       module ClassMethods
 
         # Turn the object from the ruby type we deal with to a Mongo friendly

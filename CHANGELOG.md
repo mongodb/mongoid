@@ -771,6 +771,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2085 Allow demongoization of floats and ints to big decimals.
+
 * \#2078 Calling `Model#clone` or `Model#dup` now properly sets attributes
   as dirty.
 
