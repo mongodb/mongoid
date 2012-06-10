@@ -438,6 +438,7 @@ module Mongoid
     # @since 1.0.0
     def only(*args)
       return clone if args.empty?
+      args = args.flatten
       if klass.hereditary?
         super(*args.push(:_type))
       else
