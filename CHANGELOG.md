@@ -773,6 +773,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2085 Allow demongoization of floats and ints to big decimals.
 
+* \#2084 Don't cascade if metadata does not exist.
+
 * \#2078 Calling `Model#clone` or `Model#dup` now properly sets attributes
   as dirty.
 

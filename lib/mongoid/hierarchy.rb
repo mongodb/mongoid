@@ -128,6 +128,24 @@ module Mongoid
       def hereditary?
         Mongoid::Document > superclass
       end
+
+      # When inheriting, we want to copy the fields from the parent class and
+      # set the on the child to start, mimicking the behaviour of the old
+      # class_inheritable_accessor that was deprecated in Rails edge.
+      #
+      # @example Inherit from this class.
+      #   Person.inherited(Doctor)
+      #
+      # @param [ Class ] subclass The inheriting class.
+      #
+      # @since 2.0.0.rc.6
+      def inherited(subclass)
+        super
+        subclass.fields = fields.dup
+        subclass.pre_processed_defaults = pre_processed_defaults.dup
+        subclass.post_processed_defaults = post_processed_defaults.dup
+        subclass.scopes = scopes.dup
+      end
     end
   end
 end

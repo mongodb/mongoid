@@ -8,6 +8,19 @@ describe Mongoid::Relations::Cascading do
       Class.new.tap { |c| c.send(:include, Mongoid::Document) }
     end
 
+    context "when the metadata doesnt exist" do
+
+      before do
+        klass.cascades.push("nothing")
+      end
+
+      it "does not raise an error" do
+        expect {
+          klass.new.cascade!
+        }.not_to raise_error
+      end
+    end
+
     context "when a dependent option is provided" do
 
       let(:metadata) do

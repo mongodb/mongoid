@@ -284,23 +284,6 @@ module Mongoid
         SCOPE
       end
 
-      # When inheriting, we want to copy the scopes from the parent class and
-      # set the on the child to start, mimicking the behaviour of the old
-      # class_inheritable_accessor that was deprecated in Rails edge.
-      #
-      # @api private
-      #
-      # @example Inherit from this class.
-      #   Person.inherited(Doctor)
-      #
-      # @param [ Class ] subclass The inheriting class.
-      #
-      # @since 2.0.0.rc.6
-      def inherited(subclass)
-        super
-        subclass.scopes = scopes.dup
-      end
-
       # Strip the default scope from the provided value, if it is a criteria.
       # This is used by named scopes - they should not have the default scoping
       # applied to them.

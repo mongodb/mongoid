@@ -185,22 +185,6 @@ module Mongoid
         added
       end
 
-      # When inheriting, we want to copy the fields from the parent class and
-      # set the on the child to start, mimicking the behaviour of the old
-      # class_inheritable_accessor that was deprecated in Rails edge.
-      #
-      # @example Inherit from this class.
-      #   Person.inherited(Doctor)
-      #
-      # @param [ Class ] subclass The inheriting class.
-      #
-      # @since 2.0.0.rc.6
-      def inherited(subclass)
-        super
-        subclass.fields, subclass.pre_processed_defaults, subclass.post_processed_defaults =
-          fields.dup, pre_processed_defaults.dup, post_processed_defaults.dup
-      end
-
       # Replace a field with a new type.
       #
       # @example Replace the field.
