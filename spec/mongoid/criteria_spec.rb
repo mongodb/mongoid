@@ -2971,6 +2971,36 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#extras with a hint" do
+
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode").extras(:hint => {:bad_hint => 1})
+    end
+
+    it "executes the criteria while properly giving the hint to Mongo" do
+      expect { criteria.to_ary }.to raise_error(Moped::Errors::QueryFailure,  %r{failed with error 10113: "bad hint"})
+    end
+  end
+
+  describe "#hint" do
+
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode").hint(bad_hint: 1)
+    end
+
+    it "executes the criteria while properly giving the hint to Mongo" do
+      expect { criteria.to_ary }.to raise_error(Moped::Errors::QueryFailure,  %r{failed with error 10113: "bad hint"})
+    end
+  end
+
   describe "#to_criteria" do
 
     let(:criteria) do

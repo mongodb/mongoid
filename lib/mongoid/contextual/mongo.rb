@@ -389,6 +389,18 @@ module Mongoid
         end
       end
 
+      # Apply the hint option
+      #
+      # @example Apply the hint params.
+      #   context.apply_hint
+      #
+      # @since 3.0.0
+      def apply_hint
+        if spec = criteria.options[:hint]
+          query.hint(spec)
+        end
+      end
+
       # Map the inverse sort symbols to the correct MongoDB values.
       #
       # @example Apply the inverse sorting params.
@@ -496,6 +508,7 @@ module Mongoid
         apply_limit
         apply_skip
         apply_sorting
+        apply_hint
       end
 
       # If we are limiting results, we need to set the field limitations on a
