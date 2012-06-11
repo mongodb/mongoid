@@ -745,6 +745,16 @@ describe Mongoid::Criteria do
           it "contains the second match" do
             found.should include(band_two)
           end
+
+          context "when ids are duplicates" do
+            let(:found) do
+              Band.find(band.id, band.id)
+            end
+
+            it "contains only the first match" do
+              found.should eq([band])
+            end
+          end
         end
 
         context "when any id does not match" do
@@ -805,6 +815,16 @@ describe Mongoid::Criteria do
 
           it "contains the second match" do
             found.should include(band_two)
+          end
+
+          context "when ids are duplicates" do
+            let(:found) do
+              Band.find([ band.id, band.id ])
+            end
+
+            it "contains only the first match" do
+              found.should eq([band])
+            end
           end
         end
 
