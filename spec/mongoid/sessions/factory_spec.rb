@@ -176,6 +176,19 @@ describe Mongoid::Sessions::Factory do
         cluster.seeds.should eq([ "localhost:27017" ])
       end
     end
+
+    context "when nil is provided and no default config" do
+
+      let(:config) { nil }
+
+      before do
+        Mongoid.sessions[:default] = nil
+      end
+
+      it "raises NoSessionsConfig error" do
+        expect{ Mongoid::Sessions::Factory.create(config) }.to raise_error(Mongoid::Errors::NoSessionsConfig)
+      end
+    end
   end
 
   describe ".default" do
