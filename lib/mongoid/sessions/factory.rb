@@ -58,6 +58,7 @@ module Mongoid
       #
       # @since 3.0.0
       def create_session(configuration)
+        raise Errors::NoSessionsConfig.new unless configuration
         config, options = parse(configuration)
         configuration.merge!(config) if configuration.delete(:uri)
         session = Moped::Session.new(config[:hosts], options)
