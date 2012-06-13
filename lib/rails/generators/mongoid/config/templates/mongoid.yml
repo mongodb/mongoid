@@ -58,3 +58,11 @@ development:
 
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
+test:
+  sessions:
+    default:
+      database: <%= database_name || app_name %>_test
+      hosts:
+        - localhost:27017
+      options:
+        consistency: :strong
