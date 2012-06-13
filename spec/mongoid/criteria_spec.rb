@@ -1331,6 +1331,27 @@ describe Mongoid::Criteria do
         end
       end
     end
+
+    context "when using string and object ids" do
+
+      let!(:band) do
+        Band.create
+      end
+
+      context "when providing multiple ids" do
+
+        context "when ids are duplicates" do
+
+          let(:found) do
+            Band.find([ band.id.to_s, band.id ])
+          end
+
+          it "contains only the first match" do
+            found.should eq([band])
+          end
+        end
+      end
+    end
   end
 
   describe "#find_and_modify" do
