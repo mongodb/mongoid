@@ -62,9 +62,11 @@ module Mongoid
       #
       # @since 3.0.0
       def evolve(object)
-        return object.id if object.is_a?(Document)
-        evolved = mongoize(object)
-        type.resizable? ? evolved.first : evolved
+        if object_id_field?
+          object.__evolve_object_id__
+        else
+          related_id_field.evolve(object)
+        end
       end
 
       # Mongoize the object into the Mongo friendly value.
@@ -81,7 +83,7 @@ module Mongoid
         if type.resizable? || object_id_field?
           type.__mongoize_fk__(constraint, object)
         else
-          metadata.klass.fields["_id"].mongoize(object)
+          related_id_field.mongoize(object)
         end
       end
 
@@ -113,6 +115,10 @@ module Mongoid
       # @since 3.0.0
       def evaluate_default_proc(doc)
         serialize_default(default_val[])
+      end
+
+      def related_id_field
+        @related_id_field ||= metadata.klass.fields["_id"]
       end
 
       # This is used when default values need to be serialized. Most of the

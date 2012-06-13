@@ -68,8 +68,8 @@ describe Mongoid::Extensions::Array do
         array.__evolve_object_id__
       end
 
-      it "returns the array without the nils" do
-        evolved.should eq([ object_id ])
+      it "returns the array with the nils" do
+        evolved.should eq([ object_id, nil ])
       end
 
       it "returns the same instance" do
@@ -91,12 +91,111 @@ describe Mongoid::Extensions::Array do
         array.__evolve_object_id__
       end
 
-      it "returns the array without the empty strings" do
-        evolved.should eq([ object_id ])
+      it "returns the array with the empty strings" do
+        evolved.should eq([ object_id, "" ])
       end
 
       it "returns the same instance" do
         evolved.should equal(array)
+      end
+    end
+  end
+
+  describe "#__mongoize_object_id__" do
+
+    context "when provided an array of strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:other) do
+        "blah"
+      end
+
+      let(:array) do
+        [ object_id.to_s, other ]
+      end
+
+      let(:mongoized) do
+        array.__mongoize_object_id__
+      end
+
+      it "converts the convertible ones to object ids" do
+        mongoized.should eq([ object_id, other ])
+      end
+
+      it "returns the same instance" do
+        mongoized.should equal(array)
+      end
+    end
+
+    context "when provided an array of object ids" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:array) do
+        [ object_id ]
+      end
+
+      let(:mongoized) do
+        array.__mongoize_object_id__
+      end
+
+      it "returns the array" do
+        mongoized.should eq(array)
+      end
+
+      it "returns the same instance" do
+        mongoized.should equal(array)
+      end
+    end
+
+    context "when some values are nil" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:array) do
+        [ object_id, nil ]
+      end
+
+      let(:mongoized) do
+        array.__mongoize_object_id__
+      end
+
+      it "returns the array without the nils" do
+        mongoized.should eq([ object_id ])
+      end
+
+      it "returns the same instance" do
+        mongoized.should equal(array)
+      end
+    end
+
+    context "when some values are empty strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:array) do
+        [ object_id, "" ]
+      end
+
+      let(:mongoized) do
+        array.__mongoize_object_id__
+      end
+
+      it "returns the array without the empty strings" do
+        mongoized.should eq([ object_id ])
+      end
+
+      it "returns the same instance" do
+        mongoized.should equal(array)
       end
     end
   end

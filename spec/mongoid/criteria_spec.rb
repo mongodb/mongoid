@@ -1711,20 +1711,85 @@ describe Mongoid::Criteria do
 
     describe "\##{method}" do
 
-      let!(:match) do
-        Band.create(genres: [ "electro", "dub" ])
+      context "when querying on a normal field" do
+
+        let!(:match) do
+          Band.create(genres: [ "electro", "dub" ])
+        end
+
+        let!(:non_match) do
+          Band.create(genres: [ "house" ])
+        end
+
+        let(:criteria) do
+          Band.send(method, genres: [ "dub" ])
+        end
+
+        it "returns the matching documents" do
+          criteria.should eq([ match ])
+        end
       end
 
-      let!(:non_match) do
-        Band.create(genres: [ "house" ])
-      end
+      context "when querying on a foreign key" do
 
-      let(:criteria) do
-        Band.send(method, genres: [ "dub" ])
-      end
+        let(:id) do
+          BSON::ObjectId.new
+        end
 
-      it "returns the matching documents" do
-        criteria.should eq([ match ])
+        let!(:match_one) do
+          Person.create(preference_ids: [ id ])
+        end
+
+        context "when providing valid ids" do
+
+          let(:criteria) do
+            Person.send(method, preference_ids: [ id ])
+          end
+
+          it "returns the matching documents" do
+            criteria.should eq([ match_one ])
+          end
+        end
+
+        context "when providing empty strings" do
+
+          let(:criteria) do
+            Person.send(method, preference_ids: [ id, "" ])
+          end
+
+          it "returns the matching documents" do
+            criteria.should eq([ match_one ])
+          end
+        end
+
+        context "when providing nils" do
+
+          context "when the relation is a many to many" do
+
+            let(:criteria) do
+              Person.send(method, preference_ids: [ id, nil ])
+            end
+
+            it "returns the matching documents" do
+              criteria.should eq([ match_one ])
+            end
+          end
+
+          context "when the relation is a one to one" do
+
+            let!(:game) do
+              Game.create
+            end
+
+            let(:criteria) do
+              Game.send(method, person_id: [ nil ])
+            end
+
+            it "returns the matching documents" do
+              criteria.should eq([ game ])
+            end
+          end
+        end
       end
     end
   end

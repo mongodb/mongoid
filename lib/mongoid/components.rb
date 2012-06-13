@@ -21,6 +21,7 @@ module Mongoid
     include Mongoid::Atomic
     include Mongoid::Dirty
     include Mongoid::Attributes
+    include Mongoid::Evolvable
     include Mongoid::Fields
     include Mongoid::Hierarchy
     include Mongoid::Indexes

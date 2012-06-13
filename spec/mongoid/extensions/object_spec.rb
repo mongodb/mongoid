@@ -13,6 +13,17 @@ describe Mongoid::Extensions::Object do
     end
   end
 
+  describe "#__mongoize_object_id__" do
+
+    let(:object) do
+      Object.new
+    end
+
+    it "returns self" do
+      object.__mongoize_object_id__.should eq(object)
+    end
+  end
+
   describe ".__mongoize_fk__" do
 
     context "when the related model uses object ids" do

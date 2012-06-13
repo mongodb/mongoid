@@ -101,6 +101,351 @@ describe Mongoid::Fields::ForeignKey do
     end
   end
 
+  describe "#evolve" do
+
+    let(:metadata) do
+      Person.reflect_on_association(:preferences)
+    end
+
+    context "when provided a document" do
+
+      let(:field) do
+        described_class.new(:person_id, type: Object, metadata: metadata)
+      end
+
+      let(:game) do
+        Game.new
+      end
+
+      let(:evolved) do
+        field.evolve(game)
+      end
+
+      it "returns the id for the document" do
+        evolved.should eq(game.id)
+      end
+    end
+
+    context "when the type is an array" do
+
+      let(:field) do
+        described_class.new(:preference_ids, type: Array, default: [], metadata: metadata)
+      end
+
+      context "when providing a single value" do
+
+        context "when the value is an id string" do
+
+          let(:id) do
+            BSON::ObjectId.new
+          end
+
+          let(:evolved) do
+            field.evolve(id.to_s)
+          end
+
+          it "converts the value to an object id" do
+            evolved.should eq(id)
+          end
+        end
+
+        context "when the value is a normal string" do
+
+          let(:evolved) do
+            field.evolve("testing")
+          end
+
+          it "does not convert the value" do
+            evolved.should eq("testing")
+          end
+        end
+
+        context "when the value is an empty string" do
+
+          let(:evolved) do
+            field.evolve("")
+          end
+
+          it "does not convert the value" do
+            evolved.should be_empty
+          end
+        end
+      end
+
+      context "when providing an array" do
+
+        context "when the values are id strings" do
+
+          context "when the relation stores ids as object ids" do
+
+            let(:id_one) do
+              BSON::ObjectId.new
+            end
+
+            let(:id_two) do
+              BSON::ObjectId.new
+            end
+
+            let(:evolved) do
+              field.evolve([ id_one.to_s, id_two.to_s ])
+            end
+
+            it "converts the value to an object id" do
+              evolved.should eq([ id_one, id_two ])
+            end
+          end
+
+          context "when the relation stores ids as strings" do
+
+            let!(:metadata) do
+              Agent.reflect_on_association(:accounts)
+            end
+
+            let!(:field) do
+              described_class.new(:account_ids, type: Array, default: [], metadata: metadata)
+            end
+
+            let(:id_one) do
+              BSON::ObjectId.new.to_s
+            end
+
+            let(:id_two) do
+              BSON::ObjectId.new.to_s
+            end
+
+            let(:evolved) do
+              field.evolve([ id_one, id_two ])
+            end
+
+            it "does not convert the values to object ids" do
+              evolved.should eq([ id_one, id_two ])
+            end
+          end
+        end
+
+        context "when the values are normal strings" do
+
+          let(:evolved) do
+            field.evolve([ "testing" ])
+          end
+
+          it "does not convert the value" do
+            evolved.should eq([ "testing" ])
+          end
+        end
+
+        context "when the values are empty strings" do
+
+          let(:evolved) do
+            field.evolve([ "" ])
+          end
+
+          it "does not convert the value" do
+            evolved.should eq([ "" ])
+          end
+        end
+
+        context "when the values are nils" do
+
+          let(:evolved) do
+            field.evolve([ nil ])
+          end
+
+          it "does not convert the value" do
+            evolved.should eq([ nil ])
+          end
+        end
+      end
+    end
+
+    context "when the type is an object" do
+
+      let(:metadata) do
+        Game.reflect_on_association(:person)
+      end
+
+      let(:field) do
+        described_class.new(:person_id, type: Object, metadata: metadata)
+      end
+
+      context "when providing a single value" do
+
+        context "when the relation stores object ids" do
+
+          context "when the value is an id string" do
+
+            let(:id) do
+              BSON::ObjectId.new
+            end
+
+            let(:evolved) do
+              field.evolve(id.to_s)
+            end
+
+            it "converts the value to an object id" do
+              evolved.should eq(id)
+            end
+          end
+
+          context "when the value is a normal string" do
+
+            let(:evolved) do
+              field.evolve("testing")
+            end
+
+            it "does not convert the value" do
+              evolved.should eq("testing")
+            end
+          end
+
+          context "when the value is an empty string" do
+
+            let(:evolved) do
+              field.evolve("")
+            end
+
+            it "does not convert the value" do
+              evolved.should be_empty
+            end
+          end
+        end
+
+        context "when the relation stores string ids" do
+
+          let(:metadata) do
+            Comment.reflect_on_association(:account)
+          end
+
+          let(:field) do
+            described_class.new(:person_id, type: Object, metadata: metadata)
+          end
+
+          context "when the value is an id string" do
+
+            let(:id) do
+              BSON::ObjectId.new
+            end
+
+            let(:evolved) do
+              field.evolve(id.to_s)
+            end
+
+            it "does not convert the value to an object id" do
+              evolved.should eq(id.to_s)
+            end
+          end
+
+          context "when the value is a normal string" do
+
+            let(:evolved) do
+              field.evolve("testing")
+            end
+
+            it "does not convert the value" do
+              evolved.should eq("testing")
+            end
+          end
+
+          context "when the value is an empty string" do
+
+            let(:evolved) do
+              field.evolve("")
+            end
+
+            it "does not convert the value" do
+              evolved.should be_empty
+            end
+          end
+        end
+      end
+
+      context "when providing an array" do
+
+        context "when the values are id strings" do
+
+          context "when the relation stores ids as object ids" do
+
+            let(:id_one) do
+              BSON::ObjectId.new
+            end
+
+            let(:id_two) do
+              BSON::ObjectId.new
+            end
+
+            let(:evolved) do
+              field.evolve([ id_one.to_s, id_two.to_s ])
+            end
+
+            it "converts the value to an object id" do
+              evolved.should eq([ id_one, id_two ])
+            end
+          end
+
+          context "when the relation stores ids as strings" do
+
+            let(:metadata) do
+              Comment.reflect_on_association(:account)
+            end
+
+            let(:field) do
+              described_class.new(:person_id, type: Object, metadata: metadata)
+            end
+
+            let(:id_one) do
+              BSON::ObjectId.new.to_s
+            end
+
+            let(:id_two) do
+              BSON::ObjectId.new.to_s
+            end
+
+            let(:evolved) do
+              field.evolve([ id_one, id_two ])
+            end
+
+            it "does not convert the values to object ids" do
+              evolved.should eq([ id_one, id_two ])
+            end
+          end
+        end
+
+        context "when the values are normal strings" do
+
+          let(:evolved) do
+            field.evolve([ "testing" ])
+          end
+
+          it "does not convert the value" do
+            evolved.should eq([ "testing" ])
+          end
+        end
+
+        context "when the values are empty strings" do
+
+          let(:evolved) do
+            field.evolve([ "" ])
+          end
+
+          it "does not convert the value" do
+            evolved.should eq([ "" ])
+          end
+        end
+
+        context "when the values are nils" do
+
+          let(:evolved) do
+            field.evolve([ nil ])
+          end
+
+          it "does not convert the value" do
+            evolved.should eq([ nil ])
+          end
+        end
+      end
+    end
+  end
+
   describe "#mongoize" do
 
     context "when the type is array" do
