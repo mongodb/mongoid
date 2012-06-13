@@ -20,14 +20,14 @@ describe Mongoid::Atomic::Paths::Root do
   describe "#path" do
 
     it "returns an empty string" do
-      root.path.should eq("")
+      root.path.should be_empty
     end
   end
 
   describe "#position" do
 
     it "returns an empty string" do
-      root.position.should eq("")
+      root.position.should be_empty
     end
   end
 

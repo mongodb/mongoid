@@ -529,6 +529,13 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* Polymorphic relations can not have ids other than object ids. This is
+  because Mongoid cannot properly figure out in an optimized way what the
+  various classes on the other side of the relation store their ids as, as
+  they could potentially all be different.
+
+  This was not allowed before, but nowhere was it explicitly stated.
+
 * \#2039 Validating presence of a relation now checks both the relation and
   the foreign key value.
 
@@ -770,6 +777,9 @@ For instructions on upgrading to newer versions, visit
         Band.scoped(skip: 10, limit: 20)
 
 ### Resolved Issues
+
+* \#2089 Allow proper separation of mongoization and evolving with respect to
+  foreign keys.
 
 * \#2085 Allow demongoization of floats and ints to big decimals.
 

@@ -12,7 +12,20 @@ module Mongoid
       #
       # @since 3.0.0
       def __evolve_object_id__
-        map!(&:__evolve_object_id__).compact!
+        map!(&:__evolve_object_id__)
+        self
+      end
+
+      # Mongoize the array into an array of object ids.
+      #
+      # @example Evolve the array to object ids.
+      #   [ id ].__mongoize_object_id__
+      #
+      # @return [ Array<Moped::BSON::ObjectId> ] The converted array.
+      #
+      # @since 3.0.0
+      def __mongoize_object_id__
+        map!(&:__mongoize_object_id__).compact!
         self
       end
 

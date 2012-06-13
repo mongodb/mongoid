@@ -4,20 +4,159 @@ describe Mongoid::Extensions::Hash do
 
   describe "#__evolve_object_id__" do
 
-    let(:object_id) do
-      BSON::ObjectId.new
+    context "when values have object id strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: object_id.to_s }
+      end
+
+      let(:evolved) do
+        hash.__evolve_object_id__
+      end
+
+      it "converts each value in the hash" do
+        evolved[:field].should eq(object_id)
+      end
     end
 
-    let(:hash) do
-      { field: object_id.to_s }
+    context "when values have object ids" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: object_id }
+      end
+
+      let(:evolved) do
+        hash.__evolve_object_id__
+      end
+
+      it "converts each value in the hash" do
+        evolved[:field].should eq(object_id)
+      end
     end
 
-    let(:evolved) do
-      hash.__evolve_object_id__
+    context "when values have empty strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: "" }
+      end
+
+      let(:evolved) do
+        hash.__evolve_object_id__
+      end
+
+      it "retains the empty string values" do
+        evolved[:field].should be_empty
+      end
     end
 
-    it "converts each value in the hash" do
-      evolved[:field].should eq(object_id)
+    context "when values have nils" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: nil }
+      end
+
+      let(:evolved) do
+        hash.__evolve_object_id__
+      end
+
+      it "retains the nil values" do
+        evolved[:field].should be_nil
+      end
+    end
+  end
+
+  describe "#__mongoize_object_id__" do
+
+    context "when values have object id strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: object_id.to_s }
+      end
+
+      let(:mongoized) do
+        hash.__mongoize_object_id__
+      end
+
+      it "converts each value in the hash" do
+        mongoized[:field].should eq(object_id)
+      end
+    end
+
+    context "when values have object ids" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: object_id }
+      end
+
+      let(:mongoized) do
+        hash.__mongoize_object_id__
+      end
+
+      it "converts each value in the hash" do
+        mongoized[:field].should eq(object_id)
+      end
+    end
+
+    context "when values have empty strings" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: "" }
+      end
+
+      let(:mongoized) do
+        hash.__mongoize_object_id__
+      end
+
+      it "converts the empty strings to nil" do
+        mongoized[:field].should be_nil
+      end
+    end
+
+    context "when values have nils" do
+
+      let(:object_id) do
+        BSON::ObjectId.new
+      end
+
+      let(:hash) do
+        { field: nil }
+      end
+
+      let(:mongoized) do
+        hash.__mongoize_object_id__
+      end
+
+      it "retains the nil values" do
+        mongoized[:field].should be_nil
+      end
     end
   end
 

@@ -309,36 +309,6 @@ describe Mongoid::Relations::Referenced::Many do
             movie.ratings.count.should eq(1)
           end
         end
-
-        context "when parent has String identity" do
-
-          before do
-            Movie.field(
-              :_id,
-              type: String,
-              pre_processed: true,
-              default: ->{ BSON::ObjectId.new.to_s }
-            )
-            movie.ratings << Rating.new
-          end
-
-          after do
-            Movie.field(
-              :_id,
-              type: BSON::ObjectId,
-              pre_processed: true,
-              default: ->{ BSON::ObjectId.new }
-            )
-          end
-
-          let(:movie) do
-            Movie.create
-          end
-
-          it "has rating references" do
-            movie.ratings.count.should eq(1)
-          end
-        end
       end
     end
   end
@@ -1351,36 +1321,6 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       it "adds the document to the target" do
-        movie.ratings.count.should eq(1)
-      end
-    end
-
-    context "when parent has String identity" do
-
-      before do
-        Movie.field(
-          :_id,
-          pre_processed: true,
-          type: String,
-          default: ->{ BSON::ObjectId.new.to_s }
-        )
-        movie.ratings << Rating.new
-      end
-
-      after do
-        Movie.field(
-          :_id,
-          pre_processed: true,
-          type: BSON::ObjectId,
-          default: ->{ BSON::ObjectId.new }
-        )
-      end
-
-      let(:movie) do
-        Movie.create
-      end
-
-      it "has rating references" do
         movie.ratings.count.should eq(1)
       end
     end

@@ -282,7 +282,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns root namespace" do
-            mod.should eq("")
+            mod.should be_empty
           end
         end
 

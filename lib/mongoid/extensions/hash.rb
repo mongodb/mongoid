@@ -15,6 +15,18 @@ module Mongoid
         update_values(&:__evolve_object_id__)
       end
 
+      # Mongoizes each value in the hash to an object id if it is convertable.
+      #
+      # @example Convert the hash values.
+      #   { field: id }.__mongoize_object_id__
+      #
+      # @return [ Hash ] The converted hash.
+      #
+      # @since 3.0.0
+      def __mongoize_object_id__
+        update_values(&:__mongoize_object_id__)
+      end
+
       # Get the id attribute from this hash, whether it's prefixed with an
       # underscore or is a symbol.
       #

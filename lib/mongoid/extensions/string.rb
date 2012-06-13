@@ -11,13 +11,23 @@ module Mongoid
       # @example Evolve the string.
       #   "test".__evolve_object_id__
       #
-      # @return [ String, Moped::BSON::ObjectId, nil ] The evolved string.
+      # @return [ String, Moped::BSON::ObjectId ] The evolved string.
       #
       # @since 3.0.0
       def __evolve_object_id__
-        unless blank?
-          BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
-        end
+        convert_to_object_id
+      end
+
+      # Mongoize the string into an object id if possible.
+      #
+      # @example Evolve the string.
+      #   "test".__mongoize_object_id__
+      #
+      # @return [ String, Moped::BSON::ObjectId, nil ] The mongoized string.
+      #
+      # @since 3.0.0
+      def __mongoize_object_id__
+        convert_to_object_id unless blank?
       end
 
       # Mongoize the string for storage.
@@ -114,6 +124,22 @@ module Mongoid
       # @since 2.2.1
       def unconvertable_to_bson?
         @unconvertable_to_bson ||= false
+      end
+
+      private
+
+      # If the string is a legal object id, convert it.
+      #
+      # @api private
+      #
+      # @example Convert to the object id.
+      #   string.convert_to_object_id
+      #
+      # @return [ String, BSON::ObjectId ] The string or the id.
+      #
+      # @since 3.0.0
+      def convert_to_object_id
+        BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
       end
 
       module ClassMethods
