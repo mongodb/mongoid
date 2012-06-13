@@ -245,7 +245,7 @@ module Mongoid
       multi = args.first.is_a?(::Array) || args.first.is_a?(::Range) || args.size > 1
       ids = *args.flat_map do |arg|
         arg.is_a?(::Range) ? arg.to_a : arg
-      end.uniq
+      end.uniq_by(&:to_s)
       raise_invalid if ids.any?(&:nil?)
       for_ids(ids).execute_or_raise(ids, multi)
     end
