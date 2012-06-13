@@ -58,3 +58,12 @@ development:
 
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
+test:
+  sessions:
+    default:
+      database: dmarc_web_test
+      hosts:
+        - localhost:27017
+      options:
+        consistency: :strong
+  options:
