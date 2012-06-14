@@ -22,6 +22,32 @@ module Mongoid
       stack(name).push(true)
     end
 
+    # Get the global database override.
+    #
+    # @example Get the global database override.
+    #   Threaded.database_override
+    #
+    # @return [ String, Symbol ] The override.
+    #
+    # @since 3.0.0
+    def database_override
+      Thread.current["[mongoid]:db-override"]
+    end
+
+    # Set the global database override.
+    #
+    # @example Set the global database override.
+    #   Threaded.database_override = :testing
+    #
+    # @param [ String, Symbol ] The global override name.
+    #
+    # @return [ String, Symbol ] The override.
+    #
+    # @since 3.0.0
+    def database_override=(name)
+      Thread.current["[mongoid]:db-override"] = name
+    end
+
     # Get the database sessions from the current thread.
     #
     # @example Get the database sessions.
