@@ -7,6 +7,20 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2080/\#2087 The database that Mongoid persists to can now be overridden
+  on a global level for cases where `Model#with` is not a viable option.
+
+        Mongoid.override_database(:secondary)
+
+        Band.create(name: "Placebo") #=> Persists to secondary.
+        band.albums.create #=> Persists to secondary.
+
+    Note that this option is global and overrides for all models on the current
+    thread. It is the developer's responsibility to remember to set this back
+    to nil if you no longer want the override to happen.
+
+        Mongoid.override_database(nil)
+
 * \#1989 Criteria `count`, `size` and `length` now behave as Active Record
   with regards to database access.
 

@@ -184,6 +184,20 @@ module Mongoid
         @database_name ||= __database_name__
       end
 
+      # Get the overridden database name. This either can be overridden by
+      # using +Model.with+ or by overriding at the global level via
+      # +Mongoid.override_database(:name)+.
+      #
+      # @example Get the overridden database name.
+      #   Model.database_override
+      #
+      # @return [ String, Symbol ] The overridden database name.
+      #
+      # @since 3.0.0
+      def database_override
+        persistence_options.try { |opts| opts[:database] } || Threaded.database_override
+      end
+
       # Get the session for this model. This is determined in the following order:
       #
       #   1. Any custom configuration provided by the 'store_in' macro.
@@ -197,11 +211,7 @@ module Mongoid
       # @since 3.0.0
       def mongo_session
         session = __session__
-        if persistence_options && name = persistence_options[:database]
-          session.use(name)
-        else
-          session.use(database_name)
-        end
+        session.use(database_override || database_name)
         session
       end
 

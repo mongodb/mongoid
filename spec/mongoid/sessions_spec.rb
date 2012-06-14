@@ -728,4 +728,29 @@ describe Mongoid::Sessions do
       end
     end
   end
+
+  context "when overriding the default database "do
+
+    context "when the override is global" do
+
+      before do
+        Mongoid.override_database(:mongoid_optional)
+      end
+
+      after do
+        Band.delete_all
+        Mongoid.override_database(nil)
+      end
+
+      let!(:band) do
+        Band.create(name: "Tool")
+      end
+
+      it "persists to the overridden database" do
+        Band.mongo_session.with(database: :mongoid_optional) do |sess|
+          sess[:bands].find(name: "Tool").should_not be_nil
+        end
+      end
+    end
+  end
 end

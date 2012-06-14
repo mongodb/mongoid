@@ -25,6 +25,25 @@ module Mongoid
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
 
+    # Connect to the provided database name on the default session.
+    #
+    # @note Use only in development or test environments for convenience.
+    #
+    # @example Set the database to connect to.
+    #   config.connect_to("mongoid_test")
+    #
+    # @param [ String ] name The database name.
+    #
+    # @since 3.0.0
+    def connect_to(name)
+      self.sessions = {
+        default: {
+          database: name,
+          hosts: [ "localhost:27017" ]
+        }
+      }
+    end
+
     # Return field names that could cause destructive things to happen if
     # defined in a Mongoid::Document.
     #
@@ -52,23 +71,18 @@ module Mongoid
       settings
     end
 
-    # Connect to the provided database name on the default session.
+    # Override the database to use globally.
     #
-    # @note Use only in development or test environments for convenience.
+    # @example Override the database globally.
+    #   config.override_database(:optional)
     #
-    # @example Set the database to connect to.
-    #   config.connect_to("mongoid_test")
+    # @param [ String, Symbol ] name The name of the database.
     #
-    # @param [ String ] name The database name.
+    # @return [ String, Symbol ] The global override.
     #
     # @since 3.0.0
-    def connect_to(name)
-      self.sessions = {
-        default: {
-          database: name,
-          hosts: [ "localhost:27017" ]
-        }
-      }
+    def override_database(name)
+      Threaded.database_override = name
     end
 
     # Purge all data in all collections, including indexes.
