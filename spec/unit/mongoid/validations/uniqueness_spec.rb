@@ -144,11 +144,11 @@ describe Mongoid::Validations::UniquenessValidator do
 
       context "when the document is unique in not deleted" do
         before do
-          Dictionary.create(name: "Oxford").destroy
+          Dictionary.create(:name => "Oxford").destroy
         end
 
         let(:dictionary) do
-          Dictionary.new(name: "Oxford")
+          Dictionary.new(:name => "Oxford")
         end
 
         it "returns true" do
