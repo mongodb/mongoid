@@ -85,6 +85,20 @@ module Mongoid
       Threaded.database_override = name
     end
 
+    # Override the session to use globally.
+    #
+    # @example Override the session globally.
+    #   config.override_session(:optional)
+    #
+    # @param [ String, Symbol ] name The name of the session.
+    #
+    # @return [ String, Symbol ] The global override.
+    #
+    # @since 3.0.0
+    def override_session(name)
+      Threaded.session_override = name ? name.to_s : nil
+    end
+
     # Purge all data in all collections, including indexes.
     #
     # @example Purge all data.

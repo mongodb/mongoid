@@ -753,4 +753,31 @@ describe Mongoid::Sessions do
       end
     end
   end
+
+  context "when overriding the default session", config: :mongohq do
+
+    context "when the override is global" do
+
+      before do
+        Mongoid.override_session(:mongohq_single)
+      end
+
+      after do
+        Band.with(database: "mongoid").delete_all
+        Mongoid.override_session(nil)
+      end
+
+      let!(:band) do
+        Band.with(database: "mongoid").create(name: "Tool")
+      end
+
+      let(:persisted) do
+        Band.with(session: :mongohq_single, database: "mongoid").where(name: "Tool").first
+      end
+
+      it "persists to the overridden session" do
+        persisted.should eq(band)
+      end
+    end
+  end
 end

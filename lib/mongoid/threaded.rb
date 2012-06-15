@@ -322,6 +322,32 @@ module Mongoid
       Thread.current["[mongoid]:selection"] = value
     end
 
+    # Get the global session override.
+    #
+    # @example Get the global session override.
+    #   Threaded.session_override
+    #
+    # @return [ String, Symbol ] The override.
+    #
+    # @since 3.0.0
+    def session_override
+      Thread.current["[mongoid]:session-override"]
+    end
+
+    # Set the global session override.
+    #
+    # @example Set the global session override.
+    #   Threaded.session_override = :testing
+    #
+    # @param [ String, Symbol ] The global override name.
+    #
+    # @return [ String, Symbol ] The override.
+    #
+    # @since 3.0.0
+    def session_override=(name)
+      Thread.current["[mongoid]:session-override"] = name
+    end
+
     # Get the mongoid scope stack for chained criteria.
     #
     # @example Get the scope stack.
