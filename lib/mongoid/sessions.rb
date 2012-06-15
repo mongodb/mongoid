@@ -227,6 +227,20 @@ module Mongoid
         Threaded.persistence_options(self)
       end
 
+      # Get the overridden session name. This either can be overridden by
+      # using +Model.with+ or by overriding at the global level via
+      # +Mongoid.override_session(:name)+.
+      #
+      # @example Get the overridden session name.
+      #   Model.session_override
+      #
+      # @return [ String, Symbol ] The overridden session name.
+      #
+      # @since 3.0.0
+      def session_override
+        persistence_options.try { |opts| opts[:session] } || Threaded.session_override
+      end
+
       # Give this model specific custom default storage options.
       #
       # @example Store this model by default in "artists"
@@ -356,7 +370,7 @@ module Mongoid
       #
       # @since 3.0.0
       def __session__
-        if persistence_options && name = persistence_options[:session]
+        if name = session_override
           Sessions.with_name(name)
         elsif storage_options && name = storage_options[:session]
           Sessions.with_name(name)
