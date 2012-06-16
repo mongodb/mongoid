@@ -795,6 +795,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2100 Allow atomic operations to properly execute on paranoid documents
+  that have a deleted_at set.
+
 * \#2089 Allow proper separation of mongoization and evolving with respect to
   foreign keys.
 

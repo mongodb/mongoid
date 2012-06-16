@@ -487,6 +487,25 @@ describe Mongoid::Paranoia do
     end
   end
 
+  describe "#set" do
+
+    let!(:post) do
+      ParanoidPost.create
+    end
+
+    let(:time) do
+      20.days.ago
+    end
+
+    before do
+      post.set(:deleted_at, time)
+    end
+
+    it "persists the change" do
+      post.reload.deleted_at.should be_within(1).of(time)
+    end
+  end
+
   describe ".unscoped" do
 
     let(:unscoped) do
