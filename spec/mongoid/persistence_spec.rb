@@ -624,6 +624,29 @@ describe Mongoid::Persistence do
 
   describe "#touch" do
 
+    context "when the document is embedded" do
+
+      let(:band) do
+        Band.create(name: "Placebo")
+      end
+
+      let(:label) do
+        band.create_label(name: "Mute", updated_at: 10.days.ago)
+      end
+
+      before do
+        label.touch
+      end
+
+      it "updates the updated_at timestamp" do
+        label.updated_at.should be_within(1).of(Time.now)
+      end
+
+      it "persists the changes" do
+        label.reload.updated_at.should be_within(1).of(Time.now)
+      end
+    end
+
     context "when no relations have touch options" do
 
       context "when no updated at is defined" do

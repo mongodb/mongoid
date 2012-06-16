@@ -100,7 +100,7 @@ module Mongoid
       current = Time.now
       write_attribute(:updated_at, current) if fields["updated_at"]
       write_attribute(field, current) if field
-      collection.find(atomic_selector).update(atomic_updates)
+      _root.collection.find(atomic_selector).update(atomic_updates)
       without_autobuild do
         touchables.each { |name| send(name).try(:touch) }
       end

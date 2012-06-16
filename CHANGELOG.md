@@ -795,6 +795,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2110 `Model#touch` now works properly on embedded documents.
+
 * \#2100 Allow atomic operations to properly execute on paranoid documents
   that have a deleted_at set.
 
