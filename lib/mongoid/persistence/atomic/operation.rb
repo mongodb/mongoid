@@ -93,7 +93,7 @@ module Mongoid
         #
         # @since 3.0.0
         def execute(name)
-          if document.persisted?
+          if !document.new_record?
             collection.find(document.atomic_selector).update(operation(name))
             document.remove_change(field)
           end
