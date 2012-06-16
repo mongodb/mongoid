@@ -101,7 +101,7 @@ module Mongoid #:nodoc:
       # @since 2.4.10
       def create_criteria(base, document, attribute, value)
         field = document.fields[attribute.to_s]
-        criteria = base.unscoped
+        criteria = base.paranoid ? base.unscoped.where(:deleted_at => nil) : base.unscoped
         if field.try(:localized?)
           criterion(document, attribute, value).each_pair do |key, value|
             criteria.selector.store(key, value)
