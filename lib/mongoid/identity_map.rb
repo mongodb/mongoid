@@ -25,7 +25,7 @@ module Mongoid
     #   map.get(Person, id)
     #
     # @param [ Class ] klass The class of the document.
-    # @param [ Object, Hash ] idenfier The document id or selector.
+    # @param [ Object, Hash ] identifier The document id (as String or Moped::BSON::ObjectId) or selector.
     #
     # @return [ Document ] The matching document.
     #
@@ -35,10 +35,10 @@ module Mongoid
         if identifier.is_a?(::Array)
           documents = documents_for(klass)
           identifier.map do |id|
-            documents[id] || (return nil)
+            documents[ensure_object_id_is_not_string(id)] || (return nil)
           end
         else
-          documents_for(klass)[identifier]
+          documents_for(klass)[ensure_object_id_is_not_string(identifier)]
         end
       end
     end
@@ -138,6 +138,20 @@ module Mongoid
       if klass
         self[klass.collection_name] ||= {}
       end
+    end
+
+    # To allow the IdentityMap to get documents by Moped::BSON::ObjectId or the String representation of it,
+    # this method converts legal String representations of Moped::BSON::ObjectId to Moped::BSON::ObjectId.
+    #
+    # @example Convert a String to Moped::BSON::ObjectId
+    #   map.ensure_object_id_is_not_string("4f8583b5e5a4e46a64000002")
+    #
+    # @param [ Moped::BSON::ObjectId, String ] id The id you wish to convert to Moped::BSON::ObjectId
+    #
+    # @return [ Moped::BSON::ObjectId, id.class ] If id is a legal String representation of Moped::BSON::ObjectId
+    #  representation, it will return the Moped::BSON::ObjectId equivalent. Else, returns id.
+    def ensure_object_id_is_not_string(id)
+      id.is_a?(String) && Moped::BSON::ObjectId.legal?(id) ? Moped::BSON::ObjectId(id) : id
     end
 
     class << self
