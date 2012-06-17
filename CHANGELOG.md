@@ -803,6 +803,9 @@ For instructions on upgrading to newer versions, visit
 * \#2089 Allow proper separation of mongoization and evolving with respect to
   foreign keys.
 
+* \#2088 Allow finds by string ids to pull from the identity map if the ids
+  are stored as object ids.
+
 * \#2085 Allow demongoization of floats and ints to big decimals.
 
 * \#2084 Don't cascade if metadata does not exist.
