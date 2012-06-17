@@ -262,12 +262,12 @@ module Mongoid
     #
     # @return [ Criteria ] The cloned criteria.
     def for_ids(ids)
-      field = klass.fields["_id"]
+      ids = mongoize_ids(ids)
       method = extract_id ? :all_of : :where
       if ids.size > 1
-        send(method, { _id: { "$in" => ids.map{ |id| field.mongoize(id) }}})
+        send(method, { _id: { "$in" => ids }})
       else
-        send(method, { _id: field.mongoize(ids.first) })
+        send(method, { _id: ids.first })
       end
     end
 
@@ -295,7 +295,9 @@ module Mongoid
     #
     # @since 2.2.1
     def from_map_or_db
-      doc = IdentityMap.get(klass, extract_id || selector)
+      id = extract_id
+      id = klass.fields["_id"].mongoize(id) if id
+      doc = IdentityMap.get(klass, id || selector)
       doc && doc.matches?(selector) ? doc : first
     end
 
@@ -309,6 +311,7 @@ module Mongoid
     #
     # @return [ Array<Document> ] The found documents.
     def multiple_from_map_or_db(ids)
+      ids = mongoize_ids(ids)
       return entries if klass.embedded?
       result = []
       ids.reject! do |id|
@@ -597,6 +600,22 @@ module Mongoid
       else
         return entries.send(name, *args)
       end
+    end
+
+    # Convert all the ids to their proper types.
+    #
+    # @api private
+    #
+    # @example Convert the ids.
+    #   criteria.mongoize_ids(ids)
+    #
+    # @param [ Array<Object> ] ids The ids to convert.
+    #
+    # @return [ Array<Object> ] The converted ids.
+    #
+    # @since 3.0.0
+    def mongoize_ids(ids)
+      ids.map{ |id| klass.fields["_id"].mongoize(id) }
     end
 
     # Convenience method of raising an invalid options error.

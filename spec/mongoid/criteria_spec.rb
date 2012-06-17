@@ -694,6 +694,17 @@ describe Mongoid::Criteria do
         end
       end
 
+      context "when providing a single id as a String" do
+
+        let(:from_map) do
+          Band.find(depeche.id.to_s)
+        end
+
+        it "returns the document from the map" do
+          from_map.should equal(depeche)
+        end
+      end
+
       context "when providing multiple ids" do
 
         let(:from_map) do
