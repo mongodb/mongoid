@@ -42,6 +42,39 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#cached?" do
+
+    context "when the criteria is cached" do
+
+      let(:criteria) do
+        Band.all.cache
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns true" do
+        context.should be_cached
+      end
+    end
+
+    context "when the criteria is not cached" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns false" do
+        context.should_not be_cached
+      end
+    end
+  end
+
   describe "#count" do
 
     let!(:depeche) do

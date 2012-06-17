@@ -33,6 +33,18 @@ module Mongoid
       end
       alias :empty? :blank?
 
+      # Is the context cached?
+      #
+      # @example Is the context cached?
+      #   context.cached?
+      #
+      # @return [ true, false ] If the context is cached.
+      #
+      # @since 3.0.0
+      def cached?
+        !!@cache
+      end
+
       # Get the number of documents matching the query.
       #
       # @example Get the number of matching documents.
@@ -114,7 +126,7 @@ module Mongoid
       # @return [ Enumerator ] The enumerator.
       #
       # @since 3.0.0
-      def each
+      def each(&block)
         if block_given?
           reset_length
           selecting do
@@ -122,14 +134,12 @@ module Mongoid
               docs = query.map{ |doc| Factory.from_db(klass, doc) }
               eager_load(docs)
               docs.each do |doc|
-                yield doc
-                increment_length
+                yield_and_increment(doc, &block)
               end
               docs
             else
               query.each do |doc|
-                yield Factory.from_db(klass, doc)
-                increment_length
+                yield_and_increment(Factory.from_db(klass, doc), &block)
               end
               self
             end
@@ -137,6 +147,23 @@ module Mongoid
         else
           to_enum
         end
+      end
+
+      # Yield to the document and increment the length.
+      #
+      # @api private
+      #
+      # @example Yield and increment.
+      #   context.yield_and_increment(doc) do |doc|
+      #     ...
+      #   end
+      #
+      # @param [ Document ] doc The document to yield to.
+      #
+      # @since 3.0.0
+      def yield_and_increment(doc, &block)
+        yield(doc)
+        increment_length
       end
 
       # Do any documents exist for the context.
@@ -208,7 +235,7 @@ module Mongoid
       #
       # @since 3.0.0
       def initialize(criteria)
-        @criteria, @klass = criteria, criteria.klass
+        @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         add_type_selection
         @query = klass.collection.find(criteria.selector)
         apply_options

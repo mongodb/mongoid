@@ -271,6 +271,28 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#cache" do
+
+    let!(:band) do
+      Band.create(name: "Front 242")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Front 242").cache
+    end
+
+    before do
+      Moped.logger.level = Logger::DEBUG
+      criteria.each {}
+    end
+
+    pending "only hits the database once" do
+      criteria.each do |doc|
+        doc.should eq(band)
+      end
+    end
+  end
+
   [ :clone, :dup ].each do |method|
 
     describe "\##{method}" do
