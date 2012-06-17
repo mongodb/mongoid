@@ -130,40 +130,15 @@ module Mongoid
         if block_given?
           reset_length
           selecting do
-            if eager_loadable?
-              docs = query.map{ |doc| Factory.from_db(klass, doc) }
-              eager_load(docs)
-              docs.each do |doc|
-                yield_and_increment(doc, &block)
-              end
-              docs
-            else
-              query.each do |doc|
-                yield_and_increment(Factory.from_db(klass, doc), &block)
-              end
-              self
+            documents_for_iteration.each do |doc|
+              yield_and_increment(doc, &block)
             end
+            @cache_loaded = true
+            eager_loadable? ? docs : self
           end
         else
           to_enum
         end
-      end
-
-      # Yield to the document and increment the length.
-      #
-      # @api private
-      #
-      # @example Yield and increment.
-      #   context.yield_and_increment(doc) do |doc|
-      #     ...
-      #   end
-      #
-      # @param [ Document ] doc The document to yield to.
-      #
-      # @since 3.0.0
-      def yield_and_increment(doc, &block)
-        yield(doc)
-        increment_length
       end
 
       # Do any documents exist for the context.
@@ -430,6 +405,77 @@ module Mongoid
         end
       end
 
+      # Is the cache able to be added to?
+      #
+      # @api private
+      #
+      # @example Is the context cacheable?
+      #   context.cacheable?
+      #
+      # @return [ true, false ] If caching, and the cache isn't loaded.
+      #
+      # @since 3.0.0
+      def cacheable?
+        cached? && !cache_loaded?
+      end
+
+      # Is the cache fully loaded? Will be true if caching after one full
+      # iteration.
+      #
+      # @api private
+      #
+      # @example Is the cache loaded?
+      #   context.cache_loaded?
+      #
+      # @return [ true, false ] If the cache is loaded.
+      #
+      # @since 3.0.0
+      def cache_loaded?
+        !!@cache_loaded
+      end
+
+      # Get the documents for cached queries.
+      #
+      # @api private
+      #
+      # @example Get the cached documents.
+      #   context.documents
+      #
+      # @return [ Array<Document> ] The documents.
+      #
+      # @since 3.0.0
+      def documents
+        @documents ||= []
+      end
+
+      # Get the documents the context should iterate. This follows 3 rules:
+      #
+      # 1. If the query is cached, and we already have documents loaded, use
+      #   them.
+      # 2. If we are eager loading, then eager load the documents and use
+      #   those.
+      # 3. Use the query.
+      #
+      # @api private
+      #
+      # @example Get the documents for iteration.
+      #   context.documents_for_iteration
+      #
+      # @return [ Array<Document>, Moped::Query ] The docs to iterate.
+      #
+      # @since 3.0.0
+      def documents_for_iteration
+        if cached? && documents.any?
+          documents
+        elsif eager_loadable?
+          docs = query.map{ |doc| Factory.from_db(klass, doc) }
+          eager_load(docs)
+          docs
+        else
+          query
+        end
+      end
+
       # Eager load the inclusions for the provided documents.
       #
       # @example Eager load the inclusions.
@@ -565,6 +611,25 @@ module Mongoid
           eager_load([ doc ]) if eager_loadable?
           doc
         end
+      end
+
+      # Yield to the document and increment the length.
+      #
+      # @api private
+      #
+      # @example Yield and increment.
+      #   context.yield_and_increment(doc) do |doc|
+      #     ...
+      #   end
+      #
+      # @param [ Document ] document The document to yield to.
+      #
+      # @since 3.0.0
+      def yield_and_increment(document, &block)
+        doc = document.respond_to?(:_id) ? document : Factory.from_db(klass, document)
+        yield(doc)
+        increment_length
+        documents.push(doc) if cacheable?
       end
     end
   end

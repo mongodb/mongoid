@@ -273,22 +273,43 @@ describe Mongoid::Criteria do
 
   describe "#cache" do
 
-    let!(:band) do
-      Band.create(name: "Front 242")
+    let!(:person) do
+      Person.create
     end
 
-    let(:criteria) do
-      Band.where(name: "Front 242").cache
+    context "when no eager loading is involved" do
+
+      let(:criteria) do
+        Person.all.cache
+      end
+
+      before do
+        criteria.each {}
+      end
+
+      it "does not hit the database after first iteration" do
+        criteria.context.query.expects(:each).never
+        criteria.each do |doc|
+          doc.should eq(person)
+        end
+      end
     end
 
-    before do
-      Moped.logger.level = Logger::DEBUG
-      criteria.each {}
-    end
+    context "when the criteria is eager loading" do
 
-    pending "only hits the database once" do
-      criteria.each do |doc|
-        doc.should eq(band)
+      let(:criteria) do
+        Person.includes(:posts).cache
+      end
+
+      before do
+        criteria.each {}
+      end
+
+      it "does not hit the database after first iteration" do
+        criteria.context.query.expects(:each).never
+        criteria.each do |doc|
+          doc.should eq(person)
+        end
       end
     end
   end
