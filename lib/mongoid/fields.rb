@@ -24,9 +24,9 @@ module Mongoid
       field(:_type, default: ->{ self.class.name if hereditary? }, type: String)
       field(
         :_id,
-        default: ->{ BSON::ObjectId.new },
+        default: ->{ Moped::BSON::ObjectId.new },
         pre_processed: true,
-        type: BSON::ObjectId
+        type: Moped::BSON::ObjectId
       )
 
       alias :id :_id
@@ -201,13 +201,13 @@ module Mongoid
         add_field(name, fields[name].options.merge(type: type))
       end
 
-      # Convenience method for determining if we are using +BSON::ObjectIds+ as
+      # Convenience method for determining if we are using +Moped::BSON::ObjectIds+ as
       # our id.
       #
       # @example Does this class use object ids?
       #   person.using_object_ids?
       #
-      # @return [ true, false ] If the class uses BSON::ObjectIds for the id.
+      # @return [ true, false ] If the class uses Moped::BSON::ObjectIds for the id.
       #
       # @since 1.0.0
       def using_object_ids?

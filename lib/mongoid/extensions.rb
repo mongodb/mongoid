@@ -3,7 +3,7 @@ unless defined?(Boolean)
   class Boolean; end
 end
 
-class BSON::ObjectId
+class Moped::BSON::ObjectId
   undef :as_json
   def as_json(options = nil)
     to_s

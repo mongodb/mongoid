@@ -135,11 +135,11 @@ module Mongoid
       # @example Convert to the object id.
       #   string.convert_to_object_id
       #
-      # @return [ String, BSON::ObjectId ] The string or the id.
+      # @return [ String, Moped::BSON::ObjectId ] The string or the id.
       #
       # @since 3.0.0
       def convert_to_object_id
-        BSON::ObjectId.legal?(self) ? BSON::ObjectId.from_string(self) : self
+        Moped::BSON::ObjectId.legal?(self) ? Moped::BSON::ObjectId.from_string(self) : self
       end
 
       module ClassMethods
