@@ -52,7 +52,7 @@ module Mongoid
     # on the conditions provided and the first parameter.
     #
     # @example Find a single document by an id.
-    #   Person.find(BSON::ObjectId)
+    #   Person.find(Moped::BSON::ObjectId)
     #
     # @param [ Array ] args An assortment of finder options.
     #
