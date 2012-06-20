@@ -553,7 +553,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.name_attributes =
-                      { id: BSON::ObjectId.new.to_s, first_name: "Durran" }
+                      { id: Moped::BSON::ObjectId.new.to_s, first_name: "Durran" }
                   end
 
                   it "updates the existing document" do
@@ -820,7 +820,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     animal.person_attributes =
-                      { id: BSON::ObjectId.new.to_s, title: "Madam" }
+                      { id: Moped::BSON::ObjectId.new.to_s, title: "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -2407,7 +2407,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     person.game_attributes =
-                      { id: BSON::ObjectId.new.to_s, name: "Pong" }
+                      { id: Moped::BSON::ObjectId.new.to_s, name: "Pong" }
                   end
 
                   it "updates the existing document" do
@@ -2657,7 +2657,7 @@ describe Mongoid::NestedAttributes do
 
                   before do
                     game.person_attributes =
-                      { id: BSON::ObjectId.new.to_s, title: "Madam" }
+                      { id: Moped::BSON::ObjectId.new.to_s, title: "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -2832,7 +2832,7 @@ describe Mongoid::NestedAttributes do
                   expect {
                     person.posts_attributes =
                       { "0" =>
-                        { "id" => BSON::ObjectId.new.to_s, "title" => "Rogue" }
+                        { "id" => Moped::BSON::ObjectId.new.to_s, "title" => "Rogue" }
                       }
                   }.to raise_error(Mongoid::Errors::DocumentNotFound)
                 end

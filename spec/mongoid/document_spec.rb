@@ -358,7 +358,7 @@ describe Mongoid::Document do
     end
 
     it "creates an id for the document" do
-      person.id.should be_a(BSON::ObjectId)
+      person.id.should be_a(Moped::BSON::ObjectId)
     end
 
     it "sets the attributes" do
@@ -423,7 +423,7 @@ describe Mongoid::Document do
       context "when instantiating model" do
 
         let(:person) do
-          Person.instantiate("_id" => BSON::ObjectId.new, "title" => "Sir")
+          Person.instantiate("_id" => Moped::BSON::ObjectId.new, "title" => "Sir")
         end
 
         before do
@@ -476,7 +476,7 @@ describe Mongoid::Document do
       end
 
       let(:id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       let!(:person) do
@@ -596,7 +596,7 @@ describe Mongoid::Document do
     context "when the document is not new" do
 
       let(:person) do
-        Person.instantiate("_id" => BSON::ObjectId.new)
+        Person.instantiate("_id" => Moped::BSON::ObjectId.new)
       end
 
       it "returns the id in an array" do
@@ -607,7 +607,7 @@ describe Mongoid::Document do
     context "when the document is destroyed" do
 
       let(:person) do
-        Person.instantiate("_id" => BSON::ObjectId.new).tap do |peep|
+        Person.instantiate("_id" => Moped::BSON::ObjectId.new).tap do |peep|
           peep.destroyed = true
         end
       end
@@ -634,7 +634,7 @@ describe Mongoid::Document do
     context "when the document is not new" do
 
       let(:person) do
-        Person.instantiate("_id" => BSON::ObjectId.new)
+        Person.instantiate("_id" => Moped::BSON::ObjectId.new)
       end
 
       it "returns the id as a string" do
@@ -750,10 +750,10 @@ describe Mongoid::Document do
     end
   end
 
-  context "defining a BSON::ObjectId as a field" do
+  context "defining a Moped::BSON::ObjectId as a field" do
 
     let(:bson_id) do
-      BSON::ObjectId.new
+      Moped::BSON::ObjectId.new
     end
 
     let(:person) do
@@ -765,7 +765,7 @@ describe Mongoid::Document do
     end
 
     it "persists the correct type" do
-      person.reload.bson_id.should be_a(BSON::ObjectId)
+      person.reload.bson_id.should be_a(Moped::BSON::ObjectId)
     end
 
     it "has the correct value" do

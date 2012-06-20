@@ -1688,7 +1688,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe ".criteria" do
 
     let(:id) do
-      BSON::ObjectId.new
+      Moped::BSON::ObjectId.new
     end
 
     context "when the relation is polymorphic" do
@@ -2193,7 +2193,7 @@ describe Mongoid::Relations::Referenced::Many do
 
             it "raises an error" do
               expect {
-                person.posts.find(BSON::ObjectId.new)
+                person.posts.find(Moped::BSON::ObjectId.new)
               }.to raise_error(Mongoid::Errors::DocumentNotFound)
             end
           end
@@ -2201,7 +2201,7 @@ describe Mongoid::Relations::Referenced::Many do
           context "when config set not to raise error" do
 
             let(:post) do
-              person.posts.find(BSON::ObjectId.new)
+              person.posts.find(Moped::BSON::ObjectId.new)
             end
 
             before do
@@ -2242,7 +2242,7 @@ describe Mongoid::Relations::Referenced::Many do
 
             it "raises an error" do
               expect {
-                person.posts.find([ BSON::ObjectId.new ])
+                person.posts.find([ Moped::BSON::ObjectId.new ])
               }.to raise_error(Mongoid::Errors::DocumentNotFound)
             end
           end
@@ -2250,7 +2250,7 @@ describe Mongoid::Relations::Referenced::Many do
           context "when config set not to raise error" do
 
             let(:posts) do
-              person.posts.find([ BSON::ObjectId.new ])
+              person.posts.find([ Moped::BSON::ObjectId.new ])
             end
 
             before do
@@ -2306,7 +2306,7 @@ describe Mongoid::Relations::Referenced::Many do
 
             it "raises an error" do
               expect {
-                movie.ratings.find(BSON::ObjectId.new)
+                movie.ratings.find(Moped::BSON::ObjectId.new)
               }.to raise_error(Mongoid::Errors::DocumentNotFound)
             end
           end
@@ -2314,7 +2314,7 @@ describe Mongoid::Relations::Referenced::Many do
           context "when config set not to raise error" do
 
             let(:rating) do
-              movie.ratings.find(BSON::ObjectId.new)
+              movie.ratings.find(Moped::BSON::ObjectId.new)
             end
 
             before do
@@ -2355,7 +2355,7 @@ describe Mongoid::Relations::Referenced::Many do
 
             it "raises an error" do
               expect {
-                movie.ratings.find([ BSON::ObjectId.new ])
+                movie.ratings.find([ Moped::BSON::ObjectId.new ])
               }.to raise_error(Mongoid::Errors::DocumentNotFound)
             end
           end
@@ -2363,7 +2363,7 @@ describe Mongoid::Relations::Referenced::Many do
           context "when config set not to raise error" do
 
             let(:ratings) do
-              movie.ratings.find([ BSON::ObjectId.new ])
+              movie.ratings.find([ Moped::BSON::ObjectId.new ])
             end
 
             before do

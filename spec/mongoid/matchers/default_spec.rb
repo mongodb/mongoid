@@ -28,7 +28,7 @@ describe Mongoid::Matchers::Default do
     context "when comparing object ids" do
 
       let(:object_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       let(:matcher) do
@@ -45,7 +45,7 @@ describe Mongoid::Matchers::Default do
       context "when the values are not equal" do
 
         it "returns false" do
-          matcher.matches?(BSON::ObjectId.new).should be_false
+          matcher.matches?(Moped::BSON::ObjectId.new).should be_false
         end
       end
     end
@@ -84,11 +84,11 @@ describe Mongoid::Matchers::Default do
     context "when comparing an object id to an array" do
 
       let(:object_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       let(:matcher) do
-        described_class.new([ object_id, BSON::ObjectId.new ])
+        described_class.new([ object_id, Moped::BSON::ObjectId.new ])
       end
 
       context "when the attribute contains the value" do
@@ -101,7 +101,7 @@ describe Mongoid::Matchers::Default do
       context "when the attribute does not contain the value" do
 
         it "returns false" do
-          matcher.matches?(BSON::ObjectId.new).should be_false
+          matcher.matches?(Moped::BSON::ObjectId.new).should be_false
         end
       end
     end
