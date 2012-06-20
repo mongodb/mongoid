@@ -961,7 +961,7 @@ describe Mongoid::Relations::Referenced::One do
   describe ".criteria" do
 
     let(:id) do
-      BSON::ObjectId.new
+      Moped::BSON::ObjectId.new
     end
 
     context "when the relation is polymorphic" do

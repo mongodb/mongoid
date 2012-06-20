@@ -32,7 +32,6 @@ require "active_model"
 
 require "origin"
 require "moped"
-BSON = Moped::BSON
 
 require "mongoid/extensions"
 require "mongoid/errors"

@@ -39,7 +39,7 @@ describe Mongoid::Extensions::Object do
       context "when provided an object id" do
 
         let(:object_id) do
-          BSON::ObjectId.new
+          Moped::BSON::ObjectId.new
         end
 
         let(:fk) do
@@ -56,7 +56,7 @@ describe Mongoid::Extensions::Object do
         context "when the string is a legal object id" do
 
           let(:object_id) do
-            BSON::ObjectId.new
+            Moped::BSON::ObjectId.new
           end
 
           let(:fk) do

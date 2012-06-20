@@ -376,9 +376,9 @@ describe Mongoid::Attributes do
     after(:all) do
       Person.field(
         :_id,
-        type: BSON::ObjectId,
+        type: Moped::BSON::ObjectId,
         pre_processed: true,
-        default: ->{ BSON::ObjectId.new }
+        default: ->{ Moped::BSON::ObjectId.new }
       )
     end
 
@@ -387,9 +387,9 @@ describe Mongoid::Attributes do
       before(:all) do
         Person.field(
           :_id,
-          type: BSON::ObjectId,
+          type: Moped::BSON::ObjectId,
           pre_processed: true,
-          default: ->{ BSON::ObjectId.new }
+          default: ->{ Moped::BSON::ObjectId.new }
         )
       end
 
@@ -398,7 +398,7 @@ describe Mongoid::Attributes do
       end
 
       let(:bson_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       context "when providing an object id" do
@@ -442,7 +442,7 @@ describe Mongoid::Attributes do
           :_id,
           type: String,
           pre_processed: true,
-          default: ->{ BSON::ObjectId.new.to_s }
+          default: ->{ Moped::BSON::ObjectId.new.to_s }
         )
       end
 
@@ -451,7 +451,7 @@ describe Mongoid::Attributes do
       end
 
       let(:bson_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       context "when providing an object id" do
@@ -627,7 +627,7 @@ describe Mongoid::Attributes do
     context "when supplied hash has string values" do
 
       let(:bson_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       let!(:attributes) do

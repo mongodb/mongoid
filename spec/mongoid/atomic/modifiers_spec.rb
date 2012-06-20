@@ -367,7 +367,7 @@ describe Mongoid::Atomic::Modifiers do
         context "when the sets contain an id" do
 
           let(:sets) do
-            { "_id" => BSON::ObjectId.new }
+            { "_id" => Moped::BSON::ObjectId.new }
           end
 
           before do
