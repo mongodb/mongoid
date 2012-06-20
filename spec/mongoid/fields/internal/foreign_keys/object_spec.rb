@@ -44,7 +44,7 @@ require "spec_helper"
       # context "when using object ids" do
 
         # let(:object_id) do
-          # BSON::ObjectId.new
+          # Moped::BSON::ObjectId.new
         # end
 
         # it "performs conversion on the ids if strings" do
@@ -59,7 +59,7 @@ require "spec_helper"
           # context "when provided a string" do
 
             # let(:object_id) do
-              # BSON::ObjectId.new
+              # Moped::BSON::ObjectId.new
             # end
 
             # before do
@@ -67,16 +67,16 @@ require "spec_helper"
                 # :_id,
                 # type: String,
                 # pre_processed: true,
-                # default: ->{ BSON::ObjectId.new.to_s }
+                # default: ->{ Moped::BSON::ObjectId.new.to_s }
               # )
             # end
 
             # after do
               # Person.field(
                 # :_id,
-                # type: BSON::ObjectId,
+                # type: Moped::BSON::ObjectId,
                 # pre_processed: true,
-                # default: ->{ BSON::ObjectId.new }
+                # default: ->{ Moped::BSON::ObjectId.new }
               # )
             # end
 
@@ -88,7 +88,7 @@ require "spec_helper"
           # context "when provided a hash" do
 
             # let(:object_id) do
-              # BSON::ObjectId.new
+              # Moped::BSON::ObjectId.new
             # end
 
             # before do
@@ -96,16 +96,16 @@ require "spec_helper"
                 # :_id,
                 # type: String,
                 # pre_processed: true,
-                # default: ->{ BSON::ObjectId.new.to_s }
+                # default: ->{ Moped::BSON::ObjectId.new.to_s }
               # )
             # end
 
             # after do
               # Person.field(
                 # :_id,
-                # type: BSON::ObjectId,
+                # type: Moped::BSON::ObjectId,
                 # pre_processed: true,
-                # default: ->{ BSON::ObjectId.new }
+                # default: ->{ Moped::BSON::ObjectId.new }
               # )
             # end
 
@@ -132,9 +132,9 @@ require "spec_helper"
             # after do
               # Person.field(
                 # :_id,
-                # type: BSON::ObjectId,
+                # type: Moped::BSON::ObjectId,
                 # pre_processed: true,
-                # default: ->{ BSON::ObjectId.new }
+                # default: ->{ Moped::BSON::ObjectId.new }
               # )
             # end
 
@@ -152,9 +152,9 @@ require "spec_helper"
             # after do
               # Person.field(
                 # :_id,
-                # type: BSON::ObjectId,
+                # type: Moped::BSON::ObjectId,
                 # pre_processed: true,
-                # default: ->{ BSON::ObjectId.new }
+                # default: ->{ Moped::BSON::ObjectId.new }
               # )
             # end
 
@@ -178,9 +178,9 @@ require "spec_helper"
             # after do
               # Person.field(
                 # :_id,
-                # type: BSON::ObjectId,
+                # type: Moped::BSON::ObjectId,
                 # pre_processed: true,
-                # default: ->{ BSON::ObjectId.new }
+                # default: ->{ Moped::BSON::ObjectId.new }
               # )
             # end
 

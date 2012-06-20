@@ -768,7 +768,7 @@ describe Mongoid::Serialization do
 
   describe "#to_xml" do
 
-    context "BSON::ObjectId" do
+    context "Moped::BSON::ObjectId" do
 
       let(:person) do
         Person.new

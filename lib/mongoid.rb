@@ -132,12 +132,3 @@ module Mongoid
     ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
     { to: Config }))
 end
-
-# Assign a BSON namespace shortcut, but avoid a BSON namespace collision if the
-# 10gen driver is detected. This is placed after all other requires to partially
-# help ensure that the mongoid library itself doesn't use the shortcut.
-begin
-  require "bson"
-rescue LoadError
-  BSON = Moped::BSON
-end

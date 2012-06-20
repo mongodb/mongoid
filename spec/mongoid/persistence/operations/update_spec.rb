@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Persistence::Operations::Update do
 
   let(:document) do
-    Patient.instantiate("_id" => BSON::ObjectId.new)
+    Patient.instantiate("_id" => Moped::BSON::ObjectId.new)
   end
 
   let(:address) do
@@ -11,11 +11,11 @@ describe Mongoid::Persistence::Operations::Update do
   end
 
   let(:root_category) do
-    RootCategory.instantiate("_id" => BSON::ObjectId.new.to_s)
+    RootCategory.instantiate("_id" => Moped::BSON::ObjectId.new.to_s)
   end
 
   let(:category) do
-    Category.instantiate("_id" => BSON::ObjectId.new.to_s, "name" => 'Programming')
+    Category.instantiate("_id" => Moped::BSON::ObjectId.new.to_s, "name" => 'Programming')
   end
 
   let(:collection) do

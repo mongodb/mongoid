@@ -266,7 +266,7 @@ describe Mongoid::Fields do
     context "when the field is binary" do
 
       let(:binary) do
-        BSON::Binary.new(:md5, "testing")
+        Moped::BSON::Binary.new(:md5, "testing")
       end
 
       let(:registry) do
@@ -351,7 +351,7 @@ describe Mongoid::Fields do
     context "when the field is binary" do
 
       let(:binary) do
-        BSON::Binary.new(:md5, "testing")
+        Moped::BSON::Binary.new(:md5, "testing")
       end
 
       let(:registry) do
@@ -884,7 +884,7 @@ describe Mongoid::Fields do
   describe ".replace_field" do
 
     let!(:original) do
-      Person.field(:id_test, type: BSON::ObjectId, label: "id")
+      Person.field(:id_test, type: Moped::BSON::ObjectId, label: "id")
     end
 
     let!(:altered) do
@@ -963,7 +963,7 @@ describe Mongoid::Fields do
         end
 
         let(:bson_id) do
-          BSON::ObjectId.new
+          Moped::BSON::ObjectId.new
         end
 
         it "allows mass assignment of id" do
@@ -982,7 +982,7 @@ describe Mongoid::Fields do
         end
 
         let(:bson_id) do
-          BSON::ObjectId.new
+          Moped::BSON::ObjectId.new
         end
 
         it "protects assignment of id" do
@@ -1012,7 +1012,7 @@ describe Mongoid::Fields do
       end
 
       let(:bson_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       let(:model) do

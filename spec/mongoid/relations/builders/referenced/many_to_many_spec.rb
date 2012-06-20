@@ -32,7 +32,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
     context "when provided ids" do
 
       let(:object_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       let(:object) do
@@ -66,7 +66,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       let(:object_id) do
-        BSON::ObjectId.new
+        Moped::BSON::ObjectId.new
       end
 
       let(:object) do
@@ -151,7 +151,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       context "when the ids are incorrect" do
 
         before do
-          person.preference_ids = [ BSON::ObjectId.new ]
+          person.preference_ids = [ Moped::BSON::ObjectId.new ]
         end
 
         it "returns an empty array" do
