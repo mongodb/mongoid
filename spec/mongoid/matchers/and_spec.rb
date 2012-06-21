@@ -66,7 +66,7 @@ describe Mongoid::Matchers::And do
 
           let(:matches) do
             matcher.matches?(
-              [ { title: "Sir" }, { _id: BSON::ObjectId.new } ]
+              [ { title: "Sir" }, { _id: Moped::BSON::ObjectId.new } ]
             )
           end
 
@@ -120,7 +120,7 @@ describe Mongoid::Matchers::And do
           matcher.matches?(
             [
               { title: { "$in" => [ "Prince", "Madam" ] } },
-              { _id: BSON::ObjectId.new }
+              { _id: Moped::BSON::ObjectId.new }
             ]
           )
         end

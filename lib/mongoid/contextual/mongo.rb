@@ -549,7 +549,7 @@ module Mongoid
       #
       # @param [ String ] key The id or foriegn key string.
       #
-      # @return [ Array<String, BSON::ObjectId> ] The ids to load.
+      # @return [ Array<String, Moped::BSON::ObjectId> ] The ids to load.
       #
       # @since 3.0.0
       def load_ids(key)

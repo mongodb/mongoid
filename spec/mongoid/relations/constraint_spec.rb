@@ -9,9 +9,9 @@ describe Mongoid::Relations::Constraint do
       before(:all) do
         Person.field(
           :_id,
-          type: BSON::ObjectId,
+          type: Moped::BSON::ObjectId,
           pre_processed: true,
-          default: ->{ BSON::ObjectId.new }
+          default: ->{ Moped::BSON::ObjectId.new }
         )
       end
 
@@ -31,7 +31,7 @@ describe Mongoid::Relations::Constraint do
       context "when provided an object id" do
 
         let(:object) do
-          BSON::ObjectId.new
+          Moped::BSON::ObjectId.new
         end
 
         it "returns the object id" do
@@ -42,7 +42,7 @@ describe Mongoid::Relations::Constraint do
       context "when provided a string" do
 
         let(:object) do
-          BSON::ObjectId.new
+          Moped::BSON::ObjectId.new
         end
 
         it "returns an object id from the string" do
