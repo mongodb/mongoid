@@ -45,7 +45,7 @@ describe Mongoid::Persistence::Operations::Remove do
 
     def root_delete_expectation
       ->{
-        collection.expects(:find).with({ _id: document.id }).returns(query)
+        collection.expects(:find).with({ "_id" => document.id }).returns(query)
         query.expects(:remove).returns(true)
       }
     end
