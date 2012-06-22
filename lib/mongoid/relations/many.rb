@@ -144,9 +144,9 @@ module Mongoid
       # @return [ true, false ] If the proxy responds to the method.
       #
       # @since 2.0.0
-      def respond_to?(name, include_private = false)
+      def respond_to_missing?(name, include_private)
         [].respond_to?(name, include_private) ||
-          klass.respond_to?(name, include_private) || super
+          klass.respond_to?(name, include_private)
       end
 
       # This is public access to the relation's criteria.

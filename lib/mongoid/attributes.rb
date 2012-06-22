@@ -86,7 +86,7 @@ module Mongoid
       end
     end
 
-    # Override respond_to? so it responds properly for dynamic attributes.
+    # Ensure respond_to? responds properly for dynamic attributes.
     #
     # @example Does this object respond to the method?
     #   person.respond_to?(:title)
@@ -96,12 +96,10 @@ module Mongoid
     # @return [ true, false ] True if it does, false if not.
     #
     # @since 1.0.0
-    def respond_to?(name, include_private = false)
-      super || (
-        Mongoid.allow_dynamic_fields &&
+    def respond_to_missing?(name, include_private)
+      Mongoid.allow_dynamic_fields &&
         attributes &&
         attributes.has_key?(name.to_s.reader)
-      )
     end
 
     # Write a single attribute to the document attribute hash. This will
