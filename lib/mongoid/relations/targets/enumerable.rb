@@ -324,8 +324,8 @@ module Mongoid
         # @return [ true, false ] Whether the enumerable responds.
         #
         # @since 2.1.0
-        def respond_to?(name, include_private = false)
-          [].respond_to?(name, include_private) || super
+        def respond_to_missing?(name, include_private)
+          [].respond_to?(name, include_private)
         end
 
         # Gets the total size of this enumerable. This is a combination of all

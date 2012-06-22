@@ -40,8 +40,8 @@ module Mongoid
       # @return [ true, false ] If the proxy responds to the method.
       #
       # @since 2.1.8
-      def respond_to?(name, include_private = false)
-        target.respond_to?(name, include_private) || super
+      def respond_to_missing?(name, include_private)
+        target.respond_to?(name, include_private)
       end
     end
   end

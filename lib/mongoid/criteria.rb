@@ -450,7 +450,8 @@ module Mongoid
       end
     end
 
-    # Returns true if criteria responds to the given method.
+    # Returns true if the criteria's model or entries respond to the given
+    # method.
     #
     # @example Does the criteria respond to the method?
     #   crtiteria.respond_to?(:each)
@@ -459,8 +460,9 @@ module Mongoid
     # @param [ true, false ] include_private Whether to include privates.
     #
     # @return [ true, false ] If the criteria responds to the method.
-    def respond_to?(name, include_private = false)
-      super || klass.respond_to?(name) || entries.respond_to?(name, include_private)
+    def respond_to_missing?(name, include_private)
+      klass.respond_to?(name, include_private) ||
+        entries.respond_to?(name, include_private)
     end
 
     alias :to_ary :to_a
