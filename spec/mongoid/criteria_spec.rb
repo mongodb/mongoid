@@ -245,28 +245,31 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#build" do
+  [ :build, :new ].each do |method|
 
-    let(:criteria) do
-      Band.where(name: "Depeche Mode")
-    end
+    describe "#build" do
 
-    context "when provided valid attributes" do
-
-      let(:band) do
-        criteria.build(genres: [ "electro" ])
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
       end
 
-      it "returns the new document" do
-        band.should be_new_record
-      end
+      context "when provided valid attributes" do
 
-      it "sets the criteria attributes" do
-        band.name.should eq("Depeche Mode")
-      end
+        let(:band) do
+          criteria.send(method, genres: [ "electro" ])
+        end
 
-      it "sets the attributes passed to build" do
-        band.genres.should eq([ "electro" ])
+        it "returns the new document" do
+          band.should be_new_record
+        end
+
+        it "sets the criteria attributes" do
+          band.name.should eq("Depeche Mode")
+        end
+
+        it "sets the attributes passed to build" do
+          band.genres.should eq([ "electro" ])
+        end
       end
     end
   end

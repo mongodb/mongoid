@@ -64,6 +64,7 @@ module Mongoid
     def build(attrs = {})
       create_document(:new, attrs)
     end
+    alias :new :build
 
     # Tells the criteria that the cursor that gets returned needs to be
     # cached. This is so multiple iterations don't hit the database multiple
