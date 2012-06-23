@@ -307,7 +307,7 @@ module Mongoid
       # Update all the matching documents atomically.
       #
       # @example Update all the matching documents.
-      #   context.update(name: "Smiths")
+      #   context.update({ "$set" => { name: "Smiths" }})
       #
       # @param [ Hash ] attributes The new attributes for each document.
       #
@@ -316,7 +316,7 @@ module Mongoid
       # @since 3.0.0
       def update(attributes = nil)
         return false unless attributes
-        query.update_all({ "$set" => attributes })
+        query.update_all(attributes.__consolidate__)
       end
       alias :update_all :update
 

@@ -27,6 +27,26 @@ module Mongoid
         update_values(&:__mongoize_object_id__)
       end
 
+      # Consolidate the key/values in the hash under an atomic $set.
+      #
+      # @example Consolidate the hash.
+      #   { name: "Placebo" }.__consolidate__
+      #
+      # @return [ Hash ] A new consolidated hash.
+      #
+      # @since 3.0.0
+      def __consolidate__
+        consolidated = {}
+        each_pair do |key, value|
+          if key =~ /\$/
+            (consolidated[key] ||= {}).merge!(value)
+          else
+            (consolidated["$set"] ||= {}).merge!(key => value)
+          end
+        end
+        consolidated
+      end
+
       # Get the id attribute from this hash, whether it's prefixed with an
       # underscore or is a symbol.
       #
@@ -37,7 +57,7 @@ module Mongoid
       #
       # @since 2.3.2
       def extract_id
-        self["id"] || self["_id"] || self[:id] || self[:_id]
+        self["_id"] || self["id"] || self[:id] || self[:_id]
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly

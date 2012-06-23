@@ -1215,6 +1215,47 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
+      context "when providing atomic operations" do
+
+        context "when only atomic operations are provided" do
+
+          before do
+            context.send(method, "$set" => { name: "Smiths" })
+          end
+
+          it "updates the first matching document" do
+            depeche_mode.reload.name.should eq("Smiths")
+          end
+
+          it "updates the last matching document" do
+            new_order.reload.name.should eq("Smiths")
+          end
+        end
+
+        context "when a mix are provided" do
+
+          before do
+            context.send(method, "$set" => { name: "Smiths" }, likes: 100)
+          end
+
+          it "updates the first matching document's set" do
+            depeche_mode.reload.name.should eq("Smiths")
+          end
+
+          it "updates the first matching document's updates" do
+            depeche_mode.reload.likes.should eq(100)
+          end
+
+          it "updates the last matching document's set" do
+            new_order.reload.name.should eq("Smiths")
+          end
+
+          it "updates the last matching document's updates" do
+            new_order.reload.likes.should eq(100)
+          end
+        end
+      end
+
       context "when providing no attributes" do
 
         it "returns false" do

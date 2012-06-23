@@ -795,6 +795,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2119 Allow `Criteria#update_all` to accept atomic ops and normal sets.
+
 * \#2110 `Model#touch` now works properly on embedded documents.
 
 * \#2100 Allow atomic operations to properly execute on paranoid documents
