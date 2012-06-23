@@ -62,7 +62,7 @@ module Mongoid
       #
       # @since 3.0.0
       def evolve(object)
-        if object_id_field?
+        if object_id_field? || object.is_a?(Document)
           object.__evolve_object_id__
         else
           related_id_field.evolve(object)
