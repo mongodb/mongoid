@@ -44,6 +44,7 @@ describe Mongoid::Finders do
       context "when providing a document" do
 
         context "with an owner with a BSON identity type" do
+
           let!(:person) do
             Person.create
           end
@@ -62,6 +63,7 @@ describe Mongoid::Finders do
         end
 
         context "with an owner with an Integer identity type" do
+
           let!(:jar) do
             Jar.create
           end
