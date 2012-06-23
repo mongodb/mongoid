@@ -43,20 +43,40 @@ describe Mongoid::Finders do
 
       context "when providing a document" do
 
-        let!(:person) do
-          Person.create
+        context "with an owner with a BSON identity type" do
+          let!(:person) do
+            Person.create
+          end
+
+          let!(:game) do
+            Game.create(person: person)
+          end
+
+          let(:from_db) do
+            Game.find_or_create_by(person: person)
+          end
+
+          it "returns the document" do
+            from_db.should eq(game)
+          end
         end
 
-        let!(:game) do
-          Game.create(person: person)
-        end
+        context "with an owner with an Integer identity type" do
+          let!(:jar) do
+            Jar.create
+          end
 
-        let(:from_db) do
-          Game.find_or_create_by(person: person)
-        end
+          let!(:cookie) do
+            Cookie.create(jar: jar)
+          end
 
-        it "returns the document" do
-          from_db.should eq(game)
+          let(:from_db) do
+            Cookie.find_or_create_by(jar: jar)
+          end
+
+          it "returns the document" do
+            from_db.should eq(cookie)
+          end
         end
       end
     end
