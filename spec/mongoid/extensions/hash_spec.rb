@@ -160,6 +160,63 @@ describe Mongoid::Extensions::Hash do
     end
   end
 
+  describe "#__consolidate__" do
+
+    context "when the hash already contains the key" do
+
+      context "when the $set is first" do
+
+        let(:hash) do
+          { "$set" => { name: "Tool" }, likes: 10, "$inc" => { plays: 1 }}
+        end
+
+        let(:consolidated) do
+          hash.__consolidate__
+        end
+
+        it "moves the non hash values under the provided key" do
+          consolidated.should eq({
+            "$set" => { name: "Tool", likes: 10 }, "$inc" => { plays: 1 }
+          })
+        end
+      end
+
+      context "when the $set is not first" do
+
+        let(:hash) do
+          { likes: 10, "$inc" => { plays: 1 }, "$set" => { name: "Tool" }}
+        end
+
+        let(:consolidated) do
+          hash.__consolidate__
+        end
+
+        it "moves the non hash values under the provided key" do
+          consolidated.should eq({
+            "$set" => { likes: 10, name: "Tool" }, "$inc" => { plays: 1 }
+          })
+        end
+      end
+    end
+
+    context "when the hash does not contain the key" do
+
+      let(:hash) do
+        { likes: 10, "$inc" => { plays: 1 }, name: "Tool"}
+      end
+
+      let(:consolidated) do
+        hash.__consolidate__
+      end
+
+      it "moves the non hash values under the provided key" do
+        consolidated.should eq({
+          "$set" => { likes: 10, name: "Tool" }, "$inc" => { plays: 1 }
+        })
+      end
+    end
+  end
+
   describe ".demongoize" do
 
     let(:hash) do
