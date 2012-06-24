@@ -197,8 +197,8 @@ module Mongoid # :nodoc:
                 end
               else
                 doc.delete(:suppress => true)
+                unbind_one(doc)
               end
-              unbind_one(doc)
             end
             reindex
           end

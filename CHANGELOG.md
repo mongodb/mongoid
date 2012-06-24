@@ -3,7 +3,14 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.4.11 (branch: 2.4.0-stable)
+## 2.4.12 (branch: 2.4.0-stable)
+
+### Resolved Issues
+
+* \#2127 Don't unbind parents of embedded documents mid nested
+  attributes deletion.
+
+## 2.4.11
 
 ### Resolved Issues
 
