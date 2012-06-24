@@ -20,9 +20,12 @@ module Rails
         next if model.index_options.empty?
         unless model.embedded?
           model.create_indexes
-          logger.info("Creating indexes on: #{model} for: #{model.index_options.keys.join(", ")}.")
+          logger.info("MONGOID: Created indexes on #{model}:")
+          model.index_options.each_pair do |index, options|
+            logger.info("MONGOID: Index: #{index}, Options: #{options}")
+          end
         else
-          logger.info("Index ignored on: #{model}, please define in the root model.")
+          logger.info("MONGOID: Index ignored on: #{model}, please define in the root model.")
         end
       end
     end
@@ -44,7 +47,7 @@ module Rails
         indexes = model.collection.indexes.map{ |doc| doc["name"] }
         indexes.delete_one("_id_")
         model.remove_indexes
-        logger.info("Removing indexes on: #{model} for: #{indexes.join(', ')}.")
+        logger.info("MONGOID: Removing indexes on: #{model} for: #{indexes.join(', ')}.")
       end
     end
 
@@ -63,7 +66,7 @@ module Rails
         begin
           determine_model(file, logger)
         rescue => e
-          logger.error(%Q{Failed to determine model from #{file}:
+          logger.error(%Q{MONGOID: Failed to determine model from #{file}:
             #{e.class}:#{e.message}
             #{e.backtrace.join("\n")}
           })
@@ -138,7 +141,7 @@ module Rails
         name = parts.join("::")
         klass = name.constantize
       rescue NameError, LoadError
-        logger.info("Attempted to constantize #{name}, trying without namespacing.")
+        logger.info("MONGOID: Attempted to constantize #{name}, trying without namespacing.")
         klass = parts.last.constantize
       end
       klass if klass.ancestors.include?(::Mongoid::Document)
