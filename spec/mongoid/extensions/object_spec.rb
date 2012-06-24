@@ -130,6 +130,17 @@ describe Mongoid::Extensions::Object do
     end
   end
 
+  describe "#__sortable__" do
+
+    let(:object) do
+      Object.new
+    end
+
+    it "returns self" do
+      object.__sortable__.should eq(object)
+    end
+  end
+
   describe ".demongoize" do
 
     let(:object) do

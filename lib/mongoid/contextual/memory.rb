@@ -356,7 +356,11 @@ module Mongoid
       def in_place_sort(values)
         values.each_pair do |field, dir|
           documents.sort! do |a, b|
-            dir > 0 ? a[field] <=> b[field] : b[field] <=> a[field]
+            if dir > 0
+              a[field].__sortable__ <=> b[field].__sortable__
+            else
+              b[field].__sortable__ <=> a[field].__sortable__
+            end
           end
         end
       end
