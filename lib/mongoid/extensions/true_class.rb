@@ -3,6 +3,18 @@ module Mongoid
   module Extensions
     module TrueClass
 
+      # Get the value of the object as a mongo friendy sort value.
+      #
+      # @example Get the object as sort criteria.
+      #   object.__sortable__
+      #
+      # @return [ Integer ] 1.
+      #
+      # @since 3.0.0
+      def __sortable__
+        1
+      end
+
       # Is the passed value a boolean?
       #
       # @example Is the value a boolean type?

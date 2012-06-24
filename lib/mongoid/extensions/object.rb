@@ -28,6 +28,18 @@ module Mongoid
         self
       end
 
+      # Get the value of the object as a mongo friendy sort value.
+      #
+      # @example Get the object as sort criteria.
+      #   object.__sortable__
+      #
+      # @return [ Object ] self.
+      #
+      # @since 3.0.0
+      def __sortable__
+        self
+      end
+
       # Do or do not, there is no try. -- Yoda.
       #
       # @example Do or do not.
