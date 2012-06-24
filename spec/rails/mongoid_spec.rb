@@ -37,7 +37,7 @@ describe "Rails::Mongoid" do
 
       it "creates the indexes for the models" do
         klass.expects(:create_indexes).once
-        logger.expects(:info).once
+        logger.expects(:info).twice
         indexes
       end
     end
@@ -110,7 +110,7 @@ describe "Rails::Mongoid" do
     before do
       Dir.expects(:glob).with(pattern).returns(model_paths).times(2)
       Logger.expects(:new).returns(logger).times(4)
-      logger.expects(:info).times(2)
+      logger.expects(:info).times(3)
     end
 
     let(:indexes) do
