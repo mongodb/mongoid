@@ -1183,6 +1183,39 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
+                context "when the child accesses the parent after destroy" do
+
+                  before(:all) do
+                    Band.accepts_nested_attributes_for :records, :allow_destroy => true
+                  end
+
+                  after(:all) do
+                    Band.send(:undef_method, :records_attributes=)
+                  end
+
+                  let!(:band) do
+                    Band.create
+                  end
+
+                  let!(:record) do
+                    band.records.create
+                  end
+
+                  before do
+                    band.records_attributes =
+                      { "foo" => { "id" => record.id, "_destroy" => true }}
+                    band.save
+                  end
+
+                  it "deletes the child document" do
+                    band.records.should be_empty
+                  end
+
+                  it "persists the changes" do
+                    band.reload.records.should be_empty
+                  end
+                end
+
                 context "when the child has defaults" do
 
                   before(:all) do

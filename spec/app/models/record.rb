@@ -16,6 +16,8 @@ class Record
   before_update :before_update_stub
   before_validation :before_validation_stub
 
+  after_destroy :access_band
+
   def before_create_stub
     self.before_create_called = true
   end
@@ -30,5 +32,9 @@ class Record
 
   def before_validation_stub
     self.before_validation_called = true
+  end
+
+  def access_band
+    band.name
   end
 end
