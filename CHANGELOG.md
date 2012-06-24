@@ -876,7 +876,14 @@ For instructions on upgrading to newer versions, visit
 * \#685 Attempting to use versioning with embedded documents will now
   raise a proper error alerting the developer this is not allowed.
 
-## 2.4.11 (branch: 2.4.0-stable)
+## 2.4.12 (branch: 2.4.0-stable)
+
+### Resolved Issues
+
+* \#2127 Don't unbind parents of embedded documents mid nested
+  attributes deletion.
+
+## 2.4.11
 
 ### Resolved Issues
 
