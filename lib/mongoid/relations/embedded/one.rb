@@ -36,7 +36,7 @@ module Mongoid
         # @since 2.0.0.rc.1
         def substitute(replacement)
           if _assigning?
-            base.atomic_unsets.push(atomic_path)
+            base.add_atomic_unset(target)
           else
             delete if persistable?
           end

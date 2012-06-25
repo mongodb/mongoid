@@ -14,9 +14,9 @@ module Mongoid
       :atomic_array_pulls,
       :atomic_array_add_to_sets,
       :atomic_pulls,
-      :atomic_unsets,
       :delayed_atomic_sets,
-      :delayed_atomic_pulls
+      :delayed_atomic_pulls,
+      :delayed_atomic_unsets
     ]
 
     included do
@@ -37,6 +37,21 @@ module Mongoid
     def add_atomic_pull(document)
       document.flagged_for_destroy = true
       (delayed_atomic_pulls[document.metadata.name.to_s] ||= []).push(document)
+    end
+
+    # Add an atomic unset for the document.
+    #
+    # @example Add an atomic unset.
+    #   document.add_atomic_unset(doc)
+    #
+    # @param [ Document ] document The child document.
+    #
+    # @return [ Array<Document> ] The children.
+    #
+    # @since 3.0.0
+    def add_atomic_unset(document)
+      document.flagged_for_destroy = true
+      (delayed_atomic_unsets[document.metadata.name.to_s] ||= []).push(document)
     end
 
     # For array fields these are the pushes that need to happen.
@@ -174,9 +189,7 @@ module Mongoid
       delayed_atomic_pulls.each_pair do |_, docs|
         path = nil
         ids = docs.map do |doc|
-          path ||= doc.atomic_path
-          doc.destroyed = true
-          doc.flagged_for_destroy = false
+          path ||= doc.flag_as_destroyed
           doc.id
         end
         pulls[path] = { "_id" => { "$in" => ids }} and path = nil
@@ -228,7 +241,15 @@ module Mongoid
     #
     # @since 2.2.0
     def atomic_unsets
-      @atomic_unsets ||= []
+      unsets = []
+      delayed_atomic_unsets.each_pair do |name, docs|
+        path = nil
+        docs.each do |doc|
+          path ||= doc.flag_as_destroyed
+        end
+        unsets.push(path || name)
+      end
+      unsets
     end
 
     # Get all the atomic sets that have had their saves delayed.
@@ -253,6 +274,32 @@ module Mongoid
     # @since 2.3.2
     def delayed_atomic_pulls
       @delayed_atomic_pulls ||= {}
+    end
+
+    # Get the delayed atomic unsets.
+    #
+    # @example Get the delayed atomic unsets.
+    #   document.delayed_atomic_unsets
+    #
+    # @return [ Hash ] The atomic unsets
+    #
+    # @since 3.0.0
+    def delayed_atomic_unsets
+      @delayed_atomic_unsets ||= {}
+    end
+
+    # Flag the document as destroyed and return the atomic path.
+    #
+    # @example Flag destroyed and return path.
+    #   document.flag_as_destroyed
+    #
+    # @return [ String ] The atomic path.
+    #
+    # @since 3.0.0
+    def flag_as_destroyed
+      self.destroyed = true
+      self.flagged_for_destroy = false
+      atomic_path
     end
 
     private

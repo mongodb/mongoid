@@ -2,6 +2,56 @@ require "spec_helper"
 
 describe Mongoid::Atomic do
 
+  describe "#add_atomic_pull" do
+
+    let!(:person) do
+      Person.create
+    end
+
+    let(:address) do
+      person.addresses.create
+    end
+
+    let(:location) do
+      address.locations.create
+    end
+
+    before do
+      person.add_atomic_pull(address)
+    end
+
+    it "adds the document to the delayed atomic pulls" do
+      person.delayed_atomic_pulls["addresses"].should eq([ address ])
+    end
+
+    it "flags the document for destruction" do
+      address.should be_flagged_for_destroy
+    end
+  end
+
+  describe "#add_atomic_unset" do
+
+    let!(:person) do
+      Person.new
+    end
+
+    let(:name) do
+      person.build_name
+    end
+
+    before do
+      person.add_atomic_unset(name)
+    end
+
+    it "adds the document to the delayed atomic unsets" do
+      person.delayed_atomic_unsets["name"].should eq([ name ])
+    end
+
+    it "flags the document for destruction" do
+      name.should be_flagged_for_destroy
+    end
+  end
+
   describe "#atomic_updates" do
 
     context "when the document is persisted" do

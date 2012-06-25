@@ -470,13 +470,48 @@ describe Mongoid::NestedAttributes do
 
                   context "when passed #{truth} with destroy" do
 
-                    before do
-                      person.name_attributes =
-                        { id: name.id, _destroy: truth }
+                    context "when the document has no callbacks" do
+
+                      before do
+                        person.name_attributes =
+                          { id: name.id, _destroy: truth }
+                      end
+
+                      it "destroys the existing document" do
+                        person.name.should be_nil
+                      end
                     end
 
-                    it "destroys the existing document" do
-                      person.name.should be_nil
+                    context "when the document has destroy callbacks" do
+
+                      before(:all) do
+                        PetOwner.accepts_nested_attributes_for :pet, allow_destroy: true
+                      end
+
+                      after(:all) do
+                        PetOwner.send(:undef_method, :pet_attributes=)
+                      end
+
+                      let(:owner) do
+                        PetOwner.create
+                      end
+
+                      let!(:pet) do
+                        owner.create_pet
+                      end
+
+                      before do
+                        owner.pet_attributes = { id: pet.id, _destroy: truth }
+                        owner.save
+                      end
+
+                      it "destroys the existing document" do
+                        owner.pet.should be_nil
+                      end
+
+                      it "runs the destroy callbacks" do
+                        pet.destroy_flag.should be_true
+                      end
                     end
                   end
                 end
