@@ -112,7 +112,9 @@ module Mongoid
         next unless metadata.cascading_callbacks?
         without_autobuild do
           delayed_pulls = delayed_atomic_pulls[name]
+          delayed_unsets = delayed_atomic_unsets[name]
           children.merge(delayed_pulls) if delayed_pulls
+          children.merge(delayed_unsets) if delayed_unsets
           relation = send(name)
           Array.wrap(relation).each do |child|
             next if children.include?(child)

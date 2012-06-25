@@ -74,7 +74,7 @@ module Mongoid
         def batch_replace(docs)
           if docs.blank?
             if _assigning? && !empty?
-              base.atomic_unsets.push(first.atomic_path)
+              base.add_atomic_unset(first)
             end
             batch_remove(target.dup)
           else
