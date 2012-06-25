@@ -112,10 +112,26 @@ module Mongoid
     block_given? ? yield(Config) : Config
   end
 
+  # Convenience method for getting the default session.
+  #
+  # @example Get the default session.
+  #   Mongoid.default_session
+  #
+  # @return [ Moped::Session ] The default session.
+  #
+  # @since 3.0.0
   def default_session
     Sessions.default
   end
 
+  # Convenience method for getting a named session.
+  #
+  # @example Get a named session.
+  #   Mongoid.session(:default)
+  #
+  # @return [ Moped::Session ] The named session.
+  #
+  # @since 3.0.0
   def session(name)
     Sessions.with_name(name)
   end

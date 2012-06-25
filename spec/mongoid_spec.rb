@@ -30,4 +30,18 @@ describe Mongoid do
       end
     end
   end
+
+  describe ".default_session" do
+
+    it "returns the default session" do
+      Mongoid.default_session.should eq(Mongoid::Sessions.default)
+    end
+  end
+
+  describe ".session" do
+
+    it "returns the named session" do
+      Mongoid.session(:default).should eq(Mongoid::Sessions.default)
+    end
+  end
 end
