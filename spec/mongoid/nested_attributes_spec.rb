@@ -1048,7 +1048,47 @@ describe Mongoid::NestedAttributes do
             it "sets the documents on the relation" do
               person.addresses.size.should eq(2)
             end
+          end
 
+          context "when cascading callbacks" do
+
+            before(:all) do
+              Band.accepts_nested_attributes_for :records
+            end
+
+            after(:all) do
+              Band.send(:undef_method, :records_attributes=)
+            end
+
+            let(:band) do
+              Band.new
+            end
+
+            let(:attributes) do
+              [
+                { "name" => "101" },
+                { "name" => "Ultra" }
+              ]
+            end
+
+            before do
+              band.records_attributes = attributes
+            end
+
+            context "when the parent is saved" do
+
+              before do
+                band.save
+              end
+
+              it "runs the first child create callbacks" do
+                band.records.first.before_create_called.should be_true
+              end
+
+              it "runs the last child create callbacks" do
+                band.records.last.before_create_called.should be_true
+              end
+            end
           end
         end
 
