@@ -275,4 +275,14 @@ describe Mongoid::Finders do
       end
     end
   end
+
+  Origin::Selectable.forwardables.each do |method|
+
+    describe "##{method}" do
+
+      it "forwards the #{method} to the criteria" do
+        Band.should respond_to(method)
+      end
+    end
+  end
 end
