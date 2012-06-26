@@ -1269,6 +1269,78 @@ describe Mongoid::Persistence do
     end
   end
 
+  describe "#upsert" do
+
+    context "when the document is new" do
+
+      let!(:existing) do
+        Band.create(name: "Photek")
+      end
+
+      context "when a matching document exists in the db" do
+
+        let(:updated) do
+          Band.new(name: "Tool") do |band|
+            band.id = existing.id
+          end
+        end
+
+        before do
+          updated.with(safe: true).upsert
+        end
+
+        it "updates the existing document" do
+          existing.reload.name.should eq("Tool")
+        end
+      end
+
+      context "when no matching document exists in the db" do
+
+        let(:insert) do
+          Band.new(name: "Tool")
+        end
+
+        before do
+          insert.with(safe: true).upsert
+        end
+
+        it "inserts a new document" do
+          insert.reload.should eq(insert)
+        end
+
+        it "does not modify any fields" do
+          insert.reload.name.should eq("Tool")
+        end
+      end
+    end
+
+    context "when the document is not new" do
+
+      let!(:existing) do
+        Band.create(name: "Photek")
+      end
+
+      context "when updating fields outside of the id" do
+
+        before do
+          existing.name = "Depeche Mode"
+        end
+
+        let!(:upsert) do
+          existing.upsert
+        end
+
+        it "updates the existing document" do
+          existing.reload.name.should eq("Depeche Mode")
+        end
+
+        it "returns true" do
+          upsert.should be_true
+        end
+      end
+    end
+  end
+
   [ :delete_all, :destroy_all ].each do |method|
 
     describe "##{method}" do

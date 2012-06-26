@@ -2,6 +2,7 @@
 require "mongoid/persistence/operations/insert"
 require "mongoid/persistence/operations/remove"
 require "mongoid/persistence/operations/update"
+require "mongoid/persistence/operations/upsert"
 require "mongoid/persistence/operations/embedded/insert"
 require "mongoid/persistence/operations/embedded/remove"
 
@@ -191,6 +192,21 @@ module Mongoid
         # @since 2.1.0
         def update(doc, options = {})
           Update.new(doc, options)
+        end
+
+        # Get the appropriate upsert operation based on the document.
+        #
+        # @example Get the upsert operation.
+        #   Operations.upsert(doc, options)
+        #
+        # @param [ Document ] doc The document to persist.
+        # @param [ Hash ] options The persistence options.
+        #
+        # @return [ Operations ] The operation.
+        #
+        # @since 3.0.0
+        def upsert(doc, options = {})
+          Upsert.new(doc, options)
         end
       end
     end
