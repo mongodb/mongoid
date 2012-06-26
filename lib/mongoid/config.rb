@@ -108,11 +108,8 @@ module Mongoid
     #
     # @since 2.0.2
     def purge!
-      session = Sessions.default
-      collections = session["system.namespaces"].find(name: { "$not" => /system|\$/ }).to_a
-      collections.each do |collection|
-        _, name = collection["name"].split(".", 2)
-        session[name].drop
+      Sessions.default.collections.each do |collection|
+        collection.drop
       end and true
     end
 
