@@ -793,6 +793,16 @@ For instructions on upgrading to newer versions, visit
 
         Band.scoped(skip: 10, limit: 20)
 
+* \#463 `Document#upsert` is no longer aliased to `Document#save` and now
+  actually performs a proper MongoDB upsert command when called. If you
+  were using this method before and want the same behaviour, please switch
+  to `save`.
+
+        band = Band.new(name: "Tool")
+        band.upsert #=> Inserts the document in the database.
+        band.name = "Placebo"
+        band.upsert #=> Updates the existing document.
+
 ### Resolved Issues
 
 * \#2122 Allow embedded documents to sort on boolean fields.

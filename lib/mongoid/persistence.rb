@@ -63,6 +63,25 @@ module Mongoid
     alias :delete :remove
 
     # Save the document - will perform an insert if the document is new, and
+    # update if not.
+    #
+    # @example Save the document.
+    #   document.save
+    #
+    # @param [ Hash ] options Options to pass to the save.
+    #
+    # @return [ true, false ] True is success, false if not.
+    #
+    # @since 1.0.0
+    def save(options = {})
+      if new_record?
+        insert(options).persisted?
+      else
+        update(options)
+      end
+    end
+
+    # Save the document - will perform an insert if the document is new, and
     # update if not. If a validation error occurs an error will get raised.
     #
     # @example Save the document.
@@ -72,7 +91,7 @@ module Mongoid
     #
     # @return [ true, false ] True if validation passed.
     def save!(options = {})
-      unless upsert(options)
+      unless save(options)
         self.class.fail_validate!(self) if errors.any?
         self.class.fail_callback!(self, :save!)
       end
@@ -174,23 +193,21 @@ module Mongoid
       result
     end
 
-    # Upsert the document - will perform an insert if the document is new, and
-    # update if not.
+    # Perform an upsert of the document. If the document does not exist in the
+    # database, then Mongo will insert a new one, otherwise the fields will get
+    # overwritten with new values on the existing document.
     #
     # @example Upsert the document.
     #   document.upsert
     #
-    # @param [ Hash ] options Options to pass to the upsert.
+    # @param [ Hash ] options The validation options.
     #
-    # @return [ true, false ] True is success, false if not.
+    # @return [ true ] True.
+    #
+    # @since 3.0.0
     def upsert(options = {})
-      if new_record?
-        insert(options).persisted?
-      else
-        update(options)
-      end
+      Operations.upsert(self, options).persist
     end
-    alias :save :upsert
 
     module ClassMethods #:nodoc:
 
