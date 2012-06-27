@@ -4,6 +4,21 @@ describe Mongoid::Extensions::DateTime do
 
   describe "__mongoize_time__" do
 
+    context "when the date time has more than seconds precision" do
+
+      let(:date_time) do
+        DateTime.parse("2012-06-17 18:42:15.123Z")
+      end
+
+      let(:mongoized) do
+        date_time.__mongoize_time__
+      end
+
+      it "does not drop the precision" do
+        mongoized.to_f.to_s.should match(/\.123/)
+      end
+    end
+
     context "when using active support's time zone" do
 
       before do
@@ -20,7 +35,7 @@ describe Mongoid::Extensions::DateTime do
       end
 
       let(:expected) do
-        Time.zone.local(2010, 1, 1, 0, 0, 0, 0)
+        Time.zone.local(2010, 1, 1, 9, 0, 0, 0)
       end
 
       let(:mongoized) do
@@ -48,7 +63,7 @@ describe Mongoid::Extensions::DateTime do
       end
 
       let(:expected) do
-        Time.local(2010, 1, 1, 0, 0, 0, 0)
+        Time.local(2010, 1, 1, 1, 0, 0, 0)
       end
 
       let(:mongoized) do

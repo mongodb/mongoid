@@ -250,12 +250,6 @@ describe Mongoid::Extensions::Time do
         Time.now
       end
 
-      it "returns a time" do
-        Time.mongoize(time.to_datetime).should eq(
-          Time.local(time.year, time.month, time.day, time.hour, time.min, time.sec)
-        )
-      end
-
       it "doesn't strip milli- or microseconds" do
         Time.mongoize(time).to_f.should eq(time.to_f)
       end
@@ -279,7 +273,7 @@ describe Mongoid::Extensions::Time do
 
         it "assumes the given time is local" do
           Time.mongoize(datetime).should eq(
-            Time.utc(2010, 11, 18, 23)
+            Time.utc(2010, 11, 19)
           )
         end
       end

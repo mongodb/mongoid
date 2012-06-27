@@ -13,7 +13,12 @@ module Mongoid
       # @since 3.0.0
       def __mongoize_time__
         return self if utc? && Mongoid.use_utc?
-        ::Time.configured.local(year, month, day, hour, min, sec)
+        if Mongoid.use_activesupport_time_zone?
+          in_time_zone(::Time.zone)
+        else
+          time = to_time
+          time.respond_to?(:getlocal) ? time.getlocal : time
+        end
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
