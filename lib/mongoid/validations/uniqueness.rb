@@ -165,6 +165,7 @@ module Mongoid
         Array.wrap(options[:scope]).each do |item|
           criteria = criteria.where(item => document.attributes[item.to_s])
         end
+        criteria = criteria.where(deleted_at: nil) if document.paranoid?
         criteria
       end
 

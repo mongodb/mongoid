@@ -899,6 +899,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2144 Uniqueness validation on paranoid documents now properly scopes.
+
 * \#2127 Don't unbind parents of embedded documents mid nested
   attributes deletion.
 
