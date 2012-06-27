@@ -55,9 +55,9 @@ Benchmark.bm do |bm|
 
       Person.delete_all
     end
-  end
 
-  GC.start
+    GC.start
+  end
 
   person = Person.create(:birth_date => Date.new(1970, 1, 1))
 
@@ -104,17 +104,31 @@ Benchmark.bm do |bm|
       person.addresses.clear
       GC.start
 
-      bm.report("#push (batch)     ") do
-        [].tap do |addresses|
-          i.times do |n|
-            addresses << Address.new(
-                :street => "Wienerstr. #{n}",
-                :city => "Berlin",
-                :post_code => "10999"
-              )
-          end
-          person.addresses.push(addresses)
+      bm.report("#push             ") do
+        i.times do |n|
+          person.addresses.push(
+            Address.new(
+              :street => "Wienerstr. #{n}",
+              :city => "Berlin",
+              :post_code => "10999"
+            )
+          )
         end
+      end
+
+      person.addresses.clear
+      GC.start
+
+      bm.report("#push (batch)     ") do
+        addresses = []
+        i.times do |n|
+          addresses << Address.new(
+              :street => "Wienerstr. #{n}",
+              :city => "Berlin",
+              :post_code => "10999"
+            )
+        end
+        person.addresses.concat(addresses)
       end
 
       bm.report("#each             ") do
@@ -181,6 +195,8 @@ Benchmark.bm do |bm|
         end
       end
 
+      GC.start
+
       bm.report("#count            ") do
         person.posts.count
       end
@@ -192,13 +208,21 @@ Benchmark.bm do |bm|
       Post.delete_all
       GC.start
 
-      bm.report("#push (batch)     ") do
-        [].tap do |posts|
-          i.times do |n|
-            posts << Post.new(:title => "Posting #{n}")
-          end
-          person.posts.push(posts)
+      bm.report("#push             ") do
+        i.times do |n|
+          person.posts.push(Post.new(:title => "Posting #{n}"))
         end
+      end
+
+      Post.delete_all
+      GC.start
+
+      bm.report("#push (batch)     ") do
+        posts = []
+        i.times do |n|
+          posts << Post.new(:title => "Posting #{n}")
+        end
+        person.posts.concat(posts)
       end
 
       bm.report("#each             ") do
@@ -274,13 +298,21 @@ Benchmark.bm do |bm|
       Preference.delete_all
       GC.start
 
-      bm.report("#push (batch)     ") do
-        [].tap do |preferences|
-          i.times do |n|
-            preferences << Preference.new(:name => "Preference #{n}")
-          end
-          person.preferences.push(preferences)
+      bm.report("#push             ") do
+        i.times do |n|
+          person.preferences.push(Preference.new(:name => "Preference #{n}"))
         end
+      end
+
+      Preference.delete_all
+      GC.start
+
+      bm.report("#push (batch)     ") do
+        preferences = []
+        i.times do |n|
+          preferences << Preference.new(:name => "Preference #{n}")
+        end
+        person.preferences.concat(preferences)
       end
 
       bm.report("#each             ") do

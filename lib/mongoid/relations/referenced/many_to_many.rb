@@ -52,13 +52,13 @@ module Mongoid
         #
         # @since 2.4.0
         def concat(documents)
-          ids, inserts = [], []
+          ids, docs, inserts = [], [], []
           documents.each do |doc|
             next if doc.nil? || target.include?(doc)
             append(doc)
             if persistable? || _creating?
               ids.push(doc.id)
-              save_or_delay(doc, inserts)
+              save_or_delay(doc, docs, inserts)
             else
               base.send(foreign_key).push(doc.id) and unsynced(base, foreign_key)
             end
@@ -66,7 +66,7 @@ module Mongoid
           if persistable? || _creating?
             base.push_all(foreign_key, ids)
           end
-          persist_delayed(inserts)
+          persist_delayed(docs, inserts)
           self
         end
 
