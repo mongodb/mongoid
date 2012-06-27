@@ -807,6 +807,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2129 Fixed sorting for all fields on embeds many relations.
 
+* \#2124 Fixed default scope and deleted scope on paranoid documents.
+
 * \#2122 Allow embedded documents to sort on boolean fields.
 
 * \#2119 Allow `Criteria#update_all` to accept atomic ops and normal sets.

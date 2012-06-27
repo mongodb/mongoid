@@ -16,6 +16,9 @@ module Mongoid
     included do
       field :deleted_at, type: Time
       self.paranoid = true
+
+      default_scope where(deleted_at: nil)
+      scope :deleted, ne(deleted_at: nil)
     end
 
     # Delete the paranoid +Document+ from the database completely. This will
@@ -117,38 +120,6 @@ module Mongoid
     # @since 2.3.1
     def paranoid_field
       embedded? ? "#{atomic_position}.deleted_at" : "deleted_at"
-    end
-
-    module ClassMethods
-
-      # Override the default +Criteria+ accessor to only get existing
-      # documents.
-      #
-      # @example Override the criteria.
-      #   Person.queryable
-      #
-      # @param [ Array ] args The arguments.
-      #
-      # @return [ Criteria ] The paranoid compliant criteria.
-      #
-      # @since 3.0.0
-      def queryable
-        super.where(deleted_at: nil)
-      end
-
-      # Find deleted documents
-      #
-      # @example Find deleted documents.
-      #   Person.deleted
-      #   Company.first.employees.deleted
-      #   Person.deleted.find("4c188dea7b17235a2a000001").first
-      #
-      # @return [ Criteria ] The deleted criteria.
-      #
-      # @since 1.0.0
-      def deleted
-        where(:deleted_at.ne => nil)
-      end
     end
   end
 end
