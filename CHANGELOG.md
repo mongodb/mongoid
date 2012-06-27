@@ -805,6 +805,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2129 Fixed sorting for all fields on embeds many relations.
+
 * \#2122 Allow embedded documents to sort on boolean fields.
 
 * \#2119 Allow `Criteria#update_all` to accept atomic ops and normal sets.
