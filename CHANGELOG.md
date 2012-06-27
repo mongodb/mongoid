@@ -7,6 +7,14 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* A new callback has been introduced: `upsert`, which runs when calling
+  `document.upsert` since Mongoid does not know if the document is to be
+  treated as new or persisted. With this come the model callbacks:
+
+        before_upsert
+        after_upsert
+        around_upsert
+
 * \#2080/\#2087 The database or session that Mongoid persists to can now be
   overridden on a global level for cases where `Model#with` is not a viable
   option.

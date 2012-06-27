@@ -12,15 +12,18 @@ module Mongoid
       :after_initialize,
       :after_save,
       :after_update,
+      :after_upsert,
       :after_validation,
       :around_create,
       :around_destroy,
       :around_save,
       :around_update,
+      :around_upsert,
       :before_create,
       :before_destroy,
       :before_save,
       :before_update,
+      :before_upsert,
       :before_validation
     ]
 
@@ -30,7 +33,7 @@ module Mongoid
 
       define_model_callbacks :initialize, only: :after
       define_model_callbacks :build, only: :after
-      define_model_callbacks :create, :destroy, :save, :update
+      define_model_callbacks :create, :destroy, :save, :update, :upsert
     end
 
     # Run only the after callbacks for the specific event.

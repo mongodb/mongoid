@@ -9,8 +9,13 @@ class Band
   field :likes, type: Integer
   field :views, type: Integer
   field :rating, type: Float
+  field :upserted, type: Boolean, default: false
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
   embeds_one :label, cascade_callbacks: true
+
+  after_upsert do |doc|
+    doc.upserted = true
+  end
 end
