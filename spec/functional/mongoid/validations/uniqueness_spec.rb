@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Validations::UniquenessValidator do
 
   before do
-    [ Dictionary, Login, Word ].each(&:delete_all)
+    [ Dictionary, Login, Word, ParanoidPost ].each(&:delete_all)
   end
 
   describe "#valid?" do
