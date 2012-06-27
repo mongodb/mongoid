@@ -50,13 +50,13 @@ module Mongoid
         #
         # @since 2.4.0
         def concat(documents)
-          inserts = []
+          docs, inserts = [], []
           documents.each do |doc|
             next unless doc
             append(doc)
-            save_or_delay(doc, inserts) if persistable?
+            save_or_delay(doc, docs, inserts) if persistable?
           end
-          persist_delayed(inserts)
+          persist_delayed(docs, inserts)
           self
         end
 
@@ -387,15 +387,15 @@ module Mongoid
         # @example Persist the delayed batch inserts.
         #   relation.persist_delayed([ doc ])
         #
-        # @param [ Array<Document> ] inserts The delayed inserts.
+        # @param [ Array<Document> ] docs The delayed inserts.
+        # @param [ Array<Hash> ] inserts The raw insert document.
         #
         # @since 3.0.0
-        def persist_delayed(inserts)
-          if inserts.any?
-            collection.insert(inserts.map(&:as_document))
-            inserts.each do |doc|
+        def persist_delayed(docs, inserts)
+          if docs.any?
+            collection.insert(inserts)
+            docs.each do |doc|
               doc.new_record = false
-              doc.run_after_callbacks(:create, :save)
               doc.post_persist
             end
           end
@@ -478,10 +478,10 @@ module Mongoid
         # @param [ Array<Document> ] inserts The inserts.
         #
         # @since 3.0.0
-        def save_or_delay(doc, inserts)
+        def save_or_delay(doc, docs, inserts)
           if doc.new_record? && doc.valid?(:create)
-            inserts.push(doc)
-            doc.run_before_callbacks(:save, :create)
+            docs.push(doc)
+            inserts.push(doc.as_document)
           else
             doc.save
           end
