@@ -63,7 +63,7 @@ describe Mongoid::Extensions::DateTime do
       end
 
       let(:expected) do
-        Time.local(2010, 1, 1, 1, 0, 0, 0)
+        Time.utc(2010, 1, 1, 0, 0, 0, 0).getlocal
       end
 
       let(:mongoized) do
