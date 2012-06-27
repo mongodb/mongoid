@@ -131,8 +131,8 @@ module Mongoid
         # @since 2.0.0.rc.1
         def delete(document)
           doc = target.delete_one(document)
-          _unscoped.delete_one(doc)
           if doc && !_binding?
+            _unscoped.delete_one(doc) unless doc.paranoid?
             if _assigning?
               if doc.paranoid?
                 doc.destroy(suppress: true)
