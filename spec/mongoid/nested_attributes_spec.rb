@@ -1628,7 +1628,6 @@ describe Mongoid::NestedAttributes do
                           context "when saving the parent" do
 
                             before do
-                              p persisted.atomic_updates
                               persisted.with(safe: true).save
                             end
 
