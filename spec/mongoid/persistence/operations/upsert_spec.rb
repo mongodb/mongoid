@@ -25,6 +25,10 @@ describe Mongoid::Persistence::Operations::Upsert do
       it "returns true" do
         persisted.should be_true
       end
+
+      it "runs the upsert callbacks" do
+        band.upserted.should be_true
+      end
     end
 
     context "when the document is not new" do

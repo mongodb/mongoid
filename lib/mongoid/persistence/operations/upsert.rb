@@ -7,7 +7,7 @@ module Mongoid
       # document has been modified or not, it will be sent to the db and Mongo
       # will determin whether or not to insert or update.
       class Upsert
-        include Modification, Operations
+        include Upsertion, Operations
 
         # Persist the upsert operation.
         #

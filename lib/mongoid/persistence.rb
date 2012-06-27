@@ -3,6 +3,7 @@ require "mongoid/persistence/atomic"
 require "mongoid/persistence/deletion"
 require "mongoid/persistence/insertion"
 require "mongoid/persistence/modification"
+require "mongoid/persistence/upsertion"
 require "mongoid/persistence/operations"
 
 module Mongoid
