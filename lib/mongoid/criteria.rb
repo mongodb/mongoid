@@ -319,7 +319,11 @@ module Mongoid
         doc = IdentityMap.get(klass, id)
         doc && doc.matches?(selector) ? result.push(doc) : false
       end
-      ids.empty? ? result : result + any_in(id: ids).entries
+      if ids.empty?
+        result
+      else
+        result + ((ids.size > 1) ? any_in(id: ids) : where(id: ids.first)).entries
+      end
     end
 
     # Initialize the new criteria.

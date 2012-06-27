@@ -16,7 +16,7 @@ Benchmark.bm do |bm|
 
   puts "\n[ Root Document Benchmarks ]"
 
-  [ 1000, 10000, 100000, 1000000 ].each do |i|
+  [ 1000, 10000, 100000 ].each do |i|
 
     Mongoid.unit_of_work do
 

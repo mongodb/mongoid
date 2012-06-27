@@ -1564,6 +1564,24 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#for_ids" do
+
+    context "when only 1 id exists" do
+
+      let(:id) do
+        Moped::BSON::ObjectId.new
+      end
+
+      let(:criteria) do
+        Band.queryable.for_ids([ id ])
+      end
+
+      it "does not turn the selector into an $in" do
+        criteria.selector.should eq({ "_id" => id })
+      end
+    end
+  end
+
   describe "#from_map_or_db" do
 
     before(:all) do
