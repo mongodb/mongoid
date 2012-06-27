@@ -345,6 +345,27 @@ module Mongoid
         end
       end
 
+      # Compare two values, checking for nil.
+      #
+      # @api private
+      #
+      # @example Compare the two objects.
+      #   context.compare(a, b)
+      #
+      # @param [ Object ] a The first object.
+      # @param [ Object ] b The first object.
+      #
+      # @return [ Integer ] The comparison value.
+      #
+      # @since 3.0.0
+      def compare(a, b)
+        case
+        when a.nil? then b.nil? ? 0 : 1
+        when b.nil? then -1
+        else a <=> b
+        end
+      end
+
       # Sort the documents in place.
       #
       # @example Sort the documents.
@@ -356,11 +377,9 @@ module Mongoid
       def in_place_sort(values)
         values.each_pair do |field, dir|
           documents.sort! do |a, b|
-            if dir > 0
-              a[field].__sortable__ <=> b[field].__sortable__
-            else
-              b[field].__sortable__ <=> a[field].__sortable__
-            end
+            a_value, b_value = a[field], b[field]
+            value = compare(a_value.__sortable__, b_value.__sortable__)
+            dir < 0 ? value * -1 : value
           end
         end
       end

@@ -806,16 +806,39 @@ describe Mongoid::Contextual::Memory do
 
       context "when the sort is descending" do
 
-        let!(:sorted) do
-          context.sort(street: -1)
+        context "when sorting on a string" do
+
+          let!(:sorted) do
+            context.sort(street: -1)
+          end
+
+          it "sorts the documents" do
+            context.entries.should eq([ pfluger, hobrecht, friedel ])
+          end
+
+          it "returns the context" do
+            sorted.should eq(context)
+          end
         end
 
-        it "sorts the documents" do
-          context.entries.should eq([ pfluger, hobrecht, friedel ])
-        end
+        context "when sorting on a time" do
 
-        it "returns the context" do
-          sorted.should eq(context)
+          before do
+            pfluger.move_in = 30.days.ago
+            hobrecht.move_in = 25.days.ago
+          end
+
+          let!(:sorted) do
+            context.sort(move_in: -1)
+          end
+
+          it "sorts the documents" do
+            context.entries.should eq([ friedel, hobrecht, pfluger ])
+          end
+
+          it "returns the context" do
+            sorted.should eq(context)
+          end
         end
       end
     end
