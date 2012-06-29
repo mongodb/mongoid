@@ -677,8 +677,8 @@ For instructions on upgrading to newer versions, visit
 * Custom application exceptions in various languages has been removed,
   along with the `Mongoid.add_language` feature.
 
-* Mongoid no longer supports 1.8 syntax. 1.9.x or other vms running in
-  1.9 mode is now only supported.
+* Mongoid no longer supports 1.8. MRI 1.9.3 and higher, or JRuby 1.6 and
+  higher in 1.9 mode are only supported.
 
 * \#1734 When searching for documents via `Model.find` with multiple ids,
   Mongoid will raise an error if not *all* ids are found, and tell you
