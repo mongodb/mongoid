@@ -806,7 +806,7 @@ describe Mongoid::Document do
     end
   end
 
-  context "becoming another class" do
+  describe "#becomes" do
 
     before(:all) do
       class Manager < Person
@@ -814,7 +814,7 @@ describe Mongoid::Document do
       end
     end
 
-    %w{upcasting downcasting}.each do |context|
+    [ :upcasting, :downcasting ].each do |context|
 
       before(:all) do
         Person.validates_format_of :ssn, without: /\$\$\$/
@@ -826,7 +826,7 @@ describe Mongoid::Document do
 
       context "when #{context}" do
 
-        if context == 'upcasting'
+        if context == :upcasting
 
           let(:klass) do
             Manager
@@ -856,6 +856,25 @@ describe Mongoid::Document do
 
         it "copies attributes" do
           became.title.should eq('Sir')
+        end
+
+        context "when the document has embedded documents" do
+
+          let!(:address) do
+            obj.addresses.build(street: "hobrecht")
+          end
+
+          let(:became) do
+            obj.becomes(to_become)
+          end
+
+          it "copies the embedded documents" do
+            became.addresses.first.should eq(address)
+          end
+
+          it "returns new instances" do
+            became.addresses.first.should_not equal(address)
+          end
         end
 
         context "when the document is new" do
