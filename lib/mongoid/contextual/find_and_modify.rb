@@ -4,6 +4,12 @@ module Mongoid
     class FindAndModify
       include Command
 
+      # @attribute [r] criteria The criteria for the context.
+      # @attribute [r] options The command options.
+      # @attribute [r] update The updates.
+      # @attribute [r] query The Moped query.
+      attr_reader :criteria, :options, :update, :query
+
       # Initialize the find and modify command, used for MongoDB's
       # $findAndModify.
       #
@@ -20,10 +26,8 @@ module Mongoid
       #
       # @since 3.0.0
       def initialize(criteria, update, options = {})
-        @criteria = criteria
-        command[:findandmodify] = criteria.klass.collection_name.to_s
-        command[:update] = update unless options[:remove]
-        command.merge!(options)
+        @criteria, @options, @update = criteria, options, update
+        @query = criteria.klass.collection.find(criteria.selector)
         apply_criteria_options
       end
 
@@ -36,9 +40,7 @@ module Mongoid
       #
       # @since 3.0.0
       def result
-        session.with(consistency: :strong) do |session|
-          session.command(command)["value"]
-        end
+        query.modify(update, options)
       end
 
       private
@@ -54,12 +56,11 @@ module Mongoid
       #
       # @since 3.0.0
       def apply_criteria_options
-        command[:query] = criteria.selector
-        if sort = criteria.options[:sort]
-          command[:sort] = sort
+        if spec = criteria.options[:sort]
+          query.sort(spec)
         end
-        if fields = criteria.options[:fields]
-          command[:fields] = fields
+        if spec = criteria.options[:fields]
+          query.select(spec)
         end
       end
     end
