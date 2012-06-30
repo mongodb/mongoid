@@ -25,7 +25,7 @@ module Mongoid
               bind_polymorphic_inverse_type(base, target.class.model_name)
               if inverse = metadata.inverse(target)
                 if set_base_metadata
-                  bind_inverse_of_field(base, base.metadata.name)
+                  bind_inverse_of_field(base, base.metadata_name)
                   if base.referenced_many?
                     target.__send__(inverse).push(base) unless Mongoid.using_identity_map?
                   else

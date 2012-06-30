@@ -79,7 +79,7 @@ module Mongoid
     #
     # @since 2.0.0.beta.1
     def remove_child(child)
-      name = child.metadata.name
+      name = child.metadata_name
       if child.embedded_one?
         remove_ivar(name)
       else

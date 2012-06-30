@@ -36,7 +36,7 @@ module Mongoid
     # @since 2.2.0
     def add_atomic_pull(document)
       document.flagged_for_destroy = true
-      (delayed_atomic_pulls[document.metadata.name.to_s] ||= []).push(document)
+      (delayed_atomic_pulls[document.metadata_name.to_s] ||= []).push(document)
     end
 
     # Add an atomic unset for the document.
@@ -51,7 +51,7 @@ module Mongoid
     # @since 3.0.0
     def add_atomic_unset(document)
       document.flagged_for_destroy = true
-      (delayed_atomic_unsets[document.metadata.name.to_s] ||= []).push(document)
+      (delayed_atomic_unsets[document.metadata_name.to_s] ||= []).push(document)
     end
 
     # For array fields these are the pushes that need to happen.

@@ -83,6 +83,22 @@ module Mongoid
       metadata && metadata.macro == :embeds_one
     end
 
+    # Get the metadata name for this document. If no metadata was defined
+    # will raise an error.
+    #
+    # @example Get the metadata name.
+    #   document.metadata_name
+    #
+    # @raise [ Errors::NoMetadata ] If no metadata is present.
+    #
+    # @return [ Symbol ] The metadata name.
+    #
+    # @since 3.0.0
+    def metadata_name
+      raise Errors::NoMetadata.new(self.class.name) unless metadata
+      metadata.name
+    end
+
     # Determine if the document is part of an references_many relation.
     #
     # @example Is the document in a references many?
