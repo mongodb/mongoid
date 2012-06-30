@@ -18,7 +18,7 @@ module Mongoid
       #
       # @since 3.0.0
       def prepare(&block)
-        return false if validating? && document.invalid?(:update)
+        return false if validating? && document.invalid?(:upsert)
         result = document.run_callbacks(:upsert) do
           yield(document); true
         end

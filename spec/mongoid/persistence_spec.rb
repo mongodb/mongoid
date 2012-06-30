@@ -1271,6 +1271,28 @@ describe Mongoid::Persistence do
 
   describe "#upsert" do
 
+    context "when the document validates on upsert" do
+
+      let(:account) do
+        Account.new(name: "testing")
+      end
+
+      context "when the document is not valid in the upsert context" do
+
+        before do
+          account.upsert
+        end
+
+        it "adds the validation errors" do
+          account.errors[:nickname].should_not be_empty
+        end
+
+        it "does not upsert the document" do
+          account.should be_a_new_record
+        end
+      end
+    end
+
     context "when the document is new" do
 
       let!(:existing) do

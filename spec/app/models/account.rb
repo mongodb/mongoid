@@ -23,6 +23,7 @@ class Account
   attr_accessible :balance, as: :default
 
   validates_presence_of :name
+  validates_presence_of :nickname, on: :upsert
   validates_length_of :name, maximum: 10, on: :create
 
   def overridden
