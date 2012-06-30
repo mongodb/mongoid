@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2147 `Model#becomes` now copies over the embedded documents.
+
 * A new callback has been introduced: `upsert`, which runs when calling
   `document.upsert` since Mongoid does not know if the document is to be
   treated as new or persisted. With this come the model callbacks:

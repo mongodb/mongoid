@@ -197,8 +197,8 @@ module Mongoid
       attributes
     end
 
-    # Returns an instance of the specified class with the attributes
-    # and errors of the current document.
+    # Returns an instance of the specified class with the attributes,
+    # errors, and embedded documents of the current document.
     #
     # @example Return a subclass document as a superclass instance.
     #   manager.becomes(Person)
@@ -214,7 +214,7 @@ module Mongoid
       unless klass.include?(Mongoid::Document)
         raise ArgumentError, "A class which includes Mongoid::Document is expected"
       end
-      became = klass.instantiate(frozen? ? attributes.dup : attributes)
+      became = klass.instantiate(as_document.__deep_copy__)
       became.instance_variable_set(:@errors, errors)
       became.instance_variable_set(:@new_record, new_record?)
       became.instance_variable_set(:@destroyed, destroyed?)
