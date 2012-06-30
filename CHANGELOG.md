@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2151 When asking for metadata before persistence, Mongoid will now
+  raise a `Mongoid::Errors::NoMetadata` error if the metadata is not
+  present.
+
 * \#2147 `Model#becomes` now copies over the embedded documents.
 
 * A new callback has been introduced: `upsert`, which runs when calling

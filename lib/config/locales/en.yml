@@ -303,6 +303,20 @@ en:
             \_\_merge:   'collection-name'\n
             \_\_replace: 'collection-name'\n
             \_\_reduce:  'collection-name'\n\n"
+        no_metadata:
+          message: "Metadata not found for document of type %{klass}."
+          summary: "Mongoid sets the metadata of a relation on the document
+            when it is either loaded from within the relation, or added to
+            one. The presence of the metadata is required in order to
+            provide various functionality around relations. Most likely you
+            are getting this error because the document is embedded and was
+            attempted to be persisted without being associated with a parent,
+            or the relation was not properly defined."
+          resolution: "Ensure that your relations on the %{klass} model
+            are all properly defined, and that the inverse relations
+            are also properly defined. Embedded relations must have both the
+            parent (embeds_one/embeds_many) and the inverse (embedded_in)
+            present in order to work properly."
         no_parent:
           message: "Cannot persist embedded document %{klass} without a
             parent document."

@@ -243,7 +243,7 @@ module Mongoid
       # @since 2.4.10
       def validate_embedded(document, attribute, value)
         return if skip_validation?(document)
-        relation = document._parent.send(document.metadata.name)
+        relation = document._parent.send(document.metadata_name)
         criteria = create_criteria(relation, document, attribute, value)
         add_error(document, attribute, value) if criteria.count > 1
       end
