@@ -28,12 +28,10 @@ module Mongoid
           docs = args.flatten
           return concat(docs) if docs.size > 1
           if doc = docs.first
-            if !target.include?(doc)
-              append(doc)
-              base.push(foreign_key, doc.id)
-              if persistable? || _creating?
-                doc.save
-              end
+            append(doc)
+            base.add_to_set(foreign_key, doc.id)
+            if persistable? || _creating?
+              doc.save
             end
           end
           unsynced(base, foreign_key) and self
@@ -52,19 +50,22 @@ module Mongoid
         #
         # @since 2.4.0
         def concat(documents)
-          ids, docs, inserts = [], [], []
+          ids, docs, inserts = {}, [], []
           documents.each do |doc|
-            next if doc.nil? || target.include?(doc)
+            next unless doc
             append(doc)
             if persistable? || _creating?
-              ids.push(doc.id)
+              ids[doc.id] = true
               save_or_delay(doc, docs, inserts)
             else
-              base.send(foreign_key).push(doc.id) and unsynced(base, foreign_key)
+              existing = base.send(foreign_key)
+              unless existing.include?(doc.id)
+                existing.push(doc.id) and unsynced(base, foreign_key)
+              end
             end
           end
           if persistable? || _creating?
-            base.push_all(foreign_key, ids)
+            base.push_all(foreign_key, ids.keys)
           end
           persist_delayed(docs, inserts)
           self
