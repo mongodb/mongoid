@@ -477,7 +477,7 @@ module Mongoid
       #
       # @since 3.0.0
       def documents_for_iteration
-        if cached? && documents.any?
+        if cached? && !documents.empty?
           documents
         elsif eager_loadable?
           docs = query.map{ |doc| Factory.from_db(klass, doc) }
@@ -500,17 +500,30 @@ module Mongoid
       # @since 3.0.0
       def eager_load(docs)
         criteria.inclusions.reject! do |metadata|
-          unless docs.empty?
-            if metadata.stores_foreign_key?
-              child_ids = load_ids(metadata.foreign_key).flatten
-              metadata.eager_load(child_ids)
-            else
-              parent_ids = docs.map(&:id)
-              metadata.eager_load(parent_ids)
-            end
-          end
+          metadata.eager_load(eager_loaded_ids(docs, metadata)) if !docs.empty?
         end
         self.eager_loaded = true
+      end
+
+      # Get the ids that to be used to eager load documents.
+      #
+      # @api private
+      #
+      # @example Get the ids.
+      #   context.eager_load(docs, metadata)
+      #
+      # @param [ Array<Document> ] docs The pre-loaded documents.
+      # @param [ Metadata ] metadata The relation metadata.
+      #
+      # @return [ Array<Object> ] The ids.
+      #
+      # @since 3.0.0
+      def eager_loaded_ids(docs, metadata)
+        if metadata.stores_foreign_key?
+          load_ids(metadata.foreign_key).flatten
+        else
+          docs.map(&:id)
+        end
       end
 
       # Is this context able to be eager loaded?
@@ -522,7 +535,7 @@ module Mongoid
       #
       # @since 3.0.0
       def eager_loadable?
-        !eager_loaded && criteria.inclusions.any?
+        !eager_loaded && !criteria.inclusions.empty?
       end
 
       # Increment the length of the results.

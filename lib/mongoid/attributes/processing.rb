@@ -20,7 +20,7 @@ module Mongoid
       # @since 2.0.0.rc.7
       def process_attributes(attrs = nil, role = :default, guard_protected_attributes = true)
         attrs ||= {}
-        if attrs.any?
+        if !attrs.empty?
           attrs = sanitize_for_mass_assignment(attrs, role) if guard_protected_attributes
           attrs.each_pair do |key, value|
             next if pending_attribute?(key, value)

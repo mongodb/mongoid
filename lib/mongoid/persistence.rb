@@ -93,7 +93,7 @@ module Mongoid
     # @return [ true, false ] True if validation passed.
     def save!(options = {})
       unless save(options)
-        self.class.fail_validate!(self) if errors.any?
+        self.class.fail_validate!(self) unless errors.empty?
         self.class.fail_callback!(self, :save!)
       end
       return true
@@ -188,7 +188,7 @@ module Mongoid
     def update_attributes!(attributes = {}, options = {})
       result = update_attributes(attributes, options)
       unless result
-        self.class.fail_validate!(self) if errors.any?
+        self.class.fail_validate!(self) unless errors.empty?
         self.class.fail_callback!(self, :update_attributes!)
       end
       result
@@ -248,7 +248,7 @@ module Mongoid
       def create!(attributes = {}, options = {}, &block)
         _creating do
           doc = new(attributes, options, &block)
-          fail_validate!(doc) if doc.insert.errors.any?
+          fail_validate!(doc) unless doc.insert.errors.empty?
           fail_callback!(doc, :create!) if doc.new_record?
           doc
         end

@@ -392,7 +392,7 @@ module Mongoid
         #
         # @since 3.0.0
         def persist_delayed(docs, inserts)
-          if docs.any?
+          unless docs.empty?
             collection.insert(inserts)
             docs.each do |doc|
               doc.new_record = false
