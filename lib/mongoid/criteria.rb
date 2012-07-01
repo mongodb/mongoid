@@ -148,6 +148,18 @@ module Mongoid
       @documents = docs
     end
 
+    # Is the criteria for embedded documents?
+    #
+    # @example Is the criteria for embedded documents?
+    #   criteria.embedded?
+    #
+    # @return [ true, false ] If the criteria is embedded.
+    #
+    # @since 3.0.0
+    def embedded?
+      !!@embedded
+    end
+
     # Execute the criteria or raise an error if no documents found.
     #
     # @example Execute or raise
@@ -305,7 +317,7 @@ module Mongoid
     # @return [ Array<Document> ] The found documents.
     def multiple_from_map_or_db(ids)
       ids = mongoize_ids(ids)
-      return entries if klass.embedded?
+      return entries if embedded?
       result = []
       ids.reject! do |id|
         doc = IdentityMap.get(klass, id)

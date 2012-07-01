@@ -563,6 +563,35 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#embedded?" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when the criteria is embedded" do
+
+      let(:criteria) do
+        person.addresses.where(street: "hobrecht")
+      end
+
+      it "returns true" do
+        criteria.should be_embedded
+      end
+    end
+
+    context "when the criteria is not embedded" do
+
+      let(:criteria) do
+        Person.where(active: true)
+      end
+
+      it "returns false" do
+        criteria.should_not be_embedded
+      end
+    end
+  end
+
   describe "#exists" do
 
     let!(:match) do
