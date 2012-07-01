@@ -162,9 +162,7 @@ module Mongoid
     # @since 2.0.0
     def execute_or_raise(ids, multi)
       result = multiple_from_map_or_db(ids)
-      if (result.size < ids.size) && Mongoid.raise_not_found_error
-        raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
-      end
+      check_for_missing_documents!(result, ids)
       multi ? result : result.first
     end
 
@@ -528,6 +526,27 @@ module Mongoid
     end
 
     private
+
+    # Are documents in the query missing, and are we configured to raise an
+    # error?
+    #
+    # @api private
+    #
+    # @example Check for missing documents.
+    #   criteria.check_for_missing_documents!([], [ 1 ])
+    #
+    # @param [ Array<Document> ] result The result.
+    # @param [ Array<Object> ] ids The ids.
+    #
+    # @raise [ Errors::DocumentNotFound ] If none are found and raising an
+    #   error.
+    #
+    # @since 3.0.0
+    def check_for_missing_documents!(result, ids)
+      if (result.size < ids.size) && Mongoid.raise_not_found_error
+        raise Errors::DocumentNotFound.new(klass, ids, ids - result.map(&:_id))
+      end
+    end
 
     # Create a document given the provided method and attributes from the
     # existing selector.
