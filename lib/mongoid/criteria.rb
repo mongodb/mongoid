@@ -243,12 +243,9 @@ module Mongoid
     #
     # @since 1.0.0
     def find(*args)
-      multi = args.first.is_a?(::Array) || args.first.is_a?(::Range) || args.size > 1
-      ids = *args.flat_map do |arg|
-        arg.is_a?(::Range) ? arg.to_a : arg
-      end.uniq_by(&:to_s)
+      ids = args.flat_map{ |a| a.__find_args__ }.uniq_by{ |a| a.to_s }
       raise_invalid if ids.any?(&:nil?)
-      for_ids(ids).execute_or_raise(ids, multi)
+      for_ids(ids).execute_or_raise(ids, args.multi_arged?)
     end
 
     # Adds a criterion to the +Criteria+ that specifies an id that must be matched.

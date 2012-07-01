@@ -2,6 +2,17 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Range do
 
+  describe "#__find_args__" do
+
+    let(:range) do
+      1..3
+    end
+
+    it "returns the range as an array" do
+      range.__find_args__.should eq([ 1, 2, 3 ])
+    end
+  end
+
   describe ".demongoize" do
 
     context "when the range is ascending" do
@@ -78,6 +89,17 @@ describe Mongoid::Extensions::Range do
       it "returns the object hash when passed a letter range" do
         ("a".."z").mongoize.should eq({ "min" => "a", "max" => "z" })
       end
+    end
+  end
+
+  describe "#resizable?" do
+
+    let(:range) do
+      1...3
+    end
+
+    it "returns true" do
+      range.should be_resizable
     end
   end
 end

@@ -522,6 +522,56 @@ describe Mongoid::Extensions::Array do
     end
   end
 
+  describe "#multi_arged?" do
+
+    context "when there are multiple elements" do
+
+      let(:array) do
+        [ 1, 2, 3 ]
+      end
+
+      it "returns true" do
+        array.should be_multi_arged
+      end
+    end
+
+    context "when there is one element" do
+
+      context "when the element is a non enumerable" do
+
+        let(:array) do
+          [ 1 ]
+        end
+
+        it "returns false" do
+          array.should_not be_multi_arged
+        end
+      end
+
+      context "when the element is an array" do
+
+        let(:array) do
+          [[ 1 ]]
+        end
+
+        it "returns true" do
+          array.should be_multi_arged
+        end
+      end
+
+      context "when the element is a range" do
+
+        let(:array) do
+          [ 1..2 ]
+        end
+
+        it "returns true" do
+          array.should be_multi_arged
+        end
+      end
+    end
+  end
+
   describe ".resizable?" do
 
     it "returns true" do
