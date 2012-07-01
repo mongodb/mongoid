@@ -3,6 +3,18 @@ module Mongoid
   module Extensions
     module Range
 
+      # Get the range as arguments for a find.
+      #
+      # @example Get the range as find args.
+      #   range.__find_args__
+      #
+      # @return [ Array ] The range as an array.
+      #
+      # @since 3.0.0
+      def __find_args__
+        to_a
+      end
+
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
@@ -14,6 +26,18 @@ module Mongoid
       # @since 3.0.0
       def mongoize
         ::Range.mongoize(self)
+      end
+
+      # Is this a resizable object.
+      #
+      # @example Is this resizable?
+      #   range.resizable?
+      #
+      # @return [ true ] True.
+      #
+      # @since 3.0.0
+      def resizable?
+        true
       end
 
       module ClassMethods

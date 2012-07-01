@@ -117,6 +117,16 @@ module Mongoid
         serialize_default(default_val[])
       end
 
+      # Get the id field of the relation.
+      #
+      # @api private
+      #
+      # @example Get the related id field.
+      #   field.related_id_field
+      #
+      # @return [ Fields::Standard ] The field.
+      #
+      # @since 3.0.0
       def related_id_field
         @related_id_field ||= metadata.klass.fields["_id"]
       end

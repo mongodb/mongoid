@@ -16,6 +16,18 @@ module Mongoid
       end
       alias :__mongoize_object_id__ :__evolve_object_id__
 
+      # Convert the object to args for a find query.
+      #
+      # @example Convert the object to args.
+      #   object.__find_args__
+      #
+      # @return [ Object ] self.
+      #
+      # @since 3.0.0
+      def __find_args__
+        self
+      end
+
       # Mongoize a plain object into a time.
       #
       # @example Mongoize the object.
@@ -85,6 +97,18 @@ module Mongoid
       # @since 3.0.0
       def mongoize
         self
+      end
+
+      # Is the object multi args.
+      #
+      # @example Is the object multi args?
+      #   object.multi_arged?
+      #
+      # @return [ false ] false.
+      #
+      # @since 3.0.0
+      def multi_arged?
+        false
       end
 
       # Is the object a number?

@@ -13,6 +13,17 @@ describe Mongoid::Extensions::Object do
     end
   end
 
+  describe "#__find_args__" do
+
+    let(:object) do
+      Object.new
+    end
+
+    it "returns self" do
+      object.__find_args__.should eq(object)
+    end
+  end
+
   describe "#__mongoize_object_id__" do
 
     let(:object) do
