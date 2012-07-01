@@ -243,7 +243,7 @@ module Mongoid
     #
     # @since 1.0.0
     def find(*args)
-      ids = args.flat_map{ |a| a.__find_args__ }.uniq_by{ |a| a.to_s }
+      ids = args.__find_args__
       raise_invalid if ids.any?(&:nil?)
       for_ids(ids).execute_or_raise(ids, args.multi_arged?)
     end
