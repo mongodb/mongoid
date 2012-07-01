@@ -432,7 +432,7 @@ module Mongoid
       criteria = other.to_criteria
       selector.update(criteria.selector)
       options.update(criteria.options)
-      self.documents = criteria.documents.dup if criteria.documents.any?
+      self.documents = criteria.documents.dup unless criteria.documents.empty?
       self.scoping_options = criteria.scoping_options
       self.inclusions = (inclusions + criteria.inclusions.dup).uniq
       self

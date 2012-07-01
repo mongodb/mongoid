@@ -35,9 +35,9 @@ module Mongoid
 
       field_names = self.class.attribute_names
       attribute_names = (as_document.keys + field_names).sort
-      if only.any?
+      if !only.empty?
         attribute_names &= only
-      elsif except.any?
+      elsif !except.empty?
         attribute_names -= except
       end
 
