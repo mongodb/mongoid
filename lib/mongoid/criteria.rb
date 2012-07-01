@@ -30,11 +30,8 @@ module Mongoid
     #
     # @since 1.0.0
     def ==(other)
-      case other
-      when Criteria then super
-      when Enumerable then entries == other
-      else false
-      end
+      return super if other.respond_to?(:selector)
+      entries == other
     end
 
     # Needed to properly get a criteria back as json
