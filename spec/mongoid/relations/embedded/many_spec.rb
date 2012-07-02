@@ -3307,4 +3307,46 @@ describe Mongoid::Relations::Embedded::Many do
       circuit.reload.buses.should eq([ bus_two, bus_one ])
     end
   end
+
+  context "when batch replacing multiple relations in a single update" do
+
+    let(:document) do
+      Person.create
+    end
+
+    let(:person) do
+      Person.find(document.id)
+    end
+
+    let!(:symptom_one) do
+      person.symptoms.create
+    end
+
+    let!(:symptom_two) do
+      person.symptoms.create
+    end
+
+    let!(:appointment_one) do
+      person.appointments.create
+    end
+
+    let!(:appointment_two) do
+      person.appointments.create
+    end
+
+    before do
+      person.update_attributes(
+        appointments: [ appointment_one.as_document, appointment_two.as_document ],
+        symptoms: [ symptom_one.as_document, symptom_two.as_document ]
+      )
+    end
+
+    it "does not duplicate the first relation" do
+      person.reload.symptoms.count.should eq(2)
+    end
+
+    it "does not duplicate the second relation" do
+      person.reload.appointments.count.should eq(2)
+    end
+  end
 end
