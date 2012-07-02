@@ -78,7 +78,7 @@ module Mongoid
             end
             batch_remove(target.dup)
           else
-            base.delayed_atomic_sets.clear
+            base.delayed_atomic_sets.clear unless _assigning?
             docs = normalize_docs(docs).compact
             target.clear and _unscoped.clear
             inserts = execute_batch_insert(docs, "$set")
@@ -100,6 +100,7 @@ module Mongoid
         # @since 3.0.0
         def add_atomic_sets(sets)
           if _assigning?
+            base.delayed_atomic_sets[path].try(:clear)
             base.collect_children.each do |child|
               child.delayed_atomic_sets.clear
             end
@@ -262,7 +263,9 @@ module Mongoid
             append(doc)
             if persistable? && !_assigning?
               self.path = doc.atomic_path unless path
-              if doc.invalid?(:create)
+              if doc.valid?(:create)
+                doc.run_before_callbacks(:save, :create)
+              else
                 self.inserts_valid = false
               end
             end
@@ -312,6 +315,7 @@ module Mongoid
         def post_process_batch_insert(docs)
           docs.each do |doc|
             doc.new_record = false
+            doc.run_after_callbacks(:create, :save)
             doc.post_persist
           end
         end

@@ -396,6 +396,7 @@ module Mongoid
             collection.insert(inserts)
             docs.each do |doc|
               doc.new_record = false
+              doc.run_after_callbacks(:create, :save)
               doc.post_persist
             end
           end
@@ -480,6 +481,7 @@ module Mongoid
         # @since 3.0.0
         def save_or_delay(doc, docs, inserts)
           if doc.new_record? && doc.valid?(:create)
+            doc.run_before_callbacks(:save, :create)
             docs.push(doc)
             inserts.push(doc.as_document)
           else
