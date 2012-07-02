@@ -2,14 +2,14 @@ require "spec_helper"
 
 describe Mongoid::Serialization do
 
-  describe "#as_json" do
+  describe "#field_names" do
 
-    context "when the method is overridden" do
+    let(:band) do
+      Band.new
+    end
 
-      let(:person) do
-        Person.create
-      end
-
+    it "does not duplicate fields" do
+      band.send(:field_names).should eq(band.fields.keys.sort)
     end
   end
 

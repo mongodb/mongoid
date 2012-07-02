@@ -28,17 +28,17 @@ module Mongoid
     def serializable_hash(options = nil)
       options ||= {}
 
-      only   = Array.wrap(options[:only]).map(&:to_s)
+      only = Array.wrap(options[:only]).map(&:to_s)
       except = Array.wrap(options[:except]).map(&:to_s)
 
       except |= ['_type'] unless Mongoid.include_type_for_serialization
 
-      field_names = self.class.attribute_names
-      attribute_names = (as_document.keys + field_names).sort
+      names = field_names
+
       if !only.empty?
-        attribute_names &= only
+        names &= only
       elsif !except.empty?
-        attribute_names -= except
+        names -= except
       end
 
       method_names = Array.wrap(options[:methods]).map do |name|
@@ -46,12 +46,12 @@ module Mongoid
       end.compact
 
       attrs = {}
-      (attribute_names + method_names).each do |name|
+      (names + method_names).each do |name|
         without_autobuild do
           if relations.has_key?(name)
             value = send(name)
             attrs[name] = value ? value.serializable_hash(options) : nil
-          elsif attribute_names.include?(name) && !fields.has_key?(name)
+          elsif names.include?(name) && !fields.has_key?(name)
             attrs[name] = read_attribute(name)
           else
             attrs[name] = send(name)
@@ -63,6 +63,20 @@ module Mongoid
     end
 
     private
+
+    # Get the names of all fields that will be serialized.
+    #
+    # @api private
+    #
+    # @example Get all the field names.
+    #   document.send(:field_names)
+    #
+    # @return [ Array<String> ] The names of the fields.
+    #
+    # @since 3.0.0
+    def field_names
+      (as_document.keys + attribute_names).uniq.sort
+    end
 
     # For each of the provided include options, get the relation needed and
     # provide it in the hash.
