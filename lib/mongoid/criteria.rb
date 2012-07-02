@@ -316,18 +316,10 @@ module Mongoid
     #
     # @return [ Array<Document> ] The found documents.
     def multiple_from_map_or_db(ids)
-      ids = mongoize_ids(ids)
       return entries if embedded?
-      result = []
-      ids.reject! do |id|
-        doc = IdentityMap.get(klass, id)
-        doc && doc.matches?(selector) ? result.push(doc) : false
-      end
-      if ids.empty?
-        result
-      else
-        result + ((ids.size > 1) ? any_in(id: ids) : where(id: ids.first)).entries
-      end
+      ids = mongoize_ids(ids)
+      result = from_identity_map(ids)
+      ids.empty? ? result : result + from_database(ids)
     end
 
     # Initialize the new criteria.
@@ -608,6 +600,43 @@ module Mongoid
       @scoping_options = other.scoping_options
       @documents = other.documents.dup
       @context = nil
+    end
+
+    # Get documents from the database only.
+    #
+    # @api private
+    #
+    # @example Get documents from the database.
+    #   criteria.from_database(ids)
+    #
+    # @param [ Array<Object> ] ids The ids to fetch with.
+    #
+    # @return [ Array<Document> ] The matching documents.
+    #
+    # @since 3.0.0
+    def from_database(ids)
+      (ids.size > 1 ? any_in(id: ids) : where(id: ids.first)).entries
+    end
+
+    # Get documents from the identity map only.
+    #
+    # @api private
+    #
+    # @example Get documents from the identity map.
+    #   criteria.from_identity_map(ids)
+    #
+    # @param [ Array<Object> ] ids The ids to fetch with.
+    #
+    # @return [ Array<Document> ] The matching documents.
+    #
+    # @since 3.0.0
+    def from_identity_map(ids)
+      result = []
+      ids.reject! do |id|
+        doc = IdentityMap.get(klass, id)
+        doc && doc.matches?(selector) ? result.push(doc) : false
+      end
+      result
     end
 
     # Used for chaining +Criteria+ scopes together in the for of class methods
