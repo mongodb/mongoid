@@ -170,9 +170,62 @@ describe Mongoid::Fields do
     end
   end
 
+  describe "#attribute_names" do
+
+    context "when the document is a parent class" do
+
+      let(:shape) do
+        Shape.new
+      end
+
+      it "includes the _id field" do
+        shape.attribute_names.should include("_id")
+      end
+
+      it "includes the _type field" do
+        shape.attribute_names.should include("_type")
+      end
+
+      it "includes its own fields" do
+        shape.attribute_names.should include("x")
+      end
+
+      it "does not return subclass fields" do
+        shape.attribute_names.should_not include("radius")
+      end
+    end
+
+    context "when the document is a subclass" do
+
+      let(:circle) do
+        Circle.new
+      end
+
+      it "includes the _id field" do
+        circle.attribute_names.should include("_id")
+      end
+
+      it "includes the _type field" do
+        circle.attribute_names.should include("_type")
+      end
+
+      it "includes the first parent field" do
+        circle.attribute_names.should include("x")
+      end
+
+      it "includes the second parent field" do
+        circle.attribute_names.should include("y")
+      end
+
+      it "includes the child fields" do
+        circle.attribute_names.should include("radius")
+      end
+    end
+  end
+
   describe ".attribute_names" do
 
-    context "on parent classes" do
+    context "when the class is a parent" do
 
       it "includes the _id field" do
         Shape.attribute_names.should include("_id")
@@ -191,7 +244,7 @@ describe Mongoid::Fields do
       end
     end
 
-    context "on subclasses" do
+    context "when the class is a subclass" do
 
       it "includes the _id field" do
         Circle.attribute_names.should include("_id")

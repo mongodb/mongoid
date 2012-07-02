@@ -94,6 +94,21 @@ module Mongoid
       apply_post_processed_defaults
     end
 
+    # Returns an array of names for the attributes available on this object.
+    #
+    # Provides the field names in an ORM-agnostic way. Rails v3.1+ uses this
+    # method to automatically wrap params in JSON requests.
+    #
+    # @example Get the field names
+    #   docment.attribute_names
+    #
+    # @return [ Array<String> ] The field names
+    #
+    # @since 3.0.0
+    def attribute_names
+      self.class.attribute_names
+    end
+
     # Is the document using object ids?
     #
     # @note Refactored from using delegate for class load performance.
@@ -148,7 +163,7 @@ module Mongoid
       # Returns an array of names for the attributes available on this object.
       #
       # Provides the field names in an ORM-agnostic way. Rails v3.1+ uses this
-      # meathod to automatically wrap params in JSON requests.
+      # method to automatically wrap params in JSON requests.
       #
       # @example Get the field names
       #   Model.attribute_names
