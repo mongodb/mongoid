@@ -1,11 +1,14 @@
 class Artist
   include Mongoid::Document
 
+  attr_accessor :before_add_called, :after_add_called, :before_add_referenced_called, :after_add_referenced_called, :before_remove_embedded_called, :after_remove_embedded_called, :before_remove_referenced_called, :after_remove_referenced_called
+
+
   field :name, type: String
 
-  embeds_many :songs
-  embeds_many :labels
-  has_many :albums, dependent: :destroy
+  embeds_many :songs, before_add: :before_add_song, before_remove: :before_remove_song
+  embeds_many :labels, after_add: :after_add_label, after_remove: :after_remove_label
+  has_many :albums, dependent: :destroy, before_add: :before_add_album, after_add: :after_add_album, before_remove: :before_remove_album, after_remove: :after_remove_album
 
   before_create :before_create_stub
   after_create :create_songs
@@ -28,4 +31,37 @@ class Artist
   def create_songs
     2.times { |n| songs.create!(title: "#{n}") }
   end
+
+  def before_add_song(song)
+    @before_add_called = true
+  end
+
+  def after_add_label(label)
+    @after_add_called = true
+  end
+
+  def before_add_album(album)
+    @before_add_referenced_called = true
+  end
+
+  def after_add_album(album)
+    @after_add_referenced_called = true
+  end
+
+  def before_remove_song(song)
+    @before_remove_embedded_called = true
+  end
+
+  def after_remove_label(label)
+    @after_remove_embedded_called = true
+  end
+
+  def before_remove_album(album)
+    @before_remove_referenced_called = true
+  end
+
+  def after_remove_album(album)
+    @after_remove_referenced_called = true
+  end
+
 end

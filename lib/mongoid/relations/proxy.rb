@@ -145,6 +145,26 @@ module Mongoid
         raise Errors::UnsavedDocument.new(base, doc)
       end
 
+      # Return the name of defined callback method
+      #
+      # @example returns the before_add callback method name
+      #   callback_method(:before_add)
+      #
+      # @param [ Symbol ] which callback
+      def callback_method(callback_name)
+        metadata[callback_name]
+      end
+
+      # Executes a callback method
+      #
+      # @example execute the before add callback
+      #   execute_callback(:before_add)
+      #
+      # @param [ Symbol ] callback to be executed
+      def execute_callback(callback, doc)
+        base.send callback_method(callback), doc if callback_method(callback)
+      end
+
       class << self
 
         # Get the criteria that is used to eager load a relation of this
