@@ -105,11 +105,13 @@ module Mongoid
         #
         # @since 2.1.0
         def delete(document)
+          execute_callback :before_remove, document
           target.delete(document) do |doc|
             if doc
               unbind_one(doc)
               cascade!(doc)
             end
+            execute_callback :after_remove, doc
           end
         end
 
@@ -230,11 +232,20 @@ module Mongoid
           unless metadata.destructive?
             nullify
           else
+            after_remove_error = nil
             criteria.delete_all
-            target.clear do |doc|
+            many = target.clear do |doc|
+              execute_callback :before_remove, doc
               unbind_one(doc)
               doc.destroyed = true
+              begin
+                execute_callback :after_remove, doc
+              rescue => e
+                after_remove_error = e
+              end
             end
+            raise after_remove_error if after_remove_error
+            many
           end
         end
         alias :clear :purge
@@ -293,9 +304,11 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
+          execute_callback :before_add, document
           target.push(document)
           characterize_one(document)
           bind_one(document)
+          execute_callback :after_add, document
         end
 
         # Instantiate the binding associated with this relation.
@@ -675,7 +688,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :as, :autosave, :dependent, :foreign_key, :order ]
+            [ :as, :autosave, :dependent, :foreign_key, :order, :before_add, :after_add, :before_remove, :after_remove ]
           end
 
           # Get the default validation setting for the relation. Determines if
