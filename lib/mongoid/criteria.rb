@@ -500,8 +500,7 @@ module Mongoid
     #
     # @return [ Criteria ] The cloned criteria.
     def type(types)
-      types = [types] unless types.is_a?(Array)
-      any_in(_type: types)
+      any_in(_type: Array(types))
     end
 
     # This is the general entry point for most MongoDB queries. This either
