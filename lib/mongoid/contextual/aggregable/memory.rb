@@ -38,11 +38,7 @@ module Mongoid
         #
         # @since 3.0.0
         def max(field = nil)
-          if block_given?
-            super()
-          else
-            count > 0 ? max_by { |doc| doc.send(field) }.send(field) : nil
-          end
+          block_given? ? super() : aggregate_by(field, :max_by)
         end
 
         # Get the min value of the provided field. If provided a block, will
@@ -64,11 +60,7 @@ module Mongoid
         #
         # @since 3.0.0
         def min(field = nil)
-          if block_given?
-            super()
-          else
-            count > 0 ? min_by { |doc| doc.send(field) }.send(field) : nil
-          end
+          block_given? ? super() : aggregate_by(field, :min_by)
         end
 
         # Get the sum value of the provided field. If provided a block, will
@@ -91,6 +83,25 @@ module Mongoid
           else
             count > 0 ? super(0) { |doc| doc.send(field) } : nil
           end
+        end
+
+        private
+
+        # Aggregate by the provided field and method.
+        #
+        # @api private
+        #
+        # @example Aggregate by the field and method.
+        #   aggregable.aggregate_by(:name, :min_by)
+        #
+        # @param [ Symbol ] field The field to aggregate on.
+        # @param [ Symbol ] method The method (min_by or max_by).
+        #
+        # @return [ Integer ] The aggregate.
+        #
+        # @since 3.0.0
+        def aggregate_by(field, method)
+          count > 0 ? send(method) { |doc| doc.send(field) }.send(field) : nil
         end
       end
     end
