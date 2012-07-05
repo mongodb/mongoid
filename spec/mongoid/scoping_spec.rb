@@ -526,6 +526,44 @@ describe Mongoid::Scoping do
         }.to raise_error(Mongoid::Errors::InvalidScope)
       end
     end
+
+    context "when chaining a non proc with a proc" do
+
+      context "when both scopes are or queries" do
+
+        let(:time) do
+          Time.now
+        end
+
+        before do
+          Band.scope(:xxx, Band.any_of({ :aaa.gt => 0 }, { :bbb.gt => 0 }))
+          Band.scope(:yyy, ->{ Band.any_of({ :ccc => nil }, { :ccc.gt => time }) })
+        end
+
+        after do
+          class << Band
+            undef_method :xxx
+            undef_method :yyy
+          end
+          Band.scopes.clear
+        end
+
+        let(:criteria) do
+          Band.yyy.xxx
+        end
+
+        it "properly chains the $or queries together" do
+          criteria.selector.should eq({
+            "$or" => [
+              { "ccc" => nil },
+              { "ccc" => { "$gt" => time }},
+              { "aaa" => { "$gt" => 0.0 }},
+              { "bbb" => { "$gt" => 0.0 }}
+            ]
+          })
+        end
+      end
+    end
   end
 
   describe ".scope_stack" do

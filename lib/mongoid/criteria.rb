@@ -422,8 +422,8 @@ module Mongoid
     # @since 3.0.0
     def merge!(other)
       criteria = other.to_criteria
-      selector.update(criteria.selector)
-      options.update(criteria.options)
+      selector.merge!(criteria.selector)
+      options.merge!(criteria.options)
       self.documents = criteria.documents.dup unless criteria.documents.empty?
       self.scoping_options = criteria.scoping_options
       self.inclusions = (inclusions + criteria.inclusions.dup).uniq
