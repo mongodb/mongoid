@@ -3306,6 +3306,10 @@ describe Mongoid::Relations::Embedded::Many do
     it "orders properly with the boolean" do
       circuit.reload.buses.should eq([ bus_two, bus_one ])
     end
+
+    it "orders by id" do
+      circuit.reload.buses.asc(:id).should eq([ bus_one, bus_two ])
+    end
   end
 
   context "when batch replacing multiple relations in a single update" do
