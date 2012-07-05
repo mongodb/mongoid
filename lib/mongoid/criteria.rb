@@ -302,7 +302,7 @@ module Mongoid
     def from_map_or_db
       id = extract_id
       id = klass.fields["_id"].mongoize(id) if id
-      doc = IdentityMap.get(klass, id || selector)
+      doc = IdentityMap.get(klass, id || selector.except("_type"))
       doc && doc.matches?(selector) ? doc : first
     end
 
