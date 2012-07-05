@@ -20,9 +20,9 @@ Gem::Specification.new do |s|
   s.add_dependency("activemodel", ["~> 3.1"])
   s.add_dependency("tzinfo", ["~> 0.3.22"])
   s.add_dependency("moped", ["~> 1.1.0"])
-  s.add_dependency("origin", ["~> 1.0.1"])
+  s.add_dependency("origin", ["~> 1.0.2"])
 
-  s.add_development_dependency("mocha", ["~> 0.11"])
+  s.add_development_dependency("mocha", ["= 0.11"])
   s.add_development_dependency("rspec", ["~> 2.10"])
   s.add_development_dependency("guard", ["= 1.2.1"])
   s.add_development_dependency("guard-rspec", ["~> 0.7"])

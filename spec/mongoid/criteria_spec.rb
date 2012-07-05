@@ -3017,12 +3017,26 @@ describe Mongoid::Criteria do
         Band.create(name: "Tool")
       end
 
-      let(:criteria) do
-        Band.send(method, { name: "Depeche Mode" }, { name: "New Order" })
+      context "when sending a normal $or criterion" do
+
+        let(:criteria) do
+          Band.send(method, { name: "Depeche Mode" }, { name: "New Order" })
+        end
+
+        it "returns the matching documents" do
+          criteria.should eq([ match ])
+        end
       end
 
-      it "returns the matching documents" do
-        criteria.should eq([ match ])
+      context "when matching against an id or other parameter" do
+
+        let(:criteria) do
+          Band.send(method, { id: match.id }, { name: "New Order" })
+        end
+
+        it "returns the matching documents" do
+          criteria.should eq([ match ])
+        end
       end
     end
   end
