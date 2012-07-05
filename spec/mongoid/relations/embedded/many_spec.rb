@@ -3306,8 +3306,22 @@ describe Mongoid::Relations::Embedded::Many do
     it "orders properly with the boolean" do
       circuit.reload.buses.should eq([ bus_two, bus_one ])
     end
+  end
 
-    it "orders by id" do
+  context "when the embedded relation sorts on id" do
+    let(:circuit) do
+      Circuit.create
+    end
+
+    let!(:bus_one) do
+      circuit.buses.create(saturday: true)
+    end
+
+    let!(:bus_two) do
+      circuit.buses.create(saturday: false)
+    end
+
+    it "orders properly by id" do
       circuit.reload.buses.asc(:id).should eq([ bus_one, bus_two ])
     end
   end
