@@ -3309,6 +3309,7 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   context "when the embedded relation sorts on id" do
+
     let(:circuit) do
       Circuit.create
     end
