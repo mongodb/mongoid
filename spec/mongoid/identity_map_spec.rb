@@ -251,6 +251,53 @@ describe Mongoid::IdentityMap do
     end
   end
 
+  describe "#has_identifier?" do
+    let!(:person) do
+      Person.new
+    end
+
+    context "when identity map has klass" do
+
+      before do
+        identity_map.set(person)
+      end
+
+      context "when identity map has identifier" do
+
+        let(:has_identifier) do
+          identity_map.has_identifier?(Person, person.id)
+        end
+
+        it "returns true" do
+          has_identifier.should be_true
+        end
+      end
+
+      context "when identity_map hasn't identifier" do
+
+        let(:has_identifier) do
+          identity_map.has_identifier?(Person, Moped::BSON::ObjectId.new)
+        end
+
+        it "returns false" do
+          has_identifier.should be_false
+        end
+      end
+    end
+
+    context "when identity map hasn't klass" do
+
+      let(:has_identifier) do
+        identity_map.has_identifier?(Drug, person.id)
+      end
+
+      it "returns false" do
+        has_identifier.should be_false
+      end
+    end
+  end
+
+
   describe "#get_many" do
 
     let!(:person) do
@@ -482,18 +529,39 @@ describe Mongoid::IdentityMap do
       Post.new(person: person)
     end
 
-    context "when no documents exist for the selector" do
+    context "when document is a instance" do
 
-      let!(:set) do
-        identity_map.set_one(post_one, { person_id: person.id })
+      context "when no document exist for the selector" do
+
+        let!(:set) do
+          identity_map.set_one(post_one, { person_id: person.id })
+        end
+
+        let(:document) do
+          identity_map[Post.collection_name][{ person_id: person.id }]
+        end
+
+        it "puts the documents in the map" do
+          document.should eq(post_one)
+        end
       end
+    end
 
-      let(:document) do
-        identity_map[Post.collection_name][{ person_id: person.id }]
-      end
+    context "when document is a class" do
 
-      it "puts the documents in the map" do
-        document.should eq(post_one)
+      context "when no document exists for the selector" do
+
+        let!(:set) do
+          identity_map.set_one(post_one.class, { person_id: person.id })
+        end
+
+        let(:document) do
+          identity_map[Post.collection_name][{ person_id: person.id }]
+        end
+
+        it "puts the documents in the map with nil" do
+          document.should be_nil
+        end
       end
     end
   end
