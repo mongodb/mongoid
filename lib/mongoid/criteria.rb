@@ -302,8 +302,10 @@ module Mongoid
     def from_map_or_db
       id = extract_id
       id = klass.fields["_id"].mongoize(id) if id
-      doc = IdentityMap.get(klass, id || selector.except("_type"))
-      doc && doc.matches?(selector) ? doc : first
+      identifier = id || selector.except("_type")
+      doc = IdentityMap.get(klass, identifier)
+      identifier_present = IdentityMap.has_identifier?(klass, identifier)
+      identifier_present && (doc.nil? || doc && doc.matches?(selector)) ? doc : first
     end
 
     # Get the documents from the identity map, and if not found hit the

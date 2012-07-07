@@ -43,6 +43,10 @@ module Mongoid
       end
     end
 
+    def has_identifier?(klass, identifier)
+      documents_for(klass).has_key?(identifier)
+    end
+
     # Get many documents from the map via the selector
     #
     # @example Get the document from the map.
@@ -112,14 +116,19 @@ module Mongoid
     # @example Set the document in the map.
     #   identity_map.set_selector(document, { :person_id => person.id })
     #
-    # @param [ Document ] document The document to set.
+    # @param [ Document, Class ] document The document to set.
     # @param [ Hash ] selector The selector to identify it.
     #
     # @return [ Document ] The matching document.
     #
     # @since 2.2.0
     def set_one(document, selector)
-      documents_for(document.class)[selector] = document
+      klass, value = if document.is_a?(Class)
+        [document, nil]
+      else
+        [document.class, document]
+      end
+      documents_for(klass)[selector] = value
     end
 
     private

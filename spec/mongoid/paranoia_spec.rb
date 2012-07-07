@@ -351,7 +351,7 @@ describe Mongoid::Paranoia do
       end
 
       it "clears out the identity map" do
-        Mongoid::IdentityMap.should be_empty
+        Mongoid::IdentityMap.values.all?(&:empty?).should be_true
       end
     end
 
