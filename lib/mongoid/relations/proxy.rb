@@ -172,6 +172,12 @@ module Mongoid
               IdentityMap.clear_many(klass, { foreign_key => id })
             end
           end
+          if metadata.macro == :has_one
+            no_childs = ids - eager_loaded.map{|doc| doc.__send__(foreign_key)}
+            no_childs.each do |id|
+              yield(klass, { foreign_key => id })
+            end
+          end
         end
       end
     end
