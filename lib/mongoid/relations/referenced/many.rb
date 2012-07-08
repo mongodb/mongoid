@@ -28,37 +28,15 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def <<(*args)
-          docs = args.flatten
-          return concat(docs) if docs.size > 1
-          if doc = docs.first
+          args.flatten.each do |doc|
+            next unless doc
             append(doc)
             doc.save if persistable? && !_assigning? && !doc.validated?
           end
           self
         end
         alias :push :<<
-
-        # Appends an array of documents to the relation. Performs a batch
-        # insert of the documents instead of persisting one at a time.
-        #
-        # @example Concat with other documents.
-        #   person.posts.concat([ post_one, post_two ])
-        #
-        # @param [ Array<Document> ] documents The docs to add.
-        #
-        # @return [ Array<Document> ] The documents.
-        #
-        # @since 2.4.0
-        def concat(documents)
-          docs, inserts = [], []
-          documents.each do |doc|
-            next unless doc
-            append(doc)
-            save_or_delay(doc, docs, inserts) if persistable?
-          end
-          persist_delayed(docs, inserts)
-          self
-        end
+        alias :concat :<<
 
         # Build a new document from the attributes and append it to this
         # relation without saving.
@@ -380,28 +358,6 @@ module Mongoid
           end
         end
 
-        # Persist all the delayed batch inserts.
-        #
-        # @api private
-        #
-        # @example Persist the delayed batch inserts.
-        #   relation.persist_delayed([ doc ])
-        #
-        # @param [ Array<Document> ] docs The delayed inserts.
-        # @param [ Array<Hash> ] inserts The raw insert document.
-        #
-        # @since 3.0.0
-        def persist_delayed(docs, inserts)
-          unless docs.empty?
-            collection.insert(inserts)
-            docs.each do |doc|
-              doc.new_record = false
-              doc.run_after_callbacks(:create, :save)
-              doc.post_persist
-            end
-          end
-        end
-
         # Are we able to persist this relation?
         #
         # @example Can we persist the relation?
@@ -464,28 +420,6 @@ module Mongoid
                 doc.destroyed = true
               end
             end
-          end
-        end
-
-        # Save a persisted document immediately or delay a new document for
-        # batch insert.
-        #
-        # @api private
-        #
-        # @example Save or delay the document.
-        #   relation.save_or_delay(doc, [])
-        #
-        # @param [ Document ] doc The document.
-        # @param [ Array<Document> ] inserts The inserts.
-        #
-        # @since 3.0.0
-        def save_or_delay(doc, docs, inserts)
-          if doc.new_record? && doc.valid?(:create)
-            doc.run_before_callbacks(:save, :create)
-            docs.push(doc)
-            inserts.push(doc.as_document)
-          else
-            doc.save
           end
         end
 

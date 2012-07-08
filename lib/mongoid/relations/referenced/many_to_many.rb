@@ -25,9 +25,8 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def <<(*args)
-          docs = args.flatten
-          return concat(docs) if docs.size > 1
-          if doc = docs.first
+          args.flatten.each do |doc|
+            next unless doc
             append(doc)
             base.add_to_set(foreign_key, doc.id)
             if persistable? || _creating?
@@ -37,39 +36,7 @@ module Mongoid
           unsynced(base, foreign_key) and self
         end
         alias :push :<<
-
-        # Appends an array of documents to the relation. Performs a batch
-        # insert of the documents instead of persisting one at a time.
-        #
-        # @example Concat with other documents.
-        #   person.posts.concat([ post_one, post_two ])
-        #
-        # @param [ Array<Document> ] documents The docs to add.
-        #
-        # @return [ Array<Document> ] The documents.
-        #
-        # @since 2.4.0
-        def concat(documents)
-          ids, docs, inserts = {}, [], []
-          documents.each do |doc|
-            next unless doc
-            append(doc)
-            if persistable? || _creating?
-              ids[doc.id] = true
-              save_or_delay(doc, docs, inserts)
-            else
-              existing = base.send(foreign_key)
-              unless existing.include?(doc.id)
-                existing.push(doc.id) and unsynced(base, foreign_key)
-              end
-            end
-          end
-          if persistable? || _creating?
-            base.push_all(foreign_key, ids.keys)
-          end
-          persist_delayed(docs, inserts)
-          self
-        end
+        alias :concat :<<
 
         # Build a new document from the attributes and append it to this
         # relation without saving.
