@@ -535,18 +535,14 @@ module Mongoid
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            crit = metadata.klass.where(metadata.foreign_key => object)
-
-            if metadata.polymorphic?
-              crit = crit.where(metadata.type => type.name)
-            end
-
-            inverse_metadata = metadata.inverse_metadata(metadata.klass)
-            if inverse_metadata && inverse_metadata.inverse_of_field
-              crit = crit.any_in(inverse_metadata.inverse_of_field => [metadata.name, nil])
-            end
-
-            crit
+            with_inverse_field_criterion(
+              with_polymorphic_criterion(
+                metadata.klass.where(metadata.foreign_key => object),
+                metadata,
+                type
+              ),
+              metadata
+            )
           end
 
           # Eager load the relation based on the criteria.
@@ -702,6 +698,52 @@ module Mongoid
           # @since 2.1.9
           def validation_default
             true
+          end
+
+          private
+
+          # Decorate the criteria with polymorphic criteria, if applicable.
+          #
+          # @api private
+          #
+          # @example Get the criteria with polymorphic criterion.
+          #   Proxy.with_polymorphic_criterion(criteria, metadata)
+          #
+          # @param [ Criteria ] criteria The criteria to decorate.
+          # @param [ Metadata ] metadata The metadata.
+          # @param [ Class ] type The optional type.
+          #
+          # @return [ Criteria ] The criteria.
+          #
+          # @since 3.0.0
+          def with_polymorphic_criterion(criteria, metadata, type = nil)
+            if metadata.polymorphic?
+              criteria.where(metadata.type => type.name)
+            else
+              criteria
+            end
+          end
+
+          # Decorate the criteria with inverse field criteria, if applicable.
+          #
+          # @api private
+          #
+          # @example Get the criteria with polymorphic criterion.
+          #   Proxy.with_inverse_field_criterion(criteria, metadata)
+          #
+          # @param [ Criteria ] criteria The criteria to decorate.
+          # @param [ Metadata ] metadata The metadata.
+          #
+          # @return [ Criteria ] The criteria.
+          #
+          # @since 3.0.0
+          def with_inverse_field_criterion(criteria, metadata)
+            inverse_metadata = metadata.inverse_metadata(metadata.klass)
+            if inverse_metadata.try(:inverse_of_field)
+              criteria.any_in(inverse_metadata.inverse_of_field => [ metadata.name, nil ])
+            else
+              criteria
+            end
           end
         end
       end

@@ -5,8 +5,8 @@ MODELS = File.join(File.dirname(__FILE__), "app/models")
 $LOAD_PATH.unshift(MODELS)
 
 require "mongoid"
-require "mocha"
 require "rspec"
+require "mocha"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.

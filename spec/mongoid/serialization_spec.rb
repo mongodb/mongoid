@@ -9,7 +9,7 @@ describe Mongoid::Serialization do
     end
 
     it "does not duplicate fields" do
-      band.send(:field_names).should eq(band.fields.keys.sort)
+      band.send(:field_names, {}).should eq(band.fields.except("_type").keys.sort)
     end
   end
 

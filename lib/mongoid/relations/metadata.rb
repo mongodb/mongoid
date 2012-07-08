@@ -263,7 +263,7 @@ module Mongoid
       #
       # @since 2.3.3
       def forced_nil_inverse?
-        has_key?(:inverse_of) && inverse_of.nil?
+        @forced_nil_inverse ||= has_key?(:inverse_of) && inverse_of.nil?
       end
 
       # Handles all the logic for figuring out what the foreign_key is for each
@@ -389,9 +389,11 @@ module Mongoid
       #
       # @return [ Array<Symbol> ] The inverse name.
       def inverses(other = nil)
-        return [self[:inverse_of]] if has_key?(:inverse_of)
-        return self[:as] ? [self[:as]] : lookup_inverses(other) if polymorphic?
-        @inverse ||= [(cyclic? ? cyclic_inverse : inverse_relation)]
+        if self[:polymorphic]
+          lookup_inverses(other)
+        else
+          @inverses ||= determine_inverses
+        end
       end
 
       # Get the name of the inverse relation if it exists. If this is a
@@ -862,6 +864,23 @@ module Mongoid
         relation.stores_foreign_key? && polymorphic? ? "#{name}_#{field}" : nil
       end
 
+      # Deterimene the inverses that can be memoized.
+      #
+      # @api private
+      #
+      # @example Determin the inverses.
+      #   metadata.determine_inverses
+      #
+      # @return [ Array<Symbol> ] The inverses.
+      #
+      # @since 3.0.0
+      def determine_inverses
+        return [ inverse_of ] if has_key?(:inverse_of)
+        return [ as ] if has_key?(:as)
+        return [ cyclic_inverse ] if self[:cyclic]
+        [ inverse_relation ]
+      end
+
       # Find the module the class with the specific name is in.
       # This is done by starting at the inverse_class_name's
       # module and stepping down to see where it is defined.
@@ -993,17 +1012,11 @@ module Mongoid
       def determine_inverse_relation
         default = foreign_key_match || klass.relations[inverse_klass.name.underscore]
         return default.name if default
-        candidates = inverse_relation_candidates
-
-        if candidates.size > 1
-          raise Errors::AmbiguousRelationship.new(
-            klass,
-            inverse_klass,
-            name,
-            candidates
-          )
+        names = inverse_relation_candidate_names
+        if names.size > 1
+          raise Errors::AmbiguousRelationship.new(klass, inverse_klass, name, names)
         end
-        candidates.first
+        names.first
       end
 
       # Return metadata where the foreign key matches the foreign key on this
@@ -1019,9 +1032,26 @@ module Mongoid
       # @since 2.4.11
       def foreign_key_match
         if fk = self[:foreign_key]
-          klass.relations.values.detect do |meta|
+          relations_metadata.detect do |meta|
             fk == meta.foreign_key if meta.stores_foreign_key?
           end
+        end
+      end
+
+      # Get the inverse relation candidates.
+      #
+      # @api private
+      #
+      # @example Get the inverse relation candidates.
+      #   metadata.inverse_relation_candidates
+      #
+      # @return [ Array<Metdata> ] The candidates.
+      #
+      # @since 3.0.0
+      def inverse_relation_candidates
+        relations_metadata.select do |meta|
+          next if meta.versioned? || meta.name == name
+          meta.class_name == inverse_class_name
         end
       end
 
@@ -1035,11 +1065,8 @@ module Mongoid
       # @return [ Array<Symbol> ] The candidates.
       #
       # @since 3.0.0
-      def inverse_relation_candidates
-        klass.relations.select do |_, meta|
-          next if meta.versioned? || meta.name == name
-          meta.class_name == inverse_class_name
-        end.keys.map(&:to_sym)
+      def inverse_relation_candidate_names
+        @candidate_names ||= inverse_relation_candidates.map(&:name)
       end
 
       # Determine the key for the relation in the attributes.
@@ -1091,8 +1118,11 @@ module Mongoid
       # @return [ Array<String> ] The inverse names.
       def lookup_inverses(other)
         if other
-          matching_metas = other.class.relations.find_all { |key, meta| meta.as == name }
-          matching_metas.map { |meta| meta[1].name }
+          matches = []
+          other.class.relations.values.each do |meta|
+            matches.push(meta.name) if meta.as == name
+          end
+          matches
         end
       end
 
@@ -1112,6 +1142,20 @@ module Mongoid
         if invs = lookup_inverses(other) && invs.count == 1
           invs.first
         end
+      end
+
+      # Get the relation metadata only.
+      #
+      # @api private
+      #
+      # @example Get the relation metadata.
+      #   metadata.relations_metadata
+      #
+      # @return [ Array<Metadata> ] The metadata.
+      #
+      # @since 3.0.0
+      def relations_metadata
+        klass.relations.values
       end
     end
   end

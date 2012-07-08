@@ -112,9 +112,7 @@ module Mongoid
     # Find the first +Document+ given the conditions.
     #
     # @example Find the first document.
-    #   Person.first(:conditions => { :attribute => "value" })
-    #
-    # @param [ Array ] args The conditions with options.
+    #   Person.first
     #
     # @return [ Document ] The first matching document.
     def first
@@ -124,9 +122,7 @@ module Mongoid
     # Find the last +Document+ given the conditions.
     #
     # @example Find the last document.
-    #   Person.last(:conditions => { :attribute => "value" })
-    #
-    # @param [ Array ] args The conditions with options.
+    #   Person.last
     #
     # @return [ Document ] The last matching document.
     def last

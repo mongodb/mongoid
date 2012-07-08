@@ -302,7 +302,7 @@ module Mongoid
     def from_map_or_db
       id = extract_id
       id = klass.fields["_id"].mongoize(id) if id
-      doc = IdentityMap.get(klass, id || selector)
+      doc = IdentityMap.get(klass, id || selector.except("_type"))
       doc && doc.matches?(selector) ? doc : first
     end
 
@@ -422,8 +422,8 @@ module Mongoid
     # @since 3.0.0
     def merge!(other)
       criteria = other.to_criteria
-      selector.update(criteria.selector)
-      options.update(criteria.options)
+      selector.merge!(criteria.selector)
+      options.merge!(criteria.options)
       self.documents = criteria.documents.dup unless criteria.documents.empty?
       self.scoping_options = criteria.scoping_options
       self.inclusions = (inclusions + criteria.inclusions.dup).uniq
@@ -500,8 +500,7 @@ module Mongoid
     #
     # @return [ Criteria ] The cloned criteria.
     def type(types)
-      types = [types] unless types.is_a?(Array)
-      any_in(_type: types)
+      any_in(_type: Array(types))
     end
 
     # This is the general entry point for most MongoDB queries. This either

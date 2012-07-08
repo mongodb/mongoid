@@ -1931,6 +1931,71 @@ describe Mongoid::Criteria do
       Person.create
     end
 
+    context "when the models are inherited" do
+
+      before(:all) do
+        class A
+          include Mongoid::Document
+        end
+
+        class B < A
+          belongs_to :c
+        end
+
+        class C
+          include Mongoid::Document
+          has_one :b
+        end
+      end
+
+      after(:all) do
+        Object.send(:remove_const, :A)
+        Object.send(:remove_const, :B)
+        Object.send(:remove_const, :C)
+      end
+
+      context "when the includes is on the subclass" do
+
+        let!(:c_one) do
+          C.create
+        end
+
+        let!(:c_two) do
+          C.create
+        end
+
+        let!(:b) do
+          B.create(c: c_two)
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        let!(:results) do
+          C.includes(:b).entries.detect do |c|
+            c.id == c_two.id
+          end
+        end
+
+        let(:from_map) do
+          Mongoid::IdentityMap[B.collection_name][b.id]
+        end
+
+        it "returns the correct documents" do
+          results.should eq(c_two)
+        end
+
+        it "inserts the first document into the identity map" do
+          from_map.should eq(b)
+        end
+
+        it "retrieves the document from the identity map" do
+          results.b.should equal(from_map)
+        end
+      end
+    end
+
     context "when including the same metadata multiple times" do
 
       let(:criteria) do
@@ -3017,12 +3082,26 @@ describe Mongoid::Criteria do
         Band.create(name: "Tool")
       end
 
-      let(:criteria) do
-        Band.send(method, { name: "Depeche Mode" }, { name: "New Order" })
+      context "when sending a normal $or criterion" do
+
+        let(:criteria) do
+          Band.send(method, { name: "Depeche Mode" }, { name: "New Order" })
+        end
+
+        it "returns the matching documents" do
+          criteria.should eq([ match ])
+        end
       end
 
-      it "returns the matching documents" do
-        criteria.should eq([ match ])
+      context "when matching against an id or other parameter" do
+
+        let(:criteria) do
+          Band.send(method, { id: match.id }, { name: "New Order" })
+        end
+
+        it "returns the matching documents" do
+          criteria.should eq([ match ])
+        end
       end
     end
   end

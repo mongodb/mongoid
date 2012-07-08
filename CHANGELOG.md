@@ -819,6 +819,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2166 `Criteria#from_map_or_db` strips type selection when eager loading
+  since it will check if the type is correct after.
+
 * \#2129 Fixed sorting for all fields on embeds many relations.
 
 * \#2124 Fixed default scope and deleted scope on paranoid documents.
