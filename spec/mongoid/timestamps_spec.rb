@@ -26,15 +26,15 @@ describe Mongoid::Timestamps do
     end
 
     it "forces the created_at timestamps to UTC" do
-      document.created_at.to_i.should be_within(10).of(Time.now.utc.to_i)
+      document.created_at.should be_within(10).of(Time.now.utc)
     end
 
     it "forces the updated_at timestamps to UTC" do
-      document.updated_at.to_i.should be_within(10).of(Time.now.utc.to_i)
+      document.updated_at.should be_within(10).of(Time.now.utc)
     end
 
     it "ensures created_at equals updated_at on new records" do
-      document.updated_at.to_i.should eq(document.created_at.to_i)
+      document.updated_at.should eq(document.created_at)
     end
 
     it "includes a record_timestamps class_accessor to ease AR compatibility" do
@@ -106,7 +106,7 @@ describe Mongoid::Timestamps do
     end
 
     it "updates the root document updated at" do
-      document.updated_at.to_i.should be_within(1).of(Time.now.to_i)
+      document.updated_at.should be_within(1).of(Time.now)
     end
   end
 end
