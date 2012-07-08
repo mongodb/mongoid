@@ -639,11 +639,11 @@ describe Mongoid::Persistence do
       end
 
       it "updates the updated_at timestamp" do
-        label.updated_at.to_i.should be_within(10).of(Time.now.to_i)
+        label.updated_at.should be_within(1).of(Time.now)
       end
 
       it "persists the changes" do
-        label.reload.updated_at.to_i.should be_within(10).of(Time.now.to_i)
+        label.reload.updated_at.should be_within(1).of(Time.now)
       end
     end
 
@@ -677,11 +677,11 @@ describe Mongoid::Persistence do
           end
 
           it "sets the attribute to the current time" do
-            person.lunch_time.to_i.should be_within(5).of(Time.now.to_i)
+            person.lunch_time.should be_within(5).of(Time.now)
           end
 
           it "persists the change" do
-            person.reload.lunch_time.to_i.should be_within(5).of(Time.now.to_i)
+            person.reload.lunch_time.should be_within(5).of(Time.now)
           end
 
           it "returns true" do
@@ -703,11 +703,11 @@ describe Mongoid::Persistence do
           end
 
           it "sets the updated at to the current time" do
-            agent.updated_at.to_i.should be_within(5).of(Time.now.to_i)
+            agent.updated_at.should be_within(5).of(Time.now)
           end
 
           it "persists the change" do
-            agent.reload.updated_at.to_i.should be_within(5).of(Time.now.to_i)
+            agent.reload.updated_at.should be_within(5).of(Time.now)
           end
 
           it "returns true" do
@@ -726,11 +726,11 @@ describe Mongoid::Persistence do
           end
 
           it "sets the updated at to the current time" do
-            agent.updated_at.to_i.should be_within(5).of(Time.now.to_i)
+            agent.updated_at.should be_within(5).of(Time.now)
           end
 
           it "sets the attribute to the current time" do
-            agent.dob.to_i.should be_within(5).of(Time.now.to_i)
+            agent.dob.should be_within(5).of(Time.now)
           end
 
           it "sets both attributes to the exact same time" do
@@ -738,11 +738,11 @@ describe Mongoid::Persistence do
           end
 
           it "persists the updated at change" do
-            agent.reload.updated_at.to_i.should be_within(5).of(Time.now.to_i)
+            agent.reload.updated_at.should be_within(5).of(Time.now)
           end
 
           it "persists the attribute change" do
-            agent.reload.dob.to_i.should be_within(5).of(Time.now.to_i)
+            agent.reload.dob.should be_within(5).of(Time.now)
           end
 
           it "returns true" do
@@ -789,11 +789,11 @@ describe Mongoid::Persistence do
         end
 
         it "sets the parent updated at to the current time" do
-          agency.updated_at.to_i.should be_within(5).of(Time.now.to_i)
+          agency.updated_at.should be_within(5).of(Time.now)
         end
 
         it "persists the change" do
-          agency.reload.updated_at.to_i.should be_within(5).of(Time.now.to_i)
+          agency.reload.updated_at.should be_within(5).of(Time.now)
         end
       end
     end
