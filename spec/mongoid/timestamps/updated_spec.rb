@@ -26,7 +26,7 @@ describe Mongoid::Timestamps::Updated do
     end
 
     it "forces the updated_at timestamps to UTC" do
-      agent.updated_at.should be_within(10).of(Time.now.utc)
+      agent.updated_at.to_i.should be_within(10).of(Time.now.utc.to_i)
     end
 
     it "includes a record_timestamps class_accessor to ease AR compatibility" do
@@ -80,7 +80,7 @@ describe Mongoid::Timestamps::Updated do
 
     it "runs the update callbacks" do
       agent.updated_at.should_not be_nil
-      agent.updated_at.should be_within(10).of(Time.now.utc)
+      agent.updated_at.to_i.should be_within(10).of(Time.now.utc.to_i)
     end
   end
 end
