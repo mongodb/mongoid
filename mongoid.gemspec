@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency("origin", ["~> 1.0.3"])
 
   s.add_development_dependency("mocha", ["= 0.11"])
-  s.add_development_dependency("rspec", ["~> 2.10"])
+  s.add_development_dependency("rspec", ["~> 2.11"])
   s.add_development_dependency("guard", ["= 1.2.1"])
   s.add_development_dependency("guard-rspec", ["~> 0.7"])
 
