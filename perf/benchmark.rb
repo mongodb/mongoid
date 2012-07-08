@@ -16,7 +16,7 @@ Benchmark.bm do |bm|
 
   puts "\n[ Root Document Benchmarks ]"
 
-  [ 1000, 10000, 100000 ].each do |i|
+  [ 100000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -63,7 +63,7 @@ Benchmark.bm do |bm|
 
   puts "\n[ Embedded 1-n Benchmarks ]"
 
-  [ 1000, 10000 ].each do |i|
+  [ 1000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -155,7 +155,7 @@ Benchmark.bm do |bm|
 
   puts "\n[ Embedded 1-1 Benchmarks ]"
 
-  [ 1000, 10000 ].each do |i|
+  [ 1000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -173,7 +173,7 @@ Benchmark.bm do |bm|
 
   puts "\n[ Referenced 1-n Benchmarks ]"
 
-  [ 1000, 10000, 100000 ].each do |i|
+  [ 100000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -214,7 +214,7 @@ Benchmark.bm do |bm|
         end
       end
 
-      Post.delete_all
+      person.posts.delete_all
       GC.start
 
       bm.report("#push (batch)     ") do
@@ -241,14 +241,16 @@ Benchmark.bm do |bm|
         person.posts.delete(post)
       end
 
-      Post.delete_all
+      person.posts.delete_all
       GC.start
     end
   end
 
+  Post.delete_all
+
   puts "\n[ Referenced 1-1 Benchmarks ]"
 
-  [ 1000, 10000, 100000 ].each do |i|
+  [ 100000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -262,11 +264,12 @@ Benchmark.bm do |bm|
     end
   end
 
+  Game.delete_all
   GC.start
 
   puts "\n[ Referenced n-n Benchmarks ]"
 
-  [ 1000, 10000 ].each do |i|
+  [ 10000 ].each do |i|
 
     Mongoid.unit_of_work do
 
@@ -295,7 +298,7 @@ Benchmark.bm do |bm|
         person.preferences.delete_all
       end
 
-      Preference.delete_all
+      person.preferences.delete_all
       GC.start
 
       bm.report("#push             ") do
@@ -304,7 +307,7 @@ Benchmark.bm do |bm|
         end
       end
 
-      Preference.delete_all
+      person.preferences.delete_all
       GC.start
 
       bm.report("#push (batch)     ") do
@@ -331,12 +334,15 @@ Benchmark.bm do |bm|
         person.preferences.delete(preference)
       end
 
-      Preference.delete_all
+      person.preferences.delete_all
       GC.start
     end
   end
 
-  [ 1000, 10000 ].each do |i|
+  Person.delete_all
+  Preference.delete_all
+
+  [ 10000 ].each do |i|
 
     GC.start
 
