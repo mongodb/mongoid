@@ -20,6 +20,7 @@ task :release => :build do
   system "git tag -a v#{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
   system "git push --tags"
   system "gem push mongoid-#{Mongoid::VERSION}.gem"
+  system "rm mongoid-#{Mongoid::VERSION}.gem"
 end
 
 RSpec::Core::RakeTask.new("spec") do |spec|
