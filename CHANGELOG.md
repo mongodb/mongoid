@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 3.0.1 (branch: 3.0.0-stable)
+
+### Resolved Issues
+
+* \#2181 Ensure `.first` criteria sort by ascending ids, if no other
+  sorting criteria was provided.
+
 ## 3.0.0
 
 ### New Features

@@ -196,6 +196,7 @@ module Mongoid
       #
       # @since 3.0.0
       def first
+        apply_id_sorting
         with_eager_loading(query.first)
       end
       alias :one :first
@@ -403,6 +404,21 @@ module Mongoid
         end
       end
 
+      # Apply an ascending id sort for use with #first queries, only if no
+      # other sorting is provided.
+      #
+      # @api private
+      #
+      # @example Apply the id sorting params.
+      #   context.apply_dd_sorting
+      #
+      # @since 3.0.0
+      def apply_id_sorting
+        unless criteria.options.has_key?(:sort)
+          query.sort(_id: 1)
+        end
+      end
+
       # Map the inverse sort symbols to the correct MongoDB values.
       #
       # @example Apply the inverse sorting params.
@@ -413,7 +429,7 @@ module Mongoid
         if spec = criteria.options[:sort]
           query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
         else
-          query.sort({_id: -1})
+          query.sort(_id: -1)
         end
       end
 
