@@ -1,15 +1,5 @@
 rvm:
   - 1.9.3
-  - jruby
+  - ruby-head
+  - jruby-19mode
   - jruby-head
-env:
-  - JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
-  -
-matrix:
-  exclude:
-    - rvm: 1.9.3
-      env: JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
-    - rvm: jruby
-      env:
-    - rvm: jruby-head
-      env:
