@@ -3,3 +3,16 @@ rvm:
   - ruby-head
   - jruby-19mode
   - jruby-head
+env:
+  - JRUBY_OPTS="-Xmx512M"
+  -
+matrix:
+  exclude:
+    - rvm: 1.9.3
+      env: JRUBY_OPTS="-Xmx512M"
+    - rvm: ruby-head
+      env: JRUBY_OPTS="-Xmx512M"
+    - rvm: jruby-19mode
+      env:
+    - rvm: jruby-head
+      env:
