@@ -3171,6 +3171,10 @@ describe Mongoid::Relations::Referenced::Many do
         artist.before_add_referenced_called.should be_true
       end
 
+      it "should execute callback as proc" do
+        album.before_add_called.should be_true
+      end
+
       it "should add to collection" do
         artist.albums.should eq([ album ])
       end

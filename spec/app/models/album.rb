@@ -4,6 +4,8 @@ class Album
   belongs_to :artist
   before_destroy :set_parent_name
 
+  attr_accessor :before_add_called
+
   private
 
   def set_parent_name
