@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2184 Allow names of relations that conflict with ruby core kernel
+  methods to pass existence checks.
+
 * \#2181 Ensure `.first` criteria sort by ascending ids, if no other
   sorting criteria was provided.
 
