@@ -83,6 +83,17 @@ describe Mongoid::Relations::Accessors do
 
     context "when the relation is a belongs to" do
 
+      context "when the relation is named next" do
+
+        let(:user) do
+          User.create
+        end
+
+        it "allows the existence check" do
+          user.should_not have_next
+        end
+      end
+
       context "when the relation exists" do
 
         let!(:game) do

@@ -13,6 +13,8 @@ class User
   has_and_belongs_to_many :businesses, class_name: "Business", validate: false
   has_one :shop
 
+  belongs_to :next, class_name: "User"
+
   accepts_nested_attributes_for :posts
   index name: 1
 end
