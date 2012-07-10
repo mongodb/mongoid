@@ -3384,6 +3384,10 @@ describe Mongoid::Relations::Embedded::Many do
         artist.before_add_called.should be_true
       end
 
+      it "should execute callback as proc" do
+        song.before_add_called.should be_true
+      end
+
       it "should add to collection" do
         artist.songs.should eq([song])
       end

@@ -151,8 +151,18 @@ module Mongoid
       #   callback_method(:before_add)
       #
       # @param [ Symbol ] which callback
+      #
+      # @return [ Array ] with callback methods to be executed, the array may have symbols and Procs
       def callback_method(callback_name)
-        metadata[callback_name]
+        methods = []
+        if metadata[callback_name]
+          if metadata[callback_name].is_a? Array
+            methods.concat(metadata[callback_name])
+          else
+            methods << metadata[callback_name]
+          end
+        end
+        methods
       end
 
       # Executes a callback method
@@ -162,7 +172,16 @@ module Mongoid
       #
       # @param [ Symbol ] callback to be executed
       def execute_callback(callback, doc)
-        base.send callback_method(callback), doc if callback_method(callback)
+        callback_method = callback_method(callback)
+        if callback_method
+          callback_method.each do |c|
+            if c.is_a? Proc
+              c.call(base, doc)
+            else
+              base.send c, doc
+            end
+          end
+        end
       end
 
       class << self
