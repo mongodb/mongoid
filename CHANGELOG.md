@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2187 Ensure all levels of nested documents are serialized in json.
+
 * \#2184 Allow names of relations that conflict with ruby core kernel
   methods to pass existence checks.
 
