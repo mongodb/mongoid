@@ -31,55 +31,20 @@ module Mongoid
 
       names = field_names(options)
 
-      _serializing do
-        method_names = Array.wrap(options[:methods]).map do |name|
-          name.to_s if respond_to?(name)
-        end.compact
+      method_names = Array.wrap(options[:methods]).map do |name|
+        name.to_s if respond_to?(name)
+      end.compact
 
-        (names + method_names).each do |name|
-          without_autobuild do
-            serialize_attribute(attrs, name, names, options)
-          end
+      (names + method_names).each do |name|
+        without_autobuild do
+          serialize_attribute(attrs, name, names, options)
         end
-        serialize_relations(attrs, options) if options[:include]
       end
+      serialize_relations(attrs, options) if options[:include]
       attrs
     end
 
     private
-
-    # Enter the serialization block.
-    #
-    # @api private
-    #
-    # @example Begin serialization.
-    #   document._serializing do
-    #   end
-    #
-    # @return [ Object ] The result of the yield.
-    #
-    # @since 3.0.0
-    def _serializing
-      Threaded.begin("serialization")
-      yield
-    ensure
-      Threaded.exit("serialization")
-    end
-
-    # Are we in a serialization block? We use this to protect multiple
-    # unnecessary calls to #as_document.
-    #
-    # @api private
-    #
-    # @example Are we in serialization?
-    #   document._serializing?
-    #
-    # @return [ true, false ] If we are serializing.
-    #
-    # @since 3.0.0
-    def _serializing?
-      Threaded.executing?("serialization")
-    end
 
     # Get the names of all fields that will be serialized.
     #
@@ -92,7 +57,7 @@ module Mongoid
     #
     # @since 3.0.0
     def field_names(options)
-      names = (_serializing? ? attribute_names : as_document.keys + attribute_names).uniq.sort
+      names = (as_document.keys + attribute_names).uniq.sort
 
       only = Array.wrap(options[:only]).map(&:to_s)
       except = Array.wrap(options[:except]).map(&:to_s)
