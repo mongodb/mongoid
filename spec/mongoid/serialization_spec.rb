@@ -84,6 +84,21 @@ describe Mongoid::Serialization do
           address_attributes["id"].should eq(address.id)
         end
       end
+
+      context "when nested multiple levels" do
+
+        let!(:location) do
+          address.locations.build(name: "home")
+        end
+
+        let(:attributes) do
+          person.serializable_hash
+        end
+
+        it "includes the deeply nested document" do
+          attributes["addresses"][0]["locations"].should_not be_empty
+        end
+      end
     end
 
     context "when the model has attributes that need conversion" do
