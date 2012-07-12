@@ -126,7 +126,7 @@ describe Mongoid::Callbacks do
     context "callback returns true" do
 
       before do
-        artist.expects(:before_create_stub).returns(true)
+        artist.should_receive(:before_create_stub).and_return(true)
         artist.save
       end
 
@@ -138,7 +138,7 @@ describe Mongoid::Callbacks do
     context "callback returns false" do
 
       before do
-        artist.expects(:before_create_stub).returns(false)
+        artist.should_receive(:before_create_stub).and_return(false)
         artist.save
       end
 
@@ -163,7 +163,7 @@ describe Mongoid::Callbacks do
       context "when the callback returns true" do
 
         before do
-          artist.expects(:before_save_stub).returns(true)
+          artist.should_receive(:before_save_stub).and_return(true)
         end
 
         it "the save returns true" do
@@ -174,7 +174,7 @@ describe Mongoid::Callbacks do
       context "when callback returns false" do
 
         before do
-          artist.expects(:before_save_stub).returns(false)
+          artist.should_receive(:before_save_stub).and_return(false)
         end
 
         it "the save returns false" do
@@ -198,7 +198,7 @@ describe Mongoid::Callbacks do
       context "when the callback returns true" do
 
         before do
-          artist.expects(:before_save_stub).returns(true)
+          artist.should_receive(:before_save_stub).and_return(true)
         end
 
         it "the save returns true" do
@@ -209,7 +209,7 @@ describe Mongoid::Callbacks do
       context "when the callback returns false" do
 
         before do
-          artist.expects(:before_save_stub).returns(false)
+          artist.should_receive(:before_save_stub).and_return(false)
         end
 
         it "the save returns false" do
@@ -236,7 +236,7 @@ describe Mongoid::Callbacks do
     context "when the callback returns true" do
 
       before do
-        artist.expects(:before_destroy_stub).returns(true)
+        artist.should_receive(:before_destroy_stub).and_return(true)
       end
 
       it "the destroy returns true" do
@@ -247,7 +247,7 @@ describe Mongoid::Callbacks do
     context "when the callback returns false" do
 
       before do
-        artist.expects(:before_destroy_stub).returns(false)
+        artist.should_receive(:before_destroy_stub).and_return(false)
       end
 
       it "the destroy returns false" do
@@ -346,7 +346,7 @@ describe Mongoid::Callbacks do
         context "when saving the root" do
 
           it "only executes the callbacks once for each embed" do
-            note.expects(:update_saved).twice
+            note.should_receive(:update_saved).twice
             band.save
           end
         end
@@ -364,7 +364,7 @@ describe Mongoid::Callbacks do
       end
 
       it "doesn't cascade the initialize" do
-        Service.any_instance.expects(:after_initialize_called=).never
+        Service.any_instance.should_receive(:after_initialize_called=).never
         Person.find(person.id).should eq(person)
       end
     end
@@ -1417,7 +1417,7 @@ describe Mongoid::Callbacks do
     context "when saving the document" do
 
       it "only executes the callbacks once" do
-        callback.expects(:execute).once
+        callback.should_receive(:execute).once
         callback.save
       end
     end

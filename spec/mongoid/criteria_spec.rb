@@ -291,7 +291,7 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        criteria.context.query.expects(:each).never
+        criteria.context.query.should_receive(:each).never
         criteria.each do |doc|
           doc.should eq(person)
         end
@@ -309,7 +309,7 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        criteria.context.query.expects(:each).never
+        criteria.context.query.should_receive(:each).never
         criteria.each do |doc|
           doc.should eq(person)
         end

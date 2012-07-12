@@ -372,7 +372,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "does not make any additional database queries" do
-        game_metadata.expects(:eager_load).never
+        game_metadata.should_receive(:eager_load).never
         context.send(:eager_load, [])
       end
     end
@@ -710,7 +710,7 @@ describe Mongoid::Contextual::Mongo do
       context "when calling more than once" do
 
         before do
-          context.query.expects(:count).once.returns(1)
+          context.query.should_receive(:count).once.and_return(1)
         end
 
         it "returns the cached value for subsequent calls" do
@@ -722,7 +722,7 @@ describe Mongoid::Contextual::Mongo do
 
         before do
           context.entries
-          context.query.expects(:count).never
+          context.query.should_receive(:count).never
         end
 
         it "returns the cached value for all calls" do

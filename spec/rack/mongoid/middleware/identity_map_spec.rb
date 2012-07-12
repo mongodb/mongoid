@@ -35,7 +35,7 @@ describe "Rack::Mongoid::Middleware::IdentityMap" do
     describe "when no exception is raised" do
 
       before do
-        app.expects(:call).with(env).returns([])
+        app.should_receive(:call).with(env).and_return([])
       end
 
       let!(:result) do
@@ -54,7 +54,7 @@ describe "Rack::Mongoid::Middleware::IdentityMap" do
     describe "when an exception is raised" do
 
       before do
-        app.expects(:call).with(env).raises(RuntimeError)
+        app.should_receive(:call).with(env).and_raise(RuntimeError)
       end
 
       let!(:result) do

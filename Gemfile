@@ -10,7 +10,6 @@ platforms :mri_19 do
 end
 
 group :test do
-  gem "mocha", "0.11"
   gem "rspec", "~> 2.11"
 
   unless ENV["CI"]

@@ -11,7 +11,7 @@ describe Mongoid::Persistence::Operations::Remove do
   end
 
   let(:collection) do
-    stub.quacks_like(Moped::Collection.allocate)
+    stub("collection")
   end
 
   let(:query) do
@@ -19,7 +19,7 @@ describe Mongoid::Persistence::Operations::Remove do
   end
 
   before do
-    document.stubs(:collection).returns(collection)
+    document.stub(:collection).and_return(collection)
   end
 
   describe "#initialize" do
@@ -45,8 +45,8 @@ describe Mongoid::Persistence::Operations::Remove do
 
     def root_delete_expectation
       ->{
-        collection.expects(:find).with({ "_id" => document.id }).returns(query)
-        query.expects(:remove).returns(true)
+        collection.should_receive(:find).with({ "_id" => document.id }).and_return(query)
+        query.should_receive(:remove).and_return(true)
       }
     end
 

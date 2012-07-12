@@ -46,7 +46,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
     context "when the document is not bindable" do
 
       it "does nothing" do
-        person.posts.expects(:<<).never
+        person.posts.should_receive(:<<).never
         binding.bind_one(post)
       end
     end
@@ -62,8 +62,8 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
 
       before do
         binding.bind_one(target.first)
-        person.expects(:delete).never
-        post.expects(:delete).never
+        person.should_receive(:delete).never
+        post.should_receive(:delete).never
         binding.unbind_one(target.first)
       end
 
@@ -79,7 +79,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
     context "when the documents are not unbindable" do
 
       it "does nothing" do
-        person.expects(:posts=).never
+        person.should_receive(:posts=).never
         binding.unbind_one(target.first)
       end
     end

@@ -10,6 +10,8 @@ jdk:
   - oraclejdk7
   - openjdk6
   -
+env:
+  - JRUBY_OPTS="Xmx512m"
 matrix:
   exclude:
     - rvm: 1.9.3
