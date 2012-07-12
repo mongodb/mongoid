@@ -1,15 +1,35 @@
+language: ruby
 rvm:
   - 1.9.3
-  - jruby
+  - ruby-head
+  - jruby-19mode
   - jruby-head
 env:
-  - JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
+  - JRUBY_OPTS="-Xmx512M"
   -
+jdk:
+  - openjdk7
+  - oraclejdk7
+  - openjdk6
 matrix:
   exclude:
     - rvm: 1.9.3
-      env: JRUBY_OPTS="--1.9 --server -Xinvokedynamic.constants=true"
-    - rvm: jruby
+      env: JRUBY_OPTS="-Xmx512M"
+    - rvm: 1.9.3
+      jdk: openjdk7
+    - rvm: 1.9.3
+      jdk: openjdk6
+    - rvm: 1.9.3
+      jdk: oraclejdk7
+    - rvm: ruby-head
+      env: JRUBY_OPTS="-Xmx512M"
+    - rvm: ruby-head
+      jdk: openjdk7
+    - rvm: ruby-head
+      jdk: openjdk6
+    - rvm: ruby-head
+      jdk: oraclejdk7
+    - rvm: jruby-19mode
       env:
     - rvm: jruby-head
       env:
