@@ -268,12 +268,6 @@ describe Mongoid::Persistence do
         insert.expects(:persist).returns(person)
         person.save
       end
-
-      it "returns a boolean" do
-        person.expects(:persisted?).returns(true)
-        insert.expects(:persist).returns(person)
-        person.save.should == true
-      end
     end
 
     context "when the document is not new" do
@@ -471,25 +465,6 @@ describe Mongoid::Persistence do
 
       let(:insert) do
         stub.quacks_like(Mongoid::Persistence::Operations::Insert.allocate)
-      end
-
-      context "when validation passes" do
-
-        before do
-          Mongoid::Persistence::Operations::Insert.expects(:new).with(person, {}).returns(insert)
-        end
-
-        it "delegates to the insert persistence command" do
-          person.expects(:persisted?).returns(true)
-          insert.expects(:persist).returns(person)
-          person.upsert
-        end
-
-        it "returns a boolean" do
-          person.expects(:persisted?).returns(true)
-          insert.expects(:persist).returns(person)
-          person.upsert.should == true
-        end
       end
 
       context "when validation fails" do

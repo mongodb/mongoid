@@ -151,7 +151,7 @@ module Mongoid #:nodoc:
     # @return [ true, false ] True is success, false if not.
     def upsert(options = {})
       if new_record?
-        insert(options).persisted?
+        !insert(options).new_record?
       else
         update(options)
       end
