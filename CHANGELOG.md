@@ -928,6 +928,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2178 Ensure destroy callbacks are run post replacement of an embeds one
+  relation.
+
 * \#2169 Allow saves to pass when documents are destroyed after the save
   in a callback.
 
