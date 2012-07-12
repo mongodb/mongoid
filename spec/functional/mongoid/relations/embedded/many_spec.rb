@@ -3103,8 +3103,8 @@ describe Mongoid::Relations::Embedded::Many do
 
     before do
       person.update_attributes(
-        appointments: [ appointment_one.as_document, appointment_two.as_document ],
-        symptoms: [ symptom_one.as_document, symptom_two.as_document ]
+        :appointments => [ appointment_one.as_document, appointment_two.as_document ],
+        :symptoms => [ symptom_one.as_document, symptom_two.as_document ]
       )
     end
 
