@@ -94,6 +94,30 @@ describe Mongoid::Relations::Embedded::One do
           it "saves the target" do
             name.should be_persisted
           end
+
+          context "when replacing an exising document" do
+
+            let(:pet_owner) do
+              PetOwner.create
+            end
+
+            let(:pet_one) do
+              Pet.new
+            end
+
+            let(:pet_two) do
+              Pet.new
+            end
+
+            before do
+              pet_owner.pet = pet_one
+              pet_owner.pet = pet_two
+            end
+
+            it "runs the destroy callbacks on the old document" do
+              pet_one.destroy_flag.should be_true
+            end
+          end
         end
 
         context "when setting via the parent attributes" do
