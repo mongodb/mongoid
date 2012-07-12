@@ -11,6 +11,7 @@ jdk:
   - openjdk7
   - oraclejdk7
   - openjdk6
+  -
 matrix:
   exclude:
     - rvm: 1.9.3
@@ -31,5 +32,9 @@ matrix:
       jdk: oraclejdk7
     - rvm: jruby-19mode
       env:
+    - rvm: jruby-19mode
+      jdk:
     - rvm: jruby-head
       env:
+    - rvm: jruby-head
+      jdk:
