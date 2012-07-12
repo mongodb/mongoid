@@ -1,61 +1,24 @@
 language: ruby
 bundler_args: --without development
-rvm:
-  - 1.9.3
-  - ruby-head
-  - jruby-19mode
-  - jruby-head
-jdk:
-  - openjdk7
-  - oraclejdk7
-  - openjdk6
-  -
-env:
-  - JRUBY_OPTS="-Xmx512m"
-  -
 matrix:
-  exclude:
+  include:
     - rvm: 1.9.3
-      jdk: openjdk7
-      env: JRUBY_OPTS="-Xmx512m"
-    - rvm: 1.9.3
-      jdk: openjdk6
-      env: JRUBY_OPTS="-Xmx512m"
-    - rvm: 1.9.3
-      jdk: oraclejdk7
-      env: JRUBY_OPTS="-Xmx512m"
-    - rvm: 1.9.3
-      jdk: openjdk7
-      env:
-    - rvm: 1.9.3
-      jdk: openjdk6
-      env:
-    - rvm: 1.9.3
-      jdk: oraclejdk7
-      env:
     - rvm: ruby-head
-      jdk: openjdk7
-      env: JRUBY_OPTS="-Xmx512m"
-    - rvm: ruby-head
-      jdk: openjdk6
-      env: JRUBY_OPTS="-Xmx512m"
-    - rvm: ruby-head
-      jdk: oraclejdk7
-      env: JRUBY_OPTS="-Xmx512m"
-    - rvm: ruby-head
-      jdk: openjdk7
-      env:
-    - rvm: ruby-head
-      jdk: openjdk6
-      env:
-    - rvm: ruby-head
-      jdk: oraclejdk7
-      env:
     - rvm: jruby-19mode
-      env:
+      jdk: openjdk6
+      env: JRUBY_OPTS="-Xmx512m"
     - rvm: jruby-19mode
-      jdk:
+      jdk: oraclejdk7
+      env: JRUBY_OPTS="-Xmx512m"
+    - rvm: jruby-19mode
+      jdk: openjdk7
+      env: JRUBY_OPTS="-Xmx512m"
     - rvm: jruby-head
-      env:
+      jdk: openjdk6
+      env: JRUBY_OPTS="-Xmx512m"
     - rvm: jruby-head
-      jdk:
+      jdk: oraclejdk7
+      env: JRUBY_OPTS="-Xmx512m"
+    - rvm: jruby-head
+      jdk: openjdk7
+      env: JRUBY_OPTS="-Xmx512m"
