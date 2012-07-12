@@ -39,7 +39,7 @@ module Mongoid # :nodoc:
             if _assigning?
               base.atomic_unsets.push(proxy.atomic_path)
             else
-              proxy.delete if persistable?
+              proxy.destroy if persistable?
             end
             proxy.unbind_one
             return nil unless replacement
