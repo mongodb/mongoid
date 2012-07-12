@@ -1188,7 +1188,7 @@ describe Mongoid::Attributes do
     context "when the key has not been specified as a field" do
 
       before do
-        person.stubs(:fields).returns({})
+        person.stub(:fields).and_return({})
       end
 
       it "returns the value" do

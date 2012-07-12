@@ -23,11 +23,11 @@ describe Mongoid::Relations::Cascading::Destroy do
     context "when the documents exist" do
 
       before do
-        person.expects(:posts).returns([ post ])
+        person.should_receive(:posts).and_return([ post ])
       end
 
       it "destroys all documents in the relation" do
-        post.expects(:destroy)
+        post.should_receive(:destroy)
         strategy.cascade
       end
     end
@@ -35,11 +35,11 @@ describe Mongoid::Relations::Cascading::Destroy do
     context "when no documents exist" do
 
       before do
-        person.expects(:posts).returns([])
+        person.should_receive(:posts).and_return([])
       end
 
       it "does not destroy anything" do
-        post.expects(:destroy).never
+        post.should_receive(:destroy).never
         strategy.cascade
       end
     end

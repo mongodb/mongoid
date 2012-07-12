@@ -21,11 +21,11 @@ describe Mongoid::Relations::Cascading::Nullify do
     end
 
     before do
-      person.expects(:posts).returns(relation)
+      person.should_receive(:posts).and_return(relation)
     end
 
     it "nullifies the relation" do
-      relation.expects(:nullify)
+      relation.should_receive(:nullify)
       strategy.cascade
     end
   end

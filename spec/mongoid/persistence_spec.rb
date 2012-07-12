@@ -1037,7 +1037,7 @@ describe Mongoid::Persistence do
       end
 
       it "calls assign_attributes" do
-        person.expects(:assign_attributes).with(*params)
+        person.should_receive(:assign_attributes).with(*params)
         person.update_attributes(*params)
       end
 
@@ -1264,7 +1264,7 @@ describe Mongoid::Persistence do
       end
 
       it "calls assign_attributes" do
-        person.expects(:assign_attributes).with(*params)
+        person.should_receive(:assign_attributes).with(*params)
         person.update_attributes!(*params)
       end
 

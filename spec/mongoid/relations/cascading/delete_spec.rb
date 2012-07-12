@@ -59,8 +59,8 @@ describe Mongoid::Relations::Cascading::Delete do
       context "when the documents are in memory" do
 
         before do
-          post_one.expects(:delete).never
-          post_two.expects(:delete).never
+          post_one.should_receive(:delete).never
+          post_two.should_receive(:delete).never
           person.delete
         end
 

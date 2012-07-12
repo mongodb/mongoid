@@ -19,7 +19,7 @@ describe Mongoid::Persistence::Operations::Update do
   end
 
   let(:collection) do
-    stub.quacks_like(Moped::Collection.allocate)
+    stub("collection")
   end
 
   let(:query) do
@@ -27,8 +27,8 @@ describe Mongoid::Persistence::Operations::Update do
   end
 
   before do
-    document.stubs(:collection).returns(collection)
-    root_category.stubs(:collection).returns(collection)
+    document.stub(:collection).and_return(collection)
+    root_category.stub(:collection).and_return(collection)
   end
 
   describe "#initialize" do
@@ -54,17 +54,17 @@ describe Mongoid::Persistence::Operations::Update do
 
     def root_set_expectation
       ->{
-        collection.expects(:find).with({ "_id" => document.id }).returns(query)
-        query.expects(:update).with({ "$set" => document.setters }).returns("Object")
+        collection.should_receive(:find).with({ "_id" => document.id }).and_return(query)
+        query.should_receive(:update).with({ "$set" => document.setters }).and_return("Object")
       }
     end
 
     def embedded_set_expectation
       ->{
-        collection.expects(:find).with(
+        collection.should_receive(:find).with(
           { "_id" => document.id, "addresses._id" => address.id }
-        ).returns(query)
-        query.expects(:update).with({ "$set" => address.setters }).returns("Object")
+        ).and_return(query)
+        query.should_receive(:update).with({ "$set" => address.setters }).and_return("Object")
       }
     end
 
@@ -96,7 +96,7 @@ describe Mongoid::Persistence::Operations::Update do
       context "when the document is not valid" do
 
         before do
-          document.stubs(:valid?).returns(false)
+          document.stub(:valid?).and_return(false)
         end
 
         it "returns false" do

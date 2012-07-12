@@ -207,11 +207,11 @@ describe Mongoid::Relations::Metadata do
     end
 
     before do
-      Mongoid::Relations::Options.expects(:validate!).at_least_once
+      Mongoid::Relations::Options.should_receive(:validate!).at_least(:once)
     end
 
     it "concatenates the result from #find_module and name.classify" do
-      metadata.expects(:find_module).returns("Fruit").once
+      metadata.should_receive(:find_module).once.and_return("Fruit")
       classified.should eq("Fruit::Name")
     end
   end
@@ -231,7 +231,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     before do
-      Mongoid::Relations::Options.expects(:validate!).at_least_once
+      Mongoid::Relations::Options.should_receive(:validate!).at_least(:once)
     end
 
     context "when inverse_class_name is nil" do

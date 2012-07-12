@@ -13,7 +13,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     end
 
     let(:metadata) do
-      stub_everything(
+      stub(
         klass: Post,
         name: :posts,
         foreign_key: "person_id",
@@ -52,7 +52,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     context "when order specified" do
 
       let(:metadata) do
-        stub_everything(
+        stub(
           klass: Post,
           name: :posts,
           foreign_key: "person_id",
@@ -86,7 +86,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     context "when provided a object" do
 
       let(:metadata) do
-        stub_everything(
+        stub(
           klass: Post,
           name: :posts,
           foreign_key: "person_id",

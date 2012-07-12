@@ -58,7 +58,7 @@ describe Mongoid::Relations::AutoSave do
         end
 
         it "does not add the autosave callback twice" do
-          drug.expects(:save).once
+          drug.should_receive(:save).once
           person.drugs.push(drug)
           person.save
         end

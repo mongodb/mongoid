@@ -202,7 +202,7 @@ describe Mongoid::Validations::UniquenessValidator do
                 end
 
                 it "does not touch the database" do
-                  Dictionary.expects(:where).never
+                  Dictionary.should_receive(:where).never
                   from_db.valid?
                 end
               end
