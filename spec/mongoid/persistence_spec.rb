@@ -620,6 +620,21 @@ describe Mongoid::Persistence do
         expect { oscar.save! }.to raise_error(Mongoid::Errors::Callback)
       end
     end
+
+    context "when a callback destroys the document" do
+
+      let(:oscar) do
+        Oscar.new(:destroy_after_save => true)
+      end
+
+      before do
+        oscar.save!
+      end
+
+      it "flags the document as destroyed" do
+        oscar.should be_destroyed
+      end
+    end
   end
 
   describe "#touch" do
