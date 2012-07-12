@@ -23,6 +23,8 @@ module Mongoid
         "\nResolution:\n  #{resolution(key, attributes)}"
       end
 
+      private
+
       # Given the key of the specific error and the options hash, translate the
       # message.
       #
@@ -40,7 +42,10 @@ module Mongoid
       # Create the problem.
       #
       # @example Create the problem.
-      #   error.problem
+      #   error.problem("error", {})
+      #
+      # @param [ String, Symbol ] key The error key.
+      # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The problem.
       #
@@ -52,7 +57,10 @@ module Mongoid
       # Create the summary.
       #
       # @example Create the summary.
-      #   error.summary
+      #   error.summary("error", {})
+      #
+      # @param [ String, Symbol ] key The error key.
+      # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The summary.
       #
@@ -64,7 +72,10 @@ module Mongoid
       # Create the resolution.
       #
       # @example Create the resolution.
-      #   error.resolution
+      #   error.resolution("error", {})
+      #
+      # @param [ String, Symbol ] key The error key.
+      # @param [ Hash ] attributes The attributes to interpolate.
       #
       # @return [ String ] The resolution.
       #
