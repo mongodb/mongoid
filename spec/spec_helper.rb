@@ -6,7 +6,6 @@ $LOAD_PATH.unshift(MODELS)
 
 require "mongoid"
 require "rspec"
-require "mocha"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.
@@ -55,9 +54,6 @@ module MyApp
 end
 
 RSpec.configure do |config|
-
-  # Mocha's syntax is preferred to RSpec.
-  config.mock_with(:mocha)
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do

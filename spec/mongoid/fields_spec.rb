@@ -854,7 +854,7 @@ describe Mongoid::Fields do
       context "when option is provided" do
 
         it "calls the handler with the model" do
-          handler.expects(:call).with do |model,_,_|
+          handler.should_receive(:call).with do |model,_,_|
             model.should eql User
           end
 
@@ -862,7 +862,7 @@ describe Mongoid::Fields do
         end
 
         it "calls the handler with the field" do
-          handler.expects(:call).with do |_,field,_|
+          handler.should_receive(:call).with do |_,field,_|
             field.should eql User.fields["custom"]
           end
 
@@ -870,7 +870,7 @@ describe Mongoid::Fields do
         end
 
         it "calls the handler with the option value" do
-          handler.expects(:call).with do |_,_,value|
+          handler.should_receive(:call).with do |_,_,value|
             value.should eql true
           end
 
@@ -881,7 +881,7 @@ describe Mongoid::Fields do
       context "when option is nil" do
 
         it "calls the handler" do
-          handler.expects(:call)
+          handler.should_receive(:call)
           User.field :custom, option: nil
         end
       end
@@ -889,7 +889,7 @@ describe Mongoid::Fields do
       context "when option is not provided" do
 
         it "does not call the handler" do
-          handler.expects(:call).never
+          handler.should_receive(:call).never
 
           User.field :custom
         end

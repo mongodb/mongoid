@@ -490,7 +490,7 @@ describe Mongoid::Dirty do
 
         before do
           person.changed_attributes["aliases"] = aliases
-          aliases.expects(:clone).never
+          aliases.should_receive(:clone).never
           person.aliases_will_change!
         end
 

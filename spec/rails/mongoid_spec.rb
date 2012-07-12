@@ -29,15 +29,15 @@ describe "Rails::Mongoid" do
     end
 
     before do
-      Dir.expects(:glob).with(pattern).returns(model_paths).once
-      Logger.expects(:new).returns(logger).twice
+      Dir.should_receive(:glob).once.with(pattern).and_return(model_paths)
+      Logger.should_receive(:new).twice.and_return(logger)
     end
 
     context "with ordinary Rails models" do
 
       it "creates the indexes for the models" do
-        klass.expects(:create_indexes).once
-        logger.expects(:info).twice
+        klass.should_receive(:create_indexes).once
+        logger.should_receive(:info).twice
         indexes
       end
     end
@@ -53,7 +53,7 @@ describe "Rails::Mongoid" do
       end
 
       it "does nothing" do
-        klass.expects(:create_indexes).never
+        klass.should_receive(:create_indexes).never
         indexes
       end
     end
@@ -61,8 +61,8 @@ describe "Rails::Mongoid" do
     context "when an exception is raised" do
 
       it "is not swallowed" do
-        Rails::Mongoid.expects(:determine_model).returns(klass)
-        klass.expects(:create_indexes).raises(ArgumentError)
+        Rails::Mongoid.should_receive(:determine_model).and_return(klass)
+        klass.should_receive(:create_indexes).and_raise(ArgumentError)
         expect { indexes }.to raise_error(ArgumentError)
       end
     end
@@ -82,8 +82,8 @@ describe "Rails::Mongoid" do
       end
 
       it "does nothing, but logging" do
-        klass.expects(:create_indexes).never
-        logger.expects(:info).once
+        klass.should_receive(:create_indexes).never
+        logger.should_receive(:info).once
         indexes
       end
     end
@@ -108,9 +108,9 @@ describe "Rails::Mongoid" do
     end
 
     before do
-      Dir.expects(:glob).with(pattern).returns(model_paths).times(2)
-      Logger.expects(:new).returns(logger).times(4)
-      logger.expects(:info).times(3)
+      Dir.should_receive(:glob).with(pattern).exactly(2).times.and_return(model_paths)
+      Logger.should_receive(:new).exactly(4).times.and_return(logger)
+      logger.should_receive(:info).exactly(3).times
     end
 
     let(:indexes) do
@@ -154,7 +154,7 @@ describe "Rails::Mongoid" do
     end
 
     before do
-      Dir.expects(:glob).with(pattern).returns(model_paths).once
+      Dir.should_receive(:glob).with(pattern).once.and_return(model_paths)
     end
 
     it "returns models which files matching the pattern" do
@@ -245,7 +245,7 @@ describe "Rails::Mongoid" do
         end
 
         it "raises NameError" do
-          logger.expects(:info)
+          logger.should_receive(:info)
           expect { model.should eq(klass) }.to raise_error(NameError)
         end
       end
@@ -260,7 +260,7 @@ describe "Rails::Mongoid" do
         end
 
         it "returns klass" do
-          logger.expects(:info)
+          logger.should_receive(:info)
           model.should eq(klass)
         end
       end
@@ -337,11 +337,11 @@ describe "Rails::Mongoid" do
 
       before(:all) do
         Mongoid.preload_models = false
-        Dir.stubs(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
       end
 
       it "does not load any models" do
-        Rails::Mongoid.expects(:load_model).never
+        Rails::Mongoid.should_receive(:load_model).never
         Rails::Mongoid.preload_models(app)
       end
     end
@@ -362,12 +362,12 @@ describe "Rails::Mongoid" do
         end
 
         before do
-          Dir.expects(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+          Dir.should_receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         end
 
         it "requires the models by basename" do
-          Rails::Mongoid.expects(:load_model).with("address")
-          Rails::Mongoid.expects(:load_model).with("user")
+          Rails::Mongoid.should_receive(:load_model).with("address")
+          Rails::Mongoid.should_receive(:load_model).with("user")
           Rails::Mongoid.preload_models(app)
         end
       end
@@ -379,11 +379,11 @@ describe "Rails::Mongoid" do
         end
 
         before do
-          Dir.expects(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+          Dir.should_receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         end
 
         it "requires the models by subdirectory and basename" do
-          Rails::Mongoid.expects(:load_model).with("mongoid/behaviour")
+          Rails::Mongoid.should_receive(:load_model).with("mongoid/behaviour")
           Rails::Mongoid.preload_models(app)
         end
       end
@@ -415,12 +415,12 @@ describe "Rails::Mongoid" do
 
       before(:all) do
         Mongoid.preload_models = false
-        Dir.stubs(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
       end
 
       it "loads all models" do
-        Rails::Mongoid.expects(:load_model).with("address")
-        Rails::Mongoid.expects(:load_model).with("user")
+        Rails::Mongoid.should_receive(:load_model).with("address")
+        Rails::Mongoid.should_receive(:load_model).with("user")
         Rails::Mongoid.load_models(app)
       end
     end
@@ -436,12 +436,12 @@ describe "Rails::Mongoid" do
 
       before(:all) do
         Mongoid.preload_models = ["user"]
-        Dir.stubs(:glob).with("/rails/root/app/models/**/*.rb").returns(files)
+        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
       end
 
       it "loads selected models only" do
-        Rails::Mongoid.expects(:load_model).with("user")
-        Rails::Mongoid.expects(:load_model).with("address").never
+        Rails::Mongoid.should_receive(:load_model).with("user")
+        Rails::Mongoid.should_receive(:load_model).with("address").never
         Rails::Mongoid.load_models(app)
       end
     end
