@@ -309,7 +309,7 @@ module Mongoid # :nodoc:
               proxy.clear
             else
               atomically(:$set) do
-                base.delayed_atomic_sets.clear
+                base.delayed_atomic_sets.clear unless _assigning?
                 if replacement.first.is_a?(Hash)
                   replacement = replacement.map do |doc|
                     attributes = { :metadata => metadata, :_parent => base }
@@ -327,6 +327,7 @@ module Mongoid # :nodoc:
                 end
                 if _assigning?
                   name = _unscoped.first.atomic_path
+                  base.delayed_atomic_sets[name].try(:clear)
                   base._children.each do |child|
                     child.delayed_atomic_sets.clear
                   end
