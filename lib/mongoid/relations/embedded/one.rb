@@ -38,7 +38,7 @@ module Mongoid
           if _assigning?
             base.add_atomic_unset(target)
           else
-            delete if persistable?
+            destroy if persistable?
           end
           unbind_one
           return nil unless replacement
