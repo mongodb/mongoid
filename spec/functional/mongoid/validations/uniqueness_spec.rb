@@ -21,13 +21,13 @@ describe Mongoid::Validations::UniquenessValidator do
         end
 
         let!(:post) do
-          ParanoidPost.create(title: "testing")
+          ParanoidPost.create(:title => "testing")
         end
 
         context "when the field is unique" do
 
           let(:new_post) do
-            ParanoidPost.new(title: "test")
+            ParanoidPost.new(:title => "test")
           end
 
           it "returns true" do
@@ -42,7 +42,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           let(:new_post) do
-            ParanoidPost.new(title: "testing")
+            ParanoidPost.new(:title => "testing")
           end
 
           it "returns true" do
@@ -53,7 +53,7 @@ describe Mongoid::Validations::UniquenessValidator do
         context "when the field is not unique" do
 
           let(:new_post) do
-            ParanoidPost.new(title: "testing")
+            ParanoidPost.new(:title => "testing")
           end
 
           it "returns false" do
