@@ -76,7 +76,7 @@ module Mongoid
     # @since 1.0.0
     def save(options = {})
       if new_record?
-        insert(options).persisted?
+        !insert(options).new_record?
       else
         update(options)
       end
