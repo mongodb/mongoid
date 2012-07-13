@@ -27,35 +27,17 @@ module Mongoid
     # @since 2.0.0.rc.6
     def serializable_hash(options = nil)
       options ||= {}
+      attrs = {}
 
-      only = Array.wrap(options[:only]).map(&:to_s)
-      except = Array.wrap(options[:except]).map(&:to_s)
-
-      except |= ['_type'] unless Mongoid.include_type_for_serialization
-
-      names = field_names
-
-      if !only.empty?
-        names &= only
-      elsif !except.empty?
-        names -= except
-      end
+      names = field_names(options)
 
       method_names = Array.wrap(options[:methods]).map do |name|
         name.to_s if respond_to?(name)
       end.compact
 
-      attrs = {}
       (names + method_names).each do |name|
         without_autobuild do
-          if relations.has_key?(name)
-            value = send(name)
-            attrs[name] = value ? value.serializable_hash(options) : nil
-          elsif names.include?(name) && !fields.has_key?(name)
-            attrs[name] = read_attribute(name)
-          else
-            attrs[name] = send(name)
-          end
+          serialize_attribute(attrs, name, names, options)
         end
       end
       serialize_relations(attrs, options) if options[:include]
@@ -74,8 +56,46 @@ module Mongoid
     # @return [ Array<String> ] The names of the fields.
     #
     # @since 3.0.0
-    def field_names
-      (as_document.keys + attribute_names).uniq.sort
+    def field_names(options)
+      names = (as_document.keys + attribute_names).uniq.sort
+
+      only = Array.wrap(options[:only]).map(&:to_s)
+      except = Array.wrap(options[:except]).map(&:to_s)
+      except |= ['_type'] unless Mongoid.include_type_for_serialization
+
+      if !only.empty?
+        names &= only
+      elsif !except.empty?
+        names -= except
+      end
+      names
+    end
+
+    # Serialize a single attribute. Handles relations, fields, and dynamic
+    # attributes.
+    #
+    # @api private
+    #
+    # @example Serialize the attribute.
+    #   document.serialize_attribute({}, "id" , [ "id" ])
+    #
+    # @param [ Hash ] attrs The attributes.
+    # @param [ String ] name The attribute name.
+    # @param [ Array<String> ] names The names of all attributes.
+    # @param [ Hash ] options The options.
+    #
+    # @return [ Object ] The attribute.
+    #
+    # @since 3.0.0
+    def serialize_attribute(attrs, name, names, options)
+      if relations.has_key?(name)
+        value = send(name)
+        attrs[name] = value ? value.serializable_hash(options) : nil
+      elsif names.include?(name) && !fields.has_key?(name)
+        attrs[name] = read_attribute(name)
+      else
+        attrs[name] = send(name)
+      end
     end
 
     # For each of the provided include options, get the relation needed and

@@ -89,7 +89,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.expects(:validated?).returns(false)
+          associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :name, associated)
         end
 
@@ -105,7 +105,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.expects(:validated?).returns(false)
+          associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :name, associated)
         end
 
@@ -139,7 +139,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.expects(:validated?).returns(false)
+          associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :addresses, [ associated ])
         end
 
@@ -155,7 +155,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.expects(:validated?).returns(false)
+          associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :addresses, [ associated ])
         end
 

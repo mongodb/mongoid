@@ -76,7 +76,7 @@ describe Mongoid::UnitOfWork do
     context "when provided disable: :all" do
 
       let(:other) do
-        Thread.new { p "running new thread" }
+        Thread.new { "running new thread".inspect }
       end
 
       before do

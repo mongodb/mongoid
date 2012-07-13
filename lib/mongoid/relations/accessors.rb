@@ -126,7 +126,7 @@ module Mongoid
         def existence_check(name, metadata)
           module_eval <<-END
             def #{name}?
-              without_autobuild { !#{name}.blank? }
+              without_autobuild { !__send__(:#{name}).blank? }
             end
             alias :has_#{name}? :#{name}?
           END

@@ -17,7 +17,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
     end
 
     let(:metadata) do
-      stub_everything(
+      stub(
         klass: Preference,
         name: :preferences,
         foreign_key: "preference_ids",
@@ -55,7 +55,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
     context "when order specified" do
 
       let(:metadata) do
-        stub_everything(
+        stub(
           klass: Post,
           name: :preferences,
           foreign_key: "person_id",
@@ -110,7 +110,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       context "when the object is nil" do
 
         let(:metadata) do
-          stub_everything(
+          stub(
             klass: Post,
             name: :preferences,
             foreign_key: "preference_ids",

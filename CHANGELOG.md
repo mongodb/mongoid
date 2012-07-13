@@ -3,7 +3,32 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 3.0.0 (branch: master)
+## 3.1.0 (branch: master)
+
+### New Features
+
+### Resolved Issues
+
+## 3.0.2 (branch: 3.0.0-stable)
+
+### Resolved Issues
+
+## 3.0.1
+
+### Resolved Issues
+
+* \#2191 Ensure proper visibility (private) for error message generation
+  methods.
+
+* \#2187 Ensure all levels of nested documents are serialized in json.
+
+* \#2184 Allow names of relations that conflict with ruby core kernel
+  methods to pass existence checks.
+
+* \#2181 Ensure `.first` criteria sort by ascending ids, if no other
+  sorting criteria was provided.
+
+## 3.0.0
 
 ### New Features
 
@@ -915,6 +940,12 @@ For instructions on upgrading to newer versions, visit
 ## 2.4.12 (branch: 2.4.0-stable)
 
 ### Resolved Issues
+
+* \#2178 Ensure destroy callbacks are run post replacement of an embeds one
+  relation.
+
+* \#2169 Allow saves to pass when documents are destroyed after the save
+  in a callback.
 
 * \#2144 Uniqueness validation on paranoid documents now properly scopes.
 
