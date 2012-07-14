@@ -118,6 +118,21 @@ describe Mongoid::Contextual::MapReduce do
         }.to raise_error(Mongoid::Errors::NoMapReduceOutput)
       end
     end
+
+    context "when no results are returned" do
+
+      let(:results) do
+        map_reduce.out(replace: "mr-output-two")
+      end
+
+      before do
+        Band.delete_all
+      end
+
+      it "does not raise an error" do
+        results.entries.should be_empty
+      end
+    end
   end
 
   describe "#emitted" do
