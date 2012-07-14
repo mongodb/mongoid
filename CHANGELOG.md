@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 3.0.2 (branch: 3.0.0-stable)
+
+### Resolved Issues
+
+* \#2199 Autosave false is now respected when automatically adding
+  presence validation. (John Nishinaga)
+
 ## 3.0.1
 
 ### Resolved Issues
