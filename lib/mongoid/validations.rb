@@ -194,7 +194,9 @@ module Mongoid
         if args.first == PresenceValidator
           args.last[:attributes].each do |name|
             metadata = relations[name.to_s]
-            autosave(metadata.merge!(autosave: true)) if metadata
+            if metadata && metadata[:autosave] != false
+              autosave(metadata.merge!(autosave: true))
+            end
           end
         end
         super

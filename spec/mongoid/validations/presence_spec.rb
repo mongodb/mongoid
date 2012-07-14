@@ -167,6 +167,51 @@ describe Mongoid::Validations::PresenceValidator do
       end
     end
 
+    context "when the relation is a has one and autosave is false" do
+
+      before do
+        Person.relations["game"][:autosave] = false
+        Person.validates :game, presence: true
+      end
+
+      after do
+        Person.reset_callbacks(:validate)
+      end
+
+      it "does not change autosave on the relation" do
+        Person.relations["game"][:autosave].should be_false
+      end
+
+      it "does not add any autosaved relations" do
+        Person.autosaved_relations.should be_empty
+      end
+
+      context "when the relation is new" do
+
+        let(:person) do
+          Person.new
+        end
+
+        context "when the base is valid" do
+
+          let!(:game) do
+            person.build_game
+          end
+
+          context "when saving the base" do
+
+            before do
+              person.save
+            end
+
+            it "does not save the relation" do
+              expect { game.reload }.should raise_error
+            end
+          end
+        end
+      end
+    end
+
     context "when the relation is a belongs to" do
 
       let(:product) do
