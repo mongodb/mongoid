@@ -13,6 +13,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2199 Autosave false is now respected when automatically adding
+  presence validation. (John Nishinaga)
+
 ## 3.0.1
 
 ### Resolved Issues
