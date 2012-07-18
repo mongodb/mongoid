@@ -20,3 +20,4 @@ doc/*
 *.profile
 *.profile.pdf
 *.symbols
+.idea
