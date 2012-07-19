@@ -12,10 +12,11 @@ module Mongoid
       include Aggregable::Mongo
       include Atomic
 
+      # @attribute [r] collection The collection to query against.
       # @attribute [r] criteria The criteria for the context.
       # @attribute [r] klass The klass for the criteria.
       # @attribute [r] query The Moped query.
-      attr_reader :criteria, :klass, :query
+      attr_reader :collection, :criteria, :klass, :query
 
       # @attribute [rw] eager_loaded Has the context been eager loaded?
       attr_accessor :eager_loaded
@@ -66,7 +67,7 @@ module Mongoid
       def count(document = nil, &block)
         return super(&block) if block_given?
         return query.count unless document
-        klass.collection.find(criteria.and(_id: document.id).selector).count
+        collection.find(criteria.and(_id: document.id).selector).count
       end
 
       # Delete all documents in the database that match the selector.
@@ -212,8 +213,9 @@ module Mongoid
       # @since 3.0.0
       def initialize(criteria)
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
+        @collection = klass.collection
         add_type_selection
-        @query = klass.collection.find(criteria.selector)
+        @query = collection.find(criteria.selector)
         apply_options
       end
 
