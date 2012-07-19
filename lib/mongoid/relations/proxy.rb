@@ -153,6 +153,8 @@ module Mongoid
       # @param [ Symbol ] which callback
       #
       # @return [ Array ] with callback methods to be executed, the array may have symbols and Procs
+      #
+      # @since 3.1.0
       def callback_method(callback_name)
         methods = []
         if metadata[callback_name]
@@ -171,6 +173,8 @@ module Mongoid
       #   execute_callback(:before_add)
       #
       # @param [ Symbol ] callback to be executed
+      #
+      # @since 3.1.0
       def execute_callback(callback, doc)
         callback_method = callback_method(callback)
         if callback_method
