@@ -3012,7 +3012,7 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :as, :autosave, :dependent, :foreign_key, :order ]
+        [ :as, :autosave, :dependent, :foreign_key, :order, :before_add, :after_add, :before_remove, :after_remove ]
       )
     end
   end
@@ -3156,4 +3156,207 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
   end
+
+  describe "#<< with before_add callback" do
+    let(:artist) { Artist.new }
+
+    let(:album) { Album.new }
+
+    context "executed without errors" do
+      before do
+        artist.albums << album
+      end
+
+      it "should execute callback" do
+        artist.before_add_referenced_called.should be_true
+      end
+
+      it "should execute callback as proc" do
+        album.before_add_called.should be_true
+      end
+
+      it "should add to collection" do
+        artist.albums.should eq([ album ])
+      end
+    end
+
+    context "executed with errors" do
+      before do
+        artist.expects(:before_add_album).raises
+      end
+
+      it "should add not add to collection" do
+        expect {
+          artist.albums << album
+        }.to raise_error
+
+        artist.albums.should be_empty
+      end
+    end
+  end
+
+  describe "#<< with after_add callback" do
+
+    let(:artist) { Artist.new }
+
+    let(:album) { Album.new }
+
+    it "should execute callback" do
+      artist.albums << album
+
+      artist.after_add_referenced_called.should be_true
+    end
+
+    context "executed with errors" do
+      before do
+        artist.expects(:after_add_album).raises
+      end
+
+      it "should add to collection" do
+        expect {
+          artist.albums << album
+        }.to raise_error
+
+        artist.albums.should eq([ album ])
+      end
+    end
+  end
+
+  describe "#delete or #clear with before_remove callback" do
+    let(:artist) { Artist.new }
+
+    let(:album) { Album.new }
+
+    before do
+      artist.albums << album
+    end
+
+    context "executed without errors" do
+      context "#delete" do
+        before do
+          artist.albums.delete album
+        end
+
+        it "should execute callback" do
+          artist.before_remove_referenced_called.should be_true
+        end
+
+        it "should remove form collection" do
+          artist.albums.should be_empty
+        end
+      end
+
+      context "#clear" do
+        before do
+          artist.albums.clear
+        end
+
+        it "should execute callback" do
+          artist.before_remove_referenced_called.should be_true
+        end
+
+        it "shoud clear the collection" do
+          artist.albums.should be_empty
+        end
+      end
+
+      context "executed with errors" do
+        before do
+          artist.expects(:before_remove_album).raises
+        end
+
+        context "#delete" do
+          before do
+            expect {
+              artist.albums.delete album
+            }.to raise_error
+          end
+
+          it "should not remove from collection" do
+            artist.albums.should eq([ album ])
+          end
+        end
+
+        context "#clear" do
+          before do
+            expect {
+              artist.albums.clear
+            }.to raise_error
+          end
+
+          it "should remove from collection" do
+            artist.albums.should eq([ album ])
+          end
+        end
+      end
+    end
+  end
+
+
+
+
+  describe "#delete or #clear with after_remove callback" do
+    let(:artist) { Artist.new }
+
+    let(:album) { Album.new }
+
+    before do
+      artist.albums << album
+    end
+
+    context "without errors" do
+      context "delete" do
+        before do
+          artist.albums.delete album
+        end
+
+        it "should execute callback" do
+          artist.after_remove_referenced_called.should be_true
+        end
+      end
+
+      context "clear" do
+        before do
+          artist.albums.clear
+        end
+
+        it "should execute callback" do
+          artist.albums.clear
+
+          artist.after_remove_referenced_called.should be_true
+        end
+      end
+    end
+
+    context "executed with errors" do
+      before do
+        artist.expects(:after_remove_album).raises
+      end
+
+      context "delete" do
+        before do
+          expect {
+            artist.albums.delete album
+          }.to raise_error
+        end
+
+        it "should remove from collection" do
+          artist.albums.should be_empty
+        end
+      end
+
+      context "clear" do
+        before do
+          expect {
+            artist.albums.clear
+          }.to raise_error
+        end
+
+        it "should remove from collection" do
+          artist.albums.should be_empty
+        end
+      end
+    end
+  end
+
 end

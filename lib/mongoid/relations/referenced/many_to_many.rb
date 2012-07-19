@@ -135,6 +135,9 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def nullify
+          target.each do |doc|
+            execute_callback :before_remove, doc
+          end
           unless metadata.forced_nil_inverse?
             criteria.pull(inverse_foreign_key, base.id)
           end
@@ -144,9 +147,17 @@ module Mongoid
               base.send(foreign_key).clear
             )
           end
-          target.clear do |doc|
+          after_remove_error = nil
+          many_to_many = target.clear do |doc|
             unbind_one(doc)
+            begin
+              execute_callback :after_remove, doc
+            rescue => e
+              after_remove_error = e
+            end
           end
+          raise after_remove_error if after_remove_error
+          many_to_many
         end
         alias :nullify_all :nullify
         alias :clear :nullify
@@ -195,9 +206,11 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
+          execute_callback :before_add, document
           target.push(document)
           characterize_one(document)
           bind_one(document)
+          execute_callback :after_add, document
         end
 
         # Instantiate the binding associated with this relation.
@@ -420,7 +433,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :autosave, :dependent, :foreign_key, :index, :order ]
+            [ :autosave, :dependent, :foreign_key, :index, :order, :before_add, :after_add, :before_remove, :after_remove ]
           end
 
           # Get the default validation setting for the relation. Determines if

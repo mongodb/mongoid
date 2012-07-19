@@ -2453,7 +2453,7 @@ describe Mongoid::Relations::Embedded::Many do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as ]
+        [ :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as, :before_add, :after_add, :before_remove, :after_remove ]
       )
     end
   end
@@ -3368,4 +3368,200 @@ describe Mongoid::Relations::Embedded::Many do
       person.reload.appointments.count.should eq(2)
     end
   end
+
+  describe "#<< with before_add callback" do
+
+    let(:artist) { Artist.new }
+
+    let(:song) { Song.new }
+
+    context "executed without errors" do
+      before do
+        artist.songs << song
+      end
+
+      it "should execute callback" do
+        artist.before_add_called.should be_true
+      end
+
+      it "should execute callback as proc" do
+        song.before_add_called.should be_true
+      end
+
+      it "should add to collection" do
+        artist.songs.should eq([song])
+      end
+    end
+
+    context "with errors" do
+      before do
+        artist.expects(:before_add_song).raises
+      end
+
+      it "should not add to collection" do
+        expect {
+          artist.songs << song
+        }.to raise_error
+
+        artist.songs.should be_empty
+      end
+    end
+  end
+
+  describe "#<< with after_add callback" do
+    let(:artist) { Artist.new }
+
+    let(:label) { Label.new }
+
+    it "should execute callback" do
+      artist.labels << label
+
+      artist.after_add_called.should be_true
+    end
+
+    context "executed with errors" do
+      before do
+        artist.expects(:after_add_label).raises
+      end
+
+      it "should add to collection" do
+        expect {
+          artist.labels << label
+        }.to raise_error
+
+        artist.labels.should eq([ label ])
+      end
+    end
+  end
+
+  describe "#delete or #clear with before_remove callback" do
+    let(:artist) { Artist.new }
+
+    let(:song) { Song.new }
+
+    before do
+      artist.songs << song
+    end
+
+    context "executed without errors" do
+      context "#delete" do
+        before do
+          artist.songs.delete song
+        end
+
+        it "should execute callback" do
+          artist.before_remove_embedded_called.should be_true
+        end
+
+        it "should remove form collection" do
+          artist.songs.should be_empty
+        end
+      end
+
+      context "#clear" do
+        before do
+          artist.songs.clear
+        end
+
+        it "should execute callback" do
+          artist.before_remove_embedded_called.should be_true
+        end
+
+        it "shoud clear the collection" do
+          artist.songs.should be_empty
+        end
+      end
+
+      context "executed with errors" do
+        before do
+          artist.expects(:before_remove_song).raises
+        end
+
+        context "#delete" do
+          it "should not remove from collection" do
+            expect {
+              artist.songs.delete song
+            }.to raise_error
+
+            artist.songs.should eq([ song ])
+          end
+        end
+
+        context "#clear" do
+          it "should remove from collection" do
+            expect {
+              artist.songs.clear
+            }.to raise_error
+
+            artist.songs.should eq([ song ])
+          end
+        end
+      end
+    end
+  end
+
+  describe "#delete or #clear with after_remove callback" do
+    let(:artist) { Artist.new }
+
+    let(:label) { Label.new }
+
+    before do
+      artist.labels << label
+    end
+
+    context "without errors" do
+      context "delete" do
+        before do
+          artist.labels.delete label
+        end
+
+        it "should execute callback" do
+          artist.after_remove_embedded_called.should be_true
+        end
+      end
+
+      context "clear" do
+        before do
+          artist.labels.clear
+        end
+
+        it "should execute callback" do
+          artist.labels.clear
+
+          artist.after_remove_embedded_called.should be_true
+        end
+      end
+    end
+
+    context "executed with errors" do
+      before do
+        artist.expects(:after_remove_label).raises
+      end
+
+      context "delete" do
+        before do
+          expect {
+            artist.labels.delete label
+          }.to raise_error
+        end
+
+        it "should remove from collection" do
+          artist.labels.should be_empty
+        end
+      end
+
+      context "clear" do
+        before do
+          expect {
+            artist.labels.clear
+          }.to raise_error
+        end
+
+        it "should remove from collection" do
+          artist.labels.should be_empty
+        end
+      end
+    end
+  end
+
 end

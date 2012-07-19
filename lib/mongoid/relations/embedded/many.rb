@@ -130,6 +130,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def delete(document)
+          execute_callback :before_remove, document
           doc = target.delete_one(document)
           if doc && !_binding?
             _unscoped.delete_one(doc) unless doc.paranoid?
@@ -145,6 +146,7 @@ module Mongoid
             end
           end
           reindex
+          execute_callback :after_remove, document
           doc
         end
 
@@ -296,10 +298,12 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
+          execute_callback :before_add, document
           target.push(*scope([document]))
           _unscoped.push(document)
           integrate(document)
           document._index = _unscoped.size - 1
+          execute_callback :after_add, document
         end
 
         # Instantiate the binding associated with this relation.
@@ -586,7 +590,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as ]
+            [ :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as, :before_add, :after_add, :before_remove, :after_remove ]
           end
 
           # Get the default validation setting for the relation. Determines if

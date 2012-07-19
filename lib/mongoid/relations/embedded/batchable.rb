@@ -289,6 +289,7 @@ module Mongoid
         def pre_process_batch_remove(docs, method)
           docs.map do |doc|
             self.path = doc.atomic_path unless path
+            execute_callback :before_remove, doc
             if !_assigning? && !metadata.versioned?
               doc.cascade!
               doc.run_before_callbacks(:destroy) if method == :destroy
@@ -296,6 +297,7 @@ module Mongoid
             target.delete_one(doc)
             _unscoped.delete_one(doc)
             unbind_one(doc)
+            execute_callback :after_remove, doc
             doc.as_document
           end
         end
