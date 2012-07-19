@@ -456,7 +456,7 @@ describe Mongoid::Sessions do
         end
       end
 
-      describe ".map_reduce" do
+      describe ".map_reduce", config: :mongohq do
 
         let(:map) do
           %Q{
@@ -528,7 +528,7 @@ describe Mongoid::Sessions do
         end
       end
 
-      describe ".map_reduce" do
+      describe ".map_reduce", config: :mongohq do
 
         let(:map) do
           %Q{
@@ -650,7 +650,7 @@ describe Mongoid::Sessions do
         end
       end
 
-      describe ".map_reduce" do
+      describe ".map_reduce", config: :mongohq do
 
         let(:file) do
           File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
