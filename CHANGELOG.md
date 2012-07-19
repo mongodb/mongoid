@@ -13,6 +13,14 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2203 Map/Reduce now works properly in conjunction with `Model#with`.
+
+        Band.
+          with(session: "secondary").
+          where(:likes.gt => 100).
+          map_reduce(map, reduce).
+          out(inline: 1)
+
 * \#2199 Autosave false is now respected when automatically adding
   presence validation. (John Nishinaga)
 

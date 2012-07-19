@@ -455,6 +455,50 @@ describe Mongoid::Sessions do
           Band.with(database: "mongoid_test_alt").count.should eq(1)
         end
       end
+
+      describe ".map_reduce" do
+
+        let(:map) do
+          %Q{
+          function() {
+            emit(this.name, { likes: this.likes });
+          }}
+        end
+
+        let(:reduce) do
+          %Q{
+          function(key, values) {
+            var result = { likes: 0 };
+            values.forEach(function(value) {
+              result.likes += value.likes;
+            });
+            return result;
+          }}
+        end
+
+        before do
+          Band.with(database: "mongoid_test_alt").delete_all
+        end
+
+        let!(:depeche_mode) do
+          Band.with(database: "mongoid_test_alt").
+            create(name: "Depeche Mode", likes: 200)
+        end
+
+        let!(:tool) do
+          Band.with(database: "mongoid_test_alt").
+            create(name: "Tool", likes: 100)
+        end
+
+        let(:results) do
+          Band.with(database: "mongoid_test_alt").
+            map_reduce(map, reduce).out(inline: 1)
+        end
+
+        it "executes the map/reduce on the correct database" do
+          results.first["value"].should eq({ "likes" => 200 })
+        end
+      end
     end
 
     context "when sending operations to a different collection" do
@@ -481,6 +525,50 @@ describe Mongoid::Sessions do
 
         it "persists the correct number of documents" do
           Band.with(collection: "artists").count.should eq(1)
+        end
+      end
+
+      describe ".map_reduce" do
+
+        let(:map) do
+          %Q{
+          function() {
+            emit(this.name, { likes: this.likes });
+          }}
+        end
+
+        let(:reduce) do
+          %Q{
+          function(key, values) {
+            var result = { likes: 0 };
+            values.forEach(function(value) {
+              result.likes += value.likes;
+            });
+            return result;
+          }}
+        end
+
+        before do
+          Band.with(collection: "artists").delete_all
+        end
+
+        let!(:depeche_mode) do
+          Band.with(collection: "artists").
+            create(name: "Depeche Mode", likes: 200)
+        end
+
+        let!(:tool) do
+          Band.with(collection: "artists").
+            create(name: "Tool", likes: 100)
+        end
+
+        let(:results) do
+          Band.with(collection: "artists").
+            map_reduce(map, reduce).out(inline: 1)
+        end
+
+        it "executes the map/reduce on the correct collection" do
+          results.first["value"].should eq({ "likes" => 200 })
         end
       end
     end
@@ -559,6 +647,59 @@ describe Mongoid::Sessions do
           it "persists to the specified database" do
             from_db.should eq(band)
           end
+        end
+      end
+
+      describe ".map_reduce" do
+
+        let(:map) do
+          %Q{
+          function() {
+            emit(this.name, { likes: this.likes });
+          }}
+        end
+
+        let(:reduce) do
+          %Q{
+          function(key, values) {
+            var result = { likes: 0 };
+            values.forEach(function(value) {
+              result.likes += value.likes;
+            });
+            return result;
+          }}
+        end
+
+        before do
+          Band.with(
+            session: "mongohq_repl",
+            database: "mongoid-test"
+          ).delete_all
+        end
+
+        let!(:depeche_mode) do
+          Band.with(
+            session: "mongohq_repl",
+            database: "mongoid-test"
+          ).create(name: "Depeche Mode", likes: 200)
+        end
+
+        let!(:tool) do
+          Band.with(
+            session: "mongohq_repl",
+            database: "mongoid-test"
+          ).create(name: "Tool", likes: 100)
+        end
+
+        let(:results) do
+          Band.with(
+            session: "mongohq_repl",
+            database: "mongoid-test"
+          ).map_reduce(map, reduce).out(inline: 1)
+        end
+
+        it "executes the map/reduce on the correct session" do
+          results.first["value"].should eq({ "likes" => 200 })
         end
       end
     end
