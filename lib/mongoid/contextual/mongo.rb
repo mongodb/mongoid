@@ -183,7 +183,7 @@ module Mongoid
       #
       # @since 3.0.0
       def find_and_modify(update, options = {})
-        if doc = FindAndModify.new(criteria, update, options).result
+        if doc = FindAndModify.new(collection, criteria, update, options).result
           Factory.from_db(klass, doc)
         end
       end
@@ -271,7 +271,7 @@ module Mongoid
       #
       # @since 3.0.0
       def map_reduce(map, reduce)
-        MapReduce.new(criteria, map, reduce)
+        MapReduce.new(collection, criteria, map, reduce)
       end
 
       # Skips the provided number of documents.

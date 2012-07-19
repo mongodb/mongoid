@@ -78,9 +78,9 @@ module Mongoid
       # @param [ String ] reduce The reduce js function.
       #
       # @since 3.0.0
-      def initialize(criteria, map, reduce)
-        @criteria = criteria
-        command[:mapreduce] = criteria.klass.collection_name.to_s
+      def initialize(collection, criteria, map, reduce)
+        @collection, @criteria = collection, criteria
+        command[:mapreduce] = collection.name.to_s
         command[:map], command[:reduce] = map, reduce
         apply_criteria_options
       end

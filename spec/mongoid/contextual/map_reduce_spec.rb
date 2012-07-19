@@ -28,6 +28,10 @@ describe Mongoid::Contextual::MapReduce do
     Band.create(name: "Tool", likes: 100)
   end
 
+  let!(:collection) do
+    Band.collection
+  end
+
   describe "#command" do
 
     let(:criteria) do
@@ -35,7 +39,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     it "returns the db command" do
@@ -55,7 +59,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:counts) do
@@ -79,7 +83,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     context "when the map/reduce is inline" do
@@ -142,7 +146,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:emitted) do
@@ -157,7 +161,7 @@ describe Mongoid::Contextual::MapReduce do
   describe "#empty?" do
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     context "when the map/reduce has results" do
@@ -198,7 +202,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:finalized) do
@@ -217,7 +221,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:input) do
@@ -236,7 +240,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:results) do
@@ -255,7 +259,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     context "when providing inline" do
@@ -291,7 +295,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:output) do
@@ -310,7 +314,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:reduced) do
@@ -329,7 +333,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:finalize) do
@@ -356,7 +360,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:time) do

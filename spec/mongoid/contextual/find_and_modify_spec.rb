@@ -12,6 +12,10 @@ describe Mongoid::Contextual::FindAndModify do
       Band.create(name: "Tool")
     end
 
+    let!(:collection) do
+      Band.collection
+    end
+
     context "when the selector matches" do
 
       context "when not providing options" do
@@ -21,7 +25,7 @@ describe Mongoid::Contextual::FindAndModify do
         end
 
         let(:context) do
-          described_class.new(criteria, { "$inc" => { likes: 1 }})
+          described_class.new(collection, criteria, { "$inc" => { likes: 1 }})
         end
 
         let!(:result) do
@@ -44,7 +48,7 @@ describe Mongoid::Contextual::FindAndModify do
         end
 
         let(:context) do
-          described_class.new(criteria, { "$inc" => { likes: 1 }})
+          described_class.new(collection, criteria, { "$inc" => { likes: 1 }})
         end
 
         let!(:result) do
@@ -67,7 +71,7 @@ describe Mongoid::Contextual::FindAndModify do
         end
 
         let(:context) do
-          described_class.new(criteria, { "$inc" => { likes: 1 }})
+          described_class.new(collection, criteria, { "$inc" => { likes: 1 }})
         end
 
         let!(:result) do
@@ -94,7 +98,7 @@ describe Mongoid::Contextual::FindAndModify do
         end
 
         let(:context) do
-          described_class.new(criteria, { "$inc" => { likes: 1 }}, new: true)
+          described_class.new(collection, criteria, { "$inc" => { likes: 1 }}, new: true)
         end
 
         let!(:result) do
@@ -117,7 +121,7 @@ describe Mongoid::Contextual::FindAndModify do
         end
 
         let(:context) do
-          described_class.new(criteria, {}, remove: true)
+          described_class.new(collection, criteria, {}, remove: true)
         end
 
         let!(:result) do
@@ -142,7 +146,7 @@ describe Mongoid::Contextual::FindAndModify do
         end
 
         let(:context) do
-          described_class.new(criteria, { "$inc" => { likes: 1 }}, upsert: true)
+          described_class.new(collection, criteria, { "$inc" => { likes: 1 }}, upsert: true)
         end
 
         let(:result) do
@@ -174,7 +178,7 @@ describe Mongoid::Contextual::FindAndModify do
       end
 
       let(:context) do
-        described_class.new(criteria, { "$inc" => { likes: 1 }})
+        described_class.new(collection, criteria, { "$inc" => { likes: 1 }})
       end
 
       let(:result) do
