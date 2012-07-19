@@ -3,6 +3,10 @@ module Mongoid
   module Contextual
     module Command
 
+      # @attribute [r] collection The collection to query against.
+      # @attribute [r] criteria The criteria for the context.
+      attr_reader :collection, :criteria
+
       # The database command that is being built to send to the db.
       #
       # @example Get the command.
@@ -15,18 +19,6 @@ module Mongoid
         @command ||= {}
       end
 
-      # Get the criteria for the command.
-      #
-      # @example Get the criteria.
-      #   command.criteria
-      #
-      # @return [ Criteria ] The criteria.
-      #
-      # @since 3.0.0
-      def criteria
-        @criteria
-      end
-
       # Get the database session.
       #
       # @example Get the session.
@@ -36,7 +28,7 @@ module Mongoid
       #
       # @since 3.0.0
       def session
-        criteria.klass.mongo_session
+        collection.database.session
       end
     end
   end

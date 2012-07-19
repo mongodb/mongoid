@@ -25,9 +25,10 @@ module Mongoid
       # @option options [ true, false ] :upsert Create the document if it doesn't exist.
       #
       # @since 3.0.0
-      def initialize(criteria, update, options = {})
-        @criteria, @options, @update = criteria, options, update
-        @query = criteria.klass.collection.find(criteria.selector)
+      def initialize(collection, criteria, update, options = {})
+        @collection, @criteria, @options, @update =
+          collection, criteria, options, update
+        @query = collection.find(criteria.selector)
         apply_criteria_options
       end
 
