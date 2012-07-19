@@ -3157,134 +3157,154 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
-  describe "#<< with before_add callback" do
-    let(:artist) { Artist.new }
+  context "when pushing with a before_add callback" do
 
-    let(:album) { Album.new }
+    let(:artist) do
+      Artist.new
+    end
 
-    context "executed without errors" do
+    let(:album) do
+      Album.new
+    end
+
+    context "when execution raises no errors" do
+
       before do
         artist.albums << album
       end
 
-      it "should execute callback" do
+      it "it executes method callbacks" do
         artist.before_add_referenced_called.should be_true
       end
 
-      it "should execute callback as proc" do
+      it "it executes proc callbacks" do
         album.before_add_called.should be_true
       end
 
-      it "should add to collection" do
+      it "adds the document to the relation" do
         artist.albums.should eq([ album ])
       end
     end
 
-    context "executed with errors" do
+    context "when execution raises errors" do
+
       before do
-        artist.expects(:before_add_album).raises
+        artist.should_receive(:before_add_album).and_raise
       end
 
-      it "should add not add to collection" do
+      it "does not add the document to the relation" do
         expect {
           artist.albums << album
         }.to raise_error
-
         artist.albums.should be_empty
       end
     end
   end
 
-  describe "#<< with after_add callback" do
+  context "when pushing with an after_add callback" do
 
-    let(:artist) { Artist.new }
+    let(:artist) do
+      Artist.new
+    end
 
-    let(:album) { Album.new }
+    let(:album) do
+      Album.new
+    end
 
-    it "should execute callback" do
+    it "executes the callback" do
       artist.albums << album
-
       artist.after_add_referenced_called.should be_true
     end
 
-    context "executed with errors" do
+    context "when execution raises errors" do
+
       before do
-        artist.expects(:after_add_album).raises
+        artist.should_receive(:after_add_album).and_raise
       end
 
-      it "should add to collection" do
+      it "adds the document to the relation" do
         expect {
           artist.albums << album
         }.to raise_error
-
         artist.albums.should eq([ album ])
       end
     end
   end
 
-  describe "#delete or #clear with before_remove callback" do
-    let(:artist) { Artist.new }
+  context "when #delete or #clear with before_remove callback" do
 
-    let(:album) { Album.new }
+    let(:artist) do
+      Artist.new
+    end
+
+    let(:album) do
+      Album.new
+    end
 
     before do
       artist.albums << album
     end
 
-    context "executed without errors" do
-      context "#delete" do
+    context "when executing raises no errors" do
+
+      describe "#delete" do
+
         before do
           artist.albums.delete album
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.before_remove_referenced_called.should be_true
         end
 
-        it "should remove form collection" do
+        it "removes the document from the relation" do
           artist.albums.should be_empty
         end
       end
 
-      context "#clear" do
+      describe "#clear" do
+
         before do
           artist.albums.clear
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.before_remove_referenced_called.should be_true
         end
 
-        it "shoud clear the collection" do
+        it "clears the relation" do
           artist.albums.should be_empty
         end
       end
 
-      context "executed with errors" do
+      context "when execution raises errors" do
+
         before do
-          artist.expects(:before_remove_album).raises
+          artist.should_receive(:before_remove_album).and_raise
         end
 
-        context "#delete" do
+        describe "#delete" do
+
           before do
             expect {
               artist.albums.delete album
             }.to raise_error
           end
 
-          it "should not remove from collection" do
+          it "does not remove the document from the relation" do
             artist.albums.should eq([ album ])
           end
         end
 
-        context "#clear" do
+        describe "#clear" do
+
           before do
             expect {
               artist.albums.clear
             }.to raise_error
           end
 
-          it "should remove from collection" do
+          it "does not clear the relation" do
             artist.albums.should eq([ album ])
           end
         end
@@ -3292,71 +3312,77 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  context "when #delete or #clear with after_remove callback" do
 
+    let(:artist) do
+      Artist.new
+    end
 
-
-  describe "#delete or #clear with after_remove callback" do
-    let(:artist) { Artist.new }
-
-    let(:album) { Album.new }
+    let(:album) do
+      Album.new
+    end
 
     before do
       artist.albums << album
     end
 
     context "without errors" do
-      context "delete" do
+
+      describe "#delete" do
+
         before do
           artist.albums.delete album
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.after_remove_referenced_called.should be_true
         end
       end
 
-      context "clear" do
+      describe "#clear" do
+
         before do
           artist.albums.clear
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.albums.clear
-
           artist.after_remove_referenced_called.should be_true
         end
       end
     end
 
-    context "executed with errors" do
+    context "when errors are raised" do
+
       before do
-        artist.expects(:after_remove_album).raises
+        artist.should_receive(:after_remove_album).and_raise
       end
 
-      context "delete" do
+      describe "#delete" do
+
         before do
           expect {
             artist.albums.delete album
           }.to raise_error
         end
 
-        it "should remove from collection" do
+        it "removes the documents from the relation" do
           artist.albums.should be_empty
         end
       end
 
-      context "clear" do
+      describe "#clear" do
+
         before do
           expect {
             artist.albums.clear
           }.to raise_error
         end
 
-        it "should remove from collection" do
+        it "removes the documents from the relation" do
           artist.albums.should be_empty
         end
       end
     end
   end
-
 end
