@@ -461,6 +461,56 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
         end
       end
+
+      context "when association has callback" do
+        let(:post) { Post.new }
+        let(:tag) { Tag.new }
+
+        context "before_add" do
+          it "should execute callback" do
+            post.tags.send method, tag
+
+            post.before_add_called.should be_true
+          end
+
+          context "executed with errors" do
+            before do
+              post.expects(:before_add_tag).raises
+            end
+
+            it "should not add to collection" do
+              expect {
+                post.tags.send method, tag
+              }.to raise_error
+
+              post.tags.should be_empty
+            end
+          end
+        end
+
+        context "after_add" do
+          it "should execute callback" do
+            post.tags.send method, tag
+
+            post.after_add_called.should be_true
+          end
+
+          context "executed with errors" do
+            before do
+              post.expects(:after_add_tag).raises
+            end
+
+            it "should add to collection" do
+              expect {
+                post.tags.send method, tag
+              }.to raise_error
+
+              post.tags.should eq([ tag ])
+            end
+          end
+        end
+
+      end
     end
   end
 
@@ -1058,6 +1108,75 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "clears out the relation" do
           person.preferences.should be_empty
+        end
+      end
+    end
+
+    context "when association has callback" do
+      let(:post) { Post.new }
+      let(:tag) { Tag.new }
+
+      before do
+        post.tags << tag
+      end
+
+      context "before_remove" do
+        context "executed without errors" do
+          before do
+            post.tags.clear
+          end
+
+          it "should execute callback" do
+            post.before_remove_called.should be_true
+          end
+
+          it "should remove from collection" do
+            post.tags.should be_empty
+          end
+        end
+
+        context "executed with errors" do
+          before do
+            post.expects(:before_remove_tag).raises
+          end
+
+          it "should not remove from collection" do
+            expect {
+              post.tags.clear
+            }.to raise_error
+
+            post.tags.should eq([ tag ])
+          end
+        end
+      end
+
+      context "after_remove" do
+        context "executed without errors" do
+          before do
+            post.tags.clear
+          end
+
+          it "should execute callback" do
+            post.after_remove_called.should be_true
+          end
+
+          it "should remove from collection" do
+            post.tags.should be_empty
+          end
+        end
+
+        context "executed with errors" do
+          before do
+            post.expects(:after_remove_tag).raises
+          end
+
+          it "should remove from collection" do
+            expect {
+              post.tags.clear
+            }.to raise_error
+
+            post.tags.should be_empty
+          end
         end
       end
     end
@@ -1919,6 +2038,75 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
       end
     end
+
+    context "when association has callback" do
+      let(:post) { Post.new }
+      let(:tag) { Tag.new }
+
+      before do
+        post.tags << tag
+      end
+
+      context "before_remove" do
+        context "executed without errors" do
+          before do
+            post.tags.delete tag
+          end
+
+          it "should execute callback" do
+            post.before_remove_called.should be_true
+          end
+
+          it "should remove from collection" do
+            post.tags.should be_empty
+          end
+        end
+
+        context "executed with errors" do
+          before do
+            post.expects(:before_remove_tag).raises
+          end
+
+          it "should not remove from collection" do
+            expect {
+              post.tags.delete tag
+            }.to raise_error
+
+            post.tags.should eq([ tag ])
+          end
+        end
+      end
+
+      context "after_remove" do
+        context "executed without errors" do
+          before do
+            post.tags.delete tag
+          end
+
+          it "should execute callback" do
+            post.after_remove_called.should be_true
+          end
+
+          it "should remove from collection" do
+            post.tags.should be_empty
+          end
+        end
+
+        context "executed with errors" do
+          before do
+            post.expects(:after_remove_tag).raises
+          end
+
+          it "should remove from collection" do
+            expect {
+              post.tags.delete tag
+            }.to raise_error
+
+            post.tags.should be_empty
+          end
+        end
+      end
+    end
   end
 
   [ :delete_all, :destroy_all ].each do |method|
@@ -2726,7 +2914,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :autosave, :dependent, :foreign_key, :index, :order ]
+        [ :autosave, :dependent, :foreign_key, :index, :order, :before_add, :after_add, :before_remove, :after_remove ]
       )
     end
   end
