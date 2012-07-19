@@ -3369,130 +3369,148 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#<< with before_add callback" do
+  context "when pushing with a before_add callback" do
 
-    let(:artist) { Artist.new }
+    let(:artist) do
+      Artist.new
+    end
 
-    let(:song) { Song.new }
+    let(:song) do
+      Song.new
+    end
 
-    context "executed without errors" do
+    context "when no errors are raised" do
+
       before do
         artist.songs << song
       end
 
-      it "should execute callback" do
+      it "executes the callback" do
         artist.before_add_called.should be_true
       end
 
-      it "should execute callback as proc" do
+      it "executes the callback as proc" do
         song.before_add_called.should be_true
       end
 
-      it "should add to collection" do
+      it "adds the document to the relation" do
         artist.songs.should eq([song])
       end
     end
 
     context "with errors" do
+
       before do
-        artist.expects(:before_add_song).raises
+        artist.should_receive(:before_add_song).and_raise
       end
 
-      it "should not add to collection" do
+      it "does not add the document to the relation" do
         expect {
           artist.songs << song
         }.to raise_error
-
         artist.songs.should be_empty
       end
     end
   end
 
-  describe "#<< with after_add callback" do
-    let(:artist) { Artist.new }
+  context "when pushing with an after_add callback" do
 
-    let(:label) { Label.new }
+    let(:artist) do
+      Artist.new
+    end
 
-    it "should execute callback" do
+    let(:label) do
+      Label.new
+    end
+
+    it "executes the callback" do
       artist.labels << label
-
       artist.after_add_called.should be_true
     end
 
-    context "executed with errors" do
+    context "when errors are raised" do
+
       before do
-        artist.expects(:after_add_label).raises
+        artist.should_receive(:after_add_label).and_raise
       end
 
-      it "should add to collection" do
+      it "adds the document to the relation" do
         expect {
           artist.labels << label
         }.to raise_error
-
         artist.labels.should eq([ label ])
       end
     end
   end
 
-  describe "#delete or #clear with before_remove callback" do
-    let(:artist) { Artist.new }
+  context "#delete or #clear with before_remove callback" do
 
-    let(:song) { Song.new }
+    let(:artist) do
+      Artist.new
+    end
+
+    let(:song) do
+      Song.new
+    end
 
     before do
       artist.songs << song
     end
 
-    context "executed without errors" do
-      context "#delete" do
+    context "when no errors are raised" do
+
+      describe "#delete" do
+
         before do
-          artist.songs.delete song
+          artist.songs.delete(song)
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.before_remove_embedded_called.should be_true
         end
 
-        it "should remove form collection" do
+        it "removes the document from the relation" do
           artist.songs.should be_empty
         end
       end
 
-      context "#clear" do
+      describe "#clear" do
+
         before do
           artist.songs.clear
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.before_remove_embedded_called.should be_true
         end
 
-        it "shoud clear the collection" do
+        it "shoud clear the relation" do
           artist.songs.should be_empty
         end
       end
 
-      context "executed with errors" do
+      context "when errors are raised" do
+
         before do
-          artist.expects(:before_remove_song).raises
+          artist.should_receive(:before_remove_song).and_raise
         end
 
-        context "#delete" do
-          it "should not remove from collection" do
-            expect {
-              artist.songs.delete song
-            }.to raise_error
+        describe "#delete" do
 
+          it "does not remove the document from the relation" do
+            expect {
+              artist.songs.delete(song)
+            }.to raise_error
             artist.songs.should eq([ song ])
           end
         end
 
-        context "#clear" do
-          it "should remove from collection" do
+        describe "#clear" do
+
+          it "removes the documents from the relation" do
             expect {
               artist.songs.clear
             }.to raise_error
-
             artist.songs.should eq([ song ])
           end
         end
@@ -3500,57 +3518,66 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  describe "#delete or #clear with after_remove callback" do
-    let(:artist) { Artist.new }
+  context "#delete or #clear with after_remove callback" do
 
-    let(:label) { Label.new }
+    let(:artist) do
+      Artist.new
+    end
+
+    let(:label) do
+      Label.new
+    end
 
     before do
       artist.labels << label
     end
 
-    context "without errors" do
-      context "delete" do
+    context "when no errors are raised" do
+
+      describe "#delete" do
         before do
-          artist.labels.delete label
+          artist.labels.delete(label)
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.after_remove_embedded_called.should be_true
         end
       end
 
-      context "clear" do
+      describe "#clear" do
+
         before do
           artist.labels.clear
         end
 
-        it "should execute callback" do
+        it "executes the callback" do
           artist.labels.clear
-
           artist.after_remove_embedded_called.should be_true
         end
       end
     end
 
-    context "executed with errors" do
+    context "when errors are raised" do
+
       before do
-        artist.expects(:after_remove_label).raises
+        artist.should_receive(:after_remove_label).and_raise
       end
 
-      context "delete" do
+      describe "#delete" do
+
         before do
           expect {
-            artist.labels.delete label
+            artist.labels.delete(label)
           }.to raise_error
         end
 
-        it "should remove from collection" do
+        it "removes the document from the relation" do
           artist.labels.should be_empty
         end
       end
 
-      context "clear" do
+      describe "#clear" do
+
         before do
           expect {
             artist.labels.clear
@@ -3563,5 +3590,4 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
-
 end

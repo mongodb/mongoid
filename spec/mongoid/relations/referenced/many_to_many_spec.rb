@@ -462,54 +462,59 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
       end
 
-      context "when association has callback" do
-        let(:post) { Post.new }
-        let(:tag) { Tag.new }
+      context "when association has callbacks" do
 
-        context "before_add" do
-          it "should execute callback" do
-            post.tags.send method, tag
+        let(:post) do
+          Post.new
+        end
 
+        let(:tag) do
+          Tag.new
+        end
+
+        context "when the callback is a before_add" do
+
+          it "executes the callback" do
+            post.tags.send(method, tag)
             post.before_add_called.should be_true
           end
 
-          context "executed with errors" do
+          context "when errors are raised" do
+
             before do
-              post.expects(:before_add_tag).raises
+              post.should_receive(:before_add_tag).and_raise
             end
 
-            it "should not add to collection" do
+            it "does not add the document to the relation" do
               expect {
-                post.tags.send method, tag
+                post.tags.send(method, tag)
               }.to raise_error
-
               post.tags.should be_empty
             end
           end
         end
 
-        context "after_add" do
-          it "should execute callback" do
-            post.tags.send method, tag
+        context "when the callback is an after_add" do
 
+          it "executes the callback" do
+            post.tags.send(method, tag)
             post.after_add_called.should be_true
           end
 
-          context "executed with errors" do
+          context "when errors are raised" do
+
             before do
-              post.expects(:after_add_tag).raises
+              post.should_receive(:after_add_tag).and_raise
             end
 
-            it "should add to collection" do
+            it "adds the document to the relation" do
               expect {
-                post.tags.send method, tag
+                post.tags.send(method, tag)
               }.to raise_error
-
               post.tags.should eq([ tag ])
             end
           end
         end
-
       end
     end
   end
@@ -1112,69 +1117,79 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
 
-    context "when association has callback" do
-      let(:post) { Post.new }
-      let(:tag) { Tag.new }
+    context "when the association has callbacks" do
+
+      let(:post) do
+        Post.new
+      end
+
+      let(:tag) do
+        Tag.new
+      end
 
       before do
         post.tags << tag
       end
 
-      context "before_remove" do
-        context "executed without errors" do
+      context "when the callback is a before_remove" do
+
+        context "when no errors are raised" do
+
           before do
             post.tags.clear
           end
 
-          it "should execute callback" do
+          it "executes the callback" do
             post.before_remove_called.should be_true
           end
 
-          it "should remove from collection" do
+          it "removes the document from the relation" do
             post.tags.should be_empty
           end
         end
 
-        context "executed with errors" do
+        context "when errors are raised" do
+
           before do
-            post.expects(:before_remove_tag).raises
+            post.should_receive(:before_remove_tag).and_raise
           end
 
-          it "should not remove from collection" do
+          it "does not remove the document from the relation" do
             expect {
               post.tags.clear
             }.to raise_error
-
             post.tags.should eq([ tag ])
           end
         end
       end
 
-      context "after_remove" do
-        context "executed without errors" do
+      context "when the callback is an after_remove" do
+
+        context "when no errors are raised" do
+
           before do
             post.tags.clear
           end
 
-          it "should execute callback" do
+          it "executes the callback" do
             post.after_remove_called.should be_true
           end
 
-          it "should remove from collection" do
+          it "removes the document from the relation" do
             post.tags.should be_empty
           end
         end
 
-        context "executed with errors" do
+        context "when errors are raised" do
+
           before do
-            post.expects(:after_remove_tag).raises
+            post.should_receive(:after_remove_tag).and_raise
           end
 
-          it "should remove from collection" do
+          it "removes the document from the relation" do
             expect {
               post.tags.clear
             }.to raise_error
-
             post.tags.should be_empty
           end
         end
@@ -2039,69 +2054,79 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
 
-    context "when association has callback" do
-      let(:post) { Post.new }
-      let(:tag) { Tag.new }
+    context "when the association has callbacks" do
+
+      let(:post) do
+        Post.new
+      end
+
+      let(:tag) do
+        Tag.new
+      end
 
       before do
         post.tags << tag
       end
 
-      context "before_remove" do
-        context "executed without errors" do
+      context "when the callback is a before_remove" do
+
+        context "when there are no errors" do
+
           before do
             post.tags.delete tag
           end
 
-          it "should execute callback" do
+          it "executes the callback" do
             post.before_remove_called.should be_true
           end
 
-          it "should remove from collection" do
+          it "removes the document from the relation" do
             post.tags.should be_empty
           end
         end
 
-        context "executed with errors" do
+        context "when errors are raised" do
+
           before do
-            post.expects(:before_remove_tag).raises
+            post.should_receive(:before_remove_tag).and_raise
           end
 
-          it "should not remove from collection" do
+          it "does not remove the document from the relation" do
             expect {
               post.tags.delete tag
             }.to raise_error
-
             post.tags.should eq([ tag ])
           end
         end
       end
 
-      context "after_remove" do
-        context "executed without errors" do
+      context "when the callback is an after_remove" do
+
+        context "when no errors are raised" do
+
           before do
-            post.tags.delete tag
+            post.tags.delete(tag)
           end
 
-          it "should execute callback" do
+          it "executes the callback" do
             post.after_remove_called.should be_true
           end
 
-          it "should remove from collection" do
+          it "removes the document from the relation" do
             post.tags.should be_empty
           end
         end
 
-        context "executed with errors" do
+        context "when errors are raised" do
+
           before do
-            post.expects(:after_remove_tag).raises
+            post.should_receive(:after_remove_tag).and_raise
           end
 
-          it "should remove from collection" do
+          it "removes the document from the relation" do
             expect {
-              post.tags.delete tag
+              post.tags.delete(tag)
             }.to raise_error
-
             post.tags.should be_empty
           end
         end
