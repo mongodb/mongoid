@@ -575,16 +575,16 @@ describe Mongoid::Sessions do
 
     context "when sending operations to a different session" do
 
-      let(:file) do
-        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
-      end
-
-      before(:all) do
-        described_class.clear
-        Mongoid.load!(file, :test)
-      end
-
       describe ".create" do
+
+        let(:file) do
+          File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+        end
+
+        before(:all) do
+          described_class.clear
+          Mongoid.load!(file, :test)
+        end
 
         context "when sending to a mongohq single server", config: :mongohq do
 
@@ -651,6 +651,15 @@ describe Mongoid::Sessions do
       end
 
       describe ".map_reduce" do
+
+        let(:file) do
+          File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+        end
+
+        before(:all) do
+          described_class.clear
+          Mongoid.load!(file, :test)
+        end
 
         let(:map) do
           %Q{
