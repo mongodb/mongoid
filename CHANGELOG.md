@@ -5,6 +5,16 @@ For instructions on upgrading to newer versions, visit
 
 ## 3.1.0 (branch: master)
 
+* \#2180 1-n and n-n relations now support before/after add/remove callbacks.
+  (Rodrigo Saito)
+
+        class Band
+          include Mongoid::Document
+
+          embeds_many :albums, after_add: :notify_labels
+          has_many :followers, before_remove: ->(band, follower){ notify_unfollow(follower) }
+        end
+
 ### New Features
 
 ### Resolved Issues
