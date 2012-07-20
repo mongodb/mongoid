@@ -596,7 +596,7 @@ module Mongoid
       #
       # @since 3.0.0
       def load_ids(key)
-        query.select(key => 1).map do |doc|
+        query.dup.select(key => 1).map do |doc|
           doc[key]
         end
       end

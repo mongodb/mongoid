@@ -2011,6 +2011,30 @@ describe Mongoid::Criteria do
       end
     end
 
+    context "when mapping the results more than once" do
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      let!(:post) do
+        person.posts.create(title: "one")
+      end
+
+      let(:criteria) do
+        Post.includes(:person)
+      end
+
+      let!(:results) do
+        criteria.map { |doc| doc }
+        criteria.map { |doc| doc }
+      end
+
+      it "returns the proper results" do
+        results.first.title.should eq("one")
+      end
+    end
+
     context "when providing inclusions to the default scope" do
 
       before do
