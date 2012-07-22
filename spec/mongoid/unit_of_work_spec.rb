@@ -4,6 +4,14 @@ describe Mongoid::UnitOfWork do
 
   describe ".unit_of_work" do
 
+    before do
+      Mongoid.identity_map_enabled = true
+    end
+
+    after do
+      Mongoid.identity_map_enabled = false
+    end
+
     context "when no options are provided" do
 
       context "when an exception is raised" do

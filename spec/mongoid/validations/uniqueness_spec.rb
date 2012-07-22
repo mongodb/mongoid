@@ -164,7 +164,7 @@ describe Mongoid::Validations::UniquenessValidator do
                 Dictionary.create(name: "Oxford")
               end
 
-              let(:dictionary) do
+              let!(:dictionary) do
                 Dictionary.new(name: "Oxford")
               end
 
@@ -180,11 +180,11 @@ describe Mongoid::Validations::UniquenessValidator do
 
             context "when the document is the match in the database" do
 
-              let!(:dictionary) do
-                Dictionary.create(name: "Oxford")
-              end
-
               context "when the field has changed" do
+
+                let!(:dictionary) do
+                  Dictionary.create(name: "Oxford")
+                end
 
                 it "returns true" do
                   dictionary.should be_valid
@@ -192,6 +192,14 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               context "when the field has not changed" do
+
+                before do
+                  Dictionary.default_scoping = nil
+                end
+
+                let!(:dictionary) do
+                  Dictionary.create!(name: "Oxford")
+                end
 
                 let!(:from_db) do
                   Dictionary.find(dictionary.id)
