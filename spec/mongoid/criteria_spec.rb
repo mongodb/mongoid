@@ -1931,6 +1931,24 @@ describe Mongoid::Criteria do
       Person.create
     end
 
+    context "when providing a name that is not a relation" do
+
+      it "raises an error" do
+        expect {
+          Person.includes(:members)
+        }.to raise_error(Mongoid::Errors::InvalidIncludes)
+      end
+    end
+
+    context "when providing a hash" do
+
+      it "raises an error" do
+        expect {
+          Person.includes(preferences: :members)
+        }.to raise_error(Mongoid::Errors::InvalidIncludes)
+      end
+    end
+
     context "when the models are inherited" do
 
       before(:all) do

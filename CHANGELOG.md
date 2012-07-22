@@ -26,6 +26,9 @@ For instructions on upgrading to newer versions, visit
 * \#2207 When eager loading ids the query must be duped to avoid multiple
   iteration problems not getting the required fields.
 
+* \#2204 Raise an `InvalidIncludes` error when passing arguments to
+  `Criteria.includes` that are invalid (not relations, or more than 1 level.)
+
 * \#2203 Map/Reduce now works properly in conjunction with `Model#with`.
 
         Band.

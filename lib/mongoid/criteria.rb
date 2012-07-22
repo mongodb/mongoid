@@ -362,6 +362,7 @@ module Mongoid
     def includes(*relations)
       relations.each do |name|
         metadata = klass.reflect_on_association(name)
+        raise Errors::InvalidIncludes.new(klass, relations) unless metadata
         inclusions.push(metadata) unless inclusions.include?(metadata)
       end
       clone
