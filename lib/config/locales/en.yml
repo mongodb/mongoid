@@ -132,6 +132,15 @@ en:
             \_\_\_\_include Mongoid::Document\n
             \_\_\_\_field :%{name}, %{option}: true\n
             \_\_end\n\n"
+        invalid_includes:
+          message: "Invalid includes directive: %{klass}.includes(%{args})"
+          summary: "Eager loading in Mongoid only supports providing arguments
+            to %{klass}.includes that are the names of relations on the %{klass}
+            model, and only supports one level of eager loading. (ie, eager loading
+            associations not on the %{klass} but one step away via another relation
+            is not allowed."
+          resolution: "Ensure that each parameter passed to %{klass}.includes is
+            a valid name of a relation on the %{klass} model. These are: %{relations}."
         invalid_index:
           message: "Invalid index specification on %{klass}: %{spec}, %{options}"
           summary: "Indexes in Mongoid are defined as a hash of field name and
