@@ -215,6 +215,21 @@ describe Mongoid::Sessions do
 
     context "when getting the default" do
 
+      let(:file) do
+        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+      end
+
+      before do
+        Band.storage_options = nil
+        described_class.clear
+        Mongoid.load!(file, :test)
+        Mongoid.sessions[:default][:database] = database_id
+      end
+
+      after do
+        Band.storage_options = nil
+      end
+
       let!(:band) do
         Band.new
       end
@@ -320,6 +335,17 @@ describe Mongoid::Sessions do
     end
 
     context "when getting the default" do
+
+      let(:file) do
+        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+      end
+
+      before do
+        Band.storage_options = nil
+        described_class.clear
+        Mongoid.load!(file, :test)
+        Mongoid.sessions[:default][:database] = database_id
+      end
 
       let!(:mongo_session) do
         Band.mongo_session
@@ -863,10 +889,6 @@ describe Mongoid::Sessions do
       Mongoid.sessions = config
     end
 
-    after do
-      Mongoid::Config.load!(file, :test)
-    end
-
     context "when creating a document" do
 
       let!(:band) do
@@ -880,6 +902,14 @@ describe Mongoid::Sessions do
   end
 
   context "when overriding the default database "do
+
+    let(:file) do
+      File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+    end
+
+    before do
+      Mongoid::Config.load!(file, :test)
+    end
 
     context "when the override is global" do
 
@@ -908,7 +938,12 @@ describe Mongoid::Sessions do
 
     context "when the override is global" do
 
+      let(:file) do
+        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+      end
+
       before do
+        Mongoid::Config.load!(file, :test)
         Mongoid.override_session(:mongohq_single)
       end
 
