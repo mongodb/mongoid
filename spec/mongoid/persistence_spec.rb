@@ -394,6 +394,42 @@ describe Mongoid::Persistence do
       Person.create
     end
 
+    context "when skipping validation" do
+
+      context "when no relations are involved" do
+
+        let(:account) do
+          Account.new
+        end
+
+        let!(:saved) do
+          account.save(validate: false)
+        end
+
+        it "returns true" do
+          saved.should be_true
+        end
+
+        it "saves the document" do
+          account.should be_persisted
+        end
+
+        it "does not add any validation errors" do
+          account.errors.should be_empty
+        end
+      end
+
+      pending "when saving document that is a belongs to child" do
+
+        context "when validating presence of the parent" do
+
+          context "when the parent validates associated on the child" do
+
+          end
+        end
+      end
+    end
+
     context "when the document has been instantiated with limited fields" do
 
       before do
