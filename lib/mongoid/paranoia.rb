@@ -98,7 +98,7 @@ module Mongoid
 
     # Returns a string representing the documents's key suitable for use in URLs.
     def to_param
-      to_key.join('-')
+      new_record? ? nil : to_key.join('-')
     end
 
     private

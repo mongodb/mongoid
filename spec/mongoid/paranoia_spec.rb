@@ -520,10 +520,21 @@ describe Mongoid::Paranoia do
   describe "#to_param" do
 
     let(:post) do
-      ParanoidPost.create(title: "testing")
+      ParanoidPost.new(title: "testing")
+    end
+
+    context "when the document is new" do
+
+      it "still returns nil" do
+        post.to_param.should be_nil
+      end
     end
 
     context "when the document is not deleted" do
+
+      before do
+        post.save
+      end
 
       it "returns the id as a string" do
         post.to_param.should eq(post.id.to_s)
@@ -533,6 +544,7 @@ describe Mongoid::Paranoia do
     context "when the document is deleted" do
 
       before do
+        post.save
         post.delete
       end
 
