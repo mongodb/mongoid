@@ -516,4 +516,29 @@ describe Mongoid::Paranoia do
       unscoped.selector.should eq({})
     end
   end
+
+  describe "#to_param" do
+
+    let(:post) do
+      ParanoidPost.create(title: "testing")
+    end
+
+    context "when the document is not deleted" do
+
+      it "returns the id as a string" do
+        post.to_param.should eq(post.id.to_s)
+      end
+    end
+
+    context "when the document is deleted" do
+
+      before do
+        post.delete
+      end
+
+      it "returns the id as a string" do
+        post.to_param.should eq(post.id.to_s)
+      end
+    end
+  end
 end
