@@ -96,6 +96,11 @@ module Mongoid
       attributes.delete("deleted_at")
     end
 
+    # Returns a string representing the documents's key suitable for use in URLs.
+    def to_param
+      to_key.join('-')
+    end
+
     private
 
     # Get the collection to be used for paranoid operations.
