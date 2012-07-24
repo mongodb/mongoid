@@ -12,11 +12,12 @@ module Mongoid
         # @example Persist the new values.
         #   inc.persist
         #
-        # @return [ Object ] The new integer value.
+        # @return [ Object ] The new numeric value.
         #
         # @since 2.0.0
         def persist
           prepare do
+            self.value = value.to_f
             current = document[field] || 0
             document[field] = current + value
             execute("$inc")
