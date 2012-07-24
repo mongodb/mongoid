@@ -419,12 +419,46 @@ describe Mongoid::Persistence do
         end
       end
 
-      pending "when saving document that is a belongs to child" do
+      context "when saving document that is a belongs to child" do
+
+        let(:account) do
+          Account.create
+        end
+
+        let(:alert) do
+          Alert.new(account: account)
+        end
 
         context "when validating presence of the parent" do
 
+          before do
+            Alert.validates(:message, :account, presence: true)
+          end
+
+          after do
+            Alert.reset_callbacks(:validate)
+          end
+
           context "when the parent validates associated on the child" do
 
+            before do
+              alert.save(validate: false)
+            end
+
+            it "clears any errors off the document" do
+              alert.errors.should be_empty
+            end
+
+            context "when the document is not new" do
+
+              before do
+                alert.save(validate: false)
+              end
+
+              it "clears any errors off the document" do
+                alert.errors.should be_empty
+              end
+            end
           end
         end
       end

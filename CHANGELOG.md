@@ -25,6 +25,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2224 `Model#inc` now accepts `BigDecimal` values.
 
+* \#2212 Ensure errors are cleared after a save with `validate: false` in all
+  situations.
+
 * \#2207 When eager loading ids the query must be duped to avoid multiple
   iteration problems not getting the required fields.
 
