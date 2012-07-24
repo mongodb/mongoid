@@ -23,6 +23,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2224 `Model#inc` now accepts `BigDecimal` values.
+
 * \#2207 When eager loading ids the query must be duped to avoid multiple
   iteration problems not getting the required fields.
 

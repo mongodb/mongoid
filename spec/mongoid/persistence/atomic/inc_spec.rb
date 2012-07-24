@@ -33,24 +33,50 @@ describe Mongoid::Persistence::Atomic::Inc do
 
     context "when incrementing a field with a value" do
 
-      let!(:inced) do
-        person.inc(:age, 2)
+      context "when provided an integer" do
+
+        let!(:inced) do
+          person.inc(:age, 2)
+        end
+
+        it "increments by the provided value" do
+          person.age.should eq(102)
+        end
+
+        it "returns the new value" do
+          inced.should eq(102)
+        end
+
+        it "persists the changes" do
+          reloaded.age.should eq(102)
+        end
+
+        it "resets the dirty attributes" do
+          person.changes["age"].should be_nil
+        end
       end
 
-      it "increments by the provided value" do
-        person.age.should eq(102)
-      end
+      context "when provided a big decimal" do
 
-      it "returns the new value" do
-        inced.should eq(102)
-      end
+        let!(:inced) do
+          person.inc(:blood_alcohol_content, BigDecimal.new("2.2"))
+        end
 
-      it "persists the changes" do
-        reloaded.age.should eq(102)
-      end
+        it "increments by the provided value" do
+          person.blood_alcohol_content.should eq(2.2)
+        end
 
-      it "resets the dirty attributes" do
-        person.changes["age"].should be_nil
+        it "returns the new value" do
+          inced.should eq(2.2)
+        end
+
+        it "persists the changes" do
+          reloaded.blood_alcohol_content.should eq(2.2)
+        end
+
+        it "resets the dirty attributes" do
+          person.changes["blood_alcohol_content"].should be_nil
+        end
       end
     end
 
