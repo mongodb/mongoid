@@ -482,7 +482,7 @@ describe Mongoid::Sessions do
         end
       end
 
-      describe ".map_reduce" do
+      describe ".map_reduce", config: :mongohq do
 
         let(:map) do
           %Q{
@@ -554,7 +554,7 @@ describe Mongoid::Sessions do
         end
       end
 
-      describe ".map_reduce" do
+      describe ".map_reduce", config: :mongohq do
 
         let(:map) do
           %Q{
@@ -676,7 +676,7 @@ describe Mongoid::Sessions do
         end
       end
 
-      describe ".map_reduce" do
+      describe ".map_reduce", config: :mongohq do
 
         let(:map) do
           %Q{
