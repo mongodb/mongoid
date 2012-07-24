@@ -29,6 +29,7 @@ module Mongoid
           end
           document.post_persist unless result == false
         end
+        document.errors.clear unless validating?
         document
       end
     end
