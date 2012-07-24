@@ -72,7 +72,7 @@ module Mongoid
       #   person.inc(:score, 2)
       #
       # @param [ Symbol ] field The name of the field.
-      # @param [ Integer ] value The value to increment.
+      # @param [ Numeric ] value The value to increment.
       # @param [ Hash ] options The mongo persistence options.
       #
       # @return [ Array<Object> ] The new value of the field.
