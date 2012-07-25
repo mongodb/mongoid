@@ -360,7 +360,7 @@ module Mongoid
     #
     # @since 2.2.0
     def includes(*relations)
-      relations.each do |name|
+      relations.flatten.each do |name|
         metadata = klass.reflect_on_association(name)
         raise Errors::InvalidIncludes.new(klass, relations) unless metadata
         inclusions.push(metadata) unless inclusions.include?(metadata)
