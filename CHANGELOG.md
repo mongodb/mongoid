@@ -29,6 +29,9 @@ For instructions on upgrading to newer versions, visit
 * \#2241 Map/reduce operations now always use strong consistency since they
   have the potential to write to collections, most of the time.
 
+* \#2236 Keep the instance of the document in the validations exception
+  accessible via `document` or `record`.
+
 * \#2224 `Model#inc` now accepts `BigDecimal` values.
 
 * \#2212 Ensure errors are cleared after a save with `validate: false` in all
