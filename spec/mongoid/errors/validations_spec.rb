@@ -33,5 +33,13 @@ describe Mongoid::Errors::Validations do
         "Try persisting the document with valid data"
       )
     end
+
+    it "sets the document in the error" do
+      error.document.should eq(document)
+    end
+
+    it "aliases record to document" do
+      error.record.should eq(document)
+    end
   end
 end
