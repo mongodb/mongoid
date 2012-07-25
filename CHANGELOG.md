@@ -23,6 +23,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2242 Fix eager loading not to load all documents when calling first or
+  last.
+
 * \#2224 `Model#inc` now accepts `BigDecimal` values.
 
 * \#2212 Ensure errors are cleared after a save with `validate: false` in all
