@@ -26,6 +26,9 @@ For instructions on upgrading to newer versions, visit
 * \#2242 Fix eager loading not to load all documents when calling first or
   last.
 
+* \#2241 Map/reduce operations now always use strong consistency since they
+  have the potential to write to collections, most of the time.
+
 * \#2224 `Model#inc` now accepts `BigDecimal` values.
 
 * \#2212 Ensure errors are cleared after a save with `validate: false` in all
