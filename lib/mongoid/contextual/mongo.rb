@@ -538,7 +538,7 @@ module Mongoid
       # @since 3.0.0
       def eager_loaded_ids(docs, metadata)
         if metadata.stores_foreign_key?
-          load_ids(metadata.foreign_key).flatten
+          docs.flat_map{ |doc| doc.send(metadata.foreign_key) }
         else
           docs.map(&:id)
         end
@@ -582,23 +582,6 @@ module Mongoid
       # @since 3.0.0
       def reset_length
         @length = 0
-      end
-
-      # Loads an array of ids only for the current criteria. Used by eager
-      # loading to determine the documents to load.
-      #
-      # @example Load the related ids.
-      #   criteria.load_ids("person_id")
-      #
-      # @param [ String ] key The id or foriegn key string.
-      #
-      # @return [ Array<String, Moped::BSON::ObjectId> ] The ids to load.
-      #
-      # @since 3.0.0
-      def load_ids(key)
-        query.dup.select(key => 1).map do |doc|
-          doc[key]
-        end
       end
 
       # Apply all the optional criterion.

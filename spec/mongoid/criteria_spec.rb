@@ -2053,6 +2053,63 @@ describe Mongoid::Criteria do
       end
     end
 
+    context "when including a belongs to relation" do
+
+      let!(:person_two) do
+        Person.create
+      end
+
+      let!(:post_one) do
+        person.posts.create(title: "one")
+      end
+
+      let!(:post_two) do
+        person_two.posts.create(title: "two")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+      end
+
+      context "when calling first" do
+
+        let!(:document) do
+          Post.includes(:person).first
+        end
+
+        it "eager loads for the first document" do
+          Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
+        end
+
+        it "does not eager loads for the last document" do
+          Mongoid::IdentityMap[Person.collection_name][person_two.id].should be_nil
+        end
+
+        it "returns the first document" do
+          document.should eq(post_one)
+        end
+      end
+
+      context "when calling last" do
+
+        let!(:document) do
+          Post.includes(:person).last
+        end
+
+        it "eager loads for the first document" do
+          Mongoid::IdentityMap[Person.collection_name][person_two.id].should eq(person_two)
+        end
+
+        it "does not eager loads for the last document" do
+          Mongoid::IdentityMap[Person.collection_name][person.id].should be_nil
+        end
+
+        it "returns the last document" do
+          document.should eq(post_two)
+        end
+      end
+    end
+
     context "when providing inclusions to the default scope" do
 
       before do
