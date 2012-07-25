@@ -298,7 +298,7 @@ module Mongoid
       # @since 3.0.0
       def results
         raise Errors::NoMapReduceOutput.new(command) unless command[:out]
-        @results ||= session.command(command)
+        @results ||= session.with(consistency: :strong).command(command)
       end
     end
   end

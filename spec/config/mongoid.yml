@@ -5,7 +5,7 @@ test:
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
-        consistency: :strong
+        consistency: :eventual
     mongohq_single:
       database: <%=ENV["MONGOHQ_SINGLE_NAME"]%>
       username: <%=ENV["MONGOHQ_SINGLE_USER"]%>
