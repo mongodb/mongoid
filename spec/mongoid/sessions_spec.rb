@@ -516,13 +516,28 @@ describe Mongoid::Sessions do
             create(name: "Tool", likes: 100)
         end
 
-        let(:results) do
-          Band.with(database: "mongoid_test_alt").
-            map_reduce(map, reduce).out(inline: 1)
+        context "when outputting in memory" do
+
+          let(:results) do
+            Band.with(database: "mongoid_test_alt").
+              map_reduce(map, reduce).out(inline: 1)
+          end
+
+          it "executes the map/reduce on the correct database" do
+            results.first["value"].should eq({ "likes" => 200 })
+          end
         end
 
-        it "executes the map/reduce on the correct database" do
-          results.first["value"].should eq({ "likes" => 200 })
+        context "when outputting to a collection" do
+
+          let(:results) do
+            Band.with(database: "mongoid_test_alt").
+              map_reduce(map, reduce).out(replace: "bands_output")
+          end
+
+          it "executes the map/reduce on the correct database" do
+            results.first["value"].should eq({ "likes" => 200 })
+          end
         end
       end
     end
