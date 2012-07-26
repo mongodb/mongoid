@@ -6,6 +6,61 @@ describe Mongoid::Validations::UniquenessValidator do
 
     context "when the document is a root document" do
 
+      context "when adding custom persistence options" do
+
+        before do
+          Dictionary.validates_uniqueness_of :name
+        end
+
+        after do
+          Dictionary.reset_callbacks(:validate)
+        end
+
+        context "when persisting to another collection" do
+
+          before do
+            Dictionary.with(collection: "dicts").create(name: "websters")
+          end
+
+          context "when the document is not valid" do
+
+            let(:websters) do
+              Dictionary.with(collection: "dicts").new(name: "websters")
+            end
+
+            it "performs the validation on the correct collection" do
+              websters.should_not be_valid
+            end
+
+            it "adds the uniqueness error" do
+              websters.valid?
+              websters.errors[:name].should_not be_nil
+            end
+
+            it "clears the persistence options in the thread local" do
+              websters.valid?
+              Dictionary.persistence_options.should be_nil
+            end
+          end
+
+          context "when the document is valid" do
+
+            let(:oxford) do
+              Dictionary.with(collection: "dicts").new(name: "oxford")
+            end
+
+            it "performs the validation on the correct collection" do
+              oxford.should be_valid
+            end
+
+            it "does not clear the persistence options in the thread local" do
+              oxford.valid?
+              Dictionary.persistence_options.should_not be_nil
+            end
+          end
+        end
+      end
+
       context "when the document is paranoid" do
 
         before do

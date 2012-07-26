@@ -37,6 +37,10 @@ For instructions on upgrading to newer versions, visit
 * \#2236 Keep the instance of the document in the validations exception
   accessible via `document` or `record`.
 
+* \#2234 Ensure validations when document is getting persisted with custom
+  options work properly with custom options, and do not clear them out if
+  validation passes.
+
 * \#2224 `Model#inc` now accepts `BigDecimal` values.
 
 * \#2216 Fixed assignment of metadata on embeds one relations when setting

@@ -3,6 +3,7 @@ require "mongoid/validations/localizable"
 require "mongoid/validations/associated"
 require "mongoid/validations/format"
 require "mongoid/validations/length"
+require "mongoid/validations/queryable"
 require "mongoid/validations/presence"
 require "mongoid/validations/uniqueness"
 
@@ -87,6 +88,18 @@ module Mongoid
     # @since 2.0.0.rc.2
     def validated?
       Threaded.validated?(self)
+    end
+
+    # Are we currently performing a validation that has a query?
+    #
+    # @example Are we validating with a query?
+    #   document.validating_with_query?
+    #
+    # @return [ true, false ] If we are validating with a query.
+    #
+    # @since 3.0.2
+    def validating_with_query?
+      self.class.validating_with_query?
     end
 
     module ClassMethods
@@ -202,7 +215,7 @@ module Mongoid
         super
       end
 
-      protected
+      private
 
       # Adds an associated validator for the relation if the validate option
       # was not provided or set to true.
@@ -217,6 +230,18 @@ module Mongoid
         if metadata.validate?
           validates_associated(metadata.name)
         end
+      end
+
+      # Are we currently performing a validation that has a query?
+      #
+      # @example Are we validating with a query?
+      #   Model.validating_with_query?
+      #
+      # @return [ true, false ] If we are validating with a query.
+      #
+      # @since 3.0.2
+      def validating_with_query?
+        Threaded.executing?("#{name}-validate-with-query")
       end
     end
   end
