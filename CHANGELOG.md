@@ -39,6 +39,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2224 `Model#inc` now accepts `BigDecimal` values.
 
+* \#2216 Fixed assignment of metadata on embeds one relations when setting
+  multiple times in a row.
+
 * \#2212 Ensure errors are cleared after a save with `validate: false` in all
   situations.
 

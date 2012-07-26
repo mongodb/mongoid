@@ -19,6 +19,7 @@ module Mongoid
           init(base, target, metadata) do
             characterize_one(target)
             bind_one
+            characterize_one(target)
             target.save if persistable?
           end
         end
@@ -38,12 +39,14 @@ module Mongoid
           if _assigning?
             base.add_atomic_unset(target)
           else
-            destroy if persistable?
+            target.destroy if persistable?
           end
           unbind_one
           return nil unless replacement
           self.target = replacement
           bind_one
+          characterize_one(target)
+          target.save if persistable? && !_assigning?
           self
         end
 
