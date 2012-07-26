@@ -52,6 +52,18 @@ module Mongoid
         self
       end
 
+      # Check if the object is part of a blank relation criteria.
+      #
+      # @example Is the object blank criteria?
+      #   "".blank_criteria?
+      #
+      # @return [ true, false ] If the object is blank criteria.
+      #
+      # @since 3.1.0
+      def blank_criteria?
+        false
+      end
+
       # Do or do not, there is no try. -- Yoda.
       #
       # @example Do or do not.

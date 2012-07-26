@@ -409,6 +409,34 @@ describe Mongoid::Extensions::Array do
     end
   end
 
+  describe "#blank_criteria?" do
+
+    context "when the array has an empty _id criteria" do
+
+      context "when only the id criteria is in the array" do
+
+        let(:array) do
+          [{ "_id" => { "$in" => [] }}]
+        end
+
+        it "returns true" do
+          array.should be_blank_criteria
+        end
+      end
+
+      context "when the id criteria is in the array with others" do
+
+        let(:array) do
+          [{ "_id" => "test" }, { "_id" => { "$in" => [] }}]
+        end
+
+        it "returns true" do
+          array.should be_blank_criteria
+        end
+      end
+    end
+  end
+
   describe "#delete_one" do
 
     context "when the object doesn't exist" do

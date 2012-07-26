@@ -47,6 +47,18 @@ module Mongoid
         consolidated
       end
 
+      # Check if the hash is part of a blank relation criteria.
+      #
+      # @example Is the hash blank criteria?
+      #   {}.blank_criteria?
+      #
+      # @return [ true, false ] If the hash is blank criteria.
+      #
+      # @since 3.1.0
+      def blank_criteria?
+        self == { "_id" => { "$in" => [] }}
+      end
+
       # Deletes an id value from the hash.
       #
       # @example Delete an id value.

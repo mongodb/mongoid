@@ -18,6 +18,9 @@ For instructions on upgrading to newer versions, visit
           has_many :followers, before_remove: ->(band, follower){ notify_unfollow(follower) }
         end
 
+* \#1766 Many to many relations will not touch the database if the foreign key
+  is an empty array.
+
 ### New Features
 
 ### Resolved Issues
