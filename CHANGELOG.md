@@ -29,6 +29,9 @@ For instructions on upgrading to newer versions, visit
 * \#2241 Map/reduce operations now always use strong consistency since they
   have the potential to write to collections, most of the time.
 
+* \#2238 Ensure n-n foreign key fields are flagged as resizable to prevent
+  `nil` -> `[]` changes when using `#only` and updating.
+
 * \#2236 Keep the instance of the document in the validations exception
   accessible via `document` or `record`.
 

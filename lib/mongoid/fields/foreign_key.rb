@@ -100,6 +100,18 @@ module Mongoid
           metadata.polymorphic? ? true : metadata.klass.using_object_ids?
       end
 
+      # Returns true if an array, false if not.
+      #
+      # @example Is the field resizable?
+      #   field.resizable?
+      #
+      # @return [ true, false ] If the field is resizable.
+      #
+      # @since 3.0.2
+      def resizable?
+        type.resizable?
+      end
+
       private
 
       # Evaluate the default proc. In some cases we need to instance exec,
