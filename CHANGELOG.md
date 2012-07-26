@@ -5,6 +5,8 @@ For instructions on upgrading to newer versions, visit
 
 ## 3.1.0 (branch: master)
 
+### New Features
+
 * \#2197 When providing session configuration with no ports, Mongoid will now
   default these to 27017.
 
@@ -21,11 +23,16 @@ For instructions on upgrading to newer versions, visit
 * \#1766 Many to many relations will not touch the database if the foreign key
   is an empty array.
 
-### New Features
+### Resolved Issues
+
+## 3.0.3 (branch: 3.0.0-stable)
 
 ### Resolved Issues
 
-## 3.0.2 (branch: 3.0.0-stable)
+* \#2248 Improved the performance of `exists?` on criteria and relations.
+  (Jonathan Hyman)
+
+## 3.0.2
 
 ### Resolved Issues
 

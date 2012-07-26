@@ -72,16 +72,6 @@ module Mongoid
         doc
       end
 
-      # Determine if any documents in this relation exist in the database.
-      #
-      # @example Are there persisted documents?
-      #   person.posts.exists?
-      #
-      # @return [ true, false ] True is persisted documents exist, false if not.
-      def exists?
-        criteria.embedded? ? count > 0 : criteria.exists?
-      end
-
       # Find the first document given the conditions, or creates a new document
       # with the conditions that were supplied.
       #
