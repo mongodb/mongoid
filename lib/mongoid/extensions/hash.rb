@@ -47,6 +47,18 @@ module Mongoid
         consolidated
       end
 
+      # Deletes an id value from the hash.
+      #
+      # @example Delete an id value.
+      #   {}.delete_id
+      #
+      # @return [ Object ] The deleted value, or nil.
+      #
+      # @since 3.0.2
+      def delete_id
+        delete("_id") || delete("id") || delete(:id) || delete(:_id)
+      end
+
       # Get the id attribute from this hash, whether it's prefixed with an
       # underscore or is a symbol.
       #
