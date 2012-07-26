@@ -201,6 +201,23 @@ describe Mongoid::Relations::Embedded::One do
         end
       end
     end
+
+    context "when setting a new document multiple times in a row" do
+
+      let(:parent) do
+        Parent.create
+      end
+
+      before do
+        parent.first_child = Child.new
+        parent.first_child = Child.new
+        parent.first_child = Child.new
+      end
+
+      it "saves the child document" do
+        parent.first_child.should be_a(Child)
+      end
+    end
   end
 
   describe "#= nil" do
