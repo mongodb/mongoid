@@ -65,7 +65,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.1.0
         def raise_or_return(value)
-          return nil if value.blank?
+          return nil if value.nil? || value == ""
           unless value.is_a?(::Array)
             raise Mongoid::Errors::InvalidType.new(::Array, value)
           end
