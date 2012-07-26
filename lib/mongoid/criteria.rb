@@ -187,7 +187,10 @@ module Mongoid
     #
     # @since 1.0.0
     def exists?
-      context.count > 0
+      Mongoid.unit_of_work(disable: :current) do
+        # Don't use count here since Mongo does not use counted b-tree indexes
+        !context.dup.criteria.only(:_id).limit(1).entries.first.nil?
+      end
     end
 
     # Extract a single id from the provided criteria. Could be in an $and
