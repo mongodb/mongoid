@@ -18,7 +18,6 @@ module Mongoid
     include Criterion::Scoping
 
     attr_accessor :embedded, :klass
-    delegate :exists?, to: :context
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.

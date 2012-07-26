@@ -168,6 +168,16 @@ module Mongoid
           target.each { |doc| yield(doc) if block_given? }
         end
 
+        # Determine if any documents in this relation exist in the database.
+        #
+        # @example Are there persisted documents?
+        #   person.posts.exists?
+        #
+        # @return [ true, false ] True is persisted documents exist, false if not.
+        def exists?
+          criteria.exists?
+        end
+
         # Find the matchind document on the association, either based on id or
         # conditions.
         #
