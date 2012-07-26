@@ -30,7 +30,7 @@ module Mongoid
       #
       # @since 3.0.0
       def blank?
-        count == 0
+        !exists?
       end
       alias :empty? :blank?
 
@@ -151,7 +151,10 @@ module Mongoid
       #
       # @since 3.0.0
       def exists?
-        count > 0
+        Mongoid.unit_of_work(disable: :current) do
+          # Don't use count here since Mongo does not use counted b-tree indexes
+          !criteria.dup.only(:_id).limit(1).entries.first.nil?
+        end
       end
 
       # Run an explain on the criteria.

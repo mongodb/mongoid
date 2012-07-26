@@ -79,7 +79,14 @@ module Mongoid
       #
       # @return [ true, false ] True is persisted documents exist, false if not.
       def exists?
-        count > 0
+        if criteria.embedded?
+          count > 0
+        else
+          Mongoid.unit_of_work(disable: :current) do
+            # Don't use count here since Mongo does not use counted b-tree indexes
+            !criteria.dup.only(:_id).limit(1).entries.first.nil?
+          end
+        end
       end
 
       # Find the first document given the conditions, or creates a new document
