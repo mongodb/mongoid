@@ -153,7 +153,7 @@ module Mongoid
               yield(doc)
             end
           else
-            _unloaded.each do |doc|
+            unloaded_documents.each do |doc|
               document = _added.delete(doc.id) || _loaded.delete(doc.id) || doc
               yield(document)
               _loaded[document.id] = document
@@ -400,6 +400,10 @@ module Mongoid
             _added[_unloaded.try(location).try(:id)] ||
             _unloaded.try(location) ||
             _added.values.try(location)
+        end
+
+        def unloaded_documents
+          _unloaded.selector.values.any?(&:blank_criteria?) ? [] : _unloaded
         end
       end
     end
