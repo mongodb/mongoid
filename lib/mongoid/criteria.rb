@@ -18,6 +18,7 @@ module Mongoid
     include Criterion::Scoping
 
     attr_accessor :embedded, :klass
+    delegate :exists?, to: :context
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.
@@ -176,21 +177,6 @@ module Mongoid
       result = multiple_from_map_or_db(ids)
       check_for_missing_documents!(result, ids)
       multi ? result : result.first
-    end
-
-    # Return true if the criteria has some Document or not.
-    #
-    # @example Are there any documents for the criteria?
-    #   criteria.exists?
-    #
-    # @return [ true, false ] If documents match.
-    #
-    # @since 1.0.0
-    def exists?
-      Mongoid.unit_of_work(disable: :current) do
-        # Don't use count here since Mongo does not use counted b-tree indexes
-        !context.dup.criteria.only(:_id).limit(1).entries.first.nil?
-      end
     end
 
     # Extract a single id from the provided criteria. Could be in an $and
