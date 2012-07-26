@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * \#2240 Ensure `Criteria#safely` and `Criteria#unsafely` raise errors since
   the calls must happen before the criteria is created.
 
+* \#2167 Return nil when trying to set array fields with empty strings to
+  protect from blank form fields.
+
 ## 2.4.12
 
 ### Resolved Issues

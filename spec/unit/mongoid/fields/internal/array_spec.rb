@@ -135,6 +135,13 @@ describe Mongoid::Fields::Internal::Array do
       end
     end
 
+    context "when the value is blank" do
+
+      it "returns nil" do
+        field.serialize("").should be_nil
+      end
+    end
+
     context "when the value is an array" do
 
       it "returns the array" do
