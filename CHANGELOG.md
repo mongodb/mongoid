@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.4.13
+
+### Resolved Issues
+
+* \#2240 Ensure `Criteria#safely` and `Criteria#unsafely` raise errors since
+  the calls must happen before the criteria is created.
+
 ## 2.4.12
 
 ### Resolved Issues

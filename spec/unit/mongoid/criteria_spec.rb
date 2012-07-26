@@ -1120,4 +1120,22 @@ describe Mongoid::Criteria do
       criteria.limit(1).context.options[:limit].should == 1
     end
   end
+
+  describe "#safely" do
+
+    it "raises a no method error" do
+      expect {
+        Person.where(:title => "sir").safely
+      }.to raise_error(NoMethodError)
+    end
+  end
+
+  describe "#unsafely" do
+
+    it "raises a no method error" do
+      expect {
+        Person.where(:title => "sir").unsafely
+      }.to raise_error(NoMethodError)
+    end
+  end
 end

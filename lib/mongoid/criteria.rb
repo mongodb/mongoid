@@ -247,6 +247,7 @@ module Mongoid #:nodoc:
     #
     # @return [ true, false ] If the criteria responds to the method.
     def respond_to?(name, include_private = false)
+      return false if [ :safely, :unsafely ].include?(name)
       # don't include klass private methods because method_missing won't call them
       super || @klass.respond_to?(name) || entries.respond_to?(name, include_private)
     end
@@ -377,6 +378,7 @@ module Mongoid #:nodoc:
     # Used for chaining +Criteria+ scopes together in the for of class methods
     # on the +Document+ the criteria is for.
     def method_missing(name, *args, &block)
+      super if [ :safely, :unsafely ].include?(name)
       if @klass.respond_to?(name)
         @klass.send(:with_scope, self) do
           @klass.send(name, *args, &block)
