@@ -151,10 +151,8 @@ module Mongoid
       #
       # @since 3.0.0
       def exists?
-        Mongoid.unit_of_work(disable: :current) do
-          # Don't use count here since Mongo does not use counted b-tree indexes
-          !criteria.dup.only(:_id).limit(1).entries.first.nil?
-        end
+        # Don't use count here since Mongo does not use counted b-tree indexes
+        !query.dup.select(_id: 1).limit(1).entries.first.nil?
       end
 
       # Run an explain on the criteria.
