@@ -627,4 +627,29 @@ describe Mongoid::Fields::ForeignKey do
       end
     end
   end
+
+  describe "#resizable" do
+
+    context "when the type is an array" do
+
+      let(:field) do
+        described_class.new(:vals, type: Array, default: [])
+      end
+
+      it "returns true" do
+        field.should be_resizable
+      end
+    end
+
+    context "when the type is an object" do
+
+      let(:field) do
+        described_class.new(:vals, type: Object, default: [])
+      end
+
+      it "returns false" do
+        field.should_not be_resizable
+      end
+    end
+  end
 end
