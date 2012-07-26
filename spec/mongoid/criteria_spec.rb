@@ -3515,6 +3515,35 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#for_js" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    context "when the code has no scope" do
+
+      let(:criteria) do
+        Band.for_js("this.name == 'Depeche Mode'")
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+
+    context "when the code has scope" do
+
+      let(:criteria) do
+        Band.for_js("this.name == param", param: "Depeche Mode")
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+  end
+
   describe "#within_box" do
 
     before do
