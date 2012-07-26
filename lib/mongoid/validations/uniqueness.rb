@@ -14,6 +14,8 @@ module Mongoid
     #     validates_uniqueness_of :title
     #   end
     class UniquenessValidator < ActiveModel::EachValidator
+      include Queryable
+
       attr_reader :klass
 
       # Unfortunately, we have to tie Uniqueness validators to a class.
@@ -41,12 +43,14 @@ module Mongoid
       #
       # @since 1.0.0
       def validate_each(document, attribute, value)
-        attrib, val = to_validate(document, attribute, value)
-        return unless validation_required?(document, attrib)
-        if document.embedded?
-          validate_embedded(document, attrib, val)
-        else
-          validate_root(document, attrib, val)
+        with_query(document) do
+          attrib, val = to_validate(document, attribute, value)
+          return unless validation_required?(document, attrib)
+          if document.embedded?
+            validate_embedded(document, attrib, val)
+          else
+            validate_root(document, attrib, val)
+          end
         end
       end
 
