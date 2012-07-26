@@ -100,8 +100,29 @@ module Mongoid
       # @since 3.0.0
       def parse(config)
         options = config[:options].try(:dup) || {}
-        parsed = config.has_key?(:uri) ? MongoUri.new(config[:uri]).to_hash : config
+        parsed = if config.has_key?(:uri)
+          MongoUri.new(config[:uri]).to_hash
+        else
+          inject_ports(config)
+        end
         [ parsed, options ]
+      end
+
+      # Will inject the default port of 27017 if not supplied.
+      #
+      # @example Inject default ports.
+      #   factory.inject_ports(config)
+      #
+      # @param [ Hash ] config The session configuration.
+      #
+      # @return [ Hash ] The altered configuration.
+      #
+      # @since 3.1.0
+      def inject_ports(config)
+        config["hosts"] = config["hosts"].map do |host|
+          host =~ /:/ ? host : "#{host}:27017"
+        end
+        config
       end
     end
   end

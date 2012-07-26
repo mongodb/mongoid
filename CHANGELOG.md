@@ -5,6 +5,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 3.1.0 (branch: master)
 
+* \#2197 When providing session configuration with no ports, Mongoid will now
+  default these to 27017.
+
 * \#2180 1-n and n-n relations now support before/after add/remove callbacks.
   (Rodrigo Saito)
 
