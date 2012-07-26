@@ -79,7 +79,7 @@ module Mongoid
       #
       # @return [ true, false ] True is persisted documents exist, false if not.
       def exists?
-        count > 0
+        criteria.embedded? ? count > 0 : criteria.exists?
       end
 
       # Find the first document given the conditions, or creates a new document

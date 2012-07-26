@@ -30,7 +30,7 @@ module Mongoid
       #
       # @since 3.0.0
       def blank?
-        count == 0
+        !exists?
       end
       alias :empty? :blank?
 
@@ -151,7 +151,8 @@ module Mongoid
       #
       # @since 3.0.0
       def exists?
-        count > 0
+        # Don't use count here since Mongo does not use counted b-tree indexes
+        !query.dup.select(_id: 1).limit(1).entries.first.nil?
       end
 
       # Run an explain on the criteria.
