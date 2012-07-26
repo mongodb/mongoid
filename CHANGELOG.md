@@ -23,6 +23,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2244 Get rid of id mass assignment warnings in nested attributes.
+
 * \#2242 Fix eager loading not to load all documents when calling first or
   last.
 

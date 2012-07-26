@@ -99,6 +99,7 @@ module Mongoid
                 existing.delete(doc)
                 doc.destroy unless doc.embedded?
               else
+                attrs.delete_id
                 metadata.embedded? ? doc.attributes = attrs : doc.update_attributes(attrs)
               end
             else

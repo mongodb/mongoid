@@ -25,6 +25,7 @@ module Mongoid
             return if reject?(parent, attributes)
             @existing = parent.send(metadata.name)
             if update?
+              attributes.delete_id
               existing.attributes = attributes
             elsif replace?
               parent.send(metadata.setter, Factory.build(metadata.klass, attributes))
