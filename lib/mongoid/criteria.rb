@@ -517,6 +517,24 @@ module Mongoid
       super
     end
 
+    # Find documents by the provided javascript and scope. Uses a $where but is
+    # different from +Criteria#where+ in that it will pass a code object to the
+    # query instead of a pure string. Safe against Javascript injection
+    # attacks.
+    #
+    # @example Find by javascript.
+    #   Band.for_js("this.name = param", param: "Tool")
+    #
+    # @param [ String ] javascript The javascript to execute in the $where.
+    # @param [ Hash ] scope The scope for the code.
+    #
+    # @return [ Criteria ] The criteria.
+    #
+    # @since 3.1.0
+    def for_js(javascript, scope = {})
+      js_query(Moped::BSON::Code.new(javascript, scope))
+    end
+
     private
 
     # Are documents in the query missing, and are we configured to raise an

@@ -7,6 +7,12 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2223 Allow to find documents by javascript with parameters that are
+  protected from javascript injection via `Model.for_js`.
+
+        Band.for_js("this.name = param", param: "Tool")
+        Band.where(:likes.gt => 1000).for_js("this.likes < this.follows")
+
 * \#2197 When providing session configuration with no ports, Mongoid will now
   default these to 27017.
 
