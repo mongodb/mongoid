@@ -38,6 +38,44 @@ describe Mongoid::Sessions::Factory do
           end
         end
 
+        context "when the configuration has no ports" do
+
+          let(:config) do
+            {
+              default: { hosts: [ "127.0.0.1" ], database: database_id },
+              secondary: { hosts: [ "localhost" ], database: database_id }
+            }
+          end
+
+          before do
+            Mongoid::Config.sessions = config
+          end
+
+          let(:session) do
+            described_class.create(:secondary)
+          end
+
+          let(:default) do
+            described_class.create(:default)
+          end
+
+          let(:cluster) do
+            session.cluster
+          end
+
+          it "returns a session" do
+            session.should be_a(Moped::Session)
+          end
+
+          it "sets the cluster's seed ports to 27017" do
+            cluster.seeds.should eq([ "localhost:27017" ])
+          end
+
+          it "sets ips with no ports to 27017" do
+            default.cluster.seeds.should eq([ "127.0.0.1:27017" ])
+          end
+        end
+
         context "when configured via a uri" do
 
           context "when the uri has a single host:port" do
