@@ -3,6 +3,18 @@ module Mongoid
   module Extensions
     module BigDecimal
 
+      # Convert the big decimal to an $inc-able value.
+      #
+      # @example Convert the big decimal.
+      #   bd.__to_inc__
+      #
+      # @return [ Float ] The big decimal as a float.
+      #
+      # @since 3.0.3
+      def __to_inc__
+        to_f
+      end
+
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #

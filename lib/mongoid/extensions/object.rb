@@ -52,6 +52,18 @@ module Mongoid
         self
       end
 
+      # Conversion of an object to an $inc-able value.
+      #
+      # @example Convert the object.
+      #   1.__to_inc__
+      #
+      # @return [ Object ] The object.
+      #
+      # @since 3.0.3
+      def __to_inc__
+        self
+      end
+
       # Check if the object is part of a blank relation criteria.
       #
       # @example Is the object blank criteria?
