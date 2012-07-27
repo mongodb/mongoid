@@ -17,12 +17,27 @@ module Mongoid
         # @since 2.0.0
         def persist
           prepare do
-            self.value = value.to_f
             current = document[field] || 0
             document[field] = current + value
             execute("$inc")
             document[field]
           end
+        end
+
+        private
+
+        # In case we need to cast going to the database.
+        #
+        # @api private
+        #
+        # @example Cast the value.
+        #   operation.cast_value
+        #
+        # @return [ Integer, Float ] The value casted.
+        #
+        # @since 3.0.3
+        def cast_value
+          value.__to_inc__
         end
       end
     end

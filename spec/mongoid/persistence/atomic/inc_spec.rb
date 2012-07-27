@@ -51,6 +51,10 @@ describe Mongoid::Persistence::Atomic::Inc do
           reloaded.age.should eq(102)
         end
 
+        it "keeps the field as an integer" do
+          inced.should be_a(Integer)
+        end
+
         it "resets the dirty attributes" do
           person.changes["age"].should be_nil
         end
