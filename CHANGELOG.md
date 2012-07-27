@@ -35,6 +35,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2254 $inc operations no longer convert all values to floats.
+
 * \#2248 Improved the performance of `exists?` on criteria and relations.
   (Jonathan Hyman)
 

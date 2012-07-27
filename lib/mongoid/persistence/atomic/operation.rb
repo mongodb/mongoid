@@ -47,7 +47,7 @@ module Mongoid
         #
         # @since 2.0.0
         def operation(modifier)
-          { modifier => { path => value } }
+          { modifier => { path => cast_value } }
         end
 
         # Get the path to the field that is getting atomically updated.
@@ -81,6 +81,20 @@ module Mongoid
         end
 
         private
+
+        # In case we need to cast going to the database.
+        #
+        # @api private
+        #
+        # @example Cast the value.
+        #   operation.cast_value
+        #
+        # @return [ Object ] The value.
+        #
+        # @since 3.0.3
+        def cast_value
+          value
+        end
 
         # Executes the common functionality between operations.
         #
