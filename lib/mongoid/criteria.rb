@@ -600,12 +600,11 @@ module Mongoid
     #
     # @since 1.0.0
     def initialize_copy(other)
-      @selector = other.selector.dup
-      @options = other.options.dup
       @inclusions = other.inclusions.dup
       @scoping_options = other.scoping_options
       @documents = other.documents.dup
       @context = nil
+      super
     end
 
     # Get documents from the database only.
