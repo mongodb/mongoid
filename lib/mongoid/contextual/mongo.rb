@@ -355,55 +355,32 @@ module Mongoid
         end
       end
 
-      # Apply the skip option.
+      # Apply the options.
+      #
+      # @api private
+      #
+      # @example Apply all options.
+      #   context.apply_options
+      #
+      # @since 3.1.0
+      def apply_options
+        apply_fields
+        [ :hint, :limit, :skip, :sort ].each do |name|
+          apply_option(name)
+        end
+      end
+
+      # Apply an option.
       #
       # @api private
       #
       # @example Apply the skip option.
-      #   context.apply_skip
+      #   context.apply_option(:skip)
       #
-      # @since 3.0.0
-      def apply_skip
-        if spec = criteria.options[:skip]
-          query.skip(spec)
-        end
-      end
-
-      # Apply the limit option.
-      #
-      # @api private
-      #
-      # @example Apply the limit option.
-      #   context.apply_limit
-      #
-      # @since 3.0.0
-      def apply_limit
-        if spec = criteria.options[:limit]
-          query.limit(spec)
-        end
-      end
-
-      # Map the sort symbols to the correct MongoDB values.
-      #
-      # @example Apply the sorting params.
-      #   context.apply_sorting
-      #
-      # @since 3.0.0
-      def apply_sorting
-        if spec = criteria.options[:sort]
-          query.sort(spec)
-        end
-      end
-
-      # Apply the hint option
-      #
-      # @example Apply the hint params.
-      #   context.apply_hint
-      #
-      # @since 3.0.0
-      def apply_hint
-        if spec = criteria.options[:hint]
-          query.hint(spec)
+      # @since 3.1.0
+      def apply_option(name)
+        if spec = criteria.options[name]
+          query.send(name, spec)
         end
       end
 
@@ -583,20 +560,6 @@ module Mongoid
       # @since 3.0.0
       def reset_length
         @length = 0
-      end
-
-      # Apply all the optional criterion.
-      #
-      # @example Apply the options.
-      #   context.apply_options
-      #
-      # @since 3.0.0
-      def apply_options
-        apply_fields
-        apply_limit
-        apply_skip
-        apply_sorting
-        apply_hint
       end
 
       # If we are limiting results, we need to set the field limitations on a
