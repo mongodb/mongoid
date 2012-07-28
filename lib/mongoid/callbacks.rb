@@ -9,6 +9,7 @@ module Mongoid
       :after_build,
       :after_create,
       :after_destroy,
+      :after_find,
       :after_initialize,
       :after_save,
       :after_update,
@@ -31,8 +32,7 @@ module Mongoid
       extend ActiveModel::Callbacks
       include ActiveModel::Validations::Callbacks
 
-      define_model_callbacks :initialize, only: :after
-      define_model_callbacks :build, only: :after
+      define_model_callbacks :build, :find, :initialize, only: :after
       define_model_callbacks :create, :destroy, :save, :update, :upsert
     end
 
@@ -141,7 +141,7 @@ module Mongoid
     #
     # @since 2.3.0
     def cascadable_child?(kind, child)
-      return false if kind == :initialize || !child.respond_to?("_#{kind}_callbacks")
+      return false if [ :initialize, :find ].include?(kind) || !child.respond_to?("_#{kind}_callbacks")
       [ :create, :destroy ].include?(kind) || child.changed? || child.new_record?
     end
 
