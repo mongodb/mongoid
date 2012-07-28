@@ -256,11 +256,10 @@ module Mongoid
     # @return [ Criteria ] The cloned criteria.
     def for_ids(ids)
       ids = mongoize_ids(ids)
-      method = extract_id ? :all_of : :where
       if ids.size > 1
-        send(method, { _id: { "$in" => ids }})
+        send(id_finder, { _id: { "$in" => ids }})
       else
-        send(method, { _id: ids.first })
+        send(id_finder, { _id: ids.first })
       end
     end
 
@@ -430,7 +429,7 @@ module Mongoid
     #
     # @since 1.0.0
     def only(*args)
-      return clone if args.empty?
+      return clone if args.flatten.empty?
       args = args.flatten
       if klass.hereditary?
         super(*args.push(:_type))
@@ -581,6 +580,20 @@ module Mongoid
           hash
         end
       )
+    end
+
+    # Get the finder used to generate the id query.
+    #
+    # @api private
+    #
+    # @example Get the id finder.
+    #   criteria.id_finder
+    #
+    # @return [ Symbol ] The name of the finder method.
+    #
+    # @since 3.1.0
+    def id_finder
+      @id_finder ||= extract_id ? :all_of : :where
     end
 
     # Clone or dup the current +Criteria+. This will return a new criteria with
