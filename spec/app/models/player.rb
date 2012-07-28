@@ -3,6 +3,7 @@ class Player
   field :active, type: Boolean
   field :frags, type: Integer
   field :deaths, type: Integer
+  field :impressions, type: Integer, default: 0
   field :status
 
   scope :active, where(active: true) do
@@ -21,6 +22,10 @@ class Player
 
   embeds_many :implants
   embeds_one :augmentation
+
+  after_find do |doc|
+    doc.impressions += 1
+  end
 
   class << self
     def alive

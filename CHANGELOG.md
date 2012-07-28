@@ -7,6 +7,17 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2257 `after_find` callbacks have been added for when documents are returned
+  from the database.
+
+        class Band
+          include Mongoid::Document
+
+          after_find do |doc|
+            # Some logic here.
+          end
+        end
+
 * \#2223 Allow to find documents by javascript with parameters that are
   protected from javascript injection via `Model.for_js`.
 

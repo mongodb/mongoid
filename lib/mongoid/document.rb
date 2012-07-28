@@ -214,7 +214,7 @@ module Mongoid
       unless klass.include?(Mongoid::Document)
         raise ArgumentError, "A class which includes Mongoid::Document is expected"
       end
-      became = klass.instantiate(as_document.__deep_copy__)
+      became = klass.new(as_document.__deep_copy__)
       became.instance_variable_set(:@errors, errors)
       became.instance_variable_set(:@new_record, new_record?)
       became.instance_variable_set(:@destroyed, destroyed?)
@@ -311,6 +311,7 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
         IdentityMap.set(doc) unless _loading_revision?
+        doc.run_callbacks(:find) unless doc._find_callbacks.empty?
         doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         doc
       end

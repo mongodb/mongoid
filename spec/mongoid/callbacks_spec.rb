@@ -71,6 +71,81 @@ describe Mongoid::Callbacks do
     end
   end
 
+  describe ".after_find" do
+
+    let!(:player) do
+      Player.create
+    end
+
+    context "when the callback is on a root document" do
+
+      context "when when the document is instantiated" do
+
+        it "does not execute the callback" do
+          player.impressions.should eq(0)
+        end
+      end
+
+      context "when the document is found via #find" do
+
+        let(:from_db) do
+          Player.find(player.id)
+        end
+
+        it "executes the callback" do
+          from_db.impressions.should eq(1)
+        end
+      end
+
+      context "when the document is found in a criteria" do
+
+        let(:from_db) do
+          Player.where(id: player.id).first
+        end
+
+        it "executes the callback" do
+          from_db.impressions.should eq(1)
+        end
+      end
+    end
+
+    context "when the callback is on an embedded document" do
+
+      let!(:implant) do
+        player.implants.create
+      end
+
+      context "when when the document is instantiated" do
+
+        it "does not execute the callback" do
+          implant.impressions.should eq(0)
+        end
+      end
+
+      context "when the document is found via #find" do
+
+        let(:from_db) do
+          Player.find(player.id).implants.first
+        end
+
+        it "executes the callback" do
+          from_db.impressions.should eq(1)
+        end
+      end
+
+      context "when the document is found in a criteria" do
+
+        let(:from_db) do
+          Player.find(player.id).implants.find(implant.id)
+        end
+
+        it "executes the callback" do
+          from_db.impressions.should eq(1)
+        end
+      end
+    end
+  end
+
   describe ".after_initialize" do
 
     let(:game) do
