@@ -650,9 +650,10 @@ module Mongoid
     # @since 3.0.0
     def from_identity_map(ids)
       result = []
+      selection = selector_with_type_selection
       ids.reject! do |id|
         doc = IdentityMap.get(klass, id)
-        doc && doc.matches?(selector) ? result.push(doc) : false
+        doc && doc.matches?(selection) ? result.push(doc) : false
       end
       result
     end
@@ -677,6 +678,19 @@ module Mongoid
       else
         return entries.send(name, *args)
       end
+    end
+
+    # For models where inheritance is at play we need to add the type
+    # selection.
+    #
+    # @example Add the type selection.
+    #   criteria.merge_type_selection
+    #
+    # @return [ true, false ] If type selection was added.
+    #
+    # @since 3.0.3
+    def merge_type_selection
+      selector.merge!(type_selection) if type_selectable?
     end
 
     # Convert all the ids to their proper types.
@@ -705,6 +719,48 @@ module Mongoid
     # @since 2.0.0
     def raise_invalid
       raise Errors::InvalidFind.new
+    end
+
+    # Is the criteria type selectable?
+    #
+    # @api private
+    #
+    # @example If the criteria type selectable?
+    #   criteria.type_selectable?
+    #
+    # @return [ true, false ] If type selection should be added.
+    #
+    # @since 3.0.3
+    def type_selectable?
+      klass.hereditary? && !selector.keys.include?(:_type)
+    end
+
+    # Get the selector for type selection.
+    #
+    # @api private
+    #
+    # @example Get a type selection hash.
+    #   criteria.type_selection
+    #
+    # @return [ Hash ] The type selection.
+    #
+    # @since 3.0.3
+    def type_selection
+      { _type: { "$in" => klass._types }}
+    end
+
+    # Get a new selector with type selection in it.
+    #
+    # @api private
+    #
+    # @example Get a selector with type selection.
+    #   criteria.selector_with_type_selection
+    #
+    # @return [ Hash ] The selector.
+    #
+    # @since 3.0.3
+    def selector_with_type_selection
+      type_selectable? ? selector.merge(type_selection) : selector
     end
   end
 end
