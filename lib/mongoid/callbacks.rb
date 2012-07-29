@@ -34,6 +34,8 @@ module Mongoid
 
       define_model_callbacks :build, :find, :initialize, only: :after
       define_model_callbacks :create, :destroy, :save, :update, :upsert
+
+      attr_accessor :before_callback_halted
     end
 
     # Run only the after callbacks for the specific event.
@@ -99,6 +101,21 @@ module Mongoid
     end
 
     private
+
+    # We need to hook into this for autosave, since we don't want it firing if
+    # the before callbacks were halted.
+    #
+    # @api private
+    #
+    # @example Was a before callback halted?
+    #   document.before_callback_halted?
+    #
+    # @return [ true, false ] If a before callback was halted.
+    #
+    # @since 3.0.3
+    def before_callback_halted?
+      !!@before_callback_halted
+    end
 
     # Get all the child embedded documents that are flagged as cascadable.
     #
@@ -167,6 +184,21 @@ module Mongoid
       else
         kind
       end
+    end
+
+    # We need to hook into this for autosave, since we don't want it firing if
+    # the before callbacks were halted.
+    #
+    # @api private
+    #
+    # @example Hook into the halt.
+    #   document.halted_callback_hook(filter)
+    #
+    # @param [ Symbol ] filter The callback that halted.
+    #
+    # @since 3.0.3
+    def halted_callback_hook(filter)
+      @before_callback_halted = true
     end
 
     # Run only the callbacks for the target location (before, after, around)
