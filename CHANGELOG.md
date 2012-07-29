@@ -48,6 +48,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2254 $inc operations no longer convert all values to floats.
 
+* \#2252 Don't fire autosave when before callbacks have terminated.
+
 * \#2248 Improved the performance of `exists?` on criteria and relations.
   (Jonathan Hyman)
 
