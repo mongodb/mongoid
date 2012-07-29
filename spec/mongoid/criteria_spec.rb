@@ -715,6 +715,26 @@ describe Mongoid::Criteria do
         Band.create(name: "Placebo")
       end
 
+      context "when a parent and a child are in the identity map" do
+
+        let!(:canvas) do
+          Canvas.create
+        end
+
+        let!(:browser) do
+          Browser.create
+        end
+
+        context "when fetching a child class by a parent id" do
+
+          it "raises a not found error" do
+            expect {
+              Browser.find(canvas.id)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+      end
+
       context "when providing a single id" do
 
         let(:from_map) do
@@ -757,6 +777,26 @@ describe Mongoid::Criteria do
 
       let!(:band) do
         Band.create
+      end
+
+      context "when a parent and a child are in the identity map" do
+
+        let!(:canvas) do
+          Canvas.create
+        end
+
+        let!(:browser) do
+          Browser.create
+        end
+
+        context "when fetching a child class by a parent id" do
+
+          it "raises a not found error" do
+            expect {
+              Browser.find(canvas.id)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
       end
 
       context "when providing a single id" do

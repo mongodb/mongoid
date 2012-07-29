@@ -215,7 +215,7 @@ module Mongoid
       def initialize(criteria)
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         @collection = klass.collection
-        add_type_selection
+        criteria.send(:merge_type_selection)
         @query = collection.find(criteria.selector)
         apply_options
       end
@@ -325,21 +325,6 @@ module Mongoid
       alias :update_all :update
 
       private
-
-      # For models where inheritance is at play we need to add the type
-      # selection.
-      #
-      # @example Add the type selection.
-      #   context.add_type_selection
-      #
-      # @return [ true, false ] If type selection was added.
-      #
-      # @since 3.0.0
-      def add_type_selection
-        if klass.hereditary? && !criteria.selector.keys.include?(:_type)
-          criteria.selector.merge!(_type: { "$in" => klass._types })
-        end
-      end
 
       # Apply the field limitations.
       #
