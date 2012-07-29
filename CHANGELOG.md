@@ -46,6 +46,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2259 Ensure subclassed documents can not be pulled from the identity map
+  via an id of another document in the same collection with a parent or
+  sibeling type.
+
 * \#2254 $inc operations no longer convert all values to floats.
 
 * \#2252 Don't fire autosave when before callbacks have terminated.
