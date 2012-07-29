@@ -38,6 +38,26 @@ describe Mongoid do
     end
   end
 
+  describe ".disconnect_sessions" do
+
+    let(:sessions) do
+      Mongoid::Threaded.sessions.values
+    end
+
+    before do
+      Band.all.entries
+      Mongoid.disconnect_sessions
+    end
+
+    it "disconnects from all active sessions" do
+      sessions.each do |session|
+        session.cluster.nodes.each do |node|
+          node.send(:connected?).should be_false
+        end
+      end
+    end
+  end
+
   describe ".session" do
 
     it "returns the named session" do

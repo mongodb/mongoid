@@ -124,6 +124,18 @@ module Mongoid
     Sessions.default
   end
 
+  # Disconnect all active sessions.
+  #
+  # @example Disconnect all active sessions.
+  #   Mongoid.disconnect_sessions
+  #
+  # @return [ true ] True.
+  #
+  # @since 3.1.0
+  def disconnect_sessions
+    Sessions.disconnect
+  end
+
   # Convenience method for getting a named session.
   #
   # @example Get a named session.

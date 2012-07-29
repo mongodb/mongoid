@@ -109,6 +109,20 @@ module Mongoid
         Threaded.sessions[:default] ||= Sessions::Factory.default
       end
 
+      # Disconnect all active sessions.
+      #
+      # @example Disconnect all active sessions.
+      #   Mongoid::Sessions.disconnect
+      #
+      # @return [ true ] True.
+      #
+      # @since 3.1.0
+      def disconnect
+        Threaded.sessions.values.each do |session|
+          session.disconnect
+        end
+      end
+
       # Get a session with the provided name.
       #
       # @example Get a session with the name.
