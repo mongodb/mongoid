@@ -285,4 +285,107 @@ describe Mongoid::Finders do
       end
     end
   end
+
+  describe '.method_missing' do
+    before :each do
+      Chicken.create!(leg: true, breast: true, thigh: true)
+      Chicken.create!(leg: true, breast: true, thigh: true)
+      Chicken.create!(leg: true, breast: true, thigh: true)
+    end
+
+    subject { Chicken }
+    let(:rand_meth) { (0..10).map { ('a'..'z').to_a[rand(26)] }.join }
+
+    it 'should call super if the missing method does not begin with find_by(_all)?' do
+      expect { subject.send(rand_meth) }.to raise_error(NoMethodError)
+    end
+
+    it 'should define find_by_* if the field exists' do
+      Chicken.find_by_leg(true).should be_kind_of(Chicken)
+      Chicken.find_by_breast(true).should be_kind_of(Chicken)
+      Chicken.find_by_thigh(true).should be_kind_of(Chicken)
+
+      Chicken.methods.should include(:find_by_leg)
+      Chicken.methods.should include(:find_by_breast)
+      Chicken.methods.should include(:find_by_thigh)
+    end
+
+    it 'should not define find_by_* if the field does not exist' do
+      expect { Chicken.find_by_beak(true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_by_heart(true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_by_feet(true) }.to raise_error(NoMethodError)
+
+      Chicken.methods.should_not include(:find_by_beak)
+      Chicken.methods.should_not include(:find_by_heart)
+      Chicken.methods.should_not include(:find_by_feet)
+    end
+
+    it 'should define find_by_*_and_* with unlimited _and_* if all the fields exist' do
+      Chicken.find_by_breast_and_thigh(true, true).should be_kind_of(Chicken)
+      Chicken.find_by_leg_and_breast(true, true).should be_kind_of(Chicken)
+      Chicken.find_by_thigh_and_breast(true, true).should be_kind_of(Chicken)
+      Chicken.find_by_leg_and_breast_and_thigh(true, true, true).should be_kind_of(Chicken)
+
+      Chicken.methods.should include(:find_by_breast_and_thigh)
+      Chicken.methods.should include(:find_by_leg_and_breast)
+      Chicken.methods.should include(:find_by_thigh_and_breast)
+      Chicken.methods.should include(:find_by_leg_and_breast_and_thigh)
+    end
+
+    it 'should not define find_by_*_and_* with unlimited _and_* if all fields do not exist' do
+      expect { Chicken.find_by_leg_and_beak(true, true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_by_breast_and_heart(true, true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_by_thigh_and_feet(true, true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_by_leg_and_breast_and_beak_and_heart(*[true] * 4) }.to raise_error(NoMethodError)
+
+      Chicken.methods.should_not include(:find_by_leg_and_beak)
+      Chicken.methods.should_not include(:find_by_breast_and_heart)
+      Chicken.methods.should_not include(:find_by_thigh_and_feet)
+      Chicken.methods.should_not include(:find_by_leg_and_breast_and_beak_and_heart)
+    end
+
+    it 'should define find_all_by_* if the field exists' do
+      Chicken.find_all_by_leg(true).should have(3).items
+      Chicken.find_all_by_breast(true).should have(3).items
+      Chicken.find_all_by_thigh(true).should have(3).items
+
+      Chicken.methods.should include(:find_all_by_leg)
+      Chicken.methods.should include(:find_all_by_breast)
+      Chicken.methods.should include(:find_all_by_thigh)
+    end
+
+    it 'should not define find_all_by_* if the fields do not exist' do
+      expect { Chicken.find_all_by_beak(true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_all_by_heart(true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_all_by_feet(true) }.to raise_error(NoMethodError)
+
+      Chicken.methods.should_not include(:find_all_by_beak)
+      Chicken.methods.should_not include(:find_all_by_heart)
+      Chicken.methods.should_not include(:find_all_by_feet)
+    end
+
+    it 'should define find_all_by_*_and_* with unlimited _and_* if all fields exist' do
+      Chicken.find_all_by_leg_and_breast(true, true).should have(3).items
+      Chicken.find_all_by_breast_and_thigh(true, true).should have(3).items
+      Chicken.find_all_by_leg_and_thigh(true, true).should have(3).items
+      Chicken.find_all_by_leg_and_breast_and_thigh(true, true, true).should have(3).items
+
+      Chicken.methods.should include(:find_all_by_leg_and_breast)
+      Chicken.methods.should include(:find_all_by_breast_and_thigh)
+      Chicken.methods.should include(:find_all_by_leg_and_thigh)
+      Chicken.methods.should include(:find_all_by_leg_and_breast_and_thigh)
+    end
+
+    it 'should not define find_all_by_* with unlimited _and_* if all fields do not exist' do
+      expect { Chicken.find_all_by_leg_and_beak(true, true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_all_by_breast_and_heart(true, true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_all_by_thigh_and_feet(true, true) }.to raise_error(NoMethodError)
+      expect { Chicken.find_all_by_leg_and_breast_and_beak_and_heart(*[true] * 4) }.to raise_error(NoMethodError)
+
+      Chicken.methods.should_not include(:find_all_by_leg_and_beak)
+      Chicken.methods.should_not include(:find_all_by_breast_and_heart)
+      Chicken.methods.should_not include(:find_all_by_thigh_and_feet)
+      Chicken.methods.should_not include(:find_all_by_leg_and_breast_and_beak_and_heart)
+    end
+  end
 end

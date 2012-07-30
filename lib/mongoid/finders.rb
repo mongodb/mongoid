@@ -129,6 +129,58 @@ module Mongoid
       with_default_scope.last
     end
 
+    module FindBy
+      extend ActiveSupport::Concern
+
+      included do
+        class << self
+          # Creates find_by, find_all_by, and find_by with _and_ iterated
+          # infinite times.  The goal of this method is to try and tame the
+          # learning curve when coming from ActiveRecord with traditional SQL
+          # to Mongoid NoSQL.
+          #
+          # NOTE: This method creates an actual method with
+          # define_singleton_method after it's initial call so that it does
+          # not get in the way and slow down a Rails application after it's
+          # initial call.
+          #
+          # @param *args [Any] The values of the fields you would like to search.
+          # @returns an array of document (if find_all_by) or a single otherwise.
+          #
+          # @examples
+          #
+          #   Model.find_all_by_f1('value1')
+          #   Model.find_by_f1('value1')
+          #   Model.find_all_by_f1_and_f2_and_f3(true)
+          #   Model.find_by_f1_and_f2('value1', 'value2')
+          #   Model.find_all_by_field1_and_field1('value1', 'value2')
+          #   Model.find_all_by_field1_and_field2_and_field3('value1', 'value2', 'value3')
+
+          def method_missing(meth, *args)
+            if meth =~ /\A(find_(?:all_)?by)_((?:[a-z0-9]_?)+)\Z/
+              attrs = ($2.dup).split('_and_')
+              attrs.each do |attr|
+                unless fields.has_key?(attr.to_s)
+                  super
+                end
+              end
+
+              mongoid_meth = ($1.dup =~ /\Afind_all/ ? 'where' : 'find_by')
+              class_eval(<<-SOURCE) unless methods.include?(meth)
+                define_singleton_method(:#{meth}) do |#{attrs.join(', ')}|
+                  #{mongoid_meth}(#{attrs.inject([]) { |obj, attr| obj << "#{attr}: #{attr}" }.join(', ')})
+                end
+              SOURCE
+
+              return send(meth, *args)
+            end
+
+            super
+          end
+        end
+      end
+    end
+
     protected
 
     # Find the first object or create/initialize it.

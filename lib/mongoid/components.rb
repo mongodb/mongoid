@@ -10,6 +10,7 @@ module Mongoid
       extend Mongoid::Finders
 
       class_attribute :paranoid
+      include Mongoid::Finders::FindBy
     end
 
     include ActiveModel::Conversion
