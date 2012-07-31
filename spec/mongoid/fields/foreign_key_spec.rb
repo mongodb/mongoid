@@ -652,4 +652,18 @@ describe Mongoid::Fields::ForeignKey do
       end
     end
   end
+
+  context "when the foreign key points is a many to many" do
+
+    context "when the related document stores non object ids" do
+
+      let(:agent) do
+        Agent.new(account_ids: [ true, false, 1, 2 ])
+      end
+
+      it "casts the ids on the initial set" do
+        agent.account_ids.should eq([ "true", "false", "1", "2" ])
+      end
+    end
+  end
 end
