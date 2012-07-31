@@ -46,6 +46,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2266 Restored paranoid documents are no longer flagged as destroyed.
+  (Mario Uher)
+
 * \#2263 Ensure casting of non object id foreign keys on many to many relations
   happens in the initial set, not at validation time.
 
