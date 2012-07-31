@@ -449,6 +449,10 @@ describe Mongoid::Paranoia do
       it "persists the change" do
         post.reload.deleted_at.should be_nil
       end
+
+      it "marks document again as persisted" do
+        post.persisted?.should be_true
+      end
     end
 
     context "when the document is embedded" do

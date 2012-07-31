@@ -94,6 +94,8 @@ module Mongoid
       paranoid_collection.find(atomic_selector).
         update({ "$unset" => { paranoid_field => true }})
       attributes.delete("deleted_at")
+      @destroyed = false
+      true
     end
 
     # Returns a string representing the documents's key suitable for use in URLs.
