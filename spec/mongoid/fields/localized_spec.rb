@@ -352,6 +352,17 @@ describe Mongoid::Fields::Localized do
         described_class.new(:description, localize: true, type: Integer)
       end
 
+      context "when a hash is passed" do
+
+        let(:value) do
+          field.mongoize({ "de" => "Deutsch", "en" => "English" })
+        end
+
+        it "it gets passed through" do
+          value.should eq({ "de" => "Deutsch", "en" => "English" })
+        end
+      end
+
       context "when no locale is defined" do
 
         let(:value) do
