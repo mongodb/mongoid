@@ -407,6 +407,10 @@ describe Mongoid::Contextual::MapReduce do
       inspection.should include("reduce:")
     end
 
+    it "includes the finalize function" do
+      inspection.should include("finalize:")
+    end
+
     it "includes the out option" do
       inspection.should include("out:")
     end

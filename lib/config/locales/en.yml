@@ -24,6 +24,7 @@ en:
         \_\_criteria: %{criteria},\n
         \_\_map:      %{map},\n
         \_\_reduce:   %{reduce},\n
+        \_\_finalize: %{finalize},\n
         \_\_out:      %{out},\n"
     errors:
       messages:
