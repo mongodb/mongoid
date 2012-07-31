@@ -371,4 +371,66 @@ describe Mongoid::Contextual::MapReduce do
       time.should_not be_nil
     end
   end
+
+  describe "#execute" do
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:map_reduce) do
+      described_class.new(collection, criteria, map, reduce)
+    end
+
+    let(:execution_results) do
+      map_reduce.out(inline: 1).execute
+    end
+
+    it "returns a hash" do
+      execution_results.should be_a_kind_of Hash
+    end
+  end
+
+  describe "#inspect" do
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:out) do
+      {inline: 1}
+    end
+
+    let(:map_reduce) do
+      described_class.new(collection, criteria, map, reduce).out(out)
+    end
+
+    let(:inspection) do
+      map_reduce.inspect
+    end
+
+    it "returns a string" do
+      inspection.should be_a_kind_of String
+    end
+
+    it "includes the criteria" do
+      inspection.should include("criteria:")
+    end
+
+    it "includes the map function" do
+      inspection.should include("map:")
+    end
+
+    it "includes the reduce function" do
+      inspection.should include("reduce:")
+    end
+
+    it "includes the finalize function" do
+      inspection.should include("finalize:")
+    end
+
+    it "includes the out option" do
+      inspection.should include("out:")
+    end
+  end
 end
