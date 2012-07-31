@@ -20,6 +20,12 @@ en:
         \_\_relation:     %{relation},\n
         \_\_setter:       %{setter},\n
         \_\_versioned:    %{versioned}>\n"
+      map_reduce: "#<Mongoid::Contextual::MapReduce\n
+        \_\_criteria: %{criteria},\n
+        \_\_map:      %{map},\n
+        \_\_reduce:   %{reduce},\n
+        \_\_finalize: %{finalize},\n
+        \_\_out:      %{out},\n"
     errors:
       messages:
         blank:
