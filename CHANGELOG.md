@@ -46,6 +46,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2263 Ensure casting of non object id foreign keys on many to many relations
+  happens in the initial set, not at validation time.
+
 ## 3.0.3
 
 ### Resolved Issues
