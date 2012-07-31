@@ -394,11 +394,11 @@ describe Mongoid::Contextual::MapReduce do
   describe "#inspect" do
 
     let(:criteria) do
-      Band.all
+      Band.where(name: "Depeche Mode")
     end
 
     let(:out) do
-      {inline: 1}
+      { inline: 1 }
     end
 
     let(:map_reduce) do
@@ -413,8 +413,12 @@ describe Mongoid::Contextual::MapReduce do
       inspection.should be_a_kind_of String
     end
 
-    it "includes the criteria" do
-      inspection.should include("criteria:")
+    it "includes the criteria selector" do
+      inspection.should include("selector:")
+    end
+
+    it "includes the class" do
+      inspection.should include("class:")
     end
 
     it "includes the map function" do

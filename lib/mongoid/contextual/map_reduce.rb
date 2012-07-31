@@ -169,6 +169,7 @@ module Mongoid
       #   map_reduce.execute
       #
       # @return [ Hash ] The raw output
+      #
       # @since 3.1.0
       alias :execute :raw
 
@@ -224,10 +225,12 @@ module Mongoid
         ::I18n.translate(
           "mongoid.inspection.map_reduce",
           {
-            criteria:   criteria.inspect.chomp,
-            map:        command[:map].inspect,
-            reduce:     command[:reduce].inspect,
-            finalize:   command[:finalize].inspect,
+            selector:   criteria.selector.inspect,
+            options:    criteria.options.inspect,
+            klass:      criteria.klass.inspect,
+            map:        command[:map],
+            reduce:     command[:reduce],
+            finalize:   command[:finalize],
             out:        command[:out].inspect
           }
         )
