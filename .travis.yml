@@ -6,13 +6,13 @@ matrix:
     - rvm: ruby-head
     - rvm: jruby-19mode
       jdk: oraclejdk7
-      env: JRUBY_OPTS="-Xmx512m"
+      env: JRUBY_OPTS="-Xmx512m -Xcext.enabled=false -Xcompile.invokedynamic=false"
     - rvm: jruby-19mode
       jdk: openjdk7
-      env: JRUBY_OPTS="-Xmx512m"
+      env: JRUBY_OPTS="-Xmx512m -Xcext.enabled=false -Xcompile.invokedynamic=false"
     - rvm: jruby-head
       jdk: oraclejdk7
-      env: JRUBY_OPTS="-Xmx512m"
+      env: JRUBY_OPTS="-Xmx512m -Xcext.enabled=false -Xcompile.invokedynamic=false"
     - rvm: jruby-head
       jdk: openjdk7
-      env: JRUBY_OPTS="-Xmx512m"
+      env: JRUBY_OPTS="-Xmx512m -Xcext.enabled=false -Xcompile.invokedynamic=false"
