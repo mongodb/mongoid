@@ -6,7 +6,7 @@ module Mongoid
       include Command
 
       delegate :[], to: :results
-      delegate :==, :empty?, :inspect, to: :entries
+      delegate :==, :empty?, to: :entries
 
       # Get all the counts returned by the map/reduce.
       #
@@ -162,6 +162,16 @@ module Mongoid
         results
       end
 
+      # Execute the map/reduce, returning the raw output.
+      # Useful when you don't care about map/reduce's ouptut.
+      #
+      # @example Run the map reduce
+      #   map_reduce.execute
+      #
+      # @return [ Hash ] The raw output
+      # @since 3.1.0
+      alias :execute :raw
+
       # Get the number of documents reduced by the map/reduce.
       #
       # @example Get the reduced document count.
@@ -199,6 +209,28 @@ module Mongoid
       # @since 3.0.0
       def time
         results["timeMillis"]
+      end
+
+      # Get a pretty string representation of the map/reduce, including the
+      # criteria, map, reduce, finalize, and out option.
+      #
+      # @example Inspect the map_reduce.
+      #   map_reduce.inspect
+      #
+      # @return [ String ] The inspection string.
+      #
+      # @since 3.1.0
+      def inspect
+        ::I18n.translate(
+          "mongoid.inspection.map_reduce",
+          {
+            criteria:   criteria.inspect.chomp,
+            map:        command[:map].inspect,
+            reduce:     command[:reduce].inspect,
+            finalize:   command[:finalize].inspect,
+            out:        command[:out].inspect
+          }
+        )
       end
 
       private
