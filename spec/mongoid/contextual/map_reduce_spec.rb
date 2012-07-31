@@ -380,7 +380,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce)
+      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:execution_results) do
@@ -403,7 +403,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     let(:map_reduce) do
-      described_class.new(criteria, map, reduce).out(out)
+      described_class.new(collection, criteria, map, reduce).out(out)
     end
 
     let(:inspection) do
