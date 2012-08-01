@@ -135,16 +135,38 @@ describe Mongoid::Criterion::Scoping do
 
     context "when the other has options" do
 
-      let(:criteria) do
-        Band.skip(10)
+      context "when both are options only" do
+
+        let(:criteria) do
+          Band.skip(10)
+        end
+
+        before do
+          criteria.remove_scoping(criteria)
+        end
+
+        it "removes the options" do
+          criteria.options.should be_empty
+        end
       end
 
-      before do
-        criteria.remove_scoping(criteria)
-      end
+      context "when the criteria is selection only with nil" do
 
-      it "removes the options" do
-        criteria.options.should be_empty
+        let(:criteria) do
+          Band.where(name: nil)
+        end
+
+        before do
+          criteria.remove_scoping(Band.asc(:_id))
+        end
+
+        it "removes the options" do
+          criteria.options.should be_empty
+        end
+
+        it "does not remove the selector" do
+          criteria.selector.should eq({ "name" => nil })
+        end
       end
     end
 
