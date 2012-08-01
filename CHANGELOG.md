@@ -46,6 +46,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2272 Don't wipe selectors or options when removing the default scope for
+  actual nil values. Must check if key exists as well.
+
 * \#2266 Restored paranoid documents are no longer flagged as destroyed.
   (Mario Uher)
 

@@ -32,10 +32,10 @@ module Mongoid
       def remove_scoping(other)
         if other
           selector.reject! do |key, value|
-            other.selector[key] == value
+            other.selector.has_key?(key) && other.selector[key] == value
           end
           options.reject! do |key, value|
-            other.options[key] == value
+            other.options.has_key?(key) && other.options[key] == value
           end
           other.inclusions.each do |meta|
             inclusions.delete_one(meta)
