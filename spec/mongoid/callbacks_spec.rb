@@ -107,6 +107,21 @@ describe Mongoid::Callbacks do
           from_db.impressions.should eq(1)
         end
       end
+
+      context "when the document is reloaded" do
+
+        let(:from_db) do
+          Player.find(player.id)
+        end
+
+        before do
+          from_db.reload
+        end
+
+        it "executes the callback" do
+          from_db.impressions.should eq(1)
+        end
+      end
     end
 
     context "when the callback is on an embedded document" do
