@@ -46,6 +46,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2274 When loading models, warn if error is raised but continue processing.
+
 * \#2272 Don't wipe selectors or options when removing the default scope for
   actual nil values. Must check if key exists as well.
 
