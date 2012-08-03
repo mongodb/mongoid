@@ -118,7 +118,11 @@ module Rails
     #
     # @since 2.0.0.rc.3
     def load_model(file)
-      require_dependency(file)
+      begin
+        require_dependency(file)
+      rescue Exception => e
+        Logger.new($stdout).warn(e.message)
+      end
     end
 
     # Given the provided file name, determine the model and return the class.

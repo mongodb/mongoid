@@ -445,6 +445,5 @@ describe "Rails::Mongoid" do
         Rails::Mongoid.load_models(app)
       end
     end
-
   end
 end
