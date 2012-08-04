@@ -43,6 +43,27 @@ For instructions on upgrading to newer versions, visit
 * \#2157 `Criteria#update` and `Criteria#update_all` now serialize values
   according to their field type, if a field is defined.
 
+* \#2022 Custom callbacks can now register themselves for use with observers
+  by using the `observable` macro.
+
+        class Band
+          include Mongoid::Document
+
+          define_model_callbacks :notification
+          observable :notification
+        end
+
+        class BandObserver < Mongoid::Observer
+
+          def before_notification(band)
+            #...
+          end
+
+          def after_notification(band)
+            #...
+          end
+        end
+
 * \#1766 Many to many relations will not touch the database if the foreign key
   is an empty array.
 

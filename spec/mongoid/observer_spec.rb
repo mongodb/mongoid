@@ -159,6 +159,57 @@ describe Mongoid::Observer do
     end
   end
 
+  context "when the document is being upserted" do
+
+    let!(:actor) do
+      Actor.create!
+    end
+
+    [ :before_upsert,
+      :after_upsert,
+      :around_upsert ].each do |callback|
+
+      before do
+        recorder.reset
+        actor.upsert
+      end
+
+      it "observes #{callback}" do
+        recorder.call_count[callback].should eq(1)
+      end
+
+      it "contains the model of the callback" do
+        recorder.last_record[callback].should eq(actor)
+      end
+    end
+  end
+
+  context "when custom callbacks are being fired" do
+
+    let!(:actor) do
+      Actor.create!
+    end
+
+    [ :before_custom,
+      :after_custom,
+      :around_custom ].each do |callback|
+
+      before do
+        recorder.reset
+        actor.run_callbacks(:custom) do
+        end
+      end
+
+      it "observes #{callback}" do
+        recorder.call_count[callback].should eq(1)
+      end
+
+      it "contains the model of the callback" do
+        recorder.last_record[callback].should eq(actor)
+      end
+    end
+  end
+
   context "when the document is being destroyed" do
 
     let!(:actor) do
@@ -202,6 +253,21 @@ describe Mongoid::Observer do
       it "contains the model of the callback" do
         recorder.last_record[callback].should eq(actor)
       end
+    end
+  end
+
+  context "when using a custom callback" do
+
+    let(:actor) do
+      Actor.new
+    end
+
+    before do
+      actor.do_something
+    end
+
+    it "notifies the observers once" do
+      actor.after_custom_count.should eq(1)
     end
   end
 end

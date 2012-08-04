@@ -71,6 +71,9 @@ module Mongoid
   # * before_update
   # * around_update
   # * after_update
+  # * before_upsert
+  # * around_upsert
+  # * after_upsert
   # * before_save
   # * around_save
   # * after_save
@@ -107,29 +110,7 @@ module Mongoid
   # Observers are singletons and that call instantiates and registers them.
   class Observer < ActiveModel::Observer
 
-    # Instantiate the new observer. Will add all child observers as well.
-    #
-    # @example Instantiate the observer.
-    #   Mongoid::Observer.new
-    #
-    # @since 2.0.0.rc.8
-    def initialize
-      super and observed_descendants.each { |klass| add_observer!(klass) }
-    end
-
-    protected
-
-    # Get all the child observers.
-    #
-    # @example Get the children.
-    #   observer.observed_descendants
-    #
-    # @return [ Array<Class> ] The children.
-    #
-    # @since 2.0.0.rc.8
-    def observed_descendants
-      observed_classes.sum([]) { |klass| klass.descendants }
-    end
+    private
 
     # Adds the specified observer to the class.
     #
@@ -152,25 +133,35 @@ module Mongoid
     #
     # @since 2.0.0.rc.8
     def define_callbacks(klass)
-      tap do |observer|
-        observer_name = observer.class.name.underscore.gsub('/', '__')
-        Mongoid::Callbacks::CALLBACKS.each do |callback|
-          next unless respond_to?(callback)
-          callback_meth = :"_notify_#{observer_name}_for_#{callback}"
-          unless klass.respond_to?(callback_meth)
-            klass.send(:define_method, callback_meth) do |&block|
-              if value = observer.update(callback, self, &block)
-                value
-              else
-                block.call if block
-              end
+      observer = self
+      observer_name = observer.class.name.underscore.gsub('/', '__')
+      Mongoid::Callbacks.observables.each do |callback|
+        next unless respond_to?(callback)
+        callback_meth = :"_notify_#{observer_name}_for_#{callback}"
+        unless klass.respond_to?(callback_meth)
+          klass.send(:define_method, callback_meth) do |&block|
+            if value = observer.update(callback, self, &block)
+              value
+            else
+              block.call if block
             end
-            klass.send(callback, callback_meth)
           end
+          klass.send(callback, callback_meth)
         end
       end
+      self
     end
 
+    # Are the observers disabled for the object?
+    #
+    # @api private
+    #
+    # @example If the observer disabled?
+    #   Observer.disabled_for(band)
+    #
+    # @param [ Document ] object The model instance.
+    #
+    # @return [ true, false ] If the observer is disabled.
     def disabled_for?(object)
       klass = object.class
       return false unless klass.respond_to?(:observers)

@@ -26,7 +26,7 @@ module Mongoid
       :before_update,
       :before_upsert,
       :before_validation
-    ]
+    ].freeze
 
     included do
       extend ActiveModel::Callbacks
@@ -226,6 +226,57 @@ module Mongoid
         EOM
       end
       send(name)
+    end
+
+    class << self
+
+      # Get all callbacks that can be observed.
+      #
+      # @example Get the observables.
+      #   Callbacks.observables
+      #
+      # @return [ Array<Symbol> ] The names of the observables.
+      #
+      # @since 3.1.0
+      def observables
+        CALLBACKS + registered_observables
+      end
+
+      # Get all registered callbacks that can be observed, not included in
+      # Mongoid's defaults.
+      #
+      # @example Get the observables.
+      #   Callbacks.registered_observables
+      #
+      # @return [ Array<Symbol> ] The names of the registered observables.
+      #
+      # @since 3.1.0
+      def registered_observables
+        @registered_observables ||= []
+      end
+    end
+
+    module ClassMethods
+
+      # Set a custom callback as able to be observed.
+      #
+      # @example Set a custom callback as observable.
+      #   class Band
+      #     include Mongoid::Document
+      #
+      #     define_model_callbacks :notification
+      #     observable :notification
+      #   end
+      #
+      # @param [ Array<Symbol> ] args The names of the observable callbacks.
+      #
+      # @since 3.0.1
+      def observable(*args)
+        observables = args.flat_map do |name|
+          [ :"before_#{name}", :"after_#{name}", :"around_#{name}" ]
+        end
+        Callbacks.registered_observables.concat(observables).uniq
+      end
     end
   end
 end
