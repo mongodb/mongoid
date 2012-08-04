@@ -40,6 +40,9 @@ For instructions on upgrading to newer versions, visit
           has_many :followers, before_remove: ->(band, follower){ notify_unfollow(follower) }
         end
 
+* \#2157 `Criteria#update` and `Criteria#update_all` now serialize values
+  according to their field type, if a field is defined.
+
 * \#1766 Many to many relations will not touch the database if the foreign key
   is an empty array.
 

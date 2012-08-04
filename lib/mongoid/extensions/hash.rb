@@ -35,13 +35,16 @@ module Mongoid
       # @return [ Hash ] A new consolidated hash.
       #
       # @since 3.0.0
-      def __consolidate__
+      def __consolidate__(klass)
         consolidated = {}
         each_pair do |key, value|
           if key =~ /\$/
+            value.each_pair do |key, _value|
+              value[key] = mongoize_for(klass, key, _value)
+            end
             (consolidated[key] ||= {}).merge!(value)
           else
-            (consolidated["$set"] ||= {}).merge!(key => value)
+            (consolidated["$set"] ||= {}).merge!(key => mongoize_for(klass, key, value))
           end
         end
         consolidated
@@ -107,6 +110,27 @@ module Mongoid
       # @since 3.0.0
       def resizable?
         true
+      end
+
+      private
+
+      # Mongoize for the klass, key and value.
+      #
+      # @api private
+      #
+      # @example Mongoize for the klass, field and value.
+      #   {}.mongoize_for(Band, "name", "test")
+      #
+      # @param [ Class ] klass The model class.
+      # @param [ String, Symbol ] The field key.
+      # @param [ Object ] value The value to mongoize.
+      #
+      # @return [ Object ] The mongoized value.
+      #
+      # @since 3.1.0
+      def mongoize_for(klass, key, value)
+        field = klass.fields[key.to_s]
+        field ? field.mongoize(value) : value
       end
 
       module ClassMethods

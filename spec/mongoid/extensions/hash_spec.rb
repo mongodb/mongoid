@@ -171,7 +171,7 @@ describe Mongoid::Extensions::Hash do
         end
 
         let(:consolidated) do
-          hash.__consolidate__
+          hash.__consolidate__(Band)
         end
 
         it "moves the non hash values under the provided key" do
@@ -188,7 +188,7 @@ describe Mongoid::Extensions::Hash do
         end
 
         let(:consolidated) do
-          hash.__consolidate__
+          hash.__consolidate__(Band)
         end
 
         it "moves the non hash values under the provided key" do
@@ -206,7 +206,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       let(:consolidated) do
-        hash.__consolidate__
+        hash.__consolidate__(Band)
       end
 
       it "moves the non hash values under the provided key" do

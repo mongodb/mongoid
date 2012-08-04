@@ -320,7 +320,7 @@ module Mongoid
       # @since 3.0.0
       def update(attributes = nil)
         return false unless attributes
-        query.update_all(attributes.__consolidate__)
+        query.update_all(attributes.__consolidate__(klass))
       end
       alias :update_all :update
 

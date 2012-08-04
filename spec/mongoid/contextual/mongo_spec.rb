@@ -1202,25 +1202,10 @@ describe Mongoid::Contextual::Mongo do
 
       context "when providing attributes" do
 
-        before do
-          context.send(method, name: "Smiths")
-        end
-
-        it "updates the first matching document" do
-          depeche_mode.reload.name.should eq("Smiths")
-        end
-
-        it "updates the last matching document" do
-          new_order.reload.name.should eq("Smiths")
-        end
-      end
-
-      context "when providing atomic operations" do
-
-        context "when only atomic operations are provided" do
+        context "when the attributes are of the correct type" do
 
           before do
-            context.send(method, "$set" => { name: "Smiths" })
+            context.send(method, name: "Smiths")
           end
 
           it "updates the first matching document" do
@@ -1229,6 +1214,57 @@ describe Mongoid::Contextual::Mongo do
 
           it "updates the last matching document" do
             new_order.reload.name.should eq("Smiths")
+          end
+        end
+
+        context "when the attributes must be mongoized" do
+
+          before do
+            context.send(method, member_count: "1")
+          end
+
+          it "updates the first matching document" do
+            depeche_mode.reload.member_count.should eq(1)
+          end
+
+          it "updates the last matching document" do
+            new_order.reload.member_count.should eq(1)
+          end
+        end
+      end
+
+      context "when providing atomic operations" do
+
+        context "when only atomic operations are provided" do
+
+          context "when the attributes are in the correct type" do
+
+            before do
+              context.send(method, "$set" => { name: "Smiths" })
+            end
+
+            it "updates the first matching document" do
+              depeche_mode.reload.name.should eq("Smiths")
+            end
+
+            it "updates the last matching document" do
+              new_order.reload.name.should eq("Smiths")
+            end
+          end
+
+          context "when the attributes must be mongoized" do
+
+            before do
+              context.send(method, "$set" => { member_count: "1" })
+            end
+
+            it "updates the first matching document" do
+              depeche_mode.reload.member_count.should eq(1)
+            end
+
+            it "updates the last matching document" do
+              new_order.reload.member_count.should eq(1)
+            end
           end
         end
 
