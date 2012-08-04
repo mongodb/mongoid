@@ -5,6 +5,11 @@ namespace :db do
     task :drop => "mongoid:drop"
   end
 
+  unless Rake::Task.task_defined?("db:purge")
+    desc "Drop all collections except the system collections"
+    task :purge => "mongoid:purge"
+  end
+
   unless Rake::Task.task_defined?("db:seed")
     # if another ORM has defined db:seed, don"t run it twice.
     desc "Load the seed data from db/seeds.rb"
@@ -91,6 +96,11 @@ namespace :db do
     desc "Drops the database for the current Rails.env"
     task :drop => :environment do
       ::Mongoid::Sessions.default.drop
+    end
+
+    desc "Drop all collections except the system collections"
+    task :purge => :environment do
+      ::Mongoid.purge!
     end
   end
 end

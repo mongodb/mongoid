@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2275 Added rake task `db:mongoid:purge` that will drop all collections with
+  the exception of the system collections in the default database.
+
 * \#2257 `after_find` callbacks have been added for when documents are returned
   from the database.
 
