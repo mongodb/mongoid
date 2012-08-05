@@ -511,8 +511,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def inverse_setter(other = nil)
-        inv = inverse(other)
-        inv ? "#{inv}=" : nil
+        inverse(other).__setter__
       end
 
       # Returns the name of the field in which to store the name of the class
@@ -538,7 +537,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def inverse_type_setter
-        @inverse_type_setter ||= inverse_type ? "#{inverse_type}=" : nil
+        @inverse_type_setter ||= inverse_type.__setter__
       end
 
       # Returns the name of the field in which to store the name of the inverse
@@ -563,7 +562,7 @@ module Mongoid
       #
       # @return [ String ] The name of the setter.
       def inverse_of_field_setter
-        @inverse_of_field_setter ||= inverse_of_field ? "#{inverse_of_field}=" : nil
+        @inverse_of_field_setter ||= inverse_of_field.__setter__
       end
 
       # This returns the key that is to be used to grab the attributes for the
@@ -717,7 +716,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def setter
-        @setter ||= "#{name.to_s}="
+        @setter ||= "#{name}="
       end
 
       # Returns the name of the field in which to store the name of the class
@@ -730,7 +729,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def type
-        @type ||= polymorphic? ? "#{as.to_s}_type" : nil
+        @type ||= polymorphic? ? "#{as}_type" : nil
       end
 
       # Gets the setter for the field that sets the type of document on a
@@ -743,7 +742,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def type_setter
-        @type_setter ||= type ? "#{type}=" : nil
+        @type_setter ||= type.__setter__
       end
 
 
