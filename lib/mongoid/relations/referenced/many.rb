@@ -357,7 +357,11 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def criteria
-          Many.criteria(metadata, Conversions.flag(base.id, metadata), base.class)
+          Many.criteria(
+            metadata,
+            Conversions.flag(base.send(metadata.primary_key), metadata),
+            base.class
+          )
         end
 
         # Perform the necessary cascade operations for documents that just got
