@@ -1205,7 +1205,7 @@ describe Mongoid::Relations::Referenced::One do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :as, :autobuild, :autosave, :dependent, :foreign_key ]
+        [ :as, :autobuild, :autosave, :dependent, :foreign_key, :primary_key ]
       )
     end
   end
