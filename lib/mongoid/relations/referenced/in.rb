@@ -118,7 +118,7 @@ module Mongoid
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            type.where(metadata.primary_key => object)
+            type.where(_id: object)
           end
 
           # Get the criteria that is used to eager load a relation of this

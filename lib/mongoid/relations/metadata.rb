@@ -1090,7 +1090,7 @@ module Mongoid
       # @since 2.0.0.rc.1
       def determine_key
         return store_as.to_s if relation.embedded?
-        relation.stores_foreign_key? ? foreign_key : primary_key
+        relation.stores_foreign_key? ? foreign_key : "_id"
       end
 
       # Determine the name of the inverse relation.
