@@ -31,12 +31,7 @@ module Mongoid
       # @since 3.0.0
       def remove_scoping(other)
         if other
-          selector.reject! do |key, value|
-            other.selector.has_key?(key) && other.selector[key] == value
-          end
-          options.reject! do |key, value|
-            other.options.has_key?(key) && other.options[key] == value
-          end
+          reject_matching(other, :selector, :options)
           other.inclusions.each do |meta|
             inclusions.delete_one(meta)
           end
@@ -147,6 +142,16 @@ module Mongoid
           crit.apply_default_scope
         end
         crit
+      end
+
+      private
+
+      def reject_matching(other, *methods)
+        methods.each do |method|
+          send(method).reject! do |key, value|
+            other.send(method).has_key?(key) && other.send(method)[key] == value
+          end
+        end
       end
     end
   end
