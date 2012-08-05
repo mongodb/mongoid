@@ -1098,16 +1098,7 @@ describe Mongoid::Relations::Referenced::In do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [
-          :autobuild,
-          :autosave,
-          :dependent,
-          :foreign_key,
-          :index,
-          :polymorphic,
-          :primary_key,
-          :touch
-        ]
+        [ :autobuild, :autosave, :dependent, :foreign_key, :index, :polymorphic, :touch ]
       )
     end
   end

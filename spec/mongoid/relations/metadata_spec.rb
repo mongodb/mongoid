@@ -1572,40 +1572,6 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
-  describe "#primary_key" do
-
-    context "when no primary key exists" do
-
-      let(:metadata) do
-        described_class.new(
-          name: :person,
-          inverse_class_name: "Person",
-          relation: Mongoid::Relations::Referenced::In
-        )
-      end
-
-      it "returns _id" do
-        metadata.primary_key.should eq("_id")
-      end
-    end
-
-    context "when a primary key exists" do
-
-      let(:metadata) do
-        described_class.new(
-          name: :person,
-          inverse_class_name: "Person",
-          relation: Mongoid::Relations::Referenced::In,
-          primary_key: :something_id
-        )
-      end
-
-      it "returns the primary key" do
-        metadata.primary_key.should eq("something_id")
-      end
-    end
-  end
-
   describe "#validate?" do
 
     context "when validate is provided" do

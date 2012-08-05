@@ -433,18 +433,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [
-              :after_add,
-              :after_remove,
-              :autosave,
-              :before_add,
-              :before_remove,
-              :dependent,
-              :foreign_key,
-              :index,
-              :order,
-              :primary_key
-            ]
+            [ :autosave, :dependent, :foreign_key, :index, :order, :before_add, :after_add, :before_remove, :after_remove ]
           end
 
           # Get the default validation setting for the relation. Determines if

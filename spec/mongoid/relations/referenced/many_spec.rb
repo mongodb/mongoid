@@ -3012,18 +3012,7 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [
-          :after_add,
-          :after_remove,
-          :as,
-          :autosave,
-          :before_add,
-          :before_remove,
-          :dependent,
-          :foreign_key,
-          :order,
-          :primary_key
-        ]
+        [ :as, :autosave, :dependent, :foreign_key, :order, :before_add, :after_add, :before_remove, :after_remove ]
       )
     end
   end
