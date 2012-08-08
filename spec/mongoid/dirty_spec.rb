@@ -6,39 +6,105 @@ describe Mongoid::Dirty do
 
     context "when the attribute has changed from the persisted value" do
 
-      let(:person) do
-        Person.new(title: "Grand Poobah").tap(&:move_changes)
+      context "when using the setter" do
+
+        let(:person) do
+          Person.new(title: "Grand Poobah").tap(&:move_changes)
+        end
+
+        before do
+          person.title = "Captain Obvious"
+        end
+
+        it "returns an array of the old value and new value" do
+          person.send(:attribute_change, "title").should eq(
+            [ "Grand Poobah", "Captain Obvious" ]
+          )
+        end
+
+        it "allows access via (attribute)_change" do
+          person.title_change.should eq(
+            [ "Grand Poobah", "Captain Obvious" ]
+          )
+        end
       end
 
-      before do
-        person.title = "Captain Obvious"
-      end
+      context "when using [] methods" do
 
-      it "returns an array of the old value and new value" do
-        person.send(:attribute_change, "title").should eq(
-          [ "Grand Poobah", "Captain Obvious" ]
-        )
-      end
+        let(:person) do
+          Person.new(title: "Grand Poobah").tap(&:move_changes)
+        end
 
-      it "allows access via (attribute)_change" do
-        person.title_change.should eq(
-          [ "Grand Poobah", "Captain Obvious" ]
-        )
+        before do
+          person[:title] = "Captain Obvious"
+        end
+
+        it "returns an array of the old value and new value" do
+          person.send(:attribute_change, "title").should eq(
+            [ "Grand Poobah", "Captain Obvious" ]
+          )
+        end
+
+        it "allows access via (attribute)_change" do
+          person.title_change.should eq(
+            [ "Grand Poobah", "Captain Obvious" ]
+          )
+        end
       end
     end
 
     context "when the attribute has changed from the default value" do
 
-      let(:person) do
-        Person.new(pets: true)
+      context "when using the setter" do
+
+        let(:person) do
+          Person.new(pets: true)
+        end
+
+        it "returns an array of nil and new value" do
+          person.send(:attribute_change, "pets").should eq([ nil, true ])
+        end
+
+        it "allows access via (attribute)_change" do
+          person.pets_change.should eq([ nil, true ])
+        end
       end
 
-      it "returns an array of nil and new value" do
-        person.send(:attribute_change, "pets").should eq([ nil, true ])
-      end
+      context "when using [] methods" do
 
-      it "allows access via (attribute)_change" do
-        person.pets_change.should eq([ nil, true ])
+        context "when the field is defined" do
+
+          let(:person) do
+            Person.new
+          end
+
+          before do
+            person[:pets] = true
+          end
+
+          it "returns an array of nil and new value" do
+            person.send(:attribute_change, "pets").should eq([ nil, true ])
+          end
+
+          it "allows access via (attribute)_change" do
+            person.pets_change.should eq([ nil, true ])
+          end
+        end
+
+        context "when the field is not defined" do
+
+          let(:person) do
+            Person.new
+          end
+
+          before do
+            person[:a] = "test"
+          end
+
+          it "returns an array of nil and new value" do
+            person.send(:attribute_change, "a").should eq([ nil, "test" ])
+          end
+        end
       end
     end
 
@@ -534,6 +600,28 @@ describe Mongoid::Dirty do
 
       it "does not include non changed fields" do
         person.changed.should_not include("title")
+      end
+    end
+
+    context "when the document is embedded" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:name) do
+        person.create_name(first_name: "Layne", last_name: "Staley")
+      end
+
+      context "when changing attributes via []" do
+
+        before do
+          person.name["a"] = "testing"
+        end
+
+        it "returns true" do
+          person.name.should be_changed
+        end
       end
     end
   end
