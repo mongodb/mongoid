@@ -239,29 +239,57 @@ module Mongoid
         in_place_sort(values) and self
       end
 
+      # Update the first matching document atomically.
+      #
+      # @example Update the matching document.
+      #   context.update(name: "Smiths")
+      #
+      # @param [ Hash ] attributes The new attributes for the document.
+      #
+      # @return [ nil, false ] False if no attributes were provided.
+      #
+      # @since 3.0.0
+      def update(attributes = nil)
+        update_documents(attributes, [ first ])
+      end
+
       # Update all the matching documents atomically.
       #
       # @example Update all the matching documents.
-      #   context.update(name: "Smiths")
+      #   context.update_all(name: "Smiths")
       #
       # @param [ Hash ] attributes The new attributes for each document.
       #
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update(attributes = nil)
+      def update_all(attributes = nil)
+        update_documents(attributes, entries)
+      end
+
+      private
+
+      # Update the provided documents with the attributes.
+      #
+      # @api private
+      #
+      # @example Update the documents.
+      #   context.update_documents({}, doc)
+      #
+      # @param [ Hash ] attributes The attributes.
+      # @param [ Array<Document> ] docs The docs to update.
+      #
+      # @since 3.0.4
+      def update_documents(attributes, docs)
         return false unless attributes
         updates = {}
-        each do |doc|
+        docs.each do |doc|
           @selector ||= root.atomic_selector
           doc.write_attributes(attributes)
           updates.merge!(doc.atomic_position => attributes)
         end
         collection.find(selector).update("$set" => updates)
       end
-      alias :update_all :update
-
-      private
 
       # Get the limiting value.
       #

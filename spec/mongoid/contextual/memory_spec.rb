@@ -896,7 +896,7 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
-  [ :update, :update_all ].each do |method|
+  describe "#update" do
 
     let(:person) do
       Person.create
@@ -914,113 +914,237 @@ describe Mongoid::Contextual::Memory do
       person.addresses.create(street: "pfluger")
     end
 
-    describe "##{method}" do
+    context "when the documents are embedded one level" do
 
-      context "when the documents are embedded one level" do
+      let(:criteria) do
+        Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
+          crit.documents = [ hobrecht, friedel, pfluger ]
+        end
+      end
 
-        let(:criteria) do
-          Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
-            crit.documents = [ hobrecht, friedel, pfluger ]
-          end
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when attributes are provided" do
+
+        before do
+          context.update(number: 5)
         end
 
-        let(:context) do
-          described_class.new(criteria)
+        it "updates the first matching document" do
+          hobrecht.number.should eq(5)
         end
 
-        context "when attributes are provided" do
+        it "does not update the last matching document" do
+          friedel.number.should be_nil
+        end
 
-          before do
-            context.send(method, number: 5)
-          end
+        it "does not update non matching docs" do
+          pfluger.number.should be_nil
+        end
+
+        context "when reloading the embedded documents" do
 
           it "updates the first matching document" do
-            hobrecht.number.should eq(5)
+            hobrecht.reload.number.should eq(5)
           end
 
           it "updates the last matching document" do
-            friedel.number.should eq(5)
+            friedel.reload.number.should be_nil
           end
 
           it "does not update non matching docs" do
-            pfluger.number.should be_nil
-          end
-
-          context "when reloading the embedded documents" do
-
-            it "updates the first matching document" do
-              hobrecht.reload.number.should eq(5)
-            end
-
-            it "updates the last matching document" do
-              friedel.reload.number.should eq(5)
-            end
-
-            it "does not update non matching docs" do
-              pfluger.reload.number.should be_nil
-            end
-          end
-        end
-
-        context "when no attributes are provided" do
-
-          it "returns false" do
-            context.send(method).should be_false
+            pfluger.reload.number.should be_nil
           end
         end
       end
 
-      context "when the documents are embedded multiple levels" do
+      context "when no attributes are provided" do
 
-        let!(:home) do
-          hobrecht.locations.create(name: "home")
+        it "returns false" do
+          context.update.should be_false
+        end
+      end
+    end
+
+    context "when the documents are embedded multiple levels" do
+
+      let!(:home) do
+        hobrecht.locations.create(name: "home")
+      end
+
+      let!(:work) do
+        hobrecht.locations.create(name: "work")
+      end
+
+      let(:criteria) do
+        Location.where(name: "work").tap do |crit|
+          crit.documents = [ home, work ]
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when attributes are provided" do
+
+        before do
+          context.update(number: 5)
         end
 
-        let!(:work) do
-          hobrecht.locations.create(name: "work")
+        it "updates the first matching document" do
+          work.number.should eq(5)
         end
 
-        let(:criteria) do
-          Location.where(name: "work").tap do |crit|
-            crit.documents = [ home, work ]
-          end
+        it "does not update non matching docs" do
+          home.number.should be_nil
         end
 
-        let(:context) do
-          described_class.new(criteria)
-        end
-
-        context "when attributes are provided" do
-
-          before do
-            context.send(method, number: 5)
-          end
+        context "when reloading the embedded documents" do
 
           it "updates the first matching document" do
-            work.number.should eq(5)
+            work.reload.number.should eq(5)
           end
 
           it "does not update non matching docs" do
-            home.number.should be_nil
-          end
-
-          context "when reloading the embedded documents" do
-
-            it "updates the first matching document" do
-              work.reload.number.should eq(5)
-            end
-
-            it "does not update non matching docs" do
-              home.reload.number.should be_nil
-            end
+            home.reload.number.should be_nil
           end
         end
+      end
 
-        context "when no attributes are provided" do
+      context "when no attributes are provided" do
 
-          it "returns false" do
-            context.send(method).should be_false
+        it "returns false" do
+          context.update.should be_false
+        end
+      end
+    end
+  end
+
+  describe "#update_all" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:hobrecht) do
+      person.addresses.create(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      person.addresses.create(street: "friedel")
+    end
+
+    let(:pfluger) do
+      person.addresses.create(street: "pfluger")
+    end
+
+    context "when the documents are embedded one level" do
+
+      let(:criteria) do
+        Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
+          crit.documents = [ hobrecht, friedel, pfluger ]
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when attributes are provided" do
+
+        before do
+          context.update_all(number: 5)
+        end
+
+        it "updates the first matching document" do
+          hobrecht.number.should eq(5)
+        end
+
+        it "updates the last matching document" do
+          friedel.number.should eq(5)
+        end
+
+        it "does not update non matching docs" do
+          pfluger.number.should be_nil
+        end
+
+        context "when reloading the embedded documents" do
+
+          it "updates the first matching document" do
+            hobrecht.reload.number.should eq(5)
           end
+
+          it "updates the last matching document" do
+            friedel.reload.number.should eq(5)
+          end
+
+          it "does not update non matching docs" do
+            pfluger.reload.number.should be_nil
+          end
+        end
+      end
+
+      context "when no attributes are provided" do
+
+        it "returns false" do
+          context.update_all.should be_false
+        end
+      end
+    end
+
+    context "when the documents are embedded multiple levels" do
+
+      let!(:home) do
+        hobrecht.locations.create(name: "home")
+      end
+
+      let!(:work) do
+        hobrecht.locations.create(name: "work")
+      end
+
+      let(:criteria) do
+        Location.where(name: "work").tap do |crit|
+          crit.documents = [ home, work ]
+        end
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when attributes are provided" do
+
+        before do
+          context.update_all(number: 5)
+        end
+
+        it "updates the first matching document" do
+          work.number.should eq(5)
+        end
+
+        it "does not update non matching docs" do
+          home.number.should be_nil
+        end
+
+        context "when reloading the embedded documents" do
+
+          it "updates the first matching document" do
+            work.reload.number.should eq(5)
+          end
+
+          it "does not update non matching docs" do
+            home.reload.number.should be_nil
+          end
+        end
+      end
+
+      context "when no attributes are provided" do
+
+        it "returns false" do
+          context.update_all.should be_false
         end
       end
     end
