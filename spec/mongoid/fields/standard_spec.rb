@@ -2,6 +2,17 @@ require "spec_helper"
 
 describe Mongoid::Fields::Standard do
 
+  describe "#lazy?" do
+
+    let(:field) do
+      described_class.new(:test, type: String)
+    end
+
+    it "returns false" do
+      field.should_not be_lazy
+    end
+  end
+
   describe "#pre_processed?" do
 
     context "when the field has a default" do

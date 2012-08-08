@@ -1174,7 +1174,7 @@ describe Mongoid::Dirty do
 
     it "records the foreign key dirty changes" do
       person.previous_changes["preference_ids"].should eq(
-        [[], [ preference.id ]]
+        [nil, [ preference.id ]]
       )
     end
   end
@@ -1195,8 +1195,12 @@ describe Mongoid::Dirty do
         from_db.preference_ids
       end
 
-      it "does not get marked as dirty" do
-        from_db.changes["preference_ids"].should be_nil
+      it "flags the change" do
+        from_db.changes["preference_ids"].should eq([ nil, []])
+      end
+
+      it "does not include the changes in the setters" do
+        from_db.setters.should be_empty
       end
     end
   end

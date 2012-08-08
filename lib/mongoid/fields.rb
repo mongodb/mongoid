@@ -75,7 +75,7 @@ module Mongoid
       unless attributes.has_key?(name)
         if field = fields[name]
           default = field.eval_default(self)
-          unless default.nil?
+          unless default.nil? || field.lazy?
             attribute_will_change!(name)
             attributes[name] = default
           end
@@ -107,6 +107,21 @@ module Mongoid
     # @since 3.0.0
     def attribute_names
       self.class.attribute_names
+    end
+
+    # Is the provided field a lazy evaluation?
+    #
+    # @example If the field is lazy settable.
+    #   doc.lazy_settable?(field, nil)
+    #
+    # @param [ Field ] field The field.
+    # @param [ Object ] value The current value.
+    #
+    # @return [ true, false ] If we set the field lazily.
+    #
+    # @since 3.1.0
+    def lazy_settable?(field, value)
+      !frozen? && value.nil? && field.lazy?
     end
 
     # Is the document using object ids?
@@ -335,9 +350,14 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
-            value = fields[name].demongoize(read_attribute(name))
-            attribute_will_change!(name) if value.resizable?
-            value
+            raw = read_attribute(name)
+            if lazy_settable?(field, raw)
+              write_attribute(name, field.eval_default(self))
+            else
+              value = field.demongoize(raw)
+              attribute_will_change!(name) if value.resizable?
+              value
+            end
           end
         end
       end

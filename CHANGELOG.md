@@ -67,6 +67,10 @@ For instructions on upgrading to newer versions, visit
 * \#1766 Many to many relations will not touch the database if the foreign key
   is an empty array.
 
+* \#1564 Many to many foreign keys now have the default set lazily only if the
+  relation has been accessed. This avoids storing empty arrays if the relation
+  has not been touched.
+
 ### Resolved Issues
 
 ## 3.0.4 (branch: 3.0.0-stable)

@@ -446,6 +446,31 @@ describe Mongoid::Fields::ForeignKey do
     end
   end
 
+  describe "#lazy?" do
+
+    context "when the key is resizable" do
+
+      let(:field) do
+        described_class.new(:test, type: Array)
+      end
+
+      it "returns true" do
+        field.should be_lazy
+      end
+    end
+
+    context "when the key is not resizable" do
+
+      let(:field) do
+        described_class.new(:test, type: Moped::BSON::ObjectId)
+      end
+
+      it "returns false" do
+        field.should_not be_lazy
+      end
+    end
+  end
+
   describe "#mongoize" do
 
     context "when the type is array" do

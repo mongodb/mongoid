@@ -69,6 +69,18 @@ module Mongoid
         end
       end
 
+      # Does this field do lazy default evaluation?
+      #
+      # @example Is the field lazy?
+      #   field.lazy?
+      #
+      # @return [ true, false ] If the field is lazy.
+      #
+      # @since 3.1.0
+      def lazy?
+        type.resizable?
+      end
+
       # Mongoize the object into the Mongo friendly value.
       #
       # @example Mongoize the object.

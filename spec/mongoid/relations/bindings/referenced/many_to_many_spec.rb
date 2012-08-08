@@ -147,7 +147,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "does not set the foreign key" do
-        preference.person_ids.should be_empty
+        preference.person_ids.should be_nil
       end
     end
   end

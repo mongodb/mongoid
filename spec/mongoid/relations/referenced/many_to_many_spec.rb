@@ -351,7 +351,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "sets the inverse side of the relation" do
-            event.administrators.should eq([ person ])
+            event.administrators(true).should eq([ person ])
           end
 
           context "when reloading" do
@@ -427,7 +427,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "sets the inverse side of the relation" do
-            tag_two.related.should eq([ tag_one ])
+            tag_two.related(true).should eq([ tag_one ])
           end
 
           context "when reloading" do
@@ -1532,7 +1532,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "sets the inverse side of the relation" do
-          event.administrators.should eq([ person ])
+          event.administrators(true).should eq([ person ])
         end
 
         context "when reloading" do
@@ -1608,7 +1608,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "sets the inverse side of the relation" do
-          tag_two.related.should eq([ tag_one ])
+          tag_two.related(true).should eq([ tag_one ])
         end
 
         context "when reloading" do

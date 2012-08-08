@@ -88,6 +88,18 @@ module Mongoid
         @default_val = options[:default]
       end
 
+      # Does this field do lazy default evaluation?
+      #
+      # @example Is the field lazy?
+      #   field.lazy?
+      #
+      # @return [ true, false ] If the field is lazy.
+      #
+      # @since 3.1.0
+      def lazy?
+        false
+      end
+
       # Is the field localized or not?
       #
       # @example Is the field localized?
