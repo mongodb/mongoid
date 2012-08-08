@@ -308,6 +308,20 @@ module Mongoid
         end
       end
 
+      # Update the first matching document atomically.
+      #
+      # @example Update the first matching document.
+      #   context.update({ "$set" => { name: "Smiths" }})
+      #
+      # @param [ Hash ] attributes The new attributes for each document.
+      #
+      # @return [ nil, false ] False if no attributes were provided.
+      #
+      # @since 3.0.0
+      def update(attributes = nil)
+        update_documents(attributes)
+      end
+
       # Update all the matching documents atomically.
       #
       # @example Update all the matching documents.
@@ -318,13 +332,29 @@ module Mongoid
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update(attributes = nil)
-        return false unless attributes
-        query.update_all(attributes.__consolidate__(klass))
+      def update_all(attributes = nil)
+        update_documents(attributes, :update_all)
       end
-      alias :update_all :update
 
       private
+
+      # Update the documents for the provided method.
+      #
+      # @api private
+      #
+      # @example Update the documents.
+      #   context.update_documents(attrs)
+      #
+      # @param [ Hash ] attributes The updates.
+      # @param [ Symbol ] method The method to use.
+      #
+      # @return [ true, false ] If the update succeeded.
+      #
+      # @since 3.0.4
+      def update_documents(attributes, method = :update)
+        return false unless attributes
+        query.send(method, attributes.__consolidate__(klass))
+      end
 
       # Apply the field limitations.
       #

@@ -222,7 +222,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def nullify
-          criteria.update(foreign_key => nil)
+          criteria.update_all(foreign_key => nil)
           target.clear do |doc|
             unbind_one(doc)
           end

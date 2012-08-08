@@ -1180,32 +1180,183 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  [ :update, :update_all ].each do |method|
+  describe "#update" do
 
-    describe "##{method}" do
+    let!(:depeche_mode) do
+      Band.create(name: "Depeche Mode")
+    end
 
-      let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
+    let!(:new_order) do
+      Band.create(name: "New Order")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when providing attributes" do
+
+      context "when the attributes are of the correct type" do
+
+        before do
+          context.update(name: "Smiths")
+        end
+
+        it "updates only the first matching document" do
+          depeche_mode.reload.name.should eq("Smiths")
+        end
+
+        it "does not update the last matching document" do
+          new_order.reload.name.should eq("New Order")
+        end
       end
 
-      let!(:new_order) do
-        Band.create(name: "New Order")
+      context "when the attributes must be mongoized" do
+
+        before do
+          context.update(member_count: "1")
+        end
+
+        it "updates the first matching document" do
+          depeche_mode.reload.member_count.should eq(1)
+        end
+
+        it "does not update the last matching document" do
+          new_order.reload.member_count.should be_nil
+        end
       end
+    end
 
-      let(:criteria) do
-        Band.all
-      end
+    context "when providing atomic operations" do
 
-      let(:context) do
-        described_class.new(criteria)
-      end
+      context "when only atomic operations are provided" do
 
-      context "when providing attributes" do
-
-        context "when the attributes are of the correct type" do
+        context "when the attributes are in the correct type" do
 
           before do
-            context.send(method, name: "Smiths")
+            context.update("$set" => { name: "Smiths" })
+          end
+
+          it "updates the first matching document" do
+            depeche_mode.reload.name.should eq("Smiths")
+          end
+
+          it "does not update the last matching document" do
+            new_order.reload.name.should eq("New Order")
+          end
+        end
+
+        context "when the attributes must be mongoized" do
+
+          before do
+            context.update("$set" => { member_count: "1" })
+          end
+
+          it "updates the first matching document" do
+            depeche_mode.reload.member_count.should eq(1)
+          end
+
+          it "does not update the last matching document" do
+            new_order.reload.member_count.should be_nil
+          end
+        end
+      end
+
+      context "when a mix are provided" do
+
+        before do
+          context.update("$set" => { name: "Smiths" }, likes: 100)
+        end
+
+        it "updates the first matching document's set" do
+          depeche_mode.reload.name.should eq("Smiths")
+        end
+
+        it "updates the first matching document's updates" do
+          depeche_mode.reload.likes.should eq(100)
+        end
+
+        it "does not update the last matching document's set" do
+          new_order.reload.name.should eq("New Order")
+        end
+
+        it "does not update the last matching document's updates" do
+          new_order.reload.likes.should be_nil
+        end
+      end
+    end
+
+    context "when providing no attributes" do
+
+      it "returns false" do
+        context.update.should be_false
+      end
+    end
+  end
+
+  describe "#update_all" do
+
+    let!(:depeche_mode) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create(name: "New Order")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when providing attributes" do
+
+      context "when the attributes are of the correct type" do
+
+        before do
+          context.update_all(name: "Smiths")
+        end
+
+        it "updates the first matching document" do
+          depeche_mode.reload.name.should eq("Smiths")
+        end
+
+        it "updates the last matching document" do
+          new_order.reload.name.should eq("Smiths")
+        end
+      end
+
+      context "when the attributes must be mongoized" do
+
+        before do
+          context.update_all(member_count: "1")
+        end
+
+        it "updates the first matching document" do
+          depeche_mode.reload.member_count.should eq(1)
+        end
+
+        it "updates the last matching document" do
+          new_order.reload.member_count.should eq(1)
+        end
+      end
+    end
+
+    context "when providing atomic operations" do
+
+      context "when only atomic operations are provided" do
+
+        context "when the attributes are in the correct type" do
+
+          before do
+            context.update_all("$set" => { name: "Smiths" })
           end
 
           it "updates the first matching document" do
@@ -1220,7 +1371,7 @@ describe Mongoid::Contextual::Mongo do
         context "when the attributes must be mongoized" do
 
           before do
-            context.send(method, member_count: "1")
+            context.update_all("$set" => { member_count: "1" })
           end
 
           it "updates the first matching document" do
@@ -1233,70 +1384,34 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when providing atomic operations" do
+      context "when a mix are provided" do
 
-        context "when only atomic operations are provided" do
-
-          context "when the attributes are in the correct type" do
-
-            before do
-              context.send(method, "$set" => { name: "Smiths" })
-            end
-
-            it "updates the first matching document" do
-              depeche_mode.reload.name.should eq("Smiths")
-            end
-
-            it "updates the last matching document" do
-              new_order.reload.name.should eq("Smiths")
-            end
-          end
-
-          context "when the attributes must be mongoized" do
-
-            before do
-              context.send(method, "$set" => { member_count: "1" })
-            end
-
-            it "updates the first matching document" do
-              depeche_mode.reload.member_count.should eq(1)
-            end
-
-            it "updates the last matching document" do
-              new_order.reload.member_count.should eq(1)
-            end
-          end
+        before do
+          context.update_all("$set" => { name: "Smiths" }, likes: 100)
         end
 
-        context "when a mix are provided" do
+        it "updates the first matching document's set" do
+          depeche_mode.reload.name.should eq("Smiths")
+        end
 
-          before do
-            context.send(method, "$set" => { name: "Smiths" }, likes: 100)
-          end
+        it "updates the first matching document's updates" do
+          depeche_mode.reload.likes.should eq(100)
+        end
 
-          it "updates the first matching document's set" do
-            depeche_mode.reload.name.should eq("Smiths")
-          end
+        it "updates the last matching document's set" do
+          new_order.reload.name.should eq("Smiths")
+        end
 
-          it "updates the first matching document's updates" do
-            depeche_mode.reload.likes.should eq(100)
-          end
-
-          it "updates the last matching document's set" do
-            new_order.reload.name.should eq("Smiths")
-          end
-
-          it "updates the last matching document's updates" do
-            new_order.reload.likes.should eq(100)
-          end
+        it "updates the last matching document's updates" do
+          new_order.reload.likes.should eq(100)
         end
       end
+    end
 
-      context "when providing no attributes" do
+    context "when providing no attributes" do
 
-        it "returns false" do
-          context.send(method).should be_false
-        end
+      it "returns false" do
+        context.update_all.should be_false
       end
     end
   end

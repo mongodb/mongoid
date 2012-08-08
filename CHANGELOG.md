@@ -73,6 +73,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2278 `Criteria#update` now properly updates only the first matching document,
+  where `Criteria#update_all` will update all matching documents. (no flag vs multi).
+
 * \#2274 When loading models, warn if error is raised but continue processing.
 
 * \#2272 Don't wipe selectors or options when removing the default scope for
