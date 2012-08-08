@@ -1,7 +1,7 @@
 # Overview
 
 For instructions on upgrading to newer versions, visit
-[mongoid.org](http://mongoid.org/docs/upgrading.html).
+[mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
 ## 3.1.0 (branch: master)
 
