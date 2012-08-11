@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2285 `Config.load_configuration` is now public for those who want to instantiate
+  settings directly from a hash.
+
 * \#2275 Added rake task `db:mongoid:purge` that will drop all collections with
   the exception of the system collections in the default database.
 

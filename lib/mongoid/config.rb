@@ -71,6 +71,20 @@ module Mongoid
       settings
     end
 
+    # From a hash of settings, load all the configuration.
+    #
+    # @example Load the configuration.
+    #   config.load_configuration(settings)
+    #
+    # @param [ Hash ] settings The configuration settings.
+    #
+    # @since 3.1.0
+    def load_configuration(settings)
+      configuration = settings.with_indifferent_access
+      self.options = configuration[:options]
+      self.sessions = configuration[:sessions]
+    end
+
     # Override the database to use globally.
     #
     # @example Override the database globally.
@@ -168,22 +182,6 @@ module Mongoid
     # @since 3.0.0
     def time_zone
       use_utc? ? "UTC" : ::Time.zone
-    end
-
-    private
-
-    # From a hash of settings, load all the configuration.
-    #
-    # @example Load the configuration.
-    #   config.load_configuration(settings)
-    #
-    # @param [ Hash ] settings The configuration settings.
-    #
-    # @since 3.0.0
-    def load_configuration(settings)
-      configuration = settings.with_indifferent_access
-      self.options = configuration[:options]
-      self.sessions = configuration[:sessions]
     end
   end
 end
