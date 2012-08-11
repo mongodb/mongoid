@@ -516,6 +516,20 @@ module Mongoid
       super
     end
 
+    # Get a version of this criteria without the options.
+    #
+    # @example Get the criteria without options.
+    #   criteria.without_options
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 3.0.4
+    def without_options
+      crit = clone
+      crit.options.clear
+      crit
+    end
+
     # Find documents by the provided javascript and scope. Uses a $where but is
     # different from +Criteria#where+ in that it will pass a code object to the
     # query instead of a pure string. Safe against Javascript injection

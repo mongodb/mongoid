@@ -77,6 +77,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2280 Fix synchronization of many-to-many relations when an ordering default
+  scope exists on either side of the association.
+
 * \#2278 `Criteria#update` now properly updates only the first matching document,
   where `Criteria#update_all` will update all matching documents. (no flag vs multi).
 

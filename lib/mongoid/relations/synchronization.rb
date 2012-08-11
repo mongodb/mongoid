@@ -89,10 +89,10 @@ module Mongoid
           end
 
           unless adds.empty?
-            meta.criteria(adds, self.class).add_to_set(meta.inverse_foreign_key, id)
+            meta.criteria(adds, self.class).without_options.add_to_set(meta.inverse_foreign_key, id)
           end
           unless subs.empty?
-            meta.criteria(subs, self.class).pull(meta.inverse_foreign_key, id)
+            meta.criteria(subs, self.class).without_options.pull(meta.inverse_foreign_key, id)
           end
         end
       end
