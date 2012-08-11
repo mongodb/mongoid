@@ -517,6 +517,20 @@ module Mongoid
       super
     end
 
+    # Get a version of this criteria without the options.
+    #
+    # @example Get the criteria without options.
+    #   criteria.without_options
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 3.0.4
+    def without_options
+      crit = clone
+      crit.options.clear
+      crit
+    end
+
     private
 
     # Are documents in the query missing, and are we configured to raise an

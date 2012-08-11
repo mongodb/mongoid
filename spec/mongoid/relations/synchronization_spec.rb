@@ -431,4 +431,23 @@ describe Mongoid::Relations::Synchronization do
       tag.articles.should eq([ article ])
     end
   end
+
+  context "when the document has an ordering default scope" do
+
+    let!(:dog) do
+      Dog.create(name: "Fido")
+    end
+
+    let!(:breed) do
+      Breed.new(dog_ids: [ dog.id ])
+    end
+
+    before do
+      breed.save
+    end
+
+    it "adds the id to the inverse relation" do
+      dog.reload.breed_ids.should eq([ breed.id ])
+    end
+  end
 end
