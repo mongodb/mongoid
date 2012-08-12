@@ -313,7 +313,7 @@ module Mongoid
       # @example Update the first matching document.
       #   context.update({ "$set" => { name: "Smiths" }})
       #
-      # @param [ Hash ] attributes The new attributes for each document.
+      # @param [ Hash ] attributes The new attributes for the document.
       #
       # @return [ nil, false ] False if no attributes were provided.
       #
