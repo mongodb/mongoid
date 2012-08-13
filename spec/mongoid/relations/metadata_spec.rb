@@ -1342,7 +1342,7 @@ describe Mongoid::Relations::Metadata do
         let(:metadata) do
           described_class.new(
             name: :ratable,
-            inverse_class_name: "Movie",
+            inverse_class_name: "Rating",
             polymorphic: true,
             relation: Mongoid::Relations::Referenced::In
           )
