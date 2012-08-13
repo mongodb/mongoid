@@ -632,14 +632,14 @@ describe Mongoid::Sessions do
           let!(:band) do
             Band.with(
               session: "mongohq_single",
-              database: "mongoid"
+              database: database_id
             ).create
           end
 
           let(:from_db) do
             Band.with(
               session: "mongohq_single",
-              database: "mongoid"
+              database: database_id
             ).find(band.id)
           end
 
@@ -963,16 +963,16 @@ describe Mongoid::Sessions do
       end
 
       after do
-        Band.with(database: "mongoid").delete_all
+        Band.with(database: database_id).delete_all
         Mongoid.override_session(nil)
       end
 
       let!(:band) do
-        Band.with(database: "mongoid").create(name: "Tool")
+        Band.with(database: database_id).create(name: "Tool")
       end
 
       let(:persisted) do
-        Band.with(session: :mongohq_single, database: "mongoid").where(name: "Tool").first
+        Band.with(session: :mongohq_single, database: database_id).where(name: "Tool").first
       end
 
       it "persists to the overridden session" do
