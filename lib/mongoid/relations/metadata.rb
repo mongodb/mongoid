@@ -1119,7 +1119,9 @@ module Mongoid
         if other
           matches = []
           other.class.relations.values.each do |meta|
-            matches.push(meta.name) if meta.as == name
+            if meta.as == name && meta.class_name == inverse_class_name
+              matches.push(meta.name)
+            end
           end
           matches
         end
