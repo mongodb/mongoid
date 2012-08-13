@@ -310,6 +310,22 @@ describe Mongoid::Relations::Referenced::In do
           end
         end
 
+        context "when multiple relations of the same name but different class exist" do
+
+          let(:eye) do
+            Eye.new
+          end
+
+          let(:eye_bowl) do
+            EyeBowl.new
+          end
+
+          it "should assign as expected" do
+            eye.suspended_in = eye_bowl
+            eye.suspended_in.target.should eq(eye_bowl)
+          end
+        end
+
         context "when one relation against the same class exists" do
 
           context "when the child is a new record" do
