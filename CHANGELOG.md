@@ -76,7 +76,14 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-## 3.0.4 (branch: 3.0.0-stable)
+## 3.0.5 (branch 3.0.0-stable)
+
+* \#2291 Fixed touch operations only to update the timestamp and the optional
+  field, no matter what the other changes on the document are.
+
+### Resolved Issues
+
+## 3.0.4
 
 ### Resolved Issues
 
