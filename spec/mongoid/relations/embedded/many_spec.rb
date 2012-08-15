@@ -3308,25 +3308,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  context "when the embedded relation sorts on id" do
-
-    let(:circuit) do
-      Circuit.create
-    end
-
-    let!(:bus_one) do
-      circuit.buses.create(saturday: true)
-    end
-
-    let!(:bus_two) do
-      circuit.buses.create(saturday: false)
-    end
-
-    it "orders properly by id" do
-      circuit.reload.buses.asc(:id).should eq([ bus_one, bus_two ])
-    end
-  end
-
   context "when batch replacing multiple relations in a single update" do
 
     let(:document) do
