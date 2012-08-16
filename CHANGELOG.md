@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2292 Added `Model.each_with_index`.
+
 * \#2285 `Config.load_configuration` is now public for those who want to instantiate
   settings directly from a hash.
 

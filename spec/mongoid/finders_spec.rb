@@ -15,6 +15,19 @@ describe Mongoid::Finders do
     end
   end
 
+  describe ".each_with_index" do
+
+    let!(:band) do
+      Band.create
+    end
+
+    it "iterates through all documents" do
+      Band.each_with_index do |band, index|
+        index.should eq(0)
+      end
+    end
+  end
+
   describe ".find_and_modify" do
 
     let!(:person) do
