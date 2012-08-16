@@ -46,25 +46,28 @@ module Mongoid
     MODULES = [
       Mongoid::Atomic,
       Mongoid::Attributes,
+      Mongoid::Callbacks,
       Mongoid::Copyable,
       Mongoid::Dirty,
+      Mongoid::Evolvable,
       Mongoid::Fields,
       Mongoid::Hierarchy,
       Mongoid::Indexes,
       Mongoid::Inspection,
       Mongoid::JSON,
-      Mongoid::Loggable,
       Mongoid::Matchers,
       Mongoid::NestedAttributes,
       Mongoid::Persistence,
       Mongoid::Relations,
-      Mongoid::Relations::Proxy,
+      Mongoid::Reloading,
       Mongoid::Scoping,
       Mongoid::Serialization,
+      Mongoid::Sessions,
       Mongoid::Sharding,
       Mongoid::State,
-      Mongoid::Validations,
-      Mongoid::Callbacks
+      Mongoid::Threaded::Lifecycle,
+      Mongoid::Timestamps::Timeless,
+      Mongoid::Validations
     ]
 
     class << self
