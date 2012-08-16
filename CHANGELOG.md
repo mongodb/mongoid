@@ -83,6 +83,8 @@ For instructions on upgrading to newer versions, visit
 * \#2291 Fixed touch operations only to update the timestamp and the optional
   field, no matter what the other changes on the document are.
 
+* \#1091 Allow presence validation to pass if the value is `false`.
+
 ### Resolved Issues
 
 ## 3.0.4

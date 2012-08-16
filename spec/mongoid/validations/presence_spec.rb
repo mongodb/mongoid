@@ -438,4 +438,29 @@ describe Mongoid::Validations::PresenceValidator do
       end
     end
   end
+
+  context "when validating a boolean false value" do
+
+    let(:template) do
+      Template.new
+    end
+
+    context "when the value is false" do
+
+      it "is a valid document" do
+        template.should be_valid
+      end
+    end
+
+    context "when the value is true" do
+
+      before do
+        template.active = true
+      end
+
+      it "is a valid document" do
+        template.should be_valid
+      end
+    end
+  end
 end

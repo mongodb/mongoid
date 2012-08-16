@@ -33,14 +33,14 @@ module Mongoid
               attribute,
               :blank_in_locale,
               options.merge(location: _locale)
-            ) if _value.blank?
+            ) if not_present?(_value)
           end
         elsif document.relations.has_key?(attribute.to_s)
           if relation_or_fk_missing?(document, attribute, value)
             document.errors.add(attribute, :blank, options)
           end
         else
-          document.errors.add(attribute, :blank, options) if value.blank?
+          document.errors.add(attribute, :blank, options) if not_present?(value)
         end
       end
 
@@ -64,6 +64,22 @@ module Mongoid
         return true if value.blank? && doc.send(attr).blank?
         metadata = doc.relations[attr.to_s]
         metadata.stores_foreign_key? && doc.send(metadata.foreign_key).blank?
+      end
+
+      # For guarding against false values.
+      #
+      # @api private
+      #
+      # @example Is the value not present?
+      #   validator.not_present?(value)
+      #
+      # @param [ Object ] value The value.
+      #
+      # @return [ true, false ] If the value is not present.
+      #
+      # @since 3.0.5
+      def not_present?(value)
+        value.blank? && value != false
       end
     end
   end
