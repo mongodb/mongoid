@@ -4261,6 +4261,45 @@ describe Mongoid::NestedAttributes do
       end
     end
 
+    context "when nesting multiple levels and parent is timestamped" do
+      before do
+        class Person
+          include Mongoid::Timestamps
+        end
+        class Address
+          after_save do
+            addressable.touch
+          end
+        end
+      end
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:address) do
+        person.addresses.create(street: "hobrecht")
+      end
+
+      let!(:location) do
+        address.locations.create(name: "work")
+      end
+
+      let(:attributes) do
+        {
+          locations_attributes: {
+            a: { name: "home" }
+          }
+        }
+      end
+
+      it "adds only one location" do
+        address.with(safe: true).update_attributes(attributes)
+        address.reload
+        address.locations.size.should eq(2)
+      end
+    end
+
     context "when nesting multiple levels" do
 
       let(:person) do
