@@ -18,9 +18,13 @@ module Mongoid
       #
       # @since 3.0.0
       def compose_message(key, attributes)
-        "\nProblem:\n  #{problem(key, attributes)}"+
-        "\nSummary:\n  #{summary(key, attributes)}"+
-        "\nResolution:\n  #{resolution(key, attributes)}"
+        @problem = problem(key, attributes)
+        @summary = summary(key, attributes)
+        @resolution = resolution(key, attributes)
+
+        "\nProblem:\n  #{@problem}"+
+        "\nSummary:\n  #{@summary}"+
+        "\nResolution:\n  #{@resolution}"
       end
 
       private
