@@ -59,7 +59,10 @@ module Mongoid
       #
       # @since 2.2.1
       def remove_inverse_keys(meta)
-        meta.criteria(send(meta.foreign_key), self.class).pull(meta.inverse_foreign_key, id)
+        foreign_keys = send(meta.foreign_key)
+        unless foreign_keys.nil? || foreign_keys.empty?
+          meta.criteria(foreign_keys, self.class).pull(meta.inverse_foreign_key, id)
+        end
       end
 
       # Update the inverse keys for the relation.
