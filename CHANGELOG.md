@@ -80,6 +80,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 3.0.5 (branch 3.0.0-stable)
 
+* \#2298 Protect against many to many relations pulling a null set of ids.
+   (Jonathan Hyman)
+
 * \#2291 Fixed touch operations only to update the timestamp and the optional
   field, no matter what the other changes on the document are.
 
