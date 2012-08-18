@@ -24,7 +24,8 @@ module Mongoid
       changed_attributes.clear
       apply_defaults
       reload_relations
-      run_callbacks(:initialize)
+      IdentityMap.set(self)
+      run_callbacks(:initialize) unless _initialize_callbacks.empty?
       self
     end
 

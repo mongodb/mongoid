@@ -1492,6 +1492,59 @@ describe Mongoid::Criteria do
 
     context "when the selector matches" do
 
+      context "when the identity map is enabled" do
+
+        before(:all) do
+          Mongoid.identity_map_enabled = true
+        end
+
+        after(:all) do
+          Mongoid.identity_map_enabled = false
+        end
+
+        context "when returning the updated document" do
+
+          let(:criteria) do
+            Band.where(name: "Depeche Mode")
+          end
+
+          let(:result) do
+            criteria.find_and_modify({ "$inc" => { likes: 1 }}, new: true)
+          end
+
+          it "returns the first matching document" do
+            result.should eq(depeche)
+          end
+
+          it "updates the document in the identity map" do
+            Mongoid::IdentityMap.get(Band, result.id).likes.should eq(1)
+          end
+        end
+
+        context "when not returning the updated document" do
+
+          let(:criteria) do
+            Band.where(name: "Depeche Mode")
+          end
+
+          let!(:result) do
+            criteria.find_and_modify("$inc" => { likes: 1 })
+          end
+
+          before do
+            depeche.reload
+          end
+
+          it "returns the first matching document" do
+            result.should eq(depeche)
+          end
+
+          it "updates the document in the identity map" do
+            Mongoid::IdentityMap.get(Band, depeche.id).likes.should eq(1)
+          end
+        end
+      end
+
       context "when not providing options" do
 
         let(:criteria) do
