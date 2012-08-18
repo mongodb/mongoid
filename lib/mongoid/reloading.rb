@@ -25,7 +25,7 @@ module Mongoid
       apply_defaults
       reload_relations
       IdentityMap.set(self)
-      run_callbacks(:initialize) unless _initialize_callbacks.empty?
+      run_callbacks(:initialize)
       self
     end
 
