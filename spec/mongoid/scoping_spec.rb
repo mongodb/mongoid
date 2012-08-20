@@ -58,6 +58,39 @@ describe Mongoid::Scoping do
         }.to raise_error(Mongoid::Errors::InvalidScope)
       end
     end
+
+    context "when there is more then one default_scope" do
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:additional_criteria) do
+        Band.where(origin: "England")
+      end
+
+      let(:proc_criteria) do
+        -> { Band.where(active: true) }
+      end
+
+      before do
+        Band.default_scope criteria
+        Band.default_scope additional_criteria
+        Band.default_scope proc_criteria
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it "adds the default scope to the class" do
+        Band.default_scoping.call.should eq(criteria.merge(additional_criteria).merge(proc_criteria.call))
+      end
+
+      it "flags as being default scoped" do
+        Band.should be_default_scoping
+      end
+
+    end
   end
 
   describe ".default_scopable?" do
