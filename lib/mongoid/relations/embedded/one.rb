@@ -43,6 +43,7 @@ module Mongoid
           end
           unbind_one
           return nil unless replacement
+          replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
           self.target = replacement
           bind_one
           characterize_one(target)

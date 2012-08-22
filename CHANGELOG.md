@@ -80,6 +80,9 @@ For instructions on upgrading to newer versions, visit
 
 ## 3.0.5 (branch 3.0.0-stable)
 
+* \#2309 Allow embeds_one relations to be set with hashes more than just the
+  initial set.
+
 * \#2308 Ensure documents retrieved via `#find` on `has_many` and
   `has_and_belongs_to_many` relations are kept in memory.
 

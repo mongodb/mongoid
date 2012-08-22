@@ -73,6 +73,44 @@ describe Mongoid::Relations::Embedded::One do
           Name.new
         end
 
+        context "when setting with a hash" do
+
+          before do
+            person.name = {}
+          end
+
+          let!(:child_name) do
+            person.name
+          end
+
+          it "sets the target of the relation" do
+            person.name.should eq(child_name)
+          end
+
+          it "sets the base on the inverse relation" do
+            child_name.namable.should eq(person)
+          end
+
+          it "sets the same instance on the inverse relation" do
+            child_name.namable.should eql(person)
+          end
+
+          it "saves the target" do
+            child_name.should be_persisted
+          end
+
+          context "when replacing a relation with a hash" do
+
+            before do
+              person.name = {}
+            end
+
+            it "sets the relation with the proper object" do
+              person.name.should be_a(Name)
+            end
+          end
+        end
+
         context "when setting directly" do
 
           before do
