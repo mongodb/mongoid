@@ -80,6 +80,8 @@ For instructions on upgrading to newer versions, visit
 
 ## 3.0.5 (branch 3.0.0-stable)
 
+* \#2313 Fixed deserialization of `nil` `TimeWithZone` fields. (nagachika)
+
 * \#2309 Allow embeds_one relations to be set with hashes more than just the
   initial set.
 
