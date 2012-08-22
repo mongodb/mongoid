@@ -40,7 +40,15 @@ module Mongoid
       # @since 1.0.0
       def default_scope(value)
         check_scope_validity(value)
-        self.default_scoping = value.to_proc
+
+        self.default_scoping = if (default_scoping = self.default_scoping).present?
+                                 -> {
+                                  criteria = value.kind_of?(Proc) ? value.call : value.to_criteria
+                                  default_scoping.call.merge(criteria)
+                                 }
+                               else
+                                 value.to_proc
+                               end
       end
 
       # Is the class able to have the default scope applied?
