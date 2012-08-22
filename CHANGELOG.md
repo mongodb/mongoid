@@ -83,6 +83,9 @@ For instructions on upgrading to newer versions, visit
 * \#2308 Ensure documents retrieved via `#find` on `has_many` and
   `has_and_belongs_to_many` relations are kept in memory.
 
+* \#2304 Default scopes now properly merge instead of overwrite when more
+  than one is defined as per expectations with AR.  (Kirill Maksimov)
+
 * \#2300 Ensure reloading refreshes the document in the identity map.
 
 * \#2298 Protect against many to many relations pulling a null set of ids.

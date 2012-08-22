@@ -40,15 +40,7 @@ module Mongoid
       # @since 1.0.0
       def default_scope(value)
         check_scope_validity(value)
-
-        self.default_scoping = if (default_scoping = self.default_scoping).present?
-                                 -> {
-                                  criteria = value.kind_of?(Proc) ? value.call : value.to_criteria
-                                  default_scoping.call.merge(criteria)
-                                 }
-                               else
-                                 value.to_proc
-                               end
+        self.default_scoping = process_default_scope(value)
       end
 
       # Is the class able to have the default scope applied?
@@ -290,6 +282,25 @@ module Mongoid
             criteria
           end
         SCOPE
+      end
+
+      # Process the default scope value. If one already exists, we merge the
+      # new one into the old one.
+      #
+      # @api private
+      #
+      # @example Process the default scope.
+      #   Model.process_default_scope(value)
+      #
+      # @param [ Criteria, Proc ] value The default scope value.
+      #
+      # @since 3.0.5
+      def process_default_scope(value)
+        if default_scoping
+          default_scoping.call.merge(value.to_proc.call).to_proc
+        else
+          value.to_proc
+        end
       end
 
       # Strip the default scope from the provided value, if it is a criteria.
