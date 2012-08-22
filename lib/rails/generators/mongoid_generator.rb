@@ -50,6 +50,10 @@ module Mongoid
         "#{name}.errors"
       end
 
+      def delete
+        "#{name}.delete"
+      end
+
       def destroy
         "#{name}.destroy"
       end
