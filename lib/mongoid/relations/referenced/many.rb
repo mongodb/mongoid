@@ -187,13 +187,18 @@ module Mongoid
         # @example Find by multiple ids.
         #   person.posts.find([ Moped::BSON::ObjectId.new, Moped::BSON::ObjectId.new ])
         #
+        # @note This will keep matching documents in memory for iteration
+        #   later.
+        #
         # @param [ Moped::BSON::ObjectId, Array<Moped::BSON::ObjectId> ] arg The ids.
         #
         # @return [ Document, Criteria ] The matching document(s).
         #
         # @since 2.0.0.beta.1
         def find(*args)
-          criteria.find(*args)
+          matching = criteria.find(*args)
+          Array(matching).each { |doc| target.push(doc) }
+          matching
         end
 
         # Instantiate a new references_many relation. Will set the foreign key

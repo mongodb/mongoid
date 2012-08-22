@@ -2947,6 +2947,29 @@ describe Mongoid::NestedAttributes do
               end
             end
 
+            context "when the parent is freshly loaded from the db" do
+
+              before do
+                person.reload
+              end
+
+              context "when updating valid documents with invalid values" do
+
+                before do
+                  person.posts_attributes =
+                    {
+                      "0" => { "id" => post_one.id, "title" => "testing again" },
+                      "1" => { "id" => post_two.id, "title" => "$$$" }
+                    }
+                  person.save
+                end
+
+                it "does not perist the invalid value" do
+                  post_two.reload.title.should eq("First response")
+                end
+              end
+            end
+
             context "when the ids do not match" do
 
               it "raises an error" do
@@ -4539,26 +4562,69 @@ describe Mongoid::NestedAttributes do
 
     context "when the relation is a has many" do
 
-      let(:user) do
-        User.create
+      context "when updating with valid attributes" do
+
+        let(:user) do
+          User.create
+        end
+
+        let(:params) do
+          { posts_attributes:
+            { "0" => { title: "Testing" }}
+          }
+        end
+
+        before do
+          user.update_attributes(params)
+        end
+
+        let(:post) do
+          user.posts.first
+        end
+
+        it "adds the new document to the relation" do
+          post.title.should eq("Testing")
+        end
+
+        it "autosaves the relation" do
+          user.posts(true).first.title.should eq("Testing")
+        end
       end
 
-      let(:params) do
-        { posts_attributes:
-          { "0" => { title: "Testing" }}
-        }
-      end
+      context "when the document is freshly loaded from the db" do
 
-      before do
-        user.update_attributes(params)
-      end
+        let!(:node) do
+          Node.create
+        end
 
-      it "adds the new document to the relation" do
-        user.posts.first.title.should eq("Testing")
-      end
+        let!(:server) do
+          node.servers.create(name: "test")
+        end
 
-      it "autosaves the relation" do
-        user.posts(true).first.title.should eq("Testing")
+        before do
+          node.reload
+        end
+
+        context "when updating invalid attributes" do
+
+          let!(:update) do
+            node.update_attributes({
+              servers_attributes: { "0" => { "_id" => server.id, "name" => "" }}
+            })
+          end
+
+          it "returns false" do
+            update.should be_false
+          end
+
+          it "does not update the child document" do
+            server.reload.name.should eq("test")
+          end
+
+          it "adds the errors to the document" do
+            node.errors[:servers].should_not be_nil
+          end
+        end
       end
     end
 
