@@ -70,23 +70,38 @@ describe Mongoid::Scoping do
       end
 
       let(:proc_criteria) do
-        -> { Band.where(active: true) }
+        ->{ Band.where(active: true) }
+      end
+
+      let(:rand_criteria) do
+        ->{ Band.gt(likes: rand(100)) }
       end
 
       before do
         Band.default_scope criteria
         Band.default_scope additional_criteria
         Band.default_scope proc_criteria
+        Band.default_scope rand_criteria
       end
 
       after do
         Band.default_scoping = nil
       end
 
-      it "adds the default scope to the class" do
-        Band.default_scoping.call.should eq(
-          criteria.merge(additional_criteria).merge(proc_criteria.call)
-        )
+      it "adds the first default scope" do
+        Band.default_scoping.call.selector["name"].should eq("Depeche Mode")
+      end
+
+      it "adds the additional default scope" do
+        Band.default_scoping.call.selector["origin"].should eq("England")
+      end
+
+      it "adds the proc default scope" do
+        Band.default_scoping.call.selector["active"].should be_true
+      end
+
+      it "delays execution of the merge until called" do
+        Band.all.selector["likes"].should_not eq(Band.all.selector["likes"])
       end
 
       it "flags as being default scoped" do

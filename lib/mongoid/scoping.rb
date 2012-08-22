@@ -296,8 +296,8 @@ module Mongoid
       #
       # @since 3.0.5
       def process_default_scope(value)
-        if default_scoping
-          default_scoping.call.merge(value.to_proc.call).to_proc
+        if existing = default_scoping
+          ->{ existing.call.merge(value.to_proc.call) }
         else
           value.to_proc
         end
