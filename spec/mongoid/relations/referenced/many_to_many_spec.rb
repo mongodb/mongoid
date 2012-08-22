@@ -718,6 +718,18 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             preference.person_ids.should be_empty
           end
 
+          context "and then overwriting it again with the same value" do
+
+            before do
+              person.preferences = [ another_preference ]
+            end
+
+            it "persists the relation between another_preference and person" do
+              another_preference.reload.people.should eq([ person ])
+            end
+
+          end
+
           context "and person reloaded instead of saved" do
 
             before do
