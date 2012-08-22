@@ -447,14 +447,6 @@ en:
             since the child could potentially reference a nonexistant parent."
           resolution: "Make sure to only use create or create! when the parent
             document %{base} is persisted."
-        unsupported_version:
-          message: "MongoDB %{version} not supported, please upgrade to
-            %{mongo_version}."
-          summary: "Mongoid is relying on features that were introduced in
-            MongoDB %{mongo_version} and would cause unexpected behaviour or errors
-            on version %{version}."
-          resolution: "Upgrade your MongoDB instances or keep Mongoid on your
-            previous version."
         unsupported_javascript:
           message: "Executing Javascript $where selector on an embedded criteria
             is not supported."
