@@ -60,6 +60,7 @@ describe Mongoid::Scoping do
     end
 
     context "when there is more then one default_scope" do
+
       let(:criteria) do
         Band.where(name: "Depeche Mode")
       end
@@ -83,13 +84,14 @@ describe Mongoid::Scoping do
       end
 
       it "adds the default scope to the class" do
-        Band.default_scoping.call.should eq(criteria.merge(additional_criteria).merge(proc_criteria.call))
+        Band.default_scoping.call.should eq(
+          criteria.merge(additional_criteria).merge(proc_criteria.call)
+        )
       end
 
       it "flags as being default scoped" do
         Band.should be_default_scoping
       end
-
     end
   end
 
