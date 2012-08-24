@@ -29,6 +29,7 @@ module Mongoid
         #
         # @since 3.0.0
         def demongoize(object)
+          return nil if object.blank?
           ::Time.demongoize(object).in_time_zone
         end
 
