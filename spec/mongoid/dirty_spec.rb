@@ -506,7 +506,7 @@ describe Mongoid::Dirty do
         person.changes
       end
 
-      it "does not returns the value in the changes" do
+      it "does not return the value in the changes" do
         changes.should be_empty
       end
 
