@@ -23,7 +23,7 @@ describe Mongoid::Extensions::Float do
 
   describe ".demongoize" do
 
-    context "when the the value is an float" do
+    context "when the the value is a float" do
 
       it "returns a float" do
         Float.demongoize(number).should eq(number)
@@ -49,12 +49,16 @@ describe Mongoid::Extensions::Float do
           it "it returns the float" do
             Float.mongoize(3).should eq(3)
           end
+
+          it "returns the number as type float" do
+            Float.mongoize(3).should be_a(Float)
+          end
         end
 
         context "when the value is large" do
 
           it "returns the float" do
-            Float.mongoize(1024**2).to_s.should eq("1048576")
+            Float.mongoize(1024**2).to_s.should eq("1048576.0")
           end
         end
       end

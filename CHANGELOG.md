@@ -82,6 +82,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2318 Ensure setting any numeric on a Float field actually sets it as a float,
+  even if the number provided is an integer.
+
 ## 3.0.5
 
 ### Resolved Issues
