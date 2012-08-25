@@ -3,7 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 3.0.5 (branch 3.0.0-stable)
+## 3.0.6 (branch 3.0.0-stable)
+
+### Resolved Issues
+
+## 3.0.5
+
+### Resolved Issues
 
 * \#2313 Fixed deserialization of `nil` `TimeWithZone` fields. (nagachika)
 
@@ -31,8 +37,6 @@ For instructions on upgrading to newer versions, visit
   field, no matter what the other changes on the document are.
 
 * \#1091 Allow presence validation to pass if the value is `false`.
-
-### Resolved Issues
 
 ## 3.0.4
 
