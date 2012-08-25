@@ -65,7 +65,7 @@ module Mongoid
       _changes = {}
       changed.each do |attr|
         change = attribute_change(attr)
-        _changes[attr] = attribute_change(attr) if change
+        _changes[attr] = change if change
       end
       _changes
     end
