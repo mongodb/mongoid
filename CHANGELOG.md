@@ -82,6 +82,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2313 Fixed deserialization of `nil` `TimeWithZone` fields. (nagachika)
 
+* \#2311 `Document#changes` no longer returns `nil` values for Array and Hash
+  fields that were only accessed and didn't actually change. Regression from 2.4.x.
+
 * \#2309 Allow embeds_one relations to be set with hashes more than just the
   initial set.
 

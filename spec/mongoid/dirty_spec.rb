@@ -506,8 +506,8 @@ describe Mongoid::Dirty do
         person.changes
       end
 
-      it "returns the value in the changes" do
-        changes.should eq({ "aliases" => nil })
+      it "does not returnsthe value in the changes" do
+        changes.should be_empty
       end
 
       it "is not flagged as changed" do
