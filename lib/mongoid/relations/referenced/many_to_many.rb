@@ -150,6 +150,9 @@ module Mongoid
           after_remove_error = nil
           many_to_many = target.clear do |doc|
             unbind_one(doc)
+            unless metadata.forced_nil_inverse?
+              doc.changed_attributes.delete(inverse_foreign_key)
+            end
             begin
               execute_callback :after_remove, doc
             rescue => e
