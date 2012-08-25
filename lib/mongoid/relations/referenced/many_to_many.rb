@@ -146,6 +146,9 @@ module Mongoid
           end
           target.clear do |doc|
             unbind_one(doc)
+            unless metadata.forced_nil_inverse?
+              doc.changed_attributes.delete(inverse_foreign_key)
+            end
           end
         end
         alias :nullify_all :nullify
