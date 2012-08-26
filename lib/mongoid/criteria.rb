@@ -243,6 +243,21 @@ module Mongoid
       for_ids(ids).execute_or_raise(ids, args.multi_arged?)
     end
 
+    # Find the first +Document+, or creates a new document
+    # with the conditions that were supplied plus attributes.
+    #
+    # @example First or create the document.
+    #   Person.where(name: "Jon").first_or_create(attribute: "value")
+    #
+    # @param [ Hash ] attrs The additional attributes to add.
+    #
+    # @return [ Document ] A matching or newly created document.
+    #
+    # @since 3.1.0
+    def first_or_create(attrs = nil, &block)
+      first_or(:create, attrs, &block)
+    end
+
     # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
     #
     # @example Add a single id criteria.
@@ -585,15 +600,32 @@ module Mongoid
     # @return [ Document ] The new or saved document.
     #
     # @since 3.0.0
-    def create_document(method, attrs = {})
+    def create_document(method, attrs = nil)
       klass.__send__(method,
-        selector.reduce(attrs) do |hash, (key, value)|
+        selector.reduce(attrs || {}) do |hash, (key, value)|
           unless key.to_s =~ /\$/ || value.is_a?(Hash)
             hash[key] = value
           end
           hash
         end
       )
+    end
+
+    # Find the first document or create/initialize it.
+    #
+    # @example First or perform an action.
+    #   Person.first_or(:create, :name => "Dev")
+    #
+    # @param [ Symbol ] method The method to invoke.
+    # @param [ Hash ] attrs The attributes to query or set.
+    #
+    # @return [ Document ] The first or new document.
+    #
+    # @since 3.1.0
+    def first_or(method, attrs = nil)
+      document = first || create_document(method, attrs)
+      yield(document) if block_given?
+      document
     end
 
     # Get the finder used to generate the id query.

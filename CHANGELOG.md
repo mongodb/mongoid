@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2317 Added `Document.first_or_create` and `Criteria#first_or_create`.
+  (incorvia)
+
 * \#2292 Added `Model.each_with_index`.
 
 * \#2285 `Config.load_configuration` is now public for those who want to instantiate
