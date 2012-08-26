@@ -1757,6 +1757,100 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "first_or_initialize" do
+
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    context "when the document is found" do
+
+      let(:found) do
+        Band.where(name: "Depeche Mode").first_or_initialize
+      end
+
+      it "returns the document" do
+        found.should eq(band)
+      end
+    end
+
+    context "when the document is not found" do
+
+      context "when attributes are provided" do
+
+        let(:document) do
+          Band.where(name: "Tool").first_or_initialize(origin: "Essex")
+        end
+
+        it "returns a new document" do
+          document.name.should eq("Tool")
+        end
+
+        it "returns a non persisted document" do
+          document.should_not be_persisted
+        end
+
+        it "sets the additional attributes" do
+          document.origin.should eq("Essex")
+        end
+      end
+
+      context "when attributes are not provided" do
+
+        let(:document) do
+          Band.where(name: "Tool").first_or_initialize
+        end
+
+        it "returns a new document" do
+          document.name.should eq("Tool")
+        end
+
+        it "returns a non persisted document" do
+          document.should_not be_persisted
+        end
+      end
+
+      context "when a block is provided" do
+
+        let(:document) do
+          Band.where(name: "Tool").first_or_initialize do |doc|
+            doc.active = false
+          end
+        end
+
+        it "returns a new document" do
+          document.name.should eq("Tool")
+        end
+
+        it "returns a non persisted document" do
+          document.should_not be_persisted
+        end
+
+        it "yields to the block" do
+          document.active.should be_false
+        end
+      end
+
+      context "when the criteria is complex" do
+
+        context "when the document is not found" do
+
+          let(:document) do
+            Band.in(name: [ "New Order" ]).first_or_initialize(active: false)
+          end
+
+          it "returns a new document" do
+            document.active.should be_false
+          end
+
+          it "returns a non persisted document" do
+            document.should_not be_persisted
+          end
+        end
+      end
+    end
+  end
+
   describe "#freeze" do
 
     let(:criteria) do

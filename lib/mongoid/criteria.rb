@@ -258,6 +258,21 @@ module Mongoid
       first_or(:create, attrs, &block)
     end
 
+    # Find the first +Document+, or initializes a new document
+    # with the conditions that were supplied plus attributes.
+    #
+    # @example First or initialize the document.
+    #   Person.where(name: "Jon").first_or_initialize(attribute: "value")
+    #
+    # @param [ Hash ] attrs The additional attributes to add.
+    #
+    # @return [ Document ] A matching or newly initialized document.
+    #
+    # @since 3.1.0
+    def first_or_initialize(attrs = nil, &block)
+      first_or(:new, attrs, &block)
+    end
+
     # Adds a criterion to the +Criteria+ that specifies an id that must be matched.
     #
     # @example Add a single id criteria.

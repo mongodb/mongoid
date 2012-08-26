@@ -357,6 +357,78 @@ describe Mongoid::Finders do
     end
   end
 
+  describe ".first_or_initialize" do
+
+    context "when the document is found" do
+
+      let!(:person) do
+        Person.create
+      end
+
+      it "returns the document" do
+        Person.first_or_create.should eq(person)
+      end
+    end
+
+    context "when the document is not found" do
+
+      context "when providing a document" do
+
+        let!(:person) do
+          Person.create
+        end
+
+        let(:found) do
+          Game.first_or_initialize(person: person)
+        end
+
+        it "returns the new document" do
+          found.person.should eq(person)
+        end
+
+        it "does not save the document" do
+          found.should_not be_persisted
+        end
+      end
+
+      context "when not providing a block" do
+
+        let!(:person) do
+          Person.first_or_initialize(title: "Senorita")
+        end
+
+        it "creates a non persisted document" do
+          person.should_not be_persisted
+        end
+
+        it "sets the attributes" do
+          person.title.should eq("Senorita")
+        end
+      end
+
+      context "when providing a block" do
+
+        let!(:person) do
+          Person.first_or_initialize(title: "Senorita") do |person|
+            person.pets = true
+          end
+        end
+
+        it "creates a new document" do
+          person.should_not be_persisted
+        end
+
+        it "sets the attributes" do
+          person.title.should eq("Senorita")
+        end
+
+        it "calls the block" do
+          person.pets.should be_true
+        end
+      end
+    end
+  end
+
   Origin::Selectable.forwardables.each do |method|
 
     describe "##{method}" do

@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Added `Document.first_or_initialize` and `Criteria#first_or_initialize`.
+
 * \#2317 Added `Document.first_or_create` and `Criteria#first_or_create`.
   (incorvia)
 
