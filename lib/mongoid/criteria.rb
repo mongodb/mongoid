@@ -258,6 +258,22 @@ module Mongoid
       first_or(:create, attrs, &block)
     end
 
+    # Find the first +Document+, or creates a new document
+    # with the conditions that were supplied plus attributes and will
+    # raise an error if validation fails.
+    #
+    # @example First or create the document.
+    #   Person.where(name: "Jon").first_or_create!(attribute: "value")
+    #
+    # @param [ Hash ] attrs The additional attributes to add.
+    #
+    # @return [ Document ] A matching or newly created document.
+    #
+    # @since 3.1.0
+    def first_or_create!(attrs = nil, &block)
+      first_or(:create!, attrs, &block)
+    end
+
     # Find the first +Document+, or initializes a new document
     # with the conditions that were supplied plus attributes.
     #

@@ -7,10 +7,25 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Added `Document.first_or_create!` and `Criteria#first_or_create!`. This
+  raises a validations error if creation fails validation.
+
+        Band.where(name: "Depeche Mode").first_or_create!
+        Band.where(name: "Tool").first_or_create!(active: true)
+
 * Added `Document.first_or_initialize` and `Criteria#first_or_initialize`.
+  This is the same as `first_or_create` but initializes a new (unpersisted)
+  document if none is found.
+
+        Band.where(name: "Depeche Mode").first_or_initialize
+        Band.where(name: "Tool").first_or_initialize(active: true)
 
 * \#2317 Added `Document.first_or_create` and `Criteria#first_or_create`.
-  (incorvia)
+  This will return the first matching document or create one with additional
+  attributes if one does not exist. (incorvia)
+
+        Band.where(name: "Depeche Mode").first_or_create
+        Band.where(name: "Tool").first_or_create(active: true)
 
 * \#2292 Added `Model.each_with_index`.
 
