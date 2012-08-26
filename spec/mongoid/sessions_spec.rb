@@ -653,14 +653,14 @@ describe Mongoid::Sessions do
           let!(:band) do
             Band.with(
               session: "mongohq_repl",
-              database: "mongoid-test"
+              database: "mongoid_replica"
             ).create
           end
 
           let(:from_db) do
             Band.with(
               session: "mongohq_repl",
-              database: "mongoid-test"
+              database: "mongoid_replica"
             ).find(band.id)
           end
 
@@ -674,14 +674,14 @@ describe Mongoid::Sessions do
           let!(:band) do
             Band.with(
               session: "mongohq_repl_uri",
-              database: "mongoid-test"
+              database: "mongoid_replica"
             ).create
           end
 
           let(:from_db) do
             Band.with(
               session: "mongohq_repl_uri",
-              database: "mongoid-test"
+              database: "mongoid_replica"
             ).find(band.id)
           end
 
@@ -723,28 +723,28 @@ describe Mongoid::Sessions do
         before do
           Band.with(
             session: "mongohq_repl",
-            database: "mongoid-test"
+            database: "mongoid_replica"
           ).delete_all
         end
 
         let!(:depeche_mode) do
           Band.with(
             session: "mongohq_repl",
-            database: "mongoid-test"
+            database: "mongoid_replica"
           ).create(name: "Depeche Mode", likes: 200)
         end
 
         let!(:tool) do
           Band.with(
             session: "mongohq_repl",
-            database: "mongoid-test"
+            database: "mongoid_replica"
           ).create(name: "Tool", likes: 100)
         end
 
         let(:results) do
           Band.with(
             session: "mongohq_repl",
-            database: "mongoid-test"
+            database: "mongoid_replica"
           ).map_reduce(map, reduce).out(inline: 1)
         end
 
