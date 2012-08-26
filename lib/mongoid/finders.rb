@@ -119,6 +119,19 @@ module Mongoid
       with_default_scope.first
     end
 
+    # Find the first +Document+, or creates a new document
+    # with the conditions that were supplied.
+    #
+    # @example First or create the document.
+    #   Person.first_or_create(:attribute => "value")
+    #
+    # @param [ Hash ] attrs The attributes to check.
+    #
+    # @return [ Document ] A matching or newly created document.
+    def first_or_create(attrs = {}, &block)
+      first_or(:create, attrs, &block)
+    end
+
     # Find the last +Document+ given the conditions.
     #
     # @example Find the last document.
@@ -142,6 +155,19 @@ module Mongoid
     # @return [ Document ] The first or new document.
     def find_or(method, attrs = {}, &block)
       where(attrs).first || send(method, attrs, &block)
+    end
+
+    # Find the first document or create/initialize it.
+    #
+    # @example First or perform an action.
+    #   Person.first_or(:create, :name => "Dev")
+    #
+    # @param [ Symbol ] method The method to invoke.
+    # @param [ Hash ] attrs The attributes to query or set.
+    #
+    # @return [ Document ] The first or new document.
+    def first_or(method, attrs = {}, &block)
+      with_default_scope.first || send(method, attrs, &block)
     end
   end
 end
