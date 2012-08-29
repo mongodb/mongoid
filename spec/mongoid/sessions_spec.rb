@@ -66,7 +66,7 @@ describe Mongoid::Sessions do
       end
 
       it "sets the correct collection name" do
-        band.collection.name.should eq(:artists)
+        band.collection.name.to_s.should eq("artists")
       end
 
       context "when accessing from the class level" do
@@ -76,7 +76,7 @@ describe Mongoid::Sessions do
         end
 
         it "sets the correct collection name" do
-          Band.collection.name.should eq(:artists)
+          Band.collection.name.to_s.should eq("artists")
         end
       end
 
@@ -115,7 +115,7 @@ describe Mongoid::Sessions do
       end
 
       it "sets the correct collection name" do
-        band.collection.name.should eq(:bands)
+        band.collection.name.to_s.should eq("bands")
       end
 
       context "when accessing from the class level" do
@@ -125,7 +125,7 @@ describe Mongoid::Sessions do
         end
 
         it "sets the correct collection name" do
-          Band.collection.name.should eq(:bands)
+          Band.collection.name.to_s.should eq("bands")
         end
       end
     end
