@@ -167,10 +167,12 @@ module Mongoid
           function(key, values) {
             var agg = { count: 0, max: null, min: null, sum: 0 };
             values.forEach(function(val) {
-              if (agg.max == null || val.max > agg.max) agg.max = val.max;
-              if (agg.min == null || val.max < agg.min) agg.min = val.max;
+              if (val.max !== null) {
+                if (agg.max == null || val.max > agg.max) agg.max = val.max;
+                if (agg.min == null || val.max < agg.min) agg.min = val.max;
+                agg.sum += val.sum;
+              }
               agg.count += 1;
-              agg.sum += val.sum;
             });
             return agg;
           }}
