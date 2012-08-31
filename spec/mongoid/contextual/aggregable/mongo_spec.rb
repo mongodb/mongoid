@@ -110,6 +110,56 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
       end
 
+      context "when the field sometimes exists" do
+        let!(:oasis) do
+          Band.create(name: "Oasis", likes: 50)
+        end
+
+        let!(:radiohead) do
+          Band.create(name: "Radiohead")
+        end
+
+        context "and the field doesn't exist on the last document" do
+          let(:criteria) do
+            Band.all
+          end
+
+          let(:context) do
+            Mongoid::Contextual::Mongo.new(criteria)
+          end
+
+          let(:aggregates) do
+            context.aggregates(:likes)
+          end
+
+          it "returns a min" do
+            aggregates["min"].should eq(50)
+          end
+        end
+
+        context "and the field doesn't exist on the before-last document" do
+          let!(:u2) do
+            Band.create(name: "U2", likes: 100)
+          end
+
+          let(:criteria) do
+            Band.all
+          end
+
+          let(:context) do
+            Mongoid::Contextual::Mongo.new(criteria)
+          end
+
+          let(:aggregates) do
+            context.aggregates(:likes)
+          end
+
+          it "returns a min" do
+            aggregates["min"].should eq(50)
+          end
+        end
+      end
+
       context "when there are no matching documents" do
 
         let(:criteria) do
