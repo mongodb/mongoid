@@ -15,6 +15,8 @@ class Band
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
   embeds_one :label, cascade_callbacks: true
 
+  accepts_nested_attributes_for :records, allow_destroy: true
+
   after_upsert do |doc|
     doc.upserted = true
   end
