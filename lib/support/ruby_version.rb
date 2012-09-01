@@ -1,29 +1,26 @@
-# Go ahead and fail if not using Ruby 1.9.3, no since in letting people 
+# Go ahead and fail if not using Ruby 1.9.3, no since in letting people
 # squarm for answers
-RUBY_VERSION =~ /([\d]+)\.([\d]+)\.([\d]+)/
-
-major, minor, revision = $1.to_i, $2.to_i, $3.to_i
-
-def raise_version_error(messages)
-
-  messages.each { |m| puts m}
-
-  if defined?(Rails)
-    messages.each { |m| Rails.logger.info m }
-  end
-
+def raise_version_error(message)
+  puts message
+  Rails.logger.info(message) if defined?(Rails)
   raise
 end
 
-if defined?(JRUBY_VERSION) && major <= 1 && minor <= 9 # JRUB
-  messages = []
-  messages << "\n\n\nRuby Version Error: Mongoid 3 on JRuby requires Ruby 1.9.2+ compatability; start jruby with the --1.9 argument"
+def invalid_version?
+  RUBY_VERSION =~ /([\d]+)\.([\d]+)\.([\d]+)/
+  major, minor, revision = $1.to_i, $2.to_i, $3.to_i
+  if defined?(JRUBY_VERSION)
+    major <= 1 && minor <= 9 && revision <= 1
+  else
+    major <= 1 && minor <= 9 && revision <= 2
+  end
+end
 
-  raise_version_error(messages)
-elsif major <= 1 && minor <= 9 && revision <= 2 # MRI
-  messages = []
-  messages << "\n\n\nRuby Version Error: Mongoid 3 requires Ruby 1.9.3+; you are currently using #{RUBY_VERSION}."
-  messages << "                    Please check your environments documentation for upgrading to Ruby 1.9.3\n\n\n"
-
-  raise_version_error(messages)
+if invalid_version?
+  message = %{
+Mongoid requires MRI version 1.9.3+ or JRuby 1.6.0+ running in 1.9 mode.
+You're current Ruby version is defined as #{RUBY_VERSION}. Please see:
+http://mongoid.org/en/mongoid/docs/tips.html#ruby for details.
+  }
+  raise_version_error(message)
 end
