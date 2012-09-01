@@ -38,6 +38,20 @@ module Mongoid
       attr_accessor :before_callback_halted
     end
 
+    # Is the provided type of callback executable by this document?
+    #
+    # @example Is the callback executable?
+    #   document.callback_executable?(:save)
+    #
+    # @param [ Symbol ] kin The type of callback.
+    #
+    # @return [ true, false ] If the callback can be executed.
+    #
+    # @since 3.0.6
+    def callback_executable?(kind)
+      respond_to?("_#{kind}_callbacks")
+    end
+
     # Run only the after callbacks for the specific event.
     #
     # @note ActiveSupport does not allow this type of behaviour by default, so
@@ -97,7 +111,7 @@ module Mongoid
           return false
         end
       end
-      super(kind, *args, &block)
+      callback_executable?(kind) ? super(kind, *args, &block) : true
     end
 
     private
@@ -158,7 +172,7 @@ module Mongoid
     #
     # @since 2.3.0
     def cascadable_child?(kind, child)
-      return false if [ :initialize, :find ].include?(kind) || !child.respond_to?("_#{kind}_callbacks")
+      return false if [ :initialize, :find ].include?(kind) || !child.callback_executable?(kind)
       [ :create, :destroy ].include?(kind) || child.changed? || child.new_record?
     end
 

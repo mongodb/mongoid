@@ -388,14 +388,6 @@ describe Mongoid::Callbacks do
 
     context "when the parent has a custom callback" do
 
-      before(:all) do
-        Band.define_model_callbacks(:rearrange)
-      end
-
-      after(:all) do
-        Band.reset_callbacks(:rearrange)
-      end
-
       context "when the child does not have the same callback defined" do
 
         let(:band) do
@@ -406,8 +398,45 @@ describe Mongoid::Callbacks do
           band.records.build
         end
 
-        it "does not cascade to the child" do
-          band.run_callbacks(:rearrange).should be_true
+        context "when running the callbacks directly" do
+
+          before(:all) do
+            Band.define_model_callbacks(:rearrange)
+          end
+
+          after(:all) do
+            Band.reset_callbacks(:rearrange)
+          end
+
+          it "does not cascade to the child" do
+            band.run_callbacks(:rearrange).should be_true
+          end
+        end
+
+        context "when the callbacks get triggered by a destroy" do
+
+          before(:all) do
+            Band.define_model_callbacks(:rearrange)
+            Band.set_callback(:validation, :before) do
+              run_callbacks(:rearrange)
+            end
+          end
+
+          after(:all) do
+            Band.reset_callbacks(:rearrange)
+          end
+
+          let(:attributes) do
+            {
+              records_attributes: {
+                "0" => { "_id" => record.id, "_destroy" => true }
+              }
+            }
+          end
+
+          it "does not cascade to the child" do
+            band.update_attributes(attributes).should be_true
+          end
         end
       end
     end
