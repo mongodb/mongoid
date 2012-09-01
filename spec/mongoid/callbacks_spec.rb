@@ -435,6 +435,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not cascade to the child" do
+            Band.accepts_nested_attributes_for :records, allow_destroy: true
             band.update_attributes(attributes).should be_true
           end
         end
