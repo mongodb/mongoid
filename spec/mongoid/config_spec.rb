@@ -164,7 +164,7 @@ describe Mongoid::Config do
             end
 
             it "sets the consistency option" do
-              options["consistency"].should eq(:eventual)
+              options["consistency"].should eq(:strong)
             end
           end
         end
