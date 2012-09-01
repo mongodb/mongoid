@@ -341,7 +341,7 @@ module Mongoid
           criterion = klass.scoped
           criterion.embedded = true
           criterion.documents = target
-          criterion
+          Many.apply_ordering(criterion, metadata)
         end
 
         # Deletes one document from the target and unscoped.

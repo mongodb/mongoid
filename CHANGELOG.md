@@ -105,6 +105,8 @@ For instructions on upgrading to newer versions, visit
 * \#2334 Fixed aggregation map/reduce when fields sometimes do not exist.
   (James McKinney)
 
+* \#2328 Ensure ordering is applied on all relation criteria if defined.
+
 * \#2327 Don't execute callbacks from base document if the document cannot execute
   them.
 

@@ -3385,4 +3385,27 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
   end
+
+  context "when executing a criteria call on an ordered relation" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:post_one) do
+      person.ordered_posts.create(rating: 1)
+    end
+
+    let!(:post_two) do
+      person.ordered_posts.create(rating: 5)
+    end
+
+    let(:criteria) do
+      person.ordered_posts.only(:_id, :rating)
+    end
+
+    it "does not drop the ordering" do
+      criteria.should eq([ post_two, post_one ])
+    end
+  end
 end

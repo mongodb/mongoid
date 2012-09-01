@@ -190,6 +190,21 @@ module Mongoid
 
       class << self
 
+        # Apply ordering to the criteria if it was defined on the relation.
+        #
+        # @example Apply the ordering.
+        #   Proxy.apply_ordering(criteria, metadata)
+        #
+        # @param [ Criteria ] criteria The criteria to modify.
+        # @param [ Metadata ] metadata The relation metadata.
+        #
+        # @return [ Criteria ] The ordered criteria.
+        #
+        # @since 3.0.6
+        def apply_ordering(criteria, metadata)
+          metadata.order ? criteria.order_by(metadata.order) : criteria
+        end
+
         # Get the criteria that is used to eager load a relation of this
         # type.
         #

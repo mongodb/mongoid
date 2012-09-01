@@ -291,7 +291,7 @@ module Mongoid
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            metadata.klass.all_of(_id: { "$in" => object })
+            apply_ordering(metadata.klass.all_of(_id: { "$in" => object }), metadata)
           end
 
           # Get the criteria that is used to eager load a relation of this

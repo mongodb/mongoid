@@ -550,13 +550,15 @@ module Mongoid
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            with_inverse_field_criterion(
-              with_polymorphic_criterion(
-                metadata.klass.where(metadata.foreign_key => object),
-                metadata,
-                type
-              ),
-              metadata
+            apply_ordering(
+              with_inverse_field_criterion(
+                with_polymorphic_criterion(
+                  metadata.klass.where(metadata.foreign_key => object),
+                  metadata,
+                  type
+                ),
+                metadata
+              ), metadata
             )
           end
 

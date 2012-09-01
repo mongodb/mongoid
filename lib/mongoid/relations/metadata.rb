@@ -150,8 +150,7 @@ module Mongoid
       #
       # @since 2.1.0
       def criteria(object, type)
-        query = relation.criteria(self, object, type)
-        order ? query.order_by(order) : query
+        relation.criteria(self, object, type)
       end
 
       # Returns the cyclic option of the relation.
