@@ -401,107 +401,222 @@ describe Mongoid::Relations::Targets::Enumerable do
       Person.create
     end
 
-    context "when the document is loaded" do
+    context "when document is embedded" do
 
-      let!(:post) do
-        Post.create(person_id: person.id)
+      context "when the document is loaded" do
+
+        let(:address) do
+          Address.new
+        end
+
+        let!(:enumerable) do
+          described_class.new([ address ])
+        end
+
+        let!(:deleted) do
+          enumerable.delete_if { |doc| doc == address }
+        end
+
+        it "deletes the document from the enumerable" do
+          enumerable._loaded.should be_empty
+        end
+
+        it "returns the remaining docs" do
+          deleted.should be_empty
+        end
       end
 
-      let!(:enumerable) do
-        described_class.new([ post ])
+      context "when the document is added" do
+
+        let!(:person) do
+          Person.create(addresses: [ address ])
+        end
+
+        let(:address) do
+          Address.new
+        end
+
+        let(:criteria) do
+          person.addresses
+        end
+
+        let!(:enumerable) do
+          described_class.new(criteria)
+        end
+
+        before do
+          enumerable << address
+        end
+
+        let!(:deleted) do
+          enumerable.delete_if { |doc| doc == address }
+        end
+
+        it "removes the document from the added docs" do
+          enumerable._added.should be_empty
+        end
+
+        it "returns the remaining docs" do
+          deleted.should be_empty
+        end
       end
 
-      let!(:deleted) do
-        enumerable.delete_if { |doc| doc == post }
+      context "when the document is unloaded" do
+
+        let!(:person) do
+          Person.create(addresses: [ address ])
+        end
+
+        let(:address) do
+          Address.new
+        end
+
+        let(:criteria) do
+          person.addresses
+        end
+
+        let!(:enumerable) do
+          described_class.new(criteria)
+        end
+
+        let!(:deleted) do
+          enumerable.delete_if { |doc| doc == address }
+        end
+
+        it "does not load the document" do
+          enumerable._loaded.should be_empty
+        end
+
+        it "returns the remaining docs" do
+          deleted.should be_empty
+        end
       end
 
-      it "deletes the document from the enumerable" do
-        enumerable._loaded.should be_empty
-      end
+      context "when the block doesn't match" do
 
-      it "returns the remaining docs" do
-        deleted.should be_empty
+        let(:address) do
+          Address.new(street: 'Baker Street 221b')
+        end
+
+        let(:enumerable) do
+          described_class.new([ address ])
+        end
+
+        let(:deleted) do
+          p enumerable.inspect
+          enumerable.delete_if { |doc| doc == Address.new }
+        end
+
+        it "returns the remaining docs" do
+          deleted.should eq([ address ])
+        end
       end
     end
 
-    context "when the document is added" do
+    context "when document is not embedded" do
 
-      let!(:post) do
-        Post.new
+      context "when the document is loaded" do
+
+        let!(:post) do
+          Post.create(person_id: person.id)
+        end
+
+        let!(:enumerable) do
+          described_class.new([ post ])
+        end
+
+        let!(:deleted) do
+          enumerable.delete_if { |doc| doc == post }
+        end
+
+        it "deletes the document from the enumerable" do
+          enumerable._loaded.should be_empty
+        end
+
+        it "returns the remaining docs" do
+          deleted.should be_empty
+        end
       end
 
-      let(:criteria) do
-        Person.where(person_id: person.id)
+      context "when the document is added" do
+
+        let!(:post) do
+          Post.new
+        end
+
+        let(:criteria) do
+          Person.where(person_id: person.id)
+        end
+
+        let!(:enumerable) do
+          described_class.new(criteria)
+        end
+
+        before do
+          enumerable << post
+        end
+
+        let!(:deleted) do
+          enumerable.delete_if { |doc| doc == post }
+        end
+
+        it "removes the document from the added docs" do
+          enumerable._added.should be_empty
+        end
+
+        it "returns the remaining docs" do
+          deleted.should be_empty
+        end
       end
 
-      let!(:enumerable) do
-        described_class.new(criteria)
+      context "when the document is unloaded" do
+
+        let!(:post) do
+          Post.create(person_id: person.id)
+        end
+
+        let(:criteria) do
+          Post.where(person_id: person.id)
+        end
+
+        let!(:enumerable) do
+          described_class.new(criteria)
+        end
+
+        let!(:deleted) do
+          enumerable.delete_if { |doc| doc == post }
+        end
+
+        it "does not load the document" do
+          enumerable._loaded.should be_empty
+        end
+
+        it "returns the remaining docs" do
+          deleted.should be_empty
+        end
       end
 
-      before do
-        enumerable << post
-      end
+      context "when the block doesn't match" do
 
-      let!(:deleted) do
-        enumerable.delete_if { |doc| doc == post }
-      end
+        let!(:post) do
+          Post.create(person_id: person.id)
+        end
 
-      it "removes the document from the added docs" do
-        enumerable._added.should be_empty
-      end
+        let(:criteria) do
+          Person.where(person_id: person.id)
+        end
 
-      it "returns the remaining docs" do
-        deleted.should be_empty
-      end
-    end
+        let!(:enumerable) do
+          described_class.new([ post ])
+        end
 
-    context "when the document is unloaded" do
+        let!(:deleted) do
+          enumerable.delete_if { |doc| doc == Post.new }
+        end
 
-      let!(:post) do
-        Post.create(person_id: person.id)
-      end
-
-      let(:criteria) do
-        Post.where(person_id: person.id)
-      end
-
-      let!(:enumerable) do
-        described_class.new(criteria)
-      end
-
-      let!(:deleted) do
-        enumerable.delete_if { |doc| doc == post }
-      end
-
-      it "does not load the document" do
-        enumerable._loaded.should be_empty
-      end
-
-      it "returns the remaining docs" do
-        deleted.should be_empty
-      end
-    end
-
-    context "when the block doesn't match" do
-
-      let!(:post) do
-        Post.create(person_id: person.id)
-      end
-
-      let(:criteria) do
-        Person.where(person_id: person.id)
-      end
-
-      let!(:enumerable) do
-        described_class.new([ post ])
-      end
-
-      let!(:deleted) do
-        enumerable.delete_if { |doc| doc == Post.new }
-      end
-
-      it "returns the remaining docs" do
-        deleted.should eq([ post ])
+        it "returns the remaining docs" do
+          deleted.should eq([ post ])
+        end
       end
     end
   end

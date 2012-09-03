@@ -217,7 +217,7 @@ module Mongoid
         #
         # @return [ Many ] The proxy.
         def initialize(base, target, metadata)
-          init(base, target, metadata) do
+          init(base, Targets::Enumerable.new(target), metadata) do
             target.each_with_index do |doc, index|
               integrate(doc)
               doc._index = index
