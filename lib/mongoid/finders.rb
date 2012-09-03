@@ -129,6 +129,17 @@ module Mongoid
     def last
       with_default_scope.last
     end
+    
+    # Pick up values array by a column
+    #
+    # @example Pick up all email from User model
+    #   User.pluck(:email)
+    #
+    # @return [ Array ] The all values in column
+    def pluck(column_name)
+      column_name = column_name.to_sym
+      with_default_scope.all.only([column_name]).map(&column_name)
+    end
 
     protected
 
@@ -144,5 +155,6 @@ module Mongoid
     def find_or(method, attrs = {}, &block)
       where(attrs).first || send(method, attrs, &block)
     end
+    
   end
 end

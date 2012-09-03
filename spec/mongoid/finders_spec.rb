@@ -446,6 +446,31 @@ describe Mongoid::Finders do
       end
     end
   end
+  
+  
+  describe "#pluck" do    
+    it "work" do
+      Person.create(title: "Senorita")
+      Person.create(title: "Jason")
+      Person.pluck(:title).should eq(%w(Senorita Jason))
+    end
+    
+    context "work with Criteria" do
+      before do
+        Person.create(title: "Senorita")
+        Person.create(title: "Jason", pets: true)
+        Person.create(title: "Tim")
+      end
+      
+      it "with where" do
+        Person.where(pets: false).pluck(:title).should eq(%w(Senorita Tim))
+      end
+      
+      it "with limit" do
+        Person.where(pets: false).limit(1).pluck(:title).should eq(%w(Senorita))
+      end
+    end
+  end
 
   Origin::Selectable.forwardables.each do |method|
 
