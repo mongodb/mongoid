@@ -337,8 +337,8 @@ en:
           message: "Cannot persist embedded document %{klass} without a
             parent document."
           summary: "If the document is embedded, in order to be persisted it
-            must always have a reference to it's parent document. This is
-            most likely cause by either calling %{klass}.create or
+            must always have a reference to its parent document. This is
+            most likely caused by either calling %{klass}.create or
             %{klass}.create! without setting the parent document as an
             attribute."
           resolution: "Ensure that you've set the parent relation if
@@ -407,7 +407,7 @@ en:
           summary: "Attributes flagged as readonly via Model.attr_readonly
             can only have values set when the document is a new record."
           resolution: "Don't define '%{name}' as readonly, or do not attempt
-            to update it's value after the document is persisted."
+            to update its value after the document is persisted."
         scope_overwrite:
           message: "Cannot create scope :%{scope_name}, because of existing
             method %{model_name}.%{scope_name}."
@@ -417,7 +417,7 @@ en:
           resolution: "Change the name of the scope so it does not conflict
             with the already defined method %{model_name}, or set the
             configuration option Mongoid.scope_overwrite_exception to false,
-            which is it's default. In this case a warning will be logged."
+            which is its default. In this case a warning will be logged."
         taken:
           "is already taken"
         too_many_nested_attribute_records:
