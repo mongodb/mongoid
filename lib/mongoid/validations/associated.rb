@@ -39,7 +39,7 @@ module Mongoid
         ensure
           document.exit_validate
         end
-        document.errors.add(attribute, :invalid) unless valid
+        document.errors.add(attribute, :invalid, options) unless valid
       end
     end
   end
