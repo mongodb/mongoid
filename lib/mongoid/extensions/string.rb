@@ -39,6 +39,7 @@ module Mongoid
       #
       # @since 3.0.0
       def __mongoize_time__
+        ::Time.parse(self)
         ::Time.configured.parse(self)
       end
 

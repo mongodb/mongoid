@@ -79,20 +79,36 @@ describe Mongoid::Extensions::String do
         ::Time.zone = "Berlin"
       end
 
-      let(:string) do
-        "2010-11-19 00:24:49 +0900"
+      context "when the string is a valid time" do
+
+        let(:string) do
+          "2010-11-19 00:24:49 +0900"
+        end
+
+        let(:time) do
+          string.__mongoize_time__
+        end
+
+        it "converts to a time" do
+          time.should eq(Time.parse(string))
+        end
+
+        it "converts to the as time zone" do
+          time.zone.should eq("JST")
+        end
       end
 
-      let(:time) do
-        string.__mongoize_time__
-      end
+      context "when the string is an invalid time" do
 
-      it "converts to a time" do
-        time.should eq(Time.parse(string))
-      end
+        let(:string) do
+          "shitty string"
+        end
 
-      it "converts to the as time zone" do
-        time.zone.should eq("JST")
+        it "raises an error" do
+          expect {
+            string.__mongoize_time__
+          }.to raise_error(ArgumentError)
+        end
       end
     end
 
@@ -107,16 +123,32 @@ describe Mongoid::Extensions::String do
         Time.zone = nil
       end
 
-      let(:string) do
-        "2010-11-19 00:24:49 +0900"
+      context "when the string is a valid time" do
+
+        let(:string) do
+          "2010-11-19 00:24:49 +0900"
+        end
+
+        let(:time) do
+          string.__mongoize_time__
+        end
+
+        it "converts to a time" do
+          time.should eq(Time.parse(string))
+        end
       end
 
-      let(:time) do
-        string.__mongoize_time__
-      end
+      context "when the string is an invalid time" do
 
-      it "converts to a time" do
-        time.should eq(Time.parse(string))
+        let(:string) do
+          "shitty string"
+        end
+
+        it "raises an error" do
+          expect {
+            string.__mongoize_time__
+          }.to raise_error(ArgumentError)
+        end
       end
     end
   end
