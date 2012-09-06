@@ -102,6 +102,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2348 Conversion of strings to times should raise an arugment error if the
+  string is invalid. (Campbell Allen)
+
 * \#2346 Ensure `belongs_to` relations are evolvable when passed the proxy and
   not the document.
 

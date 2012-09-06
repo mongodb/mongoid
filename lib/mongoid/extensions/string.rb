@@ -35,6 +35,11 @@ module Mongoid
       # @example Mongoize the string.
       #   "2012-01-01".__mongoize_time__
       #
+      # @note The extra parse from Time is because ActiveSupport::TimeZone
+      #   either returns nil or Time.now if the string is empty or invalid,
+      #   which is a regression from pre-3.0 and also does not agree with
+      #   the core Time API.
+      #
       # @return [ Time ] The time.
       #
       # @since 3.0.0
