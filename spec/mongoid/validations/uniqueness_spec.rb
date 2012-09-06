@@ -156,7 +156,7 @@ describe Mongoid::Validations::UniquenessValidator do
             context "when the document is not the match" do
 
               before do
-                Dictionary.create(description: "english")
+                Dictionary.with(safe: true).create(description: "english")
               end
 
               let(:dictionary) do
@@ -286,10 +286,11 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           context "when the document with the unqiue attribute is not in default scope" do
+
             context "when the attribute is not unique" do
 
               before do
-                Dictionary.create(name: "Oxford")
+                Dictionary.with(safe: true).create(name: "Oxford")
               end
 
               let(:dictionary) do

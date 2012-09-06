@@ -2,16 +2,16 @@ require "spec_helper"
 
 describe Mongoid::Relations::AutoSave do
 
-  before(:all) do
-    Person.autosaved_relations.delete_one(:account)
-    Person.autosave(Person.relations["account"].merge!(autosave: true))
-  end
-
-  after(:all) do
-    Person.reset_callbacks(:save)
-  end
-
   describe ".auto_save" do
+
+    before(:all) do
+      Person.autosaved_relations.delete_one(:account)
+      Person.autosave(Person.relations["account"].merge!(autosave: true))
+    end
+
+    after(:all) do
+      Person.reset_callbacks(:save)
+    end
 
     let(:person) do
       Person.new
