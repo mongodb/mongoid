@@ -32,6 +32,8 @@ describe Mongoid::Config::Environment do
     context "when using sinatra" do
 
       before do
+        Object.send(:remove_const, :Rails) if defined?(Rails)
+
         module Sinatra
           module Base
             extend self
@@ -52,6 +54,7 @@ describe Mongoid::Config::Environment do
     context "when the rack env variable is defined" do
 
       before do
+        Object.send(:remove_const, :Rails) if defined?(Rails)
         ENV["RACK_ENV"] = "acceptance"
       end
 
@@ -65,6 +68,10 @@ describe Mongoid::Config::Environment do
     end
 
     context "when no environment information is found" do
+
+      before do
+        Object.send(:remove_const, :Rails) if defined?(Rails)
+      end
 
       it "raises an error" do
         expect { described_class.env_name }.to raise_error(

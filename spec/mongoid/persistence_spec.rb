@@ -165,12 +165,12 @@ describe Mongoid::Persistence do
         end
 
         let!(:person) do
-          Person.create!(ssn: "555-55-9999")
+          Person.create!(ssn: "555-55-1029")
         end
 
         it "raises an error" do
           expect {
-            Person.with(safe: true).create!(ssn: "555-55-9999")
+            Person.with(safe: true).create!(ssn: "555-55-1029")
           }.to raise_error
         end
       end

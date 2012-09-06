@@ -5,7 +5,7 @@ describe Mongoid::Criteria do
   describe "#update" do
 
     let!(:person) do
-      Person.create(title: "Sir")
+      Person.create!(title: "Sir")
     end
 
     let!(:address_one) do
@@ -20,31 +20,23 @@ describe Mongoid::Criteria do
 
       context "when updating with a criteria" do
 
-        let(:from_db) do
-          Person.first
-        end
-
         before do
-          Person.with(safe: true).where(title: "Sir").update(title: "Madam")
+          Person.where(title: "Sir").update(title: "Madam")
         end
 
         it "updates all the matching documents" do
-          from_db.title.should eq("Madam")
+          person.reload.title.should eq("Madam")
         end
       end
 
       context "when updating all directly" do
-
-        let(:from_db) do
-          Person.first
-        end
 
         before do
           Person.update(title: "Madam")
         end
 
         it "updates all the matching documents" do
-          from_db.title.should eq("Madam")
+          person.reload.title.should eq("Madam")
         end
       end
     end
