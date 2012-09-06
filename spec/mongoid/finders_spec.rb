@@ -66,12 +66,26 @@ describe Mongoid::Finders do
             Game.create(person: person)
           end
 
-          let(:from_db) do
-            Game.find_or_create_by(person: person)
+          context "when providing the object directly" do
+
+            let(:from_db) do
+              Game.find_or_create_by(person: person)
+            end
+
+            it "returns the document" do
+              from_db.should eq(game)
+            end
           end
 
-          it "returns the document" do
-            from_db.should eq(game)
+          context "when providing the proxy relation" do
+
+            let(:from_db) do
+              Game.find_or_create_by(person: game.person)
+            end
+
+            it "returns the document" do
+              from_db.should eq(game)
+            end
           end
         end
 

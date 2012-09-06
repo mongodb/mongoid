@@ -102,6 +102,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2346 Ensure `belongs_to` relations are evolvable when passed the proxy and
+  not the document.
+
 * \#2334 Fixed aggregation map/reduce when fields sometimes do not exist.
   (James McKinney)
 
