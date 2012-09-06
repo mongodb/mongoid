@@ -393,6 +393,10 @@ describe Mongoid::Finders do
 
       context "when not providing a block" do
 
+        before do
+          Person.delete_all
+        end
+
         let!(:person) do
           Person.first_or_initialize(title: "esquire")
         end
