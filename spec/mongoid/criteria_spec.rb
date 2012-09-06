@@ -1759,10 +1759,6 @@ describe Mongoid::Criteria do
 
   describe "first_or_create!" do
 
-    let!(:band) do
-      Band.with(safe: true).create!(name: "Depeche Mode")
-    end
-
     context "when validation fails on the new document" do
 
       it "raises an error" do
@@ -1774,6 +1770,10 @@ describe Mongoid::Criteria do
 
     context "when the document is found" do
 
+      let!(:band) do
+        Band.with(safe: true).create!(name: "Depeche Mode")
+      end
+
       let(:found) do
         Band.where(name: "Depeche Mode").first_or_create!
       end
@@ -1784,6 +1784,10 @@ describe Mongoid::Criteria do
     end
 
     context "when the document is not found" do
+
+      let!(:band) do
+        Band.with(safe: true).create!(name: "Depeche Mode")
+      end
 
       context "when attributes are provided" do
 
