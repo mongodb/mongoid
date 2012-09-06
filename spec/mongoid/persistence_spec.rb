@@ -675,8 +675,8 @@ describe Mongoid::Persistence do
       end
 
       it "raises an error with multiple save attempts" do
-        expect { subject.save! }.should raise_error
-        expect { subject.save! }.should raise_error
+        expect { subject.save! }.to raise_error
+        expect { subject.save! }.to raise_error
       end
     end
 
