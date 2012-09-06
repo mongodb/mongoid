@@ -8,6 +8,7 @@ module Mongoid
       # of the relation and the reference is to document(s) in another
       # collection.
       class In < Relations::One
+        include Evolvable
 
         # Instantiate a new referenced_in relation.
         #
