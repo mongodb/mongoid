@@ -394,7 +394,7 @@ describe Mongoid::Finders do
       context "when not providing a block" do
 
         let!(:person) do
-          Person.first_or_initialize(title: "Senorita")
+          Person.first_or_initialize(title: "esquire")
         end
 
         it "creates a non persisted document" do
@@ -402,7 +402,7 @@ describe Mongoid::Finders do
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          person.title.should eq("esquire")
         end
       end
 
