@@ -25,7 +25,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          Person.where(title: "Sir").update(title: "Madam")
+          Person.with(safe: true).where(title: "Sir").update(title: "Madam")
         end
 
         it "updates all the matching documents" do
