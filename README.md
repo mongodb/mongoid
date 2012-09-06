@@ -24,8 +24,8 @@ Please see the new Mongoid website for up-to-date documentation:
 Donating
 --------
 
-<a class="wepay-widget-button wepay-green" id="wepay_widget_anchor_5048a59bc1ab7" href="https://www.wepay.com/donations/53299">Donate $100.00</a>
-<script type="text/javascript">
+<a class='wepay-widget-button wepay-green' id='wepay_widget_anchor_5048a59bc1ab7' href='https://www.wepay.com/donations/53299'>Donate $100.00</a>
+<script type='text/javascript'>
   var WePay = WePay || {};
   WePay.load_widgets = WePay.load_widgets || function() { };
   WePay.widgets = WePay.widgets || [];
