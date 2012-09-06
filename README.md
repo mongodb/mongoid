@@ -24,6 +24,33 @@ Please see the new Mongoid website for up-to-date documentation:
 Donating
 --------
 
+<a class="wepay-widget-button wepay-green" id="wepay_widget_anchor_5048a59bc1ab7" href="https://www.wepay.com/donations/53299">Donate $100.00</a>
+<script type="text/javascript">
+  var WePay = WePay || {};
+  WePay.load_widgets = WePay.load_widgets || function() { };
+  WePay.widgets = WePay.widgets || [];
+  WePay.widgets.push( {
+  object_id: 53299,
+  widget_type: "donation_campaign",
+  anchor_id: "wepay_widget_anchor_5048a59bc1ab7",
+  widget_options: {
+  donation_amount: "10000",
+  allow_cover_fee: true,
+  enable_recurring: true,
+  allow_anonymous: true,
+  button_text: "Donate $100.00"
+  }
+  });
+  if (!WePay.script) {
+    WePay.script = document.createElement('script');WePay.script.type = 'text/javascript';WePay.script.async = true;
+    WePay.script.src = 'https://static.wepay.com/min/js/widgets.v2.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(WePay.script, s);
+  } else if (WePay.load_widgets) {
+    WePay.load_widgets();
+  }
+</script>
+
+
 [Support Mongoid at Pledgie](http://www.pledgie.com/campaigns/7757)
 
 <a href='http://www.pledgie.com/campaigns/7757'>
