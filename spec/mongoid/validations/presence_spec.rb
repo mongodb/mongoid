@@ -205,7 +205,7 @@ describe Mongoid::Validations::PresenceValidator do
             end
 
             it "does not save the relation" do
-              expect { game.reload }.should raise_error
+              expect { game.reload }.to raise_error
             end
           end
         end
