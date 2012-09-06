@@ -36,11 +36,12 @@ module Mongoid
     # @param [ String ] name The database name.
     #
     # @since 3.0.0
-    def connect_to(name)
+    def connect_to(name, options = { consistency: :eventual })
       self.sessions = {
         default: {
           database: name,
-          hosts: [ "localhost:27017" ]
+          hosts: [ "localhost:27017" ],
+          options: options
         }
       }
     end
