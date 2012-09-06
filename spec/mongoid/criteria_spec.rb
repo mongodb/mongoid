@@ -1760,7 +1760,7 @@ describe Mongoid::Criteria do
   describe "first_or_create!" do
 
     let!(:band) do
-      Band.create(name: "Depeche Mode")
+      Band.with(safe: true).create!(name: "Depeche Mode")
     end
 
     context "when validation fails on the new document" do
