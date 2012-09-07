@@ -3593,6 +3593,57 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#pluck" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode", likes: 3)
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool", likes: 3)
+    end
+
+    let!(:photek) do
+      Band.create(name: "Photek", likes: 1)
+    end
+
+    context "when the criteria matches" do
+
+      context "when there are no duplicate values" do
+
+        let(:plucked) do
+          Band.where(:name.exists => true).pluck(:name)
+        end
+
+        it "returns the values" do
+          plucked.should eq([ "Depeche Mode", "Tool", "Photek" ])
+        end
+      end
+
+      context "when there are duplicate values" do
+
+        let(:plucked) do
+          Band.where(:name.exists => true).pluck(:likes)
+        end
+
+        it "returns the duplicates" do
+          plucked.should eq([ 3, 3, 1 ])
+        end
+      end
+    end
+
+    context "when the criteria does not match" do
+
+      let(:plucked) do
+        Band.where(name: "New Order").pluck(:_id)
+      end
+
+      it "returns an empty array" do
+        plucked.should be_empty
+      end
+    end
+  end
+
   describe "#respond_to?" do
 
     let(:criteria) do

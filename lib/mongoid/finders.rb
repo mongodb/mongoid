@@ -7,9 +7,28 @@ module Mongoid
     extend Origin::Forwardable
 
     select_with :with_default_scope
-    delegate :aggregates, :avg, :each, :each_with_index, :extras, :find_and_modify,
-      :first_or_create, :first_or_create!, :first_or_initialize, :for_js, :includes,
-      :map_reduce, :max, :min, :sum, :update, :update_all, to: :with_default_scope
+
+    # These are methods defined on the criteria that should also be accessible
+    # directly from the the class level.
+    delegate \
+      :aggregates,
+      :avg,
+      :each,
+      :each_with_index,
+      :extras,
+      :find_and_modify,
+      :first_or_create,
+      :first_or_create!,
+      :first_or_initialize,
+      :for_js,
+      :includes,
+      :map_reduce,
+      :max,
+      :min,
+      :pluck,
+      :sum,
+      :update,
+      :update_all, to: :with_default_scope
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.
@@ -129,17 +148,6 @@ module Mongoid
     def last
       with_default_scope.last
     end
-    
-    # Pick up values array by a column
-    #
-    # @example Pick up all email from User model
-    #   User.pluck(:email)
-    #
-    # @return [ Array ] The all values in column
-    def pluck(column_name)
-      column_name = column_name.to_sym
-      with_default_scope.all.only([column_name]).map(&column_name)
-    end
 
     protected
 
@@ -155,6 +163,5 @@ module Mongoid
     def find_or(method, attrs = {}, &block)
       where(attrs).first || send(method, attrs, &block)
     end
-    
   end
 end

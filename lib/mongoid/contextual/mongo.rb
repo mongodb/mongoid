@@ -275,6 +275,25 @@ module Mongoid
         MapReduce.new(collection, criteria, map, reduce)
       end
 
+      # Pluck the single field values from the database. Will return duplicates
+      # if they exist and only works for top level fields.
+      #
+      # @example Pluck a field.
+      #   context.pluck(:_id)
+      #
+      # @note This method will return the raw db values - it performs no custom
+      #   serialization.
+      #
+      # @param [ String, Symbol ] field The field to pluck.
+      #
+      # @return [ Array<Object> ] The plucked values.
+      #
+      # @since 3.1.0
+      def pluck(field)
+        normalized = field.to_s
+        query.select(normalized => 1).map{ |doc| doc[normalized] }.compact
+      end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.

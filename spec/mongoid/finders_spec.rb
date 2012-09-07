@@ -446,28 +446,41 @@ describe Mongoid::Finders do
       end
     end
   end
-  
-  
-  describe "#pluck" do    
-    it "work" do
-      Person.create(title: "Senorita")
-      Person.create(title: "Jason")
-      Person.pluck(:title).should eq(%w(Senorita Jason))
+
+  describe ".pluck" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode", likes: 3)
     end
-    
-    context "work with Criteria" do
-      before do
-        Person.create(title: "Senorita")
-        Person.create(title: "Jason", pets: true)
-        Person.create(title: "Tim")
+
+    let!(:tool) do
+      Band.create(name: "Tool", likes: 3)
+    end
+
+    let!(:photek) do
+      Band.create(name: "Photek", likes: 1)
+    end
+
+    context "when field values exist" do
+
+      let(:plucked) do
+        Band.pluck(:name)
       end
-      
-      it "with where" do
-        Person.where(pets: false).pluck(:title).should eq(%w(Senorita Tim))
+
+      it "returns the field values" do
+        plucked.should eq([ "Depeche Mode", "Tool", "Photek" ])
       end
-      
-      it "with limit" do
-        Person.where(pets: false).limit(1).pluck(:title).should eq(%w(Senorita))
+    end
+
+    context "when field values do not exist" do
+
+      let(:plucked) do
+        Band.pluck(:follows)
+      end
+
+      it "returns an empty array" do
+        p plucked
+        plucked.should be_empty
       end
     end
   end

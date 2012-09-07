@@ -20,6 +20,12 @@ For instructions on upgrading to newer versions, visit
         Band.where(name: "Depeche Mode").first_or_initialize
         Band.where(name: "Tool").first_or_initialize(active: true)
 
+* Added `Model.pluck` and `Criteria#pluck` similar to Active Record's, which
+  returns an array of values for the provided field. (Jason Lee)
+
+        Band.where(name: "Depeche Mode").pluck(:_id)
+        Band.where(name: "Tool").pluck(:likes)
+
 * \#2317 Added `Document.first_or_create` and `Criteria#first_or_create`.
   This will return the first matching document or create one with additional
   attributes if one does not exist. (incorvia)
