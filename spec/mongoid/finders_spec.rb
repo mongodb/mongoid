@@ -479,7 +479,6 @@ describe Mongoid::Finders do
       end
 
       it "returns an empty array" do
-        p plucked
         plucked.should be_empty
       end
     end
