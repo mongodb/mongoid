@@ -3556,6 +3556,34 @@ describe Mongoid::Criteria do
           end
         end
       end
+
+      context "when instantiating a document not in the result set" do
+
+        let(:criteria) do
+          Band.only(:name)
+        end
+
+        it "only limits the fields on the correct criteria" do
+          criteria.each do |band|
+            Band.new.active.should be_true
+          end
+        end
+      end
+
+      context "when nesting a criteria within a criteria" do
+
+        let(:criteria) do
+          Band.only(:name)
+        end
+
+        it "only limits the fields on the correct criteria" do
+          criteria.each do |band|
+            Band.all.each do |b|
+              b.active.should be_true
+            end
+          end
+        end
+      end
     end
 
     context "when using inheritance" do

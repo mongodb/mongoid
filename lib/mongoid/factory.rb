@@ -34,12 +34,12 @@ module Mongoid
     # @param [ Hash ] attributes The document attributes.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = nil)
+    def from_db(klass, attributes = nil, criteria_instance_id = nil)
       type = (attributes || {})["_type"]
       if type.blank?
-        klass.instantiate(attributes)
+        klass.instantiate(attributes, criteria_instance_id)
       else
-        type.camelize.constantize.instantiate(attributes)
+        type.camelize.constantize.instantiate(attributes, criteria_instance_id)
       end
     end
   end
