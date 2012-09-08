@@ -4241,6 +4241,45 @@ describe Mongoid::NestedAttributes do
       Person.accepts_nested_attributes_for :addresses
     end
 
+    context "when embedding one level behind a has many" do
+
+      let(:node) do
+        Node.create
+      end
+
+      let!(:server) do
+        node.servers.create(name: "prod")
+      end
+
+      context "when adding a new embedded document" do
+
+        let(:attributes) do
+          { servers_attributes:
+            { "0" =>
+              {
+                _id: server.id,
+                filesystems_attributes: {
+                  "0" => { name: "NFS" }
+                }
+              }
+            }
+          }
+        end
+
+        before do
+          node.update_attributes(attributes)
+        end
+
+        it "adds the new embedded document" do
+          server.reload.filesystems.first.name.should eq("NFS")
+        end
+
+        it "does not add more than one document" do
+          server.reload.filesystems.count.should eq(1)
+        end
+      end
+    end
+
     context "when deleting the child document" do
 
       let(:person) do
