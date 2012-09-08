@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.5.0
+
+### New Features
+
+* This is a release to support the 1.7.0 and higher Mongo and BSON gems and
+  resolves issues that kept the 2.4.x series locked below 1.6.2
+
 ## 2.4.13
 
 ### Resolved Issues
