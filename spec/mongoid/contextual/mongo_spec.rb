@@ -695,48 +695,100 @@ describe Mongoid::Contextual::Mongo do
         Band.create(name: "New Order")
       end
 
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
+      context "when the criteria has a limit" do
 
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns the number of documents that match" do
-        context.send(method).should eq(1)
-      end
-
-      context "when calling more than once" do
-
-        before do
-          context.query.should_receive(:count).once.and_return(1)
+        let(:criteria) do
+          Band.limit(1)
         end
 
-        it "returns the cached value for subsequent calls" do
-          2.times { context.send(method).should eq(1) }
-        end
-      end
-
-      context "when the results have been iterated over" do
-
-        before do
-          context.entries
-          context.query.should_receive(:count).never
+        let(:context) do
+          described_class.new(criteria)
         end
 
-        it "returns the cached value for all calls" do
-          context.send(method).should eq(1)
+        it "returns the number of documents that match" do
+          context.send(method).should eq(2)
         end
 
-        context "when the results have been iterated over multiple times" do
+        context "when calling more than once" do
+
+          before do
+            context.query.should_receive(:count).once.and_return(2)
+          end
+
+          it "returns the cached value for subsequent calls" do
+            2.times { context.send(method).should eq(2) }
+          end
+        end
+
+        context "when the results have been iterated over" do
 
           before do
             context.entries
+            context.query.should_receive(:count).once.and_return(2)
           end
 
-          it "resets the length on each full iteration" do
-            context.should have(1).item
+          it "returns the cached value for all calls" do
+            context.send(method).should eq(2)
+          end
+
+          context "when the results have been iterated over multiple times" do
+
+            before do
+              context.entries
+            end
+
+            it "resets the length on each full iteration" do
+              context.should have(2).items
+            end
+          end
+        end
+      end
+
+      context "when the criteria has no limit" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns the number of documents that match" do
+          context.send(method).should eq(1)
+        end
+
+        context "when calling more than once" do
+
+          before do
+            context.query.should_receive(:count).once.and_return(1)
+          end
+
+          it "returns the cached value for subsequent calls" do
+            2.times { context.send(method).should eq(1) }
+          end
+        end
+
+        context "when the results have been iterated over" do
+
+          before do
+            context.entries
+            context.query.should_receive(:count).once.and_return(1)
+          end
+
+          it "returns the cached value for all calls" do
+            context.send(method).should eq(1)
+          end
+
+          context "when the results have been iterated over multiple times" do
+
+            before do
+              context.entries
+            end
+
+            it "resets the length on each full iteration" do
+              context.should have(1).item
+            end
           end
         end
       end

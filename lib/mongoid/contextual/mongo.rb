@@ -129,10 +129,9 @@ module Mongoid
       # @since 3.0.0
       def each(&block)
         if block_given?
-          reset_length
           selecting do
             documents_for_iteration.each do |doc|
-              yield_and_increment(doc, &block)
+              yield_document(doc, &block)
             end
             @cache_loaded = true
             eager_loadable? ? docs : self
@@ -568,34 +567,6 @@ module Mongoid
         !eager_loaded && !criteria.inclusions.empty?
       end
 
-      # Increment the length of the results.
-      #
-      # @api private
-      #
-      # @example Increment the length.
-      #   context.increment_length
-      #
-      # @return [ Integer ] The new length
-      #
-      # @since 3.0.0
-      def increment_length
-        @length += 1
-      end
-
-      # Reset the length to zero. This happens once before iteration.
-      #
-      # @api private
-      #
-      # @example Reset the length.
-      #   context.reset_length
-      #
-      # @return [ Integer ] zero.
-      #
-      # @since 3.0.0
-      def reset_length
-        @length = 0
-      end
-
       # If we are limiting results, we need to set the field limitations on a
       # thread local to avoid overriding the default values.
       #
@@ -638,22 +609,21 @@ module Mongoid
         end
       end
 
-      # Yield to the document and increment the length.
+      # Yield to the document.
       #
       # @api private
       #
-      # @example Yield and increment.
-      #   context.yield_and_increment(doc) do |doc|
+      # @example Yield the document.
+      #   context.yield_document(doc) do |doc|
       #     ...
       #   end
       #
       # @param [ Document ] document The document to yield to.
       #
       # @since 3.0.0
-      def yield_and_increment(document, &block)
+      def yield_document(document, &block)
         doc = document.respond_to?(:_id) ? document : Factory.from_db(klass, document)
         yield(doc)
-        increment_length
         documents.push(doc) if cacheable?
       end
     end
