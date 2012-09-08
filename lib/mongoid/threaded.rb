@@ -301,25 +301,28 @@ module Mongoid
     # @example Get the field selection options.
     #   Threaded.selection
     #
+    # @param [ Class ] klass The model class.
+    #
     # @return [ Hash ] The field selection.
     #
     # @since 2.4.4
-    def selection
-      Thread.current["[mongoid]:selection"]
+    def selection(klass)
+      Thread.current["[mongoid][#{klass}]:selection"]
     end
 
     # Set the field selection on the current thread.
     #
     # @example Set the field selection.
-    #   Threaded.selection = { field: 1 }
+    #   Threaded.set_selection(Person, { field: 1 })
     #
+    # @param [ Class ] klass The model Class.
     # @param [ Hash ] value The current field selection.
     #
     # @return [ Hash ] The field selection.
     #
     # @since 2.4.4
-    def selection=(value)
-      Thread.current["[mongoid]:selection"] = value
+    def set_selection(klass, value)
+      Thread.current["[mongoid][#{klass}]:selection"] = value
     end
 
     # Get the global session override.
