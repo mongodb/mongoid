@@ -25,6 +25,7 @@ class Person
   field :bson_id, type: Moped::BSON::ObjectId
   field :pattern, type: Regexp
   field :override_me, type: Integer
+  field :t, as: :test, type: String
 
   index age: 1
   index addresses: 1

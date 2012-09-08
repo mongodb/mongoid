@@ -155,10 +155,11 @@ module Mongoid
     #
     # @since 2.0.0.rc.6
     def update_attribute(name, value)
-      unless attribute_writable?(name.to_s)
-        raise Errors::ReadonlyAttribute.new(name, value)
+      normalized = name.to_s
+      unless attribute_writable?(normalized)
+        raise Errors::ReadonlyAttribute.new(normalized, value)
       end
-      write_attribute(name, value)
+      write_attribute(aliased_fields[normalized] || normalized, value)
       save(validate: false)
     end
 

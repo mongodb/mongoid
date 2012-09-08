@@ -882,8 +882,41 @@ describe Mongoid::Persistence do
 
   describe "#update_attribute" do
 
-    let(:post) do
-      Post.new
+    context "when the field is aliased" do
+
+      let(:person) do
+        Person.create
+      end
+
+      context "when setting via the field name" do
+
+        before do
+          person.update_attribute(:t, "testing")
+        end
+
+        it "updates the field" do
+          person.t.should eq("testing")
+        end
+
+        it "persists the changes" do
+          person.reload.t.should eq("testing")
+        end
+      end
+
+      context "when setting via the field alias" do
+
+        before do
+          person.update_attribute(:test, "testing")
+        end
+
+        it "updates the field" do
+          person.t.should eq("testing")
+        end
+
+        it "persists the changes" do
+          person.reload.t.should eq("testing")
+        end
+      end
     end
 
     context "when setting an array field" do
@@ -935,6 +968,10 @@ describe Mongoid::Persistence do
     end
 
     context "when provided a symbol attribute name" do
+
+      let(:post) do
+        Post.new
+      end
 
       context "when the document is valid" do
 
@@ -992,6 +1029,10 @@ describe Mongoid::Persistence do
     end
 
     context "when provided a string attribute name" do
+
+      let(:post) do
+        Post.new
+      end
 
       context "when the document is valid" do
 

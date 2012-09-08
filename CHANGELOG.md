@@ -110,6 +110,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2353 Allow `update_attribute` to properly handle aliased fields.
+
 * \#2348 Conversion of strings to times should raise an arugment error if the
   string is invalid. (Campbell Allen)
 
