@@ -50,7 +50,7 @@ module Mongoid
       #
       # @since 2.1.8
       def eval_default(doc)
-        if fields = Threaded.selection
+        if fields = Threaded.selection(doc.class)
           evaluated_default(doc) if included?(fields)
         else
           evaluated_default(doc)

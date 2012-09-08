@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2356 When limiting fields returned in queries via `only` ensure that the
+  limitation is scoped to the model.
+
 * \#2353 Allow `update_attribute` to properly handle aliased fields.
 
 * \#2348 Conversion of strings to times should raise an arugment error if the

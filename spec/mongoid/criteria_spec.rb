@@ -3543,6 +3543,19 @@ describe Mongoid::Criteria do
           criteria.options[:fields]["_type"].should be_nil
         end
       end
+
+      context "when instantiating a class of another type inside the iteration" do
+
+        let(:criteria) do
+          Band.only(:name)
+        end
+
+        it "only limits the fields on the correct model" do
+          criteria.each do |band|
+            Person.new.age.should eq(100)
+          end
+        end
+      end
     end
 
     context "when using inheritance" do

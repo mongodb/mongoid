@@ -581,11 +581,11 @@ module Mongoid
       def selecting
         begin
           unless criteria.options[:fields].blank?
-            Threaded.selection = criteria.options[:fields]
+            Threaded.set_selection(klass, criteria.options[:fields])
           end
           yield
         ensure
-          Threaded.selection = nil
+          Threaded.set_selection(klass, nil)
         end
       end
 
