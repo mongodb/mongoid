@@ -76,11 +76,11 @@ describe Mongoid::Fields::ForeignKey do
     end
 
     it "dups the default value" do
-      field.eval_default(nil).should_not equal(default)
+      field.eval_default(Person.new).should_not equal(default)
     end
 
     it "returns the correct value" do
-      field.eval_default(nil).should eq(default)
+      field.eval_default(Person.new).should eq(default)
     end
   end
 

@@ -598,12 +598,11 @@ module Mongoid
       # @since 2.4.4
       def selecting
         begin
-          unless criteria.options[:fields].blank?
-            Threaded.set_selection(klass, criteria.options[:fields])
-          end
+          fields = criteria.options[:fields]
+          Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
           yield
         ensure
-          Threaded.set_selection(klass, nil)
+          Threaded.set_selection(criteria.object_id, nil)
         end
       end
 
@@ -621,7 +620,7 @@ module Mongoid
       def with_eager_loading(document)
         selecting do
           return nil unless document
-          doc = Factory.from_db(klass, document)
+          doc = Factory.from_db(klass, document, criteria.object_id)
           eager_load([ doc ]) if eager_loadable?
           doc
         end
@@ -640,7 +639,8 @@ module Mongoid
       #
       # @since 3.0.0
       def yield_document(document, &block)
-        doc = document.respond_to?(:_id) ? document : Factory.from_db(klass, document)
+        doc = document.respond_to?(:_id) ?
+          document : Factory.from_db(klass, document, criteria.object_id)
         yield(doc)
         documents.push(doc) if cacheable?
       end

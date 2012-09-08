@@ -7,6 +7,7 @@ module Mongoid
     extend ActiveSupport::Concern
     include Mongoid::Components
 
+    attr_accessor :criteria_instance_id
     attr_reader :new_record
 
     # Default comparison is via the string version of the id.
@@ -301,13 +302,16 @@ module Mongoid
       #   Person.instantiate(:title => "Sir", :age => 30)
       #
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
+      # @param [ Integer ] criteria_instance_id The criteria id that
+      #   instantiated the document.
       #
       # @return [ Document ] A new document.
       #
       # @since 1.0.0
-      def instantiate(attrs = nil)
+      def instantiate(attrs = nil, criteria_instance_id = nil)
         attributes = attrs || {}
         doc = allocate
+        doc.criteria_instance_id = criteria_instance_id
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
         IdentityMap.set(doc) unless _loading_revision?
