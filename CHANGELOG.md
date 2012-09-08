@@ -26,6 +26,8 @@ For instructions on upgrading to newer versions, visit
         Band.where(name: "Depeche Mode").pluck(:_id)
         Band.where(name: "Tool").pluck(:likes)
 
+* \#2324 Embeds many relations now properly handle `delete_if`.
+
 * \#2317 Added `Document.first_or_create` and `Criteria#first_or_create`.
   This will return the first matching document or create one with additional
   attributes if one does not exist. (incorvia)

@@ -1560,6 +1560,112 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#delete_if" do
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when the documents are new" do
+
+      let!(:address_one) do
+        person.addresses.build(street: "Bond")
+      end
+
+      let!(:address_two) do
+        person.addresses.build(street: "Upper")
+      end
+
+      context "when a block is provided" do
+
+        let!(:deleted) do
+          person.addresses.delete_if do |doc|
+            doc.street == "Bond"
+          end
+        end
+
+        it "removes the matching documents" do
+          person.addresses.size.should eq(1)
+        end
+
+        it "removes from the unscoped" do
+          person.addresses.send(:_unscoped).size.should eq(1)
+        end
+
+        it "returns the relation" do
+          deleted.should eq(person.addresses)
+        end
+      end
+
+      context "when no block is provided" do
+
+        let!(:deleted) do
+          person.addresses.delete_if
+        end
+
+        it "returns an enumerator" do
+          deleted.should be_a(Enumerator)
+        end
+      end
+    end
+
+    context "when the documents persisted" do
+
+      let!(:address_one) do
+        person.addresses.create(street: "Bond")
+      end
+
+      let!(:address_two) do
+        person.addresses.create(street: "Upper")
+      end
+
+      context "when a block is provided" do
+
+        let!(:deleted) do
+          person.addresses.delete_if do |doc|
+            doc.street == "Bond"
+          end
+        end
+
+        it "deletes the matching documents" do
+          person.addresses.count.should eq(1)
+        end
+
+        it "deletes the matching documents from the db" do
+          person.reload.addresses.count.should eq(1)
+        end
+
+        it "returns the relation" do
+          deleted.should eq(person.addresses)
+        end
+      end
+    end
+
+    context "when the documents are empty" do
+
+      context "when a block is provided" do
+
+        let!(:deleted) do
+          person.addresses.delete_if do |doc|
+            doc.street == "Bond"
+          end
+        end
+
+        it "deletes the matching documents" do
+          person.addresses.count.should eq(0)
+        end
+
+        it "deletes all the documents from the db" do
+          person.reload.addresses.count.should eq(0)
+        end
+
+        it "returns the relation" do
+          deleted.should eq(person.addresses)
+        end
+      end
+    end
+  end
+
   [ :delete_all, :destroy_all ].each do |method|
 
     describe "##{method}" do

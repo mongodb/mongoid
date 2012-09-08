@@ -165,6 +165,28 @@ module Mongoid
           remove_all(conditions, :delete)
         end
 
+        # Delete all the documents for which the provided block returns true.
+        #
+        # @example Delete the matching documents.
+        #   person.addresses.delete_if do |doc|
+        #     doc.state = "GA"
+        #   end
+        #
+        # @return [ Many, Enumerator ] The relation or an enumerator if no
+        #   block was provided.
+        #
+        # @since 3.1.0
+        def delete_if
+          if block_given?
+            target.each do |doc|
+              delete(doc) if yield(doc)
+            end
+            self
+          else
+            super
+          end
+        end
+
         # Destroy all the documents in the association whilst running callbacks.
         #
         # @example Destroy all documents from the relation.
