@@ -21,7 +21,6 @@ module Mongoid
       self.pre_processed_defaults = []
       self.post_processed_defaults = []
 
-      field(:_type, default: ->{ self.class.name if hereditary? }, type: String)
       field(
         :_id,
         default: ->{ Moped::BSON::ObjectId.new },

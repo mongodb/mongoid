@@ -634,7 +634,7 @@ describe Mongoid::Fields do
       end
 
       it "does not return subclass defaults" do
-        shape.pre_processed_defaults.should eq([ "_id", "x", "y" ])
+        shape.pre_processed_defaults.should eq([ "_id", "x", "y", "_type" ])
       end
     end
 
@@ -645,7 +645,7 @@ describe Mongoid::Fields do
       end
 
       it "has the parent and child defaults" do
-        circle.pre_processed_defaults.should eq([ "_id", "x", "y", "radius" ])
+        circle.pre_processed_defaults.should eq([ "_id", "x", "y", "_type", "radius" ])
       end
     end
   end
