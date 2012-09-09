@@ -33,19 +33,6 @@ describe Mongoid::Sessions do
 
   describe "#collection" do
 
-    let(:config) do
-      { default: { hosts: [ "localhost:27017" ], database: database_id }}
-    end
-
-    let(:session) do
-      Mongoid::Sessions::Factory.default
-    end
-
-    before do
-      Mongoid::Config.sessions = config
-      Mongoid::Threaded.sessions[:default] = session
-    end
-
     context "when overriding the default with store_in" do
 
       before do
