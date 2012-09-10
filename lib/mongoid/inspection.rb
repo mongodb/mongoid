@@ -29,7 +29,8 @@ module Mongoid
     def inspect_fields
       fields.map do |name, field|
         unless name == "_id"
-          "#{name}: #{@attributes[name].inspect}"
+          as = field.options[:as]
+          "#{name}#{as ? "(#{as})" : nil}: #{@attributes[name].inspect}"
         end
       end.compact
     end
