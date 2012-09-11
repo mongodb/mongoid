@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2365 Don't do anything when trying to replace an embeds_one with the same
+  document.
+
 * \#2356 When limiting fields returned in queries via `only` ensure that the
   limitation is scoped to the model.
 
