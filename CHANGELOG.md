@@ -113,6 +113,10 @@ For instructions on upgrading to newer versions, visit
 * \#2365 Don't do anything when trying to replace an embeds_one with the same
   document.
 
+* \#2362 Don't store inverse of field values in the database when they are not
+  needed. (When there is not more than one polymorphic parent defined on the
+  same class).
+
 * \#2356 When limiting fields returned in queries via `only` ensure that the
   limitation is scoped to the model.
 

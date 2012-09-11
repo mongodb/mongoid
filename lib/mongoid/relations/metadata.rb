@@ -435,6 +435,21 @@ module Mongoid
         !!inverse_class_name
       end
 
+      # Is the inverse field bindable? Ie, do we have more than one definition
+      # on the parent class with the same polymorphic name (as).
+      #
+      # @example Is the inverse of bindable?
+      #   metadata.inverse_of_bindable?
+      #
+      # @return [ true, false ] If the relation needs the inverse of field set.
+      #
+      # @since 3.0.6
+      def inverse_field_bindable?
+        @inverse_field_bindable ||= (inverse_klass.relations.values.count do |meta|
+          meta.as == as
+        end > 1)
+      end
+
       # Used for relational many to many only. This determines the name of the
       # foreign key field on the inverse side of the relation, since in this
       # case there are keys on both sides.
