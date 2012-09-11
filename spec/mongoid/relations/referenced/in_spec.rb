@@ -182,6 +182,10 @@ describe Mongoid::Relations::Referenced::In do
             rating.ratable_id.should eq(bar.id)
           end
 
+          it "does not set the inverse of field on the relation" do
+            rating.ratable_field.should be_nil
+          end
+
           it "sets the base on the inverse relation" do
             bar.rating.should eq(rating)
           end
@@ -215,6 +219,10 @@ describe Mongoid::Relations::Referenced::In do
 
           it "sets the foreign key of the relation" do
             rating.ratable_id.should eq(bar.id)
+          end
+
+          it "does not set the inverse of field on the relation" do
+            rating.ratable_field.should be_nil
           end
 
           it "sets the base on the inverse relation" do
