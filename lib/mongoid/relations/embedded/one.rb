@@ -36,18 +36,20 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          if _assigning?
-            base.add_atomic_unset(target)
-          else
-            target.destroy if persistable?
+          if replacement != self
+            if _assigning?
+              base.add_atomic_unset(target)
+            else
+              target.destroy if persistable?
+            end
+            unbind_one
+            return nil unless replacement
+            replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
+            self.target = replacement
+            bind_one
+            characterize_one(target)
+            target.save if persistable? && !_assigning?
           end
-          unbind_one
-          return nil unless replacement
-          replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
-          self.target = replacement
-          bind_one
-          characterize_one(target)
-          target.save if persistable? && !_assigning?
           self
         end
 

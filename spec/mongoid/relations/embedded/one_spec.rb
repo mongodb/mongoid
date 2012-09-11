@@ -111,6 +111,22 @@ describe Mongoid::Relations::Embedded::One do
           end
         end
 
+        context "when setting to the same document" do
+
+          before do
+            person.name = name
+            person.name = person.name
+          end
+
+          it "does not change the relation" do
+            person.name.should eq(name)
+          end
+
+          it "does not persist any change" do
+            person.reload.name.should eq(name)
+          end
+        end
+
         context "when setting directly" do
 
           before do
