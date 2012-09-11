@@ -117,6 +117,8 @@ For instructions on upgrading to newer versions, visit
   needed. (When there is not more than one polymorphic parent defined on the
   same class).
 
+* \#2360 Cloning documents should ignore mass assignment protection rules.
+
 * \#2356 When limiting fields returned in queries via `only` ensure that the
   limitation is scoped to the model.
 
