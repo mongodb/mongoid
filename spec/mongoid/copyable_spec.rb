@@ -12,7 +12,9 @@ describe Mongoid::Copyable do
           version: 4,
           created_at: Time.now,
           updated_at: Time.now
-        )
+        ) do |p|
+          p.owner_id = 5
+        end
       end
 
       let!(:address) do
@@ -51,6 +53,10 @@ describe Mongoid::Copyable do
 
         it "flags the document as changed" do
           copy.should be_changed
+        end
+
+        it "copies protected fields" do
+          copy.owner_id.should eq(5)
         end
       end
 
