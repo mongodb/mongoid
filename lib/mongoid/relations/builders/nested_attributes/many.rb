@@ -97,7 +97,7 @@ module Mongoid
               doc = existing.find(converted)
               if destroyable?(attrs)
                 existing.delete(doc)
-                doc.destroy unless doc.embedded?
+                doc.destroy unless doc.embedded? || doc.destroyed?
               else
                 attrs.delete_id
                 metadata.embedded? ? doc.attributes = attrs : doc.update_attributes(attrs)
