@@ -6,22 +6,13 @@ module Mongoid
     class Memory
       include Enumerable
       include Aggregable::Memory
+      include Queryable
 
-      # @attribute [r] collection The root collection.
-      # @attribute [r] criteria The criteria for the context.
-      # @attribute [r] klass The criteria class.
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
       # @attribute [r] selector The root document selector.
       # @attribute [r] matching The in memory documents that match the selector.
-      attr_reader \
-        :collection,
-        :criteria,
-        :documents,
-        :klass,
-        :path,
-        :root,
-        :selector
+      attr_reader :documents, :path, :root, :selector
 
       # Check if the context is equal to the other object.
       #
@@ -37,19 +28,6 @@ module Mongoid
         return false unless other.respond_to?(:entries)
         entries == other.entries
       end
-
-      # Is the enumerable of matching documents empty?
-      #
-      # @example Is the context empty?
-      #   context.blank?
-      #
-      # @return [ true, false ] If the context is empty.
-      #
-      # @since 3.0.0
-      def blank?
-        count == 0
-      end
-      alias :empty? :blank?
 
       # Delete all documents in the database that match the selector.
       #

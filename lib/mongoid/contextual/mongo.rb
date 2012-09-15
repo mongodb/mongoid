@@ -11,12 +11,10 @@ module Mongoid
       include Enumerable
       include Aggregable::Mongo
       include Atomic
+      include Queryable
 
-      # @attribute [r] collection The collection to query against.
-      # @attribute [r] criteria The criteria for the context.
-      # @attribute [r] klass The klass for the criteria.
       # @attribute [r] query The Moped query.
-      attr_reader :collection, :criteria, :klass, :query
+      attr_reader :query
 
       # @attribute [rw] eager_loaded Has the context been eager loaded?
       attr_accessor :eager_loaded
