@@ -17,7 +17,8 @@ describe Mongoid::Inspection do
       let(:attributes) do
         Person.fields.map do |name, field|
           unless name == "_id"
-            "#{name}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
+            as = field.options[:as]
+            "#{name}#{as ? "(#{as})" : nil}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
           end
         end.compact * ", "
       end
@@ -36,7 +37,8 @@ describe Mongoid::Inspection do
       let(:attributes) do
         Person.fields.map do |name, field|
           unless name == "_id"
-            "#{name}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
+            as = field.options[:as]
+            "#{name}#{as ? "(#{as})" : nil}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
           end
         end.compact * ", "
       end
