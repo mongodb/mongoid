@@ -14,17 +14,24 @@ describe Mongoid::Inspection do
         Person.new(title: "CEO")
       end
 
-      let(:attributes) do
-        Person.fields.map do |name, field|
-          unless name == "_id"
-            as = field.options[:as]
-            "#{name}#{as ? "(#{as})" : nil}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
-          end
-        end.compact * ", "
+      let(:inspected) do
+        person.inspect
       end
 
-      it "returns a string of class name and attributes" do
-        person.inspect.should eq("#<Person _id: #{person.id}, #{attributes}>")
+      it "includes the model type" do
+        inspected.should include("#<Person")
+      end
+
+      it "displays the id" do
+        inspected.should include("_id: #{person.id}")
+      end
+
+      it "displays defined fields" do
+        inspected.should include("title: \"CEO\"")
+      end
+
+      it "displays field aliases" do
+        inspected.should include("t(test):")
       end
     end
 
@@ -34,22 +41,16 @@ describe Mongoid::Inspection do
         Person.new(title: "CEO", some_attribute: "foo")
       end
 
-      let(:attributes) do
-        Person.fields.map do |name, field|
-          unless name == "_id"
-            as = field.options[:as]
-            "#{name}#{as ? "(#{as})" : nil}: #{person.attributes[name].nil? ? "nil" : person.attributes[name].inspect}"
-          end
-        end.compact * ", "
+      let(:inspected) do
+        person.inspect
       end
 
       before do
         Mongoid.configure.allow_dynamic_fields = true
-        attributes << ", some_attribute: #{person.attributes['some_attribute'].inspect}"
       end
 
-      it "returns a string of class name, attributes, and dynamic attributes" do
-        person.inspect.should eq("#<Person _id: #{person.id}, #{attributes}>")
+      it "includes dynamic attributes" do
+        inspected.should include("some_attribute: \"foo\"")
       end
     end
   end
