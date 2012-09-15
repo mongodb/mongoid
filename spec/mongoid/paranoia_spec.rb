@@ -167,7 +167,7 @@ describe Mongoid::Paranoia do
       end
     end
 
-    context "when the document has a dependent relation" do
+    context "when the document has a dependent: :delete relation" do
 
       let(:post) do
         ParanoidPost.create(title: "test")
@@ -185,6 +185,28 @@ describe Mongoid::Paranoia do
         expect {
           author.reload
         }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
+
+    context "when the document has a dependent: :restrict relation" do
+
+      let(:post) do
+        ParanoidPost.create(title: "test")
+      end
+
+      let!(:title) do
+        post.titles.create
+      end
+
+      before do
+        begin
+          post.destroy
+        rescue Mongoid::Errors::DeleteRestriction
+        end
+      end
+
+      it "does not destroy the document" do
+        post.should_not be_destroyed
       end
     end
   end
@@ -406,6 +428,28 @@ describe Mongoid::Paranoia do
         expect {
           author.reload
         }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
+
+    context "when the document has a dependent: :restrict relation" do
+
+      let(:post) do
+        ParanoidPost.create(title: "test")
+      end
+
+      let!(:title) do
+        post.titles.create
+      end
+
+      before do
+        begin
+          post.delete
+        rescue Mongoid::Errors::DeleteRestriction
+        end
+      end
+
+      it "does not destroy the document" do
+        post.should_not be_destroyed
       end
     end
   end
