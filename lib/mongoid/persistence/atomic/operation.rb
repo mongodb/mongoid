@@ -93,7 +93,7 @@ module Mongoid
         #
         # @since 3.0.3
         def cast_value
-          value
+          value.mongoize
         end
 
         # Executes the common functionality between operations.

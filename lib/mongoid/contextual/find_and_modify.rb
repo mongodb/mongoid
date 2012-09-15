@@ -27,7 +27,7 @@ module Mongoid
       # @since 3.0.0
       def initialize(collection, criteria, update, options = {})
         @collection, @criteria, @options, @update =
-          collection, criteria, options, update
+          collection, criteria, options, update.mongoize
         @query = collection.find(criteria.selector)
         apply_criteria_options
       end
