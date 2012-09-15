@@ -106,7 +106,11 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-## 3.0.6 (branch 3.0.0-stable)
+## 3.0.7 (branch 3.0.0-stable)
+
+### Resolved Issues
+
+## 3.0.6
 
 ### Resolved Issues
 
