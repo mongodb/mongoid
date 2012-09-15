@@ -304,6 +304,111 @@ describe Mongoid::Validations::UniquenessValidator do
           end
         end
 
+        context "when an aliased scope is provided" do
+
+          before do
+            Dictionary.validates_uniqueness_of :name, scope: :language
+          end
+
+          after do
+            Dictionary.reset_callbacks(:validate)
+          end
+
+          context "when the attribute is unique" do
+
+            before do
+              Dictionary.create(name: "Oxford", language: "English")
+            end
+
+            let(:dictionary) do
+              Dictionary.new(name: "Webster")
+            end
+
+            it "returns true" do
+              dictionary.should be_valid
+            end
+          end
+
+          context "when the attribute is unique in the scope" do
+
+            before do
+              Dictionary.create(name: "Oxford", language: "English")
+            end
+
+            let(:dictionary) do
+              Dictionary.new(name: "Webster", language: "English")
+            end
+
+            it "returns true" do
+              dictionary.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique with no scope" do
+
+            before do
+              Dictionary.create(name: "Oxford", language: "English")
+            end
+
+            let(:dictionary) do
+              Dictionary.new(name: "Oxford")
+            end
+
+            it "returns true" do
+              dictionary.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique in another scope" do
+
+            before do
+              Dictionary.create(name: "Oxford", language: "English")
+            end
+
+            let(:dictionary) do
+              Dictionary.new(name: "Oxford", language: "Deutsch")
+            end
+
+            it "returns true" do
+              dictionary.should be_valid
+            end
+          end
+
+          context "when the attribute is not unique in the same scope" do
+
+            context "when the document is not the match" do
+
+              before do
+                Dictionary.create(name: "Oxford", language: "English")
+              end
+
+              let(:dictionary) do
+                Dictionary.new(name: "Oxford", language: "English")
+              end
+
+              it "returns false" do
+                dictionary.should_not be_valid
+              end
+
+              it "adds the uniqueness errors" do
+                dictionary.valid?
+                dictionary.errors[:name].should eq([ "is already taken" ])
+              end
+            end
+
+            context "when the document is the match in the database" do
+
+              let!(:dictionary) do
+                Dictionary.create(name: "Oxford", language: "English")
+              end
+
+              it "returns true" do
+                dictionary.should be_valid
+              end
+            end
+          end
+        end
+
         context "when a single scope is provided" do
 
           before do
@@ -367,7 +472,6 @@ describe Mongoid::Validations::UniquenessValidator do
               item.update_attributes(folder_id: personal_folder.id)
               item.errors.messages[:name].first.should eq("is already taken")
             end
-
           end
 
           context "when the attribute is not unique with no scope" do
