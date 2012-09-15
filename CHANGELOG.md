@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2370 Paranoid documents now properly don't get deleted when using
+  `dependent: :restrict` and an exception is raised.
+
 * \#2365 Don't do anything when trying to replace an embeds_one with the same
   document.
 

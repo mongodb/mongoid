@@ -58,10 +58,10 @@ module Mongoid
     #
     # @since 1.0.0
     def remove(options = {})
+      cascade!
       time = self.deleted_at = Time.now
       paranoid_collection.find(atomic_selector).
         update({ "$set" => { paranoid_field => time }})
-      cascade!
       @destroyed = true
       IdentityMap.remove(self)
       Threaded.clear_options!

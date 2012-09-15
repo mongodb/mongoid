@@ -28,7 +28,9 @@ module Mongoid
         # @example Perform the cascading delete.
         #   strategy.cascade
         def cascade
-          raise Errors::DeleteRestriction.new(document, metadata.name) unless relation.blank?
+          unless relation.blank?
+            raise Errors::DeleteRestriction.new(document, metadata.name)
+          end
         end
       end
     end
