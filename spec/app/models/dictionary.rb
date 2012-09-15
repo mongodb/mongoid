@@ -5,5 +5,6 @@ class Dictionary
   field :year, type: Integer
   field :published, type: Time
   field :description, type: String, localize: true
+  field :l, type: String, as: :language
   has_many :words, validate: false
 end
