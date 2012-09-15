@@ -41,6 +41,33 @@ describe Mongoid::Contextual::FindAndModify do
         end
       end
 
+      context "when providing values that needs to be cast" do
+
+        let(:date_time) do
+          DateTime.new(1978, 1, 1)
+        end
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(collection, criteria, { "$set" => { created: date_time }})
+        end
+
+        let!(:result) do
+          context.result
+        end
+
+        it "returns the first matching document" do
+          result["name"].should eq("Depeche Mode")
+        end
+
+        it "updates the document in the database" do
+          depeche.reload.created.should eq(date_time)
+        end
+      end
+
       context "when sorting" do
 
         let(:criteria) do

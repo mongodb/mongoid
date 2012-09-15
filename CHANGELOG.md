@@ -110,6 +110,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2372 Ensure that all atomic operations mongoize values before executing.
+
 * \#2370 Paranoid documents now properly don't get deleted when using
   `dependent: :restrict` and an exception is raised.
 

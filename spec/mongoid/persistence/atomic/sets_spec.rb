@@ -54,6 +54,33 @@ describe Mongoid::Persistence::Atomic::Sets do
       end
     end
 
+    context "when setting a field with a value that must be cast" do
+
+      let(:date_time) do
+        DateTime.new(2012, 1, 2)
+      end
+
+      let!(:set) do
+        person.set(:lunch_time, date_time)
+      end
+
+      it "sets the provided value" do
+        person.lunch_time.should eq(date_time)
+      end
+
+      it "returns the new value" do
+        set.should eq(date_time)
+      end
+
+      it "persists the changes" do
+        reloaded.lunch_time.should eq(date_time)
+      end
+
+      it "resets the dirty attributes" do
+        person.changes["lunch_time"].should be_nil
+      end
+    end
+
     context "when setting a field to false" do
 
       let!(:set) do
