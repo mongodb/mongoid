@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2331 Don't double push child documents when extra saves are called in an
+  after_create callback.
+
 ## 3.0.6
 
 ### Resolved Issues
