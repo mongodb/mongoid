@@ -24,6 +24,7 @@ module Mongoid
             document.run_callbacks(:create) do
               yield(document)
               document.new_record = false
+              document.flag_children_persisted
               true
             end
           end

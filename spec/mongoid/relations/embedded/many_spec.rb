@@ -3349,4 +3349,26 @@ describe Mongoid::Relations::Embedded::Many do
       person.reload.appointments.count.should eq(2)
     end
   end
+
+  context "when saving at the parent level" do
+
+    let!(:server) do
+      Server.new(name: "staging")
+    end
+
+    let!(:filesystem) do
+      server.filesystems.build
+    end
+
+    context "when the parent has an after create callback" do
+
+      before do
+        server.save
+      end
+
+      it "does not push the embedded documents twice" do
+        server.reload.filesystems.count.should eq(1)
+      end
+    end
+  end
 end
