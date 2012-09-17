@@ -103,7 +103,7 @@ en:
           resolution: "Remove the invalid option or fix the typo. If you were
             expecting the option to be there, please consult the following page
             with repect to Mongoid's configuration:\n\n
-            \_\_http://mongoid.org/docs/installation.html"
+            \_\_http://mongoid.org/en/mongoid/docs/installation.html"
         invalid_database:
           message: "Database should be a Mongo::DB, not %{name}."
           summary: "When setting a master database in the Mongoid configuration
