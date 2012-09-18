@@ -7,7 +7,7 @@ module Mongoid
       module Options
         extend self
 
-        VALID_OPTIONS = [ :background, :drop_dups, :name, :sparse, :unique, :max, :min, :bucketSize ]
+        VALID_OPTIONS = [ :background, :drop_dups, :name, :sparse, :unique, :max, :min, :bits, :bucket_size ]
         VALID_TYPES = [ 1, -1, "2d", "geoHaystack" ]
 
         # Validate the index specification.
