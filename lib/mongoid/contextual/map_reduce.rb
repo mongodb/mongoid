@@ -216,7 +216,7 @@ module Mongoid
       def apply_criteria_options
         command[:query] = criteria.selector
         if sort = criteria.options[:sort]
-          command[:orderby] = sort
+          command[:sort] = sort
         end
         if limit = criteria.options[:limit]
           command[:limit] = limit
