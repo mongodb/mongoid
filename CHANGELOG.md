@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2388 Map/reduce properly uses `sort` instead of `orderby` in the execution
+  of the command. (Alex Tsibulya)
+
 * \#2386 Allow geo haystack and bits parameters in indexes. (Bradley Rees)
 
 * \#2380 `Model#becomes` now properly copies over dirty attributes.
