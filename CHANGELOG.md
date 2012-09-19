@@ -110,6 +110,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2380 `Model#becomes` now properly copies over dirty attributes.
+
 * \#2331 Don't double push child documents when extra saves are called in an
   after_create callback.
 

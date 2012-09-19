@@ -906,6 +906,18 @@ describe Mongoid::Document do
           end
         end
 
+        context "when the document is dirty" do
+
+          before do
+            obj.save
+            obj.ssn = "123-22-1234"
+          end
+
+          it "copies over the dirty changes" do
+            became.changes.should eq(obj.changes)
+          end
+        end
+
         context "when the document is invalid" do
 
           before do
