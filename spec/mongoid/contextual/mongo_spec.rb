@@ -969,6 +969,11 @@ describe Mongoid::Contextual::Mongo do
 
     context "when sorting is provided" do
 
+      before do
+        Band.index(name: -1)
+        Band.create_indexes
+      end
+
       let(:criteria) do
         Band.desc(:name)
       end

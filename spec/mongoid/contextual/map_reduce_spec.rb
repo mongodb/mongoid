@@ -42,13 +42,37 @@ describe Mongoid::Contextual::MapReduce do
       described_class.new(collection, criteria, map, reduce)
     end
 
+    let(:base_command) do
+      {
+          mapreduce: "bands",
+          map: map,
+          reduce: reduce,
+          query: {}
+      }
+    end
+
     it "returns the db command" do
-      map_reduce.command.should eq({
-        mapreduce: "bands",
-        map: map,
-        reduce: reduce,
-        query: {}
-      })
+      map_reduce.command.should eq(base_command)
+    end
+
+    context "with sort" do
+      let(:criteria) do
+        Band.order_by(name: -1)
+      end
+
+      it "returns the db command with a sort option" do
+        map_reduce.command.should eq(base_command.merge(sort: {'name' => -1}))
+      end
+    end
+
+    context "with limit" do
+      let(:criteria) do
+        Band.limit(10)
+      end
+
+      it "returns the db command with a limit option" do
+        map_reduce.command.should eq(base_command.merge(limit: 10))
+      end
     end
   end
 
