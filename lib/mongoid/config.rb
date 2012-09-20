@@ -120,12 +120,30 @@ module Mongoid
     # @example Purge all data.
     #   Mongoid::Config.purge!
     #
+    # @note This is the fastest way to drop all data.
+    #
     # @return [ true ] true.
     #
     # @since 2.0.2
     def purge!
       Sessions.default.collections.each do |collection|
         collection.drop
+      end and true
+    end
+
+    # Truncate all data in all collections, but not the indexes.
+    #
+    # @example Truncate all collection data.
+    #   Mongoid::Config.truncate!
+    #
+    # @note This will be slower than purge!
+    #
+    # @return [ true ] true.
+    #
+    # @since 2.0.2
+    def truncate!
+      Sessions.default.collections.each do |collection|
+        collection.find.remove_all
       end and true
     end
 
