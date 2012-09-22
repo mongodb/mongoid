@@ -1001,6 +1001,28 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  describe "#inverses" do
+
+    context "when the relation is polymorphic" do
+
+      context "when an inverse_of is defined" do
+
+        let(:metadata) do
+          described_class.new(
+            name: :ratable,
+            relation: Mongoid::Relations::Referenced::In,
+            polymorphic: true,
+            inverse_of: "my_ratings"
+          )
+        end
+
+        it "returns only the inverse_of" do
+          metadata.inverses(nil).should eq([ "my_ratings" ])
+        end
+      end
+    end
+  end
+
   describe "#indexed?" do
 
     context "when an index property exists" do
