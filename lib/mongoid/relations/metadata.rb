@@ -1131,6 +1131,7 @@ module Mongoid
       #
       # @return [ Array<String> ] The inverse names.
       def lookup_inverses(other)
+        return [ inverse_of ] if inverse_of
         if other
           matches = []
           other.class.relations.values.each do |meta|
