@@ -743,6 +743,21 @@ describe Mongoid::Relations::Accessors do
           post.person.should be_nil
         end
       end
+
+      context "when setting the _ids accessor" do
+
+        let(:post) do
+          Post.create
+        end
+
+        before do
+          person.post_ids = [ "" ]
+        end
+
+        it "ignore blank values" do
+          person.post_ids.should be_empty
+        end
+      end
     end
 
     context "when the document is a references many to many" do

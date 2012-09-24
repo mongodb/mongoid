@@ -228,7 +228,7 @@ module Mongoid
         def ids_setter(name, metadata)
           ids_method = "#{name.to_s.singularize}_ids="
           re_define_method(ids_method) do |ids|
-            send(metadata.setter, metadata.klass.find(ids))
+            send(metadata.setter, metadata.klass.find(ids.reject(&:blank?)))
           end
           self
         end
