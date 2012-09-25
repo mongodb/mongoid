@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2399 Reject blank id values on has_many `Model#object_ids=`.
+  (Tiago Rafael Godinho)
+
 * \#2393 Ensure `inverse_of` is respected when using polymorphic relations.
 
 * \#2388 Map/reduce properly uses `sort` instead of `orderby` in the execution
