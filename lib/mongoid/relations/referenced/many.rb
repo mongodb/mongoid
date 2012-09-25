@@ -163,7 +163,11 @@ module Mongoid
         #
         # @since 2.1.0
         def each
-          target.each { |doc| yield(doc) if block_given? }
+          if block_given?
+            target.each { |doc| yield(doc) }
+          else
+            to_enum
+          end
         end
 
         # Determine if any documents in this relation exist in the database.

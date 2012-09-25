@@ -139,15 +139,25 @@ module Mongoid
         # the cursor while loading the documents and then iterates over the
         # _added docs.
         #
+        # If no block is passed then it returns an enumerator containing all
+        # docs.
+        #
         # @example Iterate over the enumerable.
         #   enumerable.each do |doc|
         #     puts doc
         #   end
         #
+        # @example return an enumerator containing all the docs 
+        #
+        #   a = enumerable.each
+        #  
         # @return [ true ] That the enumerable is now _loaded.
         #
         # @since 2.1.0
         def each
+          unless block_given?
+            return to_enum
+          end
           if _loaded?
             _loaded.each_pair do |id, doc|
               yield(doc)

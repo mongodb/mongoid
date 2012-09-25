@@ -622,6 +622,22 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
       end
     end
+
+    context "when no block is passed" do
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      it "returns an enumerator" do
+        enumerable.each.class.include?(Enumerable).should be_true
+      end
+
+    end
   end
 
   describe "#entries" do
