@@ -633,18 +633,10 @@ describe Mongoid::Relations::Targets::Enumerable do
         described_class.new(criteria)
       end
 
-      let(:post_two) do
-        Post.new
-      end
-
-      before do
-        enumerable << post_two
-      end
-
       it "returns an enumerator" do
         enumerable.each.class.include?(Enumerable).should be_true
       end
-      
+
     end
   end
 
