@@ -25,6 +25,7 @@ module Mongoid
     option :skip_version_check, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
+    option :typecast_non_numeric_fields, default: true
 
     # Connect to the provided database name on the default session.
     #

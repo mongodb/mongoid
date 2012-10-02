@@ -92,8 +92,38 @@ describe Mongoid::Extensions::Integer do
 
       context "when the string is non numerical" do
 
-        it "returns 0" do
-          Integer.mongoize("foo").should eq(0)
+        context "when typecast_non_numeric_fields is true" do
+
+          before do
+            @previous_setting = Mongoid.typecast_non_numeric_fields
+            Mongoid.typecast_non_numeric_fields = true
+          end
+
+          after do
+            Mongoid.typecast_non_numeric_fields = @previous_setting
+          end
+
+          it "returns the string" do
+            Integer.mongoize("foo").should eq(0)
+          end
+
+        end
+
+        context "when typecast_non_numeric_fields is false" do
+
+          before do
+            @previous_setting = Mongoid.typecast_non_numeric_fields
+            Mongoid.typecast_non_numeric_fields = false
+          end
+
+          after do
+            Mongoid.typecast_non_numeric_fields = @previous_setting
+          end
+
+          it "returns the string" do
+            Integer.mongoize("foo").should eq("foo")
+          end
+
         end
       end
 

@@ -81,6 +81,10 @@ describe Mongoid::Config do
       it "sets the use utc option" do
         described_class.use_utc.should be_false
       end
+
+      it "sets the typecast non numeric fields option" do
+        described_class.typecast_non_numeric_fields.should be_true
+      end
     end
 
     context "when the rack environment is set" do
@@ -138,6 +142,10 @@ describe Mongoid::Config do
 
         it "sets the use utc option" do
           described_class.use_utc.should be_false
+        end
+
+        it "sets the typecast non numeric fields option" do
+          described_class.typecast_non_numeric_fields.should be_true
         end
       end
 
