@@ -96,8 +96,8 @@ describe Mongoid::Extensions::Float do
 
       context "when the string is non numerical" do
 
-        it "returns 0" do
-          Float.mongoize("foo").should eq(0.0)
+        it "returns the string" do
+          Float.mongoize("foo").should eq("foo")
         end
       end
 

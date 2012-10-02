@@ -92,8 +92,8 @@ describe Mongoid::Extensions::Integer do
 
       context "when the string is non numerical" do
 
-        it "returns 0" do
-          Integer.mongoize("foo").should eq(0)
+        it "returns the string" do
+          Integer.mongoize("foo").should eq("foo")
         end
       end
 

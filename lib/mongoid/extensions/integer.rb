@@ -52,7 +52,7 @@ module Mongoid
         # @since 3.0.0
         def mongoize(object)
           unless object.blank?
-            __numeric__(object).to_i rescue 0
+            __numeric__(object).to_i rescue object
           else
             nil
           end
