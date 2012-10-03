@@ -60,6 +60,20 @@ describe Mongoid::Extensions::BigDecimal do
         BigDecimal.mongoize(nil).should be_nil
       end
     end
+
+    context "when the value is an integer" do
+
+      it "returns a string" do
+        BigDecimal.mongoize(123456).should eq("123456")
+      end
+    end
+
+    context "when the value is a float" do
+
+      it "returns a string" do
+        BigDecimal.mongoize(123456.789).should eq("123456.789")
+      end
+    end
   end
 
   describe "#mongoize" do

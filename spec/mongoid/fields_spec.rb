@@ -1081,4 +1081,75 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  context "when a field is defined as a big decimal" do
+
+    let(:band) do
+      Band.new(name: "Tool")
+    end
+
+    let(:decimal) do
+      BigDecimal.new("1000000.00")
+    end
+
+    context "when setting to a big decimal" do
+
+      before do
+        band.sales = decimal
+      end
+
+      it "properly persists as a string" do
+        band.attributes["sales"].should eq(decimal.to_s)
+      end
+
+      it "returns the proper big decimal" do
+        band.sales.should eq(decimal)
+      end
+    end
+
+    context "when setting to a string" do
+
+      before do
+        band.sales = decimal.to_s
+      end
+
+      it "properly persists as a string" do
+        band.attributes["sales"].should eq(decimal.to_s)
+      end
+
+      it "returns the proper big decimal" do
+        band.sales.should eq(decimal)
+      end
+    end
+
+    context "when setting to an integer" do
+
+      before do
+        band.sales = decimal.to_i
+      end
+
+      it "properly persists as a string" do
+        band.attributes["sales"].should eq("1000000")
+      end
+
+      it "returns the proper big decimal" do
+        band.sales.should eq(decimal)
+      end
+    end
+
+    context "when setting to a float" do
+
+      before do
+        band.sales = decimal.to_f
+      end
+
+      it "properly persists as a string" do
+        band.attributes["sales"].should eq(decimal.to_s)
+      end
+
+      it "returns the proper big decimal" do
+        band.sales.should eq(decimal)
+      end
+    end
+  end
 end
