@@ -78,7 +78,7 @@ module Mongoid
       # @since 1.0.0
       def index(spec, options = nil)
         Validators::Options.validate(self, spec, options || {})
-        index_options[spec] = normalize_index_options(options)
+        index_options[normalize_spec(spec)] = normalize_index_options(options)
       end
 
       private
@@ -88,7 +88,7 @@ module Mongoid
       # @api private
       #
       # @example Normalize the index options.
-      # Model.normalize_index_options(drop_dups: true)
+      #   Model.normalize_index_options(drop_dups: true)
       #
       # @param [ Hash ] options The index options.
       #
@@ -100,6 +100,26 @@ module Mongoid
         opts[:dropDups] = opts.delete(:drop_dups) if opts.has_key?(:drop_dups)
         opts[:bucketSize] = opts.delete(:bucket_size) if opts.has_key?(:bucket_size)
         opts
+      end
+
+      # Normalize the spec, in case aliased fields are provided.
+      #
+      # @api private
+      #
+      # @example Normalize the spec.
+      #   Model.normalize_spec(name: 1)
+      #
+      # @param [ Hash ] spec The index specification.
+      #
+      # @return [ Hash ] The normalized specification.
+      #
+      # @since 3.0.7
+      def normalize_spec(spec)
+        spec.inject({}) do |normal, (name, direction)|
+          field_name = aliased_fields[name.to_s] || name
+          normal[field_name.to_sym] = direction
+          normal
+        end
       end
     end
   end

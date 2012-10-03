@@ -110,6 +110,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2414 Index definitions now respect aliased fields.
+
 * \#2413 Enumerable targets now properly return enumerators when no blocks
   are provided. (Andrew Smith)
 

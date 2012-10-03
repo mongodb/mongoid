@@ -64,7 +64,7 @@ describe Mongoid::Indexes do
 
       let(:klass) do
         Class.new do
-          include Mongoid::Indexes
+          include Mongoid::Document
           def self.hereditary?
             true
           end
@@ -87,7 +87,23 @@ describe Mongoid::Indexes do
 
     let(:klass) do
       Class.new do
-        include Mongoid::Indexes
+        include Mongoid::Document
+        field :a, as: :authentication_token
+      end
+    end
+
+    context "when indexing a field that is aliased" do
+
+      before do
+        klass.index({ authentication_token: 1 }, { unique: true })
+      end
+
+      let(:options) do
+        klass.index_options[a: 1]
+      end
+
+      it "sets the index with unique options" do
+        options.should eq(unique: true)
       end
     end
 
