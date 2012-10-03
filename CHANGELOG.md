@@ -129,6 +129,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2413 Enumerable targets now properly return enumerators when no blocks
+  are provided. (Andrew Smith)
+
 * \#2375 Uniqueness validation scoping now works with aliased fields.
 
 * \#2372 Ensure that all atomic operations mongoize values before executing.
