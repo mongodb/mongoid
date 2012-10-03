@@ -320,7 +320,7 @@ module Mongoid
     # @since 1.0.0
     def initialize(klass)
       @klass = klass
-      super(klass.aliased_fields, klass.fields)
+      klass ? super(klass.aliased_fields, klass.fields) : super({}, {})
     end
 
     # Eager loads all the provided relations. Will load all the documents
@@ -389,6 +389,15 @@ module Mongoid
     #
     # @example Merge the criteria with another criteria.
     #   criteri.merge(other_criteria)
+    #
+    # @example Merge the criteria with a hash. The hash must contain a klass
+    #   key and the key/value pairs correspond to method names/args.
+
+    #   criteria.merge({
+    #     klass: Band,
+    #     where: { name: "Depeche Mode" },
+    #     order_by: { name: 1 }
+    #   })
     #
     # @param [ Criteria ] other The other criterion to merge with.
     #

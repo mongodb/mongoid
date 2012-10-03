@@ -2963,42 +2963,80 @@ describe Mongoid::Criteria do
       Band.scoped.where(name: "Depeche Mode").asc(:name)
     end
 
-    let(:mergeable) do
-      Band.includes(:records).tap do |crit|
-        crit.documents = [ band ]
+    context "when merging with another criteria" do
+
+      let(:mergeable) do
+        Band.includes(:records).tap do |crit|
+          crit.documents = [ band ]
+        end
+      end
+
+      let(:metadata) do
+        Band.relations["records"]
+      end
+
+      let(:merged) do
+        criteria.merge(mergeable)
+      end
+
+      it "merges the selector" do
+        merged.selector.should eq({ "name" => "Depeche Mode" })
+      end
+
+      it "merges the options" do
+        merged.options.should eq({ sort: { "name" => 1 }})
+      end
+
+      it "merges the documents" do
+        merged.documents.should eq([ band ])
+      end
+
+      it "merges the scoping options" do
+        merged.scoping_options.should eq([ nil, nil ])
+      end
+
+      it "merges the inclusions" do
+        merged.inclusions.should eq([ metadata ])
+      end
+
+      it "returns a new criteria" do
+        merged.should_not equal(criteria)
       end
     end
 
-    let(:metadata) do
-      Band.relations["records"]
-    end
+    context "when merging with a hash" do
 
-    let(:merged) do
-      criteria.merge(mergeable)
-    end
+      let(:mergeable) do
+        { klass: Band, includes: [ :records ] }
+      end
 
-    it "merges the selector" do
-      merged.selector.should eq({ "name" => "Depeche Mode" })
-    end
+      let(:metadata) do
+        Band.relations["records"]
+      end
 
-    it "merges the options" do
-      merged.options.should eq({ sort: { "name" => 1 }})
-    end
+      let(:merged) do
+        criteria.merge(mergeable)
+      end
 
-    it "merges the documents" do
-      merged.documents.should eq([ band ])
-    end
+      it "merges the selector" do
+        merged.selector.should eq({ "name" => "Depeche Mode" })
+      end
 
-    it "merges the scoping options" do
-      merged.scoping_options.should eq([ nil, nil ])
-    end
+      it "merges the options" do
+        merged.options.should eq({ sort: { "name" => 1 }})
+      end
 
-    it "merges the inclusions" do
-      merged.inclusions.should eq([ metadata ])
-    end
+      it "merges the scoping options" do
+        merged.scoping_options.should eq([ nil, nil ])
+      end
 
-    it "returns a new criteria" do
-      merged.should_not equal(criteria)
+      it "merges the inclusions" do
+        merged.inclusions.should eq([ metadata ])
+      end
+
+      it "returns a new criteria" do
+        merged.should_not equal(criteria)
+      end
     end
   end
 
