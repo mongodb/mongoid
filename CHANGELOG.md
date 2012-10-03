@@ -113,6 +113,8 @@ For instructions on upgrading to newer versions, visit
 * \#2413 Enumerable targets now properly return enumerators when no blocks
   are provided. (Andrew Smith)
 
+* \#2409 Don't warn about missing mongoid.yml if configured programatically.
+
 * \#2401 Bring back the ability to merge a criteria with a hash.
 
 * \#2399 Reject blank id values on has_many `Model#object_ids=`.
