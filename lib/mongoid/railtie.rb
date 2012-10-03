@@ -95,7 +95,7 @@ module Rails
       # alert to create one.
       initializer "warn when configuration is missing" do
         config.after_initialize do
-          unless Rails.root.join("config", "mongoid.yml").file?
+          unless Rails.root.join("config", "mongoid.yml").file? && !::Mongoid.warn_config_not_found
             puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
             puts "to generate one run: rails generate mongoid:config\n\n"
           end
