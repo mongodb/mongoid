@@ -97,7 +97,7 @@ module Mongoid
       #
       # @since 3.0.0
       def distinct(field)
-        query.distinct(field)
+        query.distinct(klass.database_field_name(field))
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
