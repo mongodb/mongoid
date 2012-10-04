@@ -2449,6 +2449,20 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#update_all" do
+
+    context "when there are no documents present" do
+
+      let(:person) do
+        Person.create
+      end
+
+      it "updates nothing" do
+        person.addresses.update_all(street: "test").should be_false
+      end
+    end
+  end
+
   describe ".valid_options" do
 
     it "returns the valid options" do

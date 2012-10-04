@@ -1041,6 +1041,25 @@ describe Mongoid::Contextual::Memory do
       person.addresses.create(street: "pfluger")
     end
 
+    context "when the documents are empty" do
+
+      let(:person_two) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Address.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns false" do
+        context.update_all({}).should be_false
+      end
+    end
+
     context "when the documents are embedded one level" do
 
       let(:criteria) do
