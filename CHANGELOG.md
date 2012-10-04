@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2423 Fixed embedded document's `update_all` to perform the correct $set
+  when using off a criteria.
+
 * \#2414 Index definitions now respect aliased fields.
 
 * \#2413 Enumerable targets now properly return enumerators when no blocks

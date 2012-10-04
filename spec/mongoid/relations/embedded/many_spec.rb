@@ -2567,6 +2567,42 @@ describe Mongoid::Relations::Embedded::Many do
         person.addresses.update_all(street: "test").should be_false
       end
     end
+
+    context "when documents are present" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:address) do
+        person.addresses.create(street: "Hobrecht", number: 27)
+      end
+
+      context "when updating with a where clause" do
+
+        before do
+          person.addresses.
+            where(street: "Hobrecht").
+            update_all(number: 26, post_code: "12437")
+        end
+
+        it "resets the matching dirty flags" do
+          address.should_not be_changed
+        end
+
+        it "updates the first field" do
+          address.reload.number.should eq(26)
+        end
+
+        it "updates the second field" do
+          address.reload.post_code.should eq("12437")
+        end
+
+        it "does not wipe out other fields" do
+          address.reload.street.should eq("Hobrecht")
+        end
+      end
+    end
   end
 
   describe ".valid_options" do

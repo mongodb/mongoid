@@ -260,13 +260,14 @@ module Mongoid
       # @since 3.0.4
       def update_documents(attributes, docs)
         return false if !attributes || docs.empty?
-        updates = {}
+        updates = { "$set" => {}}
         docs.each do |doc|
           @selector ||= root.atomic_selector
           doc.write_attributes(attributes)
-          updates.merge!(doc.atomic_position => attributes)
+          updates["$set"].merge!(doc.atomic_updates["$set"])
+          doc.move_changes
         end
-        collection.find(selector).update("$set" => updates)
+        collection.find(selector).update(updates)
       end
 
       # Get the limiting value.

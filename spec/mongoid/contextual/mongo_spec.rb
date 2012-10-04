@@ -1358,7 +1358,7 @@ describe Mongoid::Contextual::Mongo do
   describe "#update_all" do
 
     let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      Band.create(name: "Depeche Mode", origin: "Essex")
     end
 
     let!(:new_order) do
@@ -1383,6 +1383,10 @@ describe Mongoid::Contextual::Mongo do
 
         it "updates the first matching document" do
           depeche_mode.reload.name.should eq("Smiths")
+        end
+
+        it "does not clear out other attributes" do
+          depeche_mode.reload.origin.should eq("Essex")
         end
 
         it "updates the last matching document" do
