@@ -259,7 +259,7 @@ module Mongoid
       #
       # @since 3.0.4
       def update_documents(attributes, docs)
-        return false unless attributes
+        return false if !attributes || docs.empty?
         updates = {}
         docs.each do |doc|
           @selector ||= root.atomic_selector

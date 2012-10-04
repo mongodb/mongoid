@@ -120,6 +120,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2409 Don't warn about missing mongoid.yml if configured programatically.
 
+* \#2403 Return false on `update_all` of an embeds many with no documents.
+
 * \#2401 Bring back the ability to merge a criteria with a hash.
 
 * \#2399 Reject blank id values on has_many `Model#object_ids=`.
