@@ -115,10 +115,9 @@ module Mongoid
       #
       # @since 3.0.7
       def normalize_spec(spec)
-        spec.inject({}) do |normal, (name, direction)|
-          field_name = aliased_fields[name.to_s] || name
-          normal[field_name.to_sym] = direction
-          normal
+        spec.inject({}) do |normalized, (name, direction)|
+          normalized[database_field_name(name).to_sym] = direction
+          normalized
         end
       end
     end

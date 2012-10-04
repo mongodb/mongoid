@@ -66,7 +66,7 @@ module Mongoid
         multi_parameter_attributes.each_pair do |key, values|
           begin
             values = (values.keys.min..values.keys.max).map { |i| values[i] }
-            field = self.class.fields[aliased_fields[key] || key]
+            field = self.class.fields[database_field_name(key)]
             attributes[key] = instantiate_object(field, values)
           rescue => e
             errors << Errors::AttributeAssignmentError.new(

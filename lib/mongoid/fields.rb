@@ -109,6 +109,21 @@ module Mongoid
       self.class.attribute_names
     end
 
+    # Get the name of the provided field as it is stored in the database.
+    # Used in determining if the field is aliased or not.
+    #
+    # @example Get the database field name.
+    #   model.database_field_name(:authorization)
+    #
+    # @param [ String, Symbol ] name The name to get.
+    #
+    # @return [ String ] The name of the field as it's stored in the db.
+    #
+    # @since 3.0.7
+    def database_field_name(name)
+      self.class.database_field_name(name)
+    end
+
     # Is the document using object ids?
     #
     # @note Refactored from using delegate for class load performance.
@@ -173,6 +188,22 @@ module Mongoid
       # @since 3.0.0
       def attribute_names
         fields.keys
+      end
+
+      # Get the name of the provided field as it is stored in the database.
+      # Used in determining if the field is aliased or not.
+      #
+      # @example Get the database field name.
+      #   Model.database_field_name(:authorization)
+      #
+      # @param [ String, Symbol ] name The name to get.
+      #
+      # @return [ String ] The name of the field as it's stored in the db.
+      #
+      # @since 3.0.7
+      def database_field_name(name)
+        normalized = name.to_s
+        aliased_fields[normalized] || normalized
       end
 
       # Defines all the fields that are accessible on the Document
