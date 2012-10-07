@@ -518,7 +518,7 @@ module Mongoid
           Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
           yield
         ensure
-          Threaded.set_selection(criteria.object_id, nil)
+          Threaded.delete_selection(criteria.object_id)
         end
       end
 
