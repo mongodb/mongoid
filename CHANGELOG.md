@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2440/\#2435 Pass mass assignment options down to children when setting via
+  nested attributes or embedded documents.
+
 * \#2439 Fixed memory leak in threaded selection of returned fields.
   (Tim Olsen)
 

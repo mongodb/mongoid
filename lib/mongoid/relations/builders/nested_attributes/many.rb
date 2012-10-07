@@ -16,18 +16,19 @@ module Mongoid
           #   many.build(person)
           #
           # @param [ Document ] parent The parent document of the relation.
+          # @param [ Hash ] options The mass assignment options.
           #
           # @return [ Array ] The attributes.
-          def build(parent)
+          def build(parent, options = {})
             @existing = parent.send(metadata.name)
             if over_limit?(attributes)
               raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
             end
             attributes.each do |attrs|
               if attrs.respond_to?(:with_indifferent_access)
-                process_attributes(parent, attrs)
+                process_attributes(parent, attrs, options)
               else
-                process_attributes(parent, attrs[1])
+                process_attributes(parent, attrs[1], options)
               end
             end
           end
@@ -85,11 +86,17 @@ module Mongoid
           # Process each set of attributes one at a time for each potential
           # new, existing, or ignored document.
           #
+          # @api private
+          #
           # @example Process the attributes
           #   builder.process_attributes({ "id" => 1, "street" => "Bond" })
           #
+          # @param [ Document ] parent The parent document.
           # @param [ Hash ] attrs The single document attributes to process.
-          def process_attributes(parent, attrs)
+          # @param [ Hash ] options the mass assignment options.
+          #
+          # @since 2.0.0
+          def process_attributes(parent, attrs, options)
             return if reject?(parent, attrs)
             if id = attrs.extract_id
               first = existing.first
@@ -100,10 +107,14 @@ module Mongoid
                 doc.destroy unless doc.embedded? || doc.destroyed?
               else
                 attrs.delete_id
-                metadata.embedded? ? doc.attributes = attrs : doc.update_attributes(attrs)
+                if metadata.embedded?
+                  doc.assign_attributes(attrs, options)
+                else
+                  doc.update_attributes(attrs, options)
+                end
               end
             else
-              existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
+              existing.push(Factory.build(metadata.klass, attrs, options)) unless destroyable?(attrs)
             end
           end
         end

@@ -622,7 +622,10 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as, :before_add, :after_add, :before_remove, :after_remove ]
+            [
+              :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as,
+              :before_add, :after_add, :before_remove, :after_remove
+            ]
           end
 
           # Get the default validation setting for the relation. Determines if
