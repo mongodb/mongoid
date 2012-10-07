@@ -301,13 +301,14 @@ module Mongoid
     # @example Get the field selection options.
     #   Threaded.selection
     #
-    # @param [ Class ] klass The model class.
+    # @param [ Integer ] criteria_instance_id The criteria instance id.
     #
     # @return [ Hash ] The field selection.
     #
     # @since 2.4.4
-    def selection(klass)
-      Thread.current["[mongoid][#{klass}]:selection"]
+    def selection(criteria_instance_id)
+      selections = Thread.current["[mongoid][selections]"]
+      selections[criteria_instance_id] if selections
     end
 
     # Set the field selection on the current thread.
@@ -322,7 +323,24 @@ module Mongoid
     #
     # @since 2.4.4
     def set_selection(criteria_instance_id, value)
-      Thread.current["[mongoid][#{criteria_instance_id}]:selection"] = value
+      Thread.current["[mongoid][selections]"] ||= {}
+      Thread.current["[mongoid][selections]"][criteria_instance_id] = value
+    end
+
+    # Delete the field selection on the current thread.
+    #
+    # @example Delete the field selection.
+    #   Threaded.delete_selection(Person)
+    #
+    # @param [ Integer ] criteria_instance_id The criteria instance id.
+    #
+    # @return [ Boolean ] Whether there was a field selection.
+    #
+    # @since 3.0.7
+    def delete_selection(criteria_instance_id)
+      selections = Thread.current["[mongoid][selections]"]
+      return false unless selections
+      !!selections.delete(criteria_instance_id)
     end
 
     # Get the global session override.
