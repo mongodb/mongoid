@@ -264,7 +264,6 @@ module Mongoid
         create_dirty_default_change_check(name, meth)
         create_dirty_previous_value_accessor(name, meth)
         create_dirty_reset(name, meth)
-        create_dirty_reset(name, meth)
       end
 
       # Creates the dirty change accessor.
