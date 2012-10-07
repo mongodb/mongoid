@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2439 Fixed memory leak in threaded selection of returned fields.
+  (Tim Olsen)
+
 * mongoid/moped\#82 Aliased fields now work with `Criteria#distinct`.
 
 * \#2423 Fixed embedded document's `update_all` to perform the correct $set
