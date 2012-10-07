@@ -301,13 +301,13 @@ module Mongoid
     # @example Get the field selection options.
     #   Threaded.selection
     #
-    # @param [ Class ] klass The model class.
+    # @param [ Integer ] criteria_instance_id The criteria instance id.
     #
     # @return [ Hash ] The field selection.
     #
     # @since 2.4.4
-    def selection(klass)
-      Thread.current["[mongoid][#{klass}]:selection"]
+    def selection(criteria_instance_id)
+      Thread.current["[mongoid][#{criteria_instance_id}]:selection"]
     end
 
     # Set the field selection on the current thread.
