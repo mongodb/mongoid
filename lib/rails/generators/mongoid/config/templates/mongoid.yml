@@ -18,7 +18,7 @@ development:
         # Change the default consistency model to :eventual or :strong.
         # :eventual will send reads to secondaries, :strong sends everything
         # to master. (default: :eventual)
-        consistency: :strong
+        consistency: :eventual
   # Configure Mongoid specific options. (optional)
   options:
     # Configuration for whether or not to allow access to fields that do
