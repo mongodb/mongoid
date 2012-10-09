@@ -1170,6 +1170,21 @@ describe Mongoid::Attributes do
         person.terms.should be_true
       end
     end
+
+    context "when attribute has an aliased name" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before(:each) do
+        person.write_attribute(:test, "aliased field to test")
+      end
+
+      it "allows the field name to be udpated" do
+        person.t.should eq("aliased field to test")
+      end
+    end
   end
 
   describe "#typed_value_for" do
