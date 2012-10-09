@@ -220,6 +220,21 @@ describe Mongoid::Document do
         types.should eq([ "Address" ])
       end
     end
+
+    context "when ._types had been called before class declaration" do
+      let(:descendant) do
+        Class.new(Person)
+      end
+
+      before do
+        Person._types
+        descendant
+      end
+
+      it "should clear descendants' cache" do
+        Person._types.should include(descendant.to_s)
+      end
+    end
   end
 
   describe "#attributes" do
