@@ -110,6 +110,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2453 `Model#write_attribute` now properly works with aliased fields.
+
 * \#2440/\#2435 Pass mass assignment options down to children when setting via
   nested attributes or embedded documents.
 
