@@ -7,7 +7,11 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2456 The descendants cache is now reset when the document is inherited
+  again. (Kostyantyn Stepanyuk)
+
 * \#2453 `Model#write_attribute` now properly works with aliased fields.
+  (Campbell Allen)
 
 * \#2440/\#2435 Pass mass assignment options down to children when setting via
   nested attributes or embedded documents.

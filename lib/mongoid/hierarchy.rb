@@ -155,6 +155,7 @@ module Mongoid
       # @since 2.0.0.rc.6
       def inherited(subclass)
         super
+        @_type = nil
         subclass.fields = fields.dup
         subclass.pre_processed_defaults = pre_processed_defaults.dup
         subclass.post_processed_defaults = post_processed_defaults.dup
