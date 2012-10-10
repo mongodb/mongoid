@@ -18,7 +18,15 @@ development:
         # Change the default consistency model to :eventual or :strong.
         # :eventual will send reads to secondaries, :strong sends everything
         # to master. (default: :eventual)
-        consistency: :eventual
+        # consistency: :eventual
+
+        # How many times Moped should attempt to retry an operation after
+        # failure. (default: 30)
+        # max_retries: 30
+
+        # The time in seconds that Moped should wait before retrying an
+        # operation on failure. (default: 1)
+        # retry_interval: 1
   # Configure Mongoid specific options. (optional)
   options:
     # Configuration for whether or not to allow access to fields that do
@@ -66,3 +74,7 @@ test:
         - localhost:27017
       options:
         consistency: :strong
+        # In the test environment we lower the retries and retry interval to
+        # low amounts for fast failures.
+        max_retries: 1
+        retry_interval: 0
