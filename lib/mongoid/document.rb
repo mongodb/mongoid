@@ -282,12 +282,6 @@ module Mongoid
 
     module ClassMethods
 
-      # Resets descendants' cache
-      def inherited(*)
-        @_type = nil
-        super
-      end
-
       # Performs class equality checking.
       #
       # @example Compare the classes.
