@@ -3,7 +3,7 @@ module Mongoid
   module Errors
 
     # This error is raised when trying to reference an embedded document from
-    # a document in another collection that is not it's parent.
+    # a document in another collection that is not its parent.
     #
     # @example An illegal reference to an embedded document.
     #   class Post
