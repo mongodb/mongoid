@@ -106,9 +106,11 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-## 3.0.8
+## 3.0.9
 
 ### Resolved Issues
+
+* \#2463 Fixed the broken `rails g mongoid:config` from a fresh repo.
 
 * \#2456 The descendants cache is now reset when the document is inherited
   again. (Kostyantyn Stepanyuk)
@@ -157,6 +159,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2331 Don't double push child documents when extra saves are called in an
   after_create callback.
+
+## 3.0.8 (Yanked)
 
 ## 3.0.6
 
