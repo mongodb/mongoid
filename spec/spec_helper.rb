@@ -9,6 +9,7 @@ $LOAD_PATH.unshift(SUPPORT)
 require "mongoid"
 require "mocha"
 require "rspec"
+require 'debugger'
 
 ENV["MONGOID_SPEC_HOST"] ||= "localhost"
 ENV["MONGOID_SPEC_PORT"] ||= "27017"

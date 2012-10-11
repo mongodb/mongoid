@@ -1,5 +1,4 @@
 require "spec_helper"
-require 'debugger'
 
 describe Mongoid::NestedAttributes do
 
