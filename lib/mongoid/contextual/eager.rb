@@ -58,7 +58,7 @@ module Mongoid
         !eager_loaded && !criteria.inclusions.empty?
       end
 
-      # If the provided document exists, eager load it's dependencies or return
+      # If the provided document exists, eager load its dependencies or return
       # nil.
       #
       # @example Eager load if the document is not nil.

@@ -76,7 +76,7 @@ module Mongoid
       end
     end
 
-    # Puts a document in the identity map, accessed by it's id.
+    # Puts a document in the identity map, accessed by its id.
     #
     # @example Put the document in the map.
     #   identity_map.set(document)

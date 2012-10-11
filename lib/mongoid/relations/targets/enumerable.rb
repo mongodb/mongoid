@@ -309,7 +309,7 @@ module Mongoid
           !!@executed
         end
 
-        # Reset the enumerable back to it's persisted state.
+        # Reset the enumerable back to its persisted state.
         #
         # @example Reset the enumerable.
         #   enumerable.reset

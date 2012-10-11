@@ -31,7 +31,7 @@ module Mongoid
           Mongoid.use_activesupport_time_zone? ? (::Time.zone || ::Time) : ::Time
         end
 
-        # Convert the object from it's mongo friendly ruby type to this type.
+        # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
         #   Time.demongoize(object)
