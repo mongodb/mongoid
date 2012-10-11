@@ -1,4 +1,5 @@
 require "spec_helper"
+require 'debugger'
 
 describe Mongoid::NestedAttributes do
 
@@ -4375,7 +4376,7 @@ describe Mongoid::NestedAttributes do
         end
 
         it "autosaves the relation" do
-          user.posts(true).first.title.should eq("Testing")
+          user.posts.first.title.should eq("Testing")
         end
       end
 
