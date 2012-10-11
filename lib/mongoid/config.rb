@@ -26,6 +26,19 @@ module Mongoid
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
 
+    # Has Mongoid been configured? This is checking that at least a valid
+    # session config exists.
+    #
+    # @example Is Mongoid configured?
+    #   config.configured?
+    #
+    # @return [ true, false ] If Mongoid is configured.
+    #
+    # @since 3.0.9
+    def configured?
+      sessions.has_key?(:default)
+    end
+
     # Connect to the provided database name on the default session.
     #
     # @note Use only in development or test environments for convenience.
