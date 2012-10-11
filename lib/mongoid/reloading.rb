@@ -21,6 +21,7 @@ module Mongoid
         raise Errors::DocumentNotFound.new(self.class, id, id)
       end
       @attributes = reloaded
+      @attributes_before_type_cast = {}
       changed_attributes.clear
       apply_defaults
       reload_relations
