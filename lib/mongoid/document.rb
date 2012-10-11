@@ -143,6 +143,7 @@ module Mongoid
       _building do
         @new_record = true
         @attributes ||= {}
+        @attributes_before_type_cast ||= {}
         options ||= {}
         apply_pre_processed_defaults
         process_attributes(attrs, options[:as] || :default, !options[:without_protection]) do
@@ -314,6 +315,7 @@ module Mongoid
         doc = allocate
         doc.criteria_instance_id = criteria_instance_id
         doc.instance_variable_set(:@attributes, attributes)
+        doc.instance_variable_set(:@attributes_before_type_cast, {})
         doc.apply_defaults
         IdentityMap.set(doc) unless _loading_revision?
         doc.run_callbacks(:find) unless doc._find_callbacks.empty?

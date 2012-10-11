@@ -80,6 +80,10 @@ describe Mongoid::Reloading do
       it "resets the dirty modifications" do
         person.changes.should be_empty
       end
+
+      it "resets attributes_before_type_cast" do
+        person.attributes_before_type_cast.should be_empty
+      end
     end
 
     context "when document not saved" do

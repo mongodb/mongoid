@@ -395,6 +395,27 @@ describe Mongoid::Fields do
     end
   end
 
+  describe "#getter_before_type_cast" do
+    let(:person) do
+      Person.new
+    end
+
+    context "when the attribute has not been assigned" do
+
+      it "delgates to the getter" do
+        person.age_before_type_cast.should eq(person.age)
+      end
+    end
+
+    context "when the attribute has been assigned" do
+
+      it "returns the attribute before type cast" do
+        person.age = "old"
+        person.age_before_type_cast.should eq("old")
+      end
+    end
+  end
+
   describe "#setter=" do
 
     let(:product) do

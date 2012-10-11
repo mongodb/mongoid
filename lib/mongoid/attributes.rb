@@ -12,6 +12,7 @@ module Mongoid
     include Readonly
 
     attr_reader :attributes
+    attr_reader :attributes_before_type_cast
     alias :raw_attributes :attributes
 
     # Determine if an attribute is present.
@@ -43,6 +44,22 @@ module Mongoid
       attributes.has_key?(name.to_s)
     end
 
+    # Does the document have the provided attribute before it was assigned
+    # and type cast?
+    #
+    # @example Does the document have the attribute before it was assigned?
+    #   model.has_attribute_before_type_cast?(:name)
+    #
+    # @param [ String, Symbol ] name The name of the attribute.
+    #
+    # @return [ true, false ] If the key is present in the
+    #   attributes_before_type_cast.
+    #
+    # @since 3.1.0
+    def has_attribute_before_type_cast?(name)
+      attributes_before_type_cast.has_key?(name.to_s)
+    end
+
     # Read a value from the document attributes. If the value does not exist
     # it will return nil.
     #
@@ -61,6 +78,28 @@ module Mongoid
       attributes[name.to_s]
     end
     alias :[] :read_attribute
+
+    # Read a value from the attributes before type cast. If the value has not
+    # yet been assigned then this will return the attribute's existing value
+    # using read_attribute.
+    #
+    # @example Read an attribute before type cast.
+    #   person.read_attribute_before_type_cast(:price)
+    #
+    # @param [ String, Symbol ] name The name of the attribute to get.
+    #
+    # @return [ Object ] The value of the attribute before type cast, if
+    #   available. Otherwise, the value of the attribute.
+    #
+    # @since 3.1.0
+    def read_attribute_before_type_cast(name)
+      attr = name.to_s
+      if attributes_before_type_cast.has_key?(attr)
+        attributes_before_type_cast[attr]
+      else
+        read_attribute(attr)
+      end
+    end
 
     # Remove a value from the +Document+ attributes. If the value does not exist
     # it will fail gracefully.
@@ -123,6 +162,7 @@ module Mongoid
       if attribute_writable?(access)
         _assigning do
           localized = fields[access].try(:localized?)
+          attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(access, value)
           unless attributes[access] == typed_value || attribute_changed?(access)
             attribute_will_change!(access)
@@ -198,6 +238,24 @@ module Mongoid
       READER
     end
 
+    # Define a reader method for a dynamic attribute before type cast.
+    #
+    # @api private
+    #
+    # @example Define a reader method for an attribute.
+    #   model.define_dynamic_before_type_cast_reader(:field)
+    #
+    # @param [ String ] name The name of the field.
+    #
+    # @since 3.1.0
+    def define_dynamic_before_type_cast_reader(name)
+      class_eval <<-READER
+        def #{name}_before_type_cast
+          read_attribute_before_type_cast(#{name.inspect})
+        end
+      READER
+    end
+
     # Define a writer method for a dynamic attribute.
     #
     # @api private
@@ -227,6 +285,9 @@ module Mongoid
         getter = attr.reader
         define_dynamic_writer(getter)
         write_attribute(getter, args.first)
+      elsif attr.before_type_cast?
+        define_dynamic_before_type_cast_reader(attr.reader)
+        read_attribute_before_type_cast(attr.reader)
       else
         getter = attr.reader
         define_dynamic_reader(getter)
@@ -276,6 +337,7 @@ module Mongoid
           alias reset_#{name}!   reset_#{original}!
           alias #{name}_was      #{original}_was
           alias #{name}_will_change! #{original}_will_change!
+          alias #{name}_before_type_cast #{original}_before_type_cast
         RUBY
       end
     end
