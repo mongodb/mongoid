@@ -52,7 +52,7 @@ module Mongoid
           autosave(metadata.merge!(autosave: true))
           re_define_method(meth) do |attrs|
             _assigning do
-              metadata.nested_builder(attrs, options).build(self)
+              metadata.nested_builder(attrs, options).build(self, mass_assignment_options)
             end
           end
         end

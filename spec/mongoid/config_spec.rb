@@ -9,6 +9,47 @@ describe Mongoid::Config do
     end
   end
 
+  describe "#configured?" do
+
+    after do
+      described_class.connect_to(database_id, consistency: :strong)
+    end
+
+    context "when a default session config exists" do
+
+      context "when a default database is configured" do
+
+        let(:config) do
+          {
+            default: {
+              database: database_id,
+              hosts: [ "localhost:27017" ]
+            }
+          }
+        end
+
+        before do
+          described_class.sessions = config
+        end
+
+        it "returns true" do
+          described_class.should be_configured
+        end
+      end
+    end
+
+    context "when no default session config exists" do
+
+      before do
+        described_class.sessions.clear
+      end
+
+      it "returns false" do
+        described_class.should_not be_configured
+      end
+    end
+  end
+
   describe "#destructive_fields" do
 
     Mongoid::Components.prohibited_methods.each do |method|

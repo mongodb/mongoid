@@ -167,8 +167,7 @@ module Mongoid
       # @since 2.3.0
       def scope(criteria, document, attribute)
         Array.wrap(options[:scope]).each do |item|
-          normalized = item.to_s
-          name = document.aliased_fields[normalized] || normalized
+          name = document.database_field_name(item)
           criteria = criteria.where(item => document.attributes[name])
         end
         criteria = criteria.where(deleted_at: nil) if document.paranoid?

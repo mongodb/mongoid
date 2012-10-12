@@ -45,6 +45,21 @@ module Mongoid
             object.numeric? ? ::BigDecimal.new(object.to_s) : object
           end
         end
+
+        # Mongoize an object of any type to how it's stored in the db as a big
+        # decimal.
+        #
+        # @example Mongoize the object.
+        #   BigDecimal.mongoize(123)
+        #
+        # @param [ Object ] object The object to Mongoize
+        #
+        # @return [ String ] The mongoized object.
+        #
+        # @since 3.0.7
+        def mongoize(object)
+          object ? object.to_s : object
+        end
       end
     end
   end

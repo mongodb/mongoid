@@ -2555,11 +2555,64 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#update_all" do
+
+    context "when there are no documents present" do
+
+      let(:person) do
+        Person.create
+      end
+
+      it "updates nothing" do
+        person.addresses.update_all(street: "test").should be_false
+      end
+    end
+
+    context "when documents are present" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:address) do
+        person.addresses.create(street: "Hobrecht", number: 27)
+      end
+
+      context "when updating with a where clause" do
+
+        before do
+          person.addresses.
+            where(street: "Hobrecht").
+            update_all(number: 26, post_code: "12437")
+        end
+
+        it "resets the matching dirty flags" do
+          address.should_not be_changed
+        end
+
+        it "updates the first field" do
+          address.reload.number.should eq(26)
+        end
+
+        it "updates the second field" do
+          address.reload.post_code.should eq("12437")
+        end
+
+        it "does not wipe out other fields" do
+          address.reload.street.should eq("Hobrecht")
+        end
+      end
+    end
+  end
+
   describe ".valid_options" do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as, :before_add, :after_add, :before_remove, :after_remove ]
+        [
+          :as, :cascade_callbacks, :cyclic, :order, :versioned,
+          :store_as, :before_add, :after_add, :before_remove, :after_remove
+        ]
       )
     end
   end

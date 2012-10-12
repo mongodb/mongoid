@@ -106,9 +106,44 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-## 3.0.7 (branch 3.0.0-stable)
+## 3.0.9
 
 ### Resolved Issues
+
+* \#2463 Fixed the broken `rails g mongoid:config` from a fresh repo.
+
+* \#2456 The descendants cache is now reset when the document is inherited
+  again. (Kostyantyn Stepanyuk)
+
+* \#2453 `Model#write_attribute` now properly works with aliased fields.
+  (Campbell Allen)
+
+* \#2444 Removed extra dirty methods creation call. (Kostyantyn Stepanyuk)
+
+* \#2440/\#2435 Pass mass assignment options down to children when setting via
+  nested attributes or embedded documents.
+
+* \#2439 Fixed memory leak in threaded selection of returned fields.
+  (Tim Olsen)
+
+* mongoid/moped\#82 Aliased fields now work with `Criteria#distinct`.
+
+* \#2423 Fixed embedded document's `update_all` to perform the correct $set
+  when using off a criteria.
+
+* \#2414 Index definitions now respect aliased fields.
+
+* \#2413 Enumerable targets now properly return enumerators when no blocks
+  are provided. (Andrew Smith)
+
+* \#2411 BigDecimal fields are properly stored as strings when mongoizing
+  integers and floats.
+
+* \#2409 Don't warn about missing mongoid.yml if configured programatically.
+
+* \#2403 Return false on `update_all` of an embeds many with no documents.
+
+* \#2401 Bring back the ability to merge a criteria with a hash.
 
 * \#2399 Reject blank id values on has_many `Model#object_ids=`.
   (Tiago Rafael Godinho)
@@ -124,6 +159,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2331 Don't double push child documents when extra saves are called in an
   after_create callback.
+
+## 3.0.8 (Yanked)
 
 ## 3.0.6
 

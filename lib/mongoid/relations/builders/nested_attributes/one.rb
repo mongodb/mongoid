@@ -10,25 +10,27 @@ module Mongoid
           # Builds the relation depending on the attributes and the options
           # passed to the macro.
           #
-          # This attempts to perform 3 operations, either one of an update of
-          # the existing relation, a replacement of the relation with a new
-          # document, or a removal of the relation.
+          # @example Build a 1-1 nested document.
+          #   one.build(person, as: :admin)
           #
-          # Example:
+          # @note This attempts to perform 3 operations, either one of an update of
+          #   the existing relation, a replacement of the relation with a new
+          #   document, or a removal of the relation.
           #
-          # <tt>one.build(person)</tt>
+          # @param [ Document ] parent The parent document.
+          # @param [ Hash ] options The mass assignment options.
           #
-          # Options:
+          # @return [ Document ] The built document.
           #
-          # parent: The parent document of the relation.
-          def build(parent)
+          # @since 2.0.0
+          def build(parent, options = {})
             return if reject?(parent, attributes)
             @existing = parent.send(metadata.name)
             if update?
               attributes.delete_id
-              existing.attributes = attributes
+              existing.assign_attributes(attributes, options)
             elsif replace?
-              parent.send(metadata.setter, Factory.build(metadata.klass, attributes))
+              parent.send(metadata.setter, Factory.build(metadata.klass, attributes, options))
             elsif delete?
               parent.send(metadata.setter, nil)
             end
@@ -37,19 +39,14 @@ module Mongoid
           # Create the new builder for nested attributes on one-to-one
           # relations.
           #
-          # Example:
+          # @example Instantiate the builder.
+          #   One.new(metadata, attributes, options)
           #
-          # <tt>One.new(metadata, attributes, options)</tt>
+          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Hash ] attributes The attributes hash to attempt to set.
+          # @param [ Hash ] options The options defined.
           #
-          # Options:
-          #
-          # metadata: The relation metadata
-          # attributes: The attributes hash to attempt to set.
-          # options: The options defined.
-          #
-          # Returns:
-          #
-          # A new builder.
+          # @since 2.0.0
           def initialize(metadata, attributes, options)
             @attributes = attributes.with_indifferent_access
             @metadata = metadata
@@ -62,13 +59,14 @@ module Mongoid
           # Is the id in the attribtues acceptable for allowing an update to
           # the existing relation?
           #
-          # Example:
+          # @api private
           #
-          # <tt>acceptable_id?</tt>
+          # @example Is the id acceptable?
+          #   one.acceptable_id?
           #
-          # Returns:
+          # @return [ true, false ] If the id part of the logic will allow an update.
           #
-          # True if the id part of the logic will allow an update.
+          # @since 2.0.0
           def acceptable_id?
             id = convert_id(existing.class, attributes[:id])
             existing.id == id || id.nil? || (existing.id != id && update_only?)
@@ -76,56 +74,49 @@ module Mongoid
 
           # Can the existing relation be deleted?
           #
-          # Example:
+          # @example Can the existing object be deleted?
+          #   one.delete?
           #
-          # <tt>delete?</tt>
+          # @return [ true, false ] If the relation should be deleted.
           #
-          # Returns:
-          #
-          # True if the relation should be deleted.
+          # @since 2.0.0
           def delete?
             destroyable? && !attributes[:id].nil?
           end
 
-          # Can the existing relation potentially be deleted?
+          # Can the existing relation potentially be destroyed?
           #
-          # Example:
+          # @example Is the object destroyable?
+          #   one.destroyable?({ :_destroy => "1" })
           #
-          # <tt>destroyable?({ :_destroy => "1" })</tt>
+          # @return [ true, false ] If the relation can potentially be
+          #   destroyed.
           #
-          # Options:
-          #
-          # attributes: The attributes to pull the flag from.
-          #
-          # Returns:
-          #
-          # True if the relation can potentially be deleted.
+          # @since 2.0.0
           def destroyable?
             [ 1, "1", true, "true" ].include?(destroy) && allow_destroy?
           end
 
           # Is the document to be replaced?
           #
-          # Example:
+          # @example Is the document to be replaced?
+          #   one.replace?
           #
-          # <tt>replace?</tt>
+          # @return [ true, false ] If the document should be replaced.
           #
-          # Returns:
-          #
-          # True if the document should be replaced.
+          # @since 2.0.0
           def replace?
             !existing && !destroyable? && !attributes.blank?
           end
 
           # Should the document be updated?
           #
-          # Example:
+          # @example Should the document be updated?
+          #   one.update?
           #
-          # <tt>update?</tt>
+          # @return [ true, false ] If the object should have its attributes updated.
           #
-          # Returns:
-          #
-          # True if the object should have its attributes updated.
+          # @since 2.0.0
           def update?
             existing && !destroyable? && acceptable_id?
           end

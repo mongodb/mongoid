@@ -60,20 +60,6 @@ module Rails
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
-      #
-      # @example mongoid.yml
-      #
-      #   development:
-      #     host: localhost
-      #     database: mongoid
-      #     slaves:
-      #       # - host: localhost
-      #         # port: 27018
-      #       # - host: localhost
-      #         # port: 27019
-      #     allow_dynamic_fields: false
-      #     persist_in_safe_mode: false
-      #
       initializer "setup database" do
         config_file = Rails.root.join("config", "mongoid.yml")
         if config_file.file?
@@ -95,7 +81,7 @@ module Rails
       # alert to create one.
       initializer "warn when configuration is missing" do
         config.after_initialize do
-          unless Rails.root.join("config", "mongoid.yml").file?
+          unless Rails.root.join("config", "mongoid.yml").file? || ::Mongoid.configured?
             puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
             puts "to generate one run: rails generate mongoid:config\n\n"
           end

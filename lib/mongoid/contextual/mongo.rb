@@ -97,7 +97,7 @@ module Mongoid
       #
       # @since 3.0.0
       def distinct(field)
-        query.distinct(field)
+        query.distinct(klass.database_field_name(field))
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -518,7 +518,7 @@ module Mongoid
           Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
           yield
         ensure
-          Threaded.set_selection(criteria.object_id, nil)
+          Threaded.delete_selection(criteria.object_id)
         end
       end
 

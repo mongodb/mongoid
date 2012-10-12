@@ -11,6 +11,8 @@ class Band
   field :rating, type: Float
   field :upserted, type: Boolean, default: false
   field :created, type: DateTime
+  field :sales, type: BigDecimal
+  field :y, as: :years, type: Integer
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false

@@ -16,28 +16,58 @@ describe Mongoid::Contextual::Atomic do
       Band.create
     end
 
-    let(:criteria) do
-      Band.all
+    context "when the criteria has no sorting" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.add_to_set(:members, "Dave")
+      end
+
+      it "does not add duplicates" do
+        depeche_mode.reload.members.should eq([ "Dave" ])
+      end
+
+      it "adds unique values" do
+        new_order.reload.members.should eq([ "Peter", "Dave" ])
+      end
+
+      it "adds to non initialized fields" do
+        smiths.reload.members.should eq([ "Dave" ])
+      end
     end
 
-    let(:context) do
-      Mongoid::Contextual::Mongo.new(criteria)
-    end
+    context "when the criteria has sorting" do
 
-    before do
-      context.add_to_set(:members, "Dave")
-    end
+      let(:criteria) do
+        Band.asc(:name)
+      end
 
-    it "does not add duplicates" do
-      depeche_mode.reload.members.should eq([ "Dave" ])
-    end
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
 
-    it "adds unique values" do
-      new_order.reload.members.should eq([ "Peter", "Dave" ])
-    end
+      before do
+        context.add_to_set(:members, "Dave")
+      end
 
-    it "adds to non initialized fields" do
-      smiths.reload.members.should eq([ "Dave" ])
+      it "does not add duplicates" do
+        depeche_mode.reload.members.should eq([ "Dave" ])
+      end
+
+      it "adds unique values" do
+        new_order.reload.members.should eq([ "Peter", "Dave" ])
+      end
+
+      it "adds to non initialized fields" do
+        smiths.reload.members.should eq([ "Dave" ])
+      end
     end
   end
 
