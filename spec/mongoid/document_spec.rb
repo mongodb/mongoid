@@ -593,6 +593,13 @@ describe Mongoid::Document do
         person.as_document.should_not have_key("phones")
       end
     end
+    context "removing an embedded document" do
+      it "has an empty collection when the embedded document has been removed" do
+        person.save
+        person.addresses.delete(person.addresses.first)
+        person.as_document['addresses'].should be_empty
+      end
+    end
   end
 
   describe "#to_key" do
