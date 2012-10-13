@@ -99,7 +99,7 @@ module Mongoid
       return true
     end
 
-    # Touch the document, in effect updating it's updated_at timestamp and
+    # Touch the document, in effect updating its updated_at timestamp and
     # optionally the provided field to the current time. If any belongs_to
     # relations exist with a touch option, they will be updated as well.
     #

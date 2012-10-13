@@ -228,7 +228,7 @@ module Mongoid
       end
     end
 
-    # Set the attribute back to it's old value.
+    # Set the attribute back to its old value.
     #
     # @example Reset the attribute.
     #   model.reset_attribute!("name")

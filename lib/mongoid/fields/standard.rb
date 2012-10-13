@@ -124,7 +124,7 @@ module Mongoid
         @object_id_field ||= (type == Moped::BSON::ObjectId)
       end
 
-      # Does the field pre-process it's default value?
+      # Does the field pre-process its default value?
       #
       # @example Does the field pre-process the default?
       #   field.pre_processed?

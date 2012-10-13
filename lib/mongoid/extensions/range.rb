@@ -42,7 +42,7 @@ module Mongoid
 
       module ClassMethods
 
-        # Convert the object from it's mongo friendly ruby type to this type.
+        # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
         #   Range.demongoize({ "min" => 1, "max" => 5 })

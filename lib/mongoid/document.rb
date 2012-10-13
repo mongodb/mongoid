@@ -108,7 +108,7 @@ module Mongoid
       identity.hash
     end
 
-    # A Document's is identified absolutely by it's class and database id:
+    # A Document's is identified absolutely by its class and database id:
     #
     # Person.first.identity #=> [Person, Moped::BSON::ObjectId('4f775130a04745933a000003')]
     #

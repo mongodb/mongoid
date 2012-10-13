@@ -470,7 +470,7 @@ For instructions on upgrading to newer versions, visit
           Enumerable, or included gems that inject methods into these
           or Mongoid internals.
 
-* \#1753/#1649 A setter and getter for has_many relations to set it's
+* \#1753/#1649 A setter and getter for has_many relations to set its
   children is now provided. (Piotr Jakubowski)
 
         class Album
@@ -696,7 +696,7 @@ For instructions on upgrading to newer versions, visit
         band.with(database: "secondary).save!
         Band.with(collection: "artists").where(name: "Depeche Mode")
 
-* \#1291 You can now configure on a per-model basis where it's documents are
+* \#1291 You can now configure on a per-model basis where its documents are
   stored with the new and improved `store_in` macro.
 
         class Band
@@ -813,7 +813,7 @@ For instructions on upgrading to newer versions, visit
           index({ name: 1 }, { unique: true, background: true })
         end
 
-      Geospacial indexing needs "2d" as it's direction.
+      Geospacial indexing needs "2d" as its direction.
 
         class Venue
           include Mongoid::Document
@@ -980,11 +980,11 @@ For instructions on upgrading to newer versions, visit
     If the id is set, but the document for it has not been persisted, accessing
     the relation will return empty results.
 
-    If the id is set and it's document is persisted, accessing the relation
+    If the id is set and its document is persisted, accessing the relation
     will return the document.
 
     If the id is set, but the base document is not saved afterwards, then
-    reloading will return the document to it's original state.
+    reloading will return the document to its original state.
 
 * \#1093 Field serialization strategies have changed on Array, Hash, Integer
   and Boolean to be more consistent and match AR where appropriate.
