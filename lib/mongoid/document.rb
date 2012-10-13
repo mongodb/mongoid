@@ -191,8 +191,10 @@ module Mongoid
       return attributes if frozen?
       embedded_relations.each_pair do |name, meta|
         without_autobuild do
-          relation = send(name)
-          attributes[meta.store_as] = relation.as_document unless relation.blank?
+          relation, stored = send(name), meta.store_as
+          if attributes.has_key?(stored) || !relation.blank?
+            attributes[stored] = relation.as_document
+          end
         end
       end
       attributes
