@@ -232,6 +232,7 @@ module Mongoid
           criteria.update_all(foreign_key => nil)
           target.clear do |doc|
             unbind_one(doc)
+            doc.changed_attributes.delete(foreign_key)
           end
         end
         alias :nullify_all :nullify
