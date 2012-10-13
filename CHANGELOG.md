@@ -106,6 +106,13 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+## 3.0.10
+
+### Resolved Issues
+
+* \#2454 `Model#as_document` properly allows changes from having a relation to
+  the relation being removed. (James Almond)
+
 ## 3.0.9
 
 ### Resolved Issues
