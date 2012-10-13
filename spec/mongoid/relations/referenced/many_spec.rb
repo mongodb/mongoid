@@ -2829,6 +2829,17 @@ describe Mongoid::Relations::Referenced::Many do
       it "saves the documents" do
         post_one.reload.person.should be_nil
       end
+
+      context "when adding a nullified document back to the relation" do
+
+        before do
+          person.posts.push(post_one)
+        end
+
+        it "persists the relation" do
+          person.posts(true).should eq([ post_one ])
+        end
+      end
     end
 
     context "when the relation is polymorphic" do

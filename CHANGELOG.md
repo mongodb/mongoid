@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2469 Nullified documents on relations are now able to be re-added with the
+  same in memory instance.
+
 * \#2454 `Model#as_document` properly allows changes from having a relation to
   the relation being removed. (James Almond)
 
