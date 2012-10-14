@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2472 Ensure `update_all` on embedded relations works properly when nothing
+  is actually going to be updated.
+
 * \#2469 Nullified documents on relations are now able to be re-added with the
   same in memory instance.
 

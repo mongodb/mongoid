@@ -1104,6 +1104,17 @@ describe Mongoid::Contextual::Memory do
             pfluger.reload.number.should be_nil
           end
         end
+
+        context "when updating the documents a second time" do
+
+          before do
+            context.update_all(number: 5)
+          end
+
+          it "does not error on the update" do
+            hobrecht.number.should eq(5)
+          end
+        end
       end
 
       context "when no attributes are provided" do
