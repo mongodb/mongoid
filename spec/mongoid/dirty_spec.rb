@@ -204,6 +204,46 @@ describe Mongoid::Dirty do
             )
           end
         end
+
+        context "when the values are arrays" do
+
+          let(:map) do
+            {
+              "stack1" => [ 1, 2, 3, 4 ],
+              "stack2" => [ 1, 2, 3, 4 ],
+              "stack3" => [ 1, 2, 3, 4 ]
+            }
+          end
+
+          before do
+            person.map = map
+            person.move_changes
+          end
+
+          context "when reordering the arrays inline" do
+
+            before do
+              person.map["stack1"].reverse!
+            end
+
+            it "flags the attribute as changed" do
+              person.send(:attribute_change, "map").should eq(
+                [
+                  {
+                    "stack1" => [ 1, 2, 3, 4 ],
+                    "stack2" => [ 1, 2, 3, 4 ],
+                    "stack3" => [ 1, 2, 3, 4 ]
+                  },
+                  {
+                    "stack1" => [ 4, 3, 2, 1 ],
+                    "stack2" => [ 1, 2, 3, 4 ],
+                    "stack3" => [ 1, 2, 3, 4 ]
+                  },
+                ]
+              )
+            end
+          end
+        end
       end
     end
 

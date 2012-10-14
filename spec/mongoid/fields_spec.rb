@@ -1152,4 +1152,45 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  context "when the field is a hash of arrays" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:map) do
+      {
+        "stack1" => [ 1, 2, 3, 4 ],
+        "stack2" => [ 1, 2, 3, 4 ],
+        "stack3" => [ 1, 2, 3, 4 ]
+      }
+    end
+
+    before do
+      person.map = map
+      person.map["stack1"].reverse!
+      person.save
+    end
+
+    it "properly updates the hash" do
+      person.map.should eq(
+        {
+          "stack1" => [ 4, 3, 2, 1 ],
+          "stack2" => [ 1, 2, 3, 4 ],
+          "stack3" => [ 1, 2, 3, 4 ]
+        }
+      )
+    end
+
+    it "persists the changes" do
+      person.reload.map.should eq(
+        {
+          "stack1" => [ 4, 3, 2, 1 ],
+          "stack2" => [ 1, 2, 3, 4 ],
+          "stack3" => [ 1, 2, 3, 4 ]
+        }
+      )
+    end
+  end
 end
