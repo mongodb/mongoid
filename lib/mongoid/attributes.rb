@@ -162,6 +162,7 @@ module Mongoid
       access = database_field_name(name.to_s)
       if attribute_writable?(access)
         _assigning do
+          validate_attribute_value(access, value)
           localized = fields[access].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
           typed_value = typed_value_for(access, value)
@@ -278,6 +279,26 @@ module Mongoid
           alias #{name}_will_change! #{original}_will_change!
           alias #{name}_before_type_cast #{original}_before_type_cast
         RUBY
+      end
+    end
+
+    private
+
+    # Validates an attribute value. This provides validation checking if
+    # the value is valid for given a field.
+    # For now, only Hash and Array fields are validated.
+    #
+    # @param [ String, Symbol ] name The name of the attribute to validate.
+    # @param [ Object ] value The to be validated.
+    #
+    # @since 3.0.10
+    def validate_attribute_value(access, value)
+      return unless fields[access] && value
+      validatable_types = [ Hash, Array ]
+      if validatable_types.include? fields[access].type
+        unless value.is_a? fields[access].type
+          raise Mongoid::Errors::InvalidValue.new(fields[access].type, value.class)
+        end
       end
     end
   end

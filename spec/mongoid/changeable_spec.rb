@@ -121,11 +121,11 @@ describe Mongoid::Changeable do
           end
 
           before do
-            person[:a] = "test"
+            person[:t] = "test"
           end
 
           it "returns an array of nil and new value" do
-            expect(person.send(:attribute_change, "a")).to eq([ nil, "test" ])
+            expect(person.send(:attribute_change, "t")).to eq([ nil, "test" ])
           end
         end
       end
