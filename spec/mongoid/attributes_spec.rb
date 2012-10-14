@@ -1030,6 +1030,34 @@ describe Mongoid::Attributes do
         expect(person.t).to eq("aliased field to test")
       end
     end
+
+    context "when attribute is a Hash" do
+      let(:person) { Person.new map: { somekey: "somevalue" } }
+
+      it "raises an error when try to set an invalid value" do
+        expect {
+          person.map = []
+        }.to raise_error(Mongoid::Errors::InvalidValue)
+      end
+
+      it "can set a Hash value" do
+        person.map.should eq( { somekey: "somevalue" } )
+      end
+    end
+
+    context "when attribute is an Array" do
+      let(:person) { Person.new aliases: [ :alias_1 ] }
+
+      it "can set an Array Value" do
+        person.aliases.should eq [ :alias_1 ]
+      end
+
+      it "raises an error when try to set an invalid value" do
+        expect {
+          person.aliases = {}
+        }.to raise_error(Mongoid::Errors::InvalidValue)
+      end
+    end
   end
 
   describe "#typed_value_for" do
