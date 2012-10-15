@@ -377,6 +377,26 @@ describe Mongoid::Contextual::Memory do
       described_class.new(criteria)
     end
 
+    context "when skip and limit outside of range" do
+
+      before do
+        context.skip(10).limit(2)
+      end
+
+      it "contains no documents" do
+        context.map(&:street).should be_empty
+      end
+
+      context "when calling next on the enumerator" do
+
+        it "raises a stop iteration error" do
+          expect {
+            context.each.next
+          }.to raise_error(StopIteration)
+        end
+      end
+    end
+
     context "when providing a block" do
 
       it "yields mongoid documents to the block" do
