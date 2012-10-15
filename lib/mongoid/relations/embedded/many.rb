@@ -148,6 +148,18 @@ module Mongoid
           doc
         end
 
+        # For use only with Mongoid::Paranoia - will be removed in 4.0.
+        #
+        # @example Get the deleted documents from the relation.
+        #   person.paranoid_phones.deleted
+        #
+        # @return [ Criteria ] The deleted documents.
+        #
+        # @since 3.0.10
+        def deleted
+          unscoped.deleted
+        end
+
         # Delete all the documents in the association without running callbacks.
         #
         # @example Delete all documents from the relation.

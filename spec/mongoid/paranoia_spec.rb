@@ -9,6 +9,52 @@ describe Mongoid::Paranoia do
     end
   end
 
+  describe ".deleted" do
+
+    context "when called on a root document" do
+
+      let(:post) do
+        ParanoidPost.create(title: "testing")
+      end
+
+      before do
+        post.destroy
+      end
+
+      let(:deleted) do
+        ParanoidPost.deleted
+      end
+
+      it "returns the deleted documents" do
+        deleted.should eq([ post ])
+      end
+    end
+
+    context "when called on an embedded document" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:phone) do
+        person.paranoid_phones.create
+      end
+
+      before do
+        phone.destroy
+        person.reload
+      end
+
+      it "returns the deleted documents" do
+        person.paranoid_phones.deleted.should eq([ phone ])
+      end
+
+      it "returns the correct count" do
+        person.paranoid_phones.deleted.count.should eq(1)
+      end
+    end
+  end
+
   describe "#destroy!" do
 
     context "when the document is a root" do
