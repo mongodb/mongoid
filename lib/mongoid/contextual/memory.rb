@@ -95,7 +95,7 @@ module Mongoid
       # @since 3.0.0
       def each
         if block_given?
-          documents[skipping || 0, limiting || documents.length].each do |doc|
+          (documents[skipping || 0, limiting || documents.length] || []).each do |doc|
             yield doc
           end
         else

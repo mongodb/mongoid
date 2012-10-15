@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2476 Handle skip and limit outside of range on embeds_many relations
+  gracefully.
+
 * \#2451 `relation.deleted` on embedded paranoid documents now works properly
   again.
 
