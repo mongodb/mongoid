@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2451 `relation.deleted` on embedded paranoid documents now works properly
+  again.
+
 * \#2472 Ensure `update_all` on embedded relations works properly when nothing
   is actually going to be updated.
 
