@@ -172,7 +172,7 @@ module Mongoid
                 if (agg.min == null || val.max < agg.min) agg.min = val.max;
                 agg.sum += val.sum;
               }
-              agg.count += 1;
+              agg.count += val.count;
             });
             return agg;
           }}
