@@ -24,6 +24,7 @@ module Mongoid
         if !unmatched && !params.is_a?(Hash)
           raise ArgumentError, 'please also supply the unmatched ids'
         end
+        @params = params
         super(
           compose_message(
             message_key(params),
