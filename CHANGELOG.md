@@ -112,6 +112,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2485 Removing indexes now always uses strong consistency.
 
+* \#2482 Store find parameters in the `DocumentNotFound` error.
+
 * \#2476 Handle skip and limit outside of range on embeds_many relations
   gracefully.
 

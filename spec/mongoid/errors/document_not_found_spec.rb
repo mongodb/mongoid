@@ -79,4 +79,15 @@ describe Mongoid::Errors::DocumentNotFound do
       end
     end
   end
+
+  describe "#params" do
+
+    let(:error) do
+      described_class.new(Person, 1, 1)
+    end
+
+    it "returns the parameters passed to the find" do
+      error.params.should eq(1)
+    end
+  end
 end
