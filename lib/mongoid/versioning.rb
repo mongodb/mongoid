@@ -174,7 +174,12 @@ module Mongoid
       versioned = {}
       hash.except("versions").each_pair do |name, value|
         field = fields[name]
-        versioned[name] = value if !field || field.versioned?
+
+        if field.is_a?(Mongoid::Fields::Localized)
+          versioned["#{name}_translations"] = value if !field || field.versioned?
+        else
+          versioned[name] = value if !field || field.versioned?
+        end
       end
       versioned
     end
