@@ -114,7 +114,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#2482 Store find parameters in the `DocumentNotFound` error.
 
-* \#2482 Map/reduce aggregations now properly handle Mongo's batching of
+* \#2481 Map/reduce aggregations now properly handle Mongo's batching of
   reduce jobs in groups of 100 with the state being passed through on the
   count.
 
