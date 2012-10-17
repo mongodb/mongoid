@@ -37,7 +37,7 @@ module Mongoid
       #
       # @since 3.0.0
       def remove_indexes
-        collection.indexes.each do |spec|
+        with(consistency: :strong).collection.indexes.each do |spec|
           next if spec["name"] == "_id_"
           collection.indexes.drop(spec["key"])
         end and true
