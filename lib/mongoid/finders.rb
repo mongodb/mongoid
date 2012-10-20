@@ -135,8 +135,10 @@ module Mongoid
     #   Person.first
     #
     # @return [ Document ] The first matching document.
-    def first
-      with_default_scope.first
+    def first(*args)
+      conditions = {}
+      conditions = args[0][:conditions] if args[0] && args[0][:conditions]
+      find_by(conditions)
     end
 
     # Find the last +Document+ given the conditions.

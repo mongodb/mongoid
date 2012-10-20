@@ -303,6 +303,31 @@ describe Mongoid::Finders do
     end
   end
 
+  describe ".first" do
+
+    let!(:person1) do
+      Person.create(title: "sir")
+    end
+
+    let!(:person2) do
+      Person.create(title: "sir", pets: true)
+    end
+
+    context "when no conditions are supplied" do
+
+      it "returns the first document" do
+        Person.first.should eq(person1)
+      end
+    end
+
+    context "when conditions are supplied" do
+
+      it "returns the first document given the conditions" do
+        Person.first({ conditions: { pets: true }}).should eq(person2)
+      end
+    end
+  end
+
   describe ".first_or_create" do
 
     context "when the document is found" do
