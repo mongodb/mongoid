@@ -173,10 +173,30 @@ module Mongoid
     def only_versioned_attributes(hash)
       versioned = {}
       hash.except("versions").each_pair do |name, value|
-        field = fields[name]
-        versioned[name] = value if !field || field.versioned?
+        add_versioned_attribute(versioned, name, value)
       end
       versioned
+    end
+
+    # Add the versioned attribute. Will work now for localized fields.
+    #
+    # @api private
+    #
+    # @example Add the versioned attribute.
+    #   model.add_versioned_attribute({}, "name", "test")
+    #
+    # @param [ Hash ] versioned The versioned attributes.
+    # @param [ String ] name The name of the field.
+    # @param [ Object ] value The value for the field.
+    #
+    # @since 3.0.10
+    def add_versioned_attribute(versioned, name, value)
+      field = fields[name]
+      if field && field.localized?
+        versioned["#{name}_translations"] = value
+      else
+        versioned[name] = value if !field || field.versioned?
+      end
     end
 
     module ClassMethods

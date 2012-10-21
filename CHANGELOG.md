@@ -112,6 +112,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2485 Removing indexes now always uses strong consistency.
 
+* \#2483 Versioning now handles localized fields. (Lawrence Curtis)
+
 * \#2482 Store find parameters in the `DocumentNotFound` error.
 
 * \#2481 Map/reduce aggregations now properly handle Mongo's batching of
