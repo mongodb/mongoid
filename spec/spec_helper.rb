@@ -24,7 +24,7 @@ PORT = ENV["MONGOID_SPEC_PORT"].to_i
 # names for each process running since we do not have transactions and want a
 # clean slate before each spec run.
 def database_id
-  ENV["CI"] ? "mongoid_#{Process.pid}" : "mongoid_test"
+  "mongoid_test"
 end
 
 # Can we connect to MongoHQ from this box?
