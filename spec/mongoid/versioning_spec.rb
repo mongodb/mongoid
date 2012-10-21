@@ -35,160 +35,160 @@ describe Mongoid::Versioning do
     end
   end
 
-  # describe "#version" do
+  describe "#version" do
 
-    # context "when there is no default scope" do
+    context "when there is no default scope" do
 
-      # context "when the document is new" do
+      context "when the document is new" do
 
-        # it "returns 1" do
-          # WikiPage.new.version.should eq(1)
-        # end
-      # end
+        it "returns 1" do
+          WikiPage.new.version.should eq(1)
+        end
+      end
 
-      # context "when the document is persisted once" do
+      context "when the document is persisted once" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # it "returns 1" do
-          # page.version.should eq(1)
-        # end
-      # end
+        it "returns 1" do
+          page.version.should eq(1)
+        end
+      end
 
-      # context "when the document is persisted more than once" do
+      context "when the document is persisted more than once" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # before do
-          # 3.times { |n| page.update_attribute(:title, "#{n}") }
-        # end
+        before do
+          3.times { |n| page.update_attribute(:title, "#{n}") }
+        end
 
-        # it "returns the number of versions" do
-          # page.version.should eq(4)
-        # end
-      # end
+        it "returns the number of versions" do
+          page.version.should eq(4)
+        end
+      end
 
-      # context "when maximum versions is defined" do
+      context "when maximum versions is defined" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # context "when saving over the max versions limit" do
+        context "when saving over the max versions limit" do
 
-          # before do
-            # 10.times { |n| page.update_attribute(:title, "#{n}") }
-          # end
+          before do
+            10.times { |n| page.update_attribute(:title, "#{n}") }
+          end
 
-          # it "returns the number of versions" do
-            # page.version.should eq(11)
-          # end
-        # end
-      # end
+          it "returns the number of versions" do
+            page.version.should eq(11)
+          end
+        end
+      end
 
-      # context "when performing versionless saves" do
+      context "when performing versionless saves" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # before do
-          # 10.times do |n|
-            # page.versionless { |doc| doc.update_attribute(:title, "#{n}") }
-          # end
-        # end
+        before do
+          10.times do |n|
+            page.versionless { |doc| doc.update_attribute(:title, "#{n}") }
+          end
+        end
 
-        # it "does not increment the version number" do
-          # page.version.should eq(1)
-        # end
-      # end
-    # end
+        it "does not increment the version number" do
+          page.version.should eq(1)
+        end
+      end
+    end
 
-    # context "when there is a default scope" do
+    context "when there is a default scope" do
 
-      # before :all do
-        # class WikiPage
-          # default_scope where(author: "Jim")
-        # end
-      # end
+      before :all do
+        class WikiPage
+          default_scope where(author: "Jim")
+        end
+      end
 
-      # after :all do
-        # WikiPage.default_scoping.clear
-      # end
+      after :all do
+        WikiPage.default_scoping = nil
+      end
 
-      # context "when the document is new" do
+      context "when the document is new" do
 
-        # it "returns 1" do
-          # WikiPage.new.version.should eq(1)
-        # end
-      # end
+        it "returns 1" do
+          WikiPage.new.version.should eq(1)
+        end
+      end
 
-      # context "when the document is persisted once" do
+      context "when the document is persisted once" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # it "returns 1" do
-          # page.version.should eq(1)
-        # end
-      # end
+        it "returns 1" do
+          page.version.should eq(1)
+        end
+      end
 
-      # context "when the document is persisted more than once" do
+      context "when the document is persisted more than once" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # before do
-          # 3.times { |n| page.update_attribute(:title, "#{n}") }
-        # end
+        before do
+          3.times { |n| page.update_attribute(:title, "#{n}") }
+        end
 
-        # it "returns the number of versions" do
-          # page.version.should eq(4)
-        # end
-      # end
+        it "returns the number of versions" do
+          page.version.should eq(4)
+        end
+      end
 
-      # context "when maximum versions is defined" do
+      context "when maximum versions is defined" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # context "when saving over the max versions limit" do
+        context "when saving over the max versions limit" do
 
-          # before do
-            # 10.times { |n| page.update_attribute(:title, "#{n}") }
-          # end
+          before do
+            10.times { |n| page.update_attribute(:title, "#{n}") }
+          end
 
-          # it "returns the number of versions" do
-            # page.version.should eq(11)
-          # end
-        # end
-      # end
+          it "returns the number of versions" do
+            page.version.should eq(11)
+          end
+        end
+      end
 
-      # context "when performing versionless saves" do
+      context "when performing versionless saves" do
 
-        # let(:page) do
-          # WikiPage.create(title: "1")
-        # end
+        let(:page) do
+          WikiPage.create(title: "1")
+        end
 
-        # before do
-          # 10.times do |n|
-            # page.versionless { |doc| doc.update_attribute(:title, "#{n}") }
-          # end
-        # end
+        before do
+          10.times do |n|
+            page.versionless { |doc| doc.update_attribute(:title, "#{n}") }
+          end
+        end
 
-        # it "does not increment the version number" do
-          # page.version.should eq(1)
-        # end
-      # end
-    # end
-  # end
+        it "does not increment the version number" do
+          page.version.should eq(1)
+        end
+      end
+    end
+  end
 
   describe "#versionless" do
 
@@ -217,7 +217,7 @@ describe Mongoid::Versioning do
   describe "#versions" do
 
     let(:page) do
-      WikiPage.create(title: "1") do |wiki|
+      WikiPage.create(title: "1", description: "test") do |wiki|
         wiki.author = "woodchuck"
       end
     end
@@ -236,6 +236,10 @@ describe Mongoid::Versioning do
 
         it "creates a new version" do
           version.title.should eq("1")
+        end
+
+        it "properly versions the localized fields" do
+          version.description.should eq("test")
         end
 
         it "only creates 1 new version" do
