@@ -123,6 +123,9 @@ For instructions on upgrading to newer versions, visit
 * \#2476 Handle skip and limit outside of range on embeds_many relations
   gracefully.
 
+* \#2474 Correctly detach 1-1 relations when the child is not yet loaded.
+  (Kostyantyn Stepanyuk)
+
 * \#2451 `relation.deleted` on embedded paranoid documents now works properly
   again.
 
