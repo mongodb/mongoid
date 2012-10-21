@@ -1258,6 +1258,50 @@ describe Mongoid::NestedAttributes do
 
               context "when allow_destroy is true" do
 
+                context "when the parent validation failed" do
+
+                  before(:all) do
+                    Band.validates_presence_of :name
+                    Band.accepts_nested_attributes_for :records, :allow_destroy => true
+                  end
+
+                  after(:all) do
+                    Band.send(:undef_method, :records_attributes=)
+                    Band.reset_callbacks(:validate)
+                  end
+
+                  let!(:band) do
+                    Band.create(name: "Depeche Mode")
+                  end
+
+                  let!(:record) do
+                    band.records.create
+                  end
+
+                  let(:attributes) do
+                    {
+                      name: nil,
+                      records_attributes: { "foo" => { "id" => record.id, "_destroy" => true }}
+                    }
+                  end
+
+                  before do
+                    band.update_attributes(attributes)
+                  end
+
+                  it "does not remove the child document" do
+                    band.records.should_not be_empty
+                  end
+
+                  it "keeps the child flagged for destruction" do
+                    record.should be_flagged_for_destroy
+                  end
+
+                  it "does not persist any change" do
+                    band.reload.records.should eq([ record ])
+                  end
+                end
+
                 context "when the child accesses the parent after destroy" do
 
                   before(:all) do

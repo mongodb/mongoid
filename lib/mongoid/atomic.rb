@@ -114,6 +114,7 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_updates
+      process_flagged_destroys
       mods = Modifiers.new
       generate_atomic_updates(mods, self)
       _children.each do |child|
@@ -300,6 +301,19 @@ module Mongoid
       self.destroyed = true
       self.flagged_for_destroy = false
       atomic_path
+    end
+
+    def flagged_destroys
+      @flagged_destroys ||= []
+    end
+
+    def process_flagged_destroys
+      _assigning do
+        flagged_destroys.each do |block|
+          block.call
+        end
+      end
+      flagged_destroys.clear
     end
 
     private

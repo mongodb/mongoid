@@ -103,8 +103,11 @@ module Mongoid
               converted = first ? convert_id(first.class, id) : id
               doc = existing.find(converted)
               if destroyable?(attrs)
-                existing.delete(doc)
-                doc.destroy unless doc.embedded? || doc.destroyed?
+                doc.flagged_for_destroy = true
+                parent.flagged_destroys.push(->{
+                  existing.delete(doc)
+                  doc.destroy unless doc.embedded? || doc.destroyed?
+                })
               else
                 attrs.delete_id
                 if metadata.embedded?
