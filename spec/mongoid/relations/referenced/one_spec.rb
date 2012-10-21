@@ -91,6 +91,26 @@ describe Mongoid::Relations::Referenced::One do
         it "saves the target" do
           game.should be_persisted
         end
+
+        context "when reloading the parent" do
+
+          before do
+            person.reload
+          end
+
+          context "when setting a new document on the relation" do
+
+            before do
+              person.game = Game.new
+            end
+
+            it "detaches the previous relation" do
+              expect {
+                game.reload
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+        end
       end
     end
 
