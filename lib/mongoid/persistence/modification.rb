@@ -20,6 +20,7 @@ module Mongoid
       # @since 2.1.0
       def prepare(&block)
         return false if validating? && document.invalid?(:update)
+        document.process_flagged_destroys
         result = document.run_callbacks(:save) do
           document.run_callbacks(:update) do
             yield(document); true
