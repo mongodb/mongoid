@@ -57,6 +57,7 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
+    puts Mongoid::Sessions.default.options[:database]
     Mongoid.purge!
     Mongoid::IdentityMap.clear
   end

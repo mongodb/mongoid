@@ -7,6 +7,10 @@ describe Mongoid::Config do
     if defined?(RailsTemp)
       Rails = RailsTemp
     end
+
+    Mongoid.configure do |config|
+      config.connect_to(database_id, consistency: :strong)
+    end
   end
 
   describe "#configured?" do

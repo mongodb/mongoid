@@ -659,6 +659,39 @@ describe Mongoid::Relations::Accessors do
     end
   end
 
+  describe '#setter' do
+    context 'for has_one association' do
+      it 'should correct replace current relation for new one' do
+        old_key = DoorKey.new
+        new_key = DoorKey.new
+
+        door = Door.new(door_key: old_key)
+        door.save && door.door_key.save
+
+        door.reload
+        door.door_key = new_key
+
+        DoorKey.find(old_key.id).door.should be_nil
+        DoorKey.find(new_key.id).door.should == door
+      end
+    end
+
+    context 'for embeds_one association' do
+      it 'should correct replace current relation for new one' do
+        old_knob = DoorKnob.new
+        new_knob = DoorKnob.new
+
+        door = Door.new(door_knob: old_knob)
+        door.save
+
+        door.reload
+        door.door_knob = new_knob
+
+        Door.find(door.id).door_knob.should == new_knob
+      end
+    end
+  end
+
   context "when setting relations to empty values" do
 
     context "when the document is a referenced in" do
