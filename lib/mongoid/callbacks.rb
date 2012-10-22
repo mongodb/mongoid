@@ -153,7 +153,7 @@ module Mongoid
           Array.wrap(relation).each do |child|
             next if children.include?(child)
             children.add(child) if cascadable_child?(kind, child)
-            children.merge(child.send(:cascadable_children, kind, children))
+            child.send(:cascadable_children, kind, children)
           end
         end
       end
