@@ -263,6 +263,13 @@ describe Mongoid::Extensions::String do
         "attribute=".reader.should eq("attribute")
       end
     end
+
+    context "when the string is before_type_cast" do
+
+      it "returns the reader" do
+        "attribute_before_type_cast".reader.should eq("attribute")
+      end
+    end
   end
 
   describe "#numeric?" do
@@ -340,4 +347,22 @@ describe Mongoid::Extensions::String do
       end
     end
   end
+
+  describe "#before_type_cast?" do
+
+    context "when string is a reader" do
+
+      it "returns false" do
+        "attribute".before_type_cast?.should be_false
+      end
+    end
+
+    context "when string is before_type_cast" do
+
+      it "returns true" do
+        "attribute_before_type_cast".before_type_cast?.should be_true
+      end
+    end
+  end
+
 end

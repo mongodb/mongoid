@@ -348,6 +348,7 @@ module Mongoid
       #   person.name #=> returns the field
       #   person.name = "" #=> sets the field
       #   person.name? #=> Is the field present?
+      #   person.name_before_type_cast #=> returns the field before type cast
       #
       # @param [ Symbol ] name The name of the field.
       # @param [ Symbol ] meth The name of the accessor.
@@ -358,6 +359,7 @@ module Mongoid
         field = fields[name]
 
         create_field_getter(name, meth, field)
+        create_field_getter_before_type_cast(name, meth)
         create_field_setter(name, meth, field)
         create_field_check(name, meth)
 
@@ -387,6 +389,29 @@ module Mongoid
               value = field.demongoize(raw)
               attribute_will_change!(name) if value.resizable?
               value
+            end
+          end
+        end
+      end
+
+      # Create the getter_before_type_cast method for the provided field. If
+      # the attribute has been assigned, return the attribute before it was
+      # type cast. Otherwise, delegate to the getter.
+      #
+      # @example Create the getter_before_type_cast.
+      #   Model.create_field_getter_before_type_cast("name", "name")
+      #
+      # @param [ String ] name The name of the attribute.
+      # @param [ String ] meth The name of the method.
+      #
+      # @since 3.1.0
+      def create_field_getter_before_type_cast(name, meth)
+        generated_methods.module_eval do
+          re_define_method("#{meth}_before_type_cast") do
+            if has_attribute_before_type_cast?(name)
+              read_attribute_before_type_cast(name)
+            else
+              send meth
             end
           end
         end

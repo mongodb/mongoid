@@ -93,7 +93,7 @@ module Mongoid
       #
       # @since 1.0.0
       def reader
-        delete("=")
+        delete("=").sub(/\_before\_type\_cast$/, '')
       end
 
       # Convert the string to an array with the string in it.
@@ -118,6 +118,18 @@ module Mongoid
       # @since 1.0.0
       def writer?
         include?("=")
+      end
+
+      # Does the string end with _before_type_cast?
+      #
+      # @example Is the string a setter method?
+      #   "price_before_type_cast".before_type_cast?
+      #
+      # @return [ true, false ] If the string ends with "_before_type_cast"
+      #
+      # @since 3.1.0
+      def before_type_cast?
+        ends_with?('_before_type_cast')
       end
 
       # Is the object not to be converted to bson on criteria creation?

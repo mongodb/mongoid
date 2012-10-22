@@ -547,6 +547,10 @@ describe Mongoid::Attributes do
         person.testing.should eq("Test")
       end
 
+      it "allows the getter before_type_cast" do
+        person.testing_before_type_cast.should eq("Testing")
+      end
+
       it "returns true for respond_to?" do
         person.respond_to?(:testing).should be_true
       end
@@ -845,6 +849,28 @@ describe Mongoid::Attributes do
     end
   end
 
+  describe "#read_attribute_before_type_cast" do
+    let(:person) do
+      Person.create
+    end
+
+    context "when the attribute has not yet been assigned" do
+
+      it "returns the default value" do
+        person.age_before_type_cast.should eq(100)
+      end
+    end
+
+    context "after the attribute has been assigned" do
+
+      it "returns the default value" do
+        person.age = "old"
+        person.age_before_type_cast.should eq("old")
+      end
+    end
+  end
+
+
   describe "#attribute_present?" do
 
     context "when document is a new record" do
@@ -959,6 +985,28 @@ describe Mongoid::Attributes do
 
       it "returns false" do
         person.has_attribute?(:employer_id).should be_false
+      end
+    end
+  end
+
+  describe '#has_attribute_before_type_cast?' do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "before the attribute has been assigned" do
+
+      it "returns false" do
+        person.has_attribute_before_type_cast?(:age).should be_false
+      end
+    end
+
+    context "after the attribute has been assigned" do
+
+      it "returns true" do
+        person.age = 'old'
+        person.has_attribute_before_type_cast?(:age).should be_true
       end
     end
   end
@@ -1142,6 +1190,16 @@ describe Mongoid::Attributes do
 
       it "returns the default value" do
         person.age.should eq(100)
+      end
+    end
+
+    context "when setting an attribute that needs type casting" do
+      let(:person) do
+        Person.new(age: "old")
+      end
+
+      it "should store the attribute before type cast" do
+        person.age_before_type_cast.should eq("old")
       end
     end
 
@@ -1407,6 +1465,11 @@ describe Mongoid::Attributes do
       it "aliases reset_*!" do
         product.reset_cost!
         product.cost.should be_nil
+      end
+
+      it "aliases *_before_type_cast" do
+        product.cost = "expensive"
+        product.cost_before_type_cast.should eq("expensive")
       end
     end
 

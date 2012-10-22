@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Added `*_before_type_cast` to access attributes before type cast on
+  assignment.
+
 * Added `Document.first_or_create!` and `Criteria#first_or_create!`. This
   raises a validations error if creation fails validation.
 
