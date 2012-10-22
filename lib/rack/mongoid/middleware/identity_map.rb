@@ -4,13 +4,14 @@ module Rack
     module Middleware
 
       # This middleware contains the behaviour needed to properly use the
-      # identity map in Rack based applications.
+      # identity map in Rack based applications. This middleware will properly
+      # handle Rails or Rack streaming responses.
       class IdentityMap
 
         # Initialize the new middleware.
         #
         # @example Init the middleware.
-        # IdentityMap.new(app)
+        #   IdentityMap.new(app)
         #
         # @param [ Object ] app The application.
         #
@@ -22,7 +23,7 @@ module Rack
         # Make the request with the provided environment.
         #
         # @example Make the request.
-        # identity_map.call(env)
+        #   identity_map.call(env)
         #
         # @param [ Object ] env The environment.
         #
@@ -30,7 +31,11 @@ module Rack
         #
         # @since 2.1.0
         def call(env)
-          ::Mongoid.unit_of_work { @app.call(env) }
+          response = @app.call(env)
+          response[2] = ::Rack::BodyProxy.new(response[2]) do
+            ::Mongoid::IdentityMap.clear
+          end
+          response
         end
       end
     end

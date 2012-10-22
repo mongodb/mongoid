@@ -20,6 +20,14 @@ describe "Rack::Mongoid::Middleware::IdentityMap" do
 
   describe "#call" do
 
+    module Rack
+      class BodyProxy
+        def initialize(response, &block)
+          @response, @block = response, block
+        end
+      end
+    end
+
     let(:middleware) do
       klass.new(app)
     end
@@ -42,8 +50,8 @@ describe "Rack::Mongoid::Middleware::IdentityMap" do
         middleware.call(env)
       end
 
-      it "returns the call" do
-        result.should be_empty
+      it "returns the call with the body proxy" do
+        result[2].should be_a(Rack::BodyProxy)
       end
 
       it "clears out the identity map" do

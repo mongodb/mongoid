@@ -138,6 +138,9 @@ For instructions on upgrading to newer versions, visit
 * \#2454 `Model#as_document` properly allows changes from having a relation to
   the relation being removed. (James Almond)
 
+* \#2445 Mongoid middleware now properly supports both normal and streamed
+  responses and properly clears the identity map for either.
+
 ## 3.0.9
 
 ### Resolved Issues
