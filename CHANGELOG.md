@@ -145,6 +145,15 @@ For instructions on upgrading to newer versions, visit
 * \#2445 Mongoid middleware now properly supports both normal and streamed
   responses and properly clears the identity map for either.
 
+* \#2367 Embedded documents that are to be deleted via nested attributes no
+  longer become immediately removed from the relation in case the parent
+  validation fails. Instead, they get flagged for destruction and then the
+  removal occurs upon the parent passing validation and going to persist.
+
+  Note this is a behaviour change, but since the API does not change and
+  the previous behaviour was incorrect and did not match AR this was able
+  to go into a point release.
+
 ## 3.0.9
 
 ### Resolved Issues

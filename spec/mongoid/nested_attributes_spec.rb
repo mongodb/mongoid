@@ -1493,12 +1493,16 @@ describe Mongoid::NestedAttributes do
                               }
                           end
 
-                          it "removes the first document from the relation" do
-                            persisted.addresses.size.should eq(2)
+                          it "does not remove the first document from the relation" do
+                            persisted.addresses.size.should eq(3)
+                          end
+
+                          it "flags the destroyed document for removal" do
+                            address_one.should be_marked_for_destruction
                           end
 
                           it "does not delete the unmarked document" do
-                            persisted.addresses.first.street.should eq(
+                            persisted.addresses.second.street.should eq(
                               "Alexander Platz"
                             )
                           end
@@ -1510,7 +1514,7 @@ describe Mongoid::NestedAttributes do
                           end
 
                           it "has the proper persisted count" do
-                            persisted.addresses.count.should eq(1)
+                            persisted.addresses.count.should eq(2)
                           end
 
                           it "does not delete the removed document" do
@@ -1551,8 +1555,12 @@ describe Mongoid::NestedAttributes do
                               }
                           end
 
-                          it "removes the first document from the relation" do
-                            persisted.addresses.size.should eq(2)
+                          it "does not remove the first document from the relation" do
+                            persisted.addresses.size.should eq(3)
+                          end
+
+                          it "marks the first document for destruction" do
+                            address_one.should be_marked_for_destruction
                           end
 
                           it "adds the new document to the relation" do
@@ -1562,7 +1570,7 @@ describe Mongoid::NestedAttributes do
                           end
 
                           it "has the proper persisted count" do
-                            persisted.addresses.count.should eq(1)
+                            persisted.addresses.count.should eq(2)
                           end
 
                           it "does not delete the removed document" do
