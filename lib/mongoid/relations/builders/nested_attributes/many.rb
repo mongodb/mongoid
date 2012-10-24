@@ -103,21 +103,71 @@ module Mongoid
               converted = first ? convert_id(first.class, id) : id
               doc = existing.find(converted)
               if destroyable?(attrs)
-                doc.flagged_for_destroy = true
-                parent.flagged_destroys.push(->{
-                  existing.delete(doc)
-                  doc.destroy unless doc.embedded? || doc.destroyed?
-                })
+                destroy(parent, existing, doc)
               else
-                attrs.delete_id
-                if metadata.embedded?
-                  doc.assign_attributes(attrs, options)
-                else
-                  doc.update_attributes(attrs, options)
-                end
+                update_document(doc, attrs, options)
               end
             else
               existing.push(Factory.build(metadata.klass, attrs, options)) unless destroyable?(attrs)
+            end
+          end
+
+          # Destroy the child document, needs to do some checking for embedded
+          # relations and delay the destroy in case parent validation fails.
+          #
+          # @api private
+          #
+          # @example Destroy the child.
+          #   builder.destroy(parent, relation, doc)
+          #
+          # @param [ Document ] parent The parent document.
+          # @param [ Proxy ] relation The relation proxy.
+          # @param [ Document ] doc The doc to destroy.
+          #
+          # @since 3.0.10
+          def destroy(parent, relation, doc)
+            doc.flagged_for_destroy = true
+            if !doc.embedded? || parent.new_record? || doc.paranoid?
+              destroy_document(relation, doc)
+            else
+              parent.flagged_destroys.push(->{ destroy_document(relation, doc) })
+            end
+          end
+
+          # Destroy the document.
+          #
+          # @api private
+          #
+          # @example Destroy the document.
+          #   builder.destroy_document(relation, doc)
+          #
+          # @param [ Proxy ] relation The relation proxy.
+          # @param [ Document ] doc The document to delete.
+          #
+          # @since 3.0.10
+          def destroy_document(relation, doc)
+            relation.delete(doc)
+            doc.destroy unless doc.embedded? || doc.destroyed?
+          end
+
+          # Update the document.
+          #
+          # @api private
+          #
+          # @example Update the document.
+          #   builder.update_document(doc, {}, options)
+          #
+          # @param [ Document ] doc The document to update.
+          # @param [ Hash ] attrs The attributes.
+          # @param [ Hash ] options The options.
+          #
+          # @since 3.0.10
+          def update_document(doc, attrs, options)
+            attrs.delete_id
+            if metadata.embedded?
+              doc.assign_attributes(attrs, options)
+            else
+              doc.update_attributes(attrs, options)
             end
           end
         end

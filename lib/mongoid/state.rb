@@ -42,6 +42,7 @@ module Mongoid
     def flagged_for_destroy?
       @flagged_for_destroy ||= false
     end
+    alias :marked_for_destruction? :flagged_for_destroy?
 
     # Returns true if the +Document+ has been succesfully destroyed, and false
     # if it hasn't. This is determined by the variable @destroyed and NOT
