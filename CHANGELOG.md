@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * \#2492 Backport cascading callbacks performance and memory fixes from
   3.0.0-stable.
 
+* \#2464 Backport the nested attributes fix for keeping many relations in
+  memory when updating attributes. (Chris Thompson)
+
 ## 2.5.0
 
 ### New Features
