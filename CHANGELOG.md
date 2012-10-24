@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.5.1
+
+### Resolved Issues
+
+* \#2492 Backport cascading callbacks performance and memory fixes from
+  3.0.0-stable.
+
 ## 2.5.0
 
 ### New Features

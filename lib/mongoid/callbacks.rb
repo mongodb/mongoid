@@ -23,6 +23,20 @@ module Mongoid #:nodoc:
       define_model_callbacks :create, :destroy, :save, :update
     end
 
+    # Is the provided type of callback executable by this document?
+    #
+    # @example Is the callback executable?
+    # document.callback_executable?(:save)
+    #
+    # @param [ Symbol ] kin The type of callback.
+    #
+    # @return [ true, false ] If the callback can be executed.
+    #
+    # @since 2.5.1
+    def callback_executable?(kind)
+      respond_to?("_#{kind}_callbacks")
+    end
+
     # Run the callbacks for the document. This overrides active support's
     # functionality to cascade callbacks to embedded documents that have been
     # flagged as such.
@@ -39,34 +53,15 @@ module Mongoid #:nodoc:
     #
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
-      run_cascading_callbacks(cascadable_children(kind), kind, *args) {}
-      super(kind, *args, &block)
+      cascadable_children(kind).each do |child|
+        unless child.run_callbacks(child_callback_type(kind, child), *args)
+          return false
+        end
+      end
+      callback_executable?(kind) ? super(kind, *args, &block) : true
     end
 
     private
-
-    # Execute the callbacks, including all children that have cascade callbacks
-    # set to true.
-    #
-    # @example Run the cascading callbacks.
-    #   document.run_cascading_callbacks([], :update)
-    #
-    # @param [ Array<Document> ] children The cascading children.
-    # @param [ Symbol ] kind The callback type.
-    # @param [ Array ] args The options.
-    #
-    # @since 2.3.0
-    def run_cascading_callbacks(children, kind, *args, &block)
-      if child = children.pop
-        run_cascading_callbacks(children, kind, *args) do
-          child.run_callbacks(child_callback_type(kind, child), *args) do
-            block.call
-          end
-        end
-      else
-        block.call
-      end
-    end
 
     # Get all the child embedded documents that are flagged as cascadable.
     #
