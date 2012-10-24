@@ -32,7 +32,8 @@ module Mongoid
         #
         # @since 2.0.0
         def initialize(document, field, value, options = {})
-          @document, @field, @value = document, field.to_s, value
+          @document, @field, @value =
+            document, document.database_field_name(field.to_s), value
           @options = options
         end
 
