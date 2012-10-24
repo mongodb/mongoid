@@ -26,6 +26,8 @@ class Person
   field :pattern, type: Regexp
   field :override_me, type: Integer
   field :t, as: :test, type: String
+  field :i, as: :inte, type: Integer
+  field :a, as: :array, type: Array
 
   index age: 1
   index addresses: 1

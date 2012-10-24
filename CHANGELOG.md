@@ -110,6 +110,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2494 All explicit atomic operations now properly respect aliased fields.
+
 * \#2491 Removed unnecessary merge call in cascadable children.
 
 * \#2485 Removing indexes now always uses strong consistency.
