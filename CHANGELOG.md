@@ -1284,6 +1284,16 @@ For instructions on upgrading to newer versions, visit
 * \#685 Attempting to use versioning with embedded documents will now
   raise a proper error alerting the developer this is not allowed.
 
+## 2.5.1
+
+### Resolved Issues
+
+* \#2492 Backport cascading callbacks performance and memory fixes from
+  3.0.0-stable.
+
+* \#2464 Backport the nested attributes fix for keeping many relations in
+  memory when updating attributes. (Chris Thompson)
+
 ## 2.5.0
 
 ### New Features
