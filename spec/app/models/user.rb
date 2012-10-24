@@ -7,6 +7,8 @@ class User
 
   has_one :account, :foreign_key => :creator_id
   has_many :posts, :foreign_key => :author_id
+  accepts_nested_attributes_for :posts, :allow_destroy => true
+
   has_many :descriptions
 
   has_and_belongs_to_many :followed_shops, :inverse_of => :followers, :class_name => "Shop"
