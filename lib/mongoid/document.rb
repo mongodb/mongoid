@@ -244,7 +244,7 @@ module Mongoid
     # @since 2.4.0
     def cache_key
       return "#{model_key}/new" if new_record?
-      return "#{model_key}/#{id}-#{updated_at.utc.to_s(:number)}" if updated_at
+      return "#{model_key}/#{id}-#{updated_at.utc.to_s(:number)}" unless self[:updated_at].nil?
       "#{model_key}/#{id}"
     end
 
