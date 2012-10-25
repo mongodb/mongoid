@@ -316,7 +316,7 @@ describe Mongoid::Document do
         end
       end
 
-      context "without updated_at" do
+      context "without updated_at, with Timestamps" do
 
         before do
           person.updated_at = nil
@@ -326,6 +326,20 @@ describe Mongoid::Document do
           person.cache_key.should eq("people/#{person.id}")
         end
       end
+
+      context "without updated_at, without Timestamps" do
+        let(:artist) do
+          Artist.new
+        end
+        before do
+          artist.save
+        end
+
+        it "should have the id key name" do
+          artist.cache_key.should eq("artists/#{artist.id}")
+        end
+      end
+
     end
   end
 
