@@ -105,7 +105,7 @@ module Mongoid
   #     config.use(name: "mongoid_test", host: "localhost", port: 27017)
   #   end
   #
-  # @return [ Config ] The configuration obejct.
+  # @return [ Config ] The configuration object.
   #
   # @since 1.0.0
   def configure
