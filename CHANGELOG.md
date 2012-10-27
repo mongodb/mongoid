@@ -1295,6 +1295,13 @@ For instructions on upgrading to newer versions, visit
 * \#685 Attempting to use versioning with embedded documents will now
   raise a proper error alerting the developer this is not allowed.
 
+## 2.5.2 (branch: 2.5.0-stable)
+
+### Resolved Issues
+
+* \#2502 Fixed cache key to properly handle when the document does not
+  include `Mongoid::Timestamps::Updated`. (Arthur Nogueira Neves)
+
 ## 2.5.1
 
 ### Resolved Issues
