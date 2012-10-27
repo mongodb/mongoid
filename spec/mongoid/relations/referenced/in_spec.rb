@@ -158,7 +158,31 @@ describe Mongoid::Relations::Referenced::In do
         end
       end
 
-      context "when the relation is not polymorphic" do
+      context "when the relation is polymorphic" do
+
+        context "when the parent is a subclass" do
+
+          let(:canvas) do
+            Canvas::Test.create
+          end
+
+          let(:comment) do
+            Comment.create(title: "test")
+          end
+
+          before do
+            comment.commentable = canvas
+            comment.save
+          end
+
+          it "sets the correct value in the type field" do
+            comment.commentable_type.should eq("Canvas::Test")
+          end
+
+          it "can retrieve the document from the database" do
+            comment.reload.commentable.should eq(canvas)
+          end
+        end
 
         context "when the child is a new record" do
 

@@ -22,7 +22,7 @@ module Mongoid
             binding do
               check_inverses!(target)
               bind_foreign_key(base, target.id)
-              bind_polymorphic_inverse_type(base, target.class.model_name)
+              bind_polymorphic_inverse_type(base, target.class.name)
               if inverse = metadata.inverse(target)
                 if set_base_metadata
                   bind_inverse_of_field(base, base.metadata_name)
