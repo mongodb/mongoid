@@ -485,7 +485,7 @@ module Mongoid
           klass.send(name, *args, &block)
         end
       else
-        return entries.send(name, *args)
+        return entries.send(name, *args, &block)
       end
     end
 

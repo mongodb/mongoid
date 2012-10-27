@@ -4062,6 +4062,25 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#uniq" do
+
+    let!(:band_one) do
+      Band.create(name: "New Order")
+    end
+
+    let!(:band_two) do
+      Band.create(name: "New Order")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    it "passes the block through method_missing" do
+      criteria.uniq(&:name).should eq([ band_one ])
+    end
+  end
+
   describe "#within_box" do
 
     before do
