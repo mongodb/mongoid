@@ -3,6 +3,11 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.5.2 (branch: 2.5.0-stable)
+
+* \#2502 Fixed cache key to properly handle when the document does not
+  include `Mongoid::Timestamps::Updated`. (Arthur Nogueira Neves)
+
 ## 2.5.1
 
 ### Resolved Issues
