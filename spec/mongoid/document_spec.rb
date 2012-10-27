@@ -885,6 +885,10 @@ describe Mongoid::Document do
           became.title.should eq('Sir')
         end
 
+        it "keeps the same object id" do
+          became.id.should eq(obj.id)
+        end
+
         context "when the document has embedded documents" do
 
           let!(:address) do
