@@ -218,6 +218,7 @@ module Mongoid
         raise ArgumentError, "A class which includes Mongoid::Document is expected"
       end
       became = klass.new(as_document.__deep_copy__)
+      became.id = id
       became.instance_variable_set(:@changed_attributes, changed_attributes)
       became.instance_variable_set(:@errors, errors)
       became.instance_variable_set(:@new_record, new_record?)

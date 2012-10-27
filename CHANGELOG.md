@@ -110,6 +110,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2504 `Model#becomes` properly keeps the same id.
+
 * \#2494 All explicit atomic operations now properly respect aliased fields.
 
 * \#2491 Removed unnecessary merge call in cascadable children.
