@@ -116,6 +116,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2494 All explicit atomic operations now properly respect aliased fields.
 
+* \#2493 Use `Class#name` instead of `Class#model_name` when setting
+  polymorphic types in case `model_name` has been overridden.
+
 * \#2491 Removed unnecessary merge call in cascadable children.
 
 * \#2485 Removing indexes now always uses strong consistency.

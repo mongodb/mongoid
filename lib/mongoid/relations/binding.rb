@@ -191,7 +191,7 @@ module Mongoid
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
         bind_foreign_key(doc, base.id)
-        bind_polymorphic_type(doc, base.class.model_name)
+        bind_polymorphic_type(doc, base.class.name)
         bind_inverse(doc, base)
         bind_inverse_of_field(doc, metadata.name)
       end
