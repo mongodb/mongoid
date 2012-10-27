@@ -3687,6 +3687,54 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#for_js" do
+
+    let!(:match) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    context "when the code has no scope" do
+
+      let(:criteria) do
+        Band.for_js("this.name == 'Depeche Mode'")
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+
+    context "when the code has scope" do
+
+      let(:criteria) do
+        Band.for_js("this.name == param", param: "Depeche Mode")
+      end
+
+      it "returns the matching documents" do
+        criteria.should eq([ match ])
+      end
+    end
+  end
+
+  describe "#uniq" do
+
+    let!(:band_one) do
+      Band.create(name: "New Order")
+    end
+
+    let!(:band_two) do
+      Band.create(name: "New Order")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    it "passes the block through method_missing" do
+      criteria.uniq(&:name).should eq([ band_one ])
+    end
+  end
+
   describe "#within_box" do
 
     before do
