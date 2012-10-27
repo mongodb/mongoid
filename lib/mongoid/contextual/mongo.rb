@@ -352,6 +352,7 @@ module Mongoid
       # @since 3.0.4
       def update_documents(attributes, method = :update)
         return false unless attributes
+        attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
         query.send(method, attributes.__consolidate__)
       end
 

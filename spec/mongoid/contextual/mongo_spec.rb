@@ -1378,6 +1378,21 @@ describe Mongoid::Contextual::Mongo do
           new_order.reload.name.should eq("Smiths")
         end
       end
+
+      context "when using aliased field names" do
+
+        before do
+          context.update_all(years: 100)
+        end
+
+        it "updates the first matching document" do
+          depeche_mode.reload.years.should eq(100)
+        end
+
+        it "updates the last matching document" do
+          new_order.reload.years.should eq(100)
+        end
+      end
     end
 
     context "when providing atomic operations" do
