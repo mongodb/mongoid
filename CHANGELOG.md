@@ -1192,7 +1192,31 @@ For instructions on upgrading to newer versions, visit
 * \#685 Attempting to use versioning with embedded documents will now
   raise a proper error alerting the developer this is not allowed.
 
-## 2.4.12 (branch: 2.4.0-stable)
+## 2.5.2 (branch: 2.5.0-stable)
+
+### Resolved Issues
+
+* \#2502 Fixed cache key to properly handle when the document does not
+  include `Mongoid::Timestamps::Updated`. (Arthur Nogueira Neves)
+
+## 2.5.1
+
+### Resolved Issues
+
+* \#2492 Backport cascading callbacks performance and memory fixes from
+  3.0.0-stable.
+
+* \#2464 Backport the nested attributes fix for keeping many relations in
+  memory when updating attributes. (Chris Thompson)
+
+## 2.5.0
+
+### New Features
+
+* This is a release to support the 1.7.0 and higher Mongo and BSON gems and
+  resolves issues that kept the 2.4.x series locked below 1.6.2
+
+## 2.4.12
 
 ### Resolved Issues
 
