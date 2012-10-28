@@ -2040,6 +2040,45 @@ describe Mongoid::Relations::Referenced::Many do
           map.should be_empty
         end
       end
+
+      context "when the eager load has not returned documents for some" do
+
+        let!(:person_one) do
+          Person.create
+        end
+
+        let!(:person_two) do
+          Person.create
+        end
+
+        let!(:post) do
+          person_one.posts.create(title: "testing")
+        end
+
+        let(:metadata) do
+          Person.relations["posts"]
+        end
+
+        let!(:eager) do
+          described_class.eager_load(metadata, Person.all.map(&:_id))
+        end
+
+        let(:map_one) do
+          Mongoid::IdentityMap.get(Post, "person_id" => person_one.id)
+        end
+
+        let(:map_two) do
+          Mongoid::IdentityMap.get(Post, "person_id" => person_two.id)
+        end
+
+        it "puts the found documents in the identity map" do
+          map_one.should eq({ post.id => post })
+        end
+
+        it "puts an empty array for parents with no docs" do
+          map_two.should be_empty
+        end
+      end
     end
 
     context "when the relation is polymorphic" do

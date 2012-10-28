@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2507 Ensure no extra db hits when eager loading has a mix of parents
+  with and without docs. (Douwe Maan)
+
 * \#2505 Ensure `update` and `update_all` from criteria properly handle
   aliased fields. (Dmitry Krasnoukhov)
 
