@@ -112,8 +112,12 @@ describe Mongoid::Atomic::Paths::Embedded::One do
 
     context "when the document is embedded one level" do
 
-      it "returns the the hash with parent selector" do
+      pending "returns the the hash with parent selector" do
         one.selector.should eq({ "_id" => person._id, "name._id" => name._id })
+      end
+
+      it "returns the parent selector" do
+        one.selector.should eq("_id" => person.id)
       end
     end
 
@@ -137,7 +141,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
         described_class.new(country_code)
       end
 
-      it "returns the hash with all parent selectors" do
+      pending "returns the hash with all parent selectors" do
         one.selector.should eq(
           {
             "_id" => person._id,
@@ -145,6 +149,10 @@ describe Mongoid::Atomic::Paths::Embedded::One do
             "phone_numbers.0.country_code._id" => country_code._id
           }
         )
+      end
+
+      it "returns the root selector" do
+        one.selector.should eq("_id" => person.id)
       end
     end
   end

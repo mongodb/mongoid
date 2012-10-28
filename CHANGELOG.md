@@ -114,6 +114,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2498 Criteria now properly pass provided blocks though `method_missing`.
 
+* \#2496 Embedded documents that were previously stored without ids now
+  properly update and get assigned ids from within Mongoid.
+
 * \#2494 All explicit atomic operations now properly respect aliased fields.
 
 * \#2493 Use `Class#name` instead of `Class#model_name` when setting

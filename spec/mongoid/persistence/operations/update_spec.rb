@@ -62,7 +62,7 @@ describe Mongoid::Persistence::Operations::Update do
     def embedded_set_expectation
       ->{
         collection.should_receive(:find).with(
-          { "_id" => document.id, "addresses._id" => address.id }
+          { "_id" => document.id }
         ).and_return(query)
         query.should_receive(:update).with({ "$set" => address.setters }).and_return("Object")
       }
