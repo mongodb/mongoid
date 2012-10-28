@@ -16,6 +16,7 @@ class Address
   field :latlng, type: Array
   field :map, type: Hash
   field :move_in, type: DateTime
+  field :s, type: String, as: :suite
 
   embeds_many :locations, validate: false
   embeds_one :code, validate: false
