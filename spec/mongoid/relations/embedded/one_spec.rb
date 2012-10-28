@@ -944,4 +944,51 @@ describe Mongoid::Relations::Embedded::One do
       end
     end
   end
+
+  context "when embedded documents are stored without ids" do
+
+    let!(:band) do
+      Band.create(name: "Moderat")
+    end
+
+    before do
+      band.collection.
+        find(_id: band.id).
+        update("$set" => { label: { name: "Mute" }})
+    end
+
+    context "when loading the documents" do
+
+      before do
+        band.reload
+      end
+
+      let(:label) do
+        band.label
+      end
+
+      it "creates proper documents from the db" do
+        label.name.should eq("Mute")
+      end
+
+      it "assigns ids to the documents" do
+        label.id.should_not be_nil
+      end
+
+      context "when subsequently updating the documents" do
+
+        before do
+          label.update_attribute(:name, "Interscope")
+        end
+
+        it "updates the document" do
+          label.name.should eq("Interscope")
+        end
+
+        it "persists the change" do
+          label.reload.name.should eq("Interscope")
+        end
+      end
+    end
+  end
 end

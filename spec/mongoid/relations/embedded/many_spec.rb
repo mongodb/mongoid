@@ -3421,4 +3421,51 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when embedded documents are stored without ids" do
+
+    let!(:band) do
+      Band.create(name: "Moderat")
+    end
+
+    before do
+      band.collection.
+        find(_id: band.id).
+        update("$set" => { records: [{ name: "Moderat" }]})
+    end
+
+    context "when loading the documents" do
+
+      before do
+        band.reload
+      end
+
+      let(:record) do
+        band.records.first
+      end
+
+      it "creates proper documents from the db" do
+        record.name.should eq("Moderat")
+      end
+
+      it "assigns ids to the documents" do
+        record.id.should_not be_nil
+      end
+
+      context "when subsequently updating the documents" do
+
+        before do
+          record.update_attribute(:name, "Apparat")
+        end
+
+        it "updates the document" do
+          record.name.should eq("Apparat")
+        end
+
+        it "persists the change" do
+          record.reload.name.should eq("Apparat")
+        end
+      end
+    end
+  end
 end
