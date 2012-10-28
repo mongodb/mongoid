@@ -2018,10 +2018,18 @@ describe Mongoid::Relations::Referenced::Many do
         end
       end
 
-      context "when the eager load has not returned documents" do
+      context "when the eager load has not returned documents for some parents" do
 
-        let!(:person) do
+        let!(:person1) do
           Person.create
+        end
+
+        let!(:person2) do
+          Person.create
+        end
+
+        let!(:post) do
+          person1.posts.create(title: "testing")
         end
 
         let(:metadata) do
@@ -2032,12 +2040,20 @@ describe Mongoid::Relations::Referenced::Many do
           described_class.eager_load(metadata, Person.all.map(&:_id))
         end
 
-        let(:map) do
-          Mongoid::IdentityMap.get(Post, "person_id" => person.id)
+        let(:map1) do
+          Mongoid::IdentityMap.get(Post, "person_id" => person1.id)
         end
 
-        it "puts an empty array in the identity map" do
-          map.should be_empty
+        let(:map2) do
+          Mongoid::IdentityMap.get(Post, "person_id" => person2.id)
+        end
+
+        it "puts the documents in the identity map for the parent with documents" do
+          map1.should eq({ post.id => post })
+        end
+
+        it "puts an empty array in the identity map for the parent without documents" do
+          map2.should be_empty
         end
       end
     end
