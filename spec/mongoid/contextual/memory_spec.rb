@@ -1092,6 +1092,25 @@ describe Mongoid::Contextual::Memory do
         described_class.new(criteria)
       end
 
+      context "when providing aliased fields" do
+
+        before do
+          context.update_all(suite: "10B")
+        end
+
+        it "updates the first matching document" do
+          hobrecht.suite.should eq("10B")
+        end
+
+        it "updates the last matching document" do
+          friedel.suite.should eq("10B")
+        end
+
+        it "does not update non matching docs" do
+          pfluger.suite.should be_nil
+        end
+      end
+
       context "when attributes are provided" do
 
         before do

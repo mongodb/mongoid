@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2505 Ensure `update` and `update_all` from criteria properly handle
+  aliased fields. (Dmitry Krasnoukhov)
+
 * \#2504 `Model#becomes` properly keeps the same id.
 
 * \#2498 Criteria now properly pass provided blocks though `method_missing`.
