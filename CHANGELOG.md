@@ -11,6 +11,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2433 `Mongoid::Paranoia` has been removed.
 
+* \#2432 `Mongoid::Versioning` has been removed.
+
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
 ## 3.1.0 (branch: master)

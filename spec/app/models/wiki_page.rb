@@ -1,10 +1,9 @@
 class WikiPage
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Versioning
 
   field :title, type: String
-  field :transient_property, type: String, versioned: false
+  field :transient_property, type: String
   field :author, type: String
   field :description, type: String, localize: true
   max_versions 5

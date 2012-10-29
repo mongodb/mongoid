@@ -369,8 +369,7 @@ module Mongoid
   order:        #{order.inspect}
   polymorphic:  #{polymorphic?}
   relation:     #{relation}
-  setter:       #{setter}
-  versioned:    #{versioned?}>
+  setter:       #{setter}>
 }
       end
 
@@ -782,18 +781,6 @@ module Mongoid
         end
       end
 
-      # Is this relation using Mongoid's internal versioning system?
-      #
-      # @example Is this relation versioned?
-      #   metadata.versioned?
-      #
-      # @return [ true, false ] If the relation uses Mongoid versioning.
-      #
-      # @since 2.1.0
-      def versioned?
-        !!self[:versioned]
-      end
-
       # Returns the metadata itself. Here for compatibility with Rails
       # association metadata.
       #
@@ -1059,7 +1046,7 @@ module Mongoid
       # @since 3.0.0
       def inverse_relation_candidates
         relations_metadata.select do |meta|
-          next if meta.versioned? || meta.name == name
+          next if meta.name == name
           meta.class_name == inverse_class_name
         end
       end

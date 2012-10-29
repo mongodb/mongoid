@@ -26,11 +26,9 @@ module Mongoid
       # @since 2.0.0.rc.1
       def cascade!
         cascades.each do |name|
-          if !metadata || !metadata.versioned?
-            if meta = relations[name]
-              strategy = meta.cascade_strategy
-              strategy.new(self, meta).cascade
-            end
+          if meta = relations[name]
+            strategy = meta.cascade_strategy
+            strategy.new(self, meta).cascade
           end
         end
       end
