@@ -38,3 +38,4 @@ test:
     skip_version_check: true
     use_activesupport_time_zone: true
     use_utc: false
+    typecast_non_numeric_fields: true

@@ -25,6 +25,7 @@ module Mongoid
     option :skip_version_check, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
+    option :typecast_non_numeric_fields, default: true
 
     # Has Mongoid been configured? This is checking that at least a valid
     # session config exists.

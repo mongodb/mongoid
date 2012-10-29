@@ -66,6 +66,10 @@ development:
 
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
+
+    # Typecast non-numeric fields such that setting a non-numeric value on a 
+    # numeric field results in the field being set to 0 (default: true)
+    # typecast_non_numeric_fields: true
 test:
   sessions:
     default:

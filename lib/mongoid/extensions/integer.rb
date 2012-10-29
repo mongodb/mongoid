@@ -52,7 +52,11 @@ module Mongoid
         # @since 3.0.0
         def mongoize(object)
           unless object.blank?
-            __numeric__(object).to_i rescue 0
+            begin
+              __numeric__(object).to_i
+            rescue 
+              Mongoid.typecast_non_numeric_fields? ? 0 : object
+            end
           else
             nil
           end
