@@ -23,9 +23,7 @@ module Mongoid
           def bind_one(doc)
             doc.parentize(base)
             binding do
-              unless metadata.versioned?
-                doc.do_or_do_not(metadata.inverse_setter(target), base)
-              end
+              doc.do_or_do_not(metadata.inverse_setter(target), base)
             end
           end
 

@@ -21,19 +21,6 @@ describe Mongoid::Relations::Macros do
       klass.should respond_to(:embedded_in)
     end
 
-    context "when the document is versioned" do
-
-      it "raises an error" do
-        expect {
-          Class.new do
-            include Mongoid::Document
-            include Mongoid::Versioning
-            embedded_in :parent_class
-          end
-        }.to raise_error(Mongoid::Errors::VersioningNotOnRoot)
-      end
-    end
-
     context "when defining the relation" do
 
       before do
