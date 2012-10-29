@@ -447,13 +447,6 @@ en:
           summary: "The following errors were found: %{errors}"
           resolution: "Try persisting the document with valid data or remove
             the validations."
-        versioning_not_on_root:
-          message: "Versioning not allowed on embedded document: %{klass}."
-          summary: "Mongoid::Versioning behaviour is only allowed on documents
-            that are the root document in the hierarchy."
-          resolution: "Remove the versioning from the embedded %{klass} or
-            consider moving it to a root location in the hierarchy if
-            versioning is needed."
         delete_restriction:
           message: "Cannot delete %{document} because of dependent '%{relation}'."
           summary: "When defining '%{relation}' with a :dependent => :restrict,

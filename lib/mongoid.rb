@@ -75,7 +75,6 @@ require "mongoid/timestamps"
 require "mongoid/unit_of_work"
 require "mongoid/validations"
 require "mongoid/version"
-require "mongoid/versioning"
 require "mongoid/components"
 require "mongoid/document"
 
