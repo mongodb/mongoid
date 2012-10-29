@@ -106,6 +106,13 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+## 3.0.11
+
+### Resolved Issues
+
+* \#2509 Don't hit identity map an extra time when the returned value is an
+  empty hash. (Douwe Maan)
+
 ## 3.0.10
 
 ### Resolved Issues

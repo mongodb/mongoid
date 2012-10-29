@@ -2054,6 +2054,30 @@ describe Mongoid::Criteria do
         from_db.should eq(band)
       end
     end
+
+    context "when the selector is cleared in the identity map" do
+
+      let!(:band) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      before do
+        Mongoid::IdentityMap.clear
+        Mongoid::IdentityMap.clear_many(Band, { "name" => "Depeche Mode" })
+      end
+
+      let(:from_db) do
+        criteria.from_map_or_db
+      end
+
+      it "returns nil" do
+        from_db.should be_nil
+      end
+    end
   end
 
   describe "#multiple_from_map_or_db" do

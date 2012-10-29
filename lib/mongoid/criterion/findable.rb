@@ -73,6 +73,7 @@ module Mongoid
         id = extract_id
         id = klass.fields["_id"].mongoize(id) if id
         doc = IdentityMap.get(klass, id || selector.except("_type"))
+        return nil if doc == {}
         doc && doc.matches?(selector) ? doc : first
       end
 
