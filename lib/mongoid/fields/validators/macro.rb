@@ -16,8 +16,7 @@ module Mongoid
           :metadata,
           :pre_processed,
           :subtype,
-          :type,
-          :versioned
+          :type
         ]
 
         # Validate the field definition.
