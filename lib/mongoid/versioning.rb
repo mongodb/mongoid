@@ -36,9 +36,7 @@ module Mongoid
     def revise
       previous = previous_revision
       if previous && versioned_attributes_changed?
-        new_version = versions.build(
-          previous.versioned_attributes, without_protection: true
-        )
+        new_version = versions.build(previous.versioned_attributes)
         new_version._id = nil
         if version_max.present? && versions.length > version_max
           deleted = versions.first

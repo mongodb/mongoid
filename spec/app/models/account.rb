@@ -18,10 +18,6 @@ class Account
   has_and_belongs_to_many :agents
   has_one :comment, validate: false
 
-  attr_accessible :nickname, as: [ :default, :admin ]
-  attr_accessible :name, as: [ :default, :admin ]
-  attr_accessible :balance, as: :default
-
   validates_presence_of :name
   validates_presence_of :nickname, on: :upsert
   validates_length_of :name, maximum: 10, on: :create

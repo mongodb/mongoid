@@ -13,7 +13,7 @@ module Mongoid
     end
 
     include ActiveModel::Conversion
-    include ActiveModel::MassAssignmentSecurity
+    include ActiveModel::ForbiddenAttributesProtection
     include ActiveModel::Naming
     include ActiveModel::Observing
     include ActiveModel::Serializers::JSON

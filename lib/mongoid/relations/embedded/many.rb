@@ -71,7 +71,6 @@ module Mongoid
         #
         # @overload build(attributes = {}, options = {}, type = nil)
         #   @param [ Hash ] attributes The attributes to build the document with.
-        #   @param [ Hash ] options The scoped assignment options.
         #   @param [ Class ] type Optional class to build the document with.
         #
         # @overload build(attributes = {}, type = nil)
@@ -79,11 +78,8 @@ module Mongoid
         #   @param [ Class ] type Optional class to build the document with.
         #
         # @return [ Document ] The new document.
-        def build(attributes = {}, options = {}, type = nil)
-          if options.is_a?(Class)
-            options, type = {}, options
-          end
-          doc = Factory.build(type || metadata.klass, attributes, options)
+        def build(attributes = {}, type = nil)
+          doc = Factory.build(type || metadata.klass, attributes)
           append(doc)
           doc.apply_post_processed_defaults
           yield(doc) if block_given?

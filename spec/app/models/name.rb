@@ -15,8 +15,6 @@ class Name
 
   accepts_nested_attributes_for :language
 
-  attr_protected :_id, :id
-
   def set_parent=(set = false)
     self.parent_title = namable.title if set
   end
