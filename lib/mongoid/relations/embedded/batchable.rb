@@ -194,7 +194,7 @@ module Mongoid
             docs.map do |doc|
               attributes = { metadata: metadata, _parent: base }
               attributes.merge!(doc)
-              Factory.build(klass, attributes, base.send(:mass_assignment_options))
+              Factory.build(klass, attributes)
             end
           else
             docs

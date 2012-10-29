@@ -137,19 +137,17 @@ module Mongoid
     #   Person.new(:title => "Sir")
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
-    # @param [ Hash ] options A mass-assignment protection options. Supports
-    #   :as and :without_protection
     #
     # @return [ Document ] A new document.
     #
     # @since 1.0.0
-    def initialize(attrs = nil, options = nil)
+    def initialize(attrs = nil)
       _building do
         @new_record = true
         @attributes ||= {}
         options ||= {}
         apply_pre_processed_defaults
-        process_attributes(attrs, options[:as] || :default, !options[:without_protection]) do
+        process_attributes(attrs) do
           yield(self) if block_given?
         end
         apply_post_processed_defaults

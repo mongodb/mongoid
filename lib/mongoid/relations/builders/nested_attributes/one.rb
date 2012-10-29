@@ -18,19 +18,18 @@ module Mongoid
           #   document, or a removal of the relation.
           #
           # @param [ Document ] parent The parent document.
-          # @param [ Hash ] options The mass assignment options.
           #
           # @return [ Document ] The built document.
           #
           # @since 2.0.0
-          def build(parent, options = {})
+          def build(parent)
             return if reject?(parent, attributes)
             @existing = parent.send(metadata.name)
             if update?
               attributes.delete_id
-              existing.assign_attributes(attributes, options)
+              existing.assign_attributes(attributes)
             elsif replace?
-              parent.send(metadata.setter, Factory.build(metadata.klass, attributes, options))
+              parent.send(metadata.setter, Factory.build(metadata.klass, attributes))
             elsif delete?
               parent.send(metadata.setter, nil)
             end
@@ -40,7 +39,7 @@ module Mongoid
           # relations.
           #
           # @example Instantiate the builder.
-          #   One.new(metadata, attributes, options)
+          #   One.new(metadata, attributes)
           #
           # @param [ Metadata ] metadata The relation metadata.
           # @param [ Hash ] attributes The attributes hash to attempt to set.

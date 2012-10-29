@@ -912,28 +912,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
     describe "##{method}" do
 
-      context "when providing scoped mass assignment" do
-
-        let(:person) do
-          Person.new
-        end
-
-        let(:house) do
-          person.houses.send(
-            method,
-            { name: "Dream", model: "Home" }, as: :admin
-          )
-        end
-
-        it "sets the attributes for the provided role" do
-          house.name.should eq("Dream")
-        end
-
-        it "does not set the attributes for other roles" do
-          house.model.should be_nil
-        end
-      end
-
       context "when the relation is not polymorphic" do
 
         context "when the parent is a new record" do
@@ -1754,28 +1732,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   [ :create, :create! ].each do |method|
 
     describe "##{method}" do
-
-      context "when providing scoped mass assignment" do
-
-        let(:person) do
-          Person.create
-        end
-
-        let(:house) do
-          person.houses.send(
-            method,
-            { name: "Dream", model: "Home" }, as: :admin
-          )
-        end
-
-        it "sets the attributes for the provided role" do
-          house.name.should eq("Dream")
-        end
-
-        it "does not set the attributes for other roles" do
-          house.model.should be_nil
-        end
-      end
 
       context "when the relation is not polymorphic" do
 
