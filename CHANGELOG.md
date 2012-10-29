@@ -3,6 +3,16 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 4.0.0 (branch: 4.0.0-dev)
+
+### Major Changes (Backwards Incompatible)
+
+* Mongoid now requires Active Model 4 or higher.
+
+* \#2433 `Mongoid::Paranoia` has been removed.
+
+* \#2200 Mass assignment security now mirrors Rails 4's behavior.
+
 ## 3.1.0 (branch: master)
 
 ### New Features
