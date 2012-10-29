@@ -977,14 +977,6 @@ describe Mongoid::NestedAttributes do
           Address.new(street: "Kurfeurstendamm")
         end
 
-        let(:phone_one) do
-          ParanoidPhone.new(number: "1")
-        end
-
-        let(:phone_two) do
-          ParanoidPhone.new(number: "2")
-        end
-
         context "when a limit is specified" do
 
           before(:all) do
@@ -1353,31 +1345,6 @@ describe Mongoid::NestedAttributes do
 
                     context "when the child returns false in a before callback" do
 
-                      context "when the child is paranoid" do
-
-                        before(:all) do
-                          Person.accepts_nested_attributes_for :paranoid_phones, allow_destroy: true
-                        end
-
-                        after(:all) do
-                          Person.send(:undef_method, :paranoid_phones=)
-                          Person.accepts_nested_attributes_for :paranoid_phones
-                        end
-
-                        let!(:phone) do
-                          persisted.paranoid_phones.create
-                        end
-
-                        before do
-                          persisted.paranoid_phones_attributes =
-                            { "foo" => { "id" => phone.id, "number" => 42, "_destroy" => true }}
-                        end
-
-                        it "does not destroy the child" do
-                          persisted.reload.paranoid_phones.should_not be_empty
-                        end
-                      end
-
                       context "when the child is not paranoid" do
 
                         let(:actor) do
@@ -1616,86 +1583,6 @@ describe Mongoid::NestedAttributes do
 
                       it "does not delete the unmarked document" do
                         person.addresses.last.street.should eq("Alexander Platz")
-                      end
-                    end
-                  end
-                end
-
-                context "when the child is paranoid" do
-
-                  before(:all) do
-                    Person.send(:undef_method, :paranoid_phones_attributes=)
-                    Person.accepts_nested_attributes_for :paranoid_phones,
-                      allow_destroy: true
-                  end
-
-                  after(:all) do
-                    Person.send(:undef_method, :paranoid_phones_attributes=)
-                    Person.accepts_nested_attributes_for :paranoid_phones
-                  end
-
-                  [ 1, "1", true, "true" ].each do |truth|
-
-                    context "when passed a #{truth} with destroy" do
-
-                      context "when the parent is persisted" do
-
-                        let!(:persisted) do
-                          Person.create do |p|
-                            p.paranoid_phones << [ phone_one, phone_two ]
-                          end
-                        end
-
-                        context "when setting, pulling, and pushing in one op" do
-
-                          before do
-                            persisted.paranoid_phones_attributes =
-                              {
-                                "bar" => { "id" => phone_one.id, "_destroy" => truth },
-                                "foo" => { "id" => phone_two.id, "number" => "3" },
-                                "baz" => { "number" => "4" }
-                              }
-                          end
-
-                          it "removes the first document from the relation" do
-                            persisted.paranoid_phones.size.should eq(2)
-                          end
-
-                          it "does not delete the unmarked document" do
-                            persisted.paranoid_phones.first.number.should eq("3")
-                          end
-
-                          it "adds the new document to the relation" do
-                            persisted.paranoid_phones.last.number.should eq("4")
-                          end
-
-                          it "has the proper persisted count" do
-                            persisted.paranoid_phones.count.should eq(1)
-                          end
-
-                          it "soft deletes the removed document" do
-                            phone_one.should be_destroyed
-                          end
-
-                          context "when saving the parent" do
-
-                            before do
-                              persisted.with(safe: true).save
-                            end
-
-                            it "deletes the marked document from the relation" do
-                              persisted.reload.paranoid_phones.count.should eq(2)
-                            end
-
-                            it "does not delete the unmarked document" do
-                              persisted.reload.paranoid_phones.first.number.should eq("3")
-                            end
-
-                            it "persists the new document to the relation" do
-                              persisted.reload.paranoid_phones.last.number.should eq("4")
-                            end
-                          end
-                        end
                       end
                     end
                   end

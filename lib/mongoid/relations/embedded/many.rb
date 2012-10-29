@@ -129,13 +129,9 @@ module Mongoid
           execute_callback :before_remove, document
           doc = target.delete_one(document)
           if doc && !_binding?
-            _unscoped.delete_one(doc) unless doc.paranoid?
+            _unscoped.delete_one(doc)
             if _assigning?
-              if doc.paranoid?
-                doc.destroy(suppress: true)
-              else
-                base.add_atomic_pull(doc)
-              end
+              base.add_atomic_pull(doc)
             else
               doc.delete(suppress: true)
               unbind_one(doc)
@@ -144,18 +140,6 @@ module Mongoid
           reindex
           execute_callback :after_remove, document
           doc
-        end
-
-        # For use only with Mongoid::Paranoia - will be removed in 4.0.
-        #
-        # @example Get the deleted documents from the relation.
-        #   person.paranoid_phones.deleted
-        #
-        # @return [ Criteria ] The deleted documents.
-        #
-        # @since 3.0.10
-        def deleted
-          unscoped.deleted
         end
 
         # Delete all the documents in the association without running callbacks.
