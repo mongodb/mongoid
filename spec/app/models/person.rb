@@ -39,8 +39,6 @@ class Person
 
   attr_reader :rescored
 
-  attr_protected :security_code, :owner_id
-
   embeds_many :favorites, order: :title.desc, inverse_of: :perp, validate: false
   embeds_many :videos, order: [[ :title, :asc ]], validate: false
   embeds_many :phone_numbers, class_name: "Phone", validate: false

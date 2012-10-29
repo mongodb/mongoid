@@ -680,27 +680,6 @@ describe Mongoid::Relations::Referenced::One do
 
   describe "#build_#\{name}" do
 
-    context "when using mass assignment scoping" do
-
-      let(:person) do
-        Person.new
-      end
-
-      let(:account) do
-        person.build_account(
-          { name: "bank", balance: "big" }, as: :admin
-        )
-      end
-
-      it "allows setting of fields for the role" do
-        account.name.should eq("bank")
-      end
-
-      it "does not set fields not allowed for the role" do
-        account.balance.should be_nil
-      end
-    end
-
     context "when the relationship is an illegal embedded reference" do
 
       let(:game) do
@@ -842,27 +821,6 @@ describe Mongoid::Relations::Referenced::One do
   end
 
   describe "#create_#\{name}" do
-
-    context "when using mass assignment scoping" do
-
-      let(:person) do
-        Person.create
-      end
-
-      let(:account) do
-        person.create_account(
-          { name: "bank", balance: "big" }, as: :admin
-        )
-      end
-
-      it "allows setting of fields for the role" do
-        account.name.should eq("bank")
-      end
-
-      it "does not set fields not allowed for the role" do
-        account.balance.should be_nil
-      end
-    end
 
     context "when the relationship is an illegal embedded reference" do
 

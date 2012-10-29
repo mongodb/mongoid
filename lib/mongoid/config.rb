@@ -20,11 +20,8 @@ module Mongoid
     option :include_root_in_json, default: false
     option :include_type_for_serialization, default: false
     option :preload_models, default: false
-    option :protect_sensitive_fields, default: true
     option :raise_not_found_error, default: true
     option :scope_overwrite_exception, default: false
-    # @todo: Remove at 4.0
-    option :skip_version_check, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
 

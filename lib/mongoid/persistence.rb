@@ -171,8 +171,8 @@ module Mongoid
     # @param [ Hash ] attributes The attributes to update.
     #
     # @return [ true, false ] True if validation passed, false if not.
-    def update_attributes(attributes = {}, options = {})
-      assign_attributes(attributes, options); save
+    def update_attributes(attributes = {})
+      assign_attributes(attributes); save
     end
 
     # Update the document attributes in the database and raise an error if
@@ -186,8 +186,8 @@ module Mongoid
     # @raise [ Errors::Validations ] If validation failed.
     #
     # @return [ true, false ] True if validation passed.
-    def update_attributes!(attributes = {}, options = {})
-      result = update_attributes(attributes, options)
+    def update_attributes!(attributes = {})
+      result = update_attributes(attributes)
       unless result
         self.class.fail_validate!(self) unless errors.empty?
         self.class.fail_callback!(self, :update_attributes!)
@@ -221,13 +221,12 @@ module Mongoid
       #   Person.create(:title => "Mr")
       #
       # @param [ Hash ] attributes The attributes to create with.
-      # @param [ Hash ] options A mass-assignment protection options. Supports
       #   :as and :without_protection
       #
       # @return [ Document ] The newly created document.
-      def create(attributes = {}, options = {}, &block)
+      def create(attributes = {}, &block)
         _creating do
-          doc = new(attributes, options, &block)
+          doc = new(attributes, &block)
           doc.save
           doc
         end
@@ -242,13 +241,11 @@ module Mongoid
       #   Person.create!(:title => "Mr")
       #
       # @param [ Hash ] attributes The attributes to create with.
-      # @param [ Hash ] options A mass-assignment protection options. Supports
-      #   :as and :without_protection
       #
       # @return [ Document ] The newly created document.
-      def create!(attributes = {}, options = {}, &block)
+      def create!(attributes = {}, &block)
         _creating do
-          doc = new(attributes, options, &block)
+          doc = new(attributes, &block)
           fail_validate!(doc) unless doc.insert.errors.empty?
           fail_callback!(doc, :create!) if doc.new_record?
           doc

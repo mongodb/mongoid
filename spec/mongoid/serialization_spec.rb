@@ -127,7 +127,7 @@ describe Mongoid::Serialization do
       end
 
       before do
-        person.write_attributes(attributes, false)
+        person.write_attributes(attributes)
       end
 
       let(:field_names) do
@@ -248,7 +248,7 @@ describe Mongoid::Serialization do
       end
 
       before do
-        person.write_attributes(attributes, false)
+        person.write_attributes(attributes)
       end
 
       context "when the model is saved before the relation is added" do

@@ -438,27 +438,6 @@ describe Mongoid::Relations::Embedded::One do
 
   describe "#build_#\{name}" do
 
-    context "when providing mass assignment scoping" do
-
-      let(:person) do
-        Person.new
-      end
-
-      let(:quiz) do
-        person.build_quiz(
-          { topic: "Testing", name: "Test" }, as: :admin
-        )
-      end
-
-      it "sets the attributes for the role" do
-        quiz.topic.should eq("Testing")
-      end
-
-      it "does not set attributes not for the role" do
-        quiz.name.should be_nil
-      end
-    end
-
     context "when the relation is not cyclic" do
 
       context "when the parent is a new record" do
@@ -662,27 +641,6 @@ describe Mongoid::Relations::Embedded::One do
   end
 
   describe "#create_#\{name}" do
-
-    context "when providing mass assignment scoping" do
-
-      let(:person) do
-        Person.new
-      end
-
-      let(:quiz) do
-        person.create_quiz(
-          { topic: "Testing", name: "Test" }, as: :admin
-        )
-      end
-
-      it "sets the attributes for the role" do
-        quiz.topic.should eq("Testing")
-      end
-
-      it "does not set attributes not for the role" do
-        quiz.name.should be_nil
-      end
-    end
 
     context "when the parent is a new record" do
 

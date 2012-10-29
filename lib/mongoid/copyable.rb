@@ -22,7 +22,7 @@ module Mongoid
       if attrs.delete("versions")
         attrs["version"] = 1
       end
-      self.class.new(attrs, without_protection: true)
+      self.class.new(attrs)
     end
     alias :dup :clone
   end
