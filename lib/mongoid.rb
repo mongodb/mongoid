@@ -75,7 +75,6 @@ require "mongoid/validations"
 require "mongoid/version"
 require "mongoid/versioning"
 require "mongoid/components"
-require "mongoid/paranoia"
 require "mongoid/document"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
