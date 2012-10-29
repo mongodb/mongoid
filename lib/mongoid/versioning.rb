@@ -40,13 +40,7 @@ module Mongoid
         new_version._id = nil
         if version_max.present? && versions.length > version_max
           deleted = versions.first
-          if deleted.paranoid?
-            versions.delete_one(deleted)
-            collection.find(atomic_selector).
-              update({ "$pull" => { "versions" => { "version" => deleted.version }}})
-          else
-            versions.delete(deleted)
-          end
+          versions.delete(deleted)
         end
         self.version = (version || 1 ) + 1
       end
