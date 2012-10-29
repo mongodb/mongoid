@@ -16,7 +16,6 @@ module Mongoid
           #   many.build(person)
           #
           # @param [ Document ] parent The parent document of the relation.
-          # @param [ Hash ] options The mass assignment options.
           #
           # @return [ Array ] The attributes.
           def build(parent, options = {})
@@ -26,9 +25,9 @@ module Mongoid
             end
             attributes.each do |attrs|
               if attrs.respond_to?(:with_indifferent_access)
-                process_attributes(parent, attrs, options)
+                process_attributes(parent, attrs)
               else
-                process_attributes(parent, attrs[1], options)
+                process_attributes(parent, attrs[1])
               end
             end
           end
@@ -93,10 +92,9 @@ module Mongoid
           #
           # @param [ Document ] parent The parent document.
           # @param [ Hash ] attrs The single document attributes to process.
-          # @param [ Hash ] options the mass assignment options.
           #
           # @since 2.0.0
-          def process_attributes(parent, attrs, options)
+          def process_attributes(parent, attrs)
             return if reject?(parent, attrs)
             if id = attrs.extract_id
               first = existing.first
@@ -105,10 +103,10 @@ module Mongoid
               if destroyable?(attrs)
                 destroy(parent, existing, doc)
               else
-                update_document(doc, attrs, options)
+                update_document(doc, attrs)
               end
             else
-              existing.push(Factory.build(metadata.klass, attrs, options)) unless destroyable?(attrs)
+              existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
             end
           end
 
@@ -159,15 +157,14 @@ module Mongoid
           #
           # @param [ Document ] doc The document to update.
           # @param [ Hash ] attrs The attributes.
-          # @param [ Hash ] options The options.
           #
           # @since 3.0.10
-          def update_document(doc, attrs, options)
+          def update_document(doc, attrs)
             attrs.delete_id
             if metadata.embedded?
-              doc.assign_attributes(attrs, options)
+              doc.assign_attributes(attrs)
             else
-              doc.update_attributes(attrs, options)
+              doc.update_attributes(attrs)
             end
           end
         end

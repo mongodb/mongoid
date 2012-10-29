@@ -44,11 +44,9 @@ module Mongoid
     #   person.process_attributes(:title => "sir", :age => 40)
     #
     # @param [ Hash ] attrs The attributes to set.
-    # @param [ Symbol ] role A role for scoped mass assignment.
-    # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
     #
     # @since 2.0.0.rc.7
-    def process_attributes(attrs = nil, role = :default, guard_protected_attributes = true)
+    def process_attributes(attrs = nil)
       if attrs
         errors = []
         attributes = attrs.class.new
@@ -80,8 +78,7 @@ module Mongoid
           raise Errors::MultiparameterAssignmentErrors.new(errors),
             "#{errors.size} error(s) on assignment of multiparameter attributes"
         end
-        
-        super attributes, role, guard_protected_attributes
+        super(attributes)
       else
         super
       end

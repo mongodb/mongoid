@@ -78,12 +78,8 @@ module Mongoid
         # @return [ Document ] The new document.
         #
         # @since 2.0.0.beta.1
-        def build(attributes = {}, options = {}, type = nil)
-          if options.is_a? Class
-            options, type = {}, options
-          end
-
-          doc = Factory.build(type || klass, attributes, options)
+        def build(attributes = {}, type = nil)
+          doc = Factory.build(type || klass, attributes)
           append(doc)
           doc.apply_post_processed_defaults
           yield(doc) if block_given?

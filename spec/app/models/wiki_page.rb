@@ -9,8 +9,6 @@ class WikiPage
   field :description, type: String, localize: true
   max_versions 5
 
-  attr_protected :author
-
   has_many :comments, dependent: :destroy, validate: false
   has_many :child_pages, class_name: "WikiPage", dependent: :delete, inverse_of: :parent_pages
   belongs_to :parent_pages, class_name: "WikiPage", inverse_of: :child_pages

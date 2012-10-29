@@ -196,12 +196,11 @@ module Mongoid
     #   person.assign_attributes({ :title => "Mr." }, :as => :admin)
     #
     # @param [ Hash ] attrs The new attributes to set.
-    # @param [ Hash ] options Supported options: :without_protection, :as
     #
     # @since 2.2.1
-    def assign_attributes(attrs = nil, options = {})
+    def assign_attributes(attrs = nil)
       _assigning do
-        process_attributes(attrs, options[:as] || :default, !options[:without_protection])
+        process_attributes(attrs)
       end
     end
 
@@ -219,8 +218,8 @@ module Mongoid
     # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
     #
     # @since 1.0.0
-    def write_attributes(attrs = nil, guard_protected_attributes = true)
-      assign_attributes(attrs, without_protection: !guard_protected_attributes)
+    def write_attributes(attrs = nil)
+      assign_attributes(attrs)
     end
     alias :attributes= :write_attributes
 

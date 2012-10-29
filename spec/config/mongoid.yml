@@ -35,6 +35,5 @@ test:
     preload_models: false
     scope_overwrite_exception: false
     raise_not_found_error: true
-    skip_version_check: true
     use_activesupport_time_zone: true
     use_utc: false
