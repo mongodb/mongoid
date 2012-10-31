@@ -227,6 +227,21 @@ describe Mongoid::Indexes do
       end
     end
 
+    context "when providing an expire_after_seconds option" do
+
+      before do
+        klass.index({ name: 1 }, { expire_after_seconds: 3600 })
+      end
+
+      let(:options) do
+        klass.index_options[name: 1]
+      end
+
+      it "sets the index with sparse options" do
+        options.should eq(expireAfterSeconds: 3600)
+      end
+    end
+
     context "when providing an invalid option" do
 
       it "raises an error" do

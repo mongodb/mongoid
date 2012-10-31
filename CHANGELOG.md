@@ -7,6 +7,14 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2443 `expire_after_seconds` is now a valid index option.
+
+        class Event
+          include Mongoid::Document
+          field :status, type: Integer
+          index({ status: 1 }, { expire_after_seconds: 3600 })
+        end
+
 * Added `Document.first_or_create!` and `Criteria#first_or_create!`. This
   raises a validations error if creation fails validation.
 

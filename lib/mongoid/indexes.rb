@@ -99,6 +99,9 @@ module Mongoid
         opts = options || {}
         opts[:dropDups] = opts.delete(:drop_dups) if opts.has_key?(:drop_dups)
         opts[:bucketSize] = opts.delete(:bucket_size) if opts.has_key?(:bucket_size)
+        if opts.has_key?(:expire_after_seconds)
+          opts[:expireAfterSeconds] = opts.delete(:expire_after_seconds)
+        end
         opts
       end
 
