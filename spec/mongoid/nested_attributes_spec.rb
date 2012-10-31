@@ -4421,11 +4421,49 @@ describe Mongoid::NestedAttributes do
 
     context "when nesting multiple levels" do
 
-      let(:person) do
+      let!(:person) do
         Person.create
       end
 
       context "when second level is a one to many" do
+
+        let(:person_one) do
+          Person.create
+        end
+
+        let!(:address_one) do
+          person_one.addresses.create(street: "hobrecht")
+        end
+
+        let!(:location_one) do
+          address_one.locations.create(name: "home")
+        end
+
+        context "when destroying a second level document" do
+
+          let(:attributes) do
+            { addresses_attributes:
+              { "0" =>
+                {
+                  _id: address_one.id,
+                  locations_attributes: { "0" => { _id: location_one.id, _destroy: true }}
+                }
+              }
+            }
+          end
+
+          before do
+            person_one.update_attributes(attributes)
+          end
+
+          it "deletes the document from the relation" do
+            address_one.locations.should be_empty
+          end
+
+          it "persists the change" do
+            address_one.reload.locations.should be_empty
+          end
+        end
 
         context "when adding new documents in both levels" do
 

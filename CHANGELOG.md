@@ -110,6 +110,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2512 Ensure nested attributes destroy works with the delayed destroys
+  introduced in 3.0.10 when multiple levels deep.
+
 * \#2509 Don't hit identity map an extra time when the returned value is an
   empty hash. (Douwe Maan)
 
