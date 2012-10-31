@@ -31,7 +31,8 @@ class Address
     end
   end
 
-  accepts_nested_attributes_for :locations, :code, :target
+  accepts_nested_attributes_for :code, :target
+  accepts_nested_attributes_for :locations, allow_destroy: true
 
   belongs_to :account
 
