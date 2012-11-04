@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/timestamps/created/short"
+
 module Mongoid
   module Timestamps
     # This module handles the behaviour for setting up document created at

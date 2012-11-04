@@ -7,6 +7,25 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2525 Added the ability to have short timestamped fields with aliases. This
+  sets timestamp fields as `c_at` and `u_at` that are also aliased as
+  `created_at` and `updated_at` for convenience. (Rodrigo Saito)
+
+        class Band
+          include Mongoid::Document
+          include Mongoid::Timestamps::Short # For c_at and u_at.
+        end
+
+        class Band
+          include Mongoid::Document
+          include Mongoid::Timestamps::Created::Short # For c_at only.
+        end
+
+        class Band
+          include Mongoid::Document
+          include Mongoid::Timestamps::Updated::Short # For u_at only.
+        end
+
 * \#2443 `expire_after_seconds` is now a valid index option.
 
         class Event
