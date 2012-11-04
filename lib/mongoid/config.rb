@@ -145,6 +145,18 @@ module Mongoid
       end
     end
 
+    # Is the application running under passenger?
+    #
+    # @example Is the application using passenger?
+    #   config.running_with_passenger?
+    #
+    # @return [ true, false ] If the app is deployed on Passenger.
+    #
+    # @since 3.0.11
+    def running_with_passenger?
+      @running_with_passenger ||= defined?(PhusionPassenger)
+    end
+
     # Get the session configuration or an empty hash.
     #
     # @example Get the sessions configuration.
