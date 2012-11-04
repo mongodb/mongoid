@@ -132,6 +132,17 @@ module Rails
         end
       end
 
+      # Passenger provides hooks in smart spawning to reset connections. We
+      # will handle this automatically here.
+      initializer "handle passenger smart spawning" do
+        if defined?(PhusionPassenger)
+          PhusionPassenger.on_event(:starting_worker_process) do |forked|
+            p "hi"
+            ::Mongoid.default_session.disconnect if forked
+          end
+        end
+      end
+
       # Rails runs all initializers first before getting into any generator
       # code, so we have no way in the intitializer to know if we are
       # generating a mongoid.yml. So instead of failing, we catch all the
