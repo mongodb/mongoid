@@ -38,7 +38,7 @@ module Mongoid
         def substitute(replacement)
           if replacement != self
             if _assigning?
-              base.add_atomic_unset(target)
+              base.add_atomic_unset(target) unless replacement
             else
               target.destroy if persistable?
             end

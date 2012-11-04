@@ -1244,6 +1244,33 @@ describe Mongoid::Persistence do
 
     context "when passing in a relation" do
 
+      context "when providing an embedded child" do
+
+        let!(:person) do
+          Person.create
+        end
+
+        let!(:name) do
+          person.create_name(first_name: "test", last_name: "user")
+        end
+
+        let(:new_name) do
+          Name.new(first_name: "Rupert", last_name: "Parkes")
+        end
+
+        before do
+          person.update_attributes(name: new_name)
+        end
+
+        it "updates the embedded document" do
+          person.name.should eq(new_name)
+        end
+
+        it "persists the changes" do
+          person.reload.name.should eq(new_name)
+        end
+      end
+
       context "when providing a parent to a referenced in" do
 
         let!(:person) do
