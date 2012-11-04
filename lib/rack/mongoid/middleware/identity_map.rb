@@ -37,6 +37,38 @@ module Rack
           end
           response
         end
+
+        # Passenger 3 does not execute the block provided to a Rack::BodyProxy
+        # so the identity map never gets cleared. Since there's no streaming
+        # support in it anyways we do not need the proxy functionality.
+        class Passenger
+
+          # Initialize the new middleware.
+          #
+          # @example Init the middleware.
+          #   IdentityMap.new(app)
+          #
+          # @param [ Object ] app The application.
+          #
+          # @since 3.0.11
+          def initialize(app)
+            @app = app
+          end
+
+          # Make the request with the provided environment.
+          #
+          # @example Make the request.
+          #   identity_map.call(env)
+          #
+          # @param [ Object ] env The environment.
+          #
+          # @return [ Array ] The status, headers, and response.
+          #
+          # @since 3.0.11
+          def call(env)
+            ::Mongoid.unit_of_work { @app.call(env) }
+          end
+        end
       end
     end
   end

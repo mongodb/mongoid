@@ -118,7 +118,11 @@ module Rails
 
       # Need to include the Mongoid identity map middleware.
       initializer "include the identity map" do |app|
-        app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
+        if ::Mongoid.running_with_passenger?
+          app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap::Passenger"
+        else
+          app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
+        end
       end
 
       # Instantitate any registered observers after Rails initialization and
@@ -144,7 +148,7 @@ module Rails
 
           # Passenger provides the :starting_worker_process event for executing
           # code after it has forked, so we use that and reconnect immediately.
-          if defined?(PhusionPassenger)
+          if ::Mongoid.running_with_passenger?
             PhusionPassenger.on_event(:starting_worker_process) do |forked|
               ::Mongoid.default_session.disconnect if forked
             end

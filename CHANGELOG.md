@@ -120,6 +120,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2522 Fixed `Criteria#with` to return the criteria and not the class.
 
+* \#2518 Fix unit of work call for the identity map when using Passenger.
+
 * \#2512 Ensure nested attributes destroy works with the delayed destroys
   introduced in 3.0.10 when multiple levels deep.
 
