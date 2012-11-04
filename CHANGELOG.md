@@ -118,6 +118,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2552 Fixed `Criteria#with` to return the criteria and not the class.
+
 * \#2512 Ensure nested attributes destroy works with the delayed destroys
   introduced in 3.0.10 when multiple levels deep.
 
