@@ -39,8 +39,8 @@ module Mongoid
         consolidated = {}
         each_pair do |key, value|
           if key =~ /\$/
-            value.each_pair do |key, _value|
-              value[key] = mongoize_for(klass, key, _value)
+            value.each_pair do |_key, _value|
+              value[_key] = mongoize_for(klass, _key, _value)
             end
             (consolidated[key] ||= {}).merge!(value)
           else
