@@ -444,8 +444,8 @@ module Mongoid
           re_define_method("#{meth}_translations=") do |value|
             attribute_will_change!(name)
             if value
-              value.update_values do |value|
-                field.type.mongoize(value)
+              value.update_values do |_value|
+                field.type.mongoize(_value)
               end
             end
             attributes[name] = value

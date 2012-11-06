@@ -53,7 +53,9 @@ module Mongoid
       # @return [ Hash ] The mass assignment options.
       #
       # @since 3.0.7
-      attr_writer :mass_assignment_options
+      def mass_assignment_options=(options)
+        @mass_assignment_options = options
+      end
 
       # If the key provided is the name of a relation or a nested attribute, we
       # need to wait until all other attributes are set before processing
