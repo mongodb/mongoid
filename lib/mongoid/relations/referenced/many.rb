@@ -474,7 +474,7 @@ module Mongoid
           if metadata.destructive?
             removed.delete_all
           else
-            removed.update(foreign_key => nil)
+            removed.update_all(foreign_key => nil)
           end
           in_memory.each do |doc|
             if !ids.include?(doc.id)

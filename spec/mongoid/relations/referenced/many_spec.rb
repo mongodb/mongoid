@@ -581,6 +581,35 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#= []" do
+
+    context "when the parent is persisted" do
+
+      let(:posts) do
+        [ Post.create(title: "1"), Post.create(title: "2") ]
+      end
+
+      let(:person) do
+        Person.create(posts: posts)
+      end
+
+      context "when the parent has multiple children" do
+
+        before do
+          person.posts = []
+        end
+
+        it "removes all the children" do
+          person.posts.should be_empty
+        end
+
+        it "persists the changes" do
+          person.posts(true).should be_empty
+        end
+      end
+    end
+  end
+
   describe "#= nil" do
 
     context "when the relation is not polymorphic" do

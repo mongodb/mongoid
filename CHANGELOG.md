@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 3.0.12
+
+### Resolved Issues
+
+* \#2527 Ensure removal of docs in a `has_many` does a multi update when setting
+  to an empty array.
+
 ## 3.0.11
 
 ### Resolved Issues
