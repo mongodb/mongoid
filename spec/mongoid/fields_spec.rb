@@ -170,6 +170,20 @@ describe Mongoid::Fields do
     end
   end
 
+  describe "#aliased_fields" do
+
+    let(:person) do
+      Person.new
+    end
+
+    context "when the document is subclassed" do
+
+      it "does not include the child aliases" do
+        person.aliased_fields.keys.should_not include("spec")
+      end
+    end
+  end
+
   describe "#attribute_names" do
 
     context "when the document is a parent class" do
