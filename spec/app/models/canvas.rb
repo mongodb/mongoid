@@ -5,6 +5,8 @@ class Canvas
   embeds_one :writer
   embeds_one :palette
 
+  field :foo, type: String, default: ->{ "original" }
+
   has_many :comments, as: :commentable
 
   accepts_nested_attributes_for :shapes
@@ -15,6 +17,8 @@ class Canvas
   end
 
   class Test < Canvas
+
+    field :foo, type: String, default: ->{ "overridden" }
   end
 end
 

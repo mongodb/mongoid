@@ -1207,4 +1207,26 @@ describe Mongoid::Fields do
       )
     end
   end
+
+  context "when overriding a parent class field" do
+
+    context "when the field has a default value" do
+
+      let!(:canvas) do
+        Canvas.new
+      end
+
+      let!(:test) do
+        Canvas::Test.new
+      end
+
+      it "does not override the parent" do
+        canvas.foo.should eq("original")
+      end
+
+      it "overrides the default" do
+        test.foo.should eq("overridden")
+      end
+    end
+  end
 end

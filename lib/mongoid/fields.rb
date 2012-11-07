@@ -502,9 +502,10 @@ module Mongoid
       end
 
       def field_for(name, options)
-        return Fields::Localized.new(name, options) if options[:localize]
-        return Fields::ForeignKey.new(name, options) if options[:identity]
-        Fields::Standard.new(name, options)
+        opts = options.merge(klass: self)
+        return Fields::Localized.new(name, opts) if options[:localize]
+        return Fields::ForeignKey.new(name, opts) if options[:identity]
+        Fields::Standard.new(name, opts)
       end
     end
   end

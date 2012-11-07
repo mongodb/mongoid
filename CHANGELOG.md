@@ -137,6 +137,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2529 Fields on subclasses that override fields in the parent where both have
+  defaults with procs now properly override the default in the subclass.
+
 * \#2528 Aliased fields need to be duped when subclassing.
 
 * \#2527 Ensure removal of docs in a `has_many` does a multi update when setting
