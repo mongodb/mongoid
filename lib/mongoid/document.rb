@@ -17,6 +17,7 @@ module Mongoid
       super
     ensure
       Mongoid.models.push(other)
+      Mongoid.models.uniq!
     end
 
     # Default comparison is via the string version of the id.

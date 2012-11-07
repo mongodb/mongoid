@@ -162,7 +162,7 @@ module Mongoid
     ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
     { to: Config }))
 
-  # Mongoid models are tracked globally
+  # A master list of known Mongoid models is tracked globally
   #
   def models
     @models ||= []

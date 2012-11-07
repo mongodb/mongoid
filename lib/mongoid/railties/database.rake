@@ -66,34 +66,13 @@ namespace :db do
   end
 
   namespace :mongoid do
-
     desc "Create the indexes defined on your mongoid models"
     task :create_indexes => :environment do
-      begin
-        Rails.application.eager_load!
-      rescue Object => e
-      end
-
-      begin
-        Bundler.require(:default, :assets, 'production')
-      rescue Object => e
-      end
-
       ::Rails::Mongoid.create_indexes
     end
 
     desc "Remove the indexes defined on your mongoid models without questions!"
     task :remove_indexes => :environment do
-      begin
-        Rails.application.eager_load!
-      rescue Object => e
-      end
-
-      begin
-        Bundler.require(:default, :assets, 'production')
-      rescue Object => e
-      end
-
       ::Rails::Mongoid.remove_indexes
     end
 
