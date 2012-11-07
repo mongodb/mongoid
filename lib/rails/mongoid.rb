@@ -69,7 +69,7 @@ module Rails
         engines_models_paths = Rails.application.railties.engines.map{|engine| engine.paths["app/models"].expanded}
         root_models_paths = Rails.application.paths["app/models"]
         models_paths = engines_models_paths.push(root_models_paths).flatten
-        globs.replace(model_paths.map{|path| "#{path}/**/*.rb"})
+        globs.replace(models_paths.map{|path| "#{path}/**/*.rb"})
         all_possible_models = true
       else
         all_possible_models = false
