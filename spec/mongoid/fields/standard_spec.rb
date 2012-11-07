@@ -4,6 +4,16 @@ describe Mongoid::Fields::Standard do
 
   describe "#pre_processed?" do
 
+    before(:all) do
+      class FieldTest
+        include Mongoid::Document
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :FieldTest)
+    end
+
     context "when the field has a default" do
 
       context "when the default is a proc" do
@@ -15,6 +25,7 @@ describe Mongoid::Fields::Standard do
               :test,
               default: ->{ "testing" },
               pre_processed: true,
+              klass: FieldTest,
               type: String
             )
           end
@@ -30,6 +41,7 @@ describe Mongoid::Fields::Standard do
             described_class.new(
               :test,
               default: ->{ "testing" },
+              klass: FieldTest,
               type: String
             )
           end
@@ -46,6 +58,7 @@ describe Mongoid::Fields::Standard do
           described_class.new(
             :test,
             default: "testing",
+            klass: FieldTest,
             type: String
           )
         end
