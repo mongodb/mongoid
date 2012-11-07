@@ -76,7 +76,7 @@ module Rails
       end
 
       models =
-        glob.flatten.compact.each do |glob|
+        globs.flatten.compact.each do |glob|
           Dir.glob(glob).map do |file|
             begin
               determine_model(file, logger)
