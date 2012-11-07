@@ -31,9 +31,14 @@ module Rack
         #
         # @since 2.1.0
         def call(env)
-          response = @app.call(env)
-          response[2] = ::Rack::BodyProxy.new(response[2]) do
+          begin
+            response = @app.call(env)
+            response[2] = ::Rack::Mongoid::Proxy.new(response[2]) do
+              ::Mongoid::IdentityMap.clear
+            end
+          rescue
             ::Mongoid::IdentityMap.clear
+            raise
           end
           response
         end
