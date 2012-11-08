@@ -30,14 +30,12 @@ describe "Rails::Mongoid" do
 
     before do
       Dir.should_receive(:glob).once.with(pattern).and_return(model_paths)
-      Logger.should_receive(:new).twice.and_return(logger)
     end
 
     context "with ordinary Rails models" do
 
       it "creates the indexes for the models" do
         klass.should_receive(:create_indexes).once
-        logger.should_receive(:info).twice
         indexes
       end
     end
@@ -83,7 +81,6 @@ describe "Rails::Mongoid" do
 
       it "does nothing, but logging" do
         klass.should_receive(:create_indexes).never
-        logger.should_receive(:info).once
         indexes
       end
     end
@@ -109,8 +106,6 @@ describe "Rails::Mongoid" do
 
     before do
       Dir.should_receive(:glob).with(pattern).exactly(2).times.and_return(model_paths)
-      Logger.should_receive(:new).exactly(4).times.and_return(logger)
-      logger.should_receive(:info).exactly(3).times
     end
 
     let(:indexes) do
