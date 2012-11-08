@@ -17,7 +17,6 @@ module Rails
     def create_indexes(*globs)
       models(*globs).each do |model|
         next if model.index_options.empty?
-
         unless model.embedded?
           model.create_indexes
           logger.info("MONGOID: Created indexes on #{model}:")
@@ -45,7 +44,6 @@ module Rails
     def remove_indexes(*globs)
       models(*globs).each do |model|
         next if model.embedded?
-
         indexes = model.collection.indexes.map{ |doc| doc["name"] }
         indexes.delete_one("_id_")
         model.remove_indexes
@@ -55,9 +53,10 @@ module Rails
     end
 
     # Return all models matching the globs or, if no globs are specified, all
-    # possible known from engines, the app, any gems, etc.
+    # possible models known from engines, the app, any gems, etc.
     #
-    # @example Return all models.
+    # @example Return *all* models.  Return all models under app/models/
+    #   Rails::Mongoid.models
     #   Rails::Mongoid.models("app/models/**/*.rb")
     #
     # @param [ String ] glob The file matching glob.
@@ -75,26 +74,28 @@ module Rails
         all_possible_models = false
       end
 
-      models =
-        globs.flatten.compact.each do |glob|
-          Dir.glob(glob).map do |file|
-            begin
-              determine_model(file, logger)
-            rescue => e
-              logger.error(%Q{MONGOID: Failed to determine model from #{file}:
-                #{e.class}:#{e.message}
-                #{e.backtrace.join("\n")}
-              })
-              nil
-            end
-          end
-        end.flatten.compact
+      models = []
 
+      globs.flatten.compact.each do |glob|
+        Dir.glob(glob).map do |file|
+          begin
+            model = determine_model(file, logger)
+            models.push(model)
+          rescue => e
+            logger.error(%Q{MONGOID: Failed to determine model from #{file}:
+              #{e.class}:#{e.message}
+              #{e.backtrace.join("\n")}
+            })
+            nil
+          end
+        end
+      end
+      
       if all_possible_models
         models = ::Mongoid.models | models
       end
 
-      models.sort_by{|model| model.name || ''}
+      models.compact.sort_by{|model| model.name || ''}
     end
 
     # Use the application configuration to get every model and require it, so

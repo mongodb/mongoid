@@ -16,8 +16,8 @@ module Mongoid
     def Document.included(other)
       super
     ensure
+      Mongoid.models.delete_if{|model| model.name == other.name}
       Mongoid.models.push(other)
-      Mongoid.models.uniq!
     end
 
     # Default comparison is via the string version of the id.
