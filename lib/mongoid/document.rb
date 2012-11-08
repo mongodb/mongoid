@@ -10,6 +10,16 @@ module Mongoid
     attr_accessor :criteria_instance_id
     attr_reader :new_record
 
+    # Track all classes that include Mongoid::Document to faciltate important
+    # operations such as index creation
+    #
+    def Document.included(other)
+      super
+    ensure
+      Mongoid.models.delete_if{|model| model.name == other.name}
+      Mongoid.models.push(other)
+    end
+
     # Default comparison is via the string version of the id.
     #
     # @example Compare two documents.

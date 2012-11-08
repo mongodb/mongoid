@@ -64,4 +64,10 @@ describe Mongoid do
       Mongoid.session(:default).should eq(Mongoid::Sessions.default)
     end
   end
+
+  describe ".models" do
+    it "tracks mongoid based models" do
+      Mongoid.models.include?(Band)
+    end
+  end
 end

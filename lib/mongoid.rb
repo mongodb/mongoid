@@ -161,4 +161,10 @@ module Mongoid
   delegate(*(Config.public_instance_methods(false) +
     ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
     { to: Config }))
+
+  # A master list of known Mongoid models is tracked globally
+  #
+  def models
+    @models ||= []
+  end
 end
