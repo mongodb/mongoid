@@ -64,4 +64,10 @@ describe Mongoid do
       Mongoid.session(:default).should eq(Mongoid::Sessions.default)
     end
   end
+
+  describe ".models" do
+    it "returns the list of known models" do
+      Mongoid.models.should eq(Mongoid::Document.models)
+    end
+  end
 end

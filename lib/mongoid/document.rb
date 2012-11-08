@@ -359,6 +359,28 @@ module Mongoid
         Mongoid.logger
       end
     end
+
+    # Track all document classes
+    #
+    # @return [ Array<Class> ] All document classes
+    #
+    # @since 3.1.0
+    def Document.included(other)
+      super
+    ensure
+      Mongoid.models.delete_if{|model| model.name == other.name}
+      Mongoid.models.push(other)
+    end
+
+    # Returns the list of all classes known to have included
+    # Mongoid::Document
+    #
+    # @return [ Array<Class> ] All document classes
+    #
+    # @since 3.1.0
+    def Document.models
+      @models ||= []
+    end
   end
 end
 
