@@ -118,11 +118,7 @@ module Rails
 
       # Need to include the Mongoid identity map middleware.
       initializer "include the identity map" do |app|
-        if ::Mongoid.running_with_passenger?
-          app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap::Passenger"
-        else
-          app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
-        end
+        app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
       end
 
       # Instantitate any registered observers after Rails initialization and
