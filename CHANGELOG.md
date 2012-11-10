@@ -137,6 +137,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2542 Allow embedded documents using `store_as` to properly alias in
+  criteria.
+
 * \#2541 Ensure that the type change is correct when upcasting/downcasting a
   document via `Document#becomes` (Łukasz Bandzarewicz)
 

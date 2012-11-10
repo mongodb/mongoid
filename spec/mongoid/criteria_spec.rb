@@ -3658,6 +3658,20 @@ describe Mongoid::Criteria do
         criteria.options[:fields]["_type"].should eq(1)
       end
     end
+
+    context "when limiting to embedded documents" do
+
+      context "when the embedded documents are aliased" do
+
+        let(:criteria) do
+          Person.only(:phones)
+        end
+
+        it "properly uses the database field name" do
+          criteria.options.should eq(fields: { "mobile_phones" => 1 })
+        end
+      end
+    end
   end
 
   [ :or, :any_of ].each do |method|
@@ -4217,7 +4231,6 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      p criteria.to_a
       criteria.should eq([ match ])
     end
   end
@@ -4234,6 +4247,23 @@ describe Mongoid::Criteria do
 
     it "returns the matching documents" do
       criteria.should eq([ match ])
+    end
+  end
+
+  describe "#without" do
+
+    context "when omitting to embedded documents" do
+
+      context "when the embedded documents are aliased" do
+
+        let(:criteria) do
+          Person.without(:phones)
+        end
+
+        it "properly uses the database field name" do
+          criteria.options.should eq(fields: { "mobile_phones" => 0 })
+        end
+      end
     end
   end
 end

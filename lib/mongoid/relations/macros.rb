@@ -283,8 +283,8 @@ module Mongoid
         #
         # @since 3.0.0
         def embed(name, metadata)
-          self.embedded_relations =
-            embedded_relations.merge(name.to_s => metadata)
+          self.embedded_relations = embedded_relations.merge(name.to_s => metadata)
+          aliased_fields[name.to_s] = metadata.store_as if metadata.store_as
         end
 
         # Defines a field to be used as a foreign key in the relation and
