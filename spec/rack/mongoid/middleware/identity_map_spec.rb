@@ -20,42 +20,6 @@ describe "Rack::Mongoid::Middleware::IdentityMap" do
 
   describe "#call" do
 
-    module Rack
-      class BodyProxy
-        def initialize(body, &block)
-          @body, @block, @closed = body, block, false
-        end
-
-        def respond_to?(*args)
-          return false if args.first.to_s =~ /^to_ary$/
-          super or @body.respond_to?(*args)
-        end
-
-        def close
-          return if @closed
-          @closed = true
-          begin
-            @body.close if @body.respond_to? :close
-          ensure
-            @block.call
-          end
-        end
-
-        def closed?
-          @closed
-        end
-
-        def each(*args, &block)
-          @body.each(*args, &block)
-        end
-
-        def method_missing(*args, &block)
-          super if args.first.to_s =~ /^to_ary$/
-          @body.__send__(*args, &block)
-        end
-      end
-    end
-
     let(:middleware) do
       klass.new(app)
     end
@@ -79,7 +43,7 @@ describe "Rack::Mongoid::Middleware::IdentityMap" do
       end
 
       it "returns the call with the body proxy" do
-        result[2].should be_a(Rack::BodyProxy)
+        result.should eq([])
       end
 
       it "clears out the identity map" do
