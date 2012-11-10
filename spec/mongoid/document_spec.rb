@@ -997,6 +997,33 @@ describe Mongoid::Document do
         obj.level.should eq(1)
       end
     end
+
+    context "downcasting when the document is persisted" do
+
+      let(:obj) do
+        Person.create(title: 'Sir')
+      end
+
+      let(:became) do
+        obj.becomes(Manager)
+      end
+
+      context "when downcasted document is saved" do
+        before { became.save }
+
+        it "keeps the type" do
+          became.should be_an_instance_of(Manager)
+        end
+
+        it "can by queried by the parent class" do
+          Person.find(became.id).should be_an_instance_of(Manager)
+        end
+
+        it "can by queried by the main class" do
+          Manager.find(became.id).should be_an_instance_of(Manager)
+        end
+      end
+    end
   end
 
   context "when marshalling the document" do
