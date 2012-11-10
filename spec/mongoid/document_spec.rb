@@ -850,177 +850,300 @@ describe Mongoid::Document do
   describe "#becomes" do
 
     before(:all) do
+      Person.validates_format_of :ssn, without: /\$\$\$/
+
       class Manager < Person
         field :level, type: Integer, default: 1
       end
     end
 
-    [ :upcasting, :downcasting ].each do |context|
+    after(:all) do
+      Person.reset_callbacks(:validate)
+      Object.send(:remove_const, :Manager)
+    end
 
-      before(:all) do
-        Person.validates_format_of :ssn, without: /\$\$\$/
+    context "when casting to a superclass" do
+
+      let(:manager) do
+        Manager.new(title: "Sir")
       end
 
-      after(:all) do
-        Person.reset_callbacks(:validate)
-      end
+      context "when no embedded documents are present" do
 
-      context "when #{context}" do
-
-        if context == :upcasting
-
-          let(:klass) do
-            Manager
-          end
-
-          let(:to_become) do
-            Person
-          end
-        else
-
-          let(:klass) do
-            Person
-          end
-
-          let(:to_become) do
-            Manager
-          end
-        end
-
-        let(:obj) do
-          klass.new(title: 'Sir')
-        end
-
-        let(:became) do
-          obj.becomes(to_become)
+        let(:person) do
+          manager.becomes(Person)
         end
 
         it "copies attributes" do
-          became.title.should eq('Sir')
+          person.title.should eq('Sir')
         end
 
         it "keeps the same object id" do
-          became.id.should eq(obj.id)
-        end
-
-        context "when the document has embedded documents" do
-
-          let!(:address) do
-            obj.addresses.build(street: "hobrecht")
-          end
-
-          let(:became) do
-            obj.becomes(to_become)
-          end
-
-          it "copies the embedded documents" do
-            became.addresses.first.should eq(address)
-          end
-
-          it "returns new instances" do
-            became.addresses.first.should_not equal(address)
-          end
-        end
-
-        context "when the document is new" do
-
-          it "copies the state" do
-            became.should be_new_record
-          end
-        end
-
-        context "when the document is persisted" do
-
-          before do
-            obj.save
-          end
-
-          it "copies the state" do
-            became.should be_persisted
-          end
-        end
-
-        context "when the document is destroyed" do
-
-          before do
-            obj.destroy
-          end
-
-          it "copies the state" do
-            became.should be_destroyed
-          end
-        end
-
-        context "when the document is dirty" do
-
-          before do
-            obj.save
-            obj.ssn = "123-22-1234"
-          end
-
-          it "copies over the dirty changes" do
-            became.changes.should eq(obj.changes)
-          end
-        end
-
-        context "when the document is invalid" do
-
-          before do
-            obj.ssn = "$$$"
-            obj.valid?
-          end
-
-          it "copies the errors" do
-            became.errors.should include(:ssn)
-          end
+          person.id.should eq(manager.id)
         end
 
         it "sets the class type" do
-          became._type.should eq(to_become.to_s)
+          person._type.should eq("Person")
         end
 
         it "raises an error when inappropriate class is provided" do
           expect {
-            obj.becomes(String)
+            manager.becomes(String)
           }.to raise_error(ArgumentError)
         end
       end
-    end
 
-    context "upcasting to class with default attributes" do
+      context "when the document has embedded documents" do
 
-      let(:obj) do
-        Person.new(title: 'Sir').becomes(Manager)
-      end
-
-      it "applies default attributes" do
-        obj.level.should eq(1)
-      end
-    end
-
-    context "downcasting when the document is persisted" do
-
-      let(:obj) do
-        Person.create(title: 'Sir')
-      end
-
-      let(:became) do
-        obj.becomes(Manager)
-      end
-
-      context "when downcasted document is saved" do
-        before { became.save }
-
-        it "keeps the type" do
-          became.should be_an_instance_of(Manager)
+        let!(:address) do
+          manager.addresses.build(street: "hobrecht")
         end
 
-        it "can by queried by the parent class" do
-          Person.find(became.id).should be_an_instance_of(Manager)
+        let(:person) do
+          manager.becomes(Person)
         end
 
-        it "can by queried by the main class" do
-          Manager.find(became.id).should be_an_instance_of(Manager)
+        it "copies the embedded documents" do
+          person.addresses.first.should eq(address)
+        end
+
+        it "returns new instances" do
+          person.addresses.first.should_not equal(address)
+        end
+      end
+
+      context "when the document is new" do
+
+        let(:person) do
+          manager.becomes(Person)
+        end
+
+        it "copies the state" do
+          person.should be_a_new_record
+        end
+      end
+
+      context "when the document is persisted" do
+
+        before do
+          manager.save
+        end
+
+        let(:person) do
+          manager.becomes(Person)
+        end
+
+        it "copies the state" do
+          person.should be_persisted
+        end
+      end
+
+      context "when the document is destroyed" do
+
+        before do
+          manager.destroy
+        end
+
+        let(:person) do
+          manager.becomes(Person)
+        end
+
+        it "copies the state" do
+          person.should be_destroyed
+        end
+      end
+
+      context "when the document is dirty" do
+
+        before do
+          manager.save
+          manager.ssn = "123-22-1234"
+        end
+
+        let(:person) do
+          manager.becomes(Person)
+        end
+
+        it "copies over the dirty changes" do
+          person.changes["ssn"].should eq([ nil, "123-22-1234" ])
+        end
+
+        it "adds the _type change" do
+          person.changes["_type"].should eq([ "Manager", "Person" ])
+        end
+      end
+
+      context "when the document is invalid" do
+
+        before do
+          manager.ssn = "$$$"
+          manager.valid?
+        end
+
+        let(:person) do
+          manager.becomes(Person)
+        end
+
+        it "copies the errors" do
+          person.errors.should include(:ssn)
+        end
+      end
+    end
+
+    context "when casting to a subclass" do
+
+      let(:person) do
+        Person.new(title: "Sir")
+      end
+
+      context "when no embedded documents are present" do
+
+        let(:manager) do
+          person.becomes(Manager)
+        end
+
+        it "copies attributes" do
+          manager.title.should eq('Sir')
+        end
+
+        it "keeps the same object id" do
+          manager.id.should eq(person.id)
+        end
+
+        it "sets the class type" do
+          manager._type.should eq("Manager")
+        end
+
+        it "raises an error when inappropriate class is provided" do
+          expect {
+            person.becomes(String)
+          }.to raise_error(ArgumentError)
+        end
+      end
+
+      context "when the document has embedded documents" do
+
+        let!(:address) do
+          person.addresses.build(street: "hobrecht")
+        end
+
+        let(:manager) do
+          person.becomes(Manager)
+        end
+
+        it "copies the embedded documents" do
+          manager.addresses.first.should eq(address)
+        end
+
+        it "returns new instances" do
+          manager.addresses.first.should_not equal(address)
+        end
+      end
+
+      context "when the document is new" do
+
+        let(:manager) do
+          person.becomes(Manager)
+        end
+
+        it "copies the state" do
+          manager.should be_a_new_record
+        end
+      end
+
+      context "when the document is persisted" do
+
+        before do
+          person.save
+        end
+
+        let(:manager) do
+          person.becomes(Manager)
+        end
+
+        it "copies the state" do
+          manager.should be_persisted
+        end
+
+        context "when downcasted document is saved" do
+
+          before do
+            manager.save
+          end
+
+          it "keeps the type" do
+            manager.should be_an_instance_of(Manager)
+          end
+
+          it "can by queried by the parent class" do
+            Person.find(manager.id).should be_an_instance_of(Manager)
+          end
+
+          it "can by queried by the main class" do
+            Manager.find(manager.id).should be_an_instance_of(Manager)
+          end
+        end
+      end
+
+      context "when the document is destroyed" do
+
+        before do
+          person.destroy
+        end
+
+        let(:manager) do
+          person.becomes(Manager)
+        end
+
+        it "copies the state" do
+          manager.should be_destroyed
+        end
+      end
+
+      context "when the document is dirty" do
+
+        before do
+          person.save
+          person.ssn = "123-22-1234"
+        end
+
+        let(:manager) do
+          person.becomes(Manager)
+        end
+
+        it "copies over the dirty changes" do
+          manager.changes["ssn"].should eq([ nil, "123-22-1234" ])
+        end
+
+        it "adds the _type change" do
+          manager.changes["_type"].should eq([ "Person", "Manager" ])
+        end
+      end
+
+      context "when the document is invalid" do
+
+        before do
+          person.ssn = "$$$"
+          person.valid?
+        end
+
+        let(:manager) do
+          person.becomes(Manager)
+        end
+
+        it "copies the errors" do
+          manager.errors.should include(:ssn)
+        end
+      end
+
+      context "when the subclass has defaults" do
+
+        let(:manager) do
+          Person.new(title: 'Sir').becomes(Manager)
+        end
+
+        it "applies default attributes" do
+          manager.level.should eq(1)
         end
       end
     end

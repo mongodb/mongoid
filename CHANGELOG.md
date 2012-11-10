@@ -137,6 +137,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2541 Ensure that the type change is correct when upcasting/downcasting a
+  document via `Document#becomes` (Łukasz Bandzarewicz)
+
 * \#2529 Fields on subclasses that override fields in the parent where both have
   defaults with procs now properly override the default in the subclass.
 
