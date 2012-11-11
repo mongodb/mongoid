@@ -218,8 +218,21 @@ module Mongoid
         #
         # @since 2.2.0
         def eager_load_ids(metadata, ids)
-          klass, foreign_key = metadata.klass, metadata.foreign_key
-          eager_loaded = klass.any_in(foreign_key => ids).entries
+          klass, foreign_key = metadata.klass.scoped, metadata.foreign_key
+          criteria = klass.scoped
+          [:only, :without].each do |option|
+            if metadata[option]
+              option_params = [metadata[option]].flatten.map(&:to_s)
+              case option
+              when :only
+                option_params.push(foreign_key) unless option_params.include? foreign_key
+              when :without
+                option_params.delete(foreign_key)
+              end
+              criteria = criteria.public_send(option, *option_params)
+            end
+          end
+          eager_loaded = criteria.any_in(foreign_key => ids).entries
           ids.each do |id|
             IdentityMap.clear_many(klass, { foreign_key => id })
           end

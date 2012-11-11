@@ -136,8 +136,11 @@ module Mongoid
           # @since 2.2.0
           def eager_load(metadata, ids)
             raise Errors::EagerLoad.new(metadata.name) if metadata.polymorphic?
-            klass, _ = metadata.klass, metadata.foreign_key
-            klass.any_in("_id" => ids.uniq).each do |doc|
+            criteria, _ = metadata.klass.scoped, metadata.foreign_key
+            [:only, :without].each do |option|
+              criteria = criteria.public_send(option, *metadata[option]) if metadata[option]
+            end
+            criteria.any_in("_id" => ids.uniq).each do |doc|
               IdentityMap.set(doc)
             end
           end

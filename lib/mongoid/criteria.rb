@@ -203,16 +203,25 @@ module Mongoid
     # @example Eager load the provided relations.
     #   Person.includes(:posts, :game)
     #
-    # @param [ Array<Symbol> ] relations The names of the relations to eager
-    #   load.
+    # @example Specify fields to load
+    #   Person.includes(:posts => {:only => :title}, :game => {:without => :scores})
+    #
+    # @param [ Array<Symbol, Hash> ] relations The names of the relations to eager
+    #   load, can be with options.
     #
     # @return [ Criteria ] The cloned criteria.
     #
     # @since 2.2.0
     def includes(*relations)
-      relations.flatten.each do |name|
-        metadata = klass.reflect_on_association(name)
+      relations.flatten.each do |relation|
+        name = relation.is_a?(Hash) ? relation.keys[0] : relation
+        metadata = klass.reflect_on_association(name).try(:dup)
         raise Errors::InvalidIncludes.new(klass, relations) unless metadata
+
+        [:only, :without].each do |option|
+          metadata[option] = relation[name][option] if relation[name][option]
+        end if relation.is_a?(Hash)
+
         inclusions.push(metadata) unless inclusions.include?(metadata)
       end
       clone

@@ -2352,15 +2352,6 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when providing a hash" do
-
-      it "raises an error" do
-        expect {
-          Person.includes(preferences: :members)
-        }.to raise_error(Mongoid::Errors::InvalidIncludes)
-      end
-    end
-
     context "when the models are inherited" do
 
       before(:all) do
@@ -3043,6 +3034,237 @@ describe Mongoid::Criteria do
 
         it "does not load the documents outside of the limit" do
           Mongoid::IdentityMap[Person.collection_name][person_two.id].should be_nil
+        end
+      end
+    end
+
+    context "when including with option" do
+
+      context "with relation 'IN'" do
+
+        let(:person_two) do
+          Person.create(title: 'Mike', age: 20, ssn: 123456)
+        end
+
+        let(:person_three) do
+          Person.create(title: 'Jack', age: 32, ssn: 987654)
+        end
+
+        let!(:post_one) do
+          person_two.posts.create(title: "one")
+        end
+
+        let!(:post_two) do
+          person_three.posts.create(title: "two")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        context "option 'only'" do
+          it "with one field specified" do
+            persons = Post.includes(person: {only: :title}).map(&:person)
+            persons.map { |person|
+              [person.title, person.age, person.ssn]
+            }.should eq([['Mike', nil, nil], ['Jack', nil, nil]])
+          end
+
+          it "with several fields specified" do
+            persons = Post.includes(person: {only: [:title, :age]}).map(&:person)
+            persons.map { |person|
+              [person.title, person.age, person.ssn]
+            }.should eq([['Mike', 20, nil], ['Jack', 32, nil]])
+          end
+        end
+
+        context "option 'without'" do
+          it "with one field specified" do
+            persons = Post.includes(person: {without: :title}).map(&:person)
+            persons.map { |person|
+              [person.title, person.age, person.ssn]
+            }.should eq([[nil, 20, 123456], [nil, 32, 987654]])
+          end
+
+          it "with several fields specified" do
+            persons = Post.includes(person: {without: [:title, :age]}).map(&:person)
+            persons.map { |person|
+              [person.title, person.age, person.ssn]
+            }.should eq([[nil, nil, 123456], [nil, nil, 987654]])
+          end
+        end
+      end
+
+      context "with relation 'one-to-many" do
+
+        let(:person_two) do
+          Person.create(title: 'Mike', age: 20, ssn: 123456)
+        end
+
+        let!(:post_one) do
+          person_two.posts.create(title: "one", rating: 10)
+        end
+
+        let!(:post_two) do
+          person_two.posts.create(title: "two", rating: 20)
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        context "option 'only'" do
+          it "one field" do
+            options = {posts: {only: :title}}
+            Person.where(id: person_two.id).includes(options)[0].posts.map { |post|
+              [post.title, post.rating]
+            }.should eq([["one", nil], ["two", nil]])
+          end
+
+          it "multiple fields" do
+            options = {posts: {only: [:title, :rating]}}
+            Person.where(id: person_two.id).includes(options)[0].posts.map { |post|
+              [post.title, post.rating]
+            }.should eq([["one", 10], ["two", 20]])
+          end
+
+          it "force loading foreign key field" do
+            options = {posts: {only: :title}}
+            Person.where(id: person_two.id).includes(options)[0].
+              posts.map(&:person_id).should eq([person_two.id] * 2)
+          end
+        end
+
+        context "option 'without'" do
+          it "one field" do
+            options = {posts: {without: :title}}
+            Person.where(id: person_two.id).includes(options)[0].posts.map { |post|
+              [post.title, post.rating]
+            }.should eq([[nil, 10], [nil, 20]])
+          end
+
+          it "multiple fields" do
+            options = {posts: {without: [:title, :rating]}}
+            Person.where(id: person_two.id).includes(options)[0].posts.map { |post|
+              [post.title, post.rating]
+            }.should eq([[nil, nil], [nil, nil]])
+          end
+
+          it "force loading foreign key field" do
+            options = {posts: {without: :person_id}}
+            Person.where(id: person_two.id).includes(options)[0].
+              posts.map(&:person_id).should eq([person_two.id] * 2)
+          end
+        end
+      end
+
+      context "with relation 'one-to-one" do
+
+        let(:person_two) do
+          Person.create(title: 'Mike', age: 20, ssn: 123456)
+        end
+
+        let!(:account) do
+          person_two.create_account(name: "User 1", nickname: "user1", balance: "ok")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        context "option 'only'" do
+          it "one field" do
+            options = {account: {only: :nickname}}
+            Person.where(id: person_two.id).includes(options)[0].account.tap do |account|
+              [account.nickname, account.name].should eq(["user1", nil])
+            end
+          end
+
+          it "multiple fields" do
+            options = {account: {only: [:name, :nickname]}}
+            Person.where(id: person_two.id).includes(options)[0].account.tap do |account|
+              [account.nickname, account.name, account.balance].should eq(["user1", "User 1", nil])
+            end
+          end
+
+          it "force loading foreign key field" do
+            options = {account: {only: :name}}
+            Person.where(id: person_two.id).includes(options)[0].
+              account.person_id.should eq(person_two.id)
+          end
+        end
+
+        context "option 'without'" do
+          it "one field" do
+            options = {account: {without: :nickname}}
+            Person.where(id: person_two.id).includes(options)[0].account.tap do |account|
+              [account.nickname, account.name].should eq([nil, "User 1"])
+            end
+          end
+
+          it "multiple fields" do
+            options = {account: {without: [:name, :nickname]}}
+            Person.where(id: person_two.id).includes(options)[0].account.tap do |account|
+              [account.nickname, account.name, account.balance].should eq([nil, nil, "ok"])
+            end
+          end
+
+          it "force loading foreign key field" do
+            options = {account: {without: :person_id}}
+            Person.where(id: person_two.id).includes(options)[0].
+              account.person_id.should eq(person_two.id)
+          end
+        end
+      end
+
+      context "with relation 'many-to-many" do
+
+        let(:person_two) do
+          Person.create(title: 'Mike', age: 20, ssn: 123456)
+        end
+
+        let!(:house_one) do
+          person_two.user_accounts.create(name: "User 1", username: "user1", email: "user1@example.com")
+        end
+
+        let!(:house_two) do
+          person_two.user_accounts.create(name: "User 2", username: "user2", email: "user2@example.com")
+        end
+
+        before do
+          Mongoid::IdentityMap.clear
+        end
+
+        context "option 'only'" do
+          it "one field" do
+            options = {user_accounts: {only: :username}}
+            Person.where(id: person_two.id).includes(options)[0].user_accounts.map { |account|
+              [account.username, account.name]
+            }.should eq([["user1", nil], ["user2", nil]])
+          end
+
+          it "multiple fields" do
+            options = {user_accounts: {only: [:name, :username]}}
+            Person.where(id: person_two.id).includes(options)[0].user_accounts.map { |account|
+              [account.username, account.name, account.email]
+            }.should eq([["user1", "User 1", nil], ["user2", "User 2", nil]])
+          end
+        end
+
+        context "option 'without'" do
+          it "one field" do
+            options = {user_accounts: {without: :username}}
+            Person.where(id: person_two.id).includes(options)[0].user_accounts.map { |account|
+              [account.username, account.name]
+            }.should eq([[nil, "User 1"], [nil, "User 2"]])
+          end
+
+          it "multiple fields" do
+            options = {user_accounts: {without: [:name, :username]}}
+            Person.where(id: person_two.id).includes(options)[0].user_accounts.map { |account|
+              [account.username, account.name, account.email]
+            }.should eq([[nil, nil, "user1@example.com"], [nil, nil, "user2@example.com"]])
+          end
         end
       end
     end
