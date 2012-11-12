@@ -139,7 +139,7 @@ module Rails
           # not provide application-level hooks for executing code after the
           # process has forked, so we reconnect lazily.
           if defined?(Unicorn) && !Unicorn::HttpServer::START_CTX.empty?
-            ::Mongoid.default_session.disconnect
+            ::Mongoid.default_session.disconnect if ::Mongoid.configured?
           end
 
           # Passenger provides the :starting_worker_process event for executing
