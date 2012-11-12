@@ -133,6 +133,13 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+## 3.0.13
+
+### Resolved Issues
+
+* \#2548 Fix error when generating config file with a fresh app with Unicorn in
+  the gemset.
+
 ## 3.0.12
 
 ### Resolved Issues
