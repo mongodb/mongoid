@@ -13,6 +13,8 @@ module Mongoid
     extend Options
     include ActiveModel::Observing
 
+    LOCK = Mutex.new
+
     option :allow_dynamic_fields, default: true
     option :identity_map_enabled, default: false
     option :include_root_in_json, default: false
@@ -108,7 +110,7 @@ module Mongoid
     #
     # @since 3.1.0
     def register_model(klass)
-      lock.synchronize do
+      LOCK.synchronize do
         models.push(klass) unless models.include?(klass)
       end
     end
@@ -255,22 +257,5 @@ module Mongoid
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end
-
-    private
-
-    # Gets the mutex for synchronizing methods on the configuration.
-    #
-    # @api private
-    #
-    # @example Get the mutex.
-    #   config.lock
-    #
-    # @return [ Mutex ] The mutex.
-    #
-    # @since 3.1.0
-    def lock
-      @mutex ||= Mutex.new
-    end
-
   end
 end
