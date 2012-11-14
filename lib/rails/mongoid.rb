@@ -3,20 +3,19 @@ module Rails
   module Mongoid
     extend self
 
-    # Create indexes for each model given the provided pattern and the class is
+    # Create indexes for each model given the provided globs and the class is
     # not embedded.
     #
     # @example Create all the indexes.
     #   Rails::Mongoid.create_indexes("app/models/**/*.rb")
     #
-    # @param [ String ] pattern The file matching pattern.
+    # @param [ Array<String> ] globs The file matching globs.
     #
-    # @return [ Array<String> ] The file names.
+    # @return [ Array<Class> ] The indexed models.
     #
     # @since 2.1.0
-    def create_indexes(pattern)
-      logger = Logger.new($stdout)
-      models(pattern).each do |model|
+    def create_indexes(*globs)
+      models(*globs).each do |model|
         next if model.index_options.empty?
         unless model.embedded?
           model.create_indexes
@@ -24,55 +23,76 @@ module Rails
           model.index_options.each_pair do |index, options|
             logger.info("MONGOID: Index: #{index}, Options: #{options}")
           end
+          model
         else
           logger.info("MONGOID: Index ignored on: #{model}, please define in the root model.")
+          nil
         end
-      end
+      end.compact
     end
 
-    # Remove indexes for each model given the provided pattern and the class is
+    # Remove indexes for each model given the provided globs and the class is
     # not embedded.
     #
     # @example Remove all the indexes.
     #   Rails::Mongoid.create_indexes("app/models/**/*.rb")
     #
-    # @param [ String ] pattern The file matching pattern.
+    # @param [ Array<String> ] globs The file matching globs.
     #
-    # @return [ Array<String> ] The file names.
+    # @return [ Array<Class> ] The un-indexed models.
     #
-    def remove_indexes(pattern)
-      logger = Logger.new($stdout)
-      models(pattern).each do |model|
+    def remove_indexes(*globs)
+      models(*globs).each do |model|
         next if model.embedded?
         indexes = model.collection.indexes.map{ |doc| doc["name"] }
         indexes.delete_one("_id_")
         model.remove_indexes
         logger.info("MONGOID: Removing indexes on: #{model} for: #{indexes.join(', ')}.")
-      end
+        model
+      end.compact
     end
 
-    # Return all models matching the pattern.
+    # Return all models matching the globs or, if no globs are specified, all
+    # possible models known from engines, the app, any gems, etc.
     #
-    # @example Return all models.
+    # @example Return *all* models.  Return all models under app/models/
+    #   Rails::Mongoid.models
     #   Rails::Mongoid.models("app/models/**/*.rb")
     #
-    # @param [ String ] pattern The file matching pattern.
+    # @param [ String ] glob The file matching glob.
     #
     # @return [ Array<Class> ] The models.
     #
-    def models(pattern)
-      Dir.glob(pattern).map do |file|
-        logger = Logger.new($stdout)
-        begin
-          determine_model(file, logger)
-        rescue => e
-          logger.error(%Q{MONGOID: Failed to determine model from #{file}:
-            #{e.class}:#{e.message}
-            #{e.backtrace.join("\n")}
-          })
-          nil
+    def models(*globs)
+      all_possible_models = globs.empty?
+
+      if globs.empty?
+        engines_models_paths = Rails.application.railties.engines.map{|engine| engine.paths["app/models"].expanded}
+        root_models_paths = Rails.application.paths["app/models"]
+        models_paths = engines_models_paths.push(root_models_paths).flatten
+        globs.replace(models_paths.map{|path| "#{path}/**/*.rb"})
+      end
+
+      models = []
+
+      globs.flatten.compact.each do |glob|
+        Dir.glob(glob).map do |file|
+          begin
+            model = determine_model(file, logger)
+            models.push(model)
+          rescue => e
+            logger.error(%Q{MONGOID: Failed to determine model from #{file}:
+              #{e.class}:#{e.message}
+              #{e.backtrace.join("\n")}
+            })
+            nil
+          end
         end
-      end.flatten.compact
+      end
+      
+      models = (::Mongoid.models | models) if all_possible_models
+
+      models.compact.sort_by{|model| model.name || ''}
     end
 
     # Use the application configuration to get every model and require it, so
@@ -150,5 +170,11 @@ module Rails
       end
       klass if klass.ancestors.include?(::Mongoid::Document)
     end
+
+    # Private logger object
+    #
+      def logger
+        @logger ||= Logger.new($stdout)
+      end
   end
 end

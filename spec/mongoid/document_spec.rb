@@ -14,6 +14,62 @@ describe Mongoid::Document do
     person.should_not respond_to(:_destroy)
   end
 
+  describe ".included" do
+    let(:models) do
+      Mongoid::Document.models
+    end
+
+    let(:new_klass_name) do
+      'NewKlassName'
+    end
+
+    let(:new_klass) do
+      Class.new do
+        class << self; attr_accessor :name; end
+      end.tap{|new_klass| new_klass.name = new_klass_name}
+    end
+
+    let(:new_model) do
+      new_klass.tap do
+        new_klass.send(:include, ::Mongoid::Document)
+      end
+    end
+
+    let(:twice_a_new_model) do
+      new_klass.tap do
+        2.times{ new_klass.send(:include, ::Mongoid::Document) }
+      end
+    end
+
+    it "should respond to :models" do
+      Mongoid::Document.should respond_to(:models)
+    end
+
+    context "when Document has been included in a model" do
+      it ".models should include that model" do
+        models.should include(klass)
+      end
+    end
+
+    context "before Document has been included" do
+      it ".models should *not* include that model" do
+        models.should_not include(new_klass)
+      end
+    end
+
+    context "after Document has been included" do
+      it ".models should include that model" do
+        models.should include(new_model)
+      end
+    end
+
+    context "after Document has been included multiple times" do
+      it ".models should include that model just once" do
+        models.count(twice_a_new_model).should be_eql(1)
+      end
+    end
+  end
+
   describe "#==" do
 
     context "when comparable is not a document" do
