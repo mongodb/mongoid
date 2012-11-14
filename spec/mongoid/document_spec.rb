@@ -15,8 +15,9 @@ describe Mongoid::Document do
   end
 
   describe ".included" do
+
     let(:models) do
-      Mongoid::Document.models
+      Mongoid.models
     end
 
     let(:new_klass_name) do
@@ -39,10 +40,6 @@ describe Mongoid::Document do
       new_klass.tap do
         2.times{ new_klass.send(:include, ::Mongoid::Document) }
       end
-    end
-
-    it "should respond to :models" do
-      Mongoid::Document.should respond_to(:models)
     end
 
     context "when Document has been included in a model" do

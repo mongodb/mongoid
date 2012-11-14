@@ -66,8 +66,9 @@ describe Mongoid do
   end
 
   describe ".models" do
+
     it "returns the list of known models" do
-      Mongoid.models.should eq(Mongoid::Document.models)
+      Mongoid.models.should include(Band)
     end
   end
 end

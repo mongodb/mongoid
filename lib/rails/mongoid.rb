@@ -89,10 +89,10 @@ module Rails
           end
         end
       end
-      
+
       models = (::Mongoid.models | models) if all_possible_models
 
-      models.compact.sort_by{|model| model.name || ''}
+      models.compact.sort_by { |model| model.name || '' }
     end
 
     # Use the application configuration to get every model and require it, so
@@ -171,10 +171,8 @@ module Rails
       klass if klass.ancestors.include?(::Mongoid::Document)
     end
 
-    # Private logger object
-    #
-      def logger
-        @logger ||= Logger.new($stdout)
-      end
+    def logger
+      @logger ||= Logger.new($stdout)
+    end
   end
 end

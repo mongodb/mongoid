@@ -86,6 +86,33 @@ module Mongoid
       settings
     end
 
+    # Get all the models in the application - this is everything that includes
+    # Mongoid::Document.
+    #
+    # @example Get all the models.
+    #   config.models
+    #
+    # @return [ Array<Class> ] All the models in the application.
+    #
+    # @since 3.1.0
+    def models
+      @models ||= []
+    end
+
+    # Register a model in the application with Mongoid.
+    #
+    # @example Register a model.
+    #   config.register_model(Band)
+    #
+    # @param [ Class ] klass The model to register.
+    #
+    # @since 3.1.0
+    def register_model(klass)
+      lock.synchronize do
+        models.push(klass) unless models.include?(klass)
+      end
+    end
+
     # From a hash of settings, load all the configuration.
     #
     # @example Load the configuration.
@@ -228,5 +255,22 @@ module Mongoid
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
     end
+
+    private
+
+    # Gets the mutex for synchronizing methods on the configuration.
+    #
+    # @api private
+    #
+    # @example Get the mutex.
+    #   config.lock
+    #
+    # @return [ Mutex ] The mutex.
+    #
+    # @since 3.1.0
+    def lock
+      @mutex ||= Mutex.new
+    end
+
   end
 end

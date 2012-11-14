@@ -10,6 +10,10 @@ module Mongoid
     attr_accessor :criteria_instance_id
     attr_reader :new_record
 
+    included do
+      Mongoid.register_model(self)
+    end
+
     # Default comparison is via the string version of the id.
     #
     # @example Compare two documents.
@@ -358,28 +362,6 @@ module Mongoid
       def logger
         Mongoid.logger
       end
-    end
-
-    # Track all document classes
-    #
-    # @return [ Array<Class> ] All document classes
-    #
-    # @since 3.1.0
-    def Document.included(other)
-      super
-    ensure
-      Mongoid.models.delete_if{|model| model.name == other.name}
-      Mongoid.models.push(other)
-    end
-
-    # Returns the list of all classes known to have included
-    # Mongoid::Document
-    #
-    # @return [ Array<Class> ] All document classes
-    #
-    # @since 3.1.0
-    def Document.models
-      @models ||= []
     end
   end
 end

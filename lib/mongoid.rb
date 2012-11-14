@@ -151,15 +151,6 @@ module Mongoid
     Sessions.with_name(name)
   end
 
-  # Return the list of all known Mongoid models
-  #
-  # @return [ Array<Class> ] All Mongoid models
-  #
-  # @since 3.1.0
-  def models
-    Document.models
-  end
-
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.
   #

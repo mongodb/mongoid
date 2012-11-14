@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2539 `Mongoid.models` now tracks all models in the application for more
+  accurate determination of models for things such as indexing rake tasks.
+  (Ara Howard)
+
 * \#2525 Added the ability to have short timestamped fields with aliases. This
   sets timestamp fields as `c_at` and `u_at` that are also aliased as
   `created_at` and `updated_at` for convenience. (Rodrigo Saito)
