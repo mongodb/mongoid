@@ -4,19 +4,18 @@ describe "Rails::Mongoid" do
 
   before(:all) do
     require "rails/mongoid"
+    ::Mongoid.models.delete_if do |model|
+      ![ User, Account, Address ].include?(model)
+    end
   end
 
   describe ".create_indexes" do
-
-    let(:pattern) do
-      "spec/app/models/**/*.rb"
-    end
 
     let(:logger) do
       stub
     end
 
-    let(:klass) do
+    let!(:klass) do
       User
     end
 
@@ -25,11 +24,7 @@ describe "Rails::Mongoid" do
     end
 
     let(:indexes) do
-      Rails::Mongoid.create_indexes(pattern)
-    end
-
-    before do
-      Dir.should_receive(:glob).once.with(pattern).and_return(model_paths)
+      Rails::Mongoid.create_indexes
     end
 
     context "with ordinary Rails models" do
@@ -41,10 +36,6 @@ describe "Rails::Mongoid" do
     end
 
     context "with a model without indexes" do
-
-      let(:model_paths) do
-        [ "spec/app/models/account.rb" ]
-      end
 
       let(:klass) do
         Account
@@ -59,7 +50,6 @@ describe "Rails::Mongoid" do
     context "when an exception is raised" do
 
       it "is not swallowed" do
-        Rails::Mongoid.should_receive(:determine_model).and_return(klass)
         klass.should_receive(:create_indexes).and_raise(ArgumentError)
         expect { indexes }.to raise_error(ArgumentError)
       end
@@ -67,12 +57,8 @@ describe "Rails::Mongoid" do
 
     context "when index is defined on embedded model" do
 
-      let(:klass) do
+      let!(:klass) do
         Address
-      end
-
-      let(:model_paths) do
-        [ "spec/app/models/address.rb" ]
       end
 
       before do
@@ -88,24 +74,12 @@ describe "Rails::Mongoid" do
 
   describe ".remove_indexes" do
 
-    let(:pattern) do
-      "spec/app/models/**/*.rb"
-    end
-
     let(:logger) do
       stub
     end
 
-    let(:klass) do
+    let!(:klass) do
       User
-    end
-
-    let(:model_paths) do
-      [ "spec/app/models/user.rb" ]
-    end
-
-    before do
-      Dir.should_receive(:glob).with(pattern).exactly(2).times.and_return(model_paths)
     end
 
     let(:indexes) do
@@ -113,8 +87,8 @@ describe "Rails::Mongoid" do
     end
 
     before :each do
-      Rails::Mongoid.create_indexes(pattern)
-      Rails::Mongoid.remove_indexes(pattern)
+      Rails::Mongoid.create_indexes
+      Rails::Mongoid.remove_indexes
     end
 
     it "removes indexes from klass" do
@@ -126,44 +100,13 @@ describe "Rails::Mongoid" do
     end
   end
 
-  describe ".models" do
-
-    let(:pattern) do
-      "spec/app/models/**/*.rb"
-    end
-
-    let(:logger) do
-      stub
-    end
-
-    let(:klass) do
-      User
-    end
-
-    let(:model_paths) do
-      [ "spec/app/models/user.rb" ]
-    end
-
-    let(:models) do
-      Rails::Mongoid.models(pattern)
-    end
-
-    before do
-      Dir.should_receive(:glob).with(pattern).once.and_return(model_paths)
-    end
-
-    it "returns models which files matching the pattern" do
-      models.should eq([klass])
-    end
-  end
-
   describe ".determine_model" do
 
     let(:logger) do
       stub
     end
 
-    let(:klass) do
+    let!(:klass) do
       User
     end
 
