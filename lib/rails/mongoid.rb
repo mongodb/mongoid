@@ -7,15 +7,13 @@ module Rails
     # not embedded.
     #
     # @example Create all the indexes.
-    #   Rails::Mongoid.create_indexes("app/models/**/*.rb")
-    #
-    # @param [ Array<String> ] globs The file matching globs.
+    #   Rails::Mongoid.create_indexes
     #
     # @return [ Array<Class> ] The indexed models.
     #
     # @since 2.1.0
-    def create_indexes(*globs)
-      models(*globs).each do |model|
+    def create_indexes
+      ::Mongoid.models.each do |model|
         next if model.index_options.empty?
         unless model.embedded?
           model.create_indexes
@@ -35,14 +33,12 @@ module Rails
     # not embedded.
     #
     # @example Remove all the indexes.
-    #   Rails::Mongoid.create_indexes("app/models/**/*.rb")
-    #
-    # @param [ Array<String> ] globs The file matching globs.
+    #   Rails::Mongoid.create_indexes
     #
     # @return [ Array<Class> ] The un-indexed models.
     #
-    def remove_indexes(*globs)
-      models(*globs).each do |model|
+    def remove_indexes
+      ::Mongoid.models.each do |model|
         next if model.embedded?
         indexes = model.collection.indexes.map{ |doc| doc["name"] }
         indexes.delete_one("_id_")
@@ -50,49 +46,6 @@ module Rails
         logger.info("MONGOID: Removing indexes on: #{model} for: #{indexes.join(', ')}.")
         model
       end.compact
-    end
-
-    # Return all models matching the globs or, if no globs are specified, all
-    # possible models known from engines, the app, any gems, etc.
-    #
-    # @example Return *all* models.  Return all models under app/models/
-    #   Rails::Mongoid.models
-    #   Rails::Mongoid.models("app/models/**/*.rb")
-    #
-    # @param [ String ] glob The file matching glob.
-    #
-    # @return [ Array<Class> ] The models.
-    #
-    def models(*globs)
-      all_possible_models = globs.empty?
-
-      if globs.empty?
-        engines_models_paths = Rails.application.railties.engines.map{|engine| engine.paths["app/models"].expanded}
-        root_models_paths = Rails.application.paths["app/models"]
-        models_paths = engines_models_paths.push(root_models_paths).flatten
-        globs.replace(models_paths.map{|path| "#{path}/**/*.rb"})
-      end
-
-      models = []
-
-      globs.flatten.compact.each do |glob|
-        Dir.glob(glob).map do |file|
-          begin
-            model = determine_model(file, logger)
-            models.push(model)
-          rescue => e
-            logger.error(%Q{MONGOID: Failed to determine model from #{file}:
-              #{e.class}:#{e.message}
-              #{e.backtrace.join("\n")}
-            })
-            nil
-          end
-        end
-      end
-
-      models = (::Mongoid.models | models) if all_possible_models
-
-      models.compact.sort_by { |model| model.name || '' }
     end
 
     # Use the application configuration to get every model and require it, so
