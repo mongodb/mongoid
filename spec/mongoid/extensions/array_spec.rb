@@ -576,6 +576,28 @@ describe Mongoid::Extensions::Array do
         end
       end
 
+      context "when the element is resizable Hash instance" do
+
+        let(:array) do
+          [{'key' => 'value'}]
+        end
+
+        it "returns false" do
+          array.should_not be_multi_arged
+        end
+      end
+
+      context "when the element is array of resizable Hash instances" do
+
+        let(:array) do
+          [[{'key1' => 'value2'},{'key1' => 'value2'}]]
+        end
+
+        it "returns true" do
+          array.should be_multi_arged
+        end
+      end
+
       context "when the element is an array" do
 
         let(:array) do
