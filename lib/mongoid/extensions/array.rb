@@ -74,7 +74,7 @@ module Mongoid
       #
       # @since 3.0.0
       def multi_arged?
-        first.resizable? || size > 1
+        !first.is_a?(Hash) && first.resizable? || size > 1
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
