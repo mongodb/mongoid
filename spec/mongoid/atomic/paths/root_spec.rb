@@ -31,6 +31,21 @@ describe Mongoid::Atomic::Paths::Root do
     end
   end
 
+  describe "#insert_modifier" do
+
+    let(:address) do
+      person.addresses.build
+    end
+
+    let(:root) do
+      described_class.new(address)
+    end
+
+    it "raises a mixed relations error" do
+      expect { root.insert_modifier }.to raise_error(Mongoid::Errors::InvalidPath)
+    end
+  end
+
   describe "#selector" do
 
     context "when using a shard key" do

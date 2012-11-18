@@ -21,6 +21,19 @@ module Mongoid
           @document, @path, @position = document, "", ""
         end
 
+        # Asking for the insert modifier on a document with a root path
+        # indicates a mixed relation most likely happened.
+        #
+        # @example Attempt to get the insert modifier.
+        #   root.insert_modifier
+        #
+        # @raise [ Errors::InvalidPath ] The error for the attempt.
+        #
+        # @since 3.0.14
+        def insert_modifier
+          raise Errors::InvalidPath.new(document.class)
+        end
+
         # Get the selector to use for the root document when performing atomic
         # updates. When sharding this will include the shard key.
         #
