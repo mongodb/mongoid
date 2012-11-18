@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 3.0.14
+
+### Resolved Issues
+
+* \#2552 Ensure `InvalidPath` errors are raised when embedded documents try to
+  get paths from a root selector.
+
 ## 3.0.13
 
 ### Resolved Issues
