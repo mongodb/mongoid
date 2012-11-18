@@ -2,6 +2,7 @@ source "http://rubygems.org"
 gemspec
 
 gem "rake"
+gem "moped", "~> 1.3.0"
 gem "moped-turbo", "~> 0.0.1"
 
 group :test do
