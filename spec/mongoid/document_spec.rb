@@ -672,6 +672,23 @@ describe Mongoid::Document do
         person.as_document["addresses"].should be_empty
       end
     end
+
+    context "when an embedded relation has been set to nil" do
+
+      before do
+        # Save the doc, then set an embeds_one relation to nil
+        person.save
+        person.name = nil
+        person.save
+
+        # Reload the document so the underlying document updates
+        person.reload
+      end
+
+      it "does not include the document in the hash" do
+        person.as_document.should_not have_key("name")
+      end
+    end
   end
 
   describe "#to_key" do

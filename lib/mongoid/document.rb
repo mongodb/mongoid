@@ -196,7 +196,7 @@ module Mongoid
       embedded_relations.each_pair do |name, meta|
         without_autobuild do
           relation, stored = send(name), meta.store_as
-          if attributes.has_key?(stored) || !relation.blank?
+          if (attributes.has_key?(stored) && !relation.nil?) || !relation.blank?
             attributes[stored] = relation.as_document
           end
         end
