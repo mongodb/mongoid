@@ -83,10 +83,6 @@ describe Mongoid::Config do
         described_class.reset
       end
 
-      it "sets the allow dynamic fields option" do
-        described_class.allow_dynamic_fields.should be_true
-      end
-
       it "sets the identity map option" do
         described_class.identity_map_enabled.should be_false
       end
@@ -139,10 +135,6 @@ describe Mongoid::Config do
 
         before do
           described_class.load!(file)
-        end
-
-        it "sets the allow dynamic fields option" do
-          described_class.allow_dynamic_fields.should be_true
         end
 
         it "sets the identity map option" do
@@ -237,7 +229,7 @@ describe Mongoid::Config do
       end
 
       it "does not try to assign options" do
-        described_class.allow_dynamic_fields.should be_true
+        described_class.identity_map_enabled.should be_false
       end
     end
 

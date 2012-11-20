@@ -15,18 +15,18 @@ describe Mongoid do
 
       before do
         Mongoid.configure do |config|
-          config.allow_dynamic_fields = false
+          config.identity_map_enabled = false
         end
       end
 
       after do
         Mongoid.configure do |config|
-          config.allow_dynamic_fields = true
+          config.identity_map_enabled = true
         end
       end
 
       it "sets the values on the config instance" do
-        Mongoid.allow_dynamic_fields.should be_false
+        Mongoid.identity_map_enabled.should be_false
       end
     end
   end
