@@ -1,5 +1,6 @@
 class Book
   include Mongoid::Document
+  include Mongoid::Attributes::Dynamic
   field :title, type: String
   field :chapters, type: Integer
   belongs_to :series

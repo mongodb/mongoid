@@ -532,10 +532,6 @@ describe Mongoid::Attributes do
       Person.new(attributes)
     end
 
-    before do
-      Mongoid.configure.allow_dynamic_fields = true
-    end
-
     context "when an attribute exists" do
 
       it "allows the getter" do
@@ -582,10 +578,6 @@ describe Mongoid::Attributes do
           Person.new(attributes)
         end
 
-        before do
-          Mongoid.configure.allow_dynamic_fields = true
-        end
-
         context "when attribute is a string" do
 
           it "adds the string to the attributes" do
@@ -603,22 +595,9 @@ describe Mongoid::Attributes do
 
       context "when not allowing dynamic fields" do
 
-        let!(:attributes) do
-          { nofieldstring: "Testing" }
-        end
-
-        before do
-          Mongoid.configure.allow_dynamic_fields = false
-          Person.fields.delete(:nofieldstring)
-        end
-
-        after do
-          Mongoid.configure.allow_dynamic_fields = true
-        end
-
-        it "raises an unknown attribute error" do
+        it "raises an unknown attribute error on instantiation" do
           expect {
-            Person.new({ anothernew: "Test" })
+            Bar.new({ anothernew: "Test" })
           }.to raise_error(Mongoid::Errors::UnknownAttribute)
         end
       end
@@ -1055,10 +1034,6 @@ describe Mongoid::Attributes do
         Person.new
       end
 
-      before(:all) do
-        Mongoid.allow_dynamic_fields = true
-      end
-
       context "when asking for the getter" do
 
         context "when the attribute exists" do
@@ -1104,29 +1079,21 @@ describe Mongoid::Attributes do
 
     context "when not allowing dynamic fields" do
 
-      let(:person) do
-        Person.new
-      end
-
-      before(:all) do
-        Mongoid.allow_dynamic_fields = false
-      end
-
-      after(:all) do
-        Mongoid.allow_dynamic_fields = true
+      let(:bar) do
+        Bar.new
       end
 
       context "when asking for the getter" do
 
         it "returns false" do
-          person.should_not respond_to(:attr)
+          bar.should_not respond_to(:attr)
         end
       end
 
       context "when asking for the setter" do
 
         it "returns false" do
-          person.should_not respond_to(:attr=)
+          bar.should_not respond_to(:attr=)
         end
       end
     end
@@ -1527,31 +1494,6 @@ describe Mongoid::Attributes do
 
         it "applies the defaults after all attributes are set" do
           from_db.should be_balanced
-        end
-      end
-    end
-  end
-
-  context "when dynamic fields are not allowed" do
-
-    before do
-      Mongoid.configure.allow_dynamic_fields = false
-    end
-
-    after do
-      Mongoid.configure.allow_dynamic_fields = true
-    end
-
-    context "when an embedded document has been persisted" do
-
-      context "when the field is no longer recognized" do
-
-        before do
-          Person.collection.insert 'pet' => { 'unrecognized_field' => true }
-        end
-
-        it "allows access to the legacy data" do
-          Person.first.pet.read_attribute(:unrecognized_field).should be_true
         end
       end
     end

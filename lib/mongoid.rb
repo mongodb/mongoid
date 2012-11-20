@@ -43,6 +43,7 @@ require "mongoid/threaded"
 require "mongoid/relations"
 require "mongoid/atomic"
 require "mongoid/attributes"
+require "mongoid/attributes/dynamic"
 require "mongoid/callbacks"
 require "mongoid/config"
 require "mongoid/contextual"
@@ -104,7 +105,6 @@ module Mongoid
   #
   # @example Set up configuration options.
   #   Mongoid.configure do |config|
-  #     config.allow_dynamic_fields = false
   #     config.use(name: "mongoid_test", host: "localhost", port: 27017)
   #   end
   #

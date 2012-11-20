@@ -1,5 +1,6 @@
 class Acolyte
   include Mongoid::Document
+  include Mongoid::Attributes::Dynamic
   field :status
   field :name
 
