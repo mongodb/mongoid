@@ -92,14 +92,9 @@ module Mongoid
       #
       # @since 2.0.0.rc.7
       def process_attribute(name, value)
-        writer_method = "#{name}="
-        responds = respond_to?(writer_method)
-        if Mongoid.allow_dynamic_fields && !responds
-          write_attribute(name, value)
-        else
-          raise Errors::UnknownAttribute.new(self.class, name) unless responds
-          send(writer_method, value)
-        end
+        responds = respond_to?("#{name}=")
+        raise Errors::UnknownAttribute.new(self.class, name) unless responds
+        send("#{name}=", value)
       end
 
       # Process all the pending nested attributes that needed to wait until

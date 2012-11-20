@@ -16,13 +16,13 @@ describe Mongoid::Errors::UnknownAttribute do
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "When setting Mongoid.allow_dynamic_fields to false"
+        "Without including Mongoid::Attributes::Dynamic in your model"
       )
     end
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "You can set Mongoid.allow_dynamic_fields to true"
+        "You can include Mongoid::Attributes::Dynamic"
       )
     end
   end

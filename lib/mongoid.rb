@@ -47,7 +47,6 @@ module Mongoid
   #
   # @example Set up configuration options.
   #   Mongoid.configure do |config|
-  #     config.allow_dynamic_fields = false
   #     config.use(name: "mongoid_test", host: "localhost", port: 27017)
   #   end
   #

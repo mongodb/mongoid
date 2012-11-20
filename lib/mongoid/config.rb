@@ -16,7 +16,6 @@ module Mongoid
 
     LOCK = Mutex.new
 
-    option :allow_dynamic_fields, default: true
     option :identity_map_enabled, default: false
     option :include_root_in_json, default: false
     option :include_type_for_serialization, default: false

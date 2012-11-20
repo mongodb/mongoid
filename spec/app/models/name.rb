@@ -1,5 +1,6 @@
 class Name
   include Mongoid::Document
+  include Mongoid::Attributes::Dynamic
 
   field :_id, type: String, default: ->{
     "#{first_name}-#{last_name}"

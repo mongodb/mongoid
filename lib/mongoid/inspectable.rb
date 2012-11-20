@@ -53,14 +53,7 @@ module Mongoid
     #
     # @since 1.0.0
     def inspect_dynamic_fields
-      if Mongoid.allow_dynamic_fields
-        keys = @attributes.keys - fields.keys - relations.keys - ["_id", "_type"]
-        return keys.map do |name|
-          "#{name}: #{@attributes[name].inspect}"
-        end
-      else
-        []
-      end
+      []
     end
   end
 end

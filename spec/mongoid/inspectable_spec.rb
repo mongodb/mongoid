@@ -6,10 +6,6 @@ describe Mongoid::Inspectable do
 
     context "when not allowing dynamic fields" do
 
-      before do
-        Mongoid.configure.allow_dynamic_fields = false
-      end
-
       let(:person) do
         Person.new(title: "CEO")
       end
@@ -43,10 +39,6 @@ describe Mongoid::Inspectable do
 
       let(:inspected) do
         person.inspect
-      end
-
-      before do
-        Mongoid.configure.allow_dynamic_fields = true
       end
 
       it "includes dynamic attributes" do

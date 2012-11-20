@@ -1,5 +1,6 @@
 class Person
   include Mongoid::Document
+  include Mongoid::Attributes::Dynamic
   attr_accessor :mode
 
   class_attribute :somebody_elses_important_class_options

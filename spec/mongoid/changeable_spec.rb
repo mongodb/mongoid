@@ -783,7 +783,6 @@ describe Mongoid::Changeable do
         end
 
         before do
-          Mongoid.configure.allow_dynamic_fields = true
           person.other_name[:full][:first] = 'Name'
         end
 

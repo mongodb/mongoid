@@ -411,12 +411,12 @@ en:
         unknown_attribute:
           message: "Attempted to set a value for '%{name}' which is not
             allowed on the model %{klass}."
-          summary: "When setting Mongoid.allow_dynamic_fields to false and the
-            attribute does not already exist in the attributes hash, attempting
-            to call %{klass}#%{name}= for it is not allowed. This is also
-            triggered by passing the attribute to any method that accepts an
+          summary: "Without including Mongoid::Attributes::Dynamic in your model
+            and the attribute does not already exist in the attributes hash,
+            attempting to call %{klass}#%{name}= for it is not allowed. This is
+            also triggered by passing the attribute to any method that accepts an
             attributes hash, and is raised instead of getting a NoMethodError."
-          resolution: "You can set Mongoid.allow_dynamic_fields to true if you
+          resolution: "You can include Mongoid::Attributes::Dynamic if you
             expect to be writing values for undefined fields often."
         unsaved_document:
           message: "Attempted to save %{document} before the parent %{base}."
