@@ -447,7 +447,7 @@ en:
         unknown_attribute:
           message: "Attempted to set a value for '%{name}' which is not
             allowed on the model %{klass}."
-          summary: "Witout including Mongoid::Attributes::Dynamic in your model
+          summary: "Without including Mongoid::Attributes::Dynamic in your model
             and the attribute does not already exist in the attributes hash,
             attempting to call %{klass}#%{name}= for it is not allowed. This is
             also triggered by passing the attribute to any method that accepts an
