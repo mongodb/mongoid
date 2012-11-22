@@ -29,8 +29,6 @@ en:
         \_\_out:      %{out}>\n"
     errors:
       messages:
-        blank:
-          "can't be blank"
         blank_in_locale:
           "can't be blank in %{location}"
         ambiguous_relationship:
