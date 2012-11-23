@@ -64,7 +64,9 @@ module Mongoid
         def mongoize(object)
           return nil if object.blank?
           begin
-            ::Time.at(object.__mongoize_time__.to_f).utc
+            t = object.__mongoize_time__
+            usec = t.strftime("%9N").to_i / 10**3.0
+            ::Time.at(t.to_i, usec).utc
           rescue ArgumentError
             raise Errors::InvalidTime.new(object)
           end
