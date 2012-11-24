@@ -680,9 +680,6 @@ describe Mongoid::Document do
         person.save
         person.name = nil
         person.save
-
-        # Reload the document so the underlying document updates
-        person.reload
       end
 
       it "does not include the document in the hash" do
