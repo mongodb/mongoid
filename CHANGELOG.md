@@ -141,6 +141,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2575 Prevent end of month times from rounding up since floats are not
+  precise enough to handle usec. (Steve Valaitis)
+
 * \#2573 Don't use i18n for inspection messages.
 
 * \#2571 Remove blank error message from locales. (Jordan Elver)

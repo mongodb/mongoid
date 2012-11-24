@@ -262,10 +262,19 @@ describe Mongoid::Extensions::Time do
         Time.mongoize(time).to_f.round(3).should eq(time.to_f.round(3))
       end
 
-      it "doesn't round up at end of month" do
+      it "doesn't round up the hour at end of month" do
         eom_time_mongoized.hour.should eq(eom_time.utc.hour)
+      end
+
+      it "doesn't round up the minute" do
         eom_time_mongoized.min.should eq(eom_time.utc.min)
+      end
+
+      it "doesn't round up the seconds" do
         eom_time_mongoized.sec.should eq(eom_time.utc.sec)
+      end
+
+      it "does not alter seconds" do
         (eom_time_mongoized.strftime("%11N").to_i / 100.0).round(0).should eq(999999999)
       end
 
@@ -292,10 +301,19 @@ describe Mongoid::Extensions::Time do
           )
         end
 
-        it "doesn't round up at end of month" do
+        it "doesn't round up the hour" do
           eom_time_mongoized.hour.should eq(eom_time.utc.hour)
+        end
+
+        it "doesn't round up the minutes" do
           eom_time_mongoized.min.should eq(eom_time.utc.min)
+        end
+
+        it "doesn't round up the seconds" do
           eom_time_mongoized.sec.should eq(eom_time.utc.sec)
+        end
+
+        it "does not alter the seconds" do
           (eom_time_mongoized.strftime("%11N").to_i / 100.0).round(0).should eq(999999999)
         end
       end
