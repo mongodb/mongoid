@@ -121,6 +121,7 @@ module Mongoid
           doc = super
           if doc && persistable?
             base.pull(foreign_key, doc.id)
+            target._unloaded = criteria
             unsynced(base, foreign_key)
           end
           doc
