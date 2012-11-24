@@ -3,7 +3,6 @@ gemspec
 
 gem "rake"
 gem "moped", "~> 1.3.0"
-gem "moped-turbo", "~> 0.0.1"
 
 group :test do
   gem "rspec", "~> 2.11"
@@ -11,6 +10,7 @@ group :test do
   unless ENV["CI"]
     gem "guard"
     gem "guard-rspec"
+    gem "moped-turbo", "~> 0.0.1"
     gem "rb-fsevent"
   end
 end
