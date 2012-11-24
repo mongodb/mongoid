@@ -58,6 +58,21 @@ module Mongoid
         ivar(name)
       end
 
+      # Resets the criteria inside the relation proxy. Used by many to many
+      # relations to keep the underlying ids array in sync.
+      #
+      # @example Reset the relation criteria.
+      #   person.reset_relation_criteria(:preferences)
+      #
+      # @param [ Symbol ] name The name of the relation.
+      #
+      # @since 3.0.14
+      def reset_relation_criteria(name)
+        if instance_variable_defined?("@#{name}")
+          send(name).reset_relation_criteria
+        end
+      end
+
       # Set the supplied relation to an instance variable on the class with the
       # provided name. Used as a helper just for code cleanliness.
       #

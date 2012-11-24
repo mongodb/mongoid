@@ -19,7 +19,10 @@ module Mongoid
           def bind_one(doc)
             binding do
               inverse_keys = doc.you_must(metadata.inverse_foreign_key)
-              inverse_keys.push(base.id) if inverse_keys
+              if inverse_keys
+                inverse_keys.push(base.id)
+                doc.reset_relation_criteria(metadata.inverse)
+              end
               base.synced[metadata.foreign_key] = true
               doc.synced[metadata.inverse_foreign_key] = true
             end
@@ -35,7 +38,10 @@ module Mongoid
             binding do
               base.send(metadata.foreign_key).delete_one(doc.id)
               inverse_keys = doc.you_must(metadata.inverse_foreign_key)
-              inverse_keys.delete_one(base.id) if inverse_keys
+              if inverse_keys
+                inverse_keys.delete_one(base.id)
+                doc.reset_relation_criteria(metadata.inverse)
+              end
               base.synced[metadata.foreign_key] = true
               doc.synced[metadata.inverse_foreign_key] = true
             end

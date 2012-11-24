@@ -181,7 +181,11 @@ module Mongoid
         # @since 2.0.0.rc.1
         def substitute(replacement)
           purge
-          push(replacement.compact.uniq) unless replacement.blank?
+          unless replacement.blank?
+            push(replacement.compact.uniq)
+          else
+            reset_relation_criteria
+          end
           self
         end
 

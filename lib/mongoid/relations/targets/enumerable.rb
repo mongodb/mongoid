@@ -147,10 +147,10 @@ module Mongoid
         #     puts doc
         #   end
         #
-        # @example return an enumerator containing all the docs 
+        # @example return an enumerator containing all the docs
         #
         #   a = enumerable.each
-        #  
+        #
         # @return [ true ] That the enumerable is now _loaded.
         #
         # @since 2.1.0
@@ -320,6 +320,19 @@ module Mongoid
         def reset
           _loaded.clear and _added.clear
           @executed = false
+        end
+
+        # Resets the underlying unloaded criteria object with a new one. Used
+        # my HABTM relations to keep the underlying array in sync.
+        #
+        # @example Reset the unloaded documents.
+        #   enumerable.reset_unloaded(criteria)
+        #
+        # @param [ Criteria ] criteria The criteria to replace with.
+        #
+        # @since 3.0.14
+        def reset_unloaded(criteria)
+          @_unloaded = criteria if _unloaded.is_a?(Criteria)
         end
 
         # Does this enumerable respond to the provided method?
