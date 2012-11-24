@@ -144,6 +144,8 @@ For instructions on upgrading to newer versions, visit
 * \#2552 Ensure `InvalidPath` errors are raised when embedded documents try to
   get paths from a root selector.
 
+* \#2571 Remove blank error message from locales. (Jordan Elver)
+
 ## 3.0.13
 
 ### Resolved Issues
