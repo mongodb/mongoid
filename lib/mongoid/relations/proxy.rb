@@ -39,6 +39,17 @@ module Mongoid
         extend_proxy(metadata.extension) if metadata.extension?
       end
 
+      # Resets the criteria inside the relation proxy. Used by many to many
+      # relations to keep the underlying ids array in sync.
+      #
+      # @example Reset the relation criteria.
+      #   person.preferences.reset_relation_criteria
+      #
+      # @since 3.0.14
+      def reset_relation_criteria
+        target.reset_unloaded(criteria)
+      end
+
       # The default substitutable object for a relation proxy is the clone of
       # the target.
       #
