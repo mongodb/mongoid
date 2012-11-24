@@ -143,33 +143,71 @@ describe Mongoid::Validations::UniquenessValidator do
 
         context "when the field is localized" do
 
-          before do
-            Dictionary.validates_uniqueness_of :description
+          context "when no scope is provided" do
+
+            before do
+              Dictionary.validates_uniqueness_of :description
+            end
+
+            after do
+              Dictionary.reset_callbacks(:validate)
+            end
+
+            context "when the attribute is not unique" do
+
+              context "when the document is not the match" do
+
+                before do
+                  Dictionary.with(safe: true).create(description: "english")
+                end
+
+                let(:dictionary) do
+                  Dictionary.new(description: "english")
+                end
+
+                it "returns false" do
+                  dictionary.should_not be_valid
+                end
+
+                it "adds the uniqueness error" do
+                  dictionary.valid?
+                  dictionary.errors[:description].should eq([ "is already taken" ])
+                end
+              end
+            end
           end
 
-          after do
-            Dictionary.reset_callbacks(:validate)
-          end
+          context "when a scope is provided" do
 
-          context "when the attribute is not unique" do
+            before do
+              Dictionary.validates_uniqueness_of :description, scope: :name
+            end
 
-            context "when the document is not the match" do
+            after do
+              Dictionary.reset_callbacks(:validate)
+            end
 
-              before do
-                Dictionary.with(safe: true).create(description: "english")
-              end
+            context "when the attribute is not unique in the scope" do
 
-              let(:dictionary) do
-                Dictionary.new(description: "english")
-              end
+              context "when the document is not the match" do
 
-              it "returns false" do
-                dictionary.should_not be_valid
-              end
+                before do
+                  Dictionary.with(safe: true).
+                    create(description: "english", name: "test")
+                end
 
-              it "adds the uniqueness error" do
-                dictionary.valid?
-                dictionary.errors[:description].should eq([ "is already taken" ])
+                let(:dictionary) do
+                  Dictionary.new(description: "english", name: "test")
+                end
+
+                it "returns false" do
+                  dictionary.should_not be_valid
+                end
+
+                it "adds the uniqueness error" do
+                  dictionary.valid?
+                  dictionary.errors[:description].should eq([ "is already taken" ])
+                end
               end
             end
           end

@@ -105,13 +105,13 @@ module Mongoid
       # @since 2.4.10
       def create_criteria(base, document, attribute, value)
         field = document.fields[attribute.to_s]
-        criteria = base.unscoped
+        criteria = scope(base.unscoped, document, attribute)
         if field.try(:localized?)
           criteria.selector.update(criterion(document, attribute, value))
         else
           criteria = criteria.where(criterion(document, attribute, value))
         end
-        scope(criteria, document, attribute)
+        criteria
       end
 
       # Get the default criteria for checking uniqueness.
