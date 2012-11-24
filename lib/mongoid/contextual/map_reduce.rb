@@ -201,6 +201,26 @@ module Mongoid
         results["timeMillis"]
       end
 
+      # Get a pretty string representation of the map/reduce, including the
+      # criteria, map, reduce, finalize, and out option.
+      #
+      # @example Inspect the map_reduce.
+      #   map_reduce.inspect
+      #
+      # @return [ String ] The inspection string.
+      #
+      # @since 3.1.0
+      def inspect
+%Q{#<Mongoid::Contextual::MapReduce
+  selector: #{criteria.selector.inspect}
+  class:    #{criteria.klass}
+  map:      #{command[:map]}
+  reduce:   #{command[:reduce]}
+  finalize: #{command[:finalize]}
+  out:      #{command[:out].inspect}>
+}
+      end
+
       private
 
       # Apply criteria specific options - query, sort, limit.

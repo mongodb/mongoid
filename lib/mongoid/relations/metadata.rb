@@ -357,25 +357,21 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def inspect
-        ::I18n.translate(
-          "mongoid.inspection.metadata",
-          {
-            autobuild: autobuilding?,
-            class_name: class_name,
-            cyclic: cyclic.inspect,
-            dependent: dependent.inspect,
-            inverse_of: inverse_of.inspect,
-            key: key,
-            locale: :en,
-            macro: macro,
-            name: name,
-            order: order.inspect,
-            polymorphic: polymorphic?,
-            relation: relation,
-            setter: setter,
-            versioned: versioned?
-          }
-        )
+%Q{#<Mongoid::Relations::Metadata
+  autobuild:    #{autobuilding?}
+  class_name:   #{class_name}
+  cyclic:       #{cyclic.inspect}
+  dependent:    #{dependent.inspect}
+  inverse_of:   #{inverse_of.inspect}
+  key:          #{key}
+  macro:        #{macro}
+  name:         #{name}
+  order:        #{order.inspect}
+  polymorphic:  #{polymorphic?}
+  relation:     #{relation}
+  setter:       #{setter}
+  versioned:    #{versioned?}>
+}
       end
 
       # Get the name of the inverse relations if they exists. If this is a
