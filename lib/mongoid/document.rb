@@ -193,7 +193,11 @@ module Mongoid
         without_autobuild do
           relation, stored = send(name), meta.store_as
           if attributes.has_key?(stored) || !relation.blank?
-            attributes[stored] = relation.as_document
+            if relation
+              attributes[stored] = relation.as_document
+            else
+              attributes.delete(stored)
+            end
           end
         end
       end
