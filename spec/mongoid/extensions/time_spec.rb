@@ -247,11 +247,26 @@ describe Mongoid::Extensions::Time do
     context "when given a DateTime" do
 
       let!(:time) do
-        Time.now
+        DateTime.now
+      end
+
+      let!(:eom_time) do
+        DateTime.parse("2012-11-30T23:59:59.999999999-05:00")
+      end
+
+      let!(:eom_time_mongoized) do
+        eom_time.mongoize
       end
 
       it "doesn't strip milli- or microseconds" do
-        Time.mongoize(time).to_f.should eq(time.to_f)
+        Time.mongoize(time).to_f.round(3).should eq(time.to_f.round(3))
+      end
+
+      it "doesn't round up at end of month" do
+        eom_time_mongoized.hour.should eq(eom_time.utc.hour)
+        eom_time_mongoized.min.should eq(eom_time.utc.min)
+        eom_time_mongoized.sec.should eq(eom_time.utc.sec)
+        (eom_time_mongoized.strftime("%11N").to_i / 100.0).round(0).should eq(999999999)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -275,6 +290,13 @@ describe Mongoid::Extensions::Time do
           Time.mongoize(datetime).should eq(
             Time.utc(2010, 11, 19)
           )
+        end
+
+        it "doesn't round up at end of month" do
+          eom_time_mongoized.hour.should eq(eom_time.utc.hour)
+          eom_time_mongoized.min.should eq(eom_time.utc.min)
+          eom_time_mongoized.sec.should eq(eom_time.utc.sec)
+          (eom_time_mongoized.strftime("%11N").to_i / 100.0).round(0).should eq(999999999)
         end
       end
     end
@@ -386,6 +408,14 @@ describe Mongoid::Extensions::Time do
       Time.local(2010, 11, 19)
     end
 
+    let!(:eom_time) do
+      Time.local(2012, 11, 30, 23, 59, 59, 999999.999)
+    end
+
+    let!(:eom_time_mongoized) do
+      eom_time.mongoize
+    end
+
     it "converts to a utc time" do
       time.mongoize.utc_offset.should eq(0)
     end
@@ -396,6 +426,14 @@ describe Mongoid::Extensions::Time do
 
     it "doesn't strip milli- or microseconds" do
       time.mongoize.to_f.should eq(time.to_f)
+    end
+
+    it "doesn't round up at end of month" do
+      eom_time_mongoized.hour.should eq(eom_time.utc.hour)
+      eom_time_mongoized.min.should eq(eom_time.utc.min)
+      eom_time_mongoized.sec.should eq(eom_time.utc.sec)
+      eom_time_mongoized.usec.should eq(eom_time.utc.usec)
+      eom_time_mongoized.subsec.to_f.round(3).should eq(eom_time.utc.subsec.to_f.round(3))
     end
   end
 end
