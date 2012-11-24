@@ -148,6 +148,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2571 Remove blank error message from locales. (Jordan Elver)
 
+* \#2568 Fix uniqueness validation for lacalized fields when a scope is also
+  provided.
+
 * \#2552 Ensure `InvalidPath` errors are raised when embedded documents try to
   get paths from a root selector.
 
