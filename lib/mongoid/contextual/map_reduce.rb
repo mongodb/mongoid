@@ -222,18 +222,14 @@ module Mongoid
       #
       # @since 3.1.0
       def inspect
-        ::I18n.translate(
-          "mongoid.inspection.map_reduce",
-          {
-            selector:   criteria.selector.inspect,
-            options:    criteria.options.inspect,
-            klass:      criteria.klass.inspect,
-            map:        command[:map],
-            reduce:     command[:reduce],
-            finalize:   command[:finalize],
-            out:        command[:out].inspect
-          }
-        )
+%Q{#<Mongoid::Contextual::MapReduce
+  selector: #{criteria.selector.inspect}
+  class:    #{criteria.klass}
+  map:      #{command[:map]}
+  reduce:   #{command[:reduce]}
+  finalize: #{command[:finalize]}
+  out:      #{command[:out].inspect}>
+}
       end
 
       private

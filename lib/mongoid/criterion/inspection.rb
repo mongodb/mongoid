@@ -13,15 +13,12 @@ module Mongoid
       #
       # @since 1.0.0
       def inspect
-        ::I18n.translate(
-          "mongoid.inspection.criteria",
-          {
-            selector: selector.inspect,
-            options: options.inspect,
-            klass: klass,
-            embedded: embedded?
-          }
-        )
+%Q{#<Mongoid::Criteria
+  selector: #{selector.inspect}
+  options:  #{options.inspect}
+  class:    #{klass}
+  embedded: #{embedded?}>
+}
       end
     end
   end

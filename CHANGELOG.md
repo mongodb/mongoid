@@ -141,10 +141,12 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* \#2552 Ensure `InvalidPath` errors are raised when embedded documents try to
-  get paths from a root selector.
+* \#2573 Don't use i18n for inspection messages.
 
 * \#2571 Remove blank error message from locales. (Jordan Elver)
+
+* \#2552 Ensure `InvalidPath` errors are raised when embedded documents try to
+  get paths from a root selector.
 
 ## 3.0.13
 
