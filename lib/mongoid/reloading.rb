@@ -54,7 +54,7 @@ module Mongoid
     #
     # @since 2.3.2
     def reload_root_document
-      {}.merge(collection.find(_id: id).one || {})
+      {}.merge(with(consistency: :strong).collection.find(_id: id).one || {})
     end
 
     # Reload the embedded document.
@@ -67,7 +67,7 @@ module Mongoid
     # @since 2.3.2
     def reload_embedded_document
       extract_embedded_attributes({}.merge(
-        _root.collection.find(_id: _root.id).one
+        _root.with(consistency: :strong).collection.find(_id: _root.id).one
       ))
     end
 
