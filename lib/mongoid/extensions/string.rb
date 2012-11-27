@@ -120,6 +120,18 @@ module Mongoid
         include?("=")
       end
 
+      # Is this string a valid_method_name?
+      #
+      # @example Is the string a valid Ruby idenfier for use as a method name
+      #   "model=".valid_method_name?
+      #
+      # @return [ true, false ] If the string contains a valid Ruby identifier.
+      #
+      # @since 3.0.15
+      def valid_method_name?
+        /[@$"]/ !~ to_sym.inspect
+      end
+
       # Is the object not to be converted to bson on criteria creation?
       #
       # @example Is the object unconvertable?
