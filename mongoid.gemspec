@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.summary     = "Elegant Persistance in Ruby for MongoDB."
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
 
+  s.required_ruby_version     = ">= 1.9"
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "mongoid"
 
