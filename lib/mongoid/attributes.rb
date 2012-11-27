@@ -191,6 +191,8 @@ module Mongoid
     #
     # @since 3.0.0
     def define_dynamic_reader(name)
+      return unless name.valid_method_name?
+
       class_eval <<-READER
         def #{name}
           read_attribute(#{name.inspect})
@@ -209,6 +211,8 @@ module Mongoid
     #
     # @since 3.0.0
     def define_dynamic_writer(name)
+      return unless name.valid_method_name?
+
       class_eval <<-WRITER
         def #{name}=(value)
           write_attribute(#{name.inspect}, value)
