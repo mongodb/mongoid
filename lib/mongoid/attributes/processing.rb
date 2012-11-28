@@ -120,8 +120,7 @@ module Mongoid
       def process_attribute(name, value)
         writer_method = "#{name}="
         responds = respond_to?(writer_method)
-        if Mongoid.allow_dynamic_fields && (!responds ||
-                                            !writer_method.valid_method_name?)
+        if Mongoid.allow_dynamic_fields && !responds
           write_attribute(name, value)
         else
           raise Errors::UnknownAttribute.new(self.class, name) unless responds

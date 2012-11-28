@@ -100,7 +100,8 @@ module Mongoid
       super || (
         Mongoid.allow_dynamic_fields &&
         attributes &&
-        attributes.has_key?(name.to_s.reader)
+        attributes.has_key?(name.to_s.reader) &&
+        name.to_s.valid_method_name?
       )
     end
 
