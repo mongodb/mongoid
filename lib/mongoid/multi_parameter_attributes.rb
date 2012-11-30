@@ -51,7 +51,7 @@ module Mongoid
     def process_attributes(attrs = nil, role = :default, guard_protected_attributes = true)
       if attrs
         errors = []
-        attributes = {}
+        attributes = attrs.class.new
         multi_parameter_attributes = {}
 
         attrs.each_pair do |key, value|
@@ -79,7 +79,7 @@ module Mongoid
           raise Errors::MultiparameterAssignmentErrors.new(errors),
             "#{errors.size} error(s) on assignment of multiparameter attributes"
         end
-
+        
         super attributes, role, guard_protected_attributes
       else
         super
