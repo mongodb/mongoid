@@ -59,9 +59,7 @@ require "mongoid/inspection"
 require "mongoid/json"
 require "mongoid/loggable"
 require "mongoid/matchers"
-require "mongoid/multi_parameter_attributes"
 require "mongoid/nested_attributes"
-require "mongoid/observer"
 require "mongoid/persistence"
 require "mongoid/reloading"
 require "mongoid/scoping"
@@ -156,7 +154,5 @@ module Mongoid
   #   Mongoid.database = Mongo::Connection.new.db("test")
   #
   # @since 1.0.0
-  delegate(*(Config.public_instance_methods(false) +
-    ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
-    { to: Config }))
+  delegate(*(Config.public_instance_methods(false) << { to: Config }))
 end

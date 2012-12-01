@@ -11,7 +11,6 @@ module Mongoid
   module Config
     extend self
     extend Options
-    include ActiveModel::Observing
 
     LOCK = Mutex.new
 
