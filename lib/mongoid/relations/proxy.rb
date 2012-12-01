@@ -46,7 +46,7 @@ module Mongoid
       #   person.preferences.reset_relation_criteria
       #
       # @since 3.0.14
-      def reset_relation_criteria
+      def reset_unloaded
         target.reset_unloaded(criteria)
       end
 

@@ -173,7 +173,7 @@ module Mongoid
           unless replacement.blank?
             push(replacement.compact.uniq)
           else
-            reset_relation_criteria
+            reset_unloaded
           end
           self
         end
