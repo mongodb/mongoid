@@ -143,6 +143,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2584 Allow map/reduce to operate on secondaries if output is set to `inline`.
 
+* \#2583 Ensure `nil` session override can never cause to access a session with
+  name `nil`.
+
 ## 3.0.14
 
 ### Resolved Issues
