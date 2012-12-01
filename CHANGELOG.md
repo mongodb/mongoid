@@ -141,6 +141,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2600 Instantiate the proper class type for attributes when using
+  multi parameter attributes. (xxswingxx)
+
 * \#2588 Block defining methods for dynamic attributes that would be invalid
   ruby methods. (Matt Sanford)
 
