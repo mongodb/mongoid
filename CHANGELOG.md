@@ -146,6 +146,8 @@ For instructions on upgrading to newer versions, visit
 * \#2582 Ensure `nil` session override can never cause to access a session with
   name `nil`.
 
+* \#2581 Use strong consistency when reloading documents. (Mark Kremer)
+
 ## 3.0.14
 
 ### Resolved Issues
