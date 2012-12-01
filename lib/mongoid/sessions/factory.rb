@@ -101,7 +101,7 @@ module Mongoid
       def parse(config)
         options = config[:options].try(:dup) || {}
         parsed = config.has_key?(:uri) ? MongoUri.new(config[:uri]).to_hash : config
-        [ parsed, options ]
+        [ parsed, options.symbolize_keys ]
       end
     end
   end

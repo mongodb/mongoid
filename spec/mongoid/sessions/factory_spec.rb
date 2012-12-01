@@ -217,4 +217,58 @@ describe Mongoid::Sessions::Factory do
       cluster.seeds.should eq([ "localhost:27017" ])
     end
   end
+
+  context "when options are provided with string keys" do
+
+    let(:config) do
+      {
+        default: {
+          hosts: [ "localhost:27017" ],
+          database: database_id,
+          options: {
+            "down_interval" => 10,
+            "max_retries" => 5,
+            "refresh_interval" => 30,
+            "retry_interval" => 0.1
+          }
+        }
+      }
+    end
+
+    before do
+      Mongoid::Config.sessions = config
+    end
+
+    let(:session) do
+      described_class.default
+    end
+
+    let(:cluster) do
+      session.cluster
+    end
+
+    it "returns the default session" do
+      session.should be_a(Moped::Session)
+    end
+
+    it "sets the cluster's seeds" do
+      cluster.seeds.should eq([ "localhost:27017" ])
+    end
+
+    it "sets the cluster down interval" do
+      cluster.down_interval.should eq(10)
+    end
+
+    it "sets the cluster max retries" do
+      cluster.max_retries.should eq(5)
+    end
+
+    it "sets the cluster refresh interval" do
+      cluster.refresh_interval.should eq(30)
+    end
+
+    it "sets the cluster retry interval" do
+      cluster.retry_interval.should eq(0.1)
+    end
+  end
 end
