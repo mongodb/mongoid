@@ -13,7 +13,6 @@ module Mongoid
     include ActiveModel::Conversion
     include ActiveModel::ForbiddenAttributesProtection
     include ActiveModel::Naming
-    include ActiveModel::Observing
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
     include Mongoid::Atomic

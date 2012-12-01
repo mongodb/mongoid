@@ -11,7 +11,6 @@ module Mongoid
   module Config
     extend self
     extend Options
-    include ActiveModel::Observing
 
     delegate :logger=, to: ::Mongoid
     delegate :logger, to: ::Mongoid
