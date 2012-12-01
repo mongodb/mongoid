@@ -286,7 +286,27 @@ module Mongoid
       # @since 3.0.0
       def results
         raise Errors::NoMapReduceOutput.new(command) unless command[:out]
-        @results ||= session.with(consistency: :strong).command(command)
+        @results ||= __session__.command(command)
+      end
+
+      # Get the session with the proper consistency.
+      #
+      # @api private
+      #
+      # @note We can use eventual if the output is set to inline.
+      #
+      # @example Get the session.
+      #   map_reduce.__session__
+      #
+      # @return [ Session ] The session with consistency set.
+      #
+      # @since 3.0.15
+      def __session__
+        if command[:out][:inline] != 1
+          session.with(consistency: :strong)
+        else
+          session
+        end
       end
     end
   end
