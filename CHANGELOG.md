@@ -141,6 +141,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2587 Fix method clash with `belongs_to` proxies when resetting relation
+  unloaded criteria.
+
 * \#2585 Ensure session configuration options get passed to Moped as symbols.
 
 * \#2584 Allow map/reduce to operate on secondaries if output is set to `inline`.
