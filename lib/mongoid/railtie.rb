@@ -121,17 +121,6 @@ module Rails
         app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
       end
 
-      # Instantitate any registered observers after Rails initialization and
-      # instantiate them after being reloaded in the development environment
-      initializer "instantiate observers" do
-        config.after_initialize do
-          ::Mongoid::instantiate_observers
-          ActionDispatch::Reloader.to_prepare do
-            ::Mongoid.instantiate_observers
-          end
-        end
-      end
-
       initializer "reconnect to master if application is preloaded" do
         config.after_initialize do
           # Unicorn clears the START_CTX when a worker is forked, so if we have
