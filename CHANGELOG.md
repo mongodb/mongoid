@@ -137,9 +137,11 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-## 3.0.14
+## 3.0.15
 
 ### Resolved Issues
+
+* \#2585 Ensure session configuration options get passed to Moped as symbols.
 
 * \#2584 Allow map/reduce to operate on secondaries if output is set to `inline`.
 

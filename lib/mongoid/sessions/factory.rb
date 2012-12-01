@@ -105,7 +105,7 @@ module Mongoid
         else
           inject_ports(config)
         end
-        [ parsed, options ]
+        [ parsed, options.symbolize_keys ]
       end
 
       # Will inject the default port of 27017 if not supplied.
