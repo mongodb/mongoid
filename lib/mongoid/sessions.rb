@@ -370,7 +370,7 @@ module Mongoid
       #
       # @since 3.0.0
       def __session__
-        if name = session_override
+        if !(name = session_override).nil?
           Sessions.with_name(name)
         elsif storage_options && name = storage_options[:session]
           Sessions.with_name(name)
