@@ -141,6 +141,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2588 Block defining methods for dynamic attributes that would be invalid
+  ruby methods. (Matt Sanford)
+
 * \#2587 Fix method clash with `belongs_to` proxies when resetting relation
   unloaded criteria.
 
