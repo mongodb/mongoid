@@ -786,15 +786,15 @@ describe Mongoid::Contextual::Memory do
   describe "#sort" do
 
     let(:hobrecht) do
-      Address.new(street: "hobrecht", number: 9)
+      Address.new(street: "hobrecht", number: 9, name: "hobrecht")
     end
 
     let(:friedel) do
-      Address.new(street: "friedel", number: 1)
+      Address.new(street: "friedel", number: 1, name: "friedel")
     end
 
     let(:pfluger) do
-      Address.new(street: "pfluger", number: 5)
+      Address.new(street: "pfluger", number: 5, name: "pfluger")
     end
 
     let(:criteria) do
@@ -911,8 +911,15 @@ describe Mongoid::Contextual::Memory do
       end
     end
 
-    pending "with localized field" do
+    context "with localized field" do
 
+      let!(:sorted) do
+        context.sort("name.en" => 1)
+      end
+
+      it "sorts the documents" do
+        context.entries.should eq([ friedel, hobrecht, pfluger ])
+      end
     end
   end
 

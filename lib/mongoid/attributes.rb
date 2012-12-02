@@ -58,7 +58,12 @@ module Mongoid
     #
     # @since 1.0.0
     def read_attribute(name)
-      attributes[name.to_s]
+      normalized = name.to_s
+      if hash_dot_syntax?(normalized)
+        attributes.__nested__(normalized)
+      else
+        attributes[normalized]
+      end
     end
     alias :[] :read_attribute
 
@@ -219,6 +224,20 @@ module Mongoid
           write_attribute(#{name.inspect}, value)
         end
       WRITER
+    end
+
+    # Does the string contain dot syntax for accessing hashes?
+    #
+    # @api private
+    #
+    # @example Is the string in dot syntax.
+    #   model.hash_dot_syntax?
+    #
+    # @return [ true, false ] If the string contains a "."
+    #
+    # @since 3.0.15
+    def hash_dot_syntax?(string)
+      string =~ /\./
     end
 
     # Used for allowing accessor methods for dynamic attributes.

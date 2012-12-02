@@ -72,6 +72,25 @@ module Mongoid
         self["_id"] || self["id"] || self[:id] || self[:_id]
       end
 
+      # Fetch a nested value via dot syntax.
+      #
+      # @example Fetch a nested value via dot syntax.
+      #   { "name" => { "en" => "test" }}.__nested__("name.en")
+      #
+      # @param [ String ] string the dot syntax string.
+      #
+      # @return [ Object ] The matching value.
+      #
+      # @since 3.0.15
+      def __nested__(string)
+        keys = string.split(".")
+        value = self
+        keys.each do |key|
+          value = value[key]
+        end
+        value
+      end
+
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #

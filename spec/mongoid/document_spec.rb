@@ -864,7 +864,7 @@ describe Mongoid::Document do
   describe "#becomes" do
 
     before(:all) do
-      Person.validates_format_of :ssn, without: /\$\$\$/
+      Person.validates_format_of(:ssn, without: /\$\$\$/)
 
       class Manager < Person
         field :level, type: Integer, default: 1
