@@ -99,6 +99,36 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#asc" do
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when the documents are embedded" do
+
+      let!(:hobrecht) do
+        person.addresses.create(street: "hobrecht", name: "hobrecht")
+      end
+
+      let!(:friedel) do
+        person.addresses.create(street: "friedel", name: "friedel")
+      end
+
+      let!(:pfluger) do
+        person.addresses.create(street: "pfluger", name: "pfluger")
+      end
+
+      let(:criteria) do
+        person.addresses.asc(:name)
+      end
+
+      it "returns the sorted documents" do
+        criteria.should eq([ friedel, hobrecht, pfluger ])
+      end
+    end
+  end
+
   describe "#aggregates" do
 
     context "when provided a single field" do

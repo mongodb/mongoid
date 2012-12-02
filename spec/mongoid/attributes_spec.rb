@@ -24,6 +24,27 @@ describe Mongoid::Attributes do
         Person.new
       end
 
+      context "when accessing a localized field" do
+
+        before do
+          person.desc = "testing"
+        end
+
+        context "when passing just the name" do
+
+          it "returns the full value" do
+            person[:desc].should eq("en" => "testing")
+          end
+        end
+
+        context "when passing the name with locale" do
+
+          it "returns the value for the locale" do
+            person["desc.en"].should eq("testing")
+          end
+        end
+      end
+
       context "when attribute does not exist" do
 
         it "returns the default value" do

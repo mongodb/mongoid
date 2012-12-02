@@ -28,6 +28,7 @@ class Person
   field :t, as: :test, type: String
   field :i, as: :inte, type: Integer
   field :a, as: :array, type: Array
+  field :desc, localize: true
 
   index age: 1
   index addresses: 1

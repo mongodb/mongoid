@@ -144,6 +144,8 @@ For instructions on upgrading to newer versions, visit
 * \#2600 Instantiate the proper class type for attributes when using
   multi parameter attributes. (xxswingxx)
 
+* \#2598 Fixed sorting on localized fields with embedded docs.
+
 * \#2588 Block defining methods for dynamic attributes that would be invalid
   ruby methods. (Matt Sanford)
 
