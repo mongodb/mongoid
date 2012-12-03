@@ -217,6 +217,45 @@ describe Mongoid::Atomic do
               )
             end
           end
+
+          context "when adding a new child beetween two existing and updating one of them" do
+
+            let!(:new_address) do
+              person.addresses.build(street: "Ipanema")
+            end
+
+            let!(:location) do
+              new_address.locations.build(name: "Home")
+            end
+
+            before do
+              person.addresses[0] = new_address
+              person.addresses[1] = address
+            end
+
+            it "returns the $set for 1st and 2nd level and other for the 3nd level" do
+              person.atomic_updates.should eq(
+                {
+                  "$set" => {
+                    "title" => "Sir"
+                  },
+                  "$pushAll" => {
+                    "addresses" => [{
+                      "_id" => new_address.id,
+                      "street" => "Ipanema",
+                      "locations" => [
+                        "_id" => location.id,
+                        "name" => "Home"
+                      ]
+                    }]
+                  },
+                  conflicts: {
+                    "$set" => { "addresses.0.street"=>"Bond St" }
+                  }
+                }
+              )
+            end
+          end
         end
 
         context "when adding new embedded docs at multiple levels" do
