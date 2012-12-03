@@ -12,3 +12,5 @@ group :test do
     gem "rb-fsevent"
   end
 end
+
+gem 'debugger'
