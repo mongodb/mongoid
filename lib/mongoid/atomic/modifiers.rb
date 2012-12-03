@@ -149,7 +149,8 @@ module Mongoid
       #
       # @since 2.2.0
       def set_conflict?(field)
-        pull_fields.has_key?(field.split(".", 2)[0])
+        name = field.split(".", 2)[0]
+        pull_fields.has_key?(name) || push_fields.has_key?(name)
       end
 
       # Is the operation going to be a conflict for a $push?
