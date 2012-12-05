@@ -50,6 +50,9 @@ module Mongoid
       # @since 3.0.0
       def count(document = nil, &block)
         return super(&block) if block_given?
+        return [query.count, [(query.count - criteria.options[:skip]), 0].max, criteria.options[:limit]].min if criteria.options[:limit] && criteria.options[:skip]
+        return [(query.count - criteria.options[:skip]), 0].max if criteria.options[:skip]
+        return [query.count, criteria.options[:limit]].min if criteria.options[:limit]
         return query.count unless document
         collection.find(criteria.and(_id: document.id).selector).count
       end
