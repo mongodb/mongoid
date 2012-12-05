@@ -212,10 +212,20 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        apply_inverse_sorting
-        doc = with_eager_loading(query.first)
-        apply_options
-        return doc
+        if criteria.options[:skip] || criteria.options[:limit]
+          # If skip or limit are applied, need to iterate to get last
+          # Nasty, but not sure of a more reliable way to do this
+          doc = nil
+          query.each do |d|
+            doc = d
+          end
+          with_eager_loading(doc)
+        else
+          apply_inverse_sorting
+          doc = query.first
+          apply_options
+          with_eager_loading(doc)
+        end
       end
 
       # Get's the number of documents matching the query selector.
