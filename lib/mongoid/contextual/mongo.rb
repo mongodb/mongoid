@@ -412,7 +412,9 @@ module Mongoid
       #
       # @since 3.0.0
       def apply_id_sorting
-        unless criteria.options.has_key?(:sort)
+        if criteria.options.has_key?(:sort)
+          query.sort(criteria.options[:sort])
+        else
           query.sort(_id: 1)
         end
       end
