@@ -85,8 +85,24 @@ describe Mongoid::Contextual::Mongo do
       Band.create(name: "New Order")
     end
 
+    let!(:cream) do
+      Band.create(name: "Cream")
+    end
+
+    let!(:pink_floyd) do
+      Band.create(name: "Pink Floyd")
+    end
+
+    let!(:zac_brown_band) do
+      Band.create(name: "Zac Brown Band")
+    end
+
     let(:criteria) do
       Band.where(name: "Depeche Mode")
+    end
+
+    let(:all) do
+      Band.all
     end
 
     context "when no arguments are provided" do
@@ -131,6 +147,39 @@ describe Mongoid::Contextual::Mongo do
         count.should eq(1)
       end
     end
+
+    context "when provided a limit" do
+      let(:context) do
+        described_class.new(all.limit(3))
+      end
+
+      it "returns the the number of documents that match constrained by the limit" do
+        context.count.should eq(3)
+      end
+    end
+
+    context "when provided a skip" do
+
+      let(:context) do
+        described_class.new(all.skip(3))
+      end
+
+      it "returns the number of documents remaining after the skip" do
+        context.count.should eq(2)
+      end
+    end
+
+    context "when provided a skip and a limit" do
+
+      let(:context) do
+        described_class.new(all.skip(4).limit(5))
+      end
+
+      it "returns the number of documents remaining after the skip constrained by the limit" do
+        context.count.should eq(1)
+      end
+    end
+
   end
 
   [ :delete, :delete_all ].each do |method|
@@ -612,16 +661,26 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:criteria) do
-        Band.where(name: "Depeche Mode")
+        Band.all.asc(:name)
       end
 
       let(:context) do
         described_class.new(criteria)
       end
 
-      it "returns the first matching document" do
-        context.send(method).should eq(depeche_mode)
+      context "when called normally" do
+        it "returns the first matching document" do
+          context.send(method).should eq(depeche_mode)
+        end
       end
+
+      context "when called after calling last" do
+        it "returns the first matching document" do
+          context.last
+          context.send(method).should eq(depeche_mode)
+        end
+      end
+
     end
   end
 
