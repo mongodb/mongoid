@@ -398,7 +398,7 @@ module Mongoid
       # @since 3.1.0
       def apply_options
         apply_fields
-        [ :hint, :limit, :skip, :sort ].each do |name|
+        [ :hint, :limit, :skip, :sort, :timeout, :batch_size ].each do |name|
           apply_option(name)
         end
       end
@@ -412,7 +412,8 @@ module Mongoid
       #
       # @since 3.1.0
       def apply_option(name)
-        if spec = criteria.options[name]
+        spec = criteria.options[name]
+        unless spec.nil?
           query.send(name, spec)
         end
       end
