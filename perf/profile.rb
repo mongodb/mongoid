@@ -11,6 +11,7 @@ puts "Starting profiler"
 def without_gc
   GC.disable
   yield
+ensure
   GC.enable
   GC.start
 end
