@@ -146,6 +146,9 @@ For instructions on upgrading to newer versions, visit
 * \#2619 Fixed the classes returned by `observed_classes` on an observer
   when it is observing custom models.
 
+* \#2612 `DocumentNotFound` errors now expose the class in the error
+  instance.
+
 * \#2600 Instantiate the proper class type for attributes when using
   multi parameter attributes. (xxswingxx)
 
