@@ -154,6 +154,8 @@ For instructions on upgrading to newer versions, visit
 * \#2610 Ensure calling `first` after a `last` that had sorting options resets
   the sort.
 
+* \#2604 Check pulls and pushes for conflicting updates. (Lucas Souza)
+
 * \#2600 Instantiate the proper class type for attributes when using
   multi parameter attributes. (xxswingxx)
 
