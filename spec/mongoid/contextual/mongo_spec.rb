@@ -699,6 +699,30 @@ describe Mongoid::Contextual::Mongo do
         context.last.should eq(palm)
       end
     end
+
+    context "when subsequently calling #first" do
+
+      let!(:depeche_mode) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let!(:new_order) do
+        Band.create(name: "New Order")
+      end
+
+      let(:criteria) do
+        Band.asc(:name)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it "returns the correnct document" do
+        context.last.should eq(new_order)
+        context.first.should eq(depeche_mode)
+      end
+    end
   end
 
   [ :length, :size ].each do |method|
