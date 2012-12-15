@@ -129,6 +129,25 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#batch_size" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:criteria) do
+      Person.batch_size(1000)
+    end
+
+    it "adds the batch size option" do
+      criteria.options[:batch_size].should eq(1000)
+    end
+
+    pending "returns the correct documents" do
+      criteria.should eq([ person ])
+    end
+  end
+
   describe "#aggregates" do
 
     context "when provided a single field" do
