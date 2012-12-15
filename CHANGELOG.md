@@ -141,6 +141,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2630 Fix cascading when the metadata exists but no cascade defined.
+
 * \#2600 Instantiate the proper class type for attributes when using
   multi parameter attributes. (xxswingxx)
 

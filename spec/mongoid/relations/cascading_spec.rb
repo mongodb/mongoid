@@ -2,6 +2,31 @@ require "spec_helper"
 
 describe Mongoid::Relations::Cascading do
 
+  describe "#cascade!" do
+
+    let(:band) do
+      Band.new
+    end
+
+    context "when the metadata exists" do
+
+      context "when the metadata has no cascade strategy" do
+
+        before do
+          band.cascades.push("records")
+        end
+
+        after do
+          band.cascades.delete("records")
+        end
+
+        it "ignores the cascade" do
+          band.cascade!.should eq([ "records" ])
+        end
+      end
+    end
+  end
+
   describe ".cascade" do
 
     let(:klass) do

@@ -29,7 +29,7 @@ module Mongoid
           if !metadata || !metadata.versioned?
             if meta = relations[name]
               strategy = meta.cascade_strategy
-              strategy.new(self, meta).cascade
+              strategy.new(self, meta).cascade if strategy
             end
           end
         end
