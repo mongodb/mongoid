@@ -176,5 +176,26 @@ module Mongoid
       return false unless klass.respond_to?(:observers)
       klass.observers.disabled_for?(self) || Mongoid.observers.disabled_for?(self)
     end
+
+    class << self
+
+      # Attaches the observer to the specified classes.
+      #
+      # @example Attach the BandObserver to the class Artist.
+      #   class BandObserver < Mongoid::Observer
+      #     observe :artist
+      #   end
+      #
+      # @param [ Array<Symbol> ] models The names of the models.
+      #
+      # @since 3.0.15
+      def observe(*models)
+        models.flatten!
+        models.collect! do |model|
+          model.respond_to?(:to_sym) ? model.to_s.camelize.constantize : model
+        end
+        singleton_class.redefine_method(:observed_classes) { models }
+      end
+    end
   end
 end
