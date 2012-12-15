@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2609 Pass through batch_size option to query. (Martin Mauch)
+
 * \#2539 `Mongoid.models` now tracks all models in the application for more
   accurate determination of models for things such as indexing rake tasks.
   (Ara Howard)
@@ -151,8 +153,6 @@ For instructions on upgrading to newer versions, visit
 
 * \#2610 Ensure calling `first` after a `last` that had sorting options resets
   the sort.
-
-* \#2609 Pass through batch_size option to query. (Martin Mauch)
 
 * \#2600 Instantiate the proper class type for attributes when using
   multi parameter attributes. (xxswingxx)
