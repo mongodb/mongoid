@@ -50,6 +50,9 @@ module Mongoid
       # @since 3.0.0
       def count(document = nil, &block)
         return super(&block) if block_given?
+        return [query.count, [(query.count - criteria.options[:skip]), 0].max, criteria.options[:limit]].min if criteria.options[:limit] && criteria.options[:skip]
+        return [(query.count - criteria.options[:skip]), 0].max if criteria.options[:skip]
+        return [query.count, criteria.options[:limit]].min if criteria.options[:limit]
         return query.count unless document
         collection.find(criteria.and(_id: document.id).selector).count
       end
@@ -212,8 +215,20 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        apply_inverse_sorting
-        with_eager_loading(query.first)
+        if criteria.options[:skip] || criteria.options[:limit]
+          # If skip or limit are applied, need to iterate to get last
+          # Nasty, but not sure of a more reliable way to do this
+          doc = nil
+          query.each do |d|
+            doc = d
+          end
+          with_eager_loading(doc)
+        else
+          apply_inverse_sorting
+          doc = query.first
+          apply_options
+          with_eager_loading(doc)
+        end
       end
 
       # Get's the number of documents matching the query selector.
@@ -383,7 +398,7 @@ module Mongoid
       # @since 3.1.0
       def apply_options
         apply_fields
-        [ :hint, :limit, :skip, :sort ].each do |name|
+        [ :hint, :limit, :skip, :sort, :timeout, :batch_size ].each do |name|
           apply_option(name)
         end
       end
@@ -397,7 +412,8 @@ module Mongoid
       #
       # @since 3.1.0
       def apply_option(name)
-        if spec = criteria.options[name]
+        spec = criteria.options[name]
+        unless spec.nil?
           query.send(name, spec)
         end
       end

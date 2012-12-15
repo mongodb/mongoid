@@ -85,8 +85,24 @@ describe Mongoid::Contextual::Mongo do
       Band.create(name: "New Order")
     end
 
+    let!(:cream) do
+      Band.create(name: "Cream")
+    end
+
+    let!(:pink_floyd) do
+      Band.create(name: "Pink Floyd")
+    end
+
+    let!(:zac_brown_band) do
+      Band.create(name: "Zac Brown Band")
+    end
+
     let(:criteria) do
       Band.where(name: "Depeche Mode")
+    end
+
+    let(:all) do
+      Band.all
     end
 
     context "when no arguments are provided" do
@@ -131,6 +147,39 @@ describe Mongoid::Contextual::Mongo do
         count.should eq(1)
       end
     end
+
+    context "when provided a limit" do
+      let(:context) do
+        described_class.new(all.limit(3))
+      end
+
+      it "returns the the number of documents that match constrained by the limit" do
+        context.count.should eq(3)
+      end
+    end
+
+    context "when provided a skip" do
+
+      let(:context) do
+        described_class.new(all.skip(3))
+      end
+
+      it "returns the number of documents remaining after the skip" do
+        context.count.should eq(2)
+      end
+    end
+
+    context "when provided a skip and a limit" do
+
+      let(:context) do
+        described_class.new(all.skip(4).limit(5))
+      end
+
+      it "returns the number of documents remaining after the skip constrained by the limit" do
+        context.count.should eq(1)
+      end
+    end
+
   end
 
   [ :delete, :delete_all ].each do |method|
@@ -612,16 +661,26 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:criteria) do
-        Band.where(name: "Depeche Mode")
+        Band.all.asc(:name)
       end
 
       let(:context) do
         described_class.new(criteria)
       end
 
-      it "returns the first matching document" do
-        context.send(method).should eq(depeche_mode)
+      context "when called normally" do
+        it "returns the first matching document" do
+          context.send(method).should eq(depeche_mode)
+        end
       end
+
+      context "when called after calling last" do
+        it "returns the first matching document" do
+          context.last
+          context.send(method).should eq(depeche_mode)
+        end
+      end
+
     end
   end
 
@@ -660,20 +719,36 @@ describe Mongoid::Contextual::Mongo do
         Band.create(name: "Depeche Mode")
       end
 
+      let!(:cream) do
+        Band.create(name: "Cream")
+      end
+
+      let!(:pink_floyd) do
+        Band.create(name: "Pink Floyd")
+      end
+
+      let!(:zac_brown_band) do
+        Band.create(name: "Zac Brown Band")
+      end
+
       let!(:new_order) do
         Band.create(name: "New Order")
       end
 
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
       it "returns the last matching document" do
-        context.last.should eq(new_order)
+        described_class.new(Band.all).last.should eq(new_order)
+      end
+
+      it "returns the last matching document when limit is applied" do
+        described_class.new(Band.all.limit(2)).last.should eq(cream)
+      end
+
+      it "returns the last matching document when skip is applied" do
+        described_class.new(Band.all.skip(2)).last.should eq(new_order)
+      end
+
+      it "returns the last matching document when skip and limit are applied" do
+        described_class.new(Band.all.skip(2).limit(2)).last.should eq(zac_brown_band)
       end
     end
 
@@ -683,20 +758,36 @@ describe Mongoid::Contextual::Mongo do
         Tree.create(name: "Palm")
       end
 
+      let!(:pine) do
+        Tree.create(name: "Pine")
+      end
+
+      let!(:cedar) do
+        Tree.create(name: "Cedar")
+      end
+
+      let!(:birch) do
+        Tree.create(name: "Birch")
+      end
+
       let!(:maple) do
         Tree.create(name: "Maple")
       end
 
-      let(:criteria) do
-        Tree.all
+      it "respects default scope and returns the last document" do
+        described_class.new(Tree.all).last.should eq(pine)
       end
 
-      let(:context) do
-        described_class.new(criteria)
+      it "respects default scope and returns the last document when limit is applied" do
+        described_class.new(Tree.all.limit(2)).last.should eq(cedar)
       end
 
-      it "respects default scope" do
-        context.last.should eq(palm)
+      it "respects default scope and returns the last document when skip is applied" do
+        described_class.new(Tree.all.skip(2)).last.should eq(pine)
+      end
+
+      it "respects default scope and returns the last document when skip and limit are applied" do
+        described_class.new(Tree.all.skip(2).limit(2)).last.should eq(palm)
       end
     end
   end
