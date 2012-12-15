@@ -14,6 +14,23 @@ describe Mongoid::Observer do
     ActorObserver.instance.should be_a_kind_of(ActiveModel::Observer)
   end
 
+  context "when the oberserver observes a different class" do
+
+    before(:all) do
+      class BandObserver < Mongoid::Observer
+        observe :record
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :BandObserver)
+    end
+
+    it "returns the proper observed classes" do
+      BandObserver.observed_classes.should eq([ Record ])
+    end
+  end
+
   context "when the observer is for an embedded document" do
 
     before do

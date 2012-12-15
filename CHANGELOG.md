@@ -143,6 +143,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2630 Fix cascading when the metadata exists but no cascade defined.
 
+* \#2619 Fixed the classes returned by `observed_classes` on an observer
+  when it is observing custom models.
+
 * \#2600 Instantiate the proper class type for attributes when using
   multi parameter attributes. (xxswingxx)
 
