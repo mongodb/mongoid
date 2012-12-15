@@ -149,6 +149,9 @@ For instructions on upgrading to newer versions, visit
 * \#2612 `DocumentNotFound` errors now expose the class in the error
   instance.
 
+* \#2610 Ensure calling `first` after a `last` that had sorting options resets
+  the sort.
+
 * \#2600 Instantiate the proper class type for attributes when using
   multi parameter attributes. (xxswingxx)
 

@@ -181,6 +181,7 @@ module Mongoid
       #
       # @since 3.0.0
       def first
+        apply_option(:sort)
         apply_id_sorting
         with_eager_loading(query.first)
       end
