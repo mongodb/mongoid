@@ -90,4 +90,15 @@ describe Mongoid::Errors::DocumentNotFound do
       error.params.should eq(1)
     end
   end
+
+  describe "#klass" do
+
+    let(:error) do
+      described_class.new(Person, 1, 1)
+    end
+
+    it "returns the model class" do
+      error.klass.should eq(Person)
+    end
+  end
 end

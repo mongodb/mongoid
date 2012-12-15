@@ -7,7 +7,7 @@ module Mongoid
     # it will display all of those.
     class DocumentNotFound < MongoidError
 
-      attr_reader :params
+      attr_reader :klass, :params
 
       # Create the new error.
       #
@@ -24,7 +24,7 @@ module Mongoid
         if !unmatched && !params.is_a?(Hash)
           raise ArgumentError, 'please also supply the unmatched ids'
         end
-        @params = params
+        @klass, @params = klass, params
         super(
           compose_message(
             message_key(params),
