@@ -309,6 +309,30 @@ module Mongoid
           !!@executed
         end
 
+        # Provides the data needed to Marshal.dump an enumerable proxy.
+        #
+        # @example Dump the proxy.
+        #   Marshal.dump(proxy)
+        #
+        # @return [ Array<Object> ] The dumped data.
+        #
+        # @since 3.0.15
+        def marshal_dump
+          [ _added, _loaded, _unloaded ]
+        end
+
+        # Loads the data needed to Marshal.load an enumerable proxy.
+        #
+        # @example Load the proxy.
+        #   Marshal.load(proxy)
+        #
+        # @return [ Array<Object> ] The dumped data.
+        #
+        # @since 3.0.15
+        def marshal_load(data)
+          @_added, @_loaded, @_unloaded = data
+        end
+
         # Reset the enumerable back to its persisted state.
         #
         # @example Reset the enumerable.

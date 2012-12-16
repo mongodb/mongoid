@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/criterion/inspection"
+require "mongoid/criterion/marshalable"
 require "mongoid/criterion/scoping"
 
 module Mongoid
@@ -15,6 +16,7 @@ module Mongoid
     include Contextual
     include Origin::Queryable
     include Criterion::Inspection
+    include Criterion::Marshalable
     include Criterion::Scoping
 
     attr_accessor :embedded, :klass

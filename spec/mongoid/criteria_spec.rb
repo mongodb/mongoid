@@ -1920,7 +1920,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "$gt" do
+  describe "#gt" do
 
     let!(:match) do
       Band.create(member_count: 5)
@@ -1939,7 +1939,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "$gte" do
+  describe "#gte" do
 
     let!(:match) do
       Band.create(member_count: 5)
