@@ -1224,10 +1224,17 @@ describe Mongoid::Document do
       end
     end
 
+    let!(:account) do
+      person.create_account(name: "savings")
+    end
+
     describe Marshal, ".dump" do
 
       it "successfully dumps the document" do
-        expect { Marshal.dump(person) }.not_to raise_error
+        expect {
+          Marshal.dump(person)
+          Marshal.dump(account)
+        }.not_to raise_error
       end
     end
 
@@ -1235,6 +1242,37 @@ describe Mongoid::Document do
 
       it "successfully loads the document" do
         expect { Marshal.load(Marshal.dump(person)) }.not_to raise_error
+      end
+    end
+  end
+
+  context "when putting a document in the cache" do
+
+    describe ActiveSupport::Cache do
+
+      let(:cache) do
+        ActiveSupport::Cache::MemoryStore.new
+      end
+
+      describe "#fetch" do
+
+        let!(:person) do
+          Person.new
+        end
+
+        let!(:account) do
+          person.create_account(name: "savings")
+        end
+
+        it "stores the parent object" do
+          cache.fetch("key") { person }.should eq(person)
+          cache.fetch("key").should eq(person)
+        end
+
+        it "stores the embedded object" do
+          cache.fetch("key") { account }.should eq(account)
+          cache.fetch("key").should eq(account)
+        end
       end
     end
   end

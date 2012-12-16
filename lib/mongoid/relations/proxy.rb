@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/relations/marshalable"
+
 module Mongoid
   module Relations
 
@@ -14,11 +16,12 @@ module Mongoid
       end
 
       include Threaded::Lifecycle
+      include Marshalable
 
       attr_accessor :base, :loaded, :metadata, :target
 
       # Backwards compatibility with Mongoid beta releases.
-      delegate :klass, :foreign_key, :inverse_foreign_key, to: :metadata
+      delegate :foreign_key, :inverse_foreign_key, to: :metadata
       delegate :bind_one, :unbind_one, to: :binding
       delegate :collection_name, to: :base
 
@@ -37,6 +40,18 @@ module Mongoid
         @base, @target, @metadata = base, target, metadata
         yield(self) if block_given?
         extend_proxy(metadata.extension) if metadata.extension?
+      end
+
+      # Get the class from the metadata, or return nil if no metadata present.
+      #
+      # @example Get the class.
+      #   proxy.klass
+      #
+      # @return [ Class ] The relation class.
+      #
+      # @since 3.0.15
+      def klass
+        metadata ? metadata.klass : nil
       end
 
       # Resets the criteria inside the relation proxy. Used by many to many
