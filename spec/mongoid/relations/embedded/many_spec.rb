@@ -1231,6 +1231,22 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
 
+    context "when concatenating an empty array" do
+
+      let(:person) do
+        Person.create
+      end
+
+      before do
+        person.addresses.should_not_receive(:batch_insert)
+        person.addresses.concat([])
+      end
+
+      it "doesn't update the target" do
+        person.addresses.should be_empty
+      end
+    end
+
     context "when appending more than one document at once" do
 
       let(:person) do
