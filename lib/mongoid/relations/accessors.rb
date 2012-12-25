@@ -91,6 +91,39 @@ module Mongoid
 
       private
 
+      # Get the relation. Extracted out from the getter method to avoid
+      # infinite recursion when overriding the getter.
+      #
+      # @api private
+      #
+      # @example Get the relation.
+      #   document.get_relation(:name, metadata)
+      #
+      # @param [ Symbol ] name The name of the relation.
+      # @param [ Metadata ] metadata The relation metadata.
+      # @param [ true, false ] reload If the relation is to be reloaded.
+      #
+      # @return [ Proxy ] The relation.
+      #
+      # @since 3.0.16
+      def get_relation(name, metadata, reload = false)
+        variable = "@#{name}"
+        value = if instance_variable_defined?(variable) && !reload
+          instance_variable_get(variable)
+        else
+          _building do
+            _loading do
+              __build__(name, attributes[metadata.key], metadata)
+            end
+          end
+        end
+        if value.nil? && metadata.autobuilding? && !without_autobuild?
+          send("build_#{name}")
+        else
+          value
+        end
+      end
+
       # Is the current code executing without autobuild functionality?
       #
       # @example Is autobuild disabled?
@@ -162,20 +195,8 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def getter(name, metadata)
-          re_define_method(name) do |*args|
-            reload, variable = args.first, "@#{name}"
-            value = if instance_variable_defined?(variable) && !reload
-              instance_variable_get(variable)
-            else
-              _building do
-                _loading { __build__(name, attributes[metadata.key], metadata) }
-              end
-            end
-            if value.nil? && metadata.autobuilding? && !without_autobuild?
-              send("build_#{name}")
-            else
-              value
-            end
+          re_define_method(name) do |reload = false|
+            get_relation(name, metadata, reload)
           end
           self
         end
@@ -216,8 +237,8 @@ module Mongoid
         def setter(name, metadata)
           re_define_method("#{name}=") do |object|
             without_autobuild do
-              if metadata.many? || send(name)
-                set_relation(name, send(name).substitute(object.substitutable))
+              if metadata.many? || get_relation(name, metadata)
+                set_relation(name, get_relation(name, metadata).substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, metadata)
               end

@@ -61,6 +61,24 @@ describe Mongoid::Relations::Embedded::One do
         it "does not save the target" do
           name.should_not be_persisted
         end
+
+        context "with overwritten getter" do
+
+          before do
+            person.name = nil
+            def person.name_with_default
+              name_without_default or (self.name = Name.new)
+            end
+            class << person
+              alias_method_chain :name, :default
+            end
+          end
+
+          it "sets the target without an invinite recursion" do
+            person.name = name
+            person.name.should be_present
+          end
+        end
       end
 
       context "when the parent is not a new record" do

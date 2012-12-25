@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2642 Don't batch push empty arrays on embedded documents. (Laszlo Bacsi)
 
+* \#2564 Fixed infinite recursion for cases where a relation getter was
+  overridden and called the setter from that method.
+
 * \#2554 Ensure `unscoped` on an `embeds_many` does not include documents
   flagged for destruction.
 
