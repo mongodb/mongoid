@@ -24,9 +24,9 @@ namespace :db do
     task :setup => [ "db:create", "db:mongoid:create_indexes", "db:seed" ]
   end
 
-  unless Rake::Task.task_defined?("db:reseed")
-    desc "Delete data and seed"
-    task :reseed => [ "db:drop", "db:seed" ]
+  unless Rake::Task.task_defined?("db:reset")
+    desc "Delete data and loads the seeds"
+    task :reset => [ "db:drop", "db:seed" ]
   end
 
   unless Rake::Task.task_defined?("db:create")
