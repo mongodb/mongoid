@@ -322,6 +322,71 @@ describe Mongoid::Paranoia do
     end
   end
 
+  describe "#deleted?" do
+
+    context "when the document is a root" do
+
+      let(:post) do
+        ParanoidPost.create(title: "testing")
+      end
+
+      context "when the document is hard deleted" do
+
+        before do
+          post.destroy!
+        end
+
+        it "returns true" do
+          post.should be_deleted
+        end
+      end
+
+      context "when the document is soft deleted" do
+
+        before do
+          post.destroy
+        end
+
+        it "returns true" do
+          post.should be_deleted
+        end
+      end
+    end
+
+    context "when the document is embedded" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:phone) do
+        person.paranoid_phones.create(number: "911")
+      end
+
+      context "when the document is hard deleted" do
+
+        before do
+          phone.destroy!
+        end
+
+        it "returns true" do
+          phone.should be_deleted
+        end
+      end
+
+      context "when the document is soft deleted" do
+
+        before do
+          phone.destroy
+        end
+
+        it "returns true" do
+          phone.should be_deleted
+        end
+      end
+    end
+  end
+
   describe "#delete!" do
 
     context "when the document is a root" do

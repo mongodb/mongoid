@@ -143,6 +143,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2647 Ensure `deleted?` and `destroyed?` on paranoid documents return the
+  same value.
+
 * \#2642 Don't batch push empty arrays on embedded documents. (Laszlo Bacsi)
 
 * \#2564 Fixed infinite recursion for cases where a relation getter was
