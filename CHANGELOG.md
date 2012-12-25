@@ -9,6 +9,8 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid now requires Active Model 4 or higher.
 
+* \#2656 `rake db:reseed` is now `rake db:reset` (Arthur Neves)
+
 * \#2648 `Boolean` becomes `Mongoid::Boolean` to avoid polluting the global
   namespace with a commonly used class by other libraries.
 
