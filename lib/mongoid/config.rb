@@ -13,6 +13,9 @@ module Mongoid
     extend Options
     include ActiveModel::Observing
 
+    delegate :logger=, to: ::Mongoid
+    delegate :logger, to: ::Mongoid
+    
     LOCK = Mutex.new
 
     option :allow_dynamic_fields, default: true

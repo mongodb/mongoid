@@ -159,6 +159,6 @@ module Mongoid
   #
   # @since 1.0.0
   delegate(*(Config.public_instance_methods(false) +
-    ActiveModel::Observing::ClassMethods.public_instance_methods(false) <<
+    ActiveModel::Observing::ClassMethods.public_instance_methods(false) - [:logger=, :logger] <<
     { to: Config }))
 end
