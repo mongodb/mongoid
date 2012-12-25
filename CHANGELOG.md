@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid now requires Active Model 4 or higher.
 
+* \#2648 `Boolean` becomes `Mongoid::Boolean` to avoid polluting the global
+  namespace with a commonly used class by other libraries.
+
 * \#2433 `Mongoid::Paranoia` has been removed.
 
 * \#2432 `Mongoid::Versioning` has been removed.

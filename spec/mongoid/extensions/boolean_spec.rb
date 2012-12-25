@@ -1,20 +1,20 @@
 require "spec_helper"
 
-describe Mongoid::Extensions::Boolean do
+describe Mongoid::Boolean do
 
   describe ".demongoize" do
 
     context "when provided true" do
 
       it "returns true" do
-        Boolean.demongoize(true).should eq(true)
+        described_class.demongoize(true).should eq(true)
       end
     end
 
     context "when provided false" do
 
       it "returns false" do
-        Boolean.demongoize(false).should eq(false)
+        described_class.demongoize(false).should eq(false)
       end
     end
   end
@@ -26,14 +26,14 @@ describe Mongoid::Extensions::Boolean do
       context "when provided true" do
 
         it "returns true" do
-          Boolean.mongoize(true).should eq(true)
+          described_class.mongoize(true).should eq(true)
         end
       end
 
       context "when provided false" do
 
         it "returns false" do
-          Boolean.mongoize(false).should eq(false)
+          described_class.mongoize(false).should eq(false)
         end
       end
     end
@@ -43,84 +43,84 @@ describe Mongoid::Extensions::Boolean do
       context "when provided true" do
 
         it "returns true" do
-          Boolean.mongoize("true").should eq(true)
+          described_class.mongoize("true").should eq(true)
         end
       end
 
       context "when provided t" do
 
         it "returns true" do
-          Boolean.mongoize("t").should eq(true)
+          described_class.mongoize("t").should eq(true)
         end
       end
 
       context "when provided 1" do
 
         it "returns true" do
-          Boolean.mongoize("1").should eq(true)
+          described_class.mongoize("1").should eq(true)
         end
       end
 
       context "when provided 1.0" do
 
         it "returns true" do
-          Boolean.mongoize("1.0").should eq(true)
+          described_class.mongoize("1.0").should eq(true)
         end
       end
 
       context "when provided yes" do
 
         it "returns true" do
-          Boolean.mongoize("yes").should eq(true)
+          described_class.mongoize("yes").should eq(true)
         end
       end
 
       context "when provided y" do
 
         it "returns true" do
-          Boolean.mongoize("y").should eq(true)
+          described_class.mongoize("y").should eq(true)
         end
       end
 
       context "when provided false" do
 
         it "returns false" do
-          Boolean.mongoize("false").should eq(false)
+          described_class.mongoize("false").should eq(false)
         end
       end
 
       context "when provided f" do
 
         it "returns false" do
-          Boolean.mongoize("f").should eq(false)
+          described_class.mongoize("f").should eq(false)
         end
       end
 
       context "when provided 0" do
 
         it "returns false" do
-          Boolean.mongoize("0").should eq(false)
+          described_class.mongoize("0").should eq(false)
         end
       end
 
       context "when provided 0.0" do
 
         it "returns false" do
-          Boolean.mongoize("0.0").should eq(false)
+          described_class.mongoize("0.0").should eq(false)
         end
       end
 
       context "when provided no" do
 
         it "returns false" do
-          Boolean.mongoize("no").should eq(false)
+          described_class.mongoize("no").should eq(false)
         end
       end
 
       context "when provided n" do
 
         it "returns false" do
-          Boolean.mongoize("n").should eq(false)
+          described_class.mongoize("n").should eq(false)
         end
       end
     end
