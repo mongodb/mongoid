@@ -326,7 +326,7 @@ module Mongoid
         def unscoped
           criterion = klass.unscoped
           criterion.embedded = true
-          criterion.documents = _unscoped
+          criterion.documents = _unscoped.delete_if(&:marked_for_destruction?)
           criterion
         end
 

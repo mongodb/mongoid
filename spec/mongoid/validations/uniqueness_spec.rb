@@ -1297,6 +1297,45 @@ describe Mongoid::Validations::UniquenessValidator do
 
     context "when in an embeds_many" do
 
+      let!(:def_one) do
+        word.definitions.create(description: "1")
+      end
+
+      let!(:def_two) do
+        word.definitions.create(description: "2")
+      end
+
+      context "when a document is being destroyed" do
+
+        before do
+          Definition.validates_uniqueness_of :description
+        end
+
+        after do
+          Definition.reset_callbacks(:validate)
+        end
+
+        context "when changing a document to the destroyed property" do
+
+          let(:attributes) do
+            {
+              definitions_attributes: {
+                "0" => { id: def_one.id, description: "0", "_destroy" => 1 },
+                "1" => { id: def_two.id, description: "1" }
+              }
+            }
+          end
+
+          before do
+            word.attributes = attributes
+          end
+
+          it "returns true" do
+            def_two.should be_valid
+          end
+        end
+      end
+
       context "when the document does not use composite keys" do
 
         context "when no scope is provided" do
