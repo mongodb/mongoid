@@ -3,6 +3,12 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.16
+
+### Resolved Issues
+
+* \#2642 Don't batch push empty arrays on embedded documents. (Laszlo Bacsi)
+
 ## 3.0.15
 
 ### Resolved Issues
