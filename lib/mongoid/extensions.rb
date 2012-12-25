@@ -1,8 +1,4 @@
 # encoding: utf-8
-unless defined?(Boolean)
-  class Boolean; end
-end
-
 class Moped::BSON::ObjectId
   undef :as_json
   def as_json(options = nil)
