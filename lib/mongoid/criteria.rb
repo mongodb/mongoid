@@ -747,7 +747,9 @@ module Mongoid
     #
     # @since 3.0.3
     def type_selectable?
-      klass.hereditary? && !selector.keys.include?(:_type)
+      klass.hereditary? &&
+        !selector.keys.include?("_type") &&
+        !selector.keys.include?(:_type)
     end
 
     # Get the selector for type selection.
