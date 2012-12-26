@@ -148,6 +148,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2642 Don't batch push empty arrays on embedded documents. (Laszlo Bacsi)
 
+* \#2618 Validating uniqueness now always uses string consistency by default.
+
 * \#2564 Fixed infinite recursion for cases where a relation getter was
   overridden and called the setter from that method.
 

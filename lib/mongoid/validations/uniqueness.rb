@@ -267,7 +267,9 @@ module Mongoid
       # @since 2.4.10
       def validate_root(document, attribute, value)
         criteria = create_criteria(klass, document, attribute, value)
-        add_error(document, attribute, value) if criteria.exists?
+        if criteria.with(consistency: :string).exists?
+          add_error(document, attribute, value)
+        end
       end
 
       # Are we required to validate the document?
