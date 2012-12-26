@@ -143,6 +143,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2651 Ensure `Criteria#type` works properly with both symbol and string
+  keys in the selector.
+
 * \#2647 Ensure `deleted?` and `destroyed?` on paranoid documents return the
   same value.
 
