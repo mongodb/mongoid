@@ -149,6 +149,9 @@ For instructions on upgrading to newer versions, visit
 * \#2647 Ensure `deleted?` and `destroyed?` on paranoid documents return the
   same value.
 
+* \#2646 Set unloaded doc in memory on enumerable targets before yielding to
+  the block.
+
 * \#2642 Don't batch push empty arrays on embedded documents. (Laszlo Bacsi)
 
 * \#2618 Validating uniqueness now always uses string consistency by default.

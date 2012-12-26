@@ -165,8 +165,8 @@ module Mongoid
           else
             unloaded_documents.each do |doc|
               document = _added.delete(doc.id) || _loaded.delete(doc.id) || doc
-              yield(document)
               _loaded[document.id] = document
+              yield(document)
             end
           end
           _added.each_pair do |id, doc|
