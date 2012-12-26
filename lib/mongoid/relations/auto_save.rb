@@ -48,8 +48,7 @@ module Mongoid
 
         # Set up the autosave behaviour for references many and references one
         # relations. When the option is set to true, these relations will get
-        # saved automatically when the parent is first saved, but not if the
-        # parent already exists in the database.
+        # saved automatically when the parent saved, if they are dirty.
         #
         # @example Set up autosave options.
         #   Person.autosave(metadata)
