@@ -66,7 +66,9 @@ module Mongoid
       # @since 3.0.0
       def count(document = nil, &block)
         return super(&block) if block_given?
-        return query.count unless document
+        return (@count || query.count).tap do |count|
+          @count ||= count if cached?
+        end unless document
         collection.find(criteria.and(_id: document.id).selector).count
       end
 
@@ -79,7 +81,7 @@ module Mongoid
       #
       # @since 3.0.0
       def delete
-        query.count.tap do
+        self.count.tap do
           query.remove_all
         end
       end
@@ -94,7 +96,7 @@ module Mongoid
       #
       # @since 3.0.0
       def destroy
-        destroyed = query.count
+        destroyed = self.count
         each do |doc|
           doc.destroy
         end
@@ -242,7 +244,7 @@ module Mongoid
       #
       # @since 3.0.0
       def length
-        @length ||= query.count
+        @length ||= self.count
       end
       alias :size :length
 

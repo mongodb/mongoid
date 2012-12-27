@@ -100,6 +100,21 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
+    context "when context is cached" do
+
+      let(:context) do
+        described_class.new(criteria.cache)
+      end
+
+      before do
+        context.query.should_receive(:count).once.and_return(1)
+      end
+
+      it "returns the count cached value after first call" do
+        2.times { context.count.should eq(1) }
+      end
+    end
+
     context "when provided a document" do
 
       let(:context) do
