@@ -50,9 +50,7 @@ module Mongoid
       # @since 3.0.0
       def count(document = nil, &block)
         return super(&block) if block_given?
-        return (@count || query.count).tap do |count|
-          @count ||= count if cached?
-        end unless document
+        return (cached? ? @count ||= query.count : query.count) unless document
         collection.find(criteria.and(_id: document.id).selector).count
       end
 
