@@ -20,7 +20,7 @@ module Mongoid
       # @since 3.0.0
       def eager_load(docs)
         # @todo: #2638: We've rejected all the inclusions after calling #first
-        # or #last, so when asking for the entire criteria after non of these
+        # or #last, so when asking for the entire criteria after none of these
         # remain to get executed.
         criteria.inclusions.reject! do |metadata|
           metadata.eager_load(eager_loaded_ids(docs, metadata)) if !docs.empty?
