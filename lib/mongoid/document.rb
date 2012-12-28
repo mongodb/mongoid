@@ -329,6 +329,8 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
         IdentityMap.set(doc) unless _loading_revision?
+        # @todo: #2586: Need to have access to parent document in these
+        #   callbacks.
         doc.run_callbacks(:find) unless doc._find_callbacks.empty?
         doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         doc
