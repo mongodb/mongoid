@@ -33,7 +33,12 @@ describe Mongoid::Relations::Referenced::One do
           Game.new
         end
 
+        let(:metadata) do
+          Game.relations["person"]
+        end
+
         before do
+          metadata.should_receive(:criteria).never
           person.game = game
         end
 
