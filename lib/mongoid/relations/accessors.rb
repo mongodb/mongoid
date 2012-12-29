@@ -113,7 +113,11 @@ module Mongoid
         else
           _building do
             _loading do
-              __build__(name, attributes[metadata.key], metadata)
+              # @note In the case where the record is new and we are binding,
+              # we want to avoid an extra database query when we know it is not
+              # necessary.
+              key = (new_record? && _binding?) ? nil : attributes[metadata.key]
+              __build__(name, key, metadata)
             end
           end
         end
