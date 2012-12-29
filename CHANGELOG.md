@@ -143,6 +143,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2661 Implement instance level `model_name` for documents.
+
 * \#2651 Ensure `Criteria#type` works properly with both symbol and string
   keys in the selector.
 

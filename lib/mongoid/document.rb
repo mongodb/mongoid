@@ -159,6 +159,18 @@ module Mongoid
       end
     end
 
+    # Return the model name of the document.
+    #
+    # @example Return the model name.
+    #   document.model_name
+    #
+    # @return [ String ] The model name.
+    #
+    # @since 3.0.16
+    def model_name
+      self.class.model_name
+    end
+
     # Return the key value for the document.
     #
     # @example Return the key.

@@ -545,7 +545,7 @@ describe Mongoid::Document do
     end
   end
 
-  describe "#.instantiate" do
+  describe ".instantiate" do
 
     context "when an id exists" do
 
@@ -587,6 +587,17 @@ describe Mongoid::Document do
       it "creates a new document" do
         person.should be_a(Person)
       end
+    end
+  end
+
+  describe "#model_name" do
+
+    let(:person) do
+      Person.new
+    end
+
+    it "returns the class model name" do
+      person.model_name.should eq("Person")
     end
   end
 
