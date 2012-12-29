@@ -160,6 +160,9 @@ For instructions on upgrading to newer versions, visit
 * \#2639 Avoid extra unnecesary queries on new records when building relations
   off of them.
 
+* \#2638 When a criteria is eager loading, calling `first` or `last` then
+  iterating the entire results properly eager loads the full request.
+
 * \#2618 Validating uniqueness now always uses string consistency by default.
 
 * \#2564 Fixed infinite recursion for cases where a relation getter was
