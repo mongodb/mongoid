@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid now requires Active Model 4 or higher.
 
+* \#2659 `Mongoid::Railtie` now properly uses only one initializer and
+  the name has changed to `mongoid.load-config`.
+
 * \#2656 `rake db:reseed` is now `rake db:reset` (Arthur Neves)
 
 * \#2648 `Boolean` becomes `Mongoid::Boolean` to avoid polluting the global
