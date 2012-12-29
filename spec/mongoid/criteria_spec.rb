@@ -2229,7 +2229,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ post_one ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(post_one).once.and_call_original
         end
 
         let!(:document) do
@@ -2260,7 +2260,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ post_two ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(post_two).once.and_call_original
         end
 
         let!(:document) do
@@ -2344,7 +2344,7 @@ describe Mongoid::Criteria do
           end
 
           before do
-            new_context.should_receive(:eager_load).with([ person ]).once.and_call_original
+            new_context.should_receive(:eager_load_one).with(person).once.and_call_original
           end
 
           let!(:from_db) do
@@ -2380,7 +2380,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2415,7 +2415,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2547,7 +2547,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2586,7 +2586,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2722,7 +2722,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2739,6 +2739,21 @@ describe Mongoid::Criteria do
 
         it "inserts the second document into the identity map" do
           Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+
+        context "when subsequently getting all documents" do
+
+          before do
+            context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          end
+
+          let!(:documents) do
+            criteria.entries
+          end
+
+          it "returns the correct documents" do
+            documents.should eq([ person ])
+          end
         end
       end
 
@@ -2757,7 +2772,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2774,6 +2789,21 @@ describe Mongoid::Criteria do
 
         it "inserts the second document into the identity map" do
           Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        end
+
+        context "when subsequently getting all documents" do
+
+          before do
+            context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          end
+
+          let!(:documents) do
+            criteria.entries
+          end
+
+          it "returns the correct documents" do
+            documents.should eq([ person ])
+          end
         end
       end
 
