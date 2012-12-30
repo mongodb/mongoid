@@ -337,7 +337,7 @@ module Mongoid
       # @since 3.0.0
       def __collection_name__
         if storage_options && name = storage_options[:collection]
-          name.to_sym
+          __evaluate__(name)
         else
           default_collection_name
         end
@@ -353,7 +353,7 @@ module Mongoid
       # @since 3.0.0
       def __database_name__
         if storage_options && name = storage_options[:database]
-          name.to_sym
+          __evaluate__(name)
         else
           Mongoid.sessions[__session_name__][:database]
         end
@@ -369,7 +369,7 @@ module Mongoid
       # @since 3.0.0
       def __session_name__
         if storage_options && name = storage_options[:session]
-          name.to_sym
+          __evaluate__(name)
         else
           :default
         end
@@ -386,11 +386,26 @@ module Mongoid
       def __session__
         if !(name = session_override).nil?
           Sessions.with_name(name)
-        elsif storage_options && name = storage_options[:session]
-          Sessions.with_name(name)
         else
-          Sessions.default
+          Sessions.with_name(__session_name__)
         end
+      end
+
+      # Eval the provided value, either byt calling it if it responds to call
+      # or returning the value itself.
+      #
+      # @api private
+      #
+      # @example Evaluate the name.
+      #   Model.__evaluate__(:name)
+      #
+      # @param [ String, Symbol, Proc ] name The name.
+      #
+      # @return [ Symbol ] The value as a symbol.
+      #
+      # @since 3.1.0
+      def __evaluate__(name)
+        name.respond_to?(:call) ? name.call.to_sym : name.to_sym
       end
     end
   end

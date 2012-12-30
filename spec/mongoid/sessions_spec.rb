@@ -35,8 +35,49 @@ describe Mongoid::Sessions do
 
     context "when overriding the default with store_in" do
 
-      before do
-        Band.store_in(collection: "artists")
+      shared_examples_for "an overridden collection at the class level" do
+
+        let(:band) do
+          Band.new
+        end
+
+        it "returns the collection for the model" do
+          band.collection.should be_a(Moped::Collection)
+        end
+
+        it "sets the correct collection name" do
+          band.collection.name.to_s.should eq("artists")
+        end
+
+        context "when accessing from the class level" do
+
+          it "returns the collection for the model" do
+            Band.collection.should be_a(Moped::Collection)
+          end
+
+          it "sets the correct collection name" do
+            Band.collection.name.to_s.should eq("artists")
+          end
+        end
+
+        context "when safety options exist" do
+
+          context "when the options are from the current thread" do
+
+            before do
+              Band.with(safe: { w: 3 })
+            end
+
+            it "clears the options from the current thread" do
+              Band.collection
+              Band.persistence_options.should be_nil
+            end
+
+            it "returns the collection" do
+              Band.collection.should be_a(Moped::Collection)
+            end
+          end
+        end
       end
 
       after do
@@ -44,46 +85,31 @@ describe Mongoid::Sessions do
         Band.send(:remove_instance_variable, :@collection_name)
       end
 
-      let(:band) do
-        Band.new
-      end
+      context "when overriding with a proc" do
 
-      it "returns the collection for the model" do
-        band.collection.should be_a(Moped::Collection)
-      end
-
-      it "sets the correct collection name" do
-        band.collection.name.to_s.should eq("artists")
-      end
-
-      context "when accessing from the class level" do
-
-        it "returns the collection for the model" do
-          Band.collection.should be_a(Moped::Collection)
+        before do
+          Band.store_in(collection: ->{ "artists" })
         end
 
-        it "sets the correct collection name" do
-          Band.collection.name.to_s.should eq("artists")
-        end
+        it_behaves_like "an overridden collection at the class level"
       end
 
-      context "when safety options exist" do
+      context "when overriding with a string" do
 
-        context "when the options are from the current thread" do
-
-          before do
-            Band.with(safe: { w: 3 })
-          end
-
-          it "clears the options from the current thread" do
-            Band.collection
-            Band.persistence_options.should be_nil
-          end
-
-          it "returns the collection" do
-            Band.collection.should be_a(Moped::Collection)
-          end
+        before do
+          Band.store_in(collection: "artists")
         end
+
+        it_behaves_like "an overridden collection at the class level"
+      end
+
+      context "when overriding with a symbol" do
+
+        before do
+          Band.store_in(collection: :artists)
+        end
+
+        it_behaves_like "an overridden collection at the class level"
       end
     end
 
@@ -122,8 +148,25 @@ describe Mongoid::Sessions do
 
     context "when overriding the default with store_in" do
 
-      before do
-        Band.store_in(collection: "artists")
+      shared_examples_for "an overridden collection name at the class level" do
+
+        let(:band) do
+          Band.new
+        end
+
+        context "when accessing from the instance" do
+
+          it "returns the overridden value" do
+            band.collection_name.should eq(:artists)
+          end
+        end
+
+        context "when accessing from the class level" do
+
+          it "returns the overridden value" do
+            Band.collection_name.should eq(:artists)
+          end
+        end
       end
 
       after do
@@ -131,19 +174,31 @@ describe Mongoid::Sessions do
         Band.send(:remove_instance_variable, :@collection_name)
       end
 
-      let(:band) do
-        Band.new
-      end
+      context "when overriding with a proc" do
 
-      it "returns the overridden value" do
-        band.collection_name.should eq(:artists)
-      end
-
-      context "when accessing from the class level" do
-
-        it "returns the overridden value" do
-          Band.collection_name.should eq(:artists)
+        before do
+          Band.store_in(collection: ->{ "artists" })
         end
+
+        it_behaves_like "an overridden collection name at the class level"
+      end
+
+      context "when overriding with a string" do
+
+        before do
+          Band.store_in(collection: "artists")
+        end
+
+        it_behaves_like "an overridden collection name at the class level"
+      end
+
+      context "when overriding with a symbol" do
+
+        before do
+          Band.store_in(collection: :artists)
+        end
+
+        it_behaves_like "an overridden collection name at the class level"
       end
     end
 
@@ -232,39 +287,91 @@ describe Mongoid::Sessions do
 
     context "when overriding to a monghq single server", config: :mongohq do
 
-      before(:all) do
-        Band.store_in(session: :mongohq_single)
+      shared_examples_for "an overridden session to a mongohq single server" do
+
+        let(:band) do
+          Band.new
+        end
+
+        let(:single_session) do
+          band.mongo_session
+        end
+
+        it "returns the default session" do
+          single_session.options[:database].should eq(ENV["MONGOHQ_SINGLE_NAME"])
+        end
       end
 
-      let(:band) do
-        Band.new
+      context "when overriding with a proc" do
+
+        before do
+          Band.store_in(session: ->{ :mongohq_single })
+        end
+
+        it_behaves_like "an overridden session to a mongohq single server"
       end
 
-      let(:session) do
-        band.mongo_session
+      context "when overriding with a string" do
+
+        before do
+          Band.store_in(session: "mongohq_single")
+        end
+
+        it_behaves_like "an overridden session to a mongohq single server"
       end
 
-      it "returns the default session" do
-        session.options[:database].should eq(ENV["MONGOHQ_SINGLE_NAME"])
+      context "when overriding with a symbol" do
+
+        before do
+          Band.store_in(session: :mongohq_single)
+        end
+
+        it_behaves_like "an overridden session to a mongohq single server"
       end
     end
 
     context "when overriding to a mongohq replica set", config: :mongohq do
 
-      before(:all) do
-        Band.store_in(session: :mongohq_repl)
-      end
-
       let(:band) do
         Band.new
       end
 
-      let(:repl_session) do
+      let(:replica_session) do
         band.mongo_session
       end
 
-      it "returns the default session" do
-        repl_session.options[:database].should eq(ENV["MONGOHQ_REPL_NAME"])
+      shared_examples_for "an overridden session to a mongohq replica set" do
+
+        it "returns the default session" do
+          replica_session.options[:database].should eq(ENV["MONGOHQ_REPL_NAME"])
+        end
+      end
+
+      context "when overriding with a proc" do
+
+        before do
+          Band.store_in(session: ->{ :mongohq_repl })
+        end
+
+        it_behaves_like "an overridden session to a mongohq replica set"
+      end
+
+      context "when overriding with a string" do
+
+        before do
+          Band.store_in(session: "mongohq_repl")
+        end
+
+        it_behaves_like "an overridden session to a mongohq replica set"
+      end
+
+      context "when overriding with a symbol" do
+
+        before do
+          Band.store_in(session: :mongohq_repl)
+        end
+
+        it_behaves_like "an overridden session to a mongohq replica set"
       end
     end
 

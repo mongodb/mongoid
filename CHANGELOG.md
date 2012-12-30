@@ -7,6 +7,13 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2613 Procs can now be provided as values to `store_in`:
+
+        class Band
+          include Mongoid::Document
+          store_in database: ->{ Thread.current[:database] }
+        end
+
 * \#2609 Pass through batch_size option to query. (Martin Mauch)
 
 * \#2539 `Mongoid.models` now tracks all models in the application for more
