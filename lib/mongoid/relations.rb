@@ -4,6 +4,7 @@ require "mongoid/relations/auto_save"
 require "mongoid/relations/cascading"
 require "mongoid/relations/constraint"
 require "mongoid/relations/conversions"
+require "mongoid/relations/counter_cache"
 require "mongoid/relations/cyclic"
 require "mongoid/relations/proxy"
 require "mongoid/relations/bindings"
@@ -43,6 +44,7 @@ module Mongoid
     include Reflections
     include Synchronization
     include Touchable
+    include CounterCache
 
     attr_accessor :metadata
 
