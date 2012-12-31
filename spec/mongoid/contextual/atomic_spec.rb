@@ -427,33 +427,59 @@ describe Mongoid::Contextual::Atomic do
   end
 
   describe "#unset" do
+    context 'unset one field' do
+      let!(:depeche_mode) do
+        Band.create(name: "Depeche Mode")
+      end
 
-    let!(:depeche_mode) do
-      Band.create(name: "Depeche Mode")
+      let!(:new_order) do
+        Band.create(name: "New Order")
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.unset(:name)
+      end
+
+      it "unsets the first existing field" do
+        depeche_mode.reload.name.should be_nil
+      end
+
+      it "unsets the last existing field" do
+        new_order.reload.name.should be_nil
+      end
     end
+    context 'unset multiple fields' do
+      let!(:new_order) do
+        Band.create(name: "New Order", genres: [ "electro", "dub" ])
+      end
 
-    let!(:new_order) do
-      Band.create(name: "New Order")
-    end
+      let(:criteria) do
+        Band.all
+      end
 
-    let(:criteria) do
-      Band.all
-    end
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
 
-    let(:context) do
-      Mongoid::Contextual::Mongo.new(criteria)
-    end
+      before do
+        context.unset(:name, :genres)
+      end
 
-    before do
-      context.unset(:name)
-    end
+      it "unsets name field" do
+        new_order.reload.name.should be_nil
+      end
 
-    it "unsets the first existing field" do
-      depeche_mode.reload.name.should be_nil
-    end
-
-    it "unsets the last existing field" do
-      new_order.reload.name.should be_nil
+      it "unsets genres field" do
+        new_order.reload.genres.should be_nil
+      end
     end
   end
 end
