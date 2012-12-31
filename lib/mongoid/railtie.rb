@@ -99,19 +99,23 @@ module Rails
       #
       # This will happen every request in development, once in ther other
       # environments.
-      config.to_prepare do
-        if $rails_rake_task
-          # We previously got rid of this, however in the case where
-          # threadsafe! is enabled we must load all models so things like
-          # creating indexes works properly.
-          ::Rails::Mongoid.load_models(app)
-        else
-          ::Rails::Mongoid.preload_models(app)
+      initializer "mongoid.preload-models" do |app|
+        config.to_prepare do
+          if $rails_rake_task
+            # We previously got rid of this, however in the case where
+            # threadsafe! is enabled we must load all models so things like
+            # creating indexes works properly.
+            ::Rails::Mongoid.load_models(app)
+          else
+            ::Rails::Mongoid.preload_models(app)
+          end
         end
       end
 
       # Need to include the Mongoid identity map middleware.
-      config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
+      initializer "mongoid.use-identity-map-middleware" do |app|
+        app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
+      end
 
       config.after_initialize do
         # Unicorn clears the START_CTX when a worker is forked, so if we have
