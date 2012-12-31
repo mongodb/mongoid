@@ -8,7 +8,7 @@ class Post
 
   attr_accessor :before_add_called, :after_add_called, :before_remove_called, :after_remove_called
 
-  belongs_to :person
+  belongs_to :person, counter_cache: true
   belongs_to :author, foreign_key: :author_id, class_name: "User"
   has_and_belongs_to_many :tags, before_add: :before_add_tag, after_add: :after_add_tag, before_remove: :before_remove_tag, after_remove: :after_remove_tag
   has_many :videos, validate: false

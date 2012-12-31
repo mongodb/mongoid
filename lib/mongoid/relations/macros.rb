@@ -58,6 +58,7 @@ module Mongoid
           self.embedded = true
           relate(name, meta)
           builder(name, meta).creator(name, meta)
+          add_counter_cache_callbacks(meta) if meta.counter_cached?
           meta
         end
 
@@ -140,7 +141,32 @@ module Mongoid
           meta = reference_one_to_one(name, options, Referenced::In, &block)
           aliased_fields[name.to_s] = meta.foreign_key
           touchable(meta)
+          add_counter_cache_callbacks(meta) if meta.counter_cached?
           meta
+        end
+
+        # Add the callbacks responsible for update the counter cache field
+        #
+        # @example Add the touchable.
+        #   Person.add_counter_callbacks(meta)
+        #
+        # @param [ Metadata ] metadata The metadata for the relation.
+        #
+        # @since 3.1.0
+        def add_counter_cache_callbacks(meta)
+          name = meta.name
+          cache_column = meta.counter_cache_column_name.to_sym
+
+          after_create do
+            record = __send__(name)
+            record.class.increment_counter(cache_column, record.id) if record.try(:persisted?)
+          end
+
+          before_destroy do
+            record = __send__(name)
+            record.class.decrement_counter(cache_column, record.id) if record.try(:persisted?)
+          end
+
         end
 
         # Adds a relational association from a parent Document to many
