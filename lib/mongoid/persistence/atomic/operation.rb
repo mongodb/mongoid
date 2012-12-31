@@ -6,7 +6,7 @@ module Mongoid
       # This is the included module for all atomic operation objects.
       module Operation
 
-        attr_accessor :document, :field, :value, :options
+        attr_accessor :document, :fields, :value, :options
 
         # Get the collection to be used for persistence.
         #
@@ -31,10 +31,18 @@ module Mongoid
         # @param [ Hash ] options The persistence options.
         #
         # @since 2.0.0
-        def initialize(document, field, value, options = {})
-          @document, @field, @value =
-            document, document.database_field_name(field.to_s), value
+        def initialize(document, fields, value, options = {})
+          @document, @value = document, value
           @options = options
+
+          @fields = Array.wrap(fields).collect do |field|
+            document.database_field_name(field.to_s)
+          end
+
+          self.class.send(:define_method, :field) do
+            @fields.first
+          end if @fields.length == 1
+
         end
 
         # Get the atomic operation to perform.
@@ -48,7 +56,10 @@ module Mongoid
         #
         # @since 2.0.0
         def operation(modifier)
-          { modifier => { path => cast_value } }
+          hash = Hash[fields.collect do |field|
+            [path(field), cast_value]
+          end]
+          { modifier => hash }
         end
 
         # Get the path to the field that is getting atomically updated.
@@ -59,7 +70,7 @@ module Mongoid
         # @return [ String, Symbol ] The path to the field.
         #
         # @since 2.1.0
-        def path
+        def path(field = field)
           position = document.atomic_position
           position.blank? ? field : "#{position}.#{field}"
         end
@@ -108,9 +119,13 @@ module Mongoid
         #
         # @since 3.0.0
         def execute(name)
-          if !document.new_record?
+          unless document.new_record?
             collection.find(document.atomic_selector).update(operation(name))
-            document.remove_change(field)
+            if fields.length > 1
+              document.remove_change(fields)
+            else
+              document.remove_change(field)
+            end
           end
         end
 

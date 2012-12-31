@@ -17,7 +17,7 @@ module Mongoid
         # @since 2.1.0
         def persist
           prepare do
-            document.attributes.delete(field)
+            fields.each { |f| document.attributes.delete(f) }
             execute("$unset")
           end
         end
