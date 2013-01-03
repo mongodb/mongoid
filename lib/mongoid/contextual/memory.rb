@@ -382,11 +382,11 @@ module Mongoid
       #
       # @since 3.0.0
       def in_place_sort(values)
-        values.each_pair do |field, dir|
+        values.keys.reverse.each do |field|
           documents.sort! do |a, b|
             a_value, b_value = a[field], b[field]
             value = compare(a_value.__sortable__, b_value.__sortable__)
-            dir < 0 ? value * -1 : value
+            values[field] < 0 ? value * -1 : value
           end
         end
       end
