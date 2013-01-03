@@ -865,6 +865,14 @@ describe Mongoid::Contextual::Memory do
 
     context "when providing multiple sort fields" do
 
+      let(:lenau) do
+        Address.new(street: "lenau", number: 5, name: "lenau")
+      end
+
+      before do
+        criteria.documents.unshift(lenau)
+      end
+
       context "when the sort is ascending" do
 
         let!(:sorted) do
@@ -872,7 +880,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          context.entries.should eq([ friedel, hobrecht, pfluger ])
+          context.entries.should eq([ friedel, lenau, pfluger, hobrecht ])
         end
 
         it "returns the context" do
@@ -887,7 +895,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          context.entries.should eq([ pfluger, hobrecht, friedel ])
+          context.entries.should eq([ hobrecht, pfluger, lenau, friedel ])
         end
 
         it "returns the context" do
