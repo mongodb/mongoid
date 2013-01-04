@@ -296,13 +296,13 @@ describe Mongoid::Criteria do
 
   [ :build, :new ].each do |method|
 
-    describe "#build" do
+    context "##{method}" do
 
       let(:criteria) do
         Band.where(name: "Depeche Mode")
       end
 
-      context "when provided valid attributes" do
+      describe "when provided valid attributes" do
 
         let(:band) do
           criteria.send(method, genres: [ "electro" ])
@@ -318,6 +318,28 @@ describe Mongoid::Criteria do
 
         it "sets the attributes passed to build" do
           band.genres.should eq([ "electro" ])
+        end
+      end
+
+      context "when provided a block" do
+        describe "when provided valid attributes" do
+          let(:band) do
+            criteria.send(method) do |c|
+              c.genres = [ "electro" ]
+            end
+          end
+
+          it "returns the new document" do
+            band.should be_new_record
+          end
+
+          it "sets the criteria attributes" do
+            band.name.should eq("Depeche Mode")
+          end
+
+          it "sets the attributes passed to build" do
+            band.genres.should eq([ "electro" ])
+          end
         end
       end
     end
@@ -471,14 +493,13 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#create" do
+  context "#create" do
 
     let(:criteria) do
       Band.where(name: "Depeche Mode")
     end
 
-    context "when provided valid attributes" do
-
+    describe "when provided valid attributes" do
       let(:band) do
         criteria.create(genres: [ "electro" ])
       end
@@ -495,15 +516,38 @@ describe Mongoid::Criteria do
         band.genres.should eq([ "electro" ])
       end
     end
+
+    context "when provided a block" do
+      describe "when provided valid attributes & using block" do
+        let(:band) do
+          criteria.create do |c|
+            c.genres = [ "electro" ]
+          end
+        end
+
+        it "returns the created document" do
+          band.should be_persisted
+        end
+
+        it "sets the criteria attributes" do
+          band.name.should eq("Depeche Mode")
+        end
+
+        it "sets the attributes passed to build" do
+          band.genres.should eq([ "electro" ])
+        end
+      end
+    end
+
   end
 
-  describe "#create!" do
+  context "#create!" do
 
     let(:criteria) do
       Account.where(number: "11123213")
     end
 
-    context "when provided invalid attributes" do
+    describe "when provided invalid attributes" do
 
       it "raises an error" do
         expect {
