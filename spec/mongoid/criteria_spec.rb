@@ -296,13 +296,13 @@ describe Mongoid::Criteria do
 
   [ :build, :new ].each do |method|
 
-    context "##{method}" do
+    describe "##{method}" do
 
       let(:criteria) do
         Band.where(name: "Depeche Mode")
       end
 
-      describe "when provided valid attributes" do
+      context "when provided valid attributes" do
 
         let(:band) do
           criteria.send(method, genres: [ "electro" ])
@@ -322,7 +322,7 @@ describe Mongoid::Criteria do
       end
 
       context "when provided a block" do
-        describe "when provided valid attributes" do
+        context "when provided valid attributes" do
           let(:band) do
             criteria.send(method) do |c|
               c.genres = [ "electro" ]
@@ -493,13 +493,13 @@ describe Mongoid::Criteria do
     end
   end
 
-  context "#create" do
+  describe "#create" do
 
     let(:criteria) do
       Band.where(name: "Depeche Mode")
     end
 
-    describe "when provided valid attributes" do
+    context "when provided valid attributes" do
       let(:band) do
         criteria.create(genres: [ "electro" ])
       end
@@ -518,7 +518,7 @@ describe Mongoid::Criteria do
     end
 
     context "when provided a block" do
-      describe "when provided valid attributes & using block" do
+      context "when provided valid attributes & using block" do
         let(:band) do
           criteria.create do |c|
             c.genres = [ "electro" ]
@@ -541,13 +541,13 @@ describe Mongoid::Criteria do
 
   end
 
-  context "#create!" do
+  describe "#create!" do
 
     let(:criteria) do
       Account.where(number: "11123213")
     end
 
-    describe "when provided invalid attributes" do
+    context "when provided invalid attributes" do
 
       it "raises an error" do
         expect {
