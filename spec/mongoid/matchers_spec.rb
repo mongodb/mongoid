@@ -228,6 +228,31 @@ describe Mongoid::Matchers do
         end
       end
 
+      context "with a $gt selector as a symbol" do
+
+        context "when the attributes match" do
+
+          let(:selector) do
+            { number: { :$gt => 50 } }
+          end
+
+          it "returns true" do
+            document.matches?(selector).should be_true
+          end
+        end
+
+        context "when the attributes do not match" do
+
+          let(:selector) do
+            { number: { :$gt => 200 } }
+          end
+
+          it "returns false" do
+            document.matches?(selector).should be_false
+          end
+        end
+      end
+
       context "with a $gte selector" do
 
         context "when the attributes match" do
