@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2669 Passing a block to `Criteria#new` now properly sends the
+  block through to the model's contructor. (Arthur Neves)
+
 * \#2613 Procs can now be provided as values to `store_in`:
 
         class Band
