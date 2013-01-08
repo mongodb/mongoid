@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * \#2669 Passing a block to `Criteria#new` now properly sends the
   block through to the model's contructor. (Arthur Neves)
 
+* \#2657 Logger getter and setter convenience methods have been
+  added to the `Config` module. (Arthur Neves)
+
 * \#2613 Procs can now be provided as values to `store_in`:
 
         class Band
