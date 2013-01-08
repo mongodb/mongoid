@@ -149,6 +149,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
+
 ## 3.0.16
 
 ### Resolved Issues

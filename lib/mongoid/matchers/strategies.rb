@@ -21,7 +21,7 @@ module Mongoid
     module Strategies
       extend self
 
-      MATCHERS = HashWithIndifferentAccess.new({
+      MATCHERS = {
         "$all" => Matchers::All,
         "$and" => Matchers::And,
         "$exists" => Matchers::Exists,
@@ -34,7 +34,7 @@ module Mongoid
         "$nin" => Matchers::Nin,
         "$or" => Matchers::Or,
         "$size" => Matchers::Size
-      })
+      }.with_indifferent_access
 
       # Get the matcher for the supplied key and value. Will determine the class
       # name from the key.
@@ -58,9 +58,9 @@ module Mongoid
             Default.new(extract_attribute(document, key))
           end
         else
-          case key
-            when "$or", :$or then Matchers::Or.new(value, document)
-            when "$and", :$and then Matchers::And.new(value, document)
+          case key.to_s
+            when "$or" then Matchers::Or.new(value, document)
+            when "$and" then Matchers::And.new(value, document)
             else Default.new(extract_attribute(document, key))
           end
         end
