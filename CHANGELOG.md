@@ -152,6 +152,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2683 Aliased fields are now supported when executing atomic operations from
+  criteria. (Arthur Neves)
+
 * \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
 
 * \#2664 In memory sorting of embedded documents now properly works when
