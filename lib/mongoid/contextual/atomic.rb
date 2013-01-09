@@ -15,7 +15,7 @@ module Mongoid
       #
       # @since 3.0.0
       def add_to_set(field, value)
-        query.update_all("$addToSet" => { field => value })
+        query.update_all("$addToSet" => { database_field_name(field) => value })
       end
 
       # Perform an atomic $bit operation on the matching documents.
@@ -31,7 +31,7 @@ module Mongoid
       #
       # @since 3.0.0
       def bit(field, value)
-        query.update_all("$bit" => { field => value })
+        query.update_all("$bit" => { database_field_name(field) => value })
       end
 
       # Perform an atomic $inc operation on the matching documents.
@@ -46,7 +46,7 @@ module Mongoid
       #
       # @since 3.0.0
       def inc(field, value)
-        query.update_all("$inc" => { field => value })
+        query.update_all("$inc" => { database_field_name(field) => value })
       end
 
       # Perform an atomic $pop operation on the matching documents.
@@ -66,7 +66,7 @@ module Mongoid
       #
       # @since 3.0.0
       def pop(field, value)
-        query.update_all("$pop" => { field => value })
+        query.update_all("$pop" => { database_field_name(field) => value })
       end
 
       # Perform an atomic $pull operation on the matching documents.
@@ -83,7 +83,7 @@ module Mongoid
       #
       # @since 3.0.0
       def pull(field, value)
-        query.update_all("$pull" => { field => value })
+        query.update_all("$pull" => { database_field_name(field) => value })
       end
 
       # Perform an atomic $pullAll operation on the matching documents.
@@ -98,7 +98,7 @@ module Mongoid
       #
       # @since 3.0.0
       def pull_all(field, values)
-        query.update_all("$pullAll" => { field => values })
+        query.update_all("$pullAll" => { database_field_name(field) => values })
       end
 
       # Perform an atomic $push operation on the matching documents.
@@ -113,7 +113,7 @@ module Mongoid
       #
       # @since 3.0.0
       def push(field, value)
-        query.update_all("$push" => { field => value })
+        query.update_all("$push" => { database_field_name(field) => value })
       end
 
       # Perform an atomic $pushAll operation on the matching documents.
@@ -128,7 +128,7 @@ module Mongoid
       #
       # @since 3.0.0
       def push_all(field, values)
-        query.update_all("$pushAll" => { field => values })
+        query.update_all("$pushAll" => { database_field_name(field) => values })
       end
 
       # Perform an atomic $rename of fields on the matching documents.
@@ -143,7 +143,7 @@ module Mongoid
       #
       # @since 3.0.0
       def rename(old_name, new_name)
-        query.update_all("$rename" => { old_name.to_s => new_name.to_s })
+        query.update_all("$rename" => { database_field_name(old_name) => new_name.to_s })
       end
 
       # Perform an atomic $set of fields on the matching documents.
@@ -158,7 +158,7 @@ module Mongoid
       #
       # @since 3.0.0
       def set(field, value)
-        query.update_all("$set" => { field => value })
+        query.update_all("$set" => { database_field_name(field) => value })
       end
 
       # Perform an atomic $unset of a field on the matching documents.
@@ -172,7 +172,7 @@ module Mongoid
       #
       # @since 3.0.0
       def unset(field)
-        query.update_all("$unset" => { field => true })
+        query.update_all("$unset" => { database_field_name(field) => true })
       end
     end
   end
