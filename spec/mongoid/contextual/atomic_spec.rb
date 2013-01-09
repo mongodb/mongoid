@@ -180,9 +180,11 @@ describe Mongoid::Contextual::Atomic do
       before do
         context.inc(:years, 1)
       end
+
       it "incs the value and read from alias" do
         beatles.reload.years.should eq(3)
       end
+
       it "incs the value and read from field" do
         beatles.reload.y.should eq(3)
       end
