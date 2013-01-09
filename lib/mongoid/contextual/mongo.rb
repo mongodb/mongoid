@@ -339,6 +339,15 @@ module Mongoid
         update_documents(attributes, :update_all)
       end
 
+      def without_sort
+        begin
+          sort_options = criteria.options.delete(:sort)
+          yield
+        ensure
+          criteria.options[:sort] = sort_options
+        end
+      end
+
       private
 
       # Update the documents for the provided method.

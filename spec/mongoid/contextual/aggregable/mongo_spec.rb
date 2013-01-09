@@ -206,6 +206,20 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         it "returns the avg of the provided field" do
           avg.should eq(750)
         end
+
+        context "when there is a default_scope" do
+          before do
+            Band.default_scope Band.order_by('name asc')
+          end
+          after do
+            Band.default_scoping = nil
+          end
+
+          it "returns the avg of the provided field" do
+            avg.should eq(750)
+          end
+        end
+
       end
 
       context "when no documents match" do
@@ -262,6 +276,20 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         it "returns the max of the provided field" do
           max.should eq(1000)
         end
+
+        context "when there is a default_scope" do
+          before do
+            Band.default_scope Band.order_by('name asc')
+          end
+          after do
+            Band.default_scoping = nil
+          end
+
+          it "returns the max of the provided field" do
+            max.should eq(1000)
+          end
+        end
+
 
         context "when no documents match" do
 
@@ -328,6 +356,19 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           min.should eq(500)
         end
 
+        context "when there is a default_scope" do
+          before do
+            Band.default_scope Band.order_by('name asc')
+          end
+          after do
+            Band.default_scoping = nil
+          end
+
+          it "returns the min of the provided field" do
+            min.should eq(500)
+          end
+        end
+
         context "when no documents match" do
 
           let(:criteria) do
@@ -383,6 +424,15 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         Mongoid::Contextual::Mongo.new(criteria)
       end
 
+      before do
+        Band.default_scope Band.order_by('name asc')
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+
       context "when provided a symbol" do
 
         let(:sum) do
@@ -391,6 +441,19 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
         it "returns the sum of the provided field" do
           sum.should eq(1500)
+        end
+
+        context "when there is a default_scope" do
+          before do
+            Band.default_scope Band.order_by('name asc')
+          end
+          after do
+            Band.default_scoping = nil
+          end
+
+          it "returns the sum of the provided field" do
+            sum.should eq(1500)
+          end
         end
 
         context "when no documents match" do
@@ -422,6 +485,19 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         it "returns the sum for the provided block" do
           sum.should eq(1500)
         end
+        context "when there is a default_scope" do
+          before do
+            Band.default_scope Band.order_by('name asc')
+          end
+          after do
+            Band.default_scoping = nil
+          end
+
+          it "returns the sum of the provided field" do
+            sum.should eq(1500)
+          end
+        end
+
       end
     end
   end

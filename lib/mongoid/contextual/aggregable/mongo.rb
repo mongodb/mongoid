@@ -24,8 +24,10 @@ module Mongoid
         # @since 3.0.0
         def aggregates(field)
           if query.count > 0
-            map_reduce(mapper(field), reducer).
-              out(inline: 1).finalize(finalizer).first["value"]
+            without_sort do
+              map_reduce(mapper(field), reducer).
+                out(inline: 1).finalize(finalizer).first["value"]
+            end
           else
             { "count" => 0 }
           end
