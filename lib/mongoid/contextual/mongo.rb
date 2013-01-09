@@ -181,7 +181,6 @@ module Mongoid
       #
       # @since 3.0.0
       def first
-        apply_option(:sort)
         apply_id_sorting
         with_eager_loading(query.first)
       end
@@ -216,7 +215,9 @@ module Mongoid
       # @since 3.0.0
       def last
         apply_inverse_sorting
-        with_eager_loading(query.first)
+        doc = with_eager_loading(query.first)
+        apply_option(:sort)
+        doc
       end
 
       # Get's the number of documents matching the query selector.
