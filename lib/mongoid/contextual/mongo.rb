@@ -204,6 +204,8 @@ module Mongoid
         apply_options
       end
 
+      delegate(:database_field_name, to: :@klass)
+
       # Get the last document in the database for the criteria's selector.
       #
       # @example Get the last document.

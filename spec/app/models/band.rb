@@ -5,7 +5,7 @@ class Band
   field :origin, type: String
   field :genres, type: Array
   field :member_count, type: Integer
-  field :members, type: Array
+  field :mems, as: :members, type: Array
   field :likes, type: Integer
   field :views, type: Integer
   field :rating, type: Float
