@@ -145,6 +145,10 @@ describe Mongoid::Contextual::Atomic do
       Band.create
     end
 
+    let!(:beatles) do
+      Band.create(years: 2)
+    end
+
     let(:criteria) do
       Band.all
     end
@@ -168,6 +172,19 @@ describe Mongoid::Contextual::Atomic do
 
       it "does not error on the inc" do
         smiths.likes.should be_nil
+      end
+    end
+
+    context "when using the alias" do
+
+      before do
+        context.inc(:years, 1)
+      end
+      it "incs the value and read from alias" do
+        beatles.reload.years.should eq(3)
+      end
+      it "incs the value and read from field" do
+        beatles.reload.y.should eq(3)
       end
     end
   end
