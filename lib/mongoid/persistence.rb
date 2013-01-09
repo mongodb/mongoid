@@ -113,14 +113,20 @@ module Mongoid
     #
     # @param [ Symbol ] field The name of an additional field to update.
     #
-    # @return [ true ] true.
+    # @return [ true/false ] false if record is new_record otherwise true.
     #
     # @since 3.0.0
     def touch(field = nil)
+      return false if _root.new_record?
       current = Time.now
       write_attribute(:updated_at, current) if fields["updated_at"]
       write_attribute(field, current) if field
-      _root.collection.find(atomic_selector).update(touch_atomic_updates(field))
+
+      touches = touch_atomic_updates(field)
+      unless touches.empty?
+        _root.collection.find(atomic_selector).update(touches)
+      end
+
       without_autobuild do
         touchables.each { |name| send(name).try(:touch) }
       end
