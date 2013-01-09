@@ -339,6 +339,19 @@ module Mongoid
         update_documents(attributes, :update_all)
       end
 
+
+      private
+
+      # Remove sort from criteria and yield the block
+      #
+      # @api private
+      #
+      # @example Remove sort from options.
+      #   context.without_sort do
+      #       ## Do something
+      #   end
+      #
+      # @since 3.1.0
       def without_sort
         begin
           sort_options = criteria.options.delete(:sort)
@@ -347,8 +360,6 @@ module Mongoid
           criteria.options[:sort] = sort_options
         end
       end
-
-      private
 
       # Update the documents for the provided method.
       #
