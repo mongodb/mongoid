@@ -837,21 +837,28 @@ describe Mongoid::Persistence do
       end
 
       context "when record is new" do
+
         let(:agent) do
           Agent.new(updated_at: 2.days.ago)
         end
+
         context "when no attribute is provided" do
+
           let!(:touched) do
             agent.touch
           end
+
           it "returns false" do
             touched.should be_false
           end
         end
+
         context "when an attribute is provided" do
+
           let!(:touched) do
             agent.touch(:dob)
           end
+
           it "returns false" do
             touched.should be_false
           end
