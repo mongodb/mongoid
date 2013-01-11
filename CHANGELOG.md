@@ -3,6 +3,12 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.17
+
+### Resolved Issues
+
+* \#2686 Fixed the broken Moped dependency
+
 ## 3.0.16
 
 ### Resolved Issues
