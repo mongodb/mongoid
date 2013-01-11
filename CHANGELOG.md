@@ -7,7 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* \#2686 Fixed the broken Moped dependency
+* \#2686 Fixed the broken Moped dependency - Moped now must be at least at
+  version 1.2.0.
 
 ## 3.0.16
 
