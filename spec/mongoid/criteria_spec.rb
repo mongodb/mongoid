@@ -2710,7 +2710,7 @@ describe Mongoid::Criteria do
           end
 
           let(:mapped) do
-            Mongoid::IdentityMap[Post.collection_name]["person_id" => person.id]
+            Mongoid::IdentityMap[Post.collection_name][{"person_id" => person.id}.merge!({ _type: {"$in" => Post._types }})]
           end
 
           it "does not duplicate documents in the relation" do
