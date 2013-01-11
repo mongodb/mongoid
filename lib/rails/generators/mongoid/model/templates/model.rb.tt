@@ -9,6 +9,9 @@ class <%= class_name %><%= " < #{options[:parent].classify}" if options[:parent]
 <% if options[:versioning] -%>
   include Mongoid::Versioning
 <% end -%>
+<% if options[:collection] -%>
+  store_in collection: "options[:collection]"
+<% end -%>
 <% attributes.reject{|attr| attr.reference?}.each do |attribute| -%>
   field :<%= attribute.name %>, type: <%= attribute.type_class %>
 <% end -%>
