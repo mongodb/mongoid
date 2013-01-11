@@ -1055,7 +1055,7 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       let(:map) do
-        Mongoid::IdentityMap.get(Game, "person_id" => person.id)
+        Mongoid::IdentityMap.get(Game, {"person_id" => person.id}.merge!(metadata.type_relation))
       end
 
       it "puts the documents in the identity map" do
@@ -1090,7 +1090,7 @@ describe Mongoid::Relations::Referenced::One do
       end
 
       let(:map) do
-        Mongoid::IdentityMap.get(Rating, "ratable_id" => book.id)
+        Mongoid::IdentityMap.get(Rating, {"ratable_id" => book.id}.merge!(metadata.type_relation))
       end
 
       it "puts the documents in the identity map" do

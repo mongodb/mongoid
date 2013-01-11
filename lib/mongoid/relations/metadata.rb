@@ -843,6 +843,18 @@ module Mongoid
         !!self[:touch]
       end
 
+      # Returns the metadata class types.
+      #
+      # @example Get the relation class types.
+      #   metadata.type_relation
+      #
+      # @return [ Hash ] The hash with relation class types.
+      #
+      # @since
+      def type_relation
+        { _type: {"$in" => klass._types }}
+      end
+
       private
 
       # Returns the class name for the relation.
