@@ -165,6 +165,13 @@ For instructions on upgrading to newer versions, visit
 * \#2664 In memory sorting of embedded documents now properly works when
   multiple fields are provided. (Neer Friedman)
 
+## 3.0.17
+
+### Resolved Issues
+
+* \#2686 Fixed the broken Moped dependency - Moped now must be at least at
+  version 1.2.0.
+
 ## 3.0.16
 
 ### Resolved Issues
