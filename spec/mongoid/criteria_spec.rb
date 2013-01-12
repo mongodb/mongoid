@@ -2519,6 +2519,181 @@ describe Mongoid::Criteria do
       end
     end
 
+    context "when the models are inherited from another one model" do
+
+      context "has_one relation" do
+        before(:all) do
+          class A
+            include Mongoid::Document
+          end
+
+          class B < A
+            belongs_to :d
+          end
+
+          class C < A
+            belongs_to :d
+          end
+
+          class D
+            include Mongoid::Document
+            has_one :b
+            has_one :c
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :A)
+          Object.send(:remove_const, :B)
+          Object.send(:remove_const, :C)
+          Object.send(:remove_const, :D)
+        end
+
+        context "when the includes is on the several relations" do
+
+          let!(:d_one) do
+            D.create
+          end
+
+          let!(:d_two) do
+            D.create
+          end
+
+          let!(:b) do
+            B.create(d: d_two)
+          end
+
+          let!(:c) do
+            C.create(d: d_two)
+          end
+
+          before do
+            Mongoid::IdentityMap.clear
+          end
+
+          let!(:results) do
+            D.includes(:b, :c).entries.detect do |d|
+              d.id == d_two.id
+            end
+          end
+
+          let(:from_map_b) do
+            Mongoid::IdentityMap[B.collection_name][b.id]
+          end
+
+          let(:from_map_c) do
+            Mongoid::IdentityMap[C.collection_name][c.id]
+          end
+
+          it "returns the correct documents" do
+            results.should eq(d_two)
+          end
+
+          it "inserts the b document into the identity map" do
+            from_map_b.should eq(b)
+          end
+
+          it "inserts the c document into the identity map" do
+            from_map_c.should eq(c)
+          end
+
+          it "retrieves the b document from the identity map" do
+            results.b.should equal(from_map_b)
+          end
+
+          it "retrieves the c document from the identity map" do
+            results.c.should equal(from_map_c)
+          end
+        end
+      end
+
+      context "has_many relation" do
+        before(:all) do
+          class A
+            include Mongoid::Document
+          end
+
+          class B < A
+            belongs_to :d
+          end
+
+          class C < A
+            belongs_to :d
+          end
+
+          class D
+            include Mongoid::Document
+            has_many :b
+            has_many :c
+          end
+        end
+
+        after(:all) do
+          Object.send(:remove_const, :A)
+          Object.send(:remove_const, :B)
+          Object.send(:remove_const, :C)
+          Object.send(:remove_const, :D)
+        end
+
+        context "when the includes is on the several relations" do
+
+          let!(:d_one) do
+            D.create
+          end
+
+          let!(:d_two) do
+            D.create
+          end
+
+          let!(:bs) do
+            2.times.map { B.create(d: d_two) }
+          end
+
+          let!(:cs) do
+            2.times.map { C.create(d: d_two) }
+          end
+
+          before do
+            Mongoid::IdentityMap.clear
+          end
+
+          let!(:results) do
+            D.includes(:b, :c).entries.detect do |d|
+              d.id == d_two.id
+            end
+          end
+
+          let(:from_map_bs) do
+            bs.map { |b| Mongoid::IdentityMap[B.collection_name][b.id] }
+          end
+
+          let(:from_map_cs) do
+            cs.map { |c| Mongoid::IdentityMap[C.collection_name][c.id] }
+          end
+
+          it "returns the correct documents" do
+            results.should eq(d_two)
+          end
+
+          it "inserts the b documents into the identity map" do
+            from_map_bs.should eq(bs)
+          end
+
+          it "inserts the c documents into the identity map" do
+            from_map_cs.should eq(cs)
+          end
+
+          it "retrieves the b documents from the identity map" do
+            results.b.should match_array(from_map_bs)
+          end
+
+          it "retrieves the c documents from the identity map" do
+            results.c.should match_array(from_map_cs)
+          end
+        end
+      end
+    end
+
     context "when including the same metadata multiple times" do
 
       let(:criteria) do
