@@ -1328,16 +1328,34 @@ describe Mongoid::Contextual::Mongo do
 
       context "when the attributes must be mongoized" do
 
-        before do
-          context.update(member_count: "1")
+        context "when coercing a string to integer" do
+
+          before do
+            context.update(member_count: "1")
+          end
+
+          it "updates the first matching document" do
+            depeche_mode.reload.member_count.should eq(1)
+          end
+
+          it "does not update the last matching document" do
+            new_order.reload.member_count.should be_nil
+          end
         end
 
-        it "updates the first matching document" do
-          depeche_mode.reload.member_count.should eq(1)
-        end
+        context "when coercing a string to date" do
 
-        it "does not update the last matching document" do
-          new_order.reload.member_count.should be_nil
+          before do
+            context.update(founded: "1979/1/1")
+          end
+
+          it "updates the first matching document" do
+            depeche_mode.reload.founded.should eq(Date.new(1979, 1, 1))
+          end
+
+          it "does not update the last matching document" do
+            new_order.reload.founded.should be_nil
+          end
         end
       end
     end
