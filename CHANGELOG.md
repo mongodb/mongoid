@@ -157,6 +157,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2699 Resetting a field now removes the name from the changed attributes
+  list. (Subhash Bhushan)
+
 * \#2683 Aliased fields are now supported when executing atomic operations from
   criteria. (Arthur Neves)
 
