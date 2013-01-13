@@ -7,6 +7,11 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2693 Custom collection names can be passed to the model generator.
+  (Subhash Bhushan)
+
+        rails g model band --collection=artists
+
 * \#2669 Passing a block to `Criteria#new` now properly sends the
   block through to the model's contructor. (Arthur Neves)
 
