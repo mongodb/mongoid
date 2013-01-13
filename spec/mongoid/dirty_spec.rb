@@ -927,7 +927,7 @@ describe Mongoid::Dirty do
       end
 
       it "removes the field from the changes" do
-        person.changed.should include("title")
+        person.changed.should_not include("title")
       end
     end
 
@@ -1178,7 +1178,7 @@ describe Mongoid::Dirty do
     it "allows reset of field changes" do
       person.reset_title!
       person.title.should eq("MC")
-      person.changed.should =~ [ "ssn", "some_dynamic_field", "title" ]
+      person.changed.should =~ [ "ssn", "some_dynamic_field" ]
     end
 
     context "after a save" do

@@ -239,7 +239,7 @@ module Mongoid
     #
     # @since 2.4.0
     def reset_attribute!(attr)
-      attributes[attr] = changed_attributes[attr] if attribute_changed?(attr)
+      attributes[attr] = changed_attributes.delete(attr) if attribute_changed?(attr)
     end
 
     module ClassMethods
