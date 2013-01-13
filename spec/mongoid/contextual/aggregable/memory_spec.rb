@@ -272,8 +272,8 @@ describe Mongoid::Contextual::Aggregable::Memory do
             context.sum(:likes)
           end
 
-          it "returns nil" do
-            sum.should be_nil
+          it "returns zero" do
+            sum.should eq(0)
           end
         end
       end
