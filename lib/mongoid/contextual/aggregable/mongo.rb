@@ -104,7 +104,7 @@ module Mongoid
         #
         # @since 3.0.0
         def sum(field = nil)
-          block_given? ? super() : aggregates(field)["sum"]
+          block_given? ? super() : aggregates(field)["sum"] || 0
         end
 
         private
