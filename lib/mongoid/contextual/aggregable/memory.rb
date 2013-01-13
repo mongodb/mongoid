@@ -81,7 +81,7 @@ module Mongoid
           if block_given?
             super()
           else
-            count > 0 ? super(0) { |doc| doc.send(field) } : nil
+            count > 0 ? super(0) { |doc| doc.send(field) } : 0
           end
         end
 

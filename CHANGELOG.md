@@ -10,6 +10,9 @@ For instructions on upgrading to newer versions, visit
 * \#2703 Validations on associated documents on fire if the document is
   changed. (Regression)
 
+* \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
+  of `nil`.
+
 ## 3.0.17
 
 ### Resolved Issues
