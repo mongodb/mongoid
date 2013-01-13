@@ -160,6 +160,9 @@ For instructions on upgrading to newer versions, visit
 * \#2699 Resetting a field now removes the name from the changed attributes
   list. (Subhash Bhushan)
 
+* \#2697 Eager loading fixed when including multiple models that inherit from
+  the same class. (Kirill Lazarev)
+
 * \#2683 Aliased fields are now supported when executing atomic operations from
   criteria. (Arthur Neves)
 

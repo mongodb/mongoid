@@ -850,9 +850,9 @@ module Mongoid
       #
       # @return [ Hash ] The hash with relation class types.
       #
-      # @since
+      # @since 3.1.0
       def type_relation
-        { _type: {"$in" => klass._types }}
+        { _type: { "$in" => klass._types }}
       end
 
       private

@@ -2521,7 +2521,8 @@ describe Mongoid::Criteria do
 
     context "when the models are inherited from another one model" do
 
-      context "has_one relation" do
+      context "when the relation is a has_one" do
+
         before(:all) do
           class A
             include Mongoid::Document
@@ -2607,7 +2608,8 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "has_many relation" do
+      context "when the relation is a has_many" do
+
         before(:all) do
           class A
             include Mongoid::Document
