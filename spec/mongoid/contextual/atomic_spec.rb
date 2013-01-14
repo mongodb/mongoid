@@ -427,13 +427,15 @@ describe Mongoid::Contextual::Atomic do
   end
 
   describe "#unset" do
-    context 'unset one field' do
+
+    context "when unsetting a single field" do
+
       let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
+        Band.create(name: "Depeche Mode", years: 10)
       end
 
       let!(:new_order) do
-        Band.create(name: "New Order")
+        Band.create(name: "New Order", years: 10)
       end
 
       let(:criteria) do
@@ -444,21 +446,41 @@ describe Mongoid::Contextual::Atomic do
         Mongoid::Contextual::Mongo.new(criteria)
       end
 
-      before do
-        context.unset(:name)
+      context "when the field is not aliased" do
+
+        before do
+          context.unset(:name)
+        end
+
+        it "unsets the first existing field" do
+          depeche_mode.reload.name.should be_nil
+        end
+
+        it "unsets the last existing field" do
+          new_order.reload.name.should be_nil
+        end
       end
 
-      it "unsets the first existing field" do
-        depeche_mode.reload.name.should be_nil
-      end
+      context "when the field is aliased" do
 
-      it "unsets the last existing field" do
-        new_order.reload.name.should be_nil
+        before do
+          context.unset(:years)
+        end
+
+        it "unsets the first existing field" do
+          depeche_mode.reload.years.should be_nil
+        end
+
+        it "unsets the last existing field" do
+          new_order.reload.years.should be_nil
+        end
       end
     end
-    context 'unset multiple fields' do
+
+    context "when unsetting multiple fields" do
+
       let!(:new_order) do
-        Band.create(name: "New Order", genres: [ "electro", "dub" ])
+        Band.create(name: "New Order", genres: [ "electro", "dub" ], years: 10)
       end
 
       let(:criteria) do
@@ -469,16 +491,34 @@ describe Mongoid::Contextual::Atomic do
         Mongoid::Contextual::Mongo.new(criteria)
       end
 
-      before do
-        context.unset(:name, :genres)
+      context "when the field is not aliased" do
+
+        before do
+          context.unset(:name, :genres)
+        end
+
+        it "unsets name field" do
+          new_order.reload.name.should be_nil
+        end
+
+        it "unsets genres field" do
+          new_order.reload.genres.should be_nil
+        end
       end
 
-      it "unsets name field" do
-        new_order.reload.name.should be_nil
-      end
+      context "when the field is aliased" do
 
-      it "unsets genres field" do
-        new_order.reload.genres.should be_nil
+        before do
+          context.unset(:name, :years)
+        end
+
+        it "unsets the unaliased field" do
+          new_order.reload.name.should be_nil
+        end
+
+        it "unsets the aliased field" do
+          new_order.reload.years.should be_nil
+        end
       end
     end
   end

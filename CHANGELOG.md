@@ -19,6 +19,12 @@ For instructions on upgrading to newer versions, visit
         Band.create([{ name: "Tool" }, { name: "Placebo" }])
         Band.create!([{ name: "Tool" }, { name: "Placebo" }])
 
+* \#2670 Unsetting fields now accepts multiple fields instead of only 1.
+  (Arthur Neves)
+
+        band.unset(:name, :founded)
+        Band.where(name: "Placebo").unset(:members, :origin)
+
 * \#2669 Passing a block to `Criteria#new` now properly sends the
   block through to the model's contructor. (Arthur Neves)
 
