@@ -226,16 +226,26 @@ module Mongoid
       # @example Create a new document.
       #   Person.create(:title => "Mr")
       #
-      # @param [ Hash ] attributes The attributes to create with.
+      # @example Create multiple new documents.
+      #   Person.create({ title: "Mr" }, { title: "Mrs" })
+      #
+      # @param [ Hash, Array ] attributes The attributes to create with, or an
+      #   Array of multiple attributes for multiple documents.
       # @param [ Hash ] options A mass-assignment protection options. Supports
       #   :as and :without_protection
       #
-      # @return [ Document ] The newly created document.
-      def create(attributes = {}, options = {}, &block)
+      # @return [ Document, Array<Document> ] The newly created document(s).
+      #
+      # @since 1.0.0
+      def create(attributes = nil, options = {}, &block)
         _creating do
-          doc = new(attributes, options, &block)
-          doc.save
-          doc
+          if attributes.is_a?(::Array)
+            attributes.map { |attrs| create(attrs, options, &block) }
+          else
+            doc = new(attributes, options, &block)
+            doc.save
+            doc
+          end
         end
       end
 
@@ -247,17 +257,27 @@ module Mongoid
       # @example Create a new document.
       #   Person.create!(:title => "Mr")
       #
-      # @param [ Hash ] attributes The attributes to create with.
+      # @example Create multiple new documents.
+      #   Person.create!({ title: "Mr" }, { title: "Mrs" })
+      #
+      # @param [ Hash, Array ] attributes The attributes to create with, or an
+      #   Array of multiple attributes for multiple documents.
       # @param [ Hash ] options A mass-assignment protection options. Supports
       #   :as and :without_protection
       #
-      # @return [ Document ] The newly created document.
+      # @return [ Document, Array<Document> ] The newly created document(s).
+      #
+      # @since 1.0.0
       def create!(attributes = {}, options = {}, &block)
         _creating do
-          doc = new(attributes, options, &block)
-          fail_validate!(doc) unless doc.insert.errors.empty?
-          fail_callback!(doc, :create!) if doc.new_record?
-          doc
+          if attributes.is_a?(::Array)
+            attributes.map { |attrs| create!(attrs, options, &block) }
+          else
+            doc = new(attributes, options, &block)
+            fail_validate!(doc) unless doc.insert.errors.empty?
+            fail_callback!(doc, :create!) if doc.new_record?
+            doc
+          end
         end
       end
 

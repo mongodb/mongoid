@@ -4,6 +4,65 @@ describe Mongoid::Persistence do
 
   describe ".create" do
 
+    context "when provided an array of attributes" do
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create([{ title: "sir" }, { title: "madam" }])
+        end
+
+        it "creates the first document" do
+          people.first.title.should eq("sir")
+        end
+
+        it "persists the first document" do
+          people.first.should be_persisted
+        end
+
+        it "creates the second document" do
+          people.last.title.should eq("madam")
+        end
+
+        it "persists the second document" do
+          people.last.should be_persisted
+        end
+      end
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create([{ title: "sir" }, { title: "madam" }]) do |person|
+            person.age = 36
+          end
+        end
+
+        it "creates the first document" do
+          people.first.title.should eq("sir")
+        end
+
+        it "persists the first document" do
+          people.first.should be_persisted
+        end
+
+        it "passes the block to the first document" do
+          people.first.age.should eq(36)
+        end
+
+        it "creates the second document" do
+          people.last.title.should eq("madam")
+        end
+
+        it "persists the second document" do
+          people.last.should be_persisted
+        end
+
+        it "passes the block to the second document" do
+          people.last.age.should eq(36)
+        end
+      end
+    end
+
     context "when providing attributes" do
 
       let(:person) do
@@ -155,6 +214,65 @@ describe Mongoid::Persistence do
   end
 
   describe ".create!" do
+
+    context "when provided an array of attributes" do
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create!([{ title: "sir" }, { title: "madam" }])
+        end
+
+        it "creates the first document" do
+          people.first.title.should eq("sir")
+        end
+
+        it "persists the first document" do
+          people.first.should be_persisted
+        end
+
+        it "creates the second document" do
+          people.last.title.should eq("madam")
+        end
+
+        it "persists the second document" do
+          people.last.should be_persisted
+        end
+      end
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create!([{ title: "sir" }, { title: "madam" }]) do |person|
+            person.age = 36
+          end
+        end
+
+        it "creates the first document" do
+          people.first.title.should eq("sir")
+        end
+
+        it "persists the first document" do
+          people.first.should be_persisted
+        end
+
+        it "passes the block to the first document" do
+          people.first.age.should eq(36)
+        end
+
+        it "creates the second document" do
+          people.last.title.should eq("madam")
+        end
+
+        it "persists the second document" do
+          people.last.should be_persisted
+        end
+
+        it "passes the block to the second document" do
+          people.last.age.should eq(36)
+        end
+      end
+    end
 
     context "inserting with a field that is not unique" do
 

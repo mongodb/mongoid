@@ -12,6 +12,13 @@ For instructions on upgrading to newer versions, visit
 
         rails g model band --collection=artists
 
+* \#2688 `Model.create` and `Model.create!` now can take an array of
+  attributes hashes to create multiple documents at once. If an array
+  of attributes is provided then an array of documents is returned.
+
+        Band.create([{ name: "Tool" }, { name: "Placebo" }])
+        Band.create!([{ name: "Tool" }, { name: "Placebo" }])
+
 * \#2669 Passing a block to `Criteria#new` now properly sends the
   block through to the model's contructor. (Arthur Neves)
 
