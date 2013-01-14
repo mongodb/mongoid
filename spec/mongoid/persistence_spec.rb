@@ -152,6 +152,24 @@ describe Mongoid::Persistence do
         end
       end
     end
+
+    context "when providing an array" do
+
+      let(:people) { Person.create( [ { title: "Sensei" }, { title: "Ninja" } ] ) }
+
+      it "creates two people" do
+        expect { people }.to change(Person, :count).by(2)
+      end
+
+      it "returns an array" do
+        people.should be_a_kind_of Array
+      end
+
+      it "returns an array with Person objects" do
+        people.each { |p| p.should be_a_kind_of Person }
+      end
+
+    end
   end
 
   describe ".create!" do

@@ -233,9 +233,13 @@ module Mongoid
       # @return [ Document ] The newly created document.
       def create(attributes = {}, options = {}, &block)
         _creating do
-          doc = new(attributes, options, &block)
-          doc.save
-          doc
+          if attributes.is_a?(Array)
+            attributes.collect { |attr| create(attr, options, &block) }
+          else
+            doc = new(attributes, options, &block)
+            doc.save
+            doc
+          end
         end
       end
 
