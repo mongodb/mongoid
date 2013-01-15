@@ -32,6 +32,6 @@ matrix:
       env: JRUBY_OPTS="-Xcompile.invokedynamic=false"
 branches:
   except:
-    - nested-destroy-validation-fail
+    - 4.0.0-dev
 services:
   - mongodb
