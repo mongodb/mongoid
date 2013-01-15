@@ -18,7 +18,7 @@ module Mongoid
     #
     # @return [ Document ] The new document.
     def clone
-      attrs = as_document.except("_id")
+      attrs = as_document.except("_id", "id")
       if attrs.delete("versions")
         attrs["version"] = 1
       end
