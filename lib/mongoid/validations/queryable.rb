@@ -18,11 +18,11 @@ module Mongoid
       # @since 3.0.2
       def with_query(document)
         begin
-          Threaded.begin("#{klass.name}-validate-with-query")
+          Threaded.begin_execution("#{klass.name}-validate-with-query")
           yield
         ensure
           klass.clear_persistence_options unless document.errors.empty?
-          Threaded.exit("#{klass.name}-validate-with-query")
+          Threaded.exit_execution("#{klass.name}-validate-with-query")
         end
       end
     end

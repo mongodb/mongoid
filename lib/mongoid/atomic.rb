@@ -23,7 +23,7 @@ module Mongoid
 
       # When MongoDB finally fully implements the positional operator, we can
       # get rid of all indexing related code in Mongoid.
-      attr_accessor :_index
+      attr_accessor :_index, :updates_requested
     end
 
     # Add the document as an atomic pull.
@@ -113,15 +113,17 @@ module Mongoid
     # @return [ Hash ] The updates and their modifiers.
     #
     # @since 2.1.0
-    def atomic_updates
-      process_flagged_destroys
-      mods = Modifiers.new
-      generate_atomic_updates(mods, self)
-      _children.each do |child|
-        child.process_flagged_destroys
-        generate_atomic_updates(mods, child)
+    def atomic_updates(use_indexes = false)
+      with_positional_operator do
+        process_flagged_destroys
+        mods = Modifiers.new
+        generate_atomic_updates(mods, self)
+        _children.each do |child|
+          child.process_flagged_destroys
+          generate_atomic_updates(mods, child)
+        end
+        mods
       end
-      mods
     end
     alias :_updates :atomic_updates
 
@@ -175,7 +177,7 @@ module Mongoid
     #
     # @return [ String ] The path to the document attribute in the database
     def atomic_attribute_name(name)
-      embedded? ? "#{atomic_position}.#{name}" : name
+      embedded? ? "#{atomic_prefix}.#{name}" : name
     end
 
     # Get all the attributes that need to be pulled.
@@ -208,7 +210,7 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_pushes
-      pushable? ? { atomic_path => as_document } : {}
+      pushable? ? { atomic_prefix => as_document } : {}
     end
 
     # Return the selector for this document to be matched exactly for use
@@ -252,6 +254,21 @@ module Mongoid
         unsets.push(path || name)
       end
       unsets
+    end
+
+    # Get the prefix for field names to indicate a location in the db for
+    # atomic updates.
+    #
+    # @note This is in the form: "records.$.tracks.5"
+    #
+    # @example Get the atomic prefix.
+    #   document.atomic_prefix
+    #
+    # @return [ String ] The atomic prefix.
+    #
+    # @since 3.1.0
+    def atomic_prefix
+      atomic_paths.update_selector
     end
 
     # Get all the atomic sets that have had their saves delayed.
@@ -331,6 +348,19 @@ module Mongoid
         end
       end
       flagged_destroys.clear
+    end
+
+    def updates_requested?
+      !!updates_requested
+    end
+
+    def with_positional_operator
+      begin
+        self.updates_requested = true
+        yield(self) if block_given?
+      ensure
+        self.updates_requested = false
+      end
     end
 
     private

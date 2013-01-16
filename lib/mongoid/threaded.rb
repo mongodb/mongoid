@@ -11,14 +11,14 @@ module Mongoid
     # Begin entry into a named thread local stack.
     #
     # @example Begin entry into the stack.
-    #   Threaded.begin(:create)
+    #   Threaded.begin_execution(:create)
     #
     # @param [ String ] name The name of the stack
     #
     # @return [ true ] True.
     #
     # @since 2.4.0
-    def begin(name)
+    def begin_execution(name)
       stack(name).push(true)
     end
 
@@ -77,14 +77,14 @@ module Mongoid
     # Exit from a named thread local stack.
     #
     # @example Exit from the stack.
-    #   Threaded.exit(:create)
+    #   Threaded.exit_execution(:create)
     #
     # @param [ Symbol ] name The name of the stack
     #
     # @return [ true ] True.
     #
     # @since 2.4.0
-    def exit(name)
+    def exit_execution(name)
       stack(name).pop
     end
 

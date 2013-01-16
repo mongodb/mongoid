@@ -52,6 +52,55 @@ describe Mongoid::Atomic do
     end
   end
 
+  describe "#atomic_prefix" do
+
+    context "when the document is the root" do
+
+      let(:band) do
+        Band.new
+      end
+
+      it "returns an empty string" do
+        band.atomic_prefix.should eq("")
+      end
+    end
+
+    context "when the document is embedded" do
+
+      let(:band) do
+        Band.create(name: "Tool")
+      end
+
+      let!(:record) do
+        band.records.create(name: "Undertow")
+      end
+
+      context "when embedded one level" do
+
+        context "when using the positional operator" do
+
+          it "returns the update selector with positional operator" do
+            record.atomic_prefix.should eq("records.$")
+          end
+        end
+      end
+
+      context "when embedded multiple levels" do
+
+        let!(:track) do
+          record.tracks.create(name: "Sober")
+        end
+
+        context "when using the positional operator" do
+
+          it "returns the update selector with positional operator" do
+            track.atomic_prefix.should eq("records.$.tracks.0")
+          end
+        end
+      end
+    end
+  end
+
   describe "#atomic_updates" do
 
     context "when the document is persisted" do
@@ -116,10 +165,22 @@ describe Mongoid::Atomic do
             address.street = "Bond St"
           end
 
-          it "returns the $set with correct position and modifications" do
-            person.atomic_updates.should eq(
-              { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" }}
-            )
+          context "when asking for the updates from the root" do
+
+            it "returns the $set with correct position and modifications" do
+              person.atomic_updates.should eq(
+                { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" }}
+              )
+            end
+          end
+
+          context "when asking for the updates from the child" do
+
+            it "returns the $set with correct position and modifications" do
+              address.atomic_updates.should eq(
+                { "$set" => { "addresses.$.street" => "Bond St" }}
+              )
+            end
           end
 
           context "when an existing 2nd level embedded child gets modified" do
@@ -132,14 +193,40 @@ describe Mongoid::Atomic do
               location.name = "Work"
             end
 
-            it "returns the $set with correct positions and modifications" do
-              person.atomic_updates.should eq(
-                { "$set" => {
-                  "title" => "Sir",
-                  "addresses.0.street" => "Bond St",
-                  "addresses.0.locations.0.name" => "Work" }
-                }
-              )
+            context "when asking for the updates from the root" do
+
+              it "returns the $set with correct positions and modifications" do
+                person.atomic_updates.should eq(
+                  { "$set" => {
+                    "title" => "Sir",
+                    "addresses.0.street" => "Bond St",
+                    "addresses.0.locations.0.name" => "Work" }
+                  }
+                )
+              end
+            end
+
+            context "when asking for the updates from the 1st level child" do
+
+              it "returns the $set with correct positions and modifications" do
+                address.atomic_updates.should eq(
+                  { "$set" => {
+                    "addresses.$.street" => "Bond St",
+                    "addresses.$.locations.0.name" => "Work" }
+                  }
+                )
+              end
+            end
+
+            context "when asking for the updates from the 2nd level child" do
+
+              it "returns the $set with correct positions and modifications" do
+                location.atomic_updates.should eq(
+                  { "$set" => {
+                    "addresses.$.locations.0.name" => "Work" }
+                  }
+                )
+              end
             end
           end
 
@@ -149,20 +236,41 @@ describe Mongoid::Atomic do
               address.locations.build(name: "Home")
             end
 
-            it "returns the $set with correct positions and modifications" do
-              person.atomic_updates.should eq(
-                {
-                  "$set" => {
-                    "title" => "Sir",
-                    "addresses.0.street" => "Bond St"
-                  },
-                  conflicts: {
-                    "$pushAll" => {
-                      "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
+            context "when asking for the updates from the root" do
+
+              it "returns the $set with correct positions and modifications" do
+                person.atomic_updates.should eq(
+                  {
+                    "$set" => {
+                      "title" => "Sir",
+                      "addresses.0.street" => "Bond St"
+                    },
+                    conflicts: {
+                      "$pushAll" => {
+                        "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
+                      }
                     }
                   }
-                }
-              )
+                )
+              end
+            end
+
+            context "when asking for the updates from the 1st level child" do
+
+              it "returns the $set with correct positions and modifications" do
+                address.atomic_updates.should eq(
+                  {
+                    "$set" => {
+                      "addresses.$.street" => "Bond St"
+                    },
+                    conflicts: {
+                      "$pushAll" => {
+                        "addresses.$.locations" => [{ "_id" => location.id, "name" => "Home" }]
+                      }
+                    }
+                  }
+                )
+              end
             end
           end
 
@@ -194,27 +302,39 @@ describe Mongoid::Atomic do
               new_address.locations.build(name: "Home")
             end
 
-            it "returns the $set for 1st level and other for the 2nd level" do
-              person.atomic_updates.should eq(
-                {
-                  "$set" => {
-                    "title" => "Sir",
-                    "addresses.0.street" => "Bond St"
-                  },
-                  conflicts: {
-                    "$pushAll" => {
-                      "addresses" => [{
-                        "_id" => new_address.id,
-                        "street" => "Another",
-                        "locations" => [
-                          "_id" => location.id,
-                          "name" => "Home"
-                        ]
-                      }]
+            context "when asking for the updates from the root document" do
+
+              it "returns the $set for 1st level and other for the 2nd level" do
+                person.atomic_updates.should eq(
+                  {
+                    "$set" => {
+                      "title" => "Sir",
+                      "addresses.0.street" => "Bond St"
+                    },
+                    conflicts: {
+                      "$pushAll" => {
+                        "addresses" => [{
+                          "_id" => new_address.id,
+                          "street" => "Another",
+                          "locations" => [
+                            "_id" => location.id,
+                            "name" => "Home"
+                          ]
+                        }]
+                      }
                     }
                   }
-                }
-              )
+                )
+              end
+            end
+
+            context "when asking for the updates from the 1st level document" do
+
+              it "returns the $set for 1st level and other for the 2nd level" do
+                address.atomic_updates.should eq(
+                  { "$set" => { "addresses.$.street" => "Bond St" }}
+                )
+              end
             end
           end
 

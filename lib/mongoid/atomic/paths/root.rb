@@ -7,7 +7,7 @@ module Mongoid
       # documents atomically.
       class Root
 
-        attr_reader :document, :path, :position
+        attr_reader :document, :path, :position, :update_selector
 
         # Create the new root path utility.
         #
@@ -18,7 +18,7 @@ module Mongoid
         #
         # @since 2.1.0
         def initialize(document)
-          @document, @path, @position = document, "", ""
+          @document, @path, @position, @update_selector = document, "", "", ""
         end
 
         # Asking for the insert modifier on a document with a root path

@@ -184,4 +184,61 @@ describe Mongoid::Hierarchy do
       end
     end
   end
+
+  describe "#_root?" do
+
+    context "when the document can be the root" do
+
+      context "when the document is not embedded" do
+
+        let(:band) do
+          Band.new
+        end
+
+        it "returns true" do
+          band.should be__root
+        end
+      end
+
+      context "when the document is embedded" do
+
+        let(:root_role) do
+          Role.new
+        end
+
+        context "when the document is root in a cyclic relation" do
+
+          it "returns true" do
+            root_role.should be__root
+          end
+        end
+
+        context "when document is embedded in a cyclic relation" do
+
+          let(:child_role) do
+            root_role.child_roles.build
+          end
+
+          it "returns false" do
+            child_role.should_not be__root
+          end
+        end
+      end
+    end
+
+    context "when the document is embedded and not cyclic" do
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:address) do
+        person.addresses.build
+      end
+
+      it "returns false" do
+        address.should_not be__root
+      end
+    end
+  end
 end

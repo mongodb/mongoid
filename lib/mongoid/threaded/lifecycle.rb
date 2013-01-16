@@ -22,10 +22,10 @@ module Mongoid
       #
       # @since 2.2.0
       def _assigning
-        Threaded.begin("assign")
+        Threaded.begin_execution("assign")
         yield
       ensure
-        Threaded.exit("assign")
+        Threaded.exit_execution("assign")
       end
 
       # Is the current thread in assigning mode?
@@ -51,10 +51,10 @@ module Mongoid
       #
       # @since 2.1.0
       def _binding
-        Threaded.begin("bind")
+        Threaded.begin_execution("bind")
         yield
       ensure
-        Threaded.exit("bind")
+        Threaded.exit_execution("bind")
       end
 
       # Is the current thread in binding mode?
@@ -80,10 +80,10 @@ module Mongoid
       #
       # @since 2.1.0
       def _building
-        Threaded.begin("build")
+        Threaded.begin_execution("build")
         yield
       ensure
-        Threaded.exit("build")
+        Threaded.exit_execution("build")
       end
 
       # Is the current thread in building mode?
@@ -121,10 +121,10 @@ module Mongoid
       #
       # @since 2.3.2
       def _loading
-        Threaded.begin("load")
+        Threaded.begin_execution("load")
         yield
       ensure
-        Threaded.exit("load")
+        Threaded.exit_execution("load")
       end
 
       # Is the current thread in loading mode?
@@ -150,10 +150,10 @@ module Mongoid
       #
       # @since 2.3.4
       def _loading_revision
-        Threaded.begin("load_revision")
+        Threaded.begin_execution("load_revision")
         yield
       ensure
-        Threaded.exit("load_revision")
+        Threaded.exit_execution("load_revision")
       end
 
       module ClassMethods
@@ -169,10 +169,10 @@ module Mongoid
         #
         # @since 2.1.0
         def _creating
-          Threaded.begin("create")
+          Threaded.begin_execution("create")
           yield
         ensure
-          Threaded.exit("create")
+          Threaded.exit_execution("create")
         end
 
         # Is the current thread in loading revision mode?

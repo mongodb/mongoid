@@ -9,7 +9,7 @@ describe Mongoid::Threaded do
   describe "#begin" do
 
     before do
-      described_class.begin("load")
+      described_class.begin_execution("load")
     end
 
     after do
@@ -93,8 +93,8 @@ describe Mongoid::Threaded do
   describe "#exit" do
 
     before do
-      described_class.begin("load")
-      described_class.exit("load")
+      described_class.begin_execution("load")
+      described_class.exit_execution("load")
     end
 
     after do

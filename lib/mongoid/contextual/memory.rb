@@ -264,7 +264,9 @@ module Mongoid
         docs.each do |doc|
           @selector ||= root.atomic_selector
           doc.write_attributes(attributes)
-          updates["$set"].merge!(doc.atomic_updates["$set"] || {})
+          root.with_positional_operator do
+            updates["$set"].merge!(doc.atomic_updates["$set"] || {})
+          end
           doc.move_changes
         end
         collection.find(selector).update(updates)

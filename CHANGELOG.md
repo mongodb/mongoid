@@ -40,6 +40,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2609 Pass through batch_size option to query. (Martin Mauch)
 
+* \#2545 The `$` positional operator is used for update selectors on
+  embedded documents that are nested 1 level deep, when appropriate.
+
 * \#2539 `Mongoid.models` now tracks all models in the application for more
   accurate determination of models for things such as indexing rake tasks.
   (Ara Howard)

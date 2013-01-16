@@ -131,6 +131,18 @@ module Mongoid
       object || self
     end
 
+    # Is this document the root document of the hierarchy?
+    #
+    # @example Is the document the root?
+    #   document._root?
+    #
+    # @return [ true, false ] If the document is the root.
+    #
+    # @since 3.1.0
+    def _root?
+      _parent ? false : true
+    end
+
     module ClassMethods
 
       # Determines if the document is a subclass of another document.
