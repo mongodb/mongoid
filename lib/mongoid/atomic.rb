@@ -350,10 +350,30 @@ module Mongoid
       flagged_destroys.clear
     end
 
+    # Have the atomic updates been requested at this level of the hierarchy?
+    #
+    # @example Have the updates been requested at this level?
+    #   document.updates_requested?
+    #
+    # @return [ true, false ] If the atomic updates are requested on this
+    #   document.
+    #
+    # @since 3.1.0
     def updates_requested?
       !!updates_requested
     end
 
+    # Execute the provided block while attempting to use the positional
+    # operator where appropriate.
+    #
+    # @example Execute the block.
+    #   document.with_positional_operator do
+    #     document.atomic_updates
+    #   end
+    #
+    # @return [ Object ] The result of the yield.
+    #
+    # @since 3.1.0
     def with_positional_operator
       begin
         self.updates_requested = true
