@@ -120,14 +120,10 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
 
     context "when the document is embedded one level" do
 
-      pending "returns the the hash with parent selector" do
+      it "returns the the hash with parent selector" do
         many.selector.should eq(
           { "_id" => person._id, "addresses._id" => address._id }
         )
-      end
-
-      it "returns the parent seletor" do
-        many.selector.should eq("_id" => person.id)
       end
     end
 
@@ -140,14 +136,16 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
       before do
         address.locations << location
         address.new_record = false
+        address.post_persist
         location.new_record = false
+        location.post_persist
       end
 
       let(:many) do
         described_class.new(location)
       end
 
-      pending "returns the hash with all parent selectors" do
+      it "returns the hash with all parent selectors" do
         many.selector.should eq(
           {
             "_id" => person._id,
@@ -155,10 +153,6 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
             "addresses.0.locations._id" => location._id
           }
         )
-      end
-
-      it "returns the root selector" do
-        many.selector.should eq("_id" => person.id)
       end
     end
   end

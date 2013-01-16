@@ -110,14 +110,10 @@ describe Mongoid::Atomic::Paths do
         person.addresses << address
       end
 
-      pending "returns the association with id.atomic_selector" do
+      it "returns the association with id.atomic_selector" do
         address.atomic_selector.should eq(
           { "_id" => person.id, "addresses._id" => address.id }
         )
-      end
-
-      it "returns the root selector" do
-        address.atomic_selector.should eq("_id" => person.id)
       end
     end
 
@@ -128,7 +124,7 @@ describe Mongoid::Atomic::Paths do
         person.addresses << address
       end
 
-      pending "returns the JSON notation to the document with ids" do
+      it "returns the JSON notation to the document with ids" do
         location.atomic_selector.should eq(
           {
             "_id" => person.id,
@@ -136,10 +132,6 @@ describe Mongoid::Atomic::Paths do
             "addresses.locations._id" => location.id
           }
         )
-      end
-
-      it "returns the root selector" do
-        location.atomic_selector.should eq("_id" => person.id)
       end
     end
   end

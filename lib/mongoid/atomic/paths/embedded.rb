@@ -33,10 +33,14 @@ module Mongoid
         #
         # @since 2.1.0
         def selector
-          parent.atomic_selector
-          # @todo: Durran: Bring this back once MongoDB, if ever, goes to fix
-          # this issue: https://jira.mongodb.org/browse/SERVER-831
-          # merge!({ "#{path}._id" => document._id }).merge!(document.shard_key_selector)
+          if document.persisted? && document._id_changed?
+            parent.atomic_selector
+          else
+            parent.
+              atomic_selector.
+              merge("#{path}._id" => document._id).
+              merge(document.shard_key_selector)
+          end
         end
       end
     end
