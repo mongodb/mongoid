@@ -241,32 +241,6 @@ module Mongoid
       end
     end
 
-    # Get the insert consumer from the current thread.
-    #
-    # @example Get the insert consumer.
-    #   Threaded.insert
-    #
-    # @return [ Object ] The batch insert consumer.
-    #
-    # @since 2.1.0
-    def insert(name)
-      Thread.current["[mongoid][#{name}]:insert-consumer"]
-    end
-
-    # Set the insert consumer on the current thread.
-    #
-    # @example Set the insert consumer.
-    #   Threaded.insert = consumer
-    #
-    # @param [ Object ] consumer The insert consumer.
-    #
-    # @return [ Object ] The insert consumer.
-    #
-    # @since 2.1.0
-    def set_insert(name, consumer)
-      Thread.current["[mongoid][#{name}]:insert-consumer"] = consumer
-    end
-
     # Get the persistence options for the current thread.
     #
     # @example Get the persistence options.

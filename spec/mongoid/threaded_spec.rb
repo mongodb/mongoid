@@ -140,40 +140,6 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#insert" do
-
-    before do
-      Thread.current["[mongoid][test]:insert-consumer"] = object
-    end
-
-    after do
-      Thread.current["[mongoid][test]:insert-consumer"] = nil
-    end
-
-    it "returns the object with the insert key" do
-      described_class.insert("test").should eq(object)
-    end
-  end
-
-  describe "#set_insert" do
-
-    before do
-      described_class.set_insert("test", object)
-    end
-
-    after do
-      described_class.set_insert("test", nil)
-    end
-
-    let(:consumer) do
-      described_class.insert("test")
-    end
-
-    it "sets the insert consumer" do
-      consumer.should eq(object)
-    end
-  end
-
   describe "#persistence_options" do
 
     before do
