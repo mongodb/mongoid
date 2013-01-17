@@ -18,7 +18,11 @@ module Mongoid
     #
     # @return [ Document ] The new document.
     def clone
-      attrs = as_document.except("_id")
+      doc = as_document
+      # @note This next line is here to address #2704, even though having an
+      # _id and id field in the document would cause problems with Mongoid
+      # elsewhere.
+      attrs = doc.except("_id", "id")
       if attrs.delete("versions")
         attrs["version"] = 1
       end

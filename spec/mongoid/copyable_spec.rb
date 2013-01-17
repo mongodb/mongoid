@@ -33,6 +33,25 @@ describe Mongoid::Copyable do
         person.build_game(name: "Tron")
       end
 
+      context "when the document has an id field in the database" do
+
+        let!(:band) do
+          Band.create(name: "Tool")
+        end
+
+        before do
+          Band.collection.find(_id: band.id).update("$set" => { "id" => 1234 })
+        end
+
+        let!(:cloned) do
+          band.reload.send(method)
+        end
+
+        it "does not set the id field as the _id" do
+          cloned.id.should_not eq(1234)
+        end
+      end
+
       context "when cloning a loaded document" do
 
         before do
