@@ -195,7 +195,7 @@ module Mongoid
       #
       # @since 3.0.0
       def database_name
-        @database_name ||= __database_name__
+        __database_name__
       end
 
       # Get the overridden database name. This either can be overridden by
@@ -355,7 +355,10 @@ module Mongoid
         if storage_options && name = storage_options[:database]
           __evaluate__(name)
         else
-          Mongoid.sessions[__session_name__][:database]
+          # when using Uri in the config, :database is just set after
+          # the factory creates the session, so we fallback to the
+          # actual session object
+          Mongoid.sessions[__session_name__][:database] || __session__.options[:database]
         end
       end
 
@@ -368,11 +371,8 @@ module Mongoid
       #
       # @since 3.0.0
       def __session_name__
-        if storage_options && name = storage_options[:session]
-          __evaluate__(name)
-        else
-          :default
-        end
+        name = session_override || storage_options.try(:[], :session) || :default
+        __evaluate__(name)
       end
 
       # Get the session for this class.
@@ -384,11 +384,7 @@ module Mongoid
       #
       # @since 3.0.0
       def __session__
-        if !(name = session_override).nil?
-          Sessions.with_name(name)
-        else
-          Sessions.with_name(__session_name__)
-        end
+        Sessions.with_name(__session_name__)
       end
 
       # Eval the provided value, either byt calling it if it responds to call
