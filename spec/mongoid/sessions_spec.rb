@@ -1041,6 +1041,32 @@ describe Mongoid::Sessions do
         end
       end
     end
+
+    context "when overriding the default session" do
+      let(:database_name){ "database1" }
+      let(:config) do
+        {  default: { uri: "mongodb://localhost:27017/#{database_id}" },
+          session1: { uri: "mongodb://localhost:27017/#{database_name}" }}
+      end
+
+      before do
+        Mongoid::Threaded.sessions.clear
+        Mongoid.sessions = config
+        Mongoid.override_session(:session1)
+      end
+
+      after do
+        Mongoid.override_session(nil)
+      end
+
+      it "uses the new database name from new session" do
+        Band.database_name.should eq(database_name)
+      end
+
+      it "has some database name on session" do
+        Band.mongo_session.options[:database].should eq(database_name)
+      end
+    end
   end
 
   context "when overriding the default session", config: :mongohq do
