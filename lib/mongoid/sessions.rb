@@ -225,7 +225,7 @@ module Mongoid
       # @since 3.0.0
       def mongo_session
         session = __session__
-        session.use(database_override || database_name)
+        session.use(database_override || current_database_name(session))
         session
       end
 
@@ -406,6 +406,27 @@ module Mongoid
       # @since 3.1.0
       def __evaluate__(name)
         name.respond_to?(:call) ? name.call.to_sym : name.to_sym
+      end
+
+      # Get the name of the current database to use. Will check for a session
+      # override with a database first, then database name.
+      #
+      # @api private
+      #
+      # @example Get the current database name.
+      #   Model.current_database_name
+      #
+      # @param [ Moped::Session ] session The current session.
+      #
+      # @return [ Symbol ] The current database name.
+      #
+      # @since 3.1.0
+      def current_database_name(session)
+        if session_override && name = session.options[:database]
+          name
+        else
+          database_name
+        end
       end
     end
   end

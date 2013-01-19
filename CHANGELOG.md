@@ -173,6 +173,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2714 Overriding sessions when the new session has a different database will
+  now properly switch the database at runtime as well.
+
 * \#2699 Resetting a field now removes the name from the changed attributes
   list. (Subhash Bhushan)
 
