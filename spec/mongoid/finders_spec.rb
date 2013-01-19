@@ -26,6 +26,83 @@ describe Mongoid::Finders do
     end
   end
 
+  describe ".find_by" do
+
+    context "when the document is found" do
+
+      let!(:person) do
+        Person.create(title: "sir")
+      end
+
+      context "when no block is provided" do
+
+        it "returns the document" do
+          Person.find_by(title: "sir").should eq(person)
+        end
+      end
+
+      context "when a block is provided" do
+
+        let(:result) do
+          Person.find_by(title: "sir") do |peep|
+            peep.age = 50
+          end
+        end
+
+        it "yields the returned document" do
+          result.age.should eq(50)
+        end
+      end
+    end
+
+    context "when the document is not found" do
+
+      context "when raising a not found error" do
+
+        before do
+          Mongoid.raise_not_found_error = true
+        end
+
+        it "raises an error" do
+          expect {
+            Person.find_by(ssn: "333-22-1111")
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+      end
+
+      context "when raising no error" do
+
+        before do
+          Mongoid.raise_not_found_error = false
+        end
+
+        after do
+          Mongoid.raise_not_found_error = true
+        end
+
+        context "when no block is provided" do
+
+          it "returns nil" do
+            Person.find_by(ssn: "333-22-1111").should be_nil
+          end
+        end
+
+        context "when a block is provided" do
+
+          let(:result) do
+            Person.find_by(ssn: "333-22-1111") do |peep|
+              peep.age = 50
+            end
+          end
+
+          it "returns nil" do
+            result.should be_nil
+          end
+        end
+      end
+    end
+  end
+
   describe ".find_or_create_by" do
 
     context "when the document is found" do
@@ -208,83 +285,6 @@ describe Mongoid::Finders do
 
         it "calls the block" do
           person.pets.should be_true
-        end
-      end
-    end
-  end
-
-  describe ".find_by" do
-
-    context "when the document is found" do
-
-      let!(:person) do
-        Person.create(title: "sir")
-      end
-
-      context "when no block is provided" do
-
-        it "returns the document" do
-          Person.find_by(title: "sir").should eq(person)
-        end
-      end
-
-      context "when a block is provided" do
-
-        let(:result) do
-          Person.find_by(title: "sir") do |peep|
-            peep.age = 50
-          end
-        end
-
-        it "yields the returned document" do
-          result.age.should eq(50)
-        end
-      end
-    end
-
-    context "when the document is not found" do
-
-      context "when raising a not found error" do
-
-        before do
-          Mongoid.raise_not_found_error = true
-        end
-
-        it "raises an error" do
-          expect {
-            Person.find_by(ssn: "333-22-1111")
-          }.to raise_error(Mongoid::Errors::DocumentNotFound)
-        end
-      end
-
-      context "when raising no error" do
-
-        before do
-          Mongoid.raise_not_found_error = false
-        end
-
-        after do
-          Mongoid.raise_not_found_error = true
-        end
-
-        context "when no block is provided" do
-
-          it "returns nil" do
-            Person.find_by(ssn: "333-22-1111").should be_nil
-          end
-        end
-
-        context "when a block is provided" do
-
-          let(:result) do
-            Person.find_by(ssn: "333-22-1111") do |peep|
-              peep.age = 50
-            end
-          end
-
-          it "returns nil" do
-            result.should be_nil
-          end
         end
       end
     end

@@ -10,6 +10,10 @@ For instructions on upgrading to newer versions, visit
 * \#2703 Validations on associated documents on fire if the document is
   changed. (Regression)
 
+* \#2707 Calling `find_or_create_by` or `find_by_initialize_by` off a relation
+  with a chained criteria or scope now properly keeps the relations intact on
+  the new or found document.
+
 * \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
   of `nil`.
 

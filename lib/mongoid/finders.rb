@@ -7,8 +7,24 @@ module Mongoid
     extend Origin::Forwardable
 
     select_with :with_default_scope
-    delegate :aggregates, :avg, :each, :extras, :find_and_modify, :includes,
-      :map_reduce, :max, :min, :sum, :update, :update_all, to: :with_default_scope
+
+    # These are methods defined on the criteria that should also be accessible
+    # directly from the the class level.
+    delegate \
+      :aggregates,
+      :avg,
+      :each,
+      :extras,
+      :find_and_modify,
+      :find_or_create_by,
+      :find_or_initialize_by,
+      :includes,
+      :map_reduce,
+      :max,
+      :min,
+      :sum,
+      :update,
+      :update_all, to: :with_default_scope
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.
@@ -61,32 +77,6 @@ module Mongoid
       with_default_scope.find(*args)
     end
 
-    # Find the first +Document+ given the conditions, or creates a new document
-    # with the conditions that were supplied.
-    #
-    # @example Find or create the document.
-    #   Person.find_or_create_by(:attribute => "value")
-    #
-    # @param [ Hash ] attrs The attributes to check.
-    #
-    # @return [ Document ] A matching or newly created document.
-    def find_or_create_by(attrs = {}, &block)
-      find_or(:create, attrs, &block)
-    end
-
-    # Find the first +Document+ given the conditions, or initializes a new document
-    # with the conditions that were supplied.
-    #
-    # @example Find or initialize the document.
-    #   Person.find_or_initialize_by(:attribute => "value")
-    #
-    # @param [ Hash ] attrs The attributes to check.
-    #
-    # @return [ Document ] A matching or newly initialized document.
-    def find_or_initialize_by(attrs = {}, &block)
-      find_or(:new, attrs, &block)
-    end
-
     # Find the first +Document+ given the conditions, or raises
     # Mongoid::Errors::DocumentNotFound
     #
@@ -127,21 +117,6 @@ module Mongoid
     # @return [ Document ] The last matching document.
     def last
       with_default_scope.last
-    end
-
-    protected
-
-    # Find the first object or create/initialize it.
-    #
-    # @example Find or perform an action.
-    #   Person.find_or(:create, :name => "Dev")
-    #
-    # @param [ Symbol ] method The method to invoke.
-    # @param [ Hash ] attrs The attributes to query or set.
-    #
-    # @return [ Document ] The first or new document.
-    def find_or(method, attrs = {}, &block)
-      where(attrs).first || send(method, attrs, &block)
     end
   end
 end
