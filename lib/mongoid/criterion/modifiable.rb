@@ -55,6 +55,32 @@ module Mongoid
         create_document(:create!, attrs, &block)
       end
 
+      # Find the first +Document+ given the conditions, or creates a new document
+      # with the conditions that were supplied.
+      #
+      # @example Find or create the document.
+      #   Person.find_or_create_by(:attribute => "value")
+      #
+      # @param [ Hash ] attrs The attributes to check.
+      #
+      # @return [ Document ] A matching or newly created document.
+      def find_or_create_by(attrs = {}, &block)
+        find_or(:create, attrs, &block)
+      end
+
+      # Find the first +Document+ given the conditions, or initializes a new document
+      # with the conditions that were supplied.
+      #
+      # @example Find or initialize the document.
+      #   Person.find_or_initialize_by(:attribute => "value")
+      #
+      # @param [ Hash ] attrs The attributes to check.
+      #
+      # @return [ Document ] A matching or newly initialized document.
+      def find_or_initialize_by(attrs = {}, &block)
+        find_or(:new, attrs, &block)
+      end
+
       # Find the first +Document+, or creates a new document
       # with the conditions that were supplied plus attributes.
       #
@@ -127,7 +153,24 @@ module Mongoid
           end, &block)
       end
 
+      # Find the first object or create/initialize it.
+      #
+      # @api private
+      #
+      # @example Find or perform an action.
+      #   Person.find_or(:create, :name => "Dev")
+      #
+      # @param [ Symbol ] method The method to invoke.
+      # @param [ Hash ] attrs The attributes to query or set.
+      #
+      # @return [ Document ] The first or new document.
+      def find_or(method, attrs = {}, &block)
+        where(attrs).first || send(method, attrs, &block)
+      end
+
       # Find the first document or create/initialize it.
+      #
+      # @api private
       #
       # @example First or perform an action.
       #   Person.first_or(:create, :name => "Dev")

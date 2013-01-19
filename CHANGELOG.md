@@ -176,6 +176,10 @@ For instructions on upgrading to newer versions, visit
 * \#2714 Overriding sessions when the new session has a different database will
   now properly switch the database at runtime as well.
 
+* \#2707 Calling `find_or_create_by` or `find_by_initialize_by` off a relation
+  with a chained criteria or scope now properly keeps the relations intact on
+  the new or found document.
+
 * \#2699 Resetting a field now removes the name from the changed attributes
   list. (Subhash Bhushan)
 

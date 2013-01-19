@@ -2480,26 +2480,56 @@ describe Mongoid::Relations::Referenced::Many do
         it "returns the document" do
           found.should eq(post)
         end
+
+        it "keeps the document in the relation" do
+          found.person.should eq(person)
+        end
       end
 
       context "when the document does not exist" do
 
-        let(:found) do
-          person.posts.find_or_create_by(title: "Test") do |post|
-            post.content = "The Content"
+        context "when there is no criteria attached" do
+
+          let(:found) do
+            person.posts.find_or_create_by(title: "Test") do |post|
+              post.content = "The Content"
+            end
+          end
+
+          it "sets the new document attributes" do
+            found.title.should eq("Test")
+          end
+
+          it "returns a newly persisted document" do
+            found.should be_persisted
+          end
+
+          it "calls the passed block" do
+            found.content.should eq("The Content")
+          end
+
+          it "keeps the document in the relation" do
+            found.person.should eq(person)
           end
         end
 
-        it "sets the new document attributes" do
-          found.title.should eq("Test")
-        end
+        context "when a criteria is attached" do
 
-        it "returns a newly persisted document" do
-          found.should be_persisted
-        end
+          let(:found) do
+            person.posts.recent.find_or_create_by(title: "Test")
+          end
 
-        it "calls the passed block" do
-          found.content.should eq("The Content")
+          it "sets the new document attributes" do
+            found.title.should eq("Test")
+          end
+
+          it "returns a newly persisted document" do
+            found.should be_persisted
+          end
+
+          it "keeps the document in the relation" do
+            found.person.should eq(person)
+          end
         end
       end
     end
@@ -2523,6 +2553,10 @@ describe Mongoid::Relations::Referenced::Many do
         it "returns the document" do
           found.should eq(rating)
         end
+
+        it "keeps the document in the relation" do
+          found.ratable.should eq(movie)
+        end
       end
 
       context "when the document does not exist" do
@@ -2537,6 +2571,10 @@ describe Mongoid::Relations::Referenced::Many do
 
         it "returns a newly persisted document" do
           found.should be_persisted
+        end
+
+        it "keeps the document in the relation" do
+          found.ratable.should eq(movie)
         end
       end
     end
