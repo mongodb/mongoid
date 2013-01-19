@@ -130,12 +130,15 @@ module Mongoid
       # @example Do any documents exist for the context.
       #   context.exists?
       #
+      # @note We don't use count here since Mongo does not use counted
+      #   b-tree indexes, unless a count is already cached then that is
+      #   used to determine the value.
+      #
       # @return [ true, false ] If the count is more than zero.
       #
       # @since 3.0.0
       def exists?
-        # Don't use count here since Mongo does not use counted b-tree indexes
-        !query.dup.select(_id: 1).limit(1).entries.first.nil?
+        @exists ||= check_existence
       end
 
       # Run an explain on the criteria.
@@ -181,8 +184,12 @@ module Mongoid
       #
       # @since 3.0.0
       def first
-        apply_id_sorting
-        with_eager_loading(query.first)
+        if cached? && cache_loaded?
+          documents.first
+        else
+          apply_id_sorting
+          with_eager_loading(query.first)
+        end
       end
       alias :one :first
 
@@ -343,6 +350,24 @@ module Mongoid
       end
 
       private
+
+      # Checks if any documents exist in the database.
+      #
+      # @api private
+      #
+      # @example Check for document existsence.
+      #   context.check_existence
+      #
+      # @return [ true, false ] If documents exist.
+      #
+      # @since 3.1.0
+      def check_existence
+        if cached? && cache_loaded?
+          !documents.empty?
+        else
+          @count ? @count > 0 : !query.dup.select(_id: 1).limit(1).entries.first.nil?
+        end
+      end
 
       # Update the documents for the provided method.
       #

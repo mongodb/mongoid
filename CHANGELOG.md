@@ -28,6 +28,9 @@ For instructions on upgrading to newer versions, visit
 * \#2669 Passing a block to `Criteria#new` now properly sends the
   block through to the model's contructor. (Arthur Neves)
 
+* \#2667 `exists?` no longer hits the database in cases where we have
+  the necessary information in memory.
+
 * \#2657 Logger getter and setter convenience methods have been
   added to the `Config` module. (Arthur Neves)
 

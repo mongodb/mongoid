@@ -443,6 +443,44 @@ describe Mongoid::Contextual::Mongo do
         context.should be_exists
       end
     end
+
+    context "when caching is enabled" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode").cache
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when the cache is loaded" do
+
+        before do
+          context.to_a
+        end
+
+        it "does not hit the database" do
+          context.should_receive(:query).never
+          context.should be_exists
+        end
+      end
+
+      context "when the cache is not loaded" do
+
+        context "when a count has been executed" do
+
+          before do
+            context.count
+          end
+
+          it "does not hit the database" do
+            context.should_receive(:query).never
+            context.should be_exists
+          end
+        end
+      end
+    end
   end
 
   describe "#explain" do
@@ -626,16 +664,42 @@ describe Mongoid::Contextual::Mongo do
         Band.create(name: "New Order")
       end
 
-      let(:criteria) do
-        Band.where(name: "Depeche Mode")
+      context "when the context is not cached" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        it "returns the first matching document" do
+          context.send(method).should eq(depeche_mode)
+        end
       end
 
-      let(:context) do
-        described_class.new(criteria)
-      end
+      context "when the context is cached" do
 
-      it "returns the first matching document" do
-        context.send(method).should eq(depeche_mode)
+        let(:criteria) do
+          Band.where(name: "Depeche Mode").cache
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when the cache is loaded" do
+
+          before do
+            context.to_a
+          end
+
+          it "returns the first document without touching the database" do
+            context.should_receive(:query).never
+            context.send(method).should eq(depeche_mode)
+          end
+        end
       end
     end
   end
