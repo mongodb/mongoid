@@ -176,6 +176,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2719 `distinct` is now available at the class level.
+
+        Band.distinct(:name)
+
 * \#2714 Overriding sessions when the new session has a different database will
   now properly switch the database at runtime as well.
 

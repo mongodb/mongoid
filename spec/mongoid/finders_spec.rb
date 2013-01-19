@@ -2,6 +2,18 @@ require "spec_helper"
 
 describe Mongoid::Finders do
 
+  describe ".distinct" do
+
+    before do
+      Band.create(name: "Tool")
+      Band.create(name: "Photek")
+    end
+
+    it "returns the distinct values for the field" do
+      Band.distinct(:name).should eq([ "Tool", "Photek" ])
+    end
+  end
+
   describe ".each" do
 
     let!(:band) do

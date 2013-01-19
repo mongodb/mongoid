@@ -13,6 +13,7 @@ module Mongoid
     delegate \
       :aggregates,
       :avg,
+      :distinct,
       :each,
       :each_with_index,
       :extras,
