@@ -833,6 +833,81 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#aggregate" do
+
+    let(:pipeline) do
+      [
+        {"$project" => { "name" => 1, "likes" => 1 }},
+        {"$group" => { "_id" => "$name", "likes" => { "$sum" => "$likes" }}}
+      ]
+    end
+
+    let!(:depeche_mode) do
+      Band.create(name: "Depeche Mode", likes: 200)
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool", likes: 100)
+    end
+
+    context "when no selection is provided" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.aggregate(pipeline)
+      end
+
+      it "returns the second aggregate result" do
+        results.should include(
+          { "_id" => "Tool", "likes" => 100 },
+        )
+      end
+
+      it "returns the second aggregate result" do
+        results.should include(
+          { "_id" => "Depeche Mode", "likes" => 200 }
+        )
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(2)
+      end
+    end
+
+    context "when the selection is provided" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.aggregate(pipeline)
+      end
+
+      it "includes the aggregate result" do
+        results.should include(
+          { "_id" => "Depeche Mode", "likes" => 200 }
+        )
+      end
+
+      it "returns the correct number of documents" do
+        p results.each.to_a
+        results.count.should eq(1)
+      end
+    end
+  end
+
   describe "#map_reduce" do
 
     let!(:depeche_mode) do

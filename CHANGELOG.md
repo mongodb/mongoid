@@ -7,6 +7,12 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Allow aggregation on contextual objects. (Gosha Arinich)
+
+        Band.where(name: "Depeche Mode").aggregate(
+          {"$group" => { "_id" => "$name", "likes" => { "$sum" => "$likes" }}}
+        )
+
 * Added `Document.first_or_create!` and `Criteria#first_or_create!`. This
   raises a validations error if creation fails validation.
 

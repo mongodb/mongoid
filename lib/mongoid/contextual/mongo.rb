@@ -5,6 +5,7 @@ require "mongoid/contextual/command"
 require "mongoid/contextual/eager"
 require "mongoid/contextual/find_and_modify"
 require "mongoid/contextual/map_reduce"
+require "mongoid/contextual/aggregation"
 
 module Mongoid
   module Contextual
@@ -256,6 +257,18 @@ module Mongoid
       # @since 3.0.0
       def map_reduce(map, reduce)
         MapReduce.new(collection, criteria, map, reduce)
+      end
+
+      # Initiate an aggregation operation from the context.
+      #
+      # @example Initiate an aggregation.
+      #   context.aggregate(pipeline)
+      #
+      # @param [ Array ] pipeline The Array of pipelines.
+      #
+      # @return [ Aggregation ] The aggregation lazy wrapper.
+      def aggregate(*pipeline)
+        Aggregation.new(collection, criteria, *pipeline)
       end
 
       # Pluck the single field values from the database. Will return duplicates
