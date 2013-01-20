@@ -204,9 +204,6 @@ For instructions on upgrading to newer versions, visit
 * \#2683 Aliased fields are now supported when executing atomic operations from
   criteria. (Arthur Neves)
 
-* \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
-  of `nil`.
-
 * \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
 
 * \#2664 In memory sorting of embedded documents now properly works when
@@ -216,6 +213,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2703 Validations on associated documents on fire if the document is
   changed. (Regression)
+
+* \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
+  of `nil`.
 
 ### Resolved Issues
 
