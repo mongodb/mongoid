@@ -17,6 +17,9 @@ For instructions on upgrading to newer versions, visit
 * \#2699 Resetting a field now removes the name from the changed attributes
   list. (Subhash Bhushan)
 
+* \#2683 Aliased fields are now supported when executing atomic operations from
+  criteria. (Arthur Neves)
+
 * \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
   of `nil`.
 
