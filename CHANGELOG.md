@@ -194,9 +194,6 @@ For instructions on upgrading to newer versions, visit
 * \#2697 Eager loading fixed when including multiple models that inherit from
   the same class. (Kirill Lazarev)
 
-* \#2683 Aliased fields are now supported when executing atomic operations from
-  criteria. (Arthur Neves)
-
 * \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
 
 * \#2664 In memory sorting of embedded documents now properly works when
@@ -213,6 +210,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2699 Resetting a field now removes the name from the changed attributes
   list. (Subhash Bhushan)
+
+* \#2683 Aliased fields are now supported when executing atomic operations from
+  criteria. (Arthur Neves)
 
 * \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
   of `nil`.
