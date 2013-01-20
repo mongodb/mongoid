@@ -23,6 +23,8 @@ For instructions on upgrading to newer versions, visit
 * \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
   of `nil`.
 
+* \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
+
 ## 3.0.17
 
 ### Resolved Issues
