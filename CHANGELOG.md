@@ -194,8 +194,6 @@ For instructions on upgrading to newer versions, visit
 * \#2697 Eager loading fixed when including multiple models that inherit from
   the same class. (Kirill Lazarev)
 
-* \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
-
 * \#2664 In memory sorting of embedded documents now properly works when
   multiple fields are provided. (Neer Friedman)
 
@@ -216,6 +214,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
   of `nil`.
+
+* \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
 
 ### Resolved Issues
 
