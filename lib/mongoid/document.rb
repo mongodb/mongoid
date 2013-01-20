@@ -338,7 +338,6 @@ module Mongoid
         doc.apply_defaults
         IdentityMap.set(doc) unless _loading_revision?
         yield(doc) if block_given?
-        doc.run_callbacks(:find) unless doc._find_callbacks.empty?
         doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
         doc
       end
