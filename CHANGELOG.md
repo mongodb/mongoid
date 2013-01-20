@@ -191,9 +191,6 @@ For instructions on upgrading to newer versions, visit
 * \#2714 Overriding sessions when the new session has a different database will
   now properly switch the database at runtime as well.
 
-* \#2699 Resetting a field now removes the name from the changed attributes
-  list. (Subhash Bhushan)
-
 * \#2697 Eager loading fixed when including multiple models that inherit from
   the same class. (Kirill Lazarev)
 
@@ -213,6 +210,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2703 Validations on associated documents on fire if the document is
   changed. (Regression)
+
+* \#2699 Resetting a field now removes the name from the changed attributes
+  list. (Subhash Bhushan)
 
 * \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
   of `nil`.
