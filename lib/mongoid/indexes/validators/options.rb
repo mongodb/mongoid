@@ -9,6 +9,7 @@ module Mongoid
 
         VALID_OPTIONS = [
           :background,
+          :database,
           :drop_dups,
           :name,
           :sparse,

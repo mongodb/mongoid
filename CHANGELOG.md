@@ -34,6 +34,14 @@ For instructions on upgrading to newer versions, visit
 * \#2657 Logger getter and setter convenience methods have been
   added to the `Config` module. (Arthur Neves)
 
+* \#2615 Index options can now take a specific database name if the
+  indexes are only to exist in a database other than the default.
+
+        class Band
+          include Mongoid::Document
+          index name: 1, { database: "another_db" }
+        end
+
 * \#2613 Procs can now be provided as values to `store_in`:
 
         class Band

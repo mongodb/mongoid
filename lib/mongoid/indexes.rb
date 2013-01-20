@@ -23,7 +23,12 @@ module Mongoid
       def create_indexes
         return unless index_options
         index_options.each_pair do |spec, options|
-          collection.indexes.create(spec, options)
+          if database = options[:database]
+            with(consistency: :strong, database: database).
+              collection.indexes.create(spec, options.except(:database))
+          else
+            with(consistency: :strong).collection.indexes.create(spec, options)
+          end
         end and true
       end
 
@@ -37,9 +42,13 @@ module Mongoid
       #
       # @since 3.0.0
       def remove_indexes
-        with(consistency: :strong).collection.indexes.each do |spec|
-          next if spec["name"] == "_id_"
-          collection.indexes.drop(spec["key"])
+        indexed_database_names.each do |database|
+          collection = with(consistency: :strong, database: database).collection
+          collection.indexes.each do |spec|
+            unless spec["name"] == "_id_"
+              collection.indexes.drop(spec["key"])
+            end
+          end
         end and true
       end
 
@@ -122,6 +131,23 @@ module Mongoid
           normalized[database_field_name(name).to_sym] = direction
           normalized
         end
+      end
+
+      # Get the names of all databases for this model that have index
+      # definitions.
+      #
+      # @api private
+      #
+      # @example Get the indexed database names.
+      #   Model.indexed_database_names
+      #
+      # @return [ Array<String> ] The names.
+      #
+      # @since 3.1.0
+      def indexed_database_names
+        index_options.values.map do |options|
+          options[:database] || database_name
+        end.uniq
       end
     end
   end

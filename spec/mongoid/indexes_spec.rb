@@ -21,40 +21,94 @@ describe Mongoid::Indexes do
 
   describe ".remove_indexes" do
 
-    let(:klass) do
-      Person
+    context "when no database specific options exist" do
+
+      let(:klass) do
+        Person
+      end
+
+      let(:collection) do
+        klass.collection
+      end
+
+      before do
+        klass.create_indexes
+        klass.remove_indexes
+      end
+
+      it "removes the indexes" do
+        collection.indexes.reject{ |doc| doc["name"] == "_id_" }.should be_empty
+      end
     end
 
-    let(:collection) do
-      klass.collection
-    end
+    context "when database specific options exist" do
 
-    before do
-      klass.create_indexes
-      klass.remove_indexes
-    end
+      let(:klass) do
+        Class.new do
+          include Mongoid::Document
+          store_in collection: "test_db_remove"
+          index({ test: 1 }, { database: "mia_2" })
+          index({ name: 1 }, { background: true })
+        end
+      end
 
-    it "removes the indexes" do
-      collection.indexes.reject{ |doc| doc["name"] == "_id_" }.should be_empty
+      before do
+        klass.create_indexes
+        klass.remove_indexes
+      end
+
+      let(:indexes) do
+        klass.with(database: "mia_2").collection.indexes
+      end
+
+      it "creates the indexes" do
+        indexes.reject{ |doc| doc["name"] == "_id_" }.should be_empty
+      end
     end
   end
 
   describe ".create_indexes" do
 
-    let(:klass) do
-      Class.new do
-        include Mongoid::Document
-        store_in collection: "test_class"
-        index({ _type: 1 }, { unique: false, background: true })
+    context "when no database options are specified" do
+
+      let(:klass) do
+        Class.new do
+          include Mongoid::Document
+          store_in collection: "test_class"
+          index({ _type: 1 }, { unique: false, background: true })
+        end
+      end
+
+      before do
+        klass.create_indexes
+      end
+
+      it "creates the indexes" do
+        klass.collection.indexes[_type: 1].should_not be_nil
       end
     end
 
-    before do
-      klass.create_indexes
-    end
+    context "when database options are specified" do
 
-    it "creates the indexes" do
-      klass.collection.indexes[_type: 1].should_not be_nil
+      let(:klass) do
+        Class.new do
+          include Mongoid::Document
+          store_in collection: "test_db_indexes"
+          index({ _type: 1 }, { database: "mia_1" })
+        end
+      end
+
+      before do
+        klass.create_indexes
+      end
+
+      let(:indexes) do
+        klass.with(database: "mia_1").collection.indexes
+      end
+
+      it "creates the indexes" do
+        indexes[_type: 1].should_not be_nil
+      end
     end
   end
 
@@ -164,6 +218,21 @@ describe Mongoid::Indexes do
 
       it "sets the index with name options" do
         options.should eq(name: "index_name")
+      end
+    end
+
+    context "when providing database options" do
+
+      before do
+        klass.index({ name: 1 }, { database: "mongoid_index_alt" })
+      end
+
+      let(:options) do
+        klass.index_options[name: 1]
+      end
+
+      it "sets the index with background options" do
+        options.should eq(database: "mongoid_index_alt")
       end
     end
 
