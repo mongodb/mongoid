@@ -312,7 +312,11 @@ module Mongoid
           #
           # @since 2.2.0
           def eager_load(metadata, ids)
-            metadata.klass.any_in(_id: ids).each do |doc|
+            criteria = metadata.klass.scoped
+            [:only, :without].each do |option|
+              criteria = criteria.public_send(option, *metadata[option]) if metadata[option]
+            end
+            criteria.any_in(_id: ids).each do |doc|
               IdentityMap.set(doc)
             end
           end
