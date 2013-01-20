@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.18
+
+### Resolved Issues
+
+* \#2703 Validations on associated documents on fire if the document is
+  changed. (Regression)
+
 ## 3.0.17
 
 ### Resolved Issues

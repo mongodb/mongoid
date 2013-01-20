@@ -30,7 +30,7 @@ module Mongoid
         begin
           document.begin_validate
           valid = Array.wrap(value).collect do |doc|
-            if doc.nil?
+            if doc.nil? || !doc.changed?
               true
             else
               doc.validated? ? true : doc.valid?
