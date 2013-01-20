@@ -14,6 +14,9 @@ For instructions on upgrading to newer versions, visit
   with a chained criteria or scope now properly keeps the relations intact on
   the new or found document.
 
+* \#2699 Resetting a field now removes the name from the changed attributes
+  list. (Subhash Bhushan)
+
 * \#2678 Calling `Criteria#sum` with no matching documents returns `0` instead
   of `nil`.
 
