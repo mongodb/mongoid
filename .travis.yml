@@ -5,3 +5,5 @@ rvm:
   - jruby
   - rbx-18mode
   - ree
+services:
+  - mongodb
