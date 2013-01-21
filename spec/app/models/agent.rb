@@ -5,7 +5,7 @@ class Agent
   field :number
   embeds_many :names, :as => :namable
   belongs_to :game
-  belongs_to :agency, touch: true
+  belongs_to :agency, :touch => true
 
   has_and_belongs_to_many :accounts
 end

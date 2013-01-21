@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("mocha", ["= 0.11"])
   s.add_development_dependency("rspec", ["~> 2.10"])
   s.add_development_dependency("guard-rspec", ["~> 0.7"])
+  s.add_development_dependency("rb-fsevent", ["~> 0.9.1"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.require_path = 'lib'

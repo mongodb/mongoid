@@ -4358,8 +4358,8 @@ describe Mongoid::NestedAttributes do
         end
 
         let(:params) do
-          { posts_attributes:
-            { "0" => { title: "Testing" }}
+          { :posts_attributes =>
+            { "0" => { :title => "Testing" }}
           }
         end
 
@@ -4383,7 +4383,7 @@ describe Mongoid::NestedAttributes do
         end
 
         let!(:server) do
-          node.servers.create(name: "test")
+          node.servers.create(:name => "test")
         end
 
         before do
@@ -4394,7 +4394,7 @@ describe Mongoid::NestedAttributes do
 
           let!(:update) do
             node.update_attributes({
-              servers_attributes: { "0" => { "_id" => server.id, "name" => "" }}
+              :servers_attributes => { "0" => { "_id" => server.id, "name" => "" }}
             })
           end
 

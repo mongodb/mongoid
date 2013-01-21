@@ -643,11 +643,11 @@ describe Mongoid::Persistence do
     context "when the document is embedded" do
 
       let(:band) do
-        Band.create(name: "Placebo")
+        Band.create(:name => "Placebo")
       end
 
       let(:label) do
-        band.create_label(name: "Mute", updated_at: 10.days.ago)
+        band.create_label(:name => "Mute", :updated_at => 10.days.ago)
       end
 
       before do
@@ -709,7 +709,7 @@ describe Mongoid::Persistence do
       context "when an updated at is defined" do
 
         let!(:agent) do
-          Agent.create(updated_at: 2.days.ago)
+          Agent.create(:updated_at => 2.days.ago)
         end
 
         context "when no attribute is provided" do
@@ -774,7 +774,7 @@ describe Mongoid::Persistence do
       context "when record is new" do
 
         let(:agent) do
-          Agent.new(updated_at: 2.days.ago)
+          Agent.new(:updated_at => 2.days.ago)
         end
 
         context "when no attribute is provided" do

@@ -2,7 +2,7 @@ class Acolyte
   include Mongoid::Document
   field :status
   field :name
-  field :some_time, type: Time
+  field :some_time, :type => Time
 
   embeds_many :versions, :as => :memorable
   belongs_to :church
