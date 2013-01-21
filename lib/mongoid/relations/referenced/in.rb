@@ -240,7 +240,7 @@ module Mongoid # :nodoc:
           #
           # @since 2.1.0
           def valid_options
-            [ :autosave, :foreign_key, :index, :polymorphic ]
+            [ :autosave, :foreign_key, :index, :polymorphic, :touch ]
           end
 
           # Get the default validation setting for the relation. Determines if

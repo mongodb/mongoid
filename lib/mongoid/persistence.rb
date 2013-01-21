@@ -79,6 +79,39 @@ module Mongoid #:nodoc:
       return true
     end
 
+
+    # Touch the document, in effect updating its updated_at timestamp and
+    # optionally the provided field to the current time. If any belongs_to
+    # relations exist with a touch option, they will be updated as well.
+    #
+    # @example Update the updated_at timestamp.
+    #   document.touch
+    #
+    # @example Update the updated_at and provided timestamps.
+    #   document.touch(:audited)
+    #
+    # @note This will not autobuild relations if those options are set.
+    #
+    # @param [ Symbol ] field The name of an additional field to update.
+    #
+    # @return [ true/false ] false if record is new_record otherwise true.
+    #
+    # @since 2.6.0
+    def touch(field = nil)
+      return false if _root.new_record?
+      current = Time.now
+      write_attribute(:updated_at, current) if fields["updated_at"]
+      write_attribute(field, current) if field
+
+      touches = touch_atomic_updates(field)
+      unless touches.empty?
+        _root.collection.update(atomic_selector, touches)
+      end
+
+      touchables.each { |name| send(name).try(:touch) }
+      move_changes and true
+    end
+
     # Update the document in the datbase.
     #
     # @example Update an existing document.

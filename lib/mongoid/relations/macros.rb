@@ -134,6 +134,7 @@ module Mongoid # :nodoc:
             reference(meta)
             autosave(meta)
             validates_relation(meta)
+            touchable(meta)
           end
         end
         alias :belongs_to_related :belongs_to

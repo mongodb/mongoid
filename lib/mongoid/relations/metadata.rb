@@ -754,6 +754,18 @@ module Mongoid # :nodoc:
         !!order
       end
 
+      # Is this relation touchable?
+      #
+      # @example Is the relation touchable?
+      #   metadata.touchable?
+      #
+      # @return [ true, false ] If the relation can be touched.
+      #
+      # @since 3.0.0
+      def touchable?
+        !!self[:touch]
+      end
+
       private
 
       # Returns the class name for the relation.

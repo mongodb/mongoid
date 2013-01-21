@@ -638,6 +638,213 @@ describe Mongoid::Persistence do
     end
   end
 
+  describe "#touch" do
+
+    context "when the document is embedded" do
+
+      let(:band) do
+        Band.create(name: "Placebo")
+      end
+
+      let(:label) do
+        band.create_label(name: "Mute", updated_at: 10.days.ago)
+      end
+
+      before do
+        label.touch
+      end
+
+      it "updates the updated_at timestamp" do
+        label.updated_at.should be_within(1).of(Time.now)
+      end
+
+      it "persists the changes" do
+        label.reload.updated_at.should be_within(1).of(Time.now)
+      end
+    end
+
+    context "when no relations have touch options" do
+
+      context "when no updated at is defined" do
+
+        let(:person) do
+          Acolyte.create
+        end
+
+        context "when no attribute is provided" do
+
+          let!(:touched) do
+            person.touch
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+
+          it "does not set the updated at field" do
+            person[:updated_at].should be_nil
+          end
+        end
+
+        context "when an attribute is provided" do
+
+          let!(:touched) do
+            person.touch(:some_time)
+          end
+
+          it "sets the attribute to the current time" do
+            person.some_time.should be_within(5).of(Time.now)
+          end
+
+          it "persists the change" do
+            person.reload.some_time.should be_within(5).of(Time.now)
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+        end
+      end
+
+      context "when an updated at is defined" do
+
+        let!(:agent) do
+          Agent.create(updated_at: 2.days.ago)
+        end
+
+        context "when no attribute is provided" do
+
+          let!(:touched) do
+            agent.touch
+          end
+
+          it "sets the updated at to the current time" do
+            agent.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "persists the change" do
+            agent.reload.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+
+          it "clears the dirty tracking" do
+            agent.changes.should be_empty
+          end
+        end
+
+        context "when an attribute is provided" do
+
+          let!(:touched) do
+            agent.touch(:dob)
+          end
+
+          it "sets the updated at to the current time" do
+            agent.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "sets the attribute to the current time" do
+            agent.dob.should be_within(5).of(Time.now)
+          end
+
+          it "sets both attributes to the exact same time" do
+            agent.updated_at.should be_within(1).of(agent.dob)
+          end
+
+          it "persists the updated at change" do
+            agent.reload.updated_at.should be_within(5).of(Time.now)
+          end
+
+          it "persists the attribute change" do
+            agent.reload.dob.should be_within(5).of(Time.now)
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+
+          it "clears the dirty tracking" do
+            agent.changes.should be_empty
+          end
+        end
+      end
+
+      context "when record is new" do
+
+        let(:agent) do
+          Agent.new(updated_at: 2.days.ago)
+        end
+
+        context "when no attribute is provided" do
+
+          let!(:touched) do
+            agent.touch
+          end
+
+          it "returns false" do
+            touched.should be_false
+          end
+        end
+
+        context "when an attribute is provided" do
+
+          let!(:touched) do
+            agent.touch(:dob)
+          end
+
+          it "returns false" do
+            touched.should be_false
+          end
+        end
+      end
+    end
+
+    context "when relations have touch options" do
+
+      let!(:agent) do
+        Agent.create
+      end
+
+      context "when the relation is nil" do
+
+        context "when the relation autobuilds" do
+
+          let!(:touched) do
+            agent.touch
+          end
+
+          it "does nothing to the relation" do
+            agent.instance_variable_get(:@agency).should be_nil
+          end
+        end
+      end
+
+      context "when the relation is not nil" do
+
+        let!(:agency) do
+          Agency.create.tap do |a|
+            a.agents << agent
+            a.unset(:updated_at)
+          end
+        end
+
+        let!(:touched) do
+          agent.touch
+        end
+
+        it "sets the parent updated at to the current time" do
+          agency.updated_at.should be_within(5).of(Time.now)
+        end
+
+        it "persists the change" do
+          agency.reload.updated_at.should be_within(5).of(Time.now)
+        end
+      end
+    end
+  end
+
   describe "#update_attribute" do
 
     let(:post) do
