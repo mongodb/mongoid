@@ -3,7 +3,15 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
-## 2.5.2 (branch: 2.5.0-stable)
+## 2.6.0
+
+### New Features
+
+* \#2709 Backported the `touch` functionality from Mongoid 3.
+
+## 2.5.2
+
+### Resolved Issues
 
 * \#2502 Fixed cache key to properly handle when the document does not
   include `Mongoid::Timestamps::Updated`. (Arthur Nogueira Neves)
