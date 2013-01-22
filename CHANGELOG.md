@@ -184,6 +184,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2730 Calling sort on a context properly updates the context's criteria.
+  (Arthur Neves)
+
 * \#2719 `distinct` is now available at the class level.
 
         Band.distinct(:name)
