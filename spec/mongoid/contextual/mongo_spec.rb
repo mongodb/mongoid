@@ -679,6 +679,58 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
+      context "when using .desc" do
+
+        let(:criteria) do
+          Band.desc(:name)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when there is sort on the context" do
+
+          it "follows the main sort" do
+            context.send(method).should eq(new_order)
+          end
+        end
+
+        context "when subsequently calling #last" do
+
+          it "returns the correnct document" do
+            context.send(method).should eq(new_order)
+            context.last.should eq(depeche_mode)
+          end
+        end
+      end
+
+      context "when using .sort" do
+
+        let(:criteria) do
+          Band.all.sort(:name => -1).criteria
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when there is sort on the context" do
+
+          it "follows the main sort" do
+            context.send(method).should eq(new_order)
+          end
+        end
+
+        context "when subsequently calling #last" do
+
+          it "returns the correnct document" do
+            context.send(method).should eq(new_order)
+            context.last.should eq(depeche_mode)
+          end
+        end
+      end
+
       context "when the context is cached" do
 
         let(:criteria) do

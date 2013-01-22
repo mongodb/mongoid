@@ -187,8 +187,9 @@ module Mongoid
         if cached? && cache_loaded?
           documents.first
         else
-          apply_id_sorting
-          with_eager_loading(query.first)
+          with_sorting do
+            with_eager_loading(query.first)
+          end
         end
       end
       alias :one :first
@@ -221,10 +222,9 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        apply_inverse_sorting
-        doc = with_eager_loading(query.first)
-        apply_option(:sort)
-        doc
+        with_inverse_sorting do
+          with_eager_loading(query.first)
+        end
       end
 
       # Get's the number of documents matching the query selector.
@@ -317,7 +317,10 @@ module Mongoid
         if block_given?
           super(&block)
         else
-          query.sort(values) and self
+          # update the criteria
+          @criteria = criteria.order_by(values)
+          apply_option(:sort)
+          self
         end
       end
 
@@ -436,27 +439,39 @@ module Mongoid
       #
       # @api private
       #
-      # @example Apply the id sorting params.
-      #   context.apply_dd_sorting
+      # @example Apply the id sorting params to the given block
+      #   context.with_sorting
       #
       # @since 3.0.0
-      def apply_id_sorting
-        unless criteria.options.has_key?(:sort)
-          query.sort(_id: 1)
+      def with_sorting
+        begin
+          unless criteria.options.has_key?(:sort)
+            query.sort(_id: 1)
+          end
+          yield
+        ensure
+          apply_option(:sort)
         end
       end
 
       # Map the inverse sort symbols to the correct MongoDB values.
       #
-      # @example Apply the inverse sorting params.
-      #   context.apply_inverse_sorting
+      #  @api private
+      #
+      # @example Apply the inverse sorting params to the given block
+      #   context.with_inverse_sorting
       #
       # @since 3.0.0
-      def apply_inverse_sorting
-        if spec = criteria.options[:sort]
-          query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
-        else
-          query.sort(_id: -1)
+      def with_inverse_sorting
+        begin
+          if spec = criteria.options[:sort]
+            query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
+          else
+            query.sort(_id: -1)
+          end
+          yield
+        ensure
+          apply_option(:sort)
         end
       end
 
