@@ -85,6 +85,14 @@ module Mongoid
         @name = name
         @options = options
         @label = options[:label]
+
+        unless options.has_key? :default
+          if options[:type] == Array
+            options[:default] = []
+          elsif options[:type] == Hash
+            options[:default] = {}
+          end
+        end
         @default_val = options[:default]
 
         # @todo: Durran, change API in 4.0 to take the class as a parameter.
