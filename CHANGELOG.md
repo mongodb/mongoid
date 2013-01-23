@@ -206,9 +206,6 @@ For instructions on upgrading to newer versions, visit
   with a chained criteria or scope now properly keeps the relations intact on
   the new or found document.
 
-* \#2703 Validations on associated documents on fire if the document is
-  changed. (Regression)
-
 * \#2699 Resetting a field now removes the name from the changed attributes
   list. (Subhash Bhushan)
 
