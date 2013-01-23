@@ -4,40 +4,6 @@ describe Mongoid::Validations::AssociatedValidator do
 
   describe "#valid?" do
 
-    context "when validating embedded documents" do
-
-      let(:band) do
-        Band.create(name: "Calyx")
-      end
-
-      let!(:record) do
-        band.records.build
-      end
-
-      before do
-        band.save
-      end
-
-      context "when the embedded documents are unchanged and invalid" do
-
-        before do
-          Record.validates_presence_of :name
-        end
-
-        after do
-          Record.reset_callbacks(:validate)
-        end
-
-        it "returns true" do
-          band.should be_valid
-        end
-      end
-
-      context "when the embedded documents are changed" do
-
-      end
-    end
-
     context "when validating associated on both sides" do
 
       context "when the documents are valid" do
@@ -123,7 +89,6 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.should_receive(:changed?).and_return(true)
           associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :name, associated)
         end
@@ -140,7 +105,6 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.should_receive(:changed?).and_return(true)
           associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :name, associated)
         end
@@ -175,7 +139,6 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.should_receive(:changed?).and_return(true)
           associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :addresses, [ associated ])
         end
@@ -192,7 +155,6 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         before do
-          associated.should_receive(:changed?).and_return(true)
           associated.should_receive(:validated?).and_return(false)
           validator.validate_each(person, :addresses, [ associated ])
         end
