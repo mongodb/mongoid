@@ -3,6 +3,10 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.19
+
+* Released to revert the changes in \#2703.
+
 ## 3.0.18
 
 ### Resolved Issues
