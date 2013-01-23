@@ -202,6 +202,8 @@ For instructions on upgrading to newer versions, visit
 
 ## 3.0.18
 
+### Resolved Issues
+
 * \#2707 Calling `find_or_create_by` or `find_by_initialize_by` off a relation
   with a chained criteria or scope now properly keeps the relations intact on
   the new or found document.
@@ -216,8 +218,6 @@ For instructions on upgrading to newer versions, visit
   of `nil`.
 
 * \#2671 Matchers now correctly handle symbol keys. (Jonathan Hyman)
-
-### Resolved Issues
 
 ## 3.0.17
 
