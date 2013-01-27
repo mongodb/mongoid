@@ -3,16 +3,22 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.20
+
+### Resolved Issues
+
+* \#2740 Support integer keys in hash fields when using `read_attribute` with
+  dot notation.
+
 ## 3.0.19
+
+### Resolved Issues
 
 * Released to revert the changes in \#2703.
 
 ## 3.0.18
 
 ### Resolved Issues
-
-* \#2703 Validations on associated documents on fire if the document is
-  changed. (Regression)
 
 * \#2707 Calling `find_or_create_by` or `find_by_initialize_by` off a relation
   with a chained criteria or scope now properly keeps the relations intact on
