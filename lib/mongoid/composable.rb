@@ -32,8 +32,6 @@ module Mongoid
     include ActiveModel::Conversion
     include ActiveModel::ForbiddenAttributesProtection
     include ActiveModel::Naming
-    include ActiveModel::Serializers::JSON
-    include ActiveModel::Serializers::Xml
     include Atomic
     include Changeable
     include Attributes

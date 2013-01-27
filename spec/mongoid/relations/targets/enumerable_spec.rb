@@ -1597,7 +1597,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     let!(:post) do
-      Post.create(title: "test", person_id: person.id)
+      Post.create(title: "testing title", person_id: person.id)
     end
 
     let(:criteria) do
