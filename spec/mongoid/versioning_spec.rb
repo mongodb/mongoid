@@ -188,6 +188,51 @@ describe Mongoid::Versioning do
         end
       end
     end
+
+    context "when not using the default database" do
+
+      let(:title) { "my new wiki" }
+
+      let!(:page) do
+        WikiPage.with(database: "mongoid_test_alt").create!(description: "1",title: title)
+      end
+
+      context "when the document is persisted once" do
+
+        it "returns 1" do
+          page.version.should eq(1)
+        end
+
+        it "does not persist to default database" do
+          expect {
+            WikiPage.find_by(title: title)
+          }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+
+        it "persists to specified database" do
+          WikiPage.with(database: "mongoid_test_alt").find_by(title: title).should_not be_nil
+        end
+      end
+
+      context "when the document is persisted more than once" do
+
+        before do
+          3.times { |n| page.with(database: "mongoid_test_alt").update_attribute(:description, "#{n}") }
+        end
+
+        it "returns the number of versions" do
+          page.version.should eq(4)
+        end
+
+        it "persists to specified database" do
+          WikiPage.with(database: "mongoid_test_alt").find_by(:title => title).should_not be_nil
+        end
+
+        it "persists the versions to specified database" do
+          WikiPage.with(database: "mongoid_test_alt").find_by(:title => title).version.should eq(4)
+        end
+      end
+    end
   end
 
   describe "#versionless" do
