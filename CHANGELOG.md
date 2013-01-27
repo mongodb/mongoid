@@ -200,12 +200,22 @@ For instructions on upgrading to newer versions, visit
 * \#2664 In memory sorting of embedded documents now properly works when
   multiple fields are provided. (Neer Friedman)
 
-## 3.0.18
+## 3.0.20
 
 ### Resolved Issues
 
 * \#2740 Support integer keys in hash fields when using `read_attribute` with
   dot notation.
+
+## 3.0.19
+
+### Resolved Issues
+
+* Released to revert the changes in \#2703.
+
+## 3.0.18
+
+### Resolved Issues
 
 * \#2707 Calling `find_or_create_by` or `find_by_initialize_by` off a relation
   with a chained criteria or scope now properly keeps the relations intact on
