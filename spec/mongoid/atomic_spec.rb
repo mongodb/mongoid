@@ -75,6 +75,24 @@ describe Mongoid::Atomic do
         band.records.create(name: "Undertow")
       end
 
+      context "when embedded with 10 other documents" do
+        context "when using the positional operator" do
+          it "returns the update selector with positional operator" do
+            10.times { |i| band.records.create(name: i.to_s) }
+            band.records.last.atomic_prefix.should eq("records.$")
+          end
+        end
+      end
+
+      context "when embedded with 100 other documents" do
+        context "when using the positional operator" do
+          it "returns the update selector with positional operator" do
+            100.times { |i| band.records.create(name: i.to_s) }
+            band.records.last.atomic_prefix.should eq("records.$")
+          end
+        end
+      end
+
       context "when embedded one level" do
 
         context "when using the positional operator" do

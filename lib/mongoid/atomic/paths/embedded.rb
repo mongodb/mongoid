@@ -57,7 +57,7 @@ module Mongoid
         # @since 3.1.0
         def update_selector
           if positionally_operable?
-            position.sub(/\.\d/, ".$")
+            position.sub(/\.\d+/, ".$")
           else
             position
           end
