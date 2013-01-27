@@ -36,6 +36,13 @@ describe Mongoid::Extensions::Integer do
         Integer.demongoize(nil).should be_nil
       end
     end
+
+    context "when the value is not an integer" do
+
+      it "converts the value to an integer" do
+        Integer.demongoize("1.0").should eq(1)
+      end
+    end
   end
 
   describe ".mongoize" do
