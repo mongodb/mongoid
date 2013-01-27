@@ -207,6 +207,8 @@ For instructions on upgrading to newer versions, visit
 * \#2740 Support integer keys in hash fields when using `read_attribute` with
   dot notation.
 
+* \#2739 Ensure integer deserialization properly casts to integers.
+
 ## 3.0.19
 
 ### Resolved Issues
