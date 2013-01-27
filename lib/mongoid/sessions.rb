@@ -165,7 +165,7 @@ module Mongoid
       def collection
         if opts = persistence_options
           coll = mongo_session.with(opts)[opts[:collection] || collection_name]
-          clear_persistence_options unless validating_with_query?
+          clear_persistence_options unless validating_with_query? || _loading_revision?
           coll
         else
           mongo_session[collection_name]
