@@ -340,7 +340,7 @@ module Mongoid
         doc.criteria_instance_id = criteria_instance_id
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
-        IdentityMap.set(doc) unless _loading_revision?
+        IdentityMap.set(doc)
         # @todo: #2586: Need to have access to parent document in these
         #   callbacks.
         doc.run_callbacks(:find) unless doc._find_callbacks.empty?
