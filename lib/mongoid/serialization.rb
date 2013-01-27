@@ -6,6 +6,10 @@ module Mongoid
   module Serialization
     extend ActiveSupport::Concern
 
+    include ActiveModel::Serializers::JSON
+    include ActiveModel::Serializers::Xml
+    include Mongoid::JSON
+
     # Gets the document as a serializable hash, used by ActiveModel's JSON
     # serializer.
     #
@@ -26,14 +30,19 @@ module Mongoid
     #
     # @since 2.0.0.rc.6
     def serializable_hash(options = nil)
-      options ||= {}
+      options = options.try(:clone) || {}
       attrs = {}
 
       names = field_names(options)
+      names -= aliased_fields.values
 
       method_names = Array.wrap(options[:methods]).map do |name|
         name.to_s if respond_to?(name)
       end.compact
+      # add alias
+      method_names |= aliased_fields.keys
+      method_names -= Array.wrap(options[:except]).map(&:to_s)
+      method_names &= Array.wrap(options[:only]).map(&:to_s) if options[:only]
 
       (names + method_names).each do |name|
         without_autobuild do
