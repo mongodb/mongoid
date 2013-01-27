@@ -204,6 +204,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2740 Support integer keys in hash fields when using `read_attribute` with
+  dot notation.
+
 * \#2707 Calling `find_or_create_by` or `find_by_initialize_by` off a relation
   with a chained criteria or scope now properly keeps the relations intact on
   the new or found document.

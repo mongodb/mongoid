@@ -217,6 +217,36 @@ describe Mongoid::Extensions::Hash do
     end
   end
 
+  context "when the hash key is a string" do
+
+    let(:hash) do
+      { "100" => { "name" => "hundred" } }
+    end
+
+    let(:nested) do
+      hash.__nested__("100.name")
+    end
+
+    it "should retrieve a nested value under the provided key" do
+      nested.should eq "hundred"
+    end
+  end
+
+  context "when the hash key is an integer" do
+
+    let(:hash) do
+      { 100 => { "name" => "hundred" } }
+    end
+
+    let(:nested) do
+      hash.__nested__("100.name")
+    end
+
+    it "should retrieve a nested value under the provided key" do
+      nested.should eq("hundred")
+    end
+  end
+
   describe ".demongoize" do
 
     let(:hash) do
