@@ -4839,6 +4839,24 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#max_scan" do
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:band2) do
+      Band.create(name: "Tool")
+    end
+
+    let(:criteria) do
+      Band.where({}).max_scan(1)
+    end
+
+    it "executes the criteria while properly giving the max scan to Mongo" do
+      criteria.to_ary.should eq [band]
+    end
+  end
+
   describe "#to_criteria" do
 
     let(:criteria) do
