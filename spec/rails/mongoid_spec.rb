@@ -180,6 +180,9 @@ describe "Rails::Mongoid" do
       Rails::Mongoid.send(:determine_model, file, logger)
     end
 
+    class EasyURI
+    end
+
     module Twitter
       class Follow
         include Mongoid::Document
@@ -225,6 +228,21 @@ describe "Rails::Mongoid" do
       end
     end
 
+    context "when file cannot be constantize" do
+
+      let(:file) do
+        "app/models/easy_uri.rb"
+      end
+
+      before do
+        logger.should_receive(:info)
+      end
+
+      it "returns nil" do
+        model.should be_nil
+      end
+    end
+
     context "when file is not in a subdir" do
 
       context "when file is from normal model" do
@@ -244,9 +262,9 @@ describe "Rails::Mongoid" do
           "app/models/follow.rb"
         end
 
-        it "raises NameError" do
+        it "logs the class without an error" do
           logger.should_receive(:info)
-          expect { model.should eq(klass) }.to raise_error(NameError)
+          expect { model.should eq(klass) }.not_to raise_error(NameError)
         end
       end
     end
