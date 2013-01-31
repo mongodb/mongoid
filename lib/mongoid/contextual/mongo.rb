@@ -415,7 +415,7 @@ module Mongoid
       # @since 3.1.0
       def apply_options
         apply_fields
-        [ :hint, :limit, :skip, :sort, :batch_size ].each do |name|
+        [ :hint, :limit, :skip, :sort, :batch_size, :max_scan ].each do |name|
           apply_option(name)
         end
       end
