@@ -166,9 +166,9 @@ module Rails
         klass = name.constantize
       rescue NameError, LoadError
         logger.info("MONGOID: Attempted to constantize #{name}, trying without namespacing.")
-        klass = parts.last.constantize
+        klass = parts.last.constantize rescue nil
       end
-      klass if klass.ancestors.include?(::Mongoid::Document)
+      klass if klass && klass.ancestors.include?(::Mongoid::Document)
     end
 
     def logger
