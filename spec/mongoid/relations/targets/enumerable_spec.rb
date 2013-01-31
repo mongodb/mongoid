@@ -739,6 +739,11 @@ describe Mongoid::Relations::Targets::Enumerable do
           it "does not load the enumerable" do
             enumerable.should_not be__loaded
           end
+
+          it "receives query only once" do
+            criteria.should_receive(:first).once
+            first
+          end
         end
 
         context "when added is not empty" do
@@ -1158,6 +1163,11 @@ describe Mongoid::Relations::Targets::Enumerable do
 
         it "does not load the enumerable" do
           enumerable.should_not be__loaded
+        end
+
+        it "receives query only once" do
+          criteria.should_receive(:last).once
+          last
         end
       end
 
