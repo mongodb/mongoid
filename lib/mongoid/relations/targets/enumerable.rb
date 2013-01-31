@@ -444,8 +444,8 @@ module Mongoid
 
         def matching_document(location)
           _loaded.try(:values).try(location) ||
-            _added[_unloaded.try(location).try(:id)] ||
-            _unloaded.try(location) ||
+            _added[(ul = _unloaded.try(location)).try(:id)] ||
+            ul ||
             _added.values.try(location)
         end
 
