@@ -207,6 +207,9 @@ For instructions on upgrading to newer versions, visit
 * \#2758 `Mongoid.create_indexes` does not fail when cannot constantize class.
   (Arthur Neves)
 
+* \#2743 Persistence options are no longer cleared when loading revisions.
+  (Arthur Neves)
+
 * \#2740 Support integer keys in hash fields when using `read_attribute` with
   dot notation.
 
