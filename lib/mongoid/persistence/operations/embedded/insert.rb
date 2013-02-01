@@ -18,6 +18,7 @@ module Mongoid
         class Insert
           include Insertion
           include Operations
+          include Mongoid::Atomic::Positionable
 
           # Insert the new document in the database. If the document's parent is a
           # new record, we will call save on the parent, otherwise we will $push
@@ -33,7 +34,8 @@ module Mongoid
               if parent.new_record?
                 parent.insert
               else
-                collection.find(parent.atomic_selector).update(inserts)
+                selector = parent.atomic_selector
+                collection.find(selector).update(positionally(selector, inserts))
               end
             end
           end

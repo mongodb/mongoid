@@ -963,6 +963,49 @@ describe Mongoid::Relations::Embedded::One do
     end
   end
 
+  context "when embedding a one under a many" do
+
+    let!(:person) do
+      Person.create
+    end
+
+    let!(:address_one) do
+      person.addresses.create(street: "hobrecht")
+    end
+
+    let!(:address_two) do
+      person.addresses.create(street: "kreuzberg")
+    end
+
+    context "when a parent was removed outside of mongoid" do
+
+      before do
+        person.collection.where(_id: person.id).update(
+          "$pull" => { "addresses" => { _id: address_one.id }}
+        )
+      end
+
+      it "reloads the correct number" do
+        person.reload.addresses.count.should eq(1)
+      end
+
+      context "when adding a child" do
+
+        let(:code) do
+          Code.new
+        end
+
+        before do
+          address_two.code = code
+        end
+
+        it "reloads the correct number" do
+          person.reload.addresses.count.should eq(1)
+        end
+      end
+    end
+  end
+
   context "when embedded documents are stored without ids" do
 
     let!(:band) do
