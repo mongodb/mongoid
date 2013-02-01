@@ -51,6 +51,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2609 Pass through batch_size option to query. (Martin Mauch)
 
+* \#2555 Passing hashes to `find` when the documents id is of type hash
+  now properly works. (Szymon Kurcab)
+
 * \#2545 The `$` positional operator is used for update selectors on
   embedded documents that are nested 1 level deep, when appropriate.
 
