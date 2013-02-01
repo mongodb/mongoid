@@ -64,7 +64,7 @@ describe Mongoid::Persistence::Operations::Update do
         collection.should_receive(:find).with(
           { "_id" => document.id, "addresses._id" => "oxford-st" }
         ).and_return(query)
-        query.should_receive(:update).with({ "$set" => address.setters }).and_return("Object")
+        query.should_receive(:update).with("$set" => { "addresses.$.city" => "London" }).and_return("Object")
       }
     end
 

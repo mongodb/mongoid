@@ -19,6 +19,7 @@ module Mongoid
   module Persistence
     extend ActiveSupport::Concern
     include Atomic
+    include Mongoid::Atomic::Positionable
 
     # Remove the document from the database with callbacks.
     #
@@ -124,7 +125,8 @@ module Mongoid
 
       touches = touch_atomic_updates(field)
       unless touches.empty?
-        _root.collection.find(atomic_selector).update(touches)
+        selector = atomic_selector
+        _root.collection.find(selector).update(positionally(selector, touches))
       end
 
       without_autobuild do

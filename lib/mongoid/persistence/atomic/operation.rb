@@ -5,6 +5,7 @@ module Mongoid
 
       # This is the included module for all atomic operation objects.
       module Operation
+        include Mongoid::Atomic::Positionable
 
         attr_accessor :document, :fields, :value, :options
 
@@ -120,7 +121,8 @@ module Mongoid
         # @since 3.0.0
         def execute(name)
           unless document.new_record?
-            collection.find(document.atomic_selector).update(operation(name))
+            selector = document.atomic_selector
+            collection.find(selector).update(positionally(selector, operation(name)))
             if fields.length > 1
               document.remove_change(fields)
             else

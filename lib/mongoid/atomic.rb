@@ -23,7 +23,7 @@ module Mongoid
 
       # When MongoDB finally fully implements the positional operator, we can
       # get rid of all indexing related code in Mongoid.
-      attr_accessor :_index, :updates_requested
+      attr_accessor :_index
     end
 
     # Add the document as an atomic pull.
@@ -52,6 +52,18 @@ module Mongoid
     def add_atomic_unset(document)
       document.flagged_for_destroy = true
       (delayed_atomic_unsets[document.metadata_name.to_s] ||= []).push(document)
+    end
+
+    # Returns path of the attribute for modification
+    #
+    # @example Get path of the attribute
+    #   address.atomic_attribute_name(:city)
+    #
+    # @return [ String ] The path to the document attribute in the database
+    #
+    # @since 3.0.0
+    def atomic_attribute_name(name)
+      embedded? ? "#{atomic_position}.#{name}" : name
     end
 
     # For array fields these are the pushes that need to happen.
@@ -114,16 +126,14 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_updates(use_indexes = false)
-      with_positional_operator do
-        process_flagged_destroys
-        mods = Modifiers.new
-        generate_atomic_updates(mods, self)
-        _children.each do |child|
-          child.process_flagged_destroys
-          generate_atomic_updates(mods, child)
-        end
-        mods
+      process_flagged_destroys
+      mods = Modifiers.new
+      generate_atomic_updates(mods, self)
+      _children.each do |child|
+        child.process_flagged_destroys
+        generate_atomic_updates(mods, child)
       end
+      mods
     end
     alias :_updates :atomic_updates
 
@@ -170,14 +180,16 @@ module Mongoid
       atomic_paths.position
     end
 
-    # Returns path of the attribute for modification
+    # Get the atomic paths utility for this document.
     #
-    # @example Get path of the attribute
-    #   address.atomic_attribute_name(:city)
+    # @example Get the atomic paths.
+    #   document.atomic_paths
     #
-    # @return [ String ] The path to the document attribute in the database
-    def atomic_attribute_name(name)
-      embedded? ? "#{atomic_prefix}.#{name}" : name
+    # @return [ Object ] The associated path.
+    #
+    # @since 2.1.0
+    def atomic_paths
+      @atomic_paths ||= metadata ? metadata.path(self) : Atomic::Paths::Root.new(self)
     end
 
     # Get all the attributes that need to be pulled.
@@ -210,7 +222,7 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_pushes
-      pushable? ? { atomic_prefix => as_document } : {}
+      pushable? ? { atomic_position => as_document } : {}
     end
 
     # Return the selector for this document to be matched exactly for use
@@ -254,21 +266,6 @@ module Mongoid
         unsets.push(path || name)
       end
       unsets
-    end
-
-    # Get the prefix for field names to indicate a location in the db for
-    # atomic updates.
-    #
-    # @note This is in the form: "records.$.tracks.5"
-    #
-    # @example Get the atomic prefix.
-    #   document.atomic_prefix
-    #
-    # @return [ String ] The atomic prefix.
-    #
-    # @since 3.1.0
-    def atomic_prefix
-      atomic_paths.update_selector
     end
 
     # Get all the atomic sets that have had their saves delayed.
@@ -350,52 +347,7 @@ module Mongoid
       flagged_destroys.clear
     end
 
-    # Have the atomic updates been requested at this level of the hierarchy?
-    #
-    # @example Have the updates been requested at this level?
-    #   document.updates_requested?
-    #
-    # @return [ true, false ] If the atomic updates are requested on this
-    #   document.
-    #
-    # @since 3.1.0
-    def updates_requested?
-      !!updates_requested
-    end
-
-    # Execute the provided block while attempting to use the positional
-    # operator where appropriate.
-    #
-    # @example Execute the block.
-    #   document.with_positional_operator do
-    #     document.atomic_updates
-    #   end
-    #
-    # @return [ Object ] The result of the yield.
-    #
-    # @since 3.1.0
-    def with_positional_operator
-      begin
-        self.updates_requested = true
-        yield(self) if block_given?
-      ensure
-        self.updates_requested = false
-      end
-    end
-
     private
-
-    # Get the atomic paths utility for this document.
-    #
-    # @example Get the atomic paths.
-    #   document.atomic_paths
-    #
-    # @return [ Object ] The associated path.
-    #
-    # @since 2.1.0
-    def atomic_paths
-      @atomic_paths ||= metadata ? metadata.path(self) : Atomic::Paths::Root.new(self)
-    end
 
     # Generates the atomic updates in the correct order.
     #

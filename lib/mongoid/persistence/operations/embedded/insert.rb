@@ -16,7 +16,8 @@ module Mongoid
         #     false
         #   );
         class Insert
-          include Insertion, Operations
+          include Insertion
+          include Operations
 
           # Insert the new document in the database. If the document's parent is a
           # new record, we will call save on the parent, otherwise we will $push

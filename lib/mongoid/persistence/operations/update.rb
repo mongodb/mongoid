@@ -30,7 +30,9 @@ module Mongoid
       #   );
       #
       class Update
-        include Modification, Operations
+        include Modification
+        include Operations
+        include Mongoid::Atomic::Positionable
 
         # Persist the document that is to be updated to the database. This will
         # only write changed fields via MongoDB's $set modifier operation.
@@ -42,9 +44,11 @@ module Mongoid
         def persist
           prepare do
             unless updates.empty?
-              collection.find(selector).update(updates)
+              collection.find(selector).update(positionally(selector, updates))
               conflicts.each_pair do |key, value|
-                collection.find(selector).update({ key => value })
+                collection.find(selector).update(
+                  positionally(selector, { key => value })
+                )
               end
             end
           end

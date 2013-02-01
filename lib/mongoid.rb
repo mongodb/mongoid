@@ -36,6 +36,7 @@ require "active_model"
 require "origin"
 require "moped"
 
+require "mongoid/atomic/positionable"
 require "mongoid/evolvable"
 require "mongoid/extensions"
 require "mongoid/errors"

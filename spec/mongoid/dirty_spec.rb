@@ -935,7 +935,7 @@ describe Mongoid::Dirty do
 
         it "returns a hash of field names and new values" do
           address.setters.should eq(
-            { "addresses.$.street" => "Bond St" }
+            { "addresses.0.street" => "Bond St" }
           )
         end
 
@@ -953,7 +953,7 @@ describe Mongoid::Dirty do
 
           it "returns the proper hash with locations" do
             location.setters.should eq(
-              { "addresses.$.locations.0.name" => "Work" }
+              { "addresses.0.locations.0.name" => "Work" }
             )
           end
         end

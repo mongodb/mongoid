@@ -14,7 +14,9 @@ module Mongoid
         #     false
         #   );
         class Remove
-          include Deletion, Operations
+          include Deletion
+          include Operations
+          include Mongoid::Atomic::Positionable
 
           # Remove the document from the database. If the parent is a new record,
           # it will get removed in Ruby only. If the parent is not a new record
@@ -29,7 +31,8 @@ module Mongoid
             prepare do |doc|
               parent.remove_child(doc) if notifying_parent?
               if parent.persisted?
-                collection.find(parent.atomic_selector).update(deletes)
+                selector = parent.atomic_selector
+                collection.find(selector).update(positionally(selector, deletes))
               end
             end
           end

@@ -52,83 +52,6 @@ describe Mongoid::Atomic do
     end
   end
 
-  describe "#atomic_prefix" do
-
-    context "when the document is the root" do
-
-      let(:band) do
-        Band.new
-      end
-
-      it "returns an empty string" do
-        band.atomic_prefix.should eq("")
-      end
-    end
-
-    context "when the document is embedded" do
-
-      let(:band) do
-        Band.create(name: "Tool")
-      end
-
-      let!(:record) do
-        band.records.create(name: "Undertow")
-      end
-
-      context "when embedded with 10 other documents" do
-
-        context "when using the positional operator" do
-
-          before do
-            10.times { |i| band.records.create(name: i.to_s) }
-          end
-
-          it "returns the update selector with positional operator" do
-            band.records.last.atomic_prefix.should eq("records.$")
-          end
-        end
-      end
-
-      context "when embedded with 100 other documents" do
-
-        context "when using the positional operator" do
-
-          before do
-            100.times { |i| band.records.create(name: i.to_s) }
-          end
-
-          it "returns the update selector with positional operator" do
-            band.records.last.atomic_prefix.should eq("records.$")
-          end
-        end
-      end
-
-      context "when embedded one level" do
-
-        context "when using the positional operator" do
-
-          it "returns the update selector with positional operator" do
-            record.atomic_prefix.should eq("records.$")
-          end
-        end
-      end
-
-      context "when embedded multiple levels" do
-
-        let!(:track) do
-          record.tracks.create(name: "Sober")
-        end
-
-        context "when using the positional operator" do
-
-          it "returns the update selector with positional operator" do
-            track.atomic_prefix.should eq("records.$.tracks.0")
-          end
-        end
-      end
-    end
-  end
-
   describe "#atomic_updates" do
 
     context "when the document is persisted" do
@@ -206,7 +129,7 @@ describe Mongoid::Atomic do
 
             it "returns the $set with correct position and modifications" do
               address.atomic_updates.should eq(
-                { "$set" => { "addresses.$.street" => "Bond St" }}
+                { "$set" => { "addresses.0.street" => "Bond St" }}
               )
             end
           end
@@ -239,8 +162,8 @@ describe Mongoid::Atomic do
               it "returns the $set with correct positions and modifications" do
                 address.atomic_updates.should eq(
                   { "$set" => {
-                    "addresses.$.street" => "Bond St",
-                    "addresses.$.locations.0.name" => "Work" }
+                    "addresses.0.street" => "Bond St",
+                    "addresses.0.locations.0.name" => "Work" }
                   }
                 )
               end
@@ -251,7 +174,7 @@ describe Mongoid::Atomic do
               it "returns the $set with correct positions and modifications" do
                 location.atomic_updates.should eq(
                   { "$set" => {
-                    "addresses.$.locations.0.name" => "Work" }
+                    "addresses.0.locations.0.name" => "Work" }
                   }
                 )
               end
@@ -289,11 +212,11 @@ describe Mongoid::Atomic do
                 address.atomic_updates.should eq(
                   {
                     "$set" => {
-                      "addresses.$.street" => "Bond St"
+                      "addresses.0.street" => "Bond St"
                     },
                     conflicts: {
                       "$pushAll" => {
-                        "addresses.$.locations" => [{ "_id" => location.id, "name" => "Home" }]
+                        "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
                       }
                     }
                   }
@@ -360,7 +283,7 @@ describe Mongoid::Atomic do
 
               it "returns the $set for 1st level and other for the 2nd level" do
                 address.atomic_updates.should eq(
-                  { "$set" => { "addresses.$.street" => "Bond St" }}
+                  { "$set" => { "addresses.0.street" => "Bond St" }}
                 )
               end
             end

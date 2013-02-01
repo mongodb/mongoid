@@ -33,6 +33,12 @@ module Mongoid
         #
         # @since 2.1.0
         def selector
+          @selector ||= generate_selector
+        end
+
+        private
+
+        def generate_selector
           if only_root_selector?
             parent.atomic_selector
           else
@@ -43,34 +49,8 @@ module Mongoid
           end
         end
 
-        # Gets the selector used to determine the exact embedded document to
-        # update.
-        #
-        # @example Get the update selector.
-        #   embedded.update_selector
-        #
-        # @note This replaces the first found index with the $ positional
-        #   operator since it does work at least 1 level deep.
-        #
-        # @return [ String ] The update selector.
-        #
-        # @since 3.1.0
-        def update_selector
-          if positionally_operable?
-            position.sub(/\.\d+/, ".$")
-          else
-            position
-          end
-        end
-
-        private
-
         def only_root_selector?
           document.persisted? && document._id_changed?
-        end
-
-        def positionally_operable?
-          !document._root.updates_requested? && !only_root_selector?
         end
       end
     end

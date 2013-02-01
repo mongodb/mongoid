@@ -7,6 +7,7 @@ module Mongoid
       include Enumerable
       include Aggregable::Memory
       include Queryable
+      include Mongoid::Atomic::Positionable
 
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
@@ -44,7 +45,9 @@ module Mongoid
           doc.as_document
         end
         unless removed.empty?
-          collection.find(selector).update("$pullAll" => { path => removed })
+          collection.find(selector).update(
+            positionally(selector, "$pullAll" => { path => removed })
+          )
         end
         deleted
       end
@@ -264,9 +267,7 @@ module Mongoid
         docs.each do |doc|
           @selector ||= root.atomic_selector
           doc.write_attributes(attributes)
-          root.with_positional_operator do
-            updates["$set"].merge!(doc.atomic_updates["$set"] || {})
-          end
+          updates["$set"].merge!(doc.atomic_updates["$set"] || {})
           doc.move_changes
         end
         collection.find(selector).update(updates)
