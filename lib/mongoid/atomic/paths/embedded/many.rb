@@ -37,6 +37,20 @@ module Mongoid
             locator = document.new_record? ? "" : ".#{document._index}"
             "#{pos}#{"." unless pos.blank?}#{document.metadata.store_as}#{locator}"
           end
+
+          # Get the position of the document in the hierarchy for update. This will
+          # This is the same as position.
+          #
+          # @example Get the atomic position.
+          #   many.atomic_position
+          #
+          # @return [ String ] The atomic position of the document.
+          #
+          # @since 3.1.0
+          def atomic_position
+            position
+          end
+
         end
       end
     end

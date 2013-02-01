@@ -36,6 +36,24 @@ module Mongoid
             pos = parent.atomic_position
             "#{pos}#{"." unless pos.blank?}#{document.metadata.store_as}"
           end
+
+          # Get the atomic position of the document in the hierarchy.
+          # Same as position except for 1st level embedded documents.
+          #
+          # @example Get the atomic position.
+          #   one.atomic_position
+          #
+          # @return [ String ] The atomic position of the document.
+          #
+          # @since 3.1.0
+          def atomic_position
+            if positionally_operable?
+              position.sub(/\.\d+/, ".$")
+            else
+              position
+            end
+          end
+
         end
       end
     end
