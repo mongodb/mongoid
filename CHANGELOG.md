@@ -204,6 +204,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2758 `Mongoid.create_indexes` does not fail when cannot constantize class.
+  (Arthur Neves)
+
 * \#2740 Support integer keys in hash fields when using `read_attribute` with
   dot notation.
 
