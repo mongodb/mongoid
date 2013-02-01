@@ -10,7 +10,6 @@ group :test do
   unless ENV["CI"]
     gem "guard"
     gem "guard-rspec"
-    gem "moped-turbo", "~> 0.0.1"
     gem "rb-fsevent"
   end
 end
