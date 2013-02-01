@@ -279,7 +279,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "converts the elements properly" do
-        mongoized[:date].should eq(date)
+        mongoized[:date].should eq(Time.utc(2012, 1, 1, 0, 0, 0))
       end
     end
 
@@ -313,7 +313,7 @@ describe Mongoid::Extensions::Hash do
     end
 
     it "converts the elements properly" do
-      mongoized[:date].should eq(date)
+      mongoized[:date].should eq(Time.utc(2012, 1, 1, 0, 0, 0))
     end
   end
 
