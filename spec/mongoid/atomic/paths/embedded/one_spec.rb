@@ -105,7 +105,44 @@ describe Mongoid::Atomic::Paths::Embedded::One do
       it "returns the nested position to the relation" do
         one.position.should eq("phone_numbers.0.country_code")
       end
+
+      it "returns a positionally operated update_selector" do
+        one.update_selector.should eq("phone_numbers.$.country_code")
+      end
     end
+
+    context "when the document is embedded inside another embedded document" do
+
+      let(:dokument) do
+        Dokument.create!
+      end
+
+      let(:address) do
+        Address.new
+      end
+
+      let(:code) do
+        Code.new
+      end
+
+      before do
+        dokument.addresses << address
+        address.code = code
+      end
+
+      let(:one) do
+        described_class.new(code)
+      end
+
+      it "returns the nested position to the relation" do
+        one.position.should eq("addresses.0.code")
+      end
+
+      it "returns a positionally operated update_selector" do
+        code.atomic_position.should eq("addresses.$.code")
+      end
+    end
+
   end
 
   describe "#selector" do

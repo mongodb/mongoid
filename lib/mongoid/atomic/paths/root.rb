@@ -46,6 +46,19 @@ module Mongoid
         def selector
           { "_id" => document._id }.merge!(document.shard_key_selector)
         end
+
+        # Get the atomic position of the document.
+        #
+        # @example Get the atomic position of the document.
+        #   root.atomic_position
+        #
+        # @return [ String ] The atomic position of the document.
+        #
+        # @since 3.1.0
+        def atomic_position
+          position
+        end
+
       end
     end
   end

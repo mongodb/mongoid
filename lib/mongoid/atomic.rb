@@ -167,7 +167,7 @@ module Mongoid
     #
     # @return [ String ] The positional operator with indexes.
     def atomic_position
-      atomic_paths.position
+      atomic_paths.atomic_position
     end
 
     # Returns path of the attribute for modification
