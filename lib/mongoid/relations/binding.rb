@@ -153,8 +153,6 @@ module Mongoid
       # @since 3.0.0
       def bind_inverse(doc, inverse)
         if doc.respond_to?(metadata.inverse_setter)
-          # @todo: #2639: If we are doing this and the doc is new, then no
-          # query should happen when calling the setter on the inverse.
           doc.you_must(metadata.inverse_setter, inverse)
         end
       end

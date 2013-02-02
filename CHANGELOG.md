@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2701 Cleanup up extra excessive database queries with 1-1 relations.
+
 * \#2693 Custom collection names can be passed to the model generator.
   (Subhash Bhushan)
 
