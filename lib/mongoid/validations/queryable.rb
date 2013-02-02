@@ -17,6 +17,7 @@ module Mongoid
       #
       # @since 3.0.2
       def with_query(document)
+        klass = document.class
         begin
           Threaded.begin_execution("#{klass.name}-validate-with-query")
           yield

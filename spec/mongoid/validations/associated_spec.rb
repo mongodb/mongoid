@@ -165,4 +165,19 @@ describe Mongoid::Validations::AssociatedValidator do
       end
     end
   end
+
+  context "when describing validation on the instance level" do
+
+    let!(:dictionary) do
+      Dictionary.create!(name: "en")
+    end
+
+    let(:validators) do
+      dictionary.validates_associated :words
+    end
+
+    it "adds the validation only to the instance" do
+      validators.should eq([ described_class ])
+    end
+  end
 end

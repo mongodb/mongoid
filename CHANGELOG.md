@@ -207,6 +207,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2774 Ensure validations macros for uniqueness, presence, and associated
+  are also available at the instance level.
+
 * \#2758 `Mongoid.create_indexes` does not fail when cannot constantize class.
   (Arthur Neves)
 

@@ -16,20 +16,6 @@ module Mongoid
     class UniquenessValidator < ActiveModel::EachValidator
       include Queryable
 
-      attr_reader :klass
-
-      # Unfortunately, we have to tie Uniqueness validators to a class.
-      #
-      # @example Setup the validator.
-      #   UniquenessValidator.new.setup(Person)
-      #
-      # @param [ Class ] klass The class getting validated.
-      #
-      # @since 1.0.0
-      def setup(klass)
-        @klass = klass
-      end
-
       # Validate the document for uniqueness violations.
       #
       # @example Validate the document.
@@ -266,7 +252,7 @@ module Mongoid
       #
       # @since 2.4.10
       def validate_root(document, attribute, value)
-        criteria = create_criteria(klass, document, attribute, value)
+        criteria = create_criteria(document.class, document, attribute, value)
         if criteria.with(consistency: :strong).exists?
           add_error(document, attribute, value)
         end
