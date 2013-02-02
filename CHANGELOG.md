@@ -220,6 +220,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2739 Ensure integer deserialization properly casts to integers.
 
+* \#2733 Many to many relations with `inverse_of: nil` do not persist the
+  inverse relation on `<<` or `push` if the document is already persisted.
+
 ## 3.0.19
 
 ### Resolved Issues

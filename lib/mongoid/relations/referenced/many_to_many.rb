@@ -30,7 +30,7 @@ module Mongoid
           if doc = docs.first
             append(doc)
             base.add_to_set(foreign_key, doc.id)
-            if persistable? || _creating?
+            if child_persistable?(doc)
               doc.save
             end
           end
@@ -231,6 +231,23 @@ module Mongoid
         # @since 2.0.0.rc.1
         def binding
           Bindings::Referenced::ManyToMany.new(base, target, metadata)
+        end
+
+        # Determine if the child document should be persisted.
+        #
+        # @api private
+        #
+        # @example Is the child persistable?
+        #   relation.child_persistable?(doc)
+        #
+        # @param [ Document ] doc The document.
+        #
+        # @return [ true, false ] If the document can be persisted.
+        #
+        # @since 3.0.20
+        def child_persistable?(doc)
+          (persistable? || _creating?) &&
+            !(doc.persisted? && metadata.forced_nil_inverse?)
         end
 
         # Returns the criteria object for the target class with its documents set
