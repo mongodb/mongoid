@@ -1,7 +1,7 @@
 # encoding: utf-8
 require "mongoid/contextual/queryable"
-require "mongoid/contextual/memory"
 require "mongoid/contextual/mongo"
+require "mongoid/contextual/memory"
 
 module Mongoid
   module Contextual

@@ -6,6 +6,7 @@ module Mongoid
     class Memory
       include Enumerable
       include Aggregable::Memory
+      include Eager
       include Queryable
       include Mongoid::Atomic::Positionable
 
@@ -98,9 +99,10 @@ module Mongoid
       # @since 3.0.0
       def each
         if block_given?
-          (documents[skipping || 0, limiting || documents.length] || []).each do |doc|
-            yield doc
+          documents_for_iteration.each do |doc|
+            yield(doc)
           end
+          # eager_loadable? ? docs : self
         else
           to_enum
         end
@@ -127,7 +129,9 @@ module Mongoid
       #
       # @since 3.0.0
       def first
-        documents.first
+        doc = documents.first
+        eager_load_one(doc) if eager_loadable?(doc)
+        doc
       end
       alias :one :first
 
@@ -159,7 +163,9 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        documents.last
+        doc = documents.last
+        eager_load_one(doc) if eager_loadable?(doc)
+        doc
       end
 
       # Get the length of matching documents in the context.
@@ -249,6 +255,24 @@ module Mongoid
       end
 
       private
+
+      # Get the documents the context should iterate. This follows 3 rules:
+      #
+      # @api private
+      #
+      # @example Get the documents for iteration.
+      #   context.documents_for_iteration
+      #
+      # @return [ Array<Document> ] The docs to iterate.
+      #
+      # @since 3.1.0
+      def documents_for_iteration
+        docs = documents[skipping || 0, limiting || documents.length] || []
+        if eager_loadable?
+          eager_load(docs)
+        end
+        docs
+      end
 
       # Update the provided documents with the attributes.
       #

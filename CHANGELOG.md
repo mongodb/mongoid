@@ -44,6 +44,9 @@ For instructions on upgrading to newer versions, visit
           belongs_to :band, counter_cache: true
         end
 
+* \#2662 Embedded documents that have `belongs_to` relations may now
+  eager load them.
+
 * \#2657 Logger getter and setter convenience methods have been
   added to the `Config` module. (Arthur Neves)
 
