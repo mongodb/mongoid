@@ -1994,4 +1994,19 @@ describe Mongoid::Validations::UniquenessValidator do
       end
     end
   end
+
+  context "when describing validation on the instance level" do
+
+    let!(:dictionary) do
+      Dictionary.create!(name: "en")
+    end
+
+    let(:validators) do
+      dictionary.validates_uniqueness_of :name
+    end
+
+    it "adds the validation only to the instance" do
+      validators.should eq([ described_class ])
+    end
+  end
 end
