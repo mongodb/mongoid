@@ -2,6 +2,104 @@ require "spec_helper"
 
 describe Mongoid::Relations::Metadata do
 
+  describe "#counter_cached?" do
+
+    context "when counter_cache is false" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :car,
+          relation: Mongoid::Relations::Referenced::In,
+          counter_cache: false
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_counter_cached
+      end
+    end
+
+    context "when counter_cache is true" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :car,
+          relation: Mongoid::Relations::Referenced::In,
+          counter_cache: true
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_counter_cached
+      end
+    end
+
+    context "when counter_cache is name for column" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :car,
+          relation: Mongoid::Relations::Referenced::In,
+          counter_cache: 'counter'
+        )
+      end
+
+      it "returns true" do
+        metadata.should be_counter_cached
+      end
+    end
+
+    context "when counter_cache is nil" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :car,
+          relation: Mongoid::Relations::Referenced::In,
+        )
+      end
+
+      it "returns false" do
+        metadata.should_not be_counter_cached
+      end
+    end
+  end
+
+  describe "#counter_cache_column_name" do
+    let(:inverse_class_name) { "Wheel" }
+
+    context "when the counter_cache is true" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :car,
+          relation: Mongoid::Relations::Referenced::In,
+          inverse_class_name: inverse_class_name,
+          counter_cache: true
+        )
+      end
+
+      it "returns inveser_class_name + _count" do
+        metadata.counter_cache_column_name.should eq("#{inverse_class_name.demodulize.underscore.pluralize}_count")
+      end
+    end
+
+    context "when given a custom name for counter cache" do
+      let(:counter_cache_name) { 'counte_cache_for_wheels' }
+      let(:metadata) do
+        described_class.new(
+          name: :car,
+          relation: Mongoid::Relations::Referenced::In,
+          inverse_class_name: inverse_class_name,
+          counter_cache: counter_cache_name
+        )
+      end
+
+      it "returns the name given" do
+        metadata.counter_cache_column_name.should eq(counter_cache_name)
+      end
+    end
+  end
+
   describe "#autobuilding?" do
 
     context "when the option is true" do

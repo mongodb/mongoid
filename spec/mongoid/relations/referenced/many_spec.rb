@@ -164,6 +164,10 @@ describe Mongoid::Relations::Referenced::Many do
             person.posts.count.should eq(1)
           end
 
+          it "increments the counter cache" do
+            person.reload.posts_count.should eq(1)
+          end
+
           context "when documents already exist on the relation" do
 
             let(:post_two) do
@@ -192,6 +196,10 @@ describe Mongoid::Relations::Referenced::Many do
 
             it "adds the document to the target" do
               person.posts.count.should eq(2)
+            end
+
+            it "increments the counter cache" do
+              person.reload.posts_count.should eq(2)
             end
 
             it "contains the initial document in the target" do
@@ -1912,6 +1920,7 @@ describe Mongoid::Relations::Referenced::Many do
           it "removes the correct posts" do
             person.posts.send(method, conditions: { title: "Testing" })
             person.posts.count.should eq(1)
+            person.reload.posts_count.should eq(1) if method == :destroy_all
           end
 
           it "deletes the documents from the database" do

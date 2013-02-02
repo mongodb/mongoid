@@ -10,6 +10,7 @@ module Mongoid
       # These options are available to all relations.
       COMMON = [
         :class_name,
+        :counter_cache,
         :extend,
         :inverse_class_name,
         :inverse_of,

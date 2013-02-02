@@ -138,6 +138,31 @@ module Mongoid
         @constraint ||= Constraint.new(self)
       end
 
+      # Does the metadata have a counter cache?
+      #
+      # @example Is the metadata counter_cached?
+      #   metadata.counter_cached?
+      #
+      # @return [ true, false ] If the metadata has counter_cache
+      #
+      # @since 3.1.0
+      def counter_cached?
+        !!self[:counter_cache]
+      end
+
+      # Returns the counter cache column name
+      #
+      # @example Get the counter cache column.
+      #   metadata.counter_cache_column_name
+      #
+      # @return [ String ] The counter cache column
+      #
+      # @since 3.1.0
+      def counter_cache_column_name
+        return "#{inverse_class_name.demodulize.underscore.pluralize}_count" if self[:counter_cache] == true
+        self[:counter_cache].to_s
+      end
+
       # Get the criteria that is used to query for this metadata's relation.
       #
       # @example Get the criteria.
@@ -361,6 +386,7 @@ module Mongoid
   autobuild:    #{autobuilding?}
   class_name:   #{class_name}
   cyclic:       #{cyclic.inspect}
+  counter_cache:#{counter_cached?}
   dependent:    #{dependent.inspect}
   inverse_of:   #{inverse_of.inspect}
   key:          #{key}
