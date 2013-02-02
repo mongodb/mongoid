@@ -90,7 +90,7 @@ describe Mongoid::Extensions::String do
         end
 
         it "converts to a time" do
-          time.should eq(Time.parse(string))
+          time.should eq(Time.configured.parse(string))
         end
 
         it "converts to the as time zone" do
