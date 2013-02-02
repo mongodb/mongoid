@@ -159,8 +159,11 @@ module Mongoid
       #
       # @since 3.1.0
       def counter_cache_column_name
-        return "#{inverse_class_name.demodulize.underscore.pluralize}_count" if self[:counter_cache] == true
-        self[:counter_cache].to_s
+        if self[:counter_cache] == true
+          "#{inverse_class_name.demodulize.underscore.pluralize}_count"
+        else
+          self[:counter_cache].to_s
+        end
       end
 
       # Get the criteria that is used to query for this metadata's relation.
@@ -503,13 +506,13 @@ module Mongoid
       # @example Get the inverse metadata.
       #   metadata.inverse_metadata(doc)
       #
-      # @param [ Document ] document The document to check.
+      # @param [ Document, Class ] object The document or class.
       #
       # @return [ Metadata ] The inverse metadata.
       #
       # @since 2.1.0
-      def inverse_metadata(document)
-        document.reflect_on_association(inverse(document))
+      def inverse_metadata(object)
+        object.reflect_on_association(inverse(object))
       end
 
       # Returns the inverse_of option of the relation.

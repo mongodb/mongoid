@@ -31,6 +31,19 @@ For instructions on upgrading to newer versions, visit
 * \#2667 `exists?` no longer hits the database in cases where we have
   the necessary information in memory.
 
+* \#2665 Mongoid now supports a counter cache for `belongs_to`
+  relations. (Arthur Neves)
+
+        class Band
+          include Mongoid::Document
+          belongs_to :label, counter_cache: "b_count"
+        end
+
+        class Album
+          include Mongoid::Document
+          belongs_to :band, counter_cache: true
+        end
+
 * \#2657 Logger getter and setter convenience methods have been
   added to the `Config` module. (Arthur Neves)
 

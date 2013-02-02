@@ -20,9 +20,9 @@ module Mongoid
         def reset_counters(id, *counters)
           object = find(id)
           counters.each do |name|
-            reflection_meta = reflect_on_association(name)
-            meta = reflection_meta.klass.reflect_on_association(reflection_meta.inverse)
-            counter_name = meta.counter_cache_column_name
+            meta = reflect_on_association(name)
+            inverse = meta.klass.reflect_on_association(meta.inverse)
+            counter_name = inverse.counter_cache_column_name
             object.update_attribute(counter_name, object.send(name).count)
           end
         end
@@ -31,8 +31,7 @@ module Mongoid
         # atomic $inc command.
         #
         # @example Add 5 to comments counter and remove 2 from likes
-        # counter
-        #
+        #   counter.
         #   Post.update_counters('50e0edd97c71c17ea9000001',
         #              :comments_count => 5, :likes_count => -2)
         #
@@ -51,7 +50,6 @@ module Mongoid
         # when counter_cache is enable
         #
         # @example Increment comments counter
-        #
         #   Post.increment_counter(:comments_count, '50e0edd97c71c17ea9000001')
         #
         # @param [ Symbol ] Counter cache name
@@ -62,13 +60,11 @@ module Mongoid
           update_counters(id, counter_name.to_sym => 1)
         end
 
-
         # Decrement the counter name from the entries that match the
         # id by one. This method is used on associations callbacks
         # when counter_cache is enable
         #
         # @example Decrement comments counter
-        #
         #   Post.decrement_counter(:comments_count, '50e0edd97c71c17ea9000001')
         #
         # @param [ Symbol ] Counter cache name
@@ -79,8 +75,33 @@ module Mongoid
           update_counters(id, counter_name.to_sym => -1)
         end
 
-      end
+        private
 
+        # Add the callbacks responsible for update the counter cache field
+        #
+        # @api private
+        #
+        # @example Add the touchable.
+        #   Person.add_counter_callbacks(meta)
+        #
+        # @param [ Metadata ] metadata The metadata for the relation.
+        #
+        # @since 3.1.0
+        def add_counter_cache_callbacks(meta)
+          name = meta.name
+          cache_column = meta.counter_cache_column_name.to_sym
+
+          after_create do
+            record = __send__(name)
+            record.class.increment_counter(cache_column, record.id) if record.try(:persisted?)
+          end
+
+          before_destroy do
+            record = __send__(name)
+            record.class.decrement_counter(cache_column, record.id) if record.try(:persisted?)
+          end
+        end
+      end
     end
   end
 end
