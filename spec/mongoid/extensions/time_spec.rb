@@ -275,7 +275,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "does not alter seconds" do
-        (eom_time_mongoized.strftime("%11N").to_i / 100.0).round(0).should eq(999999999)
+        (eom_time_mongoized.usec).should eq(999999)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -314,7 +314,7 @@ describe Mongoid::Extensions::Time do
         end
 
         it "does not alter the seconds" do
-          (eom_time_mongoized.strftime("%11N").to_i / 100.0).round(0).should eq(999999999)
+          (eom_time_mongoized.usec).should eq(999999)
         end
       end
     end
