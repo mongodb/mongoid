@@ -213,6 +213,8 @@ For instructions on upgrading to newer versions, visit
 * \#2743 Persistence options are no longer cleared when loading revisions.
   (Arthur Neves)
 
+* \#2741 Fix time mongoization usec rounding errors on MRI and JRuby.
+
 * \#2740 Support integer keys in hash fields when using `read_attribute` with
   dot notation.
 
