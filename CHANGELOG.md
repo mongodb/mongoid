@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2776 MongoDB 2.4.x new index types are now supported: "2dsphere",
+  "text", and "hashed". (Irakli Janiashvili)
+
 * \#2701 Cleanup up extra excessive database queries with 1-1 relations.
 
 * \#2693 Custom collection names can be passed to the model generator.
