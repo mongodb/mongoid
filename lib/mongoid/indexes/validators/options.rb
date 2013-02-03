@@ -18,10 +18,19 @@ module Mongoid
           :min,
           :bits,
           :bucket_size,
-          :expire_after_seconds
+          :expire_after_seconds,
+          :weights
         ]
 
-        VALID_TYPES = [ 1, -1, "2d", "geoHaystack" ]
+        VALID_TYPES = [
+          1,
+          -1,
+          "2d",
+          "2dsphere",
+          "geoHaystack",
+          "text",
+          "hashed"
+        ]
 
         # Validate the index specification.
         #
