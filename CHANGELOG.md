@@ -231,6 +231,8 @@ For instructions on upgrading to newer versions, visit
 * \#2774 Ensure validations macros for uniqueness, presence, and associated
   are also available at the instance level.
 
+* \#2772 Localized fields are now properly handled when cloning a document.
+
 * \#2758 `Mongoid.create_indexes` does not fail when cannot constantize class.
   (Arthur Neves)
 

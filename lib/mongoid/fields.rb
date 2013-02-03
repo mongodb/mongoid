@@ -12,12 +12,14 @@ module Mongoid
 
     included do
       class_attribute :aliased_fields
+      class_attribute :localized_fields
       class_attribute :fields
       class_attribute :pre_processed_defaults
       class_attribute :post_processed_defaults
 
       self.aliased_fields = { "id" => "_id" }
       self.fields = {}
+      self.localized_fields = {}
       self.pre_processed_defaults = []
       self.post_processed_defaults = []
 
@@ -364,6 +366,7 @@ module Mongoid
         if options[:localize]
           create_translations_getter(name, meth)
           create_translations_setter(name, meth, field)
+          localized_fields[name] = field
         end
       end
 

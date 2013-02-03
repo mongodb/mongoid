@@ -11,7 +11,8 @@ describe Mongoid::Copyable do
           title: "Sir",
           version: 4,
           created_at: Time.now,
-          updated_at: Time.now
+          updated_at: Time.now,
+          desc: "testing"
         ) do |p|
           p.owner_id = 5
         end
@@ -153,6 +154,10 @@ describe Mongoid::Copyable do
 
           it "does not copy references one documents" do
             copy.game.should be_nil
+          end
+
+          it "copies localized fields" do
+            copy.desc.should eq("testing")
           end
 
           context "when saving the copy" do

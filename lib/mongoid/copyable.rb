@@ -23,11 +23,31 @@ module Mongoid
       # _id and id field in the document would cause problems with Mongoid
       # elsewhere.
       attrs = doc.except("_id", "id")
-      if attrs.delete("versions")
-        attrs["version"] = 1
-      end
+      attrs["version"] = 1 if attrs.delete("versions")
+      process_localized_attributes(attrs)
       self.class.new(attrs, without_protection: true)
     end
     alias :dup :clone
+
+    private
+
+    # When cloning, if the document has localized fields we need to ensure they
+    # are properly processed in the clone.
+    #
+    # @api private
+    #
+    # @example Process localized attributes.
+    #   model.process_localized_attributes(attributes)
+    #
+    # @param [ Hash ] attrs The attributes.
+    #
+    # @since 3.0.20
+    def process_localized_attributes(attrs)
+      localized_fields.keys.each do |name|
+        if value = attrs.delete(name)
+          attrs["#{name}_translations"] = value
+        end
+      end
+    end
   end
 end
