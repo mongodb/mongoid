@@ -23,8 +23,41 @@ module Mongoid
         #
         # @since 3.0.0
         def touchable(metadata)
-          self.touchables.push(metadata.name) if metadata.touchable?
+          name = metadata.name
+          touchables.push(name) if metadata.touchable?
+          method_name = define_relation_touch_method(name)
+          after_create method_name
+          after_destroy method_name
+          after_touch method_name
           self
+        end
+
+        private
+
+        # Define the method that will get called for touching belongs_to
+        # relations.
+        #
+        # @api private
+        #
+        # @example Define the touch relation.
+        #   Model.define_relation_touch_method(:band)
+        #
+        # @param [ Symbol ] name The name of the relation.
+        #
+        # @since 3.1.0
+        #
+        # @return [ Symbol ] The method name.
+        def define_relation_touch_method(name)
+          method_name = "touch_#{name}_after_create_or_destroy"
+          class_eval <<-TOUCH
+            def #{method_name}
+              without_autobuild do
+                relation = __send__(:#{name})
+                relation.touch if relation
+              end
+            end
+          TOUCH
+          method_name.to_sym
         end
       end
     end

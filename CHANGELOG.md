@@ -106,6 +106,9 @@ For instructions on upgrading to newer versions, visit
           index({ status: 1 }, { expire_after_seconds: 3600 })
         end
 
+* \#2373 Relations with the `touch: true` option will now be automatically
+  touched when the child document is created or destroyed.
+
 * Added `Document.first_or_create!` and `Criteria#first_or_create!`. This
   raises a validations error if creation fails validation.
 

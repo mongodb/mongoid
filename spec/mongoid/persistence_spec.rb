@@ -986,11 +986,11 @@ describe Mongoid::Persistence do
 
     context "when relations have touch options" do
 
-      let!(:agent) do
-        Agent.create
-      end
-
       context "when the relation is nil" do
+
+        let!(:agent) do
+          Agent.create
+        end
 
         context "when the relation autobuilds" do
 
@@ -1005,6 +1005,10 @@ describe Mongoid::Persistence do
       end
 
       context "when the relation is not nil" do
+
+        let!(:agent) do
+          Agent.create
+        end
 
         let!(:agency) do
           agent.create_agency.tap do |a|
@@ -1022,6 +1026,48 @@ describe Mongoid::Persistence do
 
         it "persists the change" do
           agency.reload.updated_at.should be_within(5).of(Time.now)
+        end
+      end
+
+      context "when creating the child" do
+
+        let!(:agency) do
+          Agency.create
+        end
+
+        let!(:updated) do
+          agency.updated_at
+        end
+
+        let!(:agent) do
+          agency.agents.create
+        end
+
+        it "updates the parent's updated at" do
+          agency.updated_at.should_not eq(updated)
+        end
+      end
+
+      context "when destroying the child" do
+
+        let!(:agency) do
+          Agency.create
+        end
+
+        let!(:agent) do
+          agency.agents.create
+        end
+
+        let!(:updated) do
+          agency.updated_at
+        end
+
+        before do
+          agent.destroy
+        end
+
+        it "updates the parent's updated at" do
+          agency.updated_at.should_not eq(updated)
         end
       end
     end

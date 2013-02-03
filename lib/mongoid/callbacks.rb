@@ -12,6 +12,7 @@ module Mongoid
       :after_find,
       :after_initialize,
       :after_save,
+      :after_touch,
       :after_update,
       :after_upsert,
       :after_validation,
@@ -32,7 +33,7 @@ module Mongoid
       extend ActiveModel::Callbacks
       include ActiveModel::Validations::Callbacks
 
-      define_model_callbacks :build, :find, :initialize, only: :after
+      define_model_callbacks :build, :find, :initialize, :touch, only: :after
       define_model_callbacks :create, :destroy, :save, :update, :upsert
 
       attr_accessor :before_callback_halted
