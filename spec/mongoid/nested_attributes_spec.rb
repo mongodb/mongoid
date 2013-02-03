@@ -4465,6 +4465,61 @@ describe Mongoid::NestedAttributes do
           end
         end
 
+        context "when destroying a second level document with callbacks" do
+
+          let(:band) do
+            Band.create(name: "Tool")
+          end
+
+          let(:record) do
+            band.records.create(name: "Undertow")
+          end
+
+          let!(:track) do
+            record.tracks.create(name: "Sober")
+          end
+
+          context "when cascading callbacks" do
+
+            before(:all) do
+              Band.accepts_nested_attributes_for :records
+              Record.accepts_nested_attributes_for :tracks, allow_destroy: true
+            end
+
+            after(:all) do
+              Band.send(:undef_method, :records_attributes=)
+              Record.send(:undef_method, :tracks_attributes=)
+            end
+
+            let(:attributes) do
+              { records_attributes:
+                { "0" =>
+                  {
+                    _id: record.id,
+                    tracks_attributes: { "0" => { _id: track.id, _destroy: true }}
+                  }
+                }
+              }
+            end
+
+            before do
+              band.update_attributes(attributes)
+            end
+
+            it "removes the child from the relation" do
+              record.tracks.should be_empty
+            end
+
+            it "deletes the child document" do
+              track.should be_destroyed
+            end
+
+            it "runs the child's callbacks" do
+              track.before_destroy_called.should be_true
+            end
+          end
+        end
+
         context "when adding new documents in both levels" do
 
           context "when no documents has previously existed" do

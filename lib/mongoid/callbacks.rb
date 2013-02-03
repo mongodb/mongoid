@@ -52,6 +52,19 @@ module Mongoid
       respond_to?("_#{kind}_callbacks")
     end
 
+    # Is the document currently in a state that could potentially require
+    # callbacks to be executed?
+    #
+    # @example Is the document in a callback state?
+    #   document.in_callback_state?
+    #
+    # @return [ true, false ] If the document is in a callback state.
+    #
+    # @since 3.1.0
+    def in_callback_state?
+      new_record? || flagged_for_destroy? || changed?
+    end
+
     # Run only the after callbacks for the specific event.
     #
     # @note ActiveSupport does not allow this type of behaviour by default, so
@@ -172,8 +185,10 @@ module Mongoid
     #
     # @since 2.3.0
     def cascadable_child?(kind, child)
-      return false if [ :initialize, :find ].include?(kind) || !child.callback_executable?(kind)
-      [ :create, :destroy ].include?(kind) || child.changed? || child.new_record?
+      if kind == :initialize || kind == :find
+        return false
+      end
+      child.callback_executable?(kind) ? child.in_callback_state? : false
     end
 
     # Get the name of the callback that the child should fire. This changes

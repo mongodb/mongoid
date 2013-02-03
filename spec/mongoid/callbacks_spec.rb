@@ -216,7 +216,7 @@ describe Mongoid::Callbacks do
     context "callback returns true" do
 
       before do
-        artist.should_receive(:before_create_stub).and_return(true)
+        artist.should_receive(:before_create_stub).once.and_return(true)
         artist.save
       end
 
@@ -228,7 +228,7 @@ describe Mongoid::Callbacks do
     context "callback returns false" do
 
       before do
-        artist.should_receive(:before_create_stub).and_return(false)
+        artist.should_receive(:before_create_stub).once.and_return(false)
         artist.save
       end
 
@@ -253,7 +253,7 @@ describe Mongoid::Callbacks do
       context "when the callback returns true" do
 
         before do
-          artist.should_receive(:before_save_stub).and_return(true)
+          artist.should_receive(:before_save_stub).once.and_return(true)
         end
 
         it "the save returns true" do
@@ -264,7 +264,7 @@ describe Mongoid::Callbacks do
       context "when callback returns false" do
 
         before do
-          artist.should_receive(:before_save_stub).and_return(false)
+          artist.should_receive(:before_save_stub).once.and_return(false)
         end
 
         it "the save returns false" do
@@ -288,7 +288,7 @@ describe Mongoid::Callbacks do
       context "when the callback returns true" do
 
         before do
-          artist.should_receive(:before_save_stub).and_return(true)
+          artist.should_receive(:before_save_stub).once.and_return(true)
         end
 
         it "the save returns true" do
@@ -299,7 +299,7 @@ describe Mongoid::Callbacks do
       context "when the callback returns false" do
 
         before do
-          artist.should_receive(:before_save_stub).and_return(false)
+          artist.should_receive(:before_save_stub).once.and_return(false)
         end
 
         it "the save returns false" do
@@ -326,7 +326,7 @@ describe Mongoid::Callbacks do
     context "when the callback returns true" do
 
       before do
-        artist.should_receive(:before_destroy_stub).and_return(true)
+        artist.should_receive(:before_destroy_stub).once.and_return(true)
       end
 
       it "the destroy returns true" do
@@ -337,7 +337,7 @@ describe Mongoid::Callbacks do
     context "when the callback returns false" do
 
       before do
-        artist.should_receive(:before_destroy_stub).and_return(false)
+        artist.should_receive(:before_destroy_stub).once.and_return(false)
       end
 
       it "the destroy returns false" do
