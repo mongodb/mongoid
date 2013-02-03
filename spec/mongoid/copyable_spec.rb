@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require "spec_helper"
 
 describe Mongoid::Copyable do
@@ -12,7 +13,7 @@ describe Mongoid::Copyable do
           version: 4,
           created_at: Time.now,
           updated_at: Time.now,
-          desc: "testing"
+          desc: "description"
         ) do |p|
           p.owner_id = 5
         end
@@ -50,6 +51,42 @@ describe Mongoid::Copyable do
 
         it "does not set the id field as the _id" do
           cloned.id.should_not eq(1234)
+        end
+      end
+
+      context "when cloning a document with multiple languages field" do
+
+        before do
+          I18n.locale = 'pt_BR'
+          person.desc = "descrição"
+          person.save
+        end
+
+        after do
+          I18n.locale = :en
+        end
+
+        let!(:from_db) do
+          Person.find(person.id)
+        end
+
+        let(:copy) do
+          from_db.send(method)
+        end
+
+        it "sets the pt_BR version" do
+          I18n.locale = 'pt_BR'
+          copy.desc.should eq("descrição")
+        end
+
+        it "sets the english version" do
+          I18n.locale = :en
+          copy.desc.should eq("description")
+        end
+
+        it "sets to nil an nonexistent lang" do
+          I18n.locale = :fr
+          copy.desc.should be_nil
         end
       end
 
@@ -157,7 +194,7 @@ describe Mongoid::Copyable do
           end
 
           it "copies localized fields" do
-            copy.desc.should eq("testing")
+            copy.desc.should eq("description")
           end
 
           context "when saving the copy" do
