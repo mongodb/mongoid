@@ -296,6 +296,66 @@ describe Mongoid::Indexes do
       end
     end
 
+    context "when providing a Spherical Geospatial index" do
+
+      before do
+        klass.index({ location: "2dsphere" })
+      end
+
+      let(:options) do
+        klass.index_options[location: "2dsphere"]
+      end
+
+      it "sets the spherical geospatial index" do
+        options.should be_empty
+      end
+    end
+
+    context "when providing a hashed index" do
+
+      before do
+        klass.index({ a: "hashed" })
+      end
+
+      let(:options) do
+        klass.index_options[a: "hashed"]
+      end
+
+      it "sets the hashed index" do
+        options.should be_empty
+      end
+    end
+
+    context "when providing a text index" do
+
+      before do
+        klass.index({ content: "text" })
+      end
+
+      let(:options) do
+        klass.index_options[content: "text"]
+      end
+
+      it "sets the text index" do
+        options.should be_empty
+      end
+    end
+
+    context "when providing a compound text index" do
+
+      before do
+        klass.index({ content: "text", title: "text" }, { weights: { content: 1, title: 2 } })
+      end
+
+      let(:options) do
+        klass.index_options[content: "text", title: "text"]
+      end
+
+      it "sets the compound text index" do
+        options.should eq(weights: { content: 1, title: 2 })
+      end
+    end
+
     context "when providing an expire_after_seconds option" do
 
       before do

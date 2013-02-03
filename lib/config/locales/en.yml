@@ -135,7 +135,8 @@ en:
             \_\_max: 1\n
             \_\_bits: 26\n
             \_\_bucket_size : 1\n
-            Valid types are: 1, -1, '2d', 'geoHaystack'\n\n
+            \_\_weights: { content: 1, title: 2 }\n
+            Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
