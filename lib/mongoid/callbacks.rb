@@ -173,7 +173,7 @@ module Mongoid
     # @since 2.3.0
     def cascadable_child?(kind, child)
       return false if kind == :initialize || !child.callback_executable?(kind)
-      [ :create, :destroy ].include?(kind) || child.changed? || child.new_record?
+      child.changed? || child.new_record? || child.flagged_for_destroy?
     end
 
     # Get the name of the callback that the child should fire. This changes
