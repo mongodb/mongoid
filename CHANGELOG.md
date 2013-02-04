@@ -227,6 +227,13 @@ For instructions on upgrading to newer versions, visit
 * \#2664 In memory sorting of embedded documents now properly works when
   multiple fields are provided. (Neer Friedman)
 
+## 3.0.21
+
+### Resolved Issues
+
+* \#2781 / * \#2777 - Fixed issue with serialization of `DateTime` that was
+  only present in Rails environments.
+
 ## 3.0.20
 
 ### Resolved Issues
