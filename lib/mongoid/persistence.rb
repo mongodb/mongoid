@@ -119,9 +119,11 @@ module Mongoid
     # @since 3.0.0
     def touch(field = nil)
       return false if _root.new_record?
-      current = Time.now
-      write_attribute(:updated_at, current) if fields["updated_at"]
-      write_attribute(field, current) if field
+      unless attributes.frozen?
+        current = Time.now
+        write_attribute(:updated_at, current) if fields["updated_at"]
+        write_attribute(field, current) if field
+      end
 
       touches = touch_atomic_updates(field)
       unless touches.empty?
