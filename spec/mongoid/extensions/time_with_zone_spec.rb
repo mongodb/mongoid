@@ -251,8 +251,8 @@ describe Mongoid::Extensions::TimeWithZone do
       end
 
       it "doesn't strip milli- or microseconds" do
-        ActiveSupport::TimeWithZone.mongoize(time).to_f.round(6).should eq(
-          time.to_f.round(6)
+        ActiveSupport::TimeWithZone.mongoize(time).to_f.round(4).should eq(
+          time.to_f.round(4)
         )
       end
 
