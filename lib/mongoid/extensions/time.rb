@@ -65,9 +65,11 @@ module Mongoid
           return nil if object.blank?
           begin
             time = object.__mongoize_time__
-            return time.utc if time.is_a?(::Time)
-            usec = time.sec_fraction * 10**6
-            ::Time.at(time.to_i, usec).utc
+            if time.respond_to?(:sec_fraction)
+              ::Time.at(time.to_i, time.sec_fraction * 10**6).utc
+            else
+              ::Time.at(time.to_i, time.usec).utc
+            end
           rescue ArgumentError
             raise Errors::InvalidTime.new(object)
           end

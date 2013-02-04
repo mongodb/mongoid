@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.21
+
+### Resolved Issues
+
+* \#2781 / * \#2777 - Fixed issue with serialization of `DateTime` that was
+  only present in Rails environments.
+
 ## 3.0.20
 
 ### Resolved Issues
