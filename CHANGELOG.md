@@ -7,8 +7,6 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
-* \#2779 Fixed touch failures for frozen documents. (Arthur Neves)
-
 * \#2776 MongoDB 2.4.x new index types are now supported: "2dsphere",
   "text", and "hashed". (Irakli Janiashvili)
 
