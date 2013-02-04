@@ -1069,6 +1069,21 @@ describe Mongoid::Persistence do
         it "updates the parent's updated at" do
           agency.updated_at.should_not eq(updated)
         end
+
+        context "when child removes parent before" do
+
+          before do
+            Agent.before_destroy :destroy_agency
+          end
+
+          after do
+            Agent.reset_callbacks :destroy
+          end
+
+          it "destroys the child without error" do
+            expect { agent.destroy }.not_to raise_error
+          end
+        end
       end
     end
   end
