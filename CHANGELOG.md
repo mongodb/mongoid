@@ -227,7 +227,7 @@ For instructions on upgrading to newer versions, visit
 * \#2664 In memory sorting of embedded documents now properly works when
   multiple fields are provided. (Neer Friedman)
 
-## 3.0.21
+## 3.0.22
 
 ### Resolved Issues
 
