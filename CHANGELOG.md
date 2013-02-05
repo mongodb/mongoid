@@ -3,7 +3,7 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
-## 3.0.21
+## 3.0.22
 
 ### Resolved Issues
 
