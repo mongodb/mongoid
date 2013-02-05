@@ -57,13 +57,15 @@ module Mongoid
     # callbacks to be executed?
     #
     # @example Is the document in a callback state?
-    #   document.in_callback_state?
+    #   document.in_callback_state?(:update)
+    #
+    # @param [ Symbol ] kind The callback kind.
     #
     # @return [ true, false ] If the document is in a callback state.
     #
     # @since 3.1.0
-    def in_callback_state?
-      new_record? || flagged_for_destroy? || changed?
+    def in_callback_state?(kind)
+      [ :create, :destroy ].include?(kind) || new_record? || flagged_for_destroy? || changed?
     end
 
     # Run only the after callbacks for the specific event.
@@ -189,7 +191,7 @@ module Mongoid
       if kind == :initialize || kind == :find
         return false
       end
-      child.callback_executable?(kind) ? child.in_callback_state? : false
+      child.callback_executable?(kind) ? child.in_callback_state?(kind) : false
     end
 
     # Get the name of the callback that the child should fire. This changes

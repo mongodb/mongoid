@@ -231,6 +231,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2786 Fixed regressed cascading callbacks on destroy not firing.
+
 * \#2784 Fixed uniqueness validation properly getting added to subclasses.
   (Takeshi Akima)
 

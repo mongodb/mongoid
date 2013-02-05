@@ -344,6 +344,25 @@ describe Mongoid::Callbacks do
         artist.destroy.should be_false
       end
     end
+
+    context "when cascading callbacks" do
+
+      let!(:moderat) do
+        Band.create!(name: "Moderat")
+      end
+
+      let!(:record) do
+        moderat.records.create(name: "Moderat")
+      end
+
+      before do
+        moderat.destroy
+      end
+
+      it "executes the child destroy callbacks" do
+        record.before_destroy_called.should be_true
+      end
+    end
   end
 
   describe "#run_after_callbacks" do

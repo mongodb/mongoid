@@ -6,6 +6,7 @@ class Record
   field :before_save_called, type: Boolean, default: false
   field :before_update_called, type: Boolean, default: false
   field :before_validation_called, type: Boolean, default: false
+  field :before_destroy_called, type: Boolean, default: false
 
   embedded_in :band
   embeds_many :tracks, cascade_callbacks: true
@@ -15,6 +16,7 @@ class Record
   before_save :before_save_stub
   before_update :before_update_stub
   before_validation :before_validation_stub
+  before_destroy :before_destroy_stub
 
   after_destroy :access_band
 
@@ -32,6 +34,10 @@ class Record
 
   def before_validation_stub
     self.before_validation_called = true
+  end
+
+  def before_destroy_stub
+    self.before_destroy_called = true
   end
 
   def access_band
