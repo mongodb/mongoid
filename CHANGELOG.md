@@ -231,6 +231,13 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2784 Fixed uniqueness validation properly getting added to subclasses.
+  (Takeshi Akima)
+
+## 3.0.21
+
+### Resolved Issues
+
 * \#2781 / * \#2777 - Fixed issue with serialization of `DateTime` that was
   only present in Rails environments.
 
