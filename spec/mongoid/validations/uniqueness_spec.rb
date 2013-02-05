@@ -2013,15 +2013,12 @@ describe Mongoid::Validations::UniquenessValidator do
   context "when validation works with inheritance" do
 
     before do
-      Actor.delete_all
       Actor.validates_uniqueness_of :name
-      @johnny_depp = Actor.create!(name: "Johnny Depp")
+      Actor.create!(name: "Johnny Depp")
     end
 
     after do
-      # @johnny_depp.delete
       Actor.reset_callbacks(:validate)
-      Actor.delete_all
     end
 
     let!(:subclass_document_with_duplicated_name) do
@@ -2034,6 +2031,5 @@ describe Mongoid::Validations::UniquenessValidator do
         d.errors[:name].should eq([ "is already taken" ])
       end
     end
-
   end
 end
