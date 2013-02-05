@@ -91,7 +91,8 @@ module Mongoid
       # @since 2.4.10
       def create_criteria(base, document, attribute, value)
         field = document.fields[attribute.to_s]
-        criteria = scope(base.unscoped, document, attribute)
+        klass = base.embedded? ? base : field.options[:klass] || base
+        criteria = scope(klass.unscoped, document, attribute)
         if field.try(:localized?)
           criteria.selector.update(criterion(document, attribute, value))
         else
