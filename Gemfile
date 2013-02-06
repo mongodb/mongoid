@@ -2,10 +2,9 @@ source "http://rubygems.org"
 gemspec
 
 gem "rake"
-gem "moped", "~> 1.3.0"
 
 group :test do
-  gem "rspec", "~> 2.11"
+  gem "rspec", "~> 2.12"
 
   unless ENV["CI"]
     gem "guard"
