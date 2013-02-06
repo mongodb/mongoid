@@ -20,7 +20,7 @@ module Mongoid
         #
         # @since 2.1.0
         def path
-          position.sub(/\.\d+$/, "")
+          @path ||= position.sub(/\.\d+$/, "")
         end
 
         # Get the selector to use for the root document when performing atomic
