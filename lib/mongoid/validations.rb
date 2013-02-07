@@ -57,7 +57,7 @@ module Mongoid
       attribute = attr.to_s
       if relations.has_key?(attribute)
         begin_validate
-        relation = send(attr)
+        relation = without_autobuild { send(attr) }
         exit_validate
         relation.do_or_do_not(:in_memory) || relation
       elsif fields[attribute].try(:localized?)

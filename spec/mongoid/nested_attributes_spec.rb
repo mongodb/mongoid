@@ -250,36 +250,61 @@ describe Mongoid::NestedAttributes do
 
         context "when :reject_if => :all_blank is specified" do
 
-          before(:all) do
-            Person.send(:undef_method, :name_attributes=)
-            Person.accepts_nested_attributes_for \
-              :name, reject_if: :all_blank
-          end
+          context "when the relation is not autobuilding" do
 
-          after(:all) do
-            Person.send(:undef_method, :name_attributes=)
-            Person.accepts_nested_attributes_for :name
-          end
-
-          context "when all attributes are empty" do
-
-            before do
-              person.name_attributes = { last_name: "" }
+            before(:all) do
+              Person.send(:undef_method, :name_attributes=)
+              Person.accepts_nested_attributes_for \
+                :name, reject_if: :all_blank
             end
 
-            it "does not add the document" do
-              person.name.should be_nil
+            after(:all) do
+              Person.send(:undef_method, :name_attributes=)
+              Person.accepts_nested_attributes_for :name
+            end
+
+            context "when all attributes are empty" do
+
+              before do
+                person.name_attributes = { last_name: "" }
+              end
+
+              it "does not add the document" do
+                person.name.should be_nil
+              end
+            end
+
+            context "when an attribute is non-empty" do
+
+              before do
+                person.name_attributes = { first_name: "Lang" }
+              end
+
+              it "adds the document" do
+                person.name.first_name.should eq("Lang")
+              end
             end
           end
 
-          context "when an attribute is non-empty" do
+          context "when the relation is autobuilding" do
 
-            before do
-              person.name_attributes = { first_name: "Lang" }
+            before(:all) do
+              Product.accepts_nested_attributes_for :seo, reject_if: :all_blank
             end
 
-            it "adds the document" do
-              person.name.first_name.should eq("Lang")
+            after(:all) do
+              Product.send(:undef_method, :seo_attributes=)
+            end
+
+            context "when all attributes are empty" do
+
+              let(:product) do
+                Product.create(name: "testing")
+              end
+
+              it "does not add the document" do
+                product.seo.should_not be_persisted
+              end
             end
           end
         end
