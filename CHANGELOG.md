@@ -233,6 +233,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2795 Fix precision on time conversions. (Tom de Bruijn)
+
 * \#2794 Don't autobuild when reading a relation for validation.
 
 * \#2790 `becomes` now copies embedded documents even if they were protected
