@@ -988,6 +988,41 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#map" do
+
+    before do
+      Band.create(name: "Depeche Mode")
+      Band.create(name: "New Order")
+    end
+
+    let(:criteria) do
+      Band.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when passed the symbol field name" do
+
+      it "limits query to that field" do
+        criteria.should_receive(:only).with(:name).and_call_original
+        context.map(:name)
+      end
+
+      it "performs mapping" do
+        context.map(:name).should eq ["Depeche Mode", "New Order"]
+      end
+    end
+
+    context "when passed a block" do
+
+      it "performs mapping" do
+        context.map(&:name).should eq ["Depeche Mode", "New Order"]
+      end
+    end
+  end
+
   describe "#map_reduce" do
 
     let!(:depeche_mode) do

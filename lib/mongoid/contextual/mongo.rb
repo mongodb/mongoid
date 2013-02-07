@@ -194,6 +194,30 @@ module Mongoid
       end
       alias :one :first
 
+      # Invoke the block for each element of Contextual. Create a new array
+      # containing the values returned by the block.
+      #
+      # If the symbol field name is passed instead of the block, additional
+      # optimizations would be used.
+      #
+      # @example Map by some field.
+      #   context.map(:field1)
+      #
+      # @exmaple Map with block.
+      #   context.map(&:field1)
+      #
+      # @param [ Symbol ] field The field name.
+      #
+      # @return [ Array ] The result of mapping.
+      def map(field = nil, &block)
+        if block_given?
+          super(&block)
+        else
+          field = field.to_sym
+          criteria.only(field).map(&field.to_proc)
+        end
+      end
+
       # Create the new Mongo context. This delegates operations to the
       # underlying driver - in Mongoid's case Moped.
       #
