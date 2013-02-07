@@ -67,6 +67,8 @@ module Mongoid
             time = object.__mongoize_time__
             if time.respond_to?(:sec_fraction)
               ::Time.at(time.to_i, time.sec_fraction * 10**6).utc
+            elsif time.respond_to?(:subsec)
+              ::Time.at(time.to_i, time.subsec * 10**6).utc
             else
               ::Time.at(time.to_i, time.usec).utc
             end

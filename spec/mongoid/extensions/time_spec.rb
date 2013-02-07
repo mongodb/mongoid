@@ -278,6 +278,10 @@ describe Mongoid::Extensions::Time do
         (eom_time_mongoized.usec).should eq(999999)
       end
 
+      it "does not alter seconds with fractions" do
+        DateTime.mongoize(11.11).to_f.should eq(11.11)
+      end
+
       context "when using the ActiveSupport time zone" do
 
         let(:datetime) do
@@ -335,6 +339,10 @@ describe Mongoid::Extensions::Time do
 
       it "doesn't strip milli- or microseconds" do
         Time.mongoize(time).to_f.should eq(time.to_f)
+      end
+
+      it "does not alter seconds with fractions" do
+        Time.mongoize(102.63).to_f.should eq(102.63)
       end
     end
 
