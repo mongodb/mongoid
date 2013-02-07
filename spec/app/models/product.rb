@@ -10,4 +10,6 @@ class Product
 
   validates :name, presence: true
   validates :website, format: { with: URI.regexp, allow_blank: true }
+
+  embeds_one :seo, as: :seo_tags, cascade_callbacks: true, autobuild: true
 end

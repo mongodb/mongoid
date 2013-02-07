@@ -233,6 +233,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2794 Don't autobuild when reading a relation for validation.
+
 * \#2786 Fixed regressed cascading callbacks on destroy not firing.
 
 * \#2784 Fixed uniqueness validation properly getting added to subclasses.
