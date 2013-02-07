@@ -235,6 +235,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2794 Don't autobuild when reading a relation for validation.
 
+* \#2790 `becomes` now copies embedded documents even if they were protected
+  by mass assignment.
+
 * \#2787 Allow `becomes` to replace the document in the identity map.
 
 * \#2786 Fixed regressed cascading callbacks on destroy not firing.

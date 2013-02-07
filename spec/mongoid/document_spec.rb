@@ -990,20 +990,42 @@ describe Mongoid::Document do
 
       context "when the document has embedded documents" do
 
-        let!(:address) do
-          manager.addresses.build(street: "hobrecht")
+        context "when the attribtues are protected" do
+
+          let!(:appointment) do
+            manager.appointments.build
+          end
+
+          let(:person) do
+            manager.becomes(Person)
+          end
+
+          it "copies the embedded documents" do
+            person.appointments.first.should eq(appointment)
+          end
+
+          it "returns new instances" do
+            person.appointments.first.should_not equal(appointment)
+          end
         end
 
-        let(:person) do
-          manager.becomes(Person)
-        end
+        context "when the attributes are not protected" do
 
-        it "copies the embedded documents" do
-          person.addresses.first.should eq(address)
-        end
+          let!(:address) do
+            manager.addresses.build(street: "hobrecht")
+          end
 
-        it "returns new instances" do
-          person.addresses.first.should_not equal(address)
+          let(:person) do
+            manager.becomes(Person)
+          end
+
+          it "copies the embedded documents" do
+            person.addresses.first.should eq(address)
+          end
+
+          it "returns new instances" do
+            person.addresses.first.should_not equal(address)
+          end
         end
       end
 
