@@ -24,8 +24,13 @@ module Mongoid
         # @since 3.0.0
         def aggregates(field)
           if query.count > 0
-            map_reduce(mapper(field), reducer).
-              out(inline: 1).finalize(finalizer).first["value"]
+            result = collection.aggregate(pipeline(field)).to_a
+
+            if result.empty?
+              { "count" => query.count, "avg" => 0, "sum" => 0 }
+            else
+              result.first
+            end
           else
             { "count" => 0 }
           end
@@ -109,73 +114,24 @@ module Mongoid
 
         private
 
-        # Get the finalize function.
-        #
-        # @api private
-        #
-        # @example Get the finalize function.
-        #   aggregable.finalizer
-        #
-        # @return [ String ] The finalize JS function.
-        #
-        # @since 3.0.0
-        def finalizer
-          %Q{
-          function(key, agg) {
-            agg.avg = agg.sum / agg.count;
-            return agg;
-          }}
-        end
 
-        # Get the map function for the provided field.
+        # Get the aggregation pipeline for provided field.
         #
         # @api private
         #
-        # @example Get the map function.
-        #   aggregable.mapper(:likes)
+        # @example Get the pipeline.
+        #   aggregable.pipeline(:likes)
         #
         # @param [ String, Symbol ] field The name of the field.
         #
-        # @return [ String ] The map JS function.
-        #
-        # @since 3.0.0
-        def mapper(field)
-          %Q{
-          function() {
-            var agg = {
-              count: 1,
-              max: this.#{field},
-              min: this.#{field},
-              sum: this.#{field}
-            };
-            emit("#{field}", agg);
-          }}
-        end
-
-        # Get the reduce function for the provided field.
-        #
-        # @api private
-        #
-        # @example Get the reduce function.
-        #   aggregable.reducer(:likes)
-        #
-        # @return [ String ] The reduce JS function.
-        #
-        # @since 3.0.0
-        def reducer
-          %Q{
-          function(key, values) {
-            var agg = { count: 0, max: null, min: null, sum: 0 };
-            values.forEach(function(val) {
-              if (val.max !== null) {
-                if (agg.max == null || val.max > agg.max) agg.max = val.max;
-                if (agg.min == null || val.max < agg.min) agg.min = val.max;
-                agg.sum += val.sum;
-              }
-              agg.count += val.count;
-            });
-            return agg;
-          }}
+        # @return [ Array ] The array of pipeline operators.
+        def pipeline(field)
+          db_field = "$#{database_field_name(field)}"
+          pipeline = []
+          pipeline << {"$match" => criteria.nin(field => nil).selector }
+          pipeline << {"$limit" => criteria.options[:limit] } if criteria.options[:limit]
+          pipeline << {"$group" => {"_id" => field.to_s, "count" => {"$sum" => 1}, "max" => {"$max" => db_field}, "min" => {"$min" => db_field}, "sum" => {"$sum" => db_field}, "avg" => {"$avg" => db_field}}}
+          pipeline
         end
       end
     end
