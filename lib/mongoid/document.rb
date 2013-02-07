@@ -248,6 +248,7 @@ module Mongoid
       became.instance_variable_set(:@destroyed, destroyed?)
       became.changed_attributes["_type"] = self.class.to_s
       became._type = klass.to_s
+      IdentityMap.set(became) unless became.new_record?
       became
     end
 

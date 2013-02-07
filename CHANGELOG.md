@@ -235,6 +235,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2794 Don't autobuild when reading a relation for validation.
 
+* \#2787 Allow `becomes` to replace the document in the identity map.
+
 * \#2786 Fixed regressed cascading callbacks on destroy not firing.
 
 * \#2784 Fixed uniqueness validation properly getting added to subclasses.

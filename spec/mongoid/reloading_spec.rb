@@ -220,7 +220,7 @@ describe Mongoid::Reloading do
         Person.create
       end
 
-      context "for a references_one" do
+      context "for a has_one" do
 
         let!(:game) do
           person.create_game(score: 50)
@@ -237,20 +237,63 @@ describe Mongoid::Reloading do
         end
       end
 
-      context "for a referenced_in" do
+      context "for a belongs_to" do
 
-        let!(:game) do
-          person.create_game(score: 50)
+        context "when the relation type does not change" do
+
+          let!(:game) do
+            person.create_game(score: 50)
+          end
+
+          before do
+            Person.collection.find({ "_id" => person.id }).
+              update({ "$set" => { "title" => "Mam" }})
+            game.reload
+          end
+
+          it "reloads the association" do
+            game.person.title.should eq("Mam")
+          end
         end
 
-        before do
-          Person.collection.find({ "_id" => person.id }).
-            update({ "$set" => { "title" => "Mam" }})
-          game.reload
-        end
+        context "when the identity map is enabled" do
 
-        it "reloads the association" do
-          game.person.title.should eq("Mam")
+          before do
+            Mongoid.identity_map_enabled = true
+          end
+
+          after do
+            Mongoid.identity_map_enabled = false
+          end
+
+          context "when the relation type changes" do
+
+            let!(:doctor) do
+              Doctor.create
+            end
+
+            let!(:game) do
+              Game.create(:person => doctor)
+            end
+
+            before do
+              doctor.becomes(Doktor)
+            end
+
+            context "when reloading the base" do
+
+              it "reloads the correct type of document" do
+                game.reload.person.should be_a(Doktor)
+              end
+            end
+
+            context "when reloading the association" do
+
+              it "reloads the correct type of document" do
+                game.person(true).should be_a(Doktor)
+              end
+            end
+          end
         end
       end
     end

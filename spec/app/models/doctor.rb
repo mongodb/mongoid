@@ -7,3 +7,6 @@ class Doctor < Person
     super
   end
 end
+
+class Doktor < Person
+end
