@@ -13,8 +13,6 @@ module Mongoid
     include ActiveModel::Conversion
     include ActiveModel::ForbiddenAttributesProtection
     include ActiveModel::Naming
-    include ActiveModel::Serializers::JSON
-    include ActiveModel::Serializers::Xml
     include Mongoid::Atomic
     include Mongoid::Dirty
     include Mongoid::Attributes
@@ -23,7 +21,6 @@ module Mongoid
     include Mongoid::Hierarchy
     include Mongoid::Indexes
     include Mongoid::Inspection
-    include Mongoid::JSON
     include Mongoid::Matchers
     include Mongoid::NestedAttributes
     include Mongoid::Persistence
@@ -51,7 +48,6 @@ module Mongoid
       Mongoid::Hierarchy,
       Mongoid::Indexes,
       Mongoid::Inspection,
-      Mongoid::JSON,
       Mongoid::Matchers,
       Mongoid::NestedAttributes,
       Mongoid::Persistence,
