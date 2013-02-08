@@ -18,11 +18,13 @@ module Mongoid
         #
         # @since 3.0.0
         def touchable(metadata)
-          name = metadata.name
-          method_name = define_relation_touch_method(name)
-          after_create method_name
-          after_destroy method_name
-          after_touch method_name
+          if metadata.touchable?
+            name = metadata.name
+            method_name = define_relation_touch_method(name)
+            after_create method_name
+            after_destroy method_name
+            after_touch method_name
+          end
           self
         end
 
