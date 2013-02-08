@@ -247,6 +247,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2796 Don't cascade changes on has_many relations when assigning with
+  a delete.
+
 * \#2795 Fix precision on time conversions. (Tom de Bruijn)
 
 * \#2794 Don't autobuild when reading a relation for validation.

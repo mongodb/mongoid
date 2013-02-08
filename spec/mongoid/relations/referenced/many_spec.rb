@@ -1783,6 +1783,29 @@ describe Mongoid::Relations::Referenced::Many do
 
       context "when no dependent option is set" do
 
+        context "when we are assigning attributes" do
+
+          let!(:drug) do
+            person.drugs.create
+          end
+
+          before do
+            Mongoid::Threaded.begin(:assign)
+          end
+
+          after do
+            Mongoid::Threaded.exit(:assign)
+          end
+
+          let(:deleted) do
+            person.drugs.delete(drug)
+          end
+
+          it "does not cascade" do
+            deleted.changes.keys.should eq([ "person_id" ])
+          end
+        end
+
         context "when the document is loaded" do
 
           let!(:drug) do

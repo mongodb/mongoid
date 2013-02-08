@@ -109,7 +109,7 @@ module Mongoid
           target.delete(document) do |doc|
             if doc
               unbind_one(doc)
-              cascade!(doc)
+              cascade!(doc) if !_assigning?
             end
             execute_callback :after_remove, doc
           end
