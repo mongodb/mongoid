@@ -13,6 +13,11 @@ For instructions on upgrading to newer versions, visit
 * The minimum Active Model and Active Support dependencies have been
   raised to 3.2.
 
+* \#2799 Criteria#map can now accept a symbol of a field name as well as
+  a block to perform a more optimized `map`. (Gosha Arinich)
+
+        Band.where(:likes.gt => 1000).map(:name)
+
 * \#2798 Aggregations (`sum`, `min`, `max`, `avg`) now use the
   aggregation framework instead of map/reduce. (Gosha Arinich)
 
