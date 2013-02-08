@@ -1790,11 +1790,11 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           before do
-            Mongoid::Threaded.begin(:assign)
+            Mongoid::Threaded.begin_execution(:assign)
           end
 
           after do
-            Mongoid::Threaded.exit(:assign)
+            Mongoid::Threaded.exit_execution(:assign)
           end
 
           let(:deleted) do
