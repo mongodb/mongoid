@@ -140,7 +140,7 @@ module Mongoid
         def belongs_to(name, options = {}, &block)
           meta = reference_one_to_one(name, options, Referenced::In, &block)
           aliased_fields[name.to_s] = meta.foreign_key
-          touchable(meta)
+          touchable(meta) if meta.touchable?
           add_counter_cache_callbacks(meta) if meta.counter_cached?
           meta
         end
