@@ -1029,6 +1029,21 @@ describe Mongoid::Document do
         end
       end
 
+      context "when the document has a localize field" do
+
+        let(:manager) do
+          Manager.new(title: "Sir", desc: "description")
+        end
+
+        let(:person) do
+          manager.becomes(Person)
+        end
+
+        it "copies the localize attribute" do
+          person.desc.should eq("description")
+        end
+      end
+
       context "when the document is new" do
 
         let(:person) do
