@@ -982,6 +982,27 @@ describe Mongoid::Persistence do
           end
         end
       end
+
+      context "when creating the child" do
+
+        let(:time) do
+          Time.utc(2012, 4, 3, 12)
+        end
+
+        let(:jar) do
+          Jar.new(_id: 1, updated_at: time).tap do |jar|
+            jar.save!
+          end
+        end
+
+        let!(:cookie) do
+          jar.cookies.create!(updated_at: time)
+        end
+
+        it "does not touch the parent" do
+          jar.updated_at.should eq(time)
+        end
+      end
     end
 
     context "when relations have touch options" do
