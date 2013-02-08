@@ -18,16 +18,29 @@ module Mongoid
     #
     # @return [ Document ] The new document.
     def clone
-      attrs = as_document.except("_id")
-      if attrs.delete("versions")
-        attrs["version"] = 1
-      end
-      process_localized_attributes(attrs)
+      attrs = clone_document.except("_id")
       self.class.new(attrs, without_protection: true)
     end
     alias :dup :clone
 
     private
+
+    # Clone the document attributes
+    #
+    # @api private
+    #
+    # @example clone document
+    #   model.clone_document
+    #
+    # @param [ Hash ] dcoument The document with hash format
+    #
+    # @since 3.0.22
+    def clone_document
+      attrs = as_document.__deep_copy__
+      attrs["version"] = 1 if attrs.delete("versions")
+      process_localized_attributes(attrs)
+      attrs
+    end
 
     # When cloning, if the document has localized fields we need to ensure they
     # are properly processed in the clone.
