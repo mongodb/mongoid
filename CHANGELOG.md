@@ -7,6 +7,15 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* The minimum MongoDB requirement is now raised to 2.2, since we now
+  depend on the aggregation framework.
+
+* The minimum Active Model and Active Support dependencies have been
+  raised to 3.2.
+
+* \#2798 Aggregations (`sum`, `min`, `max`, `avg`) now use the
+  aggregation framework instead of map/reduce. (Gosha Arinich)
+
 * \#2776 MongoDB 2.4.x new index types are now supported: "2dsphere",
   "text", and "hashed". (Irakli Janiashvili)
 

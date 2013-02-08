@@ -25,7 +25,6 @@ module Mongoid
         def aggregates(field)
           if query.count > 0
             result = collection.aggregate(pipeline(field)).to_a
-
             if result.empty?
               { "count" => query.count, "avg" => 0, "sum" => 0 }
             else
@@ -114,7 +113,6 @@ module Mongoid
 
         private
 
-
         # Get the aggregation pipeline for provided field.
         #
         # @api private
@@ -125,13 +123,23 @@ module Mongoid
         # @param [ String, Symbol ] field The name of the field.
         #
         # @return [ Array ] The array of pipeline operators.
+        #
+        # @since 3.1.0
         def pipeline(field)
           db_field = "$#{database_field_name(field)}"
           pipeline = []
-          pipeline << {"$match" => criteria.nin(field => nil).selector }
-          pipeline << {"$limit" => criteria.options[:limit] } if criteria.options[:limit]
-          pipeline << {"$group" => {"_id" => field.to_s, "count" => {"$sum" => 1}, "max" => {"$max" => db_field}, "min" => {"$min" => db_field}, "sum" => {"$sum" => db_field}, "avg" => {"$avg" => db_field}}}
-          pipeline
+          pipeline << { "$match" => criteria.nin(field => nil).selector }
+          pipeline << { "$limit" => criteria.options[:limit] } if criteria.options[:limit]
+          pipeline << {
+            "$group"  => {
+              "_id"   => field.to_s,
+              "count" => { "$sum" => 1 },
+              "max"   => { "$max" => db_field },
+              "min"   => { "$min" => db_field },
+              "sum"   => { "$sum" => db_field },
+              "avg"   => { "$avg" => db_field }
+            }
+          }
         end
       end
     end

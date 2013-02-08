@@ -7,11 +7,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
     context "when provided a single field" do
 
       let!(:depeche) do
-        Band.create(name: "Depeche Mode", likes: 1000)
+        Band.create(name: "Depeche Mode", likes: 1000, years: 1000)
       end
 
       let!(:tool) do
-        Band.create(name: "Tool", likes: 500)
+        Band.create(name: "Tool", likes: 500, years: 800)
       end
 
       let(:criteria) do
@@ -23,6 +23,33 @@ describe Mongoid::Contextual::Aggregable::Mongo do
       end
 
       context "when aggregating on a field that exists" do
+
+        context "when aggregating on an aliased field" do
+
+          let(:aggregates) do
+            context.aggregates(:years)
+          end
+
+          it "returns an avg" do
+            aggregates["avg"].should eq(900)
+          end
+
+          it "returns a count" do
+            aggregates["count"].should eq(2)
+          end
+
+          it "returns a max" do
+            aggregates["max"].should eq(1000)
+          end
+
+          it "returns a min" do
+            aggregates["min"].should eq(800)
+          end
+
+          it "returns a sum" do
+            aggregates["sum"].should eq(1800)
+          end
+        end
 
         context "when more than 1 document is emitted" do
 
