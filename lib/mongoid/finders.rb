@@ -24,6 +24,7 @@ module Mongoid
       :first_or_create!,
       :first_or_initialize,
       :for_js,
+      :geo_near,
       :includes,
       :map_reduce,
       :max,

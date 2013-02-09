@@ -4,6 +4,7 @@ require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
 require "mongoid/contextual/eager"
 require "mongoid/contextual/find_and_modify"
+require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
 
 module Mongoid
@@ -193,6 +194,29 @@ module Mongoid
         end
       end
       alias :one :first
+
+      # Execute a $geoNear command against the database.
+      #
+      # @example Find documents close to 10, 10.
+      #   context.geo_near([ 10, 10 ])
+      #
+      # @example Find with spherical distance.
+      #   context.geo_near([ 10, 10 ]).spherical
+      #
+      # @example Find with a max distance.
+      #   context.geo_near([ 10, 10 ]).max_distance(0.5)
+      #
+      # @example Provide a distance multiplier.
+      #   context.geo_near([ 10, 10 ]).distance_multiplier(1133)
+      #
+      # @param [ Array<Float> ] coordinates The coordinates.
+      #
+      # @return [ GeoNear ] The GeoNear command.
+      #
+      # @since 3.1.0
+      def geo_near(coordinates)
+        GeoNear.new(collection, criteria, coordinates)
+      end
 
       # Invoke the block for each element of Contextual. Create a new array
       # containing the values returned by the block.

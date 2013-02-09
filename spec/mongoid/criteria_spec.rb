@@ -2474,6 +2474,25 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#geo_near" do
+
+    before do
+      Bar.create_indexes
+    end
+
+    let!(:match) do
+      Bar.create(location: [ 52.30, 13.25 ])
+    end
+
+    let(:criteria) do
+      Bar.geo_near([ 52, 13 ]).max_distance(10).spherical
+    end
+
+    it "returns the matching documents" do
+      criteria.should eq([ match ])
+    end
+  end
+
   describe "#gt" do
 
     let!(:match) do

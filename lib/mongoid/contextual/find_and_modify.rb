@@ -51,7 +51,7 @@ module Mongoid
       # @api private
       #
       # @example Apply the criteria options
-      #   map_reduce.apply_criteria_options
+      #   find_and_modify.apply_criteria_options
       #
       # @return [ nil ] Nothing.
       #

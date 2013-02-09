@@ -13,6 +13,11 @@ For instructions on upgrading to newer versions, visit
 * The minimum Active Model and Active Support dependencies have been
   raised to 3.2.
 
+* \#2804 $geoNear support has now been added to criteria.
+
+        Bar.where(:likes.gt => 1000).geo_near([ 52, 13 ])
+        Bar.geo_near([ 52, 13 ]).max_distance(0.5).spherical
+
 * \#2799 Criteria#map can now accept a symbol of a field name as well as
   a block to perform a more optimized `map`. (Gosha Arinich)
 
