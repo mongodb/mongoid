@@ -129,7 +129,7 @@ module Mongoid
         _root.collection.find(selector).update(positionally(selector, touches))
       end
       run_callbacks(:touch, :after)
-      move_changes and true
+      true
     end
 
     # Update the document in the database.
