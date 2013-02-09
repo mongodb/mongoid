@@ -913,8 +913,8 @@ describe Mongoid::Persistence do
             touched.should be_true
           end
 
-          it "clears the dirty tracking" do
-            agent.changes.should be_empty
+          it "keeps changes for next callback" do
+            agent.changes.should_not be_empty
           end
         end
 
@@ -948,8 +948,8 @@ describe Mongoid::Persistence do
             touched.should be_true
           end
 
-          it "clears the dirty tracking" do
-            agent.changes.should be_empty
+          it "keeps changes for next callback" do
+            agent.changes.should_not be_empty
           end
         end
       end
