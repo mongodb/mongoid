@@ -122,6 +122,9 @@ For instructions on upgrading to newer versions, visit
           include Mongoid::Timestamps::Updated::Short # For u_at only.
         end
 
+* \#2465 Documents now have an `attribute_before_type_cast` for proper
+  handling of validations. (Gerad Suyderhoud)
+
 * \#2443 `expire_after_seconds` is now a valid index option.
 
         class Event
