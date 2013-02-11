@@ -205,6 +205,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
     end
 
     context 'setting an associated document to nil' do
+
       before do
         game.person = nil
       end
@@ -218,7 +219,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
     end
 
-    context 'setting an associated document to nil' do
+    context 'setting an associated document to other doc' do
 
       let(:other_person) do
         Person.create
@@ -228,7 +229,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         game.person = other_person
       end
 
-      it 'sets the person_id to nil' do
+      it 'sets the person_id' do
         game.person_id.should eq(other_person.id)
       end
 
