@@ -5,6 +5,7 @@ class Person
   class_attribute :somebody_elses_important_class_options
   self.somebody_elses_important_class_options = { keep_me_around: true }
 
+  field :username
   field :title
   field :terms, type: Boolean
   field :pets, type: Boolean, default: false
