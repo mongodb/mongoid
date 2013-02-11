@@ -2,8 +2,16 @@ require "spec_helper"
 
 describe Mongoid::Relations::Referenced::Many do
 
-  before(:all) do
+  before :all do
     Mongoid.raise_not_found_error = true
+
+    Drug.belongs_to :person, primary_key: :username
+    Person.has_many :drugs, validate: false, primary_key: :username
+  end
+
+  after :all do
+    Drug.belongs_to :person, counter_cache: true
+    Person.has_many :drugs, validate: false
   end
 
   [ :<<, :push ].each do |method|
@@ -1588,6 +1596,21 @@ describe Mongoid::Relations::Referenced::Many do
         end
       end
     end
+
+    context "when using a diferent primary_key" do
+
+      let(:person) do
+        Person.create!(username: 'arthurnn')
+      end
+
+      let(:drug) do
+        person.drugs.create!
+      end
+
+      it 'saves pk value on fk field' do
+        drug.person_id.should eq('arthurnn')
+      end
+    end
   end
 
   describe "#create!" do
@@ -1776,7 +1799,7 @@ describe Mongoid::Relations::Referenced::Many do
   describe "#delete" do
 
     let!(:person) do
-      Person.create
+      Person.create(username: 'arthurnn')
     end
 
     context "when the document is found" do
@@ -1832,7 +1855,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when the document is not loaded" do
 
           let!(:drug) do
-            Drug.create(person_id: person.id)
+            Drug.create(person_id: person.username)
           end
 
           let!(:deleted) do
@@ -1932,7 +1955,7 @@ describe Mongoid::Relations::Referenced::Many do
         context "when conditions are provided" do
 
           let(:person) do
-            Person.create
+            Person.create(username: 'durran')
           end
 
           before do

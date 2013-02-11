@@ -30,7 +30,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         described_class.new(game, person, game_metadata)
       end
 
-      context "when the document is bindable" do
+      context "when the document is bindable with default pk" do
 
         before do
           person.should_receive(:save).never
@@ -44,6 +44,33 @@ describe Mongoid::Relations::Bindings::Referenced::In do
 
         it "sets the foreign key" do
           game.person_id.should eq(person.id)
+        end
+      end
+
+      context "when the document is bindable with username as pk" do
+
+        before do
+          Game.belongs_to :person, index: true, validate: true, primary_key: :username
+
+          person.should_receive(:save).never
+          game.should_receive(:save).never
+          binding.bind_one
+        end
+
+        after do
+          Game.belongs_to :person, index: true, validate: true
+        end
+
+        it "sets the inverse relation" do
+          person.game.should eq(game)
+        end
+
+        let(:person) do
+          Person.new(username: 'arthurnn')
+        end
+
+        it "sets the fk with username field" do
+          game.person_id.should eq(person.username)
         end
       end
 
