@@ -190,10 +190,14 @@ module Mongoid
       # @since 3.0.0
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
-        bind_foreign_key(doc, base.id)
+        bind_foreign_key(doc, record_id(base))
         bind_polymorphic_type(doc, base.class.name)
         bind_inverse(doc, base)
         bind_inverse_of_field(doc, metadata.name)
+      end
+
+      def record_id(base)
+        base.__send__(metadata.primary_key)
       end
 
       # Ensure that the metadata on the base is correct, for the cases

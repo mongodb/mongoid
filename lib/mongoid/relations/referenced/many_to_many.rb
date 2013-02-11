@@ -313,7 +313,7 @@ module Mongoid
           #
           # @since 2.1.0
           def criteria(metadata, object, type = nil)
-            apply_ordering(metadata.klass.all_of(_id: { "$in" => object }), metadata)
+            apply_ordering(metadata.klass.all_of(metadata.primary_key => { "$in" => object }), metadata)
           end
 
           # Get the criteria that is used to eager load a relation of this
@@ -458,7 +458,18 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :autosave, :dependent, :foreign_key, :index, :order, :before_add, :after_add, :before_remove, :after_remove ]
+            [
+              :after_add,
+              :after_remove,
+              :autosave,
+              :before_add,
+              :before_remove,
+              :dependent,
+              :foreign_key,
+              :index,
+              :order,
+              :primary_key
+            ]
           end
 
           # Get the default validation setting for the relation. Determines if

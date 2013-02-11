@@ -117,6 +117,41 @@ describe Mongoid::Relations::Referenced::One do
           end
         end
       end
+
+      context "when relation have a different primary_key" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let(:cat) do
+          Cat.new
+        end
+
+        before do
+          person.cat = cat
+        end
+
+        it "sets the target of the relation" do
+          person.cat.target.should eq(cat)
+        end
+
+        it "sets the foreign key of the relation" do
+          cat.person_id.should eq(person.username)
+        end
+
+        it "sets the base on the inverse relation" do
+          cat.person.should eq(person)
+        end
+
+        it "sets the same instance on the inverse relation" do
+          cat.person.should eql(person)
+        end
+
+        it "saves the target" do
+          cat.should be_persisted
+        end
+      end
     end
 
     context "when the relation is polymorphic" do
@@ -1205,7 +1240,7 @@ describe Mongoid::Relations::Referenced::One do
 
     it "returns the valid options" do
       described_class.valid_options.should eq(
-        [ :as, :autobuild, :autosave, :dependent, :foreign_key ]
+        [ :as, :autobuild, :autosave, :dependent, :foreign_key, :primary_key ]
       )
     end
   end

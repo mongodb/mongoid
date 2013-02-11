@@ -21,7 +21,7 @@ module Mongoid
           def bind_one
             binding do
               check_inverses!(target)
-              bind_foreign_key(base, target.id)
+              bind_foreign_key(base, record_id(target))
               bind_polymorphic_inverse_type(base, target.class.name)
               if inverse = metadata.inverse(target)
                 if set_base_metadata

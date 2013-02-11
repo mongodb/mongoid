@@ -105,5 +105,20 @@ describe Mongoid::Relations::Builders::Referenced::One do
         person.game.should equal(game)
       end
     end
+
+    context "when the document have a non standard pk" do
+
+      before do
+        person.save
+      end
+
+      let!(:cat) do
+        Cat.create(person_id: person.username)
+      end
+
+      it "returns the document" do
+        person.cat.should eq(cat)
+      end
+    end
   end
 end

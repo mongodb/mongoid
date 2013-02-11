@@ -5,6 +5,7 @@ class Person
   class_attribute :somebody_elses_important_class_options
   self.somebody_elses_important_class_options = { keep_me_around: true }
 
+  field :username, default: -> { "arthurnn#{rand(0..10)}" }
   field :title
   field :terms, type: Boolean
   field :pets, type: Boolean, default: false
@@ -100,7 +101,7 @@ class Person
 
   has_many :drugs, validate: false
   has_one :account, validate: false
-  has_one :cat, dependent: :nullify, validate: false
+  has_one :cat, dependent: :nullify, validate: false, primary_key: :username
   has_one :book, autobuild: true, validate: false
   has_one :home, dependent: :delete, validate: false
 

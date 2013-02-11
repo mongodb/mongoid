@@ -733,6 +733,18 @@ module Mongoid
         @polymorphic ||= (!!self[:as] || !!self[:polymorphic])
       end
 
+      # Get the primary key field for finding the related document.
+      #
+      # @example Get the primary key.
+      #   metadata.primary_key
+      #
+      # @return [ String ] The primary key field.
+      #
+      # @since 3.1.0
+      def primary_key
+        @primary_key ||= (self[:primary_key] || "_id").to_s
+      end
+
       # Get the relation associated with this metadata.
       #
       # @example Get the relation.
@@ -1129,7 +1141,7 @@ module Mongoid
       # @since 2.0.0.rc.1
       def determine_key
         return store_as.to_s if relation.embedded?
-        relation.stores_foreign_key? ? foreign_key : "_id"
+        relation.stores_foreign_key? ? foreign_key : primary_key
       end
 
       # Determine the name of the inverse relation.

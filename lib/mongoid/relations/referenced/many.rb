@@ -367,7 +367,11 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def criteria
-          Many.criteria(metadata, Conversions.flag(base.id, metadata), base.class)
+          Many.criteria(
+            metadata,
+            Conversions.flag(base.send(metadata.primary_key), metadata),
+            base.class
+          )
         end
 
         # Perform the necessary cascade operations for documents that just got
@@ -706,7 +710,18 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :as, :autosave, :dependent, :foreign_key, :order, :before_add, :after_add, :before_remove, :after_remove ]
+            [
+              :after_add,
+              :after_remove,
+              :as,
+              :autosave,
+              :before_add,
+              :before_remove,
+              :dependent,
+              :foreign_key,
+              :order,
+              :primary_key
+            ]
           end
 
           # Get the default validation setting for the relation. Determines if
