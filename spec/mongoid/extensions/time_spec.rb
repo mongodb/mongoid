@@ -204,10 +204,12 @@ describe Mongoid::Extensions::Time do
 
       context "when the string is an invalid time" do
 
-        it "raises an error" do
-          expect {
-            Time.mongoize("shitty time")
-          }.to raise_error(Mongoid::Errors::InvalidTime)
+        let(:epoch) do
+          Time.utc(1970, 1, 1, 0, 0, 0, 0)
+        end
+
+        it "converts the time to epoch" do
+          Time.mongoize("time").should eq(epoch)
         end
       end
 

@@ -132,6 +132,17 @@ describe Mongoid::Extensions::Date do
           evolved.should be_nil
         end
       end
+
+      context "when the string is an invalid time" do
+
+        let(:epoch) do
+          Date.new(1970, 1, 1)
+        end
+
+        it "returns epoch" do
+          Date.mongoize("time").should eq(epoch)
+        end
+      end
     end
 
     context "when provided a float" do

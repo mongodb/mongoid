@@ -3,6 +3,9 @@ module Mongoid
   module Extensions
     module Time
 
+      # Constant for epoch - used when passing invalid times.
+      EPOCH = ::Time.utc(1970, 1, 1, 0, 0, 0)
+
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #
@@ -73,7 +76,7 @@ module Mongoid
               ::Time.at(time.to_i, time.usec).utc
             end
           rescue ArgumentError
-            raise Errors::InvalidTime.new(object)
+            EPOCH
           end
         end
       end

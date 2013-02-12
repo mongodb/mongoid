@@ -3,6 +3,9 @@ module Mongoid
   module Extensions
     module Date
 
+      # Constant for epoch - used when passing invalid times.
+      EPOCH = ::Date.new(1970, 1, 1)
+
       # Convert the date into a time.
       #
       # @example Convert the date to a time.
@@ -57,8 +60,12 @@ module Mongoid
         # @since 3.0.0
         def mongoize(object)
           unless object.blank?
-            time = object.__mongoize_time__
-            ::Time.utc(time.year, time.month, time.day)
+            begin
+              time = object.__mongoize_time__
+              ::Time.utc(time.year, time.month, time.day)
+            rescue ArgumentError
+              EPOCH
+            end
           end
         end
       end

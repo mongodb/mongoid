@@ -63,7 +63,7 @@ module Mongoid
       elsif fields[attribute].try(:localized?)
         attributes[attribute]
       else
-        send(attr)
+        send("#{attr}_before_type_cast")
       end
     end
 

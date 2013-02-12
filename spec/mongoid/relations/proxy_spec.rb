@@ -5,6 +5,7 @@ describe Mongoid::Relations::Proxy do
   describe "#extend" do
 
     before(:all) do
+      Person.reset_callbacks(:validate)
       module Testable
       end
     end
