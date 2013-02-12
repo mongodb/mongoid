@@ -24,6 +24,30 @@ describe Mongoid::Atomic::Positionable do
       }
     end
 
+    context "when a child has an embeds many under an embeds one" do
+
+      let(:selector) do
+        { "_id" => 1, "child._id" => 2 }
+      end
+
+      let(:ops) do
+        {
+          "$set" => {
+            "field" => "value",
+            "child.children.1.children.3.field" => "value",
+          }
+        }
+      end
+
+      let(:processed) do
+        positionable.positionally(selector, ops)
+      end
+
+      it "does not do any replacement" do
+        processed.should eq(ops)
+      end
+    end
+
     context "when the selector has only 1 pair" do
 
       let(:selector) do

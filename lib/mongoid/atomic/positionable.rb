@@ -45,18 +45,21 @@ module Mongoid
 
       def process_operations(index, operations, processed)
         operations.each_pair do |operation, update|
-          updates = {}
-          update.each_pair do |position, value|
-            updates[replace_index(position, index)] = value
-          end
-          processed[operation] = updates
+          processed[operation] = process_updates(index, update)
         end
         processed
       end
 
+      def process_updates(index, update, updates = {})
+        update.each_pair do |position, value|
+          updates[replace_index(position, index)] = value
+        end
+        updates
+      end
+
       def replace_index(position, index, counter = 0)
-        position.gsub(/(\.\d+\.)/) do |match|
-          value = (counter == index) ? ".$." : match
+        position.gsub(/(\.\w+\.)/) do |match|
+          value = (counter == index && match[1, match.length - 2] =~ /\d+/) ? ".$." : match
           counter += 1
           value
         end
