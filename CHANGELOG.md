@@ -269,6 +269,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2812 Fixed criteria on many to many relations when the base document is
+  destroyed and the foreign key has not yet been lazy evaluated.
+
 * \#2796 Don't cascade changes on has_many relations when assigning with
   a delete.
 
