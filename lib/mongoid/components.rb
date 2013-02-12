@@ -42,6 +42,7 @@ module Mongoid
     include Mongoid::Validations
     include Mongoid::Callbacks
     include Mongoid::Copyable
+    include Mongoid::Equality
 
     MODULES = [
       Mongoid::Atomic,
@@ -67,7 +68,8 @@ module Mongoid
       Mongoid::State,
       Mongoid::Threaded::Lifecycle,
       Mongoid::Timestamps::Timeless,
-      Mongoid::Validations
+      Mongoid::Validations,
+      Mongoid::Equality
     ]
 
     class << self
