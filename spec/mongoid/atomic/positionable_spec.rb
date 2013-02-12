@@ -26,25 +26,62 @@ describe Mongoid::Atomic::Positionable do
 
     context "when a child has an embeds many under an embeds one" do
 
-      let(:selector) do
-        { "_id" => 1, "child._id" => 2 }
-      end
+      context "when selector does not include the embeds one" do
 
-      let(:ops) do
-        {
-          "$set" => {
-            "field" => "value",
-            "child.children.1.children.3.field" => "value",
+        let(:selector) do
+          { "_id" => 1, "child._id" => 2 }
+        end
+
+        let(:ops) do
+          {
+            "$set" => {
+              "field" => "value",
+              "child.children.1.children.3.field" => "value",
+            }
           }
-        }
+        end
+
+        let(:processed) do
+          positionable.positionally(selector, ops)
+        end
+
+        it "does not do any replacement" do
+          processed.should eq(ops)
+        end
       end
 
-      let(:processed) do
-        positionable.positionally(selector, ops)
-      end
+      context "when selector includes the embeds one" do
 
-      it "does not do any replacement" do
-        processed.should eq(ops)
+        let(:selector) do
+          { "_id" => 1, "child._id" => 2, "child.children._id" => 3 }
+        end
+
+        let(:ops) do
+          {
+            "$set" => {
+              "field" => "value",
+              "child.children.1.children.3.field" => "value",
+            }
+          }
+        end
+
+        let(:expected) do
+          {
+            "$set" => {
+              "field" => "value",
+              "child.children.$.children.3.field" => "value",
+            }
+          }
+        end
+
+
+        let(:processed) do
+          positionable.positionally(selector, ops)
+        end
+
+        it "does not do any replacement" do
+          processed.should eq(expected)
+        end
       end
     end
 
@@ -134,7 +171,7 @@ describe Mongoid::Atomic::Positionable do
         {
           "$set" => {
             "field" => "value",
-            "children.0.field" => "value",
+            "children.$.field" => "value",
             "children.0.children.$.children.3.field" => "value",
             "children.0.children.$.children.3.field" => "value",
           },
@@ -168,7 +205,7 @@ describe Mongoid::Atomic::Positionable do
         {
           "$set" => {
             "field" => "value",
-            "children.0.field" => "value",
+            "children.$.field" => "value",
             "children.0.children.1.children.$.field" => "value",
             "children.0.children.1.children.$.field" => "value",
           },

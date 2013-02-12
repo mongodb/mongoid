@@ -38,31 +38,35 @@ module Mongoid
         if selector.size == 1 || selector.values.any? { |val| val.nil? }
           return operations
         end
-        process_operations(selector.size - 2, operations, processed)
+        keys = selector.keys.map{ |m| m.sub('._id','') } - ['_id']
+        keys = keys.sort_by { |s| s.length*-1 }
+        process_operations(keys, operations, processed)
       end
 
       private
 
-      def process_operations(index, operations, processed)
+      def process_operations(keys, operations, processed)
         operations.each_pair do |operation, update|
-          processed[operation] = process_updates(index, update)
+          processed[operation] = process_updates(keys, update)
         end
         processed
       end
 
-      def process_updates(index, update, updates = {})
+      def process_updates(keys, update, updates = {})
         update.each_pair do |position, value|
-          updates[replace_index(position, index)] = value
+          updates[replace_index(keys, position)] = value
         end
         updates
       end
 
-      def replace_index(position, index, counter = 0)
-        position.gsub(/(\.\w+\.)/) do |match|
-          value = (counter == index && match[1, match.length - 2] =~ /\d+/) ? ".$." : match
-          counter += 1
-          value
+      def replace_index(keys, position)
+        # replace to $ only if that key is on the selector
+        keys.each do |kk|
+          if position =~ /^#{kk}\.\d+\.(.*)/
+            return "#{kk}.$.#{$1}"
+          end
         end
+        position
       end
     end
   end
