@@ -143,7 +143,7 @@ describe Mongoid::Criteria do
       criteria.options[:batch_size].should eq(1000)
     end
 
-    pending "returns the correct documents" do
+    it "returns the correct documents" do
       criteria.should eq([ person ])
     end
   end
