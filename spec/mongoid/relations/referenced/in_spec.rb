@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Relations::Referenced::In do
 
+  before(:all) do
+    Person.reset_callbacks(:validate)
+  end
+
   let(:person) do
     Person.create
   end

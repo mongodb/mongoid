@@ -13,6 +13,20 @@ For instructions on upgrading to newer versions, visit
 * The minimum Active Model and Active Support dependencies have been
   raised to 3.2.
 
+* \#2809 Relations can now specify a primary key to use instead of the
+  id on foreign keys.
+
+        class Person
+          include Mongoid::Document
+          field :username, type: String
+          has_many :cats, primary_key: "username"
+        end
+
+        class Cat
+          include Mongoid::Document
+          belongs_to :person, primary_key: "username"
+        end
+
 * \#2804 $geoNear support has now been added to criteria.
 
         Bar.where(:likes.gt => 1000).geo_near([ 52, 13 ])

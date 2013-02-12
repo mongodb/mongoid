@@ -1903,6 +1903,7 @@ describe Mongoid::Relations::Metadata do
 
       after do
         class_name.constantize.relations.delete("evil_drugs")
+        Person.reset_callbacks(:validate)
       end
 
       it "raises AmbiguousRelationship" do
