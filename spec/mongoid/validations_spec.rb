@@ -45,6 +45,21 @@ describe Mongoid::Validations do
         value.should eq([ address ])
       end
     end
+
+    context "when validating a non field" do
+
+      let(:princess) do
+        Princess.new
+      end
+
+      let(:value) do
+        princess.read_attribute_for_validation(:color)
+      end
+
+      it "does not error on the read" do
+        value.should be_empty
+      end
+    end
   end
 
   describe "#valid?" do

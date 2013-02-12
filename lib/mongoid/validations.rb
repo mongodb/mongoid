@@ -62,8 +62,10 @@ module Mongoid
         relation.do_or_do_not(:in_memory) || relation
       elsif fields[attribute].try(:localized?)
         attributes[attribute]
-      else
+      elsif respond_to?("#{attr}_before_type_cast")
         send("#{attr}_before_type_cast")
+      else
+        send(attr)
       end
     end
 
