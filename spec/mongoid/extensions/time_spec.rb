@@ -318,13 +318,10 @@ describe Mongoid::Extensions::Time do
         it "doesn't round up the seconds" do
           eom_time_mongoized.sec.should eq(eom_time.utc.sec)
         end
-<<<<<<< HEAD
 
         it "does not alter the seconds" do
           (eom_time_mongoized.usec).should eq(999999)
         end
-=======
->>>>>>> Fix the observers being removed from rails core
       end
     end
 
