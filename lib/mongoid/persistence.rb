@@ -128,7 +128,7 @@ module Mongoid
         selector = atomic_selector
         _root.collection.find(selector).update(positionally(selector, touches))
       end
-      run_callbacks(:touch, :after)
+      run_callbacks(:touch)
       true
     end
 
