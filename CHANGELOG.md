@@ -3,7 +3,7 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
-## 4.0.0 (branch: 4.0.0-dev)
+## 4.0.0
 
 ### Major Changes (Backwards Incompatible)
 
@@ -23,7 +23,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
-## 3.1.0 (branch: master)
+## 3.1.0
 
 ### New Features
 
