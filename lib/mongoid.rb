@@ -61,9 +61,7 @@ require "mongoid/inspection"
 require "mongoid/json"
 require "mongoid/loggable"
 require "mongoid/matchers"
-require "mongoid/multi_parameter_attributes"
 require "mongoid/nested_attributes"
-require "mongoid/observer"
 require "mongoid/persistence"
 require "mongoid/reloading"
 require "mongoid/scoping"
@@ -75,9 +73,7 @@ require "mongoid/timestamps"
 require "mongoid/unit_of_work"
 require "mongoid/validations"
 require "mongoid/version"
-require "mongoid/versioning"
 require "mongoid/components"
-require "mongoid/paranoia"
 require "mongoid/document"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
@@ -160,7 +156,5 @@ module Mongoid
   #   Mongoid.database = Mongo::Connection.new.db("test")
   #
   # @since 1.0.0
-  delegate(*(Config.public_instance_methods(false) +
-    ActiveModel::Observing::ClassMethods.public_instance_methods(false) - [:logger=, :logger] <<
-    { to: Config }))
+  delegate(*(Config.public_instance_methods(false) - [ :logger=, :logger ] << { to: Config }))
 end

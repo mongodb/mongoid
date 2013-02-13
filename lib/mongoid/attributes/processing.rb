@@ -14,48 +14,22 @@ module Mongoid
       #   person.process_attributes(:title => "sir", :age => 40)
       #
       # @param [ Hash ] attrs The attributes to set.
-      # @param [ Symbol ] role A role for scoped mass assignment.
-      # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
       #
       # @since 2.0.0.rc.7
-      def process_attributes(attrs = nil, role = :default, guard_protected_attributes = true)
-        with_mass_assignment(role, guard_protected_attributes) do
-          attrs ||= {}
-          if !attrs.empty?
-            attrs = sanitize_for_mass_assignment(attrs, role) if guard_protected_attributes
-            attrs.each_pair do |key, value|
-              next if pending_attribute?(key, value)
-              process_attribute(key, value)
-            end
+      def process_attributes(attrs = nil)
+        attrs ||= {}
+        if !attrs.empty?
+          attrs = sanitize_for_mass_assignment(attrs)
+          attrs.each_pair do |key, value|
+            next if pending_attribute?(key, value)
+            process_attribute(key, value)
           end
-          yield self if block_given?
-          process_pending
         end
+        yield self if block_given?
+        process_pending
       end
 
       private
-
-      # Get the current mass assignment options for this model.
-      #
-      # @api private
-      #
-      # @return [ Hash ] The mass assignment options.
-      #
-      # @since 3.0.7
-      def mass_assignment_options
-        @mass_assignment_options ||= {}
-      end
-
-      # Set the mass assignment options for the current model.
-      #
-      # @api private
-      #
-      # @return [ Hash ] The mass assignment options.
-      #
-      # @since 3.0.7
-      def mass_assignment_options=(options)
-        @mass_assignment_options = options
-      end
 
       # If the key provided is the name of a relation or a nested attribute, we
       # need to wait until all other attributes are set before processing
@@ -167,32 +141,10 @@ module Mongoid
         pending_relations.each_pair do |name, value|
           metadata = relations[name]
           if value.is_a?(Hash)
-            metadata.nested_builder(value, {}).build(self, mass_assignment_options)
+            metadata.nested_builder(value, {}).build(self)
           else
             send("#{name}=", value)
           end
-        end
-      end
-
-      # Execute the block with the provided mass assignment options set.
-      #
-      # @api private
-      #
-      # @example Execute with mass assignment.
-      #   model.with_mass_assignment(:default, true)
-      #
-      # @param [ Symbol ] role The role.
-      # @param [ true, false ] guard_protected_attributes To enable mass
-      #   assignment.
-      #
-      # @since 3.0.7
-      def with_mass_assignment(role, guard_protected_attributes)
-        begin
-          self.mass_assignment_options =
-            { as: role, without_protection: !guard_protected_attributes }
-          yield
-        ensure
-          self.mass_assignment_options = nil
         end
       end
     end

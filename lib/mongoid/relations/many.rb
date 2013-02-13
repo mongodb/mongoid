@@ -39,8 +39,8 @@ module Mongoid
       # @return [ Document ] The newly created document.
       #
       # @since 2.0.0.beta.1
-      def create(attributes = nil, options = {}, type = nil, &block)
-        doc = build(attributes, options, type, &block)
+      def create(attributes = nil, type = nil, &block)
+        doc = build(attributes, type, &block)
         base.persisted? ? doc.save : raise_unsaved(doc)
         doc
       end
@@ -54,7 +54,6 @@ module Mongoid
       #
       # @overload create!(attributes = nil, options = {}, type = nil)
       #   @param [ Hash ] attributes The attributes to create with.
-      #   @param [ Hash ] options The scoped assignment options.
       #   @param [ Class ] type The optional type of document to create.
       #
       # @overload create!(attributes = nil, type = nil)
@@ -66,8 +65,8 @@ module Mongoid
       # @return [ Document ] The newly created document.
       #
       # @since 2.0.0.beta.1
-      def create!(attributes = nil, options = {}, type = nil, &block)
-        doc = build(attributes, options, type, &block)
+      def create!(attributes = nil, type = nil, &block)
+        doc = build(attributes, type, &block)
         base.persisted? ? doc.save! : raise_unsaved(doc)
         doc
       end
@@ -78,9 +77,8 @@ module Mongoid
       # @example Find or create.
       #   person.posts.find_or_create_by(:title => "Testing")
       #
-      # @overload find_or_create_by(attributes = nil, options = {}, type = nil)
+      # @overload find_or_create_by(attributes = nil, type = nil)
       #   @param [ Hash ] attributes The attributes to search or create with.
-      #   @param [ Hash ] options The scoped assignment options.
       #   @param [ Class ] type The optional type of document to create.
       #
       # @overload find_or_create_by(attributes = nil, type = nil)
@@ -88,8 +86,8 @@ module Mongoid
       #   @param [ Class ] type The optional type of document to create.
       #
       # @return [ Document ] An existing document or newly created one.
-      def find_or_create_by(attrs = {}, options = {}, type = nil, &block)
-        find_or(:create, attrs, options, type, &block)
+      def find_or_create_by(attrs = {}, type = nil, &block)
+        find_or(:create, attrs, type, &block)
       end
 
       # Find the first +Document+ given the conditions, or instantiates a new document
@@ -98,9 +96,8 @@ module Mongoid
       # @example Find or initialize.
       #   person.posts.find_or_initialize_by(:title => "Test")
       #
-      # @overload find_or_initialize_by(attributes = {}, options = {}, type = nil)
+      # @overload find_or_initialize_by(attributes = {}, type = nil)
       #   @param [ Hash ] attributes The attributes to search or initialize with.
-      #   @param [ Hash ] options The scoped assignment options.
       #   @param [ Class ] type The optional subclass to build.
       #
       # @overload find_or_initialize_by(attributes = {}, type = nil)
@@ -108,8 +105,8 @@ module Mongoid
       #   @param [ Class ] type The optional subclass to build.
       #
       # @return [ Document ] An existing document or newly instantiated one.
-      def find_or_initialize_by(attrs = {}, options = {}, type = nil, &block)
-        find_or(:build, attrs, options, type, &block)
+      def find_or_initialize_by(attrs = {}, type = nil, &block)
+        find_or(:build, attrs, type, &block)
       end
 
       # This proxy can never be nil.
@@ -191,10 +188,9 @@ module Mongoid
       # @example Find or create|initialize.
       #   person.addresses.find_or(:create, :street => "Bond")
       #
-      # @overload find_or(method, attributes = {}, options = {}, type = nil)
+      # @overload find_or(method, attributes = {}, type = nil)
       #   @param [ Symbol ] method The method name, create or new.
       #   @param [ Hash ] attributes The attributes to search or build with.
-      #   @param [ Hash ] options The scoped assignment options.
       #   @param [ Class ] type The optional subclass to build.
       #
       # @overload find_or(attributes = {}, type = nil)
@@ -203,14 +199,9 @@ module Mongoid
       #   @param [ Class ] type The optional subclass to build.
       #
       # @return [ Document ] A matching document or a new/created one.
-      def find_or(method, attrs = {}, options = {}, type = nil, &block)
-        if options.is_a? Class
-          options, type = {}, options
-        end
-
+      def find_or(method, attrs = {}, type = nil, &block)
         attrs["_type"] = type.to_s if type
-
-        where(attrs).first || send(method, attrs, options, type, &block)
+        where(attrs).first || send(method, attrs, type, &block)
       end
     end
   end

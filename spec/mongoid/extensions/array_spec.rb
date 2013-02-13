@@ -523,7 +523,7 @@ describe Mongoid::Extensions::Array do
     end
 
     it "converts the elements properly" do
-      mongoized.first.should eq(date)
+      mongoized.first.should eq(Time.utc(2012, 1, 1, 0, 0, 0))
     end
   end
 
@@ -546,7 +546,7 @@ describe Mongoid::Extensions::Array do
     end
 
     it "converts the elements properly" do
-      mongoized.first.should eq(date)
+      mongoized.first.should eq(Time.utc(2012, 1, 1, 0, 0, 0))
     end
   end
 

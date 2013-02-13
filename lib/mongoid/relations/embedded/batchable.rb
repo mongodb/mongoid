@@ -201,7 +201,7 @@ module Mongoid
             docs.map do |doc|
               attributes = { metadata: metadata, _parent: base }
               attributes.merge!(doc)
-              Factory.build(klass, attributes, base.send(:mass_assignment_options))
+              Factory.build(klass, attributes)
             end
           else
             docs
@@ -297,7 +297,7 @@ module Mongoid
           docs.map do |doc|
             self.path = doc.atomic_path unless path
             execute_callback :before_remove, doc
-            if !_assigning? && !metadata.versioned?
+            unless _assigning?
               doc.cascade!
               doc.run_before_callbacks(:destroy) if method == :destroy
             end

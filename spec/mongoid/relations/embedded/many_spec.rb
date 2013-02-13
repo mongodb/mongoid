@@ -434,7 +434,6 @@ describe Mongoid::Relations::Embedded::Many do
             field :old_state, type: String
             field :new_state, type: String
             field :when_changed, type: DateTime
-            attr_protected :_id
             embedded_in :tracking_id, class_name: "MyCompany::Model::TrackingId"
           end
         end
@@ -918,28 +917,6 @@ describe Mongoid::Relations::Embedded::Many do
 
     describe "#build" do
 
-      context "when providing scoped mass assignment" do
-
-        let(:person) do
-          Person.new
-        end
-
-        let(:video) do
-          person.videos.send(
-            method,
-            { title: "Inception", year: 1999 }, as: :admin
-          )
-        end
-
-        it "sets the attributes for the provided role" do
-          video.title.should eq("Inception")
-        end
-
-        it "does not set the attributes for other roles" do
-          video.year.should be_nil
-        end
-      end
-
       context "when the relation is not cyclic" do
 
         let(:person) do
@@ -1358,27 +1335,6 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#create" do
 
-    context "when providing scoped mass assignment" do
-
-      let(:person) do
-        Person.create
-      end
-
-      let(:video) do
-        person.videos.create(
-          { title: "Inception", year: 1999 }, as: :admin
-        )
-      end
-
-      it "sets the attributes for the provided role" do
-        video.title.should eq("Inception")
-      end
-
-      it "does not set the attributes for other roles" do
-        video.year.should be_nil
-      end
-    end
-
     context "when the relation is not cyclic" do
 
       let(:person) do
@@ -1459,23 +1415,6 @@ describe Mongoid::Relations::Embedded::Many do
 
     let(:person) do
       Person.create
-    end
-
-    context "when providing scoped mass assignment" do
-
-      let(:video) do
-        person.videos.create!(
-          { title: "Inception", year: 1999 }, as: :admin
-        )
-      end
-
-      it "sets the attributes for the provided role" do
-        video.title.should eq("Inception")
-      end
-
-      it "does not set the attributes for other roles" do
-        video.year.should be_nil
-      end
     end
 
     context "when validation passes" do
@@ -2626,7 +2565,7 @@ describe Mongoid::Relations::Embedded::Many do
     it "returns the valid options" do
       described_class.valid_options.should eq(
         [
-          :as, :cascade_callbacks, :cyclic, :order, :versioned,
+          :as, :cascade_callbacks, :cyclic, :order,
           :store_as, :before_add, :after_add, :before_remove, :after_remove
         ]
       )

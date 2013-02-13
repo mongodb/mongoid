@@ -111,10 +111,6 @@ describe Mongoid::Config do
         described_class.raise_not_found_error.should be_true
       end
 
-      it "sets the skip version check option" do
-        described_class.skip_version_check.should be_true
-      end
-
       it "sets the use activesupport time zone option" do
         described_class.use_activesupport_time_zone.should be_true
       end
@@ -167,10 +163,6 @@ describe Mongoid::Config do
 
         it "sets the raise not found error option" do
           described_class.raise_not_found_error.should be_true
-        end
-
-        it "sets the skip version check option" do
-          described_class.skip_version_check.should be_true
         end
 
         it "sets the use activesupport time zone option" do

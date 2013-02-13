@@ -37,7 +37,7 @@ module Mongoid
           child = send(name)
           Array.wrap(child).each do |doc|
             children.push(doc)
-            children.concat(doc._children) unless metadata.versioned?
+            children.concat(doc._children)
           end if child
         end
       end

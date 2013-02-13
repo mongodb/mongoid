@@ -979,6 +979,10 @@ describe Mongoid::Document do
             manager.should be_an_instance_of(Manager)
           end
 
+          it "copies over the dirty changes" do
+            manager.changes["ssn"].should eq(person.changes["ssn"])
+          end
+
           it "can by queried by the parent class" do
             Person.find(manager.id).should be_an_instance_of(Manager)
           end

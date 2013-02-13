@@ -10,8 +10,4 @@ class Video
   belongs_to :game
 
   default_scope asc(:title)
-
-  attr_accessible :title, as: [ :default, :admin ]
-  attr_accessible :year, as: [ :default ]
-  attr_accessible :person_attributes, as: [ :default ]
 end

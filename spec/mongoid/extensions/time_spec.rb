@@ -261,7 +261,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "doesn't strip milli- or microseconds" do
-        Time.mongoize(time).to_f.round(3).should eq(time.to_f.round(3))
+        Time.mongoize(time).to_f.should eq(time.to_time.to_f)
       end
 
       it "doesn't round up the hour at end of month" do

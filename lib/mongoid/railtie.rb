@@ -60,7 +60,7 @@ module Rails
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
-      initializer "setup database" do
+      initializer "mongoid.load-config" do
         config_file = Rails.root.join("config", "mongoid.yml")
         if config_file.file?
           begin
@@ -79,22 +79,18 @@ module Rails
 
       # After initialization we will warn the user if we can't find a mongoid.yml and
       # alert to create one.
-      initializer "warn when configuration is missing" do
-        config.after_initialize do
-          unless Rails.root.join("config", "mongoid.yml").file? || ::Mongoid.configured?
-            puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
-            puts "to generate one run: rails generate mongoid:config\n\n"
-          end
+      config.after_initialize do
+        unless Rails.root.join("config", "mongoid.yml").file? || ::Mongoid.configured?
+          puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
+          puts "to generate one run: rails generate mongoid:config\n\n"
         end
       end
 
       # Set the proper error types for Rails. DocumentNotFound errors should be
       # 404s and not 500s, validation errors are 422s.
-      initializer "load http errors" do |app|
-        config.after_initialize do
-          unless config.action_dispatch.rescue_responses
-            ActionDispatch::ShowExceptions.rescue_responses.update(Railtie.rescue_responses)
-          end
+      config.after_initialize do
+        unless config.action_dispatch.rescue_responses
+          ActionDispatch::ShowExceptions.rescue_responses.update(Railtie.rescue_responses)
         end
       end
 
@@ -103,7 +99,7 @@ module Rails
       #
       # This will happen every request in development, once in ther other
       # environments.
-      initializer "preload all application models" do |app|
+      initializer "mongoid.preload-models" do |app|
         config.to_prepare do
           if $rails_rake_task
             # We previously got rid of this, however in the case where
@@ -117,37 +113,24 @@ module Rails
       end
 
       # Need to include the Mongoid identity map middleware.
-      initializer "include the identity map" do |app|
+      initializer "mongoid.use-identity-map-middleware" do |app|
         app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
       end
 
-      # Instantitate any registered observers after Rails initialization and
-      # instantiate them after being reloaded in the development environment
-      initializer "instantiate observers" do
-        config.after_initialize do
-          ::Mongoid::instantiate_observers
-          ActionDispatch::Reloader.to_prepare do
-            ::Mongoid.instantiate_observers
-          end
+      config.after_initialize do
+        # Unicorn clears the START_CTX when a worker is forked, so if we have
+        # data in START_CTX then we know we're being preloaded. Unicorn does
+        # not provide application-level hooks for executing code after the
+        # process has forked, so we reconnect lazily.
+        if defined?(Unicorn) && !Unicorn::HttpServer::START_CTX.empty?
+          ::Mongoid.default_session.disconnect if ::Mongoid.configured?
         end
-      end
 
-      initializer "reconnect to master if application is preloaded" do
-        config.after_initialize do
-          # Unicorn clears the START_CTX when a worker is forked, so if we have
-          # data in START_CTX then we know we're being preloaded. Unicorn does
-          # not provide application-level hooks for executing code after the
-          # process has forked, so we reconnect lazily.
-          if defined?(Unicorn) && !Unicorn::HttpServer::START_CTX.empty?
-            ::Mongoid.default_session.disconnect if ::Mongoid.configured?
-          end
-
-          # Passenger provides the :starting_worker_process event for executing
-          # code after it has forked, so we use that and reconnect immediately.
-          if ::Mongoid.running_with_passenger?
-            PhusionPassenger.on_event(:starting_worker_process) do |forked|
-              ::Mongoid.default_session.disconnect if forked
-            end
+        # Passenger provides the :starting_worker_process event for executing
+        # code after it has forked, so we use that and reconnect immediately.
+        if ::Mongoid.running_with_passenger?
+          PhusionPassenger.on_event(:starting_worker_process) do |forked|
+            ::Mongoid.default_session.disconnect if forked
           end
         end
       end

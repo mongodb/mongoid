@@ -71,7 +71,6 @@ module Mongoid
         #
         # @overload build(attributes = {}, options = {}, type = nil)
         #   @param [ Hash ] attributes The attributes to build the document with.
-        #   @param [ Hash ] options The scoped assignment options.
         #   @param [ Class ] type Optional class to build the document with.
         #
         # @overload build(attributes = {}, type = nil)
@@ -79,11 +78,8 @@ module Mongoid
         #   @param [ Class ] type Optional class to build the document with.
         #
         # @return [ Document ] The new document.
-        def build(attributes = {}, options = {}, type = nil)
-          if options.is_a?(Class)
-            options, type = {}, options
-          end
-          doc = Factory.build(type || metadata.klass, attributes, options)
+        def build(attributes = {}, type = nil)
+          doc = Factory.build(type || metadata.klass, attributes)
           append(doc)
           doc.apply_post_processed_defaults
           yield(doc) if block_given?
@@ -133,13 +129,9 @@ module Mongoid
           execute_callback :before_remove, document
           doc = target.delete_one(document)
           if doc && !_binding?
-            _unscoped.delete_one(doc) unless doc.paranoid?
+            _unscoped.delete_one(doc)
             if _assigning?
-              if doc.paranoid?
-                doc.destroy(suppress: true)
-              else
-                base.add_atomic_pull(doc)
-              end
+              base.add_atomic_pull(doc)
             else
               doc.delete(suppress: true)
               unbind_one(doc)
@@ -148,18 +140,6 @@ module Mongoid
           reindex
           execute_callback :after_remove, document
           doc
-        end
-
-        # For use only with Mongoid::Paranoia - will be removed in 4.0.
-        #
-        # @example Get the deleted documents from the relation.
-        #   person.paranoid_phones.deleted
-        #
-        # @return [ Criteria ] The deleted documents.
-        #
-        # @since 3.0.10
-        def deleted
-          unscoped.deleted
         end
 
         # Delete all the documents in the association without running callbacks.
@@ -635,7 +615,7 @@ module Mongoid
           # @since 2.1.0
           def valid_options
             [
-              :as, :cascade_callbacks, :cyclic, :order, :versioned, :store_as,
+              :as, :cascade_callbacks, :cyclic, :order, :store_as,
               :before_add, :after_add, :before_remove, :after_remove
             ]
           end

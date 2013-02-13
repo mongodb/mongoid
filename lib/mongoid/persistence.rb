@@ -128,7 +128,7 @@ module Mongoid
         selector = atomic_selector
         _root.collection.find(selector).update(positionally(selector, touches))
       end
-      run_callbacks(:touch, :after)
+      run_callbacks(:touch)
       true
     end
 
@@ -176,8 +176,8 @@ module Mongoid
     # @param [ Hash ] attributes The attributes to update.
     #
     # @return [ true, false ] True if validation passed, false if not.
-    def update_attributes(attributes = {}, options = {})
-      assign_attributes(attributes, options); save
+    def update_attributes(attributes = {})
+      assign_attributes(attributes); save
     end
 
     # Update the document attributes in the database and raise an error if
@@ -191,8 +191,8 @@ module Mongoid
     # @raise [ Errors::Validations ] If validation failed.
     #
     # @return [ true, false ] True if validation passed.
-    def update_attributes!(attributes = {}, options = {})
-      result = update_attributes(attributes, options)
+    def update_attributes!(attributes = {})
+      result = update_attributes(attributes)
       unless result
         self.class.fail_validate!(self) unless errors.empty?
         self.class.fail_callback!(self, :update_attributes!)
@@ -230,18 +230,16 @@ module Mongoid
       #
       # @param [ Hash, Array ] attributes The attributes to create with, or an
       #   Array of multiple attributes for multiple documents.
-      # @param [ Hash ] options A mass-assignment protection options. Supports
-      #   :as and :without_protection
       #
       # @return [ Document, Array<Document> ] The newly created document(s).
       #
       # @since 1.0.0
-      def create(attributes = nil, options = {}, &block)
+      def create(attributes = nil, &block)
         _creating do
           if attributes.is_a?(::Array)
-            attributes.map { |attrs| create(attrs, options, &block) }
+            attributes.map { |attrs| create(attrs, &block) }
           else
-            doc = new(attributes, options, &block)
+            doc = new(attributes, &block)
             doc.save
             doc
           end
@@ -267,12 +265,12 @@ module Mongoid
       # @return [ Document, Array<Document> ] The newly created document(s).
       #
       # @since 1.0.0
-      def create!(attributes = {}, options = {}, &block)
+      def create!(attributes = nil, &block)
         _creating do
           if attributes.is_a?(::Array)
-            attributes.map { |attrs| create!(attrs, options, &block) }
+            attributes.map { |attrs| create!(attrs, &block) }
           else
-            doc = new(attributes, options, &block)
+            doc = new(attributes, &block)
             fail_validate!(doc) unless doc.insert.errors.empty?
             fail_callback!(doc, :create!) if doc.new_record?
             doc

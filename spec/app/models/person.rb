@@ -41,8 +41,6 @@ class Person
 
   attr_reader :rescored
 
-  attr_protected :security_code, :owner_id, :appointments
-
   embeds_many :favorites, order: :title.desc, inverse_of: :perp, validate: false
   embeds_many :videos, order: [[ :title, :asc ]], validate: false
   embeds_many :phone_numbers, class_name: "Phone", validate: false
@@ -57,7 +55,6 @@ class Person
   end
 
   embeds_many :address_components, validate: false
-  embeds_many :paranoid_phones, validate: false
   embeds_many :services, cascade_callbacks: true, validate: false
   embeds_many :symptoms, validate: false
   embeds_many :appointments, validate: false
@@ -89,7 +86,6 @@ class Person
     end
   end
   has_many :ordered_posts, order: :rating.desc, validate: false
-  has_many :paranoid_posts, validate: false
   has_and_belongs_to_many \
     :preferences,
     index: true,
@@ -113,7 +109,6 @@ class Person
     validate: false
 
   accepts_nested_attributes_for :addresses
-  accepts_nested_attributes_for :paranoid_phones
   accepts_nested_attributes_for :name, update_only: true
   accepts_nested_attributes_for :pet, allow_destroy: true
   accepts_nested_attributes_for :game, allow_destroy: true

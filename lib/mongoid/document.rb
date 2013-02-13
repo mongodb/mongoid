@@ -79,20 +79,18 @@ module Mongoid
     #   Person.new(:title => "Sir")
     #
     # @param [ Hash ] attrs The attributes to set up the document with.
-    # @param [ Hash ] options A mass-assignment protection options. Supports
-    #   :as and :without_protection
     #
     # @return [ Document ] A new document.
     #
     # @since 1.0.0
-    def initialize(attrs = nil, options = nil)
+    def initialize(attrs = nil)
       _building do
         @new_record = true
         @attributes ||= {}
         @attributes_before_type_cast ||= {}
         options ||= {}
         apply_pre_processed_defaults
-        process_attributes(attrs, options[:as] || :default, !options[:without_protection]) do
+        process_attributes(attrs) do
           yield(self) if block_given?
         end
         apply_post_processed_defaults
@@ -183,7 +181,7 @@ module Mongoid
         raise ArgumentError, "A class which includes Mongoid::Document is expected"
       end
 
-      became = klass.new(clone_document, without_protection: true)
+      became = klass.new(clone_document)
       became.id = id
       became.instance_variable_set(:@changed_attributes, changed_attributes)
       became.instance_variable_set(:@errors, errors)
@@ -287,7 +285,7 @@ module Mongoid
         doc.instance_variable_set(:@attributes, attributes)
         doc.instance_variable_set(:@attributes_before_type_cast, {})
         doc.apply_defaults
-        IdentityMap.set(doc) unless _loading_revision?
+        IdentityMap.set(doc)
         yield(doc) if block_given?
         doc.run_callbacks(:find) unless doc._find_callbacks.empty?
         doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?
