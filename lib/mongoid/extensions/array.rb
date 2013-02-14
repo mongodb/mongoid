@@ -153,7 +153,11 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
-          evolve(object).collect{ |obj| obj.class.mongoize(obj) }
+          if object.is_a?(::Array)
+            evolve(object).collect{ |obj| obj.class.mongoize(obj) }
+          else
+            object
+          end
         end
 
         # Is the object's size changable?
