@@ -156,7 +156,7 @@ module Mongoid
           if object.is_a?(::Array)
             evolve(object).collect{ |obj| obj.class.mongoize(obj) }
           else
-            object
+            evolve(object)
           end
         end
 
