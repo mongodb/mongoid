@@ -179,7 +179,8 @@ module Mongoid
         unless fields.has_key?("_type")
           field(:_type, default: self.name, type: String)
         end
-        subclass.field(:_type, default: subclass.name, type: String)
+        subclass_default = subclass.name || ->{ self.class.name }
+        subclass.field(:_type, default: subclass_default, type: String)
       end
     end
   end
