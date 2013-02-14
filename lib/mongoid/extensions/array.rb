@@ -153,7 +153,7 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
-          evolve(object)
+          evolve(object).collect{ |obj| obj.class.mongoize(obj) }
         end
 
         # Is the object's size changable?
