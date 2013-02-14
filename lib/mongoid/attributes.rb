@@ -12,7 +12,6 @@ module Mongoid
     include Readonly
 
     attr_reader :attributes
-    attr_reader :attributes_before_type_cast
     alias :raw_attributes :attributes
 
     # Determine if an attribute is present.
@@ -28,6 +27,18 @@ module Mongoid
     def attribute_present?(name)
       attribute = read_attribute(name)
       !attribute.blank? || attribute == false
+    end
+
+    # Get the attributes that have not been cast.
+    #
+    # @example Get the attributes before type cast.
+    #   document.attributes_before_type_cast
+    #
+    # @return [ Hash ] The uncast attributes.
+    #
+    # @since 3.1.0
+    def attributes_before_type_cast
+      @attributes_before_type_cast ||= {}
     end
 
     # Does the document have the provided attribute?
