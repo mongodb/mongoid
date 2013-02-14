@@ -87,7 +87,6 @@ module Mongoid
       _building do
         @new_record = true
         @attributes ||= {}
-        @attributes_before_type_cast ||= {}
         options ||= {}
         apply_pre_processed_defaults
         process_attributes(attrs) do
@@ -283,7 +282,6 @@ module Mongoid
         doc = allocate
         doc.criteria_instance_id = criteria_instance_id
         doc.instance_variable_set(:@attributes, attributes)
-        doc.instance_variable_set(:@attributes_before_type_cast, {})
         doc.apply_defaults
         IdentityMap.set(doc)
         yield(doc) if block_given?
