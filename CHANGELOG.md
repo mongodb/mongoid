@@ -159,12 +159,14 @@ For instructions on upgrading to newer versions, visit
 * \#2465 Documents now have an `attribute_before_type_cast` for proper
   handling of validations. (Gerad Suyderhoud)
 
-* \#2443 `expire_after_seconds` is now a valid index option.
+* \#2443 `expire_after_seconds` is now a valid index option
+  (http://docs.mongodb.org/manual/core/indexes/#ttl-indexes,
+   http://docs.mongodb.org/manual/tutorial/expire-data/).
 
         class Event
           include Mongoid::Document
-          field :status, type: Integer
-          index({ status: 1 }, { expire_after_seconds: 3600 })
+          field :created_at, type: DateTime
+          index({ created_at: 1 }, { expire_after_seconds: 3600 })
         end
 
 * \#2373 Relations with the `touch: true` option will now be automatically
