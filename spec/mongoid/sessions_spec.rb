@@ -85,6 +85,20 @@ describe Mongoid::Sessions do
         Band.send(:remove_instance_variable, :@collection_name)
       end
 
+      context "when called multiple times with different options" do
+        before do
+          Band.store_in collection: "artists"
+          Band.store_in session: "another"
+        end
+
+        it "should merge the options together" do
+          Band.storage_options.should == {
+            collection: "artists",
+            session: "another"
+          }
+        end
+      end
+
       context "when overriding with a proc" do
 
         before do

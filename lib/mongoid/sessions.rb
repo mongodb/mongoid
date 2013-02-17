@@ -293,7 +293,8 @@ module Mongoid
       def store_in(options)
         Validators::Storage.validate(self, options)
         @collection_name, @database_name = nil, nil
-        self.storage_options = options
+        self.storage_options ||= {}
+        self.storage_options.merge! options
       end
 
       # Tell the next persistance operation to store in a specific collection,
