@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.1.1
+
+* \#2839 Validations fixed to use the type cast value with the exception
+  of the numericality validator. (Lailson Bandeira)
+
+### Resolved Issues
+
 ## 3.1.0
 
 ### New Features
