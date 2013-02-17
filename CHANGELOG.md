@@ -8,6 +8,9 @@ For instructions on upgrading to newer versions, visit
 * \#2839 Validations fixed to use the type cast value with the exception
   of the numericality validator. (Lailson Bandeira)
 
+* \#2838 `store_in` options now properly merge instead of override.
+  (Colin MacKenzie)
+
 ### Resolved Issues
 
 ## 3.1.0
