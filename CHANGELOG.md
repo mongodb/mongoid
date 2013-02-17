@@ -23,6 +23,13 @@ For instructions on upgrading to newer versions, visit
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
+## 3.1.1
+
+### Resolved Issues
+
+* \#2839 Validations fixed to use the type cast value with the exception
+  of the numericality validator. (Lailson Bandeira)
+
 ## 3.1.0
 
 ### New Features
