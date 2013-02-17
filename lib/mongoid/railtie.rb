@@ -101,14 +101,7 @@ module Rails
       # environments.
       initializer "mongoid.preload-models" do |app|
         config.to_prepare do
-          if $rails_rake_task
-            # We previously got rid of this, however in the case where
-            # threadsafe! is enabled we must load all models so things like
-            # creating indexes works properly.
-            ::Rails::Mongoid.load_models(app)
-          else
-            ::Rails::Mongoid.preload_models(app)
-          end
+          ::Rails::Mongoid.preload_models(app)
         end
       end
 
