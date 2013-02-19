@@ -53,7 +53,7 @@ module Mongoid
         # @since 3.0.0
         def batch_remove(docs, method = :delete)
           removals = pre_process_batch_remove(docs, method)
-          if !docs.empty? && !_assigning?
+          if !docs.empty?
             collection.find(selector).update("$pullAll" => { path => removals })
             post_process_batch_remove(docs, method)
           end
