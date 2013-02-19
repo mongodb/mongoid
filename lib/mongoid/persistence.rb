@@ -120,7 +120,7 @@ module Mongoid
     def touch(field = nil)
       return false if _root.new_record?
       current = Time.now
-      write_attribute(:updated_at, current) if fields["updated_at"]
+      write_attribute(:updated_at, current) if respond_to?("updated_at=")
       write_attribute(field, current) if field
 
       touches = touch_atomic_updates(field)
