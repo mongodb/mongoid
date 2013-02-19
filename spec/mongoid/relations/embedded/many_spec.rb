@@ -724,8 +724,8 @@ describe Mongoid::Relations::Embedded::Many do
             person.addresses.should be_empty
           end
 
-          it "does not delete the child document" do
-            address.should_not be_destroyed
+          it "deletes the child document" do
+            address.should be_destroyed
           end
 
           context "when saving the parent" do

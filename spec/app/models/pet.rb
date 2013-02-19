@@ -15,4 +15,9 @@ class Pet
   def destroy_flag
     @destroy_flag ||= false
   end
+
+  def visits_count=(count)
+    vet_visits.destroy_all
+    count.times { vet_visits.new }
+  end
 end

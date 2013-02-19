@@ -1124,6 +1124,30 @@ describe Mongoid::Attributes do
           end
         end
 
+        context "when parent destroy all child on setter" do
+
+          let(:owner) do
+            PetOwner.create!(title: "Mr")
+          end
+
+          let(:pet) do
+            Pet.create!(name: "Kika", pet_owner: owner)
+          end
+
+          let!(:vet_visit) do
+            pet.vet_visits.create!(date: Date.today)
+          end
+
+          before do
+            pet.send(method, { visits_count: 3 })
+            pet.save!
+          end
+
+          it "has 3 new entries" do
+            pet.vet_visits.count.should eq(3)
+          end
+        end
+
         context "when the parent has an empty embeds_many" do
 
           let(:person) do
