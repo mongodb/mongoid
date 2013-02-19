@@ -1,6 +1,6 @@
 class Label
   include Mongoid::Document
-  include Mongoid::Timestamps::Updated
+  include Mongoid::Timestamps::Updated::Short
 
   field :name, type: String
   field :after_create_called, type: Boolean, default: false
