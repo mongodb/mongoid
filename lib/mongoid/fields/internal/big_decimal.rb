@@ -21,7 +21,7 @@ module Mongoid #:nodoc:
         def deserialize(object)
           return object unless object
           begin
-            Float(object)
+            Float(object) unless object == 'NaN'
             ::BigDecimal.new(object)
           rescue ArgumentError, TypeError
             object
