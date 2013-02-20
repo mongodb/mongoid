@@ -3,15 +3,21 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.1.2
+
+### Resolved Issues
+
+* \#2848 Fixed `touch` to work when usinng short timestamps. (Arthur Neves)
+
 ## 3.1.1
+
+### Resolved Issues
 
 * \#2839 Validations fixed to use the type cast value with the exception
   of the numericality validator. (Lailson Bandeira)
 
 * \#2838 `store_in` options now properly merge instead of override.
   (Colin MacKenzie)
-
-### Resolved Issues
 
 ## 3.1.0
 
