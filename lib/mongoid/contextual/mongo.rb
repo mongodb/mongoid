@@ -466,6 +466,9 @@ module Mongoid
         [ :hint, :limit, :skip, :sort, :batch_size, :max_scan ].each do |name|
           apply_option(name)
         end
+        if criteria.options[:timeout] == false
+          query.no_timeout
+        end
       end
 
       # Apply an option.
