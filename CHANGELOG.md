@@ -303,6 +303,14 @@ For instructions on upgrading to newer versions, visit
 * \#2664 In memory sorting of embedded documents now properly works when
   multiple fields are provided. (Neer Friedman)
 
+## 3.0.23
+
+### Resolved Issues
+
+* \#2841 Calling `delete_all` or `destroy_all` on an embeds many when in the
+  middle of a parent update will now properly execute the deletion.
+  (Arthur Neves)
+
 ## 3.0.22
 
 ### Resolved Issues

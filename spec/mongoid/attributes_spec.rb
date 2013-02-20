@@ -1146,6 +1146,10 @@ describe Mongoid::Attributes do
           it "has 3 new entries" do
             pet.vet_visits.count.should eq(3)
           end
+
+          it "persists the changes" do
+            pet.reload.vet_visits.count.should eq(3)
+          end
         end
 
         context "when the parent has an empty embeds_many" do
