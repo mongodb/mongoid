@@ -759,7 +759,7 @@ describe Mongoid::Contextual::Mongo do
   describe "#initialize" do
 
     let(:criteria) do
-      Band.where(name: "Depeche Mode")
+      Band.where(name: "Depeche Mode").no_timeout
     end
 
     let(:context) do
@@ -780,6 +780,10 @@ describe Mongoid::Contextual::Mongo do
 
     it "sets the query selector" do
       context.query.selector.should eq({ "name" => "Depeche Mode" })
+    end
+
+    it "sets timeout options" do
+      context.query.operation.flags.should eq([ :no_cursor_timeout ])
     end
   end
 

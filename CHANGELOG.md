@@ -29,6 +29,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2848 Fixed `touch` to work when usinng short timestamps. (Arthur Neves)
 
+* \#2840 Fixed end-to-end `no_timeout` option handling.
+
 ## 3.1.1
 
 ### Resolved Issues
