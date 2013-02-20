@@ -3,6 +3,14 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.23
+
+### Resolved Issues
+
+* \#2841 Calling `delete_all` or `destroy_all` on an embeds many when in the
+  middle of a parent update will now properly execute the deletion.
+  (Arthur Neves)
+
 ## 3.0.22
 
 ### Resolved Issues
