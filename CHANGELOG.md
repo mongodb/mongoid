@@ -23,6 +23,12 @@ For instructions on upgrading to newer versions, visit
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
+## 3.1.2
+
+### Resolved Issues
+
+* \#2848 Fixed `touch` to work when usinng short timestamps. (Arthur Neves)
+
 ## 3.1.1
 
 ### Resolved Issues
