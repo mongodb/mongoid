@@ -25,6 +25,7 @@ module Mongoid
       # @since 3.0.15
       def marshal_load(data)
         @base, @target, @metadata = data
+        extend_proxy(metadata.extension) if metadata.extension?
       end
     end
   end
