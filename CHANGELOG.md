@@ -11,6 +11,8 @@ For instructions on upgrading to newer versions, visit
   middle of a parent update will now properly execute the deletion.
   (Arthur Neves)
 
+* \#2822 Marshal load of relations now properly reapplies extensions.
+
 ## 3.0.22
 
 ### Resolved Issues
@@ -1435,7 +1437,13 @@ For instructions on upgrading to newer versions, visit
 * \#685 Attempting to use versioning with embedded documents will now
   raise a proper error alerting the developer this is not allowed.
 
-## 2.5.2 (branch: 2.5.0-stable)
+## 2.6.0
+
+### New Features
+
+* \#2709 Backported the `touch` functionality from Mongoid 3.
+
+## 2.5.2
 
 ### Resolved Issues
 
