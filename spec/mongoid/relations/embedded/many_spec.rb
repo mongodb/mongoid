@@ -3754,4 +3754,27 @@ describe Mongoid::Relations::Embedded::Many do
       end
     end
   end
+
+  context "when embedded documents get marshalled" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:addresses) do
+      person.addresses
+    end
+
+    let!(:dumped) do
+      Marshal.dump(addresses)
+    end
+
+    let!(:loaded) do
+      Marshal.load(dumped)
+    end
+
+    it "keeps the proxy extensions when remarshalling" do
+      loaded.extension.should eq("Testing")
+    end
+  end
 end

@@ -31,6 +31,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2840 Fixed end-to-end `no_timeout` option handling.
 
+* \#2822 Marshal load of relations now properly reapplies extensions.
+
 ## 3.1.1
 
 ### Resolved Issues
