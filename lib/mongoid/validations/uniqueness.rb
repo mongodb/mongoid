@@ -265,7 +265,7 @@ module Mongoid
       #
       # @since 2.4.10
       def validate_root(document, attribute, value)
-        criteria = create_criteria(klass, document, attribute, value)
+        criteria = create_criteria(klass || document.class, document, attribute, value)
         if criteria.with(consistency: :strong).exists?
           add_error(document, attribute, value)
         end
