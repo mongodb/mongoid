@@ -12,7 +12,7 @@ module Mongoid
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
-          method =~ /(^__|^send|^object_id|^respond_to|^tap|extend_proxy)/
+          method =~ /(^__|^send|^object_id|^respond_to|^tap|extend_proxy|extend_proxies)/
       end
 
       include Threaded::Lifecycle
@@ -39,7 +39,12 @@ module Mongoid
       def init(base, target, metadata)
         @base, @target, @metadata = base, target, metadata
         yield(self) if block_given?
-        extend_proxy(metadata.extension) if metadata.extension?
+        extend_proxies(metadata.extension) if metadata.extension?
+      end
+
+      # Allow extension to be an array and extend each module
+      def extend_proxies(*extension)
+        extension.flatten.each {|ext| extend_proxy(ext) }
       end
 
       # Get the class from the metadata, or return nil if no metadata present.
