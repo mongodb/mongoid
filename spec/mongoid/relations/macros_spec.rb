@@ -559,6 +559,12 @@ describe Mongoid::Relations::Macros do
           "spec"
         end
       end
+
+      module AnotherExtension
+        def very_short_name
+          "spec"
+        end
+      end
     end
 
     let(:peep) do
@@ -588,6 +594,17 @@ describe Mongoid::Relations::Macros do
 
       it "extends the relation" do
         peep.handle.short_name.should eq("spec")
+      end
+    end
+
+    context "when the extension is two modules" do
+
+      before do
+        Peep.embeds_one(:handle, extend: [ Handle::Extension, Handle::AnotherExtension ])
+      end
+
+      it "extends the relation" do
+        peep.handle.very_short_name.should eq("spec")
       end
     end
   end
