@@ -81,7 +81,7 @@ module Mongoid
       #
       # @since 3.0.0
       def numeric?
-        true if Float(self) rescue false
+        true if Float(self) rescue (self == "NaN")
       end
 
       # Get the string as a getter string.

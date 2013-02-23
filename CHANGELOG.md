@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2851 Fixed BigDecimal demongoization of NaN values. (nkem)
+
 * \#2841 Calling `delete_all` or `destroy_all` on an embeds many when in the
   middle of a parent update will now properly execute the deletion.
   (Arthur Neves)

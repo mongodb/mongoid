@@ -28,7 +28,7 @@ describe Mongoid::Extensions::BigDecimal do
         123456.789
       end
 
-      it "returns a big decimal" do
+      it "returns a float" do
         BigDecimal.demongoize(float).should eq(float)
       end
     end
@@ -39,8 +39,27 @@ describe Mongoid::Extensions::BigDecimal do
         123456
       end
 
-      it "returns a big decimal" do
+      it "returns an integer" do
         BigDecimal.demongoize(integer).should eq(integer)
+      end
+    end
+
+    context "when the value is NaN" do
+
+      let(:nan) do
+        "NaN"
+      end
+
+      let(:demongoized) do
+        BigDecimal.demongoize(nan)
+      end
+
+      it "returns a big decimal" do
+        demongoized.should be_a(BigDecimal)
+      end
+
+      it "is a NaN big decimal" do
+        demongoized.should be_nan
       end
     end
   end
