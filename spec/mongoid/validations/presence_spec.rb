@@ -478,4 +478,34 @@ describe Mongoid::Validations::PresenceValidator do
       validators.should eq([ described_class ])
     end
   end
+
+  context "when validating an array" do
+
+    before do
+      Person.validates :aliases, presence: { allow_blank: false }
+    end
+
+    after do
+      Person.reset_callbacks(:validate)
+    end
+
+    context "when allow blank is false" do
+
+      let(:person) do
+        Person.new
+      end
+
+      context "when the array is empty" do
+
+        before do
+          person.array = []
+          person.valid?
+        end
+
+        it "adds the errors to the document" do
+          person.errors[:aliases].should_not be_empty
+        end
+      end
+    end
+  end
 end
