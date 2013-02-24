@@ -60,7 +60,6 @@ module Mongoid
           if metadata.autosave? && autosavable?(metadata)
             autosaved_relations.push(metadata.name)
             set_callback :save, :after, unless: :autosaved? do |document|
-              # @todo: Durran: Remove with Rails 4 after callback termination.
               if before_callback_halted?
                 self.before_callback_halted = false
               else
