@@ -17,7 +17,7 @@ module Mongoid
           def build(type = nil)
             return object unless object.is_a?(Hash)
             if _loading?
-              Factory.from_db(klass, object)
+              Factory.from_map_or_db(klass, object)
             else
               Factory.build(klass, object)
             end

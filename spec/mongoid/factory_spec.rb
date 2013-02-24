@@ -182,4 +182,81 @@ describe Mongoid::Factory do
       end
     end
   end
+  
+  describe ".from_map_or_db" do
+    before(:each) do
+      Mongoid::IdentityMap.clear
+    end
+    
+    context "when the attributes are nil" do
+
+      let(:document) do
+        described_class.from_map_or_db(Address, nil)
+      end
+
+      it "generates based on the provided class" do
+        document.should be_a(Address)
+      end
+
+      it "sets the attributes to empty" do
+        document.attributes.should be_empty
+      end
+    end
+    
+    context "when supplying an id" do
+      let(:attributes) do
+        { "title" => "Sir", "_type" => "person", "_id" => "1"}        
+      end
+      
+      context "when the identity map is enabled" do
+        around(:each) do |example|
+          Mongoid.identity_map_enabled = true
+          example.run
+          Mongoid.identity_map_enabled = false
+        end
+        
+        context "when a document for the id is not in the identity map" do
+          let(:document) do
+            described_class.from_map_or_db(Person, attributes)
+          end
+        
+          it "sets the attributes" do
+            document.title.should eq("Sir")
+          end          
+        end
+      
+        context "when the document has been previously loaded into the identity map" do
+          let(:db_document) do
+            described_class.from_db(Person, attributes)
+          end
+          
+          let(:document) do
+            described_class.from_map_or_db(Person, attributes)
+          end
+          
+          before(:each) do
+            Mongoid::IdentityMap.set(db_document)
+          end
+          
+          it "returns the same instance from the identity map" do
+            document.object_id.should eq(db_document.object_id)
+          end
+        end
+      end
+      
+      context "when the identity map is off" do
+        let(:db_document) do
+          described_class.from_db(Person, attributes)
+        end
+          
+        let(:document) do
+          described_class.from_map_or_db(Person, attributes)
+        end
+
+        it "returns a different instance" do
+          document.object_id.should_not eq(db_document.object_id)
+        end
+      end
+    end
+  end
 end

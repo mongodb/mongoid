@@ -589,7 +589,7 @@ module Mongoid
         if cached? && !documents.empty?
           documents
         elsif eager_loadable?
-          docs = query.map{ |doc| Factory.from_db(klass, doc) }
+          docs = query.map{ |doc| Factory.from_map_or_db(klass, doc) }
           eager_load(docs)
           docs
         else
@@ -632,7 +632,7 @@ module Mongoid
       # @since 3.0.0
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
-          document : Factory.from_db(klass, document, criteria.object_id)
+          document : Factory.from_map_or_db(klass, document, criteria.object_id)
         yield(doc)
         documents.push(doc) if cacheable?
       end
