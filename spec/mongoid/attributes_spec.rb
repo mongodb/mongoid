@@ -329,6 +329,25 @@ describe Mongoid::Attributes do
         person.respond_to?(:testing).should be_true
       end
     end
+
+    context "when the provided value needs mongoization" do
+
+      let(:new_years) do
+        DateTime.new(2013, 1, 1, 0, 0, 0)
+      end
+
+      before do
+        person[:new_years] = new_years
+      end
+
+      it "mongoizes the dynamic field" do
+        person.new_years.should be_a(Time)
+      end
+
+      it "keeps the same value" do
+        person.new_years.should eq(new_years)
+      end
+    end
   end
 
   describe "#process" do
