@@ -1999,7 +1999,7 @@ describe Mongoid::Validations::UniquenessValidator do
     it "transfers the options to the cloned session" do
       expect {
         Person.with(safe: true).create!(ssn: "132-11-1111")
-      }.to raise_error(Moped::Errors::OperationFailure)
+      }.to raise_error
     end
   end
 end
