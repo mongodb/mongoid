@@ -270,7 +270,7 @@ module Mongoid
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].mongoize(value) : value
+      fields.has_key?(key) ? fields[key].mongoize(value) : value.mongoize
     end
 
     module ClassMethods
