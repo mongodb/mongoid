@@ -2041,7 +2041,7 @@ describe Mongoid::Validations::UniquenessValidator do
     end
 
     let!(:person) do
-      Person.create(ssn: "132-11-1111")
+      Person.create(ssn: "132-11-1111", username: "testing-1234")
     end
 
     after do
@@ -2050,7 +2050,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
     it "transfers the options to the cloned session" do
       expect {
-        Person.with(safe: true).create!(ssn: "132-11-1111")
+        Person.with(safe: true).create!(ssn: "132-11-1111", username: "testing-121111")
       }.to raise_error(Moped::Errors::OperationFailure)
     end
   end
