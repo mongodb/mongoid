@@ -319,6 +319,8 @@ For instructions on upgrading to newer versions, visit
   middle of a parent update will now properly execute the deletion.
   (Arthur Neves)
 
+* \#2835 Fixed clearing of persistence options in uniqueness validator.
+
 ## 3.0.22
 
 ### Resolved Issues

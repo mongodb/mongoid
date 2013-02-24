@@ -266,7 +266,7 @@ module Mongoid
       # @since 2.4.10
       def validate_root(document, attribute, value)
         criteria = create_criteria(klass || document.class, document, attribute, value)
-        if criteria.with(consistency: :strong).exists?
+        if criteria.with(persistence_options(criteria)).exists?
           add_error(document, attribute, value)
         end
       end
@@ -286,6 +286,23 @@ module Mongoid
         document.new_record? ||
           document.send("attribute_changed?", attribute.to_s) ||
           scope_value_changed?(document)
+      end
+
+      # Get the persistence options to perform to check, merging with any
+      # existing.
+      #
+      # @api private
+      #
+      # @example Get the persistence options.
+      #   validator.persistence_options(criteria)
+      #
+      # @param [ Criteria ] criteria The criteria.
+      #
+      # @return [ Hash ] The persistence options.
+      #
+      # @since 3.0.23
+      def persistence_options(criteria)
+        (criteria.klass.persistence_options || {}).merge!(consistency: :strong)
       end
     end
   end

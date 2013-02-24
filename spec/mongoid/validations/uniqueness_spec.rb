@@ -1980,4 +1980,26 @@ describe Mongoid::Validations::UniquenessValidator do
       end
     end
   end
+
+  context "when persisting with safe options" do
+
+    before do
+      Person.validates_uniqueness_of(:username)
+      Person.create_indexes
+    end
+
+    let!(:person) do
+      Person.create(ssn: "132-11-1111")
+    end
+
+    after do
+      Person.reset_callbacks(:validate)
+    end
+
+    it "transfers the options to the cloned session" do
+      expect {
+        Person.with(safe: true).create!(ssn: "132-11-1111")
+      }.to raise_error(Moped::Errors::OperationFailure)
+    end
+  end
 end
