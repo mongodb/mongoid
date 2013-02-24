@@ -327,6 +327,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2822 Marshal load of relations now properly reapplies extensions.
 
+* \#2821 Autosaved relations should be duped in inheriting classes.
+
 ## 3.0.22
 
 ### Resolved Issues
