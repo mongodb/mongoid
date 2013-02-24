@@ -13,6 +13,8 @@ For instructions on upgrading to newer versions, visit
   middle of a parent update will now properly execute the deletion.
   (Arthur Neves)
 
+* \#2835 Fixed clearing of persistence options in uniqueness validator.
+
 * \#2826 Dynamic fields are now properly mongoized.
 
 * \#2822 Marshal load of relations now properly reapplies extensions.
