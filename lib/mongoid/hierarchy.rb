@@ -161,6 +161,7 @@ module Mongoid
         subclass.pre_processed_defaults = pre_processed_defaults.dup
         subclass.post_processed_defaults = post_processed_defaults.dup
         subclass.scopes = scopes.dup
+        subclass.autosaved_relations = autosaved_relations.dup
       end
     end
   end
