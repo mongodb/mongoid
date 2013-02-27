@@ -54,7 +54,7 @@ module Mongoid #:nodoc:
         #
         # @since 2.3.0
         def serialize(object)
-          { ::I18n.locale.to_s => object.try(:to_s) }
+          { ::I18n.locale.to_s => object }
         end
       end
     end
