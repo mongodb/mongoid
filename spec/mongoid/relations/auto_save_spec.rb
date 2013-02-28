@@ -94,6 +94,23 @@ describe Mongoid::Relations::AutoSave do
             drug.should be_persisted
           end
         end
+
+        context "when not updating the document" do
+
+          let(:from_db) do
+            Person.find person.id
+          end
+
+          before do
+            person.drugs << drug
+            person.save
+          end
+
+          it 'does not load the association' do
+            from_db.save
+            from_db.ivar(:drugs).should be_false
+          end
+        end
       end
 
       context "when the relation is a references one" do
@@ -124,6 +141,23 @@ describe Mongoid::Relations::AutoSave do
 
           it "saves the relation" do
             account.should be_persisted
+          end
+        end
+
+        context "when not updating the document" do
+
+          let(:from_db) do
+            Person.find person.id
+          end
+
+          before do
+            person.account = account
+            person.save
+          end
+
+          it 'does not load the association' do
+            from_db.save
+            from_db.ivar(:account).should be_false
           end
         end
       end
@@ -160,6 +194,65 @@ describe Mongoid::Relations::AutoSave do
 
           it "saves the relation" do
             movie.should be_persisted
+          end
+        end
+      end
+
+      context "when it has two ralations with autosaves" do
+
+        before do
+          Person.autosaved_relations.delete_one(:drugs)
+          Person.autosave(Person.relations["drugs"].merge!(autosave: true))
+        end
+
+        let!(:person) do
+          Person.create(drugs: [percocet], account: account)
+        end
+
+        let(:from_db) do
+          Person.find person.id
+        end
+
+        let(:percocet) do
+          Drug.new(name: "Percocet")
+        end
+
+        let(:account) do
+          Account.new(name: "Testing")
+        end
+
+        context "when updating one document" do
+
+          let(:placebo) do
+            Drug.new(name: "Placebo")
+          end
+
+          before do
+            from_db.drugs = [placebo]
+            from_db.save
+          end
+
+          it 'loads the updated association' do
+            from_db.ivar(:drugs).should be_true
+          end
+
+          it 'doest not load the other association' do
+            from_db.ivar(:account).should be_false
+          end
+        end
+
+        context "when updating none document" do
+
+          before do
+            from_db.save
+          end
+
+          it 'doest not load drugs association' do
+            from_db.ivar(:drugs).should be_false
+          end
+
+          it 'doest not load account association' do
+            from_db.ivar(:account).should be_false
           end
         end
       end
