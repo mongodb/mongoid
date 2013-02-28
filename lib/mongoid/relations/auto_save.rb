@@ -27,21 +27,32 @@ module Mongoid
       # Begin the associated autosave.
       #
       # @example Begin autosave.
-      #   document.begin_autosave
+      #   document.__autosaving__
       #
-      # @since 3.0.0
-      def begin_autosave
+      # @since 3.1.3
+      def __autosaving__
         Threaded.begin_autosave(self)
+        yield
+      ensure
+        Threaded.exit_autosave(self)
       end
 
-      # Exit the associated autosave.
+      # Check if there is changes for auto-saving
       #
-      # @example Exit autosave.
-      #   document.exit_autosave
+      # @example Return true if there is changes on self or in
+      #           autosaved relations.
+      #   document.changed_for_autosave?
       #
-      # @since 3.0.0
-      def exit_autosave
-        Threaded.exit_autosave(self)
+      # @since 3.1.3
+      def changed_for_autosave?
+        new_record? || changed? || marked_for_destruction?
+      end
+
+      # Returns the relation, if it exists
+      #
+      # @since 3.1.3
+      def relation_changed_for_autosave(metadata)
+        ivar(metadata.name) if self.class.autosaved_relations.include?(metadata.name)
       end
 
       module ClassMethods
@@ -63,14 +74,14 @@ module Mongoid
               if before_callback_halted?
                 self.before_callback_halted = false
               else
-                begin_autosave
-                relation = document.send(metadata.name)
-                if relation
-                  (relation.do_or_do_not(:in_memory) || Array.wrap(relation)).each do |doc|
-                    doc.save
+                __autosaving__ do
+                  if document.changed_for_autosave? || relation = document.relation_changed_for_autosave(metadata)
+                    relation = document.__send__(metadata.name) unless relation
+                    (relation.do_or_do_not(:in_memory) || Array.wrap(relation)).each do |doc|
+                      doc.save
+                    end if relation
                   end
                 end
-                exit_autosave
               end
             end
           end
