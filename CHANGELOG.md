@@ -23,6 +23,12 @@ For instructions on upgrading to newer versions, visit
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
+## 3.1.3
+
+### Resolved Issues
+
+* \#2867 `pluck` now properly handles aliased fields.
+
 ## 3.1.2
 
 ### Resolved Issues

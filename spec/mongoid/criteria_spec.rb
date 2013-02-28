@@ -4672,6 +4672,17 @@ describe Mongoid::Criteria do
         plucked.should be_empty
       end
     end
+
+    context "when plucking an aliased field" do
+
+      let(:plucked) do
+        Band.all.pluck(:id)
+      end
+
+      it "returns the field values" do
+        plucked.should eq([ depeche.id, tool.id, photek.id ])
+      end
+    end
   end
 
   describe "#respond_to?" do
