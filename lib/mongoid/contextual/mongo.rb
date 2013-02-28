@@ -332,7 +332,7 @@ module Mongoid
       #
       # @since 3.1.0
       def pluck(field)
-        normalized = field.to_s
+        normalized = klass.database_field_name(field)
         query.select(normalized => 1).map{ |doc| doc[normalized] }.compact
       end
 

@@ -3,6 +3,12 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.1.3
+
+### Resolved Issues
+
+* \#2867 `pluck` now properly handles aliased fields.
+
 ## 3.1.2
 
 ### Resolved Issues
