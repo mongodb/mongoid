@@ -29,6 +29,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2867 `pluck` now properly handles aliased fields.
 
+* \#2862 Autosaving no longer performs extra unnecessary queries.
+  (Arthur Neves)
+
 ## 3.1.2
 
 ### Resolved Issues
