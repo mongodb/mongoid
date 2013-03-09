@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/changeable"
 require "mongoid/indexable"
+require "mongoid/inspectable"
 require "mongoid/reloadable"
 require "mongoid/scopable"
 require "mongoid/shardable"
@@ -28,7 +29,7 @@ module Mongoid
     include Mongoid::Fields
     include Mongoid::Hierarchy
     include Mongoid::Indexable
-    include Mongoid::Inspection
+    include Mongoid::Inspectable
     include Mongoid::JSON
     include Mongoid::Matchers
     include Mongoid::NestedAttributes
@@ -57,7 +58,7 @@ module Mongoid
       Mongoid::Fields,
       Mongoid::Hierarchy,
       Mongoid::Indexable,
-      Mongoid::Inspection,
+      Mongoid::Inspectable,
       Mongoid::JSON,
       Mongoid::Matchers,
       Mongoid::NestedAttributes,

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Inspection do
+describe Mongoid::Inspectable do
 
   describe "#inspect" do
 
