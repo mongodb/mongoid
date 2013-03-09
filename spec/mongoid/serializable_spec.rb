@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Serialization do
+describe Mongoid::Serializable do
 
   describe "#field_names" do
 

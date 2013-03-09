@@ -5,6 +5,7 @@ require "mongoid/indexable"
 require "mongoid/inspectable"
 require "mongoid/reloadable"
 require "mongoid/scopable"
+require "mongoid/serializable"
 require "mongoid/shardable"
 
 module Mongoid
@@ -37,8 +38,8 @@ module Mongoid
     include Relations
     include Reloadable
     include Scopable
+    include Serializable
     include Sessions
-    include Serialization
     include Shardable
     include State
     include Threaded::Lifecycle
@@ -65,7 +66,7 @@ module Mongoid
       Relations,
       Reloadable,
       Scopable,
-      Serialization,
+      Serializable,
       Sessions,
       Shardable,
       State,
