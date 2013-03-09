@@ -1,6 +1,10 @@
 # encoding: utf-8
 module Mongoid
-  module Dirty
+
+  # Defines behaviour for dirty tracking.
+  #
+  # @since 2.0.0
+  module Changeable
     extend ActiveSupport::Concern
 
     # Get the changed attributes for the document.

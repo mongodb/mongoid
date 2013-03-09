@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Dirty do
+describe Mongoid::Changeable do
 
   describe "#attribute_change" do
 

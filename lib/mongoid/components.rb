@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/changeable"
 require "mongoid/reloadable"
 require "mongoid/scopable"
 require "mongoid/shardable"
@@ -20,7 +21,7 @@ module Mongoid
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
     include Mongoid::Atomic
-    include Mongoid::Dirty
+    include Mongoid::Changeable
     include Mongoid::Attributes
     include Mongoid::Evolvable
     include Mongoid::Fields
@@ -50,7 +51,7 @@ module Mongoid
       Mongoid::Attributes,
       Mongoid::Callbacks,
       Mongoid::Copyable,
-      Mongoid::Dirty,
+      Mongoid::Changeable,
       Mongoid::Evolvable,
       Mongoid::Fields,
       Mongoid::Hierarchy,
