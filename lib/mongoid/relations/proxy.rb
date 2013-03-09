@@ -247,11 +247,11 @@ module Mongoid
           klass, foreign_key = metadata.klass, metadata.foreign_key
           eager_loaded = klass.any_in(foreign_key => ids).entries
           ids.each do |id|
-            IdentityMap.clear_many(klass, metadata.type_relation.merge!(foreign_key => id))
+            IdentityMap.clear_many(klass, metadata.criteria(id, metadata.inverse_klass).selector)
           end
           eager_loaded.each do |doc|
             base_id = doc.__send__(foreign_key)
-            yield(doc,  metadata.type_relation.merge!(foreign_key => base_id))
+            yield(doc, metadata.criteria(base_id, metadata.inverse_klass).selector)
           end
         end
       end
