@@ -3,7 +3,7 @@ module Mongoid
 
   # Contains the bahviour around inspecting documents via inspect.
   #
-  # @since 2.0.0
+  # @since 4.0.0
   module Inspectable
 
     # Returns the class name plus its attributes. If using dynamic fields will

@@ -4,7 +4,7 @@ module Mongoid
   # This module defines the finder methods that hang off the document at the
   # class level.
   #
-  # @since 2.0.0
+  # @since 4.0.0
   module Findable
     extend Origin::Forwardable
 

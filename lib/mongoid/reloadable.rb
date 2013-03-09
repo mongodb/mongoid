@@ -3,7 +3,7 @@ module Mongoid
 
   # This module handles reloading behaviour of documents.
   #
-  # @since 2.0.0
+  # @since 4.0.0
   module Reloadable
 
     # Reloads the +Document+ attributes from the database. If the document has

@@ -3,7 +3,7 @@ module Mongoid
 
   # This module contains behaviour for adding shard key fields to updates.
   #
-  # @since 2.0.0
+  # @since 4.0.0
   module Shardable
     extend ActiveSupport::Concern
 

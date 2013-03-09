@@ -3,7 +3,7 @@ module Mongoid
 
   # Defines behaviour for dirty tracking.
   #
-  # @since 2.0.0
+  # @since 4.0.0
   module Changeable
     extend ActiveSupport::Concern
 
