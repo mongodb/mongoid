@@ -136,7 +136,7 @@ module Mongoid
       end
       _assigning do
         attribute_will_change!(access)
-        delayed_atomic_unsets[atomic_attribute_name(access)] = []
+        delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
         attributes.delete(access)
       end
     end
