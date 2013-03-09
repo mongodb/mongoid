@@ -7,6 +7,7 @@ require "mongoid/reloadable"
 require "mongoid/scopable"
 require "mongoid/serializable"
 require "mongoid/shardable"
+require "mongoid/traversable"
 
 module Mongoid
   module Components
@@ -29,7 +30,6 @@ module Mongoid
     include Attributes
     include Evolvable
     include Fields
-    include Hierarchy
     include Indexable
     include Inspectable
     include Matchers
@@ -43,6 +43,7 @@ module Mongoid
     include Shardable
     include State
     include Threaded::Lifecycle
+    include Traversable
     include Timestamps::Timeless
     include Validations
     include Callbacks
@@ -57,7 +58,6 @@ module Mongoid
       Changeable,
       Evolvable,
       Fields,
-      Hierarchy,
       Indexable,
       Inspectable,
       Matchers,
@@ -72,6 +72,7 @@ module Mongoid
       State,
       Threaded::Lifecycle,
       Timestamps::Timeless,
+      Traversable,
       Validations,
       Equality
     ]

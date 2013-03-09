@@ -1,6 +1,10 @@
 # encoding: utf-8
 module Mongoid
-  module Hierarchy
+
+  # Provides behaviour around traversing the document graph.
+  #
+  # @since 4.0.0
+  module Traversable
     extend ActiveSupport::Concern
 
     included do

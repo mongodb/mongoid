@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Hierarchy do
+describe Mongoid::Traversable do
 
   describe "#_children" do
 
