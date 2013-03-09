@@ -15,6 +15,9 @@ require "origin"
 require "moped"
 
 require "mongoid/version"
+require "mongoid/config"
+require "mongoid/loggable"
+require "mongoid/sessions"
 require "mongoid/document"
 require "mongoid/unit_of_work"
 
