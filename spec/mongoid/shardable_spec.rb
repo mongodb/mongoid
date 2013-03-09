@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe Mongoid::Sharding do
+describe Mongoid::Shardable do
 
   describe ".included" do
 
     let(:klass) do
       Class.new do
-        include Mongoid::Sharding
+        include Mongoid::Shardable
       end
     end
 
@@ -23,7 +23,7 @@ describe Mongoid::Sharding do
 
     let(:klass) do
       Class.new do
-        include Mongoid::Sharding
+        include Mongoid::Shardable
       end
     end
 
@@ -40,7 +40,7 @@ describe Mongoid::Sharding do
 
     let(:klass) do
       Class.new do
-        include Mongoid::Sharding
+        include Mongoid::Shardable
         attr_accessor :name
       end
     end

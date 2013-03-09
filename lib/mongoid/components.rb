@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/reloadable"
 require "mongoid/scopable"
+require "mongoid/shardable"
 
 module Mongoid
   module Components
@@ -35,7 +36,7 @@ module Mongoid
     include Mongoid::Scopable
     include Mongoid::Sessions
     include Mongoid::Serialization
-    include Mongoid::Sharding
+    include Mongoid::Shardable
     include Mongoid::State
     include Mongoid::Threaded::Lifecycle
     include Mongoid::Timestamps::Timeless
@@ -64,7 +65,7 @@ module Mongoid
       Mongoid::Scopable,
       Mongoid::Serialization,
       Mongoid::Sessions,
-      Mongoid::Sharding,
+      Mongoid::Shardable,
       Mongoid::State,
       Mongoid::Threaded::Lifecycle,
       Mongoid::Timestamps::Timeless,
