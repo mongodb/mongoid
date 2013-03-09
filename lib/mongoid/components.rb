@@ -31,7 +31,6 @@ module Mongoid
     include Mongoid::Hierarchy
     include Mongoid::Indexable
     include Mongoid::Inspectable
-    include Mongoid::JSON
     include Mongoid::Matchers
     include Mongoid::NestedAttributes
     include Mongoid::Persistence
@@ -60,7 +59,6 @@ module Mongoid
       Mongoid::Hierarchy,
       Mongoid::Indexable,
       Mongoid::Inspectable,
-      Mongoid::JSON,
       Mongoid::Matchers,
       Mongoid::NestedAttributes,
       Mongoid::Persistence,
