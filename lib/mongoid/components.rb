@@ -15,7 +15,7 @@ module Mongoid
     # module, to keep the document class from getting too cluttered.
     included do
       extend ActiveModel::Translation
-      extend Mongoid::Findable
+      extend Findable
     end
 
     include ActiveModel::Conversion
@@ -23,56 +23,56 @@ module Mongoid
     include ActiveModel::Naming
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
-    include Mongoid::Atomic
-    include Mongoid::Changeable
-    include Mongoid::Attributes
-    include Mongoid::Evolvable
-    include Mongoid::Fields
-    include Mongoid::Hierarchy
-    include Mongoid::Indexable
-    include Mongoid::Inspectable
-    include Mongoid::Matchers
-    include Mongoid::NestedAttributes
-    include Mongoid::Persistence
-    include Mongoid::Relations
-    include Mongoid::Reloadable
-    include Mongoid::Scopable
-    include Mongoid::Sessions
-    include Mongoid::Serialization
-    include Mongoid::Shardable
-    include Mongoid::State
-    include Mongoid::Threaded::Lifecycle
-    include Mongoid::Timestamps::Timeless
-    include Mongoid::Validations
-    include Mongoid::Callbacks
-    include Mongoid::Copyable
-    include Mongoid::Equality
+    include Atomic
+    include Changeable
+    include Attributes
+    include Evolvable
+    include Fields
+    include Hierarchy
+    include Indexable
+    include Inspectable
+    include Matchers
+    include NestedAttributes
+    include Persistence
+    include Relations
+    include Reloadable
+    include Scopable
+    include Sessions
+    include Serialization
+    include Shardable
+    include State
+    include Threaded::Lifecycle
+    include Timestamps::Timeless
+    include Validations
+    include Callbacks
+    include Copyable
+    include Equality
 
     MODULES = [
-      Mongoid::Atomic,
-      Mongoid::Attributes,
-      Mongoid::Callbacks,
-      Mongoid::Copyable,
-      Mongoid::Changeable,
-      Mongoid::Evolvable,
-      Mongoid::Fields,
-      Mongoid::Hierarchy,
-      Mongoid::Indexable,
-      Mongoid::Inspectable,
-      Mongoid::Matchers,
-      Mongoid::NestedAttributes,
-      Mongoid::Persistence,
-      Mongoid::Relations,
-      Mongoid::Reloadable,
-      Mongoid::Scopable,
-      Mongoid::Serialization,
-      Mongoid::Sessions,
-      Mongoid::Shardable,
-      Mongoid::State,
-      Mongoid::Threaded::Lifecycle,
-      Mongoid::Timestamps::Timeless,
-      Mongoid::Validations,
-      Mongoid::Equality
+      Atomic,
+      Attributes,
+      Callbacks,
+      Copyable,
+      Changeable,
+      Evolvable,
+      Fields,
+      Hierarchy,
+      Indexable,
+      Inspectable,
+      Matchers,
+      NestedAttributes,
+      Persistence,
+      Relations,
+      Reloadable,
+      Scopable,
+      Serialization,
+      Sessions,
+      Shardable,
+      State,
+      Threaded::Lifecycle,
+      Timestamps::Timeless,
+      Validations,
+      Equality
     ]
 
     class << self
