@@ -7,7 +7,6 @@ class Actor
   accepts_nested_attributes_for :things, allow_destroy: true
 
   define_model_callbacks :custom
-  observable :custom
 
   def do_something
     run_callbacks(:custom) do
