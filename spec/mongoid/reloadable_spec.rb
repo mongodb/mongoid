@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Reloading do
+describe Mongoid::Reloadable do
 
   describe "#reload" do
 

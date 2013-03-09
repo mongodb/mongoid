@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/reloadable"
 require "mongoid/scopable"
 
 module Mongoid
@@ -30,7 +31,7 @@ module Mongoid
     include Mongoid::NestedAttributes
     include Mongoid::Persistence
     include Mongoid::Relations
-    include Mongoid::Reloading
+    include Mongoid::Reloadable
     include Mongoid::Scopable
     include Mongoid::Sessions
     include Mongoid::Serialization
@@ -59,7 +60,7 @@ module Mongoid
       Mongoid::NestedAttributes,
       Mongoid::Persistence,
       Mongoid::Relations,
-      Mongoid::Reloading,
+      Mongoid::Reloadable,
       Mongoid::Scopable,
       Mongoid::Serialization,
       Mongoid::Sessions,

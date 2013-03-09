@@ -1,7 +1,10 @@
 # encoding: utf-8
 module Mongoid
+
   # This module handles reloading behaviour of documents.
-  module Reloading
+  #
+  # @since 2.0.0
+  module Reloadable
 
     # Reloads the +Document+ attributes from the database. If the document has
     # not been saved then an error will get raised if the configuration option
