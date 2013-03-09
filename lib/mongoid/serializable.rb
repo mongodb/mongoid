@@ -3,6 +3,8 @@ module Mongoid
 
   # This module provides the extra behaviour for including relations in JSON
   # and XML serialization.
+  #
+  # @since 2.0.0
   module Serializable
     extend ActiveSupport::Concern
 
