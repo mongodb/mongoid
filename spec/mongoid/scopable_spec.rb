@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Scoping do
+describe Mongoid::Scopable do
 
   describe ".default_scope" do
 

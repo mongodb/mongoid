@@ -3,7 +3,7 @@ module Mongoid
 
   # This module contains behaviour for all Mongoid scoping - named scopes,
   # default scopes, and criteria accessors via scoped and unscoped.
-  module Scoping
+  module Scopable
     extend ActiveSupport::Concern
 
     included do

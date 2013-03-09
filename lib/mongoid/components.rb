@@ -1,4 +1,6 @@
 # encoding: utf-8
+require "mongoid/scopable"
+
 module Mongoid
   module Components
     extend ActiveSupport::Concern
@@ -29,7 +31,7 @@ module Mongoid
     include Mongoid::Persistence
     include Mongoid::Relations
     include Mongoid::Reloading
-    include Mongoid::Scoping
+    include Mongoid::Scopable
     include Mongoid::Sessions
     include Mongoid::Serialization
     include Mongoid::Sharding
@@ -58,7 +60,7 @@ module Mongoid
       Mongoid::Persistence,
       Mongoid::Relations,
       Mongoid::Reloading,
-      Mongoid::Scoping,
+      Mongoid::Scopable,
       Mongoid::Serialization,
       Mongoid::Sessions,
       Mongoid::Sharding,
