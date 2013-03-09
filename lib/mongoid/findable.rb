@@ -3,7 +3,9 @@ module Mongoid
 
   # This module defines the finder methods that hang off the document at the
   # class level.
-  module Finders
+  #
+  # @since 2.0.0
+  module Findable
     extend Origin::Forwardable
 
     select_with :with_default_scope

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Finders do
+describe Mongoid::Findable do
 
   describe ".distinct" do
 

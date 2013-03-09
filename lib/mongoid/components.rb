@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/changeable"
+require "mongoid/findable"
 require "mongoid/indexable"
 require "mongoid/inspectable"
 require "mongoid/reloadable"
@@ -14,7 +15,7 @@ module Mongoid
     # module, to keep the document class from getting too cluttered.
     included do
       extend ActiveModel::Translation
-      extend Mongoid::Finders
+      extend Mongoid::Findable
     end
 
     include ActiveModel::Conversion
