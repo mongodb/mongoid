@@ -875,6 +875,21 @@ describe Mongoid::Attributes do
         person.title.should be_nil
       end
     end
+
+    context "when the document is new" do
+
+      let(:person) do
+        Person.new(title: "sir")
+      end
+
+      before do
+        person.remove_attribute(:title)
+      end
+
+      it "does not add a delayed unset operation" do
+        person.delayed_atomic_unsets.should be_empty
+      end
+    end
   end
 
   describe "#respond_to?" do

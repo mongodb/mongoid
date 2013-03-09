@@ -320,6 +320,13 @@ For instructions on upgrading to newer versions, visit
 * \#2664 In memory sorting of embedded documents now properly works when
   multiple fields are provided. (Neer Friedman)
 
+## 3.0.24
+
+### Resolved Issues
+
+* \#2879 `remove_attribute` on new documents no longer creates an unnecessary
+  $unset operation.
+
 ## 3.0.23
 
 ### Resolved Issues
