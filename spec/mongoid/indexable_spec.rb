@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe Mongoid::Indexes do
+describe Mongoid::Indexable do
 
   describe ".included" do
 
     let(:klass) do
       Class.new do
-        include Mongoid::Indexes
+        include Mongoid::Indexable
       end
     end
 

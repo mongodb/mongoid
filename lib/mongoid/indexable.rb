@@ -1,8 +1,8 @@
 # encoding: utf-8
-require "mongoid/indexes/validators/options"
+require "mongoid/indexable/validators/options"
 
 module Mongoid
-  module Indexes
+  module Indexable
     extend ActiveSupport::Concern
 
     included do

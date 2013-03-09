@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Indexes
+  module Indexable
     module Validators
 
       # Validates the options passed to the index macro.
