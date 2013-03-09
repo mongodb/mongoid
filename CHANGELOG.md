@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.0.24
+
+### Resolved Issues
+
+* \#2879 `remove_attribute` on new documents no longer creates an unnecessary
+  $unset operation.
+
 ## 3.0.23
 
 ### Resolved Issues
