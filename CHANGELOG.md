@@ -28,6 +28,7 @@ For instructions on upgrading to newer versions, visit
 ### Resolved Issues
 
 * Dont duplicate embedded documents when saving after calling becomes method.
+  (Arthur Neves)
 
 * \#2867 `pluck` now properly handles aliased fields.
 
