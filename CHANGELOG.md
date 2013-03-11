@@ -23,6 +23,10 @@ For instructions on upgrading to newer versions, visit
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
+### New Features
+
+* \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)
+
 ## 3.1.3
 
 ### Resolved Issues
