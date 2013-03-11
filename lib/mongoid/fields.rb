@@ -216,6 +216,7 @@ module Mongoid
       #
       # @since 3.0.7
       def database_field_name(name)
+        return nil unless name
         normalized = name.to_s
         aliased_fields[normalized] || normalized
       end
