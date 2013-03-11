@@ -741,6 +741,25 @@ describe Mongoid::Persistence do
             touched.should be_true
           end
         end
+
+        context "when an attribute alias is provided" do
+
+          let!(:touched) do
+            person.touch(:aliased_timestamp)
+          end
+
+          it "sets the attribute to the current time" do
+            person.aliased_timestamp.should be_within(5).of(Time.now)
+          end
+
+          it "persists the change" do
+            person.reload.aliased_timestamp.should be_within(5).of(Time.now)
+          end
+
+          it "returns true" do
+            touched.should be_true
+          end
+        end
       end
 
       context "when an updated at is defined" do
