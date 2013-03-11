@@ -9,6 +9,8 @@ For instructions on upgrading to newer versions, visit
 
 * Dont duplicate embedded documents when saving after calling becomes method.
 
+* \#2885 Fixed touch for aliased fields. (Niels Ganser)
+
 * \#2867 `pluck` now properly handles aliased fields.
 
 * \#2862 Autosaving no longer performs extra unnecessary queries.
