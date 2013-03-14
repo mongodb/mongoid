@@ -438,6 +438,16 @@ describe Mongoid::Scoping do
           Band.should respond_to(:active)
         end
 
+        context "when proc return nil" do
+          before do
+            Band.scope(:named_by, ->(name) { Band.where(name: name) if name})
+          end
+
+          it "return a all criteral" do
+            Band.named_by(nil).should be_a(Mongoid::Criteria)
+          end
+        end
+
         context "when calling the scope" do
 
           context "when calling from the class" do
