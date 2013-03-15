@@ -33,7 +33,7 @@ module Rails
     # not embedded.
     #
     # @example Remove all the indexes.
-    #   Rails::Mongoid.create_indexes
+    #   Rails::Mongoid.remove_indexes
     #
     # @return [ Array<Class> ] The un-indexed models.
     #
