@@ -27,6 +27,29 @@ describe Mongoid::Changeable do
             [ "Grand Poobah", "Captain Obvious" ]
           )
         end
+
+        context "when the field is aliased" do
+
+          let(:person) do
+            Person.new(test: "Aliased 1").tap(&:move_changes)
+          end
+
+          before do
+            person.test = "Aliased 2"
+          end
+
+          it "returns an array of the old value and new value" do
+            person.send(:attribute_change, "test").should eq(
+              [ "Aliased 1", "Aliased 2" ]
+            )
+          end
+
+          it "allows access via (attribute)_change" do
+            person.test_change.should eq(
+              [ "Aliased 1", "Aliased 2" ]
+            )
+          end
+        end
       end
 
       context "when using [] methods" do
@@ -335,6 +358,25 @@ describe Mongoid::Changeable do
       it "allows access via (attribute)_changed?" do
         person.title_changed?.should be_true
       end
+
+      context "when the field is aliased" do
+
+        let(:person) do
+          Person.new(test: "Aliased 1")
+        end
+
+        before do
+          person.test = "Aliased 2"
+        end
+
+        it "returns true" do
+          person.send(:attribute_changed?, "test").should be_true
+        end
+
+        it "allows access via (attribute)_changed?" do
+          person.test_changed?.should be_true
+        end
+      end
     end
 
     context "when the attribute has changed from the default value" do
@@ -478,6 +520,25 @@ describe Mongoid::Changeable do
       it "allows access via (attribute)_was" do
         person.title_was.should eq("Grand Poobah")
       end
+
+      context "when the field is aliased" do
+
+        let(:person) do
+          Person.new(test: "Aliased 1").tap(&:move_changes)
+        end
+
+        before do
+          person.test = "Aliased 2"
+        end
+
+        it "returns the old value" do
+          person.send(:attribute_was, "test").should eq("Aliased 1")
+        end
+
+        it "allows access via (attribute)_was" do
+          person.test_was.should eq("Aliased 1")
+        end
+      end
     end
 
     context "when the attribute has changed from the default value" do
@@ -529,7 +590,7 @@ describe Mongoid::Changeable do
     end
 
     let(:person) do
-      Person.new(aliases: aliases)
+      Person.new(aliases: aliases, test: "Aliased 1")
     end
 
     before do
@@ -1056,6 +1117,26 @@ describe Mongoid::Changeable do
 
       it "removes the field from the changes" do
         person.changed.should_not include("title")
+      end
+
+      context "when the field is aliased" do
+
+        let(:person) do
+          Person.instantiate(test: "Aliased 1")
+        end
+
+        before do
+          person.test = "Aliased 2"
+          person.send(:reset_attribute!, "test")
+        end
+
+        it "resets the value to the original" do
+          person.test.should be_nil
+        end
+
+        it "removes the field from the changes" do
+          person.changed.should_not include("test")
+        end
       end
     end
 
