@@ -166,6 +166,7 @@ module Mongoid
     #
     # @since 2.1.0
     def attribute_change(attr)
+      attr = database_field_name(attr)
       [changed_attributes[attr], attributes[attr]] if attribute_changed?(attr)
     end
 
@@ -180,6 +181,7 @@ module Mongoid
     #
     # @since 2.1.6
     def attribute_changed?(attr)
+      attr = database_field_name(attr)
       return false unless changed_attributes.has_key?(attr)
       changed_attributes[attr] != attributes[attr]
     end
@@ -209,6 +211,7 @@ module Mongoid
     #
     # @since 2.4.0
     def attribute_was(attr)
+      attr = database_field_name(attr)
       attribute_changed?(attr) ? changed_attributes[attr] : attributes[attr]
     end
 
@@ -239,6 +242,7 @@ module Mongoid
     #
     # @since 2.4.0
     def reset_attribute!(attr)
+      attr = database_field_name(attr)
       attributes[attr] = changed_attributes.delete(attr) if attribute_changed?(attr)
     end
 
