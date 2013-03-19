@@ -50,7 +50,7 @@ module Mongoid
             @attributes = attributes.with_indifferent_access
             @metadata = metadata
             @options = options
-            @destroy = @attributes.delete(:_destroy)
+            @destroy = @attributes.delete(:_destroy) || @attributes.delete("_destroy")
           end
 
           private
