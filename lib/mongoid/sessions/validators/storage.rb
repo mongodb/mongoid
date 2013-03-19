@@ -7,7 +7,7 @@ module Mongoid
       module Storage
         extend self
 
-        VALID_OPTIONS = [ :collection, :database, :session ]
+        VALID_OPTIONS = [ :collection, :database, :session, :skip_database_override ]
 
         # Validate the options provided to :store_in.
         #
