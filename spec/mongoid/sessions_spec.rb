@@ -82,7 +82,6 @@ describe Mongoid::Sessions do
 
       after do
         Band.storage_options = nil
-        Band.send(:remove_instance_variable, :@collection_name)
       end
 
       context "when called multiple times with different options" do
@@ -128,10 +127,6 @@ describe Mongoid::Sessions do
     end
 
     context "when not overriding the default" do
-
-      after do
-        Band.send(:remove_instance_variable, :@collection_name)
-      end
 
       let(:band) do
         Band.new
@@ -185,7 +180,6 @@ describe Mongoid::Sessions do
 
       after do
         Band.storage_options = nil
-        Band.send(:remove_instance_variable, :@collection_name)
       end
 
       context "when overriding with a proc" do
