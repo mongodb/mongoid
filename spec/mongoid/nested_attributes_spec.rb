@@ -336,12 +336,26 @@ describe Mongoid::NestedAttributes do
                 Person.accepts_nested_attributes_for :name
               end
 
-              before do
-                person.name_attributes = { first_name: "Leo", _destroy: "1" }
+              context "when destroy is a symbol" do
+
+                before do
+                  person.name_attributes = { first_name: "Leo", _destroy: "1" }
+                end
+
+                it "does not build the document" do
+                  person.name.should be_nil
+                end
               end
 
-              it "does not build the document" do
-                person.name.should be_nil
+              context "when destroy is a string" do
+
+                before do
+                  person.name_attributes = { first_name: "Leo", "_destroy" => "1" }
+                end
+
+                it "does not build the document" do
+                  person.name.should be_nil
+                end
               end
             end
 
@@ -1449,20 +1463,42 @@ describe Mongoid::NestedAttributes do
 
                       context "when the parent is new" do
 
-                        before do
-                          person.addresses_attributes =
-                            {
-                              "bar" => { "id" => address_one.id.to_s, "_destroy" => truth },
-                              "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
-                            }
+                        context "when provided a hash of attributes" do
+
+                          before do
+                            person.addresses_attributes =
+                              {
+                                "bar" => { "id" => address_one.id.to_s, "_destroy" => truth },
+                                "foo" => { "id" => address_two.id, "street" => "Alexander Platz" }
+                              }
+                          end
+
+                          it "deletes the marked document" do
+                            person.addresses.size.should eq(1)
+                          end
+
+                          it "does not delete the unmarked document" do
+                            person.addresses.first.street.should eq("Alexander Platz")
+                          end
                         end
 
-                        it "deletes the marked document" do
-                          person.addresses.size.should eq(1)
-                        end
+                        context "when provided an array of attributes" do
 
-                        it "does not delete the unmarked document" do
-                          person.addresses.first.street.should eq("Alexander Platz")
+                          before do
+                            person.addresses_attributes =
+                              [
+                                { "id" => address_one.id.to_s, "_destroy" => truth },
+                                { "id" => address_two.id, "street" => "Alexander Platz" }
+                              ]
+                          end
+
+                          it "deletes the marked document" do
+                            person.addresses.size.should eq(1)
+                          end
+
+                          it "does not delete the unmarked document" do
+                            person.addresses.first.street.should eq("Alexander Platz")
+                          end
                         end
                       end
 
