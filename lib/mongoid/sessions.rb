@@ -183,7 +183,7 @@ module Mongoid
       #
       # @since 3.0.0
       def collection_name
-        @collection_name ||= __collection_name__
+        __collection_name__
       end
 
       # Get the default database name for this model.
@@ -195,7 +195,7 @@ module Mongoid
       #
       # @since 3.0.0
       def database_name
-        @database_name ||= __database_name__
+        __database_name__
       end
 
       # Get the overridden database name. This either can be overridden by
@@ -292,9 +292,8 @@ module Mongoid
       # @since 3.0.0
       def store_in(options)
         Validators::Storage.validate(self, options)
-        @collection_name, @database_name = nil, nil
         self.storage_options ||= {}
-        self.storage_options.merge! options
+        self.storage_options.merge!(options)
       end
 
       # Tell the next persistance operation to store in a specific collection,

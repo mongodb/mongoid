@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * Dont duplicate embedded documents when saving after calling becomes method.
 
+* \#2893 Removed memoization of collection name and database name so lambdas
+  with `store_in` work properly when changing.
+
 * \#2911 The `_destroy` attribute on 1-n relations when processing nested
   attributes can now be a string or symbol when passed an array.
 
