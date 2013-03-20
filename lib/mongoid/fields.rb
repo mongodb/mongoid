@@ -432,10 +432,11 @@ module Mongoid
       def create_field_setter(name, meth, field)
         generated_methods.module_eval do
           re_define_method("#{meth}=") do |value|
-            write_attribute(name, value)
+            val = write_attribute(name, value)
             if field.foreign_key?
               remove_ivar(field.metadata.name)
             end
+            val
           end
         end
       end

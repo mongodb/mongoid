@@ -113,23 +113,31 @@ describe Mongoid::Attributes do
 
     context "when setting the attribute to nil" do
 
-      before do
+      let!(:age) do
         person[:age] = nil
       end
 
       it "does not use the default value" do
         person.age.should be_nil
       end
+
+      it "returns the set value" do
+        age.should be_nil
+      end
     end
 
     context "when field has a default value" do
 
-      before do
+      let!(:terms) do
         person[:terms] = true
       end
 
       it "allows overwriting of the default value" do
         person.terms.should be_true
+      end
+
+      it "returns the set value" do
+        terms.should eq(true)
       end
     end
   end

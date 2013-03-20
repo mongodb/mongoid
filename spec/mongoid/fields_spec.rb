@@ -436,6 +436,20 @@ describe Mongoid::Fields do
       Product.new
     end
 
+    context "when setting via the setter" do
+
+      it "returns the set value" do
+        expect(product.price = 10).to eq(10)
+      end
+    end
+
+    context "when setting via send" do
+
+      it "returns the set value" do
+        expect(product.send(:price=, 10)).to eq(10)
+      end
+    end
+
     context "when the field is binary" do
 
       let(:binary) do

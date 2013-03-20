@@ -20,6 +20,9 @@ For instructions on upgrading to newer versions, visit
 * \#2648 `Boolean` becomes `Mongoid::Boolean` to avoid polluting the global
   namespace with a commonly used class by other libraries.
 
+* \#2603 Return values from setters are now always the set value, regardless
+  of calling the setter or using send.
+
 * \#2433 `Mongoid::Paranoia` has been removed.
 
 * \#2432 `Mongoid::Versioning` has been removed.
