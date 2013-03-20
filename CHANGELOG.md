@@ -12,6 +12,8 @@ For instructions on upgrading to newer versions, visit
 * \#2899 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 
+* \#2895 Allow scopes that return nil to still be chainable. (niedhui)
+
 * \#2893 Removed memoization of collection name and database name so lambdas
   with `store_in` work properly when changing.
 
