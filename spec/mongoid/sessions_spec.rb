@@ -432,7 +432,7 @@ describe Mongoid::Sessions do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
     end
 
-    before(:all) do
+    before do
       described_class.clear
       Mongoid.load!(file, :test)
       Mongoid.sessions[:default][:database] = database_id
@@ -730,7 +730,7 @@ describe Mongoid::Sessions do
           File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
         end
 
-        before(:all) do
+        before do
           described_class.clear
           Mongoid.load!(file, :test)
         end
@@ -805,7 +805,7 @@ describe Mongoid::Sessions do
           File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
         end
 
-        before(:all) do
+        before do
           described_class.clear
           Mongoid.load!(file, :test)
         end
