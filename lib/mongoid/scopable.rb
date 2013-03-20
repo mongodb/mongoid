@@ -279,7 +279,7 @@ module Mongoid
           def #{name}(*args)
             scoping = scopes[:#{name}]
             scope, extension = scoping[:scope][*args], scoping[:extension]
-            criteria = with_default_scope.merge(scope)
+            criteria = with_default_scope.merge(scope || queryable)
             criteria.extend(extension)
             criteria
           end

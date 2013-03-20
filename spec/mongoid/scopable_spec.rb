@@ -425,11 +425,13 @@ describe Mongoid::Scopable do
 
         before do
           Band.scope(:active, ->{ Band.where(active: true).skip(10) })
+          Band.scope(:named_by, ->(name) { Band.where(name: name) if name })
         end
 
         after do
           class << Band
             undef_method :active
+            undef_method :named_by
           end
           Band.scopes.clear
         end
@@ -439,6 +441,13 @@ describe Mongoid::Scopable do
         end
 
         context "when calling the scope" do
+
+          context "when the scope would return nil" do
+
+            it "returns a chainable empty scope" do
+              Band.named_by(nil).should be_a(Mongoid::Criteria)
+            end
+          end
 
           context "when calling from the class" do
 
