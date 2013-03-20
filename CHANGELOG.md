@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid now requires Active Model 4 or higher.
 
+* \#2898 Dirty attribute methods now properly handle field aliases.
+  (Niels Ganser)
+
 * \#2659 `Mongoid::Railtie` now properly uses only one initializer and
   the name has changed to `mongoid.load-config`.
 
