@@ -26,9 +26,9 @@ module Mongoid
             end
             attributes.each do |attrs|
               if attrs.respond_to?(:with_indifferent_access)
-                process_attributes(parent, attrs, options)
+                process_attributes(parent, attrs.with_indifferent_access, options)
               else
-                process_attributes(parent, attrs[1], options)
+                process_attributes(parent, attrs[1].with_indifferent_access, options)
               end
             end
           end
