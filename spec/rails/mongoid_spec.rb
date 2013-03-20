@@ -350,10 +350,10 @@ describe "Rails::Mongoid" do
 
       before(:all) do
         Mongoid.preload_models = false
-        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
       end
 
       it "does not load any models" do
+        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         Rails::Mongoid.should_receive(:load_model).never
         Rails::Mongoid.preload_models(app)
       end
@@ -428,10 +428,10 @@ describe "Rails::Mongoid" do
 
       before(:all) do
         Mongoid.preload_models = false
-        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
       end
 
       it "loads all models" do
+        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         Rails::Mongoid.should_receive(:load_model).with("address")
         Rails::Mongoid.should_receive(:load_model).with("user")
         Rails::Mongoid.load_models(app)
@@ -449,10 +449,10 @@ describe "Rails::Mongoid" do
 
       before(:all) do
         Mongoid.preload_models = ["user"]
-        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
       end
 
       it "loads selected models only" do
+        Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         Rails::Mongoid.should_receive(:load_model).with("user")
         Rails::Mongoid.should_receive(:load_model).with("address").never
         Rails::Mongoid.load_models(app)
