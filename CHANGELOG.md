@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * Dont duplicate embedded documents when saving after calling becomes method.
 
+* \#2899 Dirty attribute methods now properly handle field aliases.
+  (Niels Ganser)
+
 * \#2893 Removed memoization of collection name and database name so lambdas
   with `store_in` work properly when changing.
 
