@@ -83,6 +83,10 @@ en:
             Mongoid.master = object."
           resolution: "Make sure that when setting the configuration
             programatically that you are passing an actual db instance."
+        unsupported_version:
+          message: "MongoDB server version should be greater than %{mongo_version}"
+          summary: "MongoDB %{version} is not supported, please upgrade"
+          resolution: "Make sure to upgrade the version of MongoDB server to at least  %{mongo_version}."
         invalid_field:
           message: "Defining a field named '%{name}' is not allowed."
           summary: "Defining this field would override the method '%{name}',

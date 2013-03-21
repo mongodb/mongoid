@@ -26,8 +26,8 @@ module Mongoid
     option :protect_sensitive_fields, default: true
     option :raise_not_found_error, default: true
     option :scope_overwrite_exception, default: false
-    # @todo: Remove at 4.0
     option :skip_version_check, default: false
+    # @todo: Remove at 4.0
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
 
@@ -130,6 +130,7 @@ module Mongoid
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
       self.sessions = configuration[:sessions]
+      check_mongodb_version!
     end
 
     # Override the database to use globally.
@@ -259,6 +260,15 @@ module Mongoid
     # @since 3.0.11
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
+    end
+
+    private
+
+    def check_mongodb_version!
+      unless skip_version_check
+        version = Sessions.default.command(buildinfo: 1)["version"]
+        raise Errors::UnsupportedVersion.new(version) if version < Mongoid::MONGODB_VERSION
+      end
     end
   end
 end
