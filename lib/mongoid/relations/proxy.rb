@@ -252,11 +252,15 @@ module Mongoid
           klass, foreign_key = metadata.klass, metadata.foreign_key
           eager_loaded = klass.any_in(foreign_key => ids).entries
           ids.each do |id|
-            IdentityMap.clear_many(klass, metadata.type_relation.merge!(foreign_key => id))
+            sel = { foreign_key => id }
+            sel.merge!(metadata.type_relation) if klass.hereditary?
+            IdentityMap.clear_many(klass, sel)
           end
           eager_loaded.each do |doc|
             base_id = doc.__send__(foreign_key)
-            yield(doc,  metadata.type_relation.merge!(foreign_key => base_id))
+            sel = { foreign_key => base_id }
+            sel.merge!(metadata.type_relation) if klass.hereditary?
+            yield(doc,  sel)
           end
         end
       end

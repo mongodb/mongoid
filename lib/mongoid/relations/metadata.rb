@@ -169,7 +169,7 @@ module Mongoid
       # Get the criteria that is used to query for this metadata's relation.
       #
       # @example Get the criteria.
-      #   metadata.criteria([ id_one, id_two ])
+      #   metadata.criteria([ id_one, id_two ], Person)
       #
       # @param [ Object ] object The foreign key used for the query.
       # @param [ Class ] type The base class.

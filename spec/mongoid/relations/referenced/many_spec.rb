@@ -2030,7 +2030,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         let(:map) do
-          Mongoid::IdentityMap.get(Post, {"person_id" => person.id}.merge!(metadata.type_relation))
+          Mongoid::IdentityMap.get(Post, {"person_id" => person.id})
         end
 
         it "puts the documents in the identity map" do
@@ -2053,7 +2053,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         let(:map) do
-          Mongoid::IdentityMap.get(Post, {"person_id" => person.id}.merge!(metadata.type_relation))
+          Mongoid::IdentityMap.get(Post, {"person_id" => person.id})
         end
 
         it "puts an empty array in the identity map" do
@@ -2084,11 +2084,11 @@ describe Mongoid::Relations::Referenced::Many do
         end
 
         let(:map_one) do
-          Mongoid::IdentityMap.get(Post, {"person_id" => person_one.id}.merge!(metadata.type_relation))
+          Mongoid::IdentityMap.get(Post, {"person_id" => person_one.id})
         end
 
         let(:map_two) do
-          Mongoid::IdentityMap.get(Post, {"person_id" => person_two.id}.merge!(metadata.type_relation))
+          Mongoid::IdentityMap.get(Post, {"person_id" => person_two.id})
         end
 
         it "puts the found documents in the identity map" do
@@ -2128,7 +2128,7 @@ describe Mongoid::Relations::Referenced::Many do
       end
 
       let(:map) do
-        Mongoid::IdentityMap.get(Rating, {"ratable_id" => movie.id}.merge!(metadata.type_relation))
+        Mongoid::IdentityMap.get(Rating, {"ratable_id" => movie.id})
       end
 
       it "puts the documents in the identity map" do
