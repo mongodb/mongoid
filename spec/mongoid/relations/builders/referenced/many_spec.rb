@@ -9,7 +9,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
   describe "#build" do
 
     let(:criteria) do
-      stub(klass: Post, selector: { "person_id" => "" })
+      stub(klass: Post, selector: { "person_id" => "" }, selector_with_type_selection: { "person_id" => "" })
     end
 
     let(:metadata) do
@@ -18,7 +18,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
         name: :posts,
         foreign_key: "person_id",
         inverse_klass: Person,
-        criteria: criteria
+        criteria: criteria,
       )
     end
 
