@@ -1114,4 +1114,21 @@ describe Mongoid::Sessions do
       end
     end
   end
+
+  context "when inherited" do
+    context "and children override collection" do
+      before do
+        Actress.store_in collection: :actresses
+      end
+
+      it "should override children collection" do
+        Actress.collection_name.should eq(:actresses)
+      end
+
+      it "should not override parental collection" do
+        Actor.collection_name.should eq(:actors)
+      end
+    end
+  end
+
 end
