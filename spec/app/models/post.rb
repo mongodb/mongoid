@@ -12,6 +12,7 @@ class Post
   belongs_to :author, foreign_key: :author_id, class_name: "User"
   has_and_belongs_to_many :tags, before_add: :before_add_tag, after_add: :after_add_tag, before_remove: :before_remove_tag, after_remove: :after_remove_tag
   has_many :videos, validate: false
+  has_many :roles, validate: false
 
   scope :recent, where(created_at: { "$lt" => Time.now, "$gt" => 30.days.ago })
   scope :posting, where(:content.in => [ "Posting" ])

@@ -18,7 +18,7 @@ module Mongoid
         # @param [ Metadata ] metadata The relation's metadata.
         def initialize(base, target, metadata)
           init(base, target, metadata) do
-            raise_mixed if klass.embedded?
+            raise_mixed if klass.embedded? && !klass.cyclic?
             characterize_one(target)
             bind_one
             target.save if persistable?

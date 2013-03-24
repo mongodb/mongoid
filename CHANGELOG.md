@@ -53,6 +53,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2885 Fixed touch for aliased fields. (Niels Ganser)
 
+* \#2883 Allow cyclic relations to not raise mixed relation errors.
+
 * \#2867 `pluck` now properly handles aliased fields.
 
 * \#2862 Autosaving no longer performs extra unnecessary queries.

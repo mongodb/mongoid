@@ -2675,6 +2675,17 @@ describe Mongoid::Relations::Referenced::Many do
         }.to raise_error(Mongoid::Errors::MixedRelations)
       end
     end
+
+    context "when a cyclic relation exists" do
+
+      let(:post) do
+        Post.new
+      end
+
+      it "does not raise an error" do
+        post.roles.should be_empty
+      end
+    end
   end
 
   describe ".macro" do

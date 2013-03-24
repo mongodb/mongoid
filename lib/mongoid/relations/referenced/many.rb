@@ -214,7 +214,7 @@ module Mongoid
         # @since 2.0.0.beta.1
         def initialize(base, target, metadata)
           init(base, Targets::Enumerable.new(target), metadata) do
-            raise_mixed if klass.embedded?
+            raise_mixed if klass.embedded? && !klass.cyclic?
           end
         end
 

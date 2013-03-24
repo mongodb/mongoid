@@ -21,6 +21,25 @@ describe Mongoid::Relations::Referenced::One do
       end
     end
 
+    context "when the relation is cyclic" do
+
+      let(:user) do
+        User.new
+      end
+
+      let(:role) do
+        Role.new
+      end
+
+      before do
+        user.role = role
+      end
+
+      it "does not raise an error" do
+        user.role.should eq(role)
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       context "when the parent is a new record" do
