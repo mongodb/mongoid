@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * Dont duplicate embedded documents when saving after calling becomes method.
 
+* \#2921 Don't use type in identity map selection if inheritance is not
+  in play. (Arthur Neves)
+
 * \#2899 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 
