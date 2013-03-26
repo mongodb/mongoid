@@ -18,23 +18,12 @@ describe Mongoid::Config::ReplsetDatabase do
         described_class.new(options['test'])
       end
 
-      let(:repl_set_connection) do
-        stub.quacks_like(Mongo::ReplSetConnection.allocate)
-      end
-
       before do
-        Mongo::ReplSetConnection.stubs(:new).returns(repl_set_connection)
-        repl_set_connection.expects(:db)
-        repl_set_connection.expects(:add_auth).never
-        repl_set_connection.expects(:apply_saved_authentication).never
-        replica_set.configure
+        Mongo::ReplSetConnection.any_instance.stubs(:connect).returns(true)
       end
 
-      it "does not modify the options in place" do
-        options["test"]["hosts"].should eq(
-          [[ENV["MONGOID_SPEC_HOST"], ENV["MONGOID_SPEC_PORT"].to_i],
-           [ENV["MONGOID_SPEC_HOST"], ENV["MONGOID_SPEC_PORT"].to_i]]
-        )
+      it "is configurable" do
+        replica_set.configure.should be
       end
     end
 
