@@ -33,6 +33,10 @@ For instructions on upgrading to newer versions, visit
 
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)
 
+### Resolved Issues
+
+* \#2903 Removed unused string `to_a` extension.
+
 ## 3.1.3
 
 ### Resolved Issues

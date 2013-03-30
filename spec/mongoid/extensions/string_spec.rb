@@ -320,17 +320,6 @@ describe Mongoid::Extensions::String do
     end
   end
 
-  describe "#to_a" do
-
-    let(:value) do
-      "Disintegration is the best album ever!"
-    end
-
-    it "returns an array with the string in it" do
-      value.to_a.should eq([ value ])
-    end
-  end
-
   describe "#writer?" do
 
     context "when string is a reader" do
