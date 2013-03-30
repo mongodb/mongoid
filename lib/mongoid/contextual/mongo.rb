@@ -49,10 +49,20 @@ module Mongoid
       # @return [ Integer ] The number of matches.
       #
       # @since 3.0.0
-      def count(document = nil, &block)
+      def count(*args, &block)
         return super(&block) if block_given?
-        return (cached? ? @count ||= query.count : query.count) unless document
-        collection.find(criteria.and(_id: document.id).selector).count
+        args = args.flatten
+        document = args.shift
+
+        if document.is_a?(Document)
+          return collection.find(criteria.and(_id: document.id).selector).count
+        end
+
+        if limit = document
+          return query.count(limit)
+        end
+
+        cached? ? @count ||= query.count : query.count
       end
 
       # Delete all documents in the database that match the selector.
