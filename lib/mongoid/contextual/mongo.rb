@@ -44,24 +44,18 @@ module Mongoid
       #     doc.likes > 1
       #   end
       #
-      # @param [ Document ] document A document ot match.
+      # @param [ Document ] document A document to match or true if wanting
+      #   skip and limit to be factored into the count.
       #
       # @return [ Integer ] The number of matches.
       #
       # @since 3.0.0
-      def count(*args, &block)
+      def count(document = false, &block)
         return super(&block) if block_given?
-        args = args.flatten
-        document = args.shift
-
         if document.is_a?(Document)
           return collection.find(criteria.and(_id: document.id).selector).count
         end
-
-        if limit = document
-          return query.count(limit)
-        end
-
+        return query.count(document) if document
         cached? ? @count ||= query.count : query.count
       end
 
