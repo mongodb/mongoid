@@ -145,6 +145,42 @@ describe Mongoid::Contextual::Mongo do
       it "returns the number of documents that match" do
         count.should eq(1)
       end
+
+      context "and a limit true" do
+
+        before do
+          2.times { Band.create(name: "Depeche Mode", likes: 1) }
+        end
+
+        let(:count) do
+          context.count(true) do |doc|
+            doc.likes.nil?
+          end
+        end
+
+        it "returns the number of documents that match" do
+          count.should eq(1)
+        end
+      end
+    end
+
+    context "when provided limit true" do
+
+      before do
+        2.times { Band.create(name: "Depeche Mode") }
+      end
+
+      let(:context) do
+        described_class.new(criteria.limit(2))
+      end
+
+      let(:count) do
+        context.count(true)
+      end
+
+      it "returns the number of documents that match" do
+        count.should eq(2)
+      end
     end
   end
 
