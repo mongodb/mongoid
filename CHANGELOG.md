@@ -9,6 +9,9 @@ For instructions on upgrading to newer versions, visit
 
 * Dont duplicate embedded documents when saving after calling becomes method.
 
+* \#2937 Counts can now take a `true` argument to factor in skip and limit.
+  (Arthur Neves)
+
 * \#2921 Don't use type in identity map selection if inheritance is not
   in play. (Arthur Neves)
 
