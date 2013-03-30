@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.7.1
+
+### Resolved Issues
+
+* \#2934 Fixed thread local persistence options not getting cleared out
+  on create.
+
 ## 2.7.0
 
 ### New Features

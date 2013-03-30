@@ -39,8 +39,16 @@ describe Mongoid::Safety do
 
           it "bubbles up to the caller" do
             lambda {
-              Person.safely.create(:ssn => "432-97-1111")
+              Person.safely.create!(:ssn => "432-97-1111")
             }.should raise_error(Mongo::OperationFailure)
+          end
+
+          it "removes safe mode options after error" do
+            begin
+              Person.safely.create!(:ssn => "432-97-1111")
+            rescue Exception => e
+              Person.create!(:ssn => "432-97-1111").should be_a(Person)
+            end
           end
         end
 

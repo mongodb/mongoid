@@ -173,6 +173,7 @@ module Mongoid #:nodoc:
           yield
         ensure
           Threaded.exit(:create)
+          Threaded.clear_safety_options!
         end
 
         # Is the current thread in loading revision mode?
