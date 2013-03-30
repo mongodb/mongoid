@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.7.0
+
+### New Features
+
+* \#2932 The minumum mongo and bson dependencies have been bumped to
+  1.8 and higher.
+
 ## 2.6.0
 
 ### New Features
