@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Validations
+  module Validatable
 
     # Validates whether or not an association is valid or not. Will correctly
     # handle has one and has many associations.
@@ -26,6 +26,8 @@ module Mongoid
       # @param [ Document ] document The document to validate.
       # @param [ Symbol ] attribute The relation to validate.
       # @param [ Object ] value The value of the relation.
+      #
+      # @since 2.0.0
       def validate_each(document, attribute, value)
         begin
           document.begin_validate

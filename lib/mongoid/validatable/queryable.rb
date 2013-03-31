@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Validations
+  module Validatable
     module Queryable
 
       # Wrap the validation inside the an execution block that alert's the

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations::FormatValidator do
+describe Mongoid::Validatable::FormatValidator do
 
   describe "#validate_each" do
 

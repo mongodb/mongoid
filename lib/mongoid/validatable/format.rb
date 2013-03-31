@@ -1,19 +1,19 @@
 # encoding: utf-8
 module Mongoid
-  module Validations
+  module Validatable
 
     # Validates that the specified attributes do or do not match a certain
-    # length.
+    # regular expression.
     #
-    # @example Set up the length validator.
+    # @example Set up the format validator.
     #
     #   class Person
     #     include Mongoid::Document
     #     field :website
     #
-    #     validates_length_of :website, in: 1..10
+    #     validates_format_of :website, :with => URI.regexp
     #   end
-    class LengthValidator < ActiveModel::Validations::LengthValidator
+    class FormatValidator < ActiveModel::Validations::FormatValidator
       include Localizable
     end
   end

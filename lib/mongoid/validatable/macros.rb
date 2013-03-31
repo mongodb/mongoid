@@ -1,5 +1,6 @@
+# encoding: utf-8
 module Mongoid
-  module Validations
+  module Validatable
     module Macros
       extend ActiveSupport::Concern
 
@@ -52,7 +53,7 @@ module Mongoid
       #
       # @since 2.4.0
       def validates_format_of(*args)
-        validates_with(Mongoid::Validations::FormatValidator, _merge_attributes(args))
+        validates_with(FormatValidator, _merge_attributes(args))
       end
 
       # Validates the length of a field.
@@ -69,7 +70,7 @@ module Mongoid
       #
       # @since 2.4.0
       def validates_length_of(*args)
-        validates_with(Mongoid::Validations::LengthValidator, _merge_attributes(args))
+        validates_with(LengthValidator, _merge_attributes(args))
       end
 
       # Validates whether or not a field is present - meaning nil or empty.

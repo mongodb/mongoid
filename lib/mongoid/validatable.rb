@@ -1,18 +1,18 @@
 # encoding: utf-8
-require "mongoid/validations/macros"
-require "mongoid/validations/localizable"
-require "mongoid/validations/associated"
-require "mongoid/validations/format"
-require "mongoid/validations/length"
-require "mongoid/validations/queryable"
-require "mongoid/validations/presence"
-require "mongoid/validations/uniqueness"
+require "mongoid/validatable/macros"
+require "mongoid/validatable/localizable"
+require "mongoid/validatable/associated"
+require "mongoid/validatable/format"
+require "mongoid/validatable/length"
+require "mongoid/validatable/queryable"
+require "mongoid/validatable/presence"
+require "mongoid/validatable/uniqueness"
 
 module Mongoid
 
   # This module provides additional validations that ActiveModel does not
   # provide: validates_associated and validates_uniqueness_of.
-  module Validations
+  module Validatable
     extend ActiveSupport::Concern
     include ActiveModel::Validations
 

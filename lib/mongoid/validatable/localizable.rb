@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Validations
+  module Validatable
 
     # Adds localization support to validations.
     module Localizable

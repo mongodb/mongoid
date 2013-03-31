@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Validations
+  module Validatable
 
     # Validates whether or not a field is unique against the documents in the
     # database.

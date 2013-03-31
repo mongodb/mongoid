@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations::AssociatedValidator do
+describe Mongoid::Validatable::AssociatedValidator do
 
   describe "#valid?" do
 

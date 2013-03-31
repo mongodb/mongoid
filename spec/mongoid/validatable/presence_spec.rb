@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations::PresenceValidator do
+describe Mongoid::Validatable::PresenceValidator do
 
   describe "#validate_each" do
 

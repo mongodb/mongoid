@@ -98,7 +98,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         expect(klass._validators[:addresses].first).to be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validatable::AssociatedValidator
         )
       end
 
@@ -189,7 +189,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         expect(klass._validators[:name].first).to be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validatable::AssociatedValidator
         )
       end
 
@@ -312,7 +312,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         expect(klass._validators[:posts].first).to be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validatable::AssociatedValidator
         )
       end
 
@@ -473,7 +473,7 @@ describe Mongoid::Relations::Macros do
 
       it "adds an associated validation" do
         expect(klass._validators[:game].first).to be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validatable::AssociatedValidator
         )
       end
 

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations do
+describe Mongoid::Validatable do
 
   let(:account) do
     Account.new(name: "Testing a really long name.")
@@ -218,7 +218,7 @@ describe Mongoid::Validations do
 
       it "adds the validator" do
         expect(klass.validators.first).to be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validatable::AssociatedValidator
         )
       end
     end
@@ -231,7 +231,7 @@ describe Mongoid::Validations do
 
       it "adds the validator" do
         expect(klass.validators.first).to be_a(
-          Mongoid::Validations::AssociatedValidator
+          Mongoid::Validatable::AssociatedValidator
         )
       end
     end
@@ -253,7 +253,7 @@ describe Mongoid::Validations do
 
       it "adds the validator" do
         expect(klass.validators.first).to be_a(
-          Mongoid::Validations::UniquenessValidator
+          Mongoid::Validatable::UniquenessValidator
         )
       end
     end
@@ -266,7 +266,7 @@ describe Mongoid::Validations do
 
       it "adds the validator" do
         expect(klass.validators.first).to be_a(
-          Mongoid::Validations::UniquenessValidator
+          Mongoid::Validatable::UniquenessValidator
         )
       end
     end
@@ -288,7 +288,7 @@ describe Mongoid::Validations do
 
       it "adds the validator" do
         expect(klass.validators.first).to be_a(
-          Mongoid::Validations::PresenceValidator
+          Mongoid::Validatable::PresenceValidator
         )
       end
     end
@@ -301,7 +301,7 @@ describe Mongoid::Validations do
 
       it "adds the validator" do
         expect(klass.validators.first).to be_a(
-          Mongoid::Validations::PresenceValidator
+          Mongoid::Validatable::PresenceValidator
         )
       end
     end

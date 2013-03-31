@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Validations
+  module Validatable
 
     # Validates that the specified attributes are not blank (as defined by
     # Object#blank?).

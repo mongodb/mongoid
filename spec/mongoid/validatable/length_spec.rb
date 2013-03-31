@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations::LengthValidator do
+describe Mongoid::Validatable::LengthValidator do
 
   describe "#validate_each" do
 

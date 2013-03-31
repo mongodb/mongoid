@@ -9,6 +9,7 @@ require "mongoid/scopable"
 require "mongoid/serializable"
 require "mongoid/shardable"
 require "mongoid/traversable"
+require "mongoid/validatable"
 
 module Mongoid
   module Components
@@ -46,7 +47,7 @@ module Mongoid
     include Threaded::Lifecycle
     include Traversable
     include Timestamps::Timeless
-    include Validations
+    include Validatable
     include Callbacks
     include Copyable
     include Equality
@@ -74,7 +75,7 @@ module Mongoid
       Threaded::Lifecycle,
       Timestamps::Timeless,
       Traversable,
-      Validations,
+      Validatable,
       Equality
     ]
 

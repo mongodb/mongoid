@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Validations::UniquenessValidator do
+describe Mongoid::Validatable::UniquenessValidator do
 
   describe "#valid?" do
 

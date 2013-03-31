@@ -19,7 +19,6 @@ require "mongoid/matchers"
 require "mongoid/nested_attributes"
 require "mongoid/state"
 require "mongoid/timestamps"
-require "mongoid/validations"
 require "mongoid/components"
 
 module Mongoid
