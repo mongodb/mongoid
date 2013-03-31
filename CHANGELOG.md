@@ -29,6 +29,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
+* `delete_all` and `destroy_all` no longer take a `:conditions` hash but
+  just the raw attributes.
+
 ### New Features
 
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)

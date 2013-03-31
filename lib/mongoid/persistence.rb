@@ -108,8 +108,7 @@ module Mongoid
       #
       # @return [ Integer ] The number of documents deleted.
       def delete_all(conditions = nil)
-        conds = conditions || {}
-        selector = conds[:conditions] || conds
+        selector = conditions || {}
         selector.merge!(_type: name) if hereditary?
         coll = collection
         deleted = coll.find(selector).count
@@ -132,8 +131,8 @@ module Mongoid
       #
       # @return [ Integer ] The number of documents destroyed.
       def destroy_all(conditions = nil)
-        conds = conditions || {}
-        documents = where(conds[:conditions] || conds)
+        selector = conditions || {}
+        documents = where(selector)
         destroyed = documents.count
         documents.each { |doc| doc.destroy }
         destroyed

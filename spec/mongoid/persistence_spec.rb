@@ -228,21 +228,6 @@ describe Mongoid::Persistence do
           Person.create
         end
 
-        context "when in a conditions attribute" do
-
-          let!(:removed) do
-            Person.send(method, conditions: { title: "sir" })
-          end
-
-          it "removes the matching documents" do
-            expect(Person.count).to eq(1)
-          end
-
-          it "returns the number of documents removed" do
-            expect(removed).to eq(1)
-          end
-        end
-
         context "when no conditions attribute provided" do
 
           let!(:removed) do

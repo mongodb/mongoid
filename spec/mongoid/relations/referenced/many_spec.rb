@@ -1901,18 +1901,18 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "removes the correct posts" do
-            person.posts.send(method, conditions: { title: "Testing" })
+            person.posts.send(method, { title: "Testing" })
             expect(person.posts.count).to eq(1)
             expect(person.reload.posts_count).to eq(1) if method == :destroy_all
           end
 
           it "deletes the documents from the database" do
-            person.posts.send(method, conditions: {title: "Testing" })
+            person.posts.send(method, { title: "Testing" })
             expect(Post.where(title: "Testing").count).to eq(0)
           end
 
           it "returns the number of documents deleted" do
-            expect(person.posts.send(method, conditions: { title: "Testing" })).to eq(1)
+            expect(person.posts.send(method, { title: "Testing" })).to eq(1)
           end
         end
 
@@ -1957,17 +1957,17 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "removes the correct ratings" do
-            movie.ratings.send(method, conditions: { value: 1 })
+            movie.ratings.send(method, { value: 1 })
             expect(movie.ratings.count).to eq(1)
           end
 
           it "deletes the documents from the database" do
-            movie.ratings.send(method, conditions: { value: 1 })
+            movie.ratings.send(method, { value: 1 })
             expect(Rating.where(value: 1).count).to eq(0)
           end
 
           it "returns the number of documents deleted" do
-            expect(movie.ratings.send(method, conditions: { value: 1 })).to eq(1)
+            expect(movie.ratings.send(method, { value: 1 })).to eq(1)
           end
         end
 
