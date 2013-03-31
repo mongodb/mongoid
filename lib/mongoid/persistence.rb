@@ -145,62 +145,6 @@ module Mongoid
       Operations.update(self, options).persist
     end
 
-    # Update a single attribute and persist the entire document.
-    # This skips validation but fires the callbacks.
-    #
-    # @example Update the attribute.
-    #   person.update_attribute(:title, "Sir")
-    #
-    # @param [ Symbol, String ] name The name of the attribute.
-    # @param [ Object ] value The new value of the attribute.a
-    #
-    # @raise [ Errors::ReadonlyAttribute ] If the field cannot be changed due
-    #   to being flagged as reaodnly.
-    #
-    # @return [ true, false ] True if save was successfull, false if not.
-    #
-    # @since 2.0.0.rc.6
-    def update_attribute(name, value)
-      normalized = name.to_s
-      unless attribute_writable?(normalized)
-        raise Errors::ReadonlyAttribute.new(normalized, value)
-      end
-      write_attribute(database_field_name(normalized), value)
-      save(validate: false)
-    end
-
-    # Update the document attributes in the database.
-    #
-    # @example Update the document's attributes
-    #   document.update_attributes(:title => "Sir")
-    #
-    # @param [ Hash ] attributes The attributes to update.
-    #
-    # @return [ true, false ] True if validation passed, false if not.
-    def update_attributes(attributes = {})
-      assign_attributes(attributes); save
-    end
-
-    # Update the document attributes in the database and raise an error if
-    # validation failed.
-    #
-    # @example Update the document's attributes.
-    #   document.update_attributes(:title => "Sir")
-    #
-    # @param [ Hash ] attributes The attributes to update.
-    #
-    # @raise [ Errors::Validations ] If validation failed.
-    #
-    # @return [ true, false ] True if validation passed.
-    def update_attributes!(attributes = {})
-      result = update_attributes(attributes)
-      unless result
-        fail_due_to_validation! unless errors.empty?
-        fail_due_to_callback!(:update_attributes!)
-      end
-      result
-    end
-
     # Perform an upsert of the document. If the document does not exist in the
     # database, then Mongo will insert a new one, otherwise the fields will get
     # overwritten with new values on the existing document.
