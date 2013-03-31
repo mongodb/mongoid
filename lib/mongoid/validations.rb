@@ -41,6 +41,20 @@ module Mongoid
       Threaded.exit_validate(self)
     end
 
+    # Given the provided options, are we performing validations?
+    #
+    # @example Are we performing validations?
+    #   document.performing_validations?(validate: true)
+    #
+    # @param [ Hash ] options The options to check.
+    #
+    # @return [ true, false ] If we are validating.
+    #
+    # @since 4.0.0
+    def performing_validations?(options = {})
+      options[:validate].nil? ? true : options[:validate]
+    end
+
     # Overrides the default ActiveModel behaviour since we need to handle
     # validations of relations slightly different than just calling the
     # getter.

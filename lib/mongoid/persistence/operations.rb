@@ -1,9 +1,7 @@
 # encoding: utf-8
-require "mongoid/persistence/operations/insert"
 require "mongoid/persistence/operations/remove"
 require "mongoid/persistence/operations/update"
 require "mongoid/persistence/operations/upsert"
-require "mongoid/persistence/operations/embedded/insert"
 require "mongoid/persistence/operations/embedded/remove"
 
 module Mongoid
@@ -52,19 +50,6 @@ module Mongoid
       # @since 2.1.0
       def initialize(document, options = {})
         @document, @options = document, options
-      end
-
-      # Get the atomic insert for embedded documents, either a push or set.
-      #
-      # @example Get the inserts.
-      #   operation.inserts
-      #
-      # @return [ Hash ] The insert ops.
-      #
-      # @since 2.1.0
-      def inserts
-        { document.atomic_insert_modifier =>
-          { document.atomic_position => document.as_document } }
       end
 
       # Should the parent document (in the case of embedded persistence) be
@@ -162,21 +147,6 @@ module Mongoid
         # @since 2.1.0
         def remove(doc, options = {})
           (doc.embedded? ? Embedded::Remove : Remove).new(doc, options)
-        end
-
-        # Get the appropriate insertion operation based on the document.
-        #
-        # @example Get the insertion operation.
-        #   Operations.insert(doc, options)
-        #
-        # @param [ Document ] doc The document to persist.
-        # @param [ Hash ] options The persistence options.
-        #
-        # @return [ Operations ] The operation.
-        #
-        # @since 2.1.0
-        def insert(doc, options = {})
-          (doc.embedded? ? Embedded::Insert : Insert).new(doc, options)
         end
 
         # Get the appropriate update operation based on the document.

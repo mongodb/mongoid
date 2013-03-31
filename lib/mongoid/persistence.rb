@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
 require "mongoid/persistence/deletion"
-require "mongoid/persistence/insertion"
 require "mongoid/persistence/modification"
 require "mongoid/persistence/upsertion"
 require "mongoid/persistence/operations"
@@ -36,19 +35,6 @@ module Mongoid
       end
       self.flagged_for_destroy = false
       result
-    end
-
-    # Insert a new document into the database. Will return the document
-    # itself whether or not the save was successful.
-    #
-    # @example Insert a document.
-    #   document.insert
-    #
-    # @param [ Hash ] options Options to pass to insert.
-    #
-    # @return [ Document ] The persisted document.
-    def insert(options = {})
-      Operations.insert(self, options).persist
     end
 
     # Remove the document from the database.

@@ -98,27 +98,6 @@ describe Mongoid::Persistence::Operations do
     end
   end
 
-  describe "#inserts" do
-
-    let(:child) do
-      document.build_name(first_name: "Syd")
-    end
-
-    let(:operation) do
-      klass.new(child)
-    end
-
-    let(:inserts) do
-      operation.inserts
-    end
-
-    it "returns the insert atomic modifiers" do
-      expect(inserts).to eq(
-        { "$set" => { "name" => { "first_name" => "Syd", "_id" => "Syd-" } } }
-      )
-    end
-  end
-
   describe "#notifying_parent?" do
 
     let(:operation) do

@@ -8,6 +8,123 @@ module Mongoid
     module Creatable
       extend ActiveSupport::Concern
 
+      # Insert a new document into the database. Will return the document
+      # itself whether or not the save was successful.
+      #
+      # @example Insert a document.
+      #   document.insert
+      #
+      # @param [ Hash ] options Options to pass to insert.
+      #
+      # @return [ Document ] The persisted document.
+      #
+      # @since 1.0.0
+      def insert(options = {})
+        prepare_insert(options) do
+          if embedded?
+            insert_as_embedded
+          else
+            insert_as_root
+          end
+        end
+      end
+
+      private
+
+      # Get the atomic insert for embedded documents, either a push or set.
+      #
+      # @api private
+      #
+      # @example Get the inserts.
+      #   document.inserts
+      #
+      # @return [ Hash ] The insert ops.
+      #
+      # @since 2.1.0
+      def atomic_inserts
+        { atomic_insert_modifier => { atomic_position => as_document }}
+      end
+
+      # Insert the embedded document.
+      #
+      # @api private
+      #
+      # @example Insert the document as embedded.
+      #   document.insert_as_embedded
+      #
+      # @return [ Document ] The document.
+      #
+      # @since 4.0.0
+      def insert_as_embedded
+        raise Errors::NoParent.new(self.class.name) unless _parent
+        if _parent.new_record?
+          _parent.insert
+        else
+          selector = _parent.atomic_selector
+          _root.collection.find(selector).update(positionally(selector, atomic_inserts))
+        end
+      end
+
+      # Insert the root document.
+      #
+      # @api private
+      #
+      # @example Insert the document as root.
+      #   document.insert_as_root
+      #
+      # @return [ Document ] The document.
+      #
+      # @since 4.0.0
+      def insert_as_root
+        collection.insert(as_document)
+        IdentityMap.set(self)
+      end
+
+      # Post process an insert, which sets the new record attribute to false
+      # and flags all the children as persisted.
+      #
+      # @api private
+      #
+      # @example Post process the insert.
+      #   document.post_process_insert
+      #
+      # @return [ true ] true.
+      #
+      # @since 4.0.0
+      def post_process_insert
+        self.new_record = false
+        flag_children_persisted
+        true
+      end
+
+      # Prepare the insert for execution. Validates and runs callbacks, etc.
+      #
+      # @api private
+      #
+      # @example Prepare for insertion.
+      #   document.prepare_insert do
+      #     collection.insert(as_document)
+      #   end
+      #
+      # @param [ Hash ] options The options.
+      #
+      # @return [ Document ] The document.
+      #
+      # @since 4.0.0
+      def prepare_insert(options = {})
+        unless performing_validations?(options) && invalid?(:create)
+          result = run_callbacks(:save) do
+            run_callbacks(:create) do
+              yield(self)
+              post_process_insert
+            end
+          end
+          post_persist unless result == false
+        end
+        errors.clear unless performing_validations?(options)
+        self
+      end
+
       module ClassMethods
 
         # Create a new document. This will instantiate a new document and
