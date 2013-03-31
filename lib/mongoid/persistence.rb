@@ -94,8 +94,8 @@ module Mongoid
     # @return [ true, false ] True if validation passed.
     def save!(options = {})
       unless save(options)
-        self.class.fail_validate!(self) unless errors.empty?
-        self.class.fail_callback!(self, :save!)
+        fail_due_to_validation! unless errors.empty?
+        fail_due_to_callback!(:save!)
       end
       return true
     end
@@ -195,8 +195,8 @@ module Mongoid
     def update_attributes!(attributes = {})
       result = update_attributes(attributes)
       unless result
-        self.class.fail_validate!(self) unless errors.empty?
-        self.class.fail_callback!(self, :update_attributes!)
+        fail_due_to_validation! unless errors.empty?
+        fail_due_to_callback!(:update_attributes!)
       end
       result
     end
@@ -272,8 +272,8 @@ module Mongoid
             attributes.map { |attrs| create!(attrs, &block) }
           else
             doc = new(attributes, &block)
-            fail_validate!(doc) unless doc.insert.errors.empty?
-            fail_callback!(doc, :create!) if doc.new_record?
+            doc.fail_due_to_validation! unless doc.insert.errors.empty?
+            doc.fail_due_to_callback!(:create!) if doc.new_record?
             doc
           end
         end
@@ -322,29 +322,6 @@ module Mongoid
         destroyed = documents.count
         documents.each { |doc| doc.destroy }
         destroyed
-      end
-
-      # Raise an error if validation failed.
-      #
-      # @example Raise the validation error.
-      #   Person.fail_validate!(person)
-      #
-      # @param [ Document ] document The document to fail.
-      def fail_validate!(document)
-        raise Errors::Validations.new(document)
-      end
-
-      # Raise an error if a callback failed.
-      #
-      # @example Raise the callback error.
-      #   Person.fail_callback!(person, :create!)
-      #
-      # @param [ Document ] document The document to fail.
-      # @param [ Symbol ] method The method being called.
-      #
-      # @since 2.2.0
-      def fail_callback!(document, method)
-        raise Errors::Callback.new(document.class, method)
       end
     end
   end

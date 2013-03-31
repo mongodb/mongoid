@@ -3,6 +3,7 @@ require "mongoid/changeable"
 require "mongoid/findable"
 require "mongoid/indexable"
 require "mongoid/inspectable"
+require "mongoid/persistable"
 require "mongoid/reloadable"
 require "mongoid/scopable"
 require "mongoid/serializable"
@@ -34,6 +35,7 @@ module Mongoid
     include Inspectable
     include Matchers
     include NestedAttributes
+    include Persistable
     include Persistence
     include Relations
     include Reloadable
@@ -62,6 +64,7 @@ module Mongoid
       Inspectable,
       Matchers,
       NestedAttributes,
+      Persistable,
       Persistence,
       Relations,
       Reloadable,
