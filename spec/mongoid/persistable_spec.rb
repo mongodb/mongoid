@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence do
+describe Mongoid::Persistable do
 
   describe "#fail_due_to_valiation!" do
 

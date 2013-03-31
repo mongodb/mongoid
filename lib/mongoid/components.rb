@@ -36,7 +36,6 @@ module Mongoid
     include Matchers
     include NestedAttributes
     include Persistable
-    include Persistence
     include Relations
     include Reloadable
     include Scopable
@@ -65,7 +64,6 @@ module Mongoid
       Matchers,
       NestedAttributes,
       Persistable,
-      Persistence,
       Relations,
       Reloadable,
       Scopable,

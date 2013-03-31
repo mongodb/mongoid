@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Atomic::Inc do
+describe Mongoid::Persistable::Atomic::Inc do
 
   describe "#inc" do
 

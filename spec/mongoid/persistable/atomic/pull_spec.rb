@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Atomic::Pull do
+describe Mongoid::Persistable::Atomic::Pull do
 
   describe "#persist" do
 

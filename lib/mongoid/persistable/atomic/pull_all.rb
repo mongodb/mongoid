@@ -1,27 +1,27 @@
 # encoding: utf-8
 module Mongoid
-  module Persistence
+  module Persistable
     module Atomic
 
-      # This class provides the ability to perform an explicit $pop
+      # This class provides the ability to perform an explicit $pullAll
       # modification on a specific field.
-      class Pop
+      class PullAll
         include Operation
 
-        # Sends the atomic $pop operation to the database.
+        # Sends the atomic $pullAll operation to the database.
         #
         # @example Persist the new values.
-        #   pop.persist
+        #   pull_all.persist
         #
         # @return [ Object ] The new array value.
         #
-        # @since 2.1.0
+        # @since 2.0.0
         def persist
           prepare do
             if document[field]
               values = document.send(field)
-              value > 0 ? values.pop : values.shift
-              execute("$pop")
+              values.delete_if { |val| value.include?(val) }
+              execute("$pullAll")
               values
             end
           end

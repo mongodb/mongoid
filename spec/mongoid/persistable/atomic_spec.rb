@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Atomic do
+describe Mongoid::Persistable::Atomic do
 
   context "when using aliased field names" do
 

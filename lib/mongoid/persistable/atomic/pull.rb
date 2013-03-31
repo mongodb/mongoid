@@ -1,27 +1,27 @@
 # encoding: utf-8
 module Mongoid
-  module Persistence
+  module Persistable
     module Atomic
 
-      # This class provides the ability to perform an explicit $pullAll
+      # This class provides the ability to perform an explicit $pull
       # modification on a specific field.
-      class PullAll
+      class Pull
         include Operation
 
-        # Sends the atomic $pullAll operation to the database.
+        # Sends the atomic $pull operation to the database.
         #
         # @example Persist the new values.
-        #   pull_all.persist
+        #   pull.persist
         #
         # @return [ Object ] The new array value.
         #
-        # @since 2.0.0
+        # @since 2.1.0
         def persist
           prepare do
             if document[field]
               values = document.send(field)
-              values.delete_if { |val| value.include?(val) }
-              execute("$pullAll")
+              values.delete(value)
+              execute("$pull")
               values
             end
           end

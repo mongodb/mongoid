@@ -1,19 +1,19 @@
 # encoding: utf-8
-require "mongoid/persistence/atomic/operation"
-require "mongoid/persistence/atomic/add_to_set"
-require "mongoid/persistence/atomic/bit"
-require "mongoid/persistence/atomic/inc"
-require "mongoid/persistence/atomic/pop"
-require "mongoid/persistence/atomic/pull"
-require "mongoid/persistence/atomic/pull_all"
-require "mongoid/persistence/atomic/push"
-require "mongoid/persistence/atomic/push_all"
-require "mongoid/persistence/atomic/rename"
-require "mongoid/persistence/atomic/sets"
-require "mongoid/persistence/atomic/unset"
+require "mongoid/persistable/atomic/operation"
+require "mongoid/persistable/atomic/add_to_set"
+require "mongoid/persistable/atomic/bit"
+require "mongoid/persistable/atomic/inc"
+require "mongoid/persistable/atomic/pop"
+require "mongoid/persistable/atomic/pull"
+require "mongoid/persistable/atomic/pull_all"
+require "mongoid/persistable/atomic/push"
+require "mongoid/persistable/atomic/push_all"
+require "mongoid/persistable/atomic/rename"
+require "mongoid/persistable/atomic/sets"
+require "mongoid/persistable/atomic/unset"
 
 module Mongoid
-  module Persistence
+  module Persistable
 
     # This module provides the explicit atomic operations helpers on the
     # document itself.

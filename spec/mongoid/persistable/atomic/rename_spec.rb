@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Atomic::Rename do
+describe Mongoid::Persistable::Atomic::Rename do
 
   describe "#rename" do
 

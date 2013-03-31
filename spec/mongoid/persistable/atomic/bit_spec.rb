@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Atomic::Bit do
+describe Mongoid::Persistable::Atomic::Bit do
 
   describe "#bit" do
 

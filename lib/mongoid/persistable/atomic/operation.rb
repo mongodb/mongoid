@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Persistence
+  module Persistable
     module Atomic
 
       # This is the included module for all atomic operation objects.

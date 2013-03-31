@@ -1,17 +1,17 @@
 # encoding: utf-8
 module Mongoid
-  module Persistence
+  module Persistable
     module Atomic
 
-      # This class provides the ability to perform an explicit $pull
+      # This class provides the ability to perform an explicit $pop
       # modification on a specific field.
-      class Pull
+      class Pop
         include Operation
 
-        # Sends the atomic $pull operation to the database.
+        # Sends the atomic $pop operation to the database.
         #
         # @example Persist the new values.
-        #   pull.persist
+        #   pop.persist
         #
         # @return [ Object ] The new array value.
         #
@@ -20,8 +20,8 @@ module Mongoid
           prepare do
             if document[field]
               values = document.send(field)
-              values.delete(value)
-              execute("$pull")
+              value > 0 ? values.pop : values.shift
+              execute("$pop")
               values
             end
           end

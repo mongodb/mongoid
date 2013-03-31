@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Persistence
+  module Persistable
     module Atomic
 
       # This class provides atomic $set behaviour.

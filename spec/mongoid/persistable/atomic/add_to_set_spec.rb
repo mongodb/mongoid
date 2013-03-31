@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Atomic::AddToSet do
+describe Mongoid::Persistable::Atomic::AddToSet do
 
   describe "#persist" do
 

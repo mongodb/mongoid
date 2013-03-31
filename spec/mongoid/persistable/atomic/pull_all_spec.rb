@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Persistence::Atomic::PushAll do
+describe Mongoid::Persistable::Atomic::PullAll do
 
   describe "#persist" do
 
@@ -10,20 +10,20 @@ describe Mongoid::Persistence::Atomic::PushAll do
         Person.create(aliases: [ "007" ])
       end
 
-      let!(:pushed) do
-        person.push_all(:aliases, [ "Bond", "James" ])
+      let!(:pulled) do
+        person.pull_all(:aliases, [ "007" ])
       end
 
       let(:reloaded) do
         person.reload
       end
 
-      it "pushes the value onto the array" do
-        expect(person.aliases).to eq([ "007", "Bond", "James" ])
+      it "pulls the value from the array" do
+        expect(person.aliases).to be_empty
       end
 
       it "persists the data" do
-        expect(reloaded.aliases).to eq([ "007", "Bond", "James" ])
+        expect(reloaded.aliases).to be_empty
       end
 
       it "removes the field from the dirty attributes" do
@@ -35,7 +35,7 @@ describe Mongoid::Persistence::Atomic::PushAll do
       end
 
       it "returns the new array value" do
-        expect(pushed).to eq([ "007", "Bond", "James" ])
+        expect(pulled).to be_empty
       end
     end
 
@@ -45,20 +45,20 @@ describe Mongoid::Persistence::Atomic::PushAll do
         Person.create
       end
 
-      let!(:pushed) do
-        person.push_all(:aliases, [ "Bond", "James" ])
+      let!(:pulled) do
+        person.pull_all(:aliases, [ "Bond" ])
       end
 
       let(:reloaded) do
         person.reload
       end
 
-      it "pushes the value onto the array" do
-        expect(person.aliases).to eq([ "Bond", "James" ])
+      it "does not modify the field" do
+        expect(person.aliases).to be_nil
       end
 
-      it "persists the data" do
-        expect(reloaded.aliases).to eq([ "Bond", "James" ])
+      it "persists no data" do
+        expect(reloaded.aliases).to be_nil
       end
 
       it "removes the field from the dirty attributes" do
@@ -69,8 +69,8 @@ describe Mongoid::Persistence::Atomic::PushAll do
         expect(person).to_not be_changed
       end
 
-      it "returns the new array value" do
-        expect(pushed).to eq([ "Bond", "James" ])
+      it "returns nil" do
+        expect(pulled).to be_nil
       end
     end
   end
