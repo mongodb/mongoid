@@ -1,7 +1,5 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
-require "mongoid/persistence/upsertion"
-require "mongoid/persistence/operations"
 
 module Mongoid
 
@@ -17,21 +15,5 @@ module Mongoid
     extend ActiveSupport::Concern
     include Atomic
     include Mongoid::Atomic::Positionable
-
-    # Perform an upsert of the document. If the document does not exist in the
-    # database, then Mongo will insert a new one, otherwise the fields will get
-    # overwritten with new values on the existing document.
-    #
-    # @example Upsert the document.
-    #   document.upsert
-    #
-    # @param [ Hash ] options The validation options.
-    #
-    # @return [ true ] True.
-    #
-    # @since 3.0.0
-    def upsert(options = {})
-      Operations.upsert(self, options).persist
-    end
   end
 end
