@@ -702,7 +702,7 @@ describe Mongoid::Fields do
   describe ".field" do
 
     it "returns the generated field" do
-      expect(Person.field(:testing)).to equal Person.fields["testing"]
+      expect(Person.field(:testing)).to eq(Person.fields["testing"])
     end
 
     context "when the field name conflicts with mongoid's internals" do
@@ -714,6 +714,23 @@ describe Mongoid::Fields do
             Person.field(:metadata)
           }.to raise_error(Mongoid::Errors::InvalidField)
         end
+      end
+    end
+
+    context "when field already exist and validate_duplicate is enable" do
+
+      before do
+        Mongoid.duplicate_fields_exception = true
+      end
+
+      after do
+        Mongoid.duplicate_fields_exception = false
+      end
+
+      it "raises an error" do
+        expect {
+          Person.field(:title)
+        }.to raise_error(Mongoid::Errors::InvalidField)
       end
     end
 

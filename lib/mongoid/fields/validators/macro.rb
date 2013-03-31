@@ -53,6 +53,15 @@ module Mongoid
           if Mongoid.destructive_fields.include?(name)
             raise Errors::InvalidField.new(klass, name)
           end
+
+          # if field alredy defined
+          if klass.fields.keys.include?(name.to_s)
+            if Mongoid.duplicate_fields_exception
+              raise Errors::InvalidField.new(klass, name)
+            else
+              Mongoid.logger.warn("Overwriting existing field #{name}.") if Mongoid.logger
+            end
+          end
         end
 
         # Validate that the field options are allowed.
