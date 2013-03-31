@@ -1,6 +1,5 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
-require "mongoid/persistence/deletion"
 require "mongoid/persistence/upsertion"
 require "mongoid/persistence/operations"
 
@@ -35,19 +34,6 @@ module Mongoid
       self.flagged_for_destroy = false
       result
     end
-
-    # Remove the document from the database.
-    #
-    # @example Remove the document.
-    #   document.remove
-    #
-    # @param [ Hash ] options Options to pass to remove.
-    #
-    # @return [ TrueClass ] True.
-    def remove(options = {})
-      Operations.remove(self, options).persist
-    end
-    alias :delete :remove
 
     # Perform an upsert of the document. If the document does not exist in the
     # database, then Mongo will insert a new one, otherwise the fields will get

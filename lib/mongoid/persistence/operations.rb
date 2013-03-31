@@ -1,7 +1,5 @@
 # encoding: utf-8
-require "mongoid/persistence/operations/remove"
 require "mongoid/persistence/operations/upsert"
-require "mongoid/persistence/operations/embedded/remove"
 
 module Mongoid
   module Persistence
