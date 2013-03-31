@@ -255,6 +255,24 @@ describe Mongoid::Persistable::Savable do
         end
       end
     end
+
+    context "when setting floating point numbers" do
+
+      context "when value is an empty string" do
+
+        let(:person) do
+          Person.new
+        end
+
+        before do
+          Person.validates_numericality_of :blood_alcohol_content, allow_blank: true
+        end
+
+        it "does not set the value" do
+          expect(person.save).to be_true
+        end
+      end
+    end
   end
 
   describe "save!" do
@@ -317,6 +335,97 @@ describe Mongoid::Persistable::Savable do
 
       it "flags the document as destroyed" do
         expect(oscar).to be_destroyed
+      end
+    end
+
+    context "when a DateTime attribute is updated and persisted" do
+
+      let(:user) do
+        User.create!(last_login: 2.days.ago).tap do |u|
+          u.last_login = DateTime.now
+        end
+      end
+
+      it "reads for persistance as a UTC Time" do
+        expect(user.changes["last_login"].last.class).to eq(Time)
+      end
+
+      it "persists with no exceptions thrown" do
+        expect {
+          user.save!
+        }.not_to raise_error
+      end
+    end
+
+    context "when a Date attribute is persisted" do
+
+      let(:user) do
+        User.create!(account_expires: 2.years.from_now).tap do |u|
+          u.account_expires = "2/2/2002".to_date
+        end
+      end
+
+      it "reads for persistance as a UTC Time" do
+        expect(user.changes["account_expires"].last.class).to eq(Time)
+      end
+
+      it "persists with no exceptions thrown" do
+        expect {
+          user.save!
+        }.not_to raise_error
+      end
+    end
+
+    context "when the document has associations" do
+
+      let!(:firefox) do
+        Firefox.create(name: "firefox")
+      end
+
+      let!(:writer) do
+        HtmlWriter.new(speed: 100)
+      end
+
+      let!(:circle) do
+        Circle.new(radius: 50)
+      end
+
+      let!(:square) do
+        Square.new(width: 300, height: 150)
+      end
+
+      let(:from_db) do
+        Firefox.find(firefox.id)
+      end
+
+      before do
+        firefox.writer = writer
+        firefox.shapes << [ circle, square ]
+        firefox.save!
+      end
+
+      it "properly persists the one-to-one type" do
+        expect(from_db).to be_a_kind_of(Firefox)
+      end
+
+      it "properly persists the one-to-one relations" do
+        expect(from_db.writer).to eq(writer)
+      end
+
+      it "properly persists the one-to-many type" do
+        expect(from_db.shapes.first).to eq(circle)
+      end
+
+      it "properly persists the one-to-many relations" do
+        expect(from_db.shapes.last).to eq(square)
+      end
+
+      it "properly sets up the parent relation" do
+        expect(from_db.shapes.first).to eq(circle)
+      end
+
+      it "properly sets up the entire hierarchy" do
+        expect(from_db.shapes.first.canvas).to eq(firefox)
       end
     end
   end
