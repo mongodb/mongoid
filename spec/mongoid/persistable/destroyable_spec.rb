@@ -101,4 +101,48 @@ describe Mongoid::Persistable::Destroyable do
       end
     end
   end
+
+  describe "#destroy_all" do
+
+    let!(:person) do
+      Person.create(title: "sir")
+    end
+
+    context "when no conditions are provided" do
+
+      let!(:removed) do
+        Person.destroy_all
+      end
+
+      it "removes all the documents" do
+        expect(Person.count).to eq(0)
+      end
+
+      it "returns the number of documents removed" do
+        expect(removed).to eq(1)
+      end
+    end
+
+    context "when conditions are provided" do
+
+      let!(:person_two) do
+        Person.create
+      end
+
+      context "when no conditions attribute provided" do
+
+        let!(:removed) do
+          Person.destroy_all(title: "sir")
+        end
+
+        it "removes the matching documents" do
+          expect(Person.count).to eq(1)
+        end
+
+        it "returns the number of documents removed" do
+          expect(removed).to eq(1)
+        end
+      end
+    end
+  end
 end

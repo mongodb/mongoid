@@ -6,6 +6,7 @@ module Mongoid
     #
     # @since 2.0.0
     module Destroyable
+      extend ActiveSupport::Concern
 
       # Remove the document from the database with callbacks.
       #
@@ -22,6 +23,32 @@ module Mongoid
         result = run_callbacks(:destroy) { delete(options) }
         self.flagged_for_destroy = false
         result
+      end
+
+      module ClassMethods
+
+        # Delete all documents given the supplied conditions. If no conditions
+        # are passed, the entire collection will be dropped for performance
+        # benefits. Fires the destroy callbacks if conditions were passed.
+        #
+        # @example Destroy matching documents from the collection.
+        #   Person.destroy_all({ :title => "Sir" })
+        #
+        # @example Destroy all documents from the collection.
+        #   Person.destroy_all
+        #
+        # @param [ Hash ] conditions Optional conditions to destroy by.
+        #
+        # @return [ Integer ] The number of documents destroyed.
+        #
+        # @since 1.0.0
+        def destroy_all(conditions = nil)
+          selector = conditions || {}
+          documents = where(selector)
+          destroyed = documents.count
+          documents.each { |doc| doc.destroy }
+          destroyed
+        end
       end
     end
   end
