@@ -12,7 +12,7 @@ require "mongoid/traversable"
 require "mongoid/validatable"
 
 module Mongoid
-  module Components
+  module Composable
     extend ActiveSupport::Concern
 
     # All modules that a +Document+ is composed of are defined in this

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Components do
+describe Mongoid::Composable do
 
   describe ".prohibited_methods" do
 
@@ -8,7 +8,7 @@ describe Mongoid::Components do
       described_class.prohibited_methods
     end
 
-    Mongoid::Components::MODULES.each do |mod|
+    Mongoid::Composable::MODULES.each do |mod|
 
       context "when checking in #{mod}" do
 

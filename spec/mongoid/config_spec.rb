@@ -52,7 +52,7 @@ describe Mongoid::Config do
 
   describe "#destructive_fields" do
 
-    Mongoid::Components.prohibited_methods.each do |method|
+    Mongoid::Composable.prohibited_methods.each do |method|
 
       it "contains #{method}" do
         expect(described_class.destructive_fields).to include(method)

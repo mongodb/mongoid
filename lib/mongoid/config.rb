@@ -68,7 +68,7 @@ module Mongoid
     #
     # @return [ Array<String> ] An array of bad field names.
     def destructive_fields
-      Components.prohibited_methods
+      Composable.prohibited_methods
     end
 
     # Load the settings from a compliant mongoid.yml file. This can be used for
