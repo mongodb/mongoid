@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/persistable/creatable"
+require "mongoid/persistable/savable"
 require "mongoid/persistable/updatable"
 
 module Mongoid
@@ -9,6 +10,7 @@ module Mongoid
   # @since 2.0.0
   module Persistable
     include Creatable
+    include Savable
     include Updatable
 
     # Raise an error if validation failed.
