@@ -1,10 +1,13 @@
 # encoding: utf-8
+require "mongoid/persistable/creatable"
+
 module Mongoid
 
   # Contains general behaviour for persistence operations.
   #
   # @since 2.0.0
   module Persistable
+    include Creatable
 
     # Raise an error if validation failed.
     #
