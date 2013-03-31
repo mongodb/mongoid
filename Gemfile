@@ -8,7 +8,7 @@ git "git://github.com/rails/rails.git" do
 end
 
 group :test do
-  gem "rspec", "~> 2.12"
+  gem "rspec", "~> 2.13"
 
   unless ENV["CI"]
     gem "guard"
