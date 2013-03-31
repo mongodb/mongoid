@@ -41,5 +41,26 @@ module Mongoid
     def fail_due_to_callback!(method)
       raise Errors::Callback.new(self.class, method)
     end
+
+    private
+
+    # Post process the persistence operation.
+    #
+    # @api private
+    #
+    # @example Post process the persistence operation.
+    #   document.post_process_persist(true)
+    #
+    # @param [ Object ] result The result of the operation.
+    # @param [ Hash ] options The options.
+    #
+    # @return [ true ] true.
+    #
+    # @since 4.0.0
+    def post_process_persist(result, options = {})
+      post_persist unless result == false
+      errors.clear unless performing_validations?(options)
+      true
+    end
   end
 end

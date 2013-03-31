@@ -119,9 +119,7 @@ module Mongoid
             post_process_insert
           end
         end
-        post_persist unless result == false
-        errors.clear unless performing_validations?(options)
-        self
+        post_process_persist(result, options) and self
       end
 
       module ClassMethods

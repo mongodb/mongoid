@@ -135,9 +135,7 @@ module Mongoid
             true
           end
         end
-        post_persist unless result == false
-        errors.clear unless performing_validations?(options)
-        result
+        post_process_persist(result, options) and result
       end
     end
   end
