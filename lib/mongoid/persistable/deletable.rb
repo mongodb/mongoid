@@ -6,6 +6,7 @@ module Mongoid
     #
     # @since 2.0.0
     module Deletable
+      extend ActiveSupport::Concern
 
       # Remove the document from the database.
       #
@@ -116,6 +117,34 @@ module Mongoid
         IdentityMap.remove(self)
         Threaded.clear_options!
         true
+      end
+
+      module ClassMethods
+
+        # Delete all documents given the supplied conditions. If no conditions
+        # are passed, the entire collection will be dropped for performance
+        # benefits. Does not fire any callbacks.
+        #
+        # @example Delete matching documents from the collection.
+        #   Person.delete_all({ :title => "Sir" })
+        #
+        # @example Delete all documents from the collection.
+        #   Person.delete_all
+        #
+        # @param [ Hash ] conditions Optional conditions to delete by.
+        #
+        # @return [ Integer ] The number of documents deleted.
+        #
+        # @since 1.0.0
+        def delete_all(conditions = nil)
+          selector = conditions || {}
+          selector.merge!(_type: name) if hereditary?
+          coll = collection
+          deleted = coll.find(selector).count
+          coll.find(selector).remove_all
+          Threaded.clear_options!
+          deleted
+        end
       end
     end
   end

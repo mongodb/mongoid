@@ -11,6 +11,7 @@ module Mongoid
   #
   # @since 2.0.0
   module Persistable
+    extend ActiveSupport::Concern
     include Creatable
     include Deletable
     include Destroyable

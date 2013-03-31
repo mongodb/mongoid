@@ -38,29 +38,6 @@ module Mongoid
 
       # Delete all documents given the supplied conditions. If no conditions
       # are passed, the entire collection will be dropped for performance
-      # benefits. Does not fire any callbacks.
-      #
-      # @example Delete matching documents from the collection.
-      #   Person.delete_all(:conditions => { :title => "Sir" })
-      #
-      # @example Delete all documents from the collection.
-      #   Person.delete_all
-      #
-      # @param [ Hash ] conditions Optional conditions to delete by.
-      #
-      # @return [ Integer ] The number of documents deleted.
-      def delete_all(conditions = nil)
-        selector = conditions || {}
-        selector.merge!(_type: name) if hereditary?
-        coll = collection
-        deleted = coll.find(selector).count
-        coll.find(selector).remove_all
-        Threaded.clear_options!
-        deleted
-      end
-
-      # Delete all documents given the supplied conditions. If no conditions
-      # are passed, the entire collection will be dropped for performance
       # benefits. Fires the destroy callbacks if conditions were passed.
       #
       # @example Destroy matching documents from the collection.
