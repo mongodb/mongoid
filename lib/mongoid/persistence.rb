@@ -18,23 +18,6 @@ module Mongoid
     include Atomic
     include Mongoid::Atomic::Positionable
 
-    # Remove the document from the database with callbacks.
-    #
-    # @example Destroy a document.
-    #   document.destroy
-    #
-    # @param [ Hash ] options Options to pass to destroy.
-    #
-    # @return [ true, false ] True if successful, false if not.
-    def destroy(options = {})
-      self.flagged_for_destroy = true
-      result = run_callbacks(:destroy) do
-        remove(options)
-      end
-      self.flagged_for_destroy = false
-      result
-    end
-
     # Perform an upsert of the document. If the document does not exist in the
     # database, then Mongo will insert a new one, otherwise the fields will get
     # overwritten with new values on the existing document.
