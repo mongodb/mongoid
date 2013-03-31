@@ -11,7 +11,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.should be_a_new_record
+        expect(person).to be_a_new_record
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::State do
       end
 
       it "returns false" do
-        person.should_not be_a_new_record
+        expect(person).to_not be_a_new_record
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.should be_a_new_record
+        expect(person).to be_a_new_record
       end
     end
   end
@@ -45,7 +45,7 @@ describe Mongoid::State do
     end
 
     it "delegates to new_record?" do
-      person.should_not be_persisted
+      expect(person).to_not be_persisted
     end
 
     context "when the object has been destroyed" do
@@ -55,7 +55,7 @@ describe Mongoid::State do
       end
 
       it "returns false" do
-        person.should_not be_persisted
+        expect(person).to_not be_persisted
       end
     end
   end
@@ -73,7 +73,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.should be_destroyed
+        expect(person).to be_destroyed
       end
     end
 
@@ -84,7 +84,7 @@ describe Mongoid::State do
       end
 
       it "returns true" do
-        person.should_not be_destroyed
+        expect(person).to_not be_destroyed
       end
     end
 
@@ -95,7 +95,7 @@ describe Mongoid::State do
       end
 
       it "returns false" do
-        person.should_not be_destroyed
+        expect(person).to_not be_destroyed
       end
     end
   end

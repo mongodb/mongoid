@@ -23,7 +23,7 @@ describe ActiveModel::Validations::NumericalityValidator do
       end
 
       it "returns false" do
-        model.should_not be_valid
+        expect(model).to_not be_valid
       end
     end
   end

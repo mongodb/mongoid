@@ -9,7 +9,7 @@ describe Mongoid::Fields::Localized do
     end
 
     it "defaults to nil" do
-      field.default_val.should be_nil
+      expect(field.default_val).to be_nil
     end
   end
 
@@ -27,7 +27,7 @@ describe Mongoid::Fields::Localized do
       end
 
       it "defaults to the value" do
-        field.default_val.should eq("No translation")
+        expect(field.default_val).to eq("No translation")
       end
     end
 
@@ -43,7 +43,7 @@ describe Mongoid::Fields::Localized do
       end
 
       it "keeps the default in the proper type" do
-        field.default_val.should eq(1)
+        expect(field.default_val).to eq(1)
       end
     end
   end
@@ -63,7 +63,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns nil" do
-          value.should be_nil
+          expect(value).to be_nil
         end
       end
 
@@ -74,7 +74,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns the string from the default locale" do
-          value.should eq("This is a test")
+          expect(value).to eq("This is a test")
         end
       end
 
@@ -95,7 +95,7 @@ describe Mongoid::Fields::Localized do
           end
 
           it "returns the string from the set locale" do
-            value.should eq("This is a test")
+            expect(value).to eq("This is a test")
           end
         end
 
@@ -108,7 +108,7 @@ describe Mongoid::Fields::Localized do
             end
 
             it "returns nil" do
-              value.should be_nil
+              expect(value).to be_nil
             end
           end
 
@@ -132,7 +132,7 @@ describe Mongoid::Fields::Localized do
                 end
 
                 it "returns the fallback translation" do
-                  value.should eq("testing")
+                  expect(value).to eq("testing")
                 end
               end
 
@@ -143,7 +143,7 @@ describe Mongoid::Fields::Localized do
                 end
 
                 it "returns the fallback translation" do
-                  value.should eq("pruebas")
+                  expect(value).to eq("pruebas")
                 end
               end
 
@@ -154,7 +154,7 @@ describe Mongoid::Fields::Localized do
                 end
 
                 it "returns nil" do
-                  value.should be_nil
+                  expect(value).to be_nil
                 end
               end
             end
@@ -170,7 +170,7 @@ describe Mongoid::Fields::Localized do
               end
 
               it "returns nil" do
-                value.should be_nil
+                expect(value).to be_nil
               end
             end
           end
@@ -191,7 +191,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns nil" do
-          value.should be_nil
+          expect(value).to be_nil
         end
       end
 
@@ -202,7 +202,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns the value from the default locale" do
-          value.should eq(100)
+          expect(value).to eq(100)
         end
       end
 
@@ -223,7 +223,7 @@ describe Mongoid::Fields::Localized do
           end
 
           it "returns the value from the set locale" do
-            value.should eq(100)
+            expect(value).to eq(100)
           end
         end
 
@@ -236,7 +236,7 @@ describe Mongoid::Fields::Localized do
             end
 
             it "returns nil" do
-              value.should be_nil
+              expect(value).to be_nil
             end
           end
 
@@ -260,7 +260,7 @@ describe Mongoid::Fields::Localized do
                 end
 
                 it "returns the fallback translation" do
-                  value.should eq(1)
+                  expect(value).to eq(1)
                 end
               end
 
@@ -271,7 +271,7 @@ describe Mongoid::Fields::Localized do
                 end
 
                 it "returns the fallback translation" do
-                  value.should eq(100)
+                  expect(value).to eq(100)
                 end
               end
 
@@ -282,7 +282,7 @@ describe Mongoid::Fields::Localized do
                 end
 
                 it "returns nil" do
-                  value.should be_nil
+                  expect(value).to be_nil
                 end
               end
             end
@@ -298,7 +298,7 @@ describe Mongoid::Fields::Localized do
               end
 
               it "returns nil" do
-                value.should be_nil
+                expect(value).to be_nil
               end
             end
           end
@@ -322,7 +322,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns the string in the default locale" do
-          value.should eq({ "en" => "This is a test" })
+          expect(value).to eq({ "en" => "This is a test" })
         end
       end
 
@@ -341,7 +341,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns the string in the set locale" do
-          value.should eq({ "de" => "This is a test" })
+          expect(value).to eq({ "de" => "This is a test" })
         end
       end
     end
@@ -359,7 +359,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns the value in the default locale" do
-          value.should eq({ "en" => 100 })
+          expect(value).to eq({ "en" => 100 })
         end
       end
 
@@ -378,7 +378,7 @@ describe Mongoid::Fields::Localized do
         end
 
         it "returns the string in the set locale" do
-          value.should eq({ "de" => 100 })
+          expect(value).to eq({ "de" => 100 })
         end
       end
     end

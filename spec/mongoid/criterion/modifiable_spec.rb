@@ -13,7 +13,7 @@ describe Mongoid::Criterion::Modifiable do
         end
 
         it "returns the document" do
-          Person.find_or_create_by(title: "Senior").should eq(person)
+          expect(Person.find_or_create_by(title: "Senior")).to eq(person)
         end
       end
 
@@ -36,7 +36,7 @@ describe Mongoid::Criterion::Modifiable do
             end
 
             it "returns the document" do
-              from_db.should eq(game)
+              expect(from_db).to eq(game)
             end
           end
 
@@ -47,7 +47,7 @@ describe Mongoid::Criterion::Modifiable do
             end
 
             it "returns the document" do
-              from_db.should eq(game)
+              expect(from_db).to eq(game)
             end
           end
         end
@@ -67,7 +67,7 @@ describe Mongoid::Criterion::Modifiable do
           end
 
           it "returns the document" do
-            from_db.should eq(cookie)
+            expect(from_db).to eq(cookie)
           end
         end
       end
@@ -90,11 +90,11 @@ describe Mongoid::Criterion::Modifiable do
         end
 
         it "returns the new document" do
-          from_db.person.should eq(person)
+          expect(from_db.person).to eq(person)
         end
 
         it "does not return an existing false document" do
-          from_db.should_not eq(game)
+          expect(from_db).to_not eq(game)
         end
       end
 
@@ -105,11 +105,11 @@ describe Mongoid::Criterion::Modifiable do
         end
 
         it "creates a persisted document" do
-          person.should be_persisted
+          expect(person).to be_persisted
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          expect(person.title).to eq("Senorita")
         end
       end
 
@@ -122,15 +122,15 @@ describe Mongoid::Criterion::Modifiable do
         end
 
         it "creates a persisted document" do
-          person.should be_persisted
+          expect(person).to be_persisted
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          expect(person.title).to eq("Senorita")
         end
 
         it "calls the block" do
-          person.pets.should be_true
+          expect(person.pets).to be_true
         end
       end
     end
@@ -145,7 +145,7 @@ describe Mongoid::Criterion::Modifiable do
       end
 
       it "returns the document" do
-        Person.find_or_initialize_by(title: "Senior").should eq(person)
+        expect(Person.find_or_initialize_by(title: "Senior")).to eq(person)
       end
     end
 
@@ -158,11 +158,11 @@ describe Mongoid::Criterion::Modifiable do
         end
 
         it "creates a new document" do
-          person.should be_new_record
+          expect(person).to be_new_record
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          expect(person.title).to eq("Senorita")
         end
       end
 
@@ -175,15 +175,15 @@ describe Mongoid::Criterion::Modifiable do
         end
 
         it "creates a new document" do
-          person.should be_new_record
+          expect(person).to be_new_record
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          expect(person.title).to eq("Senorita")
         end
 
         it "calls the block" do
-          person.pets.should be_true
+          expect(person.pets).to be_true
         end
       end
     end

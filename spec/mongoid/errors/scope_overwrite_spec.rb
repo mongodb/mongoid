@@ -9,19 +9,19 @@ describe Mongoid::Errors::ScopeOverwrite do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Cannot create scope :scope, because of existing method Person.scope."
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "When defining a scope that conflicts with a method that already exists"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Change the name of the scope so it does not conflict with the already"
       )
     end

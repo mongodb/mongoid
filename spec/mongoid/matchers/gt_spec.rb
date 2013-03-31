@@ -11,7 +11,7 @@ describe Mongoid::Matchers::Gt do
       end
 
       it "returns true" do
-        matcher.matches?("$gt" => 3).should be_true
+        expect(matcher.matches?("$gt" => 3)).to be_true
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::Matchers::Gt do
       end
 
       it "returns false" do
-        matcher.matches?("$gt" => 3).should be_false
+        expect(matcher.matches?("$gt" => 3)).to be_false
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Matchers::Gt do
       end
 
       it "returns false" do
-        matcher.matches?("$gt" => 10).should be_false
+        expect(matcher.matches?("$gt" => 10)).to be_false
       end
     end
 
@@ -44,30 +44,31 @@ describe Mongoid::Matchers::Gt do
       end
 
       it "returns false" do
-        matcher.matches?("$gt" => 5).should be_false
+        expect(matcher.matches?("$gt" => 5)).to be_false
       end
     end
 
     context "when the value is an array" do
+
       context "there are value valid" do
         let(:matcher) do
           described_class.new([6,4])
         end
 
         it "returns false" do
-          matcher.matches?("$gt" => 5).should be_true
+          expect(matcher.matches?("$gt" => 5)).to be_true
         end
       end
 
       context "there are not value valid" do
+
         let(:matcher) do
           described_class.new([3,4])
         end
 
         it "returns false" do
-          matcher.matches?("$gt" => 5).should be_false
+          expect(matcher.matches?("$gt" => 5)).to be_false
         end
-
       end
     end
   end

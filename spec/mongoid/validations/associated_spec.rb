@@ -21,11 +21,11 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "only validates the parent once" do
-          user.should be_valid
+          expect(user).to be_valid
         end
 
         it "only validates the child once" do
-          description.should be_valid
+          expect(description).to be_valid
         end
       end
 
@@ -44,16 +44,16 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "only validates the parent once" do
-          user.should_not be_valid
+          expect(user).to_not be_valid
         end
 
         it "adds the errors from the relation" do
           user.valid?
-          user.errors[:descriptions].should_not be_nil
+          expect(user.errors[:descriptions]).to_not be_nil
         end
 
         it "only validates the child once" do
-          description.should_not be_valid
+          expect(description).to_not be_valid
         end
       end
     end
@@ -78,7 +78,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "adds no errors" do
-          person.errors[:name].should be_empty
+          expect(person.errors[:name]).to be_empty
         end
       end
 
@@ -94,7 +94,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "adds no errors" do
-          person.errors[:name].should be_empty
+          expect(person.errors[:name]).to be_empty
         end
       end
 
@@ -110,11 +110,11 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "adds errors to the parent document" do
-          person.errors[:name].should_not be_empty
+          expect(person.errors[:name]).to_not be_empty
         end
 
         it "translates the error in english" do
-          person.errors[:name][0].should eq("is invalid")
+          expect(person.errors[:name][0]).to eq("is invalid")
         end
       end
     end
@@ -128,7 +128,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "adds no errors" do
-          person.errors[:addresses].should be_empty
+          expect(person.errors[:addresses]).to be_empty
         end
       end
 
@@ -144,7 +144,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "adds errors to the parent document" do
-          person.errors[:addresses].should_not be_empty
+          expect(person.errors[:addresses]).to_not be_empty
         end
       end
 
@@ -160,7 +160,7 @@ describe Mongoid::Validations::AssociatedValidator do
         end
 
         it "adds no errors" do
-          person.errors[:addresses].should be_empty
+          expect(person.errors[:addresses]).to be_empty
         end
       end
     end
@@ -177,7 +177,7 @@ describe Mongoid::Validations::AssociatedValidator do
     end
 
     it "adds the validation only to the instance" do
-      validators.should eq([ described_class ])
+      expect(validators).to eq([ described_class ])
     end
   end
 end

@@ -15,7 +15,7 @@ describe Mongoid::Loggable do
     end
 
     it "sets the logger" do
-      Mongoid.logger.should eq(logger)
+      expect(Mongoid.logger).to eq(logger)
     end
   end
 end

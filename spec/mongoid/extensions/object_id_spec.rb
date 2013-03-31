@@ -13,11 +13,11 @@ describe Mongoid::Extensions::ObjectId do
   describe "#__evolve_object_id__" do
 
     it "returns self" do
-      object_id.__evolve_object_id__.should eq(object_id)
+      expect(object_id.__evolve_object_id__).to eq(object_id)
     end
 
     it "returns the same instance" do
-      object_id.__evolve_object_id__.should equal(object_id)
+      expect(object_id.__evolve_object_id__).to equal(object_id)
     end
   end
 
@@ -32,7 +32,7 @@ describe Mongoid::Extensions::ObjectId do
         end
 
         it "returns the object id" do
-          evolved.should eq(object_id)
+          expect(evolved).to eq(object_id)
         end
       end
 
@@ -47,7 +47,7 @@ describe Mongoid::Extensions::ObjectId do
         end
 
         it "returns the array of object ids" do
-          evolved.should eq([ object_id, other_id ])
+          expect(evolved).to eq([ object_id, other_id ])
         end
       end
 
@@ -60,14 +60,14 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "evolves to an object id" do
-            evolved.should eq(object_id)
+            expect(evolved).to eq(object_id)
           end
         end
 
         context "when the string is not a valid object id" do
 
           it "returns the key" do
-            Moped::BSON::ObjectId.evolve(composite_key).should eq(
+            expect(Moped::BSON::ObjectId.evolve(composite_key)).to eq(
               composite_key
             )
           end
@@ -80,7 +80,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "evolves to an empty string" do
-            evolved.should be_empty
+            expect(evolved).to be_empty
           end
         end
       end
@@ -94,7 +94,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "returns the array with nils" do
-            evolved.should eq([ nil, nil ])
+            expect(evolved).to eq([ nil, nil ])
           end
         end
 
@@ -105,7 +105,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "returns the array with empty strings" do
-            evolved.should eq([ "", "" ])
+            expect(evolved).to eq([ "", "" ])
           end
         end
 
@@ -122,7 +122,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "evolves to an array of object ids" do
-              evolved.should eq([ object_id, other_id ])
+              expect(evolved).to eq([ object_id, other_id ])
             end
           end
 
@@ -137,7 +137,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the key" do
-              Moped::BSON::ObjectId.evolve(composite_key).should eq(
+              expect(Moped::BSON::ObjectId.evolve(composite_key)).to eq(
                 composite_key
               )
             end
@@ -160,7 +160,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              evolved.should eq(hash)
+              expect(evolved).to eq(hash)
             end
           end
 
@@ -179,7 +179,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              evolved.should eq(hash)
+              expect(evolved).to eq(hash)
             end
           end
 
@@ -194,7 +194,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with evolved value" do
-              evolved.should eq({ _id: object_id })
+              expect(evolved).to eq({ _id: object_id })
             end
           end
 
@@ -213,7 +213,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with evolved values" do
-              evolved.should eq({ _id: [ object_id, other_id ] })
+              expect(evolved).to eq({ _id: [ object_id, other_id ] })
             end
           end
         end
@@ -231,7 +231,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              evolved.should eq(hash)
+              expect(evolved).to eq(hash)
             end
           end
 
@@ -250,7 +250,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              evolved.should eq(hash)
+              expect(evolved).to eq(hash)
             end
           end
 
@@ -265,7 +265,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with evolved value" do
-              evolved.should eq({ id: object_id })
+              expect(evolved).to eq({ id: object_id })
             end
           end
 
@@ -284,7 +284,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with evolved values" do
-              evolved.should eq({ id: [ object_id, other_id ] })
+              expect(evolved).to eq({ id: [ object_id, other_id ] })
             end
           end
         end
@@ -302,7 +302,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              evolved.should eq(hash)
+              expect(evolved).to eq(hash)
             end
           end
 
@@ -317,7 +317,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              evolved.should eq(hash)
+              expect(evolved).to eq(hash)
             end
           end
         end
@@ -336,7 +336,7 @@ describe Mongoid::Extensions::ObjectId do
         end
 
         it "returns the object id" do
-          mongoized.should eq(object_id)
+          expect(mongoized).to eq(object_id)
         end
       end
 
@@ -351,7 +351,7 @@ describe Mongoid::Extensions::ObjectId do
         end
 
         it "returns the array of object ids" do
-          mongoized.should eq([ object_id, other_id ])
+          expect(mongoized).to eq([ object_id, other_id ])
         end
       end
 
@@ -364,14 +364,14 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "mongoizes to an object id" do
-            mongoized.should eq(object_id)
+            expect(mongoized).to eq(object_id)
           end
         end
 
         context "when the string is not a valid object id" do
 
           it "returns the key" do
-            Moped::BSON::ObjectId.mongoize(composite_key).should eq(
+            expect(Moped::BSON::ObjectId.mongoize(composite_key)).to eq(
               composite_key
             )
           end
@@ -384,7 +384,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "mongoizes to nil" do
-            mongoized.should be_nil
+            expect(mongoized).to be_nil
           end
         end
       end
@@ -398,7 +398,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "returns an empty array" do
-            mongoized.should be_empty
+            expect(mongoized).to be_empty
           end
         end
 
@@ -409,7 +409,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "returns an empty array" do
-            mongoized.should be_empty
+            expect(mongoized).to be_empty
           end
         end
 
@@ -426,7 +426,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "mongoizes to an array of object ids" do
-              mongoized.should eq([ object_id, other_id ])
+              expect(mongoized).to eq([ object_id, other_id ])
             end
           end
 
@@ -441,7 +441,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the key" do
-              Moped::BSON::ObjectId.mongoize(composite_key).should eq(
+              expect(Moped::BSON::ObjectId.mongoize(composite_key)).to eq(
                 composite_key
               )
             end
@@ -464,7 +464,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -483,7 +483,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -498,7 +498,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized value" do
-              mongoized.should eq({ _id: object_id })
+              expect(mongoized).to eq({ _id: object_id })
             end
           end
 
@@ -517,7 +517,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized values" do
-              mongoized.should eq({ _id: [ object_id, other_id ] })
+              expect(mongoized).to eq({ _id: [ object_id, other_id ] })
             end
           end
         end
@@ -535,7 +535,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -554,7 +554,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -569,7 +569,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized value" do
-              mongoized.should eq({ id: object_id })
+              expect(mongoized).to eq({ id: object_id })
             end
           end
 
@@ -588,7 +588,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized values" do
-              mongoized.should eq({ id: [ object_id, other_id ] })
+              expect(mongoized).to eq({ id: [ object_id, other_id ] })
             end
           end
         end
@@ -606,7 +606,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -621,7 +621,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
         end
@@ -640,7 +640,7 @@ describe Mongoid::Extensions::ObjectId do
         end
 
         it "returns the object id" do
-          mongoized.should eq(object_id)
+          expect(mongoized).to eq(object_id)
         end
       end
 
@@ -655,7 +655,7 @@ describe Mongoid::Extensions::ObjectId do
         end
 
         it "returns the array of object ids" do
-          mongoized.should eq([ object_id, other_id ])
+          expect(mongoized).to eq([ object_id, other_id ])
         end
       end
 
@@ -668,14 +668,14 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "mongoizes to an object id" do
-            mongoized.should eq(object_id)
+            expect(mongoized).to eq(object_id)
           end
         end
 
         context "when the string is not a valid object id" do
 
           it "returns the key" do
-            Moped::BSON::ObjectId.mongoize(composite_key).should eq(
+            expect(Moped::BSON::ObjectId.mongoize(composite_key)).to eq(
               composite_key
             )
           end
@@ -688,7 +688,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "mongoizes to nil" do
-            mongoized.should be_nil
+            expect(mongoized).to be_nil
           end
         end
       end
@@ -702,7 +702,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "returns an empty array" do
-            mongoized.should be_empty
+            expect(mongoized).to be_empty
           end
         end
 
@@ -713,7 +713,7 @@ describe Mongoid::Extensions::ObjectId do
           end
 
           it "returns an empty array" do
-            mongoized.should be_empty
+            expect(mongoized).to be_empty
           end
         end
 
@@ -730,7 +730,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "mongoizes to an array of object ids" do
-              mongoized.should eq([ object_id, other_id ])
+              expect(mongoized).to eq([ object_id, other_id ])
             end
           end
 
@@ -745,7 +745,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the key" do
-              Moped::BSON::ObjectId.mongoize(composite_key).should eq(
+              expect(Moped::BSON::ObjectId.mongoize(composite_key)).to eq(
                 composite_key
               )
             end
@@ -768,7 +768,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -787,7 +787,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -802,7 +802,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized value" do
-              mongoized.should eq({ _id: object_id })
+              expect(mongoized).to eq({ _id: object_id })
             end
           end
 
@@ -821,7 +821,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized values" do
-              mongoized.should eq({ _id: [ object_id, other_id ] })
+              expect(mongoized).to eq({ _id: [ object_id, other_id ] })
             end
           end
         end
@@ -839,7 +839,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -858,7 +858,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -873,7 +873,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized value" do
-              mongoized.should eq({ id: object_id })
+              expect(mongoized).to eq({ id: object_id })
             end
           end
 
@@ -892,7 +892,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash with mongoized values" do
-              mongoized.should eq({ id: [ object_id, other_id ] })
+              expect(mongoized).to eq({ id: [ object_id, other_id ] })
             end
           end
         end
@@ -910,7 +910,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
 
@@ -925,7 +925,7 @@ describe Mongoid::Extensions::ObjectId do
             end
 
             it "returns the hash" do
-              mongoized.should eq(hash)
+              expect(mongoized).to eq(hash)
             end
           end
         end
@@ -936,11 +936,11 @@ describe Mongoid::Extensions::ObjectId do
   describe "#__mongoize_object_id__" do
 
     it "returns self" do
-      object_id.__mongoize_object_id__.should eq(object_id)
+      expect(object_id.__mongoize_object_id__).to eq(object_id)
     end
 
     it "returns the same instance" do
-      object_id.__mongoize_object_id__.should equal(object_id)
+      expect(object_id.__mongoize_object_id__).to equal(object_id)
     end
   end
 end

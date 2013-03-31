@@ -17,15 +17,15 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "does not set the created timestamp" do
-          document.created_at.should be_nil
+          expect(document.created_at).to be_nil
         end
 
         it "does not set the updated timestamp" do
-          document.updated_at.should be_nil
+          expect(document.updated_at).to be_nil
         end
 
         it "clears out the timeless option after save" do
-          Mongoid::Threaded.timeless.should be_false
+          expect(Mongoid::Threaded.timeless).to be_false
         end
 
         context "when subsequently persisting" do
@@ -35,7 +35,7 @@ describe Mongoid::Timestamps::Timeless do
           end
 
           it "sets the updated timestamp" do
-            document.updated_at.should_not be_nil
+            expect(document.updated_at).to_not be_nil
           end
         end
       end
@@ -47,15 +47,15 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "does not set the created timestamp" do
-          document.created_at.should be_nil
+          expect(document.created_at).to be_nil
         end
 
         it "does not set the updated timestamp" do
-          document.updated_at.should be_nil
+          expect(document.updated_at).to be_nil
         end
 
         it "clears out the timeless option after save" do
-          Mongoid::Threaded.timeless.should be_false
+          expect(Mongoid::Threaded.timeless).to be_false
         end
 
         context "when subsequently persisting" do
@@ -65,7 +65,7 @@ describe Mongoid::Timestamps::Timeless do
           end
 
           it "sets the updated timestamp" do
-            document.updated_at.should_not be_nil
+            expect(document.updated_at).to_not be_nil
           end
         end
       end

@@ -15,7 +15,7 @@ describe Mongoid::Atomic::Modifiers do
       end
 
       it "does not contain any operations" do
-        modifiers.should eq({})
+        expect(modifiers).to eq({})
       end
     end
 
@@ -32,7 +32,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the add to set with each modifiers" do
-          modifiers.should eq({
+          expect(modifiers).to eq({
             "$addToSet" => { "preference_ids" => { "$each" => [ "one", "two" ] }}
           })
         end
@@ -50,7 +50,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the add to set with each modifiers" do
-          modifiers.should eq({
+          expect(modifiers).to eq({
             "$addToSet" =>
               { "preference_ids" =>
                 { "$each" => [ "one", "two", "three" ] }
@@ -70,7 +70,7 @@ describe Mongoid::Atomic::Modifiers do
       end
 
       it "does not contain any pull operations" do
-        modifiers.should eq({})
+        expect(modifiers).to eq({})
       end
     end
 
@@ -87,7 +87,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pull" => { "addresses" => { "_id" => { "$in" => [ "one" ]}}}}
           )
         end
@@ -109,7 +109,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "overwrites the previous pulls" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pull" => { "addresses" => { "_id" => { "$in" => [ "two" ]}}}}
           )
         end
@@ -126,7 +126,7 @@ describe Mongoid::Atomic::Modifiers do
       end
 
       it "does not contain any pull operations" do
-        modifiers.should eq({})
+        expect(modifiers).to eq({})
       end
     end
 
@@ -143,7 +143,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pullAll" =>
               { "addresses" => [
                   { "_id" => "one" }
@@ -170,7 +170,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the pull all modifiers" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pullAll" =>
               { "addresses" => [
                   { "street" => "Hobrechtstr." },
@@ -193,7 +193,7 @@ describe Mongoid::Atomic::Modifiers do
       end
 
       it "does not contain any push operations" do
-        modifiers.should eq({})
+        expect(modifiers).to eq({})
       end
     end
 
@@ -210,7 +210,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pushAll" =>
               { "addresses" => [
                   { "street" => "Oxford St" }
@@ -237,7 +237,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pushAll" =>
               { "addresses" => [
                   { "street" => "Hobrechtstr." },
@@ -268,7 +268,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers to the conflicts hash" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$set" => { "addresses.0.street" => "Bond" },
               conflicts: { "$pushAll" =>
                 { "addresses" => [
@@ -297,7 +297,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers to the conflicts hash" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pullAll" => {
               "addresses" => { "street" => "Bond St" }},
               conflicts: { "$pushAll" =>
@@ -327,7 +327,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the push all modifiers to the conflicts hash" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pushAll" => {
               "addresses.0.locations" => [{ "street" => "Bond St" }]},
               conflicts: { "$pushAll" =>
@@ -360,7 +360,7 @@ describe Mongoid::Atomic::Modifiers do
           end
 
           it "adds the sets to the modifiers" do
-            modifiers.should eq({ "$set" => { "title" => "Sir" } })
+            expect(modifiers).to eq({ "$set" => { "title" => "Sir" } })
           end
         end
 
@@ -375,7 +375,7 @@ describe Mongoid::Atomic::Modifiers do
           end
 
           it "does not include the id sets" do
-            modifiers.should eq({})
+            expect(modifiers).to eq({})
           end
         end
 
@@ -386,7 +386,7 @@ describe Mongoid::Atomic::Modifiers do
           end
 
           it "does not contain set operations" do
-            modifiers.should eq({})
+            expect(modifiers).to eq({})
           end
         end
       end
@@ -407,7 +407,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the set modifiers to the conflicts hash" do
-          modifiers.should eq(
+          expect(modifiers).to eq(
             { "$pullAll" =>
               { "addresses" => [
                   { "_id" => "one" }
@@ -437,7 +437,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "adds the unsets to the modifiers" do
-          modifiers.should eq({ "$unset" => { "addresses" => true } })
+          expect(modifiers).to eq({ "$unset" => { "addresses" => true } })
         end
       end
 
@@ -448,7 +448,7 @@ describe Mongoid::Atomic::Modifiers do
         end
 
         it "does not contain unset operations" do
-          modifiers.should eq({})
+          expect(modifiers).to eq({})
         end
       end
     end

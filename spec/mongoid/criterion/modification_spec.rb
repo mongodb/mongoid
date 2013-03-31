@@ -25,7 +25,7 @@ describe Mongoid::Criteria do
         end
 
         it "updates all the matching documents" do
-          person.reload.title.should eq("Madam")
+          expect(person.reload.title).to eq("Madam")
         end
       end
 
@@ -36,7 +36,7 @@ describe Mongoid::Criteria do
         end
 
         it "updates all the matching documents" do
-          person.reload.title.should eq("Madam")
+          expect(person.reload.title).to eq("Madam")
         end
       end
     end
@@ -54,11 +54,11 @@ describe Mongoid::Criteria do
       end
 
       it "updates all the matching documents" do
-        from_db.addresses.first.city.should eq("Berlin")
+        expect(from_db.addresses.first.city).to eq("Berlin")
       end
 
       it "does not update non matching documents" do
-        from_db.addresses.last.city.should be_nil
+        expect(from_db.addresses.last.city).to be_nil
       end
     end
 
@@ -77,11 +77,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the first document" do
-            from_db.addresses.first.city.should eq("London")
+            expect(from_db.addresses.first.city).to eq("London")
           end
 
           it "does not update the last document" do
-            from_db.addresses.last.city.should be_nil
+            expect(from_db.addresses.last.city).to be_nil
           end
         end
 
@@ -92,11 +92,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the matching documents" do
-            from_db.addresses.first.city.should eq("Berlin")
+            expect(from_db.addresses.first.city).to eq("Berlin")
           end
 
           it "does not update non matching documents" do
-            from_db.addresses.last.city.should be_nil
+            expect(from_db.addresses.last.city).to be_nil
           end
         end
       end
@@ -122,11 +122,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the first document" do
-            from_db.posts.first.title.should eq("London")
+            expect(from_db.posts.first.title).to eq("London")
           end
 
           it "does not update the last document" do
-            from_db.posts.last.title.should eq("Second")
+            expect(from_db.posts.last.title).to eq("Second")
           end
         end
 
@@ -141,11 +141,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the matching documents" do
-            from_db.posts.where(title: "Berlin").count.should eq(1)
+            expect(from_db.posts.where(title: "Berlin").count).to eq(1)
           end
 
           it "does not update non matching documents" do
-            from_db.posts.where(title: "Second").count.should eq(1)
+            expect(from_db.posts.where(title: "Second").count).to eq(1)
           end
         end
       end
@@ -171,11 +171,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the first document" do
-            from_db.preferences.first.name.should eq("London")
+            expect(from_db.preferences.first.name).to eq("London")
           end
 
           it "does not update the last document" do
-            from_db.preferences.last.name.should eq("Second")
+            expect(from_db.preferences.last.name).to eq("Second")
           end
         end
 
@@ -186,11 +186,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the matching documents" do
-            from_db.preferences.first.name.should eq("Berlin")
+            expect(from_db.preferences.first.name).to eq("Berlin")
           end
 
           it "does not update non matching documents" do
-            from_db.preferences.last.name.should eq("Second")
+            expect(from_db.preferences.last.name).to eq("Second")
           end
         end
       end
@@ -224,7 +224,7 @@ describe Mongoid::Criteria do
         end
 
         it "updates all the matching documents" do
-          from_db.title.should eq("Madam")
+          expect(from_db.title).to eq("Madam")
         end
       end
 
@@ -239,7 +239,7 @@ describe Mongoid::Criteria do
         end
 
         it "updates all the matching documents" do
-          from_db.title.should eq("Madam")
+          expect(from_db.title).to eq("Madam")
         end
       end
     end
@@ -257,11 +257,11 @@ describe Mongoid::Criteria do
       end
 
       it "updates all the matching documents" do
-        from_db.addresses.first.city.should eq("Berlin")
+        expect(from_db.addresses.first.city).to eq("Berlin")
       end
 
       it "does not update non matching documents" do
-        from_db.addresses.last.city.should be_nil
+        expect(from_db.addresses.last.city).to be_nil
       end
     end
 
@@ -280,11 +280,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the first document" do
-            from_db.addresses.first.city.should eq("London")
+            expect(from_db.addresses.first.city).to eq("London")
           end
 
           it "updates the last document" do
-            from_db.addresses.last.city.should eq("London")
+            expect(from_db.addresses.last.city).to eq("London")
           end
         end
 
@@ -295,11 +295,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the matching documents" do
-            from_db.addresses.first.city.should eq("Berlin")
+            expect(from_db.addresses.first.city).to eq("Berlin")
           end
 
           it "does not update non matching documents" do
-            from_db.addresses.last.city.should be_nil
+            expect(from_db.addresses.last.city).to be_nil
           end
         end
       end
@@ -325,11 +325,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the first document" do
-            from_db.posts.first.title.should eq("London")
+            expect(from_db.posts.first.title).to eq("London")
           end
 
           it "updates the last document" do
-            from_db.posts.last.title.should eq("London")
+            expect(from_db.posts.last.title).to eq("London")
           end
         end
 
@@ -344,11 +344,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the matching documents" do
-            from_db.posts.where(title: "Berlin").count.should eq(1)
+            expect(from_db.posts.where(title: "Berlin").count).to eq(1)
           end
 
           it "does not update non matching documents" do
-            from_db.posts.where(title: "Second").count.should eq(1)
+            expect(from_db.posts.where(title: "Second").count).to eq(1)
           end
         end
       end
@@ -374,11 +374,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the first document" do
-            from_db.preferences.first.name.should eq("London")
+            expect(from_db.preferences.first.name).to eq("London")
           end
 
           it "updates the last document" do
-            from_db.preferences.last.name.should eq("London")
+            expect(from_db.preferences.last.name).to eq("London")
           end
         end
 
@@ -389,11 +389,11 @@ describe Mongoid::Criteria do
           end
 
           it "updates the matching documents" do
-            from_db.preferences.first.name.should eq("Berlin")
+            expect(from_db.preferences.first.name).to eq("Berlin")
           end
 
           it "does not update non matching documents" do
-            from_db.preferences.last.name.should eq("Second")
+            expect(from_db.preferences.last.name).to eq("Second")
           end
         end
       end

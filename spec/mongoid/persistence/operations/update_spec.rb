@@ -38,15 +38,15 @@ describe Mongoid::Persistence::Operations::Update do
     end
 
     it "sets the document" do
-      update.document.should eq(document)
+      expect(update.document).to eq(document)
     end
 
     it "sets the collection" do
-      update.collection.should eq(document.collection)
+      expect(update.collection).to eq(document.collection)
     end
 
     it "defaults validation to true" do
-      update.should be_validating
+      expect(update).to be_validating
     end
   end
 
@@ -82,13 +82,13 @@ describe Mongoid::Persistence::Operations::Update do
 
         it "performs a $set for changed fields" do
           root_set_expectation.call
-          update.persist.should be_true
+          expect(update.persist).to be_true
         end
 
         it "moves the changed fields to previously changed" do
           root_set_expectation.call
           update.persist
-          document.changed?.should be_false
+          expect(document.changed?).to be_false
         end
 
       end
@@ -100,7 +100,7 @@ describe Mongoid::Persistence::Operations::Update do
         end
 
         it "returns false" do
-          update.persist.should be_false
+          expect(update.persist).to be_false
         end
       end
 
@@ -116,7 +116,7 @@ describe Mongoid::Persistence::Operations::Update do
 
         it "updates the document in the database" do
           root_set_expectation.call
-          update.persist.should be_true
+          expect(update.persist).to be_true
         end
       end
 

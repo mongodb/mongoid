@@ -11,11 +11,11 @@ describe Mongoid::Indexable do
     end
 
     it "adds an index_options accessor" do
-      klass.should respond_to(:index_options)
+      expect(klass).to respond_to(:index_options)
     end
 
     it "defaults index_options to empty hash" do
-      klass.index_options.should eq({})
+      expect(klass.index_options).to eq({})
     end
   end
 
@@ -37,7 +37,7 @@ describe Mongoid::Indexable do
       end
 
       it "removes the indexes" do
-        collection.indexes.reject{ |doc| doc["name"] == "_id_" }.should be_empty
+        expect(collection.indexes.reject{ |doc| doc["name"] == "_id_" }).to be_empty
       end
     end
 
@@ -62,7 +62,7 @@ describe Mongoid::Indexable do
       end
 
       it "creates the indexes" do
-        indexes.reject{ |doc| doc["name"] == "_id_" }.should be_empty
+        expect(indexes.reject{ |doc| doc["name"] == "_id_" }).to be_empty
       end
     end
   end
@@ -84,7 +84,7 @@ describe Mongoid::Indexable do
       end
 
       it "creates the indexes" do
-        klass.collection.indexes[_type: 1].should_not be_nil
+        expect(klass.collection.indexes[_type: 1]).to_not be_nil
       end
     end
 
@@ -107,7 +107,7 @@ describe Mongoid::Indexable do
       end
 
       it "creates the indexes" do
-        indexes[_type: 1].should_not be_nil
+        expect(indexes[_type: 1]).to_not be_nil
       end
     end
   end
@@ -130,7 +130,7 @@ describe Mongoid::Indexable do
       end
 
       it "adds the _type index" do
-        klass.index_options[_type: 1].should eq(
+        expect(klass.index_options[_type: 1]).to eq(
           { unique: false, background: true }
         )
       end
@@ -157,7 +157,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with unique options" do
-        options.should eq(unique: true)
+        expect(options).to eq(unique: true)
       end
     end
 
@@ -172,7 +172,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with unique options" do
-        options.should eq(unique: true)
+        expect(options).to eq(unique: true)
       end
     end
 
@@ -187,7 +187,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with dropDups options" do
-        options.should eq(dropDups: true)
+        expect(options).to eq(dropDups: true)
       end
     end
 
@@ -202,7 +202,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with sparse options" do
-        options.should eq(sparse: true)
+        expect(options).to eq(sparse: true)
       end
     end
 
@@ -217,7 +217,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with name options" do
-        options.should eq(name: "index_name")
+        expect(options).to eq(name: "index_name")
       end
     end
 
@@ -232,7 +232,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with background options" do
-        options.should eq(database: "mongoid_index_alt")
+        expect(options).to eq(database: "mongoid_index_alt")
       end
     end
 
@@ -247,7 +247,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with background options" do
-        options.should eq(background: true)
+        expect(options).to eq(background: true)
       end
     end
 
@@ -262,7 +262,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the compound key index" do
-        options.should be_empty
+        expect(options).to be_empty
       end
     end
 
@@ -277,7 +277,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the geospacial index" do
-        options.should eq({ min: -200, max: 200, bits: 32 })
+        expect(options).to eq({ min: -200, max: 200, bits: 32 })
       end
     end
 
@@ -292,7 +292,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the geo haystack index" do
-        options.should eq({ min: -200, max: 200, bucketSize: 0.5 })
+        expect(options).to eq({ min: -200, max: 200, bucketSize: 0.5 })
       end
     end
 
@@ -307,7 +307,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the spherical geospatial index" do
-        options.should be_empty
+        expect(options).to be_empty
       end
     end
 
@@ -322,7 +322,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the hashed index" do
-        options.should be_empty
+        expect(options).to be_empty
       end
     end
 
@@ -337,7 +337,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the text index" do
-        options.should be_empty
+        expect(options).to be_empty
       end
     end
 
@@ -352,7 +352,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the compound text index" do
-        options.should eq(weights: { content: 1, title: 2 })
+        expect(options).to eq(weights: { content: 1, title: 2 })
       end
     end
 
@@ -367,7 +367,7 @@ describe Mongoid::Indexable do
       end
 
       it "sets the index with sparse options" do
-        options.should eq(expireAfterSeconds: 3600)
+        expect(options).to eq(expireAfterSeconds: 3600)
       end
     end
 

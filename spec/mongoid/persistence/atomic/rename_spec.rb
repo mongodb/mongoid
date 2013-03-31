@@ -15,27 +15,27 @@ describe Mongoid::Persistence::Atomic::Rename do
       end
 
       it "removes the old field" do
-        person.age.should be_nil
+        expect(person.age).to be_nil
       end
 
       it "adds the new field" do
-        person.years.should eq(100)
+        expect(person.years).to eq(100)
       end
 
       it "returns the value" do
-        rename.should eq(100)
+        expect(rename).to eq(100)
       end
 
       it "resets the old dirty attributes" do
-        person.changes["age"].should be_nil
+        expect(person.changes["age"]).to be_nil
       end
 
       it "resets the new field dirty attributes" do
-        person.changes["years"].should be_nil
+        expect(person.changes["years"]).to be_nil
       end
 
       it "persists the changes" do
-        person.reload.years.should eq(100)
+        expect(person.reload.years).to eq(100)
       end
     end
   end

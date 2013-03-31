@@ -52,7 +52,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "adds the current to the modifications" do
-        mods["preference_ids"].should eq(
+        expect(mods["preference_ids"]).to eq(
           [ preference_one.id, preference_three.id ]
         )
       end
@@ -76,11 +76,11 @@ describe Mongoid::Fields::ForeignKey do
     end
 
     it "dups the default value" do
-      field.eval_default(Person.new).should_not equal(default)
+      expect(field.eval_default(Person.new)).to_not equal(default)
     end
 
     it "returns the correct value" do
-      field.eval_default(Person.new).should eq(default)
+      expect(field.eval_default(Person.new)).to eq(default)
     end
   end
 
@@ -97,7 +97,7 @@ describe Mongoid::Fields::ForeignKey do
     end
 
     it "returns true" do
-      field.should be_foreign_key
+      expect(field).to be_foreign_key
     end
   end
 
@@ -122,7 +122,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "returns the id for the document" do
-        evolved.should eq(game.id)
+        expect(evolved).to eq(game.id)
       end
     end
 
@@ -145,7 +145,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "converts the value to an object id" do
-            evolved.should eq(id)
+            expect(evolved).to eq(id)
           end
         end
 
@@ -156,7 +156,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should eq("testing")
+            expect(evolved).to eq("testing")
           end
         end
 
@@ -167,7 +167,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should be_empty
+            expect(evolved).to be_empty
           end
         end
       end
@@ -191,7 +191,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "converts the value to an object id" do
-              evolved.should eq([ id_one, id_two ])
+              expect(evolved).to eq([ id_one, id_two ])
             end
           end
 
@@ -218,7 +218,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "does not convert the values to object ids" do
-              evolved.should eq([ id_one, id_two ])
+              expect(evolved).to eq([ id_one, id_two ])
             end
           end
         end
@@ -230,7 +230,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should eq([ "testing" ])
+            expect(evolved).to eq([ "testing" ])
           end
         end
 
@@ -241,7 +241,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should eq([ "" ])
+            expect(evolved).to eq([ "" ])
           end
         end
 
@@ -252,7 +252,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should eq([ nil ])
+            expect(evolved).to eq([ nil ])
           end
         end
       end
@@ -283,7 +283,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "converts the value to an object id" do
-              evolved.should eq(id)
+              expect(evolved).to eq(id)
             end
           end
 
@@ -294,7 +294,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "does not convert the value" do
-              evolved.should eq("testing")
+              expect(evolved).to eq("testing")
             end
           end
 
@@ -305,7 +305,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "does not convert the value" do
-              evolved.should be_empty
+              expect(evolved).to be_empty
             end
           end
         end
@@ -331,7 +331,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "does not convert the value to an object id" do
-              evolved.should eq(id.to_s)
+              expect(evolved).to eq(id.to_s)
             end
           end
 
@@ -342,7 +342,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "does not convert the value" do
-              evolved.should eq("testing")
+              expect(evolved).to eq("testing")
             end
           end
 
@@ -353,7 +353,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "does not convert the value" do
-              evolved.should be_empty
+              expect(evolved).to be_empty
             end
           end
         end
@@ -378,7 +378,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "converts the value to an object id" do
-              evolved.should eq([ id_one, id_two ])
+              expect(evolved).to eq([ id_one, id_two ])
             end
           end
 
@@ -405,7 +405,7 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             it "does not convert the values to object ids" do
-              evolved.should eq([ id_one, id_two ])
+              expect(evolved).to eq([ id_one, id_two ])
             end
           end
         end
@@ -417,7 +417,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should eq([ "testing" ])
+            expect(evolved).to eq([ "testing" ])
           end
         end
 
@@ -428,7 +428,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should eq([ "" ])
+            expect(evolved).to eq([ "" ])
           end
         end
 
@@ -439,7 +439,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert the value" do
-            evolved.should eq([ nil ])
+            expect(evolved).to eq([ nil ])
           end
         end
       end
@@ -455,7 +455,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "returns true" do
-        field.should be_lazy
+        expect(field).to be_lazy
       end
     end
 
@@ -466,7 +466,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "returns false" do
-        field.should_not be_lazy
+        expect(field).to_not be_lazy
       end
     end
   end
@@ -498,7 +498,7 @@ describe Mongoid::Fields::ForeignKey do
         context "when provided nil" do
 
           it "returns an empty array" do
-            field.mongoize(nil).should be_empty
+            expect(field.mongoize(nil)).to be_empty
           end
         end
 
@@ -509,11 +509,11 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "returns an empty array" do
-            field.mongoize(array).should eq(array)
+            expect(field.mongoize(array)).to eq(array)
           end
 
           it "returns the same instance" do
-            field.mongoize(array).should equal(array)
+            expect(field.mongoize(array)).to equal(array)
           end
         end
 
@@ -524,7 +524,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "performs conversion on the ids if strings" do
-            field.mongoize([object_id.to_s]).should eq([object_id])
+            expect(field.mongoize([object_id.to_s])).to eq([object_id])
           end
         end
 
@@ -553,7 +553,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "does not convert" do
-            field.mongoize([object_id.to_s]).should eq([object_id.to_s])
+            expect(field.mongoize([object_id.to_s])).to eq([object_id.to_s])
           end
         end
       end
@@ -588,7 +588,7 @@ describe Mongoid::Fields::ForeignKey do
           end
 
           it "performs conversion on the ids if strings" do
-            field.mongoize(object_id.to_s).should eq(object_id)
+            expect(field.mongoize(object_id.to_s)).to eq(object_id)
           end
         end
 
@@ -621,7 +621,7 @@ describe Mongoid::Fields::ForeignKey do
               end
 
               it "does not convert" do
-                field.mongoize(object_id.to_s).should eq(object_id.to_s)
+                expect(field.mongoize(object_id.to_s)).to eq(object_id.to_s)
               end
             end
           end
@@ -644,7 +644,7 @@ describe Mongoid::Fields::ForeignKey do
               end
 
               it "converts the string to an integer" do
-                field.mongoize("1").should eq(1)
+                expect(field.mongoize("1")).to eq(1)
               end
             end
           end
@@ -662,7 +662,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "returns true" do
-        field.should be_resizable
+        expect(field).to be_resizable
       end
     end
 
@@ -673,7 +673,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "returns false" do
-        field.should_not be_resizable
+        expect(field).to_not be_resizable
       end
     end
   end
@@ -687,7 +687,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "casts the ids on the initial set" do
-        agent.account_ids.should eq([ "true", "false", "1", "2" ])
+        expect(agent.account_ids).to eq([ "true", "false", "1", "2" ])
       end
     end
   end

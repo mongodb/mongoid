@@ -35,11 +35,11 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
       end
 
       it "sets the inverse relation" do
-        post_two.person.should eq(person)
+        expect(post_two.person).to eq(person)
       end
 
       it "sets the foreign key" do
-        post_two.person_id.should eq(person.id)
+        expect(post_two.person_id).to eq(person.id)
       end
     end
 
@@ -68,11 +68,11 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
       end
 
       it "removes the inverse relation" do
-        post.person.should be_nil
+        expect(post.person).to be_nil
       end
 
       it "removes the foreign keys" do
-        post.person_id.should be_nil
+        expect(post.person_id).to be_nil
       end
     end
 
@@ -102,7 +102,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
       end
 
       it "does not set the foreign key" do
-        post.person_id.should be_nil
+        expect(post.person_id).to be_nil
       end
     end
   end
@@ -126,7 +126,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
       end
 
       it "does not unset the foreign key" do
-        post.person_id.should eq(person.id)
+        expect(post.person_id).to eq(person.id)
       end
     end
   end

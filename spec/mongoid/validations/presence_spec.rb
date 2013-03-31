@@ -21,7 +21,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds no errors" do
-          product.errors[:brand_name].should be_empty
+          expect(product.errors[:brand_name]).to be_empty
         end
       end
 
@@ -32,7 +32,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds errors" do
-          product.errors[:brand_name].should eq(["can't be blank"])
+          expect(product.errors[:brand_name]).to eq(["can't be blank"])
         end
       end
 
@@ -43,7 +43,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds errors" do
-          product.errors[:brand_name].should eq(["can't be blank"])
+          expect(product.errors[:brand_name]).to eq(["can't be blank"])
         end
       end
     end
@@ -57,7 +57,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds no errors" do
-          product.errors[:name].should be_empty
+          expect(product.errors[:name]).to be_empty
         end
       end
 
@@ -68,7 +68,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds errors" do
-          product.errors[:name].should eq(["can't be blank"])
+          expect(product.errors[:name]).to eq(["can't be blank"])
         end
       end
 
@@ -79,7 +79,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds errors" do
-          product.errors[:name].should eq(["can't be blank in en"])
+          expect(product.errors[:name]).to eq(["can't be blank in en"])
         end
       end
 
@@ -90,7 +90,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds errors" do
-          product.errors[:name].should eq(["can't be blank in en"])
+          expect(product.errors[:name]).to eq(["can't be blank in en"])
         end
       end
 
@@ -105,7 +105,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds errors" do
-          product.errors[:name].should eq(["can't be blank in de"])
+          expect(product.errors[:name]).to eq(["can't be blank in de"])
         end
       end
 
@@ -120,7 +120,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds errors" do
-          product.errors[:name].should eq(["can't be blank in en", "can't be blank in de"])
+          expect(product.errors[:name]).to eq(["can't be blank in en", "can't be blank in de"])
         end
       end
     end
@@ -160,7 +160,7 @@ describe Mongoid::Validations::PresenceValidator do
             end
 
             it "saves the relation" do
-              game.reload.should eq(game)
+              expect(game.reload).to eq(game)
             end
           end
         end
@@ -179,11 +179,11 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "does not change autosave on the relation" do
-        Person.relations["game"][:autosave].should be_false
+        expect(Person.relations["game"][:autosave]).to be_false
       end
 
       it "does not add any autosaved relations" do
-        Person.autosaved_relations.should be_empty
+        expect(Person.autosaved_relations).to be_empty
       end
 
       context "when the relation is new" do
@@ -235,7 +235,7 @@ describe Mongoid::Validations::PresenceValidator do
           end
 
           it "is not valid" do
-            line_item.should_not be_valid
+            expect(line_item).to_not be_valid
           end
         end
       end
@@ -270,14 +270,14 @@ describe Mongoid::Validations::PresenceValidator do
           end
 
           it "is valid" do
-            loaded.should be_valid
+            expect(loaded).to be_valid
           end
         end
 
         context "when the relation is in memory" do
 
           it "is valid" do
-            person.should be_valid
+            expect(person).to be_valid
           end
         end
       end
@@ -297,12 +297,12 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "is not a valid document" do
-        product.should_not be_valid
+        expect(product).to_not be_valid
       end
 
       it "includes the proper errors" do
         product.valid?
-        product.errors[:name].should_not be_empty
+        expect(product.errors[:name]).to_not be_empty
       end
     end
 
@@ -317,12 +317,12 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "is not a valid document" do
-        product.should_not be_valid
+        expect(product).to_not be_valid
       end
 
       it "includes the proper errors" do
         product.valid?
-        product.errors[:name].should_not be_empty
+        expect(product.errors[:name]).to_not be_empty
       end
     end
 
@@ -337,12 +337,12 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "is not a valid document" do
-        product.should_not be_valid
+        expect(product).to_not be_valid
       end
 
       it "includes the proper errors" do
         product.valid?
-        product.errors[:name].should_not be_empty
+        expect(product.errors[:name]).to_not be_empty
       end
     end
 
@@ -357,12 +357,12 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "is not a valid document" do
-        product.should_not be_valid
+        expect(product).to_not be_valid
       end
 
       it "includes the proper errors" do
         product.valid?
-        product.errors[:name].should_not be_empty
+        expect(product.errors[:name]).to_not be_empty
       end
     end
 
@@ -377,7 +377,7 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "is a valid document" do
-        product.should be_valid
+        expect(product).to be_valid
       end
     end
   end
@@ -402,7 +402,7 @@ describe Mongoid::Validations::PresenceValidator do
     end
 
     it "persists the changes" do
-      reloaded.products.should eq(updated_products)
+      expect(reloaded.products).to eq(updated_products)
     end
   end
 
@@ -425,11 +425,11 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "does not destroy the models change list" do
-        manufacturer.changes.should_not be_empty
+        expect(manufacturer.changes).to_not be_empty
       end
 
       it "maintains the list of changes" do
-        manufacturer.changes.should eq({
+        expect(manufacturer.changes).to eq({
           "products" => [
             [ "Laptop", "Tablet" ],
             [ "Laptop", "Tablet", "Smartphone", "Desktop" ]
@@ -448,7 +448,7 @@ describe Mongoid::Validations::PresenceValidator do
     context "when the value is false" do
 
       it "is a valid document" do
-        template.should be_valid
+        expect(template).to be_valid
       end
     end
 
@@ -459,7 +459,7 @@ describe Mongoid::Validations::PresenceValidator do
       end
 
       it "is a valid document" do
-        template.should be_valid
+        expect(template).to be_valid
       end
     end
   end
@@ -475,7 +475,7 @@ describe Mongoid::Validations::PresenceValidator do
     end
 
     it "adds the validation only to the instance" do
-      validators.should eq([ described_class ])
+      expect(validators).to eq([ described_class ])
     end
   end
 
@@ -503,7 +503,7 @@ describe Mongoid::Validations::PresenceValidator do
         end
 
         it "adds the errors to the document" do
-          person.errors[:aliases].should_not be_empty
+          expect(person.errors[:aliases]).to_not be_empty
         end
       end
     end

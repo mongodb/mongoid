@@ -9,15 +9,15 @@ describe Mongoid::Errors::InvalidPath do
     end
 
     it "contains the problem in the message" do
-      error.message.should include("Having a root path assigned for Address")
+      expect(error.message).to include("Having a root path assigned for Address")
     end
 
     it "contains the summary in the message" do
-      error.message.should include("Mongoid has two different path objects")
+      expect(error.message).to include("Mongoid has two different path objects")
     end
 
     it "contains the resolution in the message" do
-      error.message.should include("Most likely your embedded model, Address")
+      expect(error.message).to include("Most likely your embedded model, Address")
     end
   end
 end

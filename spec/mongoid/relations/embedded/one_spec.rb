@@ -23,7 +23,7 @@ describe Mongoid::Relations::Embedded::One do
     context "when the proxied document is same class" do
 
       it "returns true" do
-        (relation === Name.new).should be_true
+        expect((relation === Name.new)).to be_true
       end
     end
   end
@@ -47,19 +47,19 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should eq(name)
+          expect(person.name).to eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should eq(person)
+          expect(name.namable).to eq(person)
         end
 
         it "sets the same instance on the inverse relation" do
-          name.namable.should eql(person)
+          expect(name.namable).to eql(person)
         end
 
         it "does not save the target" do
-          name.should_not be_persisted
+          expect(name).to_not be_persisted
         end
 
         context "with overwritten getter" do
@@ -76,7 +76,7 @@ describe Mongoid::Relations::Embedded::One do
 
           it "sets the target without an invinite recursion" do
             person.name = name
-            person.name.should be_present
+            expect(person.name).to be_present
           end
         end
       end
@@ -102,19 +102,19 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should eq(child_name)
+            expect(person.name).to eq(child_name)
           end
 
           it "sets the base on the inverse relation" do
-            child_name.namable.should eq(person)
+            expect(child_name.namable).to eq(person)
           end
 
           it "sets the same instance on the inverse relation" do
-            child_name.namable.should eql(person)
+            expect(child_name.namable).to eql(person)
           end
 
           it "saves the target" do
-            child_name.should be_persisted
+            expect(child_name).to be_persisted
           end
 
           context "when replacing a relation with a hash" do
@@ -124,7 +124,7 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "sets the relation with the proper object" do
-              person.name.should be_a(Name)
+              expect(person.name).to be_a(Name)
             end
           end
         end
@@ -137,11 +137,11 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "does not change the relation" do
-            person.name.should eq(name)
+            expect(person.name).to eq(name)
           end
 
           it "does not persist any change" do
-            person.reload.name.should eq(name)
+            expect(person.reload.name).to eq(name)
           end
         end
 
@@ -152,19 +152,19 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should eq(name)
+            expect(person.name).to eq(name)
           end
 
           it "sets the base on the inverse relation" do
-            name.namable.should eq(person)
+            expect(name.namable).to eq(person)
           end
 
           it "sets the same instance on the inverse relation" do
-            name.namable.should eql(person)
+            expect(name.namable).to eql(person)
           end
 
           it "saves the target" do
-            name.should be_persisted
+            expect(name).to be_persisted
           end
 
           context "when replacing an exising document" do
@@ -187,7 +187,7 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "runs the destroy callbacks on the old document" do
-              pet_one.destroy_flag.should be_true
+              expect(pet_one.destroy_flag).to be_true
             end
           end
         end
@@ -199,11 +199,11 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should eq(name)
+            expect(person.name).to eq(name)
           end
 
           it "does not save the target" do
-            name.should_not be_persisted
+            expect(name).to_not be_persisted
           end
         end
       end
@@ -226,19 +226,19 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          parent_shelf.child_shelf.should eq(child_shelf)
+          expect(parent_shelf.child_shelf).to eq(child_shelf)
         end
 
         it "sets the base on the inverse relation" do
-          child_shelf.parent_shelf.should eq(parent_shelf)
+          expect(child_shelf.parent_shelf).to eq(parent_shelf)
         end
 
         it "sets the same instance on the inverse relation" do
-          child_shelf.parent_shelf.should eql(parent_shelf)
+          expect(child_shelf.parent_shelf).to eql(parent_shelf)
         end
 
         it "does not save the target" do
-          child_shelf.should_not be_persisted
+          expect(child_shelf).to_not be_persisted
         end
       end
 
@@ -257,19 +257,19 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          parent_shelf.child_shelf.should eq(child_shelf)
+          expect(parent_shelf.child_shelf).to eq(child_shelf)
         end
 
         it "sets the base on the inverse relation" do
-          child_shelf.parent_shelf.should eq(parent_shelf)
+          expect(child_shelf.parent_shelf).to eq(parent_shelf)
         end
 
         it "sets the same instance on the inverse relation" do
-          child_shelf.parent_shelf.should eql(parent_shelf)
+          expect(child_shelf.parent_shelf).to eql(parent_shelf)
         end
 
         it "saves the target" do
-          child_shelf.should be_persisted
+          expect(child_shelf).to be_persisted
         end
       end
     end
@@ -287,7 +287,7 @@ describe Mongoid::Relations::Embedded::One do
       end
 
       it "saves the child document" do
-        parent.first_child.should be_a(Child)
+        expect(parent.first_child).to be_a(Child)
       end
     end
   end
@@ -312,11 +312,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the relation to nil" do
-          person.name.should be_nil
+          expect(person.name).to be_nil
         end
 
         it "removes the inverse relation" do
-          name.namable.should be_nil
+          expect(name.namable).to be_nil
         end
       end
 
@@ -331,7 +331,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the relation to nil" do
-          person.name.should be_nil
+          expect(person.name).to be_nil
         end
       end
 
@@ -353,15 +353,15 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the relation to nil" do
-            person.name.should be_nil
+            expect(person.name).to be_nil
           end
 
           it "removed the inverse relation" do
-            name.namable.should be_nil
+            expect(name.namable).to be_nil
           end
 
           it "deletes the child document" do
-            name.should be_destroyed
+            expect(name).to be_destroyed
           end
         end
 
@@ -373,11 +373,11 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the relation to nil" do
-            person.name.should be_nil
+            expect(person.name).to be_nil
           end
 
           it "does not delete the child document" do
-            name.should_not be_destroyed
+            expect(name).to_not be_destroyed
           end
         end
       end
@@ -401,11 +401,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the relation to nil" do
-          parent_shelf.child_shelf.should be_nil
+          expect(parent_shelf.child_shelf).to be_nil
         end
 
         it "removes the inverse relation" do
-          child_shelf.parent_shelf.should be_nil
+          expect(child_shelf.parent_shelf).to be_nil
         end
       end
 
@@ -420,7 +420,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the relation to nil" do
-          parent_shelf.child_shelf.should be_nil
+          expect(parent_shelf.child_shelf).to be_nil
         end
       end
 
@@ -440,15 +440,15 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the relation to nil" do
-          parent_shelf.child_shelf.should be_nil
+          expect(parent_shelf.child_shelf).to be_nil
         end
 
         it "removed the inverse relation" do
-          child_shelf.parent_shelf.should be_nil
+          expect(child_shelf.parent_shelf).to be_nil
         end
 
         it "deletes the child document" do
-          child_shelf.should be_destroyed
+          expect(child_shelf).to be_destroyed
         end
       end
     end
@@ -473,19 +473,19 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "sets the target of the relation" do
-              person.name.should eq(name)
+              expect(person.name).to eq(name)
             end
 
             it "sets the base on the inverse relation" do
-              name.namable.should eq(person)
+              expect(name.namable).to eq(person)
             end
 
             it "sets no attributes" do
-              name.first_name.should be_nil
+              expect(name.first_name).to be_nil
             end
 
             it "does not save the target" do
-              name.should_not be_persisted
+              expect(name).to_not be_persisted
             end
           end
 
@@ -501,19 +501,19 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "sets the target of the relation" do
-              person.name.should eq(name)
+              expect(person.name).to eq(name)
             end
 
             it "sets the base on the inverse relation" do
-              name.namable.should eq(person)
+              expect(name.namable).to eq(person)
             end
 
             it "sets no attributes" do
-              name.first_name.should be_nil
+              expect(name.first_name).to be_nil
             end
 
             it "does not save the target" do
-              name.should_not be_persisted
+              expect(name).to_not be_persisted
             end
           end
         end
@@ -529,19 +529,19 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should eq(name)
+            expect(person.name).to eq(name)
           end
 
           it "sets the base on the inverse relation" do
-            name.namable.should eq(person)
+            expect(name.namable).to eq(person)
           end
 
           it "sets no attributes" do
-            name.first_name.should be_nil
+            expect(name.first_name).to be_nil
           end
 
           it "does not save the target" do
-            name.should_not be_persisted
+            expect(name).to_not be_persisted
           end
         end
 
@@ -556,19 +556,19 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "sets the target of the relation" do
-            person.name.should eq(name)
+            expect(person.name).to eq(name)
           end
 
           it "sets the base on the inverse relation" do
-            name.namable.should eq(person)
+            expect(name.namable).to eq(person)
           end
 
           it "sets the attributes" do
-            name.first_name.should eq("James")
+            expect(name.first_name).to eq("James")
           end
 
           it "does not save the target" do
-            name.should_not be_persisted
+            expect(name).to_not be_persisted
           end
         end
       end
@@ -584,7 +584,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "does not save the target" do
-          name.should_not be_persisted
+          expect(name).to_not be_persisted
         end
       end
     end
@@ -602,19 +602,19 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          parent_shelf.child_shelf.should eq(child_shelf)
+          expect(parent_shelf.child_shelf).to eq(child_shelf)
         end
 
         it "sets the base on the inverse relation" do
-          child_shelf.parent_shelf.should eq(parent_shelf)
+          expect(child_shelf.parent_shelf).to eq(parent_shelf)
         end
 
         it "sets the attributes" do
-          child_shelf.level.should eq(1)
+          expect(child_shelf.level).to eq(1)
         end
 
         it "does not save the target" do
-          child_shelf.should_not be_persisted
+          expect(child_shelf).to_not be_persisted
         end
       end
 
@@ -629,7 +629,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "does not save the target" do
-          child_shelf.should_not be_persisted
+          expect(child_shelf).to_not be_persisted
         end
       end
     end
@@ -654,7 +654,7 @@ describe Mongoid::Relations::Embedded::One do
     end
 
     it "returns the embedded one builder" do
-      described_class.builder(base, metadata, target).should be_a(builder_klass)
+      expect(described_class.builder(base, metadata, target)).to be_a(builder_klass)
     end
   end
 
@@ -673,19 +673,19 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should eq(name)
+          expect(person.name).to eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should eq(person)
+          expect(name.namable).to eq(person)
         end
 
         it "sets no attributes" do
-          name.first_name.should be_nil
+          expect(name.first_name).to be_nil
         end
 
         it "saves the target" do
-          name.should be_persisted
+          expect(name).to be_persisted
         end
       end
 
@@ -700,19 +700,19 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should eq(name)
+          expect(person.name).to eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should eq(person)
+          expect(name.namable).to eq(person)
         end
 
         it "sets no attributes" do
-          name.first_name.should be_nil
+          expect(name.first_name).to be_nil
         end
 
         it "saves the target" do
-          name.should be_persisted
+          expect(name).to be_persisted
         end
       end
 
@@ -727,19 +727,19 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "sets the target of the relation" do
-          person.name.should eq(name)
+          expect(person.name).to eq(name)
         end
 
         it "sets the base on the inverse relation" do
-          name.namable.should eq(person)
+          expect(name.namable).to eq(person)
         end
 
         it "sets the attributes" do
-          name.first_name.should eq("James")
+          expect(name.first_name).to eq("James")
         end
 
         it "saves the target" do
-          name.should be_persisted
+          expect(name).to be_persisted
         end
       end
 
@@ -754,7 +754,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "does not save the target" do
-          name.should be_persisted
+          expect(name).to be_persisted
         end
       end
     end
@@ -763,21 +763,21 @@ describe Mongoid::Relations::Embedded::One do
   describe ".embedded?" do
 
     it "returns true" do
-      described_class.should be_embedded
+      expect(described_class).to be_embedded
     end
   end
 
   describe ".foreign_key_suffix" do
 
     it "returns nil" do
-      described_class.foreign_key_suffix.should be_nil
+      expect(described_class.foreign_key_suffix).to be_nil
     end
   end
 
   describe ".macro" do
 
     it "returns embeds_one" do
-      described_class.macro.should eq(:embeds_one)
+      expect(described_class.macro).to eq(:embeds_one)
     end
   end
 
@@ -796,8 +796,9 @@ describe Mongoid::Relations::Embedded::One do
     end
 
     it "returns the single nested builder" do
-      described_class.nested_builder(metadata, attributes, {}).should
-        be_a(nested_builder_klass)
+      expect(
+        described_class.nested_builder(metadata, attributes, {})
+      ).to be_a(nested_builder_klass)
     end
   end
 
@@ -820,20 +821,20 @@ describe Mongoid::Relations::Embedded::One do
       context "when checking #{method}" do
 
         it "returns true" do
-          document.respond_to?(method).should be_true
+          expect(document.respond_to?(method)).to be_true
         end
       end
     end
 
     it "responds to persisted?" do
-      document.should respond_to(:persisted?)
+      expect(document).to respond_to(:persisted?)
     end
   end
 
   describe ".valid_options" do
 
     it "returns the valid options" do
-      described_class.valid_options.should eq(
+      expect(described_class.valid_options).to eq(
         [ :autobuild, :as, :cascade_callbacks, :cyclic, :store_as ]
       )
     end
@@ -842,7 +843,7 @@ describe Mongoid::Relations::Embedded::One do
   describe ".validation_default" do
 
     it "returns true" do
-      described_class.validation_default.should be_true
+      expect(described_class.validation_default).to be_true
     end
   end
 
@@ -872,11 +873,11 @@ describe Mongoid::Relations::Embedded::One do
       end
 
       it "sets the values of the array" do
-        from_db.aliases.should eq([ "Syd", "Sydney" ])
+        expect(from_db.aliases).to eq([ "Syd", "Sydney" ])
       end
 
       it "persists the array" do
-        Person.find(person.id).name.aliases.should eq([ "Syd", "Sydney" ])
+        expect(Person.find(person.id).name.aliases).to eq([ "Syd", "Sydney" ])
       end
     end
   end
@@ -914,7 +915,7 @@ describe Mongoid::Relations::Embedded::One do
           end
 
           it "persists the new document on the first save" do
-            from_db.reload.name.translations.should_not be_empty
+            expect(from_db.reload.name.translations).to_not be_empty
           end
         end
       end
@@ -944,7 +945,7 @@ describe Mongoid::Relations::Embedded::One do
       end
 
       it "reloads the correct number" do
-        person.reload.addresses.count.should eq(1)
+        expect(person.reload.addresses.count).to eq(1)
       end
 
       context "when adding a child" do
@@ -958,7 +959,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "reloads the correct number" do
-          person.reload.addresses.count.should eq(1)
+          expect(person.reload.addresses.count).to eq(1)
         end
       end
     end
@@ -987,11 +988,11 @@ describe Mongoid::Relations::Embedded::One do
       end
 
       it "creates proper documents from the db" do
-        label.name.should eq("Mute")
+        expect(label.name).to eq("Mute")
       end
 
       it "assigns ids to the documents" do
-        label.id.should_not be_nil
+        expect(label.id).to_not be_nil
       end
 
       context "when subsequently updating the documents" do
@@ -1001,11 +1002,11 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         it "updates the document" do
-          label.name.should eq("Interscope")
+          expect(label.name).to eq("Interscope")
         end
 
         it "persists the change" do
-          label.reload.name.should eq("Interscope")
+          expect(label.reload.name).to eq("Interscope")
         end
       end
     end

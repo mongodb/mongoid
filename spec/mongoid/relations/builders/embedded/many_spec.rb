@@ -27,7 +27,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an array of documents" do
-        documents.should eq(object)
+        expect(documents).to eq(object)
       end
     end
 
@@ -46,7 +46,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an empty array" do
-        documents.should eq(object)
+        expect(documents).to eq(object)
       end
     end
 
@@ -65,7 +65,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an empty array" do
-        documents.should be_empty
+        expect(documents).to be_empty
       end
     end
 
@@ -84,16 +84,16 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an array of documents" do
-        documents.should be_a_kind_of(Array)
+        expect(documents).to be_a_kind_of(Array)
       end
 
       it "creates the correct type of documents" do
-        documents[0].should be_a_kind_of(Address)
+        expect(documents[0]).to be_a_kind_of(Address)
       end
 
       it "sets the object on the documents" do
-        documents[0].city.should eq("London")
-        documents[1].city.should eq("Shanghai")
+        expect(documents[0].city).to eq("London")
+        expect(documents[1].city).to eq("Shanghai")
       end
     end
 
@@ -115,17 +115,17 @@ describe Mongoid::Relations::Builders::Embedded::Many do
       end
 
       it "returns an array of documents" do
-        documents.should be_a_kind_of(Array)
+        expect(documents).to be_a_kind_of(Array)
       end
 
       it "creates the correct type of document" do
-        documents[0].should be_a_kind_of(Circle)
-        documents[1].should be_a_kind_of(Square)
+        expect(documents[0]).to be_a_kind_of(Circle)
+        expect(documents[1]).to be_a_kind_of(Square)
       end
 
       it "sets the object on the document" do
-        documents[0].radius.should eq(100)
-        documents[1].width.should eq(50)
+        expect(documents[0].radius).to eq(100)
+        expect(documents[1].width).to eq(50)
       end
     end
   end

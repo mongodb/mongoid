@@ -19,23 +19,23 @@ describe Mongoid::Persistence::Atomic::PullAll do
       end
 
       it "pulls the value from the array" do
-        person.aliases.should be_empty
+        expect(person.aliases).to be_empty
       end
 
       it "persists the data" do
-        reloaded.aliases.should be_empty
+        expect(reloaded.aliases).to be_empty
       end
 
       it "removes the field from the dirty attributes" do
-        person.changes["aliases"].should be_nil
+        expect(person.changes["aliases"]).to be_nil
       end
 
       it "resets the document dirty flag" do
-        person.should_not be_changed
+        expect(person).to_not be_changed
       end
 
       it "returns the new array value" do
-        pulled.should be_empty
+        expect(pulled).to be_empty
       end
     end
 
@@ -54,23 +54,23 @@ describe Mongoid::Persistence::Atomic::PullAll do
       end
 
       it "does not modify the field" do
-        person.aliases.should be_nil
+        expect(person.aliases).to be_nil
       end
 
       it "persists no data" do
-        reloaded.aliases.should be_nil
+        expect(reloaded.aliases).to be_nil
       end
 
       it "removes the field from the dirty attributes" do
-        person.changes["aliases"].should be_nil
+        expect(person.changes["aliases"]).to be_nil
       end
 
       it "resets the document dirty flag" do
-        person.should_not be_changed
+        expect(person).to_not be_changed
       end
 
       it "returns nil" do
-        pulled.should be_nil
+        expect(pulled).to be_nil
       end
     end
   end

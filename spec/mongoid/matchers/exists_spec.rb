@@ -13,7 +13,7 @@ describe Mongoid::Matchers::Exists do
         end
 
         it "returns true" do
-          matcher.matches?("$exists" => true).should be_true
+          expect(matcher.matches?("$exists" => true)).to be_true
         end
       end
 
@@ -24,7 +24,7 @@ describe Mongoid::Matchers::Exists do
         end
 
         it "returns false" do
-          matcher.matches?("$exists" => true).should be_false
+          expect(matcher.matches?("$exists" => true)).to be_false
         end
       end
     end
@@ -38,7 +38,7 @@ describe Mongoid::Matchers::Exists do
         end
 
         it "returns false" do
-          matcher.matches?("$exists" => false).should be_false
+          expect(matcher.matches?("$exists" => false)).to be_false
         end
       end
 
@@ -49,7 +49,7 @@ describe Mongoid::Matchers::Exists do
         end
 
         it "returns true" do
-          matcher.matches?("$exists" => false).should be_true
+          expect(matcher.matches?("$exists" => false)).to be_true
         end
       end
     end

@@ -15,11 +15,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "adds to the aliased field" do
-        person.array.should eq([ "test", "testy" ])
+        expect(person.array).to eq([ "test", "testy" ])
       end
 
       it "persists the change" do
-        person.reload.array.should eq([ "test", "testy" ])
+        expect(person.reload.array).to eq([ "test", "testy" ])
       end
     end
 
@@ -34,11 +34,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "performs the bitwise operation" do
-        person.inte.should eq(12)
+        expect(person.inte).to eq(12)
       end
 
       it "persists the changes" do
-        person.reload.inte.should eq(12)
+        expect(person.reload.inte).to eq(12)
       end
     end
 
@@ -53,11 +53,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "increments the aliased field" do
-        person.inte.should eq(6)
+        expect(person.inte).to eq(6)
       end
 
       it "persists the change" do
-        person.reload.inte.should eq(6)
+        expect(person.reload.inte).to eq(6)
       end
     end
 
@@ -72,11 +72,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "removes from the aliased field" do
-        person.array.should eq([ "test1" ])
+        expect(person.array).to eq([ "test1" ])
       end
 
       it "persists the change" do
-        person.reload.array.should eq([ "test1" ])
+        expect(person.reload.array).to eq([ "test1" ])
       end
     end
 
@@ -91,11 +91,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "removes from the aliased field" do
-        person.array.should eq([ "test2" ])
+        expect(person.array).to eq([ "test2" ])
       end
 
       it "persists the change" do
-        person.reload.array.should eq([ "test2" ])
+        expect(person.reload.array).to eq([ "test2" ])
       end
     end
 
@@ -110,11 +110,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "removes from the aliased field" do
-        person.array.should be_empty
+        expect(person.array).to be_empty
       end
 
       it "persists the change" do
-        person.reload.array.should be_empty
+        expect(person.reload.array).to be_empty
       end
     end
 
@@ -129,11 +129,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "adds to the aliased field" do
-        person.array.should eq([ "test", "testy" ])
+        expect(person.array).to eq([ "test", "testy" ])
       end
 
       it "persists the change" do
-        person.reload.array.should eq([ "test", "testy" ])
+        expect(person.reload.array).to eq([ "test", "testy" ])
       end
     end
 
@@ -148,11 +148,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "adds to the aliased field" do
-        person.array.should eq([ "test", "testy", "test2" ])
+        expect(person.array).to eq([ "test", "testy", "test2" ])
       end
 
       it "persists the change" do
-        person.reload.array.should eq([ "test", "testy", "test2" ])
+        expect(person.reload.array).to eq([ "test", "testy", "test2" ])
       end
     end
 
@@ -167,11 +167,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "renames the aliased field" do
-        person.integer.should eq(5)
+        expect(person.integer).to eq(5)
       end
 
       it "persists the change" do
-        person.reload.integer.should eq(5)
+        expect(person.reload.integer).to eq(5)
       end
     end
 
@@ -186,11 +186,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "sets the aliased field" do
-        person.inte.should eq(8)
+        expect(person.inte).to eq(8)
       end
 
       it "persists the change" do
-        person.reload.inte.should eq(8)
+        expect(person.reload.inte).to eq(8)
       end
     end
 
@@ -205,11 +205,11 @@ describe Mongoid::Persistence::Atomic do
       end
 
       it "unsets the aliased field" do
-        person.inte.should be_nil
+        expect(person.inte).to be_nil
       end
 
       it "persists the change" do
-        person.reload.inte.should be_nil
+        expect(person.reload.inte).to be_nil
       end
     end
   end

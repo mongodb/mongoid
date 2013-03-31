@@ -19,19 +19,19 @@ describe Mongoid::Persistence::Atomic::Bit do
       end
 
       it "performs the bitwise operation" do
-        person.age.should eq(12)
+        expect(person.age).to eq(12)
       end
 
       it "returns the new value" do
-        bit.should eq(12)
+        expect(bit).to eq(12)
       end
 
       it "persists the changes" do
-        reloaded.age.should eq(12)
+        expect(reloaded.age).to eq(12)
       end
 
       it "resets the dirty attributes" do
-        person.changes["age"].should be_nil
+        expect(person.changes["age"]).to be_nil
       end
     end
 
@@ -42,19 +42,19 @@ describe Mongoid::Persistence::Atomic::Bit do
       end
 
       it "performs the bitwise operation" do
-        person.age.should eq(61)
+        expect(person.age).to eq(61)
       end
 
       it "returns the new value" do
-        bit.should eq(61)
+        expect(bit).to eq(61)
       end
 
       it "persists the changes" do
-        reloaded.age.should eq(61)
+        expect(reloaded.age).to eq(61)
       end
 
       it "resets the dirty attributes" do
-        person.changes["age"].should be_nil
+        expect(person.changes["age"]).to be_nil
       end
     end
 
@@ -69,19 +69,19 @@ describe Mongoid::Persistence::Atomic::Bit do
       end
 
       it "performs the bitwise operation" do
-        person.age.should eq(14)
+        expect(person.age).to eq(14)
       end
 
       it "returns the new value" do
-        bit.should eq(14)
+        expect(bit).to eq(14)
       end
 
       it "persists the changes" do
-        reloaded.age.should eq(14)
+        expect(reloaded.age).to eq(14)
       end
 
       it "resets the dirty attributes" do
-        person.changes["age"].should be_nil
+        expect(person.changes["age"]).to be_nil
       end
     end
   end

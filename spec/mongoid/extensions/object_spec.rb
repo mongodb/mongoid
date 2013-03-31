@@ -9,7 +9,7 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns self" do
-      object.__evolve_object_id__.should eq(object)
+      expect(object.__evolve_object_id__).to eq(object)
     end
   end
 
@@ -20,7 +20,7 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns self" do
-      object.__find_args__.should eq(object)
+      expect(object.__find_args__).to eq(object)
     end
   end
 
@@ -31,7 +31,7 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns self" do
-      object.__mongoize_object_id__.should eq(object)
+      expect(object.__mongoize_object_id__).to eq(object)
     end
   end
 
@@ -58,7 +58,7 @@ describe Mongoid::Extensions::Object do
         end
 
         it "returns the object id" do
-          fk.should eq(object_id)
+          expect(fk).to eq(object_id)
         end
       end
 
@@ -75,7 +75,7 @@ describe Mongoid::Extensions::Object do
           end
 
           it "returns the object id" do
-            fk.should eq(object_id)
+            expect(fk).to eq(object_id)
           end
         end
 
@@ -90,7 +90,7 @@ describe Mongoid::Extensions::Object do
           end
 
           it "returns the string" do
-            fk.should eq(string)
+            expect(fk).to eq(string)
           end
         end
 
@@ -101,7 +101,7 @@ describe Mongoid::Extensions::Object do
           end
 
           it "returns nil" do
-            fk.should be_nil
+            expect(fk).to be_nil
           end
         end
       end
@@ -113,7 +113,7 @@ describe Mongoid::Extensions::Object do
         end
 
         it "returns nil" do
-          fk.should be_nil
+          expect(fk).to be_nil
         end
       end
 
@@ -124,7 +124,7 @@ describe Mongoid::Extensions::Object do
         end
 
         it "returns an empty array" do
-          fk.should eq([])
+          expect(fk).to eq([])
         end
       end
     end
@@ -137,7 +137,7 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns self" do
-      object.__mongoize_time__.should eq(object)
+      expect(object.__mongoize_time__).to eq(object)
     end
   end
 
@@ -148,7 +148,7 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns self" do
-      object.__sortable__.should eq(object)
+      expect(object.__sortable__).to eq(object)
     end
   end
 
@@ -159,7 +159,7 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns the provided object" do
-      Object.demongoize(object).should eq(object)
+      expect(Object.demongoize(object)).to eq(object)
     end
   end
 
@@ -172,7 +172,7 @@ describe Mongoid::Extensions::Object do
       end
 
       it "returns nil" do
-        result.should be_nil
+        expect(result).to be_nil
       end
     end
 
@@ -185,7 +185,7 @@ describe Mongoid::Extensions::Object do
         end
 
         it "returns the result of the method" do
-          result.should eq("Yoda,Luke")
+          expect(result).to eq("Yoda,Luke")
         end
       end
 
@@ -196,7 +196,7 @@ describe Mongoid::Extensions::Object do
         end
 
         it "returns the result of the method" do
-          result.should be_nil
+          expect(result).to be_nil
         end
       end
     end
@@ -209,7 +209,7 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns the provided object" do
-      Object.mongoize(object).should eq(object)
+      expect(Object.mongoize(object)).to eq(object)
     end
   end
 
@@ -220,14 +220,14 @@ describe Mongoid::Extensions::Object do
     end
 
     it "returns the object" do
-      object.mongoize.should eq(object)
+      expect(object.mongoize).to eq(object)
     end
   end
 
   describe "#resizable?" do
 
     it "returns false" do
-      Object.new.should_not be_resizable
+      expect(Object.new).to_not be_resizable
     end
   end
 
@@ -244,7 +244,7 @@ describe Mongoid::Extensions::Object do
       end
 
       it "returns nil" do
-        result.should be_nil
+        expect(result).to be_nil
       end
     end
   end
@@ -266,11 +266,11 @@ describe Mongoid::Extensions::Object do
       end
 
       it "removes the instance variable" do
-        document.instance_variable_defined?(:@testing).should be_false
+        expect(document.instance_variable_defined?(:@testing)).to be_false
       end
 
       it "returns true" do
-        removal.should be_true
+        expect(removal).to be_true
       end
     end
 
@@ -285,7 +285,7 @@ describe Mongoid::Extensions::Object do
       end
 
       it "returns false" do
-        removal.should be_false
+        expect(removal).to be_false
       end
     end
   end

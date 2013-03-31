@@ -13,19 +13,19 @@ describe Mongoid::Persistence do
         end
 
         it "creates the first document" do
-          people.first.title.should eq("sir")
+          expect(people.first.title).to eq("sir")
         end
 
         it "persists the first document" do
-          people.first.should be_persisted
+          expect(people.first).to be_persisted
         end
 
         it "creates the second document" do
-          people.last.title.should eq("madam")
+          expect(people.last.title).to eq("madam")
         end
 
         it "persists the second document" do
-          people.last.should be_persisted
+          expect(people.last).to be_persisted
         end
       end
 
@@ -38,27 +38,27 @@ describe Mongoid::Persistence do
         end
 
         it "creates the first document" do
-          people.first.title.should eq("sir")
+          expect(people.first.title).to eq("sir")
         end
 
         it "persists the first document" do
-          people.first.should be_persisted
+          expect(people.first).to be_persisted
         end
 
         it "passes the block to the first document" do
-          people.first.age.should eq(36)
+          expect(people.first.age).to eq(36)
         end
 
         it "creates the second document" do
-          people.last.title.should eq("madam")
+          expect(people.last.title).to eq("madam")
         end
 
         it "persists the second document" do
-          people.last.should be_persisted
+          expect(people.last).to be_persisted
         end
 
         it "passes the block to the second document" do
-          people.last.age.should eq(36)
+          expect(people.last.age).to eq(36)
         end
       end
     end
@@ -70,11 +70,11 @@ describe Mongoid::Persistence do
       end
 
       it "it saves the document" do
-        person.should be_persisted
+        expect(person).to be_persisted
       end
 
       it "returns the document" do
-        person.should be_a_kind_of(Person)
+        expect(person).to be_a_kind_of(Person)
       end
 
       context "when creating an embedded document" do
@@ -84,7 +84,7 @@ describe Mongoid::Persistence do
         end
 
         it "persists the document" do
-          address.should be_persisted
+          expect(address).to be_persisted
         end
       end
 
@@ -113,11 +113,11 @@ describe Mongoid::Persistence do
         end
 
         it "should not persist in address key on User document" do
-          document.keys.should_not include("addresses")
+          expect(document.keys).to_not include("addresses")
         end
 
         it "should persist on user_addesses key on User document" do
-          document.keys.should include("user_adresses")
+          expect(document.keys).to include("user_adresses")
         end
       end
     end
@@ -131,11 +131,11 @@ describe Mongoid::Persistence do
       end
 
       it "sets the attributes" do
-        person.ssn.should eq("666-66-6666")
+        expect(person.ssn).to eq("666-66-6666")
       end
 
       it "persists the document" do
-        person.should be_persisted
+        expect(person).to be_persisted
       end
     end
   end
@@ -151,19 +151,19 @@ describe Mongoid::Persistence do
         end
 
         it "creates the first document" do
-          people.first.title.should eq("sir")
+          expect(people.first.title).to eq("sir")
         end
 
         it "persists the first document" do
-          people.first.should be_persisted
+          expect(people.first).to be_persisted
         end
 
         it "creates the second document" do
-          people.last.title.should eq("madam")
+          expect(people.last.title).to eq("madam")
         end
 
         it "persists the second document" do
-          people.last.should be_persisted
+          expect(people.last).to be_persisted
         end
       end
 
@@ -176,27 +176,27 @@ describe Mongoid::Persistence do
         end
 
         it "creates the first document" do
-          people.first.title.should eq("sir")
+          expect(people.first.title).to eq("sir")
         end
 
         it "persists the first document" do
-          people.first.should be_persisted
+          expect(people.first).to be_persisted
         end
 
         it "passes the block to the first document" do
-          people.first.age.should eq(36)
+          expect(people.first.age).to eq(36)
         end
 
         it "creates the second document" do
-          people.last.title.should eq("madam")
+          expect(people.last.title).to eq("madam")
         end
 
         it "persists the second document" do
-          people.last.should be_persisted
+          expect(people.last).to be_persisted
         end
 
         it "passes the block to the second document" do
-          people.last.age.should eq(36)
+          expect(people.last.age).to eq(36)
         end
       end
     end
@@ -226,11 +226,11 @@ describe Mongoid::Persistence do
       end
 
       it "sets the attributes" do
-        person.ssn.should eq("666-66-6666")
+        expect(person.ssn).to eq("666-66-6666")
       end
 
       it "persists the document" do
-        person.should be_persisted
+        expect(person).to be_persisted
       end
     end
 
@@ -241,7 +241,7 @@ describe Mongoid::Persistence do
       end
 
       it "saves the document" do
-        account.should be_persisted
+        expect(account).to be_persisted
       end
     end
 
@@ -274,11 +274,11 @@ describe Mongoid::Persistence do
         end
 
         it "returns true" do
-          deleted.should be_true
+          expect(deleted).to be_true
         end
 
         it "resets the flagged for destroy flag" do
-          person.should_not be_flagged_for_destroy
+          expect(person).to_not be_flagged_for_destroy
         end
       end
 
@@ -295,15 +295,15 @@ describe Mongoid::Persistence do
           end
 
           it "removes the document from the parent" do
-            person.addresses.should be_empty
+            expect(person.addresses).to be_empty
           end
 
           it "removes the attributes from the parent" do
-            person.raw_attributes["addresses"].should be_nil
+            expect(person.raw_attributes["addresses"]).to be_nil
           end
 
           it "resets the flagged for destroy flag" do
-            address.should_not be_flagged_for_destroy
+            expect(address).to_not be_flagged_for_destroy
           end
         end
 
@@ -319,7 +319,7 @@ describe Mongoid::Persistence do
           end
 
           it "removes the object from the parent and database" do
-            from_db.addresses.should be_empty
+            expect(from_db.addresses).to be_empty
           end
         end
       end
@@ -345,11 +345,11 @@ describe Mongoid::Persistence do
           end
 
           it "removes the object from the parent and database" do
-            from_db.addresses.first.locations.should be_empty
+            expect(from_db.addresses.first.locations).to be_empty
           end
 
           it "resets the flagged for destroy flag" do
-            location.should_not be_flagged_for_destroy
+            expect(location).to_not be_flagged_for_destroy
           end
         end
       end
@@ -375,15 +375,15 @@ describe Mongoid::Persistence do
         end
 
         it "returns true" do
-          saved.should be_true
+          expect(saved).to be_true
         end
 
         it "saves the document" do
-          account.should be_persisted
+          expect(account).to be_persisted
         end
 
         it "does not add any validation errors" do
-          account.errors.should be_empty
+          expect(account.errors).to be_empty
         end
       end
 
@@ -414,7 +414,7 @@ describe Mongoid::Persistence do
             end
 
             it "clears any errors off the document" do
-              alert.errors.should be_empty
+              expect(alert.errors).to be_empty
             end
 
             context "when the document is not new" do
@@ -424,7 +424,7 @@ describe Mongoid::Persistence do
               end
 
               it "clears any errors off the document" do
-                alert.errors.should be_empty
+                expect(alert.errors).to be_empty
               end
             end
           end
@@ -446,12 +446,12 @@ describe Mongoid::Persistence do
         end
 
         it "does not flag the excluded fields as dirty" do
-          limited.changes.should be_empty
+          expect(limited.changes).to be_empty
         end
 
         it "does not overwrite with the default" do
           limited.save
-          limited.reload.age.should eq(20)
+          expect(limited.reload.age).to eq(20)
         end
       end
 
@@ -463,7 +463,7 @@ describe Mongoid::Persistence do
 
         it "does not flag any changes" do
           limited.each do |person|
-            person.changes.should be_empty
+            expect(person.changes).to be_empty
           end
         end
       end
@@ -472,7 +472,7 @@ describe Mongoid::Persistence do
     context "when validation passes" do
 
       it "returns true" do
-        person.save.should be_true
+        expect(person.save).to be_true
       end
     end
 
@@ -487,7 +487,7 @@ describe Mongoid::Persistence do
       end
 
       it "has the appropriate errors" do
-        address.errors[:street].should eq(["can't be blank"])
+        expect(address.errors[:street]).to eq(["can't be blank"])
       end
     end
 
@@ -517,7 +517,7 @@ describe Mongoid::Persistence do
         end
 
         it "persists with proper set and push modifiers" do
-          person.atomic_updates.should eq({
+          expect(person.atomic_updates).to eq({
             "$set" => {
               "title" => "King",
               "name.first_name" => "Ryan"
@@ -531,15 +531,15 @@ describe Mongoid::Persistence do
         context "when saving the document" do
 
           it "saves the root document" do
-            person.title.should eq("King")
+            expect(person.title).to eq("King")
           end
 
           it "saves embedded many relations" do
-            person.addresses.first.street.should eq("Bond St")
+            expect(person.addresses.first.street).to eq("Bond St")
           end
 
           it "saves embedded one relations" do
-            person.name.first_name.should eq("Ryan")
+            expect(person.name.first_name).to eq("Ryan")
           end
         end
       end
@@ -576,15 +576,15 @@ describe Mongoid::Persistence do
         end
 
         it "saves modifications to existing embedded docs" do
-          from_db.addresses[0].number.should eq(102)
+          expect(from_db.addresses[0].number).to eq(102)
         end
 
         it "saves modifications to new embedded docs" do
-          from_db.addresses[1].street.should eq('North Ave')
+          expect(from_db.addresses[1].street).to eq('North Ave')
         end
 
         it "saves modifications to deeply embedded docs" do
-          from_db.addresses[0].locations.first.name.should eq('Work')
+          expect(from_db.addresses[0].locations.first.name).to eq('Work')
         end
       end
 
@@ -605,7 +605,7 @@ describe Mongoid::Persistence do
         end
 
         it "saves the hierarchy" do
-          person.name.should be_nil
+          expect(person.name).to be_nil
         end
       end
     end
@@ -670,7 +670,7 @@ describe Mongoid::Persistence do
       end
 
       it "flags the document as destroyed" do
-        oscar.should be_destroyed
+        expect(oscar).to be_destroyed
       end
     end
   end
@@ -692,11 +692,11 @@ describe Mongoid::Persistence do
       end
 
       it "updates the updated_at timestamp" do
-        label.updated_at.should be_within(1).of(Time.now)
+        expect(label.updated_at).to be_within(1).of(Time.now)
       end
 
       it "persists the changes" do
-        label.reload.updated_at.should be_within(1).of(Time.now)
+        expect(label.reload.updated_at).to be_within(1).of(Time.now)
       end
     end
 
@@ -715,11 +715,11 @@ describe Mongoid::Persistence do
           end
 
           it "returns true" do
-            touched.should be_true
+            expect(touched).to be_true
           end
 
           it "does not set the updated at field" do
-            person[:updated_at].should be_nil
+            expect(person[:updated_at]).to be_nil
           end
         end
 
@@ -730,15 +730,15 @@ describe Mongoid::Persistence do
           end
 
           it "sets the attribute to the current time" do
-            person.lunch_time.should be_within(5).of(Time.now)
+            expect(person.lunch_time).to be_within(5).of(Time.now)
           end
 
           it "persists the change" do
-            person.reload.lunch_time.should be_within(5).of(Time.now)
+            expect(person.reload.lunch_time).to be_within(5).of(Time.now)
           end
 
           it "returns true" do
-            touched.should be_true
+            expect(touched).to be_true
           end
         end
 
@@ -749,15 +749,15 @@ describe Mongoid::Persistence do
           end
 
           it "sets the attribute to the current time" do
-            person.aliased_timestamp.should be_within(5).of(Time.now)
+            expect(person.aliased_timestamp).to be_within(5).of(Time.now)
           end
 
           it "persists the change" do
-            person.reload.aliased_timestamp.should be_within(5).of(Time.now)
+            expect(person.reload.aliased_timestamp).to be_within(5).of(Time.now)
           end
 
           it "returns true" do
-            touched.should be_true
+            expect(touched).to be_true
           end
         end
       end
@@ -775,19 +775,19 @@ describe Mongoid::Persistence do
           end
 
           it "sets the updated at to the current time" do
-            agent.updated_at.should be_within(5).of(Time.now)
+            expect(agent.updated_at).to be_within(5).of(Time.now)
           end
 
           it "persists the change" do
-            agent.reload.updated_at.should be_within(5).of(Time.now)
+            expect(agent.reload.updated_at).to be_within(5).of(Time.now)
           end
 
           it "returns true" do
-            touched.should be_true
+            expect(touched).to be_true
           end
 
           it "keeps changes for next callback" do
-            agent.changes.should_not be_empty
+            expect(agent.changes).to_not be_empty
           end
         end
 
@@ -798,31 +798,31 @@ describe Mongoid::Persistence do
           end
 
           it "sets the updated at to the current time" do
-            agent.updated_at.should be_within(5).of(Time.now)
+            expect(agent.updated_at).to be_within(5).of(Time.now)
           end
 
           it "sets the attribute to the current time" do
-            agent.dob.should be_within(5).of(Time.now)
+            expect(agent.dob).to be_within(5).of(Time.now)
           end
 
           it "sets both attributes to the exact same time" do
-            agent.updated_at.should eq(agent.dob)
+            expect(agent.updated_at).to eq(agent.dob)
           end
 
           it "persists the updated at change" do
-            agent.reload.updated_at.should be_within(5).of(Time.now)
+            expect(agent.reload.updated_at).to be_within(5).of(Time.now)
           end
 
           it "persists the attribute change" do
-            agent.reload.dob.should be_within(5).of(Time.now)
+            expect(agent.reload.dob).to be_within(5).of(Time.now)
           end
 
           it "returns true" do
-            touched.should be_true
+            expect(touched).to be_true
           end
 
           it "keeps changes for next callback" do
-            agent.changes.should_not be_empty
+            expect(agent.changes).to_not be_empty
           end
         end
       end
@@ -840,7 +840,7 @@ describe Mongoid::Persistence do
           end
 
           it "returns false" do
-            touched.should be_false
+            expect(touched).to be_false
           end
         end
 
@@ -851,7 +851,7 @@ describe Mongoid::Persistence do
           end
 
           it "returns false" do
-            touched.should be_false
+            expect(touched).to be_false
           end
         end
       end
@@ -873,7 +873,7 @@ describe Mongoid::Persistence do
         end
 
         it "does not touch the parent" do
-          jar.updated_at.should eq(time)
+          expect(jar.updated_at).to eq(time)
         end
       end
     end
@@ -893,7 +893,7 @@ describe Mongoid::Persistence do
           end
 
           it "does nothing to the relation" do
-            agent.instance_variable_get(:@agency).should be_nil
+            expect(agent.instance_variable_get(:@agency)).to be_nil
           end
         end
       end
@@ -915,11 +915,11 @@ describe Mongoid::Persistence do
         end
 
         it "sets the parent updated at to the current time" do
-          agency.updated_at.should be_within(5).of(Time.now)
+          expect(agency.updated_at).to be_within(5).of(Time.now)
         end
 
         it "persists the change" do
-          agency.reload.updated_at.should be_within(5).of(Time.now)
+          expect(agency.reload.updated_at).to be_within(5).of(Time.now)
         end
       end
 
@@ -938,7 +938,7 @@ describe Mongoid::Persistence do
         end
 
         it "updates the parent's updated at" do
-          agency.updated_at.should_not eq(updated)
+          expect(agency.updated_at).to_not eq(updated)
         end
       end
 
@@ -961,7 +961,7 @@ describe Mongoid::Persistence do
         end
 
         it "updates the parent's updated at" do
-          agency.updated_at.should_not eq(updated)
+          expect(agency.updated_at).to_not eq(updated)
         end
       end
     end
@@ -982,11 +982,11 @@ describe Mongoid::Persistence do
         end
 
         it "updates the field" do
-          person.t.should eq("testing")
+          expect(person.t).to eq("testing")
         end
 
         it "persists the changes" do
-          person.reload.t.should eq("testing")
+          expect(person.reload.t).to eq("testing")
         end
       end
 
@@ -997,11 +997,11 @@ describe Mongoid::Persistence do
         end
 
         it "updates the field" do
-          person.t.should eq("testing")
+          expect(person.t).to eq("testing")
         end
 
         it "persists the changes" do
-          person.reload.t.should eq("testing")
+          expect(person.reload.t).to eq("testing")
         end
       end
     end
@@ -1017,11 +1017,11 @@ describe Mongoid::Persistence do
       end
 
       it "sets the new value in the document" do
-        person.aliases.should eq([ "Bond" ])
+        expect(person.aliases).to eq([ "Bond" ])
       end
 
       it "persists the changes" do
-        person.reload.aliases.should eq([ "Bond" ])
+        expect(person.reload.aliases).to eq([ "Bond" ])
       end
     end
 
@@ -1040,15 +1040,15 @@ describe Mongoid::Persistence do
           end
 
           it "persists the document" do
-            person.should be_persisted
+            expect(person).to be_persisted
           end
 
           it "changes the attribute value" do
-            person.terms.should be_false
+            expect(person.terms).to be_false
           end
 
           it "persists the changes" do
-            person.reload.terms.should be_false
+            expect(person.reload.terms).to be_false
           end
         end
       end
@@ -1067,11 +1067,11 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should eq("Testing")
+          expect(post.title).to eq("Testing")
         end
 
         it "saves the document" do
-          post.should be_persisted
+          expect(post).to be_persisted
         end
       end
 
@@ -1082,7 +1082,7 @@ describe Mongoid::Persistence do
         end
 
         it "returns true" do
-          post.update_attribute(:title, "Testing").should be_true
+          expect(post.update_attribute(:title, "Testing")).to be_true
         end
       end
 
@@ -1093,11 +1093,11 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should eq("$invalid")
+          expect(post.title).to eq("$invalid")
         end
 
         it "saves the document" do
-          post.should be_persisted
+          expect(post).to be_persisted
         end
       end
 
@@ -1128,11 +1128,11 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should eq("Testing")
+          expect(post.title).to eq("Testing")
         end
 
         it "saves the document" do
-          post.should be_persisted
+          expect(post).to be_persisted
         end
       end
 
@@ -1143,11 +1143,11 @@ describe Mongoid::Persistence do
         end
 
         it "sets the attribute" do
-          post.title.should eq("$invalid")
+          expect(post.title).to eq("$invalid")
         end
 
         it "saves the document" do
-          post.should be_persisted
+          expect(post).to be_persisted
         end
       end
     end
@@ -1172,11 +1172,11 @@ describe Mongoid::Persistence do
       end
 
       it "persists the en locale" do
-        attributes["en"].should eq("The bomb")
+        expect(attributes["en"]).to eq("The bomb")
       end
 
       it "persists the de locale" do
-        attributes["de"].should eq("Die Bombe")
+        expect(attributes["de"]).to eq("Die Bombe")
       end
     end
 
@@ -1203,11 +1203,11 @@ describe Mongoid::Persistence do
       end
 
       it "updates the attribute" do
-        from_db.name.should eq("home")
+        expect(from_db.name).to eq("home")
       end
 
       it "persists the changes" do
-        from_db.reload.name.should eq("home")
+        expect(from_db.reload.name).to eq("home")
       end
     end
   end
@@ -1242,11 +1242,11 @@ describe Mongoid::Persistence do
       end
 
       it "returns true" do
-        saved.should be_true
+        expect(saved).to be_true
       end
 
       it "saves the attributes" do
-        from_db.pets.should be_false
+        expect(from_db.pets).to be_false
       end
     end
 
@@ -1287,7 +1287,7 @@ describe Mongoid::Persistence do
       end
 
       it "saves the attributes" do
-        person.ssn.should eq("555-66-7777")
+        expect(person.ssn).to eq("555-66-7777")
       end
     end
 
@@ -1302,7 +1302,7 @@ describe Mongoid::Persistence do
       end
 
       it "saves the new record" do
-        Person.find(person.id).should_not be_nil
+        expect(Person.find(person.id)).to_not be_nil
       end
     end
 
@@ -1327,11 +1327,11 @@ describe Mongoid::Persistence do
         end
 
         it "updates the embedded document" do
-          person.name.should eq(new_name)
+          expect(person.name).to eq(new_name)
         end
 
         it "persists the changes" do
-          person.reload.name.should eq(new_name)
+          expect(person.reload.name).to eq(new_name)
         end
       end
 
@@ -1352,15 +1352,15 @@ describe Mongoid::Persistence do
           end
 
           it "sets the instance of the relation" do
-            person.posts.should eq([ post ])
+            expect(person.posts).to eq([ post ])
           end
 
           it "sets properly through method_missing" do
-            person.posts.to_a.should eq([ post ])
+            expect(person.posts.to_a).to eq([ post ])
           end
 
           it "persists the reference" do
-            person.posts(true).should eq([ post ])
+            expect(person.posts(true)).to eq([ post ])
           end
         end
 
@@ -1372,15 +1372,15 @@ describe Mongoid::Persistence do
           end
 
           it "sets the instance of the relation" do
-            person.posts.should eq([ post ])
+            expect(person.posts).to eq([ post ])
           end
 
           it "sets properly through method_missing" do
-            person.posts.to_a.should eq([ post ])
+            expect(person.posts.to_a).to eq([ post ])
           end
 
           it "persists the reference" do
-            person.posts(true).should eq([ post ])
+            expect(person.posts(true)).to eq([ post ])
           end
         end
       end
@@ -1407,11 +1407,11 @@ describe Mongoid::Persistence do
       end
 
       it "sets the first level document" do
-        person.phone_numbers.first.should eq(phone_number)
+        expect(person.phone_numbers.first).to eq(phone_number)
       end
 
       it "sets the second level document" do
-        person.phone_numbers.first.country_code.should eq(country_code)
+        expect(person.phone_numbers.first.country_code).to eq(country_code)
       end
 
       context "when updating the first level document" do
@@ -1426,7 +1426,7 @@ describe Mongoid::Persistence do
         end
 
         it "sets the new attributes" do
-          phone.number.should eq("098-765-4321")
+          expect(phone.number).to eq("098-765-4321")
         end
 
         context "when reloading the root" do
@@ -1436,7 +1436,7 @@ describe Mongoid::Persistence do
           end
 
           it "saves the new attributes" do
-            reloaded.phone_numbers.first.number.should eq("098-765-4321")
+            expect(reloaded.phone_numbers.first.number).to eq("098-765-4321")
           end
         end
       end
@@ -1474,11 +1474,11 @@ describe Mongoid::Persistence do
         end
 
         it "adds the validation errors" do
-          account.errors[:nickname].should_not be_empty
+          expect(account.errors[:nickname]).to_not be_empty
         end
 
         it "does not upsert the document" do
-          account.should be_a_new_record
+          expect(account).to be_a_new_record
         end
       end
     end
@@ -1502,7 +1502,7 @@ describe Mongoid::Persistence do
         end
 
         it "updates the existing document" do
-          existing.reload.name.should eq("Tool")
+          expect(existing.reload.name).to eq("Tool")
         end
       end
 
@@ -1517,11 +1517,11 @@ describe Mongoid::Persistence do
         end
 
         it "inserts a new document" do
-          insert.reload.should eq(insert)
+          expect(insert.reload).to eq(insert)
         end
 
         it "does not modify any fields" do
-          insert.reload.name.should eq("Tool")
+          expect(insert.reload.name).to eq("Tool")
         end
       end
     end
@@ -1543,11 +1543,11 @@ describe Mongoid::Persistence do
         end
 
         it "updates the existing document" do
-          existing.reload.name.should eq("Depeche Mode")
+          expect(existing.reload.name).to eq("Depeche Mode")
         end
 
         it "returns true" do
-          upsert.should be_true
+          expect(upsert).to be_true
         end
       end
     end
@@ -1568,11 +1568,11 @@ describe Mongoid::Persistence do
         end
 
         it "removes all the documents" do
-          Person.count.should eq(0)
+          expect(Person.count).to eq(0)
         end
 
         it "returns the number of documents removed" do
-          removed.should eq(1)
+          expect(removed).to eq(1)
         end
       end
 
@@ -1589,11 +1589,11 @@ describe Mongoid::Persistence do
           end
 
           it "removes the matching documents" do
-            Person.count.should eq(1)
+            expect(Person.count).to eq(1)
           end
 
           it "returns the number of documents removed" do
-            removed.should eq(1)
+            expect(removed).to eq(1)
           end
         end
 
@@ -1604,11 +1604,11 @@ describe Mongoid::Persistence do
           end
 
           it "removes the matching documents" do
-            Person.count.should eq(1)
+            expect(Person.count).to eq(1)
           end
 
           it "returns the number of documents removed" do
-            removed.should eq(1)
+            expect(removed).to eq(1)
           end
         end
       end
@@ -1624,7 +1624,7 @@ describe Mongoid::Persistence do
     end
 
     it "reads for persistance as a UTC Time" do
-      user.changes["last_login"].last.class.should eq(Time)
+      expect(user.changes["last_login"].last.class).to eq(Time)
     end
 
     it "persists with no exceptions thrown" do
@@ -1641,7 +1641,7 @@ describe Mongoid::Persistence do
     end
 
     it "reads for persistance as a UTC Time" do
-      user.changes["account_expires"].last.class.should eq(Time)
+      expect(user.changes["account_expires"].last.class).to eq(Time)
     end
 
     it "persists with no exceptions thrown" do
@@ -1662,7 +1662,7 @@ describe Mongoid::Persistence do
       end
 
       it "does not set the value" do
-        person.save.should be_true
+        expect(person.save).to be_true
       end
     end
   end
@@ -1685,7 +1685,7 @@ describe Mongoid::Persistence do
       end
 
       it "sets the foreign key to empty" do
-        game.reload.person_id.should be_blank
+        expect(game.reload.person_id).to be_blank
       end
     end
 
@@ -1697,7 +1697,7 @@ describe Mongoid::Persistence do
       end
 
       it "sets the foreign key as ObjectID" do
-        game.reload.person_id.should eq(person.id)
+        expect(game.reload.person_id).to eq(person.id)
       end
     end
 
@@ -1709,7 +1709,7 @@ describe Mongoid::Persistence do
       end
 
       it "keeps the the foreign key as ObjectID" do
-        game.reload.person_id.should eq(person.id)
+        expect(game.reload.person_id).to eq(person.id)
       end
     end
   end
@@ -1729,15 +1729,15 @@ describe Mongoid::Persistence do
     end
 
     it "persists the versions" do
-      attributes["version"].should eq(3)
+      expect(attributes["version"]).to eq(3)
     end
 
     it "persists the type" do
-      attributes["_type"].should eq("Browser")
+      expect(attributes["_type"]).to eq("Browser")
     end
 
     it "persists the attributes" do
-      attributes["name"].should eq("Test")
+      expect(attributes["name"]).to eq("Test")
     end
   end
 
@@ -1760,27 +1760,27 @@ describe Mongoid::Persistence do
     end
 
     it "persists the versions" do
-      attributes["version"].should eq(2)
+      expect(attributes["version"]).to eq(2)
     end
 
     it "persists the type" do
-      attributes["_type"].should eq("Firefox")
+      expect(attributes["_type"]).to eq("Firefox")
     end
 
     it "persists the attributes" do
-      attributes["name"].should eq("Testy")
+      expect(attributes["name"]).to eq("Testy")
     end
 
     it "returns the document when querying for superclass" do
-      Browser.where(name: "Testy").first.should eq(firefox)
+      expect(Browser.where(name: "Testy").first).to eq(firefox)
     end
 
     it "returns the document when querying for root class" do
-      Canvas.where(name: "Testy").first.should eq(firefox)
+      expect(Canvas.where(name: "Testy").first).to eq(firefox)
     end
 
     it 'returnss on of this subclasses if you find by _type' do
-      Canvas.where(:_type.in => ['Firefox']).count.should eq(1)
+      expect(Canvas.where(:_type.in => ['Firefox']).count).to eq(1)
     end
   end
 
@@ -1813,27 +1813,27 @@ describe Mongoid::Persistence do
     end
 
     it "properly persists the one-to-one type" do
-      from_db.should be_a_kind_of(Firefox)
+      expect(from_db).to be_a_kind_of(Firefox)
     end
 
     it "properly persists the one-to-one relations" do
-      from_db.writer.should eq(writer)
+      expect(from_db.writer).to eq(writer)
     end
 
     it "properly persists the one-to-many type" do
-      from_db.shapes.first.should eq(circle)
+      expect(from_db.shapes.first).to eq(circle)
     end
 
     it "properly persists the one-to-many relations" do
-      from_db.shapes.last.should eq(square)
+      expect(from_db.shapes.last).to eq(square)
     end
 
     it "properly sets up the parent relation" do
-      from_db.shapes.first.should eq(circle)
+      expect(from_db.shapes.first).to eq(circle)
     end
 
     it "properly sets up the entire hierarchy" do
-      from_db.shapes.first.canvas.should eq(firefox)
+      expect(from_db.shapes.first.canvas).to eq(firefox)
     end
   end
 
@@ -1844,7 +1844,7 @@ describe Mongoid::Persistence do
     end
 
     it "finds the document with String args" do
-      Firefox.find(firefox.id.to_s).should eq(firefox)
+      expect(Firefox.find(firefox.id.to_s)).to eq(firefox)
     end
 
     context "when querying for parent documents" do
@@ -1854,7 +1854,7 @@ describe Mongoid::Persistence do
       end
 
       it "returns matching subclasses" do
-        canvas.should eq(firefox)
+        expect(canvas).to eq(firefox)
       end
     end
   end
@@ -1884,15 +1884,15 @@ describe Mongoid::Persistence do
       end
 
       it "deletes from the parent class collection" do
-        Canvas.count.should eq(3)
+        expect(Canvas.count).to eq(3)
       end
 
       it "returns correct counts for child classes" do
-        Firefox.count.should eq(1)
+        expect(Firefox.count).to eq(1)
       end
 
       it "returns correct counts for root subclasses" do
-        Browser.count.should eq(2)
+        expect(Browser.count).to eq(2)
       end
     end
 
@@ -1903,15 +1903,15 @@ describe Mongoid::Persistence do
       end
 
       it "deletes from the parent class collection" do
-        Canvas.count.should eq(2)
+        expect(Canvas.count).to eq(2)
       end
 
       it "returns correct counts for child classes" do
-        Firefox.count.should eq(0)
+        expect(Firefox.count).to eq(0)
       end
 
       it "returns correct counts for root subclasses" do
-        Browser.count.should eq(1)
+        expect(Browser.count).to eq(1)
       end
     end
   end
@@ -1933,7 +1933,7 @@ describe Mongoid::Persistence do
     end
 
     it "properly saves the subclasses" do
-      from_db.palette.tools.map(&:class).should eq([Pencil, Eraser])
+      expect(from_db.palette.tools.map(&:class)).to eq([Pencil, Eraser])
     end
   end
 
@@ -1948,8 +1948,8 @@ describe Mongoid::Persistence do
     end
 
     it "does not bleed relations from one subclass to another" do
-      Truck.relations.keys.should =~ %w/ shipping_container driver bed /
-      Car.relations.keys.should =~ %w/ shipping_container driver /
+      expect(Truck.relations.keys).to eq(%w/ shipping_container driver bed /)
+      expect(Car.relations.keys).to eq(%w/ shipping_container driver /)
     end
 
     context "when appending new documents" do
@@ -1960,7 +1960,7 @@ describe Mongoid::Persistence do
       end
 
       it "allows STI from << using model.new" do
-        container.vehicles.map(&:class).should eq([ Car, Truck ])
+        expect(container.vehicles.map(&:class)).to eq([ Car, Truck ])
       end
     end
 
@@ -1972,7 +1972,7 @@ describe Mongoid::Persistence do
       end
 
       it "allows STI from << using model.create" do
-        container.vehicles.map(&:class).should eq([ Car, Truck ])
+        expect(container.vehicles.map(&:class)).to eq([ Car, Truck ])
       end
     end
 
@@ -1984,7 +1984,7 @@ describe Mongoid::Persistence do
       end
 
       it "allows STI from the build call" do
-        container.vehicles.map(&:class).should eq([ Car, Truck ])
+        expect(container.vehicles.map(&:class)).to eq([ Car, Truck ])
       end
     end
 
@@ -1996,7 +1996,7 @@ describe Mongoid::Persistence do
       end
 
       it "respects the _type attribute from the build call" do
-        container.vehicles.map(&:class).should eq([ Car, Truck ])
+        expect(container.vehicles.map(&:class)).to eq([ Car, Truck ])
       end
     end
 
@@ -2008,7 +2008,7 @@ describe Mongoid::Persistence do
       end
 
       it "allows STI from the create call" do
-        container.vehicles.map(&:class).should eq([ Car, Truck ])
+        expect(container.vehicles.map(&:class)).to eq([ Car, Truck ])
       end
     end
 
@@ -2020,7 +2020,7 @@ describe Mongoid::Persistence do
       end
 
       it "respects the _type attribute from the create call" do
-        container.vehicles.map(&:class).should eq([ Car, Truck ])
+        expect(container.vehicles.map(&:class)).to eq([ Car, Truck ])
       end
     end
 
@@ -2031,11 +2031,11 @@ describe Mongoid::Persistence do
       end
 
       it "initializes the given type document" do
-        container.vehicles.map(&:class).should eq([ Car ])
+        expect(container.vehicles.map(&:class)).to eq([ Car ])
       end
 
       it "initializes with the given attributes" do
-        container.vehicles.map(&:driver).should eq([ driver ])
+        expect(container.vehicles.map(&:driver)).to eq([ driver ])
       end
     end
 
@@ -2046,15 +2046,15 @@ describe Mongoid::Persistence do
       end
 
       it "creates the given type document" do
-        container.vehicles.map(&:class).should eq([ Car ])
+        expect(container.vehicles.map(&:class)).to eq([ Car ])
       end
 
       it "creates with the given attributes" do
-        container.vehicles.map(&:driver).should eq([ driver ])
+        expect(container.vehicles.map(&:driver)).to eq([ driver ])
       end
 
       it "creates the correct number of documents" do
-        container.vehicles.size.should eq(1)
+        expect(container.vehicles.size).to eq(1)
       end
 
       context "when executing with a found document" do
@@ -2064,7 +2064,7 @@ describe Mongoid::Persistence do
         end
 
         it "does not create an additional document" do
-          container.vehicles.size.should eq(1)
+          expect(container.vehicles.size).to eq(1)
         end
       end
 
@@ -2075,7 +2075,7 @@ describe Mongoid::Persistence do
         end
 
         it "creates the new additional document" do
-          container.vehicles.size.should eq(2)
+          expect(container.vehicles.size).to eq(2)
         end
       end
     end

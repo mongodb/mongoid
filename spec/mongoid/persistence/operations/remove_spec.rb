@@ -29,15 +29,15 @@ describe Mongoid::Persistence::Operations::Remove do
     end
 
     it "sets the document" do
-      remove.document.should eq(document)
+      expect(remove.document).to eq(document)
     end
 
     it "sets the collection" do
-      remove.collection.should eq(document.collection)
+      expect(remove.collection).to eq(document.collection)
     end
 
     it "defaults validation to true" do
-      remove.should be_validating
+      expect(remove).to be_validating
     end
   end
 
@@ -58,7 +58,7 @@ describe Mongoid::Persistence::Operations::Remove do
 
       it "removes the document from the collection" do
         root_delete_expectation.call
-        remove.persist.should be_true
+        expect(remove.persist).to be_true
       end
     end
   end
@@ -80,7 +80,7 @@ describe Mongoid::Persistence::Operations::Remove do
       end
 
       it "removes the document from the identity map" do
-        in_map.should be_nil
+        expect(in_map).to be_nil
       end
     end
   end
@@ -102,11 +102,11 @@ describe Mongoid::Persistence::Operations::Remove do
       end
 
       it "allows the access" do
-        artist.name.should eq("destroyed")
+        expect(artist.name).to eq("destroyed")
       end
 
       it "destroys the associated document" do
-        album.should be_destroyed
+        expect(album).to be_destroyed
       end
     end
   end

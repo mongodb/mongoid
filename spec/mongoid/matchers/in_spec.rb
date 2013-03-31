@@ -11,14 +11,14 @@ describe Mongoid::Matchers::In do
     context "when the values include the attribute" do
 
       it "returns true" do
-        matcher.matches?("$in" => [/\Afir.*\z/, "second"]).should be_true
+        expect(matcher.matches?("$in" => [/\Afir.*\z/, "second"])).to be_true
       end
     end
 
     context "when the values don't include the attribute" do
 
       it "returns false" do
-        matcher.matches?("$in" => ["third"]).should be_false
+        expect(matcher.matches?("$in" => ["third"])).to be_false
       end
     end
   end

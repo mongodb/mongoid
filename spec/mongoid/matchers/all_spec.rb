@@ -11,20 +11,20 @@ describe Mongoid::Matchers::All do
     context "when the attribute includes all of the values" do
 
       it "returns true" do
-        matcher.matches?("$all" => ["first", /\Asec.*\z/]).should be_true
+        expect(matcher.matches?("$all" => ["first", /\Asec.*\z/])).to be_true
       end
     end
 
     context "when the attributes doesn't include all of the values" do
 
       it "returns false" do
-        matcher.matches?("$all" => ["second", "third", "fourth"]).should be_false
+        expect(matcher.matches?("$all" => ["second", "third", "fourth"])).to be_false
       end
     end
 
     context "when the value is empty" do
       it "returns false" do
-        matcher.matches?("$all" => []).should be_false
+        expect(matcher.matches?("$all" => [])).to be_false
       end
     end
   end

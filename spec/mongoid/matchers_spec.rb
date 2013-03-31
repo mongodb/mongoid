@@ -25,7 +25,7 @@ describe Mongoid::Matchers do
         end
 
         it "returns false" do
-          document.locations.first.matches?(selector).should be_false
+          expect(document.locations.first.matches?(selector)).to be_false
         end
 
         context "when just change the selector order" do
@@ -35,7 +35,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false " do
-            document.locations.first.matches?(selector).should be_false
+            expect(document.locations.first.matches?(selector)).to be_false
           end
         end
       end
@@ -49,7 +49,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.locations.first.matches?(selector).should be_true
+            expect(document.locations.first.matches?(selector)).to be_true
           end
         end
 
@@ -60,7 +60,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.locations.first.matches?(selector).should be_false
+            expect(document.locations.first.matches?(selector)).to be_false
           end
         end
 
@@ -71,7 +71,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.locations.first.matches?(selector).should be_false
+            expect(document.locations.first.matches?(selector)).to be_false
           end
         end
       end
@@ -85,7 +85,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.locations.first.matches?(selector).should be_true
+            expect(document.locations.first.matches?(selector)).to be_true
           end
         end
 
@@ -96,7 +96,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.locations.first.matches?(selector).should be_false
+            expect(document.locations.first.matches?(selector)).to be_false
           end
         end
 
@@ -107,7 +107,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.locations.first.matches?(selector).should be_false
+            expect(document.locations.first.matches?(selector)).to be_false
           end
         end
       end
@@ -127,7 +127,7 @@ describe Mongoid::Matchers do
         end
 
         it "returns true" do
-          document.matches?(selector).should be_true
+          expect(document.matches?(selector)).to be_true
         end
       end
 
@@ -138,7 +138,7 @@ describe Mongoid::Matchers do
         end
 
         it "returns false" do
-          document.matches?(selector).should be_false
+          expect(document.matches?(selector)).to be_false
         end
       end
     end
@@ -162,7 +162,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -173,7 +173,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -187,7 +187,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -198,7 +198,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -212,7 +212,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -223,7 +223,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -237,7 +237,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -248,7 +248,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -262,7 +262,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -273,7 +273,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -287,7 +287,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -298,7 +298,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -312,7 +312,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -323,7 +323,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -337,7 +337,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -348,7 +348,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -362,7 +362,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -373,7 +373,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -387,7 +387,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -398,7 +398,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -412,7 +412,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -423,7 +423,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -437,7 +437,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -448,7 +448,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -462,7 +462,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -473,7 +473,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -487,7 +487,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -498,7 +498,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end
@@ -512,7 +512,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns true" do
-            document.matches?(selector).should be_true
+            expect(document.matches?(selector)).to be_true
           end
         end
 
@@ -523,7 +523,7 @@ describe Mongoid::Matchers do
           end
 
           it "returns false" do
-            document.matches?(selector).should be_false
+            expect(document.matches?(selector)).to be_false
           end
         end
       end

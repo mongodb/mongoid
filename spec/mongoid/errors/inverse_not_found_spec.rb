@@ -9,19 +9,19 @@ describe Mongoid::Errors::InverseNotFound do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "When adding a(n) Person to Town#citizens, Mongoid could not"
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "hen adding a document to a relation, Mongoid attempts to link"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "If an inverse is not required, like a belongs_to or"
       )
     end

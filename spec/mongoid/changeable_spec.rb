@@ -17,13 +17,13 @@ describe Mongoid::Changeable do
         end
 
         it "returns an array of the old value and new value" do
-          person.send(:attribute_change, "title").should eq(
+          expect(person.send(:attribute_change, "title")).to eq(
             [ "Grand Poobah", "Captain Obvious" ]
           )
         end
 
         it "allows access via (attribute)_change" do
-          person.title_change.should eq(
+          expect(person.title_change).to eq(
             [ "Grand Poobah", "Captain Obvious" ]
           )
         end
@@ -39,13 +39,13 @@ describe Mongoid::Changeable do
           end
 
           it "returns an array of the old value and new value" do
-            person.send(:attribute_change, "test").should eq(
+            expect(person.send(:attribute_change, "test")).to eq(
               [ "Aliased 1", "Aliased 2" ]
             )
           end
 
           it "allows access via (attribute)_change" do
-            person.test_change.should eq(
+            expect(person.test_change).to eq(
               [ "Aliased 1", "Aliased 2" ]
             )
           end
@@ -63,13 +63,13 @@ describe Mongoid::Changeable do
         end
 
         it "returns an array of the old value and new value" do
-          person.send(:attribute_change, "title").should eq(
+          expect(person.send(:attribute_change, "title")).to eq(
             [ "Grand Poobah", "Captain Obvious" ]
           )
         end
 
         it "allows access via (attribute)_change" do
-          person.title_change.should eq(
+          expect(person.title_change).to eq(
             [ "Grand Poobah", "Captain Obvious" ]
           )
         end
@@ -85,11 +85,11 @@ describe Mongoid::Changeable do
         end
 
         it "returns an array of nil and new value" do
-          person.send(:attribute_change, "pets").should eq([ nil, true ])
+          expect(person.send(:attribute_change, "pets")).to eq([ nil, true ])
         end
 
         it "allows access via (attribute)_change" do
-          person.pets_change.should eq([ nil, true ])
+          expect(person.pets_change).to eq([ nil, true ])
         end
       end
 
@@ -106,11 +106,11 @@ describe Mongoid::Changeable do
           end
 
           it "returns an array of nil and new value" do
-            person.send(:attribute_change, "pets").should eq([ nil, true ])
+            expect(person.send(:attribute_change, "pets")).to eq([ nil, true ])
           end
 
           it "allows access via (attribute)_change" do
-            person.pets_change.should eq([ nil, true ])
+            expect(person.pets_change).to eq([ nil, true ])
           end
         end
 
@@ -125,7 +125,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns an array of nil and new value" do
-            person.send(:attribute_change, "a").should eq([ nil, "test" ])
+            expect(person.send(:attribute_change, "a")).to eq([ nil, "test" ])
           end
         end
       end
@@ -143,13 +143,13 @@ describe Mongoid::Changeable do
       end
 
       it "returns an array of the original value and new value" do
-        person.send(:attribute_change, "title").should eq(
+        expect(person.send(:attribute_change, "title")).to eq(
           [ "Grand Poobah", "Dark Helmet" ]
         )
       end
 
       it "allows access via (attribute)_change" do
-        person.title_change.should eq(
+        expect(person.title_change).to eq(
           [ "Grand Poobah", "Dark Helmet" ]
         )
       end
@@ -168,13 +168,13 @@ describe Mongoid::Changeable do
         end
 
         it "returns an array of the original value and new value" do
-          person.send(:attribute_change, "aliases").should eq(
+          expect(person.send(:attribute_change, "aliases")).to eq(
             [[ "Grand Poobah" ],  [ "Dark Helmet" ]]
           )
         end
 
         it "allows access via (attribute)_change" do
-          person.aliases_change.should eq(
+          expect(person.aliases_change).to eq(
             [[ "Grand Poobah" ],  [ "Dark Helmet" ]]
           )
         end
@@ -186,7 +186,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns an array of the original value and new value" do
-            person.send(:attribute_change, "aliases").should eq(
+            expect(person.send(:attribute_change, "aliases")).to eq(
               [[ "Grand Poobah" ], [ "Dark Helmet", "Colonel Sanders" ]]
             )
           end
@@ -204,13 +204,13 @@ describe Mongoid::Changeable do
         end
 
         it "returns an array of the original value and new value" do
-          person.send(:attribute_change, "map").should eq(
+          expect(person.send(:attribute_change, "map")).to eq(
             [{ location: "Home" }, { location: "Work" }]
           )
         end
 
         it "allows access via (attribute)_change" do
-          person.map_change.should eq(
+          expect(person.map_change).to eq(
             [{ location: "Home" }, { location: "Work" }]
           )
         end
@@ -222,7 +222,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns an array of the original value and new value" do
-            person.send(:attribute_change, "map").should eq(
+            expect(person.send(:attribute_change, "map")).to eq(
               [{ location: "Home" }, { location: "Work", lat: 20.0 }]
             )
           end
@@ -250,7 +250,7 @@ describe Mongoid::Changeable do
             end
 
             it "flags the attribute as changed" do
-              person.send(:attribute_change, "map").should eq(
+              expect(person.send(:attribute_change, "map")).to eq(
                 [
                   {
                     "stack1" => [ 1, 2, 3, 4 ],
@@ -277,7 +277,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns nil" do
-        person.send(:attribute_change, "title").should be_nil
+        expect(person.send(:attribute_change, "title")).to be_nil
       end
     end
 
@@ -290,7 +290,7 @@ describe Mongoid::Changeable do
         end
 
         it "returns the change" do
-          person.send(:attribute_change, "pets").should eq([ nil, false ])
+          expect(person.send(:attribute_change, "pets")).to eq([ nil, false ])
         end
       end
 
@@ -301,7 +301,7 @@ describe Mongoid::Changeable do
         end
 
         it "returns nil" do
-          person.send(:attribute_change, "pets").should be_nil
+          expect(person.send(:attribute_change, "pets")).to be_nil
         end
       end
     end
@@ -317,7 +317,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns an empty array" do
-        person.send(:attribute_change, "title").should be_nil
+        expect(person.send(:attribute_change, "title")).to be_nil
       end
     end
 
@@ -332,7 +332,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns an empty array" do
-        person.send(:attribute_change, "title").should eq(
+        expect(person.send(:attribute_change, "title")).to eq(
           [ "Grand Poobah", nil ]
         )
       end
@@ -352,11 +352,11 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.send(:attribute_changed?, "title").should be_true
+        expect(person.send(:attribute_changed?, "title")).to be_true
       end
 
       it "allows access via (attribute)_changed?" do
-        person.title_changed?.should be_true
+        expect(person.title_changed?).to be_true
       end
 
       context "when the field is aliased" do
@@ -370,11 +370,11 @@ describe Mongoid::Changeable do
         end
 
         it "returns true" do
-          person.send(:attribute_changed?, "test").should be_true
+          expect(person.send(:attribute_changed?, "test")).to be_true
         end
 
         it "allows access via (attribute)_changed?" do
-          person.test_changed?.should be_true
+          expect(person.test_changed?).to be_true
         end
       end
     end
@@ -390,11 +390,11 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.send(:attribute_changed?, "pets").should be_true
+        expect(person.send(:attribute_changed?, "pets")).to be_true
       end
 
       it "allows access via (attribute)_changed?" do
-        person.pets_changed?.should be_true
+        expect(person.pets_changed?).to be_true
       end
     end
 
@@ -405,7 +405,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns false" do
-        person.send(:attribute_changed?, "title").should be_false
+        expect(person.send(:attribute_changed?, "title")).to be_false
       end
     end
 
@@ -420,7 +420,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns true" do
-            person.send(:attribute_changed?, "pets").should be_true
+            expect(person.send(:attribute_changed?, "pets")).to be_true
           end
         end
 
@@ -431,7 +431,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns false" do
-            person.send(:attribute_changed?, "pets").should be_false
+            expect(person.send(:attribute_changed?, "pets")).to be_false
           end
         end
       end
@@ -450,7 +450,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns false" do
-            person.should_not be_aliases_changed
+            expect(person).to_not be_aliases_changed
           end
         end
       end
@@ -469,7 +469,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns false" do
-            person.should_not be_map_changed
+            expect(person).to_not be_map_changed
           end
         end
       end
@@ -485,7 +485,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.should be_age_changed_from_default
+        expect(person).to be_age_changed_from_default
       end
     end
 
@@ -496,7 +496,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns false" do
-        person.should_not be_age_changed_from_default
+        expect(person).to_not be_age_changed_from_default
       end
     end
   end
@@ -514,11 +514,11 @@ describe Mongoid::Changeable do
       end
 
       it "returns the old value" do
-        person.send(:attribute_was, "title").should eq("Grand Poobah")
+        expect(person.send(:attribute_was, "title")).to eq("Grand Poobah")
       end
 
       it "allows access via (attribute)_was" do
-        person.title_was.should eq("Grand Poobah")
+        expect(person.title_was).to eq("Grand Poobah")
       end
 
       context "when the field is aliased" do
@@ -532,11 +532,11 @@ describe Mongoid::Changeable do
         end
 
         it "returns the old value" do
-          person.send(:attribute_was, "test").should eq("Aliased 1")
+          expect(person.send(:attribute_was, "test")).to eq("Aliased 1")
         end
 
         it "allows access via (attribute)_was" do
-          person.test_was.should eq("Aliased 1")
+          expect(person.test_was).to eq("Aliased 1")
         end
       end
     end
@@ -552,11 +552,11 @@ describe Mongoid::Changeable do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should be_false
+        expect(person.send(:attribute_was, "pets")).to be_false
       end
 
       it "allows access via (attribute)_was" do
-        person.pets_was.should be_false
+        expect(person.pets_was).to be_false
       end
     end
 
@@ -567,7 +567,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns the original value" do
-        person.send(:attribute_was, "title").should eq("Grand Poobah")
+        expect(person.send(:attribute_was, "title")).to eq("Grand Poobah")
       end
     end
 
@@ -578,7 +578,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should be_false
+        expect(person.send(:attribute_was, "pets")).to be_false
       end
     end
   end
@@ -608,11 +608,11 @@ describe Mongoid::Changeable do
       end
 
       it "does not return the value in the changes" do
-        changes.should be_empty
+        expect(changes).to be_empty
       end
 
       it "is not flagged as changed" do
-        person.should_not be_changed
+        expect(person).to_not be_changed
       end
     end
 
@@ -628,7 +628,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns the value in the changes" do
-        changes.should eq({ "aliases" => [[ "007" ], [ "007", "008" ]] })
+        expect(changes).to eq({ "aliases" => [[ "007" ], [ "007", "008" ]] })
       end
     end
 
@@ -645,11 +645,11 @@ describe Mongoid::Changeable do
         end
 
         it "clones the value" do
-          changed["aliases"].should_not equal(aliases)
+          expect(changed["aliases"]).to_not equal(aliases)
         end
 
         it "puts the old value in the changes" do
-          changed["aliases"].should eq(aliases)
+          expect(changed["aliases"]).to eq(aliases)
         end
       end
 
@@ -666,11 +666,11 @@ describe Mongoid::Changeable do
         end
 
         it "does not clone the value" do
-          changed["aliases"].should equal(aliases)
+          expect(changed["aliases"]).to equal(aliases)
         end
 
         it "retains the first value in the changes" do
-          changed["aliases"].should eq(aliases)
+          expect(changed["aliases"]).to eq(aliases)
         end
       end
     end
@@ -689,7 +689,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns an array of changed field names" do
-        person.changed.should include("title")
+        expect(person.changed).to include("title")
       end
     end
 
@@ -700,7 +700,7 @@ describe Mongoid::Changeable do
       end
 
       it "does not include non changed fields" do
-        person.changed.should_not include("title")
+        expect(person.changed).to_not include("title")
       end
     end
 
@@ -721,7 +721,7 @@ describe Mongoid::Changeable do
         end
 
         it "returns true" do
-          person.name.should be_changed
+          expect(person.name).to be_changed
         end
       end
     end
@@ -740,7 +740,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.should be_changed
+        expect(person).to be_changed
       end
     end
 
@@ -757,7 +757,7 @@ describe Mongoid::Changeable do
         end
 
         it "returns false" do
-          person.should_not be_changed
+          expect(person).to_not be_changed
         end
       end
 
@@ -772,7 +772,7 @@ describe Mongoid::Changeable do
         end
 
         it "returns true" do
-          person.should be_changed
+          expect(person).to be_changed
         end
       end
     end
@@ -784,7 +784,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns false" do
-        acolyte.should_not be_changed
+        expect(acolyte).to_not be_changed
       end
     end
 
@@ -803,7 +803,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.should be_changed
+        expect(person).to be_changed
       end
     end
 
@@ -826,7 +826,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.should be_changed
+        expect(person).to be_changed
       end
     end
 
@@ -841,7 +841,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.should be_changed
+        expect(person).to be_changed
       end
     end
 
@@ -860,7 +860,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns true" do
-        person.should be_changed
+        expect(person).to be_changed
       end
     end
   end
@@ -878,13 +878,13 @@ describe Mongoid::Changeable do
       end
 
       it "returns a hash of changes" do
-        person.changes["title"].should eq(
+        expect(person.changes["title"]).to eq(
           [ nil, "Captain Obvious" ]
         )
       end
 
       it "returns a hash with indifferent access" do
-        person.changes["title"].should eq(
+        expect(person.changes["title"]).to eq(
           [ nil, "Captain Obvious" ]
         )
       end
@@ -897,7 +897,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns an empty hash" do
-        acolyte.changes.should be_empty
+        expect(acolyte.changes).to be_empty
       end
     end
   end
@@ -926,7 +926,7 @@ describe Mongoid::Changeable do
           end
 
           it "contains array changes in the setters" do
-            setters.should eq({ "aliases" => [] })
+            expect(setters).to eq({ "aliases" => [] })
           end
         end
 
@@ -941,7 +941,7 @@ describe Mongoid::Changeable do
           end
 
           it "contains array changes in the setters" do
-            setters.should eq({ "aliases" => [ "007", "008" ] })
+            expect(setters).to eq({ "aliases" => [ "007", "008" ] })
           end
         end
 
@@ -957,7 +957,7 @@ describe Mongoid::Changeable do
           end
 
           it "does not contain array changes in the setters" do
-            setters.should eq({ "aliases" => [ "008" ]})
+            expect(setters).to eq({ "aliases" => [ "008" ]})
           end
         end
       end
@@ -973,7 +973,7 @@ describe Mongoid::Changeable do
         end
 
         it "returns a hash of field names and new values" do
-          person.setters["title"].should eq("Captain Obvious")
+          expect(person.setters["title"]).to eq("Captain Obvious")
         end
       end
 
@@ -995,7 +995,7 @@ describe Mongoid::Changeable do
         end
 
         it "returns a hash of field names and new values" do
-          address.setters.should eq(
+          expect(address.setters).to eq(
             { "addresses.0.street" => "Bond St" }
           )
         end
@@ -1013,7 +1013,7 @@ describe Mongoid::Changeable do
           end
 
           it "returns the proper hash with locations" do
-            location.setters.should eq(
+            expect(location.setters).to eq(
               { "addresses.0.locations.0.name" => "Work" }
             )
           end
@@ -1028,7 +1028,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns an empty hash" do
-        acolyte.setters.should be_empty
+        expect(acolyte.setters).to be_empty
       end
     end
   end
@@ -1050,7 +1050,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns the changes before the save" do
-        person.previous_changes["title"].should eq(
+        expect(person.previous_changes["title"]).to eq(
           [ nil, "Captain Obvious" ]
         )
       end
@@ -1059,7 +1059,7 @@ describe Mongoid::Changeable do
     context "when the document has not been saved" do
 
       it "returns an empty hash" do
-        person.previous_changes.should be_empty
+        expect(person.previous_changes).to be_empty
       end
     end
   end
@@ -1078,19 +1078,19 @@ describe Mongoid::Changeable do
     end
 
     it "clears the atomic pulls" do
-      person.atomic_pulls.should be_empty
+      expect(person.atomic_pulls).to be_empty
     end
 
     it "clears the atomic unsets" do
-      person.atomic_unsets.should be_empty
+      expect(person.atomic_unsets).to be_empty
     end
 
     it "clears the delayed atomic sets" do
-      person.delayed_atomic_sets.should be_empty
+      expect(person.delayed_atomic_sets).to be_empty
     end
 
     it "clears the changed attributes" do
-      person.changed_attributes.should be_empty
+      expect(person.changed_attributes).to be_empty
     end
   end
 
@@ -1108,15 +1108,15 @@ describe Mongoid::Changeable do
       end
 
       it "resets the value to the original" do
-        person.title.should be_nil
+        expect(person.title).to be_nil
       end
 
       it "allows access via reset_(attribute)!" do
-        person.title.should be_nil
+        expect(person.title).to be_nil
       end
 
       it "removes the field from the changes" do
-        person.changed.should_not include("title")
+        expect(person.changed).to_not include("title")
       end
 
       context "when the field is aliased" do
@@ -1131,11 +1131,11 @@ describe Mongoid::Changeable do
         end
 
         it "resets the value to the original" do
-          person.test.should be_nil
+          expect(person.test).to be_nil
         end
 
         it "removes the field from the changes" do
-          person.changed.should_not include("test")
+          expect(person.changed).to_not include("test")
         end
       end
     end
@@ -1151,7 +1151,7 @@ describe Mongoid::Changeable do
       end
 
       it "does nothing" do
-        person.title.should be_nil
+        expect(person.title).to be_nil
       end
     end
   end
@@ -1163,15 +1163,15 @@ describe Mongoid::Changeable do
     end
 
     it "defines a _change method" do
-      document.updated_at_change.should be_nil
+      expect(document.updated_at_change).to be_nil
     end
 
     it "defines a _changed? method" do
-      document.updated_at_changed?.should be_false
+      expect(document.updated_at_changed?).to be_false
     end
 
     it "defines a _changes method" do
-      document.updated_at_was.should be_nil
+      expect(document.updated_at_was).to be_nil
     end
   end
 
@@ -1190,7 +1190,7 @@ describe Mongoid::Changeable do
         end
 
         it "flags the parent as changed" do
-          person.should be_changed
+          expect(person).to be_changed
         end
       end
 
@@ -1205,7 +1205,7 @@ describe Mongoid::Changeable do
         end
 
         it "flags the parent as changed" do
-          person.should be_changed
+          expect(person).to be_changed
         end
       end
 
@@ -1216,7 +1216,7 @@ describe Mongoid::Changeable do
         end
 
         it "does not flag the parent as changed" do
-          person.should_not be_changed
+          expect(person).to_not be_changed
         end
       end
     end
@@ -1230,7 +1230,7 @@ describe Mongoid::Changeable do
         end
 
         it "flags the parent as changed" do
-          person.should be_changed
+          expect(person).to be_changed
         end
       end
 
@@ -1245,7 +1245,7 @@ describe Mongoid::Changeable do
         end
 
         it "flags the parent as changed" do
-          person.should be_changed
+          expect(person).to be_changed
         end
       end
 
@@ -1256,7 +1256,7 @@ describe Mongoid::Changeable do
         end
 
         it "does not flag the parent as changed" do
-          person.should_not be_changed
+          expect(person).to_not be_changed
         end
       end
     end
@@ -1273,7 +1273,7 @@ describe Mongoid::Changeable do
     end
 
     it "records the changes" do
-      person.changes.should eq(
+      expect(person.changes).to eq(
         { "map" => [{ "test" => {}}, { "test" => { "value" => 10 }}]}
       )
     end
@@ -1294,7 +1294,7 @@ describe Mongoid::Changeable do
     end
 
     it "records the foreign key dirty changes" do
-      person.previous_changes["preference_ids"].should eq(
+      expect(person.previous_changes["preference_ids"]).to eq(
         [nil, [ preference.id ]]
       )
     end
@@ -1317,11 +1317,11 @@ describe Mongoid::Changeable do
       end
 
       it "flags the change" do
-        from_db.changes["preference_ids"].should eq([ nil, []])
+        expect(from_db.changes["preference_ids"]).to eq([ nil, []])
       end
 
       it "does not include the changes in the setters" do
-        from_db.setters.should be_empty
+        expect(from_db.setters).to be_empty
       end
     end
   end
@@ -1341,7 +1341,7 @@ describe Mongoid::Changeable do
     end
 
     it "clears the changed attributes" do
-      from_db.changed_attributes.should be_empty
+      expect(from_db.changed_attributes).to be_empty
     end
   end
 
@@ -1361,11 +1361,11 @@ describe Mongoid::Changeable do
     end
 
     it "marks the document as changed" do
-      person.should be_changed
+      expect(person).to be_changed
     end
 
     it "marks field changes" do
-      person.changes.should eq({
+      expect(person.changes).to eq({
         "title" => [ "MC", "DJ" ],
         "ssn" => [ nil, "222-22-2222" ],
         "some_dynamic_field" => [ "blah", "bloop" ]
@@ -1373,25 +1373,25 @@ describe Mongoid::Changeable do
     end
 
     it "marks changed fields" do
-      person.changed.should =~ [ "title", "ssn", "some_dynamic_field" ]
+      expect(person.changed).to eq([ "title", "ssn", "some_dynamic_field" ])
     end
 
     it "marks the field as changed" do
-      person.title_changed?.should be_true
+      expect(person.title_changed?).to be_true
     end
 
     it "stores previous field values" do
-      person.title_was.should eq("MC")
+      expect(person.title_was).to eq("MC")
     end
 
     it "marks field changes" do
-      person.title_change.should eq([ "MC", "DJ" ])
+      expect(person.title_change).to eq([ "MC", "DJ" ])
     end
 
     it "allows reset of field changes" do
       person.reset_title!
-      person.title.should eq("MC")
-      person.changed.should =~ [ "ssn", "some_dynamic_field" ]
+      expect(person.title).to eq("MC")
+      expect(person.changed).to eq([ "ssn", "some_dynamic_field" ])
     end
 
     context "after a save" do
@@ -1401,12 +1401,12 @@ describe Mongoid::Changeable do
       end
 
       it "clears changes" do
-        person.should_not be_changed
+        expect(person).to_not be_changed
       end
 
       it "stores previous changes" do
-        person.previous_changes["title"].should eq([ "MC", "DJ" ])
-        person.previous_changes["ssn"].should eq([ nil, "222-22-2222" ])
+        expect(person.previous_changes["title"]).to eq([ "MC", "DJ" ])
+        expect(person.previous_changes["ssn"]).to eq([ nil, "222-22-2222" ])
       end
     end
 
@@ -1418,7 +1418,7 @@ describe Mongoid::Changeable do
       end
 
       it "removes the attribute from the document" do
-        person.score.should be_nil
+        expect(person.score).to be_nil
       end
     end
   end
@@ -1445,7 +1445,7 @@ describe Mongoid::Changeable do
 
       it "retains the changes until after all callbacks" do
         acolyte.update_attribute(:status, "testing")
-        acolyte.changed_in_callback.should eq({ "status" => [ nil, "testing" ] })
+        expect(acolyte.changed_in_callback).to eq({ "status" => [ nil, "testing" ] })
       end
     end
 
@@ -1469,7 +1469,7 @@ describe Mongoid::Changeable do
 
       it "retains the changes until after all callbacks" do
         acolyte.save
-        acolyte.changed_in_callback["name"].should eq([ nil, "callback-test" ])
+        expect(acolyte.changed_in_callback["name"]).to eq([ nil, "callback-test" ])
       end
     end
   end
@@ -1485,7 +1485,7 @@ describe Mongoid::Changeable do
     end
 
     it "does not set the association to nil when hitting the database" do
-      person.setters.should_not eq({ "addresses" => nil })
+      expect(person.setters).to_not eq({ "addresses" => nil })
     end
   end
 end

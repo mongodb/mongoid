@@ -28,7 +28,7 @@ describe Mongoid::Relations do
       end
 
       it "returns true" do
-        document.should be_embedded
+        expect(document).to be_embedded
       end
     end
 
@@ -37,14 +37,14 @@ describe Mongoid::Relations do
       context "when the document is embedded in" do
 
         it "returns true" do
-          document.should be_embedded
+          expect(document).to be_embedded
         end
       end
 
       context "when the document class is not embedded in" do
 
         it "returns false" do
-          person.should_not be_embedded
+          expect(person).to_not be_embedded
         end
       end
     end
@@ -54,7 +54,7 @@ describe Mongoid::Relations do
       context "when the document has no parent" do
 
         it "returns false" do
-          Item.should_not be_embedded
+          expect(Item).to_not be_embedded
         end
       end
     end
@@ -64,7 +64,7 @@ describe Mongoid::Relations do
       context "when the document has a parent" do
 
         it "returns true" do
-          SubItem.should be_embedded
+          expect(SubItem).to be_embedded
         end
       end
     end
@@ -83,7 +83,7 @@ describe Mongoid::Relations do
       end
 
       it "returns true" do
-        address.should be_an_embedded_many
+        expect(address).to be_an_embedded_many
       end
     end
 
@@ -94,7 +94,7 @@ describe Mongoid::Relations do
       end
 
       it "returns false" do
-        name.should_not be_an_embedded_many
+        expect(name).to_not be_an_embedded_many
       end
     end
   end
@@ -112,7 +112,7 @@ describe Mongoid::Relations do
       end
 
       it "returns true" do
-        name.should be_an_embedded_one
+        expect(name).to be_an_embedded_one
       end
     end
 
@@ -123,7 +123,7 @@ describe Mongoid::Relations do
       end
 
       it "returns false" do
-        address.should_not be_an_embedded_one
+        expect(address).to_not be_an_embedded_one
       end
     end
   end
@@ -141,7 +141,7 @@ describe Mongoid::Relations do
       end
 
       it "returns true" do
-        post.should be_a_referenced_many
+        expect(post).to be_a_referenced_many
       end
     end
 
@@ -152,7 +152,7 @@ describe Mongoid::Relations do
       end
 
       it "returns false" do
-        game.should_not be_a_referenced_many
+        expect(game).to_not be_a_referenced_many
       end
     end
   end
@@ -170,7 +170,7 @@ describe Mongoid::Relations do
       end
 
       it "returns true" do
-        game.should be_a_referenced_one
+        expect(game).to be_a_referenced_one
       end
     end
 
@@ -181,7 +181,7 @@ describe Mongoid::Relations do
       end
 
       it "returns false" do
-        post.should_not be_a_referenced_one
+        expect(post).to_not be_a_referenced_one
       end
     end
   end

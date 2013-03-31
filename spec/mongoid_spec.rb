@@ -7,7 +7,7 @@ describe Mongoid do
     context "when no block supplied" do
 
       it "returns the config singleton" do
-        Mongoid.configure.should eq(Mongoid::Config)
+        expect(Mongoid.configure).to eq(Mongoid::Config)
       end
     end
 
@@ -26,7 +26,7 @@ describe Mongoid do
       end
 
       it "sets the values on the config instance" do
-        Mongoid.allow_dynamic_fields.should be_false
+        expect(Mongoid.allow_dynamic_fields).to be_false
       end
     end
   end
@@ -34,7 +34,7 @@ describe Mongoid do
   describe ".default_session" do
 
     it "returns the default session" do
-      Mongoid.default_session.should eq(Mongoid::Sessions.default)
+      expect(Mongoid.default_session).to eq(Mongoid::Sessions.default)
     end
   end
 
@@ -52,7 +52,7 @@ describe Mongoid do
     it "disconnects from all active sessions" do
       sessions.each do |session|
         session.cluster.nodes.each do |node|
-          node.send(:connected?).should be_false
+          expect(node.send(:connected?)).to be_false
         end
       end
     end
@@ -61,14 +61,14 @@ describe Mongoid do
   describe ".session" do
 
     it "returns the named session" do
-      Mongoid.session(:default).should eq(Mongoid::Sessions.default)
+      expect(Mongoid.session(:default)).to eq(Mongoid::Sessions.default)
     end
   end
 
   describe ".models" do
 
     it "returns the list of known models" do
-      Mongoid.models.should include(Band)
+      expect(Mongoid.models).to include(Band)
     end
   end
 end

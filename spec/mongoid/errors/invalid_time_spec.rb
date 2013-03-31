@@ -9,19 +9,19 @@ describe Mongoid::Errors::InvalidTime do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "'this is not a date' is not a valid Time."
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Mongoid tries to serialize the values for Date, DateTime, and Time"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Make sure to pass parsable values to the field setter for Date"
       )
     end

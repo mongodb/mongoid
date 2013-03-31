@@ -19,19 +19,19 @@ describe Mongoid::Inspectable do
       end
 
       it "includes the model type" do
-        inspected.should include("#<Person")
+        expect(inspected).to include("#<Person")
       end
 
       it "displays the id" do
-        inspected.should include("_id: #{person.id}")
+        expect(inspected).to include("_id: #{person.id}")
       end
 
       it "displays defined fields" do
-        inspected.should include("title: \"CEO\"")
+        expect(inspected).to include("title: \"CEO\"")
       end
 
       it "displays field aliases" do
-        inspected.should include("t(test):")
+        expect(inspected).to include("t(test):")
       end
     end
 
@@ -50,7 +50,7 @@ describe Mongoid::Inspectable do
       end
 
       it "includes dynamic attributes" do
-        inspected.should include("some_attribute: \"foo\"")
+        expect(inspected).to include("some_attribute: \"foo\"")
       end
     end
   end

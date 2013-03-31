@@ -37,30 +37,30 @@ describe Mongoid::Relations::Synchronization do
       end
 
       it "has persisted :agent" do
-        agent.persisted?.should be_true
+        expect(agent.persisted?).to be_true
       end
 
       it "has persisted :user" do
-        user.persisted?.should be_true
+        expect(user.persisted?).to be_true
       end
 
       it "has persisted :person" do
-        person.persisted?.should be_true
+        expect(person.persisted?).to be_true
       end
 
       it "does not have persisted :account" do
-        account.persisted?.should be_false
+        expect(account.persisted?).to be_false
       end
 
       it "has instantiated a .valid? :account" do
         account.valid?
-        account.valid?.should be_true
+        expect(account.valid?).to be_true
       end
 
       context "and is Persisted" do
 
         it "is able to :save" do
-          account.save.should be_true
+          expect(account.save).to be_true
         end
       end
 
@@ -71,7 +71,7 @@ describe Mongoid::Relations::Synchronization do
         end
 
         it "is able to :save" do
-          account.save.should be_true
+          expect(account.save).to be_true
         end
       end
     end
@@ -96,7 +96,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "sets the one side of the relation" do
-      article.preferences.should eq([ preference ])
+      expect(article.preferences).to eq([ preference ])
     end
   end
 
@@ -115,11 +115,11 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "sets the inverse foreign key" do
-      one.person_ids.should eq([ person.id ])
+      expect(one.person_ids).to eq([ person.id ])
     end
 
     it "resets the synced flag" do
-      person.synced["preference_ids"].should be_false
+      expect(person.synced["preference_ids"]).to be_false
     end
 
     context "when subsequently setting with keys" do
@@ -134,7 +134,7 @@ describe Mongoid::Relations::Synchronization do
       end
 
       it "sets the inverse foreign key" do
-        two.reload.person_ids.should eq([ person.id ])
+        expect(two.reload.person_ids).to eq([ person.id ])
       end
     end
   end
@@ -158,15 +158,15 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "sets the foreign_key" do
-      person.preference_ids.should eq([ one.id, two.id ])
+      expect(person.preference_ids).to eq([ one.id, two.id ])
     end
 
     it "does not set the first inverse key" do
-      one.reload.person_ids.should be_empty
+      expect(one.reload.person_ids).to be_empty
     end
 
     it "does not set the second inverse key" do
-      two.reload.person_ids.should be_empty
+      expect(two.reload.person_ids).to be_empty
     end
 
     context "when saving the base" do
@@ -178,15 +178,15 @@ describe Mongoid::Relations::Synchronization do
         end
 
         it "persists the foreign_key" do
-          person.reload.preference_ids.should eq([ one.id, two.id ])
+          expect(person.reload.preference_ids).to eq([ one.id, two.id ])
         end
 
         it "sets the first inverse key" do
-          one.reload.person_ids.should eq([ person.id ])
+          expect(one.reload.person_ids).to eq([ person.id ])
         end
 
         it "sets the second inverse key" do
-          two.reload.person_ids.should eq([ person.id ])
+          expect(two.reload.person_ids).to eq([ person.id ])
         end
       end
     end
@@ -215,19 +215,19 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "sets the foreign_key" do
-      person.preference_ids.should eq([ three.id ])
+      expect(person.preference_ids).to eq([ three.id ])
     end
 
     it "does not remove the first inverse key" do
-      one.reload.person_ids.should eq([ person.id ])
+      expect(one.reload.person_ids).to eq([ person.id ])
     end
 
     it "does not remove the second inverse key" do
-      two.reload.person_ids.should eq([ person.id ])
+      expect(two.reload.person_ids).to eq([ person.id ])
     end
 
     it "does not set the third inverse key" do
-      three.reload.person_ids.should be_empty
+      expect(three.reload.person_ids).to be_empty
     end
 
     context "when saving the base" do
@@ -239,19 +239,19 @@ describe Mongoid::Relations::Synchronization do
         end
 
         it "persists the foreign_key" do
-          person.reload.preference_ids.should eq([ three.id ])
+          expect(person.reload.preference_ids).to eq([ three.id ])
         end
 
         it "removes the first inverse key" do
-          one.reload.person_ids.should be_empty
+          expect(one.reload.person_ids).to be_empty
         end
 
         it "removes the second inverse key" do
-          two.reload.person_ids.should be_empty
+          expect(two.reload.person_ids).to be_empty
         end
 
         it "sets the third inverse key" do
-          three.reload.person_ids.should eq([ person.id ])
+          expect(three.reload.person_ids).to eq([ person.id ])
         end
       end
     end
@@ -276,15 +276,15 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "sets the foreign_key" do
-      person.preference_ids.should be_empty
+      expect(person.preference_ids).to be_empty
     end
 
     it "does not remove the first inverse key" do
-      one.reload.person_ids.should eq([ person.id ])
+      expect(one.reload.person_ids).to eq([ person.id ])
     end
 
     it "does not remove the second inverse key" do
-      two.reload.person_ids.should eq([ person.id ])
+      expect(two.reload.person_ids).to eq([ person.id ])
     end
 
     context "when saving the base" do
@@ -296,15 +296,15 @@ describe Mongoid::Relations::Synchronization do
         end
 
         it "persists the foreign_key" do
-          person.reload.preference_ids.should be_empty
+          expect(person.reload.preference_ids).to be_empty
         end
 
         it "removes the first inverse key" do
-          one.reload.person_ids.should be_empty
+          expect(one.reload.person_ids).to be_empty
         end
 
         it "removes the second inverse key" do
-          two.reload.person_ids.should be_empty
+          expect(two.reload.person_ids).to be_empty
         end
       end
     end
@@ -329,15 +329,15 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "sets the foreign_key" do
-      person.preference_ids.should be_empty
+      expect(person.preference_ids).to be_empty
     end
 
     it "does not remove the first inverse key" do
-      one.reload.person_ids.should eq([ person.id ])
+      expect(one.reload.person_ids).to eq([ person.id ])
     end
 
     it "does not remove the second inverse key" do
-      two.reload.person_ids.should eq([ person.id ])
+      expect(two.reload.person_ids).to eq([ person.id ])
     end
 
     context "when saving the base" do
@@ -349,15 +349,15 @@ describe Mongoid::Relations::Synchronization do
         end
 
         it "persists the foreign_key" do
-          person.reload.preference_ids.should be_empty
+          expect(person.reload.preference_ids).to be_empty
         end
 
         it "removes the first inverse key" do
-          one.reload.person_ids.should be_empty
+          expect(one.reload.person_ids).to be_empty
         end
 
         it "removes the second inverse key" do
-          two.reload.person_ids.should be_empty
+          expect(two.reload.person_ids).to be_empty
         end
       end
     end
@@ -384,11 +384,11 @@ describe Mongoid::Relations::Synchronization do
       end
 
       it "removes the first inverse key" do
-        one.reload.person_ids.should be_empty
+        expect(one.reload.person_ids).to be_empty
       end
 
       it "removes the second inverse key" do
-        two.reload.person_ids.should be_empty
+        expect(two.reload.person_ids).to be_empty
       end
     end
 
@@ -399,7 +399,7 @@ describe Mongoid::Relations::Synchronization do
       end
 
       it "removes the inverse key" do
-        person.reload.preference_ids.should eq([ two.id ])
+        expect(person.reload.preference_ids).to eq([ two.id ])
       end
     end
   end
@@ -424,11 +424,11 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "persists the foreign key on the inverse" do
-      tag.article_ids.should eq([ article.id ])
+      expect(tag.article_ids).to eq([ article.id ])
     end
 
     it "persists the inverse relation" do
-      tag.articles.should eq([ article ])
+      expect(tag.articles).to eq([ article ])
     end
   end
 
@@ -447,7 +447,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "adds the id to the inverse relation" do
-      dog.reload.breed_ids.should eq([ breed.id ])
+      expect(dog.reload.breed_ids).to eq([ breed.id ])
     end
   end
 end

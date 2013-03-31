@@ -19,19 +19,19 @@ describe Mongoid::Errors::InvalidIncludes do
       end
 
       it "contains the problem in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Invalid includes directive: Band.includes(:members)"
         )
       end
 
       it "contains the summary in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Eager loading in Mongoid only supports providing arguments to Band.includes"
         )
       end
 
       it "contains the resolution in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Ensure that each parameter passed to Band.includes is a valid name"
         )
       end

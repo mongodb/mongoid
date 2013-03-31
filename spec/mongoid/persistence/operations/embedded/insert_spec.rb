@@ -51,7 +51,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
       end
 
       it "does not put the document in the identity map" do
-        in_map.should be_nil
+        expect(in_map).to be_nil
       end
     end
 
@@ -112,7 +112,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
 
         it "notifies its changes to parent and inserts the parent" do
           root_insert_expectation.call
-          insert.persist.should eq(email)
+          expect(insert.persist).to eq(email)
         end
       end
 
@@ -128,7 +128,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
 
         it "performs an in place $set on the embedded document" do
           root_set_expectation.call
-          insert.persist.should eq(email)
+          expect(insert.persist).to eq(email)
         end
       end
     end
@@ -147,12 +147,12 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
 
         it "notifies its changes to the parent and inserts the parent" do
           root_insert_expectation.call
-          insert.persist.should eq(address)
+          expect(insert.persist).to eq(address)
         end
 
         it "sets new_record to false" do
           root_insert_expectation.call
-          insert.persist.new_record?.should be_false
+          expect(insert.persist.new_record?).to be_false
         end
       end
 
@@ -168,7 +168,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
 
         it "performs a $push on the embedded array" do
           root_push_expectation.call
-          insert.persist.should eq(address)
+          expect(insert.persist).to eq(address)
         end
 
         context "when we add the parent to the child" do
@@ -182,7 +182,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
             query.should_receive(:update).with(
               { "$push" => { "addresses" => other_address.raw_attributes } }
             ).and_return("Object")
-            described_class.new(other_address).persist.should eq(other_address)
+            expect(described_class.new(other_address).persist).to eq(other_address)
           end
         end
       end

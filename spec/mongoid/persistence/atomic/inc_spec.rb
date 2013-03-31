@@ -23,11 +23,11 @@ describe Mongoid::Persistence::Atomic::Inc do
       end
 
       it "increments the provided value" do
-        inced.should eq(10)
+        expect(inced).to eq(10)
       end
 
       it "persists the change" do
-        reloaded.addresses.first.number.should eq(10)
+        expect(reloaded.addresses.first.number).to eq(10)
       end
     end
 
@@ -40,23 +40,23 @@ describe Mongoid::Persistence::Atomic::Inc do
         end
 
         it "increments by the provided value" do
-          person.age.should eq(102)
+          expect(person.age).to eq(102)
         end
 
         it "returns the new value" do
-          inced.should eq(102)
+          expect(inced).to eq(102)
         end
 
         it "persists the changes" do
-          reloaded.age.should eq(102)
+          expect(reloaded.age).to eq(102)
         end
 
         it "keeps the field as an integer" do
-          inced.should be_a(Integer)
+          expect(inced).to be_a(Integer)
         end
 
         it "resets the dirty attributes" do
-          person.changes["age"].should be_nil
+          expect(person.changes["age"]).to be_nil
         end
       end
 
@@ -67,19 +67,19 @@ describe Mongoid::Persistence::Atomic::Inc do
         end
 
         it "increments by the provided value" do
-          person.blood_alcohol_content.should eq(2.2)
+          expect(person.blood_alcohol_content).to eq(2.2)
         end
 
         it "returns the new value" do
-          inced.should eq(2.2)
+          expect(inced).to eq(2.2)
         end
 
         it "persists the changes" do
-          reloaded.blood_alcohol_content.should eq(2.2)
+          expect(reloaded.blood_alcohol_content).to eq(2.2)
         end
 
         it "resets the dirty attributes" do
-          person.changes["blood_alcohol_content"].should be_nil
+          expect(person.changes["blood_alcohol_content"]).to be_nil
         end
       end
     end
@@ -91,19 +91,19 @@ describe Mongoid::Persistence::Atomic::Inc do
       end
 
       it "sets the value to the provided number" do
-        person.score.should eq(2)
+        expect(person.score).to eq(2)
       end
 
       it "returns the new value" do
-        inced.should eq(2)
+        expect(inced).to eq(2)
       end
 
       it "persists the changes" do
-        reloaded.score.should eq(2)
+        expect(reloaded.score).to eq(2)
       end
 
       it "resets the dirty attributes" do
-        person.changes["score"].should be_nil
+        expect(person.changes["score"]).to be_nil
       end
     end
 
@@ -114,19 +114,19 @@ describe Mongoid::Persistence::Atomic::Inc do
       end
 
       it "sets the value to the provided number" do
-        person.high_score.should eq(5)
+        expect(person.high_score).to eq(5)
       end
 
       it "returns the new value" do
-        inced.should eq(5)
+        expect(inced).to eq(5)
       end
 
       it "persists the changes" do
-        reloaded.high_score.should eq(5)
+        expect(reloaded.high_score).to eq(5)
       end
 
       it "resets the dirty attributes" do
-        person.changes["high_score"].should be_nil
+        expect(person.changes["high_score"]).to be_nil
       end
     end
   end

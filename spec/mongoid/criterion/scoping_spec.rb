@@ -25,11 +25,11 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "merges in the options" do
-        scoped.options.should eq({ skip: 20 })
+        expect(scoped.options).to eq({ skip: 20 })
       end
 
       it "sets scoped to true" do
-        scoped.should be_scoped
+        expect(scoped).to be_scoped
       end
     end
 
@@ -54,11 +54,11 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "merges in the options" do
-        scoped.selector.should eq({ "name" => "Depeche Mode" })
+        expect(scoped.selector).to eq({ "name" => "Depeche Mode" })
       end
 
       it "sets scoped to true" do
-        scoped.should be_scoped
+        expect(scoped).to be_scoped
       end
     end
 
@@ -85,13 +85,13 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "merges in the inclusions" do
-          scoped.inclusions.should eq(
+          expect(scoped.inclusions).to eq(
             [ Band.relations["records"] ]
           )
         end
 
         it "sets scoped to true" do
-          scoped.should be_scoped
+          expect(scoped).to be_scoped
         end
       end
 
@@ -104,13 +104,13 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "merges in the inclusions" do
-          scoped.inclusions.should eq(
+          expect(scoped.inclusions).to eq(
             [ Band.relations["records"], Band.relations["label"] ]
           )
         end
 
         it "sets scoped to true" do
-          scoped.should be_scoped
+          expect(scoped).to be_scoped
         end
       end
     end
@@ -129,7 +129,7 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "removes the selection" do
-        criteria.selector.should be_empty
+        expect(criteria.selector).to be_empty
       end
     end
 
@@ -146,7 +146,7 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "removes the options" do
-          criteria.options.should be_empty
+          expect(criteria.options).to be_empty
         end
       end
 
@@ -161,11 +161,11 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "removes the options" do
-          criteria.options.should be_empty
+          expect(criteria.options).to be_empty
         end
 
         it "does not remove the selector" do
-          criteria.selector.should eq({ "name" => nil })
+          expect(criteria.selector).to eq({ "name" => nil })
         end
       end
     end
@@ -185,7 +185,7 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "removes the matching inclusions" do
-        criteria.inclusions.should eq([ Band.relations["records"] ])
+        expect(criteria.inclusions).to eq([ Band.relations["records"] ])
       end
     end
   end
@@ -203,15 +203,15 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "returns a criteria" do
-        scoped.should be_a(Mongoid::Criteria)
+        expect(scoped).to be_a(Mongoid::Criteria)
       end
 
       it "contains an empty selector" do
-        scoped.selector.should be_empty
+        expect(scoped.selector).to be_empty
       end
 
       it "contains empty options" do
-        scoped.options.should be_empty
+        expect(scoped.options).to be_empty
       end
     end
 
@@ -222,15 +222,15 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "returns a criteria" do
-        scoped.should be_a(Mongoid::Criteria)
+        expect(scoped).to be_a(Mongoid::Criteria)
       end
 
       it "contains an empty selector" do
-        scoped.selector.should be_empty
+        expect(scoped.selector).to be_empty
       end
 
       it "contains the options" do
-        scoped.options.should eq({ skip: 10, limit: 10 })
+        expect(scoped.options).to eq({ skip: 10, limit: 10 })
       end
     end
 
@@ -253,11 +253,11 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "allows the default scope to be added" do
-        scoped.selector.should eq({ "name" => "Depeche Mode" })
+        expect(scoped.selector).to eq({ "name" => "Depeche Mode" })
       end
 
       it "flags as scoped" do
-        scoped.should be_scoped
+        expect(scoped).to be_scoped
       end
 
       context "when chained after an unscoped criteria" do
@@ -267,7 +267,7 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "reapplies the default scope" do
-          scoped.selector.should eq({ "name" => "Depeche Mode" })
+          expect(scoped.selector).to eq({ "name" => "Depeche Mode" })
         end
       end
     end
@@ -284,7 +284,7 @@ describe Mongoid::Criterion::Scoping do
     end
 
     it "returns the scoping options" do
-      criteria.scoping_options.should eq([ true, false ])
+      expect(criteria.scoping_options).to eq([ true, false ])
     end
   end
 
@@ -299,11 +299,11 @@ describe Mongoid::Criterion::Scoping do
     end
 
     it "sets the scoped flag" do
-      criteria.should be_scoped
+      expect(criteria).to be_scoped
     end
 
     it "sets the unscoped flag" do
-      criteria.should be_unscoped
+      expect(criteria).to be_unscoped
     end
   end
 
@@ -332,7 +332,7 @@ describe Mongoid::Criterion::Scoping do
       end
 
       it "removes the default scope from the criteria" do
-        unscoped.selector.should be_empty
+        expect(unscoped.selector).to be_empty
       end
 
       context "when chained after a scoped criteria" do
@@ -342,7 +342,7 @@ describe Mongoid::Criterion::Scoping do
         end
 
         it "removes all scoping" do
-          unscoped.selector.should be_empty
+          expect(unscoped.selector).to be_empty
         end
       end
     end
@@ -353,7 +353,7 @@ describe Mongoid::Criterion::Scoping do
 
         it "does not allow default scoping to be added in the block" do
           Band.unscoped do
-            empty.skip(10).selector.should be_empty
+            expect(empty.skip(10).selector).to be_empty
           end
         end
       end
@@ -362,7 +362,7 @@ describe Mongoid::Criterion::Scoping do
 
         it "does not allow default scoping to be added in the block" do
           Band.unscoped do
-            empty.scoped.selector.should be_empty
+            expect(empty.scoped.selector).to be_empty
           end
         end
       end
@@ -382,7 +382,7 @@ describe Mongoid::Criterion::Scoping do
 
         it "does not allow the default scope to be applied" do
           Band.unscoped do
-            empty.skipped.selector.should be_empty
+            expect(empty.skipped.selector).to be_empty
           end
         end
       end

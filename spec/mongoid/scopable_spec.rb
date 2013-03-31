@@ -19,11 +19,11 @@ describe Mongoid::Scopable do
       end
 
       it "adds the default scope to the class" do
-        Band.default_scoping.call.should eq(criteria)
+        expect(Band.default_scoping.call).to eq(criteria)
       end
 
       it "flags as being default scoped" do
-        Band.should be_default_scoping
+        expect(Band).to be_default_scoping
       end
     end
 
@@ -42,11 +42,11 @@ describe Mongoid::Scopable do
       end
 
       it "adds the default scope to the class" do
-        Band.default_scoping.call.should eq(criteria)
+        expect(Band.default_scoping.call).to eq(criteria)
       end
 
       it "flags as being default scoped" do
-        Band.should be_default_scoping
+        expect(Band).to be_default_scoping
       end
     end
 
@@ -89,23 +89,23 @@ describe Mongoid::Scopable do
       end
 
       it "adds the first default scope" do
-        Band.default_scoping.call.selector["name"].should eq("Depeche Mode")
+        expect(Band.default_scoping.call.selector["name"]).to eq("Depeche Mode")
       end
 
       it "adds the additional default scope" do
-        Band.default_scoping.call.selector["origin"].should eq("England")
+        expect(Band.default_scoping.call.selector["origin"]).to eq("England")
       end
 
       it "adds the proc default scope" do
-        Band.default_scoping.call.selector["active"].should be_true
+        expect(Band.default_scoping.call.selector["active"]).to be_true
       end
 
       it "delays execution of the merge until called" do
-        Band.all.selector["likes"].should_not eq(Band.all.selector["likes"])
+        expect(Band.all.selector["likes"]).to_not eq(Band.all.selector["likes"])
       end
 
       it "flags as being default scoped" do
-        Band.should be_default_scoping
+        expect(Band).to be_default_scoping
       end
     end
   end
@@ -129,7 +129,7 @@ describe Mongoid::Scopable do
       context "when not in an unscoped block" do
 
         it "returns true" do
-          Band.should be_default_scopable
+          expect(Band).to be_default_scopable
         end
       end
 
@@ -137,7 +137,7 @@ describe Mongoid::Scopable do
 
         it "returns false" do
           Band.unscoped do
-            Band.should_not be_default_scopable
+            expect(Band).to_not be_default_scopable
           end
         end
       end
@@ -146,7 +146,7 @@ describe Mongoid::Scopable do
     context "when a default scope does not exist" do
 
       it "returns false" do
-        Band.should_not be_default_scopable
+        expect(Band).to_not be_default_scopable
       end
     end
   end
@@ -156,7 +156,7 @@ describe Mongoid::Scopable do
     context "when no criteria exists on the stack" do
 
       it "returns an empty criteria" do
-        Band.queryable.selector.should be_empty
+        expect(Band.queryable.selector).to be_empty
       end
     end
 
@@ -175,7 +175,7 @@ describe Mongoid::Scopable do
       end
 
       it "returns the criteria on the stack" do
-        Band.queryable.should eq(criteria)
+        expect(Band.queryable).to eq(criteria)
       end
     end
   end
@@ -206,7 +206,7 @@ describe Mongoid::Scopable do
         end
 
         it "adds the extension to the scope" do
-          scope.selector.should eq({ "active" => true, "origin" => "Deutschland" })
+          expect(scope.selector).to eq({ "active" => true, "origin" => "Deutschland" })
         end
       end
 
@@ -241,7 +241,7 @@ describe Mongoid::Scopable do
           end
 
           it "returns the correct documents" do
-            scoped.should eq([ undertow ])
+            expect(scoped).to eq([ undertow ])
           end
         end
       end
@@ -260,7 +260,7 @@ describe Mongoid::Scopable do
         end
 
         it "adds a method for the scope" do
-          Band.should respond_to(:active)
+          expect(Band).to respond_to(:active)
         end
 
         context "when calling the scope" do
@@ -272,15 +272,15 @@ describe Mongoid::Scopable do
             end
 
             it "returns a criteria" do
-              scope.should be_a(Mongoid::Criteria)
+              expect(scope).to be_a(Mongoid::Criteria)
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ "active" => true })
+              expect(scope.selector).to eq({ "active" => true })
             end
 
             it "contains the proper options" do
-              scope.options.should eq({ skip: 10 })
+              expect(scope.options).to eq({ skip: 10 })
             end
           end
 
@@ -302,19 +302,19 @@ describe Mongoid::Scopable do
             end
 
             it "returns a criteria" do
-              scope.should be_a(Mongoid::Criteria)
+              expect(scope).to be_a(Mongoid::Criteria)
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ "active" => true, "origin" => "England" })
+              expect(scope.selector).to eq({ "active" => true, "origin" => "England" })
             end
 
             it "contains the proper options" do
-              scope.options.should eq({ skip: 10 })
+              expect(scope.options).to eq({ skip: 10 })
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ "active" => true })
+              expect(Band.active.selector).to eq({ "active" => true })
             end
           end
 
@@ -329,23 +329,23 @@ describe Mongoid::Scopable do
             end
 
             it "returns a criteria" do
-              scope.should be_a(Mongoid::Criteria)
+              expect(scope).to be_a(Mongoid::Criteria)
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ "origin" => "England", "active" => true })
+              expect(scope.selector).to eq({ "origin" => "England", "active" => true })
             end
 
             it "contains the proper options" do
-              scope.options.should eq({ skip: 10 })
+              expect(scope.options).to eq({ skip: 10 })
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ "active" => true })
+              expect(Band.active.selector).to eq({ "active" => true })
             end
 
             it "does not modify the original criteria" do
-              criteria.selector.should eq({ "origin" => "England" })
+              expect(criteria.selector).to eq({ "origin" => "England" })
             end
           end
         end
@@ -417,7 +417,7 @@ describe Mongoid::Scopable do
         end
 
         it "adds the extension to the scope" do
-          scope.selector.should eq({ "active" => true, "origin" => "Deutschland" })
+          expect(scope.selector).to eq({ "active" => true, "origin" => "Deutschland" })
         end
       end
 
@@ -437,7 +437,7 @@ describe Mongoid::Scopable do
         end
 
         it "adds a method for the scope" do
-          Band.should respond_to(:active)
+          expect(Band).to respond_to(:active)
         end
 
         context "when calling the scope" do
@@ -445,7 +445,7 @@ describe Mongoid::Scopable do
           context "when the scope would return nil" do
 
             it "returns a chainable empty scope" do
-              Band.named_by(nil).should be_a(Mongoid::Criteria)
+              expect(Band.named_by(nil)).to be_a(Mongoid::Criteria)
             end
           end
 
@@ -456,15 +456,15 @@ describe Mongoid::Scopable do
             end
 
             it "returns a criteria" do
-              scope.should be_a(Mongoid::Criteria)
+              expect(scope).to be_a(Mongoid::Criteria)
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ "active" => true })
+              expect(scope.selector).to eq({ "active" => true })
             end
 
             it "contains the proper options" do
-              scope.options.should eq({ skip: 10 })
+              expect(scope.options).to eq({ skip: 10 })
             end
           end
 
@@ -486,19 +486,19 @@ describe Mongoid::Scopable do
             end
 
             it "returns a criteria" do
-              scope.should be_a(Mongoid::Criteria)
+              expect(scope).to be_a(Mongoid::Criteria)
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ "active" => true, "origin" => "England" })
+              expect(scope.selector).to eq({ "active" => true, "origin" => "England" })
             end
 
             it "contains the proper options" do
-              scope.options.should eq({ skip: 10 })
+              expect(scope.options).to eq({ skip: 10 })
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ "active" => true })
+              expect(Band.active.selector).to eq({ "active" => true })
             end
           end
 
@@ -513,23 +513,23 @@ describe Mongoid::Scopable do
             end
 
             it "returns a criteria" do
-              scope.should be_a(Mongoid::Criteria)
+              expect(scope).to be_a(Mongoid::Criteria)
             end
 
             it "contains the proper selector" do
-              scope.selector.should eq({ "origin" => "England", "active" => true })
+              expect(scope.selector).to eq({ "origin" => "England", "active" => true })
             end
 
             it "contains the proper options" do
-              scope.options.should eq({ skip: 10 })
+              expect(scope.options).to eq({ skip: 10 })
             end
 
             it "does not modify the original scope" do
-              Band.active.selector.should eq({ "active" => true })
+              expect(Band.active.selector).to eq({ "active" => true })
             end
 
             it "does not modify the original criteria" do
-              criteria.selector.should eq({ "origin" => "England" })
+              expect(criteria.selector).to eq({ "origin" => "England" })
             end
           end
         end
@@ -612,7 +612,7 @@ describe Mongoid::Scopable do
         end
 
         it "properly chains the $or queries together" do
-          criteria.selector.should eq({
+          expect(criteria.selector).to eq({
             "$or" => [
               { "ccc" => nil },
               { "ccc" => { "$gt" => time }},
@@ -630,7 +630,7 @@ describe Mongoid::Scopable do
     context "when the scope stack has not been accessed" do
 
       it "returns an empty array" do
-        Band.scope_stack.should eq([])
+        expect(Band.scope_stack).to eq([])
       end
     end
 
@@ -649,7 +649,7 @@ describe Mongoid::Scopable do
       end
 
       it "returns the criteria in the array" do
-        Band.scope_stack.should eq([ criteria ])
+        expect(Band.scope_stack).to eq([ criteria ])
       end
     end
   end
@@ -663,15 +663,15 @@ describe Mongoid::Scopable do
       end
 
       it "returns a criteria" do
-        scoped.should be_a(Mongoid::Criteria)
+        expect(scoped).to be_a(Mongoid::Criteria)
       end
 
       it "contains an empty selector" do
-        scoped.selector.should be_empty
+        expect(scoped.selector).to be_empty
       end
 
       it "contains empty options" do
-        scoped.options.should be_empty
+        expect(scoped.options).to be_empty
       end
     end
 
@@ -682,15 +682,15 @@ describe Mongoid::Scopable do
       end
 
       it "returns a criteria" do
-        scoped.should be_a(Mongoid::Criteria)
+        expect(scoped).to be_a(Mongoid::Criteria)
       end
 
       it "contains an empty selector" do
-        scoped.selector.should be_empty
+        expect(scoped.selector).to be_empty
       end
 
       it "contains the options" do
-        scoped.options.should eq({ skip: 10, limit: 10 })
+        expect(scoped.options).to eq({ skip: 10, limit: 10 })
       end
     end
 
@@ -713,7 +713,7 @@ describe Mongoid::Scopable do
       end
 
       it "allows the default scope to be added" do
-        scoped.selector.should eq({ "name" => "Depeche Mode" })
+        expect(scoped.selector).to eq({ "name" => "Depeche Mode" })
       end
 
       context "when chained after an unscoped criteria" do
@@ -723,7 +723,7 @@ describe Mongoid::Scopable do
         end
 
         it "reapplies the default scope" do
-          scoped.selector.should eq({ "name" => "Depeche Mode" })
+          expect(scoped.selector).to eq({ "name" => "Depeche Mode" })
         end
       end
     end
@@ -750,7 +750,7 @@ describe Mongoid::Scopable do
       end
 
       it "removes the default scope from the criteria" do
-        unscoped.selector.should be_empty
+        expect(unscoped.selector).to be_empty
       end
 
       context "when chained after a scoped criteria" do
@@ -760,7 +760,7 @@ describe Mongoid::Scopable do
         end
 
         it "removes all scoping" do
-          unscoped.selector.should be_empty
+          expect(unscoped.selector).to be_empty
         end
       end
     end
@@ -771,7 +771,7 @@ describe Mongoid::Scopable do
 
         it "does not allow default scoping to be added in the block" do
           Band.unscoped do
-            Band.skip(10).selector.should be_empty
+            expect(Band.skip(10).selector).to be_empty
           end
         end
       end
@@ -780,7 +780,7 @@ describe Mongoid::Scopable do
 
         it "does not allow default scoping to be added in the block" do
           Band.unscoped do
-            Band.scoped.selector.should be_empty
+            expect(Band.scoped.selector).to be_empty
           end
         end
       end
@@ -800,7 +800,7 @@ describe Mongoid::Scopable do
 
         it "does not allow the default scope to be applied" do
           Band.unscoped do
-            Band.skipped.selector.should be_empty
+            expect(Band.skipped.selector).to be_empty
           end
         end
       end
@@ -825,7 +825,7 @@ describe Mongoid::Scopable do
 
       it "returns an empty criteria" do
         Band.unscoped do
-          Band.with_default_scope.selector.should be_empty
+          expect(Band.with_default_scope.selector).to be_empty
         end
       end
     end
@@ -837,7 +837,7 @@ describe Mongoid::Scopable do
       end
 
       it "returns an empty criteria" do
-        scoped.selector.should be_empty
+        expect(scoped.selector).to be_empty
       end
     end
 
@@ -848,7 +848,7 @@ describe Mongoid::Scopable do
       end
 
       it "returns a scoped criteria" do
-        scoped.selector.should eq({ "name" => "Depeche Mode" })
+        expect(scoped.selector).to eq({ "name" => "Depeche Mode" })
       end
     end
   end
@@ -861,13 +861,13 @@ describe Mongoid::Scopable do
 
     it "yields to the criteria" do
       Band.with_scope(criteria) do |crit|
-        crit.selector.should eq({ "active" => true })
+        expect(crit.selector).to eq({ "active" => true })
       end
     end
 
     it "pops the criteria off the stack" do
       Band.with_scope(criteria) {}
-      Band.scope_stack.should be_empty
+      expect(Band.scope_stack).to be_empty
     end
   end
 
@@ -875,7 +875,7 @@ describe Mongoid::Scopable do
 
     it "sets the threading options" do
       Band.without_default_scope do
-        Mongoid::Threaded.should be_executing(:without_default_scope)
+        expect(Mongoid::Threaded).to be_executing(:without_default_scope)
       end
     end
   end

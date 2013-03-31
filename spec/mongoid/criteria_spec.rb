@@ -17,7 +17,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns true" do
-          criteria.should eq(other)
+          expect(criteria).to eq(other)
         end
       end
 
@@ -28,7 +28,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns false" do
-          criteria.should_not eq(other)
+          expect(criteria).to_not eq(other)
         end
       end
     end
@@ -46,7 +46,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns true" do
-          criteria.should eq(other)
+          expect(criteria).to eq(other)
         end
       end
 
@@ -65,7 +65,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns false" do
-          criteria.should_not eq(other)
+          expect(criteria).to_not eq(other)
         end
       end
     end
@@ -73,7 +73,7 @@ describe Mongoid::Criteria do
     context "when the other is neither a criteria or enumerable" do
 
       it "returns false" do
-        criteria.should_not eq("test")
+        expect(criteria).to_not eq("test")
       end
     end
   end
@@ -87,14 +87,14 @@ describe Mongoid::Criteria do
       end
 
       it "returns true" do
-        (described_class === other).should be_true
+        expect(described_class === other).to be_true
       end
     end
 
     context "when the other is not a criteria" do
 
       it "returns false" do
-        (described_class === []).should be_false
+        expect(described_class === []).to be_false
       end
     end
   end
@@ -124,7 +124,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the sorted documents" do
-        criteria.should eq([ friedel, hobrecht, pfluger ])
+        expect(criteria).to eq([ friedel, hobrecht, pfluger ])
       end
     end
   end
@@ -140,11 +140,11 @@ describe Mongoid::Criteria do
     end
 
     it "adds the batch size option" do
-      criteria.options[:batch_size].should eq(1000)
+      expect(criteria.options[:batch_size]).to eq(1000)
     end
 
     it "returns the correct documents" do
-      criteria.should eq([ person ])
+      expect(criteria).to eq([ person ])
     end
   end
 
@@ -169,23 +169,23 @@ describe Mongoid::Criteria do
       end
 
       it "returns an avg" do
-        aggregates["avg"].should eq(750)
+        expect(aggregates["avg"]).to eq(750)
       end
 
       it "returns a count" do
-        aggregates["count"].should eq(2)
+        expect(aggregates["count"]).to eq(2)
       end
 
       it "returns a max" do
-        aggregates["max"].should eq(1000)
+        expect(aggregates["max"]).to eq(1000)
       end
 
       it "returns a min" do
-        aggregates["min"].should eq(500)
+        expect(aggregates["min"]).to eq(500)
       end
 
       it "returns a sum" do
-        aggregates["sum"].should eq(1500)
+        expect(aggregates["sum"]).to eq(1500)
       end
     end
   end
@@ -211,7 +211,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the avg of the provided field" do
-        avg.should eq(750)
+        expect(avg).to eq(750)
       end
     end
   end
@@ -233,7 +233,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the matching documents" do
-        criteria.should eq([ match ])
+        expect(criteria).to eq([ match ])
       end
     end
   end
@@ -255,7 +255,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the matching documents" do
-        criteria.should eq([ match ])
+        expect(criteria).to eq([ match ])
       end
     end
   end
@@ -271,7 +271,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the criteria as a json hash" do
-      criteria.as_json.should eq([ band.serializable_hash ])
+      expect(criteria.as_json).to eq([ band.serializable_hash ])
     end
   end
 
@@ -290,7 +290,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -309,15 +309,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the new document" do
-          band.should be_new_record
+          expect(band).to be_new_record
         end
 
         it "sets the criteria attributes" do
-          band.name.should eq("Depeche Mode")
+          expect(band.name).to eq("Depeche Mode")
         end
 
         it "sets the attributes passed to build" do
-          band.genres.should eq([ "electro" ])
+          expect(band.genres).to eq([ "electro" ])
         end
       end
 
@@ -330,15 +330,15 @@ describe Mongoid::Criteria do
           end
 
           it "returns the new document" do
-            band.should be_new_record
+            expect(band).to be_new_record
           end
 
           it "sets the criteria attributes" do
-            band.name.should eq("Depeche Mode")
+            expect(band.name).to eq("Depeche Mode")
           end
 
           it "sets the attributes passed to build" do
-            band.genres.should eq([ "electro" ])
+            expect(band.genres).to eq([ "electro" ])
           end
         end
       end
@@ -364,7 +364,7 @@ describe Mongoid::Criteria do
       it "does not hit the database after first iteration" do
         criteria.context.query.should_receive(:each).never
         criteria.each do |doc|
-          doc.should eq(person)
+          expect(doc).to eq(person)
         end
       end
     end
@@ -382,7 +382,7 @@ describe Mongoid::Criteria do
       it "does not hit the database after first iteration" do
         criteria.context.query.should_receive(:each).never
         criteria.each do |doc|
-          doc.should eq(person)
+          expect(doc).to eq(person)
         end
       end
     end
@@ -410,47 +410,47 @@ describe Mongoid::Criteria do
       end
 
       it "contains an equal selector" do
-        clone.selector.should eq({ "name" => "Depeche Mode" })
+        expect(clone.selector).to eq({ "name" => "Depeche Mode" })
       end
 
       it "clones the selector" do
-        clone.selector.should_not equal(criteria.selector)
+        expect(clone.selector).to_not equal(criteria.selector)
       end
 
       it "contains equal options" do
-        clone.options.should eq({ sort: { "name" => 1 }})
+        expect(clone.options).to eq({ sort: { "name" => 1 }})
       end
 
       it "clones the options" do
-        clone.options.should_not equal(criteria.options)
+        expect(clone.options).to_not equal(criteria.options)
       end
 
       it "contains equal inclusions" do
-        clone.inclusions.should eq([ Band.relations["records"] ])
+        expect(clone.inclusions).to eq([ Band.relations["records"] ])
       end
 
       it "clones the inclusions" do
-        clone.inclusions.should_not equal(criteria.inclusions)
+        expect(clone.inclusions).to_not equal(criteria.inclusions)
       end
 
       it "contains equal documents" do
-        clone.documents.should eq([ band ])
+        expect(clone.documents).to eq([ band ])
       end
 
       it "clones the documents" do
-        clone.documents.should_not equal(criteria.documents)
+        expect(clone.documents).to_not equal(criteria.documents)
       end
 
       it "contains equal scoping options" do
-        clone.scoping_options.should eq([ nil, nil ])
+        expect(clone.scoping_options).to eq([ nil, nil ])
       end
 
       it "clones the scoping options" do
-        clone.scoping_options.should_not equal(criteria.scoping_options)
+        expect(clone.scoping_options).to_not equal(criteria.scoping_options)
       end
 
       it "sets the context to nil" do
-        clone.instance_variable_get(:@context).should be_nil
+        expect(clone.instance_variable_get(:@context)).to be_nil
       end
     end
   end
@@ -462,7 +462,7 @@ describe Mongoid::Criteria do
     end
 
     it "sets the cache option to true" do
-      criteria.cache.should be_cached
+      expect(criteria.cache).to be_cached
     end
   end
 
@@ -477,7 +477,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the embedded context" do
-        criteria.context.should be_a(Mongoid::Contextual::Memory)
+        expect(criteria.context).to be_a(Mongoid::Contextual::Memory)
       end
     end
 
@@ -488,7 +488,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the mongo context" do
-        criteria.context.should be_a(Mongoid::Contextual::Mongo)
+        expect(criteria.context).to be_a(Mongoid::Contextual::Mongo)
       end
     end
   end
@@ -505,15 +505,15 @@ describe Mongoid::Criteria do
       end
 
       it "returns the created document" do
-        band.should be_persisted
+        expect(band).to be_persisted
       end
 
       it "sets the criteria attributes" do
-        band.name.should eq("Depeche Mode")
+        expect(band.name).to eq("Depeche Mode")
       end
 
       it "sets the attributes passed to build" do
-        band.genres.should eq([ "electro" ])
+        expect(band.genres).to eq([ "electro" ])
       end
     end
 
@@ -526,15 +526,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the created document" do
-          band.should be_persisted
+          expect(band).to be_persisted
         end
 
         it "sets the criteria attributes" do
-          band.name.should eq("Depeche Mode")
+          expect(band.name).to eq("Depeche Mode")
         end
 
         it "sets the attributes passed to build" do
-          band.genres.should eq([ "electro" ])
+          expect(band.genres).to eq([ "electro" ])
         end
       end
     end
@@ -574,7 +574,7 @@ describe Mongoid::Criteria do
       end
 
       it "deletes all the documents from the database" do
-        Band.count.should eq(0)
+        expect(Band.count).to eq(0)
       end
     end
   end
@@ -592,7 +592,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the documents" do
-      criteria.documents.should eq([ band ])
+      expect(criteria.documents).to eq([ band ])
     end
   end
 
@@ -611,7 +611,7 @@ describe Mongoid::Criteria do
     end
 
     it "sets the documents" do
-      criteria.documents.should eq([ band ])
+      expect(criteria.documents).to eq([ band ])
     end
   end
 
@@ -629,7 +629,7 @@ describe Mongoid::Criteria do
 
       it "iterates over the matching documents" do
         criteria.each do |doc|
-          doc.should eq(band)
+          expect(doc).to eq(band)
         end
       end
     end
@@ -652,7 +652,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -669,7 +669,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns true" do
-        criteria.should be_embedded
+        expect(criteria).to be_embedded
       end
     end
 
@@ -680,7 +680,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns false" do
-        criteria.should_not be_embedded
+        expect(criteria).to_not be_embedded
       end
     end
   end
@@ -700,7 +700,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -717,7 +717,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns true" do
-        criteria.exists?.should be_true
+        expect(criteria.exists?).to be_true
       end
     end
 
@@ -728,7 +728,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns false" do
-        criteria.exists?.should be_false
+        expect(criteria.exists?).to be_false
       end
     end
   end
@@ -740,7 +740,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the criteria explain path" do
-      criteria.explain["cursor"].should eq("BasicCursor")
+      expect(criteria.explain["cursor"]).to eq("BasicCursor")
     end
   end
 
@@ -759,7 +759,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the id" do
-        criteria.extract_id.should eq(id)
+        expect(criteria.extract_id).to eq(id)
       end
     end
 
@@ -772,7 +772,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the _id" do
-        criteria.extract_id.should eq(id)
+        expect(criteria.extract_id).to eq(id)
       end
     end
   end
@@ -784,7 +784,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the fields minus type" do
-      criteria.field_list.should eq([ "name" ])
+      expect(criteria.field_list).to eq([ "name" ])
     end
   end
 
@@ -835,7 +835,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the document from the map" do
-          from_map.should equal(depeche)
+          expect(from_map).to equal(depeche)
         end
       end
 
@@ -846,7 +846,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the document from the map" do
-          from_map.should equal(depeche)
+          expect(from_map).to equal(depeche)
         end
       end
 
@@ -857,11 +857,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns the first match from the map" do
-          from_map.first.should equal(depeche)
+          expect(from_map.first).to equal(depeche)
         end
 
         it "returns the second match from the map" do
-          from_map.last.should equal(placebo)
+          expect(from_map.last).to equal(placebo)
         end
       end
     end
@@ -901,7 +901,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the matching document" do
-            found.should eq(band)
+            expect(found).to eq(band)
           end
         end
 
@@ -939,7 +939,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns nil" do
-              found.should be_nil
+              expect(found).to be_nil
             end
           end
         end
@@ -958,11 +958,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
 
           context "when ids are duplicates" do
@@ -971,7 +971,7 @@ describe Mongoid::Criteria do
             end
 
             it "contains only the first match" do
-              found.should eq([band])
+              expect(found).to eq([band])
             end
           end
         end
@@ -1010,7 +1010,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1029,11 +1029,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
 
           context "when ids are duplicates" do
@@ -1042,7 +1042,7 @@ describe Mongoid::Criteria do
             end
 
             it "contains only the first match" do
-              found.should eq([band])
+              expect(found).to eq([band])
             end
           end
         end
@@ -1081,7 +1081,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1113,7 +1113,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the matching document" do
-            found.should eq(band)
+            expect(found).to eq(band)
           end
         end
 
@@ -1151,7 +1151,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns nil" do
-              found.should be_nil
+              expect(found).to be_nil
             end
           end
         end
@@ -1172,11 +1172,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
         end
 
@@ -1214,7 +1214,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1235,11 +1235,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
         end
 
@@ -1277,7 +1277,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1309,7 +1309,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the matching document" do
-            found.should eq(band)
+            expect(found).to eq(band)
           end
         end
 
@@ -1347,7 +1347,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns nil" do
-              found.should be_nil
+              expect(found).to be_nil
             end
           end
         end
@@ -1368,11 +1368,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
         end
 
@@ -1410,7 +1410,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1431,11 +1431,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
         end
 
@@ -1473,7 +1473,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1505,7 +1505,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the matching document" do
-            found.should eq(band)
+            expect(found).to eq(band)
           end
         end
 
@@ -1543,7 +1543,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns nil" do
-              found.should be_nil
+              expect(found).to be_nil
             end
           end
         end
@@ -1564,11 +1564,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
         end
 
@@ -1606,7 +1606,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1627,11 +1627,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
         end
 
@@ -1669,7 +1669,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns only the matching documents" do
-              found.should eq([ band ])
+              expect(found).to eq([ band ])
             end
           end
         end
@@ -1690,11 +1690,11 @@ describe Mongoid::Criteria do
           end
 
           it "contains the first match" do
-            found.should include(band)
+            expect(found).to include(band)
           end
 
           it "contains the second match" do
-            found.should include(band_two)
+            expect(found).to include(band_two)
           end
         end
 
@@ -1732,15 +1732,15 @@ describe Mongoid::Criteria do
             end
 
             it "contains the first match" do
-              found.should include(band)
+              expect(found).to include(band)
             end
 
             it "contains the second match" do
-              found.should include(band_two)
+              expect(found).to include(band_two)
             end
 
             it "returns only the matches" do
-              found.count.should eq(2)
+              expect(found.count).to eq(2)
             end
           end
         end
@@ -1762,7 +1762,7 @@ describe Mongoid::Criteria do
           end
 
           it "contains only the first match" do
-            found.should eq([band])
+            expect(found).to eq([band])
           end
         end
       end
@@ -1802,11 +1802,11 @@ describe Mongoid::Criteria do
           end
 
           it "returns the first matching document" do
-            result.should eq(depeche)
+            expect(result).to eq(depeche)
           end
 
           it "updates the document in the identity map" do
-            Mongoid::IdentityMap.get(Band, result.id).likes.should eq(1)
+            expect(Mongoid::IdentityMap.get(Band, result.id).likes).to eq(1)
           end
         end
 
@@ -1825,11 +1825,11 @@ describe Mongoid::Criteria do
           end
 
           it "returns the first matching document" do
-            result.should eq(depeche)
+            expect(result).to eq(depeche)
           end
 
           it "updates the document in the identity map" do
-            Mongoid::IdentityMap.get(Band, depeche.id).likes.should eq(1)
+            expect(Mongoid::IdentityMap.get(Band, depeche.id).likes).to eq(1)
           end
         end
       end
@@ -1845,11 +1845,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns the first matching document" do
-          result.should eq(depeche)
+          expect(result).to eq(depeche)
         end
 
         it "updates the document in the database" do
-          depeche.reload.likes.should eq(1)
+          expect(depeche.reload.likes).to eq(1)
         end
       end
 
@@ -1864,11 +1864,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns the first matching document" do
-          result.should eq(tool)
+          expect(result).to eq(tool)
         end
 
         it "updates the document in the database" do
-          tool.reload.likes.should eq(1)
+          expect(tool.reload.likes).to eq(1)
         end
       end
 
@@ -1883,15 +1883,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the first matching document" do
-          result.should eq(depeche)
+          expect(result).to eq(depeche)
         end
 
         it "limits the returned fields" do
-          result.name.should be_nil
+          expect(result.name).to be_nil
         end
 
         it "updates the document in the database" do
-          depeche.reload.likes.should eq(1)
+          expect(depeche.reload.likes).to eq(1)
         end
       end
 
@@ -1906,11 +1906,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns the first matching document" do
-          result.should eq(depeche)
+          expect(result).to eq(depeche)
         end
 
         it "returns the updated document" do
-          result.likes.should eq(1)
+          expect(result.likes).to eq(1)
         end
       end
 
@@ -1925,7 +1925,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the first matching document" do
-          result.should eq(depeche)
+          expect(result).to eq(depeche)
         end
 
         it "deletes the document from the database" do
@@ -1947,7 +1947,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns nil" do
-        result.should be_nil
+        expect(result).to be_nil
       end
     end
   end
@@ -1965,7 +1965,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the document" do
-        found.should eq(band)
+        expect(found).to eq(band)
       end
     end
 
@@ -1978,15 +1978,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a persisted document" do
-          document.should be_persisted
+          expect(document).to be_persisted
         end
 
         it "sets the additional attributes" do
-          document.origin.should eq("Essex")
+          expect(document.origin).to eq("Essex")
         end
       end
 
@@ -1997,11 +1997,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a persisted document" do
-          document.should be_persisted
+          expect(document).to be_persisted
         end
       end
 
@@ -2014,15 +2014,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a persisted document" do
-          document.should be_persisted
+          expect(document).to be_persisted
         end
 
         it "yields to the block" do
-          document.active.should be_false
+          expect(document.active).to be_false
         end
       end
 
@@ -2035,11 +2035,11 @@ describe Mongoid::Criteria do
           end
 
           it "returns a new document" do
-            document.active.should be_false
+            expect(document.active).to be_false
           end
 
           it "returns a persisted document" do
-            document.should be_persisted
+            expect(document).to be_persisted
           end
         end
       end
@@ -2068,7 +2068,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the document" do
-        found.should eq(band)
+        expect(found).to eq(band)
       end
     end
 
@@ -2085,15 +2085,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a persisted document" do
-          document.should be_persisted
+          expect(document).to be_persisted
         end
 
         it "sets the additional attributes" do
-          document.origin.should eq("Essex")
+          expect(document.origin).to eq("Essex")
         end
       end
 
@@ -2104,11 +2104,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a persisted document" do
-          document.should be_persisted
+          expect(document).to be_persisted
         end
       end
 
@@ -2121,15 +2121,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a persisted document" do
-          document.should be_persisted
+          expect(document).to be_persisted
         end
 
         it "yields to the block" do
-          document.active.should be_false
+          expect(document.active).to be_false
         end
       end
 
@@ -2142,11 +2142,11 @@ describe Mongoid::Criteria do
           end
 
           it "returns a new document" do
-            document.active.should be_false
+            expect(document.active).to be_false
           end
 
           it "returns a persisted document" do
-            document.should be_persisted
+            expect(document).to be_persisted
           end
         end
       end
@@ -2166,7 +2166,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the document" do
-        found.should eq(band)
+        expect(found).to eq(band)
       end
     end
 
@@ -2179,15 +2179,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a non persisted document" do
-          document.should_not be_persisted
+          expect(document).to_not be_persisted
         end
 
         it "sets the additional attributes" do
-          document.origin.should eq("Essex")
+          expect(document.origin).to eq("Essex")
         end
       end
 
@@ -2198,11 +2198,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a non persisted document" do
-          document.should_not be_persisted
+          expect(document).to_not be_persisted
         end
       end
 
@@ -2215,15 +2215,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns a new document" do
-          document.name.should eq("Tool")
+          expect(document.name).to eq("Tool")
         end
 
         it "returns a non persisted document" do
-          document.should_not be_persisted
+          expect(document).to_not be_persisted
         end
 
         it "yields to the block" do
-          document.active.should be_false
+          expect(document.active).to be_false
         end
       end
 
@@ -2236,11 +2236,11 @@ describe Mongoid::Criteria do
           end
 
           it "returns a new document" do
-            document.active.should be_false
+            expect(document.active).to be_false
           end
 
           it "returns a non persisted document" do
-            document.should_not be_persisted
+            expect(document).to_not be_persisted
           end
         end
       end
@@ -2258,15 +2258,15 @@ describe Mongoid::Criteria do
     end
 
     it "freezes the criteria" do
-      criteria.should be_frozen
+      expect(criteria).to be_frozen
     end
 
     it "initializes inclusions" do
-      criteria.inclusions.should be_empty
+      expect(criteria.inclusions).to be_empty
     end
 
     it "initializes the context" do
-      criteria.context.should_not be_nil
+      expect(criteria.context).to_not be_nil
     end
   end
 
@@ -2283,7 +2283,7 @@ describe Mongoid::Criteria do
       end
 
       it "does not turn the selector into an $in" do
-        criteria.selector.should eq({ "_id" => id })
+        expect(criteria.selector).to eq({ "_id" => id })
       end
     end
   end
@@ -2313,7 +2313,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the document from the map" do
-        from_map.should equal(band)
+        expect(from_map).to equal(band)
       end
     end
 
@@ -2336,11 +2336,11 @@ describe Mongoid::Criteria do
       end
 
       it "returns the document from the database" do
-        from_db.should_not equal(band)
+        expect(from_db).to_not equal(band)
       end
 
       it "returns the correct document" do
-        from_db.should eq(band)
+        expect(from_db).to eq(band)
       end
     end
 
@@ -2364,7 +2364,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns nil" do
-        from_db.should be_nil
+        expect(from_db).to be_nil
       end
     end
   end
@@ -2400,7 +2400,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the document from the map" do
-          from_map.should include(band)
+          expect(from_map).to include(band)
         end
       end
 
@@ -2415,7 +2415,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the documents from the map" do
-          from_map.should include(band, band_two)
+          expect(from_map).to include(band, band_two)
         end
       end
     end
@@ -2445,11 +2445,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns the document from the database" do
-          from_db.first.should_not equal(band)
+          expect(from_db.first).to_not equal(band)
         end
 
         it "returns the correct document" do
-          from_db.first.should eq(band)
+          expect(from_db.first).to eq(band)
         end
       end
 
@@ -2464,11 +2464,11 @@ describe Mongoid::Criteria do
         end
 
         it "returns the document from the database" do
-          from_db.first.should_not equal(band)
+          expect(from_db.first).to_not equal(band)
         end
 
         it "returns the correct document" do
-          from_db.first.should eq(band)
+          expect(from_db.first).to eq(band)
         end
       end
     end
@@ -2489,7 +2489,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -2508,7 +2508,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -2527,7 +2527,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -2550,7 +2550,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the matching documents" do
-          criteria.should eq([ match ])
+          expect(criteria).to eq([ match ])
         end
       end
 
@@ -2571,7 +2571,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the matching documents" do
-            criteria.should eq([ match_one ])
+            expect(criteria).to eq([ match_one ])
           end
         end
 
@@ -2582,7 +2582,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the matching documents" do
-            criteria.should eq([ match_one ])
+            expect(criteria).to eq([ match_one ])
           end
         end
 
@@ -2595,7 +2595,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns the matching documents" do
-              criteria.should eq([ match_one ])
+              expect(criteria).to eq([ match_one ])
             end
           end
 
@@ -2610,7 +2610,7 @@ describe Mongoid::Criteria do
             end
 
             it "returns the matching documents" do
-              criteria.should eq([ game ])
+              expect(criteria).to eq([ game ])
             end
           end
         end
@@ -2625,15 +2625,15 @@ describe Mongoid::Criteria do
     end
 
     it "sets the class" do
-      criteria.klass.should eq(Band)
+      expect(criteria.klass).to eq(Band)
     end
 
     it "sets the aliased fields" do
-      criteria.aliased_fields.should eq(Band.aliased_fields)
+      expect(criteria.aliased_fields).to eq(Band.aliased_fields)
     end
 
     it "sets the serializers" do
-      criteria.serializers.should eq(Band.fields)
+      expect(criteria.serializers).to eq(Band.fields)
     end
   end
 
@@ -2721,15 +2721,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          results.should eq(c_two)
+          expect(results).to eq(c_two)
         end
 
         it "inserts the first document into the identity map" do
-          from_map.should eq(b)
+          expect(from_map).to eq(b)
         end
 
         it "retrieves the document from the identity map" do
-          results.b.should equal(from_map)
+          expect(results.b).to equal(from_map)
         end
       end
     end
@@ -2802,23 +2802,23 @@ describe Mongoid::Criteria do
           end
 
           it "returns the correct documents" do
-            results.should eq(d_two)
+            expect(results).to eq(d_two)
           end
 
           it "inserts the b document into the identity map" do
-            from_map_b.should eq(b)
+            expect(from_map_b).to eq(b)
           end
 
           it "inserts the c document into the identity map" do
-            from_map_c.should eq(c)
+            expect(from_map_c).to eq(c)
           end
 
           it "retrieves the b document from the identity map" do
-            results.b.should equal(from_map_b)
+            expect(results.b).to equal(from_map_b)
           end
 
           it "retrieves the c document from the identity map" do
-            results.c.should equal(from_map_c)
+            expect(results.c).to equal(from_map_c)
           end
         end
       end
@@ -2889,23 +2889,23 @@ describe Mongoid::Criteria do
           end
 
           it "returns the correct documents" do
-            results.should eq(d_two)
+            expect(results).to eq(d_two)
           end
 
           it "inserts the b documents into the identity map" do
-            from_map_bs.should eq(bs)
+            expect(from_map_bs).to eq(bs)
           end
 
           it "inserts the c documents into the identity map" do
-            from_map_cs.should eq(cs)
+            expect(from_map_cs).to eq(cs)
           end
 
           it "retrieves the b documents from the identity map" do
-            results.b.should match_array(from_map_bs)
+            expect(results.b).to match_array(from_map_bs)
           end
 
           it "retrieves the c documents from the identity map" do
-            results.c.should match_array(from_map_cs)
+            expect(results.c).to match_array(from_map_cs)
           end
         end
       end
@@ -2922,7 +2922,7 @@ describe Mongoid::Criteria do
       end
 
       it "does not duplicate the metadata in the inclusions" do
-        criteria.inclusions.should eq([ metadata ])
+        expect(criteria.inclusions).to eq([ metadata ])
       end
     end
 
@@ -2946,7 +2946,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the proper results" do
-        results.first.title.should eq("one")
+        expect(results.first.title).to eq("one")
       end
     end
 
@@ -3008,15 +3008,15 @@ describe Mongoid::Criteria do
           end
 
           it "eager loads the first document" do
-            eager_loaded[depeche.id].should eq(depeche)
+            expect(eager_loaded[depeche.id]).to eq(depeche)
           end
 
           it "does not eager load the last document" do
-            eager_loaded[tool.id].should be_nil
+            expect(eager_loaded[tool.id]).to be_nil
           end
 
           it "returns the document" do
-            document.should eq(address_one)
+            expect(document).to eq(address_one)
           end
         end
 
@@ -3047,15 +3047,15 @@ describe Mongoid::Criteria do
           end
 
           it "does not eager load the first document" do
-            eager_loaded[depeche.id].should be_nil
+            expect(eager_loaded[depeche.id]).to be_nil
           end
 
           it "eager loads the last document" do
-            eager_loaded[tool.id].should eq(tool)
+            expect(eager_loaded[tool.id]).to eq(tool)
           end
 
           it "returns the document" do
-            document.should eq(address_two)
+            expect(document).to eq(address_two)
           end
         end
 
@@ -3090,15 +3090,15 @@ describe Mongoid::Criteria do
           end
 
           it "eager loads the first document" do
-            eager_loaded[depeche.id].should eq(depeche)
+            expect(eager_loaded[depeche.id]).to eq(depeche)
           end
 
           it "eager loads the last document" do
-            eager_loaded[tool.id].should eq(tool)
+            expect(eager_loaded[tool.id]).to eq(tool)
           end
 
           it "returns the documents" do
-            documents.should eq([ address_one, address_two ])
+            expect(documents).to eq([ address_one, address_two ])
           end
         end
       end
@@ -3140,15 +3140,15 @@ describe Mongoid::Criteria do
           end
 
           it "eager loads for the first document" do
-            Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
+            expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to eq(person)
           end
 
           it "does not eager loads for the last document" do
-            Mongoid::IdentityMap[Person.collection_name][person_two.id].should be_nil
+            expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to be_nil
           end
 
           it "returns the first document" do
-            document.should eq(post_one)
+            expect(document).to eq(post_one)
           end
         end
 
@@ -3171,15 +3171,15 @@ describe Mongoid::Criteria do
           end
 
           it "eager loads for the first document" do
-            Mongoid::IdentityMap[Person.collection_name][person_two.id].should eq(person_two)
+            expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to eq(person_two)
           end
 
           it "does not eager loads for the last document" do
-            Mongoid::IdentityMap[Person.collection_name][person.id].should be_nil
+            expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to be_nil
           end
 
           it "returns the last document" do
-            document.should eq(post_two)
+            expect(document).to eq(post_two)
           end
         end
       end
@@ -3226,15 +3226,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ person ])
+          expect(documents).to eq([ person ])
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
 
         context "when executing the query twice" do
@@ -3260,11 +3260,11 @@ describe Mongoid::Criteria do
           end
 
           it "does not duplicate documents in the relation" do
-            person.posts.size.should eq(2)
+            expect(person.posts.size).to eq(2)
           end
 
           it "does not duplicate documents in the map" do
-            mapped.size.should eq(2)
+            expect(mapped.size).to eq(2)
           end
         end
       end
@@ -3292,15 +3292,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          from_db.should eq(person)
+          expect(from_db).to eq(person)
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
       end
 
@@ -3327,15 +3327,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          from_db.should eq(person)
+          expect(from_db).to eq(person)
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
       end
 
@@ -3370,19 +3370,19 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          criteria.should eq([ person ])
+          expect(criteria).to eq([ person ])
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
 
         it "does not insert the third post into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_three.id].should be_nil
+          expect(Mongoid::IdentityMap[Post.collection_name][post_three.id]).to be_nil
         end
       end
     end
@@ -3420,7 +3420,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ person ])
+          expect(documents).to eq([ person ])
         end
 
         let(:preference_map) do
@@ -3428,11 +3428,11 @@ describe Mongoid::Criteria do
         end
 
         it "inserts the first document into the identity map" do
-          preference_map[preference_one.id].should eq(preference_one)
+          expect(preference_map[preference_one.id]).to eq(preference_one)
         end
 
         it "inserts the second document into the identity map" do
-          preference_map[preference_two.id].should eq(preference_two)
+          expect(preference_map[preference_two.id]).to eq(preference_two)
         end
       end
 
@@ -3459,7 +3459,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          from_db.should eq(person)
+          expect(from_db).to eq(person)
         end
 
         let(:preference_map) do
@@ -3467,11 +3467,11 @@ describe Mongoid::Criteria do
         end
 
         it "inserts the first document into the identity map" do
-          preference_map[preference_one.id].should eq(preference_one)
+          expect(preference_map[preference_one.id]).to eq(preference_one)
         end
 
         it "inserts the second document into the identity map" do
-          preference_map[preference_two.id].should eq(preference_two)
+          expect(preference_map[preference_two.id]).to eq(preference_two)
         end
       end
 
@@ -3498,7 +3498,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          from_db.should eq(person)
+          expect(from_db).to eq(person)
         end
 
         let(:preference_map) do
@@ -3506,11 +3506,11 @@ describe Mongoid::Criteria do
         end
 
         it "inserts the first document into the identity map" do
-          preference_map[preference_one.id].should eq(preference_one)
+          expect(preference_map[preference_one.id]).to eq(preference_one)
         end
 
         it "inserts the second document into the identity map" do
-          preference_map[preference_two.id].should eq(preference_two)
+          expect(preference_map[preference_two.id]).to eq(preference_two)
         end
       end
 
@@ -3549,19 +3549,19 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ person ])
+          expect(documents).to eq([ person ])
         end
 
         it "inserts the first document into the identity map" do
-          preference_map[preference_one.id].should eq(preference_one)
+          expect(preference_map[preference_one.id]).to eq(preference_one)
         end
 
         it "inserts the second document into the identity map" do
-          preference_map[preference_two.id].should eq(preference_two)
+          expect(preference_map[preference_two.id]).to eq(preference_two)
         end
 
         it "does not insert the third preference into the identity map" do
-          preference_map[preference_three.id].should be_nil
+          expect(preference_map[preference_three.id]).to be_nil
         end
       end
     end
@@ -3599,15 +3599,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ person ])
+          expect(documents).to eq([ person ])
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
       end
 
@@ -3634,15 +3634,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          from_db.should eq(person)
+          expect(from_db).to eq(person)
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
 
         context "when subsequently getting all documents" do
@@ -3656,7 +3656,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the correct documents" do
-            documents.should eq([ person ])
+            expect(documents).to eq([ person ])
           end
         end
       end
@@ -3684,15 +3684,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          from_db.should eq(person)
+          expect(from_db).to eq(person)
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
 
         context "when subsequently getting all documents" do
@@ -3706,7 +3706,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the correct documents" do
-            documents.should eq([ person ])
+            expect(documents).to eq([ person ])
           end
         end
       end
@@ -3742,19 +3742,19 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ person ])
+          expect(documents).to eq([ person ])
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
         end
 
         it "does not insert the third post into the identity map" do
-          Mongoid::IdentityMap[Post.collection_name][post_three.id].should be_nil
+          expect(Mongoid::IdentityMap[Post.collection_name][post_three.id]).to be_nil
         end
       end
     end
@@ -3792,15 +3792,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ person ])
+          expect(documents).to eq([ person ])
         end
 
         it "deletes the replaced document from the identity map" do
-          Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+          expect(Mongoid::IdentityMap[Game.collection_name][game_one.id]).to be_nil
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+          expect(Mongoid::IdentityMap[Game.collection_name][game_two.id]).to eq(game_two)
         end
 
         context "when asking from map or db" do
@@ -3814,7 +3814,7 @@ describe Mongoid::Criteria do
           end
 
           it "returns the document from the map" do
-            game.should equal(in_map)
+            expect(game).to equal(in_map)
           end
         end
       end
@@ -3850,15 +3850,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ person ])
+          expect(documents).to eq([ person ])
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+          expect(Mongoid::IdentityMap[Game.collection_name][game_two.id]).to eq(game_two)
         end
 
         it "does not load the extra child into the map" do
-          Mongoid::IdentityMap[Game.collection_name][game_three.id].should be_nil
+          expect(Mongoid::IdentityMap[Game.collection_name][game_three.id]).to be_nil
         end
       end
     end
@@ -3904,15 +3904,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          criteria.should eq([ game_one, game_two ])
+          expect(criteria).to eq([ game_one, game_two ])
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
+          expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to eq(person)
         end
 
         it "inserts the second document into the identity map" do
-          Mongoid::IdentityMap[Person.collection_name][person_two.id].should eq(person_two)
+          expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to eq(person_two)
         end
       end
 
@@ -3935,15 +3935,15 @@ describe Mongoid::Criteria do
         end
 
         it "returns the correct documents" do
-          documents.should eq([ game_one ])
+          expect(documents).to eq([ game_one ])
         end
 
         it "inserts the first document into the identity map" do
-          Mongoid::IdentityMap[Person.collection_name][person.id].should eq(person)
+          expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to eq(person)
         end
 
         it "does not load the documents outside of the limit" do
-          Mongoid::IdentityMap[Person.collection_name][person_two.id].should be_nil
+          expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to be_nil
         end
       end
     end
@@ -3987,23 +3987,23 @@ describe Mongoid::Criteria do
       end
 
       it "returns the correct documents" do
-        criteria.should eq([ person ])
+        expect(criteria).to eq([ person ])
       end
 
       it "inserts the first has many document into the identity map" do
-        Mongoid::IdentityMap[Post.collection_name][post_one.id].should eq(post_one)
+        expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
       end
 
       it "inserts the second has many document into the identity map" do
-        Mongoid::IdentityMap[Post.collection_name][post_two.id].should eq(post_two)
+        expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
       end
 
       it "removes the first has one document from the identity map" do
-        Mongoid::IdentityMap[Game.collection_name][game_one.id].should be_nil
+        expect(Mongoid::IdentityMap[Game.collection_name][game_one.id]).to be_nil
       end
 
       it "inserts the second has one document into the identity map" do
-        Mongoid::IdentityMap[Game.collection_name][game_two.id].should eq(game_two)
+        expect(Mongoid::IdentityMap[Game.collection_name][game_two.id]).to eq(game_two)
       end
     end
   end
@@ -4019,7 +4019,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the inclusions" do
-      criteria.inclusions.should eq([ metadata ])
+      expect(criteria.inclusions).to eq([ metadata ])
     end
   end
 
@@ -4038,7 +4038,7 @@ describe Mongoid::Criteria do
     end
 
     it "sets the inclusions" do
-      criteria.inclusions.should eq([ metadata ])
+      expect(criteria.inclusions).to eq([ metadata ])
     end
   end
 
@@ -4057,7 +4057,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4076,7 +4076,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4113,7 +4113,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the map/reduce results" do
-      map_reduce.should eq([
+      expect(map_reduce).to eq([
         { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
         { "_id" => "Tool", "value" => { "likes" => 100 }}
       ])
@@ -4143,7 +4143,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the max of the provided field" do
-          max.should eq(1000)
+          expect(max).to eq(1000)
         end
       end
 
@@ -4156,7 +4156,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the document with the max value for the field" do
-          max.should eq(depeche)
+          expect(max).to eq(depeche)
         end
       end
     end
@@ -4181,7 +4181,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4212,27 +4212,27 @@ describe Mongoid::Criteria do
       end
 
       it "merges the selector" do
-        merged.selector.should eq({ "name" => "Depeche Mode" })
+        expect(merged.selector).to eq({ "name" => "Depeche Mode" })
       end
 
       it "merges the options" do
-        merged.options.should eq({ sort: { "name" => 1 }})
+        expect(merged.options).to eq({ sort: { "name" => 1 }})
       end
 
       it "merges the documents" do
-        merged.documents.should eq([ band ])
+        expect(merged.documents).to eq([ band ])
       end
 
       it "merges the scoping options" do
-        merged.scoping_options.should eq([ nil, nil ])
+        expect(merged.scoping_options).to eq([ nil, nil ])
       end
 
       it "merges the inclusions" do
-        merged.inclusions.should eq([ metadata ])
+        expect(merged.inclusions).to eq([ metadata ])
       end
 
       it "returns a new criteria" do
-        merged.should_not equal(criteria)
+        expect(merged).to_not equal(criteria)
       end
     end
 
@@ -4251,23 +4251,23 @@ describe Mongoid::Criteria do
       end
 
       it "merges the selector" do
-        merged.selector.should eq({ "name" => "Depeche Mode" })
+        expect(merged.selector).to eq({ "name" => "Depeche Mode" })
       end
 
       it "merges the options" do
-        merged.options.should eq({ sort: { "name" => 1 }})
+        expect(merged.options).to eq({ sort: { "name" => 1 }})
       end
 
       it "merges the scoping options" do
-        merged.scoping_options.should eq([ nil, nil ])
+        expect(merged.scoping_options).to eq([ nil, nil ])
       end
 
       it "merges the inclusions" do
-        merged.inclusions.should eq([ metadata ])
+        expect(merged.inclusions).to eq([ metadata ])
       end
 
       it "returns a new criteria" do
-        merged.should_not equal(criteria)
+        expect(merged).to_not equal(criteria)
       end
     end
   end
@@ -4297,27 +4297,27 @@ describe Mongoid::Criteria do
     end
 
     it "merges the selector" do
-      merged.selector.should eq({ "name" => "Depeche Mode" })
+      expect(merged.selector).to eq({ "name" => "Depeche Mode" })
     end
 
     it "merges the options" do
-      merged.options.should eq({ sort: { "name" => 1 }})
+      expect(merged.options).to eq({ sort: { "name" => 1 }})
     end
 
     it "merges the documents" do
-      merged.documents.should eq([ band ])
+      expect(merged.documents).to eq([ band ])
     end
 
     it "merges the scoping options" do
-      merged.scoping_options.should eq([ nil, nil ])
+      expect(merged.scoping_options).to eq([ nil, nil ])
     end
 
     it "merges the inclusions" do
-      merged.inclusions.should eq([ metadata ])
+      expect(merged.inclusions).to eq([ metadata ])
     end
 
     it "returns the same criteria" do
-      merged.should equal(criteria)
+      expect(merged).to equal(criteria)
     end
   end
 
@@ -4344,7 +4344,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the min of the provided field" do
-          min.should eq(500)
+          expect(min).to eq(500)
         end
       end
 
@@ -4357,7 +4357,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the document with the min value for the field" do
-          min.should eq(tool)
+          expect(min).to eq(tool)
         end
       end
     end
@@ -4378,7 +4378,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4397,7 +4397,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4416,7 +4416,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4435,7 +4435,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4454,7 +4454,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4473,7 +4473,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -4492,11 +4492,11 @@ describe Mongoid::Criteria do
         end
 
         it "limits the returned fields" do
-          criteria.first.name.should be_nil
+          expect(criteria.first.name).to be_nil
         end
 
         it "does not add _type to the fields" do
-          criteria.options[:fields]["_type"].should be_nil
+          expect(criteria.options[:fields]["_type"]).to be_nil
         end
       end
 
@@ -4507,15 +4507,15 @@ describe Mongoid::Criteria do
         end
 
         it "includes the limited fields" do
-          criteria.first.name.should_not be_nil
+          expect(criteria.first.name).to_not be_nil
         end
 
         it "excludes the non included fields" do
-          criteria.first.active.should be_nil
+          expect(criteria.first.active).to be_nil
         end
 
         it "does not add _type to the fields" do
-          criteria.options[:fields]["_type"].should be_nil
+          expect(criteria.options[:fields]["_type"]).to be_nil
         end
       end
 
@@ -4527,7 +4527,7 @@ describe Mongoid::Criteria do
 
         it "only limits the fields on the correct model" do
           criteria.each do |band|
-            Person.new.age.should eq(100)
+            expect(Person.new.age).to eq(100)
           end
         end
       end
@@ -4540,7 +4540,7 @@ describe Mongoid::Criteria do
 
         it "only limits the fields on the correct criteria" do
           criteria.each do |band|
-            Band.new.active.should be_true
+            expect(Band.new.active).to be_true
           end
         end
       end
@@ -4554,7 +4554,7 @@ describe Mongoid::Criteria do
         it "only limits the fields on the correct criteria" do
           criteria.each do |band|
             Band.all.each do |b|
-              b.active.should be_true
+              expect(b.active).to be_true
             end
           end
         end
@@ -4568,7 +4568,7 @@ describe Mongoid::Criteria do
       end
 
       it "adds _type to the fields" do
-        criteria.options[:fields]["_type"].should eq(1)
+        expect(criteria.options[:fields]["_type"]).to eq(1)
       end
     end
 
@@ -4581,7 +4581,7 @@ describe Mongoid::Criteria do
         end
 
         it "properly uses the database field name" do
-          criteria.options.should eq(fields: { "mobile_phones" => 1 })
+          expect(criteria.options).to eq(fields: { "mobile_phones" => 1 })
         end
       end
     end
@@ -4606,7 +4606,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the matching documents" do
-          criteria.should eq([ match ])
+          expect(criteria).to eq([ match ])
         end
       end
 
@@ -4617,7 +4617,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the matching documents" do
-          criteria.should eq([ match ])
+          expect(criteria).to eq([ match ])
         end
       end
     end
@@ -4646,7 +4646,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the values" do
-          plucked.should eq([ "Depeche Mode", "Tool", "Photek" ])
+          expect(plucked).to eq([ "Depeche Mode", "Tool", "Photek" ])
         end
       end
 
@@ -4657,7 +4657,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the duplicates" do
-          plucked.should eq([ 3, 3, 1 ])
+          expect(plucked).to eq([ 3, 3, 1 ])
         end
       end
     end
@@ -4669,7 +4669,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns an empty array" do
-        plucked.should be_empty
+        expect(plucked).to be_empty
       end
     end
 
@@ -4680,7 +4680,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the field values" do
-        plucked.should eq([ depeche.id, tool.id, photek.id ])
+        expect(plucked).to eq([ depeche.id, tool.id, photek.id ])
       end
     end
   end
@@ -4700,7 +4700,7 @@ describe Mongoid::Criteria do
     context "when asking about a model public class method" do
 
       it "returns true" do
-        criteria.should respond_to(:ages)
+        expect(criteria).to respond_to(:ages)
       end
     end
 
@@ -4709,7 +4709,7 @@ describe Mongoid::Criteria do
       context "when including private methods" do
 
         it "returns true" do
-          criteria.respond_to?(:for_ids, true).should be_true
+          expect(criteria.respond_to?(:for_ids, true)).to be_true
         end
       end
     end
@@ -4717,7 +4717,7 @@ describe Mongoid::Criteria do
     context "when asking about a model class public instance method" do
 
       it "returns true" do
-        criteria.respond_to?(:join).should be_true
+        expect(criteria.respond_to?(:join)).to be_true
       end
     end
 
@@ -4726,14 +4726,14 @@ describe Mongoid::Criteria do
       context "when not including private methods" do
 
         it "returns false" do
-          criteria.should_not respond_to(:fork)
+          expect(criteria).to_not respond_to(:fork)
         end
       end
 
       context "when including private methods" do
 
         it "returns true" do
-          criteria.respond_to?(:fork, true).should be_true
+          expect(criteria.respond_to?(:fork, true)).to be_true
         end
       end
     end
@@ -4741,7 +4741,7 @@ describe Mongoid::Criteria do
     context "when asking about a criteria instance method" do
 
       it "returns true" do
-        criteria.should respond_to(:context)
+        expect(criteria).to respond_to(:context)
       end
     end
 
@@ -4750,14 +4750,14 @@ describe Mongoid::Criteria do
       context "when not including private methods" do
 
         it "returns false" do
-          criteria.should_not respond_to(:puts)
+          expect(criteria).to_not respond_to(:puts)
         end
       end
 
       context "when including private methods" do
 
         it "returns true" do
-          criteria.respond_to?(:puts, true).should be_true
+          expect(criteria.respond_to?(:puts, true)).to be_true
         end
       end
     end
@@ -4780,7 +4780,7 @@ describe Mongoid::Criteria do
     end
 
     it "sorts the results in memory" do
-      sorted.should eq([ tool, depeche ])
+      expect(sorted).to eq([ tool, depeche ])
     end
   end
 
@@ -4807,7 +4807,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the sum of the provided field" do
-          sum.should eq(1500)
+          expect(sum).to eq(1500)
         end
       end
 
@@ -4818,7 +4818,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the sum for the provided block" do
-          sum.should eq(1500)
+          expect(sum).to eq(1500)
         end
       end
     end
@@ -4835,7 +4835,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the executed criteria" do
-      criteria.to_ary.should eq([ band ])
+      expect(criteria.to_ary).to eq([ band ])
     end
   end
 
@@ -4883,7 +4883,7 @@ describe Mongoid::Criteria do
     end
 
     it "executes the criteria while properly giving the max scan to Mongo" do
-      criteria.to_ary.should eq [band]
+      expect(criteria.to_ary).to eq [band]
     end
   end
 
@@ -4894,7 +4894,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns self" do
-      criteria.to_criteria.should eq(criteria)
+      expect(criteria.to_criteria).to eq(criteria)
     end
   end
 
@@ -4905,11 +4905,11 @@ describe Mongoid::Criteria do
     end
 
     it "returns a proc" do
-      criteria.to_proc.should be_a(Proc)
+      expect(criteria.to_proc).to be_a(Proc)
     end
 
     it "wraps the criteria in the proc" do
-      criteria.to_proc[].should eq(criteria)
+      expect(criteria.to_proc[]).to eq(criteria)
     end
   end
 
@@ -4926,7 +4926,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns documents with the provided type" do
-        criteria.should eq([ browser ])
+        expect(criteria).to eq([ browser ])
       end
     end
 
@@ -4941,7 +4941,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns documents with the provided types" do
-        criteria.should eq([ browser ])
+        expect(criteria).to eq([ browser ])
       end
     end
   end
@@ -4974,7 +4974,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the matching documents" do
-          criteria.should eq([ match ])
+          expect(criteria).to eq([ match ])
         end
       end
     end
@@ -4988,7 +4988,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the matching documents" do
-          criteria.should eq([ match ])
+          expect(criteria).to eq([ match ])
         end
       end
 
@@ -5007,7 +5007,7 @@ describe Mongoid::Criteria do
         end
 
         it "does not wrap the array in another array" do
-          criteria.selector.should eq({ "agent_ids" => [ id_one, id_two ]})
+          expect(criteria.selector).to eq({ "agent_ids" => [ id_one, id_two ]})
         end
       end
     end
@@ -5026,7 +5026,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the matching documents" do
-        criteria.should eq([ match ])
+        expect(criteria).to eq([ match ])
       end
     end
 
@@ -5037,7 +5037,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the matching documents" do
-        criteria.should eq([ match ])
+        expect(criteria).to eq([ match ])
       end
     end
   end
@@ -5057,7 +5057,7 @@ describe Mongoid::Criteria do
     end
 
     it "passes the block through method_missing" do
-      criteria.uniq(&:name).should eq([ band_one ])
+      expect(criteria.uniq(&:name)).to eq([ band_one ])
     end
   end
 
@@ -5072,11 +5072,11 @@ describe Mongoid::Criteria do
     end
 
     it "retains the criteria selection" do
-      criteria.selector.should eq("name" => "Depeche Mode")
+      expect(criteria.selector).to eq("name" => "Depeche Mode")
     end
 
     it "sets the persistence options" do
-      Band.persistence_options.should eq(collection: "artists")
+      expect(Band.persistence_options).to eq(collection: "artists")
     end
   end
 
@@ -5095,7 +5095,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -5114,7 +5114,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -5135,7 +5135,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -5154,7 +5154,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -5173,7 +5173,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -5188,7 +5188,7 @@ describe Mongoid::Criteria do
     end
 
     it "returns the matching documents" do
-      criteria.should eq([ match ])
+      expect(criteria).to eq([ match ])
     end
   end
 
@@ -5203,7 +5203,7 @@ describe Mongoid::Criteria do
         end
 
         it "properly uses the database field name" do
-          criteria.options.should eq(fields: { "mobile_phones" => 0 })
+          expect(criteria.options).to eq(fields: { "mobile_phones" => 0 })
         end
       end
     end

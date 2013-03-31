@@ -41,11 +41,11 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         end
 
         it "parentizes the documents" do
-          name._parent.should eq(person)
+          expect(name._parent).to eq(person)
         end
 
         it "sets the inverse relation" do
-          person.name.should eq(name)
+          expect(person.name).to eq(name)
         end
       end
 
@@ -77,11 +77,11 @@ describe Mongoid::Relations::Bindings::Embedded::In do
           end
 
           it "parentizes the documents" do
-            address._parent.should eq(person)
+            expect(address._parent).to eq(person)
           end
 
           it "sets the inverse relation" do
-            person.addresses.should include(address)
+            expect(person.addresses).to include(address)
           end
         end
 
@@ -128,7 +128,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         end
 
         it "removes the inverse relation" do
-          person.name.should be_nil
+          expect(person.name).to be_nil
         end
       end
 
@@ -155,7 +155,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         end
 
         it "removes the inverse relation" do
-          person.addresses.should be_empty
+          expect(person.addresses).to be_empty
         end
       end
 

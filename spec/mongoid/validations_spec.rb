@@ -23,7 +23,7 @@ describe Mongoid::Validations do
       end
 
       it "returns the value" do
-        value.should eq("Mr")
+        expect(value).to eq("Mr")
       end
     end
 
@@ -42,7 +42,7 @@ describe Mongoid::Validations do
       end
 
       it "returns the value" do
-        value.should eq([ address ])
+        expect(value).to eq([ address ])
       end
     end
 
@@ -57,7 +57,7 @@ describe Mongoid::Validations do
       end
 
       it "does not error on the read" do
-        value.should be_empty
+        expect(value).to be_empty
       end
     end
   end
@@ -67,7 +67,7 @@ describe Mongoid::Validations do
     context "when provided a context" do
 
       it "uses the provided context" do
-        account.should be_valid(:update)
+        expect(account).to be_valid(:update)
       end
     end
 
@@ -76,7 +76,7 @@ describe Mongoid::Validations do
       context "when the document is new" do
 
         it "defaults the context to :create" do
-          account.should_not be_valid
+          expect(account).to_not be_valid
         end
       end
 
@@ -89,7 +89,7 @@ describe Mongoid::Validations do
         end
 
         it "defaults the context to :update" do
-          account.should be_valid
+          expect(account).to be_valid
         end
       end
     end
@@ -110,7 +110,7 @@ describe Mongoid::Validations do
       end
 
       it "loads the required association from the db" do
-        from_db.should be_valid
+        expect(from_db).to be_valid
       end
     end
 
@@ -135,20 +135,20 @@ describe Mongoid::Validations do
           context "when validating once" do
 
             it "returns false" do
-              movie.should_not be_valid
+              expect(movie).to_not be_valid
             end
 
             it "adds the errors to the document" do
               movie.valid?
-              movie.errors[:ratings].should eq([ "is invalid" ])
+              expect(movie.errors[:ratings]).to eq([ "is invalid" ])
             end
           end
 
           context "when validating multiple times" do
 
             it "returns false every time" do
-              movie.should_not be_valid
-              movie.should_not be_valid
+              expect(movie).to_not be_valid
+              expect(movie).to_not be_valid
             end
           end
         end
@@ -181,20 +181,20 @@ describe Mongoid::Validations do
           context "when validating once" do
 
             it "returns false" do
-              person.should_not be_valid
+              expect(person).to_not be_valid
             end
 
             it "adds the errors to the document" do
               person.valid?
-              person.errors[:services].should eq([ "is invalid" ])
+              expect(person.errors[:services]).to eq([ "is invalid" ])
             end
           end
 
           context "when validating multiple times" do
 
             it "returns false every time" do
-              person.should_not be_valid
-              person.should_not be_valid
+              expect(person).to_not be_valid
+              expect(person).to_not be_valid
             end
           end
         end
@@ -217,7 +217,7 @@ describe Mongoid::Validations do
       end
 
       it "adds the validator" do
-        klass.validators.first.should be_a(
+        expect(klass.validators.first).to be_a(
           Mongoid::Validations::AssociatedValidator
         )
       end
@@ -230,7 +230,7 @@ describe Mongoid::Validations do
       end
 
       it "adds the validator" do
-        klass.validators.first.should be_a(
+        expect(klass.validators.first).to be_a(
           Mongoid::Validations::AssociatedValidator
         )
       end
@@ -252,7 +252,7 @@ describe Mongoid::Validations do
       end
 
       it "adds the validator" do
-        klass.validators.first.should be_a(
+        expect(klass.validators.first).to be_a(
           Mongoid::Validations::UniquenessValidator
         )
       end
@@ -265,7 +265,7 @@ describe Mongoid::Validations do
       end
 
       it "adds the validator" do
-        klass.validators.first.should be_a(
+        expect(klass.validators.first).to be_a(
           Mongoid::Validations::UniquenessValidator
         )
       end
@@ -287,7 +287,7 @@ describe Mongoid::Validations do
       end
 
       it "adds the validator" do
-        klass.validators.first.should be_a(
+        expect(klass.validators.first).to be_a(
           Mongoid::Validations::PresenceValidator
         )
       end
@@ -300,7 +300,7 @@ describe Mongoid::Validations do
       end
 
       it "adds the validator" do
-        klass.validators.first.should be_a(
+        expect(klass.validators.first).to be_a(
           Mongoid::Validations::PresenceValidator
         )
       end

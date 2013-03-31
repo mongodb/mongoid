@@ -9,19 +9,19 @@ describe Mongoid::Errors::DeleteRestriction do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Cannot delete Person because of dependent 'drugs'."
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "When defining 'drugs' with a :dependent => :restrict,"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Don't attempt to delete the parent Person when it has children"
       )
     end

@@ -19,23 +19,23 @@ describe Mongoid::Persistence::Atomic::PushAll do
       end
 
       it "pushes the value onto the array" do
-        person.aliases.should eq([ "007", "Bond", "James" ])
+        expect(person.aliases).to eq([ "007", "Bond", "James" ])
       end
 
       it "persists the data" do
-        reloaded.aliases.should eq([ "007", "Bond", "James" ])
+        expect(reloaded.aliases).to eq([ "007", "Bond", "James" ])
       end
 
       it "removes the field from the dirty attributes" do
-        person.changes["aliases"].should be_nil
+        expect(person.changes["aliases"]).to be_nil
       end
 
       it "resets the document dirty flag" do
-        person.should_not be_changed
+        expect(person).to_not be_changed
       end
 
       it "returns the new array value" do
-        pushed.should eq([ "007", "Bond", "James" ])
+        expect(pushed).to eq([ "007", "Bond", "James" ])
       end
     end
 
@@ -54,23 +54,23 @@ describe Mongoid::Persistence::Atomic::PushAll do
       end
 
       it "pushes the value onto the array" do
-        person.aliases.should eq([ "Bond", "James" ])
+        expect(person.aliases).to eq([ "Bond", "James" ])
       end
 
       it "persists the data" do
-        reloaded.aliases.should eq([ "Bond", "James" ])
+        expect(reloaded.aliases).to eq([ "Bond", "James" ])
       end
 
       it "removes the field from the dirty attributes" do
-        person.changes["aliases"].should be_nil
+        expect(person.changes["aliases"]).to be_nil
       end
 
       it "resets the document dirty flag" do
-        person.should_not be_changed
+        expect(person).to_not be_changed
       end
 
       it "returns the new array value" do
-        pushed.should eq([ "Bond", "James" ])
+        expect(pushed).to eq([ "Bond", "James" ])
       end
     end
   end

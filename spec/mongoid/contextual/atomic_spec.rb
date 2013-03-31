@@ -31,15 +31,15 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "does not add duplicates" do
-        depeche_mode.reload.members.should eq([ "Dave" ])
+        expect(depeche_mode.reload.members).to eq([ "Dave" ])
       end
 
       it "adds unique values" do
-        new_order.reload.members.should eq([ "Peter", "Dave" ])
+        expect(new_order.reload.members).to eq([ "Peter", "Dave" ])
       end
 
       it "adds to non initialized fields" do
-        smiths.reload.members.should eq([ "Dave" ])
+        expect(smiths.reload.members).to eq([ "Dave" ])
       end
     end
 
@@ -58,15 +58,15 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "does not add duplicates" do
-        depeche_mode.reload.members.should eq([ "Dave" ])
+        expect(depeche_mode.reload.members).to eq([ "Dave" ])
       end
 
       it "adds unique values" do
-        new_order.reload.members.should eq([ "Peter", "Dave" ])
+        expect(new_order.reload.members).to eq([ "Peter", "Dave" ])
       end
 
       it "adds to non initialized fields" do
-        smiths.reload.members.should eq([ "Dave" ])
+        expect(smiths.reload.members).to eq([ "Dave" ])
       end
     end
   end
@@ -96,11 +96,11 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "performs the bitwise operation on initialized fields" do
-        depeche_mode.reload.likes.should eq(12)
+        expect(depeche_mode.reload.likes).to eq(12)
       end
 
       it "does not error on non initialized fields" do
-        smiths.reload.likes.should be_nil
+        expect(smiths.reload.likes).to be_nil
       end
     end
 
@@ -111,11 +111,11 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "performs the bitwise operation on initialized fields" do
-        depeche_mode.reload.likes.should eq(61)
+        expect(depeche_mode.reload.likes).to eq(61)
       end
 
       it "does not error on non initialized fields" do
-        smiths.reload.likes.should be_nil
+        expect(smiths.reload.likes).to be_nil
       end
     end
 
@@ -126,11 +126,11 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "performs the bitwise operation on initialized fields" do
-        depeche_mode.reload.likes.should eq(14)
+        expect(depeche_mode.reload.likes).to eq(14)
       end
 
       it "does not error on non initialized fields" do
-        smiths.reload.likes.should be_nil
+        expect(smiths.reload.likes).to be_nil
       end
     end
   end
@@ -164,14 +164,14 @@ describe Mongoid::Contextual::Atomic do
     context "when the field exists" do
 
       it "incs the value" do
-        depeche_mode.reload.likes.should eq(70)
+        expect(depeche_mode.reload.likes).to eq(70)
       end
     end
 
     context "when the field does not exist" do
 
       it "does not error on the inc" do
-        smiths.likes.should be_nil
+        expect(smiths.likes).to be_nil
       end
     end
 
@@ -182,11 +182,11 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "incs the value and read from alias" do
-        beatles.reload.years.should eq(3)
+        expect(beatles.reload.years).to eq(3)
       end
 
       it "incs the value and read from field" do
-        beatles.reload.y.should eq(3)
+        expect(beatles.reload.y).to eq(3)
       end
     end
   end
@@ -216,11 +216,11 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "pops the first element off the array" do
-        depeche_mode.reload.members.should eq([ "Martin" ])
+        expect(depeche_mode.reload.members).to eq([ "Martin" ])
       end
 
       it "does not error on uninitialized fields" do
-        smiths.reload.members.should be_nil
+        expect(smiths.reload.members).to be_nil
       end
     end
 
@@ -231,11 +231,11 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "pops the last element off the array" do
-        depeche_mode.reload.members.should eq([ "Dave" ])
+        expect(depeche_mode.reload.members).to eq([ "Dave" ])
       end
 
       it "does not error on uninitialized fields" do
-        smiths.reload.members.should be_nil
+        expect(smiths.reload.members).to be_nil
       end
     end
   end
@@ -263,11 +263,11 @@ describe Mongoid::Contextual::Atomic do
     end
 
     it "pulls when the value is found" do
-      depeche_mode.reload.members.should eq([ "Dave" ])
+      expect(depeche_mode.reload.members).to eq([ "Dave" ])
     end
 
     it "does not error on non existant fields" do
-      smiths.reload.members.should be_nil
+      expect(smiths.reload.members).to be_nil
     end
   end
 
@@ -294,11 +294,11 @@ describe Mongoid::Contextual::Atomic do
     end
 
     it "pulls when the values are found" do
-      depeche_mode.reload.members.should eq([ "Fletch" ])
+      expect(depeche_mode.reload.members).to eq([ "Fletch" ])
     end
 
     it "does not error on non existant fields" do
-      smiths.reload.members.should be_nil
+      expect(smiths.reload.members).to be_nil
     end
   end
 
@@ -325,11 +325,11 @@ describe Mongoid::Contextual::Atomic do
     end
 
     it "pushes the value to existing arrays" do
-      depeche_mode.reload.members.should eq([ "Dave", "Alan" ])
+      expect(depeche_mode.reload.members).to eq([ "Dave", "Alan" ])
     end
 
     it "pushes to non existant fields" do
-      smiths.reload.members.should eq([ "Alan" ])
+      expect(smiths.reload.members).to eq([ "Alan" ])
     end
   end
 
@@ -356,11 +356,11 @@ describe Mongoid::Contextual::Atomic do
     end
 
     it "pushes the values to existing arrays" do
-      depeche_mode.reload.members.should eq([ "Dave", "Alan", "Fletch" ])
+      expect(depeche_mode.reload.members).to eq([ "Dave", "Alan", "Fletch" ])
     end
 
     it "pushes to non existant fields" do
-      smiths.reload.members.should eq([ "Alan", "Fletch" ])
+      expect(smiths.reload.members).to eq([ "Alan", "Fletch" ])
     end
   end
 
@@ -387,11 +387,11 @@ describe Mongoid::Contextual::Atomic do
     end
 
     it "renames existing fields" do
-      depeche_mode.reload.artists.should eq([ "Dave" ])
+      expect(depeche_mode.reload.artists).to eq([ "Dave" ])
     end
 
     it "does not rename non existant fields" do
-      smiths.reload.should_not respond_to(:artists)
+      expect(smiths.reload).to_not respond_to(:artists)
     end
   end
 
@@ -418,11 +418,11 @@ describe Mongoid::Contextual::Atomic do
     end
 
     it "sets existing fields" do
-      depeche_mode.reload.name.should eq("Recoil")
+      expect(depeche_mode.reload.name).to eq("Recoil")
     end
 
     it "sets non existant fields" do
-      smiths.reload.name.should eq("Recoil")
+      expect(smiths.reload.name).to eq("Recoil")
     end
   end
 
@@ -453,11 +453,11 @@ describe Mongoid::Contextual::Atomic do
         end
 
         it "unsets the first existing field" do
-          depeche_mode.reload.name.should be_nil
+          expect(depeche_mode.reload.name).to be_nil
         end
 
         it "unsets the last existing field" do
-          new_order.reload.name.should be_nil
+          expect(new_order.reload.name).to be_nil
         end
       end
 
@@ -468,11 +468,11 @@ describe Mongoid::Contextual::Atomic do
         end
 
         it "unsets the first existing field" do
-          depeche_mode.reload.years.should be_nil
+          expect(depeche_mode.reload.years).to be_nil
         end
 
         it "unsets the last existing field" do
-          new_order.reload.years.should be_nil
+          expect(new_order.reload.years).to be_nil
         end
       end
     end
@@ -498,11 +498,11 @@ describe Mongoid::Contextual::Atomic do
         end
 
         it "unsets name field" do
-          new_order.reload.name.should be_nil
+          expect(new_order.reload.name).to be_nil
         end
 
         it "unsets genres field" do
-          new_order.reload.genres.should be_nil
+          expect(new_order.reload.genres).to be_nil
         end
       end
 
@@ -513,11 +513,11 @@ describe Mongoid::Contextual::Atomic do
         end
 
         it "unsets the unaliased field" do
-          new_order.reload.name.should be_nil
+          expect(new_order.reload.name).to be_nil
         end
 
         it "unsets the aliased field" do
-          new_order.reload.years.should be_nil
+          expect(new_order.reload.years).to be_nil
         end
       end
     end

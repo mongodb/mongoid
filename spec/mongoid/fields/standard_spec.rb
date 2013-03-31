@@ -9,7 +9,7 @@ describe Mongoid::Fields::Standard do
     end
 
     it "returns false" do
-      field.should_not be_lazy
+      expect(field).to_not be_lazy
     end
   end
 
@@ -42,7 +42,7 @@ describe Mongoid::Fields::Standard do
           end
 
           it "returns true" do
-            field.should be_pre_processed
+            expect(field).to be_pre_processed
           end
         end
 
@@ -58,7 +58,7 @@ describe Mongoid::Fields::Standard do
           end
 
           it "returns false" do
-            field.should_not be_pre_processed
+            expect(field).to_not be_pre_processed
           end
         end
       end
@@ -75,7 +75,7 @@ describe Mongoid::Fields::Standard do
         end
 
         it "returns true" do
-          field.should be_pre_processed
+          expect(field).to be_pre_processed
         end
       end
     end
@@ -90,7 +90,7 @@ describe Mongoid::Fields::Standard do
       end
 
       it "returns false" do
-        field.should_not be_pre_processed
+        expect(field).to_not be_pre_processed
       end
     end
   end
@@ -102,7 +102,7 @@ describe Mongoid::Fields::Standard do
     end
 
     it "does not conflict with the ruby core hash" do
-      image.hash_is_hash.should be_true
+      expect(image.hash_is_hash).to be_true
     end
   end
 
@@ -119,14 +119,14 @@ describe Mongoid::Fields::Standard do
       end
 
       it "allows normal hash access" do
-        hash[:key].should eq("value")
+        expect(hash[:key]).to eq("value")
       end
     end
 
     context "when getting a non existant value" do
 
       it "returns nil" do
-        hash[:key].should be_nil
+        expect(hash[:key]).to be_nil
       end
     end
   end
@@ -138,11 +138,11 @@ describe Mongoid::Fields::Standard do
     end
 
     it "inherits the parents deserialize method" do
-      Thumbnail.demongoize("testy").name.should eq("testy")
+      expect(Thumbnail.demongoize("testy").name).to eq("testy")
     end
 
     it "inherits the parents serialize method" do
-      thumbnail.mongoize.should eq("test")
+      expect(thumbnail.mongoize).to eq("test")
     end
 
     context "when instantiating the class" do
@@ -155,11 +155,11 @@ describe Mongoid::Fields::Standard do
       end
 
       it "deserializes the parent type" do
-        movie.poster.name.should eq("poster")
+        expect(movie.poster.name).to eq("poster")
       end
 
       it "deserializes the child type" do
-        movie.poster_thumb.name.should eq("thumb")
+        expect(movie.poster_thumb.name).to eq("thumb")
       end
     end
   end

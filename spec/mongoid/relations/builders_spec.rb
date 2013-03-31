@@ -17,7 +17,7 @@ describe Mongoid::Relations::Builders do
         end
 
         it "does not set a binding attribute" do
-          name[:binding].should be_nil
+          expect(name[:binding]).to be_nil
         end
       end
 
@@ -28,7 +28,7 @@ describe Mongoid::Relations::Builders do
         end
 
         it "does not set a binding attribute" do
-          game[:binding].should be_nil
+          expect(game[:binding]).to be_nil
         end
       end
 
@@ -45,15 +45,15 @@ describe Mongoid::Relations::Builders do
           end
 
           it "builds the document" do
-            post.person.should eq(person)
+            expect(post.person).to eq(person)
           end
 
           it "sets the inverse" do
-            person.posts.should eq([ post ])
+            expect(person.posts).to eq([ post ])
           end
 
           it "does not save the document" do
-            person.should_not be_persisted
+            expect(person).to_not be_persisted
           end
         end
 
@@ -68,15 +68,15 @@ describe Mongoid::Relations::Builders do
           end
 
           it "builds the document" do
-            game.person.should eq(person)
+            expect(game.person).to eq(person)
           end
 
           it "sets the inverse" do
-            person.game.should eq(game)
+            expect(person.game).to eq(game)
           end
 
           it "does not save the document" do
-            person.should_not be_persisted
+            expect(person).to_not be_persisted
           end
         end
       end
@@ -98,7 +98,7 @@ describe Mongoid::Relations::Builders do
         end
 
         it "does not set a binding attribute" do
-          name[:binding].should be_nil
+          expect(name[:binding]).to be_nil
         end
       end
 
@@ -109,7 +109,7 @@ describe Mongoid::Relations::Builders do
         end
 
         it "does not set a binding attribute" do
-          game[:binding].should be_nil
+          expect(game[:binding]).to be_nil
         end
       end
 
@@ -126,19 +126,19 @@ describe Mongoid::Relations::Builders do
           end
 
           it "builds the document" do
-            post.person.should eq(person)
+            expect(post.person).to eq(person)
           end
 
           it "sets the inverse" do
-            person.posts.should eq([ post ])
+            expect(person.posts).to eq([ post ])
           end
 
           it "saves the document" do
-            person.should be_persisted
+            expect(person).to be_persisted
           end
 
           it "saves the child" do
-            post.should be_persisted
+            expect(post).to be_persisted
           end
         end
 
@@ -153,19 +153,19 @@ describe Mongoid::Relations::Builders do
           end
 
           it "builds the document" do
-            game.person.should eq(person)
+            expect(game.person).to eq(person)
           end
 
           it "sets the inverse" do
-            person.game.should eq(game)
+            expect(person.game).to eq(game)
           end
 
           it "saves the document" do
-            person.should be_persisted
+            expect(person).to be_persisted
           end
 
           it "saves the child" do
-            game.should be_persisted
+            expect(game).to be_persisted
           end
         end
       end
@@ -190,15 +190,15 @@ describe Mongoid::Relations::Builders do
           end
 
           it "replaces the existing document" do
-            person.game.should eq(game_two)
+            expect(person.game).to eq(game_two)
           end
 
           it "persists the change" do
-            person.game(true).should eq(game_two)
+            expect(person.game(true)).to eq(game_two)
           end
 
           it "removes the old document from the database" do
-            Game.collection.find.count.should eq(1)
+            expect(Game.collection.find.count).to eq(1)
           end
         end
       end

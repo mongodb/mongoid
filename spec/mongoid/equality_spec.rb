@@ -20,7 +20,7 @@ describe Mongoid::Equality do
       end
 
       it "returns false" do
-        person.should_not eq(other)
+        expect(person).to_not eq(other)
       end
     end
 
@@ -39,7 +39,7 @@ describe Mongoid::Equality do
           end
 
           it "returns false" do
-            person.should_not eq(other)
+            expect(person).to_not eq(other)
           end
         end
 
@@ -54,7 +54,7 @@ describe Mongoid::Equality do
           end
 
           it "returns true" do
-            person.should eq(other)
+            expect(person).to eq(other)
           end
         end
       end
@@ -68,14 +68,14 @@ describe Mongoid::Equality do
         context "when the instances are the same" do
 
           it "returns true" do
-            person.should eq(person)
+            expect(person).to eq(person)
           end
         end
 
         context "when the instances are different" do
 
           it "returns false" do
-            person.should_not eq(other)
+            expect(person).to_not eq(other)
           end
         end
       end
@@ -87,7 +87,7 @@ describe Mongoid::Equality do
     context "when comparable is an instance of this document" do
 
       it "returns true" do
-        (klass === person).should be_true
+        expect(klass === person).to be_true
       end
     end
 
@@ -98,28 +98,28 @@ describe Mongoid::Equality do
       end
 
       it "returns true" do
-        (klass === relation).should be_true
+        expect(klass === relation).to be_true
       end
     end
 
     context "when comparable is the same class" do
 
       it "returns true" do
-        (klass === Person).should be_true
+        expect(klass === Person).to be_true
       end
     end
 
     context "when the comparable is a subclass" do
 
       it "returns false" do
-        (Person === Doctor).should be_false
+        expect(Person === Doctor).to be_false
       end
     end
 
     context "when the comparable is an instance of a subclass" do
 
       it "returns true" do
-        (Person === Doctor.new).should be_true
+        expect(Person === Doctor.new).to be_true
       end
     end
   end
@@ -131,14 +131,14 @@ describe Mongoid::Equality do
       context "when the instance is different" do
 
         it "returns false" do
-          (person === Person.new).should be_false
+          expect(person === Person.new).to be_false
         end
       end
 
       context "when the instance is the same" do
 
         it "returns true" do
-          (person === person).should be_true
+          expect(person === person).to be_true
         end
       end
     end
@@ -146,7 +146,7 @@ describe Mongoid::Equality do
     context "when the comparable is a subclass" do
 
       it "returns false" do
-        (person === Doctor.new).should be_false
+        expect(person === Doctor.new).to be_false
       end
     end
 
@@ -155,21 +155,21 @@ describe Mongoid::Equality do
       context "when the class is the same" do
 
         it "returns true" do
-          (person === Person).should be_true
+          expect(person === Person).to be_true
         end
       end
 
       context "when the class is a subclass" do
 
         it "returns false" do
-          (person === Doctor).should be_false
+          expect(person === Doctor).to be_false
         end
       end
 
       context "when the class is a superclass" do
 
         it "returns true" do
-          (Doctor.new === Person).should be_true
+          expect(Doctor.new === Person).to be_true
         end
       end
     end
@@ -186,7 +186,7 @@ describe Mongoid::Equality do
     end
 
     it "compares based on the document id" do
-      (first <=> second ).should eq(-1)
+      expect(first <=> second).to eq(-1)
     end
   end
 
@@ -199,7 +199,7 @@ describe Mongoid::Equality do
       end
 
       it "returns false" do
-        person.should_not be_eql(other)
+        expect(person).to_not be_eql(other)
       end
     end
 
@@ -216,7 +216,7 @@ describe Mongoid::Equality do
         end
 
         it "returns true" do
-          person.should be_eql(other)
+          expect(person).to be_eql(other)
         end
       end
 
@@ -225,14 +225,14 @@ describe Mongoid::Equality do
         context "when the instances are the same" do
 
           it "returns true" do
-            person.should be_eql(person)
+            expect(person).to be_eql(person)
           end
         end
 
         context "when the instances are different" do
 
           it "returns false" do
-            person.should_not be_eql(other)
+            expect(person).to_not be_eql(other)
           end
         end
       end

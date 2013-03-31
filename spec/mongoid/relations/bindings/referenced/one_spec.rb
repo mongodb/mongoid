@@ -29,11 +29,11 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       end
 
       it "sets the inverse relation" do
-        game.person.should eq(person)
+        expect(game.person).to eq(person)
       end
 
       it "sets the foreign key" do
-        game.person_id.should eq(person.id)
+        expect(game.person_id).to eq(person.id)
       end
     end
 
@@ -66,11 +66,11 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       end
 
       it "removes the inverse relation" do
-        game.person.should be_nil
+        expect(game.person).to be_nil
       end
 
       it "removed the foreign key" do
-        game.person_id.should be_nil
+        expect(game.person_id).to be_nil
       end
     end
 
@@ -100,7 +100,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       end
 
       it "does not set the foreign key" do
-        game.person_id.should be_nil
+        expect(game.person_id).to be_nil
       end
     end
   end
@@ -124,7 +124,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       end
 
       it "does not unset the foreign key" do
-        game.person_id.should eq(person.id)
+        expect(game.person_id).to eq(person.id)
       end
     end
   end

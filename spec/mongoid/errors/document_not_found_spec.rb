@@ -11,19 +11,19 @@ describe Mongoid::Errors::DocumentNotFound do
       end
 
       it "contains the problem in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Document(s) not found for class Person with id(s) 1."
         )
       end
 
       it "contains the summary in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "When calling Person.find with an id or array of ids"
         )
       end
 
       it "contains the resolution in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Search for an id that is in the database or set the"
         )
       end
@@ -36,19 +36,19 @@ describe Mongoid::Errors::DocumentNotFound do
       end
 
       it "contains the problem in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Document(s) not found for class Person with id(s) 1."
         )
       end
 
       it "contains the summary in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "When calling Person.find with an id or array of ids"
         )
       end
 
       it "contains the resolution in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Search for an id that is in the database or set the"
         )
       end
@@ -61,19 +61,19 @@ describe Mongoid::Errors::DocumentNotFound do
       end
 
       it "contains the problem in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Document not found for class Person with attributes {:name=>\"syd\"}."
         )
       end
 
       it "contains the summary in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "When calling Person.find_by with a hash of attributes"
         )
       end
 
       it "contains the resolution in the message" do
-        error.message.should include(
+        expect(error.message).to include(
           "Search for attributes that are in the database or set"
         )
       end
@@ -87,7 +87,7 @@ describe Mongoid::Errors::DocumentNotFound do
     end
 
     it "returns the parameters passed to the find" do
-      error.params.should eq(1)
+      expect(error.params).to eq(1)
     end
   end
 
@@ -98,7 +98,7 @@ describe Mongoid::Errors::DocumentNotFound do
     end
 
     it "returns the model class" do
-      error.klass.should eq(Person)
+      expect(error.klass).to eq(Person)
     end
   end
 end

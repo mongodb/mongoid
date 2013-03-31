@@ -35,11 +35,11 @@ describe Mongoid::Relations::Bindings::Embedded::Many do
       end
 
       it "parentizes the document" do
-        address_two._parent.should eq(person)
+        expect(address_two._parent).to eq(person)
       end
 
       it "sets the inverse relation" do
-        address_two.addressable.should eq(person)
+        expect(address_two.addressable).to eq(person)
       end
     end
 

@@ -15,7 +15,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_counter_cached
+        expect(metadata).to_not be_counter_cached
       end
     end
 
@@ -30,7 +30,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_counter_cached
+        expect(metadata).to be_counter_cached
       end
     end
 
@@ -45,7 +45,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_counter_cached
+        expect(metadata).to be_counter_cached
       end
     end
 
@@ -59,7 +59,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_counter_cached
+        expect(metadata).to_not be_counter_cached
       end
     end
   end
@@ -79,7 +79,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns inveser_class_name + _count" do
-        metadata.counter_cache_column_name.should eq("#{inverse_class_name.demodulize.underscore.pluralize}_count")
+        expect(metadata.counter_cache_column_name).to eq("#{inverse_class_name.demodulize.underscore.pluralize}_count")
       end
     end
 
@@ -95,7 +95,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the name given" do
-        metadata.counter_cache_column_name.should eq(counter_cache_name)
+        expect(metadata.counter_cache_column_name).to eq(counter_cache_name)
       end
     end
   end
@@ -112,7 +112,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_autobuilding
+        expect(metadata).to be_autobuilding
       end
     end
 
@@ -126,7 +126,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_autobuilding
+        expect(metadata).to_not be_autobuilding
       end
     end
 
@@ -139,7 +139,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_autobuilding
+        expect(metadata).to_not be_autobuilding
       end
     end
   end
@@ -159,8 +159,9 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns the builder from the relation" do
-      metadata.builder(base, object).should
-      be_a_kind_of(Mongoid::Relations::Builders::Embedded::One)
+      expect(
+        metadata.builder(base, object)
+      ).to be_a_kind_of(Mongoid::Relations::Builders::Embedded::One)
     end
   end
 
@@ -176,7 +177,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_cascading_callbacks
+        expect(metadata).to be_cascading_callbacks
       end
     end
 
@@ -190,7 +191,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_cascading_callbacks
+        expect(metadata).to_not be_cascading_callbacks
       end
     end
 
@@ -203,7 +204,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_cascading_callbacks
+        expect(metadata).to_not be_cascading_callbacks
       end
     end
   end
@@ -220,7 +221,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        metadata.cascade_strategy.should be_nil
+        expect(metadata.cascade_strategy).to be_nil
       end
     end
 
@@ -235,7 +236,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the delete strategy" do
-        metadata.cascade_strategy.should eq(
+        expect(metadata.cascade_strategy).to eq(
           Mongoid::Relations::Cascading::Delete
         )
       end
@@ -252,7 +253,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the destroy strategy" do
-        metadata.cascade_strategy.should eq(
+        expect(metadata.cascade_strategy).to eq(
           Mongoid::Relations::Cascading::Destroy
         )
       end
@@ -269,7 +270,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the nullify strategy" do
-        metadata.cascade_strategy.should eq(
+        expect(metadata.cascade_strategy).to eq(
           Mongoid::Relations::Cascading::Nullify
         )
       end
@@ -286,7 +287,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns the constraint object" do
-      metadata.constraint.should be_a(Mongoid::Relations::Constraint)
+      expect(metadata.constraint).to be_a(Mongoid::Relations::Constraint)
     end
   end
 
@@ -310,7 +311,7 @@ describe Mongoid::Relations::Metadata do
 
     it "concatenates the result from #find_module and name.classify" do
       metadata.should_receive(:find_module).once.and_return("Fruit")
-      classified.should eq("Fruit::Name")
+      expect(classified).to eq("Fruit::Name")
     end
   end
 
@@ -339,7 +340,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        mod.should be_nil
+        expect(mod).to be_nil
       end
     end
 
@@ -350,7 +351,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        mod.should be_nil
+        expect(mod).to be_nil
       end
     end
 
@@ -369,7 +370,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns nil" do
-            mod.should be_nil
+            expect(mod).to be_nil
           end
         end
 
@@ -380,7 +381,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns root namespace" do
-            mod.should be_empty
+            expect(mod).to be_empty
           end
         end
 
@@ -397,7 +398,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns Fruits" do
-              mod.should eq("Fruits")
+              expect(mod).to eq("Fruits")
             end
           end
 
@@ -412,7 +413,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns Fruits" do
-              mod.should eq("Fruits")
+              expect(mod).to eq("Fruits")
             end
           end
 
@@ -427,7 +428,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns nil" do
-              mod.should be_nil
+              expect(mod).to be_nil
             end
           end
         end
@@ -449,7 +450,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the stripped class name" do
-          metadata.class_name.should eq("Person")
+          expect(metadata.class_name).to eq("Person")
         end
       end
 
@@ -463,7 +464,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "constantizes the class name" do
-          metadata.class_name.should eq("Person")
+          expect(metadata.class_name).to eq("Person")
         end
       end
     end
@@ -485,7 +486,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "classifies and constantizes the association name and adds the module" do
-              metadata.class_name.should eq("Name")
+              expect(metadata.class_name).to eq("Name")
             end
           end
 
@@ -500,7 +501,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "classifies and constantizes the association name and adds the module" do
-              metadata.class_name.should eq("Address")
+              expect(metadata.class_name).to eq("Address")
             end
           end
 
@@ -519,7 +520,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "classifies and constantizes the association name and adds the module" do
-              metadata.class_name.should eq("Fruits::Apple")
+              expect(metadata.class_name).to eq("Fruits::Apple")
             end
           end
 
@@ -534,7 +535,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "classifies and constantizes the association name and adds the module" do
-              metadata.class_name.should eq("Fruits::Apple")
+              expect(metadata.class_name).to eq("Fruits::Apple")
             end
           end
 
@@ -554,7 +555,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "classifies and constantizes the association name" do
-            metadata.class_name.should eq("Name")
+            expect(metadata.class_name).to eq("Name")
           end
         end
 
@@ -569,7 +570,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "classifies and constantizes the association name" do
-            metadata.class_name.should eq("Address")
+            expect(metadata.class_name).to eq("Address")
           end
         end
       end
@@ -588,7 +589,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_destructive
+        expect(metadata).to be_destructive
       end
     end
 
@@ -601,7 +602,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_destructive
+        expect(metadata).to_not be_destructive
       end
     end
   end
@@ -617,7 +618,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_embedded
+        expect(metadata).to be_embedded
       end
     end
 
@@ -630,7 +631,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_embedded
+        expect(metadata).to_not be_embedded
       end
     end
   end
@@ -645,7 +646,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns the extend property" do
-      metadata.extension.should eq(:value)
+      expect(metadata.extension).to eq(:value)
     end
   end
 
@@ -661,7 +662,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.extension?.should be_true
+        expect(metadata.extension?).to be_true
       end
     end
 
@@ -674,7 +675,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.extension?.should be_false
+        expect(metadata.extension?).to be_false
       end
     end
   end
@@ -697,7 +698,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should eq("person_id")
+              expect(metadata.foreign_key).to eq("person_id")
             end
           end
 
@@ -712,7 +713,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should eq("person_id")
+              expect(metadata.foreign_key).to eq("person_id")
             end
           end
 
@@ -727,7 +728,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key without the module name" do
-              metadata.foreign_key.should eq("apple_id")
+              expect(metadata.foreign_key).to eq("apple_id")
             end
           end
         end
@@ -742,7 +743,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the foreign_key" do
-            metadata.foreign_key.should eq("person_ids")
+            expect(metadata.foreign_key).to eq("person_ids")
           end
 
           context "given a specific foreign key" do
@@ -756,7 +757,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should eq("follower_list")
+              expect(metadata.foreign_key).to eq("follower_list")
             end
           end
 
@@ -771,7 +772,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key" do
-              metadata.foreign_key.should eq("follower_ids")
+              expect(metadata.foreign_key).to eq("follower_ids")
             end
           end
 
@@ -787,11 +788,11 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key without the module name" do
-              metadata.foreign_key.should eq("banana_ids")
+              expect(metadata.foreign_key).to eq("banana_ids")
             end
 
             it "returns the inverse_foreign_key without the module name" do
-              metadata.inverse_foreign_key.should eq("apple_ids")
+              expect(metadata.inverse_foreign_key).to eq("apple_ids")
             end
           end
         end
@@ -810,7 +811,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the inverse foreign key" do
-            metadata.foreign_key.should eq("person_id")
+            expect(metadata.foreign_key).to eq("person_id")
           end
         end
 
@@ -828,7 +829,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the inverse_of plus suffix" do
-              metadata.foreign_key.should eq("creator_id")
+              expect(metadata.foreign_key).to eq("creator_id")
             end
           end
 
@@ -843,7 +844,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the inverse foreign key" do
-              metadata.foreign_key.should eq("person_id")
+              expect(metadata.foreign_key).to eq("person_id")
             end
           end
 
@@ -859,7 +860,7 @@ describe Mongoid::Relations::Metadata do
             end
 
             it "returns the foreign_key without the module name" do
-              metadata.foreign_key.should eq("apple_id")
+              expect(metadata.foreign_key).to eq("apple_id")
             end
           end
         end
@@ -874,7 +875,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the inverse foreign key" do
-            metadata.foreign_key.should eq("person_id")
+            expect(metadata.foreign_key).to eq("person_id")
           end
         end
       end
@@ -891,7 +892,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the foreign_key" do
-        metadata.foreign_key.should eq("blog_post_id")
+        expect(metadata.foreign_key).to eq("blog_post_id")
       end
     end
   end
@@ -909,7 +910,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns an empty array" do
-        metadata.foreign_key_default.should be_empty
+        expect(metadata.foreign_key_default).to be_empty
       end
     end
 
@@ -924,7 +925,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns an empty array" do
-        metadata.foreign_key_default.should be_nil
+        expect(metadata.foreign_key_default).to be_nil
       end
     end
   end
@@ -942,7 +943,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the foreign_key plus =" do
-        metadata.foreign_key_setter.should eq("person_id=")
+        expect(metadata.foreign_key_setter).to eq("person_id=")
       end
     end
 
@@ -958,7 +959,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the polymorphic foreign_key plus =" do
-        metadata.foreign_key_setter.should eq("ratable_id=")
+        expect(metadata.foreign_key_setter).to eq("ratable_id=")
       end
     end
   end
@@ -976,7 +977,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        metadata.inverse_type.should be_nil
+        expect(metadata.inverse_type).to be_nil
       end
     end
 
@@ -992,7 +993,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the polymorphic name plus type" do
-        metadata.inverse_type.should eq("ratable_type")
+        expect(metadata.inverse_type).to eq("ratable_type")
       end
     end
   end
@@ -1010,7 +1011,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        metadata.inverse_type_setter.should be_nil
+        expect(metadata.inverse_type_setter).to be_nil
       end
     end
 
@@ -1026,7 +1027,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the inverse type plus =" do
-        metadata.inverse_type_setter.should eq("ratable_type=")
+        expect(metadata.inverse_type_setter).to eq("ratable_type=")
       end
     end
   end
@@ -1044,7 +1045,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        metadata.inverse_of_field.should be_nil
+        expect(metadata.inverse_of_field).to be_nil
       end
     end
 
@@ -1060,7 +1061,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the polymorphic name plus field" do
-        metadata.inverse_of_field.should eq("ratable_field")
+        expect(metadata.inverse_of_field).to eq("ratable_field")
       end
     end
   end
@@ -1078,7 +1079,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        metadata.inverse_of_field_setter.should be_nil
+        expect(metadata.inverse_of_field_setter).to be_nil
       end
     end
 
@@ -1094,7 +1095,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the inverse of field plus =" do
-        metadata.inverse_of_field_setter.should eq("ratable_field=")
+        expect(metadata.inverse_of_field_setter).to eq("ratable_field=")
       end
     end
   end
@@ -1115,7 +1116,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns only the inverse_of" do
-          metadata.inverses(nil).should eq([ "my_ratings" ])
+          expect(metadata.inverses(nil)).to eq([ "my_ratings" ])
         end
       end
     end
@@ -1133,7 +1134,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.indexed?.should be_true
+        expect(metadata.indexed?).to be_true
       end
     end
 
@@ -1146,7 +1147,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.indexed?.should be_false
+        expect(metadata.indexed?).to be_false
       end
     end
 
@@ -1160,7 +1161,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.indexed?.should be_false
+        expect(metadata.indexed?).to be_false
       end
     end
   end
@@ -1176,7 +1177,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the name of the inverse with the matching foreign_key" do
-          metadata.inverse.should eq(:creator)
+          expect(metadata.inverse).to eq(:creator)
         end
       end
 
@@ -1193,7 +1194,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the inverse with the matching inverse of" do
-            metadata.inverse.should eq(:user)
+            expect(metadata.inverse).to eq(:user)
           end
         end
 
@@ -1210,7 +1211,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the relation" do
-            metadata.inverse.should eq(:eyeable)
+            expect(metadata.inverse).to eq(:eyeable)
           end
         end
 
@@ -1226,7 +1227,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns nil" do
-            metadata.inverse(Face.new).should be_nil
+            expect(metadata.inverse(Face.new)).to be_nil
           end
         end
       end
@@ -1243,7 +1244,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns nil" do
-            metadata.inverse.should be_nil
+            expect(metadata.inverse).to be_nil
           end
         end
 
@@ -1257,7 +1258,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the inverse_of property" do
-            metadata.inverse.should eq(:crazy_name)
+            expect(metadata.inverse).to eq(:crazy_name)
           end
         end
       end
@@ -1274,7 +1275,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the name of the relation" do
-          metadata.inverse.should eq(:person)
+          expect(metadata.inverse).to eq(:person)
         end
       end
 
@@ -1290,7 +1291,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the name of the relation" do
-          metadata.inverse.should eq(:addressable)
+          expect(metadata.inverse).to eq(:addressable)
         end
       end
 
@@ -1306,7 +1307,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the name of the relation" do
-          metadata.inverse(Person.new).should eq(:addresses)
+          expect(metadata.inverse(Person.new)).to eq(:addresses)
         end
       end
 
@@ -1325,7 +1326,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the relation" do
-            metadata.inverse(Role.new).should eq(:child_roles)
+            expect(metadata.inverse(Role.new)).to eq(:child_roles)
           end
         end
 
@@ -1342,7 +1343,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the name of the relation" do
-            metadata.inverse(Entry.new).should eq(:child_entries)
+            expect(metadata.inverse(Entry.new)).to eq(:child_entries)
           end
         end
       end
@@ -1364,7 +1365,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the inverse class name plus suffix" do
-        metadata.inverse_foreign_key.should eq("person_ids")
+        expect(metadata.inverse_foreign_key).to eq("person_ids")
       end
     end
 
@@ -1380,7 +1381,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        metadata.inverse_foreign_key.should be_nil
+        expect(metadata.inverse_foreign_key).to be_nil
       end
     end
   end
@@ -1395,7 +1396,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "constantizes the inverse_class_name" do
-      metadata.inverse_klass.should eq(Person)
+      expect(metadata.inverse_klass).to eq(Person)
     end
   end
 
@@ -1413,7 +1414,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns a string for the setter" do
-        metadata.inverse_setter.should eq("person=")
+        expect(metadata.inverse_setter).to eq("person=")
       end
     end
 
@@ -1436,7 +1437,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns nil" do
-            metadata.inverse_setter(other).should be_nil
+            expect(metadata.inverse_setter(other)).to be_nil
           end
         end
 
@@ -1452,7 +1453,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns a string for the setter" do
-            metadata.inverse_setter.should eq("eyeable=")
+            expect(metadata.inverse_setter).to eq("eyeable=")
           end
         end
       end
@@ -1473,7 +1474,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns a string for the setter" do
-          metadata.inverse_setter(other).should eq("ratings=")
+          expect(metadata.inverse_setter(other)).to eq("ratings=")
         end
       end
 
@@ -1489,7 +1490,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns a string for the setter" do
-          metadata.inverse_setter.should eq("ratable=")
+          expect(metadata.inverse_setter).to eq("ratable=")
         end
       end
     end
@@ -1507,7 +1508,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the name as a string" do
-        metadata.key.should eq("addresses")
+        expect(metadata.key).to eq("addresses")
       end
 
       context "with a store_as option defined" do
@@ -1521,7 +1522,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "return the name define by store_as option" do
-          metadata.key.should eq("user_comments")
+          expect(metadata.key).to eq("user_comments")
         end
       end
     end
@@ -1540,7 +1541,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the foreign_key" do
-            metadata.key.should eq("post_ids")
+            expect(metadata.key).to eq("post_ids")
           end
         end
 
@@ -1555,7 +1556,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns the polymorphic foreign_key" do
-            metadata.key.should eq("ratable_id")
+            expect(metadata.key).to eq("ratable_id")
           end
         end
       end
@@ -1571,7 +1572,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns _id" do
-          metadata.key.should eq("_id")
+          expect(metadata.key).to eq("_id")
         end
       end
     end
@@ -1587,7 +1588,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns self" do
-      metadata.options.should eq(metadata)
+      expect(metadata.options).to eq(metadata)
     end
   end
 
@@ -1601,7 +1602,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns order criteria" do
-      metadata.order.should eq(:rating.asc)
+      expect(metadata.order).to eq(:rating.asc)
     end
   end
 
@@ -1617,7 +1618,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "constantizes the class_name" do
-        metadata.klass.should eq(Address)
+        expect(metadata.klass).to eq(Address)
       end
     end
 
@@ -1631,7 +1632,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the class" do
-        metadata.klass.should eq(Address)
+        expect(metadata.klass).to eq(Address)
       end
     end
   end
@@ -1645,7 +1646,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_many
+        expect(metadata).to be_many
       end
     end
 
@@ -1656,7 +1657,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_many
+        expect(metadata).to_not be_many
       end
     end
   end
@@ -1668,7 +1669,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns the macro from the relation" do
-      metadata.macro.should eq(:embeds_one)
+      expect(metadata.macro).to eq(:embeds_one)
     end
   end
 
@@ -1687,8 +1688,9 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "returns the nested builder from the relation" do
-      metadata.nested_builder(attributes, options).should
-      be_a_kind_of(Mongoid::Relations::Builders::NestedAttributes::One)
+      expect(
+        metadata.nested_builder(attributes, options)
+      ).to be_a_kind_of(Mongoid::Relations::Builders::NestedAttributes::One)
     end
   end
 
@@ -1705,7 +1707,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns _id" do
-        metadata.primary_key.should eq("_id")
+        expect(metadata.primary_key).to eq("_id")
       end
     end
 
@@ -1721,7 +1723,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the primary key" do
-        metadata.primary_key.should eq("something_id")
+        expect(metadata.primary_key).to eq("something_id")
       end
     end
   end
@@ -1742,7 +1744,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns true" do
-          metadata.validate?.should be_true
+          expect(metadata.validate?).to be_true
         end
       end
 
@@ -1758,7 +1760,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns false" do
-          metadata.validate?.should be_false
+          expect(metadata.validate?).to be_false
         end
       end
     end
@@ -1774,7 +1776,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the relation default" do
-        metadata.validate?.should be_true
+        expect(metadata.validate?).to be_true
       end
     end
   end
@@ -1792,7 +1794,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the value" do
-        metadata.store_as.should eq("user_comments")
+        expect(metadata.store_as).to eq("user_comments")
       end
     end
 
@@ -1806,7 +1808,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.store_as.should eq("comments")
+        expect(metadata.store_as).to eq("comments")
       end
     end
   end
@@ -1837,14 +1839,14 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns nil" do
-        inverse_relation.should be_nil
+        expect(inverse_relation).to be_nil
       end
     end
 
     context "when one match" do
 
       it "returns correct relation" do
-        inverse_relation.should eq(:drugs)
+        expect(inverse_relation).to eq(:drugs)
       end
     end
 
@@ -1880,7 +1882,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_touchable
+        expect(metadata).to_not be_touchable
       end
     end
 
@@ -1895,7 +1897,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        metadata.should be_touchable
+        expect(metadata).to be_touchable
       end
     end
 
@@ -1909,7 +1911,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        metadata.should_not be_touchable
+        expect(metadata).to_not be_touchable
       end
     end
   end
@@ -1935,7 +1937,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns the #{property} property" do
-          metadata.send(property).should eq(:value)
+          expect(metadata.send(property)).to eq(:value)
         end
       end
 
@@ -1951,7 +1953,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns true" do
-            metadata.send("#{property}?").should be_true
+            expect(metadata.send("#{property}?")).to be_true
           end
         end
 
@@ -1964,7 +1966,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns false" do
-            metadata.send("#{property}?").should be_false
+            expect(metadata.send("#{property}?")).to be_false
           end
         end
       end

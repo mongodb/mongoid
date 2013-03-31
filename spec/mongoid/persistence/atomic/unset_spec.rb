@@ -15,15 +15,15 @@ describe Mongoid::Persistence::Atomic::Unset do
       end
 
       it "removes the field" do
-        person.age.should be_nil
+        expect(person.age).to be_nil
       end
 
       it "resets the dirty attributes" do
-        person.changes["age"].should be_nil
+        expect(person.changes["age"]).to be_nil
       end
 
       it "returns nil" do
-        removed.should be_nil
+        expect(removed).to be_nil
       end
     end
 
@@ -41,23 +41,23 @@ describe Mongoid::Persistence::Atomic::Unset do
         end
 
         it "removes age field" do
-          person.age.should be_nil
+          expect(person.age).to be_nil
         end
 
         it "removes score field" do
-          person.score.should be_nil
+          expect(person.score).to be_nil
         end
 
         it "resets the age dirty attribute" do
-          person.changes["age"].should be_nil
+          expect(person.changes["age"]).to be_nil
         end
 
         it "resets the score dirty attribute" do
-          person.changes["score"].should be_nil
+          expect(person.changes["score"]).to be_nil
         end
 
         it "returns nil" do
-          removed.should be_nil
+          expect(removed).to be_nil
         end
       end
     end

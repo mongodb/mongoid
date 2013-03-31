@@ -23,11 +23,11 @@ describe Mongoid::Persistence::Atomic::Sets do
       end
 
       it "sets the provided value" do
-        set.should eq(5)
+        expect(set).to eq(5)
       end
 
       it "persists the change" do
-        reloaded.addresses.first.number.should eq(5)
+        expect(reloaded.addresses.first.number).to eq(5)
       end
     end
 
@@ -38,19 +38,19 @@ describe Mongoid::Persistence::Atomic::Sets do
       end
 
       it "sets the provided value" do
-        person.age.should eq(2)
+        expect(person.age).to eq(2)
       end
 
       it "returns the new value" do
-        set.should eq(2)
+        expect(set).to eq(2)
       end
 
       it "persists the changes" do
-        reloaded.age.should eq(2)
+        expect(reloaded.age).to eq(2)
       end
 
       it "resets the dirty attributes" do
-        person.changes["age"].should be_nil
+        expect(person.changes["age"]).to be_nil
       end
     end
 
@@ -65,19 +65,19 @@ describe Mongoid::Persistence::Atomic::Sets do
       end
 
       it "sets the provided value" do
-        person.lunch_time.should eq(date_time)
+        expect(person.lunch_time).to eq(date_time)
       end
 
       it "returns the new value" do
-        set.should eq(date_time)
+        expect(set).to eq(date_time)
       end
 
       it "persists the changes" do
-        reloaded.lunch_time.should eq(date_time)
+        expect(reloaded.lunch_time).to eq(date_time)
       end
 
       it "resets the dirty attributes" do
-        person.changes["lunch_time"].should be_nil
+        expect(person.changes["lunch_time"]).to be_nil
       end
     end
 
@@ -88,19 +88,19 @@ describe Mongoid::Persistence::Atomic::Sets do
       end
 
       it "sets the provided value" do
-        person.pets.should be_false
+        expect(person.pets).to be_false
       end
 
       it "returns the new value" do
-        set.should be_false
+        expect(set).to be_false
       end
 
       it "persists the changes" do
-        reloaded.pets.should be_false
+        expect(reloaded.pets).to be_false
       end
 
       it "resets the dirty attributes" do
-        person.changes["pets"].should be_nil
+        expect(person.changes["pets"]).to be_nil
       end
 
     end
@@ -112,19 +112,19 @@ describe Mongoid::Persistence::Atomic::Sets do
       end
 
       it "sets the value to the provided number" do
-        person.score.should eq(2)
+        expect(person.score).to eq(2)
       end
 
       it "returns the new value" do
-        set.should eq(2)
+        expect(set).to eq(2)
       end
 
       it "persists the changes" do
-        reloaded.score.should eq(2)
+        expect(reloaded.score).to eq(2)
       end
 
       it "resets the dirty attributes" do
-        person.changes["score"].should be_nil
+        expect(person.changes["score"]).to be_nil
       end
     end
 
@@ -135,19 +135,19 @@ describe Mongoid::Persistence::Atomic::Sets do
       end
 
       it "sets the value to the provided number" do
-        person.high_score.should eq(5)
+        expect(person.high_score).to eq(5)
       end
 
       it "returns the new value" do
-        set.should eq(5)
+        expect(set).to eq(5)
       end
 
       it "persists the changes" do
-        reloaded.high_score.should eq(5)
+        expect(reloaded.high_score).to eq(5)
       end
 
       it "resets the dirty attributes" do
-        person.changes["high_score"].should be_nil
+        expect(person.changes["high_score"]).to be_nil
       end
     end
   end

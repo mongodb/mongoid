@@ -11,15 +11,15 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "creates the parent relation" do
-        document.should respond_to(:parent_role)
+        expect(document).to respond_to(:parent_role)
       end
 
       it "creates the child relation" do
-        document.should respond_to(:child_roles)
+        expect(document).to respond_to(:child_roles)
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        expect(document.cyclic).to be_true
       end
     end
 
@@ -30,15 +30,15 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "creates the parent relation" do
-        document.should respond_to(:parent_entry)
+        expect(document).to respond_to(:parent_entry)
       end
 
       it "creates the child relation" do
-        document.should respond_to(:child_entries)
+        expect(document).to respond_to(:child_entries)
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        expect(document.cyclic).to be_true
       end
     end
 
@@ -62,15 +62,15 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "creates the parent relation" do
-        document.should respond_to(:parent_node)
+        expect(document).to respond_to(:parent_node)
       end
 
       it "creates the child relation" do
-        document.should respond_to(:child_nodes)
+        expect(document).to respond_to(:child_nodes)
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        expect(document.cyclic).to be_true
       end
     end
 
@@ -81,15 +81,15 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "creates the parent relation" do
-        document.should respond_to(:parent_apple)
+        expect(document).to respond_to(:parent_apple)
       end
 
       it "creates the child relation" do
-        document.should respond_to(:child_apples)
+        expect(document).to respond_to(:child_apples)
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        expect(document.cyclic).to be_true
       end
     end
 
@@ -100,7 +100,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "creates relation with cascading callbacks enabled" do
-        document.class.relations['child_pineapples'].should be_cascading_callbacks
+        expect(document.class.relations['child_pineapples']).to be_cascading_callbacks
       end
     end
   end
@@ -112,15 +112,15 @@ describe Mongoid::Relations::Cyclic do
     end
 
     it "creates the parent relation" do
-      document.should respond_to(:parent_shelf)
+      expect(document).to respond_to(:parent_shelf)
     end
 
     it "creates the child relation" do
-      document.should respond_to(:child_shelf)
+      expect(document).to respond_to(:child_shelf)
     end
 
     it "sets cyclic to true" do
-      document.cyclic.should be_true
+      expect(document.cyclic).to be_true
     end
 
     context "when cascading callbacks are enabled" do
@@ -130,7 +130,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "creates relation with cascading callbacks enabled" do
-        document.class.relations['child_mango'].should be_cascading_callbacks
+        expect(document.class.relations['child_mango']).to be_cascading_callbacks
       end
     end
   end
@@ -150,7 +150,7 @@ describe Mongoid::Relations::Cyclic do
     end
 
     it "sets the parent node" do
-      child_one.parent_node.should eq(root)
+      expect(child_one.parent_node).to eq(root)
     end
   end
 end

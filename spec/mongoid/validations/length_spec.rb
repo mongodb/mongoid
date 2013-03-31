@@ -21,7 +21,7 @@ describe Mongoid::Validations::LengthValidator do
         end
 
         it "adds no errors" do
-          product.errors[:brand_name].should be_empty
+          expect(product.errors[:brand_name]).to be_empty
         end
       end
 
@@ -32,7 +32,7 @@ describe Mongoid::Validations::LengthValidator do
         end
 
         it "adds errors" do
-          product.errors[:brand_name].should eq(
+          expect(product.errors[:brand_name]).to eq(
             ["is too long (maximum is 5 characters)"]
           )
         end
@@ -52,7 +52,7 @@ describe Mongoid::Validations::LengthValidator do
         end
 
         it "adds no errors" do
-          product.errors[:website].should be_empty
+          expect(product.errors[:website]).to be_empty
         end
       end
 
@@ -66,7 +66,7 @@ describe Mongoid::Validations::LengthValidator do
         end
 
         it "adds errors" do
-          product.errors[:website].should eq(
+          expect(product.errors[:website]).to eq(
             ["is too long (maximum is 5 characters)"]
           )
         end
@@ -79,7 +79,7 @@ describe Mongoid::Validations::LengthValidator do
         end
 
         it "adds errors" do
-          product.errors[:website].should eq(
+          expect(product.errors[:website]).to eq(
             ["is too long (maximum is 5 characters)"]
           )
         end
@@ -111,7 +111,7 @@ describe Mongoid::Validations::LengthValidator do
         end
 
         it "adds the errors to the document" do
-          person.errors[:aliases].should_not be_empty
+          expect(person.errors[:aliases]).to_not be_empty
         end
       end
     end

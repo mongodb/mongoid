@@ -15,7 +15,7 @@ require "spec_helper"
     # end
 
     # it "returns true" do
-      # field.should be_foreign_key
+      # expect(field).to be_foreign_key
     # end
   # end
 
@@ -48,7 +48,7 @@ require "spec_helper"
         # end
 
         # it "performs conversion on the ids if strings" do
-          # field.serialize(object_id.to_s).should eq(object_id)
+          # expect(field.serialize(object_id.to_s)).to eq(object_id)
         # end
       # end
 
@@ -81,7 +81,7 @@ require "spec_helper"
             # end
 
             # it "does not convert" do
-              # field.serialize(object_id.to_s).should eq(object_id.to_s)
+              # expect(field.serialize(object_id.to_s)).to eq(object_id.to_s)
             # end
           # end
 
@@ -114,7 +114,7 @@ require "spec_helper"
             # end
 
             # it "does not convert" do
-              # field.serialize(criterion).should eq(
+              # expect(field.serialize(criterion)).to eq(
                 # criterion
               # )
             # end
@@ -139,7 +139,7 @@ require "spec_helper"
             # end
 
             # it "does not convert" do
-              # field.serialize("1").should eq(1)
+              # expect(field.serialize("1")).to eq(1)
             # end
           # end
 
@@ -163,7 +163,7 @@ require "spec_helper"
             # end
 
             # it "does not convert" do
-              # field.serialize(criterion).should eq(
+              # expect(field.serialize(criterion)).to eq(
                 # { "$eq" => 1 }
               # )
             # end
@@ -189,7 +189,7 @@ require "spec_helper"
             # end
 
             # it "does not convert" do
-              # field.serialize(criterion).should eq(
+              # expect(field.serialize(criterion)).to eq(
                 # { "$in" => [ 1 ] }
               # )
             # end

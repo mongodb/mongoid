@@ -17,7 +17,7 @@ describe Mongoid::Sessions::MongoUri do
     end
 
     it "returns the database name" do
-      uri.database.should eq("mongoid_test")
+      expect(uri.database).to eq("mongoid_test")
     end
   end
 
@@ -30,7 +30,7 @@ describe Mongoid::Sessions::MongoUri do
       end
 
       it "returns an array with 1 node" do
-        uri.hosts.should eq([ "localhost:27017" ])
+        expect(uri.hosts).to eq([ "localhost:27017" ])
       end
     end
 
@@ -41,7 +41,7 @@ describe Mongoid::Sessions::MongoUri do
       end
 
       it "returns an array with 2 nodes" do
-        uri.hosts.should eq([ "localhost:27017", "localhost:27017" ])
+        expect(uri.hosts).to eq([ "localhost:27017", "localhost:27017" ])
       end
     end
   end
@@ -53,7 +53,7 @@ describe Mongoid::Sessions::MongoUri do
     end
 
     it "returns the password" do
-      uri.password.should eq("pass")
+      expect(uri.password).to eq("pass")
     end
   end
 
@@ -66,7 +66,7 @@ describe Mongoid::Sessions::MongoUri do
       end
 
       it "does not include the username and password" do
-        uri.to_hash.should eq({
+        expect(uri.to_hash).to eq({
           hosts: [ "localhost:27017", "localhost:27017" ],
           database: "mongoid_test"
         })
@@ -80,7 +80,7 @@ describe Mongoid::Sessions::MongoUri do
       end
 
       it "includes the username and password" do
-        uri.to_hash.should eq({
+        expect(uri.to_hash).to eq({
           hosts: [ "localhost:27017" ],
           database: "mongoid_test",
           username: "user",
@@ -97,7 +97,7 @@ describe Mongoid::Sessions::MongoUri do
     end
 
     it "returns the userame" do
-      uri.username.should eq("user")
+      expect(uri.username).to eq("user")
     end
   end
 end

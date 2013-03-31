@@ -10,7 +10,7 @@ describe Mongoid::Findable do
     end
 
     it "returns the distinct values for the field" do
-      Band.distinct(:name).should eq([ "Tool", "Photek" ])
+      expect(Band.distinct(:name)).to eq([ "Tool", "Photek" ])
     end
   end
 
@@ -22,7 +22,7 @@ describe Mongoid::Findable do
 
     it "iterates through all documents" do
       Band.each do |band|
-        band.should be_a(Band)
+        expect(band).to be_a(Band)
       end
     end
   end
@@ -35,7 +35,7 @@ describe Mongoid::Findable do
 
     it "iterates through all documents" do
       Band.each_with_index do |band, index|
-        index.should eq(0)
+        expect(index).to eq(0)
       end
     end
   end
@@ -47,7 +47,7 @@ describe Mongoid::Findable do
     end
 
     it "returns the document" do
-      Person.find_and_modify(title: "Junior").should eq(person)
+      expect(Person.find_and_modify(title: "Junior")).to eq(person)
     end
   end
 
@@ -62,7 +62,7 @@ describe Mongoid::Findable do
       context "when no block is provided" do
 
         it "returns the document" do
-          Person.find_by(title: "sir").should eq(person)
+          expect(Person.find_by(title: "sir")).to eq(person)
         end
       end
 
@@ -75,7 +75,7 @@ describe Mongoid::Findable do
         end
 
         it "yields the returned document" do
-          result.age.should eq(50)
+          expect(result.age).to eq(50)
         end
       end
     end
@@ -108,7 +108,7 @@ describe Mongoid::Findable do
         context "when no block is provided" do
 
           it "returns nil" do
-            Person.find_by(ssn: "333-22-1111").should be_nil
+            expect(Person.find_by(ssn: "333-22-1111")).to be_nil
           end
         end
 
@@ -121,7 +121,7 @@ describe Mongoid::Findable do
           end
 
           it "returns nil" do
-            result.should be_nil
+            expect(result).to be_nil
           end
         end
       end
@@ -137,7 +137,7 @@ describe Mongoid::Findable do
       end
 
       it "returns the document" do
-        Person.first_or_create.should eq(person)
+        expect(Person.first_or_create).to eq(person)
       end
     end
 
@@ -154,7 +154,7 @@ describe Mongoid::Findable do
         end
 
         it "returns the new document" do
-          from_db.person.should eq(person)
+          expect(from_db.person).to eq(person)
         end
       end
 
@@ -165,11 +165,11 @@ describe Mongoid::Findable do
         end
 
         it "creates a persisted document" do
-          person.should be_persisted
+          expect(person).to be_persisted
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          expect(person.title).to eq("Senorita")
         end
       end
 
@@ -182,15 +182,15 @@ describe Mongoid::Findable do
         end
 
         it "creates a persisted document" do
-          person.should be_persisted
+          expect(person).to be_persisted
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          expect(person.title).to eq("Senorita")
         end
 
         it "calls the block" do
-          person.pets.should be_true
+          expect(person.pets).to be_true
         end
       end
     end
@@ -205,7 +205,7 @@ describe Mongoid::Findable do
       end
 
       it "returns the document" do
-        Person.first_or_create.should eq(person)
+        expect(Person.first_or_create).to eq(person)
       end
     end
 
@@ -222,11 +222,11 @@ describe Mongoid::Findable do
         end
 
         it "returns the new document" do
-          found.person.should eq(person)
+          expect(found.person).to eq(person)
         end
 
         it "does not save the document" do
-          found.should_not be_persisted
+          expect(found).to_not be_persisted
         end
       end
 
@@ -241,11 +241,11 @@ describe Mongoid::Findable do
         end
 
         it "creates a non persisted document" do
-          person.should_not be_persisted
+          expect(person).to_not be_persisted
         end
 
         it "sets the attributes" do
-          person.title.should eq("esquire")
+          expect(person.title).to eq("esquire")
         end
       end
 
@@ -258,15 +258,15 @@ describe Mongoid::Findable do
         end
 
         it "creates a new document" do
-          person.should_not be_persisted
+          expect(person).to_not be_persisted
         end
 
         it "sets the attributes" do
-          person.title.should eq("Senorita")
+          expect(person.title).to eq("Senorita")
         end
 
         it "calls the block" do
-          person.pets.should be_true
+          expect(person.pets).to be_true
         end
       end
     end
@@ -293,7 +293,7 @@ describe Mongoid::Findable do
       end
 
       it "returns the field values" do
-        plucked.should eq([ "Depeche Mode", "Tool", "Photek" ])
+        expect(plucked).to eq([ "Depeche Mode", "Tool", "Photek" ])
       end
     end
 
@@ -304,7 +304,7 @@ describe Mongoid::Findable do
       end
 
       it "returns an empty array" do
-        plucked.should be_empty
+        expect(plucked).to be_empty
       end
     end
   end
@@ -314,7 +314,7 @@ describe Mongoid::Findable do
     describe "##{method}" do
 
       it "forwards the #{method} to the criteria" do
-        Band.should respond_to(method)
+        expect(Band).to respond_to(method)
       end
     end
   end

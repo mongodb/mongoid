@@ -25,21 +25,21 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
   describe "#delete_modifier" do
 
     it "returns $pull" do
-      many.delete_modifier.should eq("$pull")
+      expect(many.delete_modifier).to eq("$pull")
     end
   end
 
   describe "#document" do
 
     it "returns the document" do
-      many.document.should eq(address)
+      expect(many.document).to eq(address)
     end
   end
 
   describe "#insert_modifier" do
 
     it "returns $push" do
-      many.insert_modifier.should eq("$push")
+      expect(many.insert_modifier).to eq("$push")
     end
   end
 
@@ -48,7 +48,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
     context "when the document is embedded one level" do
 
       it "returns the name of the relation" do
-        many.path.should eq("addresses")
+        expect(many.path).to eq("addresses")
       end
     end
 
@@ -67,7 +67,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
       end
 
       it "returns the nested path to the relation" do
-        many.path.should eq("addresses.locations")
+        expect(many.path).to eq("addresses.locations")
       end
     end
   end
@@ -85,12 +85,12 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
           person.phones << phone
         end
         it "return the name of the store_as in relation" do
-          many.position.should eq("mobile_phones")
+          expect(many.position).to eq("mobile_phones")
         end
       end
 
       it "returns the name of the relation" do
-        many.position.should eq("addresses")
+        expect(many.position).to eq("addresses")
       end
     end
 
@@ -111,7 +111,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
       end
 
       it "returns the nested position to the relation" do
-        many.position.should eq("addresses.0.locations.0")
+        expect(many.position).to eq("addresses.0.locations.0")
       end
     end
   end
@@ -121,7 +121,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
     context "when the document is embedded one level" do
 
       it "returns the the hash with parent selector" do
-        many.selector.should eq(
+        expect(many.selector).to eq(
           { "_id" => person._id, "addresses._id" => address._id }
         )
       end
@@ -146,7 +146,7 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
       end
 
       it "returns the hash with all parent selectors" do
-        many.selector.should eq(
+        expect(many.selector).to eq(
           {
             "_id" => person._id,
             "addresses._id" => address._id,

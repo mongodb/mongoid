@@ -9,19 +9,19 @@ describe Mongoid::Errors::TooManyNestedAttributeRecords do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Accepting nested attributes for favorites is limited to 5 records."
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "More documents were sent to be processed than the allowed limit."
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "The limit is set as an option to the macro, for example:"
       )
     end

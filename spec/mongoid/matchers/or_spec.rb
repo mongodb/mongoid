@@ -27,14 +27,14 @@ describe Mongoid::Matchers::Or do
         end
 
         it "returns true" do
-          matches.should be_true
+          expect(matches).to be_true
         end
       end
 
       context "when none of the values are equal" do
 
         it "returns false" do
-          matcher.matches?([]).should be_false
+          expect(matcher.matches?([])).to be_false
         end
       end
     end
@@ -57,7 +57,7 @@ describe Mongoid::Matchers::Or do
         end
 
         it "returns true" do
-          matches.should be_true
+          expect(matches).to be_true
         end
       end
 
@@ -77,7 +77,7 @@ describe Mongoid::Matchers::Or do
         end
 
         it "returns false" do
-          matches.should be_false
+          expect(matches).to be_false
         end
       end
 
@@ -98,7 +98,7 @@ describe Mongoid::Matchers::Or do
         end
 
         it "returns false" do
-          matches.should be_false
+          expect(matches).to be_false
         end
       end
     end

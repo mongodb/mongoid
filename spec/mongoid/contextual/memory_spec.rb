@@ -27,7 +27,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns false" do
-          context.send(method).should be_false
+          expect(context.send(method)).to be_false
         end
       end
 
@@ -44,7 +44,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns true" do
-          context.send(method).should be_true
+          expect(context.send(method)).to be_true
         end
       end
     end
@@ -73,7 +73,7 @@ describe Mongoid::Contextual::Memory do
     context "context when no arguments are provided" do
 
       it "returns the number of matches" do
-        context.count.should eq(1)
+        expect(context.count).to eq(1)
       end
     end
 
@@ -86,7 +86,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns 1" do
-          count.should eq(1)
+          expect(count).to eq(1)
         end
       end
 
@@ -97,7 +97,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns 0" do
-          count.should eq(0)
+          expect(count).to eq(0)
         end
       end
     end
@@ -113,7 +113,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns 1" do
-          count.should eq(1)
+          expect(count).to eq(1)
         end
       end
 
@@ -126,7 +126,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns 0" do
-          count.should eq(0)
+          expect(count).to eq(0)
         end
       end
     end
@@ -169,31 +169,31 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "deletes the first matching document" do
-          hobrecht.should be_destroyed
+          expect(hobrecht).to be_destroyed
         end
 
         it "deletes the last matching document" do
-          friedel.should be_destroyed
+          expect(friedel).to be_destroyed
         end
 
         it "does not delete non matching docs" do
-          pfluger.should_not be_destroyed
+          expect(pfluger).to_not be_destroyed
         end
 
         it "removes the docs from the relation" do
-          person.addresses.should eq([ pfluger ])
+          expect(person.addresses).to eq([ pfluger ])
         end
 
         it "removes the docs from the context" do
-          context.entries.should be_empty
+          expect(context.entries).to be_empty
         end
 
         it "persists the changes to the database" do
-          person.reload.addresses.should eq([ pfluger ])
+          expect(person.reload.addresses).to eq([ pfluger ])
         end
 
         it "returns the number of deleted documents" do
-          deleted.should eq(2)
+          expect(deleted).to eq(2)
         end
       end
 
@@ -222,27 +222,27 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "deletes the first matching document" do
-          work.should be_destroyed
+          expect(work).to be_destroyed
         end
 
         it "does not delete non matching docs" do
-          home.should_not be_destroyed
+          expect(home).to_not be_destroyed
         end
 
         it "removes the docs from the relation" do
-          person.addresses.first.locations.should eq([ home ])
+          expect(person.addresses.first.locations).to eq([ home ])
         end
 
         it "removes the docs from the context" do
-          context.entries.should be_empty
+          expect(context.entries).to be_empty
         end
 
         it "persists the changes to the database" do
-          person.reload.addresses.first.locations.should eq([ home ])
+          expect(person.reload.addresses.first.locations).to eq([ home ])
         end
 
         it "returns the number of deleted documents" do
-          deleted.should eq(1)
+          expect(deleted).to eq(1)
         end
       end
     end
@@ -283,31 +283,31 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "deletes the first matching document" do
-        hobrecht.should be_destroyed
+        expect(hobrecht).to be_destroyed
       end
 
       it "deletes the last matching document" do
-        friedel.should be_destroyed
+        expect(friedel).to be_destroyed
       end
 
       it "does not delete non matching docs" do
-        pfluger.should_not be_destroyed
+        expect(pfluger).to_not be_destroyed
       end
 
       it "removes the docs from the relation" do
-        person.addresses.should eq([ pfluger ])
+        expect(person.addresses).to eq([ pfluger ])
       end
 
       it "removes the docs from the context" do
-        context.entries.should be_empty
+        expect(context.entries).to be_empty
       end
 
       it "persists the changes to the database" do
-        person.reload.addresses.should eq([ pfluger ])
+        expect(person.reload.addresses).to eq([ pfluger ])
       end
 
       it "returns the number of destroyed documents" do
-        destroyed.should eq(2)
+        expect(destroyed).to eq(2)
       end
     end
   end
@@ -335,7 +335,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns the distinct field values" do
-        context.distinct(:street).should eq([ "hobrecht" ])
+        expect(context.distinct(:street)).to eq([ "hobrecht" ])
       end
     end
 
@@ -352,7 +352,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns the distinct field values" do
-        context.distinct(:street).should eq([ "hobrecht", "friedel" ])
+        expect(context.distinct(:street)).to eq([ "hobrecht", "friedel" ])
       end
     end
   end
@@ -384,7 +384,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "contains no documents" do
-        context.map(&:street).should be_empty
+        expect(context.map(&:street)).to be_empty
       end
 
       context "when calling next on the enumerator" do
@@ -401,13 +401,13 @@ describe Mongoid::Contextual::Memory do
 
       it "yields mongoid documents to the block" do
         context.each do |doc|
-          doc.should be_a(Mongoid::Document)
+          expect(doc).to be_a(Mongoid::Document)
         end
       end
 
       it "iterates over the matching documents" do
         context.each do |doc|
-          doc.should eq(hobrecht)
+          expect(doc).to eq(hobrecht)
         end
       end
     end
@@ -419,7 +419,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns an enumerator" do
-        enum.should be_a(Enumerator)
+        expect(enum).to be_a(Enumerator)
       end
 
       context "when iterating over the enumerator" do
@@ -428,7 +428,7 @@ describe Mongoid::Contextual::Memory do
 
           it "yields mongoid documents to the block" do
             enum.each do |doc|
-              doc.should be_a(Mongoid::Document)
+              expect(doc).to be_a(Mongoid::Document)
             end
           end
         end
@@ -436,7 +436,7 @@ describe Mongoid::Contextual::Memory do
         context "when iterating with next" do
 
           it "yields mongoid documents" do
-            enum.next.should be_a(Mongoid::Document)
+            expect(enum.next).to be_a(Mongoid::Document)
           end
         end
       end
@@ -466,7 +466,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns true" do
-        context.should be_exists
+        expect(context).to be_exists
       end
     end
 
@@ -483,7 +483,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns false" do
-        context.should_not be_exists
+        expect(context).to_not be_exists
       end
     end
   end
@@ -511,7 +511,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns the first matching document" do
-        context.send(method).should eq(hobrecht)
+        expect(context.send(method)).to eq(hobrecht)
       end
     end
   end
@@ -539,15 +539,15 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "sets the criteria" do
-        context.criteria.should eq(criteria)
+        expect(context.criteria).to eq(criteria)
       end
 
       it "sets the klass" do
-        context.klass.should eq(Address)
+        expect(context.klass).to eq(Address)
       end
 
       it "sets the matching documents" do
-        context.documents.should eq([ hobrecht ])
+        expect(context.documents).to eq([ hobrecht ])
       end
     end
 
@@ -572,7 +572,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "limits the matching documents" do
-        context.should eq([ friedel ])
+        expect(context).to eq([ friedel ])
       end
     end
 
@@ -597,7 +597,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "limits the matching documents" do
-        context.should eq([ hobrecht ])
+        expect(context).to eq([ hobrecht ])
       end
     end
   end
@@ -623,7 +623,7 @@ describe Mongoid::Contextual::Memory do
     end
 
     it "returns the last matching document" do
-      context.last.should eq(friedel)
+      expect(context.last).to eq(friedel)
     end
   end
 
@@ -652,7 +652,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns the number of matches" do
-          context.send(method).should eq(1)
+          expect(context.send(method)).to eq(1)
         end
       end
 
@@ -669,7 +669,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns zero" do
-          context.send(method).should eq(0)
+          expect(context.send(method)).to eq(0)
         end
       end
     end
@@ -704,7 +704,7 @@ describe Mongoid::Contextual::Memory do
     end
 
     it "returns the context" do
-      limit.should eq(context)
+      expect(limit).to eq(context)
     end
 
     context "when asking for all documents" do
@@ -712,7 +712,7 @@ describe Mongoid::Contextual::Memory do
       context "when only a limit exists" do
 
         it "only returns the limited documents" do
-          context.entries.should eq([ hobrecht, friedel ])
+          expect(context.entries).to eq([ hobrecht, friedel ])
         end
       end
 
@@ -723,7 +723,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "applies the skip before the limit" do
-          context.entries.should eq([ friedel, pfluger ])
+          expect(context.entries).to eq([ friedel, pfluger ])
         end
       end
     end
@@ -758,7 +758,7 @@ describe Mongoid::Contextual::Memory do
     end
 
     it "returns the context" do
-      skip.should eq(context)
+      expect(skip).to eq(context)
     end
 
     context "when asking for all documents" do
@@ -766,7 +766,7 @@ describe Mongoid::Contextual::Memory do
       context "when only a skip exists" do
 
         it "skips the correct number" do
-          context.entries.should eq([ friedel, pfluger ])
+          expect(context.entries).to eq([ friedel, pfluger ])
         end
       end
 
@@ -777,7 +777,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "applies the skip before the limit" do
-          context.entries.should eq([ friedel ])
+          expect(context.entries).to eq([ friedel ])
         end
       end
     end
@@ -816,11 +816,11 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          context.entries.should eq([ friedel, hobrecht, pfluger ])
+          expect(context.entries).to eq([ friedel, hobrecht, pfluger ])
         end
 
         it "returns the context" do
-          sorted.should eq(context)
+          expect(sorted).to eq(context)
         end
       end
 
@@ -833,11 +833,11 @@ describe Mongoid::Contextual::Memory do
           end
 
           it "sorts the documents" do
-            context.entries.should eq([ pfluger, hobrecht, friedel ])
+            expect(context.entries).to eq([ pfluger, hobrecht, friedel ])
           end
 
           it "returns the context" do
-            sorted.should eq(context)
+            expect(sorted).to eq(context)
           end
         end
 
@@ -853,11 +853,11 @@ describe Mongoid::Contextual::Memory do
           end
 
           it "sorts the documents" do
-            context.entries.should eq([ friedel, hobrecht, pfluger ])
+            expect(context.entries).to eq([ friedel, hobrecht, pfluger ])
           end
 
           it "returns the context" do
-            sorted.should eq(context)
+            expect(sorted).to eq(context)
           end
         end
       end
@@ -880,11 +880,11 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          context.entries.should eq([ friedel, lenau, pfluger, hobrecht ])
+          expect(context.entries).to eq([ friedel, lenau, pfluger, hobrecht ])
         end
 
         it "returns the context" do
-          sorted.should eq(context)
+          expect(sorted).to eq(context)
         end
       end
 
@@ -895,11 +895,11 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          context.entries.should eq([ hobrecht, pfluger, lenau, friedel ])
+          expect(context.entries).to eq([ hobrecht, pfluger, lenau, friedel ])
         end
 
         it "returns the context" do
-          sorted.should eq(context)
+          expect(sorted).to eq(context)
         end
       end
     end
@@ -911,11 +911,11 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "does not sort the documents" do
-        context.entries.should eq([ hobrecht, friedel, pfluger ])
+        expect(context.entries).to eq([ hobrecht, friedel, pfluger ])
       end
 
       it "returns the context" do
-        sorted.should eq(context)
+        expect(sorted).to eq(context)
       end
     end
 
@@ -926,7 +926,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "sorts the documents" do
-        context.entries.should eq([ friedel, hobrecht, pfluger ])
+        expect(context.entries).to eq([ friedel, hobrecht, pfluger ])
       end
     end
   end
@@ -968,29 +968,29 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "updates the first matching document" do
-          hobrecht.number.should eq(5)
+          expect(hobrecht.number).to eq(5)
         end
 
         it "does not update the last matching document" do
-          friedel.number.should be_nil
+          expect(friedel.number).to be_nil
         end
 
         it "does not update non matching docs" do
-          pfluger.number.should be_nil
+          expect(pfluger.number).to be_nil
         end
 
         context "when reloading the embedded documents" do
 
           it "updates the first matching document" do
-            hobrecht.reload.number.should eq(5)
+            expect(hobrecht.reload.number).to eq(5)
           end
 
           it "updates the last matching document" do
-            friedel.reload.number.should be_nil
+            expect(friedel.reload.number).to be_nil
           end
 
           it "does not update non matching docs" do
-            pfluger.reload.number.should be_nil
+            expect(pfluger.reload.number).to be_nil
           end
         end
       end
@@ -998,7 +998,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          context.update.should be_false
+          expect(context.update).to be_false
         end
       end
     end
@@ -1030,21 +1030,21 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "updates the first matching document" do
-          work.number.should eq(5)
+          expect(work.number).to eq(5)
         end
 
         it "does not update non matching docs" do
-          home.number.should be_nil
+          expect(home.number).to be_nil
         end
 
         context "when reloading the embedded documents" do
 
           it "updates the first matching document" do
-            work.reload.number.should eq(5)
+            expect(work.reload.number).to eq(5)
           end
 
           it "does not update non matching docs" do
-            home.reload.number.should be_nil
+            expect(home.reload.number).to be_nil
           end
         end
       end
@@ -1052,7 +1052,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          context.update.should be_false
+          expect(context.update).to be_false
         end
       end
     end
@@ -1091,7 +1091,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns false" do
-        context.update_all({}).should be_false
+        expect(context.update_all({})).to be_false
       end
     end
 
@@ -1114,15 +1114,15 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "updates the first matching document" do
-          hobrecht.suite.should eq("10B")
+          expect(hobrecht.suite).to eq("10B")
         end
 
         it "updates the last matching document" do
-          friedel.suite.should eq("10B")
+          expect(friedel.suite).to eq("10B")
         end
 
         it "does not update non matching docs" do
-          pfluger.suite.should be_nil
+          expect(pfluger.suite).to be_nil
         end
       end
 
@@ -1133,29 +1133,29 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "updates the first matching document" do
-          hobrecht.number.should eq(5)
+          expect(hobrecht.number).to eq(5)
         end
 
         it "updates the last matching document" do
-          friedel.number.should eq(5)
+          expect(friedel.number).to eq(5)
         end
 
         it "does not update non matching docs" do
-          pfluger.number.should be_nil
+          expect(pfluger.number).to be_nil
         end
 
         context "when reloading the embedded documents" do
 
           it "updates the first matching document" do
-            hobrecht.reload.number.should eq(5)
+            expect(hobrecht.reload.number).to eq(5)
           end
 
           it "updates the last matching document" do
-            friedel.reload.number.should eq(5)
+            expect(friedel.reload.number).to eq(5)
           end
 
           it "does not update non matching docs" do
-            pfluger.reload.number.should be_nil
+            expect(pfluger.reload.number).to be_nil
           end
         end
 
@@ -1166,7 +1166,7 @@ describe Mongoid::Contextual::Memory do
           end
 
           it "does not error on the update" do
-            hobrecht.number.should eq(5)
+            expect(hobrecht.number).to eq(5)
           end
         end
       end
@@ -1174,7 +1174,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          context.update_all.should be_false
+          expect(context.update_all).to be_false
         end
       end
     end
@@ -1206,21 +1206,21 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "updates the first matching document" do
-          work.number.should eq(5)
+          expect(work.number).to eq(5)
         end
 
         it "does not update non matching docs" do
-          home.number.should be_nil
+          expect(home.number).to be_nil
         end
 
         context "when reloading the embedded documents" do
 
           it "updates the first matching document" do
-            work.reload.number.should eq(5)
+            expect(work.reload.number).to eq(5)
           end
 
           it "does not update non matching docs" do
-            home.reload.number.should be_nil
+            expect(home.reload.number).to be_nil
           end
         end
       end
@@ -1228,7 +1228,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          context.update_all.should be_false
+          expect(context.update_all).to be_false
         end
       end
     end

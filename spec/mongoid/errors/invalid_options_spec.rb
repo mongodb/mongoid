@@ -9,19 +9,19 @@ describe Mongoid::Errors::InvalidOptions do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Invalid option :invalid provided to relation :name."
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Mongoid checks the options that are passed to the relation macros"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Valid options are: valid, make sure these are the ones you are using."
       )
     end

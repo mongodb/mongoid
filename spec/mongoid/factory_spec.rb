@@ -17,7 +17,7 @@ describe Mongoid::Factory do
         end
 
         it "instantiates based on the type" do
-          person.title.should eq("Sir")
+          expect(person.title).to eq("Sir")
         end
       end
 
@@ -28,7 +28,7 @@ describe Mongoid::Factory do
         end
 
         it "instantiates the provided class" do
-          person.class.should eq(Person)
+          expect(person.class).to eq(Person)
         end
       end
 
@@ -39,7 +39,7 @@ describe Mongoid::Factory do
         end
 
         it "instantiates the subclass" do
-          person.class.should eq(Doctor)
+          expect(person.class).to eq(Doctor)
         end
       end
 
@@ -54,7 +54,7 @@ describe Mongoid::Factory do
         end
 
         it "instantiates based on the type" do
-          person.title.should eq("Sir")
+          expect(person.title).to eq("Sir")
         end
       end
 
@@ -69,7 +69,7 @@ describe Mongoid::Factory do
         end
 
         it "instantiates based on the type" do
-          person.title.should eq("Sir")
+          expect(person.title).to eq("Sir")
         end
       end
     end
@@ -85,7 +85,7 @@ describe Mongoid::Factory do
       end
 
       it "instantiates based on the provided class" do
-        person.title.should eq("Sir")
+        expect(person.title).to eq("Sir")
       end
     end
   end
@@ -99,11 +99,11 @@ describe Mongoid::Factory do
       end
 
       it "generates based on the provided class" do
-        document.should be_a(Address)
+        expect(document).to be_a(Address)
       end
 
       it "sets the attributes to empty" do
-        document.attributes.should be_empty
+        expect(document.attributes).to be_empty
       end
     end
 
@@ -120,11 +120,11 @@ describe Mongoid::Factory do
         end
 
         it "generates based on the type" do
-          document.should be_a(Person)
+          expect(document).to be_a(Person)
         end
 
         it "sets the attributes" do
-          document.title.should eq("Sir")
+          expect(document.title).to eq("Sir")
         end
       end
 
@@ -139,11 +139,11 @@ describe Mongoid::Factory do
         end
 
         it "generates based on the provided class" do
-          document.should be_a(Person)
+          expect(document).to be_a(Person)
         end
 
         it "sets the attributes" do
-          document.title.should eq("Sir")
+          expect(document.title).to eq("Sir")
         end
       end
 
@@ -158,7 +158,7 @@ describe Mongoid::Factory do
         end
 
         it "instantiates based on the type" do
-          person.title.should eq("Sir")
+          expect(person.title).to eq("Sir")
         end
       end
     end
@@ -174,11 +174,11 @@ describe Mongoid::Factory do
       end
 
       it "generates based on the provided class" do
-        document.should be_a(Person)
+        expect(document).to be_a(Person)
       end
 
       it "sets the attributes" do
-        document.title.should eq("Sir")
+        expect(document.title).to eq("Sir")
       end
     end
   end

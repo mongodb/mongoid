@@ -15,7 +15,7 @@ describe Mongoid::Components do
         mod.instance_methods.each do |method|
 
           it "includes #{method}" do
-            methods.should include(method.to_sym)
+            expect(methods).to include(method.to_sym)
           end
         end
       end

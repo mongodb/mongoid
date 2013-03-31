@@ -11,7 +11,7 @@ describe Mongoid::Matchers::Lte do
       end
 
       it "returns false" do
-        matcher.matches?("$lte" => 3).should be_false
+        expect(matcher.matches?("$lte" => 3)).to be_false
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::Matchers::Lte do
       end
 
       it "returns true" do
-        matcher.matches?("$lte" => 10).should be_true
+        expect(matcher.matches?("$lte" => 10)).to be_true
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Matchers::Lte do
       end
 
       it "returns true" do
-        matcher.matches?("$lte" => 5).should be_true
+        expect(matcher.matches?("$lte" => 5)).to be_true
       end
     end
 
@@ -44,7 +44,7 @@ describe Mongoid::Matchers::Lte do
       end
 
       it "returns false" do
-        matcher.matches?("$lte" => 5).should be_false
+        expect(matcher.matches?("$lte" => 5)).to be_false
       end
     end
 
@@ -55,7 +55,7 @@ describe Mongoid::Matchers::Lte do
         end
 
         it "returns true" do
-          matcher.matches?("$lte" => 5).should be_true
+          expect(matcher.matches?("$lte" => 5)).to be_true
         end
       end
 
@@ -65,7 +65,7 @@ describe Mongoid::Matchers::Lte do
         end
 
         it "returns false" do
-          matcher.matches?("$lte" => 5).should be_false
+          expect(matcher.matches?("$lte" => 5)).to be_false
         end
 
       end

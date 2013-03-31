@@ -7,14 +7,14 @@ describe Mongoid::Extensions::Symbol do
     context "when the object is not a symbol" do
 
       it "returns the symbol" do
-        Symbol.demongoize("test").should eq(:test)
+        expect(Symbol.demongoize("test")).to eq(:test)
       end
     end
 
     context "when the object is nil" do
 
       it "returns nil" do
-        Symbol.demongoize(nil).should be_nil
+        expect(Symbol.demongoize(nil)).to be_nil
       end
     end
   end
@@ -24,28 +24,28 @@ describe Mongoid::Extensions::Symbol do
     context "when the string is id" do
 
       it "returns true" do
-        :id.should be_mongoid_id
+        expect(:id).to be_mongoid_id
       end
     end
 
     context "when the string is _id" do
 
       it "returns true" do
-        :_id.should be_mongoid_id
+        expect(:_id).to be_mongoid_id
       end
     end
 
     context "when the string contains id" do
 
       it "returns false" do
-        :identity.should_not be_mongoid_id
+        expect(:identity).to_not be_mongoid_id
       end
     end
 
     context "when the string contains _id" do
 
       it "returns false" do
-        :something_id.should_not be_mongoid_id
+        expect(:something_id).to_not be_mongoid_id
       end
     end
   end
@@ -55,14 +55,14 @@ describe Mongoid::Extensions::Symbol do
     context "when the object is not a symbol" do
 
       it "returns the symbol" do
-        Symbol.mongoize("test").should eq(:test)
+        expect(Symbol.mongoize("test")).to eq(:test)
       end
     end
 
     context "when the object is nil" do
 
       it "returns nil" do
-        Symbol.mongoize(nil).should be_nil
+        expect(Symbol.mongoize(nil)).to be_nil
       end
     end
   end
@@ -70,7 +70,7 @@ describe Mongoid::Extensions::Symbol do
   describe "#mongoize" do
 
     it "returns self" do
-      :test.mongoize.should eq(:test)
+      expect(:test.mongoize).to eq(:test)
     end
   end
 end

@@ -29,17 +29,17 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "performs the validation on the correct collection" do
-              websters.should_not be_valid
+              expect(websters).to_not be_valid
             end
 
             it "adds the uniqueness error" do
               websters.valid?
-              websters.errors[:name].should_not be_nil
+              expect(websters.errors[:name]).to_not be_nil
             end
 
             it "clears the persistence options in the thread local" do
               websters.valid?
-              Dictionary.persistence_options.should be_nil
+              expect(Dictionary.persistence_options).to be_nil
             end
           end
 
@@ -50,12 +50,12 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "performs the validation on the correct collection" do
-              oxford.should be_valid
+              expect(oxford).to be_valid
             end
 
             it "does not clear the persistence options in the thread local" do
               oxford.valid?
-              Dictionary.persistence_options.should_not be_nil
+              expect(Dictionary.persistence_options).to_not be_nil
             end
           end
         end
@@ -84,7 +84,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              word.should be_valid
+              expect(word).to be_valid
             end
           end
         end
@@ -114,12 +114,12 @@ describe Mongoid::Validations::UniquenessValidator do
                 end
 
                 it "returns false" do
-                  dictionary.should_not be_valid
+                  expect(dictionary).to_not be_valid
                 end
 
                 it "adds the uniqueness error" do
                   dictionary.valid?
-                  dictionary.errors[:description].should eq([ "is already taken" ])
+                  expect(dictionary.errors[:description]).to eq([ "is already taken" ])
                 end
               end
             end
@@ -149,12 +149,12 @@ describe Mongoid::Validations::UniquenessValidator do
                 end
 
                 it "returns false" do
-                  dictionary.should_not be_valid
+                  expect(dictionary).to_not be_valid
                 end
 
                 it "adds the uniqueness error" do
                   dictionary.valid?
-                  dictionary.errors[:description].should eq([ "is already taken" ])
+                  expect(dictionary.errors[:description]).to eq([ "is already taken" ])
                 end
               end
             end
@@ -182,7 +182,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
 
             context "when subsequently cloning the document" do
@@ -192,7 +192,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false for the clone" do
-                clone.should_not be_valid
+                expect(clone).to_not be_valid
               end
             end
           end
@@ -210,12 +210,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 dictionary.valid?
-                dictionary.errors[:name].should eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
               end
             end
 
@@ -228,7 +228,7 @@ describe Mongoid::Validations::UniquenessValidator do
                 end
 
                 it "returns true" do
-                  dictionary.should be_valid
+                  expect(dictionary).to be_valid
                 end
               end
 
@@ -247,7 +247,7 @@ describe Mongoid::Validations::UniquenessValidator do
                 end
 
                 it "returns true" do
-                  from_db.should be_valid
+                  expect(from_db).to be_valid
                 end
 
                 it "does not touch the database" do
@@ -284,7 +284,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
             end
           end
@@ -311,7 +311,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -326,7 +326,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -341,7 +341,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -356,7 +356,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -373,12 +373,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                dictionary.errors[:name].should eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
               end
             end
 
@@ -389,7 +389,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                dictionary.should be_valid
+                expect(dictionary).to be_valid
               end
             end
           end
@@ -416,7 +416,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -431,7 +431,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -456,7 +456,7 @@ describe Mongoid::Validations::UniquenessValidator do
 
             it "should set an error for associated object not being unique" do
               item.update_attributes(folder_id: personal_folder.id)
-              item.errors.messages[:name].first.should eq("is already taken")
+              expect(item.errors.messages[:name].first).to eq("is already taken")
             end
           end
 
@@ -471,7 +471,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -486,7 +486,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -503,12 +503,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                dictionary.errors[:name].should eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
               end
             end
 
@@ -519,7 +519,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                dictionary.should be_valid
+                expect(dictionary).to be_valid
               end
             end
 
@@ -542,12 +542,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                dictionary.errors[:name].should eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
               end
             end
           end
@@ -574,7 +574,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -597,7 +597,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -612,7 +612,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -635,7 +635,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -660,12 +660,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
 
               it "adds the uniqueness errors" do
                 dictionary.valid?
-                dictionary.errors[:name].should eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
               end
             end
 
@@ -680,7 +680,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                dictionary.should be_valid
+                expect(dictionary).to be_valid
               end
             end
           end
@@ -707,7 +707,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
 
@@ -724,12 +724,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 dictionary.valid?
-                dictionary.errors[:name].should eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
               end
             end
 
@@ -740,7 +740,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                dictionary.should be_valid
+                expect(dictionary).to be_valid
               end
             end
           end
@@ -769,7 +769,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                dictionary.should be_valid
+                expect(dictionary).to be_valid
               end
             end
 
@@ -784,7 +784,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                dictionary.should be_valid
+                expect(dictionary).to be_valid
               end
             end
           end
@@ -802,12 +802,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                dictionary.should_not be_valid
+                expect(dictionary).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 dictionary.valid?
-                dictionary.errors[:name].should eq([ "is already taken" ])
+                expect(dictionary.errors[:name]).to eq([ "is already taken" ])
               end
             end
 
@@ -818,7 +818,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                dictionary.should be_valid
+                expect(dictionary).to be_valid
               end
             end
           end
@@ -845,7 +845,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
         end
@@ -871,7 +871,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              dictionary.should be_valid
+              expect(dictionary).to be_valid
             end
           end
         end
@@ -900,7 +900,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
 
@@ -917,12 +917,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                login.should_not be_valid
+                expect(login).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 login.valid?
-                login.errors[:username].should eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "is already taken" ])
               end
             end
 
@@ -933,7 +933,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                login.should be_valid
+                expect(login).to be_valid
               end
             end
           end
@@ -960,7 +960,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
 
@@ -975,7 +975,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
 
@@ -990,7 +990,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
 
@@ -1005,7 +1005,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
 
@@ -1022,12 +1022,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                login.should_not be_valid
+                expect(login).to_not be_valid
               end
 
               it "adds the uniqueness errors" do
                 login.valid?
-                login.errors[:username].should eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "is already taken" ])
               end
             end
 
@@ -1038,7 +1038,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                login.should be_valid
+                expect(login).to be_valid
               end
             end
           end
@@ -1065,7 +1065,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
 
@@ -1082,12 +1082,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                login.should_not be_valid
+                expect(login).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 login.valid?
-                login.errors[:username].should eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "is already taken" ])
               end
             end
 
@@ -1098,7 +1098,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                login.should be_valid
+                expect(login).to be_valid
               end
             end
           end
@@ -1127,7 +1127,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                login.should be_valid
+                expect(login).to be_valid
               end
             end
 
@@ -1142,7 +1142,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                login.should be_valid
+                expect(login).to be_valid
               end
             end
           end
@@ -1160,12 +1160,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                login.should_not be_valid
+                expect(login).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 login.valid?
-                login.errors[:username].should eq([ "is already taken" ])
+                expect(login.errors[:username]).to eq([ "is already taken" ])
               end
             end
 
@@ -1176,7 +1176,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                login.should be_valid
+                expect(login).to be_valid
               end
             end
           end
@@ -1203,7 +1203,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
         end
@@ -1229,7 +1229,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              login.should be_valid
+              expect(login).to be_valid
             end
           end
         end
@@ -1279,7 +1279,7 @@ describe Mongoid::Validations::UniquenessValidator do
           end
 
           it "returns true" do
-            def_two.should be_valid
+            expect(def_two).to be_valid
           end
         end
       end
@@ -1307,7 +1307,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1324,12 +1324,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                definition.should_not be_valid
+                expect(definition).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 definition.valid?
-                definition.errors[:description].should eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "is already taken" ])
               end
             end
 
@@ -1340,7 +1340,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                definition.should be_valid
+                expect(definition).to be_valid
               end
             end
           end
@@ -1369,7 +1369,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1390,7 +1390,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1408,7 +1408,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1429,7 +1429,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1452,12 +1452,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                definition.should_not be_valid
+                expect(definition).to_not be_valid
               end
 
               it "adds the uniqueness errors" do
                 definition.valid?
-                definition.errors[:description].should eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "is already taken" ])
               end
             end
 
@@ -1471,7 +1471,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                definition.should be_valid
+                expect(definition).to be_valid
               end
             end
           end
@@ -1501,7 +1501,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1524,7 +1524,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1542,7 +1542,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1565,7 +1565,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1590,12 +1590,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                definition.should_not be_valid
+                expect(definition).to_not be_valid
               end
 
               it "adds the uniqueness errors" do
                 definition.valid?
-                definition.errors[:description].should eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "is already taken" ])
               end
             end
 
@@ -1610,7 +1610,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                definition.should be_valid
+                expect(definition).to be_valid
               end
             end
           end
@@ -1637,7 +1637,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
 
@@ -1654,12 +1654,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                definition.should_not be_valid
+                expect(definition).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 definition.valid?
-                definition.errors[:description].should eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "is already taken" ])
               end
             end
 
@@ -1670,7 +1670,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                definition.should be_valid
+                expect(definition).to be_valid
               end
             end
           end
@@ -1699,7 +1699,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                definition.should be_valid
+                expect(definition).to be_valid
               end
             end
 
@@ -1714,7 +1714,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                definition.should be_valid
+                expect(definition).to be_valid
               end
             end
           end
@@ -1732,12 +1732,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                definition.should_not be_valid
+                expect(definition).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 definition.valid?
-                definition.errors[:description].should eq([ "is already taken" ])
+                expect(definition.errors[:description]).to eq([ "is already taken" ])
               end
             end
 
@@ -1748,7 +1748,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                definition.should be_valid
+                expect(definition).to be_valid
               end
             end
           end
@@ -1775,7 +1775,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
         end
@@ -1801,7 +1801,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              definition.should be_valid
+              expect(definition).to be_valid
             end
           end
         end
@@ -1830,7 +1830,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              word_origin.should be_valid
+              expect(word_origin).to be_valid
             end
           end
 
@@ -1847,12 +1847,12 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns false" do
-                word_origin.should_not be_valid
+                expect(word_origin).to_not be_valid
               end
 
               it "adds the uniqueness error" do
                 word_origin.valid?
-                word_origin.errors[:origin_id].should eq([ "is already taken" ])
+                expect(word_origin.errors[:origin_id]).to eq([ "is already taken" ])
               end
             end
 
@@ -1863,7 +1863,7 @@ describe Mongoid::Validations::UniquenessValidator do
               end
 
               it "returns true" do
-                word_origin.should be_valid
+                expect(word_origin).to be_valid
               end
             end
           end
@@ -1890,7 +1890,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              word_origin.should be_valid
+              expect(word_origin).to be_valid
             end
           end
         end
@@ -1916,7 +1916,7 @@ describe Mongoid::Validations::UniquenessValidator do
             end
 
             it "returns true" do
-              word_origin.should be_valid
+              expect(word_origin).to be_valid
             end
           end
         end
@@ -1938,7 +1938,7 @@ describe Mongoid::Validations::UniquenessValidator do
       end
 
       it "always returns true" do
-        pronunciation.should be_valid
+        expect(pronunciation).to be_valid
       end
     end
   end
@@ -1954,7 +1954,7 @@ describe Mongoid::Validations::UniquenessValidator do
     end
 
     it "adds the validation only to the instance" do
-      validators.should eq([ described_class ])
+      expect(validators).to eq([ described_class ])
     end
   end
 
@@ -1975,8 +1975,8 @@ describe Mongoid::Validations::UniquenessValidator do
 
     it "should be invalid" do
       subclass_document_with_duplicated_name.tap do |d|
-        d.should be_invalid
-        d.errors[:name].should eq([ "is already taken" ])
+        expect(d).to be_invalid
+        expect(d.errors[:name]).to eq([ "is already taken" ])
       end
     end
   end

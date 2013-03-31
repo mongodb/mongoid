@@ -21,23 +21,23 @@ describe Mongoid::Persistence::Atomic::Pop do
         end
 
         it "pops the value from the array" do
-          person.aliases.should eq([ "007", "008" ])
+          expect(person.aliases).to eq([ "007", "008" ])
         end
 
         it "persists the data" do
-          reloaded.aliases.should eq([ "007", "008" ])
+          expect(reloaded.aliases).to eq([ "007", "008" ])
         end
 
         it "removes the field from the dirty attributes" do
-          person.changes["aliases"].should be_nil
+          expect(person.changes["aliases"]).to be_nil
         end
 
         it "resets the document dirty flag" do
-          person.should_not be_changed
+          expect(person).to_not be_changed
         end
 
         it "returns the new array value" do
-          popped.should eq([ "007", "008" ])
+          expect(popped).to eq([ "007", "008" ])
         end
       end
 
@@ -52,23 +52,23 @@ describe Mongoid::Persistence::Atomic::Pop do
         end
 
         it "pops the value from the array" do
-          person.aliases.should eq([ "008", "009" ])
+          expect(person.aliases).to eq([ "008", "009" ])
         end
 
         it "persists the data" do
-          reloaded.aliases.should eq([ "008", "009" ])
+          expect(reloaded.aliases).to eq([ "008", "009" ])
         end
 
         it "removes the field from the dirty attributes" do
-          person.changes["aliases"].should be_nil
+          expect(person.changes["aliases"]).to be_nil
         end
 
         it "resets the document dirty flag" do
-          person.should_not be_changed
+          expect(person).to_not be_changed
         end
 
         it "returns the new array value" do
-          popped.should eq([ "008", "009" ])
+          expect(popped).to eq([ "008", "009" ])
         end
       end
     end
@@ -88,23 +88,23 @@ describe Mongoid::Persistence::Atomic::Pop do
       end
 
       it "does not modify the field" do
-        person.aliases.should be_nil
+        expect(person.aliases).to be_nil
       end
 
       it "persists no data" do
-        reloaded.aliases.should be_nil
+        expect(reloaded.aliases).to be_nil
       end
 
       it "removes the field from the dirty attributes" do
-        person.changes["aliases"].should be_nil
+        expect(person.changes["aliases"]).to be_nil
       end
 
       it "resets the document dirty flag" do
-        person.should_not be_changed
+        expect(person).to_not be_changed
       end
 
       it "returns nil" do
-        popped.should be_nil
+        expect(popped).to be_nil
       end
     end
   end

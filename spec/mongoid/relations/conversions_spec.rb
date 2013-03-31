@@ -19,7 +19,7 @@ describe Mongoid::Relations::Conversions do
       end
 
       it "returns the object" do
-        flagged.should eq(object)
+        expect(flagged).to eq(object)
       end
     end
 
@@ -58,7 +58,7 @@ describe Mongoid::Relations::Conversions do
         end
 
         it "returns the object id" do
-          flagged.should eq(object)
+          expect(flagged).to eq(object)
         end
       end
 
@@ -73,11 +73,11 @@ describe Mongoid::Relations::Conversions do
         end
 
         it "returns the string" do
-          flagged.should eq(object)
+          expect(flagged).to eq(object)
         end
 
         it "marks the string as unconvertable" do
-          flagged.should be_unconvertable_to_bson
+          expect(flagged).to be_unconvertable_to_bson
         end
       end
     end
@@ -99,7 +99,7 @@ describe Mongoid::Relations::Conversions do
         end
 
         it "returns the object id" do
-          flagged.should eq(object)
+          expect(flagged).to eq(object)
         end
       end
 
@@ -114,11 +114,11 @@ describe Mongoid::Relations::Conversions do
         end
 
         it "returns the integer" do
-          flagged.should eq(15)
+          expect(flagged).to eq(15)
         end
 
         it "marks the integer as unconvertable" do
-          flagged.should be_unconvertable_to_bson
+          expect(flagged).to be_unconvertable_to_bson
         end
       end
     end

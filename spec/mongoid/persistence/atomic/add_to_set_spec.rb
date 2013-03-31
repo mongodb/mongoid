@@ -17,15 +17,15 @@ describe Mongoid::Persistence::Atomic::AddToSet do
         end
 
         it "adds the value onto the array" do
-          person.aliases.should eq([ "Bond" ])
+          expect(person.aliases).to eq([ "Bond" ])
         end
 
         it "does not reset the dirty flagging" do
-          person.changes["aliases"].should eq([nil, ["Bond"]])
+          expect(person.changes["aliases"]).to eq([nil, ["Bond"]])
         end
 
         it "returns the new array value" do
-          added.should eq([ "Bond" ])
+          expect(added).to eq([ "Bond" ])
         end
       end
 
@@ -36,15 +36,15 @@ describe Mongoid::Persistence::Atomic::AddToSet do
         end
 
         it "adds the value onto the array" do
-          person.aliases.should eq([ "Bond", "James" ])
+          expect(person.aliases).to eq([ "Bond", "James" ])
         end
 
         it "does not reset the dirty flagging" do
-          person.changes["aliases"].should eq([nil, ["Bond", "James"]])
+          expect(person.changes["aliases"]).to eq([nil, ["Bond", "James"]])
         end
 
         it "returns the new array value" do
-          added.should eq([ "Bond", "James" ])
+          expect(added).to eq([ "Bond", "James" ])
         end
       end
     end
@@ -68,23 +68,23 @@ describe Mongoid::Persistence::Atomic::AddToSet do
           end
 
           it "adds the value onto the array" do
-            person.aliases.should eq([ "007", "Bond" ])
+            expect(person.aliases).to eq([ "007", "Bond" ])
           end
 
           it "persists the data" do
-            reloaded.aliases.should eq([ "007", "Bond" ])
+            expect(reloaded.aliases).to eq([ "007", "Bond" ])
           end
 
           it "removes the field from the dirty attributes" do
-            person.changes["aliases"].should be_nil
+            expect(person.changes["aliases"]).to be_nil
           end
 
           it "resets the document dirty flag" do
-            person.should_not be_changed
+            expect(person).to_not be_changed
           end
 
           it "returns the new array value" do
-            added.should eq([ "007", "Bond" ])
+            expect(added).to eq([ "007", "Bond" ])
           end
         end
 
@@ -99,23 +99,23 @@ describe Mongoid::Persistence::Atomic::AddToSet do
           end
 
           it "adds the value onto the array" do
-            person.aliases.should eq([ "007", "Bond", "James" ])
+            expect(person.aliases).to eq([ "007", "Bond", "James" ])
           end
 
           it "persists the data" do
-            reloaded.aliases.should eq([ "007", "Bond", "James" ])
+            expect(reloaded.aliases).to eq([ "007", "Bond", "James" ])
           end
 
           it "removes the field from the dirty attributes" do
-            person.changes["aliases"].should be_nil
+            expect(person.changes["aliases"]).to be_nil
           end
 
           it "resets the document dirty flag" do
-            person.should_not be_changed
+            expect(person).to_not be_changed
           end
 
           it "returns the new array value" do
-            added.should eq([ "007", "Bond", "James" ])
+            expect(added).to eq([ "007", "Bond", "James" ])
           end
         end
       end
@@ -137,23 +137,23 @@ describe Mongoid::Persistence::Atomic::AddToSet do
           end
 
           it "does not add the value" do
-            person.aliases.should eq([ "Bond" ])
+            expect(person.aliases).to eq([ "Bond" ])
           end
 
           it "persists the data" do
-            reloaded.aliases.should eq([ "Bond" ])
+            expect(reloaded.aliases).to eq([ "Bond" ])
           end
 
           it "removes the field from the dirty attributes" do
-            person.changes["aliases"].should be_nil
+            expect(person.changes["aliases"]).to be_nil
           end
 
           it "resets the document dirty flag" do
-            person.should_not be_changed
+            expect(person).to_not be_changed
           end
 
           it "returns the array value" do
-            added.should eq([ "Bond" ])
+            expect(added).to eq([ "Bond" ])
           end
         end
 
@@ -168,23 +168,23 @@ describe Mongoid::Persistence::Atomic::AddToSet do
           end
 
           it "does not add the duplicate value" do
-            person.aliases.should eq([ "Bond", "James" ])
+            expect(person.aliases).to eq([ "Bond", "James" ])
           end
 
           it "persists the data" do
-            reloaded.aliases.should eq([ "Bond", "James" ])
+            expect(reloaded.aliases).to eq([ "Bond", "James" ])
           end
 
           it "removes the field from the dirty attributes" do
-            person.changes["aliases"].should be_nil
+            expect(person.changes["aliases"]).to be_nil
           end
 
           it "resets the document dirty flag" do
-            person.should_not be_changed
+            expect(person).to_not be_changed
           end
 
           it "returns the array value" do
-            added.should eq([ "Bond", "James" ])
+            expect(added).to eq([ "Bond", "James" ])
           end
         end
       end
@@ -207,23 +207,23 @@ describe Mongoid::Persistence::Atomic::AddToSet do
         end
 
         it "adds the value onto the array" do
-          person.aliases.should eq([ "Bond" ])
+          expect(person.aliases).to eq([ "Bond" ])
         end
 
         it "persists the data" do
-          reloaded.aliases.should eq([ "Bond" ])
+          expect(reloaded.aliases).to eq([ "Bond" ])
         end
 
         it "removes the field from the dirty attributes" do
-          person.changes["aliases"].should be_nil
+          expect(person.changes["aliases"]).to be_nil
         end
 
         it "resets the document dirty flag" do
-          person.should_not be_changed
+          expect(person).to_not be_changed
         end
 
         it "returns the new array value" do
-          added.should eq([ "Bond" ])
+          expect(added).to eq([ "Bond" ])
         end
       end
 
@@ -238,23 +238,23 @@ describe Mongoid::Persistence::Atomic::AddToSet do
         end
 
         it "adds the value onto the array" do
-          person.aliases.should eq([ "Bond", "James" ])
+          expect(person.aliases).to eq([ "Bond", "James" ])
         end
 
         it "persists the data" do
-          reloaded.aliases.should eq([ "Bond", "James" ])
+          expect(reloaded.aliases).to eq([ "Bond", "James" ])
         end
 
         it "removes the field from the dirty attributes" do
-          person.changes["aliases"].should be_nil
+          expect(person.changes["aliases"]).to be_nil
         end
 
         it "resets the document dirty flag" do
-          person.should_not be_changed
+          expect(person).to_not be_changed
         end
 
         it "returns the new array value" do
-          added.should eq([ "Bond", "James" ])
+          expect(added).to eq([ "Bond", "James" ])
         end
       end
     end

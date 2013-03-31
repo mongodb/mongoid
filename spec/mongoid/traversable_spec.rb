@@ -24,11 +24,11 @@ describe Mongoid::Traversable do
       end
 
       it "includes embeds_one documents" do
-        person._children.should include(name)
+        expect(person._children).to include(name)
       end
 
       it "includes embeds_many documents" do
-        person._children.should include(address)
+        expect(person._children).to include(address)
       end
     end
 
@@ -53,15 +53,15 @@ describe Mongoid::Traversable do
       end
 
       it "includes embeds_one documents" do
-        person._children.should include(name)
+        expect(person._children).to include(name)
       end
 
       it "includes embeds_many documents" do
-        person._children.should include(address)
+        expect(person._children).to include(address)
       end
 
       it "includes embedded documents multiple levels deep" do
-        person._children.should include(location)
+        expect(person._children).to include(location)
       end
     end
   end
@@ -71,14 +71,14 @@ describe Mongoid::Traversable do
     context "when the document is a subclass" do
 
       it "returns true" do
-        Circle.should be_hereditary
+        expect(Circle).to be_hereditary
       end
     end
 
     context "when the document is not a subclass" do
 
       it "returns false" do
-        Shape.should_not be_hereditary
+        expect(Shape).to_not be_hereditary
       end
     end
   end
@@ -88,14 +88,14 @@ describe Mongoid::Traversable do
     context "when the document is a subclass" do
 
       it "returns true" do
-        Circle.new.should be_hereditary
+        expect(Circle.new).to be_hereditary
       end
     end
 
     context "when the document is not a subclass" do
 
       it "returns false" do
-        Shape.new.should_not be_hereditary
+        expect(Shape.new).to_not be_hereditary
       end
     end
   end
@@ -115,7 +115,7 @@ describe Mongoid::Traversable do
     end
 
     it "sets the parent document" do
-      address._parent.should eq(person)
+      expect(address._parent).to eq(person)
     end
   end
 
@@ -136,7 +136,7 @@ describe Mongoid::Traversable do
       end
 
       it "removes the relation instance" do
-        person.name.should be_nil
+        expect(person.name).to be_nil
       end
     end
 
@@ -151,7 +151,7 @@ describe Mongoid::Traversable do
       end
 
       it "removes the document from the relation target" do
-        person.addresses.should be_empty
+        expect(person.addresses).to be_empty
       end
     end
   end
@@ -173,14 +173,14 @@ describe Mongoid::Traversable do
     context "when the document is not the root" do
 
       it "returns the root" do
-        address._root.should eq(person)
+        expect(address._root).to eq(person)
       end
     end
 
     context "when the document is the root" do
 
       it "returns self" do
-        person._root.should eq(person)
+        expect(person._root).to eq(person)
       end
     end
   end
@@ -196,7 +196,7 @@ describe Mongoid::Traversable do
         end
 
         it "returns true" do
-          band.should be__root
+          expect(band).to be__root
         end
       end
 
@@ -209,7 +209,7 @@ describe Mongoid::Traversable do
         context "when the document is root in a cyclic relation" do
 
           it "returns true" do
-            root_role.should be__root
+            expect(root_role).to be__root
           end
         end
 
@@ -220,7 +220,7 @@ describe Mongoid::Traversable do
           end
 
           it "returns false" do
-            child_role.should_not be__root
+            expect(child_role).to_not be__root
           end
         end
       end
@@ -237,7 +237,7 @@ describe Mongoid::Traversable do
       end
 
       it "returns false" do
-        address.should_not be__root
+        expect(address).to_not be__root
       end
     end
   end

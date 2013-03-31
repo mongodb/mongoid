@@ -22,7 +22,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "returns the option" do
-        builder.allow_destroy?.should be_true
+        expect(builder.allow_destroy?).to be_true
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "returns false" do
-        builder.allow_destroy?.should be_false
+        expect(builder.allow_destroy?).to be_false
       end
     end
   end
@@ -76,7 +76,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "rejects the matching attributes" do
-        person.addresses.should be_empty
+        expect(person.addresses).to be_empty
       end
 
     end
@@ -96,7 +96,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "rejects the matching attributes" do
-        person.addresses.should be_empty
+        expect(person.addresses).to be_empty
       end
 
     end
@@ -120,7 +120,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "updates existing documents" do
-        person.addresses.first.street.should eq("Maybachufer")
+        expect(person.addresses.first.street).to eq("Maybachufer")
       end
     end
 
@@ -139,7 +139,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "adds new documents" do
-        person.addresses.first.street.should eq("Maybachufer")
+        expect(person.addresses.first.street).to eq("Maybachufer")
       end
     end
   end
@@ -159,7 +159,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
     end
 
     it "sorts the attributes" do
-      builder.attributes.map { |e| e[0] }.should eq([ "1", "2", "4" ])
+      expect(builder.attributes.map { |e| e[0] }).to eq([ "1", "2", "4" ])
     end
   end
 
@@ -178,7 +178,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         end
 
         it "returns true" do
-          builder.reject?(builder, { last_name: "Lang" }).should be_true
+          expect(builder.reject?(builder, { last_name: "Lang" })).to be_true
         end
       end
 
@@ -189,7 +189,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
         end
 
         it "returns false" do
-          builder.reject?(builder, { first_name: "Lang" }).should be_false
+          expect(builder.reject?(builder, { first_name: "Lang" })).to be_false
         end
       end
     end
@@ -201,7 +201,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "returns false" do
-        builder.reject?(builder,{ first_name: "Lang" }).should be_false
+        expect(builder.reject?(builder,{ first_name: "Lang" })).to be_false
       end
     end
   end
@@ -215,7 +215,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "returns the option" do
-        builder.update_only?.should be_true
+        expect(builder.update_only?).to be_true
       end
     end
 
@@ -226,7 +226,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
 
       it "returns false" do
-        builder.update_only?.should be_false
+        expect(builder.update_only?).to be_false
       end
     end
   end

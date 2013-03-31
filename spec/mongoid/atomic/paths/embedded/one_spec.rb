@@ -21,21 +21,21 @@ describe Mongoid::Atomic::Paths::Embedded::One do
   describe "#delete_modifier" do
 
     it "returns $unset" do
-      one.delete_modifier.should eq("$unset")
+      expect(one.delete_modifier).to eq("$unset")
     end
   end
 
   describe "#document" do
 
     it "returns the document" do
-      one.document.should eq(name)
+      expect(one.document).to eq(name)
     end
   end
 
   describe "#insert_modifier" do
 
     it "returns $set" do
-      one.insert_modifier.should eq("$set")
+      expect(one.insert_modifier).to eq("$set")
     end
   end
 
@@ -44,7 +44,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
     context "when the document is embedded one level" do
 
       it "returns the name of the relation" do
-        one.path.should eq("name")
+        expect(one.path).to eq("name")
       end
     end
 
@@ -68,7 +68,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
       end
 
       it "returns the nested path to the relation" do
-        one.path.should eq("phone_numbers.country_code")
+        expect(one.path).to eq("phone_numbers.country_code")
       end
     end
   end
@@ -78,7 +78,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
     context "when the document is embedded one level" do
 
       it "returns the name of the relation" do
-        one.position.should eq("name")
+        expect(one.position).to eq("name")
       end
     end
 
@@ -103,7 +103,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
       end
 
       it "returns the nested position to the relation" do
-        one.position.should eq("phone_numbers.0.country_code")
+        expect(one.position).to eq("phone_numbers.0.country_code")
       end
     end
   end
@@ -113,7 +113,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
     context "when the document is embedded one level" do
 
       it "returns the the hash with parent selector" do
-        one.selector.should eq({ "_id" => person._id, "name._id" => name._id })
+        expect(one.selector).to eq({ "_id" => person._id, "name._id" => name._id })
       end
     end
 
@@ -139,7 +139,7 @@ describe Mongoid::Atomic::Paths::Embedded::One do
       end
 
       it "returns the hash with all parent selectors" do
-        one.selector.should eq(
+        expect(one.selector).to eq(
           {
             "_id" => person._id,
             "phone_numbers._id" => phone._id,

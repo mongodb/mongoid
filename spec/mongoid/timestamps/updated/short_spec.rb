@@ -18,23 +18,23 @@ describe Mongoid::Timestamps::Updated::Short do
     end
 
     it "does not add c_at to the document" do
-      fields["c_at"].should be_nil
+      expect(fields["c_at"]).to be_nil
     end
 
     it "adds u_at to the document" do
-      fields["u_at"].should_not be_nil
+      expect(fields["u_at"]).to_not be_nil
     end
 
     it "does not add the long updated_at" do
-      fields["updated_at"].should be_nil
+      expect(fields["updated_at"]).to be_nil
     end
 
     it "forces the updated_at timestamps to UTC" do
-      agent.updated_at.should be_within(10).of(Time.now.utc)
+      expect(agent.updated_at).to be_within(10).of(Time.now.utc)
     end
 
     it "aliases the raw field" do
-      agent.u_at.should eq(agent.updated_at)
+      expect(agent.u_at).to eq(agent.updated_at)
     end
   end
 
@@ -51,11 +51,11 @@ describe Mongoid::Timestamps::Updated::Short do
       end
 
       it "does not override it with the default" do
-        doc.updated_at.should eq(time)
+        expect(doc.updated_at).to eq(time)
       end
 
       it "does not persist an auto value" do
-        doc.reload.updated_at.should eq(time)
+        expect(doc.reload.updated_at).to eq(time)
       end
     end
   end
@@ -83,8 +83,8 @@ describe Mongoid::Timestamps::Updated::Short do
     end
 
     it "runs the update callbacks" do
-      agent.updated_at.should_not be_nil
-      agent.updated_at.should be_within(10).of(Time.now.utc)
+      expect(agent.updated_at).to_not be_nil
+      expect(agent.updated_at).to be_within(10).of(Time.now.utc)
     end
   end
 end

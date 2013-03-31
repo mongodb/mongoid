@@ -11,14 +11,14 @@ describe Mongoid::Matchers::Ne do
     context "when the values are not equal" do
 
       it "returns true" do
-        matcher.matches?("$ne" => "second").should be_true
+        expect(matcher.matches?("$ne" => "second")).to be_true
       end
     end
 
     context "when the values are equal" do
 
       it "returns false" do
-        matcher.matches?("$ne" => "first").should be_false
+        expect(matcher.matches?("$ne" => "first")).to be_false
       end
     end
   end

@@ -22,7 +22,7 @@ describe Mongoid::Criterion::Marshalable do
     end
 
     it "loads the proper attributes" do
-      Marshal.load(Marshal.dump(criteria)).should eq(criteria)
+      expect(Marshal.load(Marshal.dump(criteria))).to eq(criteria)
     end
   end
 end

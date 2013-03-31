@@ -48,7 +48,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       it "sets the documents" do
-        documents.should eq(criteria)
+        expect(documents).to eq(criteria)
       end
     end
 
@@ -82,7 +82,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       it "ordered by specified filed" do
-        documents.should eq(criteria)
+        expect(documents).to eq(criteria)
       end
     end
 
@@ -103,7 +103,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         end
 
         it "returns the objects" do
-          documents.should eq(object)
+          expect(documents).to eq(object)
         end
       end
 
@@ -127,7 +127,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         end
 
         it "returns the object" do
-          documents.should eq(criteria)
+          expect(documents).to eq(criteria)
         end
       end
     end
@@ -144,7 +144,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       context "when the ids are empty" do
 
         it "returns an empty array" do
-          person.preferences.should be_empty
+          expect(person.preferences).to be_empty
         end
       end
 
@@ -155,7 +155,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         end
 
         it "returns an empty array" do
-          person.preferences.should be_empty
+          expect(person.preferences).to be_empty
         end
       end
     end
@@ -172,7 +172,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
     end
 
     it "returns the criteria" do
-      criteria.should be_empty
+      expect(criteria).to be_empty
     end
   end
 end

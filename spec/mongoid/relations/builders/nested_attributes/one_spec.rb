@@ -18,7 +18,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the option" do
-        builder.allow_destroy?.should be_true
+        expect(builder.allow_destroy?).to be_true
       end
     end
 
@@ -29,7 +29,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.allow_destroy?.should be_false
+        expect(builder.allow_destroy?).to be_false
       end
     end
   end
@@ -55,7 +55,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "does not change the relation" do
-        person.name.should be_nil
+        expect(person.name).to be_nil
       end
     end
 
@@ -74,7 +74,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "does not change the relation" do
-        person.name.should be_nil
+        expect(person.name).to be_nil
       end
     end
 
@@ -102,7 +102,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "updates the relation" do
-        person.name.last_name.should eq("Lang")
+        expect(person.name.last_name).to eq("Lang")
       end
     end
 
@@ -123,7 +123,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "updates the relation" do
-        person.name.last_name.should eq("Lang")
+        expect(person.name.last_name).to eq("Lang")
       end
     end
 
@@ -150,7 +150,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "deletes the relation" do
-        person.name.should be_nil
+        expect(person.name).to be_nil
       end
     end
   end
@@ -164,7 +164,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the value" do
-        builder.destroy.should be_true
+        expect(builder.destroy).to be_true
       end
     end
 
@@ -175,7 +175,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns nil" do
-        builder.destroy.should be_nil
+        expect(builder.destroy).to be_nil
       end
     end
   end
@@ -195,7 +195,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns true" do
-          builder.reject?(builder, { last_name: "Lang" }).should be_true
+          expect(builder.reject?(builder, { last_name: "Lang" })).to be_true
         end
       end
 
@@ -206,7 +206,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns false" do
-          builder.reject?(builder, { first_name: "Lang" }).should be_false
+          expect(builder.reject?(builder, { first_name: "Lang" })).to be_false
         end
       end
     end
@@ -218,7 +218,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.reject?(builder, { first_name: "Lang" }).should be_false
+        expect(builder.reject?(builder, { first_name: "Lang" })).to be_false
       end
     end
   end
@@ -232,7 +232,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the option" do
-        builder.update_only?.should be_true
+        expect(builder.update_only?).to be_true
       end
     end
 
@@ -243,7 +243,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.update_only?.should be_false
+        expect(builder.update_only?).to be_false
       end
     end
   end

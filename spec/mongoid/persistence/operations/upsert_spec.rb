@@ -19,15 +19,15 @@ describe Mongoid::Persistence::Operations::Upsert do
       end
 
       it "inserts the document in the database" do
-        band.reload.should eq(band)
+        expect(band.reload).to eq(band)
       end
 
       it "returns true" do
-        persisted.should be_true
+        expect(persisted).to be_true
       end
 
       it "runs the upsert callbacks" do
-        band.upserted.should be_true
+        expect(band.upserted).to be_true
       end
     end
 
@@ -48,11 +48,11 @@ describe Mongoid::Persistence::Operations::Upsert do
       end
 
       it "updates the document in the database" do
-        band.reload.name.should eq("Tool")
+        expect(band.reload.name).to eq("Tool")
       end
 
       it "returns true" do
-        persisted.should be_true
+        expect(persisted).to be_true
       end
     end
   end

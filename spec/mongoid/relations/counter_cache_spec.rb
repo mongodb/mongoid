@@ -17,7 +17,7 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'returns zero' do
-        person.reload.drugs_count.should eq(0)
+        expect(person.reload.drugs_count).to eq(0)
       end
     end
 
@@ -59,7 +59,7 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'resets to the right value' do
-        person.reload.posts_count.should eq(1)
+        expect(person.reload.posts_count).to eq(1)
       end
     end
   end
@@ -81,7 +81,7 @@ describe Mongoid::Relations::CounterCache do
         end
 
         it 'return 8' do
-          person.reload.drugs_count.should eq(8)
+          expect(person.reload.drugs_count).to eq(8)
         end
       end
 
@@ -92,7 +92,7 @@ describe Mongoid::Relations::CounterCache do
         end
 
         it 'return -2' do
-          person.reload.drugs_count.should eq(-2)
+          expect(person.reload.drugs_count).to eq(-2)
         end
       end
     end
@@ -105,7 +105,7 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'returns 2' do
-        person.reload.drugs_count.should eq(2)
+        expect(person.reload.drugs_count).to eq(2)
       end
     end
 
@@ -118,11 +118,11 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'updates drugs_counter' do
-        person.reload.drugs_count.should eq(2)
+        expect(person.reload.drugs_count).to eq(2)
       end
 
       it 'updates second_counter' do
-        person.reload.second_counter.should eq(5)
+        expect(person.reload.second_counter).to eq(5)
       end
     end
   end
@@ -138,7 +138,7 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'returns 3' do
-        person.reload.drugs_count.should eq(3)
+        expect(person.reload.drugs_count).to eq(3)
       end
     end
 
@@ -149,7 +149,7 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'returns 3' do
-        person.reload.drugs_count.should eq(3)
+        expect(person.reload.drugs_count).to eq(3)
       end
     end
   end
@@ -169,7 +169,7 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'returns 0' do
-        person.reload.drugs_count.should eq(0)
+        expect(person.reload.drugs_count).to eq(0)
       end
     end
     context 'when increment 3 times using string as argument' do
@@ -179,7 +179,7 @@ describe Mongoid::Relations::CounterCache do
       end
 
       it 'returns 0' do
-        person.reload.drugs_count.should eq(0)
+        expect(person.reload.drugs_count).to eq(0)
       end
     end
   end

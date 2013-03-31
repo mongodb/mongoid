@@ -17,7 +17,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "returns true" do
-          person.should have_game
+          expect(person).to have_game
         end
       end
 
@@ -26,14 +26,14 @@ describe Mongoid::Relations::Accessors do
         context "when not autobuilding" do
 
           it "returns false" do
-            person.should_not have_game
+            expect(person).to_not have_game
           end
         end
 
         context "when autobuilding" do
 
           it "returns false" do
-            person.should_not have_book
+            expect(person).to_not have_book
           end
         end
       end
@@ -48,14 +48,14 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "returns true" do
-          person.should have_posts
+          expect(person).to have_posts
         end
       end
 
       context "when the relation does not have documents" do
 
         it "returns false" do
-          person.should_not have_posts
+          expect(person).to_not have_posts
         end
       end
     end
@@ -69,14 +69,14 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "returns true" do
-          person.should have_preferences
+          expect(person).to have_preferences
         end
       end
 
       context "when the relation does not have documents" do
 
         it "returns false" do
-          person.should_not have_preferences
+          expect(person).to_not have_preferences
         end
       end
     end
@@ -90,7 +90,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "allows the existence check" do
-          user.should_not have_next
+          expect(user).to_not have_next
         end
       end
 
@@ -101,7 +101,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "returns true" do
-          game.should have_person
+          expect(game).to have_person
         end
       end
 
@@ -114,7 +114,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns false" do
-            game.should_not have_person
+            expect(game).to_not have_person
           end
         end
 
@@ -125,7 +125,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns false" do
-            book.should_not have_person
+            expect(book).to_not have_person
           end
         end
       end
@@ -140,7 +140,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "returns true" do
-          person.should have_name
+          expect(person).to have_name
         end
       end
 
@@ -149,7 +149,7 @@ describe Mongoid::Relations::Accessors do
         context "when the relation does not autobuild" do
 
           it "returns false" do
-            person.should_not have_name
+            expect(person).to_not have_name
           end
         end
 
@@ -160,7 +160,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns false" do
-            person.should_not have_passport
+            expect(person).to_not have_passport
           end
         end
       end
@@ -175,14 +175,14 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "returns true" do
-          person.should have_addresses
+          expect(person).to have_addresses
         end
       end
 
       context "when the relation does not have documents" do
 
         it "returns false" do
-          person.should_not have_addresses
+          expect(person).to_not have_addresses
         end
       end
     end
@@ -196,7 +196,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "returns true" do
-          name.should have_namable
+          expect(name).to have_namable
         end
       end
 
@@ -209,7 +209,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns false" do
-            name.should_not have_namable
+            expect(name).to_not have_namable
           end
         end
 
@@ -220,7 +220,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns false" do
-            passport.should_not have_person
+            expect(passport).to_not have_person
           end
         end
       end
@@ -244,11 +244,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "builds the new document" do
-            passport.should be_a(Passport)
+            expect(passport).to be_a(Passport)
           end
 
           it "stores in the altered attribute" do
-            person.as_document["pass"].should eq(passport.attributes)
+            expect(person.as_document["pass"]).to eq(passport.attributes)
           end
         end
 
@@ -259,7 +259,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "does not build a new document" do
-            person.passport.should eq(passport)
+            expect(person.passport).to eq(passport)
           end
         end
       end
@@ -277,7 +277,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "builds the new document" do
-            person.should be_a(Person)
+            expect(person).to be_a(Person)
           end
         end
 
@@ -288,7 +288,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "does not build a new document" do
-            passport.person.should eq(person)
+            expect(passport.person).to eq(person)
           end
         end
       end
@@ -302,7 +302,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "builds the new document" do
-            book.should be_a(Book)
+            expect(book).to be_a(Book)
           end
         end
 
@@ -313,7 +313,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "does not build a new document" do
-            person.book.should eq(book)
+            expect(person.book).to eq(book)
           end
         end
       end
@@ -331,7 +331,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "builds the new document" do
-            person.should be_a(Person)
+            expect(person).to be_a(Person)
           end
         end
 
@@ -342,7 +342,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "does not build a new document" do
-            book.person.should eq(person)
+            expect(book.person).to eq(person)
           end
         end
       end
@@ -371,11 +371,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            preferences.should eq([ preference ])
+            expect(preferences).to eq([ preference ])
           end
 
           it "reloads a new instance" do
-            preferences.first.should_not equal(preference)
+            expect(preferences.first).to_not equal(preference)
           end
         end
 
@@ -386,11 +386,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            preferences.should eq([ preference ])
+            expect(preferences).to eq([ preference ])
           end
 
           it "reloads a new instance" do
-            preferences.first.should_not equal(preference)
+            expect(preferences.first).to_not equal(preference)
           end
         end
 
@@ -401,7 +401,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            preferences.should eq([ preference ])
+            expect(preferences).to eq([ preference ])
           end
         end
       end
@@ -423,11 +423,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            posts.should eq([ post ])
+            expect(posts).to eq([ post ])
           end
 
           it "reloads a new instance" do
-            posts.first.should_not equal(post)
+            expect(posts.first).to_not equal(post)
           end
         end
 
@@ -438,11 +438,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            posts.should eq([ post ])
+            expect(posts).to eq([ post ])
           end
 
           it "reloads a new instance" do
-            posts.first.should_not equal(post)
+            expect(posts.first).to_not equal(post)
           end
         end
 
@@ -453,7 +453,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            posts.should eq([ post ])
+            expect(posts).to eq([ post ])
           end
         end
       end
@@ -475,11 +475,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            reloaded_game.should eq(game)
+            expect(reloaded_game).to eq(game)
           end
 
           it "reloads a new instance" do
-            reloaded_game.should_not equal(game)
+            expect(reloaded_game).to_not equal(game)
           end
         end
 
@@ -490,11 +490,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            reloaded_game.should eq(game)
+            expect(reloaded_game).to eq(game)
           end
 
           it "reloads a new instance" do
-            reloaded_game.should_not equal(game)
+            expect(reloaded_game).to_not equal(game)
           end
         end
 
@@ -505,7 +505,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "reloads the correct documents" do
-            reloaded_game.should eq(game)
+            expect(reloaded_game).to eq(game)
           end
         end
       end
@@ -538,7 +538,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns the correct document" do
-            rating.ratable.should eq(movie)
+            expect(rating.ratable).to eq(movie)
           end
         end
 
@@ -549,7 +549,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns the correct documents" do
-            ratings.should eq([ movie_rating ])
+            expect(ratings).to eq([ movie_rating ])
           end
         end
 
@@ -560,7 +560,7 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns the correct document" do
-            rating.should eq(book_rating)
+            expect(rating).to eq(book_rating)
           end
         end
       end
@@ -598,11 +598,11 @@ describe Mongoid::Relations::Accessors do
           end
 
           it "returns the correct type" do
-            eye.eyeable.should be_a(Face)
+            expect(eye.eyeable).to be_a(Face)
           end
 
           it "returns the correct document" do
-            eye.eyeable.should eq(face)
+            expect(eye.eyeable).to eq(face)
           end
         end
 
@@ -615,7 +615,7 @@ describe Mongoid::Relations::Accessors do
             end
 
             it "returns the correct documents" do
-              eyes.should eq([ eye_bowl_blue_eye ])
+              expect(eyes).to eq([ eye_bowl_blue_eye ])
             end
           end
 
@@ -626,7 +626,7 @@ describe Mongoid::Relations::Accessors do
             end
 
             it "returns the correct documents" do
-              eyes.should eq([ eye_bowl_brown_eye ])
+              expect(eyes).to eq([ eye_bowl_brown_eye ])
             end
           end
         end
@@ -640,7 +640,7 @@ describe Mongoid::Relations::Accessors do
             end
 
             it "returns the correct document" do
-              eye.should eq(face_left_eye)
+              expect(eye).to eq(face_left_eye)
             end
           end
 
@@ -651,7 +651,7 @@ describe Mongoid::Relations::Accessors do
             end
 
             it "returns the correct document" do
-              eye.should eq(face_right_eye)
+              expect(eye).to eq(face_right_eye)
             end
           end
         end
@@ -674,7 +674,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "converts them to nil" do
-          post.person.should be_nil
+          expect(post.person).to be_nil
         end
       end
 
@@ -685,7 +685,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "converts it to nil" do
-          post.person_id.should be_nil
+          expect(post.person_id).to be_nil
         end
       end
     end
@@ -703,7 +703,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "converts them to nil" do
-          person.game.should be_nil
+          expect(person.game).to be_nil
         end
       end
 
@@ -718,7 +718,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "converts it to nil" do
-          game.person_id.should be_nil
+          expect(game.person_id).to be_nil
         end
       end
     end
@@ -740,7 +740,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "converts it to nil" do
-          post.person.should be_nil
+          expect(post.person).to be_nil
         end
       end
 
@@ -755,7 +755,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "ignore blank values" do
-          person.post_ids.should be_empty
+          expect(person.post_ids).to be_empty
         end
       end
     end
@@ -773,7 +773,7 @@ describe Mongoid::Relations::Accessors do
         end
 
         it "does not add them" do
-          person.preference_ids.should be_empty
+          expect(person.preference_ids).to be_empty
         end
       end
     end

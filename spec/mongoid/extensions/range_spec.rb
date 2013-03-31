@@ -9,7 +9,7 @@ describe Mongoid::Extensions::Range do
     end
 
     it "returns the range as an array" do
-      range.__find_args__.should eq([ 1, 2, 3 ])
+      expect(range.__find_args__).to eq([ 1, 2, 3 ])
     end
   end
 
@@ -22,7 +22,7 @@ describe Mongoid::Extensions::Range do
       end
 
       it "returns an ascending range" do
-        Range.demongoize(hash).should eq(1..3)
+        expect(Range.demongoize(hash)).to eq(1..3)
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Extensions::Range do
       end
 
       it "returns an descending range" do
-        Range.demongoize(hash).should eq(5..1)
+        expect(Range.demongoize(hash)).to eq(5..1)
       end
     end
 
@@ -44,7 +44,7 @@ describe Mongoid::Extensions::Range do
       end
 
       it "returns an alphabetic range" do
-        Range.demongoize(hash).should eq("a".."z")
+        expect(Range.demongoize(hash)).to eq("a".."z")
       end
     end
   end
@@ -54,22 +54,22 @@ describe Mongoid::Extensions::Range do
     context "when the value is not nil" do
 
       it "returns the object hash" do
-        Range.mongoize(1..3).should eq({ "min" => 1, "max" => 3 })
+        expect(Range.mongoize(1..3)).to eq({ "min" => 1, "max" => 3 })
       end
 
       it "returns the object hash when passed an inverse range" do
-        Range.mongoize(5..1).should eq({ "min" => 5, "max" => 1 })
+        expect(Range.mongoize(5..1)).to eq({ "min" => 5, "max" => 1 })
       end
 
       it "returns the object hash when passed a letter range" do
-        Range.mongoize("a".."z").should eq({ "min" => "a", "max" => "z" })
+        expect(Range.mongoize("a".."z")).to eq({ "min" => "a", "max" => "z" })
       end
     end
 
     context "when the value is nil" do
 
       it "returns nil" do
-        Range.mongoize(nil).should be_nil
+        expect(Range.mongoize(nil)).to be_nil
       end
     end
   end
@@ -79,15 +79,15 @@ describe Mongoid::Extensions::Range do
     context "when the value is not nil" do
 
       it "returns the object hash" do
-        (1..3).mongoize.should eq({ "min" => 1, "max" => 3 })
+        expect((1..3).mongoize).to eq({ "min" => 1, "max" => 3 })
       end
 
       it "returns the object hash when passed an inverse range" do
-        (5..1).mongoize.should eq({ "min" => 5, "max" => 1 })
+        expect((5..1).mongoize).to eq({ "min" => 5, "max" => 1 })
       end
 
       it "returns the object hash when passed a letter range" do
-        ("a".."z").mongoize.should eq({ "min" => "a", "max" => "z" })
+        expect(("a".."z").mongoize).to eq({ "min" => "a", "max" => "z" })
       end
     end
   end
@@ -99,7 +99,7 @@ describe Mongoid::Extensions::Range do
     end
 
     it "returns true" do
-      range.should be_resizable
+      expect(range).to be_resizable
     end
   end
 end

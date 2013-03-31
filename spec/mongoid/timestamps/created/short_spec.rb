@@ -18,19 +18,19 @@ describe Mongoid::Timestamps::Created::Short do
     end
 
     it "adds c_at to the document" do
-      fields["c_at"].should_not be_nil
+      expect(fields["c_at"]).to_not be_nil
     end
 
     it "does not add u_at to the document" do
-      fields["u_at"].should be_nil
+      expect(fields["u_at"]).to be_nil
     end
 
     it "does not add the created_at to the document" do
-      fields["created_at"].should be_nil
+      expect(fields["created_at"]).to be_nil
     end
 
     it "forces the c_at timestamps to UTC" do
-      quiz.created_at.should be_within(10).of(Time.now.utc)
+      expect(quiz.created_at).to be_within(10).of(Time.now.utc)
     end
   end
 
@@ -41,11 +41,11 @@ describe Mongoid::Timestamps::Created::Short do
     end
 
     it "runs the created callbacks" do
-      quiz.created_at.should be_within(10).of(Time.now.utc)
+      expect(quiz.created_at).to be_within(10).of(Time.now.utc)
     end
 
     it "allows access via the raw field" do
-      quiz.c_at.should eq(quiz.created_at)
+      expect(quiz.c_at).to eq(quiz.created_at)
     end
   end
 end

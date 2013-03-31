@@ -43,7 +43,7 @@ describe Mongoid::Persistence::Operations::Insert do
       end
 
       it "puts the document in the identity map" do
-        in_map.should eq(person)
+        expect(in_map).to eq(person)
       end
     end
   end
@@ -55,19 +55,19 @@ describe Mongoid::Persistence::Operations::Insert do
     end
 
     it "sets the document" do
-      insert.document.should eq(document)
+      expect(insert.document).to eq(document)
     end
 
     it "sets the collection" do
-      insert.collection.should eq(document.collection)
+      expect(insert.collection).to eq(document.collection)
     end
 
     it "defaults validation to true" do
-      insert.should be_validating
+      expect(insert).to be_validating
     end
 
     it "sets the options" do
-      insert.options.should be_empty
+      expect(insert.options).to be_empty
     end
   end
 
@@ -103,13 +103,13 @@ describe Mongoid::Persistence::Operations::Insert do
 
       it "returns the document" do
         root_set_expectation.call
-        insert.persist.should eq(document)
+        expect(insert.persist).to eq(document)
       end
 
       it "sets new_record to false" do
         root_set_expectation.call
         insert.persist
-        document.new_record?.should be_false
+        expect(document.new_record?).to be_false
       end
     end
 
@@ -120,12 +120,12 @@ describe Mongoid::Persistence::Operations::Insert do
       end
 
       it "returns the document" do
-        insert.persist.should eq(document)
+        expect(insert.persist).to eq(document)
       end
 
       it "leaves the document as a new record" do
         insert.persist
-        document.new_record?.should be_true
+        expect(document.new_record?).to be_true
       end
     end
 
@@ -142,7 +142,7 @@ describe Mongoid::Persistence::Operations::Insert do
       it "inserts the document in the database" do
         root_set_expectation.call
         insert.persist
-        document.new_record?.should be_false
+        expect(document.new_record?).to be_false
       end
     end
   end

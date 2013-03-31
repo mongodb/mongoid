@@ -17,7 +17,7 @@ describe Mongoid::Threaded do
     end
 
     it "adds a boolen to the load stack" do
-      described_class.stack("load").should eq([ true ])
+      expect(described_class.stack("load")).to eq([ true ])
     end
   end
 
@@ -26,7 +26,7 @@ describe Mongoid::Threaded do
     context "when loading is not set" do
 
       it "returns false" do
-        described_class.should_not be_executing(:load)
+        expect(described_class).to_not be_executing(:load)
       end
     end
 
@@ -41,7 +41,7 @@ describe Mongoid::Threaded do
       end
 
       it "returns true" do
-        described_class.should be_executing(:load)
+        expect(described_class).to be_executing(:load)
       end
     end
 
@@ -52,7 +52,7 @@ describe Mongoid::Threaded do
       end
 
       it "returns false" do
-        described_class.should_not be_executing(:load)
+        expect(described_class).to_not be_executing(:load)
       end
     end
   end
@@ -66,7 +66,7 @@ describe Mongoid::Threaded do
       end
 
       it "returns an empty stack" do
-        loading.should be_empty
+        expect(loading).to be_empty
       end
     end
 
@@ -85,7 +85,7 @@ describe Mongoid::Threaded do
       end
 
       it "returns the stack" do
-        loading.should eq([ true ])
+        expect(loading).to eq([ true ])
       end
     end
   end
@@ -102,7 +102,7 @@ describe Mongoid::Threaded do
     end
 
     it "removes a boolen from the stack" do
-      described_class.stack("load").should be_empty
+      expect(described_class.stack("load")).to be_empty
     end
   end
 
@@ -117,11 +117,11 @@ describe Mongoid::Threaded do
     end
 
     it "removes all persistence options" do
-      described_class.persistence_options(Band).should be_nil
+      expect(described_class.persistence_options(Band)).to be_nil
     end
 
     it "returns true" do
-      cleared.should be_true
+      expect(cleared).to be_true
     end
   end
 
@@ -136,7 +136,7 @@ describe Mongoid::Threaded do
     end
 
     it "returns the object with the identity map key" do
-      described_class.identity_map.should eq(object)
+      expect(described_class.identity_map).to eq(object)
     end
   end
 
@@ -155,14 +155,14 @@ describe Mongoid::Threaded do
     end
 
     it "sets the persistence options" do
-      options.should eq({ safe: { w: 3 }})
+      expect(options).to eq({ safe: { w: 3 }})
     end
   end
 
   describe "#scope_stack" do
 
     it "returns the default with the scope stack key" do
-      described_class.scope_stack.should be_a(Hash)
+      expect(described_class.scope_stack).to be_a(Hash)
     end
   end
 
@@ -177,7 +177,7 @@ describe Mongoid::Threaded do
     end
 
     it "returns the timeless value" do
-      described_class.timeless.should be_true
+      expect(described_class.timeless).to be_true
     end
   end
 
@@ -186,7 +186,7 @@ describe Mongoid::Threaded do
     context "when timeless is not set" do
 
       it "returns true" do
-        described_class.should be_timestamping
+        expect(described_class).to be_timestamping
       end
     end
 
@@ -201,7 +201,7 @@ describe Mongoid::Threaded do
       end
 
       it "returns false" do
-        described_class.should_not be_timestamping
+        expect(described_class).to_not be_timestamping
       end
     end
   end
@@ -221,7 +221,7 @@ describe Mongoid::Threaded do
     end
 
     it "marks the document as being validated" do
-      described_class.validations_for(Person).should eq([ person.id ])
+      expect(described_class.validations_for(Person)).to eq([ person.id ])
     end
   end
 
@@ -237,7 +237,7 @@ describe Mongoid::Threaded do
     end
 
     it "unmarks the document as being validated" do
-      described_class.validations_for(Person).should be_empty
+      expect(described_class.validations_for(Person)).to be_empty
     end
   end
 
@@ -258,14 +258,14 @@ describe Mongoid::Threaded do
       end
 
       it "returns true" do
-        described_class.validated?(person).should be_true
+        expect(described_class.validated?(person)).to be_true
       end
     end
 
     context "when the document is not validated" do
 
       it "returns false" do
-        described_class.validated?(person).should be_false
+        expect(described_class.validated?(person)).to be_false
       end
     end
   end
@@ -285,7 +285,7 @@ describe Mongoid::Threaded do
     end
 
     it "marks the document as being autosaved" do
-      described_class.autosaves_for(Person).should eq([ person.id ])
+      expect(described_class.autosaves_for(Person)).to eq([ person.id ])
     end
   end
 
@@ -301,7 +301,7 @@ describe Mongoid::Threaded do
     end
 
     it "unmarks the document as being autosaved" do
-      described_class.autosaves_for(Person).should be_empty
+      expect(described_class.autosaves_for(Person)).to be_empty
     end
   end
 
@@ -322,14 +322,14 @@ describe Mongoid::Threaded do
       end
 
       it "returns true" do
-        described_class.autosaved?(person).should be_true
+        expect(described_class.autosaved?(person)).to be_true
       end
     end
 
     context "when the document is not autosaved" do
 
       it "returns false" do
-        described_class.autosaved?(person).should be_false
+        expect(described_class.autosaved?(person)).to be_false
       end
     end
   end

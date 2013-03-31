@@ -5,7 +5,7 @@ describe Mongoid::Extensions::FalseClass do
   describe "#__sortable__" do
 
     it "returns 0" do
-      false.__sortable__.should eq(0)
+      expect(false.__sortable__).to eq(0)
     end
   end
 
@@ -14,28 +14,28 @@ describe Mongoid::Extensions::FalseClass do
     context "when provided a Boolean" do
 
       it "returns true" do
-        false.is_a?(Boolean).should be_true
+        expect(false.is_a?(Boolean)).to be_true
       end
     end
 
     context "when provided a FalseClass" do
 
       it "returns true" do
-        false.is_a?(FalseClass).should be_true
+        expect(false.is_a?(FalseClass)).to be_true
       end
     end
 
     context "when provided a TrueClass" do
 
       it "returns false" do
-        false.is_a?(TrueClass).should be_false
+        expect(false.is_a?(TrueClass)).to be_false
       end
     end
 
     context "when provided an invalid class" do
 
       it "returns false" do
-        false.is_a?(String).should be_false
+        expect(false.is_a?(String)).to be_false
       end
     end
   end

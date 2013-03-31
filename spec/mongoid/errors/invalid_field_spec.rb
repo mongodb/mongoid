@@ -17,19 +17,19 @@ describe Mongoid::Errors::InvalidField do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Defining a field named 'crazy_method' is not allowed."
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Defining this field would override the method 'crazy_method'"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Use Mongoid.destructive_fields to see what names are not allowed"
       )
     end

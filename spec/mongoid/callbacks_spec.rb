@@ -23,51 +23,51 @@ describe Mongoid::Callbacks do
     end
 
     it "includes the before_create callback" do
-      klass.should respond_to(:before_create)
+      expect(klass).to respond_to(:before_create)
     end
 
     it "includes the after_create callback" do
-      klass.should respond_to(:after_create)
+      expect(klass).to respond_to(:after_create)
     end
 
     it "includes the before_destroy callback" do
-      klass.should respond_to(:before_destroy)
+      expect(klass).to respond_to(:before_destroy)
     end
 
     it "includes the after_destroy callback" do
-      klass.should respond_to(:after_destroy)
+      expect(klass).to respond_to(:after_destroy)
     end
 
     it "includes the before_save callback" do
-      klass.should respond_to(:before_save)
+      expect(klass).to respond_to(:before_save)
     end
 
     it "includes the after_save callback" do
-      klass.should respond_to(:after_save)
+      expect(klass).to respond_to(:after_save)
     end
 
     it "includes the before_update callback" do
-      klass.should respond_to(:before_update)
+      expect(klass).to respond_to(:before_update)
     end
 
     it "includes the after_update callback" do
-      klass.should respond_to(:after_update)
+      expect(klass).to respond_to(:after_update)
     end
 
     it "includes the before_validation callback" do
-      klass.should respond_to(:before_validation)
+      expect(klass).to respond_to(:before_validation)
     end
 
     it "includes the after_validation callback" do
-      klass.should respond_to(:after_validation)
+      expect(klass).to respond_to(:after_validation)
     end
 
     it "includes the after_initialize callback" do
-      klass.should respond_to(:after_initialize)
+      expect(klass).to respond_to(:after_initialize)
     end
 
     it "includes the after_build callback" do
-      klass.should respond_to(:after_build)
+      expect(klass).to respond_to(:after_build)
     end
   end
 
@@ -82,7 +82,7 @@ describe Mongoid::Callbacks do
       context "when when the document is instantiated" do
 
         it "does not execute the callback" do
-          player.impressions.should eq(0)
+          expect(player.impressions).to eq(0)
         end
       end
 
@@ -93,7 +93,7 @@ describe Mongoid::Callbacks do
         end
 
         it "executes the callback" do
-          from_db.impressions.should eq(1)
+          expect(from_db.impressions).to eq(1)
         end
       end
 
@@ -104,7 +104,7 @@ describe Mongoid::Callbacks do
         end
 
         it "executes the callback" do
-          from_db.impressions.should eq(1)
+          expect(from_db.impressions).to eq(1)
         end
       end
 
@@ -119,7 +119,7 @@ describe Mongoid::Callbacks do
         end
 
         it "executes the callback" do
-          from_db.impressions.should eq(1)
+          expect(from_db.impressions).to eq(1)
         end
       end
     end
@@ -133,7 +133,7 @@ describe Mongoid::Callbacks do
       context "when when the document is instantiated" do
 
         it "does not execute the callback" do
-          implant.impressions.should eq(0)
+          expect(implant.impressions).to eq(0)
         end
       end
 
@@ -144,7 +144,7 @@ describe Mongoid::Callbacks do
         end
 
         it "executes the callback" do
-          from_db.impressions.should eq(1)
+          expect(from_db.impressions).to eq(1)
         end
       end
 
@@ -155,7 +155,7 @@ describe Mongoid::Callbacks do
         end
 
         it "executes the callback" do
-          from_db.impressions.should eq(1)
+          expect(from_db.impressions).to eq(1)
         end
       end
     end
@@ -168,7 +168,7 @@ describe Mongoid::Callbacks do
     end
 
     it "runs after document instantiation" do
-      game.name.should eq("Testing")
+      expect(game.name).to eq("Testing")
     end
   end
 
@@ -179,7 +179,7 @@ describe Mongoid::Callbacks do
     end
 
     it "runs after document build (references_many)" do
-      weapon.name.should eq("Holy Hand Grenade (5)")
+      expect(weapon.name).to eq("Holy Hand Grenade (5)")
     end
 
     let(:implant) do
@@ -187,7 +187,7 @@ describe Mongoid::Callbacks do
     end
 
     it "runs after document build (embeds_many)" do
-      implant.name.should eq('Cochlear Implant (5)')
+      expect(implant.name).to eq('Cochlear Implant (5)')
     end
 
     let(:powerup) do
@@ -195,7 +195,7 @@ describe Mongoid::Callbacks do
     end
 
     it "runs after document build (references_one)" do
-      powerup.name.should eq("Quad Damage (5)")
+      expect(powerup.name).to eq("Quad Damage (5)")
     end
 
     let(:augmentation) do
@@ -203,7 +203,7 @@ describe Mongoid::Callbacks do
     end
 
     it "runs after document build (embeds_one)" do
-      augmentation.name.should eq("Infolink (5)")
+      expect(augmentation.name).to eq("Infolink (5)")
     end
   end
 
@@ -221,7 +221,7 @@ describe Mongoid::Callbacks do
       end
 
       it "gets saved" do
-        artist.persisted?.should be_true
+        expect(artist.persisted?).to be_true
       end
     end
 
@@ -233,7 +233,7 @@ describe Mongoid::Callbacks do
       end
 
       it "does not get saved" do
-        artist.persisted?.should be_false
+        expect(artist.persisted?).to be_false
       end
     end
   end
@@ -257,7 +257,7 @@ describe Mongoid::Callbacks do
         end
 
         it "the save returns true" do
-          artist.save.should be_true
+          expect(artist.save).to be_true
         end
       end
 
@@ -268,7 +268,7 @@ describe Mongoid::Callbacks do
         end
 
         it "the save returns false" do
-          artist.save.should be_false
+          expect(artist.save).to be_false
         end
       end
     end
@@ -292,7 +292,7 @@ describe Mongoid::Callbacks do
         end
 
         it "the save returns true" do
-          artist.save.should be_true
+          expect(artist.save).to be_true
         end
       end
 
@@ -303,7 +303,7 @@ describe Mongoid::Callbacks do
         end
 
         it "the save returns false" do
-          artist.save.should be_false
+          expect(artist.save).to be_false
         end
       end
     end
@@ -330,7 +330,7 @@ describe Mongoid::Callbacks do
       end
 
       it "the destroy returns true" do
-        artist.destroy.should be_true
+        expect(artist.destroy).to be_true
       end
     end
 
@@ -341,7 +341,7 @@ describe Mongoid::Callbacks do
       end
 
       it "the destroy returns false" do
-        artist.destroy.should be_false
+        expect(artist.destroy).to be_false
       end
     end
 
@@ -360,7 +360,7 @@ describe Mongoid::Callbacks do
       end
 
       it "executes the child destroy callbacks" do
-        record.before_destroy_called.should be_true
+        expect(record.before_destroy_called).to be_true
       end
     end
   end
@@ -376,11 +376,11 @@ describe Mongoid::Callbacks do
     end
 
     it "runs the after callbacks" do
-      object.after_save_called.should be_true
+      expect(object.after_save_called).to be_true
     end
 
     it "does not run the before callbacks" do
-      object.before_save_called.should be_false
+      expect(object.before_save_called).to be_false
     end
   end
 
@@ -395,11 +395,11 @@ describe Mongoid::Callbacks do
     end
 
     it "runs the before callbacks" do
-      object.before_save_called.should be_true
+      expect(object.before_save_called).to be_true
     end
 
     it "does not run the after callbacks" do
-      object.after_save_called.should be_false
+      expect(object.after_save_called).to be_false
     end
   end
 
@@ -428,7 +428,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not cascade to the child" do
-            band.run_callbacks(:rearrange).should be_true
+            expect(band.run_callbacks(:rearrange)).to be_true
           end
         end
 
@@ -455,7 +455,7 @@ describe Mongoid::Callbacks do
 
           it "does not cascade to the child" do
             Band.accepts_nested_attributes_for :records, allow_destroy: true
-            band.update_attributes(attributes).should be_true
+            expect(band.update_attributes(attributes)).to be_true
           end
         end
       end
@@ -504,7 +504,7 @@ describe Mongoid::Callbacks do
 
       it "doesn't cascade the initialize" do
         Service.any_instance.should_receive(:after_initialize_called=).never
-        Person.find(person.id).should eq(person)
+        expect(Person.find(person.id)).to eq(person)
       end
     end
 
@@ -538,7 +538,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_create_called.should be_true
+              expect(label.after_create_called).to be_true
             end
           end
 
@@ -557,7 +557,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_create_called.should be_true
+              expect(label.after_create_called).to be_true
             end
           end
         end
@@ -578,7 +578,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not execute the callback" do
-            label.after_create_called.should be_false
+            expect(label.after_create_called).to be_false
           end
         end
       end
@@ -602,7 +602,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_save_called.should be_true
+              expect(label.after_save_called).to be_true
             end
           end
 
@@ -621,7 +621,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_save_called.should be_true
+              expect(label.after_save_called).to be_true
             end
           end
         end
@@ -641,7 +641,7 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            label.after_save_called.should be_true
+            expect(label.after_save_called).to be_true
           end
         end
       end
@@ -665,7 +665,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              label.after_update_called.should be_false
+              expect(label.after_update_called).to be_false
             end
           end
 
@@ -684,7 +684,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              label.after_update_called.should be_false
+              expect(label.after_update_called).to be_false
             end
           end
         end
@@ -707,7 +707,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_update_called.should be_true
+              expect(label.after_update_called).to be_true
             end
           end
 
@@ -722,7 +722,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              label.after_update_called.should be_false
+              expect(label.after_update_called).to be_false
             end
           end
         end
@@ -747,7 +747,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_validation_called.should be_true
+              expect(label.after_validation_called).to be_true
             end
           end
 
@@ -766,7 +766,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_validation_called.should be_true
+              expect(label.after_validation_called).to be_true
             end
           end
         end
@@ -786,7 +786,7 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            label.after_validation_called.should be_true
+            expect(label.after_validation_called).to be_true
           end
         end
       end
@@ -810,7 +810,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_create_called.should be_true
+              expect(record.before_create_called).to be_true
             end
           end
 
@@ -829,7 +829,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_create_called.should be_true
+              expect(record.before_create_called).to be_true
             end
           end
         end
@@ -850,7 +850,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not execute the callback" do
-            record.before_create_called.should be_false
+            expect(record.before_create_called).to be_false
           end
         end
       end
@@ -874,11 +874,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_save_called.should be_true
+              expect(record.before_save_called).to be_true
             end
 
             it "persists the change" do
-              band.reload.records.first.before_save_called.should be_true
+              expect(band.reload.records.first.before_save_called).to be_true
             end
           end
 
@@ -897,11 +897,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_save_called.should be_true
+              expect(record.before_save_called).to be_true
             end
 
             it "persists the change" do
-              band.reload.records.first.before_save_called.should be_true
+              expect(band.reload.records.first.before_save_called).to be_true
             end
           end
         end
@@ -921,11 +921,11 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            record.before_save_called.should be_true
+            expect(record.before_save_called).to be_true
           end
 
           it "persists the change" do
-            band.reload.records.first.before_save_called.should be_true
+            expect(band.reload.records.first.before_save_called).to be_true
           end
         end
       end
@@ -949,7 +949,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              record.before_update_called.should be_false
+              expect(record.before_update_called).to be_false
             end
           end
 
@@ -968,7 +968,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              record.before_update_called.should be_false
+              expect(record.before_update_called).to be_false
             end
           end
         end
@@ -991,11 +991,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_update_called.should be_true
+              expect(record.before_update_called).to be_true
             end
 
             it "persists the change" do
-              band.reload.records.first.before_update_called.should be_true
+              expect(band.reload.records.first.before_update_called).to be_true
             end
           end
 
@@ -1006,7 +1006,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              record.before_update_called.should be_false
+              expect(record.before_update_called).to be_false
             end
           end
         end
@@ -1031,11 +1031,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_validation_called.should be_true
+              expect(record.before_validation_called).to be_true
             end
 
             it "persists the change" do
-              band.reload.records.first.before_validation_called.should be_true
+              expect(band.reload.records.first.before_validation_called).to be_true
             end
           end
 
@@ -1054,11 +1054,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_validation_called.should be_true
+              expect(record.before_validation_called).to be_true
             end
 
             it "persists the change" do
-              band.reload.records.first.before_validation_called.should be_true
+              expect(band.reload.records.first.before_validation_called).to be_true
             end
           end
         end
@@ -1078,11 +1078,11 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            record.before_validation_called.should be_true
+            expect(record.before_validation_called).to be_true
           end
 
           it "persists the change" do
-            band.reload.records.first.before_validation_called.should be_true
+            expect(band.reload.records.first.before_validation_called).to be_true
           end
         end
       end
@@ -1113,7 +1113,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_create_called.should be_true
+              expect(track.before_create_called).to be_true
             end
           end
 
@@ -1136,7 +1136,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_create_called.should be_true
+              expect(track.before_create_called).to be_true
             end
           end
         end
@@ -1161,7 +1161,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not execute the callback" do
-            track.before_create_called.should be_false
+            expect(track.before_create_called).to be_false
           end
         end
       end
@@ -1193,11 +1193,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_save_called.should be_true
+              expect(track.before_save_called).to be_true
             end
 
             it "persists the change" do
-              reloaded.tracks.first.before_save_called.should be_true
+              expect(reloaded.tracks.first.before_save_called).to be_true
             end
           end
 
@@ -1224,11 +1224,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_save_called.should be_true
+              expect(track.before_save_called).to be_true
             end
 
             it "persists the change" do
-              reloaded.tracks.first.before_save_called.should be_true
+              expect(reloaded.tracks.first.before_save_called).to be_true
             end
           end
         end
@@ -1256,11 +1256,11 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            track.before_save_called.should be_true
+            expect(track.before_save_called).to be_true
           end
 
           it "persists the change" do
-            reloaded.tracks.first.before_save_called.should be_true
+            expect(reloaded.tracks.first.before_save_called).to be_true
           end
         end
       end
@@ -1288,7 +1288,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              track.before_update_called.should be_false
+              expect(track.before_update_called).to be_false
             end
           end
 
@@ -1311,7 +1311,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              track.before_update_called.should be_false
+              expect(track.before_update_called).to be_false
             end
           end
         end
@@ -1342,11 +1342,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_update_called.should be_true
+              expect(track.before_update_called).to be_true
             end
 
             it "persists the change" do
-              reloaded.tracks.first.before_update_called.should be_true
+              expect(reloaded.tracks.first.before_update_called).to be_true
             end
           end
 
@@ -1357,7 +1357,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              track.before_update_called.should be_false
+              expect(track.before_update_called).to be_false
             end
           end
         end
@@ -1386,7 +1386,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_validation_called.should be_true
+              expect(track.before_validation_called).to be_true
             end
           end
 
@@ -1409,7 +1409,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_validation_called.should be_true
+              expect(track.before_validation_called).to be_true
             end
           end
         end
@@ -1433,7 +1433,7 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            track.before_validation_called.should be_true
+            expect(track.before_validation_called).to be_true
           end
         end
       end
@@ -1445,7 +1445,7 @@ describe Mongoid::Callbacks do
     it "goes in all validation callback in good order" do
       shin = ValidationCallback.new
       shin.valid?
-      shin.history.should eq([:before_validation, :validate, :after_validation])
+      expect(shin.history).to eq([:before_validation, :validate, :after_validation])
     end
   end
 
@@ -1461,7 +1461,7 @@ describe Mongoid::Callbacks do
 
     it "does not duplicate the child documents" do
       parent.child_docs.create(position: 1)
-      ParentDoc.find(parent.id).child_docs.size.should eq(1)
+      expect(ParentDoc.find(parent.id).child_docs.size).to eq(1)
     end
   end
 
@@ -1488,22 +1488,22 @@ describe Mongoid::Callbacks do
       end
 
       it "fails to save" do
-        person.should be_valid
-        person.save.should be_false
+        expect(person).to be_valid
+        expect(person.save).to be_false
       end
 
       it "is a new record" do
-        person.should be_a_new_record
+        expect(person).to be_a_new_record
         expect { person.save }.not_to change { person.new_record? }
       end
 
       it "is left dirty" do
-        person.should be_changed
+        expect(person).to be_changed
         expect { person.save }.not_to change { person.changed? }
       end
 
       it "child documents are left dirty" do
-        address.should be_changed
+        expect(address).to be_changed
         expect { person.save }.not_to change { address.changed? }
       end
     end
@@ -1521,22 +1521,22 @@ describe Mongoid::Callbacks do
       end
 
       it "#save returns false" do
-        person.should be_valid
-        person.save.should be_false
+        expect(person).to be_valid
+        expect(person.save).to be_false
       end
 
       it "is a not a new record" do
-        person.should_not be_a_new_record
+        expect(person).to_not be_a_new_record
         expect { person.save }.not_to change { person.new_record? }
       end
 
       it "is left dirty" do
-        person.should be_changed
+        expect(person).to be_changed
         expect { person.save }.not_to change { person.changed? }
       end
 
       it "child documents are left dirty" do
-        address.should be_changed
+        expect(address).to be_changed
         expect { person.save }.not_to change { address.changed? }
       end
     end

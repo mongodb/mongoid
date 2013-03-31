@@ -17,7 +17,7 @@ describe Mongoid::Extensions::Integer do
     end
 
     it "returns the float as a time" do
-      mongoized.should eq(Time.at(integer))
+      expect(mongoized).to eq(Time.at(integer))
     end
   end
 
@@ -26,21 +26,21 @@ describe Mongoid::Extensions::Integer do
     context "when the the value is an integer" do
 
       it "returns a integer" do
-        Integer.demongoize(number).should eq(number)
+        expect(Integer.demongoize(number)).to eq(number)
       end
     end
 
     context "when the value is nil" do
 
       it "returns nil" do
-        Integer.demongoize(nil).should be_nil
+        expect(Integer.demongoize(nil)).to be_nil
       end
     end
 
     context "when the value is not an integer" do
 
       it "converts the value to an integer" do
-        Integer.demongoize("1.0").should eq(1)
+        expect(Integer.demongoize("1.0")).to eq(1)
       end
     end
   end
@@ -54,14 +54,14 @@ describe Mongoid::Extensions::Integer do
         context "when the value is small" do
 
           it "it returns the integer" do
-            Integer.mongoize(3).should eq(3)
+            expect(Integer.mongoize(3)).to eq(3)
           end
         end
 
         context "when the value is large" do
 
           it "returns the integer" do
-            Integer.mongoize(1024**2).to_s.should eq("1048576")
+            expect(Integer.mongoize(1024**2).to_s).to eq("1048576")
           end
         end
       end
@@ -69,28 +69,28 @@ describe Mongoid::Extensions::Integer do
       context "when the value is a decimal" do
 
         it "casts to integer" do
-          Integer.mongoize(2.5).should eq(2)
+          expect(Integer.mongoize(2.5)).to eq(2)
         end
       end
 
       context "when the value is floating point zero" do
 
         it "returns the integer zero" do
-          Integer.mongoize(0.00000).should eq(0)
+          expect(Integer.mongoize(0.00000)).to eq(0)
         end
       end
 
       context "when the value is a floating point integer" do
 
         it "returns the integer number" do
-          Integer.mongoize(4.00000).should eq(4)
+          expect(Integer.mongoize(4.00000)).to eq(4)
         end
       end
 
       context "when the value has leading zeros" do
 
         it "returns the stripped integer" do
-          Integer.mongoize("000011").should eq(11)
+          expect(Integer.mongoize("000011")).to eq(11)
         end
       end
     end
@@ -100,28 +100,28 @@ describe Mongoid::Extensions::Integer do
       context "when the string is non numerical" do
 
         it "returns 0" do
-          Integer.mongoize("foo").should eq(0)
+          expect(Integer.mongoize("foo")).to eq(0)
         end
       end
 
       context "when the string is numerical" do
 
         it "returns the integer value for the string" do
-          Integer.mongoize("3").should eq(3)
+          expect(Integer.mongoize("3")).to eq(3)
         end
       end
 
       context "when the string is empty" do
 
         it "returns nil" do
-          Integer.mongoize("").should be_nil
+          expect(Integer.mongoize("")).to be_nil
         end
       end
 
       context "when the string is nil" do
 
         it "returns nil" do
-          Integer.mongoize(nil).should be_nil
+          expect(Integer.mongoize(nil)).to be_nil
         end
       end
     end
@@ -130,7 +130,7 @@ describe Mongoid::Extensions::Integer do
   describe "#mongoize" do
 
     it "returns self" do
-      number.mongoize.should eq(number)
+      expect(number.mongoize).to eq(number)
     end
   end
 end

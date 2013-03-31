@@ -46,7 +46,7 @@ describe Mongoid::Atomic::Positionable do
         end
 
         it "does not do any replacement" do
-          processed.should eq(ops)
+          expect(processed).to eq(ops)
         end
       end
 
@@ -80,7 +80,7 @@ describe Mongoid::Atomic::Positionable do
         end
 
         it "does not do any replacement" do
-          processed.should eq(expected)
+          expect(processed).to eq(expected)
         end
       end
     end
@@ -96,7 +96,7 @@ describe Mongoid::Atomic::Positionable do
       end
 
       it "does not do any replacement" do
-        processed.should eq(updates)
+        expect(processed).to eq(updates)
       end
     end
 
@@ -127,7 +127,7 @@ describe Mongoid::Atomic::Positionable do
         end
 
         it "replaces the first index with the positional operator" do
-          processed.should eq(expected)
+          expect(processed).to eq(expected)
         end
       end
 
@@ -156,7 +156,7 @@ describe Mongoid::Atomic::Positionable do
         end
 
         it "replaces the first index with the positional operator" do
-          processed.should eq(expected)
+          expect(processed).to eq(expected)
         end
       end
     end
@@ -186,7 +186,7 @@ describe Mongoid::Atomic::Positionable do
       end
 
       it "replaces the first index with the positional operator" do
-        processed.should eq(expected)
+        expect(processed).to eq(expected)
       end
     end
 
@@ -220,7 +220,7 @@ describe Mongoid::Atomic::Positionable do
       end
 
       it "replaces the first index with the positional operator" do
-        processed.should eq(expected)
+        expect(processed).to eq(expected)
       end
     end
   end

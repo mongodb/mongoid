@@ -29,7 +29,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the root collection" do
-        collection.name.should eq(document.collection.name)
+        expect(collection.name).to eq(document.collection.name)
       end
     end
 
@@ -48,7 +48,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the root collection" do
-        collection.name.should eq(document.collection.name)
+        expect(collection.name).to eq(document.collection.name)
       end
     end
   end
@@ -70,7 +70,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the delete atomic modifiers" do
-        deletes.should eq(
+        expect(deletes).to eq(
           { "$unset" => { "name" => true } }
         )
       end
@@ -91,7 +91,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the delete atomic modifiers" do
-        deletes.should eq(
+        expect(deletes).to eq(
           { "$pull" => { "addresses" => { "_id" => "unter-den-linden" } } }
         )
       end
@@ -113,7 +113,7 @@ describe Mongoid::Persistence::Operations do
     end
 
     it "returns the insert atomic modifiers" do
-      inserts.should eq(
+      expect(inserts).to eq(
         { "$set" => { "name" => { "first_name" => "Syd", "_id" => "Syd-" } } }
       )
     end
@@ -132,7 +132,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns false" do
-        operation.should_not be_notifying_parent
+        expect(operation).to_not be_notifying_parent
       end
     end
 
@@ -143,7 +143,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns true" do
-        operation.should be_notifying_parent
+        expect(operation).to be_notifying_parent
       end
     end
 
@@ -154,7 +154,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns true" do
-        operation.should be_notifying_parent
+        expect(operation).to be_notifying_parent
       end
     end
   end
@@ -170,7 +170,7 @@ describe Mongoid::Persistence::Operations do
     end
 
     it "returns the options" do
-      operation.options.should eq(options)
+      expect(operation.options).to eq(options)
     end
   end
 
@@ -185,7 +185,7 @@ describe Mongoid::Persistence::Operations do
     end
 
     it "returns the document's parent" do
-      operation.parent.should eq(document)
+      expect(operation.parent).to eq(document)
     end
   end
 
@@ -196,7 +196,7 @@ describe Mongoid::Persistence::Operations do
     end
 
     it "returns the document's atomic selector" do
-      operation.selector.should eq(document.atomic_selector)
+      expect(operation.selector).to eq(document.atomic_selector)
     end
   end
 
@@ -213,7 +213,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the updates" do
-        updates.should eq(document.atomic_updates)
+        expect(updates).to eq(document.atomic_updates)
       end
     end
 
@@ -249,7 +249,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns the updates without conflicts" do
-        updates.should eq(
+        expect(updates).to eq(
           {
             "$set" => {
             "addresses.0.street" => "Unter den Linden",
@@ -260,7 +260,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "sets the conflicts" do
-        conflicts.should eq(
+        expect(conflicts).to eq(
           {
             "$pushAll" => {
             "addresses" => [ { "street" => "Freiderichstr", "_id" => "freiderichstr" } ]
@@ -284,7 +284,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns true" do
-        operation.should be_validating
+        expect(operation).to be_validating
       end
     end
 
@@ -295,7 +295,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns false" do
-        operation.should_not be_validating
+        expect(operation).to_not be_validating
       end
     end
 
@@ -306,7 +306,7 @@ describe Mongoid::Persistence::Operations do
       end
 
       it "returns true" do
-        operation.should be_validating
+        expect(operation).to be_validating
       end
     end
   end

@@ -9,7 +9,7 @@ describe Mongoid::Errors::InvalidSetPolymorphicRelation do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "The eyeable attribute can't be set to an instance of Face"
       )
     end

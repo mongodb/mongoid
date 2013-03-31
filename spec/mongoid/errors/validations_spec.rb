@@ -17,29 +17,29 @@ describe Mongoid::Errors::Validations do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Validation of Person failed"
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "The following errors were found: Error 1, Error 2"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Try persisting the document with valid data"
       )
     end
 
     it "sets the document in the error" do
-      error.document.should eq(document)
+      expect(error.document).to eq(document)
     end
 
     it "aliases record to document" do
-      error.record.should eq(document)
+      expect(error.record).to eq(document)
     end
   end
 end

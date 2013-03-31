@@ -35,7 +35,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "sets the inverse foreign key" do
-        preference_two.person_ids.should eq([ person.id ])
+        expect(preference_two.person_ids).to eq([ person.id ])
       end
 
       it "passes the binding options through to the inverse" do
@@ -43,11 +43,11 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "syncs the base" do
-        person.should be_synced("preference_ids")
+        expect(person).to be_synced("preference_ids")
       end
 
       it "syncs the inverse" do
-        preference_two.should be_synced("person_ids")
+        expect(preference_two).to be_synced("person_ids")
       end
     end
 
@@ -90,19 +90,19 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "removes the inverse relation" do
-        preference.people.should be_empty
+        expect(preference.people).to be_empty
       end
 
       it "removed the foreign keys" do
-        preference.person_ids.should be_empty
+        expect(preference.person_ids).to be_empty
       end
 
       it "syncs the base" do
-        person.should be_synced("preference_ids")
+        expect(person).to be_synced("preference_ids")
       end
 
       it "syncs the inverse" do
-        preference.should be_synced("person_ids")
+        expect(preference).to be_synced("person_ids")
       end
     end
 
@@ -147,7 +147,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "does not set the foreign key" do
-        preference.person_ids.should be_nil
+        expect(preference.person_ids).to be_nil
       end
     end
   end
@@ -171,7 +171,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "does not unset the foreign key" do
-        preference.person_ids.should eq([ person.id ])
+        expect(preference.person_ids).to eq([ person.id ])
       end
     end
   end

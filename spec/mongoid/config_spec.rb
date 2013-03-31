@@ -33,7 +33,7 @@ describe Mongoid::Config do
         end
 
         it "returns true" do
-          described_class.should be_configured
+          expect(described_class).to be_configured
         end
       end
     end
@@ -45,7 +45,7 @@ describe Mongoid::Config do
       end
 
       it "returns false" do
-        described_class.should_not be_configured
+        expect(described_class).to_not be_configured
       end
     end
   end
@@ -55,7 +55,7 @@ describe Mongoid::Config do
     Mongoid::Components.prohibited_methods.each do |method|
 
       it "contains #{method}" do
-        described_class.destructive_fields.should include(method)
+        expect(described_class.destructive_fields).to include(method)
       end
     end
   end
@@ -84,39 +84,39 @@ describe Mongoid::Config do
       end
 
       it "sets the allow dynamic fields option" do
-        described_class.allow_dynamic_fields.should be_true
+        expect(described_class.allow_dynamic_fields).to be_true
       end
 
       it "sets the identity map option" do
-        described_class.identity_map_enabled.should be_false
+        expect(described_class.identity_map_enabled).to be_false
       end
 
       it "sets the include root in json option" do
-        described_class.include_root_in_json.should be_false
+        expect(described_class.include_root_in_json).to be_false
       end
 
       it "sets the include type with serialization option" do
-        described_class.include_type_for_serialization.should be_false
+        expect(described_class.include_type_for_serialization).to be_false
       end
 
       it "sets the scope overwrite option" do
-        described_class.scope_overwrite_exception.should be_false
+        expect(described_class.scope_overwrite_exception).to be_false
       end
 
       it "sets the preload models option" do
-        described_class.preload_models.should be_false
+        expect(described_class.preload_models).to be_false
       end
 
       it "sets the raise not found error option" do
-        described_class.raise_not_found_error.should be_true
+        expect(described_class.raise_not_found_error).to be_true
       end
 
       it "sets the use activesupport time zone option" do
-        described_class.use_activesupport_time_zone.should be_true
+        expect(described_class.use_activesupport_time_zone).to be_true
       end
 
       it "sets the use utc option" do
-        described_class.use_utc.should be_false
+        expect(described_class.use_utc).to be_false
       end
     end
 
@@ -138,39 +138,39 @@ describe Mongoid::Config do
         end
 
         it "sets the allow dynamic fields option" do
-          described_class.allow_dynamic_fields.should be_true
+          expect(described_class.allow_dynamic_fields).to be_true
         end
 
         it "sets the identity map option" do
-          described_class.identity_map_enabled.should be_false
+          expect(described_class.identity_map_enabled).to be_false
         end
 
         it "sets the include root in json option" do
-          described_class.include_root_in_json.should be_false
+          expect(described_class.include_root_in_json).to be_false
         end
 
         it "sets the include type with serialization option" do
-          described_class.include_type_for_serialization.should be_false
+          expect(described_class.include_type_for_serialization).to be_false
         end
 
         it "sets the scope overwrite option" do
-          described_class.scope_overwrite_exception.should be_false
+          expect(described_class.scope_overwrite_exception).to be_false
         end
 
         it "sets the preload models option" do
-          described_class.preload_models.should be_false
+          expect(described_class.preload_models).to be_false
         end
 
         it "sets the raise not found error option" do
-          described_class.raise_not_found_error.should be_true
+          expect(described_class.raise_not_found_error).to be_true
         end
 
         it "sets the use activesupport time zone option" do
-          described_class.use_activesupport_time_zone.should be_true
+          expect(described_class.use_activesupport_time_zone).to be_true
         end
 
         it "sets the use utc option" do
-          described_class.use_utc.should be_false
+          expect(described_class.use_utc).to be_false
         end
       end
 
@@ -187,7 +187,7 @@ describe Mongoid::Config do
           end
 
           it "sets the default hosts" do
-            default[:hosts].should eq(["#{HOST}:#{PORT}"])
+            expect(default[:hosts]).to eq(["#{HOST}:#{PORT}"])
           end
 
           context "when the default has options" do
@@ -197,7 +197,7 @@ describe Mongoid::Config do
             end
 
             it "sets the consistency option" do
-              options["consistency"].should eq(:strong)
+              expect(options["consistency"]).to eq(:strong)
             end
           end
         end
@@ -213,7 +213,7 @@ describe Mongoid::Config do
           end
 
           it "sets the secondary host" do
-            secondary["hosts"].should eq([ ENV["MONGOHQ_SINGLE_URL"] ])
+            expect(secondary["hosts"]).to eq([ ENV["MONGOHQ_SINGLE_URL"] ])
           end
         end
       end
@@ -229,7 +229,7 @@ describe Mongoid::Config do
       end
 
       it "does not try to assign options" do
-        described_class.allow_dynamic_fields.should be_true
+        expect(described_class.allow_dynamic_fields).to be_true
       end
     end
 

@@ -9,19 +9,19 @@ describe Mongoid::Criterion::Inspection do
     end
 
     it "includes the selector" do
-      criteria.inspect.should include("selector")
+      expect(criteria.inspect).to include("selector")
     end
 
     it "includes the options" do
-      criteria.inspect.should include("options")
+      expect(criteria.inspect).to include("options")
     end
 
     it "includes the class" do
-      criteria.inspect.should include("class")
+      expect(criteria.inspect).to include("class")
     end
 
     it "includes the embedded flag" do
-      criteria.inspect.should include("embedded")
+      expect(criteria.inspect).to include("embedded")
     end
   end
 end

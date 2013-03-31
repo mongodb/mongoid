@@ -15,7 +15,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       it "adds the field to readonly attributes" do
-        Person.readonly_attributes.to_a.should eq([ "title" ])
+        expect(Person.readonly_attributes.to_a).to eq([ "title" ])
       end
     end
 
@@ -26,7 +26,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       it "adds the fields to readonly attributes" do
-        Person.readonly_attributes.to_a.should eq([ "title", "terms" ])
+        expect(Person.readonly_attributes.to_a).to eq([ "title", "terms" ])
       end
     end
 
@@ -41,19 +41,19 @@ describe Mongoid::Attributes::Readonly do
       end
 
       it "sets the first readonly value" do
-        person.title.should eq("sir")
+        expect(person.title).to eq("sir")
       end
 
       it "sets subsequent readonly values" do
-        person.terms.should be_true
+        expect(person.terms).to be_true
       end
 
       it "persists the first readonly value" do
-        person.reload.title.should eq("sir")
+        expect(person.reload.title).to eq("sir")
       end
 
       it "persists subsequent readonly values" do
-        person.reload.terms.should be_true
+        expect(person.reload.terms).to be_true
       end
     end
 
@@ -75,11 +75,11 @@ describe Mongoid::Attributes::Readonly do
         end
 
         it "does not update the field" do
-          person.title.should eq("sir")
+          expect(person.title).to eq("sir")
         end
 
         it "does not persist the changes" do
-          person.reload.title.should eq("sir")
+          expect(person.reload.title).to eq("sir")
         end
       end
 
@@ -91,11 +91,11 @@ describe Mongoid::Attributes::Readonly do
         end
 
         it "does not update the field" do
-          person.title.should eq("sir")
+          expect(person.title).to eq("sir")
         end
 
         it "does not persist the changes" do
-          person.reload.title.should eq("sir")
+          expect(person.reload.title).to eq("sir")
         end
       end
 
@@ -107,11 +107,11 @@ describe Mongoid::Attributes::Readonly do
         end
 
         it "does not update the field" do
-          person.title.should eq("sir")
+          expect(person.title).to eq("sir")
         end
 
         it "does not persist the changes" do
-          person.reload.title.should eq("sir")
+          expect(person.reload.title).to eq("sir")
         end
       end
 
@@ -123,11 +123,11 @@ describe Mongoid::Attributes::Readonly do
         end
 
         it "does not update the field" do
-          person.title.should eq("sir")
+          expect(person.title).to eq("sir")
         end
 
         it "does not persist the changes" do
-          person.reload.title.should eq("sir")
+          expect(person.reload.title).to eq("sir")
         end
       end
 
@@ -139,11 +139,11 @@ describe Mongoid::Attributes::Readonly do
         end
 
         it "does not update the field" do
-          person.title.should eq("sir")
+          expect(person.title).to eq("sir")
         end
 
         it "does not persist the changes" do
-          person.reload.title.should eq("sir")
+          expect(person.reload.title).to eq("sir")
         end
       end
 

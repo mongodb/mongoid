@@ -21,11 +21,11 @@ describe Mongoid::Atomic do
     end
 
     it "adds the document to the delayed atomic pulls" do
-      person.delayed_atomic_pulls["addresses"].should eq([ address ])
+      expect(person.delayed_atomic_pulls["addresses"]).to eq([ address ])
     end
 
     it "flags the document for destruction" do
-      address.should be_flagged_for_destroy
+      expect(address).to be_flagged_for_destroy
     end
   end
 
@@ -44,11 +44,11 @@ describe Mongoid::Atomic do
     end
 
     it "adds the document to the delayed atomic unsets" do
-      person.delayed_atomic_unsets["name"].should eq([ name ])
+      expect(person.delayed_atomic_unsets["name"]).to eq([ name ])
     end
 
     it "flags the document for destruction" do
-      name.should be_flagged_for_destroy
+      expect(name).to be_flagged_for_destroy
     end
   end
 
@@ -67,7 +67,7 @@ describe Mongoid::Atomic do
         end
 
         it "returns the atomic updates" do
-          person.atomic_updates.should eq({ "$set" => { "title" => "Sir" }})
+          expect(person.atomic_updates).to eq({ "$set" => { "title" => "Sir" }})
         end
 
         context "when an embeds many child is added" do
@@ -77,7 +77,7 @@ describe Mongoid::Atomic do
           end
 
           it "returns a $set and $pushAll for modifications" do
-            person.atomic_updates.should eq(
+            expect(person.atomic_updates).to eq(
               {
                 "$set" => { "title" => "Sir" },
                 "$pushAll" => { "addresses" => [
@@ -95,7 +95,7 @@ describe Mongoid::Atomic do
           end
 
           it "returns a $set for modifications" do
-            person.atomic_updates.should eq(
+            expect(person.atomic_updates).to eq(
               {
                 "$set" => {
                   "title" => "Sir",
@@ -119,7 +119,7 @@ describe Mongoid::Atomic do
           context "when asking for the updates from the root" do
 
             it "returns the $set with correct position and modifications" do
-              person.atomic_updates.should eq(
+              expect(person.atomic_updates).to eq(
                 { "$set" => { "title" => "Sir", "addresses.0.street" => "Bond St" }}
               )
             end
@@ -128,7 +128,7 @@ describe Mongoid::Atomic do
           context "when asking for the updates from the child" do
 
             it "returns the $set with correct position and modifications" do
-              address.atomic_updates.should eq(
+              expect(address.atomic_updates).to eq(
                 { "$set" => { "addresses.0.street" => "Bond St" }}
               )
             end
@@ -147,7 +147,7 @@ describe Mongoid::Atomic do
             context "when asking for the updates from the root" do
 
               it "returns the $set with correct positions and modifications" do
-                person.atomic_updates.should eq(
+                expect(person.atomic_updates).to eq(
                   { "$set" => {
                     "title" => "Sir",
                     "addresses.0.street" => "Bond St",
@@ -160,7 +160,7 @@ describe Mongoid::Atomic do
             context "when asking for the updates from the 1st level child" do
 
               it "returns the $set with correct positions and modifications" do
-                address.atomic_updates.should eq(
+                expect(address.atomic_updates).to eq(
                   { "$set" => {
                     "addresses.0.street" => "Bond St",
                     "addresses.0.locations.0.name" => "Work" }
@@ -172,7 +172,7 @@ describe Mongoid::Atomic do
             context "when asking for the updates from the 2nd level child" do
 
               it "returns the $set with correct positions and modifications" do
-                location.atomic_updates.should eq(
+                expect(location.atomic_updates).to eq(
                   { "$set" => {
                     "addresses.0.locations.0.name" => "Work" }
                   }
@@ -190,7 +190,7 @@ describe Mongoid::Atomic do
             context "when asking for the updates from the root" do
 
               it "returns the $set with correct positions and modifications" do
-                person.atomic_updates.should eq(
+                expect(person.atomic_updates).to eq(
                   {
                     "$set" => {
                       "title" => "Sir",
@@ -209,7 +209,7 @@ describe Mongoid::Atomic do
             context "when asking for the updates from the 1st level child" do
 
               it "returns the $set with correct positions and modifications" do
-                address.atomic_updates.should eq(
+                expect(address.atomic_updates).to eq(
                   {
                     "$set" => {
                       "addresses.0.street" => "Bond St"
@@ -236,7 +236,7 @@ describe Mongoid::Atomic do
             end
 
             it "returns the $set for the first level and $unset for other." do
-              updates.should eq({
+              expect(updates).to eq({
                 "$unset" => { "addresses" => true },
                 "$set" => { "title" => "Sir" }
               })
@@ -256,7 +256,7 @@ describe Mongoid::Atomic do
             context "when asking for the updates from the root document" do
 
               it "returns the $set for 1st level and other for the 2nd level" do
-                person.atomic_updates.should eq(
+                expect(person.atomic_updates).to eq(
                   {
                     "$set" => {
                       "title" => "Sir",
@@ -282,7 +282,7 @@ describe Mongoid::Atomic do
             context "when asking for the updates from the 1st level document" do
 
               it "returns the $set for 1st level and other for the 2nd level" do
-                address.atomic_updates.should eq(
+                expect(address.atomic_updates).to eq(
                   { "$set" => { "addresses.0.street" => "Bond St" }}
                 )
               end
@@ -305,7 +305,7 @@ describe Mongoid::Atomic do
             end
 
             it "returns the $set for 1st and 2nd level and other for the 3nd level" do
-              person.atomic_updates.should eq(
+              expect(person.atomic_updates).to eq(
                 {
                   "$set" => {
                     "title" => "Sir"
@@ -340,7 +340,7 @@ describe Mongoid::Atomic do
           end
 
           it "returns the proper $sets and $pushAlls for all levels" do
-            person.atomic_updates.should eq(
+            expect(person.atomic_updates).to eq(
               {
                 "$set" => {
                   "title" => "Sir",

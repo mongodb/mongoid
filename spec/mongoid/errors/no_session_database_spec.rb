@@ -9,19 +9,19 @@ describe Mongoid::Errors::NoSessionDatabase do
     end
 
     it "contains the problem in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "No database provided for session configuration: :secondary."
       )
     end
 
     it "contains the summary in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "Each session configuration must provide a database so Mongoid"
       )
     end
 
     it "contains the resolution in the message" do
-      error.message.should include(
+      expect(error.message).to include(
         "If configuring via a mongoid.yml, ensure that within your :secondary"
       )
     end

@@ -50,7 +50,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         it "sets the document" do
-          document.should eq(person)
+          expect(document).to eq(person)
         end
       end
 
@@ -90,7 +90,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         it "sets the document" do
-          document.should eq(person)
+          expect(document).to eq(person)
         end
       end
     end
@@ -110,7 +110,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it "returns the object" do
-        document.should eq(object)
+        expect(document).to eq(object)
       end
     end
   end
@@ -126,7 +126,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
       context "when the id is nil" do
 
         it "returns nil" do
-          game.person.should be_nil
+          expect(game.person).to be_nil
         end
       end
 
@@ -137,7 +137,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         it "returns nil" do
-          game.person.should be_nil
+          expect(game.person).to be_nil
         end
       end
     end
@@ -161,11 +161,11 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it "returns the document" do
-        game.person.should eq(person)
+        expect(game.person).to eq(person)
       end
 
       it "gets the document from the identity map" do
-        game.person.should equal(person)
+        expect(game.person).to equal(person)
       end
     end
 
@@ -185,11 +185,11 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it 'sets the person_id to nil' do
-        game.person_id.should be_nil
+        expect(game.person_id).to be_nil
       end
 
       it 'does not delete the person' do
-        Person.find(person.id).should eq(person)
+        expect(Person.find(person.id)).to eq(person)
       end
     end
   end
@@ -211,11 +211,11 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it 'sets the person_id to nil' do
-        game.person_id.should be_nil
+        expect(game.person_id).to be_nil
       end
 
       it 'does not delete the person' do
-        Person.find(person.id).should eq(person)
+        expect(Person.find(person.id)).to eq(person)
       end
     end
 
@@ -230,11 +230,11 @@ describe Mongoid::Relations::Builders::Referenced::In do
       end
 
       it 'sets the person_id' do
-        game.person_id.should eq(other_person.id)
+        expect(game.person_id).to eq(other_person.id)
       end
 
       it 'does not delete the person' do
-        Person.find(person.id).should eq(person)
+        expect(Person.find(person.id)).to eq(person)
       end
     end
   end

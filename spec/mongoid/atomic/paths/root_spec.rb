@@ -13,21 +13,21 @@ describe Mongoid::Atomic::Paths::Root do
   describe "#document" do
 
     it "returns the document" do
-      root.document.should eq(person)
+      expect(root.document).to eq(person)
     end
   end
 
   describe "#path" do
 
     it "returns an empty string" do
-      root.path.should be_empty
+      expect(root.path).to be_empty
     end
   end
 
   describe "#position" do
 
     it "returns an empty string" do
-      root.position.should be_empty
+      expect(root.position).to be_empty
     end
   end
 
@@ -59,7 +59,7 @@ describe Mongoid::Atomic::Paths::Root do
       end
 
       it "returns the id and shard key in the hash" do
-        root.selector.should eq({ "_id" => profile.id, "name" => profile.name })
+        expect(root.selector).to eq({ "_id" => profile.id, "name" => profile.name })
       end
     end
 
@@ -68,7 +68,7 @@ describe Mongoid::Atomic::Paths::Root do
       context "when using object ids" do
 
         it "returns the hash with the id" do
-          root.selector.should eq({ "_id" => person.id })
+          expect(root.selector).to eq({ "_id" => person.id })
         end
       end
 
@@ -90,14 +90,14 @@ describe Mongoid::Atomic::Paths::Root do
           end
 
           it "returns the hash with the old key" do
-            root.selector.should eq({ "_id" => "savings" })
+            expect(root.selector).to eq({ "_id" => "savings" })
           end
         end
 
         context "when the composite key has not changed" do
 
           it "returns the hash with the key" do
-            root.selector.should eq({ "_id" => "savings" })
+            expect(root.selector).to eq({ "_id" => "savings" })
           end
         end
       end

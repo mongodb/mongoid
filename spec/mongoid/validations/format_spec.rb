@@ -21,7 +21,7 @@ describe Mongoid::Validations::FormatValidator do
         end
 
         it "adds no errors" do
-          product.errors[:brand_name].should be_empty
+          expect(product.errors[:brand_name]).to be_empty
         end
       end
 
@@ -32,7 +32,7 @@ describe Mongoid::Validations::FormatValidator do
         end
 
         it "adds errors" do
-          product.errors[:brand_name].should eq(["is invalid"])
+          expect(product.errors[:brand_name]).to eq(["is invalid"])
         end
       end
     end
@@ -50,7 +50,7 @@ describe Mongoid::Validations::FormatValidator do
         end
 
         it "adds no errors" do
-          product.errors[:website].should be_empty
+          expect(product.errors[:website]).to be_empty
         end
       end
 
@@ -64,7 +64,7 @@ describe Mongoid::Validations::FormatValidator do
         end
 
         it "adds errors" do
-          product.errors[:website].should eq(["is invalid"])
+          expect(product.errors[:website]).to eq(["is invalid"])
         end
       end
 
@@ -75,7 +75,7 @@ describe Mongoid::Validations::FormatValidator do
         end
 
         it "adds errors" do
-          product.errors[:website].should eq(["is invalid"])
+          expect(product.errors[:website]).to eq(["is invalid"])
         end
       end
     end

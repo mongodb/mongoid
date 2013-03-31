@@ -25,19 +25,19 @@ describe Mongoid::Relations::Polymorphic do
         end
 
         it "sets polymorphic to true" do
-          klass.should be_polymorphic
+          expect(klass).to be_polymorphic
         end
 
         it "adds the foreign key type field" do
-          klass.fields["ratable_type"].should_not be_nil
+          expect(klass.fields["ratable_type"]).to_not be_nil
         end
 
         it "adds the foreign key inverse field field" do
-          klass.fields["ratable_field"].should_not be_nil
+          expect(klass.fields["ratable_field"]).to_not be_nil
         end
 
         it "returns self" do
-          polymorphed.should eq(klass)
+          expect(polymorphed).to eq(klass)
         end
       end
 
@@ -56,15 +56,15 @@ describe Mongoid::Relations::Polymorphic do
         end
 
         it "sets polymorphic to true" do
-          klass.should be_polymorphic
+          expect(klass).to be_polymorphic
         end
 
         it "does not add the foreign key type field" do
-          klass.fields["ratable_type"].should be_nil
+          expect(klass.fields["ratable_type"]).to be_nil
         end
 
         it "does not add the foreign key inverse field field" do
-          klass.fields["ratable_field"].should be_nil
+          expect(klass.fields["ratable_field"]).to be_nil
         end
       end
     end
@@ -83,15 +83,15 @@ describe Mongoid::Relations::Polymorphic do
       end
 
       it "sets polymorphic to false" do
-        klass.should_not be_polymorphic
+        expect(klass).to_not be_polymorphic
       end
 
       it "does not add the foreign key type field" do
-        klass.fields["ratable_type"].should be_nil
+        expect(klass.fields["ratable_type"]).to be_nil
       end
 
       it "does not add the foreign key inverse field field" do
-        klass.fields["ratable_field"].should be_nil
+        expect(klass.fields["ratable_field"]).to be_nil
       end
     end
   end
@@ -101,14 +101,14 @@ describe Mongoid::Relations::Polymorphic do
     context "when the document is in a polymorphic relation" do
 
       it "returns true" do
-        Movie.should be_polymorphic
+        expect(Movie).to be_polymorphic
       end
     end
 
     context "when the document is not in a polymorphic relation" do
 
       it "returns false" do
-        Survey.should_not be_polymorphic
+        expect(Survey).to_not be_polymorphic
       end
     end
   end
@@ -118,14 +118,14 @@ describe Mongoid::Relations::Polymorphic do
     context "when the document is in a polymorphic relation" do
 
       it "returns true" do
-        Movie.new.should be_polymorphic
+        expect(Movie.new).to be_polymorphic
       end
     end
 
     context "when the document is not in a polymorphic relation" do
 
       it "returns false" do
-        Survey.new.should_not be_polymorphic
+        expect(Survey.new).to_not be_polymorphic
       end
     end
   end

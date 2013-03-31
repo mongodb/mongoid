@@ -12,13 +12,13 @@ describe "A document loaded from rails" do
   end
 
   it "defines a _destroy method" do
-    Person.new.should respond_to(:_destroy)
+    expect(Person.new).to respond_to(:_destroy)
   end
 
   describe "#_destroy" do
 
     it "always returns false" do
-      Person.new._destroy.should be_false
+      expect(Person.new._destroy).to be_false
     end
   end
 end

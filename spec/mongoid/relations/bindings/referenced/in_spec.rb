@@ -39,11 +39,11 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "sets the inverse relation" do
-          person.game.should eq(game)
+          expect(person.game).to eq(game)
         end
 
         it "sets the foreign key" do
-          game.person_id.should eq(person.id)
+          expect(game.person_id).to eq(person.id)
         end
       end
 
@@ -62,7 +62,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "sets the inverse relation" do
-          person.game.should eq(game)
+          expect(person.game).to eq(game)
         end
 
         let(:person) do
@@ -70,7 +70,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "sets the fk with username field" do
-          game.person_id.should eq(person.username)
+          expect(game.person_id).to eq(person.username)
         end
       end
 
@@ -102,11 +102,11 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "sets the inverse relation" do
-          person.posts.should include(post)
+          expect(person.posts).to include(post)
         end
 
         it "sets the foreign key" do
-          post.person_id.should eq(person.id)
+          expect(post.person_id).to eq(person.id)
         end
       end
 
@@ -142,11 +142,11 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "removes the inverse relation" do
-          person.game.should be_nil
+          expect(person.game).to be_nil
         end
 
         it "removed the foreign key" do
-          game.person_id.should be_nil
+          expect(game.person_id).to be_nil
         end
       end
 
@@ -175,11 +175,11 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "removes the inverse relation" do
-          person.posts.should be_empty
+          expect(person.posts).to be_empty
         end
 
         it "removes the foreign key" do
-          post.person_id.should be_nil
+          expect(post.person_id).to be_nil
         end
       end
 
@@ -210,7 +210,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
       end
 
       it "does not set the foreign key" do
-        game.person_id.should be_nil
+        expect(game.person_id).to be_nil
       end
     end
   end
@@ -234,7 +234,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
       end
 
       it "does not unset the foreign key" do
-        game.person_id.should eq(person.id)
+        expect(game.person_id).to eq(person.id)
       end
     end
   end

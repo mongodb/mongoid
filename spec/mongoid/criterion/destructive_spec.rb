@@ -40,11 +40,11 @@ describe Mongoid::Criteria do
         end
 
         it "deletes the removes the documents from the database" do
-          Person.count.should eq(1)
+          expect(Person.count).to eq(1)
         end
 
         it "returns the number removed" do
-          removed.should eq(2)
+          expect(removed).to eq(2)
         end
       end
 
@@ -65,11 +65,11 @@ describe Mongoid::Criteria do
           end
 
           it "deletes the removes the documents from the database" do
-            person.addresses.count.should eq(1)
+            expect(person.addresses.count).to eq(1)
           end
 
           it "returns the number removed" do
-            removed.should eq(1)
+            expect(removed).to eq(1)
           end
         end
 
@@ -88,11 +88,11 @@ describe Mongoid::Criteria do
           end
 
           it "deletes the removes the documents from the database" do
-            person.addresses.count.should eq(0)
+            expect(person.addresses.count).to eq(0)
           end
 
           it "returns the number removed" do
-            removed.should eq(2)
+            expect(removed).to eq(2)
           end
         end
       end

@@ -21,7 +21,7 @@ describe Mongoid::Relations::Cascading do
         end
 
         it "ignores the cascade" do
-          band.cascade!.should eq([ "records" ])
+          expect(band.cascade!).to eq([ "records" ])
         end
       end
     end
@@ -61,11 +61,11 @@ describe Mongoid::Relations::Cascading do
       end
 
       it "adds the action to the cascades" do
-        klass.cascades.should include("posts")
+        expect(klass.cascades).to include("posts")
       end
 
       it "returns self" do
-        cascaded.should eq(klass)
+        expect(cascaded).to eq(klass)
       end
     end
 
@@ -83,11 +83,11 @@ describe Mongoid::Relations::Cascading do
       end
 
       it "does not add an action to the cascades" do
-        klass.cascades.should_not include("posts")
+        expect(klass.cascades).to_not include("posts")
       end
 
       it "returns self" do
-        cascaded.should eq(klass)
+        expect(cascaded).to eq(klass)
       end
     end
   end
@@ -161,7 +161,7 @@ describe Mongoid::Relations::Cascading do
             end
 
             it "removes the references to the removed document" do
-              from_db.ratable_id.should be_nil
+              expect(from_db.ratable_id).to be_nil
             end
           end
 
@@ -186,7 +186,7 @@ describe Mongoid::Relations::Cascading do
               end
 
               it "removes the references to the removed document" do
-                from_db.ratable_id.should be_nil
+                expect(from_db.ratable_id).to be_nil
               end
             end
 
@@ -197,7 +197,7 @@ describe Mongoid::Relations::Cascading do
               end
 
               it "returns nil" do
-                book.send(method).should be_true
+                expect(book.send(method)).to be_true
               end
             end
           end
@@ -221,11 +221,11 @@ describe Mongoid::Relations::Cascading do
             end
 
             it "removes the references from the removed document" do
-              person.preference_ids.should_not include(preference.id)
+              expect(person.preference_ids).to_not include(preference.id)
             end
 
             it "removes the references to the removed document" do
-              from_db.person_ids.should_not include(person.id)
+              expect(from_db.person_ids).to_not include(person.id)
             end
           end
         end
@@ -255,7 +255,7 @@ describe Mongoid::Relations::Cascading do
 
               it "deletes the parent" do
                 person.send(method)
-                person.should be_destroyed
+                expect(person).to be_destroyed
               end
             end
 
@@ -294,7 +294,7 @@ describe Mongoid::Relations::Cascading do
 
               it "deletes the parent" do
                 person.send(method)
-                person.should be_destroyed
+                expect(person).to be_destroyed
               end
             end
 
@@ -333,7 +333,7 @@ describe Mongoid::Relations::Cascading do
 
               it "deletes the parent" do
                 person.send(method)
-                person.should be_destroyed
+                expect(person).to be_destroyed
               end
             end
 

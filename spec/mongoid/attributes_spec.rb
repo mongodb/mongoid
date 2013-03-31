@@ -11,7 +11,7 @@ describe Mongoid::Attributes do
       end
 
       it "does not cause an infinite loop" do
-        account.overridden.should eq("not recommended")
+        expect(account.overridden).to eq("not recommended")
       end
     end
   end
@@ -33,14 +33,14 @@ describe Mongoid::Attributes do
         context "when passing just the name" do
 
           it "returns the full value" do
-            person[:desc].should eq("en" => "testing")
+            expect(person[:desc]).to eq("en" => "testing")
           end
         end
 
         context "when passing the name with locale" do
 
           it "returns the value for the locale" do
-            person["desc.en"].should eq("testing")
+            expect(person["desc.en"]).to eq("testing")
           end
         end
       end
@@ -48,7 +48,7 @@ describe Mongoid::Attributes do
       context "when attribute does not exist" do
 
         it "returns the default value" do
-          person[:age].should eq(100)
+          expect(person[:age]).to eq(100)
         end
       end
 
@@ -59,7 +59,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns the value" do
-          person[:owner_id].should eq(5)
+          expect(person[:owner_id]).to eq(5)
         end
       end
     end
@@ -85,7 +85,7 @@ describe Mongoid::Attributes do
           end
 
           it "returns the default value" do
-            found[:age].should eq(100)
+            expect(found[:age]).to eq(100)
           end
         end
 
@@ -98,7 +98,7 @@ describe Mongoid::Attributes do
           end
 
           it "returns the default value" do
-            person[:age].should eq(100)
+            expect(person[:age]).to eq(100)
           end
         end
       end
@@ -118,11 +118,11 @@ describe Mongoid::Attributes do
       end
 
       it "does not use the default value" do
-        person.age.should be_nil
+        expect(person.age).to be_nil
       end
 
       it "returns the set value" do
-        age.should be_nil
+        expect(age).to be_nil
       end
     end
 
@@ -133,11 +133,11 @@ describe Mongoid::Attributes do
       end
 
       it "allows overwriting of the default value" do
-        person.terms.should be_true
+        expect(person.terms).to be_true
       end
 
       it "returns the set value" do
-        terms.should eq(true)
+        expect(terms).to eq(true)
       end
     end
   end
@@ -149,7 +149,7 @@ describe Mongoid::Attributes do
     end
 
     it "delegates to #id" do
-      person._id.should eq(person.id)
+      expect(person._id).to eq(person.id)
     end
   end
 
@@ -190,7 +190,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the object id" do
-          person.id.should eq(bson_id)
+          expect(person.id).to eq(bson_id)
         end
       end
 
@@ -201,7 +201,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the object id" do
-          person.id.should eq(bson_id)
+          expect(person.id).to eq(bson_id)
         end
       end
 
@@ -212,7 +212,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the supplied value to_s" do
-          person.id.should eq(2)
+          expect(person.id).to eq(2)
         end
       end
     end
@@ -243,7 +243,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the string of the object id" do
-          person.id.should eq(bson_id.to_s)
+          expect(person.id).to eq(bson_id.to_s)
         end
       end
 
@@ -254,7 +254,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the string" do
-          person.id.should eq(bson_id.to_s)
+          expect(person.id).to eq(bson_id.to_s)
         end
       end
 
@@ -265,7 +265,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the supplied value to_s" do
-          person.id.should eq("2")
+          expect(person.id).to eq("2")
         end
       end
     end
@@ -287,7 +287,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the integer" do
-          person.id.should eq(1)
+          expect(person.id).to eq(1)
         end
       end
 
@@ -298,7 +298,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the id as the supplied value" do
-          person.id.should eq(2)
+          expect(person.id).to eq(2)
         end
       end
     end
@@ -321,20 +321,20 @@ describe Mongoid::Attributes do
     context "when an attribute exists" do
 
       it "allows the getter" do
-        person.testing.should eq("Testing")
+        expect(person.testing).to eq("Testing")
       end
 
       it "allows the setter" do
         person.testing = "Test"
-        person.testing.should eq("Test")
+        expect(person.testing).to eq("Test")
       end
 
       it "allows the getter before_type_cast" do
-        person.testing_before_type_cast.should eq("Testing")
+        expect(person.testing_before_type_cast).to eq("Testing")
       end
 
       it "returns true for respond_to?" do
-        person.respond_to?(:testing).should be_true
+        expect(person.respond_to?(:testing)).to be_true
       end
     end
 
@@ -349,11 +349,11 @@ describe Mongoid::Attributes do
       end
 
       it "mongoizes the dynamic field" do
-        person.new_years.should be_a(Time)
+        expect(person.new_years).to be_a(Time)
       end
 
       it "keeps the same value" do
-        person.new_years.should eq(new_years)
+        expect(person.new_years).to eq(new_years)
       end
     end
   end
@@ -383,14 +383,14 @@ describe Mongoid::Attributes do
         context "when attribute is a string" do
 
           it "adds the string to the attributes" do
-            person.attributes["nofieldstring"].should eq("Testing")
+            expect(person.attributes["nofieldstring"]).to eq("Testing")
           end
         end
 
         context "when attribute is not a string" do
 
           it "adds a cast value to the attributes" do
-            person.attributes["nofieldint"].should eq(5)
+            expect(person.attributes["nofieldint"]).to eq(5)
           end
         end
       end
@@ -445,15 +445,15 @@ describe Mongoid::Attributes do
       end
 
       it "casts integers" do
-        person[:age].should eq(30)
+        expect(person[:age]).to eq(30)
       end
 
       it "casts booleans" do
-        person[:terms].should be_true
+        expect(person[:terms]).to be_true
       end
 
       it "sets empty strings to nil" do
-        person[:score].should be_nil
+        expect(person[:score]).to be_nil
       end
     end
 
@@ -474,7 +474,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the associations" do
-          person.name.should eq(name)
+          expect(person.name).to eq(name)
         end
       end
 
@@ -493,11 +493,11 @@ describe Mongoid::Attributes do
         end
 
         it "sets the parent association" do
-          person.game.should eq(game)
+          expect(person.game).to eq(game)
         end
 
         it "sets the inverse association" do
-          game.person.should eq(person)
+          expect(game.person).to eq(person)
         end
       end
 
@@ -512,7 +512,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the association" do
-          name.person.should eq(person)
+          expect(name.person).to eq(person)
         end
       end
     end
@@ -532,7 +532,7 @@ describe Mongoid::Attributes do
       end
 
       it "calls the setter for the association" do
-        person.employer_id.should eq("1")
+        expect(person.employer_id).to eq("1")
       end
     end
 
@@ -547,7 +547,7 @@ describe Mongoid::Attributes do
       end
 
       it "sets the empty array" do
-        person.aliases.should be_empty
+        expect(person.aliases).to be_empty
       end
     end
 
@@ -562,7 +562,7 @@ describe Mongoid::Attributes do
       end
 
       it "sets the empty hash" do
-        person.map.should eq({})
+        expect(person.map).to eq({})
       end
     end
   end
@@ -582,7 +582,7 @@ describe Mongoid::Attributes do
     end
 
     it "only overwrites supplied attributes" do
-      person.title.should eq("Sir")
+      expect(person.title).to eq("Sir")
     end
   end
 
@@ -597,8 +597,8 @@ describe Mongoid::Attributes do
       context "when attribute does not exist" do
 
         it "returns the default value" do
-          person.age.should eq(100)
-          person.pets.should be_false
+          expect(person.age).to eq(100)
+          expect(person.pets).to be_false
         end
 
       end
@@ -610,7 +610,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns the value" do
-          person.read_attribute(:owner_id).should eq(5)
+          expect(person.read_attribute(:owner_id)).to eq(5)
         end
       end
     end
@@ -633,7 +633,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns the default value" do
-          person.age.should eq(100)
+          expect(person.age).to eq(100)
         end
       end
     end
@@ -647,7 +647,7 @@ describe Mongoid::Attributes do
     context "when the attribute has not yet been assigned" do
 
       it "returns the default value" do
-        person.age_before_type_cast.should eq(100)
+        expect(person.age_before_type_cast).to eq(100)
       end
     end
 
@@ -655,7 +655,7 @@ describe Mongoid::Attributes do
 
       it "returns the default value" do
         person.age = "old"
-        person.age_before_type_cast.should eq("old")
+        expect(person.age_before_type_cast).to eq("old")
       end
     end
   end
@@ -672,7 +672,7 @@ describe Mongoid::Attributes do
       context "when attribute does not exist" do
 
         it "returns false" do
-          person.attribute_present?(:owner_id).should be_false
+          expect(person.attribute_present?(:owner_id)).to be_false
         end
       end
 
@@ -682,7 +682,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns true" do
-          person.attribute_present?(:owner_id).should be_true
+          expect(person.attribute_present?(:owner_id)).to be_true
         end
       end
     end
@@ -705,7 +705,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns true" do
-          person.attribute_present?(:age).should be_true
+          expect(person.attribute_present?(:age)).to be_true
         end
       end
     end
@@ -722,7 +722,7 @@ describe Mongoid::Attributes do
 
           it "return true"  do
             person.terms = false
-            person.attribute_present?(:terms).should be_true
+            expect(person.attribute_present?(:terms)).to be_true
           end
         end
 
@@ -730,7 +730,7 @@ describe Mongoid::Attributes do
 
           it "return true"  do
             person.terms = false
-            person.attribute_present?(:terms).should be_true
+            expect(person.attribute_present?(:terms)).to be_true
           end
         end
       end
@@ -743,7 +743,7 @@ describe Mongoid::Attributes do
       end
 
       it "return false" do
-        person.attribute_present?(:title).should be_false
+        expect(person.attribute_present?(:title)).to be_false
       end
     end
   end
@@ -759,14 +759,14 @@ describe Mongoid::Attributes do
       context "when provided a symbol" do
 
         it "returns true" do
-          person.has_attribute?(:title).should be_true
+          expect(person.has_attribute?(:title)).to be_true
         end
       end
 
       context "when provided a string" do
 
         it "returns true" do
-          person.has_attribute?("title").should be_true
+          expect(person.has_attribute?("title")).to be_true
         end
       end
     end
@@ -774,7 +774,7 @@ describe Mongoid::Attributes do
     context "when the key is not in the attributes" do
 
       it "returns false" do
-        person.has_attribute?(:employer_id).should be_false
+        expect(person.has_attribute?(:employer_id)).to be_false
       end
     end
   end
@@ -788,7 +788,7 @@ describe Mongoid::Attributes do
     context "before the attribute has been assigned" do
 
       it "returns false" do
-        person.has_attribute_before_type_cast?(:age).should be_false
+        expect(person.has_attribute_before_type_cast?(:age)).to be_false
       end
     end
 
@@ -796,7 +796,7 @@ describe Mongoid::Attributes do
 
       it "returns true" do
         person.age = 'old'
-        person.has_attribute_before_type_cast?(:age).should be_true
+        expect(person.has_attribute_before_type_cast?(:age)).to be_true
       end
     end
   end
@@ -814,11 +814,11 @@ describe Mongoid::Attributes do
       end
 
       it "removes the attribute" do
-        person.title.should be_nil
+        expect(person.title).to be_nil
       end
 
       it "removes the key from the attributes hash" do
-        person.has_attribute?(:title).should be_false
+        expect(person.has_attribute?(:title)).to be_false
       end
 
       context "when saving after the removal" do
@@ -828,7 +828,7 @@ describe Mongoid::Attributes do
         end
 
         it "persists the removal" do
-          person.reload.has_attribute?(:title).should be_false
+          expect(person.reload.has_attribute?(:title)).to be_false
         end
       end
     end
@@ -849,11 +849,11 @@ describe Mongoid::Attributes do
      end
 
      it "removes the attribute" do
-       person.pet.name.should be_nil
+       expect(person.pet.name).to be_nil
      end
 
      it "removes the key from the attributes hash" do
-       person.pet.has_attribute?(:name).should be_false
+       expect(person.pet.has_attribute?(:name)).to be_false
      end
 
      context "when saving after the removal" do
@@ -863,7 +863,7 @@ describe Mongoid::Attributes do
        end
 
        it "persists the removal" do
-         person.reload.pet.has_attribute?(:name).should be_false
+         expect(person.reload.pet.has_attribute?(:name)).to be_false
        end
      end
 
@@ -880,7 +880,7 @@ describe Mongoid::Attributes do
       end
 
       it "does not fail" do
-        person.title.should be_nil
+        expect(person.title).to be_nil
       end
     end
 
@@ -895,7 +895,7 @@ describe Mongoid::Attributes do
       end
 
       it "does not add a delayed unset operation" do
-        person.delayed_atomic_unsets.should be_empty
+        expect(person.delayed_atomic_unsets).to be_empty
       end
     end
   end
@@ -921,14 +921,14 @@ describe Mongoid::Attributes do
           end
 
           it "returns true" do
-            person.should respond_to(:attr)
+            expect(person).to respond_to(:attr)
           end
         end
 
         context "when the attribute does not exist" do
 
           it "returns false" do
-            person.should_not respond_to(:attr)
+            expect(person).to_not respond_to(:attr)
           end
         end
       end
@@ -942,14 +942,14 @@ describe Mongoid::Attributes do
           end
 
           it "returns true" do
-            person.should respond_to(:attr=)
+            expect(person).to respond_to(:attr=)
           end
         end
 
         context "when the attribute does not exist" do
 
           it "returns false" do
-            person.should_not respond_to(:attr=)
+            expect(person).to_not respond_to(:attr=)
           end
         end
       end
@@ -972,14 +972,14 @@ describe Mongoid::Attributes do
       context "when asking for the getter" do
 
         it "returns false" do
-          person.should_not respond_to(:attr)
+          expect(person).to_not respond_to(:attr)
         end
       end
 
       context "when asking for the setter" do
 
         it "returns false" do
-          person.should_not respond_to(:attr=)
+          expect(person).to_not respond_to(:attr=)
         end
       end
     end
@@ -994,7 +994,7 @@ describe Mongoid::Attributes do
       end
 
       it "returns the default value" do
-        person.age.should eq(100)
+        expect(person.age).to eq(100)
       end
     end
 
@@ -1004,7 +1004,7 @@ describe Mongoid::Attributes do
       end
 
       it "should store the attribute before type cast" do
-        person.age_before_type_cast.should eq("old")
+        expect(person.age_before_type_cast).to eq("old")
       end
     end
 
@@ -1015,7 +1015,7 @@ describe Mongoid::Attributes do
       end
 
       it "does not use the default value" do
-        person.age.should be_nil
+        expect(person.age).to be_nil
       end
     end
 
@@ -1030,7 +1030,7 @@ describe Mongoid::Attributes do
       end
 
       it "allows overwriting of the default value" do
-        person.terms.should be_true
+        expect(person.terms).to be_true
       end
     end
 
@@ -1045,7 +1045,7 @@ describe Mongoid::Attributes do
       end
 
       it "allows the field name to be udpated" do
-        person.t.should eq("aliased field to test")
+        expect(person.t).to eq("aliased field to test")
       end
     end
   end
@@ -1070,7 +1070,7 @@ describe Mongoid::Attributes do
       end
 
       it "returns the value" do
-        person.send(:typed_value_for, "age", "51").should eq("51")
+        person.send(:typed_value_for, "age", expect("51")).to eq("51")
       end
     end
   end
@@ -1082,7 +1082,7 @@ describe Mongoid::Attributes do
     end
 
     it "typecasts proc values" do
-      person.age.should eq(100)
+      expect(person.age).to eq(100)
     end
   end
 
@@ -1101,7 +1101,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets nested documents" do
-          person.videos.first.title.should eq("Fight Club")
+          expect(person.videos.first.title).to eq("Fight Club")
         end
       end
 
@@ -1122,7 +1122,7 @@ describe Mongoid::Attributes do
           end
 
           it "properly casts values" do
-            person.age.should eq(50)
+            expect(person.age).to eq(50)
           end
         end
 
@@ -1133,7 +1133,7 @@ describe Mongoid::Attributes do
           end
 
           it "does not set anything" do
-            person.age.should eq(100)
+            expect(person.age).to eq(100)
           end
         end
       end
@@ -1161,8 +1161,8 @@ describe Mongoid::Attributes do
           end
 
           it "does not overwrite child attributes if not in the hash" do
-            owner.pet.name.should eq("Bingo")
-            owner.pet.vet_visits.size.should eq(1)
+            expect(owner.pet.name).to eq("Bingo")
+            expect(owner.pet.vet_visits.size).to eq(1)
           end
         end
 
@@ -1186,11 +1186,11 @@ describe Mongoid::Attributes do
           end
 
           it "has 3 new entries" do
-            pet.vet_visits.count.should eq(3)
+            expect(pet.vet_visits.count).to eq(3)
           end
 
           it "persists the changes" do
-            pet.reload.vet_visits.count.should eq(3)
+            expect(pet.reload.vet_visits.count).to eq(3)
           end
         end
 
@@ -1228,7 +1228,7 @@ describe Mongoid::Attributes do
           end
 
           it "sets the child attributes on the parent" do
-            name.attributes.should eq(
+            expect(name.attributes).to eq(
               { "_id" => "Test-User", "first_name" => "Test2", "last_name" => "User2" }
             )
           end
@@ -1250,7 +1250,7 @@ describe Mongoid::Attributes do
           end
 
           it "updates the child attributes on the parent" do
-            address.attributes.should eq(
+            expect(address.attributes).to eq(
               { "_id" => "test", "street" => "Test2" }
             )
           end
@@ -1272,37 +1272,37 @@ describe Mongoid::Attributes do
       end
 
       it "aliases the getter" do
-        product.cost.should eq(500)
+        expect(product.cost).to eq(500)
       end
 
       it "aliases the existance check" do
-        product.cost?.should be_true
+        expect(product.cost?).to be_true
       end
 
       it "aliases *_changed?" do
-        product.cost_changed?.should be_true
+        expect(product.cost_changed?).to be_true
       end
 
       it "aliases *_change" do
-        product.cost_change.should eq([ nil, 500 ])
+        expect(product.cost_change).to eq([ nil, 500 ])
       end
 
       it "aliases *_will_change!" do
-        product.should respond_to(:cost_will_change!)
+        expect(product).to respond_to(:cost_will_change!)
       end
 
       it "aliases *_was" do
-        product.cost_was.should be_nil
+        expect(product.cost_was).to be_nil
       end
 
       it "aliases reset_*!" do
         product.reset_cost!
-        product.cost.should be_nil
+        expect(product.cost).to be_nil
       end
 
       it "aliases *_before_type_cast" do
         product.cost = "expensive"
-        product.cost_before_type_cast.should eq("expensive")
+        expect(product.cost_before_type_cast).to eq("expensive")
       end
     end
 
@@ -1313,32 +1313,32 @@ describe Mongoid::Attributes do
       end
 
       it "aliases the getter" do
-        product.price.should eq(500)
+        expect(product.price).to eq(500)
       end
 
       it "aliases the existance check" do
-        product.price?.should be_true
+        expect(product.price?).to be_true
       end
 
       it "aliases *_changed?" do
-        product.price_changed?.should be_true
+        expect(product.price_changed?).to be_true
       end
 
       it "aliases *_change" do
-        product.price_change.should eq([ nil, 500 ])
+        expect(product.price_change).to eq([ nil, 500 ])
       end
 
       it "aliases *_will_change!" do
-        product.should respond_to(:price_will_change!)
+        expect(product).to respond_to(:price_will_change!)
       end
 
       it "aliases *_was" do
-        product.price_was.should be_nil
+        expect(product.price_was).to be_nil
       end
 
       it "aliases reset_*!" do
         product.reset_price!
-        product.price.should be_nil
+        expect(product.price).to be_nil
       end
     end
   end
@@ -1350,7 +1350,7 @@ describe Mongoid::Attributes do
     end
 
     it "has an entry in the attributes" do
-      person.reload.attributes.should have_key("score")
+      expect(person.reload.attributes).to have_key("score")
     end
   end
 
@@ -1362,7 +1362,7 @@ describe Mongoid::Attributes do
 
     it "saves the default" do
       expect { person.save }.to_not raise_error
-      person.last_drink_taken_at.should eq(1.day.ago.in_time_zone("Alaska").to_date)
+      expect(person.last_drink_taken_at).to eq(1.day.ago.in_time_zone("Alaska").to_date)
     end
   end
 
@@ -1375,7 +1375,7 @@ describe Mongoid::Attributes do
       end
 
       it "applies the default value" do
-        person.last_drink_taken_at.should eq(1.day.ago.in_time_zone("Alaska").to_date)
+        expect(person.last_drink_taken_at).to eq(1.day.ago.in_time_zone("Alaska").to_date)
       end
     end
 
@@ -1392,7 +1392,7 @@ describe Mongoid::Attributes do
         end
 
         it "does not set the default" do
-          from_db.age.should eq(50)
+          expect(from_db.age).to eq(50)
         end
       end
 
@@ -1407,7 +1407,7 @@ describe Mongoid::Attributes do
         end
 
         it "does not set the default" do
-          from_db.age.should be_nil
+          expect(from_db.age).to be_nil
         end
       end
 
@@ -1422,7 +1422,7 @@ describe Mongoid::Attributes do
         end
 
         it "applies the defaults after all attributes are set" do
-          from_db.should be_balanced
+          expect(from_db).to be_balanced
         end
       end
     end
@@ -1447,7 +1447,7 @@ describe Mongoid::Attributes do
         end
 
         it "allows access to the legacy data" do
-          Person.first.pet.read_attribute(:unrecognized_field).should be_true
+          expect(Person.first.pet.read_attribute(:unrecognized_field)).to be_true
         end
       end
     end
