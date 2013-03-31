@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "mongoid/persistence/atomic"
 require "mongoid/persistence/deletion"
-require "mongoid/persistence/modification"
 require "mongoid/persistence/upsertion"
 require "mongoid/persistence/operations"
 
@@ -49,18 +48,6 @@ module Mongoid
       Operations.remove(self, options).persist
     end
     alias :delete :remove
-
-    # Update the document in the database.
-    #
-    # @example Update an existing document.
-    #   document.update
-    #
-    # @param [ Hash ] options Options to pass to update.
-    #
-    # @return [ true, false ] True if succeeded, false if not.
-    def update(options = {})
-      Operations.update(self, options).persist
-    end
 
     # Perform an upsert of the document. If the document does not exist in the
     # database, then Mongo will insert a new one, otherwise the fields will get

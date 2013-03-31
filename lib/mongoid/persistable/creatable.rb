@@ -112,15 +112,14 @@ module Mongoid
       #
       # @since 4.0.0
       def prepare_insert(options = {})
-        unless performing_validations?(options) && invalid?(:create)
-          result = run_callbacks(:save) do
-            run_callbacks(:create) do
-              yield(self)
-              post_process_insert
-            end
+        return self if performing_validations?(options) && invalid?(:create)
+        result = run_callbacks(:save) do
+          run_callbacks(:create) do
+            yield(self)
+            post_process_insert
           end
-          post_persist unless result == false
         end
+        post_persist unless result == false
         errors.clear unless performing_validations?(options)
         self
       end

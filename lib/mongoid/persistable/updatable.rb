@@ -8,6 +8,30 @@ module Mongoid
     # @since 2.0.0
     module Updatable
 
+      # Update the document in the database.
+      #
+      # @example Update an existing document.
+      #   document.update
+      #
+      # @param [ Hash ] options Options to pass to update.
+      #
+      # @return [ true, false ] True if succeeded, false if not.
+      #
+      # @since 1.0.0
+      def update(options = {})
+        prepare_update(options) do
+          updates, conflicts = init_atomic_updates
+          unless updates.empty?
+            coll = _root.collection
+            selector = atomic_selector
+            coll.find(selector).update(positionally(selector, updates))
+            conflicts.each_pair do |key, value|
+              coll.find(selector).update(positionally(selector, { key => value }))
+            end
+          end
+        end
+      end
+
       # Update a single attribute and persist the entire document.
       # This skips validation but fires the callbacks.
       #
@@ -67,6 +91,52 @@ module Mongoid
           fail_due_to_validation! unless errors.empty?
           fail_due_to_callback!(:update_attributes!)
         end
+        result
+      end
+
+      private
+
+      # Initialize the atomic updates.
+      #
+      # @api private
+      #
+      # @example Initialize the atomic updates.
+      #   document.init_atomic_updates
+      #
+      # @return [ Array<Hash> ] The updates and conflicts.
+      #
+      # @since 4.0.0
+      def init_atomic_updates
+        updates = atomic_updates
+        conflicts = updates.delete(:conflicts) || {}
+        [ updates, conflicts ]
+      end
+
+      # Prepare the update for execution. Validates and runs callbacks, etc.
+      #
+      # @api private
+      #
+      # @example Prepare for update.
+      #   document.prepare_update do
+      #     collection.update(atomic_selector)
+      #   end
+      #
+      # @param [ Hash ] options The options.
+      #
+      # @return [ true, false ] The result of the update.
+      #
+      # @since 4.0.0
+      def prepare_update(options = {})
+        return false if performing_validations?(options) && invalid?(:update)
+        process_flagged_destroys
+        result = run_callbacks(:save) do
+          run_callbacks(:update) do
+            yield(self)
+            true
+          end
+        end
+        post_persist unless result == false
+        errors.clear unless performing_validations?(options)
         result
       end
     end
