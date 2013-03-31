@@ -24,6 +24,7 @@ module Mongoid
     option :preload_models, default: false
     option :raise_not_found_error, default: true
     option :scope_overwrite_exception, default: false
+    option :duplicate_fields_exception, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
 
