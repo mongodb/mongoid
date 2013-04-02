@@ -4,6 +4,7 @@ require "mongoid/persistable/creatable"
 require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"
 require "mongoid/persistable/savable"
+require "mongoid/persistable/settable"
 require "mongoid/persistable/updatable"
 require "mongoid/persistable/upsertable"
 
@@ -20,6 +21,7 @@ module Mongoid
     include Deletable
     include Destroyable
     include Savable
+    include Settable
     include Updatable
     include Upsertable
 
@@ -70,6 +72,25 @@ module Mongoid
     def post_process_persist(result, options = {})
       post_persist unless result == false
       errors.clear unless performing_validations?(options)
+      true
+    end
+
+    # Prepare an atomic persistence operation. Yields an empty hash to be sent
+    # to the update.
+    #
+    # @api private
+    #
+    # @example Prepare the atomic operation.
+    #   document.prepare_atomic_operation do |opts|
+    #   end
+    #
+    # @return [ Object ] The result of the operation.
+    #
+    # @since 4.0.0
+    def prepare_atomic_operation
+      # @todo: Check if the document is persisted here.
+      yield({}) if block_given?
+      Threaded.clear_options!
       true
     end
   end

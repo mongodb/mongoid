@@ -137,10 +137,7 @@ module Mongoid
             criteria.pull(inverse_foreign_key, base.id)
           end
           if persistable?
-            base.set(
-              foreign_key,
-              base.send(foreign_key).clear
-            )
+            base.set(foreign_key => base.send(foreign_key).clear)
           end
           after_remove_error = nil
           many_to_many = target.clear do |doc|

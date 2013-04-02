@@ -175,25 +175,6 @@ describe Mongoid::Persistable::Atomic do
       end
     end
 
-    describe "#set" do
-
-      let(:person) do
-        Person.create(inte: 5)
-      end
-
-      before do
-        person.set(:inte, 8)
-      end
-
-      it "sets the aliased field" do
-        expect(person.inte).to eq(8)
-      end
-
-      it "persists the change" do
-        expect(person.reload.inte).to eq(8)
-      end
-    end
-
     describe "#unset" do
 
       let(:person) do

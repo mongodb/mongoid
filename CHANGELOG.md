@@ -9,6 +9,12 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid now requires Active Model 4 or higher.
 
+* `Document#set` now accepts multiple attributes in the form of a hash,
+  instead of the previous `(field, value)` args. Field aliases and typecasting
+  are also now supported in this operation.
+
+        document.set(name: "Photek", likes: 10000)
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 

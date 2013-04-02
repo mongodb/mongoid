@@ -9,7 +9,6 @@ require "mongoid/persistable/atomic/pull_all"
 require "mongoid/persistable/atomic/push"
 require "mongoid/persistable/atomic/push_all"
 require "mongoid/persistable/atomic/rename"
-require "mongoid/persistable/atomic/sets"
 require "mongoid/persistable/atomic/unset"
 
 module Mongoid
@@ -187,24 +186,6 @@ module Mongoid
       # @since 2.1.0
       def rename(field, value, options = {})
         Rename.new(self, field, value, options).persist
-      end
-
-      # Performs an atomic $set of the provided value on the supplied
-      # field. If the field does not exist it will be initialized as
-      # the provided value.
-      #
-      # @example Set a field.
-      #   person.set(:score, 2)
-      #
-      # @param [ Symbol ] field The name of the field.
-      # @param [ Integer ] value The value to set.
-      # @param [ Hash ] options The mongo persistence options.
-      #
-      # @return [ Array<Object> ] The new value of the field.
-      #
-      # @since 2.1.0
-      def set(field, value = nil, options = {})
-        Sets.new(self, field, value, options).persist
       end
 
       # Performs the atomic $unset on the supplied field.
