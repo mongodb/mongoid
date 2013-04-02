@@ -7,6 +7,7 @@ require "mongoid/persistable/savable"
 require "mongoid/persistable/settable"
 require "mongoid/persistable/updatable"
 require "mongoid/persistable/upsertable"
+require "mongoid/persistable/unsettable"
 
 module Mongoid
 
@@ -24,6 +25,7 @@ module Mongoid
     include Settable
     include Updatable
     include Upsertable
+    include Unsettable
 
     # Raise an error if validation failed.
     #

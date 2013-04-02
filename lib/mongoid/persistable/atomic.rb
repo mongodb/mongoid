@@ -9,7 +9,6 @@ require "mongoid/persistable/atomic/pull_all"
 require "mongoid/persistable/atomic/push"
 require "mongoid/persistable/atomic/push_all"
 require "mongoid/persistable/atomic/rename"
-require "mongoid/persistable/atomic/unset"
 
 module Mongoid
   module Persistable
@@ -186,26 +185,6 @@ module Mongoid
       # @since 2.1.0
       def rename(field, value, options = {})
         Rename.new(self, field, value, options).persist
-      end
-
-      # Performs the atomic $unset on the supplied field.
-      #
-      # @example
-      #   Remove the field.
-      #     person.unset(:age)
-      #   Remove fields age and score.
-      #     person.unset([:age, :score])
-      #
-      # @param [ Symbol, Array<Object> ] fields The fields name.
-      # @param [ Hash ] options The mongo persistence options.
-      #
-      # @return [ nil ] Always nil.
-      #
-      # @since 2.1.0
-      def unset(*args)
-        fields = args.__find_args__
-        options = fields[-1].is_a?(Hash) ? fields.delete_at(-1) : {}
-        Unset.new(self, fields, true, options).persist
       end
     end
   end
