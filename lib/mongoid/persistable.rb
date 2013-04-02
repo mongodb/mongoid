@@ -81,7 +81,7 @@ module Mongoid
     # @api private
     #
     # @example Prepare the atomic operation.
-    #   document.prepare_atomic_operation do |opts|
+    #   document.prepare_atomic_operation do |selector, opts|
     #   end
     #
     # @return [ Object ] The result of the operation.
@@ -89,7 +89,7 @@ module Mongoid
     # @since 4.0.0
     def prepare_atomic_operation
       # @todo: Check if the document is persisted here.
-      yield({}) if block_given?
+      yield(_root.collection, atomic_selector, {}) if block_given?
       Threaded.clear_options!
       true
     end
