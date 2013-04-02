@@ -37,6 +37,10 @@ describe Mongoid::Persistable::Settable do
       it "persists the normal field set" do
         expect(person.reload.title).to eq("kaiser")
       end
+
+      it "resets the dirty attributes for the sets" do
+        expect(person).to_not be_changed
+      end
     end
 
     context "when the document is embedded" do
