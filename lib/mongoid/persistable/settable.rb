@@ -24,7 +24,7 @@ module Mongoid
           setters.each do |field, value|
             normalized = database_field_name(field)
             send("#{field}=", value)
-            changed_attributes.delete(normalized)
+            remove_change(normalized)
             ops[atomic_attribute_name(normalized)] = attributes[normalized]
           end
           coll.find(selector).update(positionally(selector, "$set" => ops))
