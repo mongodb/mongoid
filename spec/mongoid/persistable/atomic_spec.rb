@@ -155,24 +155,5 @@ describe Mongoid::Persistable::Atomic do
         expect(person.reload.array).to eq([ "test", "testy", "test2" ])
       end
     end
-
-    describe "#rename" do
-
-      let(:person) do
-        Person.create(inte: 5)
-      end
-
-      before do
-        person.rename(:inte, :integer)
-      end
-
-      it "renames the aliased field" do
-        expect(person.integer).to eq(5)
-      end
-
-      it "persists the change" do
-        expect(person.reload.integer).to eq(5)
-      end
-    end
   end
 end

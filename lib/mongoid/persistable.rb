@@ -3,6 +3,7 @@ require "mongoid/persistable/atomic"
 require "mongoid/persistable/creatable"
 require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"
+require "mongoid/persistable/renamable"
 require "mongoid/persistable/savable"
 require "mongoid/persistable/settable"
 require "mongoid/persistable/updatable"
@@ -21,6 +22,7 @@ module Mongoid
     include Creatable
     include Deletable
     include Destroyable
+    include Renamable
     include Savable
     include Settable
     include Updatable

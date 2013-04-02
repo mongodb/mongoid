@@ -15,6 +15,11 @@ For instructions on upgrading to newer versions, visit
 
         document.set(name: "Photek", likes: 10000)
 
+* `Document#rename` now accepts multiple attributes in the form of a hash,
+  instead of the previous `(field, value)` args. Field aliases are supported.
+
+        document.rename(first_name: "fn", last_name: "ln")
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 

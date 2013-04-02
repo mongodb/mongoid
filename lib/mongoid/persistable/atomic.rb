@@ -8,7 +8,6 @@ require "mongoid/persistable/atomic/pull"
 require "mongoid/persistable/atomic/pull_all"
 require "mongoid/persistable/atomic/push"
 require "mongoid/persistable/atomic/push_all"
-require "mongoid/persistable/atomic/rename"
 
 module Mongoid
   module Persistable
@@ -169,22 +168,6 @@ module Mongoid
       # @since 2.1.0
       def push_all(field, value, options = {})
         PushAll.new(self, field, value, options).persist
-      end
-
-      # Performs the atomic $rename from the old field to the new field name.
-      #
-      # @example Rename the field.
-      #   person.rename(:age, :years)
-      #
-      # @param [ Symbol ] field The old field name.
-      # @param [ Symbol ] value The new field name.
-      # @param [ Hash ] options The mongo persistence options.
-      #
-      # @return [ Object ] The value of the new field.
-      #
-      # @since 2.1.0
-      def rename(field, value, options = {})
-        Rename.new(self, field, value, options).persist
       end
     end
   end
