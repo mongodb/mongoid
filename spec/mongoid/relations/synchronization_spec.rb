@@ -415,7 +415,6 @@ describe Mongoid::Relations::Synchronization do
     end
 
     before do
-      Moped.logger.level = Logger::DEBUG
       article.tags << persisted
       article.save
     end
