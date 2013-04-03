@@ -93,7 +93,8 @@ module Mongoid
     # @api private
     #
     # @example Prepare the atomic operation.
-    #   document.prepare_atomic_operation do |selector, opts|
+    #   document.prepare_atomic_operation do |coll, selector, opts|
+    #     ...
     #   end
     #
     # @return [ Object ] The result of the operation.
@@ -104,6 +105,30 @@ module Mongoid
       yield(_root.collection, atomic_selector, {}) if block_given?
       Threaded.clear_options!
       true
+    end
+
+    # Process the atomic operations - this handles the common behaviour of
+    # iterating through each op, getting the aliased field name, and removing
+    # appropriate dirty changes.
+    #
+    # @api private
+    #
+    # @example Process the atomic operations.
+    #   document.process_atomic_operations(pulls) do |field, value|
+    #     ...
+    #   end
+    #
+    # @param [ Hash ] operations The atomic operations.
+    #
+    # @return [ Hash ] The operations.
+    #
+    # @since 3.0.0
+    def process_atomic_operations(operations)
+      operations.each do |field, value|
+        normalized = database_field_name(field)
+        yield(normalized, value)
+        remove_change(normalized)
+      end
     end
   end
 end

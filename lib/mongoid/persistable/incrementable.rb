@@ -22,12 +22,11 @@ module Mongoid
       # @since 4.0.0
       def inc(increments)
         prepare_atomic_operation do |coll, selector, ops|
-          increments.each do |field, value|
+          process_atomic_operations(increments) do |field, value|
             increment = value.__to_inc__
-            normalized = database_field_name(field)
-            current = attributes[normalized]
-            attributes[normalized] = (current || 0) + increment
-            ops[atomic_attribute_name(normalized)] = increment
+            current = attributes[field]
+            attributes[field] = (current || 0) + increment
+            ops[atomic_attribute_name(field)] = increment
           end
           coll.find(selector).update(positionally(selector, "$inc" => ops))
         end

@@ -117,7 +117,7 @@ describe Mongoid::Persistable::Pullable do
 
     context "when the document is the root document" do
 
-      shared_examples_for "a pullable root document" do
+      shared_examples_for "a multi-pullable root document" do
 
         it "pulls the first value" do
           expect(person.aliases).to eq([ 3 ])
@@ -156,7 +156,7 @@ describe Mongoid::Persistable::Pullable do
           )
         end
 
-        it_behaves_like "a pullable root document"
+        it_behaves_like "a multi-pullable root document"
       end
 
       context "when providing symbol keys" do
@@ -165,7 +165,7 @@ describe Mongoid::Persistable::Pullable do
           person.pull_all(aliases: [ 1, 2 ], array: [ 5, 6 ])
         end
 
-        it_behaves_like "a pullable root document"
+        it_behaves_like "a multi-pullable root document"
       end
     end
 

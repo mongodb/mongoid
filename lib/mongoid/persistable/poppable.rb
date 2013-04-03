@@ -26,12 +26,10 @@ module Mongoid
       # @since 4.0.0
       def pop(pops)
         prepare_atomic_operation do |coll, selector, ops|
-          pops.each do |field, value|
-            normalized = database_field_name(field)
+          process_atomic_operations(pops) do |field, value|
             values = send(field)
             value > 0 ? values.pop : values.shift
-            remove_change(normalized)
-            ops[atomic_attribute_name(normalized)] = value
+            ops[atomic_attribute_name(field)] = value
           end
           coll.find(selector).update(positionally(selector, "$pop" => ops))
         end

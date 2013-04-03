@@ -22,11 +22,9 @@ module Mongoid
       # @since 4.0.0
       def pull(pulls)
         prepare_atomic_operation do |coll, selector, ops|
-          pulls.each do |field, value|
-            normalized = database_field_name(field)
+          process_atomic_operations(pulls) do |field, value|
             (send(field) || []).delete(value)
-            remove_change(normalized)
-            ops[atomic_attribute_name(normalized)] = value
+            ops[atomic_attribute_name(field)] = value
           end
           coll.find(selector).update(positionally(selector, "$pull" => ops))
         end
@@ -44,12 +42,10 @@ module Mongoid
       # @since 4.0.0
       def pull_all(pulls)
         prepare_atomic_operation do |coll, selector, ops|
-          pulls.each do |field, value|
-            normalized = database_field_name(field)
+          process_atomic_operations(pulls) do |field, value|
             existing = send(field) || []
             value.each{ |val| existing.delete(val) }
-            remove_change(normalized)
-            ops[atomic_attribute_name(normalized)] = value
+            ops[atomic_attribute_name(field)] = value
           end
           coll.find(selector).update(positionally(selector, "$pullAll" => ops))
         end
