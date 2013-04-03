@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "mongoid/persistable/atomic/operation"
 require "mongoid/persistable/atomic/add_to_set"
-require "mongoid/persistable/atomic/bit"
 require "mongoid/persistable/atomic/pull"
 require "mongoid/persistable/atomic/pull_all"
 require "mongoid/persistable/atomic/push"
@@ -34,29 +33,6 @@ module Mongoid
       # @since 2.0.0
       def add_to_set(field, value, options = {})
         AddToSet.new(self, field, value, options).persist
-      end
-
-      # Performs an atomic $bit operation on the field with the provided hash
-      # of bitwise ops to execute in order.
-      #
-      # @example Execute a bitwise and on the field.
-      #   person.bit(:age, { :and => 12 })
-      #
-      # @example Execute a bitwise or on the field.
-      #   person.bit(:age, { :or => 12 })
-      #
-      # @example Execute a chain of bitwise operations.
-      #   person.bit(:age, { :and => 10, :or => 12 })
-      #
-      # @param [ Symbol ] field The name of the field.
-      # @param [ Hash ] value The bitwise operations to perform.
-      # @param [ Hash ] options The mongo persistence options.
-      #
-      # @return [ Integer ] The new value of the field.
-      #
-      # @since 2.1.0
-      def bit(field, value, options = {})
-        Bit.new(self, field, value, options).persist
       end
 
       # Performs an atomic $pull of the provided value on the supplied

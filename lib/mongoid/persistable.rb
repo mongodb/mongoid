@@ -4,6 +4,7 @@ require "mongoid/persistable/creatable"
 require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"
 require "mongoid/persistable/incrementable"
+require "mongoid/persistable/logical"
 require "mongoid/persistable/poppable"
 require "mongoid/persistable/renamable"
 require "mongoid/persistable/savable"
@@ -25,6 +26,7 @@ module Mongoid
     include Deletable
     include Destroyable
     include Incrementable
+    include Logical
     include Poppable
     include Renamable
     include Savable

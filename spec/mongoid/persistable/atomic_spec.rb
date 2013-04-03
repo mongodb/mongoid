@@ -23,25 +23,6 @@ describe Mongoid::Persistable::Atomic do
       end
     end
 
-    describe "#bit" do
-
-      let(:person) do
-        Person.create(inte: 60)
-      end
-
-      before do
-        person.bit(:inte, { and: 13 })
-      end
-
-      it "performs the bitwise operation" do
-        expect(person.inte).to eq(12)
-      end
-
-      it "persists the changes" do
-        expect(person.reload.inte).to eq(12)
-      end
-    end
-
     describe "#pull" do
 
       let(:person) do

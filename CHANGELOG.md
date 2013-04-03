@@ -26,6 +26,18 @@ For instructions on upgrading to newer versions, visit
 
         document.inc(score: 10, place: -1, lives: -10)
 
+* `Document#pop` now accepts multiple attributes in the form of a hash, instead
+  of previously only being able to pop one value at a time. Aliases and
+  serialization is supported.
+
+        document.pop(names: 1, aliases: -1)
+
+* `Document#bit` now accepts multiple attributes in the form of a hash, instead
+  of previously only being able to apply one set of operations at a time.
+  Aliases and serialization are supported.
+
+        document.bit(age: { and: 13 }, score: { or: 13 })
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 
