@@ -16,6 +16,7 @@ class Address
   field :parent_title
   field :services, type: Array
   field :aliases, as: :a, type: Array
+  field :test, type: Array
   field :latlng, type: Array
   field :map, type: Hash
   field :move_in, type: DateTime

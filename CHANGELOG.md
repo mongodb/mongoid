@@ -50,6 +50,15 @@ For instructions on upgrading to newer versions, visit
 
         document.pull_all(names: ["James", "Bond"], aliases: ["007"])
 
+* `Document#push_all` has been removed since it was deprecated in MongoDB 2.4.
+  Use `Document.push` instead.
+
+* `Document#push` now accepts multiple attributes in the form of a hash, and
+  can handle the pushing of single values or multiple values to the field via
+  $push with $each. Aliases and serialization is supported.
+
+        document.push(names: "James", aliases: [ "007", "Jim" ])
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 

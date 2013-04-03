@@ -65,7 +65,7 @@ module Mongoid
             end
           end
           if persistable? || _creating?
-            base.push_all(foreign_key, ids.keys)
+            base.push(foreign_key => ids.keys)
           end
           persist_delayed(docs, inserts)
           self
