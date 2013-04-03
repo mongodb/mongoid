@@ -5,7 +5,7 @@ module Mongoid
     # Defines behaviour for persistence operations that update existing
     # documents.
     #
-    # @since 2.0.0
+    # @since 4.0.0
     module Updatable
 
       # Update the document in the database.

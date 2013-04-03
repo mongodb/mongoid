@@ -4,7 +4,7 @@ module Mongoid
 
     # Defines behaviour for $set operations.
     #
-    # @since 2.0.0
+    # @since 4.0.0
     module Settable
       extend ActiveSupport::Concern
 

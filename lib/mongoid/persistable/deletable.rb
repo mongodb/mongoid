@@ -4,7 +4,7 @@ module Mongoid
 
     # Defines behaviour for persistence operations that delete documents.
     #
-    # @since 2.0.0
+    # @since 4.0.0
     module Deletable
       extend ActiveSupport::Concern
 

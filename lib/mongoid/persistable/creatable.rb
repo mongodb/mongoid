@@ -4,7 +4,7 @@ module Mongoid
 
     # Defines behaviour for persistence operations that create new documents.
     #
-    # @since 2.0.0
+    # @since 4.0.0
     module Creatable
       extend ActiveSupport::Concern
 

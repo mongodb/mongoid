@@ -4,7 +4,7 @@ module Mongoid
 
     # Defines behaviour for persistence operations that save documents.
     #
-    # @since 2.0.0
+    # @since 4.0.0
     module Savable
 
       # Save the document - will perform an insert if the document is new, and

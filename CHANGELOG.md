@@ -20,6 +20,12 @@ For instructions on upgrading to newer versions, visit
 
         document.rename(first_name: "fn", last_name: "ln")
 
+* `Document#inc` now accepts multiple attributes in the form of a hash, instead
+  of previously only being able to increment one value at a time. Aliases and
+  serialization is supported.
+
+        document.inc(score: 10, place: -1, lives: -10)
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 

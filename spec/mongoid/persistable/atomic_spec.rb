@@ -42,25 +42,6 @@ describe Mongoid::Persistable::Atomic do
       end
     end
 
-    describe "#inc" do
-
-      let(:person) do
-        Person.create(inte: 5)
-      end
-
-      before do
-        person.inc(:inte, 1)
-      end
-
-      it "increments the aliased field" do
-        expect(person.inte).to eq(6)
-      end
-
-      it "persists the change" do
-        expect(person.reload.inte).to eq(6)
-      end
-    end
-
     describe "#pop" do
 
       let(:person) do

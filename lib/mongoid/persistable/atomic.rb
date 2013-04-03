@@ -2,7 +2,6 @@
 require "mongoid/persistable/atomic/operation"
 require "mongoid/persistable/atomic/add_to_set"
 require "mongoid/persistable/atomic/bit"
-require "mongoid/persistable/atomic/inc"
 require "mongoid/persistable/atomic/pop"
 require "mongoid/persistable/atomic/pull"
 require "mongoid/persistable/atomic/pull_all"
@@ -59,24 +58,6 @@ module Mongoid
       # @since 2.1.0
       def bit(field, value, options = {})
         Bit.new(self, field, value, options).persist
-      end
-
-      # Performs an atomic $inc of the provided value on the supplied
-      # field. If the field does not exist it will be initialized as
-      # the provided value.
-      #
-      # @example Increment a field.
-      #   person.inc(:score, 2)
-      #
-      # @param [ Symbol ] field The name of the field.
-      # @param [ Numeric ] value The value to increment.
-      # @param [ Hash ] options The mongo persistence options.
-      #
-      # @return [ Array<Object> ] The new value of the field.
-      #
-      # @since 2.0.0
-      def inc(field, value, options = {})
-        Inc.new(self, field, value, options).persist
       end
 
       # Performs an atomic $pop of the provided value on the supplied

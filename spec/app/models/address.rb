@@ -7,6 +7,8 @@ class Address
 
   field :address_type
   field :number, type: Integer
+  field :no, type: Integer
+  field :h, as: :house, type: Integer
   field :street
   field :city
   field :state

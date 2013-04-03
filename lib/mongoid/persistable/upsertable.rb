@@ -4,7 +4,7 @@ module Mongoid
 
     # Defines behaviour for persistence operations that upsert documents.
     #
-    # @since 2.0.0
+    # @since 4.0.0
     module Upsertable
 
       # Perform an upsert of the document. If the document does not exist in the

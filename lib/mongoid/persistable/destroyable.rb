@@ -4,7 +4,7 @@ module Mongoid
 
     # Defines behaviour for persistence operations that destroy documents.
     #
-    # @since 2.0.0
+    # @since 4.0.0
     module Destroyable
       extend ActiveSupport::Concern
 
