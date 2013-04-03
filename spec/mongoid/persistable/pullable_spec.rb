@@ -171,6 +171,58 @@ describe Mongoid::Persistable::Pullable do
 
     context "when the document is embedded" do
 
+      shared_examples_for "a multi-pullable embedded document" do
+
+        it "pulls the first value" do
+          expect(address.services).to eq([ 3 ])
+        end
+
+        it "pulls the last value" do
+          expect(address.a).to eq([ 4 ])
+        end
+
+        it "returns true" do
+          expect(pull_all).to be_true
+        end
+
+        it "resets dirty changes" do
+          expect(address).to_not be_changed
+        end
+
+        it "persists the first pull" do
+          expect(address.reload.services).to eq([ 3 ])
+        end
+
+        it "persists the last pull" do
+          expect(address.reload.a).to eq([ 4 ])
+        end
+      end
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:address) do
+        person.addresses.create(street: "t", services: [ 1, 2, 3 ], a: [ 4, 5, 6 ])
+      end
+
+      context "when providing string keys" do
+
+        let!(:pull_all) do
+          address.pull_all("services" => [ 1, 2 ], "a" => [ 5, 6 ])
+        end
+
+        it_behaves_like "a multi-pullable embedded document"
+      end
+
+      context "when providing symbol keys" do
+
+        let!(:pull_all) do
+          address.pull_all(services: [ 1, 2 ], a: [ 5, 6 ])
+        end
+
+        it_behaves_like "a multi-pullable embedded document"
+      end
     end
   end
 end
