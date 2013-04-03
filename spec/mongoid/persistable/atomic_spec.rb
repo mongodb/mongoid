@@ -42,25 +42,6 @@ describe Mongoid::Persistable::Atomic do
       end
     end
 
-    describe "#pop" do
-
-      let(:person) do
-        Person.create(array: [ "test1", "test2" ])
-      end
-
-      before do
-        person.pop(:array, 1)
-      end
-
-      it "removes from the aliased field" do
-        expect(person.array).to eq([ "test1" ])
-      end
-
-      it "persists the change" do
-        expect(person.reload.array).to eq([ "test1" ])
-      end
-    end
-
     describe "#pull" do
 
       let(:person) do

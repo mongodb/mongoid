@@ -2,7 +2,6 @@
 require "mongoid/persistable/atomic/operation"
 require "mongoid/persistable/atomic/add_to_set"
 require "mongoid/persistable/atomic/bit"
-require "mongoid/persistable/atomic/pop"
 require "mongoid/persistable/atomic/pull"
 require "mongoid/persistable/atomic/pull_all"
 require "mongoid/persistable/atomic/push"
@@ -58,26 +57,6 @@ module Mongoid
       # @since 2.1.0
       def bit(field, value, options = {})
         Bit.new(self, field, value, options).persist
-      end
-
-      # Performs an atomic $pop of the provided value on the supplied
-      # field.
-      #
-      # @example Pop the last value from the array.
-      #   person.pop(:aliases, 1)
-      #
-      # @example Pop the first value from the array.
-      #   person.pop(:aliases, -1)
-      #
-      # @param [ Symbol ] field The name of the field.
-      # @param [ Integer ] value Whether to pop the first or last.
-      # @param [ Hash ] options The mongo persistence options.
-      #
-      # @return [ Array<Object> ] The new value of the field.
-      #
-      # @since 2.1.0
-      def pop(field, value, options = {})
-        Pop.new(self, field, value, options).persist
       end
 
       # Performs an atomic $pull of the provided value on the supplied
