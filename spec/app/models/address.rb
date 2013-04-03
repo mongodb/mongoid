@@ -19,6 +19,7 @@ class Address
   field :latlng, type: Array
   field :map, type: Hash
   field :move_in, type: DateTime
+  field :end_date, type: Date
   field :s, type: String, as: :suite
   field :name, localize: true
 
