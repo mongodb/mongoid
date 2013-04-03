@@ -44,6 +44,12 @@ For instructions on upgrading to newer versions, visit
 
         document.pull(names: "James", aliases: "007")
 
+* `Document#pull_all` now accepts multiple attributes in the form of a hash,
+  instead of previously only being able to pull one value at a time. Aliases and
+  serialization is supported.
+
+        document.pull_all(names: ["James", "Bond"], aliases: ["007"])
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 

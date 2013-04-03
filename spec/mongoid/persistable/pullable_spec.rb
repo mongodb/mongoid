@@ -40,7 +40,7 @@ describe Mongoid::Persistable::Pullable do
       context "when providing string keys" do
 
         let!(:pull) do
-          person.pull("aliases" => 1, "array" => 5)
+          person.pull("aliases" => 1, "array" => 5, "test_array" => 2)
         end
 
         it_behaves_like "a pullable root document"
@@ -110,6 +110,67 @@ describe Mongoid::Persistable::Pullable do
 
         it_behaves_like "a pullable embedded document"
       end
+    end
+  end
+
+  describe "#pull_all" do
+
+    context "when the document is the root document" do
+
+      shared_examples_for "a pullable root document" do
+
+        it "pulls the first value" do
+          expect(person.aliases).to eq([ 3 ])
+        end
+
+        it "pulls the last value" do
+          expect(person.array).to eq([ 4 ])
+        end
+
+        it "returns true" do
+          expect(pull_all).to be_true
+        end
+
+        it "resets dirty changes" do
+          expect(person).to_not be_changed
+        end
+
+        it "persists the first pull" do
+          expect(person.reload.aliases).to eq([ 3 ])
+        end
+
+        it "persists the last pull" do
+          expect(person.reload.array).to eq([ 4 ])
+        end
+      end
+
+      let(:person) do
+        Person.create(aliases: [ 1, 1, 2, 3 ], array: [ 4, 5, 6 ])
+      end
+
+      context "when providing string keys" do
+
+        let!(:pull_all) do
+          person.pull_all(
+            "aliases" => [ 1, 2 ], "array" => [ 5, 6 ], "test_array" => [ 1 ]
+          )
+        end
+
+        it_behaves_like "a pullable root document"
+      end
+
+      context "when providing symbol keys" do
+
+        let!(:pull_all) do
+          person.pull_all(aliases: [ 1, 2 ], array: [ 5, 6 ])
+        end
+
+        it_behaves_like "a pullable root document"
+      end
+    end
+
+    context "when the document is embedded" do
+
     end
   end
 end

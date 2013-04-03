@@ -23,25 +23,6 @@ describe Mongoid::Persistable::Atomic do
       end
     end
 
-    describe "#pull_all" do
-
-      let(:person) do
-        Person.create(array: [ "test1", "test2" ])
-      end
-
-      before do
-        person.pull_all(:array, [ "test1", "test2" ])
-      end
-
-      it "removes from the aliased field" do
-        expect(person.array).to be_empty
-      end
-
-      it "persists the change" do
-        expect(person.reload.array).to be_empty
-      end
-    end
-
     describe "#push" do
 
       let(:person) do
