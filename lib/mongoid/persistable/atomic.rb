@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "mongoid/persistable/atomic/operation"
 require "mongoid/persistable/atomic/add_to_set"
-require "mongoid/persistable/atomic/pull"
 require "mongoid/persistable/atomic/pull_all"
 require "mongoid/persistable/atomic/push"
 require "mongoid/persistable/atomic/push_all"
@@ -33,25 +32,6 @@ module Mongoid
       # @since 2.0.0
       def add_to_set(field, value, options = {})
         AddToSet.new(self, field, value, options).persist
-      end
-
-      # Performs an atomic $pull of the provided value on the supplied
-      # field.
-      #
-      # @note Support for a $pull with an expression is not yet supported.
-      #
-      # @example Pull the value from the field.
-      #   person.pull(:aliases, "Bond")
-      #
-      # @param [ Symbol ] field The name of the field.
-      # @param [ Object ] value The value to pull.
-      # @param [ Hash ] options The mongo persistence options.
-      #
-      # @return [ Array<Object> ] The new value of the field.
-      #
-      # @since 2.1.0
-      def pull(field, value, options = {})
-        Pull.new(self, field, value, options).persist
       end
 
       # Performs an atomic $pullAll of the provided value on the supplied

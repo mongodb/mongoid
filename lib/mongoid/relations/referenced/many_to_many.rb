@@ -114,7 +114,7 @@ module Mongoid
         def delete(document)
           doc = super
           if doc && persistable?
-            base.pull(foreign_key, doc.id)
+            base.pull(foreign_key => doc.id)
             target._unloaded = criteria
             unsynced(base, foreign_key)
           end

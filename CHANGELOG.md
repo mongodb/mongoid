@@ -38,6 +38,12 @@ For instructions on upgrading to newer versions, visit
 
         document.bit(age: { and: 13 }, score: { or: 13 })
 
+* `Document#pull` now accepts multiple attributes in the form of a hash, instead
+  of previously only being able to pull one value at a time. Aliases and
+  serialization is supported.
+
+        document.pull(names: "James", aliases: "007")
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 
