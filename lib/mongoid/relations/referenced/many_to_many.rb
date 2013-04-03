@@ -29,7 +29,7 @@ module Mongoid
           return concat(docs) if docs.size > 1
           if doc = docs.first
             append(doc)
-            base.add_to_set(foreign_key, doc.id)
+            base.add_to_set(foreign_key => doc.id)
             if child_persistable?(doc)
               doc.save
             end

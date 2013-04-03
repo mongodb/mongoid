@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/persistable/atomic"
 require "mongoid/persistable/creatable"
 require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"
@@ -22,7 +21,6 @@ module Mongoid
   # @since 2.0.0
   module Persistable
     extend ActiveSupport::Concern
-    include Atomic
     include Mongoid::Atomic::Positionable
     include Creatable
     include Deletable

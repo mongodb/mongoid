@@ -59,6 +59,11 @@ For instructions on upgrading to newer versions, visit
 
         document.push(names: "James", aliases: [ "007", "Jim" ])
 
+* `Document#add_to_set` now accepts multiple attributes in the form of a hash,
+  and now aliases and serialization are supported.
+
+        document.add_to_set(names: "James", aliases: "007")
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 

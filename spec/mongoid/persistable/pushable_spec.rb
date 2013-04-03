@@ -2,8 +2,123 @@ require "spec_helper"
 
 describe Mongoid::Persistable::Pushable do
 
-  pending "#add_to_set" do
+  describe "#add_to_set" do
 
+    context "when the document is a root document" do
+
+      shared_examples_for "a unique pushable root document" do
+
+        it "adds single values" do
+          expect(person.aliases).to eq([ 1, 2, 4 ])
+        end
+
+        it "does not add duplicate values" do
+          expect(person.array).to eq([ 4, 5 ])
+        end
+
+        it "sets absent values" do
+          expect(person.test_array).to eq([ 1 ])
+        end
+
+        it "returns true" do
+          expect(add).to be_true
+        end
+
+        it "resets the dirty changes" do
+          expect(person).to_not be_changed
+        end
+
+        it "persists single adds" do
+          expect(person.reload.aliases).to eq([ 1, 2, 4 ])
+        end
+
+        it "persists absent values" do
+          expect(person.reload.test_array).to eq([ 1 ])
+        end
+      end
+
+      let(:person) do
+        Person.create(aliases: [ 1, 2 ], array: [ 4, 5 ])
+      end
+
+      context "when provided string fields" do
+
+        let!(:add) do
+          person.add_to_set("aliases" => 4, "array" => 4, "test_array" => 1)
+        end
+
+        it_behaves_like "a unique pushable root document"
+      end
+
+      context "when provided symbol fields" do
+
+        let!(:add) do
+          person.add_to_set(aliases: 4, array: 4, test_array: 1)
+        end
+
+        it_behaves_like "a unique pushable root document"
+      end
+    end
+
+    context "when the document is embedded" do
+
+      shared_examples_for "a unique pushable embedded document" do
+
+        it "adds single values" do
+          expect(address.services).to eq([ 1, 4 ])
+        end
+
+        it "does not add duplicate values" do
+          expect(address.a).to eq([ 4, 5 ])
+        end
+
+        it "sets absent values" do
+          expect(address.test).to eq([ 1 ])
+        end
+
+        it "returns true" do
+          expect(add).to be_true
+        end
+
+        it "resets the dirty changes" do
+          expect(address).to_not be_changed
+        end
+
+        it "persists single adds" do
+          expect(address.reload.services).to eq([ 1, 4 ])
+        end
+
+        it "persists absent values" do
+          expect(address.reload.test).to eq([ 1 ])
+        end
+      end
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:address) do
+        person.addresses.create(street: "t", services: [ 1 ], a: [ 4, 5 ])
+      end
+
+      context "when provided string fields" do
+
+        let!(:add) do
+          address.add_to_set("services" => 4, "a" => 5, "test" => 1)
+        end
+
+        it_behaves_like "a unique pushable embedded document"
+      end
+
+      context "when provided symbol fields" do
+
+        let!(:add) do
+          address.add_to_set(services: 4, a: 5, test: 1)
+        end
+
+        it_behaves_like "a unique pushable embedded document"
+      end
+    end
   end
 
   describe "#push" do

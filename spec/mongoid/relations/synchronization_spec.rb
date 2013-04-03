@@ -406,7 +406,7 @@ describe Mongoid::Relations::Synchronization do
 
   context "when appending an existing document to a new one" do
 
-    let!(:peristed) do
+    let!(:persisted) do
       Tag.create
     end
 
@@ -415,20 +415,17 @@ describe Mongoid::Relations::Synchronization do
     end
 
     before do
-      article.tags << Tag.first
+      Moped.logger.level = Logger::DEBUG
+      article.tags << persisted
       article.save
     end
 
-    let(:tag) do
-      Tag.first
-    end
-
     it "persists the foreign key on the inverse" do
-      expect(tag.article_ids).to eq([ article.id ])
+      expect(persisted.article_ids).to eq([ article.id ])
     end
 
     it "persists the inverse relation" do
-      expect(tag.articles).to eq([ article ])
+      expect(persisted.articles).to eq([ article ])
     end
   end
 

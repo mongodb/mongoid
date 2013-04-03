@@ -8,8 +8,27 @@ module Mongoid
     module Pushable
       extend ActiveSupport::Concern
 
-      # def add_to_set(adds)
-      # end
+      # Add the single values to the arrays only if the value does not already
+      # exist in the array.
+      #
+      # @example Add the values to the sets.
+      #   document.add_to_set(names: "James", aliases: "Bond")
+      #
+      # @param [ Hash ] adds The field/value pairs to add.
+      #
+      # @return [ true, false ] If the operation succeeded.
+      #
+      # @since 4.0.0
+      def add_to_set(adds)
+        prepare_atomic_operation do |coll, selector, ops|
+          process_atomic_operations(adds) do |field, value|
+            existing = send(field) || (attributes[field] ||= [])
+            existing.push(value) unless existing.include?(value)
+            ops[atomic_attribute_name(field)] = value
+          end
+          coll.find(selector).update(positionally(selector, "$addToSet" => ops))
+        end
+      end
 
       # Push a single value or multiple values onto arrays.
       #
@@ -27,10 +46,9 @@ module Mongoid
       def push(pushes)
         prepare_atomic_operation do |coll, selector, ops|
           process_atomic_operations(pushes) do |field, value|
-            existing = send(field) || []
+            existing = send(field) || (attributes[field] ||= [])
             values = [ value ].flatten
             values.each{ |val| existing.push(val) }
-            send("#{field}=", existing)
             ops[atomic_attribute_name(field)] = { "$each" => values }
           end
           coll.find(selector).update(positionally(selector, "$push" => ops))
