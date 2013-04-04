@@ -10,6 +10,21 @@ describe Mongoid::Relations::Referenced::In do
     Person.create
   end
 
+  describe "#" do
+    let(:game) do
+      Game.create(person: person)
+    end
+
+    before do
+      game.reload
+    end
+
+    it "calls for game building with a game object, so there's no excessive query" do
+      Person.any_instance.should_receive(:__build__).with(:game, game, anything)
+      game.person
+    end
+  end
+
   describe "#=" do
 
     context "when the relation is named target" do
