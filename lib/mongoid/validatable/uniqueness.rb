@@ -104,13 +104,8 @@ module Mongoid
       #
       # @since 2.4.10
       def create_criteria(base, document, attribute, value)
-        field = document.fields[attribute.to_s]
         criteria = scope(base.unscoped, document, attribute)
-        if field.try(:localized?)
-          criteria.selector.update(criterion(document, attribute, value))
-        else
-          criteria = criteria.where(criterion(document, attribute, value))
-        end
+        criteria.selector.update(criterion(document, attribute, value))
         criteria
       end
 
@@ -129,7 +124,13 @@ module Mongoid
       #
       # @since 2.3.0
       def criterion(document, attribute, value)
-        selector = { attribute => filter(value) }
+        if localized?(document, attribute)
+          conditions = value.inject([]) { |acc, (k,v)| acc << { "#{attribute}.#{k}" => filter(v) } }
+          selector = { "$or" => conditions }
+        else
+          selector = { attribute => filter(value) }
+        end
+
         if document.persisted? && !document.embedded?
           selector.merge!(_id: { "$ne" => document.id })
         end
@@ -303,6 +304,23 @@ module Mongoid
       # @since 3.0.23
       def persistence_options(criteria)
         (criteria.klass.persistence_options || {}).merge!(consistency: :strong)
+      end
+
+      # Is the attribute localized?
+      #
+      # @api private
+      #
+      # @example Is the attribute localized?
+      #   validator.localized?(doc, :field)
+      #
+      # @param [ Document ] document The document getting validated.
+      # @param [ Symbol ] attribute The attribute to validate.
+      #
+      # @return [ true, false ] If the attribute is localized.
+      #
+      # @since 4.0.0
+      def localized?(document, attribute)
+        document.fields[attribute.to_s].try(:localized?)
       end
     end
   end

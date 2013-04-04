@@ -93,33 +93,196 @@ describe Mongoid::Validatable::UniquenessValidator do
 
           context "when no scope is provided" do
 
-            before do
-              Dictionary.validates_uniqueness_of :description
+            context "when case sensitive is true" do
+
+              before do
+                Dictionary.validates_uniqueness_of :description
+              end
+
+              after do
+                Dictionary.reset_callbacks(:validate)
+              end
+
+              context "when the attribute is unique" do
+
+                context "when single localization" do
+
+                  before do
+                    Dictionary.with(safe: true).create(description: "english")
+                  end
+
+                  let(:dictionary) do
+                    Dictionary.new(description: "English")
+                  end
+
+                  it "returns true" do
+                    expect(dictionary).to be_valid
+                  end
+                end
+
+                context "when multiple localizations" do
+
+                  before do
+                    Dictionary.with(safe: true).
+                        create(description_translations: { "en" => "english", "de" => "german" })
+                  end
+
+                  let(:dictionary) do
+                    Dictionary.new(description_translations: { "en" => "English", "de" => "German" })
+                  end
+
+                  it "returns true" do
+                    expect(dictionary).to be_valid
+                  end
+                end
+              end
+
+              context "when the attribute is not unique" do
+
+                context "when the document is not the match" do
+
+                  context "when single localization" do
+
+                    before do
+                      Dictionary.with(safe: true).create(description: "english")
+                    end
+
+                    let(:dictionary) do
+                      Dictionary.new(description: "english")
+                    end
+
+                    it "returns false" do
+                      expect(dictionary).to_not be_valid
+                    end
+
+                    it "adds the uniqueness error" do
+                      dictionary.valid?
+                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                    end
+                  end
+
+                  context "when multiple localizations" do
+
+                    before do
+                      Dictionary.with(safe: true).
+                          create(description_translations: { "en" => "english", "de" => "german" })
+                    end
+
+                    let(:dictionary) do
+                      Dictionary.new(description_translations: { "en" => "english", "de" => "German" })
+                    end
+
+                    it "returns false" do
+                      expect(dictionary).to_not be_valid
+                    end
+
+                    it "adds the uniqueness error" do
+                      dictionary.valid?
+                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                    end
+                  end
+                end
+              end
             end
 
-            after do
-              Dictionary.reset_callbacks(:validate)
-            end
+            context "when case sensitive is false" do
 
-            context "when the attribute is not unique" do
+              before do
+                Dictionary.validates_uniqueness_of :description, case_sensitive: false
+              end
 
-              context "when the document is not the match" do
+              after do
+                Dictionary.reset_callbacks(:validate)
+              end
 
-                before do
-                  Dictionary.with(safe: true).create(description: "english")
+              context "when the attribute is unique" do
+
+                context "when there are no special characters" do
+
+                  before do
+                    Dictionary.with(safe: true).create(description: "english")
+                  end
+
+                  let(:dictionary) do
+                    Dictionary.new(description: "german")
+                  end
+
+                  it "returns true" do
+                    expect(dictionary).to be_valid
+                  end
                 end
 
-                let(:dictionary) do
-                  Dictionary.new(description: "english")
+                context "when special characters exist" do
+
+                  before do
+                    Dictionary.with(safe: true).create(description: "english")
+                  end
+
+                  let(:dictionary) do
+                    Dictionary.new(description: "en@gl.ish")
+                  end
+
+                  it "returns true" do
+                    expect(dictionary).to be_valid
+                  end
+                end
+              end
+
+              context "when the attribute is not unique" do
+
+                context "when the document is not the match" do
+
+                  context "when signle localization" do
+
+                    before do
+                      Dictionary.with(safe: true).create(description: "english")
+                    end
+
+                    let(:dictionary) do
+                      Dictionary.new(description: "English")
+                    end
+
+                    it "returns false" do
+                      expect(dictionary).to_not be_valid
+                    end
+
+                    it "adds the uniqueness error" do
+                      dictionary.valid?
+                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                    end
+                  end
+
+                  context "when multiple localizations" do
+
+                    before do
+                      Dictionary.with(safe: true).
+                          create(description_translations: { "en" => "english", "de" => "german" })
+                    end
+
+                    let(:dictionary) do
+                      Dictionary.new(description_translations: { "en" => "English", "de" => "German" })
+                    end
+
+                    it "returns false" do
+                      expect(dictionary).to_not be_valid
+                    end
+
+                    it "adds the uniqueness error" do
+                      dictionary.valid?
+                      expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                    end
+                  end
                 end
 
-                it "returns false" do
-                  expect(dictionary).to_not be_valid
-                end
+                context "when the document is the match in the database" do
 
-                it "adds the uniqueness error" do
-                  dictionary.valid?
-                  expect(dictionary.errors[:description]).to eq([ "is already taken" ])
+                  let!(:dictionary) do
+                    Dictionary.with(safe: true).create(description: "english")
+                  end
+
+                  it "returns true" do
+                    expect(dictionary).to be_valid
+                  end
                 end
               end
             end
