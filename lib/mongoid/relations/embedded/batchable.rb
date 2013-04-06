@@ -6,7 +6,7 @@ module Mongoid
       # Contains behaviour for executing operations in batch on embedded
       # documents.
       module Batchable
-        include Mongoid::Atomic::Positionable
+        include Positional
 
         # Insert new documents as a batch push ($pushAll). This ensures that
         # all callbacks are run at the appropriate time and only 1 request is

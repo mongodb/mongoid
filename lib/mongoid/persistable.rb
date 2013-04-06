@@ -21,13 +21,13 @@ module Mongoid
   # @since 2.0.0
   module Persistable
     extend ActiveSupport::Concern
-    include Mongoid::Atomic::Positionable
     include Creatable
     include Deletable
     include Destroyable
     include Incrementable
     include Logical
     include Poppable
+    include Positional
     include Pullable
     include Pushable
     include Renamable

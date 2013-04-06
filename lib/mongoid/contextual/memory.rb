@@ -8,7 +8,7 @@ module Mongoid
       include Aggregable::Memory
       include Eager
       include Queryable
-      include Mongoid::Atomic::Positionable
+      include Positional
 
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.

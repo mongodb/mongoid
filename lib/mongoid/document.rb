@@ -1,5 +1,5 @@
 # encoding: utf-8
-require "mongoid/atomic/positionable"
+require "mongoid/positional"
 require "mongoid/evolvable"
 require "mongoid/extensions"
 require "mongoid/errors"

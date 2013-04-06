@@ -1,12 +1,12 @@
 require "spec_helper"
 
-describe Mongoid::Atomic::Positionable do
+describe Mongoid::Positional do
 
   describe "#positionally" do
 
     let(:positionable) do
       Class.new do
-        include Mongoid::Atomic::Positionable
+        include Mongoid::Positional
       end.new
     end
 
