@@ -3,6 +3,7 @@ require "mongoid/changeable"
 require "mongoid/findable"
 require "mongoid/indexable"
 require "mongoid/inspectable"
+require "mongoid/interceptable"
 require "mongoid/persistable"
 require "mongoid/reloadable"
 require "mongoid/scopable"
@@ -48,20 +49,20 @@ module Mongoid
     include Traversable
     include Timestamps::Timeless
     include Validatable
-    include Callbacks
+    include Interceptable
     include Copyable
     include Equality
 
     MODULES = [
       Atomic,
       Attributes,
-      Callbacks,
       Copyable,
       Changeable,
       Evolvable,
       Fields,
       Indexable,
       Inspectable,
+      Interceptable,
       Matchers,
       NestedAttributes,
       Persistable,

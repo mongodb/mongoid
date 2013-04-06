@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Mongoid::Callbacks do
+describe Mongoid::Interceptable do
 
   class TestClass
-    include Mongoid::Callbacks
+    include Mongoid::Interceptable
 
     attr_reader :before_save_called, :after_save_called
 

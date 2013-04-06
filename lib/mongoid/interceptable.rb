@@ -2,7 +2,9 @@
 module Mongoid
 
   # This module contains all the callback hooks for Mongoid.
-  module Callbacks
+  #
+  # @since 4.0.0
+  module Interceptable
     extend ActiveSupport::Concern
 
     CALLBACKS = [
