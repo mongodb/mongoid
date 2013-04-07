@@ -27,7 +27,7 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.add_to_set(:members, "Dave")
+        context.add_to_set(members: "Dave")
       end
 
       it "does not add duplicates" do
@@ -54,11 +54,15 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.add_to_set(:members, "Dave")
+        context.add_to_set(members: "Dave", genres: "Electro")
       end
 
       it "does not add duplicates" do
         expect(depeche_mode.reload.members).to eq([ "Dave" ])
+      end
+
+      it "adds multiple operations" do
+        expect(depeche_mode.reload.genres).to eq([ "Electro" ])
       end
 
       it "adds unique values" do
@@ -92,7 +96,7 @@ describe Mongoid::Contextual::Atomic do
     context "when performing a bitwise and" do
 
       before do
-        context.bit(:likes, { and: 13 })
+        context.bit(likes: { and: 13 })
       end
 
       it "performs the bitwise operation on initialized fields" do
@@ -107,7 +111,7 @@ describe Mongoid::Contextual::Atomic do
     context "when performing a bitwise or" do
 
       before do
-        context.bit(:likes, { or: 13 })
+        context.bit(likes: { or: 13 })
       end
 
       it "performs the bitwise operation on initialized fields" do
@@ -122,7 +126,7 @@ describe Mongoid::Contextual::Atomic do
     context "when chaining bitwise operations" do
 
       before do
-        context.bit(:likes, { and: 13, or: 10 })
+        context.bit(likes: { and: 13, or: 10 })
       end
 
       it "performs the bitwise operation on initialized fields" do
@@ -158,7 +162,7 @@ describe Mongoid::Contextual::Atomic do
     end
 
     before do
-      context.inc(:likes, 10)
+      context.inc(likes: 10)
     end
 
     context "when the field exists" do
@@ -178,7 +182,7 @@ describe Mongoid::Contextual::Atomic do
     context "when using the alias" do
 
       before do
-        context.inc(:years, 1)
+        context.inc(years: 1)
       end
 
       it "incs the value and read from alias" do
@@ -212,7 +216,7 @@ describe Mongoid::Contextual::Atomic do
     context "when popping from the front" do
 
       before do
-        context.pop(:members, -1)
+        context.pop(members: -1)
       end
 
       it "pops the first element off the array" do
@@ -227,7 +231,7 @@ describe Mongoid::Contextual::Atomic do
     context "when popping from the rear" do
 
       before do
-        context.pop(:members, 1)
+        context.pop(members: 1)
       end
 
       it "pops the last element off the array" do
@@ -259,7 +263,7 @@ describe Mongoid::Contextual::Atomic do
     end
 
     before do
-      context.pull(:members, "Alan")
+      context.pull(members: "Alan")
     end
 
     it "pulls when the value is found" do
@@ -290,7 +294,7 @@ describe Mongoid::Contextual::Atomic do
     end
 
     before do
-      context.pull_all(:members, [ "Alan", "Dave" ])
+      context.pull_all(members: [ "Alan", "Dave" ])
     end
 
     it "pulls when the values are found" do
@@ -321,7 +325,7 @@ describe Mongoid::Contextual::Atomic do
     end
 
     before do
-      context.push(:members, "Alan")
+      context.push(members: "Alan")
     end
 
     it "pushes the value to existing arrays" do
@@ -352,7 +356,7 @@ describe Mongoid::Contextual::Atomic do
     end
 
     before do
-      context.push_all(:members, [ "Alan", "Fletch" ])
+      context.push_all(members: [ "Alan", "Fletch" ])
     end
 
     it "pushes the values to existing arrays" do
@@ -383,7 +387,7 @@ describe Mongoid::Contextual::Atomic do
     end
 
     before do
-      context.rename(:members, :artists)
+      context.rename(members: :artists)
     end
 
     it "renames existing fields" do
@@ -414,7 +418,7 @@ describe Mongoid::Contextual::Atomic do
     end
 
     before do
-      context.set(:name, "Recoil")
+      context.set(name: "Recoil")
     end
 
     it "sets existing fields" do

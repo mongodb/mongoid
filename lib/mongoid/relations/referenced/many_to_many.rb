@@ -134,7 +134,7 @@ module Mongoid
             execute_callback :before_remove, doc
           end
           unless metadata.forced_nil_inverse?
-            criteria.pull(inverse_foreign_key, base.id)
+            criteria.pull(inverse_foreign_key => base.id)
           end
           if persistable?
             base.set(foreign_key => base.send(foreign_key).clear)

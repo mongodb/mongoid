@@ -64,6 +64,11 @@ For instructions on upgrading to newer versions, visit
 
         document.add_to_set(names: "James", aliases: "007")
 
+* Criteria atomic operations API is now changed to match the changes in the
+  single document atomic API, for example:
+
+        Band.where(name: "Depeche Mode").inc(likes: 10, followers: 20)
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 
