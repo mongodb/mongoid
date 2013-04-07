@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.1.4
+
+### Resolved Issues
+
+* \#2944 Fixed uniqueness validation for localized fields when case insensitive
+  is true. (Vladimir Zhukov)
+
 ## 3.1.3
 
 ### Resolved Issues
