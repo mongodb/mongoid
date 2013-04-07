@@ -20,12 +20,12 @@ module Mongoid
       #
       # @since 4.0.0
       def set(setters)
-        prepare_atomic_operation do |coll, selector, ops|
+        prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|
             send("#{field}=", value)
             ops[atomic_attribute_name(field)] = attributes[field]
           end
-          coll.find(selector).update(positionally(selector, "$set" => ops))
+          { "$set" => ops }
         end
       end
     end

@@ -87,6 +87,42 @@ For instructions on upgrading to newer versions, visit
 * `delete_all` and `destroy_all` no longer take a `:conditions` hash but
   just the raw attributes.
 
+* \#1344 Atomic updates can now be executed in an `atomically` block, which will
+  delay any atomic updates on the document the block was called on until the
+  block is complete.
+
+    Update calls can be executed as normal in the block:
+
+        document.atomically do
+          document.inc(likes: 10)
+          document.bit(members: { and: 10 })
+          document.set(name: "Photek")
+        end
+
+    The document is also yielded to the block:
+
+        document.atomically do |doc|
+          doc.inc(likes: 10)
+          doc.bit(members: { and: 10 })
+          doc.set(name: "Photek")
+        end
+
+    The atomic commands are have a fluid interface:
+
+        document.atomically do |doc|
+          doc.inc(likes: 10).bit(members: { and: 10 }).set(name: "Photek")
+        end
+
+    If the fluid interface is leveraged without the `atomically` block, the
+    operations will persist in individual calls. For example, the following
+    would hit the database 3 times without the block provided:
+
+        doc.inc(likes: 10).bit(members: { and: 10 }).set(name: "Photek")
+
+    The block is only good for 1 document at a time, so embedded and root
+    document updates cannot be mixed at this time.
+
+
 ### New Features
 
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)

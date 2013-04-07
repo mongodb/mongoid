@@ -20,7 +20,7 @@ module Mongoid
       #
       # @since 4.0.0
       def bit(operations)
-        prepare_atomic_operation do |coll, selector, ops|
+        prepare_atomic_operation do |ops|
           process_atomic_operations(operations) do |field, values|
             value = attributes[field]
             values.each do |op, val|
@@ -30,7 +30,7 @@ module Mongoid
             attributes[field] = value
             ops[atomic_attribute_name(field)] = values
           end
-          coll.find(selector).update(positionally(selector, "$bit" => ops))
+          { "$bit" => ops }
         end
       end
     end

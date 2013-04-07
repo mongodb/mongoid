@@ -21,13 +21,13 @@ module Mongoid
       #
       # @since 4.0.0
       def unset(*fields)
-        prepare_atomic_operation do |coll, selector, ops|
+        prepare_atomic_operation do |ops|
           fields.flatten.each do |field|
             normalized = database_field_name(field)
             attributes.delete(normalized)
             ops[atomic_attribute_name(normalized)] = true
           end
-          coll.find(selector).update(positionally(selector, "$unset" => ops))
+          { "$unset" => ops }
         end
       end
     end

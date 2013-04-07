@@ -20,13 +20,13 @@ module Mongoid
       #
       # @since 4.0.0
       def add_to_set(adds)
-        prepare_atomic_operation do |coll, selector, ops|
+        prepare_atomic_operation do |ops|
           process_atomic_operations(adds) do |field, value|
             existing = send(field) || (attributes[field] ||= [])
             existing.push(value) unless existing.include?(value)
             ops[atomic_attribute_name(field)] = value
           end
-          coll.find(selector).update(positionally(selector, "$addToSet" => ops))
+          { "$addToSet" => ops }
         end
       end
 
@@ -44,14 +44,14 @@ module Mongoid
       #
       # @since 4.0.0
       def push(pushes)
-        prepare_atomic_operation do |coll, selector, ops|
+        prepare_atomic_operation do |ops|
           process_atomic_operations(pushes) do |field, value|
             existing = send(field) || (attributes[field] ||= [])
             values = [ value ].flatten
             values.each{ |val| existing.push(val) }
             ops[atomic_attribute_name(field)] = { "$each" => values }
           end
-          coll.find(selector).update(positionally(selector, "$push" => ops))
+          { "$push" => ops }
         end
       end
     end

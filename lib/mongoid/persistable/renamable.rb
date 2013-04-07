@@ -21,13 +21,13 @@ module Mongoid
       #
       # @since 4.0.0
       def rename(renames)
-        prepare_atomic_operation do |coll, selector, ops|
+        prepare_atomic_operation do |ops|
           process_atomic_operations(renames) do |old_field, new_field|
             new_name = new_field.to_s
             attributes[new_name] = attributes.delete(old_field)
             ops[atomic_attribute_name(old_field)] = atomic_attribute_name(new_name)
           end
-          coll.find(selector).update(positionally(selector, "$rename" => ops))
+          { "$rename" => ops }
         end
       end
     end

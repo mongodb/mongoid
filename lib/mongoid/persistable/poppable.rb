@@ -25,13 +25,13 @@ module Mongoid
       #
       # @since 4.0.0
       def pop(pops)
-        prepare_atomic_operation do |coll, selector, ops|
+        prepare_atomic_operation do |ops|
           process_atomic_operations(pops) do |field, value|
             values = send(field)
             value > 0 ? values.pop : values.shift
             ops[atomic_attribute_name(field)] = value
           end
-          coll.find(selector).update(positionally(selector, "$pop" => ops))
+          { "$pop" => ops }
         end
       end
     end
