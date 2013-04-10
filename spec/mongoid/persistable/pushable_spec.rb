@@ -44,7 +44,7 @@ describe Mongoid::Persistable::Pushable do
       context "when provided string fields" do
 
         let!(:add) do
-          person.add_to_set("aliases" => 4, "array" => 4, "test_array" => 1)
+          person.add_to_set("aliases" => 4, "array" => [4, 5], "test_array" => 1)
         end
 
         it_behaves_like "a unique pushable root document"
@@ -53,7 +53,7 @@ describe Mongoid::Persistable::Pushable do
       context "when provided symbol fields" do
 
         let!(:add) do
-          person.add_to_set(aliases: 4, array: 4, test_array: 1)
+          person.add_to_set(aliases: 4, array: [4, 5], test_array: 1)
         end
 
         it_behaves_like "a unique pushable root document"
