@@ -56,7 +56,7 @@ module Mongoid
           return collection.find(criteria.and(_id: document.id).selector).count
         end
         return query.count(document) if document
-        cached? ? @count ||= query.count : query.count
+        try_cache(:count) { query.count }
       end
 
       # Delete all documents in the database that match the selector.
@@ -143,7 +143,12 @@ module Mongoid
       #
       # @since 3.0.0
       def exists?
-        @exists ||= check_existence
+        return !documents.empty? if cached? && cache_loaded?
+        return @count > 0 if instance_variable_defined?(:@count)
+
+        try_cache(:exists) do
+          !!(query.dup.select(_id: 1).limit(1).first)
+        end
       end
 
       # Run an explain on the criteria.
@@ -189,9 +194,8 @@ module Mongoid
       #
       # @since 3.0.0
       def first
-        if cached? && cache_loaded?
-          documents.first
-        else
+        return documents.first if cached? && cache_loaded?
+        try_cache(:first) do
           with_sorting do
             with_eager_loading(query.first)
           end
@@ -274,8 +278,10 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        with_inverse_sorting do
-          with_eager_loading(query.first)
+        try_cache(:last) do
+          with_inverse_sorting do
+            with_eager_loading(query.first)
+          end
         end
       end
 
@@ -406,21 +412,21 @@ module Mongoid
 
       private
 
-      # Checks if any documents exist in the database.
+      # yield the block given or return the cached value
       #
-      # @api private
+      # @param [ String, Symbol ] key The instance variable name
       #
-      # @example Check for document existsence.
-      #   context.check_existence
+      # @return the result of the block
       #
-      # @return [ true, false ] If documents exist.
-      #
-      # @since 3.1.0
-      def check_existence
-        if cached? && cache_loaded?
-          !documents.empty?
+      # @since 3.1.4
+      def try_cache(key, &block)
+        unless cached?
+          yield
         else
-          @count ? @count > 0 : !query.dup.select(_id: 1).limit(1).entries.first.nil?
+          unless ret = instance_variable_get("@#{key}")
+            instance_variable_set("@#{key}", ret = yield)
+          end
+          ret
         end
       end
 
