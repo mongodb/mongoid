@@ -480,6 +480,29 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
+    context "when caching is not enabled" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context "when exists? already called" do
+
+        before do
+          context.exists?
+        end
+
+        it "hits the database again" do
+          context.should_receive(:query).once.and_call_original
+          context.should be_exists
+        end
+      end
+    end
+
     context "when caching is enabled" do
 
       let(:criteria) do
@@ -786,6 +809,18 @@ describe Mongoid::Contextual::Mongo do
           it "returns the first document without touching the database" do
             context.should_receive(:query).never
             expect(context.send(method)).to eq(depeche_mode)
+          end
+        end
+
+        context "when first method was called before" do
+
+          before do
+            context.first
+          end
+
+          it "returns the first document without touching the database" do
+            context.should_receive(:query).never
+            context.send(method).should eq(depeche_mode)
           end
         end
       end
