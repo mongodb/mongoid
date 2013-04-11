@@ -115,45 +115,4 @@ describe Mongoid::Atomic::Paths::Embedded::Many do
       end
     end
   end
-
-  describe "#selector" do
-
-    context "when the document is embedded one level" do
-
-      it "returns the the hash with parent selector" do
-        expect(many.selector).to eq(
-          { "_id" => person._id, "addresses._id" => address._id }
-        )
-      end
-    end
-
-    context "when the document is embedded multiple levels" do
-
-      let(:location) do
-        Location.new(name: "home")
-      end
-
-      before do
-        address.locations << location
-        address.new_record = false
-        address.post_persist
-        location.new_record = false
-        location.post_persist
-      end
-
-      let(:many) do
-        described_class.new(location)
-      end
-
-      it "returns the hash with all parent selectors" do
-        expect(many.selector).to eq(
-          {
-            "_id" => person._id,
-            "addresses._id" => address._id,
-            "addresses.0.locations._id" => location._id
-          }
-        )
-      end
-    end
-  end
 end

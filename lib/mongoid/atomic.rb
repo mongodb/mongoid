@@ -225,17 +225,6 @@ module Mongoid
       pushable? ? { atomic_position => as_document } : {}
     end
 
-    # Return the selector for this document to be matched exactly for use
-    # with MongoDB's $ operator.
-    #
-    # @example Get the selector.
-    #   address.atomic_selector
-    #
-    # @return [ String ] The exact selector for this document.
-    def atomic_selector
-      atomic_paths.selector
-    end
-
     # Get all the attributes that need to be set.
     #
     # @example Get the sets.

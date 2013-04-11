@@ -107,46 +107,4 @@ describe Mongoid::Atomic::Paths::Embedded::One do
       end
     end
   end
-
-  describe "#selector" do
-
-    context "when the document is embedded one level" do
-
-      it "returns the the hash with parent selector" do
-        expect(one.selector).to eq({ "_id" => person._id, "name._id" => name._id })
-      end
-    end
-
-    context "when the document is embedded multiple levels" do
-
-      let(:phone) do
-        Phone.new(number: "404-555-1212")
-      end
-
-      let(:country_code) do
-        CountryCode.new(code: 1)
-      end
-
-      before do
-        phone.country_code = country_code
-        person.phone_numbers << phone
-        phone.new_record = false
-        phone.post_persist
-      end
-
-      let(:one) do
-        described_class.new(country_code)
-      end
-
-      it "returns the hash with all parent selectors" do
-        expect(one.selector).to eq(
-          {
-            "_id" => person._id,
-            "phone_numbers._id" => phone._id,
-            "phone_numbers.0.country_code._id" => country_code._id
-          }
-        )
-      end
-    end
-  end
 end

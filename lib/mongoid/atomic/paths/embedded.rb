@@ -22,36 +22,6 @@ module Mongoid
         def path
           @path ||= position.sub(/\.\d+$/, "")
         end
-
-        # Get the selector to use for the root document when performing atomic
-        # updates. When sharding this will include the shard key.
-        #
-        # @example Get the selector.
-        #   many.selector
-        #
-        # @return [ Hash ] The selector to identify the document with.
-        #
-        # @since 2.1.0
-        def selector
-          @selector ||= generate_selector
-        end
-
-        private
-
-        def generate_selector
-          if only_root_selector?
-            parent.atomic_selector
-          else
-            parent.
-              atomic_selector.
-              merge("#{path}._id" => document._id).
-              merge(document.shard_key_selector)
-          end
-        end
-
-        def only_root_selector?
-          document.persisted? && document._id_changed?
-        end
       end
     end
   end

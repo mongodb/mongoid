@@ -6,6 +6,7 @@ require "mongoid/inspectable"
 require "mongoid/interceptable"
 require "mongoid/persistable"
 require "mongoid/reloadable"
+require "mongoid/selectable"
 require "mongoid/scopable"
 require "mongoid/serializable"
 require "mongoid/shardable"
@@ -13,6 +14,10 @@ require "mongoid/traversable"
 require "mongoid/validatable"
 
 module Mongoid
+
+  # This module provides inclusions of all behaviour in a Mongoid document.
+  #
+  # @since 4.0.0
   module Composable
     extend ActiveSupport::Concern
 
@@ -41,6 +46,7 @@ module Mongoid
     include Relations
     include Reloadable
     include Scopable
+    include Selectable
     include Serializable
     include Sessions
     include Shardable

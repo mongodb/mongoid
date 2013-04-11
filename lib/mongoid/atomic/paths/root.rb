@@ -33,19 +33,6 @@ module Mongoid
         def insert_modifier
           raise Errors::InvalidPath.new(document.class)
         end
-
-        # Get the selector to use for the root document when performing atomic
-        # updates. When sharding this will include the shard key.
-        #
-        # @example Get the selector.
-        #   root.selector
-        #
-        # @return [ Hash ] The selector to identify the document with.
-        #
-        # @since 2.1.0
-        def selector
-          @selector ||= { "_id" => document._id }.merge!(document.shard_key_selector)
-        end
       end
     end
   end
