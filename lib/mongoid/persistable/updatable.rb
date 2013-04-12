@@ -15,6 +15,8 @@ module Mongoid
       #
       # @param [ Hash ] options Options to pass to update.
       #
+      # @option options [ true, false ] :validate Whether or not to validate.
+      #
       # @return [ true, false ] True if succeeded, false if not.
       #
       # @since 1.0.0
