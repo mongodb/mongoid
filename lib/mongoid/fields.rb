@@ -473,6 +473,7 @@ module Mongoid
           re_define_method("#{meth}_translations") do
             attributes[name] ||= {}
           end
+          alias_method :"#{meth}_t", :"#{meth}_translations"
         end
       end
 
@@ -497,6 +498,7 @@ module Mongoid
             end
             attributes[name] = value
           end
+          alias_method :"#{meth}_t=", :"#{meth}_translations="
         end
       end
 

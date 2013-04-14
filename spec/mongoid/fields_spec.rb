@@ -55,12 +55,20 @@ describe Mongoid::Fields do
           end
         end
       end
+
+      it "should have alias method #\{field}_t" do
+        product.method(:name_t).should eq product.method(:name_translations)
+      end
     end
 
     context "when the field is not localized" do
 
       it "does not respond to the method" do
         expect(product).to_not respond_to(:price_translations)
+      end
+
+      it "does not respond to the alias method" do
+        product.should_not respond_to(:price_t)
       end
     end
   end
@@ -160,12 +168,20 @@ describe Mongoid::Fields do
           end
         end
       end
+
+      it "should have alias method #\{field}_t=" do
+        product.method(:name_t=).should eq product.method(:name_translations=)
+      end
     end
 
     context "when the field is not localized" do
 
       it "does not respond to the method" do
         expect(product).to_not respond_to(:price_translations=)
+      end
+
+      it "does not respond to the alias method" do
+        product.should_not respond_to(:price_t=)
       end
     end
   end
