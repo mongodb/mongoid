@@ -775,6 +775,23 @@ describe Mongoid::Changeable do
           expect(person).to be_changed
         end
       end
+
+      context "when a dynamic field is changed in place" do
+
+        let(:person) do
+          Person.create(other_name: { full: {first: 'first', last: 'last'} })
+        end
+
+        before do
+          Mongoid.configure.allow_dynamic_fields = true
+          person.other_name[:full][:first] = 'Name'
+        end
+
+        it "returns true" do
+          person.changes.should_not be_empty
+          person.should be_changed
+        end
+      end
     end
 
     context "when the document has not changed" do
