@@ -16,6 +16,9 @@ For instructions on upgrading to newer versions, visit
 
 * Dont duplicate embedded documents when saving after calling becomes method.
 
+* \#2961 Reloading a mongoid.yml configuration now properly clears previously
+  configured sessions.
+
 * \#2937 Counts can now take a `true` argument to factor in skip and limit.
   (Arthur Neves)
 

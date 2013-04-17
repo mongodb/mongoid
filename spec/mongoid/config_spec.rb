@@ -73,6 +73,22 @@ describe Mongoid::Config do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
     end
 
+    context "when existing sessions exist in the configuration" do
+
+      let(:session) do
+        Moped::Session.new([ "127.0.0.1:27017" ])
+      end
+
+      before do
+        Mongoid::Threaded.sessions[:test] = session
+        described_class.load!(file, :test)
+      end
+
+      it "clears the previous sessions" do
+        expect(Mongoid::Threaded.sessions[:test]).to be_nil
+      end
+    end
+
     context "when provided an environment" do
 
       before do
