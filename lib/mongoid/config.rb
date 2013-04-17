@@ -84,7 +84,11 @@ module Mongoid
     # @since 2.0.1
     def load!(path, environment = nil)
       settings = Environment.load_yaml(path, environment)
-      load_configuration(settings) if settings.present?
+      if settings.present?
+        Sessions.disconnect
+        Sessions.clear
+        load_configuration(settings)
+      end
       settings
     end
 
