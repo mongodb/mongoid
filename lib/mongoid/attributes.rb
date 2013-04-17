@@ -252,6 +252,7 @@ module Mongoid
 
       class_eval <<-READER
         def #{name}
+          attribute_will_change!(#{name.inspect})
           read_attribute(#{name.inspect})
         end
       READER
@@ -270,6 +271,7 @@ module Mongoid
     def define_dynamic_before_type_cast_reader(name)
       class_eval <<-READER
         def #{name}_before_type_cast
+          attribute_will_change!(#{name.inspect})
           read_attribute_before_type_cast(#{name.inspect})
         end
       READER
@@ -322,10 +324,12 @@ module Mongoid
         write_attribute(getter, args.first)
       elsif attr.before_type_cast?
         define_dynamic_before_type_cast_reader(attr.reader)
+        attribute_will_change!(attr.reader)
         read_attribute_before_type_cast(attr.reader)
       else
         getter = attr.reader
         define_dynamic_reader(getter)
+        attribute_will_change!(attr.reader)
         read_attribute(getter)
       end
     end
