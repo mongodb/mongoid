@@ -130,6 +130,10 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#2938 A configuration option `duplicate_fields_exception` has been added that
+  when set to `true` will raise an exception when defining a field that will
+  override an existing method. (Arthur Neves)
+
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)
 
 ### Resolved Issues
