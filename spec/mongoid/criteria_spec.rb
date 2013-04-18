@@ -4641,12 +4641,23 @@ describe Mongoid::Criteria do
 
       context "when there are no duplicate values" do
 
-        let(:plucked) do
-          Band.where(:name.exists => true).pluck(:name)
+        let(:criteria) do
+          Band.where(:name.exists => true)
+        end
+
+        let!(:plucked) do
+          criteria.pluck(:name)
         end
 
         it "returns the values" do
           expect(plucked).to eq([ "Depeche Mode", "Tool", "Photek" ])
+        end
+
+        context "when subsequently executing the criteria without a pluck" do
+
+          it "does not limit the fields" do
+            expect(criteria.first.likes).to eq(3)
+          end
         end
       end
 
