@@ -144,6 +144,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2979 `pluck` no longer modifies the context in place. (Brian Goff)
+
 * \#2944 Fixed uniqueness validation for localized fields when case insensitive
   is true. (Vladimir Zhukov)
 
