@@ -228,11 +228,10 @@ module Mongoid
       # @since 2.4.4
       def to_validate(document, attribute, value)
         metadata = document.relations[attribute.to_s]
-        attr = document.class.aliased_fields[attribute.to_s] || attribute
         if metadata && metadata.stores_foreign_key?
           [ metadata.foreign_key, value.id ]
         else
-          [ attr, value ]
+          [ attribute, value ]
         end
       end
 
@@ -250,8 +249,9 @@ module Mongoid
       # @since 2.4.10
       def validate_embedded(document, attribute, value)
         return if skip_validation?(document)
+        attr = document.class.aliased_fields[attribute.to_s] || attribute
         relation = document._parent.send(document.metadata_name)
-        criteria = create_criteria(relation, document, attribute, value)
+        criteria = create_criteria(relation, document, attr, value)
         add_error(document, attribute, value) if criteria.count > 1
       end
 
@@ -268,7 +268,8 @@ module Mongoid
       #
       # @since 2.4.10
       def validate_root(document, attribute, value)
-        criteria = create_criteria(klass || document.class, document, attribute, value)
+        attr = document.class.aliased_fields[attribute.to_s] || attribute
+        criteria = create_criteria(klass || document.class, document, attr, value)
         if criteria.with(persistence_options(criteria)).exists?
           add_error(document, attribute, value)
         end
