@@ -228,10 +228,11 @@ module Mongoid
       # @since 2.4.4
       def to_validate(document, attribute, value)
         metadata = document.relations[attribute.to_s]
+        attr = document.class.aliased_fields[attribute.to_s] || attribute
         if metadata && metadata.stores_foreign_key?
           [ metadata.foreign_key, value.id ]
         else
-          [ attribute, value ]
+          [ attr, value ]
         end
       end
 

@@ -141,6 +141,44 @@ describe Mongoid::Validations::UniquenessValidator do
           end
         end
 
+        context "when the field name is aliased" do
+
+          let(:dictionary) do
+            Dictionary.new(language: "en")
+          end
+
+          after do
+            Dictionary.reset_callbacks(:validate)
+          end
+
+          context "when the validation uses the aliased name" do
+
+            before do
+              Dictionary.validates_uniqueness_of :language
+              Dictionary.create!(language: "en")
+            end
+
+            it "correctly detects a uniqueness conflict" do
+              expect(dictionary).to_not be_valid
+            end
+
+          end
+
+          context "when the validation uses the underlying field name" do
+
+            before do
+              Dictionary.validates_uniqueness_of :l
+              Dictionary.create!(language: "en")
+            end
+
+            it "correctly detects a uniqueness conflict" do
+              expect(dictionary).to_not be_valid
+            end
+
+          end
+
+        end
+
         context "when the field is localized" do
 
           context "when no scope is provided" do
