@@ -124,6 +124,8 @@ module Mongoid
       #
       # @since 2.3.0
       def criterion(document, attribute, value)
+        attribute = document.class.aliased_fields[attribute.to_s] || attribute
+
         if localized?(document, attribute)
           conditions = value.inject([]) { |acc, (k,v)| acc << { "#{attribute}.#{k}" => filter(v) } }
           selector = { "$or" => conditions }
@@ -249,9 +251,8 @@ module Mongoid
       # @since 2.4.10
       def validate_embedded(document, attribute, value)
         return if skip_validation?(document)
-        attr = document.class.aliased_fields[attribute.to_s] || attribute
         relation = document._parent.send(document.metadata_name)
-        criteria = create_criteria(relation, document, attr, value)
+        criteria = create_criteria(relation, document, attribute, value)
         add_error(document, attribute, value) if criteria.count > 1
       end
 
@@ -268,8 +269,7 @@ module Mongoid
       #
       # @since 2.4.10
       def validate_root(document, attribute, value)
-        attr = document.class.aliased_fields[attribute.to_s] || attribute
-        criteria = create_criteria(klass || document.class, document, attr, value)
+        criteria = create_criteria(klass || document.class, document, attribute, value)
         if criteria.with(persistence_options(criteria)).exists?
           add_error(document, attribute, value)
         end
