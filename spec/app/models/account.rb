@@ -14,7 +14,7 @@ class Account
   embeds_many :memberships
   belongs_to :creator, class_name: "User", foreign_key: :creator_id
   belongs_to :person
-  has_many :alerts
+  has_many :alerts, autosave: false
   has_and_belongs_to_many :agents
   has_one :comment, validate: false
 
