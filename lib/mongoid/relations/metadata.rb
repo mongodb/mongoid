@@ -160,7 +160,7 @@ module Mongoid
       # @since 3.1.0
       def counter_cache_column_name
         if self[:counter_cache] == true
-          "#{inverse_class_name.demodulize.underscore.pluralize}_count"
+          "#{inverse || inverse_class_name.demodulize.underscore.pluralize}_count"
         else
           self[:counter_cache].to_s
         end
