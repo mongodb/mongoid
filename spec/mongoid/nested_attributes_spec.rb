@@ -4,27 +4,50 @@ describe Mongoid::NestedAttributes do
 
   describe ".accepts_nested_attributes_for" do
 
-    let(:person) do
-      Person.new
+    context "when the autosave option is not defined" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        Person.accepts_nested_attributes_for :favorites
+      end
+
+      after do
+        Person.send(:undef_method, :favorites_attributes=)
+        Person.nested_attributes.clear
+      end
+
+      it "adds a method for handling the attributes" do
+        expect(person).to respond_to(:favorites_attributes=)
+      end
+
+      it "adds the method name to the nested attributes list" do
+        expect(Person.nested_attributes).to eq({
+          "favorites_attributes" => "favorites_attributes="
+        })
+      end
     end
 
-    before do
-      Person.accepts_nested_attributes_for :favorites
-    end
+    context "when autosave is explicitly false" do
 
-    after do
-      Person.send(:undef_method, :favorites_attributes=)
-      Person.nested_attributes.clear
-    end
+      before do
+        Account.accepts_nested_attributes_for :alerts
+      end
 
-    it "adds a method for handling the attributes" do
-      expect(person).to respond_to(:favorites_attributes=)
-    end
+      after do
+        Account.send(:undef_method, :alerts_attributes=)
+        Account.nested_attributes.clear
+      end
 
-    it "adds the method name to the nested attributes list" do
-      expect(Person.nested_attributes).to eq({
-        "favorites_attributes" => "favorites_attributes="
-      })
+      let(:metadata) do
+        Account.reflect_on_association(:alerts)
+      end
+
+      it "keeps autosave set to false" do
+        expect(metadata).to_not be_autosave
+      end
     end
   end
 

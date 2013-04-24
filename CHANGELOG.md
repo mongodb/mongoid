@@ -146,6 +146,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2979 `pluck` no longer modifies the context in place. (Brian Goff)
 
+* \#2959 Nested attributes will now respect `autosave: false` if defined on the
+  relation.
+
 * \#2944 Fixed uniqueness validation for localized fields when case insensitive
   is true. (Vladimir Zhukov)
 

@@ -46,15 +46,31 @@ module Mongoid
           meth = "#{name}_attributes="
           self.nested_attributes["#{name}_attributes"] = meth
           metadata = relations[name.to_s]
-          unless metadata
-            raise Errors::NestedAttributesMetadataNotFound.new(self, name)
-          end
-          autosave(metadata.merge!(autosave: true))
+          raise Errors::NestedAttributesMetadataNotFound.new(self, name) unless metadata
+          autosave_nested_attributes(metadata)
           re_define_method(meth) do |attrs|
             _assigning do
               metadata.nested_builder(attrs, options).build(self)
             end
           end
+        end
+      end
+
+      private
+
+      # Add the autosave information for the nested relation.
+      #
+      # @api private
+      #
+      # @example Add the autosave if appropriate.
+      #   Person.autosave_nested_attributes(metadata)
+      #
+      # @param [ Metadata ] metadata The existing relation metadata.
+      #
+      # @since 3.1.4
+      def autosave_nested_attributes(metadata)
+        unless metadata.autosave == false
+          autosave(metadata.merge!(autosave: true))
         end
       end
     end
