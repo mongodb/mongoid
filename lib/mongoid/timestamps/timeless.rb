@@ -16,7 +16,7 @@ module Mongoid
       #
       # @since 2.3.0
       def timeless
-        Threaded.timeless = true
+        Threaded.timeless = self.class
         self
       end
 
@@ -29,8 +29,10 @@ module Mongoid
       #
       # @since 2.3.0
       def timestamping?
-        Threaded.timestamping?
+        Threaded.timestamping?(self.class)
       end
+
+      private
 
       module ClassMethods
 
@@ -43,7 +45,7 @@ module Mongoid
         #
         # @since 2.3.0
         def timeless
-          Threaded.timeless = true
+          Threaded.timeless = self
           self
         end
       end

@@ -169,15 +169,15 @@ describe Mongoid::Threaded do
   describe "#timeless" do
 
     before do
-      described_class.timeless = true
+      described_class.timeless = Person
     end
 
     after do
-      described_class.timeless = false
+      described_class.timeless = nil
     end
 
     it "returns the timeless value" do
-      expect(described_class.timeless).to be_true
+      expect(described_class.timeless).to eq(Person)
     end
   end
 
@@ -186,22 +186,22 @@ describe Mongoid::Threaded do
     context "when timeless is not set" do
 
       it "returns true" do
-        expect(described_class).to be_timestamping
+        expect(described_class).to be_timestamping(Person)
       end
     end
 
-    context "when timeless is true" do
+    context "when timeless is set" do
 
       before do
-        described_class.timeless = true
+        described_class.timeless = Person
       end
 
       after do
-        described_class.timeless = false
+        described_class.timeless = nil
       end
 
       it "returns false" do
-        expect(described_class).to_not be_timestamping
+        expect(described_class).to_not be_timestamping(Person)
       end
     end
   end
