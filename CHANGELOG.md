@@ -144,7 +144,7 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* \#2992 `Document.timeless` now properly scopes to the class and not thread.
+* \#2991 `Document.timeless` now properly scopes to the class and not thread.
 
 * \#2979 `pluck` no longer modifies the context in place. (Brian Goff)
 
