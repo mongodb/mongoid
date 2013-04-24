@@ -65,7 +65,10 @@ describe Mongoid::Relations::Metadata do
   end
 
   describe "#counter_cache_column_name" do
-    let(:inverse_class_name) { "Wheel" }
+
+    let(:inverse_class_name) do
+      "Wheel"
+    end
 
     context "when the counter_cache is true" do
 
@@ -78,8 +81,14 @@ describe Mongoid::Relations::Metadata do
         )
       end
 
-      it "returns inveser_class_name + _count" do
-        expect(metadata.counter_cache_column_name).to eq("#{inverse_class_name.demodulize.underscore.pluralize}_count")
+      before do
+        metadata.should_receive(:inverse).and_return(:wheels)
+      end
+
+      it "returns inverse name + _count" do
+        expect(metadata.counter_cache_column_name).to eq(
+          "#{inverse_class_name.demodulize.underscore.pluralize}_count"
+        )
       end
     end
 
