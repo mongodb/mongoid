@@ -58,13 +58,8 @@ describe Mongoid::Relations::CounterCache do
         Person.reset_counters(person.id, :posts)
       end
 
-<<<<<<< HEAD
-      it 'resets to the right value' do
-        person.reload.posts_count.should eq(1)
-=======
       it "resets to the right value" do
         expect(person.reload.posts_count).to eq(1)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
       end
     end
 
@@ -104,13 +99,8 @@ describe Mongoid::Relations::CounterCache do
           Person.update_counters person.id, :drugs_count => 5
         end
 
-<<<<<<< HEAD
-        it 'return 8' do
-          person.reload.drugs_count.should eq(8)
-=======
         it "return 8" do
           expect(person.reload.drugs_count).to eq(8)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
         end
       end
 
@@ -120,13 +110,8 @@ describe Mongoid::Relations::CounterCache do
           Person.update_counters person.id, :drugs_count => -5
         end
 
-<<<<<<< HEAD
-        it 'return -2' do
-          person.reload.drugs_count.should eq(-2)
-=======
         it "return -2" do
           expect(person.reload.drugs_count).to eq(-2)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
         end
       end
     end
@@ -138,13 +123,8 @@ describe Mongoid::Relations::CounterCache do
         Person.update_counters person.id, "drugs_count" => 2
       end
 
-<<<<<<< HEAD
-      it 'returns 2' do
-        person.reload.drugs_count.should eq(2)
-=======
       it "returns 2" do
         expect(person.reload.drugs_count).to eq(2)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
       end
     end
 
@@ -156,21 +136,12 @@ describe Mongoid::Relations::CounterCache do
         Person.update_counters(person.id, :drugs_count => 2, :second_counter => 5)
       end
 
-<<<<<<< HEAD
-      it 'updates drugs_counter' do
-        person.reload.drugs_count.should eq(2)
-      end
-
-      it 'updates second_counter' do
-        person.reload.second_counter.should eq(5)
-=======
       it "updates drugs_counter" do
         expect(person.reload.drugs_count).to eq(2)
       end
 
       it "updates second_counter" do
         expect(person.reload.second_counter).to eq(5)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
       end
     end
   end
@@ -185,13 +156,8 @@ describe Mongoid::Relations::CounterCache do
         3.times { Person.increment_counter(:drugs_count, person.id) }
       end
 
-<<<<<<< HEAD
-      it 'returns 3' do
-        person.reload.drugs_count.should eq(3)
-=======
       it "returns 3" do
         expect(person.reload.drugs_count).to eq(3)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
       end
     end
 
@@ -201,13 +167,8 @@ describe Mongoid::Relations::CounterCache do
         3.times { Person.increment_counter("drugs_count", person.id) }
       end
 
-<<<<<<< HEAD
-      it 'returns 3' do
-        person.reload.drugs_count.should eq(3)
-=======
       it "returns 3" do
         expect(person.reload.drugs_count).to eq(3)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
       end
     end
   end
@@ -226,13 +187,8 @@ describe Mongoid::Relations::CounterCache do
         3.times { Person.decrement_counter(:drugs_count, person.id) }
       end
 
-<<<<<<< HEAD
-      it 'returns 0' do
-        person.reload.drugs_count.should eq(0)
-=======
       it "returns 0" do
         expect(person.reload.drugs_count).to eq(0)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
       end
     end
     context "when increment 3 times using string as argument" do
@@ -241,13 +197,8 @@ describe Mongoid::Relations::CounterCache do
         3.times { Person.decrement_counter("drugs_count", person.id) }
       end
 
-<<<<<<< HEAD
-      it 'returns 0' do
-        person.reload.drugs_count.should eq(0)
-=======
       it "returns 0" do
         expect(person.reload.drugs_count).to eq(0)
->>>>>>> 0dc3871... Fix counter cache to use relation name when possible.
       end
     end
   end
