@@ -124,6 +124,8 @@ module Mongoid
       #
       # @since 2.3.0
       def criterion(document, attribute, value)
+        attribute = document.class.aliased_fields[attribute.to_s] || attribute
+
         if localized?(document, attribute)
           conditions = value.inject([]) { |acc, (k,v)| acc << { "#{attribute}.#{k}" => filter(v) } }
           selector = { "$or" => conditions }
