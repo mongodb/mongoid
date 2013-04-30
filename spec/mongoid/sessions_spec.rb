@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Sessions do
 
+  before :each do
+    purge_database_alt!
+  end
+
   describe ".clear_persistence_options" do
 
     context "when options exist on the current thread" do
@@ -556,13 +560,13 @@ describe Mongoid::Sessions do
     context "when sending operations to a different database" do
 
       after do
-        Band.with(database: "mongoid_test_alt").delete_all
+        Band.with(database: database_id_alt).delete_all
       end
 
       describe ".create" do
 
         let!(:band) do
-          Band.with(database: "mongoid_test_alt").create
+          Band.with(database: database_id_alt).create
         end
 
         it "does not persist to the default database" do
@@ -572,7 +576,7 @@ describe Mongoid::Sessions do
         end
 
         let(:from_db) do
-          Band.with(database: "mongoid_test_alt").find(band.id)
+          Band.with(database: database_id_alt).find(band.id)
         end
 
         it "persists to the specified database" do
@@ -580,7 +584,7 @@ describe Mongoid::Sessions do
         end
 
         it "persists the correct number of documents" do
-          expect(Band.with(database: "mongoid_test_alt").count).to eq(1)
+          expect(Band.with(database: database_id_alt).count).to eq(1)
         end
       end
 
@@ -605,23 +609,23 @@ describe Mongoid::Sessions do
         end
 
         before do
-          Band.with(database: "mongoid_test_alt").delete_all
+          Band.with(database: database_id_alt).delete_all
         end
 
         let!(:depeche_mode) do
-          Band.with(database: "mongoid_test_alt").
+          Band.with(database: database_id_alt).
             create(name: "Depeche Mode", likes: 200)
         end
 
         let!(:tool) do
-          Band.with(database: "mongoid_test_alt").
+          Band.with(database: database_id_alt).
             create(name: "Tool", likes: 100)
         end
 
         context "when outputting in memory" do
 
           let(:results) do
-            Band.with(database: "mongoid_test_alt").
+            Band.with(database: database_id_alt).
               map_reduce(map, reduce).out(inline: 1)
           end
 
@@ -633,7 +637,7 @@ describe Mongoid::Sessions do
         context "when outputting to a collection" do
 
           let(:results) do
-            Band.with(database: "mongoid_test_alt").
+            Band.with(database: database_id_alt).
               map_reduce(map, reduce).out(replace: "bands_output")
           end
 

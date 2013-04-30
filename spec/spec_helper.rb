@@ -27,9 +27,21 @@ def database_id
   "mongoid_test"
 end
 
+def database_id_alt
+  "mongoid_test_alt"
+end
+
 # Can we connect to MongoHQ from this box?
 def mongohq_connectable?
   ENV["MONGOHQ_REPL_PASS"].present?
+end
+
+def purge_database_alt!
+  session = Mongoid::Sessions.default
+  session.use(database_id_alt)
+  session.collections.each do |collection|
+    collection.drop
+  end
 end
 
 # Set the database that the spec suite connects to.
