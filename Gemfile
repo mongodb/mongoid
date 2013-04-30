@@ -3,10 +3,6 @@ gemspec
 
 gem "rake"
 
-git "git://github.com/rails/rails.git" do
-  gem "activemodel"
-end
-
 group :test do
   gem "rspec", "~> 2.13"
 
