@@ -262,7 +262,7 @@ module Mongoid
       # @since 3.0.0
       def initialize(criteria)
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
-        @collection = klass.collection
+        @collection = klass.collection(criteria.persistence_options)
         criteria.send(:merge_type_selection)
         @query = collection.find(criteria.selector)
         apply_options

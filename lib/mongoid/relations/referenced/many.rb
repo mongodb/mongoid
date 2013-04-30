@@ -320,6 +320,8 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
+          document.with(@persistence_options) if @persistence_options
+
           execute_callback :before_add, document
           target.push(document)
           characterize_one(document)
@@ -350,6 +352,7 @@ module Mongoid
         #
         # @since 2.0.2
         def collection
+#          base.collection
           klass.collection
         end
 

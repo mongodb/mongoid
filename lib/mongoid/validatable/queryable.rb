@@ -22,7 +22,7 @@ module Mongoid
           Threaded.begin_execution("#{klass.name}-validate-with-query")
           yield
         ensure
-          klass.clear_persistence_options unless document.errors.empty?
+#          klass.clear_persistence_options unless document.errors.empty?
           Threaded.exit_execution("#{klass.name}-validate-with-query")
         end
       end
