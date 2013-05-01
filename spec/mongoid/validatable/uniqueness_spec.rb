@@ -25,7 +25,7 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the document is not valid" do
 
             let(:websters) do
-              Dictionary.new(name: "websters").with(collection: "dicts")
+              Dictionary.with(collection: "dicts").new(name: "websters")
             end
 
             it "performs the validation on the correct collection" do
