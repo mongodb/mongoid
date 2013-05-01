@@ -89,6 +89,55 @@ describe Mongoid::Validatable::UniquenessValidator do
           end
         end
 
+        context "when the field name is aliased" do
+
+          before do
+            Dictionary.create!(language: "en")
+          end
+
+          let(:dictionary) do
+            Dictionary.new(language: "en")
+          end
+
+          after do
+            Dictionary.reset_callbacks(:validate)
+          end
+
+          context "when the validation uses the aliased name" do
+
+            before do
+              Dictionary.validates_uniqueness_of :language
+            end
+
+            it "correctly detects a uniqueness conflict" do
+              expect(dictionary).to_not be_valid
+            end
+
+            it "adds the uniqueness error to the aliased field name" do
+              dictionary.valid?
+              expect(dictionary.errors).to have_key(:language)
+              expect(dictionary.errors[:language]).to eq([ "is already taken" ])
+            end
+          end
+
+          context "when the validation uses the underlying field name" do
+
+            before do
+              Dictionary.validates_uniqueness_of :l
+            end
+
+            it "correctly detects a uniqueness conflict" do
+              expect(dictionary).to_not be_valid
+            end
+
+            it "adds the uniqueness error to the underlying field name" do
+              dictionary.valid?
+              expect(dictionary.errors).to have_key(:l)
+              expect(dictionary.errors[:l]).to eq([ "is already taken" ])
+            end
+          end
+        end
+
         context "when the field is localized" do
 
           context "when no scope is provided" do
@@ -2009,6 +2058,55 @@ describe Mongoid::Validatable::UniquenessValidator do
 
             it "returns true" do
               expect(definition).to be_valid
+            end
+          end
+        end
+
+        context "when the field name is aliased" do
+
+          before do
+            word.definitions.build(part: "noun")
+          end
+
+          let(:definition) do
+            word.definitions.build(part: "noun")
+          end
+
+          after do
+            Definition.reset_callbacks(:validate)
+          end
+
+          context "when the validation uses the aliased name" do
+
+            before do
+              Definition.validates_uniqueness_of :part, case_sensitive: false
+            end
+
+            it "correctly detects a uniqueness conflict" do
+              expect(definition).to_not be_valid
+            end
+
+            it "adds the uniqueness error to the aliased field name" do
+              definition.valid?
+              expect(definition.errors).to have_key(:part)
+              expect(definition.errors[:part]).to eq([ "is already taken" ])
+            end
+          end
+
+          context "when the validation uses the underlying field name" do
+
+            before do
+              Definition.validates_uniqueness_of :p, case_sensitive: false
+            end
+
+            it "correctly detects a uniqueness conflict" do
+              expect(definition).to_not be_valid
+            end
+
+            it "adds the uniqueness error to the underlying field name" do
+              definition.valid?
+              expect(definition.errors).to have_key(:p)
+              expect(definition.errors[:p]).to eq([ "is already taken" ])
             end
           end
         end
