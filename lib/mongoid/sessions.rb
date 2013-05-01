@@ -82,7 +82,13 @@ module Mongoid
       self.class.collection(persistence_options)
     end
 
-    delegate :mongo_session, :collection_name, to: 'self.class'
+    def mongo_session
+      self.class.mongo_session
+    end
+
+    def collection_name
+      self.class.collection_name
+    end
 
     module ClassMethods
 
