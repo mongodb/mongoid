@@ -176,7 +176,7 @@ module Mongoid
         subclass.fields = fields.dup
         subclass.pre_processed_defaults = pre_processed_defaults.dup
         subclass.post_processed_defaults = post_processed_defaults.dup
-        subclass.scopes = scopes.dup
+        subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
         subclass.autosaved_relations = autosaved_relations.dup
 
         # We only need the _type field if inheritance is in play, but need to
