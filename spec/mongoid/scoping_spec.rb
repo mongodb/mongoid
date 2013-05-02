@@ -198,7 +198,7 @@ describe Mongoid::Scoping do
           class << Band
             undef_method :active
           end
-          Band.scopes.clear
+          Band._declared_scopes.clear
         end
 
         let(:scope) do
@@ -223,7 +223,7 @@ describe Mongoid::Scoping do
           class << Record
             undef_method :tool
           end
-          Record.scopes.clear
+          Record._declared_scopes.clear
         end
 
         context "when calling the scope" do
@@ -256,7 +256,7 @@ describe Mongoid::Scoping do
           class << Band
             undef_method :active
           end
-          Band.scopes.clear
+          Band._declared_scopes.clear
         end
 
         it "adds a method for the scope" do
@@ -294,7 +294,7 @@ describe Mongoid::Scoping do
               class << Band
                 undef_method :english
               end
-              Band.scopes.clear
+              Band._declared_scopes.clear
             end
 
             let(:scope) do
@@ -364,7 +364,7 @@ describe Mongoid::Scoping do
             class << Band
               undef_method :active
             end
-            Band.scopes.clear
+            Band._declared_scopes.clear
           end
 
           it "raises an exception" do
@@ -382,7 +382,7 @@ describe Mongoid::Scoping do
             class << Band
               undef_method :active
             end
-            Band.scopes.clear
+            Band._declared_scopes.clear
           end
 
           it "raises no exception" do
@@ -409,7 +409,7 @@ describe Mongoid::Scoping do
           class << Band
             undef_method :active
           end
-          Band.scopes.clear
+          Band._declared_scopes.clear
         end
 
         let(:scope) do
@@ -431,7 +431,7 @@ describe Mongoid::Scoping do
           class << Band
             undef_method :active
           end
-          Band.scopes.clear
+          Band._declared_scopes.clear
         end
 
         it "adds a method for the scope" do
@@ -479,7 +479,7 @@ describe Mongoid::Scoping do
               class << Band
                 undef_method :english
               end
-              Band.scopes.clear
+              Band._declared_scopes.clear
             end
 
             let(:scope) do
@@ -549,7 +549,7 @@ describe Mongoid::Scoping do
             class << Band
               undef_method :active
             end
-            Band.scopes.clear
+            Band._declared_scopes.clear
           end
 
           it "raises an exception" do
@@ -567,7 +567,7 @@ describe Mongoid::Scoping do
             class << Band
               undef_method :active
             end
-            Band.scopes.clear
+            Band._declared_scopes.clear
           end
 
           it "raises no exception" do
@@ -605,7 +605,7 @@ describe Mongoid::Scoping do
             undef_method :xxx
             undef_method :yyy
           end
-          Band.scopes.clear
+          Band._declared_scopes.clear
         end
 
         let(:criteria) do
@@ -622,6 +622,50 @@ describe Mongoid::Scoping do
             ]
           })
         end
+      end
+    end
+
+    context "when working with a subclass" do
+
+      before do
+        Shape.scope(:located_at, ->(x,y) {Shape.where(x: x, y: y)})
+        Circle.scope(:with_radius, ->(r) {Circle.where(radius: r)})
+      end
+
+      after do
+        class << Shape
+          undef_method :located_at
+        end
+        Shape._declared_scopes.clear
+
+        class << Circle
+          undef_method :with_radius
+        end
+        Circle._declared_scopes.clear
+      end
+
+      let(:shape_scope_keys) do
+        Shape.scopes.keys
+      end
+
+      let(:circle_located_at) do
+        Circle.located_at(0,0)
+      end
+
+      let(:circle_scope_keys) do
+        Circle.scopes.keys
+      end
+
+      it "doesn't include subclass scopes in superclass scope list" do
+        expect(shape_scope_keys).to match_array([:located_at])
+      end
+
+      it "includes superclass scope methods on subclass" do
+        expect(circle_located_at).to be_a(Mongoid::Criteria)
+      end
+
+      it "includes superclass scopes in subclass scope list" do
+        expect(circle_scope_keys).to match_array([:located_at, :with_radius])
       end
     end
   end
@@ -796,7 +840,7 @@ describe Mongoid::Scoping do
           class << Band
             undef_method :skipped
           end
-          Band.scopes.clear
+          Band._declared_scopes.clear
         end
 
         it "does not allow the default scope to be applied" do

@@ -377,7 +377,7 @@ describe Mongoid::Criterion::Scoping do
           class << Band
             undef_method :skipped
           end
-          Band.scopes.clear
+          Band._declared_scopes.clear
         end
 
         it "does not allow the default scope to be applied" do
