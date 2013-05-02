@@ -10,11 +10,33 @@ module Mongoid
 
     included do
       class_attribute :default_scoping
-      class_attribute :scopes
-      self.scopes = {}
+      class_attribute :_declared_scopes
+      self._declared_scopes = {}
     end
 
     module ClassMethods
+
+      # Returns a hash of all the scopes defined for this class, including
+      # scopes defined on ancestor classes.
+      #
+      # @example Get the defined scopes for a class
+      #   class Band
+      #     include Mongoid::Document
+      #     field :active, type: Boolean
+      #
+      #     scope :active, where(active: true)
+      #   end
+      #   Band.scopes
+      #
+      # @return [ Hash ] The scopes defined for this class
+      #
+      # @since 4.0.0
+      def scopes
+        ancestors.reverse.inject({}) do |s,klass|
+          s.merge!(klass._declared_scopes) if klass.respond_to?(:_declared_scopes)
+          s
+        end.freeze
+      end
 
       # Add a default scope to the model. This scope will be applied to all
       # criteria unless #unscoped is specified.
@@ -96,7 +118,7 @@ module Mongoid
         normalized = name.to_sym
         check_scope_validity(value)
         check_scope_name(normalized)
-        scopes[normalized] = {
+        _declared_scopes[normalized] = {
           scope: strip_default_scope(value),
           extension: Module.new(&block)
         }
@@ -228,7 +250,7 @@ module Mongoid
       #
       # @since 2.1.0
       def check_scope_name(name)
-        if scopes[name] || respond_to?(name, true)
+        if _declared_scopes[name] || respond_to?(name, true)
           if Mongoid.scope_overwrite_exception
             raise Errors::ScopeOverwrite.new(self.name, name)
           else
@@ -275,9 +297,9 @@ module Mongoid
       #
       # @since 3.0.0
       def define_scope_method(name)
-        (class << self; self; end).class_eval <<-SCOPE
+        (class << self; self; end).class_eval <<-SCOPE, __FILE__, __LINE__ + 1
           def #{name}(*args)
-            scoping = scopes[:#{name}]
+            scoping = _declared_scopes[:#{name}]
             scope, extension = scoping[:scope][*args], scoping[:extension]
             criteria = with_default_scope.merge(scope || queryable)
             criteria.extend(extension)
