@@ -1397,6 +1397,50 @@ describe Mongoid::Validatable::UniquenessValidator do
           end
         end
       end
+
+      context "when the attribute is a custom type" do
+
+        before do
+          Bar.validates_uniqueness_of :lat_lng
+        end
+
+        after do
+          Bar.reset_callbacks(:validate)
+        end
+
+        context "when the attribute is unique" do
+
+          before do
+            Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+          end
+
+          let(:unique_bar) do
+            Bar.new(lat_lng: LatLng.new(54.30, 14.25))
+          end
+
+          it "returns true" do
+            expect(unique_bar).to be_valid
+          end
+
+        end
+
+        context "when the attribute is not unique" do
+
+          before do
+            Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+          end
+
+          let(:non_unique_bar) do
+            Bar.new(lat_lng: LatLng.new(52.30, 13.25))
+          end
+
+          it "returns false" do
+            expect(non_unique_bar).to_not be_valid
+          end
+
+        end
+
+      end
     end
   end
 
