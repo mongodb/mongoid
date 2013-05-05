@@ -65,6 +65,10 @@ module MyApp
   end
 end
 
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.irregular("canvas", "canvases")
+end
+
 RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
