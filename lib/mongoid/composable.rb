@@ -41,7 +41,6 @@ module Mongoid
     include Indexable
     include Inspectable
     include Matchers
-    include NestedAttributes
     include Persistable
     include Relations
     include Reloadable
@@ -70,7 +69,6 @@ module Mongoid
       Inspectable,
       Interceptable,
       Matchers,
-      NestedAttributes,
       Persistable,
       Relations,
       Reloadable,

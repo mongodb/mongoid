@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::NestedAttributes do
+describe Mongoid::Attributes::Nested do
 
   describe ".accepts_nested_attributes_for" do
 

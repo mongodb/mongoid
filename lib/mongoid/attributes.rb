@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "mongoid/attributes/nested"
 require "mongoid/attributes/processing"
 require "mongoid/attributes/readonly"
 
@@ -8,6 +9,7 @@ module Mongoid
   # and how to get and set values.
   module Attributes
     extend ActiveSupport::Concern
+    include Nested
     include Processing
     include Readonly
 
