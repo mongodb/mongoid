@@ -153,6 +153,8 @@ For instructions on upgrading to newer versions, visit
 * \#3018 Uniqueness validator now properly serializes values in its check.
   (Jerry Clinesmith)
 
+* \#3011 Fixed aliased field support for uniqueness validation. (Johnny Shields)
+
 * \#3008 Fixed subclasses not being able to inherit scopes properly when scope
   is added post class load. (Mike Dillon)
 
