@@ -160,6 +160,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2991 `Document.timeless` now properly scopes to the class and not thread.
 
+* \#2980 Dynamic fields now properly handle in place editing of hashes and
+  arrays. (Matthew Widmann)
+
 * \#2979 `pluck` no longer modifies the context in place. (Brian Goff)
 
 * \#2970 Fixed counter cache to properly use the name of the relation if available
