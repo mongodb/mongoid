@@ -124,13 +124,13 @@ module Mongoid
       #
       # @since 2.3.0
       def criterion(document, attribute, value)
-        attribute = document.class.aliased_fields[attribute.to_s] || attribute
+        field = document.database_field_name(attribute)
 
-        if localized?(document, attribute)
-          conditions = value.inject([]) { |acc, (k,v)| acc << { "#{attribute}.#{k}" => filter(v) } }
+        if localized?(document, field)
+          conditions = value.inject([]) { |acc, (k,v)| acc << { "#{field}.#{k}" => filter(v) } }
           selector = { "$or" => conditions }
         else
-          selector = { attribute => filter(value) }
+          selector = { field => filter(value) }
         end
 
         if document.persisted? && !document.embedded?
