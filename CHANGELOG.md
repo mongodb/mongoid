@@ -69,6 +69,9 @@ For instructions on upgrading to newer versions, visit
 
         Band.where(name: "Depeche Mode").inc(likes: 10, followers: 20)
 
+* \#2956 Caching on queries now only happens when `cache` is specifically
+  called. (Arthur Neves)
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 
