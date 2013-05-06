@@ -75,14 +75,6 @@ en:
             expecting the option to be there, please consult the following page
             with repect to Mongoid's configuration:\n\n
             \_\_http://mongoid.org/en/mongoid/docs/installation.html"
-        invalid_database:
-          message: "Database should be a Mongo::DB, not %{name}."
-          summary: "When setting a master database in the Mongoid configuration
-            it must be an actual instance of a Mongo::DB, and not just a name
-            of the database. This check is performed when calling
-            Mongoid.master = object."
-          resolution: "Make sure that when setting the configuration
-            programatically that you are passing an actual db instance."
         invalid_field:
           message: "Defining a field named '%{name}' is not allowed."
           summary: "Defining this field would override the method '%{name}',
