@@ -144,6 +144,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3021 Removed `mongoid.yml` warning from initializer, this is now handled by
+  the session configuration options.
+
 * \#2991 `Document.timeless` now properly scopes to the class and not thread.
 
 * \#2979 `pluck` no longer modifies the context in place. (Brian Goff)

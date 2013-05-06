@@ -77,15 +77,6 @@ module Rails
         end
       end
 
-      # After initialization we will warn the user if we can't find a mongoid.yml and
-      # alert to create one.
-      config.after_initialize do
-        unless Rails.root.join("config", "mongoid.yml").file? || ::Mongoid.configured?
-          puts "\nMongoid config not found. Create a config file at: config/mongoid.yml"
-          puts "to generate one run: rails generate mongoid:config\n\n"
-        end
-      end
-
       # Set the proper error types for Rails. DocumentNotFound errors should be
       # 404s and not 500s, validation errors are 422s.
       config.after_initialize do
