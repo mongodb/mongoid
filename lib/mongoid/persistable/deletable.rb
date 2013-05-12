@@ -115,7 +115,7 @@ module Mongoid
         freeze
         self.destroyed = true
         IdentityMap.remove(self)
-        Threaded.clear_options!
+        clear_timeless_option
         true
       end
 
@@ -142,7 +142,6 @@ module Mongoid
           coll = collection
           deleted = coll.find(selector).count
           coll.find(selector).remove_all
-          Threaded.clear_options!
           deleted
         end
       end

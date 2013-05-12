@@ -185,7 +185,7 @@ For instructions on upgrading to newer versions, visit
 * \#3008 Fixed subclasses not being able to inherit scopes properly when scope
   is added post class load. (Mike Dillon)
 
-* \#2991 `Document.timeless` now properly scopes to the class and not thread.
+* \#2991 `Document.timeless` now properly scopes to the instance and not thread.
 
 * \#2980 Dynamic fields now properly handle in place editing of hashes and
   arrays. (Matthew Widmann)
