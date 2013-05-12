@@ -301,7 +301,6 @@ module Mongoid
         coll = collection
         deleted = coll.find(selector).count
         coll.find(selector).remove_all
-        Threaded.clear_options!
         deleted
       end
 
