@@ -7,6 +7,10 @@ require "rails/mongoid"
 
 module Rails
   module Mongoid
+
+    # Hooks Mongoid into Rails 3 and higher.
+    #
+    # @since 2.0.0
     class Railtie < Rails::Railtie
 
       # Determine which generator to use. app_generators was introduced after
@@ -56,10 +60,14 @@ module Rails
       #       config.mongoid.persist_in_safe_mode = true
       #     end
       #   end
+      #
+      # @since 2.0.0
       config.mongoid = ::Mongoid::Config
 
       # Initialize Mongoid. This will look for a mongoid.yml in the config
       # directory and configure mongoid appropriately.
+      #
+      # @since 2.0.0
       initializer "mongoid.load-config" do
         config_file = Rails.root.join("config", "mongoid.yml")
         if config_file.file?
@@ -79,6 +87,8 @@ module Rails
 
       # Set the proper error types for Rails. DocumentNotFound errors should be
       # 404s and not 500s, validation errors are 422s.
+      #
+      # @since 2.0.0
       config.after_initialize do
         unless config.action_dispatch.rescue_responses
           ActionDispatch::ShowExceptions.rescue_responses.update(Railtie.rescue_responses)
@@ -90,6 +100,8 @@ module Rails
       #
       # This will happen every request in development, once in ther other
       # environments.
+      #
+      # @since 2.0.0
       initializer "mongoid.preload-models" do |app|
         config.to_prepare do
           ::Rails::Mongoid.preload_models(app)
@@ -97,6 +109,8 @@ module Rails
       end
 
       # Need to include the Mongoid identity map middleware.
+      #
+      # @since 3.0.0
       initializer "mongoid.use-identity-map-middleware" do |app|
         app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
       end
@@ -123,9 +137,19 @@ module Rails
       # code, so we have no way in the intitializer to know if we are
       # generating a mongoid.yml. So instead of failing, we catch all the
       # errors and print them out.
+      #
+      # @since 3.0.0
       def handle_configuration_error(e)
         puts "There is a configuration error with the current mongoid.yml."
         puts e.message
+      end
+
+      # Clears the idenity map on console reload. Identity map is on a thread
+      # local so it's safe to clear it in all environments.
+      #
+      # @since 4.0.0
+      ActionDispatch::Reloader.to_cleanup do
+        ::Mongoid::IdentityMap.clear
       end
     end
   end

@@ -160,6 +160,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#3002 Reloading the Rails console will also now clear Mongoid's identity map.
+
 * \#2938 A configuration option `duplicate_fields_exception` has been added that
   when set to `true` will raise an exception when defining a field that will
   override an existing method. (Arthur Neves)
