@@ -459,21 +459,6 @@ module Mongoid
         !!inverse_class_name
       end
 
-      # Is the inverse field bindable? Ie, do we have more than one definition
-      # on the parent class with the same polymorphic name (as).
-      #
-      # @example Is the inverse of bindable?
-      #   metadata.inverse_of_bindable?
-      #
-      # @return [ true, false ] If the relation needs the inverse of field set.
-      #
-      # @since 3.0.6
-      def inverse_field_bindable?
-        @inverse_field_bindable ||= (inverse_klass.relations.values.count do |meta|
-          meta.as == as
-        end > 1)
-      end
-
       # Used for relational many to many only. This determines the name of the
       # foreign key field on the inverse side of the relation, since in this
       # case there are keys on both sides.
@@ -576,31 +561,6 @@ module Mongoid
       # @since 2.0.0.rc.1
       def inverse_type_setter
         @inverse_type_setter ||= inverse_type.__setter__
-      end
-
-      # Returns the name of the field in which to store the name of the inverse
-      # field for the polymorphic relation.
-      #
-      # @example Get the name of the field.
-      #   metadata.inverse_of_field
-      #
-      # @return [ String ] The name of the field for storing the name of the
-      #   inverse field.
-      #
-      # @since 2.4.5
-      def inverse_of_field
-        @inverse_of_field ||= determine_inverse_for(:field)
-      end
-
-      # Gets the setter for the field that stores the name of the inverse field
-      # on a polymorphic relation.
-      #
-      # @example Get the inverse type setter.
-      #   metadata.inverse_of_field_setter
-      #
-      # @return [ String ] The name of the setter.
-      def inverse_of_field_setter
-        @inverse_of_field_setter ||= inverse_of_field.__setter__
       end
 
       # This returns the key that is to be used to grab the attributes for the

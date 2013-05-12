@@ -1016,8 +1016,7 @@ describe Mongoid::Relations::Referenced::One do
         expect(criteria.selector).to eq(
           {
             "ratable_id"    => id,
-            "ratable_type"  => "Book",
-            "ratable_field" => { "$in" => [ :rating, nil ] }
+            "ratable_type"  => "Book"
           }
         )
       end
