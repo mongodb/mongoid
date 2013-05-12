@@ -69,6 +69,34 @@ For instructions on upgrading to newer versions, visit
 
         Band.where(name: "Depeche Mode").inc(likes: 10, followers: 20)
 
+* \#3029 The `relation_field` field that is added for a single use case with polymorphic
+  relations has been removed. So where the following would work before:
+
+        class Eye
+          include Mongoid::Document
+          belongs_to :eyeable, polymorphic: true
+        end
+
+        class Face
+          include Mongoid::Document
+          has_one :left_eye, class_name: "Eye", as: :eyeable
+          has_one :right_eye, class_name: "Eye", as: :eyeable
+        end
+
+      This would now need to be modeled as (with the appropriate migration):
+
+        class Eye
+          include Mongoid::Document
+          belongs_to :left_socket, class_name: "Face", inverse_of: :left_eye
+          belongs_to :right_socket, class_name: "Face", inverse_of: :right_eye
+        end
+
+        class Face
+          include Mongoid::Document
+          has_one :left_eye, class_name: "Eye", inverse_of: :left_socket
+          has_one :right_eye, class_name: "Eye", inverse_of: :right_socket
+        end
+
 * \#2956 Caching on queries now only happens when `cache` is specifically
   called. (Arthur Neves)
 
@@ -129,7 +157,6 @@ For instructions on upgrading to newer versions, visit
 
     The block is only good for 1 document at a time, so embedded and root
     document updates cannot be mixed at this time.
-
 
 ### New Features
 

@@ -210,10 +210,6 @@ describe Mongoid::Relations::Referenced::In do
             expect(rating.ratable_id).to eq(bar.id)
           end
 
-          it "does not set the inverse of field on the relation" do
-            expect(rating.ratable_field).to be_nil
-          end
-
           it "sets the base on the inverse relation" do
             expect(bar.rating).to eq(rating)
           end
@@ -247,10 +243,6 @@ describe Mongoid::Relations::Referenced::In do
 
           it "sets the foreign key of the relation" do
             expect(rating.ratable_id).to eq(bar.id)
-          end
-
-          it "does not set the inverse of field on the relation" do
-            expect(rating.ratable_field).to be_nil
           end
 
           it "sets the base on the inverse relation" do
@@ -755,65 +747,6 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       context "when the relation is polymorphic" do
-
-        context "when multiple relations against the same class exist" do
-
-          context "when the parent is a new record" do
-
-            let(:face) do
-              Face.new
-            end
-
-            let(:eye) do
-              Eye.new
-            end
-
-            before do
-              face.left_eye = eye
-              eye.eyeable = nil
-            end
-
-            it "sets the relation to nil" do
-              expect(eye.eyeable).to be_nil
-            end
-
-            it "removed the inverse relation" do
-              expect(face.left_eye).to be_nil
-            end
-
-            it "removes the foreign key value" do
-              expect(eye.eyeable_id).to be_nil
-            end
-          end
-
-          context "when the parent is not a new record" do
-
-            let(:face) do
-              Face.new
-            end
-
-            let(:eye) do
-              Eye.create
-            end
-
-            before do
-              face.left_eye = eye
-              eye.eyeable = nil
-            end
-
-            it "sets the relation to nil" do
-              expect(eye.eyeable).to be_nil
-            end
-
-            it "removed the inverse relation" do
-              expect(face.left_eye).to be_nil
-            end
-
-            it "removes the foreign key value" do
-              expect(eye.eyeable_id).to be_nil
-            end
-          end
-        end
 
         context "when one relation against the same class exists" do
 

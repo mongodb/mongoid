@@ -282,10 +282,6 @@ describe Mongoid::Relations::Referenced::Many do
             expect(rating.ratable_id).to eq(movie.id)
           end
 
-          it "does not set the inverse field on the relation" do
-            expect(rating.ratable_field).to be_nil
-          end
-
           it "sets the base on the inverse relation" do
             expect(rating.ratable).to eq(movie)
           end
@@ -315,10 +311,6 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "sets the foreign key on the relation" do
             expect(rating.ratable_id).to eq(movie.id)
-          end
-
-          it "does not set the inverse field on the relation" do
-            expect(rating.ratable_field).to be_nil
           end
 
           it "sets the base on the inverse relation" do
