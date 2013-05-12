@@ -282,6 +282,40 @@ describe Mongoid::Relations::Referenced::ManyToMany do
               expect(person.reload.preferences).to eq([ preference ])
             end
           end
+
+          pending "when the identity map is enabled [ Github-3015 ]" do
+
+            let(:dungeon) do
+              Dungeon.new
+            end
+
+            let(:dragon) do
+              Dragon.new
+            end
+
+            before do
+              Mongoid.identity_map_enabled = true
+              dungeon.save!
+              dragon.dungeons.send(method, dungeon)
+              dragon.save!
+            end
+
+            after do
+              Mongoid.identity_map_enabled = false
+            end
+
+            it "sets the proper length of the child" do
+              expect(dragon.dungeons.length).to eq(1)
+            end
+
+            it "sets the proper number of foreign keys" do
+              expect(dungeon.dragon_ids.length).to eq(1)
+            end
+
+            it "sets the proper number of parent docs" do
+              expect(dungeon.dragons.length).to eq(1)
+            end
+          end
         end
 
         context "when the parent is not a new record" do
