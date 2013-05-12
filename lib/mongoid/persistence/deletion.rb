@@ -24,7 +24,7 @@ module Mongoid
         document.freeze
         document.destroyed = true
         IdentityMap.remove(document)
-        document.clear_timeless_option
+        Threaded.clear_options!
         true
       end
     end

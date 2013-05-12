@@ -64,7 +64,7 @@ module Mongoid
         update({ "$set" => { paranoid_field => time }})
       @destroyed = true
       IdentityMap.remove(self)
-      clear_timeless_option
+      Threaded.clear_options!
       true
     end
     alias :delete :remove

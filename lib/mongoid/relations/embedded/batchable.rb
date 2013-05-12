@@ -62,6 +62,7 @@ module Mongoid
             )
             post_process_batch_remove(docs, method)
           end
+          Threaded.clear_options!
           reindex
         end
 
@@ -304,7 +305,6 @@ module Mongoid
             _unscoped.delete_one(doc)
             unbind_one(doc)
             execute_callback :after_remove, doc
-            doc.clear_timeless_option
             doc.as_document
           end
         end

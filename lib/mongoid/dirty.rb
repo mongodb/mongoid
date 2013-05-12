@@ -97,7 +97,7 @@ module Mongoid
     def post_persist
       reset_persisted_children
       move_changes
-      clear_timeless_option
+      Threaded.clear_options!
     end
 
     # Get the previous changes on the document.

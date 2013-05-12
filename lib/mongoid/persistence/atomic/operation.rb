@@ -88,7 +88,9 @@ module Mongoid
         #
         # @since 2.1.0
         def prepare
-          yield(document)
+          doc = yield(document)
+          Threaded.clear_options!
+          doc
         end
 
         private
