@@ -123,6 +123,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#2432 `Mongoid::Versioning` has been removed.
 
+* \#2218 Creating or instantiating documents that have default scopes will now
+  apply the default scope to the document, if the scope is not complex.
+
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
 
 * `delete_all` and `destroy_all` no longer take a `:conditions` hash but

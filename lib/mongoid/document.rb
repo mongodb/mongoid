@@ -109,6 +109,7 @@ module Mongoid
         @attributes ||= {}
         options ||= {}
         apply_pre_processed_defaults
+        apply_default_scoping
         process_attributes(attrs) do
           yield(self) if block_given?
         end

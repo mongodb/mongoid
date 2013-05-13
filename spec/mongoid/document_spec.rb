@@ -219,6 +219,31 @@ describe Mongoid::Document do
       expect(person.title).to eq("Sir")
     end
 
+    context "when the model has a default scope" do
+
+      context "when the default scope is settable" do
+
+        let(:sound) do
+          Sound.new
+        end
+
+        it "sets the default scoping on the model" do
+          expect(sound).to be_active
+        end
+      end
+
+      context "when the default scope is not settable" do
+
+        let(:audio) do
+          Audio.new
+        end
+
+        it "does not set the default scoping" do
+          expect(audio.likes).to be_nil
+        end
+      end
+    end
+
     context "when accessing a relation from an overridden setter" do
 
       let(:doctor) do

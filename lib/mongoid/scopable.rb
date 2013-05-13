@@ -14,6 +14,27 @@ module Mongoid
       self._declared_scopes = {}
     end
 
+    private
+
+    # Apply the default scoping to the attributes of the document, as long as
+    # they are not complex queries.
+    #
+    # @api private
+    #
+    # @example Apply the default scoping.
+    #   document.apply_default_scoping
+    #
+    # @return [ true, false ] If default scoping was applied.
+    #
+    # @since 4.0.0
+    def apply_default_scoping
+      if default_scoping
+        default_scoping.call.selector.each do |field, value|
+          attributes[field] = value unless value.respond_to?(:each_pair)
+        end
+      end
+    end
+
     module ClassMethods
 
       # Returns a hash of all the scopes defined for this class, including
