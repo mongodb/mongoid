@@ -171,6 +171,20 @@ For instructions on upgrading to newer versions, visit
   when set to `true` will raise an exception when defining a field that will
   override an existing method. (Arthur Neves)
 
+* \#2924 MongoDB 2.4 beta text search now has a DSL provided by Mongoid. Like
+  other queries, text searches are lazy evaluated, and available off the class
+  or criteria level.
+
+    Note that any 3rd party gem that provides a `text_search` method will now no
+    longer work with Mongoid, and will need to change its syntax. Examples:
+
+        Band.text_search("mode").project(name: 1).each do |doc|
+          # ...
+        end
+
+        Band.limit(10).text_search("phase").language("latin")
+        Band.where(:likes.gt => 1000).text_search("lucy")
+
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)
 
 ### Resolved Issues
