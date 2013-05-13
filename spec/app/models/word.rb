@@ -1,6 +1,7 @@
 class Word
   include Mongoid::Document
   field :name, type: String
+  field :origin, type: String
 
   belongs_to :dictionary
 

@@ -2,12 +2,41 @@ require "spec_helper"
 
 describe Mongoid::Contextual::TextSearch do
 
-  before(:all) do
-    Word.create_indexes
-  end
+  describe "#execute" do
 
-  after(:all) do
-    Word.remove_indexes
+    before do
+      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
+      Word.create_indexes
+    end
+
+    after(:all) do
+      Word.remove_indexes
+    end
+
+    let(:collection) do
+      Word.collection
+    end
+
+    let(:criteria) do
+      Word.all
+    end
+
+    let(:search) do
+      described_class.new(collection, criteria, "phase")
+    end
+
+    before do
+      Word.with(safe: true).create!(name: "phase", origin: "latin")
+      Word.with(safe: true).create!(name: "phazed", origin: "latin")
+    end
+
+    let(:results) do
+      search.execute
+    end
+
+    it "returns the raw results" do
+      expect(results).to_not be_empty
+    end
   end
 
   describe "#initialize" do

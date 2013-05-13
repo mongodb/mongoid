@@ -10,8 +10,10 @@ module Mongoid
 
       def each
         if block_given?
-          documents.each do |doc|
-            yield doc
+          selecting do
+            documents.each do |doc|
+              yield doc
+            end
           end
         else
           to_enum
@@ -90,6 +92,16 @@ module Mongoid
 
       private
 
+      # Apply the options from the criteria to the text search command.
+      #
+      # @api private
+      #
+      # @example Apply the criteria options, filter and limit only.
+      #   text_search.apply_criteria_options
+      #
+      # @return [ nil ] Nothing.
+      #
+      # @since 4.0.0
       def apply_criteria_options
         command[:filter] = criteria.selector
         if limit = criteria.options[:limit]
@@ -105,6 +117,16 @@ module Mongoid
 
       def results
         @results ||= session.command(command)
+      end
+
+      def selecting
+        begin
+          fields = command[:project]
+          Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
+          yield
+        ensure
+          Threaded.delete_selection(criteria.object_id)
+        end
       end
     end
   end
