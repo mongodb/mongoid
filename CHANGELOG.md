@@ -121,7 +121,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#2563 The `allow_dynamic_fields` configuration option has been removed as
   dynamic fields are now allowed on a per-model level. In order to allow a
-  model to use dynamic fields, simply include the module in each:
+  model to use dynamic fields, simply include the module in each.
+  (Josh Martin)
 
         class Band
           include Mongoid::Document
