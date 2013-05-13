@@ -37,7 +37,7 @@ describe Mongoid::Fields do
         end
 
         it "returns translations as a HashWithIndifferentAccess" do
-          expect(translations.class).to eq(HashWithIndifferentAccess)
+          expect(translations[:en]).to eq("test")
         end
       end
 
