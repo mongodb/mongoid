@@ -119,6 +119,15 @@ For instructions on upgrading to newer versions, visit
 * \#2603 Return values from setters are now always the set value, regardless
   of calling the setter or using send.
 
+* \#2563 The `allow_dynamic_fields` configuration option has been removed as
+  dynamic fields are now allowed on a per-model level. In order to allow a
+  model to use dynamic fields, simply include the module in each:
+
+        class Band
+          include Mongoid::Document
+          include Mongoid::Attributes::Dynamic
+        end
+
 * \#2433 `Mongoid::Paranoia` has been removed.
 
 * \#2432 `Mongoid::Versioning` has been removed.
