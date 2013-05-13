@@ -1517,6 +1517,57 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#text_search" do
+
+    let(:criteria) do
+      Word.all
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    before do
+      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
+      Word.create_indexes
+      Word.with(safe: true).create!(name: "phase", origin: "latin")
+    end
+
+    after(:all) do
+      Word.remove_indexes
+    end
+
+    context "when the search is projecting" do
+
+      let(:search) do
+        context.text_search("phase").project(name: 1)
+      end
+
+      let(:documents) do
+        search.entries
+      end
+
+      it "limits the fields to the projection" do
+        expect(documents.first.origin).to be_nil
+      end
+    end
+
+    context "when the search is not projecting" do
+
+      let(:search) do
+        context.text_search("phase")
+      end
+
+      let(:documents) do
+        search.entries
+      end
+
+      it "returns all fields" do
+        expect(documents.first.origin).to eq("latin")
+      end
+    end
+  end
+
   describe "#update" do
 
     let!(:depeche_mode) do

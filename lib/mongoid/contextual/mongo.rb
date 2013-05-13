@@ -383,6 +383,20 @@ module Mongoid
         end
       end
 
+      # Execute a text command against the database.
+      #
+      # @example Find documents with the text "phase"
+      #   context.text_search("phase")
+      #
+      # @param [ String ] query The text search query.
+      #
+      # @return [ TextSearch ] The TextSearch command.
+      #
+      # @since 4.0.0
+      def text_search(query)
+        TextSearch.new(collection, criteria, query)
+      end
+
       # Update the first matching document atomically.
       #
       # @example Update the first matching document.
