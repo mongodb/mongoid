@@ -1,6 +1,10 @@
 # encoding: utf-8
 module Mongoid
   module Contextual
+
+    # Wraps behaviour around a lazy text search command.
+    #
+    # @since 4.0.0
     class TextSearch
       include Enumerable
       include Command
@@ -8,6 +12,16 @@ module Mongoid
       delegate :[], to: :results
       delegate :==, :empty?, to: :entries
 
+      # Iterate over the results of the text search command.
+      #
+      # @example Iterate over the results.
+      #   text_search.each do |doc|
+      #     #...
+      #   end
+      #
+      # @return [ Enumerator ] The enumerator.
+      #
+      # @since 4.0.0
       def each
         if block_given?
           selecting do
@@ -20,6 +34,16 @@ module Mongoid
         end
       end
 
+      # Instantiate a new text search lazy proxy.
+      #
+      # @example Instantiate the text search.
+      #   TextSearch.new(collection, criteria, "test")
+      #
+      # @param [ Moped::Collection ] collection The collection to execute on.
+      # @param [ Criteria ] criteria The criteria to filter results.
+      # @param [ String ] search_string The search string.
+      #
+      # @since 4.0.0
       def initialize(collection, criteria, search_string)
         @collection, @criteria = collection, criteria
         command[:text] = collection.name.to_s
@@ -47,6 +71,15 @@ module Mongoid
 }
       end
 
+      # Execute the text search command, and return the raw results (in hash
+      # form).
+      #
+      # @example Execute the command.
+      #   text_search.execute
+      #
+      # @return [ Hash ] The raw results.
+      #
+      # @since 4.0.0
       def execute
         results
       end
@@ -109,16 +142,48 @@ module Mongoid
         end
       end
 
+      # Get the results of the text search as documents.
+      #
+      # @api private
+      #
+      # @example Get the results as documents.
+      #   text_search.documents
+      #
+      # @return [ Array<Document> ] The documents.
+      #
+      # @since 4.0.0
       def documents
         results["results"].map do |attributes|
           Factory.from_db(criteria.klass, attributes["obj"], criteria.object_id)
         end
       end
 
+      # Get the raw results.
+      #
+      # @api private
+      #
+      # @example Get the raw results.
+      #   text_search.results
+      #
+      # @return [ Hash ] The raw results.
+      #
+      # @since 4.0.0
       def results
         @results ||= session.command(command)
       end
 
+      # Execute the block setting field limitations.
+      #
+      # @api private
+      #
+      # @example Execute with field limitations.
+      #   text_search.selecting do
+      #     #...
+      #   end
+      #
+      # @return [ Object ] The result of the yield.
+      #
+      # @since 4.0.0
       def selecting
         begin
           fields = command[:project]

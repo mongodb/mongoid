@@ -2,6 +2,61 @@ require "spec_helper"
 
 describe Mongoid::Contextual::TextSearch do
 
+  describe "#each" do
+
+    before do
+      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
+      Word.create_indexes
+    end
+
+    after(:all) do
+      Word.remove_indexes
+    end
+
+    let(:collection) do
+      Word.collection
+    end
+
+    let(:criteria) do
+      Word.all
+    end
+
+    before do
+      Word.with(safe: true).create!(name: "phase", origin: "latin")
+      Word.with(safe: true).create!(name: "phazed", origin: "latin")
+    end
+
+    context "when the search is projecting" do
+
+      let(:search) do
+        described_class.new(collection, criteria, "phase").project(name: 1)
+      end
+
+      let(:documents) do
+        search.entries
+      end
+
+      it "limits the fields to the projection" do
+        expect(documents.first.origin).to be_nil
+      end
+    end
+
+    context "when the search is not projecting" do
+
+      let(:search) do
+        described_class.new(collection, criteria, "phase")
+      end
+
+      let(:documents) do
+        search.entries
+      end
+
+      it "returns all fields" do
+        expect(documents.first.origin).to eq("latin")
+      end
+    end
+  end
+
   describe "#execute" do
 
     before do
