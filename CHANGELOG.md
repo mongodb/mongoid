@@ -129,6 +129,10 @@ For instructions on upgrading to newer versions, visit
           include Mongoid::Attributes::Dynamic
         end
 
+* \#2497 Calling `to_json` no longer tampers with the return value from the
+  driver, and proper returns `{ "$oid" : object_id.to_s }` instead of just
+  the string representation previously.
+
 * \#2433 `Mongoid::Paranoia` has been removed.
 
 * \#2432 `Mongoid::Versioning` has been removed.

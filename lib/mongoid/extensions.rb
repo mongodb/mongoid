@@ -1,8 +1,7 @@
 # encoding: utf-8
 class Moped::BSON::ObjectId
-  undef :as_json
   def as_json(options = nil)
-    to_s
+    { "$oid" => to_s }
   end
   def to_xml(options = nil)
     ActiveSupport::XmlMini.to_tag(options[:root], self.to_s, options)
