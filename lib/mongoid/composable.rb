@@ -52,7 +52,6 @@ module Mongoid
     include State
     include Threaded::Lifecycle
     include Traversable
-    include Timestamps::Timeless
     include Validatable
     include Interceptable
     include Copyable
@@ -78,7 +77,6 @@ module Mongoid
       Shardable,
       State,
       Threaded::Lifecycle,
-      Timestamps::Timeless,
       Traversable,
       Validatable,
       Equality

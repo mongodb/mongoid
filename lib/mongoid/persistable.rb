@@ -140,7 +140,6 @@ module Mongoid
       # @todo: Check if the document is persisted here.
       operations = yield({})
       persist_or_delay_atomic_operation(operations)
-      clear_timeless_option
       self
     end
 

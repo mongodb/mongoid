@@ -32,7 +32,7 @@ module Mongoid
       #
       # @since 2.4.0
       def able_to_set_updated_at?
-        !frozen? && timestamping? && (new_record? || changed?)
+        !frozen? && (new_record? || changed?)
       end
     end
   end

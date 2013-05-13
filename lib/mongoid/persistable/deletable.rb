@@ -115,7 +115,6 @@ module Mongoid
         freeze
         self.destroyed = true
         IdentityMap.remove(self)
-        clear_timeless_option
         true
       end
 

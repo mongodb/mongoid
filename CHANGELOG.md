@@ -97,6 +97,11 @@ For instructions on upgrading to newer versions, visit
           has_one :right_eye, class_name: "Eye", inverse_of: :right_socket
         end
 
+* \#2991 The `timeless` feature has been removed, due to the fact with the current
+  overall design of Mongoid it would never be thread safe when accessed from the
+  class level, and has too many edge cases. Active Record's implementation of this
+  feature also suffers the same faults.
+
 * \#2956 Caching on queries now only happens when `cache` is specifically
   called. (Arthur Neves)
 

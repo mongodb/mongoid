@@ -10,7 +10,7 @@ module Mongoid
 
       included do
         field :created_at, type: Time
-        set_callback :create, :before, :set_created_at, if: :timestamping?
+        set_callback :create, :before, :set_created_at
       end
 
       # Update the created_at field on the Document to the current time. This is
