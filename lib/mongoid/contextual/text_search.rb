@@ -18,16 +18,6 @@ module Mongoid
         end
       end
 
-      def language(value)
-        command[:language] = value
-        self
-      end
-
-      def project(value)
-        command[:project] = value
-        self
-      end
-
       def initialize(collection, criteria, search_string)
         @collection, @criteria = collection, criteria
         command[:text] = collection.name.to_s
@@ -57,6 +47,26 @@ module Mongoid
 
       def execute
         results
+      end
+
+      # Set the language of the text search.
+      #
+      # @example Set the text search language.
+      #   text_search.language("deutsch")
+      #
+      # @param [ String ] value The name of the language.
+      #
+      # @return [ TextSearch ] The modified text search.
+      #
+      # @since 4.0.0
+      def language(value)
+        command[:language] = value
+        self
+      end
+
+      def project(value)
+        command[:project] = value
+        self
       end
 
       def stats

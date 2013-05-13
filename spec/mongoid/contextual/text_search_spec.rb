@@ -48,4 +48,31 @@ describe Mongoid::Contextual::TextSearch do
       expect(search.command[:limit]).to eq(100)
     end
   end
+
+  describe "#language" do
+
+    let(:collection) do
+      Word.collection
+    end
+
+    let(:criteria) do
+      Word.limit(100)
+    end
+
+    let(:search) do
+      described_class.new(collection, criteria, "phase")
+    end
+
+    let!(:text_search) do
+      search.language("deutsch")
+    end
+
+    it "sets the search language" do
+      expect(search.command[:language]).to eq("deutsch")
+    end
+
+    it "returns the text search" do
+      expect(text_search).to equal(search)
+    end
+  end
 end
