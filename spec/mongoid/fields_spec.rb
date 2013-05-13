@@ -35,6 +35,10 @@ describe Mongoid::Fields do
             { "en" => "test", "de" => "The best" }
           )
         end
+
+        it "returns translations as a HashWithIndifferentAccess" do
+          expect(translations.class).to eq(HashWithIndifferentAccess)
+        end
       end
 
       context "when translations do not exist" do
