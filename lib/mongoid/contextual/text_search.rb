@@ -115,12 +115,16 @@ module Mongoid
         self
       end
 
+      # Get the raw statistics returned from the text search.
+      #
+      # @example Get the stats.
+      #   text_search.stats
+      #
+      # @return [ Hash ] The raw statistics.
+      #
+      # @since 4.0.0
       def stats
         results["stats"]
-      end
-
-      def time
-        stats["time"]
       end
 
       private

@@ -2,16 +2,16 @@ require "spec_helper"
 
 describe Mongoid::Contextual::TextSearch do
 
+  before do
+    Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
+    Word.create_indexes
+  end
+
+  after(:all) do
+    Word.remove_indexes
+  end
+
   describe "#each" do
-
-    before do
-      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
-      Word.create_indexes
-    end
-
-    after(:all) do
-      Word.remove_indexes
-    end
 
     let(:collection) do
       Word.collection
@@ -58,15 +58,6 @@ describe Mongoid::Contextual::TextSearch do
   end
 
   describe "#execute" do
-
-    before do
-      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
-      Word.create_indexes
-    end
-
-    after(:all) do
-      Word.remove_indexes
-    end
 
     let(:collection) do
       Word.collection
@@ -184,6 +175,33 @@ describe Mongoid::Contextual::TextSearch do
 
     it "returns the text search" do
       expect(text_search).to equal(search)
+    end
+  end
+
+  describe "#stats" do
+
+    let(:collection) do
+      Word.collection
+    end
+
+    let(:criteria) do
+      Word.all
+    end
+
+    let(:search) do
+      described_class.new(collection, criteria, "phase")
+    end
+
+    before do
+      Word.with(safe: true).create!(name: "phase", origin: "latin")
+    end
+
+    let(:stats) do
+      search.stats
+    end
+
+    it "returns the raw stats" do
+      expect(stats["nscanned"]).to eq(1)
     end
   end
 end
