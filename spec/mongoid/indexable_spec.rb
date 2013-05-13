@@ -311,6 +311,84 @@ describe Mongoid::Indexable do
       end
     end
 
+    context "when providing a text index" do
+
+      context "when the index is a single field" do
+
+        before do
+          klass.index({ description: "text" })
+        end
+
+        let(:options) do
+          klass.index_options[description: "text"]
+        end
+
+        it "allows the set of the text index" do
+          expect(options).to be_empty
+        end
+      end
+
+      context "when the index is multiple fields" do
+
+        before do
+          klass.index({ description: "text", name: "text" })
+        end
+
+        let(:options) do
+          klass.index_options[description: "text", name: "text"]
+        end
+
+        it "allows the set of the text index" do
+          expect(options).to be_empty
+        end
+      end
+
+      context "when the index is all string fields" do
+
+        before do
+          klass.index({ "$**" => "text" })
+        end
+
+        let(:options) do
+          klass.index_options[:"$**" => "text"]
+        end
+
+        it "allows the set of the text index" do
+          expect(options).to be_empty
+        end
+      end
+
+      context "when providing a default language" do
+
+        before do
+          klass.index({ description: "text" }, default_language: "english")
+        end
+
+        let(:options) do
+          klass.index_options[description: "text"]
+        end
+
+        it "allows the set of the text index" do
+          expect(options).to eq(default_language: "english")
+        end
+      end
+
+      context "when providing a name" do
+
+        before do
+          klass.index({ description: "text" }, name: "text_index")
+        end
+
+        let(:options) do
+          klass.index_options[description: "text"]
+        end
+
+        it "allows the set of the text index" do
+          expect(options).to eq(name: "text_index")
+        end
+      end
+    end
+
     context "when providing a hashed index" do
 
       before do
