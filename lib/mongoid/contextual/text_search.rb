@@ -24,7 +24,7 @@ module Mongoid
       # @since 4.0.0
       def each
         if block_given?
-          selecting do
+          selecting(:project) do
             documents.each do |doc|
               yield doc
             end
@@ -174,28 +174,6 @@ module Mongoid
       # @since 4.0.0
       def results
         @results ||= session.command(command)
-      end
-
-      # Execute the block setting field limitations.
-      #
-      # @api private
-      #
-      # @example Execute with field limitations.
-      #   text_search.selecting do
-      #     #...
-      #   end
-      #
-      # @return [ Object ] The result of the yield.
-      #
-      # @since 4.0.0
-      def selecting
-        begin
-          fields = command[:project]
-          Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
-          yield
-        ensure
-          Threaded.delete_selection(criteria.object_id)
-        end
       end
     end
   end
