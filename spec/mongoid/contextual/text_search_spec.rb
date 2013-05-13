@@ -75,4 +75,31 @@ describe Mongoid::Contextual::TextSearch do
       expect(text_search).to equal(search)
     end
   end
+
+  describe "#project" do
+
+    let(:collection) do
+      Word.collection
+    end
+
+    let(:criteria) do
+      Word.limit(100)
+    end
+
+    let(:search) do
+      described_class.new(collection, criteria, "phase")
+    end
+
+    let!(:text_search) do
+      search.project(name: 1, title: 1)
+    end
+
+    it "sets the search field limitations" do
+      expect(search.command[:project]).to eq(name: 1, title: 1)
+    end
+
+    it "returns the text search" do
+      expect(text_search).to equal(search)
+    end
+  end
 end

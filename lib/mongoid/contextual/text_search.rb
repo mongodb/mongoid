@@ -64,6 +64,17 @@ module Mongoid
         self
       end
 
+      # Limits the fields returned by the text search for each document. By
+      # default, _id is always included.
+      #
+      # @example Limit the returned fields.
+      #   text_search.project(name: 1, title: 1)
+      #
+      # @param [ Hash ] value The fields to project.
+      #
+      # @return [ TextSearch ] The modified text search.
+      #
+      # @since 4.0.0
       def project(value)
         command[:project] = value
         self
