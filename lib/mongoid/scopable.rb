@@ -321,7 +321,7 @@ module Mongoid
       #
       # @since 3.0.0
       def define_scope_method(name)
-        (class << self; self; end).class_eval <<-SCOPE, __FILE__, __LINE__ + 1
+        singleton_class.class_eval <<-SCOPE, __FILE__, __LINE__ + 1
           def #{name}(*args)
             scoping = _declared_scopes[:#{name}]
             scope, extension = scoping[:scope][*args], scoping[:extension]
