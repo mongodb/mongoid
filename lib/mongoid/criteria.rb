@@ -3,7 +3,7 @@ require "mongoid/criteria/findable"
 require "mongoid/criteria/inspectable"
 require "mongoid/criteria/marshalable"
 require "mongoid/criteria/modifiable"
-require "mongoid/criterion/scoping"
+require "mongoid/criteria/scopable"
 
 module Mongoid
 
@@ -21,7 +21,7 @@ module Mongoid
     include Inspectable
     include Marshalable
     include Modifiable
-    include Criterion::Scoping
+    include Scopable
 
     attr_accessor :embedded, :klass
 

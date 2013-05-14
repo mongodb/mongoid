@@ -1,7 +1,7 @@
 # encoding: utf-8
 module Mongoid
-  module Criterion
-    module Scoping
+  class Criteria
+    module Scopable
 
       # Applies the default scope to the criteria.
       #
