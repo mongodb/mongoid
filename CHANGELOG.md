@@ -212,6 +212,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3034 `first_or_create` on criterion now properly passes the block to create
+  instead of calling after the document was created.
+
 * \#3021 Removed `mongoid.yml` warning from initializer, this is now handled by
   the session configuration options.
 

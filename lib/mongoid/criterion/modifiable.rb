@@ -181,10 +181,8 @@ module Mongoid
       # @return [ Document ] The first or new document.
       #
       # @since 3.1.0
-      def first_or(method, attrs = nil)
-        document = first || create_document(method, attrs)
-        yield(document) if block_given?
-        document
+      def first_or(method, attrs = {}, &block)
+        first || create_document(method, attrs, &block)
       end
     end
   end
