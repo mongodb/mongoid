@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Criterion
+  class Criteria
     module Findable
 
       # Execute the criteria or raise an error if no documents found.
