@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Criterion
+  class Criteria
     module Modifiable
 
       # Build a document given the selector and return it.

@@ -1,8 +1,8 @@
 # encoding: utf-8
 require "mongoid/criteria/findable"
+require "mongoid/criteria/modifiable"
 require "mongoid/criterion/inspection"
 require "mongoid/criterion/marshalable"
-require "mongoid/criterion/modifiable"
 require "mongoid/criterion/scoping"
 
 module Mongoid
@@ -18,9 +18,9 @@ module Mongoid
     include Contextual
     include Origin::Queryable
     include Findable
+    include Modifiable
     include Criterion::Inspection
     include Criterion::Marshalable
-    include Criterion::Modifiable
     include Criterion::Scoping
 
     attr_accessor :embedded, :klass
