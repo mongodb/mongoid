@@ -162,20 +162,32 @@ describe Mongoid::Document do
           expect(document.cache_key).to eq("dokuments/#{document.id}")
         end
       end
+    end
 
-      context "without updated_at, without Timestamps" do
-        let(:artist) do
-          Artist.new
-        end
-        before do
-          artist.save
-        end
+    context "when model dont have Timestamps" do
 
-        it "should have the id key name" do
-          expect(artist.cache_key).to eq("artists/#{artist.id}")
-        end
+      let(:artist) do
+        Artist.create!
       end
 
+      it "should have the id key name" do
+        expect(artist.cache_key).to eq("artists/#{artist.id}")
+      end
+    end
+
+    context "when model has Short Timestamps" do
+
+      let(:agent) do
+        ShortAgent.create!
+      end
+
+      let!(:updated_at) do
+        agent.updated_at.utc.to_s(:number)
+      end
+
+      it "has the id and updated_at key name" do
+        expect(agent.cache_key).to eq("short_agents/#{agent.id}-#{updated_at}")
+      end
     end
   end
 
