@@ -63,14 +63,39 @@ module Mongoid
         #
         # @since 3.0.0
         def with(options)
-          Threaded.set_persistence_options(self, options)
-          self
+          Proxy.new(self, options)
         end
 
         def persistence_options
-          Threaded.persistence_options(self).tap do
-            Threaded.clear_persistence_options(self)
-          end
+          Threaded.persistence_options(self)
+        end
+      end
+
+      class Proxy < BasicObject
+        undef_method :==
+
+        def initialize(target, options)
+          @target = target
+          @options = options
+        end
+
+        def persistence_options
+          @options
+        end
+
+        def method_missing(name, *args, &block)
+          Threaded.set_persistence_options(@target, @options)
+          @target.send(name, *args, &block)
+        ensure
+          Threaded.clear_persistence_options(@target)
+        end
+
+        def send(symbol, *args)
+          __send__(symbol, *args)
+        end
+
+        def self.const_missing(name)
+          ::Object.const_get(name)
         end
       end
     end

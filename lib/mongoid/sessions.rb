@@ -103,7 +103,7 @@ module Mongoid
       #
       # @since 3.0.0
       def collection(opts = nil)
-        if opts ||= persistence_options
+        if opts ||= self.persistence_options
           mongo_session.with(opts)[opts[:collection] || collection_name]
         else
           mongo_session[collection_name]
@@ -164,7 +164,7 @@ module Mongoid
       def mongo_session
         session = __session__
         session.use(database_override || current_database_name(session))
-        session
+        self.persistence_options ? session.with(self.persistence_options) : session
       end
 
       # Get the overridden session name. This either can be overridden by

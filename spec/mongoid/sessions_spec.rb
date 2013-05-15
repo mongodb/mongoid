@@ -477,16 +477,12 @@ describe Mongoid::Sessions do
 
     context "when options exist on the current thread" do
 
-      before do
+      let(:klass) do
         Band.with(safe: { w: 2 })
       end
 
-      after do
-#        Band.clear_persistence_options
-      end
-
       it "returns the options" do
-        expect(Band.persistence_options).to eq(safe: { w: 2 })
+        expect(klass.persistence_options).to eq(safe: { w: 2 })
       end
     end
 
