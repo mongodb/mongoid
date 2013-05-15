@@ -117,7 +117,7 @@ module Mongoid
       #
       # @since 3.0.15
       def valid_method_name?
-        /[@$"]/ !~ to_sym.inspect
+        /[@$"]/ !~ self
       end
 
       # Does the string end with _before_type_cast?
