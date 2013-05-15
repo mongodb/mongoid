@@ -83,6 +83,10 @@ module Mongoid
           @options
         end
 
+        def respond_to?(*args)
+          @target.respond_to?(*args)
+        end
+
         def method_missing(name, *args, &block)
           Threaded.set_persistence_options(@target, @options)
           @target.send(name, *args, &block)

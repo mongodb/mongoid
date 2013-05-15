@@ -52,11 +52,6 @@ describe Mongoid::Validatable::UniquenessValidator do
             it "performs the validation on the correct collection" do
               expect(oxford).to be_valid
             end
-
-            it "does not clear the persistence options in the thread local" do
-              oxford.valid?
-#              expect(Dictionary.persistence_options).to_not be_nil
-            end
           end
         end
       end

@@ -352,7 +352,6 @@ module Mongoid
         #
         # @since 2.0.2
         def collection
-#          base.collection
           klass.collection
         end
 
