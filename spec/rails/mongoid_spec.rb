@@ -62,7 +62,7 @@ describe "Rails::Mongoid" do
       end
 
       before do
-        klass.index_options = { city: {} }
+        klass.index(street: 1)
       end
 
       it "does nothing, but logging" do

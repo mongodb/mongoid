@@ -14,12 +14,12 @@ module Rails
     # @since 2.1.0
     def create_indexes
       ::Mongoid.models.each do |model|
-        next if model.index_options.empty?
+        next if model.index_specifications.empty?
         unless model.embedded?
           model.create_indexes
           logger.info("MONGOID: Created indexes on #{model}:")
-          model.index_options.each_pair do |index, options|
-            logger.info("MONGOID: Index: #{index}, Options: #{options}")
+          model.index_specifications.each do |spec|
+            logger.info("MONGOID: Index: #{spec.key}, Options: #{spec.options}")
           end
           model
         else

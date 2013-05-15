@@ -97,6 +97,12 @@ For instructions on upgrading to newer versions, visit
           has_one :right_eye, class_name: "Eye", inverse_of: :right_socket
         end
 
+* \#3037 Model indexes are no longer stored in an `index_options` hash on the
+  model class. Instead, an array named `index_specifications` now exists on the
+  class which contains a list of `Indexable::Specification` objects. This is so
+  we could properly handle the case of indexes with the same keys but different
+  order.
+
 * \#2991 The `timeless` feature has been removed, due to the fact with the current
   overall design of Mongoid it would never be thread safe when accessed from the
   class level, and has too many edge cases. Active Record's implementation of this
