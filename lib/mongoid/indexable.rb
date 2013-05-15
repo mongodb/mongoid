@@ -90,7 +90,10 @@ module Mongoid
       #
       # @since 1.0.0
       def index(spec, options = nil)
-        index_specifications.push(Specification.new(self, spec, options))
+        specification = Specification.new(self, spec, options)
+        if !index_specifications.include?(specification)
+          index_specifications.push(specification)
+        end
       end
 
       # Get an index specification for the provided key.

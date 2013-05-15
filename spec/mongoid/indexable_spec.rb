@@ -75,7 +75,7 @@ describe Mongoid::Indexable do
         Class.new do
           include Mongoid::Document
           store_in collection: "test_class"
-          index({ _type: 1 }, { unique: false, background: true })
+          index({ _type: 1 }, unique: false, background: true)
         end
       end
 
