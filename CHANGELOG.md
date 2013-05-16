@@ -218,6 +218,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3044 Ensure enumerable targets match arrays in case statements.
+
 * \#3034 `first_or_create` on criterion now properly passes the block to create
   instead of calling after the document was created.
 
