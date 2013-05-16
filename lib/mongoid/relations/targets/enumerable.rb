@@ -16,7 +16,7 @@ module Mongoid
         # @attribute [rw] _unloaded A criteria representing persisted docs.
         attr_accessor :_added, :_loaded, :_unloaded
 
-        delegate :===, :is_a?, :kind_of?, to: []
+        delegate :is_a?, :kind_of?, to: []
 
         # Check if the enumerable is equal to the other object.
         #
@@ -31,6 +31,21 @@ module Mongoid
         def ==(other)
           return false unless other.respond_to?(:entries)
           entries == other.entries
+        end
+
+        # Check equality of the enumerable against the provided object for case
+        # statements.
+        #
+        # @example Check case equality.
+        #   enumerable === Array
+        #
+        # @param [ Object ] other The object to check.
+        #
+        # @return [ true, false ] If the objects are equal in a case.
+        #
+        # @since 3.1.4
+        def ===(other)
+          other.class == Class ? Array == other : self == other
         end
 
         # Append a document to the enumerable.

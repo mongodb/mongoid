@@ -109,6 +109,52 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
   end
 
+  describe "#===" do
+
+    let(:enumerable) do
+      described_class.new([])
+    end
+
+    context "when compared to an array class" do
+
+      it "returns true" do
+        expect(enumerable === Array).to be_true
+      end
+    end
+
+    context "when compared to a different class" do
+
+      it "returns false" do
+        expect(enumerable === Mongoid::Document).to be_false
+      end
+    end
+
+    context "when compared to an array instance" do
+
+      context "when the entries are equal" do
+
+        let(:other) do
+          described_class.new([])
+        end
+
+        it "returns true" do
+          expect(enumerable === other).to be_true
+        end
+      end
+
+      context "when the entries are not equal" do
+
+        let(:other) do
+          described_class.new([ Band.new ])
+        end
+
+        it "returns false" do
+          expect(enumerable === other).to be_false
+        end
+      end
+    end
+  end
+
   describe "#<<" do
 
     let(:person) do
