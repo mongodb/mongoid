@@ -89,7 +89,7 @@ module Mongoid
     #
     # @since 1.0.0
     def read_attribute(name)
-      normalized = name.to_s
+      normalized = database_field_name(name.to_s)
       if hash_dot_syntax?(normalized)
         attributes.__nested__(normalized)
       else
