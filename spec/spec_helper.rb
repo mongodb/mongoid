@@ -78,6 +78,10 @@ RSpec.configure do |config|
     Mongoid::IdentityMap.clear
   end
 
+  config.treat_symbols_as_metadata_keys_with_true_values = true
+  config.filter_run :focus
+  config.filter_run_excluding :skip
+
   # Filter out MongoHQ specs if we can't connect to it.
   config.filter_run_excluding(config: ->(value){
     return true if value == :mongohq && !mongohq_connectable?
