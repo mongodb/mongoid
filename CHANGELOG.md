@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.1.5
+
+### Resolved Issues
+
+* Include updated_at on cache_key even when is a short timestamp (Arthur Neves)
+
+
 ## 3.1.4
 
 ### Resolved Issues
