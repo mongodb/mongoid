@@ -616,6 +616,21 @@ describe Mongoid::Attributes do
         end
       end
     end
+
+    context "when attribute has an aliased name" do
+
+      let(:person) do
+        Person.new
+      end
+
+      before(:each) do
+        person.write_attribute(:t, "aliased field to test")
+      end
+
+      it "returns the value of the aliased field" do
+        expect(person.read_attribute(:test)).to eq("aliased field to test")
+      end
+    end
   end
 
   describe "#read_attribute_before_type_cast" do
