@@ -78,14 +78,6 @@ RSpec.configure do |config|
     Mongoid::IdentityMap.clear
   end
 
-  # On travis we are creating many different databases on each test run. We
-  # drop the database after the suite.
-  config.after(:suite) do
-    if ENV["CI"]
-      Mongoid::Threaded.sessions[:default].drop
-    end
-  end
-
   # Filter out MongoHQ specs if we can't connect to it.
   config.filter_run_excluding(config: ->(value){
     return true if value == :mongohq && !mongohq_connectable?
