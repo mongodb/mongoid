@@ -67,6 +67,7 @@ end
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular("canvas", "canvases")
+  inflect.singular("address_components", "address_component")
 end
 
 RSpec.configure do |config|
@@ -89,8 +90,4 @@ RSpec.configure do |config|
   config.filter_run_excluding(config: ->(value){
     return true if value == :mongohq && !mongohq_connectable?
   })
-end
-
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.singular("address_components", "address_component")
 end
