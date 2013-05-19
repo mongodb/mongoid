@@ -4,6 +4,11 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 MODELS = File.join(File.dirname(__FILE__), "app/models")
 $LOAD_PATH.unshift(MODELS)
 
+if ENV["CI"]
+  require "coveralls"
+  Coveralls.wear!
+end
+
 require "mongoid"
 require "rspec"
 
