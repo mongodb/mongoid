@@ -24,8 +24,6 @@ Please see the new Mongoid website for up-to-date documentation:
 Donating
 --------
 
-[Support Mongoid at Wepay](https://www.wepay.com/donations/mongoid)
-
 [Support Mongoid at Pledgie](http://www.pledgie.com/campaigns/7757)
 
 <a href='http://www.pledgie.com/campaigns/7757'>
