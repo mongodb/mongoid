@@ -104,6 +104,43 @@ describe Mongoid::Persistable do
         it_behaves_like "an atomically updatable root document"
       end
 
+      context "when given multiple operations of the same type" do
+
+        let(:operations) do
+          {
+            "$inc" => { "member_count" => 10, "other_count" => 10 },
+            "$bit" => { "likes" => { :and => 13 }},
+            "$set" => { "name" => "Placebo" },
+            "$unset" => { "origin" => true }
+          }
+        end
+
+        before do
+          Moped::Query.any_instance.should_receive(:update).with(operations).and_call_original
+        end
+
+        let!(:update) do
+          document.atomically do
+            document.
+              inc(member_count: 10).
+              inc(other_count: 10).
+              bit(likes: { and: 13 }).
+              set(name: "Placebo").
+              unset(:origin)
+          end
+        end
+
+        it_behaves_like "an atomically updatable root document"
+
+        it "performs multiple inc updates" do
+          expect(document.other_count).to eq(10)
+        end
+
+        it "persists multiple inc updates" do
+          expect(document.reload.other_count).to eq(10)
+        end
+      end
+
       context "when expecting the document to be yielded" do
 
         let(:operations) do

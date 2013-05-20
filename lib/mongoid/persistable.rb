@@ -180,7 +180,10 @@ module Mongoid
     # @since 4.0.0
     def persist_or_delay_atomic_operation(operation)
       if executing_atomically?
-        @atomic_updates_to_execute.merge!(operation)
+        operation.each do |(name, hash)|
+          @atomic_updates_to_execute[name] ||= {}
+          @atomic_updates_to_execute[name].merge!(hash)
+        end
       else
         persist_atomic_operations(operation)
       end
