@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Matchers::Exists do
+describe Mongoid::Matchable::Exists do
 
   describe "#matches?" do
 

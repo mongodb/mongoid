@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Matchers::Size do
+describe Mongoid::Matchable::Size do
 
   let(:matcher) do
     described_class.new(["first", "second"])

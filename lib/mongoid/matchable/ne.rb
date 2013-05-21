@@ -1,11 +1,11 @@
 # encoding: utf-8
 module Mongoid
-  module Matchers
+  module Matchable
 
-    # Performs size checking.
-    class Size < Default
+    # Performs non-equivalency checks.
+    class Ne < Default
 
-      # Return true if the attribute size is equal to the first value.
+      # Return true if the attribute and first value are not equal.
       #
       # @example Do the values match?
       #   matcher.matches?({ :key => 10 })
@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def matches?(value)
-        @attribute.size == value.values.first
+        @attribute != value.values.first
       end
     end
   end

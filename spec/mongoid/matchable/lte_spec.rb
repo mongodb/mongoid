@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Matchers::Lte do
+describe Mongoid::Matchable::Lte do
 
   describe "#matches?" do
 

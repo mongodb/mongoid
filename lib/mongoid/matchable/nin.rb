@@ -1,11 +1,11 @@
 # encoding: utf-8
 module Mongoid
-  module Matchers
+  module Matchable
 
-    # Performs Greater Than matching.
-    class Gt < Default
+    # Performs not in checking.
+    class Nin < Default
 
-      # Return true if the attribute is greater than the value.
+      # Return true if the attribute is not in the value list.
       #
       # @example Do the values match?
       #   matcher.matches?({ :key => 10 })
@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def matches?(value)
-        determine(value, :>)
+        Array.wrap(@attribute).none? { |e| value.values.first.include?(e) }
       end
     end
   end

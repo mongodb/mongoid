@@ -1,11 +1,11 @@
 # encoding: utf-8
 module Mongoid
-  module Matchers
+  module Matchable
 
-    # Performs less than matching.
-    class Lt < Default
+    # Performs Greater Than matching.
+    class Gt < Default
 
-      # Return true if the attribute is less than the value.
+      # Return true if the attribute is greater than the value.
       #
       # @example Do the values match?
       #   matcher.matches?({ :key => 10 })
@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def matches?(value)
-        determine(value, :<)
+        determine(value, :>)
       end
     end
   end

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Matchers::All do
+describe Mongoid::Matchable::All do
 
   let(:matcher) do
     described_class.new(["first", "second", "third"])

@@ -1,11 +1,11 @@
 # encoding: utf-8
 module Mongoid
-  module Matchers
+  module Matchable
 
-    # Performs non-equivalency checks.
-    class Ne < Default
+    # Performs Greater than or equal to matching.
+    class Gte < Default
 
-      # Return true if the attribute and first value are not equal.
+      # Return true if the attribute is greater than or equal to the value.
       #
       # @example Do the values match?
       #   matcher.matches?({ :key => 10 })
@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def matches?(value)
-        @attribute != value.values.first
+        determine(value, :>=)
       end
     end
   end

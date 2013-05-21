@@ -1,21 +1,24 @@
 # encoding: utf-8
 module Mongoid
-  module Matchers
+  module Matchable
 
-    # Performs matching for any value in an array.
-    class In < Default
+    # Checks that all values match.
+    class All < Default
 
-      # Return true if the attribute is in the values.
+      # Return true if the attribute and first value in the hash are equal.
       #
       # @example Do the values match?
       #   matcher.matches?({ :key => 10 })
       #
       # @param [ Hash ] value The values to check.
       #
-      # @return [ true, false ] If a value exists.
+      # @return [ true, false ] If the values match.
       def matches?(value)
+        first = first(value)
+        return false if first.is_a?(Array) && first.empty?
+
         attribute_array = Array.wrap(@attribute)
-        value.values.first.any? do |e|
+        first.all? do |e|
           attribute_array.any? { |_attribute| e === _attribute }
         end
       end

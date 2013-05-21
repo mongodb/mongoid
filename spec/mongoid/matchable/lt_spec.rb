@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Matchers::Gt do
+describe Mongoid::Matchable::Lt do
 
   describe "#matches?" do
 
@@ -10,8 +10,8 @@ describe Mongoid::Matchers::Gt do
         described_class.new(5)
       end
 
-      it "returns true" do
-        expect(matcher.matches?("$gt" => 3)).to be_true
+      it "returns false" do
+        expect(matcher.matches?("$lt" => 3)).to be_false
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::Matchers::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 3)).to be_false
+        expect(matcher.matches?("$lt" => 3)).to be_false
       end
     end
 
@@ -32,8 +32,8 @@ describe Mongoid::Matchers::Gt do
         described_class.new(5)
       end
 
-      it "returns false" do
-        expect(matcher.matches?("$gt" => 10)).to be_false
+      it "returns true" do
+        expect(matcher.matches?("$lt" => 10)).to be_true
       end
     end
 
@@ -44,31 +44,30 @@ describe Mongoid::Matchers::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 5)).to be_false
+        expect(matcher.matches?("$lt" => 5)).to be_false
       end
     end
 
     context "when the value is an array" do
-
       context "there are value valid" do
         let(:matcher) do
-          described_class.new([6,4])
+          described_class.new([3, 4])
         end
 
-        it "returns false" do
-          expect(matcher.matches?("$gt" => 5)).to be_true
+        it "returns true" do
+          expect(matcher.matches?("$lt" => 5)).to be_true
         end
       end
 
       context "there are not value valid" do
-
         let(:matcher) do
-          described_class.new([3,4])
+          described_class.new([5,6])
         end
 
         it "returns false" do
-          expect(matcher.matches?("$gt" => 5)).to be_false
+          expect(matcher.matches?("$lt" => 5)).to be_false
         end
+
       end
     end
   end

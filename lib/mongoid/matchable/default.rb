@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Matchers
+  module Matchable
 
     # Contains all the default behavior for checking for matching documents
     # given MongoDB expressions.

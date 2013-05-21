@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Matchers::And do
+describe Mongoid::Matchable::And do
 
   let(:person) do
     Person.new

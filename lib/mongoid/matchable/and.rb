@@ -1,32 +1,29 @@
 # encoding: utf-8
 module Mongoid
-  module Matchers
+  module Matchable
 
     # Defines behavior for handling $or expressions in embedded documents.
-    class Or < Default
+    class And < Default
 
       # Does the supplied query match the attribute?
       #
       # @example Does this match?
-      #   matcher.matches?("$or" => [ { field => value } ])
+      #   matcher.matches?([ { field => value } ])
       #
       # @param [ Array ] conditions The or expression.
       #
       # @return [ true, false ] True if matches, false if not.
       #
-      # @since 2.0.0.rc.7
+      # @since 2.3.0
       def matches?(conditions)
         conditions.each do |condition|
-          res = true
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            res &&= Strategies.matcher(document, key, value).matches?(value)
-            break unless res
+            return false unless Matchable.matcher(document, key, value).matches?(value)
           end
-          return res if res
         end
-        return false
+        true
       end
     end
   end

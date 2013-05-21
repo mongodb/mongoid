@@ -4,6 +4,7 @@ require "mongoid/findable"
 require "mongoid/indexable"
 require "mongoid/inspectable"
 require "mongoid/interceptable"
+require "mongoid/matchable"
 require "mongoid/persistable"
 require "mongoid/reloadable"
 require "mongoid/selectable"
@@ -40,7 +41,7 @@ module Mongoid
     include Fields
     include Indexable
     include Inspectable
-    include Matchers
+    include Matchable
     include Persistable
     include Relations
     include Reloadable
@@ -67,7 +68,7 @@ module Mongoid
       Indexable,
       Inspectable,
       Interceptable,
-      Matchers,
+      Matchable,
       Persistable,
       Relations,
       Reloadable,

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Matchers::Ne do
+describe Mongoid::Matchable::Ne do
 
   let(:matcher) do
     described_class.new("first")
