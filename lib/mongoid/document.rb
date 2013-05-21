@@ -203,7 +203,8 @@ module Mongoid
       became = klass.new(clone_document)
       became.id = id
       became.instance_variable_set(:@changed_attributes, changed_attributes)
-      became.instance_variable_set(:@errors, errors)
+      became.instance_variable_set(:@errors, ActiveModel::Errors.new(became))
+      became.errors.instance_variable_set(:@messages, errors.instance_variable_get(:@messages))
       became.instance_variable_set(:@new_record, new_record?)
       became.instance_variable_set(:@destroyed, destroyed?)
       became.changed_attributes["_type"] = self.class.to_s
