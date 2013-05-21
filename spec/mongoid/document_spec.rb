@@ -1109,6 +1109,24 @@ describe Mongoid::Document do
         it "copies the errors" do
           expect(manager.errors).to include(:ssn)
         end
+        
+      end
+      
+      context "when the subclass validates attributes not present on the parent class" do
+        
+        before do
+          Manager.validates_inclusion_of(:level, in: [1, 2])
+        end
+        
+        let(:manager) do
+          person.becomes(Manager)
+        end
+        
+        it "validates the instance of the subclass" do
+          manager.level = 3
+          expect(manager.valid?).to be_false
+        end
+        
       end
 
       context "when the subclass has defaults" do
