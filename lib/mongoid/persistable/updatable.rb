@@ -54,7 +54,7 @@ module Mongoid
         unless attribute_writable?(normalized)
           raise Errors::ReadonlyAttribute.new(normalized, value)
         end
-        write_attribute(database_field_name(normalized), value)
+        send("#{normalized}=", value)
         save(validate: false)
       end
 

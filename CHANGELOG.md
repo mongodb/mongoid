@@ -97,6 +97,9 @@ For instructions on upgrading to newer versions, visit
           has_one :right_eye, class_name: "Eye", inverse_of: :right_socket
         end
 
+* \#3075 `update_attribute` now properly calls the setter method instead of
+  using `write_attribute`.
+
 * \#3037 Model indexes are no longer stored in an `index_options` hash on the
   model class. Instead, an array named `index_specifications` now exists on the
   class which contains a list of `Indexable::Specification` objects. This is so

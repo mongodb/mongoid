@@ -33,6 +33,7 @@ class Person
   field :a, as: :array, type: Array
   field :desc, localize: true
   field :test_array, type: Array
+  field :overridden_setter, type: String
 
   index age: 1
   index addresses: 1
@@ -148,6 +149,11 @@ class Person
 
   def override_me
     read_attribute(:override_me).to_s
+  end
+
+  def overridden_setter=(value)
+    @override_called = true
+    super(value)
   end
 
   class << self

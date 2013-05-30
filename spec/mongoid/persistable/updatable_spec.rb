@@ -10,6 +10,29 @@ describe Mongoid::Persistable::Updatable do
         Person.create
       end
 
+      context "when the setter is overridden" do
+
+        before do
+          person.update_attribute(:overridden_setter, "value")
+        end
+
+        it "updates the field" do
+          expect(person.overridden_setter).to eq("value")
+        end
+
+        it "clears the dirty attributes" do
+          expect(person).to_not be_changed
+        end
+
+        it "calls the overridden setter" do
+          expect(person.instance_variable_get(:@override_called)).to be_true
+        end
+
+        it "persists the changes" do
+          expect(person.reload.overridden_setter).to eq("value")
+        end
+      end
+
       context "when setting via the field name" do
 
         before do
