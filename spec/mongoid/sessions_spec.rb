@@ -1002,7 +1002,7 @@ describe Mongoid::Sessions do
     end
 
     let(:config) do
-      { default: { uri: "mongodb://localhost:27017/#{database_id}" }}
+      { default: { uri: "mongodb://localhost:#{PORT}/#{database_id}" }}
     end
 
     before do
@@ -1064,8 +1064,8 @@ describe Mongoid::Sessions do
       end
 
       let(:config) do
-        {  default: { uri: "mongodb://localhost:27017/#{database_id}" },
-          session1: { uri: "mongodb://localhost:27017/#{database_name}" }}
+        {  default: { uri: "mongodb://localhost:#{PORT}/#{database_id}" },
+          session1: { uri: "mongodb://localhost:#{PORT}/#{database_name}" }}
       end
 
       before do

@@ -217,6 +217,13 @@ For instructions on upgrading to newer versions, visit
 
 * \#2903 Removed unused string `to_a` extension.
 
+## 3.1.5
+
+### Resolved Issues
+
+* \#3068 Fixed spec runs on non standard MongoDB ports if `MONGOID_SPEC_PORT` is
+  set.
+
 ## 3.1.4
 
 ### Resolved Issues
