@@ -9,6 +9,8 @@ For instructions on upgrading to newer versions, visit
 
 * Include updated_at on cache_key even when is a short timestamp (Arthur Neves)
 
+* \#3068 Fixed spec runs on non standard MongoDB ports if `MONGOID_SPEC_PORT` is
+  set.
 
 ## 3.1.4
 

@@ -27,6 +27,19 @@ def database_id
   "mongoid_test"
 end
 
+def database_id_alt
+  "mongoid_test_alt"
+end
+
+CONFIG = {
+  sessions: {
+    default: {
+      database: database_id,
+      hosts: [ "#{HOST}:#{PORT}" ]
+    }
+  }
+}
+
 # Can we connect to MongoHQ from this box?
 def mongohq_connectable?
   ENV["MONGOHQ_REPL_PASS"].present?
@@ -34,7 +47,7 @@ end
 
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
-  config.connect_to(database_id, consistency: :strong)
+  config.load_configuration(CONFIG)
 end
 
 # Autoload every model for the test suite that sits in spec/app/models.
