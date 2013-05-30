@@ -72,6 +72,12 @@ namespace :db do
       ::Rails::Mongoid.create_indexes
     end
 
+    desc "Remove indexes that exist in the database but aren't specified on the models"
+    task :drop_undefined_indexes => :environment do
+      ::Rails.application.eager_load!
+      ::Rails::Mongoid.drop_undefined_indexes
+    end
+
     desc "Remove the indexes defined on your mongoid models without questions!"
     task :remove_indexes => :environment do
       ::Rails.application.eager_load!

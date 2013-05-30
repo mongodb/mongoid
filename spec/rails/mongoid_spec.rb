@@ -72,6 +72,55 @@ describe "Rails::Mongoid" do
     end
   end
 
+  describe ".undefined_indexes" do
+
+    before(:each) do
+      Rails::Mongoid.create_indexes
+    end
+
+    subject do
+      Rails::Mongoid.undefined_indexes
+    end
+
+    it { should eq({}) }
+
+    context "with extra index on model collection" do
+      before(:each) do
+        User.collection.indexes.create(account_expires: 1)
+      end
+
+      its(:keys) { should eq([User]) }
+
+      it "should have single index returned" do
+        names = subject[User].map{ |index| index['name'] }
+        expect(names).to eq(['account_expires_1'])
+      end
+    end
+  end
+
+  describe ".drop_undefined_indexes" do
+
+    let(:logger) do
+      stub
+    end
+
+    let(:indexes) do
+      User.collection.indexes
+    end
+
+    before(:each) do
+      Rails::Mongoid.create_indexes
+      indexes.create(account_expires: 1)
+      Rails::Mongoid.drop_undefined_indexes
+    end
+
+    subject do
+      Rails::Mongoid.undefined_indexes
+    end
+
+    it { should eq({}) }
+  end
+
   describe ".remove_indexes" do
 
     let(:logger) do
