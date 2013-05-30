@@ -25,5 +25,6 @@ Gem::Specification.new do |s|
   s.add_dependency("origin", ["~> 1.0"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
+  s.test_files   = Dir.glob("spec/**/*")
   s.require_path = 'lib'
 end
