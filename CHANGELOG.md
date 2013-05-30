@@ -215,6 +215,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3063 `Document#becomes` now properly sets base object on errors.
+  (Adam Ross Cohen)
+
 * \#2903 Removed unused string `to_a` extension.
 
 ## 3.1.5
