@@ -224,6 +224,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3081 Criteria's `method_missing` now checks if an array responds to the provided
+  method before calling entries in order to not hit the database if a `NoMethodError`
+  was to get raised.
+
 * \#3068 Fixed spec runs on non standard MongoDB ports if `MONGOID_SPEC_PORT` is
   set.
 

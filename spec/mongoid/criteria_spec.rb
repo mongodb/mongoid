@@ -3534,6 +3534,59 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#method_missing" do
+
+    let(:criteria) do
+      Person.all
+    end
+
+    context "when the method exists on the class" do
+
+      before do
+        Person.should_receive(:minor).and_call_original
+      end
+
+      it "calls the method on the class" do
+        expect(criteria.minor).to be_empty
+      end
+    end
+
+    context "when the method exists on the criteria" do
+
+      before do
+        criteria.should_receive(:to_criteria).and_call_original
+      end
+
+      it "calls the method on the criteria" do
+        expect(criteria.to_criteria).to eq(criteria)
+      end
+    end
+
+    context "when the method exists on array" do
+
+      before do
+        criteria.should_receive(:entries).and_call_original
+      end
+
+      it "calls the method on the criteria" do
+        expect(criteria.at(0)).to be_nil
+      end
+    end
+
+    context "when the method does not exist" do
+
+      before do
+        criteria.should_receive(:entries).never
+      end
+
+      it "raises an error" do
+        expect {
+          criteria.to_hash
+        }.to raise_error(NoMethodError)
+      end
+    end
+  end
+
   describe "#uniq" do
 
     let!(:band_one) do
