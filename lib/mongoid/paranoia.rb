@@ -82,6 +82,10 @@ module Mongoid
     end
     alias :deleted? :destroyed?
 
+    def persisted?
+      !new_record? && !(@destroyed ||= false)
+    end
+
     # Restores a previously soft-deleted document. Handles this by removing the
     # deleted_at flag.
     #

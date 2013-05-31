@@ -387,6 +387,50 @@ describe Mongoid::Paranoia do
     end
   end
 
+  describe "#destroyed?" do
+
+    context "when the document is a root" do
+
+      let(:post) do
+        ParanoidPost.create(title: "testing")
+      end
+
+      context "when the document is hard deleted" do
+
+        before do
+          post.destroy!
+        end
+
+        it "returns false" do
+          post.should_not be_persisted
+        end
+      end
+
+      context "when the document is soft deleted" do
+
+        before do
+          post.destroy
+        end
+
+        it "returns false" do
+          post.should_not be_persisted
+        end
+      end
+
+      context "when the document is reloaded" do
+
+        before do
+          post.destroy
+          post.reload
+        end
+
+        it "returns false" do
+          post.should_not be_persisted
+        end
+      end
+    end
+  end
+
   describe "#delete!" do
 
     context "when the document is a root" do
