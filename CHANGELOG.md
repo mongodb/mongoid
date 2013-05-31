@@ -7,10 +7,14 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* Include updated_at on cache_key even when is a short timestamp (Arthur Neves)
+* \#3081 Criteria's `method_missing` now checks if an array responds to the provided
+  method before calling entries in order to not hit the database if a `NoMethodError`
+  was to get raised.
 
 * \#3068 Fixed spec runs on non standard MongoDB ports if `MONGOID_SPEC_PORT` is
   set.
+
+* Include updated_at on cache_key even when is a short timestamp (Arthur Neves)
 
 ## 3.1.4
 
