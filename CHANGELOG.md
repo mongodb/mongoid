@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3079 Embbed docs with paranoia parents, were losing the _id when
+  reloading from db, as they didnt have the right persisted? value. (Arthur Neves)
+
 * \#3081 Criteria's `method_missing` now checks if an array responds to the provided
   method before calling entries in order to not hit the database if a `NoMethodError`
   was to get raised.
