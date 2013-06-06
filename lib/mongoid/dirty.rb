@@ -183,7 +183,11 @@ module Mongoid
     def attribute_changed?(attr)
       attr = database_field_name(attr)
       return false unless changed_attributes.has_key?(attr)
-      changed_attributes[attr] != attributes[attr]
+      if changed_attributes[attr].is_a?(Hash) && attributes[attr].is_a?(Hash) # Neither can be nil
+        HashWithIndifferentAccess.new(changed_attributes[attr]) != HashWithIndifferentAccess.new(attributes[attr])
+      else
+        changed_attributes[attr] != attributes[attr]
+      end
     end
 
     # Get whether or not the field has a different value from the default.
@@ -199,7 +203,12 @@ module Mongoid
     def attribute_changed_from_default?(attr)
       field = fields[attr]
       return false unless field
-      attributes[attr] != field.eval_default(self)
+      _default_value = field.eval_default(self)
+      if attributes[attr].is_a?(Hash) && _default_value.is_a?(Hash) # Neither can be nil
+        HashWithIndifferentAccess.new(attributes[attr]) != HashWithIndifferentAccess.new(_default_value)
+      else
+        attributes[attr] != _default_value
+      end
     end
 
     # Get the previous value for the attribute.
