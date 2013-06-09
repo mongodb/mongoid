@@ -17,6 +17,8 @@ For instructions on upgrading to newer versions, visit
 * \#3068 Fixed spec runs on non standard MongoDB ports if `MONGOID_SPEC_PORT` is
   set.
 
+* \#3047 Ensure `blank?` and `empty?` don't fall through method missing on criteria.
+
 * Include updated_at on cache_key even when is a short timestamp (Arthur Neves)
 
 ## 3.1.4
