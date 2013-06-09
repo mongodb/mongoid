@@ -621,6 +621,39 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#empty?" do
+
+    context "when matching documents exist" do
+
+      let!(:match) do
+        Band.create(name: "Depeche Mode")
+      end
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      it "returns false" do
+        expect(criteria).to_not be_empty
+      end
+    end
+
+    context "when no matching documents exist" do
+
+      let!(:nonmatch) do
+        Band.create(name: "New Order")
+      end
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      it "returns true" do
+        expect(criteria).to be_empty
+      end
+    end
+  end
+
   describe "#exists" do
 
     let!(:match) do
