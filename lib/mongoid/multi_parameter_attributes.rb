@@ -50,7 +50,7 @@ module Mongoid
       if attrs
         errors = []
         attributes = attrs.class.new
-        attributes.permitted = true if attrs.respond_to?(:permitted?) && attrs.permitted?
+        attributes.permit! if attrs.respond_to?(:permitted?) && attrs.permitted?
         multi_parameter_attributes = {}
 
         attrs.each_pair do |key, value|
