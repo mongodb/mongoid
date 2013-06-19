@@ -41,7 +41,7 @@ describe Mongoid::Persistable::Upsertable do
         end
 
         before do
-          updated.with(safe: true).upsert
+          updated.upsert
         end
 
         it "updates the existing document" do
@@ -60,7 +60,7 @@ describe Mongoid::Persistable::Upsertable do
         end
 
         before do
-          insert.with(safe: true).upsert
+          insert.upsert
         end
 
         it "inserts a new document" do

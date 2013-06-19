@@ -240,7 +240,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
       end
 
-      context "when.with(safe: true).adding to the relation" do
+      context "when.adding to the relation" do
 
         let(:person) do
           Person.create
@@ -253,7 +253,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           before do
-            person.posts.with(safe: true).send(method, post)
+            person.posts.send(method, post)
           end
 
           it "adds the document to the relation" do
@@ -275,7 +275,7 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "raises an error" do
             expect {
-              person.posts.with(safe: true).send(method, post)
+              person.posts.send(method, post)
             }.to raise_error(Moped::Errors::OperationFailure)
           end
         end
@@ -1461,7 +1461,7 @@ describe Mongoid::Relations::Referenced::Many do
         end
       end
 
-      context "when.with(safe: true).creating the document" do
+      context "when.creating the document" do
 
         context "when the operation is successful" do
 
@@ -1470,7 +1470,7 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           let!(:post) do
-            person.posts.with(safe: true).create(text: "Testing")
+            person.posts.create(text: "Testing")
           end
 
           it "creates the document" do
@@ -1490,7 +1490,7 @@ describe Mongoid::Relations::Referenced::Many do
 
           it "raises an error" do
             expect {
-              person.posts.with(safe: true).create do |doc|
+              person.posts.create do |doc|
                 doc._id = existing.id
               end
             }.to raise_error(Moped::Errors::OperationFailure)

@@ -1530,7 +1530,7 @@ describe Mongoid::Contextual::Mongo do
     before do
       Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
       Word.create_indexes
-      Word.with(safe: true).create!(name: "phase", origin: "latin")
+      Word.create!(name: "phase", origin: "latin")
     end
 
     after(:all) do

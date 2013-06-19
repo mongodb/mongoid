@@ -13,7 +13,8 @@ test:
       hosts:
         - <%=ENV["MONGOHQ_SINGLE_URL"]%>
       options:
-        safe: true
+        write:
+          w: 1
         consistency: :strong
     mongohq_repl:
       database: <%=ENV["MONGOHQ_REPL_NAME"]%>
@@ -24,7 +25,8 @@ test:
         - <%=ENV["MONGOHQ_REPL_2_URL"]%>
       options:
         consistency: :strong
-        safe: true
+        write:
+          w: :majority
     mongohq_repl_uri:
       uri: <%= ENV["MONGOHQ_REPL_URI"]%>
   options:

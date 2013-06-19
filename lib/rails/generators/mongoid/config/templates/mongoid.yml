@@ -11,9 +11,9 @@ development:
       hosts:
         - localhost:27017
       options:
-        # Change whether the session persists in safe mode by default.
-        # (default: false)
-        # safe: false
+        # Change the default write concern. (default = { w: 1 })
+        # write:
+        #   w: 1
 
         # Change the default consistency model to :eventual or :strong.
         # :eventual will send reads to secondaries, :strong sends everything

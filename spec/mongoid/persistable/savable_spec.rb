@@ -291,7 +291,7 @@ describe Mongoid::Persistable::Savable do
         end
 
         it "raises an error" do
-          expect { person.with(safe: true).save! }.to raise_error
+          expect { person.save! }.to raise_error
         end
       end
     end

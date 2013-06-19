@@ -1575,7 +1575,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.with(safe: true).save
+                              persisted.save
                             end
 
                             it "deletes the marked document from the relation" do
@@ -1631,7 +1631,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.with(safe: true).save
+                              persisted.save
                             end
 
                             it "deletes the marked document from the relation" do
@@ -4381,7 +4381,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        address.with(safe: true).update_attributes(attributes)
+        address.update_attributes(attributes)
         address.reload
       end
 
@@ -4507,7 +4507,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.with(safe: true).update_attributes(attributes)
+              person.update_attributes(attributes)
             end
 
             let(:address) do
@@ -4547,7 +4547,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.with(safe: true).update_attributes(attributes)
+              person.update_attributes(attributes)
               person.reload
             end
 
@@ -4578,7 +4578,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.with(safe: true).update_attributes(attributes)
+            person.update_attributes(attributes)
           end
 
           let(:address) do
@@ -4627,7 +4627,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.with(safe: true).update_attributes(attributes)
+            person.update_attributes(attributes)
           end
 
           it "updates the first level embedded document" do
@@ -4667,7 +4667,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.with(safe: true).update_attributes(attributes)
+              person.update_attributes(attributes)
             end
 
             it "updates the first level embedded document" do
@@ -4703,7 +4703,7 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                person.with(safe: true).update_attributes(attributes)
+                person.update_attributes(attributes)
               end
 
               it "updates the nested embedded document" do

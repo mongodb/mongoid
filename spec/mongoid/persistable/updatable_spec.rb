@@ -282,6 +282,42 @@ describe Mongoid::Persistable::Updatable do
 
         it "raises an error" do
           expect {
+            person.update_attributes(map: { "bad.key" => "value" })
+          }.to raise_error(Moped::Errors::OperationFailure)
+        end
+      end
+
+      context "when validation passes" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let!(:saved) do
+          person.update_attributes(pets: false)
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "returns true" do
+          expect(saved).to be_true
+        end
+
+        it "saves the attributes" do
+          expect(from_db.pets).to be_false
+        end
+      end
+
+      context "when the document has been destroyed" do
+
+        let(:person) do
+          Person.create
+        end
+
+        it "raises an error" do
+          expect {
             person.with(safe: true).send(method, map: { "bad.key" => "value" })
           }.to raise_error(Moped::Errors::OperationFailure)
         end
