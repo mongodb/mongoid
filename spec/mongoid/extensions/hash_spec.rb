@@ -7,7 +7,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have object id strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do
@@ -26,7 +26,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have object ids" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do
@@ -45,7 +45,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have empty strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do
@@ -64,7 +64,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have nils" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do
@@ -86,7 +86,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have object id strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do
@@ -105,7 +105,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have object ids" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do
@@ -124,7 +124,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have empty strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do
@@ -143,7 +143,7 @@ describe Mongoid::Extensions::Hash do
     context "when values have nils" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:hash) do

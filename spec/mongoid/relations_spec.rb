@@ -5,9 +5,9 @@ describe Mongoid::Relations do
   before(:all) do
     Person.field(
       :_id,
-      type: Moped::BSON::ObjectId,
+      type: BSON::ObjectId,
       pre_processed: true,
-      default: ->{ Moped::BSON::ObjectId.new }
+      default: ->{ BSON::ObjectId.new }
     )
   end
 

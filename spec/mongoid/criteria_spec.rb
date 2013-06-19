@@ -716,7 +716,7 @@ describe Mongoid::Criteria do
   describe "#extract_id" do
 
     let(:id) do
-      Moped::BSON::ObjectId.new
+      BSON::ObjectId.new
     end
 
     context "when an id exists" do
@@ -1046,7 +1046,7 @@ describe Mongoid::Criteria do
       context "when querying on a foreign key" do
 
         let(:id) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let!(:match_one) do
@@ -3556,11 +3556,11 @@ describe Mongoid::Criteria do
       context "when the criteria is an exact fk array match" do
 
         let(:id_one) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:id_two) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:criteria) do

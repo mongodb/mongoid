@@ -37,7 +37,7 @@ module Mongoid
         return object if metadata.polymorphic?
         klass, field = metadata.klass, metadata.klass.fields["_id"]
         if klass.using_object_ids?
-          Moped::BSON::ObjectId.mongoize(object)
+          BSON::ObjectId.mongoize(object)
         elsif object.is_a?(::Array)
           object.map!{ |obj| field.mongoize(obj) }
         else

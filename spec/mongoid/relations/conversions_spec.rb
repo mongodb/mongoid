@@ -11,7 +11,7 @@ describe Mongoid::Relations::Conversions do
       end
 
       let(:object) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:flagged) do
@@ -30,16 +30,16 @@ describe Mongoid::Relations::Conversions do
           :_id,
           type: String,
           pre_processed: true,
-          default: ->{ Moped::BSON::ObjectId.new.to_s }
+          default: ->{ BSON::ObjectId.new.to_s }
         )
       end
 
       after do
         Person.field(
           :_id,
-          type: Moped::BSON::ObjectId,
+          type: BSON::ObjectId,
           pre_processed: true,
-          default: ->{ Moped::BSON::ObjectId.new }
+          default: ->{ BSON::ObjectId.new }
         )
       end
 
@@ -50,7 +50,7 @@ describe Mongoid::Relations::Conversions do
       context "when provided an object id" do
 
         let(:object) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:flagged) do
@@ -65,7 +65,7 @@ describe Mongoid::Relations::Conversions do
       context "when provided a string" do
 
         let(:object) do
-          Moped::BSON::ObjectId.new.to_s
+          BSON::ObjectId.new.to_s
         end
 
         let(:flagged) do
@@ -91,7 +91,7 @@ describe Mongoid::Relations::Conversions do
       context "when provided an object id" do
 
         let(:object) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:flagged) do

@@ -7,7 +7,7 @@ describe Mongoid::Extensions::Array do
     context "when provided an array of strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:other) do
@@ -34,7 +34,7 @@ describe Mongoid::Extensions::Array do
     context "when provided an array of object ids" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:array) do
@@ -57,7 +57,7 @@ describe Mongoid::Extensions::Array do
     context "when some values are nil" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:array) do
@@ -80,7 +80,7 @@ describe Mongoid::Extensions::Array do
     context "when some values are empty strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:array) do
@@ -106,7 +106,7 @@ describe Mongoid::Extensions::Array do
     context "when provided an array of strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:other) do
@@ -133,7 +133,7 @@ describe Mongoid::Extensions::Array do
     context "when provided an array of object ids" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:array) do
@@ -156,7 +156,7 @@ describe Mongoid::Extensions::Array do
     context "when some values are nil" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:array) do
@@ -179,7 +179,7 @@ describe Mongoid::Extensions::Array do
     context "when some values are empty strings" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:array) do
@@ -215,7 +215,7 @@ describe Mongoid::Extensions::Array do
       context "when provided an object id" do
 
         let(:object_id) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:fk) do
@@ -230,7 +230,7 @@ describe Mongoid::Extensions::Array do
       context "when provided a object ids" do
 
         let(:object_id) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:fk) do
@@ -247,7 +247,7 @@ describe Mongoid::Extensions::Array do
         context "when the string is a legal object id" do
 
           let(:object_id) do
-            Moped::BSON::ObjectId.new
+            BSON::ObjectId.new
           end
 
           let(:fk) do
@@ -302,7 +302,7 @@ describe Mongoid::Extensions::Array do
         context "when the strings are legal object ids" do
 
           let(:object_id) do
-            Moped::BSON::ObjectId.new
+            BSON::ObjectId.new
           end
 
           let(:fk) do

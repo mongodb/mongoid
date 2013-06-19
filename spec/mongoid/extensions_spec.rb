@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Moped::BSON::ObjectId do
+describe BSON::ObjectId do
 
   describe "#as_json" do
 

@@ -63,7 +63,7 @@ describe Mongoid::Timestamps::Updated::Short do
   context "when the document has not changed" do
 
     let(:agent) do
-      ShortAgent.instantiate("_id" => Moped::BSON::ObjectId.new, "account_ids" => [])
+      ShortAgent.instantiate("_id" => BSON::ObjectId.new, "account_ids" => [])
     end
 
     before do

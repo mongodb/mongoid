@@ -108,7 +108,7 @@ describe Mongoid::IdentityMap do
           end
 
           let(:get) do
-            identity_map.get(Person, [ person.id, Moped::BSON::ObjectId.new ])
+            identity_map.get(Person, [ person.id, BSON::ObjectId.new ])
           end
 
           it "returns nil" do

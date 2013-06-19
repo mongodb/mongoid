@@ -131,16 +131,16 @@ module Mongoid
         @metadata ||= options[:metadata]
       end
 
-      # Is the field a Moped::BSON::ObjectId?
+      # Is the field a BSON::ObjectId?
       #
-      # @example Is the field a Moped::BSON::ObjectId?
+      # @example Is the field a BSON::ObjectId?
       #   field.object_id_field?
       #
-      # @return [ true, false ] If the field is a Moped::BSON::ObjectId.
+      # @return [ true, false ] If the field is a BSON::ObjectId.
       #
       # @since 2.2.0
       def object_id_field?
-        @object_id_field ||= (type == Moped::BSON::ObjectId)
+        @object_id_field ||= (type == BSON::ObjectId)
       end
 
       # Does the field pre-process its default value?

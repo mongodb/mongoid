@@ -62,7 +62,7 @@ describe Mongoid::Fields::ForeignKey do
   describe "#eval_default" do
 
     let(:default) do
-      [ Moped::BSON::ObjectId.new ]
+      [ BSON::ObjectId.new ]
     end
 
     let(:field) do
@@ -137,7 +137,7 @@ describe Mongoid::Fields::ForeignKey do
         context "when the value is an id string" do
 
           let(:id) do
-            Moped::BSON::ObjectId.new
+            BSON::ObjectId.new
           end
 
           let(:evolved) do
@@ -179,11 +179,11 @@ describe Mongoid::Fields::ForeignKey do
           context "when the relation stores ids as object ids" do
 
             let(:id_one) do
-              Moped::BSON::ObjectId.new
+              BSON::ObjectId.new
             end
 
             let(:id_two) do
-              Moped::BSON::ObjectId.new
+              BSON::ObjectId.new
             end
 
             let(:evolved) do
@@ -206,11 +206,11 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             let(:id_one) do
-              Moped::BSON::ObjectId.new.to_s
+              BSON::ObjectId.new.to_s
             end
 
             let(:id_two) do
-              Moped::BSON::ObjectId.new.to_s
+              BSON::ObjectId.new.to_s
             end
 
             let(:evolved) do
@@ -275,7 +275,7 @@ describe Mongoid::Fields::ForeignKey do
           context "when the value is an id string" do
 
             let(:id) do
-              Moped::BSON::ObjectId.new
+              BSON::ObjectId.new
             end
 
             let(:evolved) do
@@ -323,7 +323,7 @@ describe Mongoid::Fields::ForeignKey do
           context "when the value is an id string" do
 
             let(:id) do
-              Moped::BSON::ObjectId.new
+              BSON::ObjectId.new
             end
 
             let(:evolved) do
@@ -366,11 +366,11 @@ describe Mongoid::Fields::ForeignKey do
           context "when the relation stores ids as object ids" do
 
             let(:id_one) do
-              Moped::BSON::ObjectId.new
+              BSON::ObjectId.new
             end
 
             let(:id_two) do
-              Moped::BSON::ObjectId.new
+              BSON::ObjectId.new
             end
 
             let(:evolved) do
@@ -393,11 +393,11 @@ describe Mongoid::Fields::ForeignKey do
             end
 
             let(:id_one) do
-              Moped::BSON::ObjectId.new.to_s
+              BSON::ObjectId.new.to_s
             end
 
             let(:id_two) do
-              Moped::BSON::ObjectId.new.to_s
+              BSON::ObjectId.new.to_s
             end
 
             let(:evolved) do
@@ -462,7 +462,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the key is not resizable" do
 
       let(:field) do
-        described_class.new(:test, type: Moped::BSON::ObjectId)
+        described_class.new(:test, type: BSON::ObjectId)
       end
 
       it "returns false" do
@@ -520,7 +520,7 @@ describe Mongoid::Fields::ForeignKey do
         context "when using object ids" do
 
           let(:object_id) do
-            Moped::BSON::ObjectId.new
+            BSON::ObjectId.new
           end
 
           it "performs conversion on the ids if strings" do
@@ -531,7 +531,7 @@ describe Mongoid::Fields::ForeignKey do
         context "when not using object ids" do
 
           let(:object_id) do
-            Moped::BSON::ObjectId.new
+            BSON::ObjectId.new
           end
 
           before do
@@ -539,16 +539,16 @@ describe Mongoid::Fields::ForeignKey do
               :_id,
               type: String,
               pre_processed: true,
-              default: ->{ Moped::BSON::ObjectId.new.to_s }
+              default: ->{ BSON::ObjectId.new.to_s }
             )
           end
 
           after do
             Person.field(
               :_id,
-              type: Moped::BSON::ObjectId,
+              type: BSON::ObjectId,
               pre_processed: true,
-              default: ->{ Moped::BSON::ObjectId.new }
+              default: ->{ BSON::ObjectId.new }
             )
           end
 
@@ -584,7 +584,7 @@ describe Mongoid::Fields::ForeignKey do
         context "when using object ids" do
 
           let(:object_id) do
-            Moped::BSON::ObjectId.new
+            BSON::ObjectId.new
           end
 
           it "performs conversion on the ids if strings" do
@@ -599,7 +599,7 @@ describe Mongoid::Fields::ForeignKey do
             context "when provided a string" do
 
               let(:object_id) do
-                Moped::BSON::ObjectId.new
+                BSON::ObjectId.new
               end
 
               before do
@@ -607,16 +607,16 @@ describe Mongoid::Fields::ForeignKey do
                   :_id,
                   type: String,
                   pre_processed: true,
-                  default: ->{ Moped::BSON::ObjectId.new.to_s }
+                  default: ->{ BSON::ObjectId.new.to_s }
                 )
               end
 
               after do
                 Person.field(
                   :_id,
-                  type: Moped::BSON::ObjectId,
+                  type: BSON::ObjectId,
                   pre_processed: true,
-                  default: ->{ Moped::BSON::ObjectId.new }
+                  default: ->{ BSON::ObjectId.new }
                 )
               end
 
@@ -637,9 +637,9 @@ describe Mongoid::Fields::ForeignKey do
               after do
                 Person.field(
                   :_id,
-                  type: Moped::BSON::ObjectId,
+                  type: BSON::ObjectId,
                   pre_processed: true,
-                  default: ->{ Moped::BSON::ObjectId.new }
+                  default: ->{ BSON::ObjectId.new }
                 )
               end
 

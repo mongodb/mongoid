@@ -15,7 +15,7 @@ module Mongoid
       #   person.__build__(:addresses, { :id => 1 }, metadata)
       #
       # @param [ String, Symbol ] name The name of the relation.
-      # @param [ Hash, Moped::BSON::ObjectId ] object The id or attributes to use.
+      # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
       # @param [ Metadata ] metadata The relation's metadata.
       # @param [ true, false ] building If we are in a build operation.
       #

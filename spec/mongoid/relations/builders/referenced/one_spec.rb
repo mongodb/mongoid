@@ -29,7 +29,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
     context "when provided an id" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       let(:object) do

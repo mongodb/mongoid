@@ -353,7 +353,7 @@ describe Mongoid::Fields do
     context "when the field is binary" do
 
       let(:binary) do
-        Moped::BSON::Binary.new(:md5, "testing")
+        BSON::Binary.new(:md5, "testing")
       end
 
       let(:registry) do
@@ -473,7 +473,7 @@ describe Mongoid::Fields do
     context "when the field is binary" do
 
       let(:binary) do
-        Moped::BSON::Binary.new(:md5, "testing")
+        BSON::Binary.new(:md5, "testing")
       end
 
       let(:registry) do
@@ -1029,7 +1029,7 @@ describe Mongoid::Fields do
   describe ".replace_field" do
 
     let!(:original) do
-      Person.field(:id_test, type: Moped::BSON::ObjectId, label: "id")
+      Person.field(:id_test, type: BSON::ObjectId, label: "id")
     end
 
     let!(:altered) do

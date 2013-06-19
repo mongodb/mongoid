@@ -75,7 +75,7 @@ module Mongoid
 
     # A Document's is identified absolutely by its class and database id:
     #
-    # Person.first.identity #=> [Person, Moped::BSON::ObjectId('4f775130a04745933a000003')]
+    # Person.first.identity #=> [Person, BSON::ObjectId('4f775130a04745933a000003')]
     #
     # @example Get the identity
     #   document.identity
@@ -92,7 +92,7 @@ module Mongoid
     # an empty +Hash+.
     #
     # If a primary key is defined, the document's id will be set to that key,
-    # otherwise it will be set to a fresh +Moped::BSON::ObjectId+ string.
+    # otherwise it will be set to a fresh +BSON::ObjectId+ string.
     #
     # @example Create a new document.
     #   Person.new(:title => "Sir")

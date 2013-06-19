@@ -14,7 +14,7 @@ describe Mongoid::Extensions::String do
     context "when the string is a legal object id" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       it "returns the object id" do
@@ -46,7 +46,7 @@ describe Mongoid::Extensions::String do
     context "when the string is a legal object id" do
 
       let(:object_id) do
-        Moped::BSON::ObjectId.new
+        BSON::ObjectId.new
       end
 
       it "returns the object id" do

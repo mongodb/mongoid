@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 gemspec
 
+gem "moped", github: "mongoid/moped"
 gem "rake"
 
 group :test do
