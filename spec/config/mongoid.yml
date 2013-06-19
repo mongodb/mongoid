@@ -5,7 +5,7 @@ test:
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
-        consistency: :strong
+        read: :primary
     mongohq_single:
       database: <%=ENV["MONGOHQ_SINGLE_NAME"]%>
       username: <%=ENV["MONGOHQ_SINGLE_USER"]%>
@@ -15,7 +15,7 @@ test:
       options:
         write:
           w: 1
-        consistency: :strong
+        read: :primary
     mongohq_repl:
       database: <%=ENV["MONGOHQ_REPL_NAME"]%>
       username: <%=ENV["MONGOHQ_REPL_USER"]%>
@@ -24,7 +24,7 @@ test:
         - <%=ENV["MONGOHQ_REPL_1_URL"]%>
         - <%=ENV["MONGOHQ_REPL_2_URL"]%>
       options:
-        consistency: :strong
+        read: :primary
         write:
           w: :majority
     mongohq_repl_uri:
