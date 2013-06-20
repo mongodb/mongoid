@@ -428,7 +428,7 @@ module Mongoid
     #
     # @since 3.1.0
     def for_js(javascript, scope = {})
-      js_query(BSON::Code.new(javascript, scope))
+      js_query(BSON::CodeWithScope.new(javascript, scope))
     end
 
     private
