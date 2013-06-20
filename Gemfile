@@ -1,7 +1,6 @@
 source "https://rubygems.org"
 gemspec
 
-gem "bson", github: "mongodb/bson-ruby"
 gem "moped", github: "mongoid/moped"
 gem "rake"
 
