@@ -111,6 +111,9 @@ module Mongoid
         if opts.has_key?(:expire_after_seconds)
           opts[:expireAfterSeconds] = opts.delete(:expire_after_seconds)
         end
+        unless opts.has_key?(:background)
+          opts[:background] = true
+        end
         opts
       end
 
