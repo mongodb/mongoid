@@ -3150,6 +3150,17 @@ describe Mongoid::Criteria do
         end
       end
 
+      context "when plucking mult-fields" do
+
+        let(:plucked) do
+          Band.where(:name.exists => true).pluck(:name, :likes)
+        end
+
+        it "returns the values" do
+          expect(plucked).to eq([ ["Depeche Mode", 3], ["Tool", 3], ["Photek", 1] ])
+        end
+      end
+
       context "when there are duplicate values" do
 
         let(:plucked) do
@@ -3181,6 +3192,31 @@ describe Mongoid::Criteria do
 
       it "returns the field values" do
         expect(plucked).to eq([ depeche.id, tool.id, photek.id ])
+      end
+    end
+
+    context "when plucking a field that doesnt exist" do
+
+      context "when pluck one field" do
+
+        let(:plucked) do
+          Band.all.pluck(:foo)
+        end
+
+        it "returns a empty array" do
+          expect(plucked).to eq([])
+        end
+      end
+
+      context "when pluck multiple fields" do
+
+        let(:plucked) do
+          Band.all.pluck(:foo, :bar)
+        end
+
+        it "returns a empty array" do
+          expect(plucked).to eq([[], [], []])
+        end
       end
     end
   end

@@ -337,14 +337,24 @@ module Mongoid
       # @note This method will return the raw db values - it performs no custom
       #   serialization.
       #
-      # @param [ String, Symbol ] field The field to pluck.
+      # @param [ String, Symbol, Array ] field Fields to pluck.
       #
-      # @return [ Array<Object> ] The plucked values.
+      # @return [ Array<Object, Array> ] The plucked values.
       #
       # @since 3.1.0
-      def pluck(field)
-        normalized = klass.database_field_name(field)
-        query.dup.select(normalized => 1).map{ |doc| doc[normalized] }.compact
+      def pluck(*fields)
+        normalized_select = fields.inject({}) do |hash, f|
+          hash[klass.database_field_name(f)] = 1
+          hash
+        end
+
+        query.dup.select(normalized_select).map do |doc|
+          if normalized_select.size == 1
+            doc[normalized_select.keys.first]
+          else
+            normalized_select.keys.map { |n| doc[n] }.compact
+          end
+        end.compact
       end
 
       # Skips the provided number of documents.
