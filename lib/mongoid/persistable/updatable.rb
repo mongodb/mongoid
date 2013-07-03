@@ -20,7 +20,7 @@ module Mongoid
       # @return [ true, false ] True if succeeded, false if not.
       #
       # @since 1.0.0
-      def update(options = {})
+      def update_document(options = {})
         prepare_update(options) do
           updates, conflicts = init_atomic_updates
           unless updates.empty?
@@ -66,23 +66,24 @@ module Mongoid
       # Update the document attributes in the database.
       #
       # @example Update the document's attributes
-      #   document.update_attributes(:title => "Sir")
+      #   document.update(:title => "Sir")
       #
       # @param [ Hash ] attributes The attributes to update.
       #
       # @return [ true, false ] True if validation passed, false if not.
       #
       # @since 1.0.0
-      def update_attributes(attributes = {})
+      def update(attributes = {})
         assign_attributes(attributes)
         save
       end
+      alias :update_attributes :update
 
       # Update the document attributes in the database and raise an error if
       # validation failed.
       #
       # @example Update the document's attributes.
-      #   document.update_attributes(:title => "Sir")
+      #   document.update!(:title => "Sir")
       #
       # @param [ Hash ] attributes The attributes to update.
       #
@@ -92,7 +93,7 @@ module Mongoid
       # @return [ true, false ] True if validation passed.
       #
       # @since 1.0.0
-      def update_attributes!(attributes = {})
+      def update!(attributes = {})
         result = update_attributes(attributes)
         unless result
           fail_due_to_validation! unless errors.empty?
@@ -100,6 +101,7 @@ module Mongoid
         end
         result
       end
+      alias :update_attributes! :update!
 
       private
 
