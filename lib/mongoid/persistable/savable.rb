@@ -22,7 +22,7 @@ module Mongoid
         if new_record?
           !insert(options).new_record?
         else
-          update(options)
+          update_document(options)
         end
       end
 

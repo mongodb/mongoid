@@ -270,238 +270,241 @@ describe Mongoid::Persistable::Updatable do
     end
   end
 
-  describe "#update_attributes" do
+  [:update_attributes, :update].each do |method|
 
-    context "when saving with a hash field with invalid keys" do
+    describe "##{method}" do
 
-      let(:person) do
-        Person.create
+      context "when saving with a hash field with invalid keys" do
+
+        let(:person) do
+          Person.create
+        end
+
+        it "raises an error" do
+          expect {
+            person.with(safe: true).send(method, map: { "bad.key" => "value" })
+          }.to raise_error(Moped::Errors::OperationFailure)
+        end
       end
 
-      it "raises an error" do
-        expect {
-          person.with(safe: true).update_attributes(map: { "bad.key" => "value" })
-        }.to raise_error(Moped::Errors::OperationFailure)
-      end
-    end
+      context "when validation passes" do
 
-    context "when validation passes" do
+        let(:person) do
+          Person.create
+        end
 
-      let(:person) do
-        Person.create
-      end
+        let!(:saved) do
+          person.send(method, pets: false)
+        end
 
-      let!(:saved) do
-        person.update_attributes(pets: false)
-      end
+        let(:from_db) do
+          Person.find(person.id)
+        end
 
-      let(:from_db) do
-        Person.find(person.id)
-      end
+        it "returns true" do
+          expect(saved).to be_true
+        end
 
-      it "returns true" do
-        expect(saved).to be_true
+        it "saves the attributes" do
+          expect(from_db.pets).to be_false
+        end
       end
 
-      it "saves the attributes" do
-        expect(from_db.pets).to be_false
-      end
-    end
-
-    context "when the document has been destroyed" do
-
-      let!(:person) do
-        Person.create
-      end
-
-      before do
-        person.delete
-      end
-
-      it "raises an error" do
-        expect {
-          person.update_attributes(title: "something")
-        }.to raise_error
-      end
-    end
-
-    context "when updating through a one-to-one relation" do
-
-      let(:person) do
-        Person.create!
-      end
-
-      let(:game) do
-        Game.create(person: person)
-      end
-
-      before do
-        person.update_attributes!(ssn: "444-44-4444")
-        game.person.update_attributes!(ssn: "555-66-7777")
-      end
-
-      let(:from_db) do
-        Person.find(person.id)
-      end
-
-      it "saves the attributes" do
-        expect(person.ssn).to eq("555-66-7777")
-      end
-    end
-
-    context "on a new record" do
-
-      let(:person) do
-        Person.new
-      end
-
-      before do
-        person.update_attributes(pets: false, title: nil)
-      end
-
-      it "saves the new record" do
-        expect(Person.find(person.id)).to_not be_nil
-      end
-    end
-
-    context "when passing in a relation" do
-
-      context "when providing an embedded child" do
+      context "when the document has been destroyed" do
 
         let!(:person) do
           Person.create
         end
 
-        let!(:name) do
-          person.create_name(first_name: "test", last_name: "user")
-        end
-
-        let(:new_name) do
-          Name.new(first_name: "Rupert", last_name: "Parkes")
-        end
-
         before do
-          person.update_attributes(name: new_name)
+          person.delete
         end
 
-        it "updates the embedded document" do
-          expect(person.name).to eq(new_name)
-        end
-
-        it "persists the changes" do
-          expect(person.reload.name).to eq(new_name)
+        it "raises an error" do
+          expect {
+            person.send(method, title: "something")
+          }.to raise_error
         end
       end
 
-      context "when providing a parent to a referenced in" do
+      context "when updating through a one-to-one relation" do
+
+        let(:person) do
+          Person.create!
+        end
+
+        let(:game) do
+          Game.create(person: person)
+        end
+
+        before do
+          person.send(method, ssn: "444-44-4444")
+          game.person.send(method, ssn: "555-66-7777")
+        end
+
+        let(:from_db) do
+          Person.find(person.id)
+        end
+
+        it "saves the attributes" do
+          expect(person.ssn).to eq("555-66-7777")
+        end
+      end
+
+      context "on a new record" do
+
+        let(:person) do
+          Person.new
+        end
+
+        before do
+          person.send(method, pets: false, title: nil)
+        end
+
+        it "saves the new record" do
+          expect(Person.find(person.id)).to_not be_nil
+        end
+      end
+
+      context "when passing in a relation" do
+
+        context "when providing an embedded child" do
+
+          let!(:person) do
+            Person.create
+          end
+
+          let!(:name) do
+            person.create_name(first_name: "test", last_name: "user")
+          end
+
+          let(:new_name) do
+            Name.new(first_name: "Rupert", last_name: "Parkes")
+          end
+
+          before do
+            person.send(method, name: new_name)
+          end
+
+          it "updates the embedded document" do
+            expect(person.name).to eq(new_name)
+          end
+
+          it "persists the changes" do
+            expect(person.reload.name).to eq(new_name)
+          end
+        end
+
+        context "when providing a parent to a referenced in" do
+
+          let!(:person) do
+            Person.create
+          end
+
+          let!(:post) do
+            Post.create(title: "Testing")
+          end
+
+          context "when the relation has not yet been touched" do
+
+            before do
+              post.send(method, person: person)
+            end
+
+            it "sets the instance of the relation" do
+              expect(person.posts).to eq([ post ])
+            end
+
+            it "sets properly through method_missing" do
+              expect(person.posts.to_a).to eq([ post ])
+            end
+
+            it "persists the reference" do
+              expect(person.posts(true)).to eq([ post ])
+            end
+          end
+
+          context "when the relation has been touched" do
+
+            before do
+              person.posts
+              post.send(method, person: person)
+            end
+
+            it "sets the instance of the relation" do
+              expect(person.posts).to eq([ post ])
+            end
+
+            it "sets properly through method_missing" do
+              expect(person.posts.to_a).to eq([ post ])
+            end
+
+            it "persists the reference" do
+              expect(person.posts(true)).to eq([ post ])
+            end
+          end
+        end
+      end
+
+      context "when in a deeply nested hierarchy" do
 
         let!(:person) do
-          Person.create
+          Person.new(title: "The Boss")
         end
 
-        let!(:post) do
-          Post.create(title: "Testing")
+        let!(:phone_number) do
+          Phone.new(number: "123-456-7890")
         end
 
-        context "when the relation has not yet been touched" do
-
-          before do
-            post.update_attributes(person: person)
-          end
-
-          it "sets the instance of the relation" do
-            expect(person.posts).to eq([ post ])
-          end
-
-          it "sets properly through method_missing" do
-            expect(person.posts.to_a).to eq([ post ])
-          end
-
-          it "persists the reference" do
-            expect(person.posts(true)).to eq([ post ])
-          end
-        end
-
-        context "when the relation has been touched" do
-
-          before do
-            person.posts
-            post.update_attributes(person: person)
-          end
-
-          it "sets the instance of the relation" do
-            expect(person.posts).to eq([ post ])
-          end
-
-          it "sets properly through method_missing" do
-            expect(person.posts.to_a).to eq([ post ])
-          end
-
-          it "persists the reference" do
-            expect(person.posts(true)).to eq([ post ])
-          end
-        end
-      end
-    end
-
-    context "when in a deeply nested hierarchy" do
-
-      let!(:person) do
-        Person.new(title: "The Boss")
-      end
-
-      let!(:phone_number) do
-        Phone.new(number: "123-456-7890")
-      end
-
-      let!(:country_code) do
-        CountryCode.new(code: 1)
-      end
-
-      before do
-        phone_number.country_code = country_code
-        person.phone_numbers << phone_number
-        person.save
-      end
-
-      it "sets the first level document" do
-        expect(person.phone_numbers.first).to eq(phone_number)
-      end
-
-      it "sets the second level document" do
-        expect(person.phone_numbers.first.country_code).to eq(country_code)
-      end
-
-      context "when updating the first level document" do
-
-        let(:phone) do
-          person.phone_numbers.first
+        let!(:country_code) do
+          CountryCode.new(code: 1)
         end
 
         before do
-          phone.number = "098-765-4321"
-          phone.update_attributes(number: "098-765-4321")
+          phone_number.country_code = country_code
+          person.phone_numbers << phone_number
+          person.save
         end
 
-        it "sets the new attributes" do
-          expect(phone.number).to eq("098-765-4321")
+        it "sets the first level document" do
+          expect(person.phone_numbers.first).to eq(phone_number)
         end
 
-        context "when reloading the root" do
+        it "sets the second level document" do
+          expect(person.phone_numbers.first.country_code).to eq(country_code)
+        end
 
-          let(:reloaded) do
-            person.reload
+        context "when updating the first level document" do
+
+          let(:phone) do
+            person.phone_numbers.first
           end
 
-          it "saves the new attributes" do
-            expect(reloaded.phone_numbers.first.number).to eq("098-765-4321")
+          before do
+            phone.number = "098-765-4321"
+            phone.send(method, number: "098-765-4321")
+          end
+
+          it "sets the new attributes" do
+            expect(phone.number).to eq("098-765-4321")
+          end
+
+          context "when reloading the root" do
+
+            let(:reloaded) do
+              person.reload
+            end
+
+            it "saves the new attributes" do
+              expect(reloaded.phone_numbers.first.number).to eq("098-765-4321")
+            end
           end
         end
       end
     end
   end
 
-  describe "#update_attributes!" do
+  describe "#update!" do
 
     context "when a callback returns false" do
 
@@ -511,7 +514,7 @@ describe Mongoid::Persistable::Updatable do
 
       it "raises a callback error" do
         expect {
-          oscar.update_attributes!(title: "The Grouch")
+          oscar.update!(title: "The Grouch")
         }.to raise_error(Mongoid::Errors::Callback)
       end
     end
