@@ -69,6 +69,8 @@ For instructions on upgrading to newer versions, visit
 
         Band.where(name: "Depeche Mode").inc(likes: 10, followers: 20)
 
+* \#3138 `update_attributes` can now be accessed simply by calling `update`.
+
 * \#3029 The `relation_field` field that is added for a single use case with polymorphic
   relations has been removed. So where the following would work before:
 
