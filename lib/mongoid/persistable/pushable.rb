@@ -23,7 +23,7 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(adds) do |field, value|
             existing = send(field) || (attributes[field] ||= [])
-            values = [ value ].flatten
+            values = [ value ].flatten(1)
             values.each do |val|
               existing.push(val) unless existing.include?(val)
             end
@@ -50,7 +50,7 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(pushes) do |field, value|
             existing = send(field) || (attributes[field] ||= [])
-            values = [ value ].flatten
+            values = [ value ].flatten(1)
             values.each{ |val| existing.push(val) }
             ops[atomic_attribute_name(field)] = { "$each" => values }
           end

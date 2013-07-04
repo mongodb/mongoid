@@ -34,6 +34,7 @@ class Person
   field :desc, localize: true
   field :test_array, type: Array
   field :overridden_setter, type: String
+  field :arrays, type: Array
 
   index age: 1
   index addresses: 1

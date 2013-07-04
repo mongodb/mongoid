@@ -226,6 +226,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3116 Relations instance variables are now all prefixed with `_`.
 
+* \#3093 Only flatten 1 level when atomically pushing arrays.
+
 * \#3063 `Document#becomes` now properly sets base object on errors.
   (Adam Ross Cohen)
 

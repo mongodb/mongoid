@@ -35,6 +35,10 @@ describe Mongoid::Persistable::Pushable do
         it "persists absent values" do
           expect(person.reload.test_array).to eq([ 1 ])
         end
+
+        it "flattens only 1 level" do
+          expect(person.reload.arrays).to eq([[ 7, 8 ]])
+        end
       end
 
       let(:person) do
@@ -44,7 +48,7 @@ describe Mongoid::Persistable::Pushable do
       context "when provided string fields" do
 
         let!(:add) do
-          person.add_to_set("aliases" => 4, "array" => [4, 5], "test_array" => 1)
+          person.add_to_set("aliases" => 4, "array" => [4, 5], "test_array" => 1, "arrays" => [[ 7, 8 ]])
         end
 
         it_behaves_like "a unique pushable root document"
@@ -53,7 +57,7 @@ describe Mongoid::Persistable::Pushable do
       context "when provided symbol fields" do
 
         let!(:add) do
-          person.add_to_set(aliases: 4, array: [4, 5], test_array: 1)
+          person.add_to_set(aliases: 4, array: [4, 5], test_array: 1, arrays: [[ 7, 8 ]])
         end
 
         it_behaves_like "a unique pushable root document"
@@ -158,6 +162,10 @@ describe Mongoid::Persistable::Pushable do
         it "persists absent values" do
           expect(person.reload.test_array).to eq([ 1 ])
         end
+
+        it "flattens only 1 level" do
+          expect(person.reload.arrays).to eq([[ 7, 8 ]])
+        end
       end
 
       let(:person) do
@@ -167,7 +175,7 @@ describe Mongoid::Persistable::Pushable do
       context "when provided string fields" do
 
         let!(:push) do
-          person.push("aliases" => 4, "array" => [ 7, 8 ], "test_array" => 1)
+          person.push("aliases" => 4, "array" => [ 7, 8 ], "test_array" => 1, "arrays" => [[ 7, 8 ]])
         end
 
         it_behaves_like "a pushable root document"
@@ -176,7 +184,7 @@ describe Mongoid::Persistable::Pushable do
       context "when provided symbol fields" do
 
         let!(:push) do
-          person.push(aliases: 4, array: [ 7, 8 ], test_array: 1)
+          person.push(aliases: 4, array: [ 7, 8 ], test_array: 1, arrays: [[ 7, 8 ]])
         end
 
         it_behaves_like "a pushable root document"
