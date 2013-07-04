@@ -115,8 +115,8 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def ivar(name)
-        if instance_variable_defined?("@#{name}")
-          return instance_variable_get("@#{name}")
+        if instance_variable_defined?("@_#{name}")
+          return instance_variable_get("@_#{name}")
         else
           false
         end
@@ -170,8 +170,8 @@ module Mongoid
       #
       # @since 2.1.0
       def remove_ivar(name)
-        if instance_variable_defined?("@#{name}")
-          return remove_instance_variable("@#{name}")
+        if instance_variable_defined?("@_#{name}")
+          return remove_instance_variable("@_#{name}")
         else
           false
         end

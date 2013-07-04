@@ -224,6 +224,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3116 Relations instance variables are now all prefixed with `_`.
+
 * \#3063 `Document#becomes` now properly sets base object on errors.
   (Adam Ross Cohen)
 

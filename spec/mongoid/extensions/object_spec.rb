@@ -258,7 +258,7 @@ describe Mongoid::Extensions::Object do
       end
 
       before do
-        document.instance_variable_set(:@testing, "testing")
+        document.instance_variable_set(:@_testing, "testing")
       end
 
       let!(:removal) do
@@ -266,7 +266,7 @@ describe Mongoid::Extensions::Object do
       end
 
       it "removes the instance variable" do
-        expect(document.instance_variable_defined?(:@testing)).to be_false
+        expect(document.instance_variable_defined?(:@_testing)).to be_false
       end
 
       it "returns true" do

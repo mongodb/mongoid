@@ -68,7 +68,7 @@ module Mongoid
       #
       # @since 3.0.14
       def reset_relation_criteria(name)
-        if instance_variable_defined?("@#{name}")
+        if instance_variable_defined?("@_#{name}")
           send(name).reset_unloaded
         end
       end
@@ -86,7 +86,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def set_relation(name, relation)
-        instance_variable_set("@#{name}", relation)
+        instance_variable_set("@_#{name}", relation)
       end
 
       private
@@ -107,7 +107,7 @@ module Mongoid
       #
       # @since 3.0.16
       def get_relation(name, metadata, reload = false)
-        variable = "@#{name}"
+        variable = "@_#{name}"
         value = if instance_variable_defined?(variable) && !reload
           instance_variable_get(variable)
         else
@@ -127,7 +127,7 @@ module Mongoid
       # @todo: Durran: Refactor before release, but this fixes the issue with
       # the extra queries.
       def get_relation_for_set(name, metadata, object)
-        variable = "@#{name}"
+        variable = "@_#{name}"
         value = if instance_variable_defined?(variable)
           instance_variable_get(variable)
         else
