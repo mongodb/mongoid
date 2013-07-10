@@ -2,7 +2,7 @@
 # squarm for answers
 def raise_version_error(message)
   puts message
-  Rails.logger.info(message) if defined?(Rails)
+  Rails.logger.info(message) if defined?(Rails) && Rails.logger
   raise
 end
 
