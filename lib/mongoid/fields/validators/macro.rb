@@ -16,7 +16,8 @@ module Mongoid
           :metadata,
           :pre_processed,
           :subtype,
-          :type
+          :type,
+          :overwrite
         ]
 
         # Validate the field definition.
@@ -30,7 +31,7 @@ module Mongoid
         #
         # @since 3.0.0
         def validate(klass, name, options)
-          validate_name(klass, name)
+          validate_name(klass, name, options)
           validate_options(klass, name, options)
         end
 
@@ -49,13 +50,13 @@ module Mongoid
         # @raise [ Errors::InvalidField ] If the name is not allowed.
         #
         # @since 3.0.0
-        def validate_name(klass, name)
+        def validate_name(klass, name, options)
           if Mongoid.destructive_fields.include?(name)
             raise Errors::InvalidField.new(klass, name)
           end
 
           # if field alredy defined
-          if klass.fields.keys.include?(name.to_s)
+          if ! options[:overwrite] && klass.fields.keys.include?(name.to_s)
             if Mongoid.duplicate_fields_exception
               raise Errors::InvalidField.new(klass, name)
             else
