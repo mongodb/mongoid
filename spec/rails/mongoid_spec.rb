@@ -12,7 +12,7 @@ describe "Rails::Mongoid" do
   describe ".create_indexes" do
 
     let(:logger) do
-      stub
+      double
     end
 
     let!(:klass) do
@@ -105,7 +105,7 @@ describe "Rails::Mongoid" do
   describe ".drop_undefined_indexes" do
 
     let(:logger) do
-      stub
+      double
     end
 
     let(:indexes) do
@@ -130,7 +130,7 @@ describe "Rails::Mongoid" do
   describe ".remove_indexes" do
 
     let(:logger) do
-      stub
+      double
     end
 
     let!(:klass) do
@@ -158,7 +158,7 @@ describe "Rails::Mongoid" do
   describe ".determine_model" do
 
     let(:logger) do
-      stub
+      double
     end
 
     let!(:klass) do
@@ -326,11 +326,11 @@ describe "Rails::Mongoid" do
   describe ".preload_models" do
 
     let(:app) do
-      stub(config: config)
+      double(config: config)
     end
 
     let(:config) do
-      stub(paths: paths)
+      double(paths: paths)
     end
 
     let(:paths) do
@@ -404,11 +404,11 @@ describe "Rails::Mongoid" do
   describe ".load_models" do
 
     let(:app) do
-      stub(config: config)
+      double(config: config)
     end
 
     let(:config) do
-      stub(paths: paths)
+      double(paths: paths)
     end
 
     let(:paths) do

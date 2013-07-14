@@ -5,15 +5,15 @@ describe Mongoid::Relations::Builders::Embedded::In do
   describe "#build" do
 
     let(:object) do
-      stub
+      double
     end
 
     let(:base) do
-      stub
+      double
     end
 
     let(:metadata) do
-      stub(klass: Person, name: :person)
+      double(klass: Person, name: :person)
     end
 
     context "when a document is provided" do

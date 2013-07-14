@@ -85,7 +85,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is valid" do
 
         let(:associated) do
-          stub(valid?: true)
+          double(valid?: true)
         end
 
         before do
@@ -101,7 +101,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is invalid" do
 
         let(:associated) do
-          stub(valid?: false)
+          double(valid?: false)
         end
 
         before do
@@ -135,7 +135,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association has invalid documents" do
 
         let(:associated) do
-          stub(valid?: false)
+          double(valid?: false)
         end
 
         before do
@@ -151,7 +151,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the assocation has all valid documents" do
 
         let(:associated) do
-          stub(valid?: true)
+          double(valid?: true)
         end
 
         before do

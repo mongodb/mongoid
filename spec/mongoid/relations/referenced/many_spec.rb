@@ -974,11 +974,11 @@ describe Mongoid::Relations::Referenced::Many do
     end
 
     let(:document) do
-      stub
+      double
     end
 
     let(:metadata) do
-      stub(extension?: false)
+      double(extension?: false)
     end
 
     it "returns the embedded in builder" do

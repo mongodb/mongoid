@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Builders::Referenced::In do
 
   let(:base) do
-    stub
+    double
   end
 
   describe "#build" do
@@ -13,7 +13,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
     end
 
     let(:metadata) do
-      stub(
+      double(
         klass: Person,
         name: :person,
         foreign_key: "person_id",
@@ -38,7 +38,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         let(:person) do
-          stub
+          double
         end
 
         before do
@@ -78,7 +78,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         let(:person) do
-          stub
+          double
         end
 
         before do

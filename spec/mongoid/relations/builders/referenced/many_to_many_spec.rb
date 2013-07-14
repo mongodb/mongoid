@@ -7,17 +7,17 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
   end
 
   let(:base) do
-    stub
+    double
   end
 
   describe "#build" do
 
     let(:criteria) do
-      stub(klass: Preference, selector: { "_id" => { "$in" => [] }})
+      double(klass: Preference, selector: { "_id" => { "$in" => [] }})
     end
 
     let(:metadata) do
-      stub(
+      double(
         klass: Preference,
         name: :preferences,
         foreign_key: "preference_ids",
@@ -40,7 +40,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       let(:preference) do
-        stub
+        double
       end
 
       let(:documents) do
@@ -55,7 +55,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
     context "when order specified" do
 
       let(:metadata) do
-        stub(
+        double(
           klass: Post,
           name: :preferences,
           foreign_key: "person_id",
@@ -74,7 +74,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       end
 
       let(:preference) do
-        stub
+        double
       end
 
       let(:documents) do
@@ -95,7 +95,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
         end
 
         let(:preference) do
-          stub
+          double
         end
 
         let!(:documents) do
@@ -110,7 +110,7 @@ describe Mongoid::Relations::Builders::Referenced::ManyToMany do
       context "when the object is nil" do
 
         let(:metadata) do
-          stub(
+          double(
             klass: Post,
             name: :preferences,
             foreign_key: "preference_ids",

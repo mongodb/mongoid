@@ -16,7 +16,7 @@ describe Mongoid::Relations::Cascading::Restrict do
   end
 
   let(:metadata) do
-    stub(name: :drugs)
+    double(name: :drugs)
   end
 
   let(:strategy) do
@@ -26,7 +26,7 @@ describe Mongoid::Relations::Cascading::Restrict do
   describe "#cascade" do
 
     let(:drug) do
-      stub
+      double
     end
 
     context "when the document exists" do

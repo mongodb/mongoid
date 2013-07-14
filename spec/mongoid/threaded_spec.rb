@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Threaded do
 
   let(:object) do
-    stub
+    double
   end
 
   describe "#begin" do

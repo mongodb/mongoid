@@ -7,7 +7,7 @@ describe Mongoid::Relations::Cascading::Destroy do
   end
 
   let(:metadata) do
-    stub(name: :posts)
+    double(name: :posts)
   end
 
   let(:strategy) do
@@ -17,7 +17,7 @@ describe Mongoid::Relations::Cascading::Destroy do
   describe "#cascade" do
 
     let(:post) do
-      stub
+      double
     end
 
     context "when the documents exist" do

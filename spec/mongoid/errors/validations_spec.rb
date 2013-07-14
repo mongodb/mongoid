@@ -5,11 +5,11 @@ describe Mongoid::Errors::Validations do
   describe "#message" do
 
     let(:errors) do
-      stub(full_messages: [ "Error 1", "Error 2" ], empty?: false)
+      double(full_messages: [ "Error 1", "Error 2" ], empty?: false)
     end
 
     let(:document) do
-      stub(errors: errors, class: Person)
+      double(errors: errors, class: Person)
     end
 
     let(:error) do

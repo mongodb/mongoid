@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Builders::Embedded::Many do
 
   let(:base) do
-    stub
+    double
   end
 
   let(:builder) do
@@ -15,7 +15,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when passed an array of documents" do
 
       let(:metadata) do
-        stub(klass: Address, name: :addresses)
+        double(klass: Address, name: :addresses)
       end
 
       let(:object) do
@@ -34,7 +34,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when the array is empty" do
 
       let(:metadata) do
-        stub(klass: Address, name: :addresses)
+        double(klass: Address, name: :addresses)
       end
 
       let(:object) do
@@ -53,7 +53,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when passed nil" do
 
       let(:metadata) do
-        stub(klass: Address, name: :addresses)
+        double(klass: Address, name: :addresses)
       end
 
       let(:builder) do
@@ -72,7 +72,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when no type is in the object" do
 
       let(:metadata) do
-        stub(klass: Address, name: :addresses)
+        double(klass: Address, name: :addresses)
       end
 
       let(:object) do
@@ -100,7 +100,7 @@ describe Mongoid::Relations::Builders::Embedded::Many do
     context "when a type is in the object" do
 
       let(:metadata) do
-        stub(klass: Shape, name: :shapes)
+        double(klass: Shape, name: :shapes)
       end
 
       let(:object) do

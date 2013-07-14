@@ -9,11 +9,11 @@ describe Mongoid::Relations::Cascading::Nullify do
   describe "#cascade" do
 
     let(:relation) do
-      stub
+      double
     end
 
     let(:metadata) do
-      stub(name: :posts)
+      double(name: :posts)
     end
 
     let(:strategy) do

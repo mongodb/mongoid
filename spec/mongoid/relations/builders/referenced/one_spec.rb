@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Relations::Builders::Referenced::One do
 
   let(:base) do
-    stub(new_record?: false)
+    double(new_record?: false)
   end
 
   describe "#build" do
@@ -13,7 +13,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
     end
 
     let(:metadata) do
-      stub(
+      double(
         klass: Post,
         name: :post,
         foreign_key: "person_id",
@@ -37,7 +37,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
       end
 
       let(:post) do
-        stub
+        double
       end
 
       before do

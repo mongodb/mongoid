@@ -3,17 +3,17 @@ require "spec_helper"
 describe Mongoid::Relations::Builders::Referenced::Many do
 
   let(:base) do
-    stub
+    double
   end
 
   describe "#build" do
 
     let(:criteria) do
-      stub(klass: Post, selector: { "person_id" => "" }, selector_with_type_selection: { "person_id" => "" })
+      double(klass: Post, selector: { "person_id" => "" }, selector_with_type_selection: { "person_id" => "" })
     end
 
     let(:metadata) do
-      stub(
+      double(
         klass: Post,
         name: :posts,
         foreign_key: "person_id",
@@ -37,7 +37,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       let(:post) do
-        stub
+        double
       end
 
       let(:documents) do
@@ -52,7 +52,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     context "when order specified" do
 
       let(:metadata) do
-        stub(
+        double(
           klass: Post,
           name: :posts,
           foreign_key: "person_id",
@@ -71,7 +71,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
       end
 
       let(:post) do
-        stub
+        double
       end
 
       let(:documents) do
@@ -86,7 +86,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
     context "when provided a object" do
 
       let(:metadata) do
-        stub(
+        double(
           klass: Post,
           name: :posts,
           foreign_key: "person_id",

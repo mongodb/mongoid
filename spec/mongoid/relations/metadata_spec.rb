@@ -160,11 +160,11 @@ describe Mongoid::Relations::Metadata do
     end
 
     let(:object) do
-      stub
+      double
     end
 
     let(:base) do
-      stub
+      double
     end
 
     it "returns the builder from the relation" do
