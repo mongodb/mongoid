@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3159 Upserting now properly flags documents as persisted.
+
 * \#3079 Embbed docs with paranoia parents, were losing the _id when
   reloading from db, as they didnt have the right persisted? value. (Arthur Neves)
 

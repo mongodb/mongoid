@@ -23,6 +23,7 @@ module Mongoid
           yield(document); true
         end
         document.post_persist unless result == false
+        document.new_record = false
         result
       end
     end

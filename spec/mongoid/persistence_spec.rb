@@ -1715,6 +1715,10 @@ describe Mongoid::Persistence do
         it "does not modify any fields" do
           insert.reload.name.should eq("Tool")
         end
+
+        it "sets the document as persisted" do
+          insert.should be_persisted
+        end
       end
     end
 
