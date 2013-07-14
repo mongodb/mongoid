@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency("activemodel", ["~> 4.0.0"])
   s.add_dependency("tzinfo", ["~> 0.3.22"])
-  s.add_dependency("moped", ["~> 1.4"])
+  s.add_dependency("moped", ["~> 1.5"])
   s.add_dependency("origin", ["~> 1.0"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
