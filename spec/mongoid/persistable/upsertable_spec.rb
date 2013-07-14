@@ -47,6 +47,10 @@ describe Mongoid::Persistable::Upsertable do
         it "updates the existing document" do
           expect(existing.reload.name).to eq("Tool")
         end
+
+        it "flags the document as persisted" do
+          expect(existing).to be_persisted
+        end
       end
 
       context "when no matching document exists in the db" do
@@ -65,6 +69,10 @@ describe Mongoid::Persistable::Upsertable do
 
         it "does not modify any fields" do
           expect(insert.reload.name).to eq("Tool")
+        end
+
+        it "flags the document as persisted" do
+          expect(insert).to be_persisted
         end
       end
     end

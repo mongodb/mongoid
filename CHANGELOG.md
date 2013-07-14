@@ -237,6 +237,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3159 Upserting now properly flags documents as persisted.
+
 * \#3081 Criteria's `method_missing` now checks if an array responds to the provided
   method before calling entries in order to not hit the database if a `NoMethodError`
   was to get raised.

@@ -47,6 +47,7 @@ module Mongoid
           yield(self)
           true
         end
+        self.new_record = false
         post_process_persist(result, options) and result
       end
     end
