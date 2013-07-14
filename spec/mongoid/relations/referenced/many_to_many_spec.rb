@@ -3266,7 +3266,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     it "does not delete the target from the database" do
       expect {
         preference.reload
-      }.not_to raise_error(Mongoid::Errors::DocumentNotFound)
+      }.not_to raise_error
     end
   end
 

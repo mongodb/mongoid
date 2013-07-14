@@ -257,7 +257,9 @@ describe "Rails::Mongoid" do
 
         it "logs the class without an error" do
           logger.should_receive(:info)
-          expect { expect(model).to eq(klass) }.not_to raise_error(NameError)
+          expect {
+            expect(model).to be_nil
+          }.not_to raise_error
         end
       end
     end
