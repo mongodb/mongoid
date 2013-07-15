@@ -130,7 +130,7 @@ module Mongoid
       #
       # @return [ Moped::Session ] The requested session
       def checkout
-        unless (session = session_for_thread(Thread.current))
+        unless (session = session_for(Thread.current))
           synchronize do
             session = get_session
             reserve(session)
@@ -160,7 +160,7 @@ module Mongoid
       #
       # @return [ true] True
       def checkin_from_thread(thread)
-        checkin session_for_thread(thread)
+        checkin session_for(thread)
         true
       end
 
@@ -173,7 +173,7 @@ module Mongoid
       # @return [ Hash ] Remaining reserved sessions
       def clear(thread=nil)
         if thread
-          @reserved_sessions.delete(thread) if session_for_thread(thread)
+          @reserved_sessions.delete(thread) if session_for(thread)
           @sessions.pop
         else
           @reserved_sessions = {}
@@ -210,10 +210,10 @@ module Mongoid
       # Gets the session for the given thread
       #
       # @example Get the session for a thread
-      #   session_pool.session_for_thread(Thread.current)
+      #   session_pool.session_for(Thread.current)
       #
       # @return [ Moped::Session ] Session for the given thread
-      def session_for_thread(thread)
+      def session_for(thread)
         @reserved_sessions[thread]
       end
 

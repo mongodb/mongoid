@@ -155,7 +155,7 @@ module Mongoid
         synchronize do
           @session_pool.try(:each) do |name, pool|
             if thread
-              pool.session_for_thread(thread).try(:disconnect)
+              pool.session_for(thread).try(:disconnect)
             else
               pool.sessions.try(:each) { |session| session.disconnect }
             end
@@ -175,7 +175,7 @@ module Mongoid
       #
       # @since 3.0.0
       def with_name(name)
-        session_pool(name).session_for_thread(Thread.current) ||
+        session_pool(name).session_for(Thread.current) ||
           session_pool(name).checkout
       end
 
