@@ -201,8 +201,7 @@ module Mongoid
       #
       # @return [ true ] True
       def reap
-        @reserved_sessions.keys.each do |thread|
-          session = @reserved_sessions[thread]
+        @reserved_sessions.each do |thread, session|
           checkin(session) if thread.stop?
         end
         true
