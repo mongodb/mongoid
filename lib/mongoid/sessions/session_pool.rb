@@ -180,6 +180,7 @@ module Mongoid
           @sessions = []
           @available = Queue.new self
         end
+        @reserved_sessions
       end
 
       # Checks the number of available sessions
