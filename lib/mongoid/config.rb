@@ -27,6 +27,9 @@ module Mongoid
     option :duplicate_fields_exception, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
+    option :session_pool_size, default: 5
+    option :session_checkout_timeout, default: 5
+    option :session_reap_frequency, default: 10
 
     # Has Mongoid been configured? This is checking that at least a valid
     # session config exists.
