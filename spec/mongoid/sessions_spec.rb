@@ -1006,7 +1006,7 @@ describe Mongoid::Sessions do
     end
 
     before do
-      Mongoid::Threaded.sessions.clear
+      Mongoid::Sessions.clear
       Mongoid.sessions = config
     end
 

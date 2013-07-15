@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "mongoid/sessions/factory"
 require "mongoid/sessions/validators"
+require 'mongoid/sessions/session_pool'
 
 module Mongoid
   module Sessions
@@ -85,16 +86,27 @@ module Mongoid
 
     class << self
 
-      # Clear all sessions from the current thread.
+      def synchronize(&block)
+        @lock||= Mutex.new
+        @lock.synchronize(&block)
+      end
+
+      # Gets the current pool of sessions for the given name
+      # If Pool does not yet exist it is created
       #
-      # @example Clear all sessions.
-      #   Mongoid::Sessions.clear
+      # @example Get sessions for the default pool
+      #   Mongoid::Sessions.session_pool
       #
-      # @return [ Array ] The empty sessions.
-      #
-      # @since 3.0.0
-      def clear
-        Threaded.sessions.clear
+      # @return [ Hash ] The default session pool
+      def session_pool(name=:default)
+        synchronize do
+          @session_pool ||= {}
+          @session_pool[name] ||= SessionPool.new(
+            size: Config.session_pool_size,
+            name: name,
+            checkout_timeout: Config.session_checkout_timeout,
+            reap_frequency: Config.session_reap_frequency )
+        end
       end
 
       # Get the default session.
@@ -106,7 +118,29 @@ module Mongoid
       #
       # @since 3.0.0
       def default
-        Threaded.sessions[:default] ||= Sessions::Factory.default
+        with_name(:default)
+      end
+
+      # Clear all sessions from the current thread.
+      #
+      # @example Clear all sessions.
+      #   Mongoid::Sessions.clear
+      #
+      # @return [ true ] True
+      #
+      # @since 3.0.0
+      def clear(thread=Thread.current)
+        disconnect(thread)
+        synchronize do
+          if thread
+            @session_pool.try(:each) do |name, pool|
+              pool.clear(thread)
+            end
+          else
+            @session_pool = nil
+          end
+        end
+        true
       end
 
       # Disconnect all active sessions.
@@ -117,10 +151,17 @@ module Mongoid
       # @return [ true ] True.
       #
       # @since 3.1.0
-      def disconnect
-        Threaded.sessions.values.each do |session|
-          session.disconnect
+      def disconnect(thread=Thread.current)
+        synchronize do
+          @session_pool.try(:each) do |name, pool|
+            if thread
+              pool.session_for(thread).try(:disconnect)
+            else
+              pool.sessions.try(:each) { |session| session.disconnect }
+            end
+          end
         end
+        true
       end
 
       # Get a session with the provided name.
@@ -134,7 +175,35 @@ module Mongoid
       #
       # @since 3.0.0
       def with_name(name)
-        Threaded.sessions[name.to_sym] ||= Sessions::Factory.create(name)
+        session_pool(name).session_for(Thread.current) ||
+          session_pool(name).checkout
+      end
+
+
+      # Use a session with the given name in a block and automatically
+      #   return to the session pool when block completes
+      #
+      # @example Run some code in a block
+      #   Mongoid::Sessions.with_session(:default) do
+      #     # some stuff with the db
+      #   end
+      #
+      # @return [ value ] Value from last line of the code block
+      def with_session(name=:default)
+        yield
+      ensure
+        reap_current_session(name)
+      end
+
+      # Returns the given session name back to the session pool
+      #
+      # @example Reap the session
+      #   Mongoid::Sessions.reap_current_session(:default)
+      #
+      # @return [ true ] True
+      def reap_current_session(name, thread = Thread.current)
+        session_pool(name).checkin_from_thread(thread)
+        true
       end
     end
 

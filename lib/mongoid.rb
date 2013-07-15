@@ -101,4 +101,8 @@ module Mongoid
   #
   # @since 1.0.0
   delegate(*(Config.public_instance_methods(false) - [ :logger=, :logger ] << { to: Config }))
+
+  def with_session(&block)
+    Sessions.with_session(&block)
+  end
 end
