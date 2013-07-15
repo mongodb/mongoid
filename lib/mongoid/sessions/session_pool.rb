@@ -220,6 +220,13 @@ module Mongoid
       private
 
       # Sets the session as reserved
+      #
+      # @api private
+      #
+      # @example Reserve a session
+      #   session_pool.reserve(session)
+      #
+      # @return [ Moped::Session ] The reserved session
       def reserve(session)
         @reserved_sessions[current_session_id] = session
       end
@@ -233,6 +240,13 @@ module Mongoid
       end
 
       # Release session from reservation
+      #
+      # @api private
+      #
+      # @example Release the session
+      #   session_pool.release(session)
+      #
+      # @return [ Moped::Session ] The released session
       def release(session)
         thread = if @reserved_sessions[current_session_id] == session
                    current_session_id
@@ -245,6 +259,13 @@ module Mongoid
       end
 
       # Asks for an available queue for a session
+      #
+      # @api private
+      #
+      # @example Request a session
+      #   session_pool.get_session
+      #
+      # @rturn [ Moped::Session ] The reserved session
       def get_session
         if session = @available.poll
           session
@@ -256,13 +277,27 @@ module Mongoid
       end
 
       # Creates a new session and checks it out from the available pool
+      #
+      # @api private
+      #
+      # @example checkout a  new session
+      #   session_pool.checkout_new_session
+      #
+      # @return [ Moped::Session ] The new session
       def checkout_new_session
         session = new_session
         @sessions << session
         session
       end
 
-      # Creates the new session
+      # Creates a new session
+      #
+      # @api private
+      #
+      # @example Create a new session
+      #   sesion_pool.new_session
+      #
+      # @return [ Moped::Session ] The created session
       def new_session
         Factory.create(@name)
       end
