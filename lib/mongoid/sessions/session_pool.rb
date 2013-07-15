@@ -123,7 +123,7 @@ module Mongoid
         @available = Queue.new self
       end
 
-      # Checkout session from the available pool and put in reserved_sessions
+      # Checks out session from the available pool and put in reserved_sessions
       #
       # @example Checkout a session
       #   sesion_pool.checkout
@@ -165,7 +165,7 @@ module Mongoid
       end
 
 
-      # Clear the sessions for the given thread
+      # Clears the sessions for the given thread
       #
       # @example Clear the sessions
       #   session_pool.clear
