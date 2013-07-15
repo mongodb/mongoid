@@ -25,6 +25,19 @@ describe Mongoid::Sessions::SessionPool do
       end
     end
 
+    context 'When all sessions are checked out' do
+      let(:session_pool) do
+        Mongoid::Sessions::SessionPool.new(
+          size: 0,
+          name: :default,
+          checkout_timeout: 0.001)
+      end
+
+      it 'Waits the checkout_timeout period and returns an error' do
+        expect { session_pool.checkout }.
+          to raise_error(Mongoid::Sessions::SessionPool::Queue::ConnectionTimeoutError)
+      end
+    end
 
   end
 
