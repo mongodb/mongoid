@@ -178,7 +178,7 @@ module Mongoid
         else
           @reserved_sessions = {}
           @sessions = []
-          @available = []
+          @available = Queue.new self
         end
       end
 
