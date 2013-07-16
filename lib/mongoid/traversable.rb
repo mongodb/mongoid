@@ -185,7 +185,7 @@ module Mongoid
           field(:_type, default: self.name, type: String)
         end
         subclass_default = subclass.name || ->{ self.class.name }
-        subclass.field(:_type, default: subclass_default, type: String)
+        subclass.field(:_type, default: subclass_default, type: String, overwrite: true)
       end
     end
   end

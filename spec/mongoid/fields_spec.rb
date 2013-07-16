@@ -752,6 +752,12 @@ describe Mongoid::Fields do
           Person.field(:title)
         }.to raise_error(Mongoid::Errors::InvalidField)
       end
+
+      it "doesn't raise an error" do
+        expect {
+          Class.new(Person)
+        }.to_not raise_error(Mongoid::Errors::InvalidField)
+      end
     end
 
     context "when the field is a time" do
