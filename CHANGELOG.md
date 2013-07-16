@@ -200,6 +200,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#3146 Adding :overwrite field option, when it`s true, it wont check duplicates.
+ (Daniel Libanori)
+
 * \#3002 Reloading the Rails console will also now clear Mongoid's identity map.
 
 * \#2938 A configuration option `duplicate_fields_exception` has been added that
