@@ -20,7 +20,7 @@ module Mongoid
             binding do
               inverse_keys = doc.you_must(metadata.inverse_foreign_key)
               if inverse_keys
-                inverse_keys.push(record_id(base))
+                inverse_keys.push(inverse_record_id(doc))
                 doc.reset_relation_criteria(metadata.inverse)
               end
               base.synced[metadata.foreign_key] = true
@@ -39,12 +39,26 @@ module Mongoid
               base.send(metadata.foreign_key).delete_one(record_id(doc))
               inverse_keys = doc.you_must(metadata.inverse_foreign_key)
               if inverse_keys
-                inverse_keys.delete_one(record_id(base))
+                inverse_keys.delete_one(inverse_record_id(doc))
                 doc.reset_relation_criteria(metadata.inverse)
               end
               base.synced[metadata.foreign_key] = true
               doc.synced[metadata.inverse_foreign_key] = true
             end
+          end
+
+          # Find the inverse id referenced by inverse_keys
+          def inverse_record_id(doc)
+            inverse_metadata = determine_inverse_metadata(doc)
+            if inverse_metadata
+              base.__send__(inverse_metadata.primary_key)
+            else
+              base.id
+            end
+          end
+
+          def determine_inverse_metadata(doc)
+            doc.relations[base.class.name.demodulize.underscore.pluralize]
           end
         end
       end

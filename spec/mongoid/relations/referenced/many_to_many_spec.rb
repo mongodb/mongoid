@@ -3496,4 +3496,58 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
   end
+
+  context "when using a different primary key" do
+
+    let(:dog) do
+      Dog.create(name: 'Doggie')
+    end
+
+    let(:cat) do
+      Cat.create(name: 'Kitty')
+    end
+
+    let(:fire_hydrant) do
+      FireHydrant.create(location: '221B Baker Street')
+    end
+
+    context "when adding to a one-way many to many" do
+      before do
+        fire_hydrant.cats.push(cat)
+      end
+
+      it "adds the pk value to the fk set" do
+        expect(fire_hydrant.cat_ids).to eq([cat.name])
+      end
+    end
+
+    context "when adding to a two-way many to many" do
+      before do
+        fire_hydrant.dogs.push(dog)
+      end
+
+      it "adds the pk value to the fk set" do
+        expect(fire_hydrant.dog_ids).to eq([dog.name])
+      end
+
+      it "adds the base pk value to the inverse fk set" do
+        expect(dog.fire_hydrant_ids).to eq([fire_hydrant.location])
+      end
+    end
+
+    context "when deleting from a two-way many to many" do
+      before do
+        dog.fire_hydrants.push(fire_hydrant)
+        fire_hydrant.dogs.delete(dog)
+      end
+
+      it "removes the pk value from the fk set" do
+        expect(fire_hydrant.dog_ids).to eq([])
+      end
+
+      it "removes the base pk value from the inverse fk set" do
+        expect(dog.fire_hydrant_ids).to eq([])
+      end
+    end
+  end
 end
