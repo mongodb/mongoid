@@ -186,7 +186,19 @@ module Mongoid
     #
     # @since 3.0.0
     def identity_map_enabled?
-      Thread.current["[mongoid]:identity-map-enabled"] != false
+      Thread.current["[mongoid]:identity-map-enabled"] == true
+    end
+
+    # Is the identity map disabled on the current thread?
+    #
+    # @example Is the identity map disabled?
+    #   Threaded.identity_map_disabled?
+    #
+    # @return [ true, false ] If the identity map is disabled.
+    #
+    # @since 4.0.0
+    def identity_map_disabled?
+      Thread.current["[mongoid]:identity-map-enabled"] == false
     end
 
     # Disable the identity map on either the current thread or all threads.
