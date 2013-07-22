@@ -102,7 +102,7 @@ describe "Rails::Mongoid" do
     end
   end
 
-  describe ".drop_undefined_indexes" do
+  describe ".remove_undefined_indexes" do
 
     let(:logger) do
       double
