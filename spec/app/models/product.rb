@@ -1,6 +1,6 @@
 class Product
   include Mongoid::Document
-  field :description, localize: true
+  field :description, localize: true, default: "no desc translation"
   field :name, localize: true, default: "no translation"
   field :price, type: Integer
   field :brand_name
@@ -10,6 +10,7 @@ class Product
 
   validates :name, presence: true
   validates :website, format: { with: URI.regexp, allow_blank: true }
+  validates :description, presence: { default_locale: true }
 
   embeds_one :seo, as: :seo_tags, cascade_callbacks: true, autobuild: true
 end
