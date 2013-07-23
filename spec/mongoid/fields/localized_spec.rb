@@ -157,6 +157,17 @@ describe Mongoid::Fields::Localized do
                   expect(value).to be_nil
                 end
               end
+
+              context "when the value is an empty string" do
+
+                let(:value) do
+                  field.demongoize({ "de" => "", "en" => "testing" })
+                end
+
+                it "returns the fallback translation" do
+                  expect(value).to eq("testing")
+                end
+              end
             end
 
             context "when no fallbacks are defined" do
