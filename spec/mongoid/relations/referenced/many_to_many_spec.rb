@@ -3512,6 +3512,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     context "when adding to a one-way many to many" do
+
       before do
         fire_hydrant.cats.push(cat)
       end
@@ -3522,6 +3523,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     context "when adding to a two-way many to many" do
+
       before do
         fire_hydrant.dogs.push(dog)
       end
@@ -3536,6 +3538,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
 
     context "when deleting from a two-way many to many" do
+
       before do
         dog.fire_hydrants.push(fire_hydrant)
         fire_hydrant.dogs.delete(dog)
