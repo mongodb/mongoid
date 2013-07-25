@@ -120,11 +120,7 @@ module Mongoid
         def delete(document)
           doc = super
           if doc && persistable?
-<<<<<<< HEAD
-            base.pull(foreign_key, doc.id)
-=======
             base.pull(foreign_key => doc.send(metadata.primary_key))
->>>>>>> 9cae8d5... ManyToMany handles primary_key option
             target._unloaded = criteria
             unsynced(base, foreign_key)
           end
