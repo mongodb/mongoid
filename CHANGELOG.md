@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3173 Fixed issues around many to many relations with custom primary keys.
+  (Bowen Sun)
+
 * \#3159 Upserting now properly flags documents as persisted.
 
 * \#3079 Embbed docs with paranoia parents, were losing the _id when
