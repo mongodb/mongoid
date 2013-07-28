@@ -85,6 +85,110 @@ describe Mongoid::Validatable::LengthValidator do
         end
       end
     end
+
+    context "when the field is aliased" do
+
+      context "when the aliased field name is validated" do
+
+        let(:validator) do
+          described_class.new(attributes: [:sku], in: 1..5)
+        end
+
+        context "when the value is valid" do
+
+          before do
+            validator.validate_each(product, :sku, "12345")
+          end
+
+          it "adds no errors" do
+            product.errors[:sku].should be_empty
+          end
+        end
+
+        context "when the value is invalid" do
+
+          before do
+            validator.validate_each(product, :sku, "123456")
+          end
+
+          it "adds errors" do
+            product.errors[:sku].should eq(["is too long (maximum is 5 characters)"])
+          end
+        end
+      end
+
+      context "when the underlying field name is validated" do
+
+        let(:validator) do
+          described_class.new(attributes: [:stock_keeping_unit], in: 1..5)
+        end
+
+        context "when the value is valid" do
+
+          before do
+            validator.validate_each(product, :stock_keeping_unit, "12345")
+          end
+
+          it "adds no errors" do
+            product.errors[:stock_keeping_unit].should be_empty
+          end
+        end
+
+        context "when the value is invalid" do
+
+          before do
+            validator.validate_each(product, :stock_keeping_unit, "123456")
+          end
+
+          it "adds errors" do
+            product.errors[:stock_keeping_unit].should eq(["is too long (maximum is 5 characters)"])
+          end
+        end
+      end
+
+      context "when the field is localized" do
+
+        let(:validator) do
+          described_class.new(attributes: [:tagline], in: 1..5)
+        end
+
+        context "when the localized value is valid" do
+
+          before do
+            validator.validate_each(product, :tagline, { "en" => "12345" })
+          end
+
+          it "adds no errors" do
+            product.errors[:tagline].should be_empty
+          end
+        end
+
+        context "when one of the localized values is invalid" do
+
+          before do
+            validator.validate_each(
+                product,
+                :tagline, { "en" => "12345", "fr" => "123456" }
+            )
+          end
+
+          it "adds errors" do
+            product.errors[:tagline].should eq(["is too long (maximum is 5 characters)"])
+          end
+        end
+
+        context "when the localized value is invalid" do
+
+          before do
+            validator.validate_each(product, :tagline, { "en" => "123456" })
+          end
+
+          it "adds errors" do
+            product.errors[:tagline].should eq(["is too long (maximum is 5 characters)"])
+          end
+        end
+      end
+    end
   end
 
   context "when validating an array" do
