@@ -6,6 +6,8 @@ class Product
   field :brand_name
   field :stores, type: Array
   field :website, localize: true
+  field :sku, as: :stock_keeping_unit
+  field :tl, as: :tagline, localize: true
   alias_attribute :cost, :price
 
   validates :name, presence: true
