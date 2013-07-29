@@ -323,7 +323,7 @@ module Mongoid
       #
       # @since 4.0.0
       def localized?(document, attribute)
-        document.fields[attribute.to_s].try(:localized?)
+        document.fields[document.database_field_name(attribute)].try(:localized?)
       end
     end
   end
