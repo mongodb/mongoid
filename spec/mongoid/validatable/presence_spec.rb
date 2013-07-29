@@ -124,6 +124,87 @@ describe Mongoid::Validatable::PresenceValidator do
         end
       end
     end
+
+    context "when the field is aliased" do
+
+      context "when the aliased field name is validated" do
+
+        context "when the value is valid" do
+
+          before do
+            validator.validate_each(product, :sku, "12345")
+          end
+
+          it "adds no errors" do
+            product.errors[:sku].should be_empty
+          end
+        end
+
+        context "when the value is invalid" do
+
+          before do
+            validator.validate_each(product, :sku, nil)
+          end
+
+          it "adds errors" do
+            product.errors[:sku].should eq(["can't be blank"])
+          end
+        end
+      end
+
+      context "when the underlying field name is validated" do
+
+        context "when the value is valid" do
+
+          before do
+            validator.validate_each(product, :stock_keeping_unit, "12345")
+          end
+
+          it "adds no errors" do
+            product.errors[:stock_keeping_unit].should be_empty
+          end
+        end
+
+        context "when the value is invalid" do
+
+          before do
+            validator.validate_each(product, :stock_keeping_unit, nil)
+          end
+
+          it "adds errors" do
+            product.errors[:stock_keeping_unit].should eq(["can't be blank"])
+          end
+        end
+      end
+
+      context "when the field is localized" do
+
+        context "when the localized value is valid" do
+
+          before do
+            validator.validate_each(product, :tagline, { "en" => "12345" })
+          end
+
+          it "adds no errors" do
+            product.errors[:tagline].should be_empty
+          end
+        end
+
+        context "when one of the localized values is invalid" do
+
+          before do
+            validator.validate_each(
+                product,
+                :tagline, { "en" => "12345", "fr" => nil }
+            )
+          end
+
+          it "adds errors" do
+            product.errors[:tagline].should eq(["can't be blank in fr"])
+          end
+        end
+      end
+    end
   end
 
   context "when validating a relation" do
