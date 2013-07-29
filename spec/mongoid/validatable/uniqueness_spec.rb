@@ -2060,11 +2060,11 @@ describe Mongoid::Validatable::UniquenessValidator do
         context "when the field name is aliased" do
 
           before do
-            word.definitions.build(part: "noun")
+            word.definitions.build(part: "noun", synonyms: "foo")
           end
 
           let(:definition) do
-            word.definitions.build(part: "noun")
+            word.definitions.build(part: "noun", synonyms: "foo")
           end
 
           after do
@@ -2102,6 +2102,43 @@ describe Mongoid::Validatable::UniquenessValidator do
               definition.valid?
               expect(definition.errors).to have_key(:p)
               expect(definition.errors[:p]).to eq([ "is already taken" ])
+            end
+          end
+
+          context "when the field is localized" do
+
+            context "when the validation uses the aliased name" do
+
+              before do
+                Definition.validates_uniqueness_of :synonyms, case_sensitive: false
+              end
+
+              it "correctly detects a uniqueness conflict" do
+                expect(definition).to_not be_valid
+              end
+
+              it "adds the uniqueness error to the aliased field name" do
+                definition.valid?
+                expect(definition.errors).to have_key(:synonyms)
+                expect(definition.errors[:synonyms]).to eq([ "is already taken" ])
+              end
+            end
+
+            context "when the validation uses the underlying field name" do
+
+              before do
+                Definition.validates_uniqueness_of :syn, case_sensitive: false
+              end
+
+              it "correctly detects a uniqueness conflict" do
+                expect(definition).to_not be_valid
+              end
+
+              it "adds the uniqueness error to the aliased field name" do
+                definition.valid?
+                expect(definition.errors).to have_key(:syn)
+                expect(definition.errors[:syn]).to eq([ "is already taken" ])
+              end
             end
           end
         end
