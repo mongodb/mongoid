@@ -198,7 +198,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         it "returns nil" do
-          expect(aggregates).to eq({ "count" => 0 })
+          expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => 0 })
         end
       end
     end
@@ -253,8 +253,8 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           context.avg(:likes)
         end
 
-        it "returns nil" do
-          expect(avg).to be_nil
+        it "returns 0" do
+          expect(avg).to eq(0)
         end
       end
     end

@@ -23,15 +23,11 @@ module Mongoid
         #
         # @since 3.0.0
         def aggregates(field)
-          if query.count > 0
-            result = collection.aggregate(pipeline(field)).to_a
-            if result.empty?
-              { "count" => query.count, "avg" => 0, "sum" => 0 }
-            else
-              result.first
-            end
+          result = collection.aggregate(pipeline(field)).to_a
+          if result.empty?
+            { "count" => query.count, "avg" => 0, "sum" => 0 }
           else
-            { "count" => 0 }
+            result.first
           end
         end
 
