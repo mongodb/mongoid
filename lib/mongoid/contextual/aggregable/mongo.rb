@@ -12,7 +12,7 @@ module Mongoid
         #
         # @param [ String, Symbol ] field The field name.
         #
-        # @return [ Hash ] The aggregate values in the form:
+        # @return [ Hash ] count is a number of documents with the provided field. If there're none, then count is 0 and max, min, sum, avg are nil.
         #   {
         #     "count" => 2.0,
         #     "max" => 1000.0,
@@ -25,7 +25,7 @@ module Mongoid
         def aggregates(field)
           result = collection.aggregate(pipeline(field)).to_a
           if result.empty?
-            { "count" => query.count, "avg" => 0, "sum" => 0 }
+            { "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil }
           else
             result.first
           end

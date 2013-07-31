@@ -34,7 +34,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
             expect(aggregates["avg"]).to eq(900)
           end
 
-          it "returns a count" do
+          it "returns a count of documents with that field" do
             expect(aggregates["count"]).to eq(2)
           end
 
@@ -61,7 +61,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
             expect(aggregates["avg"]).to eq(750)
           end
 
-          it "returns a count" do
+          it "returns a count of documents with that field" do
             expect(aggregates["count"]).to eq(2)
           end
 
@@ -92,7 +92,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
             expect(aggregates["avg"]).to eq(1000)
           end
 
-          it "returns a count" do
+          it "returns a count of documents with that field" do
             expect(aggregates["count"]).to eq(1)
           end
 
@@ -117,11 +117,11 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         it "returns an avg" do
-          expect(aggregates["avg"]).to eq(0)
+          expect(aggregates["avg"]).to be_nil
         end
 
-        it "returns a count" do
-          expect(aggregates["count"]).to eq(2)
+        it "returns a count of documents with that field" do
+          expect(aggregates["count"]).to eq(0)
         end
 
         it "returns a max" do
@@ -133,7 +133,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         it "returns a sum" do
-          expect(aggregates["sum"]).to eq(0)
+          expect(aggregates["sum"]).to be_nil
         end
       end
 
@@ -162,6 +162,10 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           it "returns a min" do
             expect(aggregates["min"]).to eq(50)
           end
+
+          it "returns a count of documents with that field" do
+            expect(aggregates["count"]).to eq(3)
+          end
         end
 
         context "and the field doesn't exist on the before-last document" do
@@ -184,6 +188,10 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           it "returns a min" do
             expect(aggregates["min"]).to eq(50)
           end
+
+          it "returns a count of documents with that field" do
+            expect(aggregates["count"]).to eq(4)
+          end
         end
       end
 
@@ -198,7 +206,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         it "returns nil" do
-          expect(aggregates).to eq({ "count" => 0, "sum" => 0, "avg" => 0 })
+          expect(aggregates).to eq({ "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil })
         end
       end
     end
@@ -253,8 +261,8 @@ describe Mongoid::Contextual::Aggregable::Mongo do
           context.avg(:likes)
         end
 
-        it "returns 0" do
-          expect(avg).to eq(0)
+        it "returns nil" do
+          expect(avg).to be_nil
         end
       end
     end
