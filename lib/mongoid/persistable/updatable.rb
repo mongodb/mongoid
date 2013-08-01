@@ -28,7 +28,9 @@ module Mongoid
             selector = atomic_selector
             coll.find(selector).update(positionally(selector, updates))
             conflicts.each_pair do |key, value|
-              coll.find(selector).update(positionally(selector, { key => value }))
+              value.each do |val|
+                coll.find(selector).update(positionally(selector, { key => val }))
+              end
             end
           end
         end

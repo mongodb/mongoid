@@ -51,7 +51,12 @@ module Mongoid
       # @since 3.0.0
       def pull(modifications)
         modifications.each_pair do |field, value|
-          pulls[field] = value
+          if pull_conflict?(field)
+            add_conflicting_operation(conflicting_pulls, field, value)
+          else
+            pulls[field] = value
+          end
+
           pull_fields[field.split(".", 2)[0]] = field
         end
       end
@@ -67,8 +72,12 @@ module Mongoid
       def push(modifications)
         modifications.each_pair do |field, value|
           push_fields[field] = field
-          mods = push_conflict?(field) ? conflicting_pushes : pushes
-          add_operation(mods, field, Array.wrap(value))
+
+          if push_conflict?(field)
+            add_conflicting_operation(conflicting_pushes, field, Array.wrap(value))
+          else
+            add_operation(pushes, field, Array.wrap(value))
+          end
         end
       end
 
@@ -83,8 +92,13 @@ module Mongoid
       def set(modifications)
         modifications.each_pair do |field, value|
           next if field == "_id"
-          mods = set_conflict?(field) ? conflicting_sets : sets
-          add_operation(mods, field, value)
+
+          if set_conflict?(field)
+            add_conflicting_operation(conflicting_sets, field, value)
+          else
+            add_operation(sets, field, value)
+          end
+
           set_fields[field.split(".", 2)[0]] = field
         end
       end
@@ -104,6 +118,26 @@ module Mongoid
       end
 
       private
+
+      # Add the operation to the conflicting modifications.
+      #
+      # @example Add the operation.
+      #   modifications.add_conflicting_operation(mods, field, value)
+      #
+      # @param [ Array ] mods The conflicting modifications.
+      # @param [ String ] field The field.
+      # @param [ Hash ] value The atomic op.
+      #
+      # @since 3.1.4
+      def add_conflicting_operation(mods, field, value)
+        if mod = mods.find { |mod| mod.has_key?(field) }
+          value.each do |val|
+            mod[field].push(val)
+          end
+        else
+          mods.push({ field => value })
+        end
+      end
 
       # Add the operation to the modifications, either appending or creating a
       # new one.
@@ -136,6 +170,21 @@ module Mongoid
       # @since 2.4.0
       def add_to_sets
         self["$addToSet"] ||= {}
+      end
+
+      # Is the operation going to be a conflict for a $pull?
+      #
+      # @example Is this a conflict for a pull?
+      #   modifiers.pull_conflict?(field)
+      #
+      # @param [ String ] field The field.
+      #
+      # @return [ true, false ] If this field is a conflict.
+      #
+      # @since 2.2.0
+      def pull_conflict?(field)
+        name = field.split(".", 2)[0]
+        pull_fields.has_key?(name) && pull_fields[name] != field
       end
 
       # Is the operation going to be a conflict for a $set?
@@ -178,7 +227,7 @@ module Mongoid
       #
       # @since 2.2.0
       def conflicting_pulls
-        conflicts["$pullAll"] ||= {}
+        conflicts["$pull"] ||= []
       end
 
       # Get the conflicting push modifications.
@@ -190,7 +239,7 @@ module Mongoid
       #
       # @since 2.2.0
       def conflicting_pushes
-        conflicts["$pushAll"] ||= {}
+        conflicts["$pushAll"] ||= []
       end
 
       # Get the conflicting set modifications.
@@ -202,7 +251,7 @@ module Mongoid
       #
       # @since 2.2.0
       def conflicting_sets
-        conflicts["$set"] ||= {}
+        conflicts["$set"] ||= []
       end
 
       # Get the push operations that would have conflicted with the sets.
