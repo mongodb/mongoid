@@ -262,9 +262,9 @@ describe Mongoid::Persistence::Operations do
       it "sets the conflicts" do
         conflicts.should eq(
           {
-            "$pushAll" => {
+            "$pushAll" => [{
             "addresses" => [ { "street" => "Freiderichstr", "_id" => "freiderichstr" } ]
-            }
+            }]
           }
         )
       end
