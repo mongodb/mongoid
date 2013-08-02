@@ -108,6 +108,38 @@ describe Mongoid::Contextual::Aggregable::Mongo do
             expect(aggregates["sum"]).to eq(1000)
           end
         end
+
+        context "when only 1 document is emitted because of sorting, skip and limit" do
+
+          let(:criteria) do
+            Band.desc(:name).skip(1).limit(1)
+          end
+
+          let(:aggregates) do
+            context.aggregates(:likes)
+          end
+
+          it "returns an avg" do
+            expect(aggregates["avg"]).to eq(1000)
+          end
+
+          it "returns a count of documents with that field" do
+            expect(aggregates["count"]).to eq(1)
+          end
+
+          it "returns a max" do
+            expect(aggregates["max"]).to eq(1000)
+          end
+
+          it "returns a min" do
+            expect(aggregates["min"]).to eq(1000)
+          end
+
+          it "returns a sum" do
+            expect(aggregates["sum"]).to eq(1000)
+          end
+        end
+
       end
 
       context "when the field does not exist" do
