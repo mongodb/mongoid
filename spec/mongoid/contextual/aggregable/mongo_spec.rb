@@ -442,8 +442,8 @@ describe Mongoid::Contextual::Aggregable::Mongo do
             context.sum(:likes)
           end
 
-          it "returns zero" do
-            expect(sum).to eq(0)
+          it "returns nil" do
+            expect(sum).to be_nil
           end
         end
       end
