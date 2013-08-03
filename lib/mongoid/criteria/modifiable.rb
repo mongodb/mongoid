@@ -146,7 +146,7 @@ module Mongoid
       def create_document(method, attrs = nil, &block)
         klass.__send__(method,
           selector.reduce(attrs || {}) do |hash, (key, value)|
-            unless key.to_s =~ /\$/ || value.is_a?(Hash)
+            unless key.to_s =~ /\$/ || value.is_a?(Hash) || value.is_a?(Regexp)
               hash[key] = value
             end
             hash
