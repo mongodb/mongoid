@@ -63,7 +63,7 @@ module Rails
     # models.
     #
     # @example Remove undefined indexes.
-    #   Rails::Mongoid.drop_undefined_indexes
+    #   Rails::Mongoid.remove_undefined_indexes
     #
     # @return [ Hash{Class => Array(Hash)}] The list of indexes that were removed by model.
     #
