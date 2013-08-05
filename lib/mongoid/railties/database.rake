@@ -78,11 +78,6 @@ namespace :db do
       ::Rails::Mongoid.remove_undefined_indexes
     end
 
-    desc "DEPRECATED alias for remove_undefined_indexes"
-    task :drop_undefined_indexes => :remove_undefined_indexes do
-      puts "This task is DEPRECATED. Use remove_undefined_indexes in the future."
-    end
-
     desc "Remove the indexes defined on your mongoid models without questions!"
     task :remove_indexes => :environment do
       ::Rails.application.eager_load!
