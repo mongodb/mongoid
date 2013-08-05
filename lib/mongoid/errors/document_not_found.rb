@@ -22,8 +22,9 @@ module Mongoid
       # @param [ Array ] unmatched The unmatched ids, if appropriate
       def initialize(klass, params, unmatched = nil)
         if !unmatched && !params.is_a?(Hash)
-          raise ArgumentError, 'please also supply the unmatched ids'
+          unmatched = Array(params)
         end
+
         @klass, @params = klass, params
         super(
           compose_message(
