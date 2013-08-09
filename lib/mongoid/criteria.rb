@@ -94,6 +94,21 @@ module Mongoid
     def documents
       @documents ||= []
     end
+    
+    # These methods are needed for has_many relationships
+    # They are included for embeds_many relationships but not has_many relationships
+    
+    def as_document
+        attributes = []
+        _unscoped.each do |doc|
+            attributes.push(doc.as_document)
+        end
+        attributes
+    end
+    
+    def _unscoped
+        @_unscoped ||= []
+    end
 
     # Set the embedded documents on the criteria.
     #
