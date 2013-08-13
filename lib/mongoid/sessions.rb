@@ -79,15 +79,15 @@ module Mongoid
     #
     # @since 3.0.0
     def collection
-      self.class.collection(persistence_options)
+      mongo_session[collection_name]
     end
 
     def mongo_session
-      self.class.mongo_session
+      persistence_options ? self.class.mongo_session.with(persistence_options) : self.class.mongo_session
     end
 
     def collection_name
-      self.class.collection_name
+      persistence_options.try { |opts| opts[:collection] } || self.class.collection_name
     end
 
     module ClassMethods
@@ -102,12 +102,8 @@ module Mongoid
       # @return [ Moped::Collection ] The collection.
       #
       # @since 3.0.0
-      def collection(opts = nil)
-        if opts ||= self.persistence_options
-          mongo_session.with(opts)[opts[:collection] || collection_name]
-        else
-          mongo_session[collection_name]
-        end
+      def collection
+        mongo_session[collection_name]
       end
 
       # Get the name of the collection this model persists to. This will be
@@ -147,7 +143,7 @@ module Mongoid
       #
       # @since 3.0.0
       def database_override
-        persistence_options.try { |opts| opts[:database] } || Threaded.database_override
+        self.persistence_options.try { |opts| opts[:database] } || Threaded.database_override
       end
 
       # Get the session for this model. This is determined in the following order:
@@ -178,7 +174,7 @@ module Mongoid
       #
       # @since 3.0.0
       def session_override
-        persistence_options.try { |opts| opts[:session] } || Threaded.session_override
+        self.persistence_options.try { |opts| opts[:session] } || Threaded.session_override
       end
 
       # Give this model specific custom default storage options.
@@ -233,6 +229,10 @@ module Mongoid
       #
       # @since 3.0.0
       def __collection_name__
+        if coll = self.persistence_options.try(:[], :collection)
+          return coll
+        end
+
         if storage_options && name = storage_options[:collection]
           __evaluate__(name)
         else

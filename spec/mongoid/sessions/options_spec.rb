@@ -2,10 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Sessions::Options do
 
-#  class Foo
-#    include Mongoid::Sessions::Options
-#  end
-
   describe "#with" do
 
     context "when passing some options" do
@@ -50,7 +46,7 @@ describe Mongoid::Sessions::Options do
     end
 
     it "passes down the options to collection" do
-      Band.should_receive(:collection).with(options)
+      Moped::Session.any_instance.should_receive(:with).with(options).and_return({})
       instance.collection
     end
   end

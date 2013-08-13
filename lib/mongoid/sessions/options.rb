@@ -63,7 +63,7 @@ module Mongoid
         #
         # @since 3.0.0
         def with(options)
-          Proxy.new(self, options)
+          Proxy.new(self, (persistence_options || {}).merge(options))
         end
 
         def persistence_options
