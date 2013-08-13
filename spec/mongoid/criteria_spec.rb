@@ -3681,16 +3681,12 @@ describe Mongoid::Criteria do
       Band.where(name: "Depeche Mode").with(collection: "artists")
     end
 
-    after do
-      Band.persistence_options.clear
-    end
-
     it "retains the criteria selection" do
       expect(criteria.selector).to eq("name" => "Depeche Mode")
     end
 
     it "sets the persistence options" do
-      expect(Band.persistence_options).to eq(collection: "artists")
+      expect(criteria.persistence_options).to eq(collection: "artists")
     end
   end
 
