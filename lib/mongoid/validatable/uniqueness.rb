@@ -173,6 +173,7 @@ module Mongoid
           name = document.database_field_name(item)
           criteria = criteria.where(item => document.attributes[name])
         end
+        criteria = criteria.with(document.persistence_options)
         criteria
       end
 
@@ -305,7 +306,7 @@ module Mongoid
       #
       # @since 3.0.23
       def persistence_options(criteria)
-        (criteria.klass.persistence_options || {}).merge!(consistency: :strong)
+        (criteria.persistence_options || {}).merge!(consistency: :strong)
       end
 
       # Is the attribute localized?

@@ -2,39 +2,6 @@ require "spec_helper"
 
 describe Mongoid::Sessions do
 
-  before :each do
-    purge_database_alt!
-  end
-
-  describe ".clear_persistence_options" do
-
-    context "when options exist on the current thread" do
-
-      before do
-        Band.with(safe: true)
-      end
-
-      let!(:cleared) do
-        Band.clear_persistence_options
-      end
-
-      it "remove the options from the current thread" do
-        expect(Band.persistence_options).to be_nil
-      end
-
-      it "returns true" do
-        expect(cleared).to be_true
-      end
-    end
-
-    context "when options do not exist on the current thread" do
-
-      it "returns true" do
-        expect(Band.clear_persistence_options).to be_true
-      end
-    end
-  end
-
   describe "#collection" do
 
     context "when overriding the default with store_in" do
@@ -510,16 +477,12 @@ describe Mongoid::Sessions do
 
     context "when options exist on the current thread" do
 
-      before do
+      let(:klass) do
         Band.with(safe: { w: 2 })
       end
 
-      after do
-        Band.clear_persistence_options
-      end
-
       it "returns the options" do
-        expect(Band.persistence_options).to eq(safe: { w: 2 })
+        expect(klass.persistence_options).to eq(safe: { w: 2 })
       end
     end
 

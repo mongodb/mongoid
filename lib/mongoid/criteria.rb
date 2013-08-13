@@ -4,6 +4,7 @@ require "mongoid/criteria/inspectable"
 require "mongoid/criteria/marshalable"
 require "mongoid/criteria/modifiable"
 require "mongoid/criteria/scopable"
+require "mongoid/sessions/options"
 
 module Mongoid
 
@@ -22,6 +23,7 @@ module Mongoid
     include Marshalable
     include Modifiable
     include Scopable
+    include Sessions::Options
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
@@ -396,25 +398,6 @@ module Mongoid
       super
     end
 
-    # Tell the next persistance operation to query from a specific collection,
-    # database or session.
-    #
-    # @example Send the criteria to another collection.
-    #   Band.where(name: "Depeche Mode").with(collection: "artists")
-    #
-    # @param [ Hash ] options The storage options.
-    #
-    # @option options [ String, Symbol ] :collection The collection name.
-    # @option options [ String, Symbol ] :database The database name.
-    # @option options [ String, Symbol ] :session The session name.
-    #
-    # @return [ Criteria ] The criteria.
-    #
-    # @since 3.0.0
-    def with(options)
-      Threaded.set_persistence_options(klass, options)
-      self
-    end
 
     # Get a version of this criteria without the options.
     #
