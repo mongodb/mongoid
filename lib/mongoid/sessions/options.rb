@@ -36,7 +36,43 @@ module Mongoid
         @persistence_options
       end
 
+      module Threaded
+
+        # Get the persistence options for the current thread.
+        #
+        # @example Get the persistence options.
+        #   Threaded.persistence_options(Band)
+        #
+        # @param [ Class ] klass The model class.
+        #
+        # @return [ Hash ] The current persistence options.
+        #
+        # @since 4.0.0
+        def persistence_options(klass = self)
+          Thread.current["[mongoid][#{klass}]:persistence-options"]
+        end
+
+        private
+        # Set the persistence options on the current thread.
+        #
+        # @api private
+        #
+        # @example Set the persistence options.
+        #   Threaded.set_persistence_options(Band, { safe: { fsync: true }})
+        #
+        # @param [ Class ] klass The model class.
+        # @param [ Hash ] options The persistence options.
+        #
+        # @return [ Hash ] The persistence options.
+        #
+        # @since 4.0.0
+        def set_persistence_options(klass, options)
+          Thread.current["[mongoid][#{klass}]:persistence-options"] = options
+        end
+      end
+
       module ClassMethods
+        include Threaded
 
         # Tell the next persistance operation to store in a specific collection,
         # database or session.
@@ -65,13 +101,11 @@ module Mongoid
         def with(options)
           Proxy.new(self, (persistence_options || {}).merge(options))
         end
-
-        def persistence_options
-          Threaded.persistence_options(self)
-        end
       end
 
       class Proxy < BasicObject
+        include Threaded
+
         undef_method :==
 
         def initialize(target, options)
@@ -88,11 +122,11 @@ module Mongoid
         end
 
         def method_missing(name, *args, &block)
-          Threaded.set_persistence_options(@target, @options)
+          set_persistence_options(@target, @options)
           @target.send(name, *args, &block)
         ensure
-          Threaded.clear_persistence_options(@target)
-        end
+          set_persistence_options(@target, nil)
+         end
 
         def send(symbol, *args)
           __send__(symbol, *args)

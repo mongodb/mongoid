@@ -8,7 +8,7 @@ describe Mongoid::Sessions::Options do
 
       let(:options) { { database: 'test' } }
 
-      let(:klass) do
+      let!(:klass) do
         Band.with(options)
       end
 
@@ -18,6 +18,10 @@ describe Mongoid::Sessions::Options do
 
       it "sets the options into the instance" do
         expect(klass.new.persistence_options).to eq(options)
+      end
+
+      it "doesnt set the options on class level" do
+        expect(Band.new.persistence_options).to be_nil
       end
 
       context "when calling .collection method" do
@@ -48,6 +52,20 @@ describe Mongoid::Sessions::Options do
     it "passes down the options to collection" do
       Moped::Session.any_instance.should_receive(:with).with(options).and_return({})
       instance.collection
+    end
+  end
+
+  describe "#persistence_options" do
+
+    it "touches the thread local" do
+      expect(Thread.current).to receive(:[]).with("[mongoid][Band]:persistence-options").and_return({foo: :bar})
+      expect(Band.persistence_options).to eq({foo: :bar})
+    end
+
+    it "cannot force a value on thread local" do
+      expect {
+        Band.set_persistence_options(Band, {})
+      }.to raise_error(NoMethodError)
     end
   end
 end

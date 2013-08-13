@@ -126,21 +126,6 @@ module Mongoid
       validations_for(document.class).push(document.id)
     end
 
-    # Clear out all the persistence options.
-    #
-    # @example Clear out the persistence options.
-    #   Threaded.clear_persistence_options(Band)
-    #
-    # @param [ Class ] klass The model class.
-    #
-    # @return [ true ] true.
-    #
-    # @since 2.0.0
-    def clear_persistence_options(klass)
-      Thread.current["[mongoid][#{klass}]:persistence-options"] = nil
-      true
-    end
-
     # Exit autosaving a document on the current thread.
     #
     # @example Exit autosave.
@@ -229,35 +214,6 @@ module Mongoid
       else
         Thread.current["[mongoid]:identity-map-enabled"] = true
       end
-    end
-
-    # Get the persistence options for the current thread.
-    #
-    # @example Get the persistence options.
-    #   Threaded.persistence_options(Band)
-    #
-    # @param [ Class ] klass The model class.
-    #
-    # @return [ Hash ] The current persistence options.
-    #
-    # @since 2.1.0
-    def persistence_options(klass)
-      Thread.current["[mongoid][#{klass}]:persistence-options"]
-    end
-
-    # Set the persistence options on the current thread.
-    #
-    # @example Set the persistence options.
-    #   Threaded.set_persistence_options(Band, { safe: { fsync: true }})
-    #
-    # @param [ Class ] klass The model class.
-    # @param [ Hash ] options The persistence options.
-    #
-    # @return [ Hash ] The persistence options.
-    #
-    # @since 2.1.0
-    def set_persistence_options(klass, options)
-      Thread.current["[mongoid][#{klass}]:persistence-options"] = options
     end
 
     # Get the field selection options from the current thread.

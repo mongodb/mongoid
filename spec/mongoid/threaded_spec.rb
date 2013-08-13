@@ -106,25 +106,6 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#clear_persistence_options" do
-
-    before do
-      described_class.set_persistence_options(Band, { safe: { w: 3 }})
-    end
-
-    let!(:cleared) do
-      described_class.clear_persistence_options(Band)
-    end
-
-    it "removes all persistence options" do
-      expect(described_class.persistence_options(Band)).to be_nil
-    end
-
-    it "returns true" do
-      expect(cleared).to be_true
-    end
-  end
-
   describe "#identity_map" do
 
     before do
@@ -137,25 +118,6 @@ describe Mongoid::Threaded do
 
     it "returns the object with the identity map key" do
       expect(described_class.identity_map).to eq(object)
-    end
-  end
-
-  describe "#persistence_options" do
-
-    before do
-      described_class.set_persistence_options(Band, { safe: { w: 3 }})
-    end
-
-    after do
-      described_class.set_persistence_options(Band, nil)
-    end
-
-    let(:options) do
-      described_class.persistence_options(Band)
-    end
-
-    it "sets the persistence options" do
-      expect(options).to eq({ safe: { w: 3 }})
     end
   end
 
