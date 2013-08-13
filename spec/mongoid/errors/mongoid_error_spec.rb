@@ -9,7 +9,7 @@ describe Mongoid::Errors::MongoidError do
   before do
     ["message", "summary", "resolution"].each do |name|
       ::I18n.should_receive(:translate).
-        with("mongoid.errors.messages.#{key}.#{name}", { locale: :en }).
+        with("mongoid.errors.messages.#{key}.#{name}", {}).
       and_return(name)
     end
 
