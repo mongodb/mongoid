@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* \#3043/\#2949 Rework on the internals of persistence options. (Arthur Neves)
+
 * Mongoid now requires Active Model 4 or higher.
 
 * `Document#set` now accepts multiple attributes in the form of a hash,
