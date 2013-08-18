@@ -60,7 +60,7 @@ module Mongoid
             if Mongoid.duplicate_fields_exception
               raise Errors::InvalidField.new(klass, name)
             else
-              Mongoid.logger.warn("Overwriting existing field #{name}.") if Mongoid.logger
+              Mongoid.logger.warn("Overwriting existing field #{name} in class #{klass.name}.") if Mongoid.logger
             end
           end
         end
