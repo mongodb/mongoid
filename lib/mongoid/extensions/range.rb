@@ -53,7 +53,7 @@ module Mongoid
         #
         # @since 3.0.0
         def demongoize(object)
-          object.nil? ? nil : ::Range.new(object["min"], object["max"])
+          object.nil? ? nil : ::Range.new(object["min"], object["max"], object["exclude_end"])
         end
 
         # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -68,11 +68,13 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
-          if object.is_a?(::Hash)
-            object
-          else
-            object.nil? ? nil : { "min" => object.first, "max" => object.last }
+          return nil if object.nil?
+          return object if object.is_a?(::Hash)
+          hash = { "min" => object.first, "max" => object.last }
+          if object.respond_to?(:exclude_end?) && object.exclude_end?
+            hash.merge!("exclude_end" => true)
           end
+          hash
         end
       end
     end
