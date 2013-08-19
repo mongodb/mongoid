@@ -202,6 +202,9 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#3155 Range field will persist the exclude_end when provided.
+  (Daniel Libanori)
+
 * \#3146 Adding :overwrite field option, when it`s true, it wont check duplicates.
  (Daniel Libanori)
 
@@ -228,6 +231,9 @@ For instructions on upgrading to newer versions, visit
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)
 
 ### Resolved Issues
+
+* \#3088 Range field can accept a hash, which could be the attribute from the db.
+  (Daniel Libanori)
 
 * \#3116 Relations instance variables are now all prefixed with `_`.
 
