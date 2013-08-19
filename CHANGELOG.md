@@ -202,6 +202,18 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#3172 Enable identity map locally inside a `unit_of_work` without globally
+  setting `Mongoid.identity_map_enabled = true`. (Daniel Doubrovkine)
+  Example:
+
+      Mpngoid.identity_map_enabled = false
+
+      Mongoid.unit_of_work(enable: :current) do
+        # will use identity map to eager-load comments for each account
+        # with a single $in query
+        Account.all.includes(:comment)
+      end
+
 * \#3146 Adding :overwrite field option, when it`s true, it wont check duplicates.
  (Daniel Libanori)
 

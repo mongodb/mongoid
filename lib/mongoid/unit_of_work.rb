@@ -34,12 +34,17 @@ module Mongoid
     # @since 2.1.0
     def unit_of_work(options = {})
       disable = options[:disable]
+      enable = options[:enable]
       begin
         Threaded.disable_identity_map(disable) if disable
+        Threaded.enable_identity_map(enable) if enable
         yield if block_given?
       ensure
         if disable
           Threaded.enable_identity_map(disable)
+        elsif enable
+          Threaded.disable_identity_map(enable)
+          IdentityMap.clear
         else
           IdentityMap.clear
         end
@@ -55,7 +60,7 @@ module Mongoid
     #
     # @since 3.0.0
     def using_identity_map?
-      Mongoid.identity_map_enabled? && Threaded.identity_map_enabled?
+      (Mongoid.identity_map_enabled? && ! Threaded.identity_map_disabled?) || Threaded.identity_map_enabled?
     end
   end
 end

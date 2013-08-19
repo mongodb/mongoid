@@ -62,7 +62,7 @@ describe Mongoid::UnitOfWork do
     end
   end
 
-  context "when options are provided" do
+  context "with identity map enabled" do
 
     before do
       Mongoid.identity_map_enabled = true
@@ -72,16 +72,85 @@ describe Mongoid::UnitOfWork do
       Mongoid.identity_map_enabled = false
     end
 
-    context "when provided disable: :current" do
+    context "when options are provided" do
 
-      it "disables the identity map on the current thread" do
-        Mongoid.unit_of_work(disable: :current) do
-          expect(Mongoid).to_not be_using_identity_map
+      context "when provided disable: :current" do
+
+        it "disables the identity map on the current thread" do
+          Mongoid.unit_of_work(disable: :current) do
+            expect(Mongoid).to_not be_using_identity_map
+          end
+        end
+      end
+
+      context "when provided disable: :all" do
+
+        let(:other) do
+          Thread.new { "running new thread".inspect }
+        end
+
+        before do
+          other.run
+          Thread.current
+        end
+
+        after do
+          Thread.kill(other)
+        end
+
+        it "disables the identity map on all threads" do
+          Mongoid.unit_of_work(disable: :all) do
+            Thread.list.each do |thread|
+              expect(thread[:"[mongoid]:identity-map-enabled"]).to be_false
+            end
+          end
+        end
+      end
+
+      context "when nested inside another unit of work" do
+
+        let(:person) do
+          Person.new
+        end
+
+        context "when documents exist in the identity map" do
+
+          before do
+            Mongoid::IdentityMap.set(person)
+          end
+
+          it "does not clear the map in the inner block" do
+            Mongoid.unit_of_work do
+              Mongoid.unit_of_work(disable: :current) do
+                expect(Mongoid::IdentityMap[:people][person.id]).to eq(person)
+              end
+            end
+          end
+
+          it "clears the map after the block" do
+            Mongoid.unit_of_work do
+              Mongoid.unit_of_work(disable: :current) do
+              end
+            end
+            expect(Mongoid::IdentityMap.get(Person, person.id)).to be_nil
+          end
+        end
+      end
+    end
+  end
+
+  context "when options are provided" do
+
+    context "when provided enable: :current" do
+
+      it "enables the identity map on the current thread for the duration of the query" do
+        Mongoid.unit_of_work(enable: :current) do
+          expect(Mongoid).to be_using_identity_map
         end
       end
     end
 
-    context "when provided disable: :all" do
+    context "when provided enable: :all" do
 
       let(:other) do
         Thread.new { "running new thread".inspect }
@@ -96,44 +165,15 @@ describe Mongoid::UnitOfWork do
         Thread.kill(other)
       end
 
-      it "disables the identity map on all threads" do
-        Mongoid.unit_of_work(disable: :all) do
+      it "enables the identity map on all threads for the duration of the query" do
+        Mongoid.unit_of_work(enable: :all) do
           Thread.list.each do |thread|
-            expect(thread[:"[mongoid]:identity-map-enabled"]).to be_false
+            expect(thread[:"[mongoid]:identity-map-enabled"]).to be_true
           end
         end
       end
     end
 
-    context "when nested inside another unit of work" do
-
-      let(:person) do
-        Person.new
-      end
-
-      context "when documents exist in the identity map" do
-
-        before do
-          Mongoid::IdentityMap.set(person)
-        end
-
-        it "does not clear the map in the inner block" do
-          Mongoid.unit_of_work do
-            Mongoid.unit_of_work(disable: :current) do
-              expect(Mongoid::IdentityMap[:people][person.id]).to eq(person)
-            end
-          end
-        end
-
-        it "clears the map after the block" do
-          Mongoid.unit_of_work do
-            Mongoid.unit_of_work(disable: :current) do
-            end
-          end
-          expect(Mongoid::IdentityMap.get(Person, person.id)).to be_nil
-        end
-      end
-    end
   end
 
   describe ".using_identity_map?" do
