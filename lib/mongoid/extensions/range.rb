@@ -68,7 +68,11 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
-          object.nil? ? nil : { "min" => object.first, "max" => object.last }
+          if object.is_a?(::Hash)
+            object
+          else
+            object.nil? ? nil : { "min" => object.first, "max" => object.last }
+          end
         end
       end
     end

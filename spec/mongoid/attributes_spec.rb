@@ -1120,6 +1120,33 @@ describe Mongoid::Attributes do
         end
       end
 
+      context "copying from instance" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:instance) do
+          Person.new(attributes)
+        end
+
+        let(:attributes) do
+          { age: 50, range: 1..100 }
+        end
+
+        before do
+          person.send(method, instance.attributes)
+        end
+
+        it "properly copies values" do
+          expect(person.age).to eq(50)
+        end
+
+        it "properly copies ranges" do
+          expect(person.range).to eq(1..100)
+        end
+      end
+
       context "on a parent document" do
 
         context "when the parent has a has many through a has one" do
