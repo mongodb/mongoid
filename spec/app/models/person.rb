@@ -35,6 +35,7 @@ class Person
   field :test_array, type: Array
   field :overridden_setter, type: String
   field :arrays, type: Array
+  field :range, type: Range
 
   index age: 1
   index addresses: 1
