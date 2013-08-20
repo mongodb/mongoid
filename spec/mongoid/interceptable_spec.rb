@@ -1460,8 +1460,8 @@ describe Mongoid::Interceptable do
     end
 
     it "does not duplicate the child documents" do
-      parent.child_docs.create(position: 1)
-      expect(ParentDoc.find(parent.id).child_docs.size).to eq(1)
+      parent.children.create(position: 1)
+      expect(ParentDoc.find(parent.id).children.size).to eq(1)
     end
   end
 
