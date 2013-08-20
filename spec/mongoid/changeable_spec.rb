@@ -1504,4 +1504,23 @@ describe Mongoid::Changeable do
       expect(person.setters).to_not eq({ "addresses" => nil })
     end
   end
+
+  context 'with a "children" relation' do
+
+    let(:parent) do
+      TreeStructure.new
+    end
+
+    it "defaults the children association to an empty array" do
+      expect(parent.children).to be == []
+    end
+
+    describe '#move_changes' do
+      it "does not overwrite the children association" do
+        expect {
+          parent.move_changes
+        }.not_to change(parent, :children)
+      end
+    end
+  end
 end
