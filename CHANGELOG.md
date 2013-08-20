@@ -232,6 +232,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3144/\#3219 Fixing name colission on @_children ivar. (Arthur Neves)
+
 * \#3088 Range field can accept a hash, which could be the attribute from the db.
   (Daniel Libanori)
 
