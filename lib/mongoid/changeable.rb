@@ -84,7 +84,7 @@ module Mongoid
     #
     # @since 2.1.0
     def move_changes
-      @_children = nil
+      @__children = nil
       @previous_changes = changes
       Atomic::UPDATES.each do |update|
         send(update).clear
