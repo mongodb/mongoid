@@ -17,9 +17,16 @@ module Mongoid #:nodoc:
         # yes, construction is weird but the driver wants
         # "A list of host-port pairs ending with a hash containing any options"
         # mongo likes symbols
+
+        # except it actually doesn't in mongo driver 1.9.1, so let's rescue the error and 
+        # give it what it wants. most likely caused by legacy.rb in the driver.
         options = reject{ |key, value| Config.blacklisted_options.include?(key.to_s) }
         options["logger"] = Mongoid::Logger.new
-        connection = Mongo::ReplSetConnection.new(*(hosts.clone << options.symbolize_keys))
+        begin
+          connection = Mongo::ReplSetConnection.new(*(hosts.clone << options.symbolize_keys))
+        rescue Mongo::MongoArgumentError
+          connection = Mongo::ReplSetConnection.new(hosts.clone, options.symbolize_keys)
+        end
 
         if authenticating?
           connection.add_auth(database, username, password)
