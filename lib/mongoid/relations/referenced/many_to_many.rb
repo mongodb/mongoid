@@ -45,18 +45,19 @@ module Mongoid
         #   person.posts.concat([ post_one, post_two ])
         #
         # @param [ Array<Document> ] documents The docs to add.
+        # @param [ Hash ] options Options to pass to the save.
         #
         # @return [ Array<Document> ] The documents.
         #
         # @since 2.4.0
-        def concat(documents)
+        def concat(documents, options = {})
           ids, docs, inserts = {}, [], []
           documents.each do |doc|
             next unless doc
             append(doc)
             if persistable? || _creating?
               ids[doc.id] = true
-              save_or_delay(doc, docs, inserts)
+              save_or_delay(doc, docs, inserts, options)
             else
               existing = base.send(foreign_key)
               unless existing.include?(doc.id)
