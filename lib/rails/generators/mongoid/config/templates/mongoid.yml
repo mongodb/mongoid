@@ -57,7 +57,7 @@ development:
     # admin access. (default: false)
     # skip_version_check: false
 
-    # User Active Support's time zone in conversions. (default: true)
+    # Use Active Support's time zone in conversions. (default: true)
     # use_activesupport_time_zone: true
 
     # Ensure all times are UTC in the app side. (default: false)
