@@ -255,6 +255,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3231 Allow evolution of proxy documents to work in criteria.
 
+* \#3203 Fixed `index: true` specification for polymorphic relations.
+
 * \#3173 Fixed issues around many to many relations with custom primary keys.
   (Bowen Sun)
 
