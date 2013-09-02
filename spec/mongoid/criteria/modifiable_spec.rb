@@ -387,6 +387,22 @@ describe Mongoid::Criteria::Modifiable do
         it "sets the additional attributes" do
           expect(document.origin).to eq("Essex")
         end
+
+        context "when up-level selector uses a regular expression" do
+
+          let(:game) do
+            Game.where(name: /serious/).first_or_create(name: "Serious Sam")
+          end
+
+          let(:account) do
+            Account.where(name: /Johnny/).first_or_create(nickname: "Vegas")
+          end
+
+          it "does not set regexp as attribute value" do
+            game.name.should eq("Serious Sam")
+            account.name.should be_nil
+          end
+        end
       end
 
       context "when attributes are not provided" do
