@@ -514,13 +514,13 @@ module Mongoid
         # @param [ Array<Document> ] inserts The inserts.
         #
         # @since 3.0.0
-        def save_or_delay(doc, docs, inserts)
+        def save_or_delay(doc, docs, inserts, options = {})
           if doc.new_record? && doc.valid?(:create)
             doc.run_before_callbacks(:save, :create)
             docs.push(doc)
             inserts.push(doc.as_document)
           else
-            doc.save
+            doc.save(options)
           end
         end
 
