@@ -311,7 +311,7 @@ module Mongoid
             )
             if metadata.indexed?
               if metadata.polymorphic?
-                index({ key => 1, metadata.type => 1 }, { background: true })
+                index({ key => 1, metadata.inverse_type => 1 }, { background: true })
               else
                 index({ key => 1 }, { background: true })
               end
