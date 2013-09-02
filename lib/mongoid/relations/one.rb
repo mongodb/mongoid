@@ -43,6 +43,18 @@ module Mongoid
       def respond_to?(name, include_private = false)
         target.respond_to?(name, include_private) || super
       end
+
+      # Evolve the proxy document into an object id.
+      #
+      # @example Evolve the proxy document.
+      #   proxy.__evolve_object_id__
+      #
+      # @return [ Object ] The proxy document's id.
+      #
+      # @since 4.0.0
+      def __evolve_object_id__
+        target.id
+      end
     end
   end
 end

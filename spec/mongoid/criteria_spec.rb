@@ -823,6 +823,39 @@ describe Mongoid::Criteria do
 
   describe "#find" do
 
+    context "when finding by a document" do
+
+      let(:band) do
+        Band.create(name: "Tool")
+      end
+
+      let!(:record) do
+        band.records.create(name: "Undertow")
+      end
+
+      context "when the document is the root" do
+
+        let(:found) do
+          Band.find(band)
+        end
+
+        it "returns the matching document" do
+          expect(found).to eq(band)
+        end
+      end
+
+      context "when the document is the proxy" do
+
+        let(:found) do
+          Band.find(band.records.first.band)
+        end
+
+        it "returns the matching document" do
+          expect(found).to eq(band)
+        end
+      end
+    end
+
     context "when the identity map is enabled" do
 
       before(:all) do
