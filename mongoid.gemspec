@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "mongoid"
 
   s.add_dependency("activemodel", ["~> 3.2"])
-  s.add_dependency("tzinfo", ["~> 0.3.22"])
+  s.add_dependency("tzinfo", ["~> 0.3.29"])
   s.add_dependency("moped", ["~> 1.4"])
   s.add_dependency("origin", ["~> 1.0"])
 
