@@ -248,12 +248,12 @@ describe Mongoid::Relations::Macros do
           klass.belongs_to(:relatable, polymorphic: true, index: true)
         end
 
-        let(:index) do
-          klass.index_specifications.first
+        let(:indexes) do
+          klass.index_options
         end
 
         it "adds the background index to the definitions" do
-          expect(index.key).to eq(relatable_id: 1, relatable_type: 1)
+          expect(indexes).to eq({ relatable_id: 1, relatable_type: 1 } => { background: true })
         end
       end
     end
