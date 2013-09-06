@@ -980,15 +980,13 @@ module Mongoid
       # @since 2.0.0.rc.1
       def determine_foreign_key
         return self[:foreign_key].to_s if self[:foreign_key]
-        suffix = relation.foreign_key_suffix
+        return nil if relation.embedded?
+
         if relation.stores_foreign_key?
           relation.foreign_key(name)
         else
-          if polymorphic?
-            "#{self[:as]}#{suffix}"
-          else
-            inverse_of ? "#{inverse_of}#{suffix}" : inverse_class_name.foreign_key
-          end
+          suffix = relation.foreign_key_suffix
+          "#{inverse}#{suffix}"
         end
       end
 

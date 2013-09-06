@@ -859,17 +859,36 @@ describe Mongoid::Relations::Metadata do
 
           context "when the class is namespaced" do
 
-            let(:metadata) do
-              described_class.new(
-                name: :bananas,
-                relation: Mongoid::Relations::Referenced::Many,
-                inverse_class_name: "Fruits::Apple",
-                class_name: "Fruits::Banana"
-              )
+            context "when name doesnt include namespace" do
+
+              let(:metadata) do
+                described_class.new(
+                  name: :bananas,
+                  relation: Mongoid::Relations::Referenced::Many,
+                  inverse_class_name: "Fruits::Apple",
+                  class_name: "Fruits::Banana"
+                  )
+              end
+
+              it "returns the foreign_key without the module name" do
+                expect(metadata.foreign_key).to eq("apple_id")
+              end
             end
 
-            it "returns the foreign_key without the module name" do
-              expect(metadata.foreign_key).to eq("apple_id")
+            context "when name include namespace" do
+
+              let(:metadata) do
+                described_class.new(
+                  name: :fruits_melons,
+                  relation: Mongoid::Relations::Referenced::Many,
+                  inverse_class_name: "Fruits::Apple",
+                  class_name: "Fruits::Melon"
+                  )
+              end
+
+              it "returns the foreign_key with the module name" do
+                expect(metadata.foreign_key).to eq("fruit_apple_id")
+              end
             end
           end
         end
@@ -883,8 +902,8 @@ describe Mongoid::Relations::Metadata do
             )
           end
 
-          it "returns the inverse foreign key" do
-            expect(metadata.foreign_key).to eq("person_id")
+          it "returns a nil foreign key" do
+            expect(metadata.foreign_key).to be_nil
           end
         end
       end
