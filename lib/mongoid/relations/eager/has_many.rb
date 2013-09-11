@@ -5,10 +5,9 @@ module Mongoid
       class HasMany
 
         def preload
-          entries = {}
+          entries = Hash.new([])
           each_loaded_document do |doc|
-            fk = doc.__send__(@metadata.foreign_key)
-            entries[fk] ||= []
+            fk = doc.send(@metadata.foreign_key)
             entries[fk] << doc
           end
 

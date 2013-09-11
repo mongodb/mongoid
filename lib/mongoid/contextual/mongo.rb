@@ -2,11 +2,13 @@
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
-require "mongoid/contextual/eager"
+#require "mongoid/contextual/eager"
 require "mongoid/contextual/find_and_modify"
 require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
 require "mongoid/contextual/text_search"
+
+require "mongoid/relations/eager"
 
 module Mongoid
   module Contextual
@@ -14,7 +16,7 @@ module Mongoid
       include Enumerable
       include Aggregable::Mongo
       include Atomic
-      include Eager
+      include Relations::Eager
       include Queryable
 
       # @attribute [r] query The Moped query.

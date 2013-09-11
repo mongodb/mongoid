@@ -1,3 +1,5 @@
+require "mongoid/relations/eager/base"
+
 module Mongoid
   module Relations
     module Eager
