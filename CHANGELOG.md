@@ -3,6 +3,10 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/docs/upgrading.html).
 
+## 2.8.1
+
+* Mongoid now requires Ruby driver ~> 1.9.
+
 ## 2.7.1
 
 ### Resolved Issues
