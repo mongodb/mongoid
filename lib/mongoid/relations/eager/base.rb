@@ -22,21 +22,26 @@ module Mongoid
         end
 
         def each_loaded_document
-          @metadata.klass.any_in("_id" => keys_from_docs).each do |doc|
+          p grouped_docs
+          p key
+          p @metadata.klass
+          @metadata.klass.any_in(key => keys_from_docs).each do |doc|
             yield doc
           end
         end
 
-        def set_on_parent(id, element)
+        def set_on_parent(id, doc)
+          p id
+          p grouped_docs
           grouped_docs[id].each do |d|
             method = @metadata.setter
-            d.send(method, element)
+            d.send(method, doc)
           end
         end
 
         def grouped_docs
           @grouped_docs[@metadata.name] ||= @docs.group_by do |doc|
-            group_by_key(doc)
+            doc.send(group_by_key)
           end
         end
 

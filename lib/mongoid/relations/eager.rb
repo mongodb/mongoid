@@ -1,4 +1,8 @@
+require "mongoid/relations/eager/base"
 require "mongoid/relations/eager/belongs_to"
+require "mongoid/relations/eager/has_one"
+require "mongoid/relations/eager/has_many"
+require "mongoid/relations/eager/has_and_belongs_to_many"
 
 module Mongoid
   module Relations

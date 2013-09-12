@@ -144,6 +144,10 @@ module Mongoid
             eager_load_ids(metadata, ids) { |doc, key| IdentityMap.set_one(doc, key) }
           end
 
+          def eager_load_klass
+            Relations::Eager::HasOne
+          end
+
           # Returns true if the relation is an embedded one. In this case
           # always false.
           #
