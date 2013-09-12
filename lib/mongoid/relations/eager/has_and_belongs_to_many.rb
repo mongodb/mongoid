@@ -7,9 +7,11 @@ module Mongoid
         def preload
           entries = Hash.new { |hash, key| hash[key] = [] }
           each_loaded_document do |doc|
-#            p doc
-            id = doc.send(group_by_key)
-            entries[id] << doc
+
+            ids = doc.send(key)
+            ids.each do |id|
+              entries[id] << doc
+            end
           end
 
           entries.each do |id, docs|
@@ -22,8 +24,7 @@ module Mongoid
         end
 
         def key
-          "account_ids"
-          #@metadata.foreign_key
+          @metadata.inverse_foreign_key
         end
       end
     end

@@ -645,6 +645,17 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
         end
       end
+
+      context "when the document already have the children" do
+
+        before do
+          person.preferences = [ preference ]
+        end
+
+        it do
+          p person
+        end
+      end
     end
 
     context "when the relation is not polymorphic" do

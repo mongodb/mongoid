@@ -37,11 +37,6 @@ describe Mongoid::Relations::Eager do
         context.preload(Account, inclusions, [doc])
       end
 
-      it "sets the parent" do
-        doc.should_receive(:person=).once
-        context.preload(Account, inclusions, [doc])
-      end
-
       it "preloads the parent" do
         expect(doc.ivar(:person)).to be_false
         context.preload(Account, inclusions, [doc])
@@ -100,14 +95,11 @@ describe Mongoid::Relations::Eager do
 
       let(:includes) { [:agents] }
 
-      it "" do
-#        p account
-        p agent
-
+      it "preloads the child" do
+#        Moped.logger.level = Mongoid.logger.level = 0
         expect(doc.ivar(:agents)).to be_false
         context.preload(Account, inclusions, [doc])
-
-        p doc.ivar(:agents)
+        expect(doc.ivar(:agents)).to eq(doc.agents)
       end
 
     end
