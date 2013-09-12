@@ -22,7 +22,7 @@ module Mongoid #:nodoc:
         connection = Mongo::ReplSetConnection.new(hosts.clone, options.symbolize_keys)
 
         if authenticating?
-          connection.add_auth(database, username, password)
+          connection.add_auth(database, username, password, nil)
           connection.apply_saved_authentication
         end
 
