@@ -1148,6 +1148,28 @@ describe Mongoid::Attributes do
         end
       end
 
+      context "typecasting to bool" do
+
+        let(:person) do
+          Person.new
+        end
+
+        let(:attributes) do
+          { pets: 1 }
+        end
+
+        context "when passing a hash" do
+
+          before do
+            person.send(method, attributes)
+          end
+
+          it "properly casts values" do
+            expect(person.pets).to eq(true)
+          end
+        end
+      end
+
       context "copying from instance" do
 
         let(:person) do
