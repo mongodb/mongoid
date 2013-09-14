@@ -717,6 +717,69 @@ describe Mongoid::Fields do
         expect(circle.pre_processed_defaults).to eq([ "_id", "x", "y", "_type", "radius" ])
       end
     end
+
+    context "when use a relation in default proc" do
+
+      context "with a #embeds_one relationship" do
+
+        let(:customer) do
+          Customer.new(name: 'Newton')
+        end
+
+        let(:order) do
+          customer.build_order
+        end
+
+        it "use parent field" do
+          expect(order.customer_name).to eq(customer.name)
+        end
+      end
+
+      context "with a #embeds_many relationship" do
+
+        let(:job) do
+          Job.new(name: 'teacher')
+        end
+
+        let(:employee) do
+          job.employees.build
+        end
+
+        it "use parent field" do
+          expect(employee.job_name).to eq(job.name)
+        end
+      end
+
+      context "with a #has_one relationship" do
+
+        let(:drink) do
+          Drink.new(name: 'Sex on the beach')
+        end
+
+        let(:recipe) do
+          drink.build_recipe
+        end
+
+        it "use parent field" do
+          expect(recipe.drink_name).to eq(drink.name)
+        end
+      end
+
+      context "with a #has_many relationship" do
+
+        let(:network) do
+          Network.new(name: 'Rivers')
+        end
+
+        let(:host) do
+          network.hosts.build
+        end
+
+        it "use parent field" do
+          expect(host.network_name).to eq(network.name)
+        end
+      end
+    end
   end
 
   describe ".field" do

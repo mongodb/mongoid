@@ -79,6 +79,8 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def build(attributes = {}, type = nil)
+          attributes ||= {}
+          attributes[metadata.inverse] = base
           doc = Factory.build(type || klass, attributes)
           append(doc)
           doc.apply_post_processed_defaults
