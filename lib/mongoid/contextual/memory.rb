@@ -102,7 +102,7 @@ module Mongoid
           documents_for_iteration.each do |doc|
             yield(doc)
           end
-          # eager_loadable? ? docs : self
+          self
         else
           to_enum
         end

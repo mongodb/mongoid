@@ -124,7 +124,7 @@ module Mongoid
               yield_document(doc, &block)
             end
             @cache_loaded = true
-            eager_loadable? ? docs : self
+            self
           end
         else
           to_enum
