@@ -80,7 +80,6 @@ describe Mongoid::Relations::Eager do
         context.preload(Account, inclusions, [doc])
         expect(doc.ivar(:alerts)).to eq(doc.alerts)
       end
-
     end
 
     context "when has_and_belongs_to_many" do
@@ -96,12 +95,10 @@ describe Mongoid::Relations::Eager do
       let(:includes) { [:agents] }
 
       it "preloads the child" do
-#        Moped.logger.level = Mongoid.logger.level = 0
         expect(doc.ivar(:agents)).to be_false
         context.preload(Account, inclusions, [doc])
         expect(doc.ivar(:agents)).to eq(doc.agents)
       end
-
     end
   end
 end

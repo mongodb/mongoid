@@ -569,21 +569,6 @@ module Mongoid
             )
           end
 
-          # Eager load the relation based on the criteria.
-          #
-          # @example Eager load the criteria.
-          #   Proxy.eager_load(metadata, criteria)
-          #
-          # @param [ Metadata ] metadata The relation metadata.
-          # @param [ Array<Object> ] ids The ids of the base docs.
-          #
-          # @return [ Criteria ] The criteria to eager load the relation.
-          #
-          # @since 2.2.0
-          def eager_load(metadata, ids)
-            eager_load_ids(metadata, ids) { |doc, key| IdentityMap.set_many(doc, key) }
-          end
-
           def eager_load_klass
             Relations::Eager::HasMany
           end

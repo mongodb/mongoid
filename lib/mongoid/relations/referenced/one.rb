@@ -128,22 +128,6 @@ module Mongoid
             crit
           end
 
-          # Get the criteria that is used to eager load a relation of this
-          # type.
-          #
-          # @example Get the eager load criteria.
-          #   Proxy.eager_load(metadata, criteria)
-          #
-          # @param [ Metadata ] metadata The relation metadata.
-          # @param [ Array<Object> ] ids The ids of the base docs.
-          #
-          # @return [ Criteria ] The criteria to eager load the relation.
-          #
-          # @since 2.2.0
-          def eager_load(metadata, ids)
-            eager_load_ids(metadata, ids) { |doc, key| IdentityMap.set_one(doc, key) }
-          end
-
           def eager_load_klass
             Relations::Eager::HasOne
           end
