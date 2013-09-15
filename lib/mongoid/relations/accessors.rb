@@ -106,34 +106,13 @@ module Mongoid
       # @return [ Proxy ] The relation.
       #
       # @since 3.0.16
-      def get_relation(name, metadata, reload = false)
-        variable = "@_#{name}"
-        value = if instance_variable_defined?(variable) && !reload
-          instance_variable_get(variable)
-        else
-          _building do
-            _loading do
-              __build__(name, attributes[metadata.key], metadata)
-            end
-          end
-        end
-        if value.nil? && metadata.autobuilding? && !without_autobuild?
-          send("build_#{name}")
-        else
+      def get_relation(name, metadata, object, reload = false)
+        if !reload && (value = ivar(name)) != false
           value
-        end
-      end
-
-      # @todo: Durran: Refactor before release, but this fixes the issue with
-      # the extra queries.
-      def get_relation_for_set(name, metadata, object)
-        variable = "@_#{name}"
-        value = if instance_variable_defined?(variable)
-          instance_variable_get(variable)
         else
           _building do
             _loading do
-              if needs_no_database_query?(object, metadata)
+              if object && needs_no_database_query?(object, metadata)
                 __build__(name, object, metadata)
               else
                 __build__(name, attributes[metadata.key], metadata)
@@ -220,7 +199,11 @@ module Mongoid
         # @since 2.0.0.rc.1
         def getter(name, metadata)
           re_define_method(name) do |reload = false|
-            get_relation(name, metadata, reload)
+            value = get_relation(name, metadata, nil, reload)
+            if value.nil? && metadata.autobuilding? && !without_autobuild?
+              value = send("build_#{name}")
+            end
+            value
           end
           self
         end
@@ -261,7 +244,7 @@ module Mongoid
         def setter(name, metadata)
           re_define_method("#{name}=") do |object|
             without_autobuild do
-              if value = get_relation_for_set(name, metadata, object)
+              if value = get_relation(name, metadata, object)
                 set_relation(name, value.substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, metadata)
