@@ -25,7 +25,7 @@ module Mongoid
 
       def eager_loadable?(document = nil)
         return false if criteria.inclusions.empty?
-        document ? !inclusions_loaded?(document) : !eager_loaded
+        !eager_loaded
       end
 
       def eager_load(docs)

@@ -1744,16 +1744,8 @@ describe Mongoid::Criteria do
             new_criteria.first
           end
 
-          let(:mapped) do
-            Mongoid::IdentityMap[Post.collection_name][{"person_id" => person.id}]
-          end
-
           it "does not duplicate documents in the relation" do
             expect(person.posts.size).to eq(2)
-          end
-
-          it "does not duplicate documents in the map" do
-            expect(mapped.size).to eq(2)
           end
         end
       end
@@ -2102,10 +2094,6 @@ describe Mongoid::Criteria do
 
       context "when calling first on the criteria" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).includes(:posts)
         end
@@ -2126,19 +2114,7 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(person)
         end
 
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
-        end
-
         context "when subsequently getting all documents" do
-
-          before do
-            context.should_receive(:eager_load).with([ person ]).once.and_call_original
-          end
 
           let!(:documents) do
             criteria.entries
@@ -2152,20 +2128,12 @@ describe Mongoid::Criteria do
 
       context "when calling last on the criteria" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).includes(:posts)
         end
 
         let(:context) do
           criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2176,19 +2144,7 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(person)
         end
 
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
-        end
-
         context "when subsequently getting all documents" do
-
-          before do
-            context.should_receive(:eager_load).with([ person ]).once.and_call_original
-          end
 
           let!(:documents) do
             criteria.entries
@@ -2210,10 +2166,6 @@ describe Mongoid::Criteria do
           person_two.posts.create(title: "three")
         end
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.includes(:posts).asc(:age).limit(1)
         end
@@ -2233,18 +2185,6 @@ describe Mongoid::Criteria do
         it "returns the correct documents" do
           expect(documents).to eq([ person ])
         end
-
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
-        end
-
-        it "does not insert the third post into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_three.id]).to be_nil
-        end
       end
     end
 
@@ -2259,10 +2199,6 @@ describe Mongoid::Criteria do
       end
 
       context "when the criteria has no options" do
-
-        before do
-          Mongoid::IdentityMap.clear
-        end
 
         let!(:criteria) do
           Person.asc(:age).includes(:game)
@@ -2283,29 +2219,6 @@ describe Mongoid::Criteria do
         it "returns the correct documents" do
           expect(documents).to eq([ person ])
         end
-
-        it "deletes the replaced document from the identity map" do
-          expect(Mongoid::IdentityMap[Game.collection_name][game_one.id]).to be_nil
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Game.collection_name][game_two.id]).to eq(game_two)
-        end
-
-        context "when asking from map or db" do
-
-          let(:in_map) do
-            Mongoid::IdentityMap[Game.collection_name][game_two.id]
-          end
-
-          let(:game) do
-            Game.where("person_id" => person.id).from_map_or_db
-          end
-
-          it "returns the document from the map" do
-            expect(game).to equal(in_map)
-          end
-        end
       end
 
       context "when the criteria has limiting options" do
@@ -2316,10 +2229,6 @@ describe Mongoid::Criteria do
 
         let!(:game_three) do
           person_two.create_game(name: "Skyrim")
-        end
-
-        before do
-          Mongoid::IdentityMap.clear
         end
 
         let!(:criteria) do
@@ -2341,14 +2250,6 @@ describe Mongoid::Criteria do
         it "returns the correct documents" do
           expect(documents).to eq([ person ])
         end
-
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Game.collection_name][game_two.id]).to eq(game_two)
-        end
-
-        it "does not load the extra child into the map" do
-          expect(Mongoid::IdentityMap[Game.collection_name][game_three.id]).to be_nil
-        end
       end
     end
 
@@ -2364,10 +2265,6 @@ describe Mongoid::Criteria do
 
       let!(:game_two) do
         person_two.create_game(name: "two")
-      end
-
-      before do
-        Mongoid::IdentityMap.clear
       end
 
       context "when providing no options" do
@@ -2395,14 +2292,6 @@ describe Mongoid::Criteria do
         it "returns the correct documents" do
           expect(criteria).to eq([ game_one, game_two ])
         end
-
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to eq(person)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to eq(person_two)
-        end
       end
 
       context "when the criteria has limiting options" do
@@ -2426,14 +2315,6 @@ describe Mongoid::Criteria do
         it "returns the correct documents" do
           expect(documents).to eq([ game_one ])
         end
-
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to eq(person)
-        end
-
-        it "does not load the documents outside of the limit" do
-          expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to be_nil
-        end
       end
     end
 
@@ -2455,10 +2336,6 @@ describe Mongoid::Criteria do
         person.create_game(name: "two")
       end
 
-      before do
-        Mongoid::IdentityMap.clear
-      end
-
       let!(:criteria) do
         Person.includes(:posts, :game).asc(:age)
       end
@@ -2477,22 +2354,6 @@ describe Mongoid::Criteria do
 
       it "returns the correct documents" do
         expect(criteria).to eq([ person ])
-      end
-
-      it "inserts the first has many document into the identity map" do
-        expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
-      end
-
-      it "inserts the second has many document into the identity map" do
-        expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
-      end
-
-      it "removes the first has one document from the identity map" do
-        expect(Mongoid::IdentityMap[Game.collection_name][game_one.id]).to be_nil
-      end
-
-      it "inserts the second has one document into the identity map" do
-        expect(Mongoid::IdentityMap[Game.collection_name][game_two.id]).to eq(game_two)
       end
     end
   end
