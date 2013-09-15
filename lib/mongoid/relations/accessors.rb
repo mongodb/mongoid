@@ -261,9 +261,7 @@ module Mongoid
         def setter(name, metadata)
           re_define_method("#{name}=") do |object|
             without_autobuild do
-              if metadata.many?
-                set_relation(name, get_relation(name, metadata).substitute(object.substitutable))
-              elsif value = get_relation_for_set(name, metadata, object)
+              if value = get_relation_for_set(name, metadata, object)
                 set_relation(name, value.substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, metadata)

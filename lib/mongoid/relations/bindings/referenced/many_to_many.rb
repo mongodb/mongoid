@@ -20,7 +20,9 @@ module Mongoid
             binding do
               inverse_keys = doc.you_must(metadata.inverse_foreign_key)
               if inverse_keys
-                inverse_keys.push(inverse_record_id(doc))
+                unless inverse_keys.include?(inverse_record_id(doc))
+                  inverse_keys.push(inverse_record_id(doc))
+                end
                 doc.reset_relation_criteria(metadata.inverse)
               end
               base.synced[metadata.foreign_key] = true

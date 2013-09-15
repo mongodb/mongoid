@@ -635,6 +635,16 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         it "does not add duplicate inverse keys" do
           expect(preference.person_ids).to eq([ person.id ])
         end
+
+        context "when reloading document from db" do
+
+          let(:from_db) { Preference.last }
+
+          it "does not create duplicate keys" do
+            person.preferences = [ from_db ]
+            expect(from_db.person_ids).to eq([ person.id ])
+          end
+        end
       end
     end
 
