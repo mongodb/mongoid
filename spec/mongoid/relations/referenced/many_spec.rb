@@ -898,6 +898,25 @@ describe Mongoid::Relations::Referenced::Many do
 
       context "when the relation is polymorphic" do
 
+        context "when the parent is a subclass" do
+
+          let(:video_game) do
+            VideoGame.create
+          end
+
+          let(:rating) do
+            video_game.ratings.build
+          end
+
+          it "sets the parent on the child" do
+            expect(rating.ratable).to eq(video_game)
+          end
+
+          it "sets the correct polymorphic type" do
+            expect(rating.ratable_type).to eq("VideoGame")
+          end
+        end
+
         context "when the parent is a new record" do
 
           let(:movie) do
