@@ -263,6 +263,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3231 Allow evolution of proxy documents to work in criteria.
 
+* \#3247 Bump dependency on tzinfo to 0.3.29.
+
 * \#3203 Fixed `index: true` specification for polymorphic relations.
 
 * \#3173 Fixed issues around many to many relations with custom primary keys.
@@ -272,6 +274,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#3137 Allow multiple `belongs_to` sets in a row with ids.
 
+* \#3079 Embbed docs with paranoia parents, were losing the _id when
+  reloading from db, as they didnt have the right persisted? value. (Arthur Neves)
+
 * \#3081 Criteria's `method_missing` now checks if an array responds to the provided
   method before calling entries in order to not hit the database if a `NoMethodError`
   was to get raised.
@@ -280,6 +285,8 @@ For instructions on upgrading to newer versions, visit
   set.
 
 * \#3047 Ensure `blank?` and `empty?` don't fall through method missing on criteria.
+
+* Include updated_at on cache_key even when is a short timestamp (Arthur Neves)
 
 ## 3.1.4
 
