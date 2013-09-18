@@ -267,6 +267,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#3203 Fixed `index: true` specification for polymorphic relations.
 
+* \#3192 Fixed aliased fields + localized fields combinations with
+  validation. (Johnny Shields)
+
 * \#3173 Fixed issues around many to many relations with custom primary keys.
   (Bowen Sun)
 
