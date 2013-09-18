@@ -75,25 +75,6 @@ describe Mongoid::Criterion::Modifiable do
 
     context "when the document is not found" do
 
-      context "when using dynamic persistence options" do
-
-        let!(:band) do
-          Band.with(collection: "users").find_or_create_by(name: "testing")
-        end
-
-        let(:from_db) do
-          User.where(name: "testing").first
-        end
-
-        it "returns the new document" do
-          expect(band.name).to eq("testing")
-        end
-
-        it "persists to the provided options" do
-          expect(from_db.name).to eq("testing")
-        end
-      end
-
       context "when providing a document" do
 
         let!(:person) do
