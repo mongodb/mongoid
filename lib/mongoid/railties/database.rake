@@ -51,9 +51,7 @@ namespace :db do
 
   unless Rake::Task.task_defined?("db:test:prepare")
     namespace :test do
-      task :prepare do
-        # noop
-      end
+      task :prepare => "mongoid:create_indexes"
     end
   end
 

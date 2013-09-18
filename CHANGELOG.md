@@ -74,6 +74,9 @@ For instructions on upgrading to newer versions, visit
 
         Band.where(name: "Depeche Mode").inc(likes: 10, followers: 20)
 
+* \#3141 `rake db:test:prepare` now sets up all defined indexes if Mongoid is the
+  only ODM/ORM in the environment.
+
 * \#3138 `update_attributes` can now be accessed simply by calling `update`.
 
 * \#3083 A new rake task: `rake mongoid:remove_undefined_indexes` has been added to
