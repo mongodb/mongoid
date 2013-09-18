@@ -1,0 +1,1 @@
+class VideoGame < Game; end
