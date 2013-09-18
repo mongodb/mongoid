@@ -18,6 +18,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3159 Upserting now properly flags documents as persisted.
 
+* \#3137 Allow multiple `belongs_to` sets in a row with ids.
+
 * \#3079 Embbed docs with paranoia parents, were losing the _id when
   reloading from db, as they didnt have the right persisted? value. (Arthur Neves)
 

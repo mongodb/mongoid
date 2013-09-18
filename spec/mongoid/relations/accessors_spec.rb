@@ -778,4 +778,67 @@ describe Mongoid::Relations::Accessors do
       end
     end
   end
+
+  context "when setting association foreign keys" do
+
+    let(:game) do
+      Game.new
+    end
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when value is an empty string" do
+
+      before do
+        game.person_id = ""
+        game.save
+      end
+
+      it "sets the foreign key to empty" do
+        expect(game.reload.person_id).to be_blank
+      end
+    end
+
+    context "when value is a populated string" do
+
+      before do
+        game.person_id = person.id.to_s
+        game.save
+      end
+
+      it "sets the foreign key as ObjectID" do
+        expect(game.reload.person_id).to eq(person.id)
+      end
+    end
+
+    context "when value is a ObjectID" do
+
+      before do
+        game.person_id = person.id
+        game.save
+      end
+
+      it "keeps the the foreign key as ObjectID" do
+        expect(game.reload.person_id).to eq(person.id)
+      end
+    end
+
+    context "when setting ids multiple times on the relation itself" do
+
+      before do
+        game.person = person.id
+        game.person = person.id
+      end
+
+      it "sets the relation foreign key" do
+        expect(game.person_id).to eq(person.id)
+      end
+
+      it "sets the appropriate relation" do
+        expect(game.person).to eq(person)
+      end
+    end
+  end
 end
