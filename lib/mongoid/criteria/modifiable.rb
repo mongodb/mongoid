@@ -165,14 +165,7 @@ module Mongoid
       #
       # @return [ Document ] The first or new document.
       def find_or(method, attrs = {}, &block)
-        options = klass.persistence_options
-        document = where(attrs).first
-        return document if document
-        if options
-          klass.with(options).send(method, attrs, &block)
-        else
-          send(method, attrs, &block)
-        end
+        where(attrs).first || send(method, attrs, &block)
       end
 
       # Find the first document or create/initialize it.

@@ -258,8 +258,6 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* \#3243 Fixed `find_or_creeate_by` with custom persistence options.
-
 * \#3231 Allow evolution of proxy documents to work in criteria.
 
 * \#3203 Fixed `index: true` specification for polymorphic relations.
