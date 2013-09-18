@@ -732,5 +732,21 @@ describe Mongoid::Relations::Accessors do
         expect(game.reload.person_id).to eq(person.id)
       end
     end
+
+    context "when setting ids multiple times on the relation itself" do
+
+      before do
+        game.person = person.id
+        game.person = person.id
+      end
+
+      it "sets the relation foreign key" do
+        expect(game.person_id).to eq(person.id)
+      end
+
+      it "sets the appropriate relation" do
+        expect(game.person).to eq(person)
+      end
+    end
   end
 end

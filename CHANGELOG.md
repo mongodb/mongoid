@@ -270,6 +270,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3159 Upserting now properly flags documents as persisted.
 
+* \#3137 Allow multiple `belongs_to` sets in a row with ids.
+
 * \#3081 Criteria's `method_missing` now checks if an array responds to the provided
   method before calling entries in order to not hit the database if a `NoMethodError`
   was to get raised.

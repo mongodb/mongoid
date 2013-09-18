@@ -53,7 +53,7 @@ module Mongoid
         def substitute(replacement)
           unbind_one
           return nil unless replacement
-          self.target = replacement
+          self.target = normalize(replacement)
           bind_one
           self
         end
@@ -72,6 +72,23 @@ module Mongoid
         # @since 2.0.0.rc.1
         def binding
           Bindings::Referenced::In.new(base, target, metadata)
+        end
+
+        # Normalize the value provided as a replacement for substitution.
+        #
+        # @api private
+        #
+        # @example Normalize the substitute.
+        #   proxy.normalize(id)
+        #
+        # @param [ Document, Object ] replacement The replacement object.
+        #
+        # @return [ Document ] The document.
+        #
+        # @since 3.1.5
+        def normalize(replacement)
+          return replacement if replacement.is_a?(Document)
+          metadata.builder(klass, replacement).build
         end
 
         # Are we able to persist this relation?
