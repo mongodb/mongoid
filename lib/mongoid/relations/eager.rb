@@ -14,7 +14,7 @@ module Mongoid
         selecting do
           return nil unless document
           doc = Factory.from_db(klass, document, criteria.object_id)
-          eager_load_one(doc) if eager_loadable?(doc)
+          eager_load_one(doc)
           doc
         end
       end
@@ -29,6 +29,7 @@ module Mongoid
       end
 
       def eager_load(docs)
+        return false unless eager_loadable?
         preload(klass, criteria.inclusions, docs)
         self.eager_loaded = true
       end

@@ -42,6 +42,10 @@ describe Mongoid::Relations::Eager do
         context.preload(Account, inclusions, [doc])
         expect(doc.ivar(:person)).to eq(doc.person)
       end
+
+      context "when polymorphic relation" do
+        pending
+      end
     end
 
     context "when has_one" do
@@ -98,6 +102,130 @@ describe Mongoid::Relations::Eager do
         expect(doc.ivar(:agents)).to be_false
         context.preload(Account, inclusions, [doc])
         expect(doc.ivar(:agents)).to eq(doc.agents)
+      end
+    end
+  end
+
+  describe ".eager_load" do
+
+    before do
+      Person.create!
+    end
+
+    let(:context) do
+      Mongoid::Contextual::Mongo.new(criteria)
+    end
+
+    context "when including one has_many relation" do
+
+      let(:criteria) do
+        Person.includes(:posts)
+      end
+
+      let(:docs) do
+        Person.all.to_a
+      end
+
+      let(:posts_metadata) do
+        Person.reflect_on_association(:posts)
+      end
+
+      it "runs the has_many preload" do
+        Mongoid::Relations::Eager::HasMany.should_receive(:new).with(Person, [posts_metadata], docs).once.and_call_original
+
+        context.eager_load(docs)
+      end
+    end
+
+    context "when including multiple relations" do
+
+      let(:criteria) do
+        Person.includes(:posts, :houses, :cat)
+      end
+
+      let(:docs) do
+        Person.all.to_a
+      end
+
+      let(:posts_metadata) do
+        Person.reflect_on_association(:posts)
+      end
+
+      let(:houses_metadata) do
+        Person.reflect_on_association(:houses)
+      end
+
+      let(:cat_metadata) do
+        Person.reflect_on_association(:cat)
+      end
+
+      it "runs the has_many preload" do
+        Mongoid::Relations::Eager::HasMany.should_receive(:new).with(Person, [posts_metadata], docs).once.and_call_original
+
+        context.eager_load(docs)
+      end
+
+      it "runs the has_one preload" do
+        Mongoid::Relations::Eager::HasOne.should_receive(:new).with(Person, [cat_metadata], docs).once.and_call_original
+        context.eager_load(docs)
+      end
+
+      it "runs the has_and_belongs_to_many preload" do
+        Mongoid::Relations::Eager::HasAndBelongsToMany.should_receive(:new).with(Person, [houses_metadata], docs).once.and_call_original
+        context.eager_load(docs)
+      end
+    end
+
+    context "when including two of the same relation type" do
+
+      let(:criteria) do
+        Person.includes(:book, :cat)
+      end
+
+      let(:docs) do
+        Person.all.to_a
+      end
+
+      let(:book_metadata) do
+        Person.reflect_on_association(:book)
+      end
+
+      let(:cat_metadata) do
+        Person.reflect_on_association(:cat)
+      end
+
+      it "runs the has_one preload" do
+        Mongoid::Relations::Eager::HasOne.should_receive(:new).with(Person, [book_metadata, cat_metadata], docs).once.and_call_original
+        context.eager_load(docs)
+      end
+    end
+  end
+
+  describe ".eager_loadable?" do
+
+    let(:context) do
+      Mongoid::Contextual::Mongo.new(criteria)
+    end
+
+    context "when criteria has multiple includes" do
+
+      let(:criteria) do
+        Post.includes(:person, :roles)
+      end
+
+      it "is eager_loadable" do
+        expect(context.eager_loadable?).to be_true
+      end
+    end
+
+    context "when criteria has no includes" do
+
+      let(:criteria) do
+        Post.all
+      end
+
+      it "is not eager_loadable" do
+        expect(context.eager_loadable?).to be_false
       end
     end
   end

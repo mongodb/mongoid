@@ -10,15 +10,18 @@ module Mongoid
           @grouped_docs = {}
         end
 
+        def shift_relation
+          @metadata = @relations.shift
+        end
+
         def run
-          @relations.each do |relation|
-            @metadata = relation
+          while shift_relation
             preload
           end
         end
 
         def preload
-          raise StandardError, "Implement preload" # TODO
+          raise NotImplementedError
         end
 
         def each_loaded_document
@@ -44,7 +47,7 @@ module Mongoid
         end
 
         def group_by_key(doc)
-          raise StandardError # TODO
+          raise NotImplementedError
         end
       end
 
