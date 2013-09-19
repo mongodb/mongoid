@@ -18,13 +18,13 @@ describe Mongoid::Relations::Eager::HasOne do
     Person.reflect_on_association(:cat)
   end
 
-  describe ".grouped_doc" do
-
-    let(:eager) do
-      described_class.new(Person, [cat_metadata], docs).tap do |b|
-        b.shift_relation
-      end
+  let(:eager) do
+    described_class.new(Person, [cat_metadata], docs).tap do |b|
+      b.shift_relation
     end
+  end
+
+  describe ".grouped_doc" do
 
     it "aggregates by the relation primary key" do
       expect(eager.grouped_docs.keys).to eq([person.username])
@@ -32,12 +32,6 @@ describe Mongoid::Relations::Eager::HasOne do
   end
 
   describe ".set_on_parent" do
-
-    let(:eager) do
-      described_class.new(Person, [cat_metadata], docs).tap do |b|
-        b.shift_relation
-      end
-    end
 
     it "sets the relation into the parent" do
       docs.each do |doc|
