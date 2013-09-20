@@ -18,6 +18,25 @@ describe Mongoid::Relations::Referenced::Many do
 
     describe "##{method}" do
 
+      context "when providing the base class in child contructor" do
+
+        let(:person) do
+          Person.create
+        end
+
+        let!(:post) do
+          person.posts.send(method, Post.new(person: person))
+        end
+
+        it "only adds the relation once" do
+          expect(person.posts.size).to eq(1)
+        end
+
+        it "only persists the relation once" do
+          expect(person.reload.posts.size).to eq(1)
+        end
+      end
+
       context "when the relations are not polymorphic" do
 
         context "when the parent is a new record" do
