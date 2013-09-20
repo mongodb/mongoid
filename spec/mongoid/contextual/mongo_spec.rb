@@ -1586,6 +1586,26 @@ describe Mongoid::Contextual::Mongo do
       described_class.new(criteria)
     end
 
+    context "when adding an element to a HABTM set" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:preference) do
+        Preference.create
+      end
+
+      before do
+        Person.where(id: person.id).
+          update("$addToSet" => { preference_ids: preference.id })
+      end
+
+      it "adds a single element to the array" do
+        expect(person.reload.preference_ids).to eq([ preference.id ])
+      end
+    end
+
     context "when providing attributes" do
 
       context "when the attributes are of the correct type" do

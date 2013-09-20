@@ -37,6 +37,11 @@ module Mongoid
     include Upsertable
     include Unsettable
 
+    # The atomic operations that deal with arrays or sets in the db.
+    #
+    # @since 4.0.0
+    LIST_OPERATIONS = [ "$addToSet", "$push", "$pull", "$pullAll" ].freeze
+
     # Execute operations atomically (in a single database call) for everything
     # that would happen inside the block.
     #

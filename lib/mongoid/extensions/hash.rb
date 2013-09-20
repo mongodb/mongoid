@@ -40,11 +40,11 @@ module Mongoid
         each_pair do |key, value|
           if key =~ /\$/
             value.each_pair do |_key, _value|
-              value[_key] = mongoize_for(klass, _key, _value)
+              value[_key] = mongoize_for(key, klass, _key, _value)
             end
             (consolidated[key] ||= {}).merge!(value)
           else
-            (consolidated["$set"] ||= {}).merge!(key => mongoize_for(klass, key, value))
+            (consolidated["$set"] ||= {}).merge!(key => mongoize_for(key, klass, key, value))
           end
         end
         consolidated
@@ -166,9 +166,17 @@ module Mongoid
       # @return [ Object ] The mongoized value.
       #
       # @since 3.1.0
-      def mongoize_for(klass, key, value)
+      def mongoize_for(operator, klass, key, value)
         field = klass.fields[key.to_s]
-        field ? field.mongoize(value) : value
+        if field
+          val = field.mongoize(value)
+          if Mongoid::Persistable::LIST_OPERATIONS.include?(operator) && field.resizable?
+            val = val.first if !value.is_a?(Array)
+          end
+          val
+        else
+          value
+        end
       end
 
       module ClassMethods

@@ -257,6 +257,13 @@ For instructions on upgrading to newer versions, visit
 
 * \#2903 Removed unused string `to_a` extension.
 
+## 3.1.6
+
+### Resolved Issues
+
+* \#3262 Fixed atomic array operations on HABTM foreign key fields from turning
+  single elements into arrays.
+
 ## 3.1.5
 
 ### Resolved Issues
