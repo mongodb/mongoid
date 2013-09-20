@@ -21,6 +21,11 @@ module Mongoid
     include Atomic
     include Mongoid::Atomic::Positionable
 
+    # The atomic operations that deal with arrays or sets in the db.
+    #
+    # @since 4.0.0
+    LIST_OPERATIONS = [ "$addToSet", "$push", "$pull", "$pullAll" ].freeze
+
     # Remove the document from the database with callbacks.
     #
     # @example Destroy a document.

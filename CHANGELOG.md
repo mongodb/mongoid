@@ -3,6 +3,13 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.1.6
+
+### Resolved Issues
+
+* \#3262 Fixed atomic array operations on HABTM foreign key fields from turning
+  single elements into arrays.
+
 ## 3.1.5
 
 ### Resolved Issues
