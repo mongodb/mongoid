@@ -1,7 +1,7 @@
 class Account
   include Mongoid::Document
 
-  field :_id, type: String, default: ->{ name.try(:parameterize) }
+  field :_id, type: String, overwrite: true, default: ->{ name.try(:parameterize) }
 
   field :number, type: String
   field :balance, type: String
