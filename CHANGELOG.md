@@ -264,6 +264,10 @@ For instructions on upgrading to newer versions, visit
 * \#3262 Fixed atomic array operations on HABTM foreign key fields from turning
   single elements into arrays.
 
+* \#3282 Fixed .timeless option to use a thread local instead of a class attribute.
+  Also remove the timeless methods from all docs, and only add to timestamps docs.
+  (Arthur Neves)
+
 ## 3.1.5
 
 ### Resolved Issues
