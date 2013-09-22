@@ -40,6 +40,11 @@ module Mongoid
 
       module ClassMethods
 
+        def timeless_table
+          Thread.current['[mongoid]:timeless'] ||= Hash.new
+        end
+        delegate :[]=, :[], to: :timeless_table
+
         # Begin an execution that should skip timestamping.
         #
         # @example Create a document but don't timestamp.
@@ -52,23 +57,21 @@ module Mongoid
           counter = 0
           counter += 1 if self < Mongoid::Timestamps::Created
           counter += 1 if self < Mongoid::Timestamps::Updated
-          Thread.current["[mongoid]:[#{name}]:timeless"] = counter
+          self[name] = counter
           self
         end
 
         def clear_timeless_option
-          if counter = Thread.current["[mongoid]:[#{name}]:timeless"]
+          if counter = self[name]
             counter -= 1
-            Thread.current["[mongoid]:[#{name}]:timeless"] =
-              (counter == 0) ? nil : counter
+            self[name] = (counter == 0) ? nil : counter
           end
           true
         end
 
         def timeless?
-          !!Thread.current["[mongoid]:[#{name}]:timeless"]
+          !!self[name]
         end
-
       end
     end
   end
