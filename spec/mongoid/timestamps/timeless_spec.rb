@@ -81,7 +81,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "clears out the timeless option after save" do
-          expect(document).to be_timestamping
+          expect(document).to_not be_timeless
         end
 
         context "when subsequently persisting" do
@@ -111,7 +111,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "clears out the timeless option after save" do
-          expect(document).to be_timestamping
+          expect(document).to_not be_timeless
         end
 
         context "when subsequently persisting" do
