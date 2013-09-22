@@ -7,11 +7,6 @@ module Mongoid
     module Timeless
       extend ActiveSupport::Concern
 
-      included do
-        class_attribute :timestamping
-        self.timestamping = true
-      end
-
       # Clears out the timeless option.
       #
       # @example Clear the timeless option.
@@ -21,7 +16,7 @@ module Mongoid
       #
       # @since 3.1.4
       def clear_timeless_option
-        self.class.timestamping = true
+        self.class.clear_timeless_option
       end
 
       # Begin an execution that should skip timestamping.
@@ -33,8 +28,12 @@ module Mongoid
       #
       # @since 2.3.0
       def timeless
-        self.class.timestamping = false
+        self.class.timeless
         self
+      end
+
+      def timeless?
+        self.class.timeless?
       end
 
       private
@@ -50,9 +49,26 @@ module Mongoid
         #
         # @since 2.3.0
         def timeless
-          self.timestamping = false
+          counter = 0
+          counter += 1 if self < Mongoid::Timestamps::Created
+          counter += 1 if self < Mongoid::Timestamps::Updated
+          Thread.current["[mongoid]:[#{name}]:timeless"] = counter
           self
         end
+
+        def clear_timeless_option
+          if counter = Thread.current["[mongoid]:[#{name}]:timeless"]
+            counter -= 1
+            Thread.current["[mongoid]:[#{name}]:timeless"] =
+              (counter == 0) ? nil : counter
+          end
+          true
+        end
+
+        def timeless?
+          !!Thread.current["[mongoid]:[#{name}]:timeless"]
+        end
+
       end
     end
   end
