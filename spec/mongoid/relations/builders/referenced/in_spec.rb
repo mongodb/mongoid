@@ -57,12 +57,13 @@ describe Mongoid::Relations::Builders::Referenced::In do
       context "when the object is an integer" do
 
         before do
-          Person.field :_id, type: Integer
+          Person.field :_id, overwrite: true, type: Integer
         end
 
         after do
           Person.field(
             :_id,
+            overwrite: true,
             type: Moped::BSON::ObjectId,
             pre_processed: true,
             default: ->{ Moped::BSON::ObjectId.new }

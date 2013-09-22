@@ -1,7 +1,7 @@
 class Animal
   include Mongoid::Document
 
-  field :_id, type: String, default: ->{ name.try(:parameterize) }
+  field :_id, type: String, overwrite: true, default: ->{ name.try(:parameterize) }
 
   field :name
   field :height, type: Integer

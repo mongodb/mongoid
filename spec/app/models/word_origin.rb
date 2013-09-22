@@ -1,7 +1,7 @@
 class WordOrigin
   include Mongoid::Document
 
-  field :_id, type: Integer, default: ->{ origin_id }
+  field :_id, type: Integer, overwrite: true, default: ->{ origin_id }
 
   field :origin_id, type: Integer
   field :country, type: String

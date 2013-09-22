@@ -1,7 +1,7 @@
 class Address
   include Mongoid::Document
 
-  field :_id, type: String, default: ->{ street.try(:parameterize) }
+  field :_id, type: String, overwrite: true, default: ->{ street.try(:parameterize) }
 
   attr_accessor :mode
 

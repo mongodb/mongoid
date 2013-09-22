@@ -338,11 +338,11 @@ describe Mongoid::Criteria::Findable do
     context "when using string ids" do
 
       before(:all) do
-        Band.field :_id, type: String
+        Band.field :_id, overwrite: true, type: String
       end
 
       after(:all) do
-        Band.field :_id, type: Moped::BSON::ObjectId, default: ->{ Moped::BSON::ObjectId.new }
+        Band.field :_id, overwrite: true, type: Moped::BSON::ObjectId, default: ->{ Moped::BSON::ObjectId.new }
       end
 
       let!(:band) do
@@ -534,11 +534,11 @@ describe Mongoid::Criteria::Findable do
     context "when using hash ids" do
 
       before(:all) do
-        Band.field :_id, type: Hash
+        Band.field :_id, overwrite: true, type: Hash
       end
 
       after(:all) do
-        Band.field :_id, type: Moped::BSON::ObjectId, default: ->{ Moped::BSON::ObjectId.new }
+        Band.field :_id, overwrite: true, type: Moped::BSON::ObjectId, default: ->{ Moped::BSON::ObjectId.new }
       end
 
       let!(:band) do
@@ -730,11 +730,11 @@ describe Mongoid::Criteria::Findable do
     context "when using integer ids" do
 
       before(:all) do
-        Band.field :_id, type: Integer
+        Band.field :_id, overwrite: true, type: Integer
       end
 
       after(:all) do
-        Band.field :_id, type: Moped::BSON::ObjectId, default: ->{ Moped::BSON::ObjectId.new }
+        Band.field :_id, overwrite: true, type: Moped::BSON::ObjectId, default: ->{ Moped::BSON::ObjectId.new }
       end
 
       let!(:band) do
