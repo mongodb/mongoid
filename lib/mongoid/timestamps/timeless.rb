@@ -36,14 +36,17 @@ module Mongoid
         self.class.timeless?
       end
 
-      private
-
-      module ClassMethods
+      class << self
 
         def timeless_table
           Thread.current['[mongoid]:timeless'] ||= Hash.new
         end
         delegate :[]=, :[], to: :timeless_table
+      end
+
+      private
+
+      module ClassMethods
 
         # Begin an execution that should skip timestamping.
         #
@@ -57,20 +60,20 @@ module Mongoid
           counter = 0
           counter += 1 if self < Mongoid::Timestamps::Created
           counter += 1 if self < Mongoid::Timestamps::Updated
-          self[name] = counter
+          Timeless[name] = counter
           self
         end
 
         def clear_timeless_option
-          if counter = self[name]
+          if counter = Timeless[name]
             counter -= 1
-            self[name] = (counter == 0) ? nil : counter
+            Timeless[name] = (counter == 0) ? nil : counter
           end
           true
         end
 
         def timeless?
-          !!self[name]
+          !!Timeless[name]
         end
       end
     end
