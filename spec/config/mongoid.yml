@@ -26,7 +26,7 @@ test:
       options:
         read: :primary
         write:
-          w: :majority
+          w: majority
     mongohq_repl_uri:
       uri: <%= ENV["MONGOHQ_REPL_URI"]%>
   options:
