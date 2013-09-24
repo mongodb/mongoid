@@ -49,7 +49,7 @@ module Mongoid
     # @param [ String ] name The database name.
     #
     # @since 3.0.0
-    def connect_to(name, options = { read: :secondary_preferred })
+    def connect_to(name, options = { read: :primary })
       self.sessions = {
         default: {
           database: name,
