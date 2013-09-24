@@ -7,6 +7,28 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* Mongoid now supports the new read preferences that the core drivers
+  provide. These include:
+
+    - `:primary`: Will always read from a primary node. (default)
+    - `:primary_preferred`: Attempt a primary first, then secondary if none available.
+    - `:secondary`: Will always read from a secondary node.
+    - `:secondary_preferred`: Attempt a secondary first, then primary if none available.
+    - `:nearest`: Attempt to read from the node with the lowest latency.
+
+    The `:consistency` option is no longer valid, use the `:read` option now.
+
+* Mongoid now defaults all writes to propagate (formerly "safe mode") and now
+  has different propagate semantics:
+
+    - `{ w: -1 }`: Don't verify writes and raise no network errors.
+    - `{ w: 0 }`: Don't verify writes and raise network errors.
+    - `{ w: 1 }`: Verify writes on the primary node. (default)
+    - `{ w: n }`: Verify writes on n number of nodes.
+    - `{ w: :majority }`: Verify writes on a majority of nodes.
+
+    The `:safe` option is no longer valid use the `:write` option now.
+
 * \#3230 Array and Hash fields now validate that the correct types are
   getting set, instead of allowing any value. (Rodrigo Saito)
 
