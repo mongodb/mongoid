@@ -205,7 +205,7 @@ describe Mongoid::Config do
             end
 
             it "sets the read option" do
-              expect(options["read"]).to eq(:primary)
+              expect(options["read"]).to eq("primary")
             end
           end
         end
