@@ -11,6 +11,3 @@ jdk:
 env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -J-Xms512m -J-Xmx1024m"
 services:
   - mongodb
-branches:
-  except:
-    - moped-2-integration
