@@ -279,7 +279,8 @@ describe Mongoid::Sessions::Factory do
             "down_interval" => 10,
             "max_retries" => 5,
             "refresh_interval" => 30,
-            "retry_interval" => 0.1
+            "retry_interval" => 0.1,
+            "write" => { "w" => 1 }
           }
         }
       }
@@ -323,6 +324,10 @@ describe Mongoid::Sessions::Factory do
 
     it "sets the cluster retry interval" do
       expect(cluster.retry_interval).to eq(0.1)
+    end
+
+    it "sets the write concern" do
+      expect(session.write_concern).to be_a(Moped::WriteConcern::Propagate)
     end
   end
 end
