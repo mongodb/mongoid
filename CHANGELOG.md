@@ -25,7 +25,7 @@ For instructions on upgrading to newer versions, visit
     - `{ w: 0 }`: Don't verify writes and raise network errors.
     - `{ w: 1 }`: Verify writes on the primary node. (default)
     - `{ w: n }`: Verify writes on n number of nodes.
-    - `{ w: :majority }`: Verify writes on a majority of nodes.
+    - `{ w: "majority" }`: Verify writes on a majority of nodes.
 
     The `:safe` option is no longer valid use the `:write` option now.
 
