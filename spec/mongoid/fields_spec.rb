@@ -756,7 +756,7 @@ describe Mongoid::Fields do
       it "doesn't raise an error" do
         expect {
           Class.new(Person)
-        }.to_not raise_error(Mongoid::Errors::InvalidField)
+        }.to_not raise_error
       end
     end
 

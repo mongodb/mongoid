@@ -250,7 +250,7 @@ describe Mongoid::Relations::Cascading do
               end
 
               it "raises no error" do
-                expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+                expect{ person.send(method) }.to_not raise_error
               end
 
               it "deletes the parent" do
@@ -289,7 +289,7 @@ describe Mongoid::Relations::Cascading do
               end
 
               it "raises no error" do
-                expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+                expect{ person.send(method) }.to_not raise_error
               end
 
               it "deletes the parent" do
@@ -328,7 +328,7 @@ describe Mongoid::Relations::Cascading do
               end
 
               it "raises no error" do
-                expect{ person.send(method) }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+                expect{ person.send(method) }.to_not raise_error
               end
 
               it "deletes the parent" do

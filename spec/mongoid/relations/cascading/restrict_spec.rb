@@ -38,7 +38,7 @@ describe Mongoid::Relations::Cascading::Restrict do
         end
 
         it "deletes the person" do
-          expect { strategy.cascade }.to_not raise_error(Mongoid::Errors::DeleteRestriction)
+          expect { strategy.cascade }.to_not raise_error
         end
       end
 
