@@ -1,4 +1,4 @@
 class Registry
   include Mongoid::Document
-  field :data, type: Moped::BSON::Binary
+  field :data, type: BSON::Binary
 end

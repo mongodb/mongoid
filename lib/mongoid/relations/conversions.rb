@@ -20,7 +20,7 @@ module Mongoid
       # @since 2.3.0
       def flag(object, metadata)
         inverse = metadata.inverse_klass
-        if inverse.using_object_ids? || object.is_a?(Moped::BSON::ObjectId)
+        if inverse.using_object_ids? || object.is_a?(BSON::ObjectId)
           object
         else
           if object.is_a?(String)

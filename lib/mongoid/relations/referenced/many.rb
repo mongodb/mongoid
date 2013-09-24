@@ -182,15 +182,15 @@ module Mongoid
         # conditions.
         #
         # @example Find by an id.
-        #   person.posts.find(Moped::BSON::ObjectId.new)
+        #   person.posts.find(BSON::ObjectId.new)
         #
         # @example Find by multiple ids.
-        #   person.posts.find([ Moped::BSON::ObjectId.new, Moped::BSON::ObjectId.new ])
+        #   person.posts.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
         #
         # @note This will keep matching documents in memory for iteration
         #   later.
         #
-        # @param [ Moped::BSON::ObjectId, Array<Moped::BSON::ObjectId> ] arg The ids.
+        # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] arg The ids.
         #
         # @return [ Document, Criteria ] The matching document(s).
         #

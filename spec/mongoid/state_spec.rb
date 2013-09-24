@@ -7,7 +7,7 @@ describe Mongoid::State do
     context "when calling new on the document" do
 
       let(:person) do
-        Person.new("_id" => Moped::BSON::ObjectId.new)
+        Person.new("_id" => BSON::ObjectId.new)
       end
 
       it "returns true" do
@@ -18,7 +18,7 @@ describe Mongoid::State do
     context "when the object has been saved" do
 
       let(:person) do
-        Person.instantiate("_id" => Moped::BSON::ObjectId.new)
+        Person.instantiate("_id" => BSON::ObjectId.new)
       end
 
       it "returns false" do

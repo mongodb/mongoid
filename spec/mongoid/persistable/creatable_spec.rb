@@ -468,7 +468,7 @@ describe Mongoid::Persistable::Creatable do
 
         it "raises an error" do
           expect {
-            4.times { Person.with(safe: true).create!(ssn: "555-55-1029") }
+            4.times { Person.create!(ssn: "555-55-1029") }
           }.to raise_error
         end
       end

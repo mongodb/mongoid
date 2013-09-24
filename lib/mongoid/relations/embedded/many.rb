@@ -208,10 +208,10 @@ module Mongoid
         # methods.
         #
         # @example Find a document by its id.
-        #   person.addresses.find(Moped::BSON::ObjectId.new)
+        #   person.addresses.find(BSON::ObjectId.new)
         #
         # @example Find documents for multiple ids.
-        #   person.addresses.find([ Moped::BSON::ObjectId.new, Moped::BSON::ObjectId.new ])
+        #   person.addresses.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
         #
         # @param [ Array<Object> ] args Various arguments.
         #

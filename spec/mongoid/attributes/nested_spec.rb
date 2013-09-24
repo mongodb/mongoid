@@ -650,7 +650,7 @@ describe Mongoid::Attributes::Nested do
 
                   before do
                     person.name_attributes =
-                      { id: Moped::BSON::ObjectId.new.to_s, first_name: "Durran" }
+                      { id: BSON::ObjectId.new.to_s, first_name: "Durran" }
                   end
 
                   it "updates the existing document" do
@@ -917,7 +917,7 @@ describe Mongoid::Attributes::Nested do
 
                   before do
                     animal.person_attributes =
-                      { id: Moped::BSON::ObjectId.new.to_s, title: "Madam" }
+                      { id: BSON::ObjectId.new.to_s, title: "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -1575,7 +1575,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.with(safe: true).save
+                              persisted.save
                             end
 
                             it "deletes the marked document from the relation" do
@@ -1631,7 +1631,7 @@ describe Mongoid::Attributes::Nested do
                           context "when saving the parent" do
 
                             before do
-                              persisted.with(safe: true).save
+                              persisted.save
                             end
 
                             it "deletes the marked document from the relation" do
@@ -2538,7 +2538,7 @@ describe Mongoid::Attributes::Nested do
 
                   before do
                     person.game_attributes =
-                      { id: Moped::BSON::ObjectId.new.to_s, name: "Pong" }
+                      { id: BSON::ObjectId.new.to_s, name: "Pong" }
                   end
 
                   it "updates the existing document" do
@@ -2788,7 +2788,7 @@ describe Mongoid::Attributes::Nested do
 
                   before do
                     game.person_attributes =
-                      { id: Moped::BSON::ObjectId.new.to_s, title: "Madam" }
+                      { id: BSON::ObjectId.new.to_s, title: "Madam" }
                   end
 
                   it "updates the existing document" do
@@ -2963,7 +2963,7 @@ describe Mongoid::Attributes::Nested do
                   expect {
                     person.posts_attributes =
                       { "0" =>
-                        { "id" => Moped::BSON::ObjectId.new.to_s, "title" => "Rogue" }
+                        { "id" => BSON::ObjectId.new.to_s, "title" => "Rogue" }
                       }
                   }.to raise_error(Mongoid::Errors::DocumentNotFound)
                 end
@@ -4381,7 +4381,7 @@ describe Mongoid::Attributes::Nested do
       end
 
       before do
-        address.with(safe: true).update_attributes(attributes)
+        address.update_attributes(attributes)
         address.reload
       end
 
@@ -4507,7 +4507,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.with(safe: true).update_attributes(attributes)
+              person.update_attributes(attributes)
             end
 
             let(:address) do
@@ -4547,7 +4547,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.with(safe: true).update_attributes(attributes)
+              person.update_attributes(attributes)
               person.reload
             end
 
@@ -4578,7 +4578,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.with(safe: true).update_attributes(attributes)
+            person.update_attributes(attributes)
           end
 
           let(:address) do
@@ -4627,7 +4627,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           before do
-            person.with(safe: true).update_attributes(attributes)
+            person.update_attributes(attributes)
           end
 
           it "updates the first level embedded document" do
@@ -4667,7 +4667,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             before do
-              person.with(safe: true).update_attributes(attributes)
+              person.update_attributes(attributes)
             end
 
             it "updates the first level embedded document" do
@@ -4703,7 +4703,7 @@ describe Mongoid::Attributes::Nested do
               end
 
               before do
-                person.with(safe: true).update_attributes(attributes)
+                person.update_attributes(attributes)
               end
 
               it "updates the nested embedded document" do

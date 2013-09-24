@@ -8,7 +8,7 @@ module Mongoid
       # @example Evolve the array to object ids.
       #   [ id ].__evolve_object_id__
       #
-      # @return [ Array<Moped::BSON::ObjectId> ] The converted array.
+      # @return [ Array<BSON::ObjectId> ] The converted array.
       #
       # @since 3.0.0
       def __evolve_object_id__
@@ -33,7 +33,7 @@ module Mongoid
       # @example Evolve the array to object ids.
       #   [ id ].__mongoize_object_id__
       #
-      # @return [ Array<Moped::BSON::ObjectId> ] The converted array.
+      # @return [ Array<BSON::ObjectId> ] The converted array.
       #
       # @since 3.0.0
       def __mongoize_object_id__

@@ -1,11 +1,11 @@
 require "spec_helper"
 
-describe Moped::BSON::Binary do
+describe BSON::Binary do
 
   describe "#mongoize" do
 
     let(:binary) do
-      Moped::BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new(:md5, "testing")
     end
 
     it "returns the binary" do
@@ -16,11 +16,11 @@ describe Moped::BSON::Binary do
   describe ".demongoize" do
 
     let(:binary) do
-      Moped::BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new(:md5, "testing")
     end
 
     let(:demongoized) do
-      Moped::BSON::Binary.demongoize(binary)
+      BSON::Binary.demongoize(binary)
     end
 
     it "returns the binary" do
@@ -31,11 +31,11 @@ describe Moped::BSON::Binary do
   describe ".evolve" do
 
     let(:binary) do
-      Moped::BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new(:md5, "testing")
     end
 
     let(:evolved) do
-      Moped::BSON::Binary.evolve(binary)
+      BSON::Binary.evolve(binary)
     end
 
     it "returns the binary" do
@@ -46,11 +46,11 @@ describe Moped::BSON::Binary do
   describe ".mongoize" do
 
     let(:binary) do
-      Moped::BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new(:md5, "testing")
     end
 
     let(:mongoized) do
-      Moped::BSON::Binary.mongoize(binary)
+      BSON::Binary.mongoize(binary)
     end
 
     it "returns the binary" do

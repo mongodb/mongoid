@@ -34,7 +34,7 @@ describe Mongoid::Sessions::Factory do
           end
 
           it "sets the cluster's seeds" do
-            expect(cluster.seeds).to eq([ "localhost:27017" ])
+            expect(cluster.seeds.first.address.resolved).to eq("127.0.0.1:27017")
           end
         end
 
@@ -68,11 +68,11 @@ describe Mongoid::Sessions::Factory do
           end
 
           it "sets the cluster's seed ports to 27017" do
-            expect(cluster.seeds).to eq([ "localhost:27017" ])
+            expect(cluster.seeds.first.address.original).to eq("localhost:27017")
           end
 
           it "sets ips with no ports to 27017" do
-            expect(default.cluster.seeds).to eq([ "127.0.0.1:27017" ])
+            expect(default.cluster.seeds.first.address.original).to eq("127.0.0.1:27017")
           end
         end
 
@@ -104,7 +104,7 @@ describe Mongoid::Sessions::Factory do
             end
 
             it "sets the cluster's seeds" do
-              expect(cluster.seeds).to eq([ "localhost:27017" ])
+              expect(cluster.seeds.first.address.original).to eq("localhost:27017")
             end
 
             it "sets the database" do
@@ -148,12 +148,16 @@ describe Mongoid::Sessions::Factory do
               session.cluster
             end
 
+            let(:seeds) do
+              cluster.seeds.map{ |node| node.address.original }
+            end
+
             it "returns a session" do
               expect(session).to be_a(Moped::Session)
             end
 
             it "sets the cluster's seeds" do
-              expect(cluster.seeds).to eq([ "localhost:27017", "localhost:27017" ])
+              expect(seeds).to eq([ "localhost:27017", "localhost:27017" ])
             end
 
             it "sets the database" do
@@ -206,12 +210,16 @@ describe Mongoid::Sessions::Factory do
         session.cluster
       end
 
+      let(:seeds) do
+        cluster.seeds.map{ |node| node.address.original }
+      end
+
       it "returns the default session" do
         expect(session).to be_a(Moped::Session)
       end
 
       it "sets the cluster's seeds" do
-        expect(cluster.seeds).to eq([ "localhost:27017" ])
+        expect(seeds).to eq([ "localhost:27017" ])
       end
     end
 
@@ -247,12 +255,16 @@ describe Mongoid::Sessions::Factory do
       session.cluster
     end
 
+    let(:seeds) do
+      cluster.seeds.map{ |node| node.address.original }
+    end
+
     it "returns the default session" do
       expect(session).to be_a(Moped::Session)
     end
 
     it "sets the cluster's seeds" do
-      expect(cluster.seeds).to eq([ "localhost:27017" ])
+      expect(seeds).to eq([ "localhost:27017" ])
     end
   end
 
@@ -267,7 +279,8 @@ describe Mongoid::Sessions::Factory do
             "down_interval" => 10,
             "max_retries" => 5,
             "refresh_interval" => 30,
-            "retry_interval" => 0.1
+            "retry_interval" => 0.1,
+            "write" => { "w" => 1 }
           }
         }
       }
@@ -285,12 +298,16 @@ describe Mongoid::Sessions::Factory do
       session.cluster
     end
 
+    let(:seeds) do
+      cluster.seeds.map{ |node| node.address.original }
+    end
+
     it "returns the default session" do
       expect(session).to be_a(Moped::Session)
     end
 
     it "sets the cluster's seeds" do
-      expect(cluster.seeds).to eq([ "localhost:27017" ])
+      expect(seeds).to eq([ "localhost:27017" ])
     end
 
     it "sets the cluster down interval" do
@@ -307,6 +324,10 @@ describe Mongoid::Sessions::Factory do
 
     it "sets the cluster retry interval" do
       expect(cluster.retry_interval).to eq(0.1)
+    end
+
+    it "sets the write concern" do
+      expect(session.write_concern).to be_a(Moped::WriteConcern::Propagate)
     end
   end
 end

@@ -12,7 +12,7 @@ describe Mongoid::Config do
   describe "#configured?" do
 
     after do
-      described_class.connect_to(database_id, consistency: :strong)
+      described_class.connect_to(database_id, read: :primary)
     end
 
     context "when a default session config exists" do
@@ -204,8 +204,8 @@ describe Mongoid::Config do
               default["options"]
             end
 
-            it "sets the consistency option" do
-              expect(options["consistency"]).to eq(:strong)
+            it "sets the read option" do
+              expect(options["read"]).to eq(:primary)
             end
           end
         end

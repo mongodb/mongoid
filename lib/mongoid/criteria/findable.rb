@@ -24,12 +24,12 @@ module Mongoid
       # Find the matchind document(s) in the criteria for the provided ids.
       #
       # @example Find by an id.
-      #   criteria.find(Moped::BSON::ObjectId.new)
+      #   criteria.find(BSON::ObjectId.new)
       #
       # @example Find by multiple ids.
-      #   criteria.find([ Moped::BSON::ObjectId.new, Moped::BSON::ObjectId.new ])
+      #   criteria.find([ BSON::ObjectId.new, BSON::ObjectId.new ])
       #
-      # @param [ Array<Moped::BSON::ObjectId> ] args The ids to search for.
+      # @param [ Array<BSON::ObjectId> ] args The ids to search for.
       #
       # @return [ Array<Document>, Document ] The matching document(s).
       #

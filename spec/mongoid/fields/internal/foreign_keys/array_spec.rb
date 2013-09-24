@@ -57,7 +57,7 @@ require "spec_helper"
   # describe "#eval_default" do
 
     # let(:default) do
-      # [ Moped::BSON::ObjectId.new ]
+      # [ BSON::ObjectId.new ]
     # end
 
     # let(:field) do
@@ -143,7 +143,7 @@ require "spec_helper"
       # context "when using object ids" do
 
         # let(:object_id) do
-          # Moped::BSON::ObjectId.new
+          # BSON::ObjectId.new
         # end
 
         # it "performs conversion on the ids if strings" do
@@ -154,7 +154,7 @@ require "spec_helper"
       # context "when not using object ids" do
 
         # let(:object_id) do
-          # Moped::BSON::ObjectId.new
+          # BSON::ObjectId.new
         # end
 
         # before do
@@ -162,16 +162,16 @@ require "spec_helper"
             # :_id,
             # type: String,
             # pre_processed: true,
-            # default: ->{ Moped::BSON::ObjectId.new.to_s }
+            # default: ->{ BSON::ObjectId.new.to_s }
           # )
         # end
 
         # after do
           # Person.field(
             # :_id,
-            # type: Moped::BSON::ObjectId,
+            # type: BSON::ObjectId,
             # pre_processed: true,
-            # default: ->{ Moped::BSON::ObjectId.new }
+            # default: ->{ BSON::ObjectId.new }
           # )
         # end
 

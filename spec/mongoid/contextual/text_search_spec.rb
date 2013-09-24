@@ -22,8 +22,8 @@ describe Mongoid::Contextual::TextSearch do
     end
 
     before do
-      Word.with(safe: true).create!(name: "phase", origin: "latin")
-      Word.with(safe: true).create!(name: "phazed", origin: "latin")
+      Word.create!(name: "phase", origin: "latin")
+      Word.create!(name: "phazed", origin: "latin")
     end
 
     context "when the search is projecting" do
@@ -72,8 +72,8 @@ describe Mongoid::Contextual::TextSearch do
     end
 
     before do
-      Word.with(safe: true).create!(name: "phase", origin: "latin")
-      Word.with(safe: true).create!(name: "phazed", origin: "latin")
+      Word.create!(name: "phase", origin: "latin")
+      Word.create!(name: "phazed", origin: "latin")
     end
 
     let(:results) do
@@ -193,7 +193,7 @@ describe Mongoid::Contextual::TextSearch do
     end
 
     before do
-      Word.with(safe: true).create!(name: "phase", origin: "latin")
+      Word.create!(name: "phase", origin: "latin")
     end
 
     let(:stats) do

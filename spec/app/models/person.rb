@@ -24,7 +24,7 @@ class Person
   field :owner_id, type: Integer
   field :security_code
   field :reading, type: Object
-  field :bson_id, type: Moped::BSON::ObjectId
+  field :bson_id, type: BSON::ObjectId
   field :pattern, type: Regexp
   field :override_me, type: Integer
   field :at, as: :aliased_timestamp, type: Time

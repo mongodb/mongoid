@@ -8,7 +8,7 @@ module Mongoid
       # @example Evolve the object id.
       #   object_id.__evolve_object_id__
       #
-      # @return [ Moped::BSON::ObjectId ] self.
+      # @return [ BSON::ObjectId ] self.
       #
       # @since 3.0.0
       def __evolve_object_id__
@@ -25,7 +25,7 @@ module Mongoid
         #
         # @param [ Object ] object The object to evolve.
         #
-        # @return [ Moped::BSON::ObjectId ] The object id.
+        # @return [ BSON::ObjectId ] The object id.
         #
         # @since 3.0.0
         def evolve(object)
@@ -39,7 +39,7 @@ module Mongoid
         #
         # @param [ Object ] object The object to convert.
         #
-        # @return [ Moped::BSON::ObjectId ] The object id.
+        # @return [ BSON::ObjectId ] The object id.
         #
         # @since 3.0.0
         def mongoize(object)
@@ -50,5 +50,5 @@ module Mongoid
   end
 end
 
-Moped::BSON::ObjectId.__send__(:include, Mongoid::Extensions::ObjectId)
-Moped::BSON::ObjectId.__send__(:extend, Mongoid::Extensions::ObjectId::ClassMethods)
+BSON::ObjectId.__send__(:include, Mongoid::Extensions::ObjectId)
+BSON::ObjectId.__send__(:extend, Mongoid::Extensions::ObjectId::ClassMethods)

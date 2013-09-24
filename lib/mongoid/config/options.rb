@@ -20,7 +20,7 @@ module Mongoid
       # Define a configuration option with a default.
       #
       # @example Define the option.
-      #   Options.option(:persist_in_safe_mode, :default => false)
+      #   Options.option(:persist_in_safe_mode, :default => true)
       #
       # @param [ Symbol ] name The name of the configuration option.
       # @param [ Hash ] options Extras for the option.

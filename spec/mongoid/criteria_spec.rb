@@ -716,7 +716,7 @@ describe Mongoid::Criteria do
   describe "#extract_id" do
 
     let(:id) do
-      Moped::BSON::ObjectId.new
+      BSON::ObjectId.new
     end
 
     context "when an id exists" do
@@ -1046,7 +1046,7 @@ describe Mongoid::Criteria do
       context "when querying on a foreign key" do
 
         let(:id) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let!(:match_one) do
@@ -1137,7 +1137,7 @@ describe Mongoid::Criteria do
     end
 
     let!(:person) do
-      Person.create
+      Person.create(age: 1)
     end
 
     context "when providing a name that is not a relation" do
@@ -1595,7 +1595,7 @@ describe Mongoid::Criteria do
       context "when the criteria is from the root" do
 
         let!(:person_two) do
-          Person.create
+          Person.create(age: 2)
         end
 
         let!(:post_one) do
@@ -1699,7 +1699,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.all
+          Person.asc(:age).all
         end
 
         let!(:context) do
@@ -1765,7 +1765,7 @@ describe Mongoid::Criteria do
         end
 
         let(:criteria) do
-          Person.all
+          Person.asc(:age).all
         end
 
         let!(:context) do
@@ -1800,7 +1800,7 @@ describe Mongoid::Criteria do
         end
 
         let(:criteria) do
-          Person.all
+          Person.asc(:age).all
         end
 
         let!(:context) do
@@ -1843,7 +1843,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.asc(:_id).limit(1)
+          Person.asc(:age).limit(1)
         end
 
         let(:context) do
@@ -1893,7 +1893,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:preferences)
+          Person.asc(:age).includes(:preferences)
         end
 
         let(:context) do
@@ -1932,7 +1932,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:preferences)
+          Person.asc(:age).includes(:preferences)
         end
 
         let(:context) do
@@ -1971,7 +1971,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:preferences)
+          Person.asc(:age).includes(:preferences)
         end
 
         let(:context) do
@@ -2018,7 +2018,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:preferences).asc(:_id).limit(1)
+          Person.includes(:preferences).asc(:age).limit(1)
         end
 
         let(:context) do
@@ -2072,7 +2072,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:posts)
+          Person.asc(:age).includes(:posts)
         end
 
         let(:context) do
@@ -2107,7 +2107,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:posts)
+          Person.asc(:age).includes(:posts)
         end
 
         let(:context) do
@@ -2157,7 +2157,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:posts)
+          Person.asc(:age).includes(:posts)
         end
 
         let(:context) do
@@ -2215,7 +2215,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:posts).asc(:_id).limit(1)
+          Person.includes(:posts).asc(:age).limit(1)
         end
 
         let(:context) do
@@ -2265,7 +2265,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.includes(:game)
+          Person.asc(:age).includes(:game)
         end
 
         let(:context) do
@@ -2311,7 +2311,7 @@ describe Mongoid::Criteria do
       context "when the criteria has limiting options" do
 
         let!(:person_two) do
-          Person.create
+          Person.create(age: 2)
         end
 
         let!(:game_three) do
@@ -2323,7 +2323,7 @@ describe Mongoid::Criteria do
         end
 
         let!(:criteria) do
-          Person.where(id: person.id).includes(:game).asc(:_id).limit(1)
+          Person.where(id: person.id).includes(:game).asc(:age).limit(1)
         end
 
         let(:context) do
@@ -2355,7 +2355,7 @@ describe Mongoid::Criteria do
     context "when including a belongs to" do
 
       let(:person_two) do
-        Person.create
+        Person.create(age: 2)
       end
 
       let!(:game_one) do
@@ -2460,7 +2460,7 @@ describe Mongoid::Criteria do
       end
 
       let!(:criteria) do
-        Person.includes(:posts, :game)
+        Person.includes(:posts, :game).asc(:age)
       end
 
       let(:context) do
@@ -3432,7 +3432,7 @@ describe Mongoid::Criteria do
     before do
       Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
       Word.create_indexes
-      Word.with(safe: true).create!(name: "phase", origin: "latin")
+      Word.create!(name: "phase", origin: "latin")
     end
 
     after(:all) do
@@ -3556,11 +3556,11 @@ describe Mongoid::Criteria do
       context "when the criteria is an exact fk array match" do
 
         let(:id_one) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:id_two) do
-          Moped::BSON::ObjectId.new
+          BSON::ObjectId.new
         end
 
         let(:criteria) do

@@ -1,5 +1,5 @@
 # encoding: utf-8
-class Moped::BSON::ObjectId
+class BSON::ObjectId
   def as_json(options = nil)
     { "$oid" => to_s }
   end

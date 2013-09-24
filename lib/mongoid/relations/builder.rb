@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Document ] base The base document.
       # @param [ Metdata ] metadata The metadata for the relation.
-      # @param [ Hash, Moped::BSON::ObjectId ] object The attributes to build from or
+      # @param [ Hash, BSON::ObjectId ] object The attributes to build from or
       #   id to query with.
       #
       # @since 2.0.0.rc.1

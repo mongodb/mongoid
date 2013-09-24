@@ -314,7 +314,7 @@ module Mongoid
       # @since 3.0.15
       def __session__
         if command[:out][:inline] != 1
-          session.with(consistency: :strong)
+          session.with(read: :primary)
         else
           session
         end
