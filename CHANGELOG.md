@@ -162,6 +162,8 @@ For instructions on upgrading to newer versions, visit
 * \#2603 Return values from setters are now always the set value, regardless
   of calling the setter or using send.
 
+* \#2597 Mongoid::Observer was removed in line with Rails 4 Core.
+
 * \#2563 The `allow_dynamic_fields` configuration option has been removed as
   dynamic fields are now allowed on a per-model level. In order to allow a
   model to use dynamic fields, simply include the module in each.
