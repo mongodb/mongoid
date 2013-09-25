@@ -90,14 +90,27 @@ module Mongoid
           cache_column = meta.counter_cache_column_name.to_sym
 
           after_create do
-            record = __send__(name)
-            record.class.increment_counter(cache_column, record.id) if record.try(:persisted?)
+            if record = __send__(name)
+              record[cache_column] = (record[cache_column] || 0) + 1
+
+              if record.persisted?
+                record.class.increment_counter(cache_column, record.id)
+                record.remove_change(cache_column)
+              end
+            end
           end
 
           before_destroy do
-            record = __send__(name)
-            record.class.decrement_counter(cache_column, record.id) if record.try(:persisted?)
+            if record = __send__(name)
+              record[cache_column] = (record[cache_column] || 0) - 1
+
+              if record.persisted?
+                record.class.decrement_counter(cache_column, record.id)
+                record.remove_change(cache_column)
+              end
+            end
           end
+
         end
       end
     end

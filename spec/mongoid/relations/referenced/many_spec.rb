@@ -192,7 +192,23 @@ describe Mongoid::Relations::Referenced::Many do
           end
 
           it "increments the counter cache" do
-            expect(person.reload.posts_count).to eq(1)
+            expect(person[:posts_count]).to eq(1)
+            expect(person.posts_count).to eq(1)
+          end
+
+          it "doesnt change the list of changes" do
+            expect(person.changed).to eq([])
+          end
+
+          context "when saving another post" do
+
+            before do
+              person.posts.send(method, Post.new)
+            end
+
+            it "increments the counter cache" do
+              expect(person.posts_count).to eq(2)
+            end
           end
 
           context "when documents already exist on the relation" do
