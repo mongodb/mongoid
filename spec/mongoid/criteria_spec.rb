@@ -1628,7 +1628,7 @@ describe Mongoid::Criteria do
             criteria.first
           end
 
-          it "eager loads for the first document" do
+          pending "eager loads for the first document" do
             expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to eq(person)
           end
 
