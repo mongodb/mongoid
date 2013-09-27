@@ -227,6 +227,14 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Mongoid now uses ActiveSupport::LogSubscriber to subscribe logs, and
+  ActiveSupport::Notifications to send operation logs. (Arthur Neves)
+  Example of log subscription:
+
+    ActiveSupport::Notifications.subscribe('query.moped') do |event|
+      ..
+    end
+
 * \#3155 Range field will persist the exclude_end when provided.
   (Daniel Libanori)
 
