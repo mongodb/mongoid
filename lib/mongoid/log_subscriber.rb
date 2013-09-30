@@ -2,9 +2,15 @@ module Mongoid
 
   class LogSubscriber < ActiveSupport::LogSubscriber
     def query(event)
+      return unless logger.debug?
+
       payload = event.payload
       runtime = ("%.4fms" % event.duration)
-      Moped::Loggable.log_operations(payload[:prefix], payload[:ops], runtime)
+      debug(payload[:prefix], payload[:ops], runtime)
+    end
+
+    def debug(prefix, operations, runtime)
+      Moped::Loggable.log_operations(prefix, operations, runtime)
     end
 
     def logger
