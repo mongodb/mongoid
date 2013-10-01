@@ -80,7 +80,7 @@ module Mongoid
         # @api private
         #
         # @example Add the touchable.
-        #   Person.add_counter_callbacks(meta)
+        #   Person.add_counter_cache_callbacks(meta)
         #
         # @param [ Metadata ] metadata The metadata for the relation.
         #
