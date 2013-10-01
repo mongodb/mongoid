@@ -36,7 +36,7 @@ module Mongoid
         #              :comments_count => 5, :likes_count => -2)
         #
         # @param [ String ] The id of the object to update.
-        # @param [ Hash ] Key = counter_cahe and Value = factor.
+        # @param [ Hash ] Key = counter_cache and Value = factor.
         #
         # @since 3.1.0
         def update_counters(id, counters)
@@ -45,13 +45,13 @@ module Mongoid
 
         # Increment the counter name from the entries that match the
         # id by one. This method is used on associations callbacks
-        # when counter_cache is enable
+        # when counter_cache is enabled
         #
         # @example Increment comments counter
         #   Post.increment_counter(:comments_count, '50e0edd97c71c17ea9000001')
         #
         # @param [ Symbol ] Counter cache name
-        # @param [ String ] The id of the object that will be reset.
+        # @param [ String ] The id of the object that will have its counter incremented.
         #
         # @since 3.1.0
         def increment_counter(counter_name, id)
@@ -60,13 +60,13 @@ module Mongoid
 
         # Decrement the counter name from the entries that match the
         # id by one. This method is used on associations callbacks
-        # when counter_cache is enable
+        # when counter_cache is enabled
         #
         # @example Decrement comments counter
         #   Post.decrement_counter(:comments_count, '50e0edd97c71c17ea9000001')
         #
         # @param [ Symbol ] Counter cache name
-        # @param [ String ] The id of the object that will be reset.
+        # @param [ String ] The id of the object that will have its counter decremented.
         #
         # @since 3.1.0
         def decrement_counter(counter_name, id)
