@@ -9,8 +9,13 @@ module Mongoid
     include Options
 
     included do
-      cattr_accessor :default_collection_name, :storage_options
-      self.default_collection_name = self.name.collectionize.to_sym
+      cattr_accessor :default_collection_name do
+        self.name.collectionize.to_sym
+      end
+
+      cattr_accessor :storage_options, instance_writer: false do
+        {}
+      end
     end
 
     class << self
@@ -214,8 +219,7 @@ module Mongoid
       # @since 3.0.0
       def store_in(options)
         Validators::Storage.validate(self, options)
-        self.storage_options ||= {}
-        self.storage_options.merge!(options)
+        storage_options.merge!(options)
       end
 
       private
