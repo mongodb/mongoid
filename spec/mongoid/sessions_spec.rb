@@ -505,6 +505,19 @@ describe Mongoid::Sessions do
       end
     end
 
+    context "when provided a class that extend another document" do
+
+      let(:klass) do
+        Class.new(Band)
+      end
+
+      it "raises an error" do
+        expect {
+          klass.store_in(database: :artists)
+        }.to raise_error(Mongoid::Errors::InvalidStorageOptions)
+      end
+    end
+
     context "when provided a hash" do
 
       context "when the hash is not valid" do
