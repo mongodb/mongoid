@@ -4,72 +4,76 @@ describe Mongoid::Sessions do
 
   describe "#collection" do
 
-    context "when overriding the default with store_in" do
+    shared_examples_for "an overridden collection at the class level" do
 
-      shared_examples_for "an overridden collection at the class level" do
+      let(:band) do
+        klass.new
+      end
 
-        let(:band) do
-          Band.new
-        end
+      it "returns the collection for the model" do
+        expect(band.collection).to be_a(Moped::Collection)
+      end
+
+      it "sets the correct collection name" do
+        expect(band.collection.name).to eq("artists")
+      end
+
+      context "when accessing from the class level" do
 
         it "returns the collection for the model" do
-          expect(band.collection).to be_a(Moped::Collection)
+          expect(klass.collection).to be_a(Moped::Collection)
         end
 
         it "sets the correct collection name" do
-          expect(band.collection.name.to_s).to eq("artists")
-        end
-
-        context "when accessing from the class level" do
-
-          it "returns the collection for the model" do
-            expect(Band.collection).to be_a(Moped::Collection)
-          end
-
-          it "sets the correct collection name" do
-            expect(Band.collection.name.to_s).to eq("artists")
-          end
-        end
-
-        context "when safety options exist" do
-
-          context "when the options are from the current thread" do
-
-            before do
-              Band.with(safe: { w: 3 })
-            end
-
-            it "clears the options from the current thread" do
-              Band.collection
-              expect(Band.persistence_options).to be_nil
-            end
-
-            it "returns the collection" do
-              expect(Band.collection).to be_a(Moped::Collection)
-            end
-          end
+          expect(klass.collection.name).to eq("artists")
         end
       end
+    end
+
+    context "when overriding the persistence options" do
+
+      let(:klass) do
+        Band.with(collection: "artists")
+      end
+
+      it_behaves_like "an overridden collection at the class level"
+    end
+
+    context "when overriding store_in and persistence options" do
+
+      let(:klass) do
+        Band.with(collection: "artists")
+      end
+
+      before do
+        Band.store_in collection: "foo"
+      end
+
+      it_behaves_like "an overridden collection at the class level"
+    end
+
+    context "when overriding the default with store_in" do
 
       after do
-        Band.storage_options = {}
+        Band.reset_storage_options!
       end
 
       context "when called multiple times with different options" do
+
         before do
           Band.store_in collection: "artists"
           Band.store_in session: "another"
         end
 
         it "should merge the options together" do
-          expect(Band.storage_options).to eq({
-            collection: "artists",
-            session: "another"
-          })
+          expect(Band.storage_options[:collection]).to eq("artists")
+          expect(Band.storage_options[:session]).to eq("another")
         end
       end
 
       context "when overriding with a proc" do
+
+        let(:klass) { Band }
 
         before do
           Band.store_in(collection: ->{ "artists" })
@@ -80,6 +84,8 @@ describe Mongoid::Sessions do
 
       context "when overriding with a string" do
 
+        let(:klass) { Band }
+
         before do
           Band.store_in(collection: "artists")
         end
@@ -88,6 +94,8 @@ describe Mongoid::Sessions do
       end
 
       context "when overriding with a symbol" do
+
+        let(:klass) { Band }
 
         before do
           Band.store_in(collection: :artists)
@@ -126,31 +134,55 @@ describe Mongoid::Sessions do
 
   describe "#collection_name" do
 
-    context "when overriding the default with store_in" do
+    shared_examples_for "an overridden collection name at the class level" do
 
-      shared_examples_for "an overridden collection name at the class level" do
+      let(:band) do
+        klass.new
+      end
 
-        let(:band) do
-          Band.new
-        end
+      context "when accessing from the instance" do
 
-        context "when accessing from the instance" do
-
-          it "returns the overridden value" do
-            expect(band.collection_name).to eq(:artists)
-          end
-        end
-
-        context "when accessing from the class level" do
-
-          it "returns the overridden value" do
-            expect(Band.collection_name).to eq(:artists)
-          end
+        it "returns the overridden value" do
+          expect(band.collection_name).to eq(:artists)
         end
       end
 
+      context "when accessing from the class level" do
+
+        it "returns the overridden value" do
+          expect(klass.collection_name).to eq(:artists)
+        end
+      end
+    end
+
+    context "when overriding the persistence options" do
+
+      let(:klass) do
+        Band.with(collection: "artists")
+      end
+
+      it_behaves_like "an overridden collection name at the class level"
+    end
+
+    context "when overriding store_in and persistence options" do
+
+      let(:klass) do
+        Band.with(collection: "artists")
+      end
+
+      before do
+        Band.store_in collection: "foo"
+      end
+
+      it_behaves_like "an overridden collection name at the class level"
+    end
+
+    context "when overriding the default with store_in" do
+
+      let(:klass) { Band }
+
       after do
-        Band.storage_options = {}
+        Band.reset_storage_options!
       end
 
       context "when overriding with a proc" do
@@ -230,10 +262,6 @@ describe Mongoid::Sessions do
       Mongoid.sessions[:default][:database] = database_id
     end
 
-    after do
-      Band.storage_options = {}
-    end
-
     context "when getting the default" do
 
       let(:file) do
@@ -241,14 +269,9 @@ describe Mongoid::Sessions do
       end
 
       before do
-        Band.storage_options = {}
         described_class.clear
         Mongoid.load!(file, :test)
         Mongoid.sessions[:default][:database] = database_id
-      end
-
-      after do
-        Band.storage_options = {}
       end
 
       let!(:band) do
@@ -260,7 +283,7 @@ describe Mongoid::Sessions do
       end
 
       it "returns the default session" do
-        expect(mongo_session.options[:database]).to eq(database_id)
+        expect(mongo_session.options[:database].to_s).to eq(database_id)
       end
     end
 
@@ -404,7 +427,7 @@ describe Mongoid::Sessions do
     end
 
     after do
-      Band.storage_options = {}
+      Band.reset_storage_options!
     end
 
     context "when getting the default" do
@@ -414,7 +437,7 @@ describe Mongoid::Sessions do
       end
 
       before do
-        Band.storage_options = {}
+        Band.reset_storage_options!
         described_class.clear
         Mongoid.load!(file, :test)
         Mongoid.sessions[:default][:database] = database_id
@@ -425,7 +448,7 @@ describe Mongoid::Sessions do
       end
 
       it "returns the default session" do
-        expect(mongo_session.options[:database]).to eq(database_id)
+        expect(mongo_session.options[:database].to_s).to eq(database_id)
       end
     end
 
@@ -469,27 +492,6 @@ describe Mongoid::Sessions do
         expect {
           Band.mongo_session
         }.to raise_error(Mongoid::Errors::NoSessionConfig)
-      end
-    end
-  end
-
-  describe ".persistence_options" do
-
-    context "when options exist on the current thread" do
-
-      let(:klass) do
-        Band.with(safe: { w: 2 })
-      end
-
-      it "returns the options" do
-        expect(klass.persistence_options).to eq(safe: { w: 2 })
-      end
-    end
-
-    context "when there are no options on the current thread" do
-
-      it "returns nil" do
-        expect(Band.persistence_options).to be_nil
       end
     end
   end
