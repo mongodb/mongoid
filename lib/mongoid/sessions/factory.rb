@@ -61,6 +61,8 @@ module Mongoid
         raise Errors::NoSessionsConfig.new unless configuration
         config, options = parse(configuration)
         configuration.merge!(config) if configuration.delete(:uri)
+
+        options[:instrumenter] = ActiveSupport::Notifications
         session = Moped::Session.new(config[:hosts], options)
         session.use(config[:database])
         if authenticated?(config)

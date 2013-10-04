@@ -162,6 +162,8 @@ For instructions on upgrading to newer versions, visit
 * \#2603 Return values from setters are now always the set value, regardless
   of calling the setter or using send.
 
+* \#2597 `Mongoid::Observer` was removed in line with Rails 4.
+
 * \#2563 The `allow_dynamic_fields` configuration option has been removed as
   dynamic fields are now allowed on a per-model level. In order to allow a
   model to use dynamic fields, simply include the module in each.
@@ -224,6 +226,14 @@ For instructions on upgrading to newer versions, visit
     document updates cannot be mixed at this time.
 
 ### New Features
+
+* Mongoid now uses ActiveSupport::LogSubscriber to subscribe logs, and
+  ActiveSupport::Notifications to send operation logs. (Arthur Neves)
+  Example of log subscription:
+
+    ActiveSupport::Notifications.subscribe('query.moped') do |event|
+      ..
+    end
 
 * \#3155 Range field will persist the exclude_end when provided.
   (Daniel Libanori)
