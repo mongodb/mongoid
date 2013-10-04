@@ -15,6 +15,7 @@ end
 
 require "mongoid"
 require "rspec"
+require "helpers"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.
@@ -89,6 +90,7 @@ ActiveSupport::Inflector.inflections do |inflect|
 end
 
 RSpec.configure do |config|
+  config.include Helpers
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
