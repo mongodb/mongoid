@@ -40,4 +40,38 @@ describe Mongoid::Relations::Eager::HasOne do
       eager.set_on_parent(person.username, :foo)
     end
   end
+
+  describe ".includes" do
+
+    before do
+      3.times { Cat.create!(person: person) }
+      Cat.create!(person: Person.create!)
+    end
+
+    context "when including the has_one relation" do
+
+      it "queries twice" do
+
+        expect_query(2) do
+
+          Person.all.includes(:cat).each do |person|
+            expect(person.cat).to_not be_nil
+          end
+        end
+      end
+    end
+
+    context "when including more than one has_one relation" do
+
+      it "queries 3 times" do
+
+        expect_query(3) do
+
+          Person.all.includes(:cat, :account).each do |person|
+            expect(person.cat).to_not be_nil
+          end
+        end
+      end
+    end
+  end
 end

@@ -40,4 +40,26 @@ describe Mongoid::Relations::Eager::BelongsTo do
       eager.set_on_parent(person.id, :foo)
     end
   end
+
+  describe ".includes" do
+
+    before do
+      3.times { |i| Account.create!(person: person, name: "savings#{i}") }
+    end
+
+    context "when including the belongs_to relation" do
+
+      it "queries twice" do
+
+        expect_query(2) do
+          Account.all.includes(:person).each do |account|
+            expect(account.person).to_not be_nil
+          end
+        end
+      end
+    end
+
+
+  end
+
 end
