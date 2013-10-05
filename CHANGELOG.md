@@ -16,6 +16,10 @@ For instructions on upgrading to newer versions, visit
     - `:secondary_preferred`: Attempt a secondary first, then primary if none available.
     - `:nearest`: Attempt to read from the node with the lowest latency.
 
+    Sample syntax:
+
+        Person.with(read: :secondary).first
+
     The `:consistency` option is no longer valid, use the `:read` option now.
 
 * Mongoid now defaults all writes to propagate (formerly "safe mode") and now
@@ -26,6 +30,10 @@ For instructions on upgrading to newer versions, visit
     - `{ w: 1 }`: Verify writes on the primary node. (default)
     - `{ w: n }`: Verify writes on n number of nodes.
     - `{ w: "majority" }`: Verify writes on a majority of nodes.
+
+    Sample syntax:
+
+        Person.with(write: {w: :majority}).create!(name: "John)
 
     The `:safe` option is no longer valid use the `:write` option now.
 
