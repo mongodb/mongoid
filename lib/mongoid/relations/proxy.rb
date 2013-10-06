@@ -236,34 +236,6 @@ module Mongoid
         def apply_ordering(criteria, metadata)
           metadata.order ? criteria.order_by(metadata.order) : criteria
         end
-
-        # Get the criteria that is used to eager load a relation of this
-        # type.
-        #
-        # @example Get the eager load criteria.
-        #   Proxy.eager_load(metadata, criteria)
-        #
-        # @param [ Metadata ] metadata The relation metadata.
-        # @param [ Array<Object> ] ids The ids of the base docs.
-        #
-        # @return [ Criteria ] The criteria to eager load the relation.
-        #
-        # @since 2.2.0
-        def eager_load_ids(metadata, ids)
-          klass, foreign_key = metadata.klass, metadata.foreign_key
-          eager_loaded = klass.any_in(foreign_key => ids).entries
-          ids.each do |id|
-            sel = { foreign_key => id }
-            sel.merge!(metadata.type_relation) if klass.hereditary?
-            IdentityMap.clear_many(klass, sel)
-          end
-          eager_loaded.each do |doc|
-            base_id = doc.__send__(foreign_key)
-            sel = { foreign_key => base_id }
-            sel.merge!(metadata.type_relation) if klass.hereditary?
-            yield(doc,  sel)
-          end
-        end
       end
     end
   end
