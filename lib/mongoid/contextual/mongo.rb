@@ -424,7 +424,7 @@ module Mongoid
       # Update all the matching documents atomically.
       #
       # @example Update all the matching documents.
-      #   context.update({ "$set" => { name: "Smiths" }})
+      #   context.update_all({ "$set" => { name: "Smiths" }})
       #
       # @param [ Hash ] attributes The new attributes for each document.
       #
