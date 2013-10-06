@@ -1308,6 +1308,10 @@ describe Mongoid::Attributes do
         product.cost = 500
       end
 
+      it "adds the alias for criteria" do
+        expect(Product.where(cost: 500).selector).to eq("price" => 500)
+      end
+
       it "aliases the getter" do
         expect(product.cost).to eq(500)
       end

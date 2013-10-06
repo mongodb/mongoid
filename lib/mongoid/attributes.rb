@@ -268,6 +268,7 @@ module Mongoid
       #
       # @since 2.3.0
       def alias_attribute(name, original)
+        aliased_fields[name.to_s] = original.to_s
         class_eval <<-RUBY
           alias #{name}  #{original}
           alias #{name}= #{original}=
