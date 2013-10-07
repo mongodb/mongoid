@@ -275,6 +275,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3089 Allow demongoization of strings to floats (Daniel Libanori)
+
 * \#3278 Counter cache should update the document in memory too. (Arthur Neves)
 
 * \#3242 Has_many relation must use the inverse foreign_key. (Arthur Neves)
