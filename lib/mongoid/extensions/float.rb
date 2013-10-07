@@ -47,6 +47,7 @@ module Mongoid
             nil
           end
         end
+        alias :demongoize :mongoize
       end
     end
   end

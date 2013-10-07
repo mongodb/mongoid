@@ -36,6 +36,20 @@ describe Mongoid::Extensions::Float do
         expect(Float.demongoize(nil)).to be_nil
       end
     end
+
+    context "when the value is a float string" do
+
+      it "returns a float" do
+        expect(Float.demongoize(number.to_s)).to eq(number)
+      end
+    end
+
+    context "when the value is a no float string" do
+
+      it "returns a float" do
+        expect(Float.demongoize('asdf')).to eq(0)
+      end
+    end
   end
 
   describe ".mongoize" do
