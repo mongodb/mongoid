@@ -44,7 +44,7 @@ describe Mongoid::Extensions::Float do
       end
     end
 
-    context "when the value is a no float string" do
+    context "when the value is not a float string" do
 
       it "returns a float" do
         expect(Float.demongoize('asdf')).to eq(0)
