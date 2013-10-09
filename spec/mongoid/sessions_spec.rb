@@ -52,7 +52,7 @@ describe Mongoid::Sessions do
       end
 
       after do
-        Band.storage_options = nil
+        Band.storage_options = {}
       end
 
       context "when called multiple times with different options" do
@@ -150,7 +150,7 @@ describe Mongoid::Sessions do
       end
 
       after do
-        Band.storage_options = nil
+        Band.storage_options = {}
       end
 
       context "when overriding with a proc" do
@@ -231,7 +231,7 @@ describe Mongoid::Sessions do
     end
 
     after do
-      Band.storage_options = nil
+      Band.storage_options = {}
     end
 
     context "when getting the default" do
@@ -241,14 +241,14 @@ describe Mongoid::Sessions do
       end
 
       before do
-        Band.storage_options = nil
+        Band.storage_options = {}
         described_class.clear
         Mongoid.load!(file, :test)
         Mongoid.sessions[:default][:database] = database_id
       end
 
       after do
-        Band.storage_options = nil
+        Band.storage_options = {}
       end
 
       let!(:band) do
@@ -404,7 +404,7 @@ describe Mongoid::Sessions do
     end
 
     after do
-      Band.storage_options = nil
+      Band.storage_options = {}
     end
 
     context "when getting the default" do
@@ -414,7 +414,7 @@ describe Mongoid::Sessions do
       end
 
       before do
-        Band.storage_options = nil
+        Band.storage_options = {}
         described_class.clear
         Mongoid.load!(file, :test)
         Mongoid.sessions[:default][:database] = database_id
@@ -501,6 +501,19 @@ describe Mongoid::Sessions do
       it "raises an error" do
         expect {
           Band.store_in :artists
+        }.to raise_error(Mongoid::Errors::InvalidStorageOptions)
+      end
+    end
+
+    context "when provided a class that extend another document" do
+
+      let(:klass) do
+        Class.new(Band)
+      end
+
+      it "raises an error" do
+        expect {
+          klass.store_in(database: :artists)
         }.to raise_error(Mongoid::Errors::InvalidStorageOptions)
       end
     end

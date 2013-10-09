@@ -19,12 +19,25 @@ module Mongoid
         #
         # @since 3.0.0
         def validate(klass, options)
-          if !options.is_a?(::Hash) || !valid_keys?(options)
+          if !valid_keys?(options) || !valid_parent?(klass)
             raise Errors::InvalidStorageOptions.new(klass, options)
           end
         end
 
         private
+        # Determine if the current klass is valid to change store_in
+        # options
+        #
+        # @api private
+        #
+        # @param [ Class ] klass
+        #
+        # @return [ true, false ] If the class is valid
+        #
+        # @since 4.0.0
+        def valid_parent?(klass)
+          !klass.superclass.include?(Mongoid::Document)
+        end
 
         # Determine if all keys in the options hash are valid.
         #
@@ -39,6 +52,7 @@ module Mongoid
         #
         # @since 3.0.0
         def valid_keys?(options)
+          return false unless options.is_a?(::Hash)
           options.keys.all? do |key|
             VALID_OPTIONS.include?(key)
           end
