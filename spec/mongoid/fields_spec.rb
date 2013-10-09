@@ -353,7 +353,7 @@ describe Mongoid::Fields do
     context "when the field is binary" do
 
       let(:binary) do
-        BSON::Binary.new(:md5, "testing")
+        BSON::Binary.new("testing", :md5)
       end
 
       let(:registry) do
@@ -473,7 +473,7 @@ describe Mongoid::Fields do
     context "when the field is binary" do
 
       let(:binary) do
-        BSON::Binary.new(:md5, "testing")
+        BSON::Binary.new("testing", :md5)
       end
 
       let(:registry) do

@@ -5,7 +5,7 @@ describe BSON::Binary do
   describe "#mongoize" do
 
     let(:binary) do
-      BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new("testing", :md5)
     end
 
     it "returns the binary" do
@@ -16,7 +16,7 @@ describe BSON::Binary do
   describe ".demongoize" do
 
     let(:binary) do
-      BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new("testing", :md5)
     end
 
     let(:demongoized) do
@@ -31,7 +31,7 @@ describe BSON::Binary do
   describe ".evolve" do
 
     let(:binary) do
-      BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new("testing", :md5)
     end
 
     let(:evolved) do
@@ -46,7 +46,7 @@ describe BSON::Binary do
   describe ".mongoize" do
 
     let(:binary) do
-      BSON::Binary.new(:md5, "testing")
+      BSON::Binary.new("testing", :md5)
     end
 
     let(:mongoized) do
