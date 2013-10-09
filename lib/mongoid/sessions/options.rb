@@ -36,6 +36,16 @@ module Mongoid
         @persistence_options
       end
 
+      def mongo_session
+        self.class.mongo_session.with(persistence_options) if persistence_options
+      end
+
+      def collection_name
+        if persistence_options && v = persistence_options[:collection]
+          return v.to_sym
+        end
+      end
+
       module Threaded
 
         # Get the persistence options for the current thread.
@@ -73,6 +83,27 @@ module Mongoid
 
       module ClassMethods
         include Threaded
+
+        def session_name
+          if persistence_options && v = persistence_options[:session]
+            return v.to_sym
+          end
+          super
+        end
+
+        def collection_name
+          if persistence_options && v = persistence_options[:collection]
+            return v.to_sym
+          end
+          super
+        end
+
+        def database_name
+          if persistence_options && v = persistence_options[:database]
+            return v.to_sym
+          end
+          super
+        end
 
         # Tell the next persistance operation to store in a specific collection,
         # database or session.

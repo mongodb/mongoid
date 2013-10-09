@@ -68,4 +68,25 @@ describe Mongoid::Sessions::Options do
       }.to raise_error(NoMethodError)
     end
   end
+
+  describe ".persistence_options" do
+
+    context "when options exist on the current thread" do
+
+      let(:klass) do
+        Band.with(safe: { w: 2 })
+      end
+
+      it "returns the options" do
+        expect(klass.persistence_options).to eq(safe: { w: 2 })
+      end
+    end
+
+    context "when there are no options on the current thread" do
+
+      it "returns nil" do
+        expect(Band.persistence_options).to be_nil
+      end
+    end
+  end
 end
