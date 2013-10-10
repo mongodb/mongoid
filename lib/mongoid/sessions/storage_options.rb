@@ -60,7 +60,7 @@ module Mongoid
           {
             collection: self.name.collectionize.to_sym,
             session: :default,
-            database: Mongoid.sessions[:default][:database]
+            database: -> { Mongoid.sessions[:default][:database] }
           }
         end
 
