@@ -2,23 +2,46 @@ require "spec_helper"
 
 describe Mongoid::Matchable::Nin do
 
-  let(:matcher) do
-    described_class.new("first")
-  end
-
   describe "#matches?" do
 
-    context "when the values do not contain the attribute" do
+    context 'when the attribute is not nil' do
 
-      it "returns true" do
-        expect(matcher.matches?("$nin" => ["second", "third"])).to be true
+    let(:matcher) do
+      described_class.new("first")
+    end
+
+      context "when the values do not contain the attribute" do
+
+        it "returns true" do
+          expect(matcher.matches?("$nin" => ["second", "third"])).to be true
+        end
+      end
+
+      context "when the values contain the attribute" do
+
+        it "returns false" do
+          expect(matcher.matches?("$nin" => ["first"])).to be false
+        end
       end
     end
 
-    context "when the values contain the attribute" do
+    context 'when the attribute is nil' do
+      let(:matcher) do
+        described_class.new(nil)
+      end
 
-      it "returns false" do
-        expect(matcher.matches?("$nin" => ["first"])).to be false
+      context "when the values do not contain the attribute" do
+
+        it "returns true" do
+          expect(matcher.matches?("$nin" => ["third"])).to be true
+        end
+      end
+
+      context "when the values contain the attribute" do
+
+        it "returns false" do
+          expect(matcher.matches?("$nin" => [/\Afir.*\z/, nil])).to be false
+        end
       end
     end
   end

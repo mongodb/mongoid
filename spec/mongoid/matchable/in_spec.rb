@@ -2,23 +2,47 @@ require "spec_helper"
 
 describe Mongoid::Matchable::In do
 
-  let(:matcher) do
-    described_class.new("first")
-  end
-
   describe "#matches?" do
 
-    context "when the values include the attribute" do
+    context 'when the attribute is not nil' do
 
-      it "returns true" do
-        expect(matcher.matches?("$in" => [/\Afir.*\z/, "second"])).to be true
+      let(:matcher) do
+        described_class.new("first")
+      end
+
+      context "when the values include the attribute" do
+
+        it "returns true" do
+          expect(matcher.matches?("$in" => [/\Afir.*\z/, "second"])).to be true
+        end
+      end
+
+      context "when the values don't include the attribute" do
+
+        it "returns false" do
+          expect(matcher.matches?("$in" => ["third"])).to be false
+        end
       end
     end
 
-    context "when the values don't include the attribute" do
+    context 'when the attribute is nil' do
 
-      it "returns false" do
-        expect(matcher.matches?("$in" => ["third"])).to be false
+      let(:matcher) do
+        described_class.new(nil)
+      end
+
+      context "when the values include the attribute" do
+
+        it "returns true" do
+          expect(matcher.matches?("$in" => [/\Afir.*\z/, nil])).to be true
+        end
+      end
+
+      context "when the values don't include the attribute" do
+
+        it "returns false" do
+          expect(matcher.matches?("$in" => ["third"])).to be false
+        end
       end
     end
   end
