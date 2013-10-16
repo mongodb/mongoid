@@ -5,7 +5,6 @@ describe Mongoid::Relations::AutoSave do
   describe ".auto_save" do
 
     before(:all) do
-      Person.autosaved_relations.delete_one(:account)
       Person.autosave(Person.relations["account"].merge!(autosave: true))
     end
 
@@ -48,7 +47,6 @@ describe Mongoid::Relations::AutoSave do
         end
 
         before do
-          Person.autosaved_relations.delete_one(:drugs)
           Person.autosave(metadata)
           Person.autosave(metadata)
         end
@@ -129,6 +127,10 @@ describe Mongoid::Relations::AutoSave do
           it "saves the relation" do
             expect(account).to be_persisted
           end
+
+          it "persists on the database" do
+            expect(account.reload).to_not be_nil
+          end
         end
 
         context "when saving an existing parent document" do
@@ -141,6 +143,25 @@ describe Mongoid::Relations::AutoSave do
 
           it "saves the relation" do
             expect(account).to be_persisted
+          end
+
+          it "persists on the database" do
+            expect(account.reload).to_not be_nil
+          end
+        end
+
+        context "when updating the child" do
+
+          before do
+            person.account = account
+            person.save
+          end
+
+          it "sends one insert" do
+            account.name = "account"
+            expect_query(1) do
+              person.with(write: {w:0}).save
+            end
           end
         end
 
@@ -201,7 +222,6 @@ describe Mongoid::Relations::AutoSave do
       context "when it has two ralations with autosaves" do
 
         before do
-          Person.autosaved_relations.delete_one(:drugs)
           Person.autosave(Person.relations["drugs"].merge!(autosave: true))
         end
 
