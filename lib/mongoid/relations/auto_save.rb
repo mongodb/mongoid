@@ -7,11 +7,6 @@ module Mongoid
     module AutoSave
       extend ActiveSupport::Concern
 
-      included do
-        class_attribute :autosaved_relations
-        self.autosaved_relations = []
-      end
-
       # Used to prevent infinite loops in associated autosaves.
       #
       # @example Is the document autosaved?
@@ -44,15 +39,8 @@ module Mongoid
       #   document.changed_for_autosave?
       #
       # @since 3.1.3
-      def changed_for_autosave?
-        new_record? || changed? || marked_for_destruction?
-      end
-
-      # Returns the relation, if it exists
-      #
-      # @since 3.1.3
-      def relation_changed_for_autosave(metadata)
-        ivar(metadata.name) if self.class.autosaved_relations.include?(metadata.name)
+      def changed_for_autosave?(doc)
+        doc.new_record? || doc.changed? || doc.marked_for_destruction?
       end
 
       module ClassMethods
@@ -68,38 +56,29 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def autosave(metadata)
-          if metadata.autosave? && autosavable?(metadata)
-            autosaved_relations.push(metadata.name)
-            set_callback :save, :after, unless: :autosaved? do |document|
+          if metadata.autosave? && !metadata.embedded?
+            save_method = :"autosave_documents_for_#{metadata.name}"
+            define_method(save_method) do
+
               if before_callback_halted?
                 self.before_callback_halted = false
               else
                 __autosaving__ do
-                  if document.changed_for_autosave? || relation = document.relation_changed_for_autosave(metadata)
-                    relation = document.__send__(metadata.name) unless relation
-                    (relation.do_or_do_not(:in_memory) || Array.wrap(relation)).each do |doc|
-                      doc.save
-                    end if relation
+                  if relation = ivar(metadata.name)
+                    if :belongs_to == metadata.macro
+                      relation.save if changed_for_autosave?(relation)
+                    else
+                      Array(relation).each { |d| d.save if changed_for_autosave?(d) }
+                    end
                   end
                 end
               end
             end
+
+            after_save save_method, unless: :autosaved?
           end
         end
 
-        # Can the autosave be added?
-        #
-        # @example Can the autosave be added?
-        #   Person.autosavable?(metadata)
-        #
-        # @param [ Metadata ] metadata The relation metadata.
-        #
-        # @return [ true, false ] If the autosave is able to be added.
-        #
-        # @since 3.0.0
-        def autosavable?(metadata)
-          !autosaved_relations.include?(metadata.name) && !metadata.embedded?
-        end
       end
     end
   end

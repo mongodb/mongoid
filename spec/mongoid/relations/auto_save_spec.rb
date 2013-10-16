@@ -5,7 +5,6 @@ describe Mongoid::Relations::AutoSave do
   describe ".auto_save" do
 
     before(:all) do
-      Person.autosaved_relations.delete_one(:account)
       Person.autosave(Person.relations["account"].merge!(autosave: true))
     end
 
@@ -48,7 +47,6 @@ describe Mongoid::Relations::AutoSave do
         end
 
         before do
-          Person.autosaved_relations.delete_one(:drugs)
           Person.autosave(metadata)
           Person.autosave(metadata)
         end
@@ -201,7 +199,6 @@ describe Mongoid::Relations::AutoSave do
       context "when it has two ralations with autosaves" do
 
         before do
-          Person.autosaved_relations.delete_one(:drugs)
           Person.autosave(Person.relations["drugs"].merge!(autosave: true))
         end
 
