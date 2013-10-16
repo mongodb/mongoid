@@ -212,12 +212,10 @@ describe Mongoid::Validatable::PresenceValidator do
     context "when the relation is a has one" do
 
       before do
-        Person.autosaved_relations.delete_one(:game)
         Person.validates :game, presence: true
       end
 
       after do
-        Person.autosaved_relations.clear
         Person.reset_callbacks(:save)
         Person.reset_callbacks(:validate)
       end
@@ -261,10 +259,6 @@ describe Mongoid::Validatable::PresenceValidator do
 
       it "does not change autosave on the relation" do
         expect(Person.relations["game"][:autosave]).to be_false
-      end
-
-      it "does not add any autosaved relations" do
-        expect(Person.autosaved_relations).to be_empty
       end
 
       context "when the relation is new" do
@@ -329,7 +323,6 @@ describe Mongoid::Validatable::PresenceValidator do
       end
 
       after do
-        Person.autosaved_relations.clear
         Person.reset_callbacks(:save)
         Person.reset_callbacks(:validate)
       end
