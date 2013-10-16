@@ -65,10 +65,11 @@ module Mongoid
               else
                 __autosaving__ do
                   if relation = ivar(metadata.name)
+                    options = persistence_options || {}
                     if :belongs_to == metadata.macro
-                      relation.save if changed_for_autosave?(relation)
+                      relation.with(options).save if changed_for_autosave?(relation)
                     else
-                      Array(relation).each { |d| d.save if changed_for_autosave?(d) }
+                      Array(relation).each { |d| d.with(options).save if changed_for_autosave?(d) }
                     end
                   end
                 end
