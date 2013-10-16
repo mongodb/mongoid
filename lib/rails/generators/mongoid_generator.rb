@@ -56,8 +56,9 @@ module Rails
   module Generators
     class GeneratedAttribute
       def type_class
-        return "Time" if type.to_s == "datetime"
-        return "String" if type.to_s == "text"
+        return "Time" if type == :datetime
+        return "String" if type == :text
+        return "Mongoid::Boolean" if type == :boolean
         type.to_s.camelcase
       end
     end

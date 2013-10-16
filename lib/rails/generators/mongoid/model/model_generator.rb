@@ -12,7 +12,6 @@ module Mongoid
 
       class_option :timestamps, type: :boolean
       class_option :parent,     type: :string, desc: "The parent class for the generated model"
-      class_option :versioning, type: :boolean, default: false, desc: "Enable mongoid versioning"
       class_option :collection, type: :string, desc: "The collection for storing model's documents"
 
       def create_model_file
