@@ -111,7 +111,6 @@ module Mongoid
           return nil unless name
           name.respond_to?(:call) ? name.call.to_sym : name.to_sym
         end
-
       end
     end
   end

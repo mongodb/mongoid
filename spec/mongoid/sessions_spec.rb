@@ -300,7 +300,7 @@ describe Mongoid::Sessions do
         end
 
         it "returns the default session" do
-          expect(single_session.options[:database]).to eq(ENV["MONGOHQ_SINGLE_NAME"])
+          expect(single_session.options[:database].to_s).to eq(ENV["MONGOHQ_SINGLE_NAME"])
         end
       end
 
@@ -344,8 +344,12 @@ describe Mongoid::Sessions do
 
       shared_examples_for "an overridden session to a mongohq replica set" do
 
-        it "returns the default session" do
-          expect(replica_session.options[:database]).to eq(ENV["MONGOHQ_REPL_NAME"])
+        let(:seeds) do
+          replica_session.cluster.seeds.map{ |node| node.address.original }
+        end
+
+        it "returns the overridden session" do
+          expect(seeds).to eq([ ENV["MONGOHQ_REPL_1_URL"], ENV["MONGOHQ_REPL_2_URL"] ])
         end
       end
 
@@ -391,8 +395,12 @@ describe Mongoid::Sessions do
         band.mongo_session
       end
 
-      it "returns the default session" do
-        expect(repl_session.options[:database]).to eq(ENV["MONGOHQ_REPL_NAME"])
+      let(:seeds) do
+        repl_session.cluster.seeds.map{ |node| node.address.original }
+      end
+
+      it "returns the overridden session" do
+        expect(seeds).to eq([ ENV["MONGOHQ_REPL_1_URL"], ENV["MONGOHQ_REPL_2_URL"] ])
       end
     end
 
@@ -463,7 +471,7 @@ describe Mongoid::Sessions do
       end
 
       it "returns the default session" do
-        expect(session.options[:database]).to eq(ENV["MONGOHQ_SINGLE_NAME"])
+        expect(session.options[:database].to_s).to eq(ENV["MONGOHQ_SINGLE_NAME"])
       end
     end
 
@@ -477,8 +485,12 @@ describe Mongoid::Sessions do
         Band.mongo_session
       end
 
-      it "returns the default session" do
-        expect(repl_session.options[:database]).to eq(ENV["MONGOHQ_REPL_NAME"])
+      let(:seeds) do
+        repl_session.cluster.seeds.map{ |node| node.address.original }
+      end
+
+      it "returns the overridden session" do
+        expect(seeds).to eq([ ENV["MONGOHQ_REPL_1_URL"], ENV["MONGOHQ_REPL_2_URL"] ])
       end
     end
 
@@ -1037,19 +1049,13 @@ describe Mongoid::Sessions do
 
     context "when the override is configured with a uri" do
 
-      let(:database_name) do
-        "mongoid_other"
-      end
-
-      let(:config) do
-        {  default: { uri: "mongodb://localhost:#{PORT}/#{database_id}" },
-          session1: { uri: "mongodb://localhost:#{PORT}/#{database_name}" }}
+      let(:file) do
+        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
       end
 
       before do
-        Mongoid::Threaded.sessions.clear
-        Mongoid.sessions = config
-        Mongoid.override_session(:session1)
+        Mongoid::Config.load!(file, :test)
+        Mongoid.override_session(:mongohq_repl_uri)
       end
 
       after do
@@ -1057,7 +1063,7 @@ describe Mongoid::Sessions do
       end
 
       it "has some database name on session" do
-        expect(Band.mongo_session.options[:database]).to eq(database_name)
+        expect(Band.mongo_session.options[:database]).to eq(:mongoid_test)
       end
     end
 
