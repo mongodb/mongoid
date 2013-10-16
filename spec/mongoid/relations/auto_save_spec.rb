@@ -127,6 +127,10 @@ describe Mongoid::Relations::AutoSave do
           it "saves the relation" do
             expect(account).to be_persisted
           end
+
+          it "persists on the database" do
+            expect(account.reload).to_not be_nil
+          end
         end
 
         context "when saving an existing parent document" do
@@ -139,6 +143,25 @@ describe Mongoid::Relations::AutoSave do
 
           it "saves the relation" do
             expect(account).to be_persisted
+          end
+
+          it "persists on the database" do
+            expect(account.reload).to_not be_nil
+          end
+        end
+
+        context "when updating the child" do
+
+          before do
+            person.account = account
+            person.save
+          end
+
+          it "sends one insert" do
+            account.name = "account"
+            expect_query(1) do
+              person.with(write: {w:0}).save
+            end
           end
         end
 
