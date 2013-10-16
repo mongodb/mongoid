@@ -1226,4 +1226,18 @@ describe Mongoid::Fields do
       end
     end
   end
+
+  context "when a localized field is a boolean" do
+
+    context "when the default is true" do
+
+      let(:definition) do
+        Definition.new
+      end
+
+      it "returns the proper predicate result" do
+        expect(definition).to be_active
+      end
+    end
+  end
 end
