@@ -5,6 +5,7 @@ module Mongoid
       class BelongsTo < Base
 
         def preload
+          raise Errors::EagerLoad.new(@metadata.name) if @metadata.polymorphic?
           each_loaded_document do |doc|
             id = doc.send(key)
             set_on_parent(id, doc)
