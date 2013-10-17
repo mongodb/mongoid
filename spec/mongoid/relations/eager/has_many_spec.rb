@@ -12,10 +12,6 @@ describe Mongoid::Relations::Eager::HasMany do
       Person.create!
     end
 
-    before do
-      Post.create!(person: person)
-    end
-
     let(:metadata) do
       Person.reflect_on_association(:posts)
     end
@@ -24,6 +20,10 @@ describe Mongoid::Relations::Eager::HasMany do
       described_class.new(Person, [metadata], docs).tap do |b|
         b.shift_relation
       end
+    end
+
+    before do
+      Post.create!(person: person)
     end
 
     it "aggregates by the parent primary key" do
