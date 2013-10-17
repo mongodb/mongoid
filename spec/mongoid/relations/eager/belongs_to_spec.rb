@@ -2,29 +2,29 @@ require "spec_helper"
 
 describe Mongoid::Relations::Eager::BelongsTo do
 
-  let(:person) do
-    Person.create!
-  end
-
-  let!(:post) do
-    Post.create!(person: person)
-  end
-
-  let(:person_metadata) do
-    Post.reflect_on_association(:person)
-  end
-
-  let(:docs) do
-    Post.all.to_a
-  end
-
-  let(:eager) do
-    described_class.new(Post, [person_metadata], docs).tap do |b|
-      b.shift_relation
-    end
-  end
-
   describe ".grouped_docs" do
+
+    let(:docs) do
+      Post.all.to_a
+    end
+
+    let(:person) do
+      Person.create!
+    end
+
+    let(:metadata) do
+      Post.reflect_on_association(:person)
+    end
+
+    let(:eager) do
+      described_class.new(Post, [metadata], docs).tap do |b|
+        b.shift_relation
+      end
+    end
+
+    before do
+      Post.create!(person: person)
+    end
 
     it "aggregates by the perent id" do
       expect(eager.grouped_docs.keys).to eq([person.id])
@@ -32,6 +32,28 @@ describe Mongoid::Relations::Eager::BelongsTo do
   end
 
   describe ".set_on_parent" do
+
+    let(:docs) do
+      Post.all.to_a
+    end
+
+    let(:person) do
+      Person.create!
+    end
+
+    let(:metadata) do
+      Post.reflect_on_association(:person)
+    end
+
+    let(:eager) do
+      described_class.new(Post, [metadata], docs).tap do |b|
+        b.shift_relation
+      end
+    end
+
+    before do
+      Post.create!(person: person)
+    end
 
     it "sets the relation into the parent" do
       docs.each do |doc|
@@ -42,6 +64,10 @@ describe Mongoid::Relations::Eager::BelongsTo do
   end
 
   describe ".includes" do
+
+    let(:person) do
+      Person.create!
+    end
 
     before do
       3.times { |i| Account.create!(person: person, name: "savings#{i}") }
@@ -59,7 +85,48 @@ describe Mongoid::Relations::Eager::BelongsTo do
       end
     end
 
+    context "when the relation is not polymorphic" do
 
+      let!(:post) do
+        person.posts.create(title: "testing")
+      end
+
+      let!(:eager) do
+        Post.includes(:person).last
+      end
+
+      it "puts the documents in the parent document" do
+        expect(eager.ivar(:person)).to eq(person)
+      end
+
+      it "does not query when touching the association" do
+        expect_query(0) do
+          expect(eager.person).to eq(person)
+        end
+      end
+
+      it "does not query when updating the association" do
+        expect_query(0) do
+          eager.person.username = "arthurnn"
+        end
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let!(:movie) do
+        Movie.create(name: "Bladerunner")
+      end
+
+      let!(:rating) do
+        movie.ratings.create(value: 10)
+      end
+
+      it "raises an error" do
+        expect {
+          Rating.includes(:ratable).last
+        }.to raise_error(Mongoid::Errors::EagerLoad)
+      end
+    end
   end
-
 end
