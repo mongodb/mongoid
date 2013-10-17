@@ -17,8 +17,8 @@ describe Mongoid::Relations::Eager::BelongsTo do
     end
 
     let(:eager) do
-      described_class.new(Post, [metadata], docs).tap do |b|
-        b.shift_relation
+      described_class.new([metadata], docs).tap do |b|
+        b.shift_metadata
       end
     end
 
@@ -26,7 +26,7 @@ describe Mongoid::Relations::Eager::BelongsTo do
       Post.create!(person: person)
     end
 
-    it "aggregates by the perent id" do
+    it "aggregates by the parent id" do
       expect(eager.grouped_docs.keys).to eq([person.id])
     end
   end
@@ -46,8 +46,8 @@ describe Mongoid::Relations::Eager::BelongsTo do
     end
 
     let(:eager) do
-      described_class.new(Post, [metadata], docs).tap do |b|
-        b.shift_relation
+      described_class.new([metadata], docs).tap do |b|
+        b.shift_metadata
       end
     end
 

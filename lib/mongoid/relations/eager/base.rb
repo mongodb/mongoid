@@ -1,21 +1,19 @@
 module Mongoid
   module Relations
     module Eager
-
       class Base
-
-        def initialize(owner, relations, docs)
-          @relations = relations
+        def initialize(associations, docs)
+          @associations = associations
           @docs = docs
           @grouped_docs = {}
         end
 
-        def shift_relation
-          @metadata = @relations.shift
+        def shift_metadata
+          @metadata = @associations.shift
         end
 
         def run
-          while shift_relation
+          while shift_metadata
             preload
           end
         end
@@ -50,7 +48,6 @@ module Mongoid
           raise NotImplementedError
         end
       end
-
     end
   end
 end

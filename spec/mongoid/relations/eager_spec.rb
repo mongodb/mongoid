@@ -34,12 +34,12 @@ describe Mongoid::Relations::Eager do
 
       it "groups by foreign_key" do
         doc.should_receive(:person_id).once
-        context.preload(Account, inclusions, [doc])
+        context.preload(inclusions, [doc])
       end
 
       it "preloads the parent" do
         expect(doc.ivar(:person)).to be_false
-        context.preload(Account, inclusions, [doc])
+        context.preload(inclusions, [doc])
         expect(doc.ivar(:person)).to eq(doc.person)
       end
     end
@@ -58,7 +58,7 @@ describe Mongoid::Relations::Eager do
 
       it "preloads the child" do
         expect(doc.ivar(:comment)).to be_false
-        context.preload(Account, inclusions, [doc])
+        context.preload(inclusions, [doc])
         expect(doc.ivar(:comment)).to eq(doc.comment)
       end
     end
@@ -77,7 +77,7 @@ describe Mongoid::Relations::Eager do
 
       it "preloads the child" do
         expect(doc.ivar(:alerts)).to be_false
-        context.preload(Account, inclusions, [doc])
+        context.preload(inclusions, [doc])
         expect(doc.ivar(:alerts)).to eq(doc.alerts)
       end
     end
@@ -96,7 +96,7 @@ describe Mongoid::Relations::Eager do
 
       it "preloads the child" do
         expect(doc.ivar(:agents)).to be_false
-        context.preload(Account, inclusions, [doc])
+        context.preload(inclusions, [doc])
         expect(doc.ivar(:agents)).to eq(doc.agents)
       end
     end
@@ -127,7 +127,7 @@ describe Mongoid::Relations::Eager do
       end
 
       it "runs the has_many preload" do
-        Mongoid::Relations::Eager::HasMany.should_receive(:new).with(Person, [posts_metadata], docs).once.and_call_original
+        Mongoid::Relations::Eager::HasMany.should_receive(:new).with([posts_metadata], docs).once.and_call_original
 
         context.eager_load(docs)
       end
@@ -156,18 +156,18 @@ describe Mongoid::Relations::Eager do
       end
 
       it "runs the has_many preload" do
-        Mongoid::Relations::Eager::HasMany.should_receive(:new).with(Person, [posts_metadata], docs).once.and_call_original
+        Mongoid::Relations::Eager::HasMany.should_receive(:new).with([posts_metadata], docs).once.and_call_original
 
         context.eager_load(docs)
       end
 
       it "runs the has_one preload" do
-        Mongoid::Relations::Eager::HasOne.should_receive(:new).with(Person, [cat_metadata], docs).once.and_call_original
+        Mongoid::Relations::Eager::HasOne.should_receive(:new).with([cat_metadata], docs).once.and_call_original
         context.eager_load(docs)
       end
 
       it "runs the has_and_belongs_to_many preload" do
-        Mongoid::Relations::Eager::HasAndBelongsToMany.should_receive(:new).with(Person, [houses_metadata], docs).once.and_call_original
+        Mongoid::Relations::Eager::HasAndBelongsToMany.should_receive(:new).with([houses_metadata], docs).once.and_call_original
         context.eager_load(docs)
       end
     end
@@ -191,7 +191,7 @@ describe Mongoid::Relations::Eager do
       end
 
       it "runs the has_one preload" do
-        Mongoid::Relations::Eager::HasOne.should_receive(:new).with(Person, [book_metadata, cat_metadata], docs).once.and_call_original
+        Mongoid::Relations::Eager::HasOne.should_receive(:new).with([book_metadata, cat_metadata], docs).once.and_call_original
         context.eager_load(docs)
       end
     end

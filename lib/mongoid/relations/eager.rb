@@ -30,16 +30,16 @@ module Mongoid
 
       def eager_load(docs)
         return false unless eager_loadable?
-        preload(klass, criteria.inclusions, docs)
+        preload(criteria.inclusions, docs)
         self.eager_loaded = true
       end
 
-      def preload(owner, relations, docs)
+      def preload(relations, docs)
 
         relations.group_by do |metadata|
           metadata.relation
-        end.each do |relation, fields|
-          relation.eager_load_klass.new(owner, fields, docs).run
+        end.each do |relation, associations|
+          relation.eager_load_klass.new(associations, docs).run
         end
       end
 

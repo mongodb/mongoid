@@ -21,8 +21,8 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
     end
 
     let(:eager) do
-      described_class.new(Person, [metadata], docs).tap do |b|
-        b.shift_relation
+      described_class.new([metadata], docs).tap do |b|
+        b.shift_metadata
       end
     end
 
@@ -50,8 +50,8 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
     end
 
     let(:eager) do
-      described_class.new(Person, [metadata], docs).tap do |b|
-        b.shift_relation
+      described_class.new([metadata], docs).tap do |b|
+        b.shift_metadata
       end
     end
 
