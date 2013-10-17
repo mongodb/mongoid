@@ -2,29 +2,29 @@ require "spec_helper"
 
 describe Mongoid::Relations::Eager::HasOne do
 
-  let(:person) do
-    Person.create!
-  end
-
-  let!(:cat) do
-    Cat.create!(person: person)
-  end
-
-  let(:docs) do
-    Person.all.to_a
-  end
-
-  let(:cat_metadata) do
-    Person.reflect_on_association(:cat)
-  end
-
-  let(:eager) do
-    described_class.new(Person, [cat_metadata], docs).tap do |b|
-      b.shift_relation
-    end
-  end
-
   describe ".grouped_doc" do
+
+    let(:person) do
+      Person.create!
+    end
+
+    let(:docs) do
+      Person.all.to_a
+    end
+
+    let(:metadata) do
+      Person.reflect_on_association(:cat)
+    end
+
+    let(:eager) do
+      described_class.new(Person, [metadata], docs).tap do |b|
+        b.shift_relation
+      end
+    end
+
+    before do
+      Cat.create!(person: person)
+    end
 
     it "aggregates by the relation primary key" do
       expect(eager.grouped_docs.keys).to eq([person.username])
@@ -32,6 +32,28 @@ describe Mongoid::Relations::Eager::HasOne do
   end
 
   describe ".set_on_parent" do
+
+    let(:person) do
+      Person.create!
+    end
+
+    let(:docs) do
+      Person.all.to_a
+    end
+
+    let(:metadata) do
+      Person.reflect_on_association(:cat)
+    end
+
+    let(:eager) do
+      described_class.new(Person, [metadata], docs).tap do |b|
+        b.shift_relation
+      end
+    end
+
+    before do
+      Cat.create!(person: person)
+    end
 
     it "sets the relation into the parent" do
       docs.each do |doc|
@@ -42,6 +64,10 @@ describe Mongoid::Relations::Eager::HasOne do
   end
 
   describe ".includes" do
+
+    let(:person) do
+      Person.create!
+    end
 
     before do
       3.times { Cat.create!(person: person) }
@@ -70,6 +96,59 @@ describe Mongoid::Relations::Eager::HasOne do
           Person.all.includes(:cat, :account).each do |person|
             expect(person.cat).to_not be_nil
           end
+        end
+      end
+    end
+
+    context "when the relation is not polymorphic" do
+
+      let!(:game) do
+        person.create_game(name: "Tron")
+      end
+
+      let!(:eager) do
+        Person.all.includes(:game).first
+      end
+
+      it "puts the documents in the parent document" do
+        expect(eager.ivar(:game)).to eq(game)
+      end
+
+      it "does not query when touching the association" do
+        expect_query(0) do
+          expect(eager.game).to eq(game)
+        end
+      end
+
+      it "does not query when updating the association" do
+        expect_query(0) do
+          eager.game.name = "Revenge of Racing of Magic"
+          expect(eager.game.name).to eq("Revenge of Racing of Magic")
+        end
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let!(:book) do
+        Book.create(name: "Game of Thrones")
+      end
+
+      let!(:rating) do
+        book.create_rating(value: 10)
+      end
+
+      let!(:eager) do
+        Book.all.includes(:rating).first
+      end
+
+      it "puts the found documents in the parent document" do
+        expect(eager.ivar(:rating)).to eq(rating)
+      end
+
+      it "does not query when touching the association" do
+        expect_query(0) do
+          expect(eager.rating).to eq(rating)
         end
       end
     end
