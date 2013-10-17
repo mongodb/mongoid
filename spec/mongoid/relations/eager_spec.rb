@@ -42,10 +42,6 @@ describe Mongoid::Relations::Eager do
         context.preload(Account, inclusions, [doc])
         expect(doc.ivar(:person)).to eq(doc.person)
       end
-
-      context "when polymorphic relation" do
-        pending
-      end
     end
 
     context "when has_one" do
