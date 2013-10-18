@@ -30,6 +30,7 @@ describe Mongoid::Relations::Conversions do
           :_id,
           type: String,
           pre_processed: true,
+          overwrite: true,
           default: ->{ BSON::ObjectId.new.to_s }
         )
       end
@@ -39,6 +40,7 @@ describe Mongoid::Relations::Conversions do
           :_id,
           type: BSON::ObjectId,
           pre_processed: true,
+          overwrite: true,
           default: ->{ BSON::ObjectId.new }
         )
       end
