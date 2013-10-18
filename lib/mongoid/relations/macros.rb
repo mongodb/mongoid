@@ -303,6 +303,7 @@ module Mongoid
               key,
               type: type,
               identity: true,
+              overwrite: true,
               metadata: metadata,
               default: metadata.foreign_key_default
             )
