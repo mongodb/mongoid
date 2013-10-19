@@ -28,7 +28,7 @@ module Mongoid
                   if base.referenced_many?
                     target.__send__(inverse).push(base) unless Mongoid.using_identity_map?
                   else
-                    target.do_or_do_not(metadata.inverse_setter(target), base)
+                    target.set_relation(inverse, base)
                   end
                 end
               end
@@ -53,7 +53,7 @@ module Mongoid
                 if base.referenced_many?
                   target.__send__(inverse).delete(base)
                 else
-                  target.__send__("#{inverse}=", nil)
+                  target.set_relation(inverse, nil)
                 end
               end
             end

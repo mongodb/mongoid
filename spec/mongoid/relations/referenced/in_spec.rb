@@ -419,15 +419,15 @@ describe Mongoid::Relations::Referenced::In do
     context "when dependent is destroy" do
 
       let(:account) do
-        Account.create
+        Account.create!(name: 'checkings')
       end
 
       let(:drug) do
-        Drug.create
+        Drug.create!
       end
 
       let(:person) do
-        Person.create
+        Person.create!
       end
 
       context "when relation is has_one" do
@@ -445,6 +445,17 @@ describe Mongoid::Relations::Referenced::In do
         end
 
         context "when parent exists" do
+
+          context "when child touch the parent" do
+
+            let!(:account_from_db) { account.reload }
+
+            it "queries only the parent" do
+              expect_query(1) do
+                expect(account_from_db.person.id).to eq(person.id)
+              end
+            end
+          end
 
           context "when child is destroyed" do
 
