@@ -275,6 +275,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#2701 Fixing extra query on belongs_to binding. (Arthur Neves)
+
 * \#3089 Allow demongoization of strings to floats (Daniel Libanori)
 
 * \#3278 Counter cache should update the document in memory too. (Arthur Neves)
