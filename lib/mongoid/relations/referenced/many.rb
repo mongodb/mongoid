@@ -431,8 +431,6 @@ module Mongoid
             collection.insert(inserts)
             docs.each do |doc|
               doc.new_record = false
-              doc.run_after_callbacks(:create, :save)
-              doc.post_persist
             end
           end
         end
