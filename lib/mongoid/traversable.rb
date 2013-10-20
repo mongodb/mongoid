@@ -120,6 +120,7 @@ module Mongoid
         child.move_changes
         child.new_record = false
       end
+      @__children = nil
     end
 
     # Return the root document in the object graph. If the current document
