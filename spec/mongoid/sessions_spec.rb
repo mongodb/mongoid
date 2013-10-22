@@ -49,6 +49,10 @@ describe Mongoid::Sessions do
         Band.store_in collection: "foo"
       end
 
+      after do
+        Band.reset_storage_options!
+      end
+
       it_behaves_like "an overridden collection at the class level"
     end
 
@@ -90,6 +94,10 @@ describe Mongoid::Sessions do
           Band.store_in(collection: "artists")
         end
 
+        after do
+          Band.reset_storage_options!
+        end
+
         it_behaves_like "an overridden collection at the class level"
       end
 
@@ -98,7 +106,11 @@ describe Mongoid::Sessions do
         let(:klass) { Band }
 
         before do
-          Band.store_in(collection: :artists)
+          klass.store_in(collection: :artists)
+        end
+
+        after do
+          klass.reset_storage_options!
         end
 
         it_behaves_like "an overridden collection at the class level"
@@ -174,6 +186,10 @@ describe Mongoid::Sessions do
         Band.store_in collection: "foo"
       end
 
+      after do
+        Band.reset_storage_options!
+      end
+
       it_behaves_like "an overridden collection name at the class level"
     end
 
@@ -246,6 +262,112 @@ describe Mongoid::Sessions do
         it "returns the root class pluralized model name" do
           expect(Firefox.collection_name).to eq(:canvases)
         end
+      end
+    end
+  end
+
+  describe "#database_name" do
+
+    shared_examples_for "an overridden database name" do
+
+      let(:band) do
+        klass.new
+      end
+
+      context "when accessing from the instance" do
+
+        it "returns the overridden value" do
+          expect(band.mongo_session.options[:database].to_s).to eq(database_id_alt)
+        end
+      end
+
+      context "when accessing from the class level" do
+
+        it "returns the overridden value" do
+          expect(klass.database_name.to_s).to eq(database_id_alt)
+        end
+
+        it "session returns the overridden value" do
+          expect(klass.mongo_session.options[:database].to_s).to eq(database_id_alt)
+        end
+      end
+    end
+
+    context "when overriding the persistence options" do
+
+      let(:klass) do
+        Band.with(database: database_id_alt)
+      end
+
+      it_behaves_like "an overridden database name"
+    end
+
+    context "when overriding with store_in" do
+
+      let(:klass) { Band }
+
+      before do
+        Band.store_in database: database_id_alt
+      end
+
+      after do
+        Band.reset_storage_options!
+      end
+
+      it_behaves_like "an overridden database name"
+    end
+
+    context "when overriding store_in and persistence options" do
+
+      let(:klass) do
+        Band.with(database: database_id_alt)
+      end
+
+      before do
+        Band.store_in database: "foo"
+      end
+
+      after do
+        Band.reset_storage_options!
+      end
+
+      it_behaves_like "an overridden database name"
+    end
+
+    context "when overriding using the session" do
+
+      let(:session_name) { :alternative }
+
+      before do
+        Mongoid.sessions[session_name] = { database: database_id_alt, hosts: [ "#{HOST}:#{PORT}" ] }
+      end
+
+      after do
+        Mongoid.sessions.delete(session_name)
+      end
+
+      context "when overriding the persistence options" do
+
+        let(:klass) do
+          Band.with(session: session_name)
+        end
+
+        it_behaves_like "an overridden database name"
+      end
+
+      context "when overriding with store_in" do
+
+        let(:klass) { Band }
+
+        before do
+          Band.store_in(session: session_name)
+        end
+
+        after do
+          Band.reset_storage_options!
+        end
+
+        it_behaves_like "an overridden database name"
       end
     end
   end

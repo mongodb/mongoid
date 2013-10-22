@@ -37,7 +37,10 @@ module Mongoid
       end
 
       def mongo_session
-        self.class.mongo_session.with(persistence_options) if persistence_options
+        if persistence_options
+          session_name = persistence_options[:session] || self.class.session_name
+          Sessions.with_name(session_name).with(persistence_options)
+        end
       end
 
       def collection_name
