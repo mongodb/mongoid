@@ -229,20 +229,6 @@ module Mongoid
         !!dependent
       end
 
-      # Get the criteria needed to eager load this relation.
-      #
-      # @example Get the eager loading criteria.
-      #   metadata.eager_load(criteria)
-      #
-      # @param [ Array<Object> ] ids The ids of the returned parents.
-      #
-      # @return [ Criteria ] The eager loading criteria.
-      #
-      # @since 2.2.0
-      def eager_load(ids)
-        relation.eager_load(self, ids)
-      end
-
       # Will determine if the relation is an embedded one or not. Currently
       # only checks against embeds one and many.
       #

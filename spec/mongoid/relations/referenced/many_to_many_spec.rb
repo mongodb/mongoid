@@ -2272,48 +2272,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
-  describe ".eager_load" do
-
-    before do
-      Mongoid.identity_map_enabled = true
-    end
-
-    after do
-      Mongoid.identity_map_enabled = false
-    end
-
-    context "when the relation is not polymorphic" do
-
-      let!(:person) do
-        Person.create
-      end
-
-      let!(:preference) do
-        person.preferences.create(name: "testing")
-      end
-
-      let(:metadata) do
-        Person.relations["preferences"]
-      end
-
-      let(:ids) do
-        [ preference.id ]
-      end
-
-      let!(:eager) do
-        described_class.eager_load(metadata, ids)
-      end
-
-      let(:map) do
-        Mongoid::IdentityMap.get(Preference, ids)
-      end
-
-      it "puts the documents in the identity map" do
-        expect(map).to eq([ preference ])
-      end
-    end
-  end
-
   describe ".embedded?" do
 
     it "returns false" do

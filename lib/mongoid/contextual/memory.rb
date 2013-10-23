@@ -1,12 +1,13 @@
 # encoding: utf-8
 require "mongoid/contextual/aggregable/memory"
+require "mongoid/relations/eager"
 
 module Mongoid
   module Contextual
     class Memory
       include Enumerable
       include Aggregable::Memory
-      include Eager
+      include Relations::Eager
       include Queryable
       include Positional
 
@@ -130,7 +131,7 @@ module Mongoid
       # @since 3.0.0
       def first
         doc = documents.first
-        eager_load_one(doc) if eager_loadable?(doc)
+        eager_load_one(doc)
         doc
       end
       alias :one :first
@@ -164,7 +165,7 @@ module Mongoid
       # @since 3.0.0
       def last
         doc = documents.last
-        eager_load_one(doc) if eager_loadable?(doc)
+        eager_load_one(doc)
         doc
       end
 
