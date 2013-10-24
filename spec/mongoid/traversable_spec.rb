@@ -100,6 +100,13 @@ describe Mongoid::Traversable do
     end
   end
 
+  describe "#inherited" do
+
+    it "duplicates the localized fields" do
+      expect(Actress.localized_fields).to_not equal(Actor.localized_fields)
+    end
+  end
+
   describe "#parentize" do
 
     let(:address) do

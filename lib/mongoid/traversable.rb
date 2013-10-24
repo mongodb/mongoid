@@ -174,6 +174,7 @@ module Mongoid
         super
         @_type = nil
         subclass.aliased_fields = aliased_fields.dup
+        subclass.localized_fields = localized_fields.dup
         subclass.fields = fields.dup
         subclass.pre_processed_defaults = pre_processed_defaults.dup
         subclass.post_processed_defaults = post_processed_defaults.dup
