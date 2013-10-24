@@ -4,6 +4,20 @@ module Mongoid
     module CounterCache
       extend ActiveSupport::Concern
 
+      # Reset the given counter using the .count() query from the
+      # db. This method is usuful in case that a counter got
+      # corrupted, or a new counter was added to the collection.
+      #
+      # @example Reset the given counter cache
+      #   post.reset_counters(:comments)
+      #
+      # @param [ Symbol, Array ] One or more counter caches to reset
+      #
+      # @since 4.0.0
+      def reset_counters(*counters)
+        self.class.reset_counters(self, *counters)
+      end
+
       module ClassMethods
 
         # Reset the given counter using the .count() query from the
@@ -18,12 +32,12 @@ module Mongoid
         #
         # @since 3.1.0
         def reset_counters(id, *counters)
-          object = find(id)
+          document = id.is_a?(Document) ? id : find(id)
           counters.each do |name|
             meta = reflect_on_association(name)
             inverse = meta.klass.reflect_on_association(meta.inverse)
             counter_name = inverse.counter_cache_column_name
-            object.update_attribute(counter_name, object.send(name).count)
+            document.update_attribute(counter_name, document.send(name).count)
           end
         end
 
@@ -110,7 +124,6 @@ module Mongoid
               end
             end
           end
-
         end
       end
     end

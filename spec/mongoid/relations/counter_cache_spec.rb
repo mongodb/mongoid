@@ -13,6 +13,91 @@ describe Mongoid::Relations::CounterCache do
       end
 
       before do
+        person.reset_counters(:drugs)
+      end
+
+      it "sets the counter to zero" do
+        expect(person.drugs_count).to eq(0)
+      end
+
+      it "persists the changes" do
+        expect(person.reload.drugs_count).to eq(0)
+      end
+    end
+
+    context "when reset with invalid name" do
+
+      let(:person) do
+        Person.create
+      end
+
+      it "expect to raise an error" do
+        expect {
+          person.reset_counters(:not_exist)
+        }.to raise_error
+      end
+    end
+
+    context "when counter gets messy" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:post) do
+        person.posts.create(title: "my first post")
+      end
+
+      before do
+        Person.update_counters(person.id, :posts_count => 10)
+        person.reload
+        person.reset_counters(:posts)
+      end
+
+      it "resets to the right value" do
+        expect(person.posts_count).to eq(1)
+      end
+
+      it "persists the change" do
+        expect(person.reload.posts_count).to eq(1)
+      end
+    end
+
+    context "when the counter is on a subclass" do
+
+      let(:subscription) do
+        Subscription.create
+      end
+
+      let!(:pack) do
+        subscription.packs.create
+      end
+
+      before do
+        subscription.reset_counters(:packs)
+      end
+
+      it "resets the appropriate counter" do
+        expect(subscription[:packs_count]).to eq(1)
+      end
+
+      it "persists the change" do
+        expect(subscription.reload[:packs_count]).to eq(1)
+      end
+    end
+  end
+
+  describe ".reset_counters" do
+
+    context "when counter is reset" do
+
+      let(:person) do
+        Person.create do |person|
+          person[:drugs_count] = 3
+        end
+      end
+
+      before do
         Person.reset_counters person.id, :drugs
       end
 

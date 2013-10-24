@@ -243,6 +243,10 @@ For instructions on upgrading to newer versions, visit
       ..
     end
 
+* \#3319 Counters can now be reset from a document instance:
+
+    document.reset_counters(:relation)
+
 * \#3302 Aliasing using `alias_attribute` now properly handles aliases in criteria.
 
 * \#3155 Range field will persist the exclude_end when provided.
