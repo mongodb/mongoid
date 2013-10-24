@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3337 Ensure localized fields map is cloned with inheritance.
+
 * \#3262 Fixed atomic array operations on HABTM foreign key fields from turning
   single elements into arrays.
 
