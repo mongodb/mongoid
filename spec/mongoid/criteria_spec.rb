@@ -2987,6 +2987,28 @@ describe Mongoid::Criteria do
       Band.create(name: "Photek", likes: 1)
     end
 
+    context "when the field is aliased" do
+
+      let!(:expensive) do
+        Product.create(price: 100000)
+      end
+
+      let!(:cheap) do
+        Product.create(price: 1)
+      end
+
+      context "when using alias_attribute" do
+
+        let(:plucked) do
+          Product.pluck(:price)
+        end
+
+        it "uses the aliases" do
+          expect(plucked).to eq([ 100000, 1 ])
+        end
+      end
+    end
+
     context "when the criteria matches" do
 
       context "when there are no duplicate values" do
