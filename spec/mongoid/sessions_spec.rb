@@ -1185,7 +1185,7 @@ describe Mongoid::Sessions do
       end
 
       it "has some database name on session" do
-        expect(Band.mongo_session.options[:database]).to eq(:mongoid_test)
+        expect(Band.mongo_session.options[:database]).to eq(:mongoid_replica)
       end
     end
 
