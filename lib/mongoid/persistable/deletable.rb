@@ -114,7 +114,6 @@ module Mongoid
         yield(self)
         freeze
         self.destroyed = true
-        IdentityMap.remove(self)
         true
       end
 

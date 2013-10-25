@@ -13,7 +13,6 @@ require "mongoid/equality"
 require "mongoid/criteria"
 require "mongoid/factory"
 require "mongoid/fields"
-require "mongoid/identity_map"
 require "mongoid/state"
 require "mongoid/timestamps"
 require "mongoid/composable"
@@ -220,7 +219,6 @@ module Mongoid
         end
       end
 
-      IdentityMap.set(became) unless became.new_record?
       became
     end
 
@@ -315,7 +313,6 @@ module Mongoid
         doc.criteria_instance_id = criteria_instance_id
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
-        IdentityMap.set(doc)
         yield(doc) if block_given?
         doc.run_callbacks(:find) unless doc._find_callbacks.empty?
         doc.run_callbacks(:initialize) unless doc._initialize_callbacks.empty?

@@ -17,8 +17,7 @@ module Mongoid
           def build(type = nil)
             return object.try(:dup) unless query?
             ids = object || []
-            crit = metadata.criteria(ids, base.class)
-            IdentityMap.get(crit.klass, ids) || crit
+            metadata.criteria(ids, base.class)
           end
 
           # Do we need to perform a database query? It will be so if the object we

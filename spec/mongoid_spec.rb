@@ -15,18 +15,18 @@ describe Mongoid do
 
       before do
         Mongoid.configure do |config|
-          config.identity_map_enabled = false
+          config.preload_models = true
         end
       end
 
       after do
         Mongoid.configure do |config|
-          config.identity_map_enabled = true
+          config.preload_models = false
         end
       end
 
       it "sets the values on the config instance" do
-        expect(Mongoid.identity_map_enabled).to be_false
+        expect(Mongoid.preload_models).to be_true
       end
     end
   end

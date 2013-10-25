@@ -293,14 +293,9 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             end
 
             before do
-              Mongoid.identity_map_enabled = true
               dungeon.save!
               dragon.dungeons.send(method, dungeon)
               dragon.save!
-            end
-
-            after do
-              Mongoid.identity_map_enabled = false
             end
 
             it "sets the proper length of the child" do

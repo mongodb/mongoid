@@ -77,7 +77,6 @@ module Mongoid
       # @since 4.0.0
       def insert_as_root
         collection.insert(as_document)
-        IdentityMap.set(self)
       end
 
       # Post process an insert, which sets the new record attribute to false

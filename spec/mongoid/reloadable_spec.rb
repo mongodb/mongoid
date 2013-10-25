@@ -259,46 +259,6 @@ describe Mongoid::Reloadable do
             expect(game.person.title).to eq("Mam")
           end
         end
-
-        context "when the identity map is enabled" do
-
-          before do
-            Mongoid.identity_map_enabled = true
-          end
-
-          after do
-            Mongoid.identity_map_enabled = false
-          end
-
-          context "when the relation type changes" do
-
-            let!(:doctor) do
-              Doctor.create
-            end
-
-            let!(:game) do
-              Game.create(:person => doctor)
-            end
-
-            before do
-              doctor.becomes(Doktor)
-            end
-
-            context "when reloading the base" do
-
-              it "reloads the correct type of document" do
-                expect(game.reload.person).to be_a(Doktor)
-              end
-            end
-
-            context "when reloading the association" do
-
-              it "reloads the correct type of document" do
-                expect(game.person(true)).to be_a(Doktor)
-              end
-            end
-          end
-        end
       end
     end
   end

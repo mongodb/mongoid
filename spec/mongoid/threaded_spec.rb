@@ -106,21 +106,6 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#identity_map" do
-
-    before do
-      Thread.current["[mongoid]:identity-map"] = object
-    end
-
-    after do
-      Thread.current["[mongoid]:identity-map"] = nil
-    end
-
-    it "returns the object with the identity map key" do
-      expect(described_class.identity_map).to eq(object)
-    end
-  end
-
   describe "#scope_stack" do
 
     it "returns the default with the scope stack key" do

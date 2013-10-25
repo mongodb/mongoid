@@ -16,7 +16,7 @@ module Mongoid
       #
       # @since 2.0.0
       def execute_or_raise(ids, multi)
-        result = multiple_from_map_or_db(ids)
+        result = multiple_from_db(ids)
         check_for_missing_documents!(result, ids)
         multi ? result : result.first
       end
@@ -60,23 +60,6 @@ module Mongoid
         end
       end
 
-      # Get the document from the identity map, and if not found hit the
-      # database.
-      #
-      # @example Get the document from the map or criteria.
-      #   criteria.from_map_or_db
-      #
-      # @return [ Document ] The found document.
-      #
-      # @since 2.2.1
-      def from_map_or_db
-        id = extract_id
-        id = klass.fields["_id"].mongoize(id) if id
-        doc = IdentityMap.get(klass, id || selector_with_type_selection)
-        return nil if doc == {}
-        doc && doc.matches?(selector) ? doc : first
-      end
-
       # Get the documents from the identity map, and if not found hit the
       # database.
       #
@@ -86,11 +69,10 @@ module Mongoid
       # @param [ ids ] The searched ids.
       #
       # @return [ Array<Document> ] The found documents.
-      def multiple_from_map_or_db(ids)
+      def multiple_from_db(ids)
         return entries if embedded?
         ids = mongoize_ids(ids)
-        result = from_identity_map(ids)
-        ids.empty? ? result : result + from_database(ids)
+        ids.empty? ? [] : from_database(ids)
       end
 
       private
@@ -123,28 +105,6 @@ module Mongoid
       # @since 3.0.0
       def from_database(ids)
         (ids.size > 1 ? any_in(id: ids) : where(id: ids.first)).entries
-      end
-
-      # Get documents from the identity map only.
-      #
-      # @api private
-      #
-      # @example Get documents from the identity map.
-      #   criteria.from_identity_map(ids)
-      #
-      # @param [ Array<Object> ] ids The ids to fetch with.
-      #
-      # @return [ Array<Document> ] The matching documents.
-      #
-      # @since 3.0.0
-      def from_identity_map(ids)
-        result = []
-        selection = selector_with_type_selection
-        ids.reject! do |id|
-          doc = IdentityMap.get(klass, id)
-          doc && doc.matches?(selection) ? result.push(doc) : false
-        end
-        result
       end
 
       # Convert all the ids to their proper types.

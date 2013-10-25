@@ -356,65 +356,44 @@ Benchmark.bm do |bm|
 
     puts "\n[ Iterate with association load 1-1 ]"
 
-    Mongoid.unit_of_work do
-
-      bm.report("#each [ normal ] ") do
-        Post.all.each do |post|
-          post.person.title
-        end
+    bm.report("#each [ normal ] ") do
+      Post.all.each do |post|
+        post.person.title
       end
+    end
 
-      Mongoid.identity_map_enabled = true
-
-      bm.report("#each [ eager ]  ") do
-        Post.includes(:person).each do |post|
-          post.person.title
-        end
+    bm.report("#each [ eager ]  ") do
+      Post.includes(:person).each do |post|
+        post.person.title
       end
-
-      Mongoid.identity_map_enabled = false
     end
 
     puts "\n[ Iterate with association load 1-n ]"
 
-    Mongoid.unit_of_work do
-
-      bm.report("#each [ normal ] ") do
-        Person.all.each do |person|
-          person.posts.each { |post| post.title }
-        end
+    bm.report("#each [ normal ] ") do
+      Person.all.each do |person|
+        person.posts.each { |post| post.title }
       end
+    end
 
-      Mongoid.identity_map_enabled = true
-
-      bm.report("#each [ eager ]  ") do
-        Person.includes(:posts).each do |person|
-          person.posts.each { |post| post.title }
-        end
+    bm.report("#each [ eager ]  ") do
+      Person.includes(:posts).each do |person|
+        person.posts.each { |post| post.title }
       end
-
-      Mongoid.identity_map_enabled = false
     end
 
     puts "\n[ Iterate with association load n-n ]"
 
-    Mongoid.unit_of_work do
-
-      bm.report("#each [ normal ] ") do
-        Person.all.each do |person|
-          person.preferences.each { |preference| preference.name }
-        end
+    bm.report("#each [ normal ] ") do
+      Person.all.each do |person|
+        person.preferences.each { |preference| preference.name }
       end
+    end
 
-      Mongoid.identity_map_enabled = true
-
-      bm.report("#each [ eager ]  ") do
-        Person.includes(:preferences).each do |person|
-          person.preferences.each { |preference| preference.name }
-        end
+    bm.report("#each [ eager ]  ") do
+      Person.includes(:preferences).each do |person|
+        person.preferences.each { |preference| preference.name }
       end
-
-      Mongoid.identity_map_enabled = false
     end
   end
 end

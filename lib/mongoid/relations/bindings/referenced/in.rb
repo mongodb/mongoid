@@ -26,7 +26,7 @@ module Mongoid
               if inverse = metadata.inverse(target)
                 if set_base_metadata
                   if base.referenced_many?
-                    target.__send__(inverse).push(base) unless Mongoid.using_identity_map?
+                    target.__send__(inverse).push(base)
                   else
                     target.set_relation(inverse, base)
                   end

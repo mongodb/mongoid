@@ -199,9 +199,6 @@ module Mongoid
     # into the identity map who's ids match based on the extra query for the
     # ids.
     #
-    # @note This will only work if Mongoid's identity map is enabled. To do
-    #   so set identity_map_enabled: true in your mongoid.yml
-    #
     # @note This will work for embedded relations that reference another
     #   collection via belongs_to as well.
     #

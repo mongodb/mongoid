@@ -19,7 +19,6 @@ require "mongoid/config"
 require "mongoid/loggable"
 require "mongoid/sessions"
 require "mongoid/document"
-require "mongoid/unit_of_work"
 require "mongoid/log_subscriber"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
@@ -39,7 +38,6 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 
 module Mongoid
   extend Loggable
-  extend UnitOfWork
   extend self
 
   MONGODB_VERSION = "2.2.0"

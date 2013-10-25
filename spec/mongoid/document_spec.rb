@@ -375,14 +375,6 @@ describe Mongoid::Document do
 
     context "when an id exists" do
 
-      before do
-        Mongoid.identity_map_enabled = true
-      end
-
-      after do
-        Mongoid.identity_map_enabled = false
-      end
-
       let(:id) do
         BSON::ObjectId.new
       end
@@ -397,10 +389,6 @@ describe Mongoid::Document do
 
       it "sets persisted to true" do
         expect(person).to be_persisted
-      end
-
-      it "puts the document in the identity map" do
-        expect(Mongoid::IdentityMap.get(Person, id)).to eq(person)
       end
     end
 

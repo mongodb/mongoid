@@ -99,10 +99,6 @@ describe Mongoid::Config do
         described_class.reset
       end
 
-      it "sets the identity map option" do
-        expect(described_class.identity_map_enabled).to be_false
-      end
-
       it "sets the include root in json option" do
         expect(described_class.include_root_in_json).to be_false
       end
@@ -147,10 +143,6 @@ describe Mongoid::Config do
 
         before do
           described_class.load!(file)
-        end
-
-        it "sets the identity map option" do
-          expect(described_class.identity_map_enabled).to be_false
         end
 
         it "sets the include root in json option" do
@@ -237,7 +229,7 @@ describe Mongoid::Config do
       end
 
       it "does not try to assign options" do
-        expect(described_class.identity_map_enabled).to be_false
+        expect(described_class.preload_models).to be_false
       end
     end
 
