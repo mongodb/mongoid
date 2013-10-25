@@ -65,6 +65,8 @@ module Mongoid
         def builder(name, metadata)
           re_define_method("build_#{name}") do |*args|
             attributes, options = parse_args(*args)
+            attributes ||= {}
+            attributes[metadata.inverse] = self
             document = Factory.build(metadata.klass, attributes)
             _building do
               child = send("#{name}=", document)
