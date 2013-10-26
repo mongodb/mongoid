@@ -42,7 +42,6 @@ module Mongoid
           relation.eager_load_klass.new(associations, docs).run
         end
       end
-
     end
   end
 end

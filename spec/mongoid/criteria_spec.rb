@@ -1128,14 +1128,6 @@ describe Mongoid::Criteria do
 
   describe "#includes" do
 
-    before do
-      Mongoid.identity_map_enabled = true
-    end
-
-    after do
-      Mongoid.identity_map_enabled = false
-    end
-
     let!(:person) do
       Person.create(age: 1)
     end
@@ -1195,30 +1187,20 @@ describe Mongoid::Criteria do
           B.create(c: c_two)
         end
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:results) do
-          C.includes(:b).entries.detect do |c|
+          C.includes(:b).to_a.detect do |c|
             c.id == c_two.id
           end
-        end
-
-        let(:from_map) do
-          Mongoid::IdentityMap[B.collection_name][b.id]
         end
 
         it "returns the correct documents" do
           expect(results).to eq(c_two)
         end
 
-        it "inserts the first document into the identity map" do
-          expect(from_map).to eq(b)
-        end
-
-        it "retrieves the document from the identity map" do
-          expect(results.b).to equal(from_map)
+        it "does not query the db" do
+          expect_query(0) do
+            results.b
+          end
         end
       end
     end
@@ -1272,42 +1254,26 @@ describe Mongoid::Criteria do
             C.create(d: d_two)
           end
 
-          before do
-            Mongoid::IdentityMap.clear
-          end
-
           let!(:results) do
             D.includes(:b, :c).entries.detect do |d|
               d.id == d_two.id
             end
           end
 
-          let(:from_map_b) do
-            Mongoid::IdentityMap[B.collection_name][b.id]
-          end
-
-          let(:from_map_c) do
-            Mongoid::IdentityMap[C.collection_name][c.id]
-          end
-
           it "returns the correct documents" do
             expect(results).to eq(d_two)
           end
 
-          it "inserts the b document into the identity map" do
-            expect(from_map_b).to eq(b)
+          it "does not query the db on b" do
+            expect_query(0) do
+              results.b
+            end
           end
 
-          it "inserts the c document into the identity map" do
-            expect(from_map_c).to eq(c)
-          end
-
-          it "retrieves the b document from the identity map" do
-            expect(results.b).to equal(from_map_b)
-          end
-
-          it "retrieves the c document from the identity map" do
-            expect(results.c).to equal(from_map_c)
+          it "does not query the db on c" do
+            expect_query(0) do
+              results.b
+            end
           end
         end
       end
@@ -1359,42 +1325,25 @@ describe Mongoid::Criteria do
             2.times.map { C.create(d: d_two) }
           end
 
-          before do
-            Mongoid::IdentityMap.clear
-          end
-
           let!(:results) do
             D.includes(:b, :c).entries.detect do |d|
               d.id == d_two.id
             end
           end
-
-          let(:from_map_bs) do
-            bs.map { |b| Mongoid::IdentityMap[B.collection_name][b.id] }
-          end
-
-          let(:from_map_cs) do
-            cs.map { |c| Mongoid::IdentityMap[C.collection_name][c.id] }
-          end
-
           it "returns the correct documents" do
             expect(results).to eq(d_two)
           end
 
-          it "inserts the b documents into the identity map" do
-            expect(from_map_bs).to eq(bs)
+          it "does not query the db on b" do
+            expect_query(0) do
+              results.b
+            end
           end
 
-          it "inserts the c documents into the identity map" do
-            expect(from_map_cs).to eq(cs)
-          end
-
-          it "retrieves the b documents from the identity map" do
-            expect(results.b).to match_array(from_map_bs)
-          end
-
-          it "retrieves the c documents from the identity map" do
-            expect(results.c).to match_array(from_map_cs)
+          it "does not query the db on c" do
+            expect_query(0) do
+              results.b
+            end
           end
         end
       end
@@ -1416,10 +1365,6 @@ describe Mongoid::Criteria do
     end
 
     context "when mapping the results more than once" do
-
-      before do
-        Mongoid::IdentityMap.clear
-      end
 
       let!(:post) do
         person.posts.create(title: "one")
@@ -1472,10 +1417,6 @@ describe Mongoid::Criteria do
 
         context "when calling first" do
 
-          before do
-            Mongoid::IdentityMap.clear
-          end
-
           let(:criteria) do
             peep.reload.addresses.includes(:band)
           end
@@ -1484,24 +1425,21 @@ describe Mongoid::Criteria do
             criteria.context
           end
 
-          before do
-            context.should_receive(:eager_load_one).with(address_one).once.and_call_original
-          end
-
           let!(:document) do
             criteria.first
           end
 
-          let(:eager_loaded) do
-            Mongoid::IdentityMap[Band.collection_name]
-          end
-
           it "eager loads the first document" do
-            expect(eager_loaded[depeche.id]).to eq(depeche)
+            expect_query(0) do
+              expect(document.band).to eq(depeche)
+            end
           end
 
           it "does not eager load the last document" do
-            expect(eager_loaded[tool.id]).to be_nil
+            doc = criteria.last
+            expect_query(1) do
+              expect(doc.band).to eq(tool)
+            end
           end
 
           it "returns the document" do
@@ -1511,10 +1449,6 @@ describe Mongoid::Criteria do
 
         context "when calling last" do
 
-          before do
-            Mongoid::IdentityMap.clear
-          end
-
           let(:criteria) do
             peep.reload.addresses.includes(:band)
           end
@@ -1523,24 +1457,21 @@ describe Mongoid::Criteria do
             criteria.context
           end
 
-          before do
-            context.should_receive(:eager_load_one).with(address_two).once.and_call_original
-          end
-
           let!(:document) do
             criteria.last
           end
 
-          let(:eager_loaded) do
-            Mongoid::IdentityMap[Band.collection_name]
+          it "eager loads the last document" do
+            expect_query(0) do
+              expect(document.band).to eq(tool)
+            end
           end
 
           it "does not eager load the first document" do
-            expect(eager_loaded[depeche.id]).to be_nil
-          end
-
-          it "eager loads the last document" do
-            expect(eager_loaded[tool.id]).to eq(tool)
+            doc = criteria.first
+            expect_query(1) do
+              expect(doc.band).to eq(depeche)
+            end
           end
 
           it "returns the document" do
@@ -1550,10 +1481,6 @@ describe Mongoid::Criteria do
 
         context "when iterating all documents" do
 
-          before do
-            Mongoid::IdentityMap.clear
-          end
-
           let(:criteria) do
             peep.reload.addresses.includes(:band)
           end
@@ -1562,28 +1489,20 @@ describe Mongoid::Criteria do
             criteria.context
           end
 
-          before do
-            context.
-              should_receive(:eager_load).
-              with([ address_one, address_two ]).
-              once.
-              and_call_original
-          end
-
           let!(:documents) do
             criteria.to_a
           end
 
-          let(:eager_loaded) do
-            Mongoid::IdentityMap[Band.collection_name]
-          end
-
           it "eager loads the first document" do
-            expect(eager_loaded[depeche.id]).to eq(depeche)
+            expect_query(0) do
+              expect(documents.first.band).to eq(depeche)
+            end
           end
 
           it "eager loads the last document" do
-            expect(eager_loaded[tool.id]).to eq(tool)
+            expect_query(0) do
+              expect(documents.last.band).to eq(tool)
+            end
           end
 
           it "returns the documents" do
@@ -1606,34 +1525,27 @@ describe Mongoid::Criteria do
           person_two.posts.create(title: "two")
         end
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         context "when calling first" do
 
-          let!(:criteria) do
+          let(:criteria) do
             Post.includes(:person)
-          end
-
-          let!(:context) do
-            criteria.context
-          end
-
-          before do
-            context.should_receive(:eager_load_one).with(post_one).once.and_call_original
           end
 
           let!(:document) do
             criteria.first
           end
 
-          pending "eager loads for the first document" do
-            expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to eq(person)
+          it "eager loads the first document" do
+            expect_query(0) do
+              expect(document.person).to eq(person)
+            end
           end
 
-          it "does not eager loads for the last document" do
-            expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to be_nil
+          it "does not eager load the last document" do
+            doc = criteria.last
+            expect_query(1) do
+              expect(doc.person).to eq(person_two)
+            end
           end
 
           it "returns the first document" do
@@ -1647,24 +1559,21 @@ describe Mongoid::Criteria do
             Post.includes(:person)
           end
 
-          let!(:context) do
-            criteria.context
-          end
-
-          before do
-            context.should_receive(:eager_load_one).with(post_two).once.and_call_original
-          end
-
           let!(:document) do
             criteria.last
           end
 
-          it "eager loads for the first document" do
-            expect(Mongoid::IdentityMap[Person.collection_name][person_two.id]).to eq(person_two)
+          it "eager loads the last document" do
+            expect_query(0) do
+              expect(document.person).to eq(person_two)
+            end
           end
 
-          it "does not eager loads for the last document" do
-            expect(Mongoid::IdentityMap[Person.collection_name][person.id]).to be_nil
+          it "does not eager load the first document" do
+            doc = criteria.first
+            expect_query(1) do
+              expect(doc.person).to eq(person)
+            end
           end
 
           it "returns the last document" do
@@ -1694,20 +1603,8 @@ describe Mongoid::Criteria do
 
       context "when the criteria has no options" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).all
-        end
-
-        let!(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -1718,12 +1615,16 @@ describe Mongoid::Criteria do
           expect(documents).to eq([ person ])
         end
 
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(documents.first.posts.first).to eq(post_one)
+          end
         end
 
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
+        it "eager loads the last document" do
+          expect_query(0) do
+            expect(documents.first.posts.last).to eq(post_two)
+          end
         end
 
         context "when executing the query twice" do
@@ -1752,20 +1653,8 @@ describe Mongoid::Criteria do
 
       context "when calling first on the criteria" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let(:criteria) do
           Person.asc(:age).all
-        end
-
-        let!(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -1776,20 +1665,20 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(person)
         end
 
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(from_db.posts.first).to eq(post_one)
+          end
         end
 
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
+        it "eager loads the last document" do
+          expect_query(0) do
+            expect(from_db.posts.last).to eq(post_two)
+          end
         end
       end
 
       context "when calling last on the criteria" do
-
-        before do
-          Mongoid::IdentityMap.clear
-        end
 
         let(:criteria) do
           Person.asc(:age).all
@@ -1811,12 +1700,16 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(person)
         end
 
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(from_db.posts.first).to eq(post_one)
+          end
         end
 
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
+        it "eager loads the last document" do
+          expect_query(0) do
+            expect(from_db.posts.last).to eq(post_two)
+          end
         end
       end
 
@@ -1830,20 +1723,8 @@ describe Mongoid::Criteria do
           person_two.posts.create(title: "three")
         end
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).limit(1)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -1854,16 +1735,16 @@ describe Mongoid::Criteria do
           expect(criteria).to eq([ person ])
         end
 
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(documents.first.posts.first).to eq(post_one)
+          end
         end
 
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
-        end
-
-        it "does not insert the third post into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_three.id]).to be_nil
+        it "eager loads the second document" do
+          expect_query(0) do
+            expect(documents.first.posts.last).to eq(post_two)
+          end
         end
       end
     end
@@ -1880,20 +1761,8 @@ describe Mongoid::Criteria do
 
       context "when the criteria has no options" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).includes(:preferences)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -1904,35 +1773,23 @@ describe Mongoid::Criteria do
           expect(documents).to eq([ person ])
         end
 
-        let(:preference_map) do
-          Mongoid::IdentityMap[Preference.collection_name]
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(documents.first.preferences.first).to eq(preference_one)
+          end
         end
 
-        it "inserts the first document into the identity map" do
-          expect(preference_map[preference_one.id]).to eq(preference_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(preference_map[preference_two.id]).to eq(preference_two)
+        it "eager loads the last document" do
+          expect_query(0) do
+            expect(documents.first.preferences.last).to eq(preference_two)
+          end
         end
       end
 
       context "when calling first on the criteria" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).includes(:preferences)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -1943,35 +1800,23 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(person)
         end
 
-        let(:preference_map) do
-          Mongoid::IdentityMap[Preference.collection_name]
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(from_db.preferences.first).to eq(preference_one)
+          end
         end
 
-        it "inserts the first document into the identity map" do
-          expect(preference_map[preference_one.id]).to eq(preference_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(preference_map[preference_two.id]).to eq(preference_two)
+        it "eager loads the last document" do
+          expect_query(0) do
+            expect(from_db.preferences.last).to eq(preference_two)
+          end
         end
       end
 
       context "when calling last on the criteria" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).includes(:preferences)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -1982,67 +1827,16 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(person)
         end
 
-        let(:preference_map) do
-          Mongoid::IdentityMap[Preference.collection_name]
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(from_db.preferences.first).to eq(preference_one)
+          end
         end
 
-        it "inserts the first document into the identity map" do
-          expect(preference_map[preference_one.id]).to eq(preference_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(preference_map[preference_two.id]).to eq(preference_two)
-        end
-      end
-
-      context "when the criteria has limiting options" do
-
-        let!(:person_two) do
-          Person.create
-        end
-
-        let!(:preference_three) do
-          person_two.preferences.create(name: "three")
-        end
-
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
-        let!(:criteria) do
-          Person.includes(:preferences).asc(:age).limit(1)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
-        end
-
-        let!(:documents) do
-          criteria.entries
-        end
-
-        let(:preference_map) do
-          Mongoid::IdentityMap[Preference.collection_name]
-        end
-
-        it "returns the correct documents" do
-          expect(documents).to eq([ person ])
-        end
-
-        it "inserts the first document into the identity map" do
-          expect(preference_map[preference_one.id]).to eq(preference_one)
-        end
-
-        it "inserts the second document into the identity map" do
-          expect(preference_map[preference_two.id]).to eq(preference_two)
-        end
-
-        it "does not insert the third preference into the identity map" do
-          expect(preference_map[preference_three.id]).to be_nil
+        it "eager loads the last document" do
+          expect_query(0) do
+            expect(from_db.preferences.last).to eq(preference_two)
+          end
         end
       end
     end
@@ -2059,20 +1853,8 @@ describe Mongoid::Criteria do
 
       context "when the criteria has no options" do
 
-        before do
-          Mongoid::IdentityMap.clear
-        end
-
         let!(:criteria) do
           Person.asc(:age).includes(:posts)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -2083,12 +1865,16 @@ describe Mongoid::Criteria do
           expect(documents).to eq([ person ])
         end
 
-        it "inserts the first document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_one.id]).to eq(post_one)
+        it "eager loads the first document" do
+          expect_query(0) do
+            expect(documents.first.posts.first).to eq(post_one)
+          end
         end
 
-        it "inserts the second document into the identity map" do
-          expect(Mongoid::IdentityMap[Post.collection_name][post_two.id]).to eq(post_two)
+        it "eager loads the last document" do
+          expect_query(0) do
+            expect(documents.first.posts.last).to eq(post_two)
+          end
         end
       end
 
@@ -2096,14 +1882,6 @@ describe Mongoid::Criteria do
 
         let!(:criteria) do
           Person.asc(:age).includes(:posts)
-        end
-
-        let(:context) do
-          criteria.context
-        end
-
-        before do
-          context.should_receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2130,10 +1908,6 @@ describe Mongoid::Criteria do
 
         let!(:criteria) do
           Person.asc(:age).includes(:posts)
-        end
-
-        let(:context) do
-          criteria.context
         end
 
         let!(:from_db) do
