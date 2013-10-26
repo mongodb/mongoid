@@ -5,7 +5,7 @@ class Post
   field :title, type: String
   field :content, type: String
   field :rating, type: Integer
-  field :person_title, type: String, default: ->{ person.try(:title) }
+  field :person_title, type: String, default: ->{ person.title if ivar(:person) }
 
   attr_accessor :before_add_called, :after_add_called, :before_remove_called, :after_remove_called
 
