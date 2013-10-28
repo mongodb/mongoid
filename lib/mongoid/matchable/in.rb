@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def matches?(value)
-        attribute_array = Array.wrap(@attribute)
+        attribute_array = @attribute.nil? ? [nil] : Array.wrap(@attribute)
         value.values.first.any? do |e|
           attribute_array.any? { |_attribute| e === _attribute }
         end
