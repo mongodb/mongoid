@@ -6,9 +6,10 @@ Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
 Project Tracking
 ----------------
 
-* [Mongoid Google Group](http://groups.google.com/group/mongoid)
 * [Mongoid Website and Documentation](http://mongoid.org)
-* [Mongoid Code Climate](https://codeclimate.com/github/mongoid/mongoid)
+* [Mongoid Google Group](http://groups.google.com/group/mongoid)
+* [Stackoverflow](http://stackoverflow.com/questions/tagged/mongoid)
+* #mongoid on freenode IRC
 
 Compatibility
 -------------
