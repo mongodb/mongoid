@@ -209,7 +209,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :autobuild, :cyclic, :polymorphic ]
+            [ :autobuild, :cyclic, :polymorphic, :touch ]
           end
 
           # Get the default validation setting for the relation. Determines if

@@ -25,7 +25,33 @@ describe Mongoid::Relations::Touchable do
       it "persists the changes" do
         expect(label.reload.updated_at).to be_within(1).of(Time.now)
       end
+
+      context "when the relation has the touch option", focus: true do
+        before do
+          [Band, Child].each { |klass| klass.send(:include, Mongoid::Timestamps)}
+          Child.embedded_in :band, inverse_of: :child, touch: true
+          Band.embeds_one :child
+        end
+
+        it "updates the parent's timestamp after a child is created or destroyed" do
+          pending "parent's updated_at doesn't get updated" do
+            parent = Band.create(name: "Rammstein", updated_at: 2.days.ago)
+            child  = parent.create_child
+
+            expect(parent.reload.updated_at).to be_within(2).of(Time.now)
+          end
+        end
+
+        it "updates the parent's timestamp after the child is updated" do
+          parent = Band.create(name: "Placebo", updated_at: 10.days.ago)
+          child  = parent.create_child
+
+          child.touch
+          expect(parent.reload.updated_at).to be_within(2).of(Time.now)
+        end
+      end
     end
+
 
     context "when no relations have touch options" do
 

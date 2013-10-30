@@ -446,7 +446,7 @@ describe Mongoid::Relations::Embedded::In do
 
     it "returns the valid options" do
       expect(described_class.valid_options).to eq(
-        [ :autobuild, :cyclic, :polymorphic ]
+        [ :autobuild, :cyclic, :polymorphic, :touch ]
       )
     end
   end
