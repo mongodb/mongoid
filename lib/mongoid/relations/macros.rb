@@ -53,6 +53,7 @@ module Mongoid
         def embedded_in(name, options = {}, &block)
           meta = characterize(name, Embedded::In, options, &block)
           self.embedded = true
+          touchable(meta)
           relate(name, meta)
           builder(name, meta).creator(name, meta)
           add_counter_cache_callbacks(meta) if meta.counter_cached?
