@@ -55,7 +55,6 @@ module Mongoid
             raise Errors::InvalidField.new(klass, name)
           end
 
-          # if field alredy defined
           if !options[:overwrite] && klass.fields.keys.include?(name.to_s)
             if Mongoid.duplicate_fields_exception
               raise Errors::InvalidField.new(klass, name)

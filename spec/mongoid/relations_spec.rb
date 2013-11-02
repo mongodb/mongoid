@@ -7,7 +7,8 @@ describe Mongoid::Relations do
       :_id,
       type: BSON::ObjectId,
       pre_processed: true,
-      default: ->{ BSON::ObjectId.new }
+      default: ->{ BSON::ObjectId.new },
+      overwrite: true
     )
   end
 

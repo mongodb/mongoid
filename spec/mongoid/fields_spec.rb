@@ -618,7 +618,7 @@ describe Mongoid::Fields do
       context "when provided a default array" do
 
         before do
-          Person.field(:array_testing, type: Array, default: [])
+          Person.field(:array_testing, type: Array, default: [], overwrite: true)
         end
 
         after do
@@ -636,7 +636,7 @@ describe Mongoid::Fields do
       context "when provided a default hash" do
 
         before do
-          Person.field(:hash_testing, type: Hash, default: {})
+          Person.field(:hash_testing, type: Hash, default: {}, overwrite: true)
         end
 
         after do
@@ -658,7 +658,8 @@ describe Mongoid::Fields do
             Person.field(
               :generated_testing,
               type: Float,
-              default: ->{ Time.now.to_f }
+              default: ->{ Time.now.to_f },
+              overwrite: true
             )
           end
 
@@ -680,7 +681,8 @@ describe Mongoid::Fields do
             Person.field(
               :rank,
               type: Integer,
-              default: ->{ title? ? 1 : 2 }
+              default: ->{ title? ? 1 : 2 },
+              overwrite: true
             )
           end
 
@@ -789,7 +791,7 @@ describe Mongoid::Fields do
     context "when providing no options" do
 
       before do
-        Person.field(:testing)
+        Person.field(:testing, overwrite: true)
       end
 
       let(:person) do
@@ -856,7 +858,7 @@ describe Mongoid::Fields do
       end
 
       before do
-        Person.field :aliased, as: :alias, type: Boolean
+        Person.field :aliased, as: :alias, type: Boolean, overwrite: true
       end
 
       it "uses the alias to write the attribute" do
@@ -950,7 +952,7 @@ describe Mongoid::Fields do
             expect(model).to eql User
           end
 
-          User.field :custom, option: true
+          User.field :custom, option: true, overwrite: true
         end
 
         it "calls the handler with the field" do
@@ -958,7 +960,7 @@ describe Mongoid::Fields do
             expect(field).to eql User.fields["custom"]
           end
 
-          User.field :custom, option: true
+          User.field :custom, option: true, overwrite: true
         end
 
         it "calls the handler with the option value" do
@@ -966,7 +968,7 @@ describe Mongoid::Fields do
             expect(value).to eql true
           end
 
-          User.field :custom, option: true
+          User.field :custom, option: true, overwrite: true
         end
       end
 
@@ -974,7 +976,7 @@ describe Mongoid::Fields do
 
         it "calls the handler" do
           handler.should_receive(:call)
-          User.field :custom, option: nil
+          User.field :custom, option: nil, overwrite: true
         end
       end
 
@@ -983,7 +985,7 @@ describe Mongoid::Fields do
         it "does not call the handler" do
           handler.should_receive(:call).never
 
-          User.field :custom
+          User.field :custom, overwrite: true
         end
       end
     end

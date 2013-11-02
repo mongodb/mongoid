@@ -451,7 +451,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the key is resizable" do
 
       let(:field) do
-        described_class.new(:test, type: Array)
+        described_class.new(:test, type: Array, overwrite: true)
       end
 
       it "returns true" do
@@ -462,7 +462,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the key is not resizable" do
 
       let(:field) do
-        described_class.new(:test, type: BSON::ObjectId)
+        described_class.new(:test, type: BSON::ObjectId, overwrite: true)
       end
 
       it "returns false" do
@@ -491,7 +491,8 @@ describe Mongoid::Fields::ForeignKey do
             type: Array,
             default: [],
             identity: true,
-            metadata: metadata
+            metadata: metadata,
+            overwrite: true
           )
         end
 
@@ -539,7 +540,8 @@ describe Mongoid::Fields::ForeignKey do
               :_id,
               type: String,
               pre_processed: true,
-              default: ->{ BSON::ObjectId.new.to_s }
+              default: ->{ BSON::ObjectId.new.to_s },
+              overwrite: true
             )
           end
 
@@ -548,7 +550,8 @@ describe Mongoid::Fields::ForeignKey do
               :_id,
               type: BSON::ObjectId,
               pre_processed: true,
-              default: ->{ BSON::ObjectId.new }
+              default: ->{ BSON::ObjectId.new },
+              overwrite: true
             )
           end
 
@@ -577,7 +580,8 @@ describe Mongoid::Fields::ForeignKey do
             type: Object,
             default: nil,
             identity: true,
-            metadata: metadata
+            metadata: metadata,
+            overwrite: true
           )
         end
 
@@ -607,7 +611,8 @@ describe Mongoid::Fields::ForeignKey do
                   :_id,
                   type: String,
                   pre_processed: true,
-                  default: ->{ BSON::ObjectId.new.to_s }
+                  default: ->{ BSON::ObjectId.new.to_s },
+                  overwrite: true
                 )
               end
 
@@ -616,7 +621,8 @@ describe Mongoid::Fields::ForeignKey do
                   :_id,
                   type: BSON::ObjectId,
                   pre_processed: true,
-                  default: ->{ BSON::ObjectId.new }
+                  default: ->{ BSON::ObjectId.new },
+                  overwrite: true
                 )
               end
 
@@ -631,7 +637,7 @@ describe Mongoid::Fields::ForeignKey do
             context "when provided a string" do
 
               before do
-                Person.field(:_id, type: Integer)
+                Person.field(:_id, type: Integer, overwrite: true)
               end
 
               after do
@@ -639,7 +645,8 @@ describe Mongoid::Fields::ForeignKey do
                   :_id,
                   type: BSON::ObjectId,
                   pre_processed: true,
-                  default: ->{ BSON::ObjectId.new }
+                  default: ->{ BSON::ObjectId.new },
+                  overwrite: true
                 )
               end
 

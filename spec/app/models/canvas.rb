@@ -18,7 +18,7 @@ class Canvas
 
   class Test < Canvas
 
-    field :foo, type: String, default: ->{ "overridden" }
+    field :foo, type: String, overwrite: true, default: ->{ "overridden" }
   end
 end
 
