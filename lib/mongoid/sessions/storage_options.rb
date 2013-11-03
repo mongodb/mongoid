@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid
   module Sessions
     module StorageOptions
@@ -6,7 +7,7 @@ module Mongoid
       included do
 
         cattr_accessor :storage_options, instance_writer: false do
-          self.storage_options_defaults
+          storage_options_defaults
         end
       end
 
@@ -49,16 +50,30 @@ module Mongoid
         # @since 3.0.0
         def store_in(options)
           Validators::Storage.validate(self, options)
-          self.storage_options.merge!(options)
+          storage_options.merge!(options)
         end
 
+        # Reset the store_in options
+        #
+        # @example Reset the store_in options
+        #   Model.reset_storage_options!
+        #
+        # @since 4.0.0
         def reset_storage_options!
           self.storage_options = storage_options_defaults.dup
         end
 
+        # Get the default storage options.
+        #
+        # @example Get the default storage options.
+        #   Model.storage_options_defaults
+        #
+        # @return [ Hash ] Default storage options.
+        #
+        # @since 4.0.0
         def storage_options_defaults
           {
-            collection: self.name.collectionize.to_sym,
+            collection: name.collectionize.to_sym,
             session: :default,
             database: -> { Mongoid.sessions[session_name][:database] }
           }
@@ -73,7 +88,7 @@ module Mongoid
         #
         # @since 3.0.0
         def collection_name
-          __evaluate__(self.storage_options[:collection])
+          __evaluate__(storage_options[:collection])
         end
 
         # Get the session name for the model.
@@ -85,11 +100,19 @@ module Mongoid
         #
         # @since 3.0.0
         def session_name
-          __evaluate__(self.storage_options[:session])
+          __evaluate__(storage_options[:session])
         end
 
+        # Get the database name for the model.
+        #
+        # @example Get the database name.
+        #   Model.database_name
+        #
+        # @return [ Symbol ] The name of the session.
+        #
+        # @since 4.0.0
         def database_name
-          __evaluate__(self.storage_options[:database])
+          __evaluate__(storage_options[:database])
         end
 
         private
