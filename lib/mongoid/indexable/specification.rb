@@ -23,7 +23,7 @@ module Mongoid
       #   @return [ Hash ] The index key.
       # @!attribute options
       #   @return [ Hash ] The index options.
-      attr_reader :klass, :key, :options
+      attr_reader :klass, :key, :fields, :options
 
       # Is this index specification equal to another?
       #
@@ -36,19 +36,7 @@ module Mongoid
       #
       # @since 4.0.0
       def ==(other)
-        fields == other.fields
-      end
-
-      # Get an array of the fields, in order, that are part of the index.
-      #
-      # @example Get the index fields.
-      #   specification.fields
-      #
-      # @return [ Array<Symbol> ] The names of the fields.
-      #
-      # @since 4.0.0
-      def fields
-        key.keys
+        fields == other.fields && key == other.key
       end
 
       # Instantiate a new index specification.
@@ -66,6 +54,7 @@ module Mongoid
         Validators::Options.validate(klass, key, options)
         @klass = klass
         @key = normalize_key(key)
+        @fields = @key.keys
         @options = normalize_options(options.dup)
       end
 

@@ -288,6 +288,26 @@ describe Mongoid::Indexable do
       end
     end
 
+    context "when providing multiple compound indexes with different order" do
+
+      before do
+        klass.index({ name: 1, title: -1 })
+        klass.index({ name: 1, title: 1 })
+      end
+
+      let(:first_spec) do
+        klass.index_specification(name: 1, title: -1)
+      end
+
+      let(:second_spec) do
+        klass.index_specification(name: 1, title: 1)
+      end
+
+      it "does not overwrite the index options" do
+        expect(first_spec).to_not eq(second_spec)
+      end
+    end
+
     context "when providing a geospacial index" do
 
       before do

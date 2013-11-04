@@ -48,6 +48,21 @@ describe Mongoid::Indexable::Specification do
         expect(spec_one).to_not eq(spec_two)
       end
     end
+
+    context "when the keys are the same with different value" do
+
+      let(:spec_one) do
+        described_class.new(Band, { name: 1, title: 1 })
+      end
+
+      let(:spec_two) do
+        described_class.new(Band, { name: 1, title: -1 })
+      end
+
+      it "returns false" do
+        expect(spec_one).to_not eq(spec_two)
+      end
+    end
   end
 
   describe "#fields" do
