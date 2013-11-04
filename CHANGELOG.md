@@ -279,6 +279,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3348 Fixing compounded indexes having the same keys with
+  different directions. (Arthur Neves)
+
 * \#2701 Fixing extra query on belongs_to binding. (Arthur Neves)
 
 * \#3089 Allow demongoization of strings to floats (Daniel Libanori)
