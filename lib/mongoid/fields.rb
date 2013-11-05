@@ -311,10 +311,10 @@ module Mongoid
         field = field_for(name, options)
         fields[name] = field
         add_defaults(field)
-        create_accessors(name, name, options)
+        create_accessors(name, name, options) unless aliased && options[:only_alias]
         create_accessors(name, aliased, options) if aliased
         process_options(field)
-        create_dirty_methods(name, name)
+        create_dirty_methods(name, name) unless aliased && options[:only_alias]
         create_dirty_methods(name, aliased) if aliased
         field
       end

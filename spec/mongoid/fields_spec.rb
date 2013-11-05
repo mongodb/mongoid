@@ -736,6 +736,12 @@ describe Mongoid::Fields do
             Person.field(:metadata)
           }.to raise_error(Mongoid::Errors::InvalidField)
         end
+
+        it "doesn't raise an error if the field is aliased and only using the alias" do
+          expect {
+            Person.field(:metadata, :as => :info, :only_alias => true)
+          }.not_to raise_error(Mongoid::Errors::InvalidField)
+        end
       end
     end
 
