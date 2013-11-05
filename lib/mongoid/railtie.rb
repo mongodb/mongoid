@@ -108,13 +108,6 @@ module Rails
         end
       end
 
-      # Need to include the Mongoid identity map middleware.
-      #
-      # @since 3.0.0
-      initializer "mongoid.use-identity-map-middleware" do |app|
-        app.config.middleware.use "Rack::Mongoid::Middleware::IdentityMap"
-      end
-
       config.after_initialize do
         # Unicorn clears the START_CTX when a worker is forked, so if we have
         # data in START_CTX then we know we're being preloaded. Unicorn does
@@ -142,14 +135,6 @@ module Rails
       def handle_configuration_error(e)
         puts "There is a configuration error with the current mongoid.yml."
         puts e.message
-      end
-
-      # Clears the idenity map on console reload. Identity map is on a thread
-      # local so it's safe to clear it in all environments.
-      #
-      # @since 4.0.0
-      ActionDispatch::Reloader.to_cleanup do
-        ::Mongoid::IdentityMap.clear
       end
     end
   end

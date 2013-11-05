@@ -17,8 +17,7 @@ module Mongoid
           def build(type = nil)
             return object unless query?
             return [] if object.is_a?(Array)
-            crit = metadata.criteria(Conversions.flag(object, metadata), base.class)
-            IdentityMap.get_many(crit.klass, crit.send(:selector_with_type_selection)) || crit
+            metadata.criteria(Conversions.flag(object, metadata), base.class)
           end
         end
       end

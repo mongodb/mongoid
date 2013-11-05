@@ -346,7 +346,6 @@ module Mongoid
             doc.run_after_callbacks(:destroy) if method == :destroy
             doc.freeze
             doc.destroyed = true
-            IdentityMap.remove(doc)
           end
         end
       end

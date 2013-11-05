@@ -95,7 +95,6 @@ RSpec.configure do |config|
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
     Mongoid.purge!
-    Mongoid::IdentityMap.clear
   end
 
   # Filter out MongoHQ specs if we can't connect to it.

@@ -771,14 +771,6 @@ describe Mongoid::Criteria do
 
       context "when the identity map is enabled" do
 
-        before(:all) do
-          Mongoid.identity_map_enabled = true
-        end
-
-        after(:all) do
-          Mongoid.identity_map_enabled = false
-        end
-
         context "when returning the updated document" do
 
           let(:criteria) do
@@ -791,10 +783,6 @@ describe Mongoid::Criteria do
 
           it "returns the first matching document" do
             expect(result).to eq(depeche)
-          end
-
-          it "updates the document in the identity map" do
-            expect(Mongoid::IdentityMap.get(Band, result.id).likes).to eq(1)
           end
         end
 
@@ -814,10 +802,6 @@ describe Mongoid::Criteria do
 
           it "returns the first matching document" do
             expect(result).to eq(depeche)
-          end
-
-          it "updates the document in the identity map" do
-            expect(Mongoid::IdentityMap.get(Band, depeche.id).likes).to eq(1)
           end
         end
       end
@@ -1330,6 +1314,7 @@ describe Mongoid::Criteria do
               d.id == d_two.id
             end
           end
+
           it "returns the correct documents" do
             expect(results).to eq(d_two)
           end

@@ -17,7 +17,7 @@ module Mongoid
           def build(type = nil)
             return object unless query?
             return nil if base.new_record?
-            metadata.criteria(Conversions.flag(object, metadata), base.class).from_map_or_db
+            metadata.criteria(Conversions.flag(object, metadata), base.class).first
           end
         end
       end

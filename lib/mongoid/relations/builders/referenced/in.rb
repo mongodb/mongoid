@@ -17,7 +17,7 @@ module Mongoid
           def build(type = nil)
             return object unless query?
             model = type ? type.constantize : metadata.klass
-            metadata.criteria(object, model).from_map_or_db
+            metadata.criteria(object, model).first
           end
         end
       end

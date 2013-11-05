@@ -2085,14 +2085,6 @@ describe Mongoid::Relations::Referenced::Many do
 
     context "when the identity map is enabled" do
 
-      before do
-        Mongoid.identity_map_enabled = true
-      end
-
-      after do
-        Mongoid.identity_map_enabled = false
-      end
-
       context "when the document is in the map" do
 
         let(:person) do

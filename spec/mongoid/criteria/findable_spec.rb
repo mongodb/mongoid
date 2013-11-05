@@ -37,106 +37,10 @@ describe Mongoid::Criteria::Findable do
       end
     end
 
-    context "when the identity map is enabled" do
-
-      before(:all) do
-        Mongoid.identity_map_enabled = true
-      end
-
-      after(:all) do
-        Mongoid.identity_map_enabled = false
-      end
-
-      let!(:depeche) do
-        Band.create(name: "Depeche Mode")
-      end
-
-      let!(:placebo) do
-        Band.create(name: "Placebo")
-      end
-
-      context "when a parent and a child are in the identity map" do
-
-        let!(:canvas) do
-          Canvas.create
-        end
-
-        let!(:browser) do
-          Browser.create
-        end
-
-        context "when fetching a child class by a parent id" do
-
-          it "raises a not found error" do
-            expect {
-              Browser.find(canvas.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
-          end
-        end
-      end
-
-      context "when providing a single id" do
-
-        let(:from_map) do
-          Band.find(depeche.id)
-        end
-
-        it "returns the document from the map" do
-          expect(from_map).to equal(depeche)
-        end
-      end
-
-      context "when providing a single id as a String" do
-
-        let(:from_map) do
-          Band.find(depeche.id.to_s)
-        end
-
-        it "returns the document from the map" do
-          expect(from_map).to equal(depeche)
-        end
-      end
-
-      context "when providing multiple ids" do
-
-        let(:from_map) do
-          Band.find(depeche.id, placebo.id)
-        end
-
-        it "returns the first match from the map" do
-          expect(from_map.first).to equal(depeche)
-        end
-
-        it "returns the second match from the map" do
-          expect(from_map.last).to equal(placebo)
-        end
-      end
-    end
-
     context "when using object ids" do
 
       let!(:band) do
         Band.create
-      end
-
-      context "when a parent and a child are in the identity map" do
-
-        let!(:canvas) do
-          Canvas.create
-        end
-
-        let!(:browser) do
-          Browser.create
-        end
-
-        context "when fetching a child class by a parent id" do
-
-          it "raises a not found error" do
-            expect {
-              Browser.find(canvas.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
-          end
-        end
       end
 
       context "when providing a single id" do
@@ -213,6 +117,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when ids are duplicates" do
+
             let(:found) do
               Band.find(band.id, band.id)
             end
@@ -284,6 +189,7 @@ describe Mongoid::Criteria::Findable do
           end
 
           context "when ids are duplicates" do
+
             let(:found) do
               Band.find([ band.id, band.id ])
             end
@@ -1034,188 +940,51 @@ describe Mongoid::Criteria::Findable do
     end
   end
 
-  describe "#from_map_or_db" do
+  describe "#multiple_from__db" do
 
-    before(:all) do
-      Mongoid.identity_map_enabled = true
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
     end
 
-    after(:all) do
-      Mongoid.identity_map_enabled = false
+    let!(:band_two) do
+      Band.create(name: "Tool")
     end
 
-    context "when the document is in the identity map" do
-
-      let!(:band) do
-        Band.create(name: "Depeche Mode")
-      end
+    context "when providing a single id" do
 
       let(:criteria) do
         Band.where(_id: band.id)
-      end
-
-      let(:from_map) do
-        criteria.from_map_or_db
-      end
-
-      it "returns the document from the map" do
-        expect(from_map).to equal(band)
-      end
-    end
-
-    context "when the document is not in the identity map" do
-
-      let!(:band) do
-        Band.create(name: "Depeche Mode")
-      end
-
-      let(:criteria) do
-        Band.where(_id: band.id)
-      end
-
-      before do
-        Mongoid::IdentityMap.clear
       end
 
       let(:from_db) do
-        criteria.from_map_or_db
+        criteria.multiple_from_db([ band.id ])
       end
 
       it "returns the document from the database" do
-        expect(from_db).to_not equal(band)
+        expect(from_db.first).to_not equal(band)
       end
 
       it "returns the correct document" do
-        expect(from_db).to eq(band)
+        expect(from_db.first).to eq(band)
       end
     end
 
-    context "when the selector is cleared in the identity map" do
-
-      let!(:band) do
-        Band.create(name: "Depeche Mode")
-      end
+    context "when providing multiple ids" do
 
       let(:criteria) do
-        Band.where(name: "Depeche Mode")
-      end
-
-      before do
-        Mongoid::IdentityMap.clear
-        Mongoid::IdentityMap.clear_many(Band, { "name" => "Depeche Mode" })
+        Band.where(:_id.in => [ band.id, band_two.id ])
       end
 
       let(:from_db) do
-        criteria.from_map_or_db
+        criteria.multiple_from_db([ band.id, band_two.id ])
       end
 
-      it "returns nil" do
-        expect(from_db).to be_nil
-      end
-    end
-  end
-
-  describe "#multiple_from_map_or_db" do
-
-    before(:all) do
-      Mongoid.identity_map_enabled = true
-    end
-
-    after(:all) do
-      Mongoid.identity_map_enabled = false
-    end
-
-    context "when the document is in the identity map" do
-
-      let!(:band) do
-        Band.create(name: "Depeche Mode")
+      it "returns the document from the database" do
+        expect(from_db.first).to_not equal(band)
       end
 
-      let!(:band_two) do
-        Band.create(name: "Tool")
-      end
-
-      context "when providing a single id" do
-
-        let(:criteria) do
-          Band.where(_id: band.id)
-        end
-
-        let(:from_map) do
-          criteria.multiple_from_map_or_db([ band.id ])
-        end
-
-        it "returns the document from the map" do
-          expect(from_map).to include(band)
-        end
-      end
-
-      context "when providing multiple ids" do
-
-        let(:criteria) do
-          Band.where(:_id.in => [ band.id, band_two.id ])
-        end
-
-        let(:from_map) do
-          criteria.multiple_from_map_or_db([ band.id, band_two.id ])
-        end
-
-        it "returns the documents from the map" do
-          expect(from_map).to include(band, band_two)
-        end
-      end
-    end
-
-    context "when the document is not in the identity map" do
-
-      let!(:band) do
-        Band.create(name: "Depeche Mode")
-      end
-
-      let!(:band_two) do
-        Band.create(name: "Tool")
-      end
-
-      before do
-        Mongoid::IdentityMap.clear
-      end
-
-      context "when providing a single id" do
-
-        let(:criteria) do
-          Band.where(_id: band.id)
-        end
-
-        let(:from_db) do
-          criteria.multiple_from_map_or_db([ band.id ])
-        end
-
-        it "returns the document from the database" do
-          expect(from_db.first).to_not equal(band)
-        end
-
-        it "returns the correct document" do
-          expect(from_db.first).to eq(band)
-        end
-      end
-
-      context "when providing multiple ids" do
-
-        let(:criteria) do
-          Band.where(:_id.in => [ band.id, band_two.id ])
-        end
-
-        let(:from_db) do
-          criteria.multiple_from_map_or_db([ band.id, band_two.id ])
-        end
-
-        it "returns the document from the database" do
-          expect(from_db.first).to_not equal(band)
-        end
-
-        it "returns the correct document" do
-          expect(from_db.first).to eq(band)
-        end
+      it "returns the correct document" do
+        expect(from_db.first).to eq(band)
       end
     end
   end

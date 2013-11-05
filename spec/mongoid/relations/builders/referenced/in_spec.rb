@@ -145,10 +145,6 @@ describe Mongoid::Relations::Builders::Referenced::In do
 
     context "when the document is persisted" do
 
-      before do
-        Mongoid.identity_map_enabled = true
-      end
-
       let!(:person) do
         Person.create
       end
@@ -157,16 +153,8 @@ describe Mongoid::Relations::Builders::Referenced::In do
         Game.new(person_id: person.id)
       end
 
-      after do
-        Mongoid.identity_map_enabled = false
-      end
-
       it "returns the document" do
         expect(game.person).to eq(person)
-      end
-
-      it "gets the document from the identity map" do
-        expect(game.person).to equal(person)
       end
     end
 

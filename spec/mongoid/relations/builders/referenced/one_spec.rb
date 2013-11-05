@@ -84,25 +84,12 @@ describe Mongoid::Relations::Builders::Referenced::One do
 
     context "when the document is persisted" do
 
-      before do
-        Mongoid.identity_map_enabled = true
-        person.save
-      end
-
-      after do
-        Mongoid.identity_map_enabled = false
-      end
-
       let!(:game) do
-        Game.create(person_id: person.id)
+        Game.create(person: person)
       end
 
       it "returns the document" do
         expect(person.game).to eq(game)
-      end
-
-      it "pulls the document from the identity map" do
-        expect(person.game).to equal(game)
       end
     end
 
@@ -113,7 +100,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
       end
 
       let!(:cat) do
-        Cat.create(person_id: person.username)
+        Cat.create(person: person)
       end
 
       it "returns the document" do
