@@ -28,10 +28,6 @@ describe Mongoid::Timestamps::Updated do
     it "forces the updated_at timestamps to UTC" do
       expect(agent.updated_at).to be_within(10).of(Time.now.utc)
     end
-
-    pending "includes a record_timestamps class_accessor to ease AR compatibility" do
-      expect(Agent.new).to respond_to(:record_timestamps)
-    end
   end
 
   context "when the document is new" do

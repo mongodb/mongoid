@@ -36,10 +36,6 @@ describe Mongoid::Timestamps do
     it "ensures created_at equals updated_at on new records" do
       expect(document.updated_at).to eq(document.created_at)
     end
-
-    pending "includes a record_timestamps class_accessor to ease AR compatibility" do
-      expect(Dokument.new).to respond_to(:record_timestamps)
-    end
   end
 
   context "when the document has not changed" do
