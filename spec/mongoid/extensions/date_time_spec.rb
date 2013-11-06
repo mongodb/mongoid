@@ -7,14 +7,14 @@ describe Mongoid::Extensions::DateTime do
     context "when the date time has more than seconds precision" do
 
       let(:date_time) do
-        DateTime.parse("2012-06-17 18:42:15.123Z")
+        Time.parse("2012-06-17 18:42:15.123Z")
       end
 
       let(:mongoized) do
         date_time.__mongoize_time__
       end
 
-      pending "does not drop the precision" do
+      it "does not drop the precision" do
         expect(mongoized.to_f.to_s).to match(/\.123/)
       end
     end
