@@ -10,6 +10,13 @@ jdk:
   - openjdk7
 env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -J-Xms512m -J-Xmx1024m"
 matrix:
+  exclude:
+    - rvm: 1.9.3
+      jdk: oraclejdk7
+      env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -J-Xms512m -J-Xmx1024m"
+    - rvm: 2.0.0
+      jdk: oraclejdk7
+      env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -J-Xms512m -J-Xmx1024m"
   allow_failures:
     - rvm: jruby-head
 notifications:
