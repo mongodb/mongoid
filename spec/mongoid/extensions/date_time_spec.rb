@@ -14,8 +14,27 @@ describe Mongoid::Extensions::DateTime do
         date_time.__mongoize_time__
       end
 
-      pending "does not drop the precision" do
-        expect(mongoized.to_f.to_s).to match(/\.123/)
+      context 'does not drop the precision' do
+
+        it "for utc DateTime" do
+          date_time.stub(:utc?).and_return(true)
+          Mongoid.stub(:use_utc?).and_return(true)
+          expect(mongoized.to_f.to_s).to match(/\.123/)
+        end
+
+        it "when using Active Support timezone" do
+          date_time.stub(:utc?).and_return(false)
+          Mongoid.stub(:use_utc?).and_return(false)
+          Mongoid.stub(:use_activesupport_time_zone?).and_return(true)
+          expect(mongoized.to_f.to_s).to match(/\.123/)
+        end
+
+        it "for DateTime without zone" do
+          date_time.stub(:utc?).and_return(false)
+          Mongoid.stub(:use_utc?).and_return(false)
+          Mongoid.stub(:use_activesupport_time_zone?).and_return(false)
+          expect(mongoized.to_f.to_s).to match(/\.123/)
+        end
       end
     end
 
