@@ -11,6 +11,7 @@ require "mongoid/selectable"
 require "mongoid/scopable"
 require "mongoid/serializable"
 require "mongoid/shardable"
+require "mongoid/timestamps/macros"
 require "mongoid/traversable"
 require "mongoid/validatable"
 
@@ -28,6 +29,8 @@ module Mongoid
       extend ActiveModel::Translation
       extend Findable
     end
+
+
 
     include ActiveModel::Conversion
     include ActiveModel::ForbiddenAttributesProtection
@@ -51,6 +54,7 @@ module Mongoid
     include Sessions
     include Shardable
     include State
+    include Timestamps::Macros
     include Threaded::Lifecycle
     include Traversable
     include Validatable
