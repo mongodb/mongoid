@@ -2,6 +2,36 @@ require "spec_helper"
 
 describe Mongoid::Persistable::Creatable do
 
+  shared_examples :persistable_document do
+    it "creates the first document" do
+      expect(people.first.title).to eq("sir")
+    end
+
+    it "persists the first document" do
+      expect(people.first).to be_persisted
+    end
+
+    it "creates the second document" do
+      expect(people.last.title).to eq("madam")
+    end
+
+    it "persists the second document" do
+      expect(people.last).to be_persisted
+    end
+  end
+
+  shared_examples :persistable_document_block do
+    include_examples :persistable_document
+
+    it "passes the block to the first document" do
+      expect(people.first.age).to eq(36)
+    end
+
+    it "passes the block to the second document" do
+      expect(people.last.age).to eq(36)
+    end
+  end
+
   describe ".create" do
 
     context "when provided an array of attributes" do
@@ -12,24 +42,10 @@ describe Mongoid::Persistable::Creatable do
           Person.create([{ title: "sir" }, { title: "madam" }])
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
+        include_examples :persistable_document
       end
 
-      context "when no block is passed" do
+      context "when block is passed" do
 
         let(:people) do
           Person.create([{ title: "sir" }, { title: "madam" }]) do |person|
@@ -37,29 +53,7 @@ describe Mongoid::Persistable::Creatable do
           end
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "passes the block to the first document" do
-          expect(people.first.age).to eq(36)
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
-
-        it "passes the block to the second document" do
-          expect(people.last.age).to eq(36)
-        end
+        include_examples :persistable_document_block
       end
     end
 
@@ -71,54 +65,18 @@ describe Mongoid::Persistable::Creatable do
           Person.create({ title: "sir" }, { title: "madam" })
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
+        include_examples :persistable_document
       end
 
-      context "when no block is passed" do
+      context "when block is passed" do
 
         let(:people) do
-          Person.create([{ title: "sir" }, { title: "madam" }]) do |person|
+          Person.create({ title: "sir" }, { title: "madam" }) do |person|
             person.age = 36
           end
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "passes the block to the first document" do
-          expect(people.first.age).to eq(36)
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
-
-        it "passes the block to the second document" do
-          expect(people.last.age).to eq(36)
-        end
+        include_examples :persistable_document_block
       end
     end
 
@@ -466,24 +424,10 @@ describe Mongoid::Persistable::Creatable do
           Person.create!([{ title: "sir" }, { title: "madam" }])
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
+        shared_examples :persistable_document
       end
 
-      context "when no block is passed" do
+      context "when block is passed" do
 
         let(:people) do
           Person.create!([{ title: "sir" }, { title: "madam" }]) do |person|
@@ -491,29 +435,7 @@ describe Mongoid::Persistable::Creatable do
           end
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "passes the block to the first document" do
-          expect(people.first.age).to eq(36)
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
-
-        it "passes the block to the second document" do
-          expect(people.last.age).to eq(36)
-        end
+        shared_examples :persistable_document_block
       end
     end
 
@@ -525,54 +447,18 @@ describe Mongoid::Persistable::Creatable do
           Person.create!({ title: "sir" }, { title: "madam" })
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
+        shared_examples :persistable_document
       end
 
-      context "when no block is passed" do
+      context "when block is passed" do
 
         let(:people) do
-          Person.create!([{ title: "sir" }, { title: "madam" }]) do |person|
+          Person.create!({ title: "sir" }, { title: "madam" }) do |person|
             person.age = 36
           end
         end
 
-        it "creates the first document" do
-          expect(people.first.title).to eq("sir")
-        end
-
-        it "persists the first document" do
-          expect(people.first).to be_persisted
-        end
-
-        it "passes the block to the first document" do
-          expect(people.first.age).to eq(36)
-        end
-
-        it "creates the second document" do
-          expect(people.last.title).to eq("madam")
-        end
-
-        it "persists the second document" do
-          expect(people.last).to be_persisted
-        end
-
-        it "passes the block to the second document" do
-          expect(people.last.age).to eq(36)
-        end
+        shared_examples :persistable_document_block
       end
     end
 
