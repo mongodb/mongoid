@@ -63,6 +63,65 @@ describe Mongoid::Persistable::Creatable do
       end
     end
 
+    context "when provided an array of attributes without square brackets" do
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create({ title: "sir" }, { title: "madam" })
+        end
+
+        it "creates the first document" do
+          expect(people.first.title).to eq("sir")
+        end
+
+        it "persists the first document" do
+          expect(people.first).to be_persisted
+        end
+
+        it "creates the second document" do
+          expect(people.last.title).to eq("madam")
+        end
+
+        it "persists the second document" do
+          expect(people.last).to be_persisted
+        end
+      end
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create([{ title: "sir" }, { title: "madam" }]) do |person|
+            person.age = 36
+          end
+        end
+
+        it "creates the first document" do
+          expect(people.first.title).to eq("sir")
+        end
+
+        it "persists the first document" do
+          expect(people.first).to be_persisted
+        end
+
+        it "passes the block to the first document" do
+          expect(people.first.age).to eq(36)
+        end
+
+        it "creates the second document" do
+          expect(people.last.title).to eq("madam")
+        end
+
+        it "persists the second document" do
+          expect(people.last).to be_persisted
+        end
+
+        it "passes the block to the second document" do
+          expect(people.last.age).to eq(36)
+        end
+      end
+    end
+
     context "when providing attributes" do
 
       let(:person) do
@@ -405,6 +464,65 @@ describe Mongoid::Persistable::Creatable do
 
         let(:people) do
           Person.create!([{ title: "sir" }, { title: "madam" }])
+        end
+
+        it "creates the first document" do
+          expect(people.first.title).to eq("sir")
+        end
+
+        it "persists the first document" do
+          expect(people.first).to be_persisted
+        end
+
+        it "creates the second document" do
+          expect(people.last.title).to eq("madam")
+        end
+
+        it "persists the second document" do
+          expect(people.last).to be_persisted
+        end
+      end
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create!([{ title: "sir" }, { title: "madam" }]) do |person|
+            person.age = 36
+          end
+        end
+
+        it "creates the first document" do
+          expect(people.first.title).to eq("sir")
+        end
+
+        it "persists the first document" do
+          expect(people.first).to be_persisted
+        end
+
+        it "passes the block to the first document" do
+          expect(people.first.age).to eq(36)
+        end
+
+        it "creates the second document" do
+          expect(people.last.title).to eq("madam")
+        end
+
+        it "persists the second document" do
+          expect(people.last).to be_persisted
+        end
+
+        it "passes the block to the second document" do
+          expect(people.last.age).to eq(36)
+        end
+      end
+    end
+
+    context "when provided an array of attributes without square brackets" do
+
+      context "when no block is passed" do
+
+        let(:people) do
+          Person.create!({ title: "sir" }, { title: "madam" })
         end
 
         it "creates the first document" do

@@ -235,6 +235,18 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* Now persistable create methods accept inserting multiple new documents
+  without square brackets. (Abd ar-Rahman Hamidi)
+    e.g.
+    ```ruby
+      Person.create({ title: "Mr" }, { title: "Mrs" })
+      Person.create([{ title: "Mr" }, { title: "Mrs" }])
+
+      # bang version
+      Person.create!({ title: "Mr" }, { title: "Mrs" })
+      Person.create!([{ title: "Mr" }, { title: "Mrs" }])
+    ```
+
 * Mongoid now uses ActiveSupport::LogSubscriber to subscribe logs, and
   ActiveSupport::Notifications to send operation logs. (Arthur Neves)
   Example of log subscription:
