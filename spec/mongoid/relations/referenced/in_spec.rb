@@ -188,6 +188,37 @@ describe Mongoid::Relations::Referenced::In do
           end
         end
 
+        context "#update_attributes" do
+
+          let(:canvas) do
+            Canvas.create
+          end
+
+          let(:comment) do
+            Comment.create(title: "test")
+          end
+
+          before do
+            comment.commentable_type = canvas.class.name
+            comment.commentable_id = canvas.id.to_s
+            comment.save
+          end
+
+          it "sets the correct value in the type field" do
+            expect(comment.commentable_type).to eq("Canvas")
+          end
+
+          it "properly stores ID in database" do
+            comment.reload
+            expect(comment.commentable_id).to eq(canvas.id)
+            expect(comment.commentable_id.class.name).to eq('BSON::ObjectId')
+          end
+
+          it "can retrieve the document from the database" do
+            expect(comment.reload.commentable).to eq(canvas)
+          end
+        end
+
         context "when the child is a new record" do
 
           let(:bar) do
