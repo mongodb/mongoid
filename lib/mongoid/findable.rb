@@ -119,6 +119,7 @@ module Mongoid
     def first
       with_default_scope.first
     end
+    alias :one :first
 
     # Find the last +Document+ given the conditions.
     #

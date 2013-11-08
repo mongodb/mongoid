@@ -128,6 +128,20 @@ describe Mongoid::Findable do
     end
   end
 
+  [ :first, :one ].each do |method|
+
+    describe "##{method}" do
+
+      let!(:person) do
+        Person.create
+      end
+
+      it "returns the first matching document" do
+        expect(Person.send(method)).to eq(person)
+      end
+    end
+  end
+
   describe ".first_or_create" do
 
     context "when the document is found" do
