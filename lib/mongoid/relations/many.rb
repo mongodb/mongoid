@@ -21,11 +21,11 @@ module Mongoid
         size == 0
       end
 
-        # Creates a new document on the references many relation. This will
-        # save the document if the parent has been persisted.
-        #
-        # @example Create and save the new document.
-        #   person.posts.create(:text => "Testing")
+      # Creates a new document on the references many relation. This will
+      # save the document if the parent has been persisted.
+      #
+      # @example Create and save the new document.
+      #   person.posts.create(:text => "Testing")
       #
       # @overload create(attributes = nil, options = {}, type = nil)
       #   @param [ Hash ] attributes The attributes to create with.
