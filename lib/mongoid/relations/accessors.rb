@@ -44,20 +44,6 @@ module Mongoid
         target ? metadata.relation.new(self, target, metadata) : nil
       end
 
-      # Determines if the relation exists or not.
-      #
-      # @example Does the relation exist?
-      #   person.relation_exists?(:people)
-      #
-      # @param [ String ] name The name of the relation to check.
-      #
-      # @return [ true, false ] True if set and not nil, false if not.
-      #
-      # @since 2.0.0.rc.1
-      def relation_exists?(name)
-        ivar(name)
-      end
-
       # Resets the criteria inside the relation proxy. Used by many to many
       # relations to keep the underlying ids array in sync.
       #
@@ -174,7 +160,7 @@ module Mongoid
         # @return [ Class ] The model being set up.
         #
         # @since 3.0.0
-        def existence_check(name, metadata)
+        def existence_check(name)
           module_eval <<-END
             def #{name}?
               without_autobuild { !__send__(:#{name}).blank? }

@@ -349,7 +349,7 @@ module Mongoid
         # @param [ Metadata ] metadata The metadata for the relation.
         def relate(name, metadata)
           self.relations = relations.merge(name.to_s => metadata)
-          getter(name, metadata).setter(name, metadata).existence_check(name, metadata)
+          getter(name, metadata).setter(name, metadata).existence_check(name)
         end
       end
     end
