@@ -27,14 +27,14 @@ describe Mongoid::Matchable::Or do
         end
 
         it "returns true" do
-          expect(matches).to be_true
+          expect(matches).to be_truthy
         end
       end
 
       context "when none of the values are equal" do
 
         it "returns false" do
-          expect(matcher.matches?([])).to be_false
+          expect(matcher.matches?([])).to be_falsey
         end
       end
     end
@@ -57,7 +57,7 @@ describe Mongoid::Matchable::Or do
         end
 
         it "returns true" do
-          expect(matches).to be_true
+          expect(matches).to be_truthy
         end
       end
 
@@ -77,7 +77,7 @@ describe Mongoid::Matchable::Or do
         end
 
         it "returns false" do
-          expect(matches).to be_false
+          expect(matches).to be_falsey
         end
       end
 
@@ -98,7 +98,7 @@ describe Mongoid::Matchable::Or do
         end
 
         it "returns false" do
-          expect(matches).to be_false
+          expect(matches).to be_falsey
         end
       end
     end

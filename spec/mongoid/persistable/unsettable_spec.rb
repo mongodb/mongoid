@@ -17,7 +17,7 @@ describe Mongoid::Persistable::Unsettable do
         end
 
         it "returns true" do
-          expect(unset).to be_true
+          expect(unset).to be_truthy
         end
 
         it "persists the first unset" do
@@ -91,7 +91,7 @@ describe Mongoid::Persistable::Unsettable do
         end
 
         it "returns true" do
-          expect(unset).to be_true
+          expect(unset).to be_truthy
         end
 
         it "persists the first unset" do

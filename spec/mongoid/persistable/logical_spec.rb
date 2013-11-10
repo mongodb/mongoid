@@ -21,7 +21,7 @@ describe Mongoid::Persistable::Logical do
         end
 
         it "returns true" do
-          expect(bit).to be_true
+          expect(bit).to be_truthy
         end
 
         it "resets dirty changes" do
@@ -87,7 +87,7 @@ describe Mongoid::Persistable::Logical do
         end
 
         it "returns true" do
-          expect(bit).to be_true
+          expect(bit).to be_truthy
         end
 
         it "resets dirty changes" do

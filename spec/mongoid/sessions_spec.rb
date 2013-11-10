@@ -1003,7 +1003,7 @@ describe Mongoid::Sessions do
         context "when using safe: false" do
 
           it "ignores mongodb error" do
-            expect(Person.with(safe: false).create(ssn: "432-97-1111")).to be_true
+            expect(Person.with(safe: false).create(ssn: "432-97-1111")).to be_truthy
           end
         end
       end

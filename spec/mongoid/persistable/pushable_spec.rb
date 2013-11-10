@@ -21,7 +21,7 @@ describe Mongoid::Persistable::Pushable do
         end
 
         it "returns true" do
-          expect(add).to be_true
+          expect(add).to be_truthy
         end
 
         it "resets the dirty changes" do
@@ -81,7 +81,7 @@ describe Mongoid::Persistable::Pushable do
         end
 
         it "returns true" do
-          expect(add).to be_true
+          expect(add).to be_truthy
         end
 
         it "resets the dirty changes" do
@@ -144,7 +144,7 @@ describe Mongoid::Persistable::Pushable do
         end
 
         it "returns true" do
-          expect(push).to be_true
+          expect(push).to be_truthy
         end
 
         it "resets the dirty changes" do
@@ -208,7 +208,7 @@ describe Mongoid::Persistable::Pushable do
         end
 
         it "returns true" do
-          expect(push).to be_true
+          expect(push).to be_truthy
         end
 
         it "resets the dirty changes" do

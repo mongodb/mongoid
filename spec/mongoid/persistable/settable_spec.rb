@@ -21,7 +21,7 @@ describe Mongoid::Persistable::Settable do
         end
 
         it "returns true" do
-          expect(set).to be_true
+          expect(set).to be_truthy
         end
 
         it "persists the normal field set" do
@@ -85,7 +85,7 @@ describe Mongoid::Persistable::Settable do
         end
 
         it "returns true" do
-          expect(set).to be_true
+          expect(set).to be_truthy
         end
 
         it "persists the normal field set" do
