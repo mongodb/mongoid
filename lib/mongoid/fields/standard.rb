@@ -73,6 +73,7 @@ module Mongoid
       #
       # @example Create the new field.
       #   Field.new(:name, :type => String)
+      #   Field.new(:name, :string, default: :mongoid)
       #
       # @param [ Hash ] options The field options.
       #
@@ -81,17 +82,21 @@ module Mongoid
       # @option options [ String ] :label The field's label.
       #
       # @since 3.0.0
-      def initialize(name, options = {})
-        @name = name
-        @options = options
-        @label = options[:label]
-        @default_val = options[:default]
+      def initialize(*arguments)
+        raise ArgumentError unless arguments.length.between?(1, 3)
+
+        @name     = arguments.shift
+        @type     = arguments.shift unless arguments.first.is_a?(Hash)
+        @options  = arguments.shift || {}
+
+        @label        = @options[:label]
+        @default_val  = @options[:default]
 
         # @todo: Durran, change API in 4.0 to take the class as a parameter.
         # This is here temporarily to address #2529 without changing the
         # constructor signature.
         if default_val.respond_to?(:call)
-          define_default_method(options[:klass])
+          define_default_method(@options[:klass])
         end
       end
 
