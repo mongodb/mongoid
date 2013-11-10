@@ -166,6 +166,12 @@ module Mongoid
       # @since 2.1.0
       def type
         @type ||= options[:type] || Object
+
+        if @type.is_a?(String) || @type.is_a?(Symbol)
+          @type = @type.to_s.camelize.constantize
+        end
+
+        @type
       end
 
       private
