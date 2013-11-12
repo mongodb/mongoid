@@ -17,7 +17,7 @@ describe Mongoid::Persistable::Poppable do
         end
 
         it "returns true" do
-          expect(pop).to be_true
+          expect(pop).to be_truthy
         end
 
         it "persists pops" do
@@ -69,7 +69,7 @@ describe Mongoid::Persistable::Poppable do
         end
 
         it "returns true" do
-          expect(pop).to be_true
+          expect(pop).to be_truthy
         end
 
         it "persists pops" do

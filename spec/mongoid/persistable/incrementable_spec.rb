@@ -21,7 +21,7 @@ describe Mongoid::Persistable::Incrementable do
         end
 
         it "returns true" do
-          expect(inc).to be_true
+          expect(inc).to be_truthy
         end
 
         it "persists a positive inc" do
@@ -102,7 +102,7 @@ describe Mongoid::Persistable::Incrementable do
         end
 
         it "returns true" do
-          expect(inc).to be_true
+          expect(inc).to be_truthy
         end
 
         it "persists a positive inc" do

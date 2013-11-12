@@ -22,11 +22,11 @@ describe Mongoid::Config::Options do
       end
 
       it "defines a getter" do
-        expect(config.preload_models).to be_false
+        expect(config.preload_models).to be_falsey
       end
 
       it "defines a setter" do
-        (config.preload_models = expect(true)).to be_true
+        (config.preload_models = expect(true)).to be_truthy
       end
 
       it "defines a presence check" do
@@ -43,7 +43,7 @@ describe Mongoid::Config::Options do
     end
 
     it "resets the settings to the defaults" do
-      expect(config.preload_models).to be_false
+      expect(config.preload_models).to be_falsey
     end
   end
 

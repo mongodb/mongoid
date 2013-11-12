@@ -266,11 +266,11 @@ describe Mongoid::Extensions::Object do
       end
 
       it "removes the instance variable" do
-        expect(document.instance_variable_defined?(:@_testing)).to be_false
+        expect(document.instance_variable_defined?(:@_testing)).to be_falsey
       end
 
       it "returns true" do
-        expect(removal).to be_true
+        expect(removal).to be_truthy
       end
     end
 
@@ -285,7 +285,7 @@ describe Mongoid::Extensions::Object do
       end
 
       it "returns false" do
-        expect(removal).to be_false
+        expect(removal).to be_falsey
       end
     end
   end

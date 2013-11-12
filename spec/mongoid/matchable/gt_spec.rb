@@ -11,7 +11,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns true" do
-        expect(matcher.matches?("$gt" => 3)).to be_true
+        expect(matcher.matches?("$gt" => 3)).to be_truthy
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 3)).to be_false
+        expect(matcher.matches?("$gt" => 3)).to be_falsey
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 10)).to be_false
+        expect(matcher.matches?("$gt" => 10)).to be_falsey
       end
     end
 
@@ -44,7 +44,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 5)).to be_false
+        expect(matcher.matches?("$gt" => 5)).to be_falsey
       end
     end
 
@@ -56,7 +56,7 @@ describe Mongoid::Matchable::Gt do
         end
 
         it "returns false" do
-          expect(matcher.matches?("$gt" => 5)).to be_true
+          expect(matcher.matches?("$gt" => 5)).to be_truthy
         end
       end
 
@@ -67,7 +67,7 @@ describe Mongoid::Matchable::Gt do
         end
 
         it "returns false" do
-          expect(matcher.matches?("$gt" => 5)).to be_false
+          expect(matcher.matches?("$gt" => 5)).to be_falsey
         end
       end
     end

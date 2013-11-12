@@ -17,7 +17,7 @@ describe Mongoid::Persistable::Pullable do
         end
 
         it "returns true" do
-          expect(pull).to be_true
+          expect(pull).to be_truthy
         end
 
         it "resets dirty changes" do
@@ -69,7 +69,7 @@ describe Mongoid::Persistable::Pullable do
         end
 
         it "returns true" do
-          expect(pull).to be_true
+          expect(pull).to be_truthy
         end
 
         it "resets dirty changes" do
@@ -128,7 +128,7 @@ describe Mongoid::Persistable::Pullable do
         end
 
         it "returns true" do
-          expect(pull_all).to be_true
+          expect(pull_all).to be_truthy
         end
 
         it "resets dirty changes" do
@@ -182,7 +182,7 @@ describe Mongoid::Persistable::Pullable do
         end
 
         it "returns true" do
-          expect(pull_all).to be_true
+          expect(pull_all).to be_truthy
         end
 
         it "resets dirty changes" do

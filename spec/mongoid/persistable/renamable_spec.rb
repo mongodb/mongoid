@@ -25,7 +25,7 @@ describe Mongoid::Persistable::Renamable do
         end
 
         it "returns true" do
-          expect(rename).to be_true
+          expect(rename).to be_truthy
         end
 
         it "persists the first rename" do
@@ -89,7 +89,7 @@ describe Mongoid::Persistable::Renamable do
         end
 
         it "returns true" do
-          expect(rename).to be_true
+          expect(rename).to be_truthy
         end
 
         it "persists the first rename" do

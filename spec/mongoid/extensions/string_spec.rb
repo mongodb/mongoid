@@ -325,14 +325,14 @@ describe Mongoid::Extensions::String do
     context "when string is a reader" do
 
       it "returns false" do
-        expect("attribute".writer?).to be_false
+        expect("attribute".writer?).to be_falsey
       end
     end
 
     context "when string is a writer" do
 
       it "returns true" do
-        expect("attribute=".writer?).to be_true
+        expect("attribute=".writer?).to be_truthy
       end
     end
   end
@@ -342,14 +342,14 @@ describe Mongoid::Extensions::String do
     context "when string is a reader" do
 
       it "returns false" do
-        expect("attribute".before_type_cast?).to be_false
+        expect("attribute".before_type_cast?).to be_falsey
       end
     end
 
     context "when string is before_type_cast" do
 
       it "returns true" do
-        expect("attribute_before_type_cast".before_type_cast?).to be_true
+        expect("attribute_before_type_cast".before_type_cast?).to be_truthy
       end
     end
   end
