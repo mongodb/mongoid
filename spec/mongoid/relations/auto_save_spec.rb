@@ -106,7 +106,7 @@ describe Mongoid::Relations::AutoSave do
 
           it 'does not load the association' do
             from_db.save
-            expect(from_db.ivar(:drugs)).to be_false
+            expect(from_db.ivar(:drugs)).to be false
           end
         end
       end
@@ -178,7 +178,7 @@ describe Mongoid::Relations::AutoSave do
 
           it 'does not load the association' do
             from_db.save
-            expect(from_db.ivar(:account)).to be_false
+            expect(from_db.ivar(:account)).to be false
           end
         end
       end
@@ -253,11 +253,11 @@ describe Mongoid::Relations::AutoSave do
           end
 
           it 'loads the updated association' do
-            expect(from_db.ivar(:drugs)).to be_true
+            expect(from_db.ivar(:drugs)).to eq([placebo])
           end
 
           it 'doest not load the other association' do
-            expect(from_db.ivar(:account)).to be_false
+            expect(from_db.ivar(:account)).to be false
           end
         end
 
@@ -268,11 +268,11 @@ describe Mongoid::Relations::AutoSave do
           end
 
           it 'doest not load drugs association' do
-            expect(from_db.ivar(:drugs)).to be_false
+            expect(from_db.ivar(:drugs)).to be false
           end
 
           it 'doest not load account association' do
-            expect(from_db.ivar(:account)).to be_false
+            expect(from_db.ivar(:account)).to be false
           end
         end
       end

@@ -221,7 +221,7 @@ describe Mongoid::Interceptable do
       end
 
       it "gets saved" do
-        expect(artist.persisted?).to be_true
+        expect(artist.persisted?).to be true
       end
     end
 
@@ -233,7 +233,7 @@ describe Mongoid::Interceptable do
       end
 
       it "does not get saved" do
-        expect(artist.persisted?).to be_false
+        expect(artist.persisted?).to be false
       end
     end
   end
@@ -257,7 +257,7 @@ describe Mongoid::Interceptable do
         end
 
         it "the save returns true" do
-          expect(artist.save).to be_true
+          expect(artist.save).to be true
         end
       end
 
@@ -268,7 +268,7 @@ describe Mongoid::Interceptable do
         end
 
         it "the save returns false" do
-          expect(artist.save).to be_false
+          expect(artist.save).to be false
         end
       end
     end
@@ -292,7 +292,7 @@ describe Mongoid::Interceptable do
         end
 
         it "the save returns true" do
-          expect(artist.save).to be_true
+          expect(artist.save).to be true
         end
       end
 
@@ -303,7 +303,7 @@ describe Mongoid::Interceptable do
         end
 
         it "the save returns false" do
-          expect(artist.save).to be_false
+          expect(artist.save).to be false
         end
       end
     end
@@ -330,7 +330,7 @@ describe Mongoid::Interceptable do
       end
 
       it "the destroy returns true" do
-        expect(artist.destroy).to be_true
+        expect(artist.destroy).to be true
       end
     end
 
@@ -341,7 +341,7 @@ describe Mongoid::Interceptable do
       end
 
       it "the destroy returns false" do
-        expect(artist.destroy).to be_false
+        expect(artist.destroy).to be false
       end
     end
 
@@ -360,7 +360,7 @@ describe Mongoid::Interceptable do
       end
 
       it "executes the child destroy callbacks" do
-        expect(record.before_destroy_called).to be_true
+        expect(record.before_destroy_called).to be true
       end
     end
   end
@@ -376,11 +376,11 @@ describe Mongoid::Interceptable do
     end
 
     it "runs the after callbacks" do
-      expect(object.after_save_called).to be_true
+      expect(object.after_save_called).to be true
     end
 
     it "does not run the before callbacks" do
-      expect(object.before_save_called).to be_false
+      expect(object.before_save_called).to be nil
     end
   end
 
@@ -395,11 +395,11 @@ describe Mongoid::Interceptable do
     end
 
     it "runs the before callbacks" do
-      expect(object.before_save_called).to be_true
+      expect(object.before_save_called).to be true
     end
 
     it "does not run the after callbacks" do
-      expect(object.after_save_called).to be_false
+      expect(object.after_save_called).to be nil
     end
   end
 
@@ -428,7 +428,7 @@ describe Mongoid::Interceptable do
           end
 
           it "does not cascade to the child" do
-            expect(band.run_callbacks(:rearrange)).to be_true
+            expect(band.run_callbacks(:rearrange)).to be true
           end
         end
 
@@ -455,7 +455,7 @@ describe Mongoid::Interceptable do
 
           it "does not cascade to the child" do
             Band.accepts_nested_attributes_for :records, allow_destroy: true
-            expect(band.update_attributes(attributes)).to be_true
+            expect(band.update_attributes(attributes)).to be true
           end
         end
       end
@@ -538,7 +538,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(label.after_create_called).to be_true
+              expect(label.after_create_called).to be true
             end
           end
 
@@ -557,7 +557,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(label.after_create_called).to be_true
+              expect(label.after_create_called).to be true
             end
           end
         end
@@ -578,7 +578,7 @@ describe Mongoid::Interceptable do
           end
 
           it "does not execute the callback" do
-            expect(label.after_create_called).to be_false
+            expect(label.after_create_called).to be false
           end
         end
       end
@@ -602,7 +602,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(label.after_save_called).to be_true
+              expect(label.after_save_called).to be true
             end
           end
 
@@ -621,7 +621,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(label.after_save_called).to be_true
+              expect(label.after_save_called).to be true
             end
           end
         end
@@ -641,7 +641,7 @@ describe Mongoid::Interceptable do
           end
 
           it "executes the callback" do
-            expect(label.after_save_called).to be_true
+            expect(label.after_save_called).to be true
           end
         end
       end
@@ -665,7 +665,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(label.after_update_called).to be_false
+              expect(label.after_update_called).to be false
             end
           end
 
@@ -684,7 +684,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(label.after_update_called).to be_false
+              expect(label.after_update_called).to be false
             end
           end
         end
@@ -707,7 +707,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(label.after_update_called).to be_true
+              expect(label.after_update_called).to be true
             end
           end
 
@@ -722,7 +722,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(label.after_update_called).to be_false
+              expect(label.after_update_called).to be false
             end
           end
         end
@@ -747,7 +747,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(label.after_validation_called).to be_true
+              expect(label.after_validation_called).to be true
             end
           end
 
@@ -766,7 +766,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(label.after_validation_called).to be_true
+              expect(label.after_validation_called).to be true
             end
           end
         end
@@ -786,7 +786,7 @@ describe Mongoid::Interceptable do
           end
 
           it "executes the callback" do
-            expect(label.after_validation_called).to be_true
+            expect(label.after_validation_called).to be true
           end
         end
       end
@@ -810,7 +810,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(record.before_create_called).to be_true
+              expect(record.before_create_called).to be true
             end
           end
 
@@ -829,7 +829,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(record.before_create_called).to be_true
+              expect(record.before_create_called).to be true
             end
           end
         end
@@ -850,7 +850,7 @@ describe Mongoid::Interceptable do
           end
 
           it "does not execute the callback" do
-            expect(record.before_create_called).to be_false
+            expect(record.before_create_called).to be false
           end
         end
       end
@@ -874,11 +874,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(record.before_save_called).to be_true
+              expect(record.before_save_called).to be true
             end
 
             it "persists the change" do
-              expect(band.reload.records.first.before_save_called).to be_true
+              expect(band.reload.records.first.before_save_called).to be true
             end
           end
 
@@ -897,11 +897,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(record.before_save_called).to be_true
+              expect(record.before_save_called).to be true
             end
 
             it "persists the change" do
-              expect(band.reload.records.first.before_save_called).to be_true
+              expect(band.reload.records.first.before_save_called).to be true
             end
           end
         end
@@ -921,11 +921,11 @@ describe Mongoid::Interceptable do
           end
 
           it "executes the callback" do
-            expect(record.before_save_called).to be_true
+            expect(record.before_save_called).to be true
           end
 
           it "persists the change" do
-            expect(band.reload.records.first.before_save_called).to be_true
+            expect(band.reload.records.first.before_save_called).to be true
           end
         end
       end
@@ -949,7 +949,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(record.before_update_called).to be_false
+              expect(record.before_update_called).to be false
             end
           end
 
@@ -968,7 +968,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(record.before_update_called).to be_false
+              expect(record.before_update_called).to be false
             end
           end
         end
@@ -991,11 +991,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(record.before_update_called).to be_true
+              expect(record.before_update_called).to be true
             end
 
             it "persists the change" do
-              expect(band.reload.records.first.before_update_called).to be_true
+              expect(band.reload.records.first.before_update_called).to be true
             end
           end
 
@@ -1006,7 +1006,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(record.before_update_called).to be_false
+              expect(record.before_update_called).to be false
             end
           end
         end
@@ -1031,11 +1031,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(record.before_validation_called).to be_true
+              expect(record.before_validation_called).to be true
             end
 
             it "persists the change" do
-              expect(band.reload.records.first.before_validation_called).to be_true
+              expect(band.reload.records.first.before_validation_called).to be true
             end
           end
 
@@ -1054,11 +1054,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(record.before_validation_called).to be_true
+              expect(record.before_validation_called).to be true
             end
 
             it "persists the change" do
-              expect(band.reload.records.first.before_validation_called).to be_true
+              expect(band.reload.records.first.before_validation_called).to be true
             end
           end
         end
@@ -1078,11 +1078,11 @@ describe Mongoid::Interceptable do
           end
 
           it "executes the callback" do
-            expect(record.before_validation_called).to be_true
+            expect(record.before_validation_called).to be true
           end
 
           it "persists the change" do
-            expect(band.reload.records.first.before_validation_called).to be_true
+            expect(band.reload.records.first.before_validation_called).to be true
           end
         end
       end
@@ -1113,7 +1113,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(track.before_create_called).to be_true
+              expect(track.before_create_called).to be true
             end
           end
 
@@ -1136,7 +1136,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(track.before_create_called).to be_true
+              expect(track.before_create_called).to be true
             end
           end
         end
@@ -1161,7 +1161,7 @@ describe Mongoid::Interceptable do
           end
 
           it "does not execute the callback" do
-            expect(track.before_create_called).to be_false
+            expect(track.before_create_called).to be false
           end
         end
       end
@@ -1193,11 +1193,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(track.before_save_called).to be_true
+              expect(track.before_save_called).to be true
             end
 
             it "persists the change" do
-              expect(reloaded.tracks.first.before_save_called).to be_true
+              expect(reloaded.tracks.first.before_save_called).to be true
             end
           end
 
@@ -1224,11 +1224,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(track.before_save_called).to be_true
+              expect(track.before_save_called).to be true
             end
 
             it "persists the change" do
-              expect(reloaded.tracks.first.before_save_called).to be_true
+              expect(reloaded.tracks.first.before_save_called).to be true
             end
           end
         end
@@ -1256,11 +1256,11 @@ describe Mongoid::Interceptable do
           end
 
           it "executes the callback" do
-            expect(track.before_save_called).to be_true
+            expect(track.before_save_called).to be true
           end
 
           it "persists the change" do
-            expect(reloaded.tracks.first.before_save_called).to be_true
+            expect(reloaded.tracks.first.before_save_called).to be true
           end
         end
       end
@@ -1288,7 +1288,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(track.before_update_called).to be_false
+              expect(track.before_update_called).to be false
             end
           end
 
@@ -1311,7 +1311,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(track.before_update_called).to be_false
+              expect(track.before_update_called).to be false
             end
           end
         end
@@ -1342,11 +1342,11 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(track.before_update_called).to be_true
+              expect(track.before_update_called).to be true
             end
 
             it "persists the change" do
-              expect(reloaded.tracks.first.before_update_called).to be_true
+              expect(reloaded.tracks.first.before_update_called).to be true
             end
           end
 
@@ -1357,7 +1357,7 @@ describe Mongoid::Interceptable do
             end
 
             it "does not execute the callback" do
-              expect(track.before_update_called).to be_false
+              expect(track.before_update_called).to be false
             end
           end
         end
@@ -1386,7 +1386,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(track.before_validation_called).to be_true
+              expect(track.before_validation_called).to be true
             end
           end
 
@@ -1409,7 +1409,7 @@ describe Mongoid::Interceptable do
             end
 
             it "executes the callback" do
-              expect(track.before_validation_called).to be_true
+              expect(track.before_validation_called).to be true
             end
           end
         end
@@ -1433,7 +1433,7 @@ describe Mongoid::Interceptable do
           end
 
           it "executes the callback" do
-            expect(track.before_validation_called).to be_true
+            expect(track.before_validation_called).to be true
           end
         end
       end
@@ -1489,7 +1489,7 @@ describe Mongoid::Interceptable do
 
       it "fails to save" do
         expect(person).to be_valid
-        expect(person.save).to be_false
+        expect(person.save).to be false
       end
 
       it "is a new record" do
@@ -1522,7 +1522,7 @@ describe Mongoid::Interceptable do
 
       it "#save returns false" do
         expect(person).to be_valid
-        expect(person.save).to be_false
+        expect(person.save).to be false
       end
 
       it "is a not a new record" do

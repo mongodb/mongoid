@@ -97,7 +97,7 @@ describe Mongoid::Scopable do
       end
 
       it "adds the proc default scope" do
-        expect(Band.default_scoping.call.selector["active"]).to be_true
+        expect(Band.default_scoping.call.selector["active"]).to be true
       end
 
       it "delays execution of the merge until called" do

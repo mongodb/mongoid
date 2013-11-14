@@ -16,8 +16,8 @@ describe Mongoid::Persistable::Poppable do
           expect(person.aliases).to eq([ "b" ])
         end
 
-        it "returns true" do
-          expect(pop).to be_true
+        it "returns the self object" do
+          expect(pop).to eq(person)
         end
 
         it "persists pops" do
@@ -68,8 +68,8 @@ describe Mongoid::Persistable::Poppable do
           expect(address.aliases).to eq([ "b" ])
         end
 
-        it "returns true" do
-          expect(pop).to be_true
+        it "returns self object" do
+          expect(pop).to eq(address)
         end
 
         it "persists pops" do

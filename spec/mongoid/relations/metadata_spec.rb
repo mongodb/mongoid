@@ -671,7 +671,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        expect(metadata.extension?).to be_true
+        expect(metadata.extension?).to be true
       end
     end
 
@@ -684,7 +684,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        expect(metadata.extension?).to be_false
+        expect(metadata.extension?).to be false
       end
     end
   end
@@ -1094,7 +1094,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns true" do
-        expect(metadata.indexed?).to be_true
+        expect(metadata.indexed?).to be true
       end
     end
 
@@ -1107,7 +1107,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        expect(metadata.indexed?).to be_false
+        expect(metadata.indexed?).to be false
       end
     end
 
@@ -1121,7 +1121,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns false" do
-        expect(metadata.indexed?).to be_false
+        expect(metadata.indexed?).to be false
       end
     end
   end
@@ -1704,7 +1704,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns true" do
-          expect(metadata.validate?).to be_true
+          expect(metadata.validate?).to be true
         end
       end
 
@@ -1720,7 +1720,7 @@ describe Mongoid::Relations::Metadata do
         end
 
         it "returns false" do
-          expect(metadata.validate?).to be_false
+          expect(metadata.validate?).to be false
         end
       end
     end
@@ -1736,7 +1736,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       it "returns the relation default" do
-        expect(metadata.validate?).to be_true
+        expect(metadata.validate?).to be true
       end
     end
   end
@@ -1913,7 +1913,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns true" do
-            expect(metadata.send("#{property}?")).to be_true
+            expect(metadata.send("#{property}?")).to be true
           end
         end
 
@@ -1926,7 +1926,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns false" do
-            expect(metadata.send("#{property}?")).to be_false
+            expect(metadata.send("#{property}?")).to be false
           end
         end
       end

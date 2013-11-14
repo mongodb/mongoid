@@ -133,7 +133,7 @@ describe Mongoid::Attributes do
       end
 
       it "allows overwriting of the default value" do
-        expect(person.terms).to be_true
+        expect(person.terms).to be true
       end
 
       it "returns the set value" do
@@ -333,7 +333,7 @@ describe Mongoid::Attributes do
       end
 
       it "returns true for respond_to?" do
-        expect(person.respond_to?(:testing)).to be_true
+        expect(person.respond_to?(:testing)).to be true
       end
     end
 
@@ -431,7 +431,7 @@ describe Mongoid::Attributes do
       end
 
       it "casts booleans" do
-        expect(person[:terms]).to be_true
+        expect(person[:terms]).to be true
       end
 
       it "sets empty strings to nil" do
@@ -580,7 +580,7 @@ describe Mongoid::Attributes do
 
         it "returns the default value" do
           expect(person.age).to eq(100)
-          expect(person.pets).to be_false
+          expect(person.pets).to be false
         end
 
       end
@@ -669,7 +669,7 @@ describe Mongoid::Attributes do
       context "when attribute does not exist" do
 
         it "returns false" do
-          expect(person.attribute_present?(:owner_id)).to be_false
+          expect(person.attribute_present?(:owner_id)).to be false
         end
       end
 
@@ -679,7 +679,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns true" do
-          expect(person.attribute_present?(:owner_id)).to be_true
+          expect(person.attribute_present?(:owner_id)).to be true
         end
       end
     end
@@ -702,7 +702,7 @@ describe Mongoid::Attributes do
         end
 
         it "returns true" do
-          expect(person.attribute_present?(:age)).to be_true
+          expect(person.attribute_present?(:age)).to be true
         end
       end
     end
@@ -719,7 +719,7 @@ describe Mongoid::Attributes do
 
           it "return true"  do
             person.terms = false
-            expect(person.attribute_present?(:terms)).to be_true
+            expect(person.attribute_present?(:terms)).to be true
           end
         end
 
@@ -727,7 +727,7 @@ describe Mongoid::Attributes do
 
           it "return true"  do
             person.terms = false
-            expect(person.attribute_present?(:terms)).to be_true
+            expect(person.attribute_present?(:terms)).to be true
           end
         end
       end
@@ -740,7 +740,7 @@ describe Mongoid::Attributes do
       end
 
       it "return false" do
-        expect(person.attribute_present?(:title)).to be_false
+        expect(person.attribute_present?(:title)).to be false
       end
     end
   end
@@ -756,14 +756,14 @@ describe Mongoid::Attributes do
       context "when provided a symbol" do
 
         it "returns true" do
-          expect(person.has_attribute?(:title)).to be_true
+          expect(person.has_attribute?(:title)).to be true
         end
       end
 
       context "when provided a string" do
 
         it "returns true" do
-          expect(person.has_attribute?("title")).to be_true
+          expect(person.has_attribute?("title")).to be true
         end
       end
     end
@@ -771,7 +771,7 @@ describe Mongoid::Attributes do
     context "when the key is not in the attributes" do
 
       it "returns false" do
-        expect(person.has_attribute?(:employer_id)).to be_false
+        expect(person.has_attribute?(:employer_id)).to be false
       end
     end
   end
@@ -785,7 +785,7 @@ describe Mongoid::Attributes do
     context "before the attribute has been assigned" do
 
       it "returns false" do
-        expect(person.has_attribute_before_type_cast?(:age)).to be_false
+        expect(person.has_attribute_before_type_cast?(:age)).to be false
       end
     end
 
@@ -793,7 +793,7 @@ describe Mongoid::Attributes do
 
       it "returns true" do
         person.age = 'old'
-        expect(person.has_attribute_before_type_cast?(:age)).to be_true
+        expect(person.has_attribute_before_type_cast?(:age)).to be true
       end
     end
   end
@@ -815,7 +815,7 @@ describe Mongoid::Attributes do
       end
 
       it "removes the key from the attributes hash" do
-        expect(person.has_attribute?(:title)).to be_false
+        expect(person.has_attribute?(:title)).to be false
       end
 
       context "when saving after the removal" do
@@ -825,7 +825,7 @@ describe Mongoid::Attributes do
         end
 
         it "persists the removal" do
-          expect(person.reload.has_attribute?(:title)).to be_false
+          expect(person.reload.has_attribute?(:title)).to be false
         end
       end
     end
@@ -850,7 +850,7 @@ describe Mongoid::Attributes do
      end
 
      it "removes the key from the attributes hash" do
-       expect(person.pet.has_attribute?(:name)).to be_false
+       expect(person.pet.has_attribute?(:name)).to be false
      end
 
      context "when saving after the removal" do
@@ -860,7 +860,7 @@ describe Mongoid::Attributes do
        end
 
        it "persists the removal" do
-         expect(person.reload.pet.has_attribute?(:name)).to be_false
+         expect(person.reload.pet.has_attribute?(:name)).to be false
        end
      end
 
@@ -1015,7 +1015,7 @@ describe Mongoid::Attributes do
       end
 
       it "allows overwriting of the default value" do
-        expect(person.terms).to be_true
+        expect(person.terms).to be true
       end
     end
 
@@ -1320,11 +1320,11 @@ describe Mongoid::Attributes do
       end
 
       it "aliases the existance check" do
-        expect(product.cost?).to be_true
+        expect(product.cost?).to be true
       end
 
       it "aliases *_changed?" do
-        expect(product.cost_changed?).to be_true
+        expect(product.cost_changed?).to be true
       end
 
       it "aliases *_change" do
@@ -1361,11 +1361,11 @@ describe Mongoid::Attributes do
       end
 
       it "aliases the existance check" do
-        expect(product.price?).to be_true
+        expect(product.price?).to be true
       end
 
       it "aliases *_changed?" do
-        expect(product.price_changed?).to be_true
+        expect(product.price_changed?).to be true
       end
 
       it "aliases *_change" do

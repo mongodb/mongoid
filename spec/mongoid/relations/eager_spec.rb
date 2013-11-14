@@ -38,7 +38,7 @@ describe Mongoid::Relations::Eager do
       end
 
       it "preloads the parent" do
-        expect(doc.ivar(:person)).to be_false
+        expect(doc.ivar(:person)).to be false
         context.preload(inclusions, [doc])
         expect(doc.ivar(:person)).to eq(doc.person)
       end
@@ -57,7 +57,7 @@ describe Mongoid::Relations::Eager do
       let(:includes) { [:comment] }
 
       it "preloads the child" do
-        expect(doc.ivar(:comment)).to be_false
+        expect(doc.ivar(:comment)).to be false
         context.preload(inclusions, [doc])
         expect(doc.ivar(:comment)).to eq(doc.comment)
       end
@@ -76,7 +76,7 @@ describe Mongoid::Relations::Eager do
       let(:includes) { [:alerts] }
 
       it "preloads the child" do
-        expect(doc.ivar(:alerts)).to be_false
+        expect(doc.ivar(:alerts)).to be false
         context.preload(inclusions, [doc])
         expect(doc.ivar(:alerts)).to eq(doc.alerts)
       end
@@ -95,7 +95,7 @@ describe Mongoid::Relations::Eager do
       let(:includes) { [:agents] }
 
       it "preloads the child" do
-        expect(doc.ivar(:agents)).to be_false
+        expect(doc.ivar(:agents)).to be false
         context.preload(inclusions, [doc])
         expect(doc.ivar(:agents)).to eq(doc.agents)
       end
@@ -210,7 +210,7 @@ describe Mongoid::Relations::Eager do
       end
 
       it "is eager_loadable" do
-        expect(context.eager_loadable?).to be_true
+        expect(context.eager_loadable?).to be true
       end
     end
 
@@ -221,7 +221,7 @@ describe Mongoid::Relations::Eager do
       end
 
       it "is not eager_loadable" do
-        expect(context.eager_loadable?).to be_false
+        expect(context.eager_loadable?).to be false
       end
     end
   end

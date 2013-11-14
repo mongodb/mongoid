@@ -27,7 +27,7 @@ describe Mongoid::Matchable::And do
           end
 
           it "returns true" do
-            expect(matches).to be_true
+            expect(matches).to be true
           end
         end
 
@@ -38,7 +38,7 @@ describe Mongoid::Matchable::And do
           end
 
           it "returns false" do
-            expect(matches).to be_false
+            expect(matches).to be false
           end
         end
       end
@@ -58,7 +58,7 @@ describe Mongoid::Matchable::And do
           end
 
           it "returns true" do
-            expect(matches).to be_true
+            expect(matches).to be true
           end
         end
 
@@ -75,7 +75,7 @@ describe Mongoid::Matchable::And do
           end
 
           it "returns false" do
-            expect(matches).to be_false
+            expect(matches).to be false
           end
         end
 
@@ -86,7 +86,7 @@ describe Mongoid::Matchable::And do
           end
 
           it "returns true" do
-            expect(matches).to be_true
+            expect(matches).to be true
           end
         end
       end
@@ -110,7 +110,7 @@ describe Mongoid::Matchable::And do
         end
 
         it "returns true" do
-          expect(matches).to be_true
+          expect(matches).to be true
         end
       end
 
@@ -130,7 +130,7 @@ describe Mongoid::Matchable::And do
         end
 
         it "returns false" do
-          expect(matches).to be_false
+          expect(matches).to be false
         end
       end
 
@@ -153,7 +153,7 @@ describe Mongoid::Matchable::And do
           end
 
           it "returns true" do
-            expect(matches).to be_true
+            expect(matches).to be true
           end
         end
       end

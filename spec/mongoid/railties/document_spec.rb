@@ -18,7 +18,7 @@ describe "A document loaded from rails" do
   describe "#_destroy" do
 
     it "always returns false" do
-      expect(Person.new._destroy).to be_false
+      expect(Person.new._destroy).to be false
     end
   end
 end

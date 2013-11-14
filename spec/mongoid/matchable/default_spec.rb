@@ -13,14 +13,14 @@ describe Mongoid::Matchable::Default do
       context "when the values are equal" do
 
         it "returns true" do
-          expect(matcher.matches?("Testing")).to be_true
+          expect(matcher.matches?("Testing")).to be true
         end
       end
 
       context "when the values are not equal" do
 
         it "returns false" do
-          expect(matcher.matches?("Other")).to be_false
+          expect(matcher.matches?("Other")).to be false
         end
       end
     end
@@ -38,14 +38,14 @@ describe Mongoid::Matchable::Default do
       context "when the values are equal" do
 
         it "returns true" do
-          expect(matcher.matches?(object_id)).to be_true
+          expect(matcher.matches?(object_id)).to be true
         end
       end
 
       context "when the values are not equal" do
 
         it "returns false" do
-          expect(matcher.matches?(BSON::ObjectId.new)).to be_false
+          expect(matcher.matches?(BSON::ObjectId.new)).to be false
         end
       end
     end
@@ -61,14 +61,14 @@ describe Mongoid::Matchable::Default do
         context "when the value is a string" do
 
           it "returns true" do
-            expect(matcher.matches?("Test1")).to be_true
+            expect(matcher.matches?("Test1")).to be true
           end
         end
 
         context "when the value is a regexp" do
 
           it "returns true" do
-            expect(matcher.matches?(/^Test[3-5]$/)).to be_true
+            expect(matcher.matches?(/^Test[3-5]$/)).to be true
           end
         end
       end
@@ -76,7 +76,7 @@ describe Mongoid::Matchable::Default do
       context "when the attribute does not contain the value" do
 
         it "returns false" do
-          expect(matcher.matches?("Test4")).to be_false
+          expect(matcher.matches?("Test4")).to be false
         end
       end
     end
@@ -94,14 +94,14 @@ describe Mongoid::Matchable::Default do
       context "when the attribute contains the value" do
 
         it "returns true" do
-          expect(matcher.matches?(object_id)).to be_true
+          expect(matcher.matches?(object_id)).to be true
         end
       end
 
       context "when the attribute does not contain the value" do
 
         it "returns false" do
-          expect(matcher.matches?(BSON::ObjectId.new)).to be_false
+          expect(matcher.matches?(BSON::ObjectId.new)).to be false
         end
       end
     end
@@ -115,14 +115,14 @@ describe Mongoid::Matchable::Default do
       context "when the attribute contains the value" do
 
         it "returns true" do
-          expect(matcher.matches?(["Test1", "Test2", "Test3"])).to be_true
+          expect(matcher.matches?(["Test1", "Test2", "Test3"])).to be true
         end
       end
 
       context "when the attribute does not contain the value" do
 
         it "returns false" do
-          expect(matcher.matches?(["Test1", "Test2"])).to be_false
+          expect(matcher.matches?(["Test1", "Test2"])).to be false
         end
       end
     end

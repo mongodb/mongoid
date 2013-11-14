@@ -197,7 +197,7 @@ describe Mongoid::Relations::Cascading do
               end
 
               it "returns nil" do
-                expect(book.send(method)).to be_true
+                expect(book.send(method)).to be true
               end
             end
           end

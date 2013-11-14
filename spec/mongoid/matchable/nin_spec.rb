@@ -11,14 +11,14 @@ describe Mongoid::Matchable::Nin do
     context "when the values do not contain the attribute" do
 
       it "returns true" do
-        expect(matcher.matches?("$nin" => ["second", "third"])).to be_true
+        expect(matcher.matches?("$nin" => ["second", "third"])).to be true
       end
     end
 
     context "when the values contain the attribute" do
 
       it "returns false" do
-        expect(matcher.matches?("$nin" => ["first"])).to be_false
+        expect(matcher.matches?("$nin" => ["first"])).to be false
       end
     end
   end

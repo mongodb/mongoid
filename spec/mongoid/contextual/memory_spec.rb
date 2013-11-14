@@ -27,7 +27,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns false" do
-          expect(context.send(method)).to be_false
+          expect(context.send(method)).to be false
         end
       end
 
@@ -44,7 +44,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "returns true" do
-          expect(context.send(method)).to be_true
+          expect(context.send(method)).to be true
         end
       end
     end
@@ -998,7 +998,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          expect(context.update).to be_false
+          expect(context.update).to be false
         end
       end
     end
@@ -1052,7 +1052,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          expect(context.update).to be_false
+          expect(context.update).to be false
         end
       end
     end
@@ -1091,7 +1091,7 @@ describe Mongoid::Contextual::Memory do
       end
 
       it "returns false" do
-        expect(context.update_all({})).to be_false
+        expect(context.update_all({})).to be false
       end
     end
 
@@ -1174,7 +1174,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          expect(context.update_all).to be_false
+          expect(context.update_all).to be false
         end
       end
     end
@@ -1228,7 +1228,7 @@ describe Mongoid::Contextual::Memory do
       context "when no attributes are provided" do
 
         it "returns false" do
-          expect(context.update_all).to be_false
+          expect(context.update_all).to be false
         end
       end
     end

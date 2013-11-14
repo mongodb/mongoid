@@ -19,7 +19,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        expect(document.cyclic).to be_true
+        expect(document.cyclic).to be true
       end
     end
 
@@ -38,7 +38,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        expect(document.cyclic).to be_true
+        expect(document.cyclic).to be true
       end
     end
 
@@ -70,7 +70,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        expect(document.cyclic).to be_true
+        expect(document.cyclic).to be true
       end
     end
 
@@ -89,7 +89,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        expect(document.cyclic).to be_true
+        expect(document.cyclic).to be true
       end
     end
 
@@ -120,7 +120,7 @@ describe Mongoid::Relations::Cyclic do
     end
 
     it "sets cyclic to true" do
-      expect(document.cyclic).to be_true
+      expect(document.cyclic).to be true
     end
 
     context "when cascading callbacks are enabled" do

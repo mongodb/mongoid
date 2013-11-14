@@ -20,8 +20,8 @@ describe Mongoid::Persistable::Logical do
           expect(person.inte).to eq(14)
         end
 
-        it "returns true" do
-          expect(bit).to be_true
+        it "returns self object" do
+          expect(bit).to eq(person)
         end
 
         it "resets dirty changes" do
@@ -86,8 +86,8 @@ describe Mongoid::Persistable::Logical do
           expect(address.house).to eq(14)
         end
 
-        it "returns true" do
-          expect(bit).to be_true
+        it "returns the self object" do
+          expect(bit).to eq(address)
         end
 
         it "resets dirty changes" do

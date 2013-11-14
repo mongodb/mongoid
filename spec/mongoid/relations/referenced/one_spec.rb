@@ -278,11 +278,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            expect(game.persisted?).to be_false
+            expect(game.persisted?).to be false
           end
 
           it "leaves the new child persisted" do
-            expect(new_game.persisted?).to be_true
+            expect(new_game.persisted?).to be true
           end
         end
 
@@ -309,11 +309,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child persisted" do
-            expect(game.persisted?).to be_true
+            expect(game.persisted?).to be true
           end
 
           it "leaves the new child unpersisted" do
-            expect(new_game.persisted?).to be_false
+            expect(new_game.persisted?).to be false
           end
         end
       end
@@ -351,11 +351,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            expect(game.persisted?).to be_false
+            expect(game.persisted?).to be false
           end
 
           it "leaves the new child persisted" do
-            expect(new_game.persisted?).to be_true
+            expect(new_game.persisted?).to be true
           end
         end
 
@@ -382,11 +382,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            expect(game.persisted?).to be_false
+            expect(game.persisted?).to be false
           end
 
           it "leaves the new child unpersisted" do
-            expect(new_game.persisted?).to be_false
+            expect(new_game.persisted?).to be false
           end
         end
       end
@@ -424,11 +424,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child persisted" do
-            expect(cat.persisted?).to be_true
+            expect(cat.persisted?).to be true
           end
 
           it "leaves the new child persisted" do
-            expect(new_cat.persisted?).to be_true
+            expect(new_cat.persisted?).to be true
           end
         end
 
@@ -455,11 +455,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child persisted" do
-            expect(cat.persisted?).to be_true
+            expect(cat.persisted?).to be true
           end
 
           it "leaves the new child unpersisted" do
-            expect(new_cat.persisted?).to be_false
+            expect(new_cat.persisted?).to be false
           end
         end
       end
@@ -497,11 +497,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            expect(cat.persisted?).to be_false
+            expect(cat.persisted?).to be false
           end
 
           it "leaves the new child persisted" do
-            expect(new_cat.persisted?).to be_true
+            expect(new_cat.persisted?).to be true
           end
         end
 
@@ -528,11 +528,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            expect(cat.persisted?).to be_false
+            expect(cat.persisted?).to be false
           end
 
           it "leaves the new child unpersisted" do
-            expect(new_cat.persisted?).to be_false
+            expect(new_cat.persisted?).to be false
           end
         end
       end
@@ -1127,7 +1127,7 @@ describe Mongoid::Relations::Referenced::One do
       context "when checking #{method}" do
 
         it "returns true" do
-          expect(document.respond_to?(method)).to be_true
+          expect(document.respond_to?(method)).to be true
         end
       end
     end
@@ -1136,7 +1136,7 @@ describe Mongoid::Relations::Referenced::One do
   describe ".stores_foreign_key?" do
 
     it "returns false" do
-      expect(described_class.stores_foreign_key?).to be_false
+      expect(described_class.stores_foreign_key?).to be false
     end
   end
 
@@ -1152,7 +1152,7 @@ describe Mongoid::Relations::Referenced::One do
   describe ".validation_default" do
 
     it "returns true" do
-      expect(described_class.validation_default).to be_true
+      expect(described_class.validation_default).to be true
     end
   end
 

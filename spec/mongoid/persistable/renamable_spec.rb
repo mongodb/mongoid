@@ -24,8 +24,8 @@ describe Mongoid::Persistable::Renamable do
           expect(person.dob).to be_nil
         end
 
-        it "returns true" do
-          expect(rename).to be_true
+        it "returns self object" do
+          expect(rename).to eq(person)
         end
 
         it "persists the first rename" do
@@ -88,8 +88,8 @@ describe Mongoid::Persistable::Renamable do
           expect(name.middle).to be_nil
         end
 
-        it "returns true" do
-          expect(rename).to be_true
+        it "returns self object" do
+          expect(rename).to eq(name)
         end
 
         it "persists the first rename" do

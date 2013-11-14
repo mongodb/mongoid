@@ -83,7 +83,7 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       it "allows saving of the embedded document" do
-        expect(address.save).to be_true
+        expect(address.save).to be true
       end
     end
 
@@ -1003,7 +1003,7 @@ describe Mongoid::Relations::Referenced::In do
       context "when checking #{method}" do
 
         it "returns true" do
-          expect(document.respond_to?(method)).to be_true
+          expect(document.respond_to?(method)).to be true
         end
       end
     end
@@ -1012,7 +1012,7 @@ describe Mongoid::Relations::Referenced::In do
   describe ".stores_foreign_key?" do
 
     it "returns true" do
-      expect(described_class.stores_foreign_key?).to be_true
+      expect(described_class.stores_foreign_key?).to be true
     end
   end
 
@@ -1037,7 +1037,7 @@ describe Mongoid::Relations::Referenced::In do
   describe ".validation_default" do
 
     it "returns false" do
-      expect(described_class.validation_default).to be_false
+      expect(described_class.validation_default).to be false
     end
   end
 

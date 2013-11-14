@@ -292,7 +292,7 @@ describe Mongoid::Criteria::Modifiable do
         end
 
         it "calls the block" do
-          expect(person.pets).to be_true
+          expect(person.pets).to be true
         end
       end
     end
@@ -345,7 +345,7 @@ describe Mongoid::Criteria::Modifiable do
         end
 
         it "calls the block" do
-          expect(person.pets).to be_true
+          expect(person.pets).to be true
         end
       end
     end
@@ -421,7 +421,7 @@ describe Mongoid::Criteria::Modifiable do
         end
 
         it "yields to the block" do
-          expect(document.active).to be_false
+          expect(document.active).to be false
         end
       end
 
@@ -434,7 +434,7 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it "returns a new document" do
-            expect(document.active).to be_false
+            expect(document.active).to be false
           end
 
           it "returns a persisted document" do
@@ -545,7 +545,7 @@ describe Mongoid::Criteria::Modifiable do
         end
 
         it "yields to the block" do
-          expect(document.active).to be_false
+          expect(document.active).to be false
         end
       end
 
@@ -558,7 +558,7 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it "returns a new document" do
-            expect(document.active).to be_false
+            expect(document.active).to be false
           end
 
           it "returns a persisted document" do
@@ -639,7 +639,7 @@ describe Mongoid::Criteria::Modifiable do
         end
 
         it "yields to the block" do
-          expect(document.active).to be_false
+          expect(document.active).to be false
         end
       end
 
@@ -652,7 +652,7 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it "returns a new document" do
-            expect(document.active).to be_false
+            expect(document.active).to be false
           end
 
           it "returns a non persisted document" do

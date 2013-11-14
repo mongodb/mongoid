@@ -25,14 +25,14 @@ describe Mongoid::Relations::Embedded::In do
       context "when the document is a different instance" do
 
         it "returns false" do
-          expect((relation === Person.new)).to be_false
+          expect((relation === Person.new)).to be false
         end
       end
 
       context "when the document is the same instance" do
 
         it "returns true" do
-          expect((relation === target)).to be_true
+          expect((relation === target)).to be true
         end
       end
     end
@@ -436,7 +436,7 @@ describe Mongoid::Relations::Embedded::In do
       context "when checking #{method}" do
 
         it "returns true" do
-          expect(document.respond_to?(method)).to be_true
+          expect(document.respond_to?(method)).to be true
         end
       end
     end
@@ -454,7 +454,7 @@ describe Mongoid::Relations::Embedded::In do
   describe ".validation_default" do
 
     it "returns false" do
-      expect(described_class.validation_default).to be_false
+      expect(described_class.validation_default).to be false
     end
   end
 

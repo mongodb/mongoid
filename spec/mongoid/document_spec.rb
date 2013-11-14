@@ -1112,7 +1112,7 @@ describe Mongoid::Document do
 
         it "validates the instance of the subclass" do
           manager.level = 3
-          expect(manager.valid?).to be_false
+          expect(manager.valid?).to be false
         end
       end
 

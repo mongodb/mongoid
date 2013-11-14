@@ -98,7 +98,7 @@ describe Mongoid::Persistable::Upsertable do
         end
 
         it "returns true" do
-          expect(upsert).to be_true
+          expect(upsert).to be true
         end
       end
     end

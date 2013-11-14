@@ -118,14 +118,14 @@ describe Mongoid::Relations::Targets::Enumerable do
     context "when compared to an array class" do
 
       it "returns true" do
-        expect(enumerable === Array).to be_true
+        expect(enumerable === Array).to be true
       end
     end
 
     context "when compared to a different class" do
 
       it "returns false" do
-        expect(enumerable === Mongoid::Document).to be_false
+        expect(enumerable === Mongoid::Document).to be false
       end
     end
 
@@ -138,7 +138,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "returns true" do
-          expect(enumerable === other).to be_true
+          expect(enumerable === other).to be true
         end
       end
 
@@ -149,7 +149,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "returns false" do
-          expect(enumerable === other).to be_false
+          expect(enumerable === other).to be false
         end
       end
     end
@@ -214,7 +214,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "returns true" do
-        expect(any).to be_true
+        expect(any).to be true
       end
 
       it "retains the correct length" do
@@ -710,7 +710,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "returns an enumerator" do
-        expect(enumerable.each.class.include?(Enumerable)).to be_true
+        expect(enumerable.each.class.include?(Enumerable)).to be true
       end
 
     end
@@ -950,7 +950,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "returns true" do
-          expect(included).to be_true
+          expect(included).to be true
         end
 
         it "retains the correct length" do
@@ -981,7 +981,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "returns true" do
-          expect(included).to be_true
+          expect(included).to be true
         end
       end
     end
@@ -1001,7 +1001,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "returns true" do
-        expect(included).to be_true
+        expect(included).to be true
       end
 
       it "retains the correct length" do
@@ -1165,14 +1165,14 @@ describe Mongoid::Relations::Targets::Enumerable do
     context "when checking against enumerable" do
 
       it "returns true" do
-        expect(enumerable.is_a?(::Enumerable)).to be_true
+        expect(enumerable.is_a?(::Enumerable)).to be true
       end
     end
 
     context "when checking against array" do
 
       it "returns true" do
-        expect(enumerable.is_a?(Array)).to be_true
+        expect(enumerable.is_a?(Array)).to be true
       end
     end
   end
@@ -1348,14 +1348,14 @@ describe Mongoid::Relations::Targets::Enumerable do
     context "when checking against enumerable" do
 
       it "returns true" do
-        expect(enumerable.kind_of?(::Enumerable)).to be_true
+        expect(enumerable.kind_of?(::Enumerable)).to be true
       end
     end
 
     context "when checking against array" do
 
       it "returns true" do
-        expect(enumerable.kind_of?(Array)).to be_true
+        expect(enumerable.kind_of?(Array)).to be true
       end
     end
   end
@@ -1386,8 +1386,8 @@ describe Mongoid::Relations::Targets::Enumerable do
       expect(enumerable._loaded).to eq({ post.id => post })
     end
 
-    it "returns true" do
-      expect(loaded).to be_true
+    it "returns the object" do
+      expect(loaded).to eq([post])
     end
 
     it "sets loaded to true" do

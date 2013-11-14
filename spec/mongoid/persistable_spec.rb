@@ -29,7 +29,7 @@ describe Mongoid::Persistable do
         end
 
         it "returns true" do
-          expect(update).to be_true
+          expect(update).to be true
         end
 
         it "persists inc updates" do
@@ -173,7 +173,7 @@ describe Mongoid::Persistable do
     context "when providing no block "do
 
       it "returns true" do
-        expect(document.atomically).to be_true
+        expect(document.atomically).to be true
       end
     end
   end

@@ -16,8 +16,8 @@ describe Mongoid::Persistable::Unsettable do
           expect(person.age).to be_nil
         end
 
-        it "returns true" do
-          expect(unset).to be_true
+        it "returns self object" do
+          expect(unset).to eq(person)
         end
 
         it "persists the first unset" do
@@ -90,8 +90,8 @@ describe Mongoid::Persistable::Unsettable do
           expect(address.city).to be_nil
         end
 
-        it "returns true" do
-          expect(unset).to be_true
+        it "returns self object" do
+          expect(unset).to eq(address)
         end
 
         it "persists the first unset" do

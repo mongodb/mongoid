@@ -42,6 +42,7 @@ module Mongoid
             )
           end
         end
+        true
       end
     end
   end

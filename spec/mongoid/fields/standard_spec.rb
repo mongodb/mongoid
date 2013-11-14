@@ -102,7 +102,7 @@ describe Mongoid::Fields::Standard do
     end
 
     it "does not conflict with the ruby core hash" do
-      expect(image.hash_is_hash).to be_true
+      expect(image.hash_is_hash).to be true
     end
   end
 

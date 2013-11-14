@@ -20,8 +20,8 @@ describe Mongoid::Persistable::Incrementable do
           expect(person.inte).to eq(30)
         end
 
-        it "returns true" do
-          expect(inc).to be_true
+        it "returns the self document" do
+          expect(inc).to eq(person)
         end
 
         it "persists a positive inc" do
@@ -101,8 +101,8 @@ describe Mongoid::Persistable::Incrementable do
           expect(address.house).to eq(30)
         end
 
-        it "returns true" do
-          expect(inc).to be_true
+        it "returns the self document" do
+          expect(inc).to eq(address)
         end
 
         it "persists a positive inc" do

@@ -37,30 +37,30 @@ describe Mongoid::Relations::Synchronization do
       end
 
       it "has persisted :agent" do
-        expect(agent.persisted?).to be_true
+        expect(agent.persisted?).to be true
       end
 
       it "has persisted :user" do
-        expect(user.persisted?).to be_true
+        expect(user.persisted?).to be true
       end
 
       it "has persisted :person" do
-        expect(person.persisted?).to be_true
+        expect(person.persisted?).to be true
       end
 
       it "does not have persisted :account" do
-        expect(account.persisted?).to be_false
+        expect(account.persisted?).to be false
       end
 
       it "has instantiated a .valid? :account" do
         account.valid?
-        expect(account.valid?).to be_true
+        expect(account.valid?).to be true
       end
 
       context "and is Persisted" do
 
         it "is able to :save" do
-          expect(account.save).to be_true
+          expect(account.save).to be true
         end
       end
 
@@ -71,7 +71,7 @@ describe Mongoid::Relations::Synchronization do
         end
 
         it "is able to :save" do
-          expect(account.save).to be_true
+          expect(account.save).to be true
         end
       end
     end
@@ -119,7 +119,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "resets the synced flag" do
-      expect(person.synced["preference_ids"]).to be_false
+      expect(person.synced["preference_ids"]).to be false
     end
 
     context "when subsequently setting with keys" do

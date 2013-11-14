@@ -165,14 +165,14 @@ describe Mongoid::Threaded do
       end
 
       it "returns true" do
-        expect(described_class.validated?(person)).to be_true
+        expect(described_class.validated?(person)).to be true
       end
     end
 
     context "when the document is not validated" do
 
       it "returns false" do
-        expect(described_class.validated?(person)).to be_false
+        expect(described_class.validated?(person)).to be false
       end
     end
   end
@@ -229,14 +229,14 @@ describe Mongoid::Threaded do
       end
 
       it "returns true" do
-        expect(described_class.autosaved?(person)).to be_true
+        expect(described_class.autosaved?(person)).to be true
       end
     end
 
     context "when the document is not autosaved" do
 
       it "returns false" do
-        expect(described_class.autosaved?(person)).to be_false
+        expect(described_class.autosaved?(person)).to be false
       end
     end
   end

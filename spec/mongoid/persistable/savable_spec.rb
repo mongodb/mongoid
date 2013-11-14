@@ -21,7 +21,7 @@ describe Mongoid::Persistable::Savable do
         end
 
         it "returns true" do
-          expect(saved).to be_true
+          expect(saved).to be true
         end
 
         it "saves the document" do
@@ -118,7 +118,7 @@ describe Mongoid::Persistable::Savable do
     context "when validation passes" do
 
       it "returns true" do
-        expect(person.save).to be_true
+        expect(person.save).to be true
       end
     end
 
@@ -269,7 +269,7 @@ describe Mongoid::Persistable::Savable do
         end
 
         it "does not set the value" do
-          expect(person.save).to be_true
+          expect(person.save).to be true
         end
       end
     end

@@ -87,7 +87,7 @@ describe Mongoid::Equality do
     context "when comparable is an instance of this document" do
 
       it "returns true" do
-        expect(klass === person).to be_true
+        expect(klass === person).to be true
       end
     end
 
@@ -98,28 +98,28 @@ describe Mongoid::Equality do
       end
 
       it "returns true" do
-        expect(klass === relation).to be_true
+        expect(klass === relation).to be true
       end
     end
 
     context "when comparable is the same class" do
 
       it "returns true" do
-        expect(klass === Person).to be_true
+        expect(klass === Person).to be true
       end
     end
 
     context "when the comparable is a subclass" do
 
       it "returns false" do
-        expect(Person === Doctor).to be_false
+        expect(Person === Doctor).to be false
       end
     end
 
     context "when the comparable is an instance of a subclass" do
 
       it "returns true" do
-        expect(Person === Doctor.new).to be_true
+        expect(Person === Doctor.new).to be true
       end
     end
   end
@@ -131,14 +131,14 @@ describe Mongoid::Equality do
       context "when the instance is different" do
 
         it "returns false" do
-          expect(person === Person.new).to be_false
+          expect(person === Person.new).to be false
         end
       end
 
       context "when the instance is the same" do
 
         it "returns true" do
-          expect(person === person).to be_true
+          expect(person === person).to be true
         end
       end
     end
@@ -146,7 +146,7 @@ describe Mongoid::Equality do
     context "when the comparable is a subclass" do
 
       it "returns false" do
-        expect(person === Doctor.new).to be_false
+        expect(person === Doctor.new).to be false
       end
     end
 
@@ -155,21 +155,21 @@ describe Mongoid::Equality do
       context "when the class is the same" do
 
         it "returns true" do
-          expect(person === Person).to be_true
+          expect(person === Person).to be true
         end
       end
 
       context "when the class is a subclass" do
 
         it "returns false" do
-          expect(person === Doctor).to be_false
+          expect(person === Doctor).to be false
         end
       end
 
       context "when the class is a superclass" do
 
         it "returns true" do
-          expect(Doctor.new === Person).to be_true
+          expect(Doctor.new === Person).to be true
         end
       end
     end

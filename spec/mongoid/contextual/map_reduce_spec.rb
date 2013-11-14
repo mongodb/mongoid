@@ -272,7 +272,7 @@ describe Mongoid::Contextual::MapReduce do
     end
 
     it "adds the jsMode flag to the command" do
-      expect(results.command[:jsMode]).to be_true
+      expect(results.command[:jsMode]).to be true
     end
   end
 

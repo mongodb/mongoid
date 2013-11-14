@@ -25,7 +25,7 @@ describe Mongoid::Persistable::Updatable do
         end
 
         it "calls the overridden setter" do
-          expect(person.instance_variable_get(:@override_called)).to be_true
+          expect(person.instance_variable_get(:@override_called)).to be true
         end
 
         it "persists the changes" do
@@ -102,11 +102,11 @@ describe Mongoid::Persistable::Updatable do
           end
 
           it "changes the attribute value" do
-            expect(person.terms).to be_false
+            expect(person.terms).to be false
           end
 
           it "persists the changes" do
-            expect(person.reload.terms).to be_false
+            expect(person.reload.terms).to be false
           end
         end
       end
@@ -140,7 +140,7 @@ describe Mongoid::Persistable::Updatable do
         end
 
         it "returns true" do
-          expect(post.update_attribute(:title, "Testing")).to be_true
+          expect(post.update_attribute(:title, "Testing")).to be true
         end
       end
 
@@ -302,11 +302,11 @@ describe Mongoid::Persistable::Updatable do
         end
 
         it "returns true" do
-          expect(saved).to be_true
+          expect(saved).to be true
         end
 
         it "saves the attributes" do
-          expect(from_db.pets).to be_false
+          expect(from_db.pets).to be false
         end
       end
 
@@ -338,11 +338,11 @@ describe Mongoid::Persistable::Updatable do
         end
 
         it "returns true" do
-          expect(saved).to be_true
+          expect(saved).to be true
         end
 
         it "saves the attributes" do
-          expect(from_db.pets).to be_false
+          expect(from_db.pets).to be false
         end
       end
 

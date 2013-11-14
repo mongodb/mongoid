@@ -18,7 +18,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the option" do
-        expect(builder.allow_destroy?).to be_true
+        expect(builder.allow_destroy?).to be true
       end
     end
 
@@ -29,7 +29,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        expect(builder.allow_destroy?).to be_false
+        expect(builder.allow_destroy?).to be false
       end
     end
   end
@@ -164,7 +164,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the value" do
-        expect(builder.destroy).to be_true
+        expect(builder.destroy).to be true
       end
     end
 
@@ -195,7 +195,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns true" do
-          expect(builder.reject?(builder, { last_name: "Lang" })).to be_true
+          expect(builder.reject?(builder, { last_name: "Lang" })).to be true
         end
       end
 
@@ -206,7 +206,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns false" do
-          expect(builder.reject?(builder, { first_name: "Lang" })).to be_false
+          expect(builder.reject?(builder, { first_name: "Lang" })).to be false
         end
       end
     end
@@ -218,7 +218,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        expect(builder.reject?(builder, { first_name: "Lang" })).to be_false
+        expect(builder.reject?(builder, { first_name: "Lang" })).to be false
       end
     end
   end
@@ -232,7 +232,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the option" do
-        expect(builder.update_only?).to be_true
+        expect(builder.update_only?).to be true
       end
     end
 
@@ -243,7 +243,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        expect(builder.update_only?).to be_false
+        expect(builder.update_only?).to be false
       end
     end
   end

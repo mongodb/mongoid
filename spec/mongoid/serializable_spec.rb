@@ -26,7 +26,7 @@ describe Mongoid::Serializable do
       end
 
       it "returns true" do
-        expect(person.include_root_in_json).to be_true
+        expect(person.include_root_in_json).to be true
       end
     end
 
@@ -37,7 +37,7 @@ describe Mongoid::Serializable do
       end
 
       it "returns false" do
-        expect(person.include_root_in_json).to be_false
+        expect(person.include_root_in_json).to be false
       end
     end
   end
@@ -219,7 +219,7 @@ describe Mongoid::Serializable do
         it "includes the extra fields" do
           expect(person.serializable_hash(
             methods: [ :_type ]
-          ).has_key?("_type")).to be_true
+          ).has_key?("_type")).to be true
         end
       end
 
@@ -463,7 +463,7 @@ describe Mongoid::Serializable do
               it "includes the first relation" do
                 expect(relation_hash[0]["locations"].any? do |location|
                   location["name"] == "Home"
-                end).to be_true
+                end).to be true
               end
 
               context "after retrieved from database" do

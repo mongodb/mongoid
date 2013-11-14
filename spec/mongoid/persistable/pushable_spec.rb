@@ -20,8 +20,8 @@ describe Mongoid::Persistable::Pushable do
           expect(person.test_array).to eq([ 1 ])
         end
 
-        it "returns true" do
-          expect(add).to be_true
+        it "returns self objet" do
+          expect(add).to eq(person)
         end
 
         it "resets the dirty changes" do
@@ -80,8 +80,8 @@ describe Mongoid::Persistable::Pushable do
           expect(address.test).to eq([ 1 ])
         end
 
-        it "returns true" do
-          expect(add).to be_true
+        it "returns self object" do
+          expect(add).to eq(address)
         end
 
         it "resets the dirty changes" do
@@ -143,8 +143,8 @@ describe Mongoid::Persistable::Pushable do
           expect(person.test_array).to eq([ 1 ])
         end
 
-        it "returns true" do
-          expect(push).to be_true
+        it "returns self object" do
+          expect(push).to eq(person)
         end
 
         it "resets the dirty changes" do
@@ -207,8 +207,8 @@ describe Mongoid::Persistable::Pushable do
           expect(address.test).to eq([ 1 ])
         end
 
-        it "returns true" do
-          expect(push).to be_true
+        it "returns self object" do
+          expect(push).to eq(address)
         end
 
         it "resets the dirty changes" do

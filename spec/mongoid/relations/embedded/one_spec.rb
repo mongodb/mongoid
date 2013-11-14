@@ -23,7 +23,7 @@ describe Mongoid::Relations::Embedded::One do
     context "when the proxied document is same class" do
 
       it "returns true" do
-        expect((relation === Name.new)).to be_true
+        expect((relation === Name.new)).to be true
       end
     end
   end
@@ -187,7 +187,7 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "runs the destroy callbacks on the old document" do
-              expect(pet_one.destroy_flag).to be_true
+              expect(pet_one.destroy_flag).to be true
             end
           end
         end
@@ -821,7 +821,7 @@ describe Mongoid::Relations::Embedded::One do
       context "when checking #{method}" do
 
         it "returns true" do
-          expect(document.respond_to?(method)).to be_true
+          expect(document.respond_to?(method)).to be true
         end
       end
     end
@@ -843,7 +843,7 @@ describe Mongoid::Relations::Embedded::One do
   describe ".validation_default" do
 
     it "returns true" do
-      expect(described_class.validation_default).to be_true
+      expect(described_class.validation_default).to be true
     end
   end
 

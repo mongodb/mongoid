@@ -21,7 +21,7 @@ describe Mongoid::Persistable::Destroyable do
       end
 
       it "returns true" do
-        expect(destroyd).to be_true
+        expect(destroyd).to be true
       end
 
       it "resets the flagged for destroy flag" do

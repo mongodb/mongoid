@@ -126,7 +126,7 @@ describe Mongoid::Relations::Eager::HasMany do
         end
 
         it "does not set anything on the parent" do
-          expect(eager.ivar(:posts)).to be_false
+          expect(eager.ivar(:posts)).to be false
         end
 
         it "tries to query again when touching the association" do
@@ -159,7 +159,7 @@ describe Mongoid::Relations::Eager::HasMany do
         end
 
         it "does not set documents not found" do
-          expect(eager.last.ivar(:posts)).to be_false
+          expect(eager.last.ivar(:posts)).to be false
         end
       end
     end

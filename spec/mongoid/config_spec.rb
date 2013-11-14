@@ -100,31 +100,31 @@ describe Mongoid::Config do
       end
 
       it "sets the include root in json option" do
-        expect(described_class.include_root_in_json).to be_false
+        expect(described_class.include_root_in_json).to be false
       end
 
       it "sets the include type with serialization option" do
-        expect(described_class.include_type_for_serialization).to be_false
+        expect(described_class.include_type_for_serialization).to be false
       end
 
       it "sets the scope overwrite option" do
-        expect(described_class.scope_overwrite_exception).to be_false
+        expect(described_class.scope_overwrite_exception).to be false
       end
 
       it "sets the preload models option" do
-        expect(described_class.preload_models).to be_false
+        expect(described_class.preload_models).to be false
       end
 
       it "sets the raise not found error option" do
-        expect(described_class.raise_not_found_error).to be_true
+        expect(described_class.raise_not_found_error).to be true
       end
 
       it "sets the use activesupport time zone option" do
-        expect(described_class.use_activesupport_time_zone).to be_true
+        expect(described_class.use_activesupport_time_zone).to be true
       end
 
       it "sets the use utc option" do
-        expect(described_class.use_utc).to be_false
+        expect(described_class.use_utc).to be false
       end
     end
 
@@ -146,31 +146,31 @@ describe Mongoid::Config do
         end
 
         it "sets the include root in json option" do
-          expect(described_class.include_root_in_json).to be_false
+          expect(described_class.include_root_in_json).to be false
         end
 
         it "sets the include type with serialization option" do
-          expect(described_class.include_type_for_serialization).to be_false
+          expect(described_class.include_type_for_serialization).to be false
         end
 
         it "sets the scope overwrite option" do
-          expect(described_class.scope_overwrite_exception).to be_false
+          expect(described_class.scope_overwrite_exception).to be false
         end
 
         it "sets the preload models option" do
-          expect(described_class.preload_models).to be_false
+          expect(described_class.preload_models).to be false
         end
 
         it "sets the raise not found error option" do
-          expect(described_class.raise_not_found_error).to be_true
+          expect(described_class.raise_not_found_error).to be true
         end
 
         it "sets the use activesupport time zone option" do
-          expect(described_class.use_activesupport_time_zone).to be_true
+          expect(described_class.use_activesupport_time_zone).to be true
         end
 
         it "sets the use utc option" do
-          expect(described_class.use_utc).to be_false
+          expect(described_class.use_utc).to be false
         end
       end
 
@@ -229,7 +229,7 @@ describe Mongoid::Config do
       end
 
       it "does not try to assign options" do
-        expect(described_class.preload_models).to be_false
+        expect(described_class.preload_models).to be false
       end
     end
 

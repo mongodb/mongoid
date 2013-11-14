@@ -45,7 +45,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       it "sets subsequent readonly values" do
-        expect(person.terms).to be_true
+        expect(person.terms).to be true
       end
 
       it "persists the first readonly value" do
@@ -53,7 +53,7 @@ describe Mongoid::Attributes::Readonly do
       end
 
       it "persists subsequent readonly values" do
-        expect(person.reload.terms).to be_true
+        expect(person.reload.terms).to be true
       end
     end
 

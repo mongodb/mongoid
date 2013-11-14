@@ -204,7 +204,7 @@ describe Mongoid::Findable do
         end
 
         it "calls the block" do
-          expect(person.pets).to be_true
+          expect(person.pets).to be true
         end
       end
     end
@@ -280,7 +280,7 @@ describe Mongoid::Findable do
         end
 
         it "calls the block" do
-          expect(person.pets).to be_true
+          expect(person.pets).to be true
         end
       end
     end

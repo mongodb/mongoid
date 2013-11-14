@@ -16,8 +16,8 @@ describe Mongoid::Persistable::Pullable do
           expect(person.array).to eq([ 4, 6 ])
         end
 
-        it "returns true" do
-          expect(pull).to be_true
+        it "returns self object" do
+          expect(pull).to eq(person)
         end
 
         it "resets dirty changes" do
@@ -68,8 +68,8 @@ describe Mongoid::Persistable::Pullable do
           expect(address.a).to eq([ 4, 6 ])
         end
 
-        it "returns true" do
-          expect(pull).to be_true
+        it "returns self object" do
+          expect(pull).to eq(address)
         end
 
         it "resets dirty changes" do
@@ -127,8 +127,8 @@ describe Mongoid::Persistable::Pullable do
           expect(person.array).to eq([ 4 ])
         end
 
-        it "returns true" do
-          expect(pull_all).to be_true
+        it "returns self object" do
+          expect(pull_all).to eq(person)
         end
 
         it "resets dirty changes" do
@@ -181,8 +181,8 @@ describe Mongoid::Persistable::Pullable do
           expect(address.a).to eq([ 4 ])
         end
 
-        it "returns true" do
-          expect(pull_all).to be_true
+        it "returns self object" do
+          expect(pull_all).to eq(address)
         end
 
         it "resets dirty changes" do

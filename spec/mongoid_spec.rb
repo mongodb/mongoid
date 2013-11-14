@@ -26,7 +26,7 @@ describe Mongoid do
       end
 
       it "sets the values on the config instance" do
-        expect(Mongoid.preload_models).to be_true
+        expect(Mongoid.preload_models).to be true
       end
     end
   end
@@ -52,7 +52,7 @@ describe Mongoid do
     it "disconnects from all active sessions" do
       sessions.each do |session|
         session.cluster.nodes.each do |node|
-          expect(node.send(:connected?)).to be_false
+          expect(node.send(:connected?)).to be false
         end
       end
     end

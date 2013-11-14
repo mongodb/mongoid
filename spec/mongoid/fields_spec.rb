@@ -807,7 +807,7 @@ describe Mongoid::Fields do
       end
 
       it "adds an existance method" do
-        expect(Person.new.testing?).to be_false
+        expect(Person.new.testing?).to be false
       end
 
       context "when overwriting an existing field" do
@@ -824,7 +824,7 @@ describe Mongoid::Fields do
         end
 
         it "properly overwrites the method" do
-          expect(person.testing_override_called).to be_true
+          expect(person.testing_override_called).to be true
         end
       end
     end
@@ -847,7 +847,7 @@ describe Mongoid::Fields do
       end
 
       it "adds an accessor method with a question mark" do
-        expect(person.terms?).to be_true
+        expect(person.terms?).to be true
       end
     end
 
@@ -862,11 +862,11 @@ describe Mongoid::Fields do
       end
 
       it "uses the alias to write the attribute" do
-        (person.alias = expect(true)).to be_true
+        (person.alias = expect(true)).to be true
       end
 
       it "uses the alias to read the attribute" do
-        expect(person.alias).to be_true
+        expect(person.alias).to be true
       end
 
       it "uses the alias for the query method" do
@@ -874,11 +874,11 @@ describe Mongoid::Fields do
       end
 
       it "uses the name to write the attribute" do
-        (person.aliased = expect(true)).to be_true
+        (person.aliased = expect(true)).to be true
       end
 
       it "uses the name to read the attribute" do
-        expect(person.aliased).to be_true
+        expect(person.aliased).to be true
       end
 
       it "uses the name for the query method" do
@@ -900,11 +900,11 @@ describe Mongoid::Fields do
         end
 
         it "sets name_changed?" do
-          expect(person.aliased_changed?).to be_true
+          expect(person.aliased_changed?).to be true
         end
 
         it "sets alias_changed?" do
-          expect(person.alias_changed?).to be_true
+          expect(person.alias_changed?).to be true
         end
       end
 
@@ -915,11 +915,11 @@ describe Mongoid::Fields do
         end
 
         it "sets name_changed?" do
-          expect(person.aliased_changed?).to be_true
+          expect(person.aliased_changed?).to be true
         end
 
         it "sets alias_changed?" do
-          expect(person.alias_changed?).to be_true
+          expect(person.alias_changed?).to be true
         end
       end
 

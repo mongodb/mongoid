@@ -42,7 +42,7 @@ describe Mongoid::Relations::Touchable do
           end
 
           it "returns true" do
-            expect(touched).to be_true
+            expect(touched).to be true
           end
 
           it "does not set the updated at field" do
@@ -65,7 +65,7 @@ describe Mongoid::Relations::Touchable do
           end
 
           it "returns true" do
-            expect(touched).to be_true
+            expect(touched).to be true
           end
         end
 
@@ -84,7 +84,7 @@ describe Mongoid::Relations::Touchable do
           end
 
           it "returns true" do
-            expect(touched).to be_true
+            expect(touched).to be true
           end
         end
       end
@@ -110,7 +110,7 @@ describe Mongoid::Relations::Touchable do
           end
 
           it "returns true" do
-            expect(touched).to be_true
+            expect(touched).to be true
           end
 
           it "keeps changes for next callback" do
@@ -145,7 +145,7 @@ describe Mongoid::Relations::Touchable do
           end
 
           it "returns true" do
-            expect(touched).to be_true
+            expect(touched).to be true
           end
 
           it "keeps changes for next callback" do
@@ -167,7 +167,7 @@ describe Mongoid::Relations::Touchable do
           end
 
           it "returns false" do
-            expect(touched).to be_false
+            expect(touched).to be false
           end
         end
 
@@ -178,7 +178,7 @@ describe Mongoid::Relations::Touchable do
           end
 
           it "returns false" do
-            expect(touched).to be_false
+            expect(touched).to be false
           end
         end
       end

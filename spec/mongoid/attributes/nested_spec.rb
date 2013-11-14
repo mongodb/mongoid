@@ -572,7 +572,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "runs the destroy callbacks" do
-                        expect(pet.destroy_flag).to be_true
+                        expect(pet.destroy_flag).to be true
                       end
                     end
                   end
@@ -1136,11 +1136,11 @@ describe Mongoid::Attributes::Nested do
               end
 
               it "runs the first child create callbacks" do
-                expect(band.records.first.before_create_called).to be_true
+                expect(band.records.first.before_create_called).to be true
               end
 
               it "runs the last child create callbacks" do
-                expect(band.records.last.before_create_called).to be_true
+                expect(band.records.last.before_create_called).to be true
               end
             end
           end
@@ -4334,11 +4334,11 @@ describe Mongoid::Attributes::Nested do
       end
 
       it "runs the before destroy callbacks" do
-        expect(service.before_destroy_called).to be_true
+        expect(service.before_destroy_called).to be true
       end
 
       it "runs the after destroy callbacks" do
-        expect(service.after_destroy_called).to be_true
+        expect(service.after_destroy_called).to be true
       end
 
       it "clears the delayed atomic pulls from the parent" do
@@ -4486,7 +4486,7 @@ describe Mongoid::Attributes::Nested do
             end
 
             it "runs the child's callbacks" do
-              expect(track.before_destroy_called).to be_true
+              expect(track.before_destroy_called).to be true
             end
           end
         end
@@ -4769,7 +4769,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           it "returns false" do
-            expect(update).to be_false
+            expect(update).to be false
           end
 
           it "does not update the child document" do

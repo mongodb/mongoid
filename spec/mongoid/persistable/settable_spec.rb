@@ -20,8 +20,8 @@ describe Mongoid::Persistable::Settable do
           expect(person.dob).to eq(date)
         end
 
-        it "returns true" do
-          expect(set).to be_true
+        it "returns self object" do
+          expect(set).to eq(person)
         end
 
         it "persists the normal field set" do
@@ -84,8 +84,8 @@ describe Mongoid::Persistable::Settable do
           expect(address.end_date).to eq(date)
         end
 
-        it "returns true" do
-          expect(set).to be_true
+        it "returns self object" do
+          expect(set).to eq(address)
         end
 
         it "persists the normal field set" do

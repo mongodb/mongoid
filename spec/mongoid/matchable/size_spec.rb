@@ -11,14 +11,14 @@ describe Mongoid::Matchable::Size do
     context "when the attribute is the same size" do
 
       it "returns true" do
-        expect(matcher.matches?("$size" => 2)).to be_true
+        expect(matcher.matches?("$size" => 2)).to be true
       end
     end
 
     context "when the attribute is not the same size" do
 
       it "returns false" do
-        expect(matcher.matches?("$size" => 5)).to be_false
+        expect(matcher.matches?("$size" => 5)).to be false
       end
     end
   end
