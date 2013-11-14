@@ -7,7 +7,7 @@ class Account
   field :balance, type: String
   field :nickname, type: String
   field :name, type: String
-  field :balanced, type: Boolean, default: ->{ balance? ? true : false }
+  field :balanced, type: Mongoid::Boolean, default: ->{ balance? ? true : false }
 
   field :overridden, type: String
 

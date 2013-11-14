@@ -1,6 +1,6 @@
 class Player
   include Mongoid::Document
-  field :active, type: Boolean
+  field :active, type: Mongoid::Boolean
   field :frags, type: Integer
   field :deaths, type: Integer
   field :impressions, type: Integer, default: 0

@@ -8,8 +8,8 @@ class Person
 
   field :username, default: -> { "arthurnn#{rand(0..10)}" }
   field :title
-  field :terms, type: Boolean
-  field :pets, type: Boolean, default: false
+  field :terms, type: Mongoid::Boolean
+  field :pets, type: Mongoid::Boolean, default: false
   field :age, type: Integer, default: "100"
   field :dob, type: Date
   field :employer_id

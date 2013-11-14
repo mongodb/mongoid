@@ -1,7 +1,7 @@
 class Note
   include Mongoid::Document
   field :text, type: String
-  field :saved, type: Boolean, default: false
+  field :saved, type: Mongoid::Boolean, default: false
   embedded_in :noteable, polymorphic: true
 
   after_save :update_saved

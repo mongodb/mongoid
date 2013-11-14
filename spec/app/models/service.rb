@@ -1,9 +1,9 @@
 class Service
   include Mongoid::Document
   field :sid
-  field :before_destroy_called, type: Boolean, default: false
-  field :after_destroy_called, type: Boolean, default: false
-  field :after_initialize_called, type: Boolean, default: false
+  field :before_destroy_called, type: Mongoid::Boolean, default: false
+  field :after_destroy_called, type: Mongoid::Boolean, default: false
+  field :after_initialize_called, type: Mongoid::Boolean, default: false
   embedded_in :person
   belongs_to :target, class_name: "User"
   validates_numericality_of :sid
