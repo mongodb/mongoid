@@ -318,7 +318,7 @@ describe Mongoid::Persistable::Updatable do
 
         it "raises an error" do
           expect {
-            person.with(safe: true).send(method, map: { "bad.key" => "value" })
+            person.send(method, map: { "bad.key" => "value" })
           }.to raise_error(Moped::Errors::OperationFailure)
         end
       end

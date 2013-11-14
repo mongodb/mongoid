@@ -977,6 +977,7 @@ describe Mongoid::Sessions do
       describe ".create" do
 
         before do
+          Person.create_indexes
           Person.create(ssn: "432-97-1111")
         end
 
@@ -989,10 +990,6 @@ describe Mongoid::Sessions do
 
         context "when a mongodb error occurs" do
 
-          before do
-            Person.create_indexes
-          end
-
           it "bubbles up to the caller" do
             expect {
               Person.create(ssn: "432-97-1111")
@@ -1000,10 +997,14 @@ describe Mongoid::Sessions do
           end
         end
 
-        context "when using safe: false" do
+        context "when using write -1" do
+
+          let(:new_person) do
+            Person.with(write: {w: -1}).create(ssn: "432-97-1111")
+          end
 
           it "ignores mongodb error" do
-            expect(Person.with(safe: false).create(ssn: "432-97-1111")).to be_true
+            expect(new_person).to_not be nil
           end
         end
       end
