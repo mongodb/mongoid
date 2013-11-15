@@ -57,7 +57,7 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
 
     it "sets the relation into the parent" do
       docs.each do |doc|
-        expect(doc).to receive(:set_relation).with(:houses, :foo)
+        expect(doc).to receive(:__build__).once.with(:houses, :foo, metadata)
       end
       eager.set_on_parent(person.id, :foo)
     end
@@ -88,28 +88,54 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
 
     context "when the relation is not polymorphic" do
 
-      let!(:preference) do
-        person.preferences.create(name: "testing")
-      end
-
-      let!(:eager) do
+      let(:eager) do
         Person.includes(:preferences).last
       end
 
-      it "puts the documents in the parent document" do
-        expect(eager.ivar(:preferences)).to eq([ preference ])
-      end
+      context "when the eager load has returned documents" do
 
-      it "does not query when touching the association" do
-        expect_query(0) do
-          expect(eager.preferences).to eq([ preference ])
+        let!(:preference) do
+          person.preferences.create(name: "testing")
+        end
+
+        before { eager }
+
+        it "puts the documents in the parent document" do
+          expect(eager.ivar(:preferences)).to eq([ preference ])
+        end
+
+        it "does not query when touching the association" do
+          expect_query(0) do
+            expect(eager.preferences).to eq([ preference ])
+          end
+        end
+
+        it "does not query when updating the association" do
+          expect_query(0) do
+            eager.preferences.first.name = "new pref"
+            expect(eager.preferences.first.name).to eq("new pref")
+          end
         end
       end
 
-      it "does not query when updating the association" do
-        expect_query(0) do
-          eager.preferences.first.name = "new pref"
-          expect(eager.preferences.first.name).to eq("new pref")
+      context "when the eager load has not returned documents" do
+
+        before { eager }
+
+        it "has an empty proxy" do
+          expect(eager.preferences).to eq []
+        end
+
+        it "does not query when touching the association" do
+          expect_query(0) do
+            eager.preferences.entries
+          end
+        end
+
+        it "returns the proxy" do
+          expect do
+            eager.preferences.create(name: "testing")
+          end.to_not raise_error
         end
       end
     end

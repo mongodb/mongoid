@@ -53,13 +53,20 @@ describe Mongoid::Relations::Eager::HasOne do
 
     before do
       Cat.create!(person: person)
+      eager
     end
 
     it "sets the relation into the parent" do
       docs.each do |doc|
-        expect(doc).to receive(:set_relation).with(:cat, :foo)
+        expect(doc).to receive(:set_relation).once.with(:cat, :foo)
       end
       eager.set_on_parent(person.username, :foo)
+    end
+
+    it "doesnt call an extra query" do
+      expect_query(0) do
+        eager.set_on_parent(person.username, :foo)
+      end
     end
   end
 

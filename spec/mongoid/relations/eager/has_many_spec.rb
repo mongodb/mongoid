@@ -53,13 +53,20 @@ describe Mongoid::Relations::Eager::HasMany do
 
     before do
       Post.create!(person: person)
+      eager
     end
 
     it "sets the relation into the parent" do
       docs.each do |doc|
-        expect(doc).to receive(:set_relation).with(:posts, :foo)
+        expect(doc).to receive(:__build__).once.with(:posts, :foo, metadata)
       end
       eager.set_on_parent(person.id, :foo)
+    end
+
+    it "doesnt call an extra query" do
+      expect_query(0) do
+        eager.set_on_parent(person.id, :foo)
+      end
     end
   end
 
@@ -78,9 +85,9 @@ describe Mongoid::Relations::Eager::HasMany do
 
       it "queries twice" do
 
-        expect_query(2) do
+         expect_query(2) do
           Person.all.includes(:drugs).each do |person|
-            expect(person.drugs).to_not be_nil
+            expect(person.drugs.entries).to_not be_empty
           end
         end
       end
@@ -117,22 +124,30 @@ describe Mongoid::Relations::Eager::HasMany do
 
       context "when the eager load has not returned documents" do
 
-        before do
-          person
-        end
+        before { person }
 
         let!(:eager) do
           Person.includes(:posts).last
         end
 
         it "does not set anything on the parent" do
-          expect(eager.ivar(:posts)).to be false
+          expect(eager.ivar(:posts)).to be_empty
         end
 
-        it "tries to query again when touching the association" do
-          expect_query(1) do
-            expect(eager.posts).to be_empty
+        it "has an empty proxy" do
+          expect(eager.posts).to eq([])
+        end
+
+        it "does not query when touching the association" do
+          expect_query(0) do
+            eager.posts.entries
           end
+        end
+
+        it "returns the proxy" do
+          expect do
+            eager.posts.create(title: "testing")
+          end.to_not raise_error
         end
       end
 
@@ -159,7 +174,7 @@ describe Mongoid::Relations::Eager::HasMany do
         end
 
         it "does not set documents not found" do
-          expect(eager.last.ivar(:posts)).to be false
+          expect(eager.last.ivar(:posts)).to be_empty
         end
       end
     end

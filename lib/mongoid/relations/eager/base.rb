@@ -30,8 +30,12 @@ module Mongoid
 
         def set_on_parent(id, element)
           grouped_docs[id].each do |d|
-            d.set_relation(@metadata.name, element)
+            set_relation(d, element)
           end
+        end
+
+        def set_relation(doc, element)
+          doc.set_relation(@metadata.name, element)
         end
 
         def grouped_docs

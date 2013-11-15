@@ -87,27 +87,49 @@ describe Mongoid::Relations::Eager::BelongsTo do
 
     context "when the relation is not polymorphic" do
 
-      let!(:post) do
-        person.posts.create(title: "testing")
-      end
-
-      let!(:eager) do
+      let(:eager) do
         Post.includes(:person).last
       end
 
-      it "puts the documents in the parent document" do
-        expect(eager.ivar(:person)).to eq(person)
-      end
+      context "when the eager load has returned documents" do
 
-      it "does not query when touching the association" do
-        expect_query(0) do
-          expect(eager.person).to eq(person)
+        let!(:post) do
+          person.posts.create(title: "testing")
+        end
+
+        before { eager }
+
+        it "puts the documents in the parent document" do
+          expect(eager.ivar(:person)).to eq(person)
+        end
+
+        it "does not query when touching the association" do
+          expect_query(0) do
+            expect(eager.person).to eq(person)
+          end
+        end
+
+        it "does not query when updating the association" do
+          expect_query(0) do
+            eager.person.username = "arthurnn"
+          end
         end
       end
 
-      it "does not query when updating the association" do
-        expect_query(0) do
-          eager.person.username = "arthurnn"
+      context "when the eager load has not returned documents" do
+
+        let!(:post) do
+          Post.create(title: "testing")
+        end
+
+        before { eager }
+
+        it "does not set anything on the parent" do
+          expect(eager.ivar(:person)).to be nil
+        end
+
+        it "has a nil relation" do
+          expect(eager.person).to be nil
         end
       end
     end

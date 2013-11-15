@@ -5,6 +5,10 @@ module Mongoid
       class HasOne < Base
 
         def preload
+          @docs.each do |d|
+            set_relation(d, nil)
+          end
+
           each_loaded_document do |doc|
             id = doc.send(key)
             set_on_parent(id, doc)
