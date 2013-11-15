@@ -88,7 +88,7 @@ ActiveSupport::Inflector.inflections do |inflect|
 end
 
 RSpec.configure do |config|
-  config.include Helpers
+  config.include Mongoid::SpecHelpers
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
