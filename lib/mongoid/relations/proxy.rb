@@ -18,7 +18,7 @@ module Mongoid
       include Threaded::Lifecycle
       include Marshalable
 
-      attr_accessor :base, :loaded, :metadata, :target
+      attr_accessor :base, :metadata, :target
 
       # Backwards compatibility with Mongoid beta releases.
       delegate :foreign_key, :inverse_foreign_key, to: :metadata
