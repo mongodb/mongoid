@@ -41,7 +41,7 @@ module Mongoid
       #
       # @since 2.0.0.beta.1
       def create(attributes = nil, type = nil, &block)
-        return attributes.collect{|attribute| create(attribute)} if attributes.class == Array
+        return attributes.collect{|attribute| create(attribute,type,&block)} if attributes.class == Array
         doc = build(attributes, type, &block)
         base.persisted? ? doc.save : raise_unsaved(doc)
         doc
@@ -69,7 +69,7 @@ module Mongoid
       #
       # @since 2.0.0.beta.1
       def create!(attributes = nil, type = nil, &block)
-        return attributes.collect{|attribute| create!(attribute)} if attributes.class == Array
+        return attributes.collect{|attribute| create!(attribute,type,&block)} if attributes.class == Array
         doc = build(attributes, type, &block)
         base.persisted? ? doc.save! : raise_unsaved(doc)
         doc
