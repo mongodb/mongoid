@@ -948,27 +948,8 @@ describe Mongoid::Fields do
       context "when option is provided" do
 
         it "calls the handler with the model" do
-          handler.should_receive(:call).with do |model,_,_|
-            expect(model).to eql User
-          end
-
           User.field :custom, option: true, overwrite: true
-        end
-
-        it "calls the handler with the field" do
-          handler.should_receive(:call).with do |_,field,_|
-            expect(field).to eql User.fields["custom"]
-          end
-
-          User.field :custom, option: true, overwrite: true
-        end
-
-        it "calls the handler with the option value" do
-          handler.should_receive(:call).with do |_,_,value|
-            expect(value).to eql true
-          end
-
-          User.field :custom, option: true, overwrite: true
+          expect(User.fields["custom"].options[:option]).to be_truthy
         end
       end
 
