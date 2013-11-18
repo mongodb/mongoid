@@ -7,6 +7,12 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* IdentityMap removed. (Arthur Neves)
+
+* Eager load rework. Eager load now doesnt need the identity map to load
+  related documents. A set of preloaders can eager load the associations
+  passed to .includes method. (Arthur Neves)
+
 * Mongoid now supports the new read preferences that the core drivers
   provide. These include:
 
