@@ -1336,6 +1336,33 @@ describe Mongoid::Relations::Embedded::Many do
 
   describe "#create" do
 
+    context "when providing multiple attributes" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:addresses) do
+        person.addresses.create([{ street: "Bond" }, { street: "Upper" }])
+      end
+
+      it "creates multiple documents" do
+        expect(addresses.size).to eq(2)
+      end
+
+      it "sets the first attributes" do
+        expect(addresses.first.street).to eq("Bond")
+      end
+
+      it "sets the second attributes" do
+        expect(addresses.last.street).to eq("Upper")
+      end
+
+      it "persists the children" do
+        expect(person.addresses.count).to eq(2)
+      end
+    end
+
     context "when the relation is not cyclic" do
 
       let(:person) do
@@ -1416,6 +1443,29 @@ describe Mongoid::Relations::Embedded::Many do
 
     let(:person) do
       Person.create
+    end
+
+    context "when providing multiple attributes" do
+
+      let!(:addresses) do
+        person.addresses.create!([{ street: "Bond" }, { street: "Upper" }])
+      end
+
+      it "creates multiple documents" do
+        expect(addresses.size).to eq(2)
+      end
+
+      it "sets the first attributes" do
+        expect(addresses.first.street).to eq("Bond")
+      end
+
+      it "sets the second attributes" do
+        expect(addresses.last.street).to eq("Upper")
+      end
+
+      it "persists the children" do
+        expect(person.addresses.count).to eq(2)
+      end
     end
 
     context "when validation passes" do

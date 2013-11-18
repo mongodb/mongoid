@@ -1460,6 +1460,33 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#create" do
 
+    context "when providing multiple attributes" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:posts) do
+        person.posts.create([{ text: "Test1" }, { text: "Test2" }])
+      end
+
+      it "creates multiple documents" do
+        expect(posts.size).to eq(2)
+      end
+
+      it "sets the first attributes" do
+        expect(posts.first.text).to eq("Test1")
+      end
+
+      it "sets the second attributes" do
+        expect(posts.last.text).to eq("Test2")
+      end
+
+      it "persists the children" do
+        expect(person.posts.count).to eq(2)
+      end
+    end
+
     context "when the relation is not polymorphic" do
 
       context "when the parent is a new record" do
@@ -1618,6 +1645,33 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   describe "#create!" do
+
+    context "when providing multiple attributes" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:posts) do
+        person.posts.create!([{ text: "Test1" }, { text: "Test2" }])
+      end
+
+      it "creates multiple documents" do
+        expect(posts.size).to eq(2)
+      end
+
+      it "sets the first attributes" do
+        expect(posts.first.text).to eq("Test1")
+      end
+
+      it "sets the second attributes" do
+        expect(posts.last.text).to eq("Test2")
+      end
+
+      it "persists the children" do
+        expect(person.posts.count).to eq(2)
+      end
+    end
 
     context "when the relation is not polymorphic" do
 

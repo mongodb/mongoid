@@ -110,6 +110,12 @@ For instructions on upgrading to newer versions, visit
 
         Band.where(name: "Depeche Mode").inc(likes: 10, followers: 20)
 
+* \#3399 #create and #create! on relations can now take an array of attributes as
+  the first parameter to create multiple documents at once.
+
+        person.addresses.create([{ street: "Bond" }, { street: "Upper" }])
+        person.addresses.create!([{ street: "Bond" }, { street: "Upper" }])
+
 * \#3141 `rake db:test:prepare` now sets up all defined indexes if Mongoid is the
   only ODM/ORM in the environment.
 
