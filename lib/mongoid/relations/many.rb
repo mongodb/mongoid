@@ -26,6 +26,7 @@ module Mongoid
       #
       # @example Create and save the new document.
       #   person.posts.create(:text => "Testing")
+      #   person.posts.create([{:text=>'test'},{:text=>'test'}])
       #
       # @overload create(attributes = nil, options = {}, type = nil)
       #   @param [ Hash ] attributes The attributes to create with.
@@ -40,6 +41,7 @@ module Mongoid
       #
       # @since 2.0.0.beta.1
       def create(attributes = nil, type = nil, &block)
+        return attributes.collect{|attribute| create(attribute)} if attributes.class == Array
         doc = build(attributes, type, &block)
         base.persisted? ? doc.save : raise_unsaved(doc)
         doc
@@ -51,6 +53,7 @@ module Mongoid
       #
       # @example Create and save the new document.
       #   person.posts.create!(:text => "Testing")
+      #   person.posts.create!([{:text=>'test'},{:text=>'test'}])
       #
       # @overload create!(attributes = nil, options = {}, type = nil)
       #   @param [ Hash ] attributes The attributes to create with.
@@ -66,6 +69,7 @@ module Mongoid
       #
       # @since 2.0.0.beta.1
       def create!(attributes = nil, type = nil, &block)
+        return attributes.collect{|attribute| create!(attribute)} if attributes.class == Array
         doc = build(attributes, type, &block)
         base.persisted? ? doc.save! : raise_unsaved(doc)
         doc
