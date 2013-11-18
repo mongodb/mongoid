@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def matches?(value)
-        @attribute != value.values.first
+        !super(value.values.first)
       end
     end
   end

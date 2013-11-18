@@ -291,6 +291,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3397 Fixed $ne matcher for embedded documents to match server behaviour.
+
 * \#3348 Fixing compounded indexes having the same keys with
   different directions. (Arthur Neves)
 
