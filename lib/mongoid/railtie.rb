@@ -119,7 +119,7 @@ module Rails
 
         # Passenger provides the :starting_worker_process event for executing
         # code after it has forked, so we use that and reconnect immediately.
-        if ::Mongoid.running_with_passenger?
+        if ::Mongoid::Config.running_with_passenger?
           PhusionPassenger.on_event(:starting_worker_process) do |forked|
             ::Mongoid.default_session.disconnect if forked
           end
