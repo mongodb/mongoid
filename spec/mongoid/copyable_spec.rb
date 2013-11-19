@@ -119,7 +119,7 @@ describe Mongoid::Copyable do
 
       context "when the document is new" do
 
-        context "when versions exist" do
+        context "when there are changes" do
 
           let(:copy) do
             person.send(method)
@@ -147,14 +147,6 @@ describe Mongoid::Copyable do
 
           it "has a different id from the original" do
             expect(copy.id).to_not eq(person.id)
-          end
-
-          it "does not copy the versions" do
-            expect(copy[:versions]).to be_nil
-          end
-
-          it "resets the document version" do
-            expect(copy.version).to eq(1)
           end
 
           it "returns a new instance" do
@@ -228,7 +220,7 @@ describe Mongoid::Copyable do
           person.new_record = false
         end
 
-        context "when versions exist" do
+        context "when there are changes" do
 
           let(:copy) do
             person.send(method)
@@ -256,10 +248,6 @@ describe Mongoid::Copyable do
 
           it "has a different id from the original" do
             expect(copy.id).to_not eq(person.id)
-          end
-
-          it "does not copy the versions" do
-            expect(copy[:versions]).to be_nil
           end
 
           it "returns a new instance" do
