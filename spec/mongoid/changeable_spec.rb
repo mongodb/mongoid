@@ -541,25 +541,6 @@ describe Mongoid::Changeable do
       end
     end
 
-    pending "when the attribute has changed from the default value" do
-
-      let(:person) do
-        Person.new
-      end
-
-      before do
-        person.pets = true
-      end
-
-      it "returns the default value" do
-        expect(person.send(:attribute_was, "pets")).to be false
-      end
-
-      it "allows access via (attribute)_was" do
-        expect(person.pets_was).to be false
-      end
-    end
-
     context "when the attribute has not changed from the persisted value" do
 
       let!(:person) do
