@@ -551,17 +551,6 @@ describe Mongoid::Changeable do
         expect(person.send(:attribute_was, "title")).to eq("Grand Poobah")
       end
     end
-
-    pending "when the attribute has not changed from the default value" do
-
-      let(:person) do
-        Person.new
-      end
-
-      it "returns the default value" do
-        expect(person.send(:attribute_was, "pets")).to be false
-      end
-    end
   end
 
   describe "#attribute_will_change!" do
