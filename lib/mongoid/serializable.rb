@@ -12,7 +12,7 @@ module Mongoid
     # similar to +ActiveRecord+.
     included do
       undef_method :include_root_in_json
-      delegate :include_root_in_json, to: ::Mongoid
+      delegate include_root_in_json: ::Mongoid
     end
 
     # Gets the document as a serializable hash, used by ActiveModel's JSON
