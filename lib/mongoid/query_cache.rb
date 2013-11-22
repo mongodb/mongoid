@@ -5,13 +5,17 @@ module Mongoid
       Thread.current['[mongoid]:query_cache'] ||= Hash.new
     end
 
+    def self.clear_cache
+      Thread.current['[mongoid]:query_cache'] = nil
+    end
+
     module Base
 
       def alias_query_cache_clear(*method_names)
         method_names.each do |method_name|
           class_eval <<-CODE, __FILE__, __LINE__ + 1
               def #{method_name}_with_clear_cache(*args)
-                Thread.current['[mongoid]:query_cache'] = nil
+                QueryCache.clear_cache
                 #{method_name}_without_clear_cache(*args)
               end
             CODE

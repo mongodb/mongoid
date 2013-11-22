@@ -169,6 +169,7 @@ module Mongoid
     #
     # @since 2.0.2
     def purge!
+      Mongoid::QueryCache.clear_cache
       Sessions.default.collections.each do |collection|
         collection.drop
       end and true
