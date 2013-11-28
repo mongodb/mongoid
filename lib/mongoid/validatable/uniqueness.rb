@@ -13,6 +13,16 @@ module Mongoid
     #
     #     validates_uniqueness_of :title
     #   end
+    #
+    # It is also possible to limit the uniqueness constraint to a set of
+    # records matching certain conditions:
+    #   class Person
+    #     include Mongoid::Document
+    #     field :title
+    #     field :active, type: Boolean
+    #
+    #     validates_uniqueness_of :title, conditions: -> {where(active: true)}
+    #   end
     class UniquenessValidator < ActiveModel::EachValidator
       include Queryable
 
@@ -253,6 +263,7 @@ module Mongoid
         return if skip_validation?(document)
         relation = document._parent.send(document.metadata_name)
         criteria = create_criteria(relation, document, attribute, value)
+        criteria = criteria.merge(options[:conditions].call) if options[:conditions]
         add_error(document, attribute, value) if criteria.count > 1
       end
 
@@ -270,6 +281,8 @@ module Mongoid
       # @since 2.4.10
       def validate_root(document, attribute, value)
         criteria = create_criteria(klass || document.class, document, attribute, value)
+        criteria = criteria.merge(options[:conditions].call) if options[:conditions]
+
         if criteria.with(persistence_options(criteria)).exists?
           add_error(document, attribute, value)
         end
