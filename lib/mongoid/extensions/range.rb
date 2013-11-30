@@ -82,4 +82,4 @@ module Mongoid
 end
 
 ::Range.__send__(:include, Mongoid::Extensions::Range)
-::Range.__send__(:extend, Mongoid::Extensions::Range::ClassMethods)
+::Range.extend(Mongoid::Extensions::Range::ClassMethods)

@@ -271,4 +271,4 @@ module Mongoid
 end
 
 ::Object.__send__(:include, Mongoid::Extensions::Object)
-::Object.__send__(:extend, Mongoid::Extensions::Object::ClassMethods)
+::Object.extend(Mongoid::Extensions::Object::ClassMethods)

@@ -214,4 +214,4 @@ module Mongoid
 end
 
 ::Hash.__send__(:include, Mongoid::Extensions::Hash)
-::Hash.__send__(:extend, Mongoid::Extensions::Hash::ClassMethods)
+::Hash.extend(Mongoid::Extensions::Hash::ClassMethods)

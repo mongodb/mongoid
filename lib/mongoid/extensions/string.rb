@@ -196,4 +196,4 @@ module Mongoid
 end
 
 ::String.__send__(:include, Mongoid::Extensions::String)
-::String.__send__(:extend, Mongoid::Extensions::String::ClassMethods)
+::String.extend(Mongoid::Extensions::String::ClassMethods)

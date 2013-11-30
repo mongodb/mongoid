@@ -53,4 +53,4 @@ module Mongoid
 end
 
 ::ActiveSupport::TimeWithZone.__send__(:include, Mongoid::Extensions::TimeWithZone)
-::ActiveSupport::TimeWithZone.__send__(:extend, Mongoid::Extensions::TimeWithZone::ClassMethods)
+::ActiveSupport::TimeWithZone.extend(Mongoid::Extensions::TimeWithZone::ClassMethods)

@@ -177,4 +177,4 @@ module Mongoid
 end
 
 ::Array.__send__(:include, Mongoid::Extensions::Array)
-::Array.__send__(:extend, Mongoid::Extensions::Array::ClassMethods)
+::Array.extend(Mongoid::Extensions::Array::ClassMethods)
