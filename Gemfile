@@ -2,6 +2,7 @@ source "https://rubygems.org"
 gemspec
 
 gem "rake"
+gem "moped", github: "mongoid/moped"
 
 group :test do
   gem "rspec", "~> 2.99.0.beta1"
