@@ -85,4 +85,4 @@ module Mongoid
 end
 
 ::Time.__send__(:include, Mongoid::Extensions::Time)
-::Time.__send__(:extend, Mongoid::Extensions::Time::ClassMethods)
+::Time.extend(Mongoid::Extensions::Time::ClassMethods)

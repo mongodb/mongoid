@@ -52,4 +52,4 @@ module Mongoid
 end
 
 ::Set.__send__(:include, Mongoid::Extensions::Set)
-::Set.__send__(:extend, Mongoid::Extensions::Set::ClassMethods)
+::Set.extend(Mongoid::Extensions::Set::ClassMethods)

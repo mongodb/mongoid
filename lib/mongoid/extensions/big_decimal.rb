@@ -66,4 +66,4 @@ module Mongoid
 end
 
 ::BigDecimal.__send__(:include, Mongoid::Extensions::BigDecimal)
-::BigDecimal.__send__(:extend, Mongoid::Extensions::BigDecimal::ClassMethods)
+::BigDecimal.extend(Mongoid::Extensions::BigDecimal::ClassMethods)

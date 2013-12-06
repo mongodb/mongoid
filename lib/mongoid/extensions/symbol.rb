@@ -51,4 +51,4 @@ module Mongoid
 end
 
 ::Symbol.__send__(:include, Mongoid::Extensions::Symbol)
-::Symbol.__send__(:extend, Mongoid::Extensions::Symbol::ClassMethods)
+::Symbol.extend(Mongoid::Extensions::Symbol::ClassMethods)

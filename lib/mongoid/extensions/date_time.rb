@@ -70,4 +70,4 @@ module Mongoid
 end
 
 ::DateTime.__send__(:include, Mongoid::Extensions::DateTime)
-::DateTime.__send__(:extend, Mongoid::Extensions::DateTime::ClassMethods)
+::DateTime.extend(Mongoid::Extensions::DateTime::ClassMethods)

@@ -24,4 +24,4 @@ module Mongoid
   end
 end
 
-::Regexp.__send__(:extend, Mongoid::Extensions::Regexp::ClassMethods)
+::Regexp.extend(Mongoid::Extensions::Regexp::ClassMethods)
