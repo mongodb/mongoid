@@ -1,4 +1,4 @@
-Mongoid [![Build Status](https://secure.travis-ci.org/mongoid/mongoid.png?branch=master)](http://travis-ci.org/mongoid/mongoid) [![Code Climate](https://codeclimate.com/github/mongoid/mongoid.png)](https://codeclimate.com/github/mongoid/mongoid) [![Coverage Status](https://coveralls.io/repos/mongoid/mongoid/badge.png?branch=master)](https://coveralls.io/r/mongoid/mongoid?branch=master)
+Mongoid [![Build Status](https://secure.travis-ci.org/mongoid/mongoid.png?branch=master)](http://travis-ci.org/mongoid/mongoid) [![Code Climate](https://codeclimate.com/github/mongoid/mongoid.png)](https://codeclimate.com/github/mongoid/mongoid) [![Coverage Status](https://coveralls.io/repos/mongoid/mongoid/badge.png?branch=master)](https://coveralls.io/r/mongoid/mongoid?branch=master) [![Gem Version](https://badge.fury.io/rb/mongoid.png)](http://badge.fury.io/rb/mongoid)
 ========
 
 Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
