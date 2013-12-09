@@ -208,6 +208,37 @@ describe Mongoid::Relations::Embedded::Many do
           end
         end
       end
+
+      context "when the child has one sided many to many relation" do
+        let(:person) do
+          Person.create
+        end
+
+        let(:message) do
+          Message.new
+        end
+
+        context "assign parent first" do
+          before do
+            message.person = person
+            message.receviers.send(method, person)
+          end
+
+          it "appends to the relation array" do
+            expect(message.receviers).to include(person)
+          end
+        end
+
+        context "not assign parent" do
+          before do
+            message.receviers.send(method, person)
+          end
+
+          it "appends to the relation array" do
+            expect(message.receviers).to include(person)
+          end
+        end
+      end
     end
   end
 
