@@ -64,6 +64,7 @@ class Person
   embeds_many :services, cascade_callbacks: true, validate: false
   embeds_many :symptoms, validate: false
   embeds_many :appointments, validate: false
+  embeds_many :messages, validate: false
 
   embeds_one :passport, autobuild: true, store_as: :pass, validate: false
   embeds_one :pet, class_name: "Animal", validate: false

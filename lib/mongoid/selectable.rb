@@ -19,7 +19,7 @@ module Mongoid
     # @since 1.0.0
     def atomic_selector
       @atomic_selector ||=
-        (embedded? ? embedded_atomic_selector : root_atomic_selector)
+          (embedded? && _parent ? embedded_atomic_selector : root_atomic_selector)
     end
 
     private
