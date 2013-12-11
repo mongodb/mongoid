@@ -269,6 +269,23 @@ describe Mongoid::Relations::Touchable do
         end
       end
 
+      context "when modifying the child" do
+
+        let!(:agency) do
+          Agency.create
+        end
+
+        let!(:agent) do
+          agency.agents.create(number: '1')
+        end
+
+        it "updates the parent's updated at" do
+          expect {
+            agent.update_attributes(number: '2')
+          }.to change { agency.updated_at }
+        end
+      end
+
       context "when destroying the child" do
 
         let!(:agency) do
