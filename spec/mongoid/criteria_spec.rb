@@ -3332,81 +3332,27 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#within_box" do
+  describe "#geo_spacial" do
 
-    before do
-      Bar.create_indexes
-    end
+    context "when checking within a polygon" do
 
-    let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
-    end
+      before do
+        Bar.create_indexes
+      end
 
-    let(:criteria) do
-      Bar.within_box(location: [[ 50, 10 ], [ 60, 20 ]])
-    end
+      let!(:match) do
+        Bar.create(location: [ 52.30, 13.25 ])
+      end
 
-    it "returns the matching documents" do
-      expect(criteria).to eq([ match ])
-    end
-  end
+      let(:criteria) do
+        Bar.geo_spacial(
+          :location.within_polygon => [[[ 50, 10 ], [ 50, 20 ], [ 60, 20 ], [ 60, 10 ], [ 50, 10 ]]]
+        )
+      end
 
-  describe "#within_circle" do
-
-    before do
-      Bar.create_indexes
-    end
-
-    let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
-    end
-
-    let(:criteria) do
-      Bar.within_circle(location: [[ 52, 13 ], 0.5 ])
-    end
-
-    it "returns the matching documents" do
-      expect(criteria).to eq([ match ])
-    end
-  end
-
-  describe "#within_polygon" do
-
-    before do
-      Bar.create_indexes
-    end
-
-    let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
-    end
-
-    let(:criteria) do
-      Bar.within_polygon(
-        location: [[ 50, 10 ], [ 50, 20 ], [ 60, 20 ], [ 60, 10 ]]
-      )
-    end
-
-    it "returns the matching documents" do
-      expect(criteria).to eq([ match ])
-    end
-  end
-
-  describe "#within_spherical_circle" do
-
-    before do
-      Bar.create_indexes
-    end
-
-    let!(:match) do
-      Bar.create(location: [ 52.30, 13.25 ])
-    end
-
-    let(:criteria) do
-      Bar.within_spherical_circle(location: [[ 52, 13 ], 0.5 ])
-    end
-
-    it "returns the matching documents" do
-      expect(criteria).to eq([ match ])
+      it "returns the matching documents" do
+        expect(criteria).to eq([ match ])
+      end
     end
   end
 
