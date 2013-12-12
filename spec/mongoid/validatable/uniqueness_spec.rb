@@ -1483,7 +1483,48 @@ describe Mongoid::Validatable::UniquenessValidator do
           end
 
         end
+      end
 
+      context "when conditions is set" do
+
+        before do
+          Band.validates_uniqueness_of :name, conditions: ->{ Band.where(active: true) }
+        end
+
+        after do
+          Band.reset_callbacks(:validate)
+        end
+
+        context "when the attribute is unique" do
+
+          before do
+            Band.create(name: 'Foo', active: false)
+          end
+
+          let(:unique_band) do
+            Band.new(name: 'Foo')
+          end
+
+          it "returns true" do
+            expect(unique_band).to be_valid
+          end
+
+        end
+
+        context "when the attribute is not unique" do
+
+          before do
+            Band.create(name: 'Foo')
+          end
+
+          let(:non_unique_band) do
+            Band.new(name: 'Foo')
+          end
+
+          it "returns false" do
+            expect(non_unique_band).to_not be_valid
+          end
+        end
       end
     end
   end
