@@ -18,43 +18,40 @@ Benchmark.bm do |bm|
 
   [ 100000 ].each do |i|
 
-    Mongoid.unit_of_work do
+    puts "[ #{i} ]"
 
-      puts "[ #{i} ]"
-
-      bm.report("#new              ") do
-        i.times do |n|
-          Person.new
-        end
+    bm.report("#new              ") do
+      i.times do |n|
+        Person.new
       end
-
-      bm.report("#create           ") do
-        i.times do |n|
-          Person.create(:birth_date => Date.new(1970, 1, 1))
-        end
-      end
-
-      bm.report("#each             ") do
-        Person.all.each { |person| person.birth_date }
-      end
-
-      bm.report("#find             ") do
-        Person.find(Person.first.id)
-      end
-
-      bm.report("#save             ") do
-        Person.all.each do |person|
-          person.title = "Testing"
-          person.save
-        end
-      end
-
-      bm.report("#update_attribute ") do
-        Person.all.each { |person| person.update_attribute(:title, "Updated") }
-      end
-
-      Person.delete_all
     end
+
+    bm.report("#create           ") do
+      i.times do |n|
+        Person.create(:birth_date => Date.new(1970, 1, 1))
+      end
+    end
+
+    bm.report("#each             ") do
+      Person.all.each { |person| person.birth_date }
+    end
+
+    bm.report("#find             ") do
+      Person.find(Person.first.id)
+    end
+
+    bm.report("#save             ") do
+      Person.all.each do |person|
+        person.title = "Testing"
+        person.save
+      end
+    end
+
+    bm.report("#update_attribute ") do
+      Person.all.each { |person| person.update_attribute(:title, "Updated") }
+    end
+
+    Person.delete_all
 
     GC.start
   end
@@ -65,90 +62,87 @@ Benchmark.bm do |bm|
 
   [ 1000 ].each do |i|
 
-    Mongoid.unit_of_work do
+    puts "[ #{i} ]"
 
-      puts "[ #{i} ]"
-
-      bm.report("#build            ") do
-        i.times do |n|
-          person.addresses.build(
-            :street => "Wienerstr. #{n}",
-            :city => "Berlin",
-            :post_code => "10999"
-          )
-        end
+    bm.report("#build            ") do
+      i.times do |n|
+        person.addresses.build(
+          :street => "Wienerstr. #{n}",
+          :city => "Berlin",
+          :post_code => "10999"
+        )
       end
+    end
 
-      bm.report("#clear            ") do
-        person.addresses.clear
-      end
-
-      bm.report("#create           ") do
-        i.times do |n|
-          person.addresses.create(
-            :street => "Wienerstr. #{n}",
-            :city => "Berlin",
-            :post_code => "10999"
-          )
-        end
-      end
-
-      bm.report("#count            ") do
-        person.addresses.count
-      end
-
-      bm.report("#delete_all       ") do
-        person.addresses.delete_all
-      end
-
+    bm.report("#clear            ") do
       person.addresses.clear
-      GC.start
+    end
 
-      bm.report("#push             ") do
-        i.times do |n|
-          person.addresses.push(
-            Address.new(
-              :street => "Wienerstr. #{n}",
-              :city => "Berlin",
-              :post_code => "10999"
-            )
-          )
-        end
+    bm.report("#create           ") do
+      i.times do |n|
+        person.addresses.create(
+          :street => "Wienerstr. #{n}",
+          :city => "Berlin",
+          :post_code => "10999"
+        )
       end
+    end
 
-      person.addresses.clear
-      GC.start
+    bm.report("#count            ") do
+      person.addresses.count
+    end
 
-      bm.report("#push (batch)     ") do
-        addresses = []
-        i.times do |n|
-          addresses << Address.new(
-              :street => "Wienerstr. #{n}",
-              :city => "Berlin",
-              :post_code => "10999"
-            )
-        end
-        person.addresses.concat(addresses)
-      end
-
-      bm.report("#each             ") do
-        person.addresses.each do |address|
-          address.street
-        end
-      end
-
-      address = person.addresses.last
-
-      bm.report("#find             ") do
-        person.addresses.find(address.id)
-      end
-
-      bm.report("#delete           ") do
-        person.addresses.delete(address)
-      end
-
+    bm.report("#delete_all       ") do
       person.addresses.delete_all
     end
+
+    person.addresses.clear
+    GC.start
+
+    bm.report("#push             ") do
+      i.times do |n|
+        person.addresses.push(
+          Address.new(
+            :street => "Wienerstr. #{n}",
+            :city => "Berlin",
+            :post_code => "10999"
+          )
+        )
+      end
+    end
+
+    person.addresses.clear
+    GC.start
+
+    bm.report("#push (batch)     ") do
+      addresses = []
+      i.times do |n|
+        addresses << Address.new(
+            :street => "Wienerstr. #{n}",
+            :city => "Berlin",
+            :post_code => "10999"
+          )
+      end
+      person.addresses.concat(addresses)
+    end
+
+    bm.report("#each             ") do
+      person.addresses.each do |address|
+        address.street
+      end
+    end
+
+    address = person.addresses.last
+
+    bm.report("#find             ") do
+      person.addresses.find(address.id)
+    end
+
+    bm.report("#delete           ") do
+      person.addresses.delete(address)
+    end
+
+    person.addresses.delete_all
   end
 
   GC.start
@@ -157,14 +151,11 @@ Benchmark.bm do |bm|
 
   [ 1000 ].each do |i|
 
-    Mongoid.unit_of_work do
+    puts "[ #{i} ]"
 
-      puts "[ #{i} ]"
-
-      bm.report("#relation=        ") do
-        i.times do |n|
-          person.name = Name.new(:given => "Name #{n}")
-        end
+    bm.report("#relation=        ") do
+      i.times do |n|
+        person.name = Name.new(:given => "Name #{n}")
       end
     end
   end
@@ -175,75 +166,72 @@ Benchmark.bm do |bm|
 
   [ 100000 ].each do |i|
 
-    Mongoid.unit_of_work do
+    puts "[ #{i} ]"
 
-      puts "[ #{i} ]"
-
-      bm.report("#build            ") do
-        i.times do |n|
-          person.posts.build(:title => "Posting #{n}")
-        end
+    bm.report("#build            ") do
+      i.times do |n|
+        person.posts.build(:title => "Posting #{n}")
       end
-
-      bm.report("#clear            ") do
-        person.posts.clear
-      end
-
-      bm.report("#create           ") do
-        i.times do |n|
-          person.posts.create(:title => "Posting #{n}")
-        end
-      end
-
-      GC.start
-
-      bm.report("#count            ") do
-        person.posts.count
-      end
-
-      bm.report("#delete_all       ") do
-        person.posts.delete_all
-      end
-
-      Post.delete_all
-      GC.start
-
-      bm.report("#push             ") do
-        i.times do |n|
-          person.posts.push(Post.new(:title => "Posting #{n}"))
-        end
-      end
-
-      person.posts.delete_all
-      GC.start
-
-      bm.report("#push (batch)     ") do
-        posts = []
-        i.times do |n|
-          posts << Post.new(:title => "Posting #{n}")
-        end
-        person.posts.concat(posts)
-      end
-
-      bm.report("#each             ") do
-        person.posts.each do |post|
-          post.title
-        end
-      end
-
-      post = person.posts.last
-
-      bm.report("#find             ") do
-        person.posts.find(post.id)
-      end
-
-      bm.report("#delete           ") do
-        person.posts.delete(post)
-      end
-
-      person.posts.delete_all
-      GC.start
     end
+
+    bm.report("#clear            ") do
+      person.posts.clear
+    end
+
+    bm.report("#create           ") do
+      i.times do |n|
+        person.posts.create(:title => "Posting #{n}")
+      end
+    end
+
+    GC.start
+
+    bm.report("#count            ") do
+      person.posts.count
+    end
+
+    bm.report("#delete_all       ") do
+      person.posts.delete_all
+    end
+
+    Post.delete_all
+    GC.start
+
+    bm.report("#push             ") do
+      i.times do |n|
+        person.posts.push(Post.new(:title => "Posting #{n}"))
+      end
+    end
+
+    person.posts.delete_all
+    GC.start
+
+    bm.report("#push (batch)     ") do
+      posts = []
+      i.times do |n|
+        posts << Post.new(:title => "Posting #{n}")
+      end
+      person.posts.concat(posts)
+    end
+
+    bm.report("#each             ") do
+      person.posts.each do |post|
+        post.title
+      end
+    end
+
+    post = person.posts.last
+
+    bm.report("#find             ") do
+      person.posts.find(post.id)
+    end
+
+    bm.report("#delete           ") do
+      person.posts.delete(post)
+    end
+
+    person.posts.delete_all
+    GC.start
   end
 
   Post.delete_all
@@ -252,14 +240,11 @@ Benchmark.bm do |bm|
 
   [ 100000 ].each do |i|
 
-    Mongoid.unit_of_work do
+    puts "[ #{i} ]"
 
-      puts "[ #{i} ]"
-
-      bm.report("#relation=        ") do
-        i.times do |n|
-          person.game = Game.new(:name => "Final Fantasy #{n}")
-        end
+    bm.report("#relation=        ") do
+      i.times do |n|
+        person.game = Game.new(:name => "Final Fantasy #{n}")
       end
     end
   end
@@ -271,72 +256,69 @@ Benchmark.bm do |bm|
 
   [ 10000 ].each do |i|
 
-    Mongoid.unit_of_work do
+    puts "[ #{i} ]"
 
-      puts "[ #{i} ]"
+    GC.disable
 
-      GC.disable
-
-      bm.report("#build            ") do
-        i.times do |n|
-          person.preferences.build(:name => "Preference #{n}")
-        end
+    bm.report("#build            ") do
+      i.times do |n|
+        person.preferences.build(:name => "Preference #{n}")
       end
-
-      GC.enable
-      GC.start
-
-      bm.report("#clear            ") do
-        person.preferences.clear
-      end
-
-      bm.report("#count            ") do
-        person.preferences.count
-      end
-
-      bm.report("#delete_all       ") do
-        person.preferences.delete_all
-      end
-
-      person.preferences.delete_all
-      GC.start
-
-      bm.report("#push             ") do
-        i.times do |n|
-          person.preferences.push(Preference.new(:name => "Preference #{n}"))
-        end
-      end
-
-      person.preferences.delete_all
-      GC.start
-
-      bm.report("#push (batch)     ") do
-        preferences = []
-        i.times do |n|
-          preferences << Preference.new(:name => "Preference #{n}")
-        end
-        person.preferences.concat(preferences)
-      end
-
-      bm.report("#each             ") do
-        person.preferences.each do |preference|
-          preference.name
-        end
-      end
-
-      preference = person.preferences.last
-
-      bm.report("#find             ") do
-        person.preferences.find(preference.id)
-      end
-
-      bm.report("#delete           ") do
-        person.preferences.delete(preference)
-      end
-
-      person.preferences.delete_all
-      GC.start
     end
+
+    GC.enable
+    GC.start
+
+    bm.report("#clear            ") do
+      person.preferences.clear
+    end
+
+    bm.report("#count            ") do
+      person.preferences.count
+    end
+
+    bm.report("#delete_all       ") do
+      person.preferences.delete_all
+    end
+
+    person.preferences.delete_all
+    GC.start
+
+    bm.report("#push             ") do
+      i.times do |n|
+        person.preferences.push(Preference.new(:name => "Preference #{n}"))
+      end
+    end
+
+    person.preferences.delete_all
+    GC.start
+
+    bm.report("#push (batch)     ") do
+      preferences = []
+      i.times do |n|
+        preferences << Preference.new(:name => "Preference #{n}")
+      end
+      person.preferences.concat(preferences)
+    end
+
+    bm.report("#each             ") do
+      person.preferences.each do |preference|
+        preference.name
+      end
+    end
+
+    preference = person.preferences.last
+
+    bm.report("#find             ") do
+      person.preferences.find(preference.id)
+    end
+
+    bm.report("#delete           ") do
+      person.preferences.delete(preference)
+    end
+
+    person.preferences.delete_all
+    GC.start
   end
 
   Person.delete_all
