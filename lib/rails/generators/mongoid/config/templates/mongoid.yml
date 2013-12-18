@@ -53,10 +53,6 @@ development:
     # existing method. (default: false)
     # scope_overwrite_exception: false
 
-    # Skip the database version check, used when connecting to a db without
-    # admin access. (default: false)
-    # skip_version_check: false
-
     # Use Active Support's time zone in conversions. (default: true)
     # use_activesupport_time_zone: true
 

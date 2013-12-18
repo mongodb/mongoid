@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* `skip_version_check` config option was removed.
+
 * IdentityMap removed. (Arthur Neves)
 
 * Eager load rework. Eager load now doesnt need the identity map to load
