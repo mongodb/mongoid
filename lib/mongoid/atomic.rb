@@ -376,7 +376,8 @@ module Mongoid
       return {} unless atomic_updates.has_key?("$set")
       touches = {}
       updates["$set"].each_pair do |key, value|
-        touches.merge!({ key => value }) if key =~ /updated_at|#{field}/
+        updated_at_field = aliased_fields['updated_at'] || 'updated_at'
+        touches.merge!({ key => value }) if key =~ /(^|\.)(#{updated_at_field}|#{field})$/
       end
       { "$set" => touches }
     end
