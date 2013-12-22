@@ -23,7 +23,7 @@ module Mongoid
       #   person.set_updated_at
       def set_updated_at
         if able_to_set_updated_at?
-          self.updated_at = Time.now.utc unless updated_at_changed?
+          touch_without_saving unless updated_at_changed?
         end
 
         self.class.clear_timeless_option

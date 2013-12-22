@@ -133,9 +133,30 @@ module Mongoid
         child.process_flagged_destroys
         generate_atomic_updates(mods, child)
       end
+      atomic_root_timestamp_updates(mods)
+
       mods
     end
     alias :_updates :atomic_updates
+
+    # Get the atomic updates related to the `updated_at` (or equivalent) field
+    # for all documents up to the root node. This ensures that when an embedded
+    # document is changed, the documents containing it get their timestamps
+    # updated.
+    #
+    # @return [ Hash ] The updates and their modifiers.
+    #
+    # @since 4.0.0
+    def atomic_root_timestamp_updates(mods)
+      return mods unless _parent
+      if updates = _root.touch_atomic_updates['$set']
+        updates.each do |key, value|
+          next if mods['$set'] && mods['$set'].key?(key)
+          mods.set({ key => value })
+        end
+      end
+      mods
+    end
 
     # Get the removal modifier for the document. Will be nil on root
     # documents, $unset on embeds_one, $set on embeds_many.
@@ -357,6 +378,8 @@ module Mongoid
       mods.add_to_set(doc.atomic_array_add_to_sets)
       mods.pull_all(doc.atomic_array_pulls)
     end
+
+    protected
 
     # Get the atomic updates for a touch operation. Should only include the
     # updated_at field and the optional extra field.

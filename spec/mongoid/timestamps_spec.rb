@@ -83,13 +83,13 @@ describe Mongoid::Timestamps do
   end
 
   context "when only embedded documents have changed" do
-
     let!(:document) do
       Dokument.create(updated_at: 2.days.ago)
     end
 
     let!(:address) do
-      document.addresses.create(street: "Karl Marx Strasse")
+      TimestampedAddress.create street: "Karl Marx Strasse",
+                                addressable: document
     end
 
     let!(:updated_at) do
@@ -98,11 +98,152 @@ describe Mongoid::Timestamps do
 
     before do
       address.number = 1
-      document.save
     end
 
-    it "updates the root document updated at" do
-      expect(document.updated_at).to be_within(1).of(Time.now)
+    context "and the root document is saved" do
+      before do
+        document.save
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+    end
+
+    context "and the embedded document is saved" do
+      before do
+        address.save
+        document.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+    end
+
+    context "and the embedded document is destroyed" do
+      before do
+        address.destroy
+        document.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+    end
+
+    context "and the embedded document is touched" do
+      before do
+        address.touch
+        document.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+    end
+  end
+
+  context "when only embedded documents of embedded documents have changed" do
+    let!(:document) do
+      Dokument.create(updated_at: 2.days.ago)
+    end
+
+    let!(:address) do
+      TimestampedAddress.create street: "Karl Marx Strasse",
+                                updated_at: 2.days.ago,
+                                addressable: document
+    end
+
+    let!(:location) do
+      address.locations.create!(name: 'value')
+    end
+
+    let!(:updated_at) do
+      document.updated_at
+    end
+
+    before do
+      location.name = 'another'
+    end
+
+    context "and the bottom-most document is saved" do
+      before do
+        location.save
+        document.reload
+        address.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+
+      it "updates the mid-level document updated at" do
+        expect(address.updated_at).to be_within(1).of(Time.now)
+      end
+    end
+
+    context "and the bottom-most document is destroyed" do
+      before do
+        location.destroy
+        document.reload
+        address.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+
+      it "updates the mid-level document updated at" do
+        expect(address.updated_at).to be_within(1).of(Time.now)
+      end
+    end
+
+    context "and the bottom-most document is touched" do
+      before do
+        location.touch
+        document.reload
+        address.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+
+      it "updates the mid-level document updated at" do
+        expect(address.updated_at).to be_within(1).of(Time.now)
+      end
+    end
+
+    context "and the root document is saved" do
+      before do
+        document.save
+        document.reload
+        address.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+
+      it "does not update the mid-level document updated at" do
+        expect(address.updated_at).not_to be_within(1).of(Time.now)
+      end
+    end
+
+    context "and the mid-level document is saved" do
+      before do
+        address.save
+        document.reload
+      end
+
+      it "updates the root document updated at" do
+        expect(document.updated_at).to be_within(1).of(Time.now)
+      end
+
+      it "updates the mid-level document updated at" do
+        expect(address.updated_at).to be_within(1).of(Time.now)
+      end
     end
   end
 end

@@ -22,6 +22,7 @@ module Mongoid
       # @since 1.0.0
       def update_document(options = {})
         prepare_update(options) do
+          touch_without_saving if changed?
           updates, conflicts = init_atomic_updates
           unless updates.empty?
             coll = _root.collection
