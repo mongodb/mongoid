@@ -232,7 +232,7 @@ module Mongoid
     #
     # @since 3.0.15
     def hash_dot_syntax?(string)
-      string =~ /\./
+      string.include?(".")
     end
 
     # Return the typecasted value for a field.
