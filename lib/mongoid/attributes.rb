@@ -308,7 +308,7 @@ module Mongoid
     #
     # @since 3.0.15
     def hash_dot_syntax?(string)
-      string =~ /\./
+      string.include?(".")
     end
 
     # Used for allowing accessor methods for dynamic attributes.
