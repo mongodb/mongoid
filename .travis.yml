@@ -3,13 +3,12 @@ bundler_args: --without development
 rvm:
   - 1.9.3
   - 2.0.0
-  - ruby-head
+  - 2.1.0
   - jruby
   - jruby-head
 env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -J-Xms512m -J-Xmx1024m"
 matrix:
   allow_failures:
-    - rvm: ruby-head
     - rvm: jruby-head
 notifications:
   email: false
