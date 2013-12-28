@@ -4,7 +4,7 @@ gemspec
 gem "rake"
 
 group :test do
-  gem "rspec", "~> 2.99.0.beta1"
+  gem "rspec", "~> 3.0.0.beta1"
 
   if ENV["CI"]
     gem "coveralls", require: false
