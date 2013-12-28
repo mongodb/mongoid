@@ -1044,7 +1044,7 @@ describe Mongoid::Attributes do
       end
 
       it "can set a Hash value" do
-        person.map.should eq( { somekey: "somevalue" } )
+        expect(person.map).to eq( { somekey: "somevalue" } )
       end
     end
 
@@ -1052,7 +1052,7 @@ describe Mongoid::Attributes do
       let(:person) { Person.new aliases: [ :alias_1 ] }
 
       it "can set an Array Value" do
-        person.aliases.should eq [ :alias_1 ]
+        expect(person.aliases).to eq([ :alias_1 ])
       end
 
       it "raises an error when try to set an invalid value" do
