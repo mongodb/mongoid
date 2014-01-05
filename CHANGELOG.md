@@ -257,6 +257,12 @@ For instructions on upgrading to newer versions, visit
       ..
     end
 
+* \#3478 Criteria objects now have a #none method that will cause the criteria to
+  never hit the database and always have zero documents.
+
+    Band.none
+    Band.none.where(name: "Tool") # Always has zero documents.
+
 * \#3319 Counters can now be reset from a document instance:
 
     document.reset_counters(:relation)
