@@ -297,6 +297,31 @@ module Mongoid
       self
     end
 
+    # Returns a criteria that will always contain zero results and never hits
+    # the database.
+    #
+    # @example Return a none criteria.
+    #   criteria.none
+    #
+    # @return [ Criteria ] The none criteria.
+    #
+    # @since 4.0.0
+    def none
+      @none = true and self
+    end
+
+    # Is the criteria a none criteria?
+    #
+    # @example Is the criteria a none criteria?
+    #   criteria.none?
+    #
+    # @return [ true, false ] If the criteria is a none.
+    #
+    # @since 4.0.0
+    def none?
+      !!@none
+    end
+
     # Overriden to include _type in the fields.
     #
     # @example Limit the fields returned from the database.

@@ -31,6 +31,7 @@ module Mongoid
       :map_reduce,
       :max,
       :min,
+      :none,
       :pluck,
       :sum,
       :text_search,

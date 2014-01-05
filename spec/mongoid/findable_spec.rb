@@ -286,6 +286,71 @@ describe Mongoid::Findable do
     end
   end
 
+  describe ".none" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode", likes: 3)
+    end
+
+    context "when not chaining any criteria" do
+
+      it "returns no records" do
+        expect(Band.none).to be_empty
+      end
+
+      it "has an empty count" do
+        expect(Band.none.count).to eq(0)
+      end
+
+      it "returns nil for first" do
+        expect(Band.none.first).to be_nil
+      end
+
+      it "returns nil for last" do
+        expect(Band.none.last).to be_nil
+      end
+
+      it "returns zero for length" do
+        expect(Band.none.length).to eq(0)
+      end
+
+      it "returns zero for size" do
+        expect(Band.none.size).to eq(0)
+      end
+    end
+
+    context "when chaining criteria after the none" do
+
+      let(:criteria) do
+        Band.none.where(name: "Depeche Mode")
+      end
+
+      it "returns no records" do
+        expect(criteria).to be_empty
+      end
+
+      it "has an empty count" do
+        expect(criteria.count).to eq(0)
+      end
+
+      it "returns nil for first" do
+        expect(criteria.first).to be_nil
+      end
+
+      it "returns nil for last" do
+        expect(criteria.last).to be_nil
+      end
+
+      it "returns zero for length" do
+        expect(criteria.length).to eq(0)
+      end
+
+      it "returns zero for size" do
+        expect(criteria.size).to eq(0)
+      end
+    end
+  end
+
   describe ".pluck" do
 
     let!(:depeche) do
