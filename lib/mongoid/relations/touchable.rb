@@ -54,8 +54,7 @@ module Mongoid
           if metadata.touchable?
             name = metadata.name
             method_name = define_relation_touch_method(name)
-            after_create method_name
-            after_update method_name
+            after_save method_name
             after_destroy method_name
             after_touch method_name
           end
