@@ -252,10 +252,12 @@ module Mongoid
       unless respond_to?(name)
         chain = ActiveSupport::Callbacks::CallbackChain.new(name, {})
         send("_#{kind}_callbacks").each do |callback|
-          chain.push(callback) if callback.kind == place
+          chain.append(callback) if callback.kind == place
         end
         class_eval <<-EOM
-          def #{name}() #{chain.compile} end
+          def #{name}()
+            #{chain.compile}
+          end
           protected :#{name}
         EOM
       end

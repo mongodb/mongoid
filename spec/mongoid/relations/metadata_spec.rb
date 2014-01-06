@@ -390,7 +390,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns root namespace" do
-            expect(mod).to be_empty
+            expect(mod).to be_nil
           end
         end
 
