@@ -3,6 +3,12 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 3.1.7
+
+### Resolved Issues
+
+* \#3414 Backkport skip and limit options on aggregation. (Wojciech Piekutowski)
+
 ## 3.1.6
 
 ### Resolved Issues
