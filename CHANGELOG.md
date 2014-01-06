@@ -299,6 +299,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3449 Touch needs to work for create and update. (Greggory Rothmeier)
+
 * \#3397 Fixed $ne matcher for embedded documents to match server behaviour.
 
 * \#3348 Fixing compounded indexes having the same keys with
