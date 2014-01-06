@@ -331,6 +331,12 @@ For instructions on upgrading to newer versions, visit
 
 * \#2903 Removed unused string `to_a` extension.
 
+## 3.1.7
+
+### Resolved Issues
+
+* \#3414 Backkport skip and limit options on aggregation. (Wojciech Piekutowski)
+
 ## 3.1.6
 
 ### Resolved Issues
