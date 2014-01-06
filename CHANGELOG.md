@@ -301,6 +301,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3449 Touch needs to work for create and update. (Greggory Rothmeier)
 
+* \#3432 Fixed mongoization of DateTime losing precision.
+
 * \#3397 Fixed $ne matcher for embedded documents to match server behaviour.
 
 * \#3348 Fixing compounded indexes having the same keys with
