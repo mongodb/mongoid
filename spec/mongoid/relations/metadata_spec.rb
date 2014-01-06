@@ -1812,19 +1812,38 @@ describe Mongoid::Relations::Metadata do
 
     context "when multiple matches" do
 
-      before do
-        class_name.constantize.has_many(:evil_drugs, class_name: "Drug")
+      context "when the inverse_of is not nil" do
+
+        before do
+          class_name.constantize.has_many(:evil_drugs, class_name: "Drug")
+        end
+
+        after do
+          class_name.constantize.relations.delete("evil_drugs")
+          Person.reset_callbacks(:validate)
+        end
+
+        it "raises AmbiguousRelationship" do
+          expect {
+            inverse_relation
+          }.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+        end
       end
 
-      after do
-        class_name.constantize.relations.delete("evil_drugs")
-        Person.reset_callbacks(:validate)
-      end
+      context "when the inverse_of is nil" do
 
-      it "raises AmbiguousRelationship" do
-        expect {
-          inverse_relation
-        }.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+        before do
+          class_name.constantize.has_many(:evil_drugs, class_name: "Drug", inverse_of: nil)
+        end
+
+        after do
+          class_name.constantize.relations.delete("evil_drugs")
+          Person.reset_callbacks(:validate)
+        end
+
+        it "returns the non-nil inverses" do
+          expect(inverse_relation).to eq(:drugs)
+        end
       end
     end
   end

@@ -335,6 +335,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3465 Fixed ambigous relation errors where inverse_of is set to nil.
+
 * \#3414 Backkport skip and limit options on aggregation. (Wojciech Piekutowski)
 
 ## 3.1.6
