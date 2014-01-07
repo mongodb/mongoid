@@ -3,6 +3,7 @@ require "spec_helper"
 describe Mongoid::QueryCache do
 
   around do |spec|
+    Mongoid::QueryCache.clear_cache
     Mongoid::QueryCache.cache { spec.run }
   end
 
