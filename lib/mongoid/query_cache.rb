@@ -1,15 +1,46 @@
 module Mongoid
   module QueryCache
+    class << self
 
-    def self.cache_table
-      Thread.current['[mongoid]:query_cache'] ||= Hash.new
+      def cache_table
+        Thread.current['[mongoid]:query_cache'] ||= Hash.new
+      end
+
+      def clear_cache
+        Thread.current['[mongoid]:query_cache'] = nil
+      end
+
+      def enabled=(value)
+        Thread.current['[mongoid]:query_cache:enabled'] = value
+      end
+
+      def enabled?
+        !!Thread.current['[mongoid]:query_cache:enabled']
+      end
+
+      def cache
+        enabled = QueryCache.enabled?
+        QueryCache.enabled = true
+        yield
+      ensure
+        QueryCache.enabled = enabled
+      end
     end
 
-    def self.clear_cache
-      Thread.current['[mongoid]:query_cache'] = nil
+    class Middleware
+
+      def initialize(app)
+        @app = app
+      end
+
+      def call(env)
+        QueryCache.cache { @app.call(env) }
+      ensure
+        QueryCache.clear_cache
+      end
     end
 
-    module Base
+    module Base # :nodoc:
 
       def alias_query_cache_clear(*method_names)
         method_names.each do |method_name|
@@ -25,7 +56,7 @@ module Mongoid
       end
     end
 
-    module Query
+    module Query # :nodoc:
       def self.included(base)
         base.extend QueryCache::Base
         base.alias_method_chain(:cursor, :cache)
@@ -37,14 +68,14 @@ module Mongoid
       end
     end
 
-    module Collection
+    module Collection # :nodoc:
       def self.included(base)
         base.extend QueryCache::Base
         base.alias_query_cache_clear(:insert)
       end
     end
 
-    class CachedCursor < Moped::Cursor
+    class CachedCursor < Moped::Cursor # :nodoc:
 
       def load_docs
         with_cache { super }
@@ -52,6 +83,7 @@ module Mongoid
 
       private
       def with_cache
+        return yield unless QueryCache.enabled?
         return yield if @collection =~ /^system./
         key = [@database, @collection, @selector]
         QueryCache.cache_table[key] ||= yield
