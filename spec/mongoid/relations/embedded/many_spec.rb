@@ -1216,7 +1216,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       before do
-        person.addresses.should_not_receive(:batch_insert)
+        expect(person.addresses).to_not receive(:batch_insert)
         person.addresses.concat([])
       end
 
