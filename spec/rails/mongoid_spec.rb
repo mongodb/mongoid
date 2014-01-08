@@ -354,7 +354,7 @@ describe "Rails::Mongoid" do
 
       it "does not load any models" do
         Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        Rails::Mongoid.should_receive(:load_model).never
+        expect(Rails::Mongoid).to receive(:load_model).never
         Rails::Mongoid.preload_models(app)
       end
     end
@@ -379,8 +379,8 @@ describe "Rails::Mongoid" do
         end
 
         it "requires the models by basename" do
-          Rails::Mongoid.should_receive(:load_model).with("address")
-          Rails::Mongoid.should_receive(:load_model).with("user")
+          expect(Rails::Mongoid).to receive(:load_model).with("address")
+          expect(Rails::Mongoid).to receive(:load_model).with("user")
           Rails::Mongoid.preload_models(app)
         end
       end
@@ -396,7 +396,7 @@ describe "Rails::Mongoid" do
         end
 
         it "requires the models by subdirectory and basename" do
-          Rails::Mongoid.should_receive(:load_model).with("mongoid/behaviour")
+          expect(Rails::Mongoid).to receive(:load_model).with("mongoid/behaviour")
           Rails::Mongoid.preload_models(app)
         end
       end
@@ -432,8 +432,8 @@ describe "Rails::Mongoid" do
 
       it "loads all models" do
         Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        Rails::Mongoid.should_receive(:load_model).with("address")
-        Rails::Mongoid.should_receive(:load_model).with("user")
+        expect(Rails::Mongoid).to receive(:load_model).with("address")
+        expect(Rails::Mongoid).to receive(:load_model).with("user")
         Rails::Mongoid.load_models(app)
       end
     end
@@ -453,8 +453,8 @@ describe "Rails::Mongoid" do
 
       it "loads selected models only" do
         Dir.stub(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
-        Rails::Mongoid.should_receive(:load_model).with("user")
-        Rails::Mongoid.should_receive(:load_model).with("address").never
+        expect(Rails::Mongoid).to receive(:load_model).with("user")
+        expect(Rails::Mongoid).to receive(:load_model).with("address").never
         Rails::Mongoid.load_models(app)
       end
     end
