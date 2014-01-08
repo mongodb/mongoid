@@ -57,7 +57,7 @@ describe Mongoid::Relations::Referenced::One do
         end
 
         before do
-          metadata.should_receive(:criteria).never
+          expect(metadata).to receive(:criteria).never
           person.game = game
         end
 

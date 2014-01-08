@@ -82,7 +82,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       before do
-        metadata.should_receive(:inverse).and_return(:wheels)
+        expect(metadata).to receive(:inverse).and_return(:wheels)
       end
 
       it "returns inverse name + _count" do
@@ -319,7 +319,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     it "concatenates the result from #find_module and name.classify" do
-      metadata.should_receive(:find_module).once.and_return("Fruit")
+      expect(metadata).to receive(:find_module).once.and_return("Fruit")
       expect(classified).to eq("Fruit::Name")
     end
   end

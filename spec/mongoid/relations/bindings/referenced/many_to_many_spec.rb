@@ -85,7 +85,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       before do
         binding.bind_one(target.first)
         expect(person).to receive(:delete).never
-        preference.should_receive(:delete).never
+        expect(preference).to receive(:delete).never
         binding.unbind_one(target.first)
       end
 
@@ -115,8 +115,8 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       it "never performs a persistance operation" do
         expect(person).to receive(:delete).never
         expect(person).to receive(:save).never
-        preference.should_receive(:delete).never
-        preference.should_receive(:save).never
+        expect(preference).to receive(:delete).never
+        expect(preference).to receive(:save).never
         binding.unbind_one(target.first)
       end
     end

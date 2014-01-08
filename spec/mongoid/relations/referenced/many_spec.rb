@@ -3286,7 +3286,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when execution raises errors" do
 
       before do
-        artist.should_receive(:before_add_album).and_raise
+        expect(artist).to receive(:before_add_album).and_raise
       end
 
       it "does not add the document to the relation" do
@@ -3316,7 +3316,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when execution raises errors" do
 
       before do
-        artist.should_receive(:after_add_album).and_raise
+        expect(artist).to receive(:after_add_album).and_raise
       end
 
       it "adds the document to the relation" do
@@ -3377,7 +3377,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when execution raises errors" do
 
         before do
-          artist.should_receive(:before_remove_album).and_raise
+          expect(artist).to receive(:before_remove_album).and_raise
         end
 
         describe "#delete" do
@@ -3452,7 +3452,7 @@ describe Mongoid::Relations::Referenced::Many do
     context "when errors are raised" do
 
       before do
-        artist.should_receive(:after_remove_album).and_raise
+        expect(artist).to receive(:after_remove_album).and_raise
       end
 
       describe "#delete" do

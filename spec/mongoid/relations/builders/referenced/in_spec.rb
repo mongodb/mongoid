@@ -42,7 +42,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         before do
-          criteria.should_receive(:first).and_return(person)
+          expect(criteria).to receive(:first).and_return(person)
         end
 
         let!(:document) do
@@ -83,7 +83,7 @@ describe Mongoid::Relations::Builders::Referenced::In do
         end
 
         before do
-          criteria.should_receive(:first).and_return(person)
+          expect(criteria).to receive(:first).and_return(person)
         end
 
         let!(:document) do

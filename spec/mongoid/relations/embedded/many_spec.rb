@@ -3547,7 +3547,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "with errors" do
 
       before do
-        artist.should_receive(:before_add_song).and_raise
+        expect(artist).to receive(:before_add_song).and_raise
       end
 
       it "does not add the document to the relation" do
@@ -3577,7 +3577,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when errors are raised" do
 
       before do
-        artist.should_receive(:after_add_label).and_raise
+        expect(artist).to receive(:after_add_label).and_raise
       end
 
       it "adds the document to the relation" do
@@ -3638,7 +3638,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when errors are raised" do
 
         before do
-          artist.should_receive(:before_remove_song).and_raise
+          expect(artist).to receive(:before_remove_song).and_raise
         end
 
         describe "#delete" do
@@ -3706,7 +3706,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when errors are raised" do
 
       before do
-        artist.should_receive(:after_remove_label).and_raise
+        expect(artist).to receive(:after_remove_label).and_raise
       end
 
       describe "#delete" do

@@ -45,7 +45,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "does not persist the child document" do
-            preference.should_receive(:save).never
+            expect(preference).to receive(:save).never
             article.preferences.send(method, preference)
           end
         end
