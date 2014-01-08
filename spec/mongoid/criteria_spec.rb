@@ -2213,15 +2213,29 @@ describe Mongoid::Criteria do
       Band.create(name: "Tool", likes: 100)
     end
 
-    let(:map_reduce) do
-      Band.limit(2).map_reduce(map, reduce).out(inline: 1)
+    context "when no timeout options are provided" do
+
+      let(:map_reduce) do
+        Band.limit(2).map_reduce(map, reduce).out(inline: 1)
+      end
+
+      it "returns the map/reduce results" do
+        expect(map_reduce).to eq([
+          { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
+          { "_id" => "Tool", "value" => { "likes" => 100 }}
+        ])
+      end
     end
 
-    it "returns the map/reduce results" do
-      expect(map_reduce).to eq([
-        { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
-        { "_id" => "Tool", "value" => { "likes" => 100 }}
-      ])
+    context "when timeout options are provided" do
+
+      let(:map_reduce) do
+        Band.limit(2).no_timeout.map_reduce(map, reduce).out(replace: "test_bands")
+      end
+
+      it "sets the timeout option on the query" do
+        expect(map_reduce.send(:documents).operation.flags).to eq([ :no_cursor_timeout ])
+      end
     end
   end
 

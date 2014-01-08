@@ -257,6 +257,9 @@ For instructions on upgrading to newer versions, visit
       ..
     end
 
+* \#3479 Map/reduce now respects criteria no timeout options if output is not
+  inline.
+
 * \#3478 Criteria objects now have a #none method that will cause the criteria to
   never hit the database and always have zero documents.
 
