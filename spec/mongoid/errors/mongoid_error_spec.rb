@@ -8,7 +8,7 @@ describe Mongoid::Errors::MongoidError do
 
   before do
     ["message", "summary", "resolution"].each do |name|
-      ::I18n.should_receive(:translate).
+      expect(::I18n).to receive(:translate).
         with("mongoid.errors.messages.#{key}.#{name}", {}).
       and_return(name)
     end
