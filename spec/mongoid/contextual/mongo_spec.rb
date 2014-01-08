@@ -107,7 +107,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       before do
-        context.query.should_receive(:count).once.and_return(1)
+        expect(context.query).to receive(:count).once.and_return(1)
       end
 
       it "returns the count cached value after first call" do
@@ -438,7 +438,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "does not make any additional database queries" do
-        game_metadata.should_receive(:eager_load).never
+        expect(game_metadata).to receive(:eager_load).never
         context.send(:eager_load, [])
       end
     end
@@ -497,8 +497,8 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "hits the database again" do
-          context.should_receive(:query).once.and_call_original
-          context.should be_exists
+          expect(context).to receive(:query).once.and_call_original
+          expect(context).to be_exists
         end
       end
     end
@@ -520,7 +520,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "does not hit the database" do
-          context.should_receive(:query).never
+          expect(context).to receive(:query).never
           expect(context).to be_exists
         end
       end
@@ -534,7 +534,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "does not hit the database" do
-            context.should_receive(:query).never
+            expect(context).to receive(:query).never
             expect(context).to be_exists
           end
         end
@@ -807,7 +807,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first document without touching the database" do
-            context.should_receive(:query).never
+            expect(context).to receive(:query).never
             expect(context.send(method)).to eq(depeche_mode)
           end
         end
@@ -819,8 +819,8 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first document without touching the database" do
-            context.should_receive(:query).never
-            context.send(method).should eq(depeche_mode)
+            expect(context).to receive(:query).never
+            expect(context.send(method)).to eq(depeche_mode)
           end
         end
       end
@@ -957,7 +957,7 @@ describe Mongoid::Contextual::Mongo do
         context "when calling more than once" do
 
           before do
-            context.query.should_receive(:count).once.and_return(2)
+            expect(context.query).to receive(:count).once.and_return(2)
           end
 
           it "returns the cached value for subsequent calls" do
@@ -969,7 +969,7 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             context.entries
-            context.query.should_receive(:count).once.and_return(2)
+            expect(context.query).to receive(:count).once.and_return(2)
           end
 
           it "returns the cached value for all calls" do
@@ -1006,7 +1006,7 @@ describe Mongoid::Contextual::Mongo do
         context "when calling more than once" do
 
           before do
-            context.query.should_receive(:count).once.and_return(1)
+            expect(context.query).to receive(:count).once.and_return(1)
           end
 
           it "returns the cached value for subsequent calls" do
@@ -1018,7 +1018,7 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             context.entries
-            context.query.should_receive(:count).once.and_return(1)
+            expect(context.query).to receive(:count).once.and_return(1)
           end
 
           it "returns the cached value for all calls" do
@@ -1081,7 +1081,7 @@ describe Mongoid::Contextual::Mongo do
     context "when passed the symbol field name" do
 
       it "limits query to that field" do
-        criteria.should_receive(:only).with(:name).and_call_original
+        expect(criteria).to receive(:only).with(:name).and_call_original
         context.map(:name)
       end
 
