@@ -60,7 +60,7 @@ describe Mongoid::Relations::Cascading::Restrict do
       end
 
       it "doesn't delete anything" do
-        drug.should_receive(:delete).never
+        expect(drug).to receive(:delete).never
         strategy.cascade
       end
     end

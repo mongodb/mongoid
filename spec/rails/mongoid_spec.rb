@@ -30,7 +30,7 @@ describe "Rails::Mongoid" do
     context "with ordinary Rails models" do
 
       it "creates the indexes for the models" do
-        klass.should_receive(:create_indexes).once
+        expect(klass).to receive(:create_indexes).once
         indexes
       end
     end
@@ -42,7 +42,7 @@ describe "Rails::Mongoid" do
       end
 
       it "does nothing" do
-        klass.should_receive(:create_indexes).never
+        expect(klass).to receive(:create_indexes).never
         indexes
       end
     end
@@ -50,7 +50,7 @@ describe "Rails::Mongoid" do
     context "when an exception is raised" do
 
       it "is not swallowed" do
-        klass.should_receive(:create_indexes).and_raise(ArgumentError)
+        expect(klass).to receive(:create_indexes).and_raise(ArgumentError)
         expect { indexes }.to raise_error(ArgumentError)
       end
     end
@@ -66,7 +66,7 @@ describe "Rails::Mongoid" do
       end
 
       it "does nothing, but logging" do
-        klass.should_receive(:create_indexes).never
+        expect(klass).to receive(:create_indexes).never
         indexes
       end
     end
@@ -228,7 +228,7 @@ describe "Rails::Mongoid" do
       end
 
       before do
-        logger.should_receive(:info)
+        expect(logger).to receive(:info)
       end
 
       it "returns nil" do
@@ -256,7 +256,7 @@ describe "Rails::Mongoid" do
         end
 
         it "logs the class without an error" do
-          logger.should_receive(:info)
+          expect(logger).to receive(:info)
           expect {
             expect(model).to be_nil
           }.not_to raise_error
@@ -273,7 +273,7 @@ describe "Rails::Mongoid" do
         end
 
         it "returns klass" do
-          logger.should_receive(:info)
+          expect(logger).to receive(:info)
           expect(model).to eq(klass)
         end
       end

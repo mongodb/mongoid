@@ -25,7 +25,7 @@ describe Mongoid::Relations::Cascading::Nullify do
     end
 
     it "nullifies the relation" do
-      relation.should_receive(:nullify)
+      expect(relation).to receive(:nullify)
       strategy.cascade
     end
   end

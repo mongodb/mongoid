@@ -46,7 +46,7 @@ describe Mongoid::Relations::Bindings::Referenced::Many do
     context "when the document is not bindable" do
 
       it "does nothing" do
-        person.posts.should_receive(:<<).never
+        expect(person.posts).to receive(:<<).never
         binding.bind_one(post)
       end
     end

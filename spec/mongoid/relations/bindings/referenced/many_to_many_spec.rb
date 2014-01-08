@@ -68,7 +68,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     context "when the document is not bindable" do
 
       it "does nothing" do
-        person.preferences.should_receive(:<<).never
+        expect(person.preferences).to receive(:<<).never
         binding.bind_one(preference)
       end
     end
