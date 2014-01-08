@@ -757,8 +757,8 @@ describe Mongoid::Changeable do
         end
 
         it "returns true" do
-          person.changes.should_not be_empty
-          person.should be_changed
+          expect(person.changes).to_not be_empty
+          expect(person).to be_changed
         end
       end
     end
