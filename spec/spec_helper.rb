@@ -89,6 +89,7 @@ end
 
 RSpec.configure do |config|
   config.include Mongoid::SpecHelpers
+  config.raise_errors_for_deprecations!
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
