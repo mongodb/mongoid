@@ -61,7 +61,7 @@ describe Mongoid::Fields do
       end
 
       it "should have alias method #\{field}_t" do
-        product.method(:name_t).should eq product.method(:name_translations)
+        expect(product.method(:name_t)).to eq product.method(:name_translations)
       end
     end
 
@@ -72,7 +72,7 @@ describe Mongoid::Fields do
       end
 
       it "does not respond to the alias method" do
-        product.should_not respond_to(:price_t)
+        expect(product).to_not respond_to(:price_t)
       end
     end
   end
@@ -174,7 +174,7 @@ describe Mongoid::Fields do
       end
 
       it "should have alias method #\{field}_t=" do
-        product.method(:name_t=).should eq product.method(:name_translations=)
+        expect(product.method(:name_t=)).to eq product.method(:name_translations=)
       end
     end
 
@@ -185,7 +185,7 @@ describe Mongoid::Fields do
       end
 
       it "does not respond to the alias method" do
-        product.should_not respond_to(:price_t=)
+        expect(product).to_not respond_to(:price_t=)
       end
     end
   end
@@ -956,7 +956,7 @@ describe Mongoid::Fields do
       context "when option is nil" do
 
         it "calls the handler" do
-          handler.should_receive(:call)
+          expect(handler).to receive(:call)
           User.field :custom, option: nil, overwrite: true
         end
       end
@@ -964,8 +964,7 @@ describe Mongoid::Fields do
       context "when option is not provided" do
 
         it "does not call the handler" do
-          handler.should_receive(:call).never
-
+          expect(handler).to receive(:call).never
           User.field :custom, overwrite: true
         end
       end
