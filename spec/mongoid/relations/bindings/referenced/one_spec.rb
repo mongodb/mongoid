@@ -23,8 +23,8 @@ describe Mongoid::Relations::Bindings::Referenced::One do
     context "when the document is bindable" do
 
       before do
-        person.should_receive(:save).never
-        game.should_receive(:save).never
+        expect(person).to receive(:save).never
+        expect(game).to receive(:save).never
         binding.bind_one
       end
 
@@ -44,7 +44,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
       end
 
       it "does nothing" do
-        person.should_receive(:game=).never
+        expect(person).to receive(:game=).never
         binding.bind_one
       end
     end
@@ -60,8 +60,8 @@ describe Mongoid::Relations::Bindings::Referenced::One do
 
       before do
         binding.bind_one
-        person.should_receive(:delete).never
-        game.should_receive(:delete).never
+        expect(person).to receive(:delete).never
+        expect(game).to receive(:delete).never
         binding.unbind_one
       end
 
@@ -77,7 +77,7 @@ describe Mongoid::Relations::Bindings::Referenced::One do
     context "when the document is not unbindable" do
 
       it "does nothing" do
-        person.should_receive(:game=).never
+        expect(person).to receive(:game=).never
         binding.unbind_one
       end
     end

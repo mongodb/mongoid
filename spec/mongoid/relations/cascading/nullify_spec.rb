@@ -21,7 +21,7 @@ describe Mongoid::Relations::Cascading::Nullify do
     end
 
     before do
-      person.should_receive(:posts).and_return(relation)
+      expect(person).to receive(:posts).and_return(relation)
     end
 
     it "nullifies the relation" do

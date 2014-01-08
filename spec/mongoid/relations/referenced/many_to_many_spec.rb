@@ -515,7 +515,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           context "when errors are raised" do
 
             before do
-              post.should_receive(:before_add_tag).and_raise
+              expect(post).to receive(:before_add_tag).and_raise
             end
 
             it "does not add the document to the relation" do
@@ -537,7 +537,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           context "when errors are raised" do
 
             before do
-              post.should_receive(:after_add_tag).and_raise
+              expect(post).to receive(:after_add_tag).and_raise
             end
 
             it "adds the document to the relation" do
@@ -1185,7 +1185,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:before_remove_tag).and_raise
+            expect(post).to receive(:before_remove_tag).and_raise
           end
 
           it "does not remove the document from the relation" do
@@ -1217,7 +1217,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:after_remove_tag).and_raise
+            expect(post).to receive(:after_remove_tag).and_raise
           end
 
           it "removes the document from the relation" do
@@ -2119,7 +2119,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:before_remove_tag).and_raise
+            expect(post).to receive(:before_remove_tag).and_raise
           end
 
           it "does not remove the document from the relation" do
@@ -2151,7 +2151,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:after_remove_tag).and_raise
+            expect(post).to receive(:after_remove_tag).and_raise
           end
 
           it "removes the document from the relation" do
