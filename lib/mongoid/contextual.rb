@@ -49,7 +49,7 @@ module Mongoid
     #
     # @since 3.0.0
     def create_context
-      return None.new(self) if none?
+      return None.new(self) if empty_and_chainable?
       embedded ? Memory.new(self) : Mongo.new(self)
     end
   end

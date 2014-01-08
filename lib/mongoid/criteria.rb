@@ -310,15 +310,15 @@ module Mongoid
       @none = true and self
     end
 
-    # Is the criteria a none criteria?
+    # Is the criteria an empty but chainable criteria?
     #
     # @example Is the criteria a none criteria?
-    #   criteria.none?
+    #   criteria.empty_and_chainable?
     #
     # @return [ true, false ] If the criteria is a none.
     #
     # @since 4.0.0
-    def none?
+    def empty_and_chainable?
       !!@none
     end
 
