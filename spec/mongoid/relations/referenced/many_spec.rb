@@ -3505,4 +3505,19 @@ describe Mongoid::Relations::Referenced::Many do
       expect(criteria).to eq([ post_two, post_one ])
     end
   end
+
+  context "when accessing a scope named open" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:post) do
+      person.posts.create(title: "open")
+    end
+
+    it "returns the appropriate documents" do
+      expect(person.posts.open).to eq([ post ])
+    end
+  end
 end

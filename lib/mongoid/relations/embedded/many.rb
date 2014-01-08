@@ -401,7 +401,7 @@ module Mongoid
         def method_missing(name, *args, &block)
           return super if target.respond_to?(name)
           klass.send(:with_scope, criteria) do
-            criteria.send(name, *args, &block)
+            criteria.public_send(name, *args, &block)
           end
         end
 

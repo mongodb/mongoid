@@ -308,6 +308,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3397 Fixed $ne matcher for embedded documents to match server behaviour.
 
+* \#3352 Allow named scopes named "open" to work through 1-n relations.
+
 * \#3348 Fixing compounded indexes having the same keys with
   different directions. (Arthur Neves)
 

@@ -410,7 +410,7 @@ module Mongoid
             target.send(name, *args, &block)
           else
             klass.send(:with_scope, criteria) do
-              criteria.send(name, *args, &block)
+              criteria.public_send(name, *args, &block)
             end
           end
         end
