@@ -104,14 +104,14 @@ module Mongoid
         send(name, *args) if name && respond_to?(name)
       end
 
-      # Get the value for an instance variable or nil if it doesn't exist.
+      # Get the value for an instance variable or false if it doesn't exist.
       #
       # @example Get the value for an instance var.
       #   document.ivar("person")
       #
       # @param [ String ] name The name of the variable.
       #
-      # @return [ Object, nil ] The value or nil.
+      # @return [ Object, false ] The value or false.
       #
       # @since 2.0.0.rc.1
       def ivar(name)
