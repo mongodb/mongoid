@@ -216,7 +216,7 @@ describe Mongoid::Interceptable do
     context "callback returns true" do
 
       before do
-        artist.should_receive(:before_create_stub).once.and_return(true)
+        expect(artist).to receive(:before_create_stub).once.and_return(true)
         artist.save
       end
 
@@ -228,7 +228,7 @@ describe Mongoid::Interceptable do
     context "callback returns false" do
 
       before do
-        artist.should_receive(:before_create_stub).once.and_return(false)
+        expect(artist).to receive(:before_create_stub).once.and_return(false)
         artist.save
       end
 
@@ -253,7 +253,7 @@ describe Mongoid::Interceptable do
       context "when the callback returns true" do
 
         before do
-          artist.should_receive(:before_save_stub).once.and_return(true)
+          expect(artist).to receive(:before_save_stub).once.and_return(true)
         end
 
         it "the save returns true" do
@@ -264,7 +264,7 @@ describe Mongoid::Interceptable do
       context "when callback returns false" do
 
         before do
-          artist.should_receive(:before_save_stub).once.and_return(false)
+          expect(artist).to receive(:before_save_stub).once.and_return(false)
         end
 
         it "the save returns false" do
@@ -288,7 +288,7 @@ describe Mongoid::Interceptable do
       context "when the callback returns true" do
 
         before do
-          artist.should_receive(:before_save_stub).once.and_return(true)
+          expect(artist).to receive(:before_save_stub).once.and_return(true)
         end
 
         it "the save returns true" do
@@ -299,7 +299,7 @@ describe Mongoid::Interceptable do
       context "when the callback returns false" do
 
         before do
-          artist.should_receive(:before_save_stub).once.and_return(false)
+          expect(artist).to receive(:before_save_stub).once.and_return(false)
         end
 
         it "the save returns false" do
@@ -326,7 +326,7 @@ describe Mongoid::Interceptable do
     context "when the callback returns true" do
 
       before do
-        artist.should_receive(:before_destroy_stub).once.and_return(true)
+        expect(artist).to receive(:before_destroy_stub).once.and_return(true)
       end
 
       it "the destroy returns true" do
@@ -337,7 +337,7 @@ describe Mongoid::Interceptable do
     context "when the callback returns false" do
 
       before do
-        artist.should_receive(:before_destroy_stub).once.and_return(false)
+        expect(artist).to receive(:before_destroy_stub).once.and_return(false)
       end
 
       it "the destroy returns false" do
@@ -485,7 +485,7 @@ describe Mongoid::Interceptable do
         context "when saving the root" do
 
           it "only executes the callbacks once for each embed" do
-            note.should_receive(:update_saved).twice
+            expect(note).to receive(:update_saved).twice
             band.save
           end
         end
@@ -503,7 +503,7 @@ describe Mongoid::Interceptable do
       end
 
       it "doesn't cascade the initialize" do
-        Service.any_instance.should_receive(:after_initialize_called=).never
+        expect_any_instance_of(Service).to receive(:after_initialize_called=).never
         expect(Person.find(person.id)).to eq(person)
       end
     end
@@ -1556,7 +1556,7 @@ describe Mongoid::Interceptable do
     context "when saving the document" do
 
       it "only executes the callbacks once" do
-        callback.should_receive(:execute).once
+        expect(callback).to receive(:execute).once
         callback.save
       end
     end
