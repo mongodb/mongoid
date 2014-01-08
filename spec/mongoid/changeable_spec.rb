@@ -627,7 +627,7 @@ describe Mongoid::Changeable do
 
         before do
           person.changed_attributes["aliases"] = aliases
-          aliases.should_receive(:clone).never
+          expect(aliases).to receive(:clone).never
           person.aliases_will_change!
         end
 
