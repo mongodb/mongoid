@@ -375,7 +375,7 @@ describe "Rails::Mongoid" do
         end
 
         before do
-          Dir.should_receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
+          expect(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         end
 
         it "requires the models by basename" do
@@ -392,7 +392,7 @@ describe "Rails::Mongoid" do
         end
 
         before do
-          Dir.should_receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
+          expect(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         end
 
         it "requires the models by subdirectory and basename" do

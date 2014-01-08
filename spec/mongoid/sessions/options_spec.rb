@@ -50,7 +50,7 @@ describe Mongoid::Sessions::Options do
     end
 
     it "passes down the options to collection" do
-      Moped::Session.any_instance.should_receive(:with).with(options).and_return({})
+      expect_any_instance_of(Moped::Session).to receive(:with).with(options).and_return({})
       instance.collection
     end
   end
