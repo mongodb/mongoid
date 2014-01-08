@@ -362,7 +362,7 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        criteria.context.query.should_receive(:each).never
+        expect(criteria.context.query).to receive(:each).never
         criteria.each do |doc|
           expect(doc).to eq(person)
         end
@@ -380,7 +380,7 @@ describe Mongoid::Criteria do
       end
 
       it "does not hit the database after first iteration" do
-        criteria.context.query.should_receive(:each).never
+        expect(criteria.context.query).to receive(:each).never
         criteria.each do |doc|
           expect(doc).to eq(person)
         end
@@ -1623,7 +1623,7 @@ describe Mongoid::Criteria do
           end
 
           before do
-            new_context.should_receive(:eager_load_one).with(person).once.and_call_original
+            expect(new_context).to receive(:eager_load_one).with(person).once.and_call_original
           end
 
           let!(:from_db) do
@@ -1674,7 +1674,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load_one).with(person).once.and_call_original
+          expect(context).to receive(:eager_load_one).with(person).once.and_call_original
         end
 
         let!(:from_db) do
@@ -1934,7 +1934,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -1968,7 +1968,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -1999,7 +1999,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ person ]).once.and_call_original
+          expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -2037,11 +2037,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.
-            should_receive(:eager_load).
-            with([ game_one, game_two ]).
-            once.
-            and_call_original
+          expect(context).to receive(:eager_load).with([ game_one, game_two ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -2064,7 +2060,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          context.should_receive(:eager_load).with([ game_one ]).once.and_call_original
+          expect(context).to receive(:eager_load).with([ game_one ]).once.and_call_original
         end
 
         let!(:documents) do
@@ -2104,7 +2100,7 @@ describe Mongoid::Criteria do
       end
 
       before do
-        context.should_receive(:eager_load).with([ person ]).once.and_call_original
+        expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
       end
 
       let!(:documents) do
@@ -3254,7 +3250,7 @@ describe Mongoid::Criteria do
     context "when the method exists on the class" do
 
       before do
-        Person.should_receive(:minor).and_call_original
+        expect(Person).to receive(:minor).and_call_original
       end
 
       it "calls the method on the class" do
@@ -3265,7 +3261,7 @@ describe Mongoid::Criteria do
     context "when the method exists on the criteria" do
 
       before do
-        criteria.should_receive(:to_criteria).and_call_original
+        expect(criteria).to receive(:to_criteria).and_call_original
       end
 
       it "calls the method on the criteria" do
@@ -3276,7 +3272,7 @@ describe Mongoid::Criteria do
     context "when the method exists on array" do
 
       before do
-        criteria.should_receive(:entries).and_call_original
+        expect(criteria).to receive(:entries).and_call_original
       end
 
       it "calls the method on the criteria" do
@@ -3287,7 +3283,7 @@ describe Mongoid::Criteria do
     context "when the method does not exist" do
 
       before do
-        criteria.should_receive(:entries).never
+        expect(criteria).to receive(:entries).never
       end
 
       it "raises an error" do
