@@ -18,8 +18,8 @@ module Mongoid
     #
     # @since 1.0.0
     def atomic_selector
-      # TODO: smarty cache return value and auto refresh when relation changed
-      embedded? ? embedded_atomic_selector : root_atomic_selector
+      @atomic_selector ||=
+        (embedded? ? embedded_atomic_selector : root_atomic_selector)
     end
 
     private
@@ -37,10 +37,8 @@ module Mongoid
     def embedded_atomic_selector
       if persisted? && _id_changed?
         _parent.atomic_selector
-      elsif _parent
-        _parent.atomic_selector.merge("#{atomic_path}._id" => _id)
       else
-        {}
+        _parent.atomic_selector.merge("#{atomic_path}._id" => _id)
       end
     end
 

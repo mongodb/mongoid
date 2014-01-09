@@ -142,7 +142,6 @@ module Mongoid
     #
     # @since 4.0.0
     def prepare_atomic_operation
-      # @todo: Check if the document is persisted here.
       operations = yield({})
       persist_or_delay_atomic_operation(operations)
       self
@@ -205,8 +204,10 @@ module Mongoid
     #
     # @since 4.0.0
     def persist_atomic_operations(operations)
-      selector = atomic_selector
-      _root.collection.find(selector).update(positionally(selector, operations))
+      if persisted?
+        selector = atomic_selector
+        _root.collection.find(selector).update(positionally(selector, operations))
+      end
     end
   end
 end
