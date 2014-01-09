@@ -143,7 +143,7 @@ module Mongoid
         check_scope_validity(value)
         check_scope_name(normalized)
         _declared_scopes[normalized] = {
-          scope: strip_default_scope(value),
+          scope: value,
           extension: Module.new(&block)
         }
         define_scope_method(normalized)
@@ -302,7 +302,7 @@ module Mongoid
       #
       # @since 3.0.0
       def check_scope_validity(value)
-        unless value.respond_to?(:to_proc)
+        unless value.respond_to?(:call)
           raise Errors::InvalidScope.new(self, value)
         end
       end
@@ -348,30 +348,6 @@ module Mongoid
           ->{ existing.call.merge(value.to_proc.call) }
         else
           value.to_proc
-        end
-      end
-
-      # Strip the default scope from the provided value, if it is a criteria.
-      # This is used by named scopes - they should not have the default scoping
-      # applied to them.
-      #
-      # @api private
-      #
-      # @example Strip the default scope.
-      #   Model.strip_default_scope
-      #
-      # @param [ Proc, Criteria ] value The value to strip from.
-      #
-      # @return [ Proc ] The stripped criteria, as a proc.
-      #
-      # @since 3.0.0
-      def strip_default_scope(value)
-        if value.is_a?(Criteria)
-          default = default_scoping.try(:call)
-          value.remove_scoping(default)
-          value.to_proc
-        else
-          value
         end
       end
     end

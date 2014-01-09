@@ -43,8 +43,8 @@ class Address
   belongs_to :account
   belongs_to :band
 
-  scope :without_postcode, where(postcode: nil)
-  scope :rodeo, where(street: "Rodeo Dr") do
+  scope :without_postcode, ->{ where(postcode: nil) }
+  scope :rodeo, ->{ where(street: "Rodeo Dr") } do
     def mansion?
       all? { |address| address.street == "Rodeo Dr" }
     end

@@ -1571,7 +1571,7 @@ describe Mongoid::Criteria do
     context "when providing inclusions to the default scope" do
 
       before do
-        Person.default_scope(Person.includes(:posts))
+        Person.default_scope(->{ Person.includes(:posts) })
       end
 
       after do

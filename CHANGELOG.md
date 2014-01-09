@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* Scopes and default scopes must now all be defined within lambdas or procs.
+
 * `skip_version_check` config option was removed.
 
 * IdentityMap removed. (Arthur Neves)

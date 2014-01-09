@@ -9,5 +9,5 @@ class Video
   belongs_to :post
   belongs_to :game
 
-  default_scope asc(:title)
+  default_scope ->{ asc(:title) }
 end
