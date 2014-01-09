@@ -336,6 +336,9 @@ For instructions on upgrading to newer versions, visit
 * \#3063 `Document#becomes` now properly sets base object on errors.
   (Adam Ross Cohen)
 
+* \#3019 Atomic operations will no longer attempt to persist if the document
+  is not persisted.
+
 * \#2903 Removed unused string `to_a` extension.
 
 ## 3.1.7
