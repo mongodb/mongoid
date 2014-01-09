@@ -2,6 +2,37 @@ require "spec_helper"
 
 describe Mongoid::Fields::Standard do
 
+  describe "Boolean" do
+
+    context "when field type is Boolean" do
+
+      let(:field) do
+        described_class.new(
+          :test,
+          type: Boolean
+          )
+      end
+
+      it "returns as Mongoid::Boolean" do
+        expect(field.type).to eq(Mongoid::Boolean)
+      end
+    end
+
+    context "when field type is Mongoid::Boolean" do
+
+      let(:field) do
+        described_class.new(
+          :test,
+          type: Mongoid::Boolean
+          )
+      end
+
+      it "returns as Mongoid::Boolean" do
+        expect(field.type).to eq(Mongoid::Boolean)
+      end
+    end
+  end
+
   describe "#lazy?" do
 
     let(:field) do
