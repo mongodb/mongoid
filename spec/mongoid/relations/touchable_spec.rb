@@ -207,6 +207,26 @@ describe Mongoid::Relations::Touchable do
 
     context "when relations have touch options" do
 
+      context "when the relation is a parent of an embedded doc" do
+
+        let(:page) do
+          WikiPage.create(title: "test")
+        end
+
+        let!(:edit) do
+          page.edits.create
+        end
+
+        before do
+          page.unset(:updated_at)
+          edit.touch
+        end
+
+        it "touches the parent document" do
+          expect(page.updated_at).to be_within(5).of(Time.now)
+        end
+      end
+
       context "when the relation is nil" do
 
         let!(:agent) do

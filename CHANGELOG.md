@@ -272,6 +272,8 @@ For instructions on upgrading to newer versions, visit
 
     document.reset_counters(:relation)
 
+* \#3310 embedded_in relations now accept a `touch` option to update parents.
+
 * \#3302 Aliasing using `alias_attribute` now properly handles aliases in criteria.
 
 * \#3155 Range field will persist the exclude_end when provided.
