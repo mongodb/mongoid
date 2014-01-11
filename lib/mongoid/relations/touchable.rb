@@ -28,6 +28,10 @@ module Mongoid
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
         write_attribute(field, current) if field
 
+        if embedded? && reflect_on_association(metadata.inverse)[:touch]
+          _root.touch
+        end
+
         touches = touch_atomic_updates(field)
         unless touches.empty?
           selector = atomic_selector
