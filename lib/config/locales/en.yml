@@ -448,10 +448,3 @@ en:
             %{document} when the child '%{relation}' still has documents in it."
           resolution: "Don't attempt to delete the parent %{document} when
             it has children, or change the dependent option on the relation."
-        criteria_not_permitted:
-          message: "%{klass}.%{method} was called with non-permitted arguments."
-          summary: "You tried to query Mongo using data that is marked as not
-            permitted. This is usually a sign that you're passing a Hash from
-            rails params instead of a string."
-          resolution: "If you meant to pass a Hash from the params, call .permit
-            on it. Otherwise call .to_s on the param to silence this message."
