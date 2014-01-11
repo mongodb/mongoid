@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* Mongoid 4 now only supports MongoDB 2.4.0 and higher.
+
 * On criteria, dont accept parameters without permitting them.
   [fixes https://jira.mongodb.org/browse/SECURITY-90]
   (Conrad Irwin)
