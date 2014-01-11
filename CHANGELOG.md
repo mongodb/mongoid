@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* On criteria, dont accept parameters without permitting them.
+  [fixes https://jira.mongodb.org/browse/SECURITY-90]
+  (Conrad Irwin)
+
 * Scopes and default scopes must now all be defined within lambdas or procs.
 
 * `skip_version_check` config option was removed.
