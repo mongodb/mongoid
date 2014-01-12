@@ -1577,6 +1577,33 @@ describe Mongoid::Relations::Referenced::Many do
           expect(person.posts.count).to eq(1)
         end
       end
+
+      context "when passing a new object" do
+
+        let!(:odd) do
+          Odd.create(name: 'one')
+        end
+
+        let!(:even) do
+          odd.evens.create(name: 'two', odds: [Odd.new(name: 'three')])
+        end
+
+        it "only push one even to the list" do
+          expect(odd.evens.count).to eq(1)
+        end
+
+        it "saves the reference back" do
+          expect(odd.evens.first.odds.count).to eq(1)
+        end
+
+        it "only saves one even" do
+          expect(Even.count).to eq(1)
+        end
+
+        it "saves the first odd and the second" do
+          expect(Odd.count).to eq(2)
+        end
+      end
     end
 
     context "when the relation is polymorphic" do
