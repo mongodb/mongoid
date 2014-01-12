@@ -20,6 +20,7 @@ require "mongoid/loggable"
 require "mongoid/sessions"
 require "mongoid/document"
 require "mongoid/log_subscriber"
+require 'mongoid/tasks/database'
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
