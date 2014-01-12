@@ -147,32 +147,6 @@ module Rails
       end
     end
 
-    # Given the provided file name, determine the model and return the class.
-    #
-    # @example Determine the model from the file.
-    #   Rails::Mongoid.determine_model("app/models/person.rb")
-    #
-    # @param [ String ] file The filename.
-    #
-    # @return [ Class ] The model.
-    #
-    # @since 2.1.0
-    def determine_model(file, logger)
-      return nil unless file =~ /app\/models\/(.*).rb$/
-      return nil unless logger
-
-      model_path = $1.split('/')
-      begin
-        parts = model_path.map { |path| path.camelize }
-        name = parts.join("::")
-        klass = name.constantize
-      rescue NameError, LoadError
-        logger.info("MONGOID: Attempted to constantize #{name}, trying without namespacing.")
-        klass = parts.last.constantize rescue nil
-      end
-      klass if klass && klass.ancestors.include?(::Mongoid::Document)
-    end
-
     def logger
       @logger ||= Logger.new($stdout)
     end
