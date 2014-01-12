@@ -174,11 +174,11 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             let(:pet_one) do
-              Pet.new
+              Pet.new(name: 'kika')
             end
 
             let(:pet_two) do
-              Pet.new
+              Pet.new(name: 'tiksy')
             end
 
             before do
@@ -188,6 +188,14 @@ describe Mongoid::Relations::Embedded::One do
 
             it "runs the destroy callbacks on the old document" do
               expect(pet_one.destroy_flag).to be true
+            end
+
+            it "keeps the name of the destroyed" do
+              expect(pet_one.name).to eq("kika")
+            end
+
+            it "saves the new name" do
+              expect(pet_owner.pet.name).to eq("tiksy")
             end
           end
         end
