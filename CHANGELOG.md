@@ -265,6 +265,10 @@ For instructions on upgrading to newer versions, visit
       ..
     end
 
+* Field types can now use symbols as well as class names. See:
+  https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields.rb#L16
+  for the available mappings.
+
 * \#3479 Map/reduce now respects criteria no timeout options if output is not
   inline.
 
@@ -311,6 +315,8 @@ For instructions on upgrading to newer versions, visit
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)
 
 ### Resolved Issues
+
+* \#3487 Map Boolean to Mongoid::Boolean in field definitions. (Arthur Neves)
 
 * \#3449 Touch needs to work for create and update. (Greggory Rothmeier)
 

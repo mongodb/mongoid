@@ -309,6 +309,92 @@ describe Mongoid::Fields do
       end
     end
 
+    context "when providing a root Boolean type" do
+
+      let(:klass) do
+        Class.new do
+          include Mongoid::Document
+        end
+      end
+
+      it "converts to Mongoid::Boolean" do
+        expect(klass.field(:test, type: Boolean).type).to be(Mongoid::Boolean)
+      end
+    end
+
+    context "when using symbol types" do
+
+      let(:klass) do
+        Class.new do
+          include Mongoid::Document
+        end
+      end
+
+      it "converts :array to Array" do
+        expect(klass.field(:test, type: :array).type).to be(Array)
+      end
+
+      it "converts :big_decimal to BigDecimal" do
+        expect(klass.field(:test, type: :big_decimal).type).to be(BigDecimal)
+      end
+
+      it "converts :binary to BSON::Binary" do
+        expect(klass.field(:test, type: :binary).type).to be(BSON::Binary)
+      end
+
+      it "converts :boolean to Mongoid::Boolean" do
+        expect(klass.field(:test, type: :boolean).type).to be(Mongoid::Boolean)
+      end
+
+      it "converts :date to Date" do
+        expect(klass.field(:test, type: :date).type).to be(Date)
+      end
+
+      it "converts :date_time to DateTime" do
+        expect(klass.field(:test, type: :date_time).type).to be(DateTime)
+      end
+
+      it "converts :float to Float" do
+        expect(klass.field(:test, type: :float).type).to be(Float)
+      end
+
+      it "converts :hash to Hash" do
+        expect(klass.field(:test, type: :hash).type).to be(Hash)
+      end
+
+      it "converts :integer to Integer" do
+        expect(klass.field(:test, type: :integer).type).to be(Integer)
+      end
+
+      it "converts :object_id to BSON::ObjectId" do
+        expect(klass.field(:test, type: :object_id).type).to be(BSON::ObjectId)
+      end
+
+      it "converts :range to Range" do
+        expect(klass.field(:test, type: :range).type).to be(Range)
+      end
+
+      it "converts :regexp to Rexegp" do
+        expect(klass.field(:test, type: :regexp).type).to be(Regexp)
+      end
+
+      it "converts :set to Set" do
+        expect(klass.field(:test, type: :set).type).to be(Set)
+      end
+
+      it "converts :string to String" do
+        expect(klass.field(:test, type: :string).type).to be(String)
+      end
+
+      it "converts :symbol to Symbol" do
+        expect(klass.field(:test, type: :symbol).type).to be(Symbol)
+      end
+
+      it "converts :time to Time" do
+        expect(klass.field(:test, type: :time).type).to be(Time)
+      end
+    end
+
     context "when the options are valid" do
 
       context "when the options are all standard" do

@@ -10,6 +10,28 @@ module Mongoid
   module Fields
     extend ActiveSupport::Concern
 
+    # For fields defined with symbols use the correct class.
+    #
+    # @since 4.0.0
+    TYPE_MAPPINGS = {
+      array: Array,
+      big_decimal: BigDecimal,
+      binary: BSON::Binary,
+      boolean: Mongoid::Boolean,
+      date: Date,
+      date_time: DateTime,
+      float: Float,
+      hash: Hash,
+      integer: Integer,
+      object_id: BSON::ObjectId,
+      range: Range,
+      regexp: Regexp,
+      set: Set,
+      string: String,
+      symbol: Symbol,
+      time: Time
+    }.with_indifferent_access
+
     included do
       class_attribute :aliased_fields
       class_attribute :localized_fields
@@ -533,9 +555,19 @@ module Mongoid
 
       def field_for(name, options)
         opts = options.merge(klass: self)
+        type_mapping = TYPE_MAPPINGS[options[:type]]
+        opts[:type] = type_mapping || unmapped_type(options)
         return Fields::Localized.new(name, opts) if options[:localize]
         return Fields::ForeignKey.new(name, opts) if options[:identity]
         Fields::Standard.new(name, opts)
+      end
+
+      def unmapped_type(options)
+        if "Boolean" == options[:type].to_s
+          Mongoid::Boolean
+        else
+          options[:type] || Object
+        end
       end
     end
   end
