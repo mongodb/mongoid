@@ -2,6 +2,16 @@ require "spec_helper"
 
 describe "Mongoid::Tasks::Database" do
 
+  let(:logger) do
+    double("logger").tap do |log|
+      allow(log).to receive(:info)
+    end
+  end
+
+  before do
+    allow(Mongoid::Tasks::Database).to receive(:logger).and_return(logger)
+  end
+
   let(:models) do
     [ User, Account, Address ]
   end
