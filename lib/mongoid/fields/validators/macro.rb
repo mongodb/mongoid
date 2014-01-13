@@ -17,7 +17,8 @@ module Mongoid
           :pre_processed,
           :subtype,
           :type,
-          :overwrite
+          :overwrite,
+          :only_alias,
         ]
 
         # Validate the field definition.
@@ -52,7 +53,7 @@ module Mongoid
         # @since 3.0.0
         def validate_name(klass, name, options)
           if Mongoid.destructive_fields.include?(name)
-            raise Errors::InvalidField.new(klass, name)
+            raise Errors::InvalidField.new(klass, name) unless options[:as] && options[:only_alias]
           end
 
           if !options[:overwrite] && klass.fields.keys.include?(name.to_s)
