@@ -34,7 +34,7 @@ module Mongoid
           # @since 2.1.0
           def position
             pos = parent.atomic_position
-            "#{pos}#{"." unless pos.blank?}#{document.metadata.store_as}"
+            "#{pos}#{"." unless pos.blank?}#{document.__metadata.store_as}"
           end
         end
       end

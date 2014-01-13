@@ -79,7 +79,7 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       it "does not erase the metadata" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "allows saving of the embedded document" do

@@ -189,7 +189,7 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_paths
-      @atomic_paths ||= metadata ? metadata.path(self) : Atomic::Paths::Root.new(self)
+      @atomic_paths ||= __metadata ? __metadata.path(self) : Atomic::Paths::Root.new(self)
     end
 
     # Get all the attributes that need to be pulled.

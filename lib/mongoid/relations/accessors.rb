@@ -155,7 +155,6 @@ module Mongoid
         #   person.game?
         #
         # @param [ String, Symbol ] name The name of the relation.
-        # @param [ Metadata ] The metadata.
         #
         # @return [ Class ] The model being set up.
         #
@@ -201,7 +200,6 @@ module Mongoid
         #   Person.ids_getter("addresses", metadata)
         #
         # @param [ String, Symbol ] name The name of the relation.
-        # @param [ Metadata] metadata The metadata for the relation.
         #
         # @return [ Class ] The class being set up.
         def ids_getter(name, metadata)
@@ -211,7 +209,6 @@ module Mongoid
           end
           self
         end
-
 
         # Defines the setter for the relation. This does a few things based on
         # some conditions. If there is an existing association, a target

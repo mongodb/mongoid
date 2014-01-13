@@ -41,7 +41,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(address.metadata).to_not be_nil
+          expect(address.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -181,7 +181,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "sets the metadata on the child" do
-            expect(child_role.metadata).to_not be_nil
+            expect(child_role.__metadata).to_not be_nil
           end
 
           it "sets the index on the child" do
@@ -283,7 +283,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -634,7 +634,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(child_role.metadata).to_not be_nil
+          expect(child_role.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -981,7 +981,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(address.metadata).to_not be_nil
+          expect(address.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1024,7 +1024,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(child_role.metadata).to_not be_nil
+          expect(child_role.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1213,7 +1213,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -1320,7 +1320,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(child_role.metadata).to_not be_nil
+          expect(child_role.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1427,7 +1427,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -1526,7 +1526,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do

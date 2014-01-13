@@ -46,7 +46,8 @@ module Mongoid
     include Touchable
     include CounterCache
 
-    attr_accessor :metadata
+    attr_accessor :__metadata
+    alias :relation_metadata :__metadata
 
     # Determine if the document itself is embedded in another document via the
     # proper channels. (If it has a parent document.)
@@ -70,7 +71,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_many?
-      metadata && metadata.macro == :embeds_many
+      __metadata && __metadata.macro == :embeds_many
     end
 
     # Determine if the document is part of an embeds_one relation.
@@ -82,7 +83,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_one?
-      metadata && metadata.macro == :embeds_one
+      __metadata && __metadata.macro == :embeds_one
     end
 
     # Get the metadata name for this document. If no metadata was defined
@@ -97,8 +98,8 @@ module Mongoid
     #
     # @since 3.0.0
     def metadata_name
-      raise Errors::NoMetadata.new(self.class.name) unless metadata
-      metadata.name
+      raise Errors::NoMetadata.new(self.class.name) unless __metadata
+      __metadata.name
     end
 
     # Determine if the document is part of an references_many relation.
@@ -110,7 +111,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_many?
-      metadata && metadata.macro == :has_many
+      __metadata && __metadata.macro == :has_many
     end
 
     # Determine if the document is part of an references_one relation.
@@ -122,7 +123,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_one?
-      metadata && metadata.macro == :has_one
+      __metadata && __metadata.macro == :has_one
     end
 
     # Convenience method for iterating through the loaded relations and
@@ -141,21 +142,6 @@ module Mongoid
             remove_instance_variable("@_#{name}")
           end
         end
-      end
-    end
-
-    module ClassMethods
-
-      # This is convenience for librarys still on the old API.
-      #
-      # @example Get the associations.
-      #   Person.associations
-      #
-      # @return [ Hash ] The relations.
-      #
-      # @since 2.3.1
-      def associations
-        self.relations
       end
     end
   end

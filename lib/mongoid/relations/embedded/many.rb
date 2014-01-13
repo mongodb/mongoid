@@ -79,7 +79,7 @@ module Mongoid
         #
         # @return [ Document ] The new document.
         def build(attributes = {}, type = nil)
-          doc = Factory.build(type || metadata.klass, attributes)
+          doc = Factory.build(type || __metadata.klass, attributes)
           append(doc)
           doc.apply_post_processed_defaults
           yield(doc) if block_given?
@@ -341,7 +341,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def binding
-          Bindings::Embedded::Many.new(base, target, metadata)
+          Bindings::Embedded::Many.new(base, target, __metadata)
         end
 
         # Returns the criteria object for the target class with its documents set
@@ -355,7 +355,7 @@ module Mongoid
           criterion = klass.scoped
           criterion.embedded = true
           criterion.documents = target
-          Many.apply_ordering(criterion, metadata)
+          Many.apply_ordering(criterion, __metadata)
         end
 
         # Deletes one document from the target and unscoped.
@@ -443,8 +443,8 @@ module Mongoid
         #
         # @since 2.4.0
         def scope(docs)
-          return docs unless metadata.order || metadata.klass.default_scoping?
-          crit = metadata.klass.order_by(metadata.order)
+          return docs unless __metadata.order || __metadata.klass.default_scoping?
+          crit = __metadata.klass.order_by(__metadata.order)
           crit.embedded = true
           crit.documents = docs
           crit.entries

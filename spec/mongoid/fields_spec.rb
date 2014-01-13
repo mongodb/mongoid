@@ -729,11 +729,11 @@ describe Mongoid::Fields do
 
     context "when the field name conflicts with mongoid's internals" do
 
-      context "when the field is named metadata" do
+      context "when the field is named __metadata" do
 
         it "raises an error" do
           expect {
-            Person.field(:metadata)
+            Person.field(:__metadata)
           }.to raise_error(Mongoid::Errors::InvalidField)
         end
       end

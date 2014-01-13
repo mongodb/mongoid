@@ -88,11 +88,11 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         context "when the base has metadata" do
 
           before do
-            address.metadata = person_metadata
+            address.__metadata = person_metadata
           end
 
           it "does not overwrite the existing metadata" do
-            expect(address).to receive(:metadata=).never
+            expect(address).to receive(:__metadata=).never
             binding.bind_one
           end
         end

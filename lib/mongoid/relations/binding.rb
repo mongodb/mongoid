@@ -193,7 +193,7 @@ module Mongoid
       def set_base_metadata
         inverse_metadata = metadata.inverse_metadata(target)
         if inverse_metadata != metadata && !inverse_metadata.nil?
-          base.metadata = inverse_metadata
+          base.__metadata = inverse_metadata
         end
       end
 

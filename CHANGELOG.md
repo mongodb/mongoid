@@ -9,6 +9,10 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid 4 now only supports MongoDB 2.4.0 and higher.
 
+* `Document#metadata` has been renamed to `Document#relation_metadata` to
+  avoid common conflicts. Relation proxies also have this renamed to the
+  same as well.
+
 * Scopes and default scopes must now all be defined within lambdas or procs.
 
 * `skip_version_check` config option was removed.

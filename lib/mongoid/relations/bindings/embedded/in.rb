@@ -24,7 +24,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def bind_one
-            base.metadata = metadata.inverse_metadata(target) unless base.metadata
+            base.__metadata = metadata.inverse_metadata(target) unless base.__metadata
             base.parentize(target)
             binding do
               if base.embedded_many?
