@@ -22,10 +22,6 @@ describe "Mongoid::Tasks::Database" do
       User
     end
 
-    let(:model_paths) do
-      [ "spec/app/models/user.rb" ]
-    end
-
     let(:indexes) do
       Mongoid::Tasks::Database.create_indexes(models)
     end
