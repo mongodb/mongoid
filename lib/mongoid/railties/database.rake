@@ -67,19 +67,19 @@ namespace :db do
     desc "Create the indexes defined on your mongoid models"
     task :create_indexes => :environment do
       ::Rails.application.eager_load!
-      ::Rails::Mongoid.create_indexes
+      ::Mongoid::Tasks::Database.create_indexes
     end
 
     desc "Remove indexes that exist in the database but aren't specified on the models"
     task :remove_undefined_indexes => :environment do
       ::Rails.application.eager_load!
-      ::Rails::Mongoid.remove_undefined_indexes
+      ::Mongoid::Tasks::Database.remove_undefined_indexes
     end
 
     desc "Remove the indexes defined on your mongoid models without questions!"
     task :remove_indexes => :environment do
       ::Rails.application.eager_load!
-      ::Rails::Mongoid.remove_indexes
+      ::Mongoid::Tasks::Database.remove_indexes
     end
 
     desc "Drops the database for the current Rails.env"
