@@ -165,7 +165,14 @@ module Mongoid
       #
       # @since 2.1.0
       def type
-        @type ||= options[:type] || Object
+        @type ||=
+          begin
+            if "Boolean" == options[:type].to_s
+              Mongoid::Boolean
+            else
+              options[:type] || Object
+            end
+          end
       end
 
       private

@@ -13,9 +13,11 @@ module Mongoid
       # @return [ String ] The object mongoized.
       #
       # @since 3.0.0
-      def mongoize(object)
+      def evolve(object)
         ::Boolean.evolve(object)
       end
+      alias :mongoize :evolve
+
     end
   end
 end
