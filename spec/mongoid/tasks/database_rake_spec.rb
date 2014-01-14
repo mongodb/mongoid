@@ -249,3 +249,37 @@ describe "db:mongoid:remove_indexes" do
     end
   end
 end
+
+describe "db:mongoid:drop" do
+  include_context "rake task"
+
+  it "works" do
+    task.invoke
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    it "works" do
+      task.invoke
+    end
+  end
+end
+
+describe "db:mongoid:purge" do
+  include_context "rake task"
+
+  it "receives a purge" do
+    expect(Mongoid).to receive(:purge!)
+    task.invoke
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    it "receives a purge" do
+      expect(Mongoid).to receive(:purge!)
+      task.invoke
+    end
+  end
+end

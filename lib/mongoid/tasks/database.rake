@@ -18,7 +18,7 @@ namespace :db do
       ::Mongoid::Tasks::Database.remove_indexes
     end
 
-    desc "Drops the database for the current Rails.env"
+    desc "Drops the default session"
     task :drop => :environment do
       ::Mongoid::Sessions.default.drop
     end
