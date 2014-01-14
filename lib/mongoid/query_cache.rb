@@ -19,18 +19,50 @@ module Mongoid
         Thread.current["[mongoid]:query_cache"] ||= {}
       end
 
+      # Clear the query cache.
+      #
+      # @example Clear the cache.
+      #   QueryCache.clear_cache
+      #
+      # @return [ nil ] Always nil.
+      #
+      # @since 4.0.0
       def clear_cache
         Thread.current["[mongoid]:query_cache"] = nil
       end
 
+      # Set whether the cache is enabled.
+      #
+      # @example Set if the cache is enabled.
+      #   QueryCache.enabled = true
+      #
+      # @param [ true, false ] value The enabled value.
+      #
+      # @since 4.0.0
       def enabled=(value)
         Thread.current["[mongoid]:query_cache:enabled"] = value
       end
 
+      # Is the query cache enabled on the current thread?
+      #
+      # @example Is the query cache enabled?
+      #   QueryCache.enabled?
+      #
+      # @return [ true, false ] If the cache is enabled.
+      #
+      # @since 4.0.0
       def enabled?
         !!Thread.current["[mongoid]:query_cache:enabled"]
       end
 
+      # Execute the block while using the query cache.
+      #
+      # @example Execute with the cache.
+      #   QueryCache.cache { collection.find }
+      #
+      # @return [ Object ] The result of the block.
+      #
+      # @since 4.0.0
       def cache
         enabled = QueryCache.enabled?
         QueryCache.enabled = true
