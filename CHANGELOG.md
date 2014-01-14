@@ -285,6 +285,13 @@ For instructions on upgrading to newer versions, visit
     Band.none
     Band.none.where(name: "Tool") # Always has zero documents.
 
+* \#3410 Mongoid now has a query cache that can be used as a middleware in
+  Rack applications. (Arthur Neves)
+
+    For Rails:
+
+      config.middleware.use(Mongoid::QueryCache::Middleware)
+
 * \#3319 Counters can now be reset from a document instance:
 
     document.reset_counters(:relation)
