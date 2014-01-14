@@ -1,3 +1,5 @@
+load 'mongoid/tasks/database.rake'
+
 namespace :db do
 
   unless Rake::Task.task_defined?("db:drop")
@@ -21,7 +23,7 @@ namespace :db do
 
   unless Rake::Task.task_defined?("db:setup")
     desc "Create the database, and initialize with the seed data"
-    task :setup => [ "db:create", "db:mongoid:create_indexes", "db:seed" ]
+    task :setup => [ "db:create", "mongoid:create_indexes", "db:seed" ]
   end
 
   unless Rake::Task.task_defined?("db:reset")
@@ -64,32 +66,8 @@ namespace :db do
   end
 
   namespace :mongoid do
-    desc "Create the indexes defined on your mongoid models"
-    task :create_indexes => :environment do
+    task :load_models do
       ::Rails.application.eager_load!
-      ::Mongoid::Tasks::Database.create_indexes
-    end
-
-    desc "Remove indexes that exist in the database but aren't specified on the models"
-    task :remove_undefined_indexes => :environment do
-      ::Rails.application.eager_load!
-      ::Mongoid::Tasks::Database.remove_undefined_indexes
-    end
-
-    desc "Remove the indexes defined on your mongoid models without questions!"
-    task :remove_indexes => :environment do
-      ::Rails.application.eager_load!
-      ::Mongoid::Tasks::Database.remove_indexes
-    end
-
-    desc "Drops the database for the current Rails.env"
-    task :drop => :environment do
-      ::Mongoid::Sessions.default.drop
-    end
-
-    desc "Drop all collections except the system collections"
-    task :purge => :environment do
-      ::Mongoid.purge!
     end
   end
 end
