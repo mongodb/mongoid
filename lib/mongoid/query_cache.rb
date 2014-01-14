@@ -1,21 +1,34 @@
+# encoding: utf-8
 module Mongoid
+
+  # A cache of database queries on a per-request basis.
+  #
+  # @since 4.0.0
   module QueryCache
     class << self
 
+      # Get the cached queries.
+      #
+      # @example Get the cached queries from the current thread.
+      #   QueryCache.cache_table
+      #
+      # @return [ Hash ] The hash of cached queries.
+      #
+      # @since 4.0.0
       def cache_table
-        Thread.current['[mongoid]:query_cache'] ||= Hash.new
+        Thread.current["[mongoid]:query_cache"] ||= {}
       end
 
       def clear_cache
-        Thread.current['[mongoid]:query_cache'] = nil
+        Thread.current["[mongoid]:query_cache"] = nil
       end
 
       def enabled=(value)
-        Thread.current['[mongoid]:query_cache:enabled'] = value
+        Thread.current["[mongoid]:query_cache:enabled"] = value
       end
 
       def enabled?
-        !!Thread.current['[mongoid]:query_cache:enabled']
+        !!Thread.current["[mongoid]:query_cache:enabled"]
       end
 
       def cache
