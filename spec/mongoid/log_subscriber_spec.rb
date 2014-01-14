@@ -62,7 +62,7 @@ describe Mongoid::LogSubscriber do
 
         before do
           expect(subscribe).to receive(:debug).once
-          Band.all.to_a
+          PetOwner.all.to_a
         end
 
         it "sends operations logs to TestLogSubscriber" do
