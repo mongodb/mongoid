@@ -7,6 +7,13 @@ For instructions on upgrading to newer versions, visit
 
 ### Major Changes (Backwards Incompatible)
 
+* \#3320 Remove Rails dependencies on database rake tasks. (Arthur Neves)
+
+    All db:* rake tasks should work as before when using Rails.
+    When not in a Rails, just load the database tasks using:
+
+        load 'mongoid/tasks/database.rake'
+
 * Mongoid 4 now only supports MongoDB 2.4.0 and higher.
 
 * `Document#metadata` has been renamed to `Document#relation_metadata` to
