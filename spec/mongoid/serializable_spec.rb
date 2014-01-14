@@ -160,7 +160,9 @@ describe Mongoid::Serializable do
       end
 
       let(:field_names) do
-        person.fields.keys.map(&:to_s) - ["_type"]
+        person.fields.map do |name, field|
+          name == "_id" ? "id" : (field.options[:as] || name).to_s
+        end - ["_type"]
       end
 
       it "serializes assigned attributes" do
@@ -181,12 +183,34 @@ describe Mongoid::Serializable do
           { only: :name }
         end
 
-        before do
+        let!(:hash) do
           person.serializable_hash(options)
         end
 
         it "does not modify the options in the argument" do
           expect(options[:except]).to be_nil
+        end
+
+        context "when using only one aliases" do
+
+          let(:options) do
+            { only: :test }
+          end
+
+          it "includes the alias field" do
+            hash.keys.should include 'test'
+          end
+        end
+
+        context "when using except one aliases" do
+
+          let(:options) do
+            { except: :test }
+          end
+
+          it "includes the alias field" do
+            hash.keys.should_not include 'test'
+          end
         end
       end
 
@@ -819,7 +843,7 @@ describe Mongoid::Serializable do
       end
 
       it "serializes as string" do
-        expect(person.to_xml).to include("<_id>#{person.id}</_id>")
+        expect(person.to_xml).to include("<id>#{person.id}</id>")
       end
     end
 
