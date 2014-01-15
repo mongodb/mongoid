@@ -351,6 +351,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#3242 Has_many relation must use the inverse foreign_key. (Arthur Neves)
 
+* \#3233 Don't double call validation callbacks when cascading children and
+  relation validation is turned on.
+
 * \#3197 Improvements in the calls to `aggregates` on root and embedded
   collections. (Wojciech Piekutowski)
 

@@ -170,7 +170,7 @@ module Mongoid
           relation = send(name)
           Array.wrap(relation).each do |child|
             next if children.include?(child)
-            children.add(child) if cascadable_child?(kind, child)
+            children.add(child) if cascadable_child?(kind, child, metadata)
             child.send(:cascadable_children, kind, children)
           end
         end
@@ -189,10 +189,9 @@ module Mongoid
     # @return [ true, false ] If the child should fire the callback.
     #
     # @since 2.3.0
-    def cascadable_child?(kind, child)
-      if kind == :initialize || kind == :find
-        return false
-      end
+    def cascadable_child?(kind, child, metadata)
+      return false if kind == :initialize || kind == :find
+      return false if kind == :validate && metadata.validate?
       child.callback_executable?(kind) ? child.in_callback_state?(kind) : false
     end
 

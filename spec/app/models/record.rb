@@ -43,4 +43,9 @@ class Record
   def access_band
     band.name
   end
+
+  def dont_call_me_twice
+  end
+
+  validate { dont_call_me_twice }
 end
