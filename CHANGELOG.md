@@ -330,6 +330,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3490 Allow localized fields to work with boolean `false` values.
+  (Aymeric Brisse)
+
 * \#3487 Map Boolean to Mongoid::Boolean in field definitions. (Arthur Neves)
 
 * \#3449 Touch needs to work for create and update. (Greggory Rothmeier)
