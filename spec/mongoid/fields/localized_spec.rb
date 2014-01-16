@@ -178,6 +178,21 @@ describe Mongoid::Fields::Localized do
       end
     end
 
+    context "when no type is provided" do
+
+      let(:field) do
+        described_class.new(:description, localize: true)
+      end
+
+      let(:value) do
+        field.demongoize({ "en" => false })
+      end
+
+      it "allows booleans to be returned" do
+        expect(value).to eq(false)
+      end
+    end
+
     context "when the type is not a string" do
 
       let(:field) do
