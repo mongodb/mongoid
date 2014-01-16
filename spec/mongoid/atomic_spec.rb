@@ -197,9 +197,9 @@ describe Mongoid::Atomic do
                       "addresses.0.street" => "Bond St"
                     },
                     conflicts: {
-                      "$pushAll" => {
+                      "$pushAll" => [{
                         "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
-                      }
+                      }]
                     }
                   }
                 )
@@ -215,9 +215,9 @@ describe Mongoid::Atomic do
                       "addresses.0.street" => "Bond St"
                     },
                     conflicts: {
-                      "$pushAll" => {
+                      "$pushAll" => [{
                         "addresses.0.locations" => [{ "_id" => location.id, "name" => "Home" }]
-                      }
+                      }]
                     }
                   }
                 )
@@ -263,7 +263,7 @@ describe Mongoid::Atomic do
                       "addresses.0.street" => "Bond St"
                     },
                     conflicts: {
-                      "$pushAll" => {
+                      "$pushAll" => [{
                         "addresses" => [{
                           "_id" => new_address.id,
                           "street" => "Another",
@@ -272,7 +272,7 @@ describe Mongoid::Atomic do
                             "name" => "Home"
                           ]
                         }]
-                      }
+                      }]
                     }
                   }
                 )
@@ -321,7 +321,7 @@ describe Mongoid::Atomic do
                     }]
                   },
                   conflicts: {
-                    "$set" => { "addresses.0.street"=>"Bond St" }
+                    "$set" => [{ "addresses.0.street"=>"Bond St" }]
                   }
                 }
               )
