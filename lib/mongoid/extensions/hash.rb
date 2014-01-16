@@ -38,14 +38,10 @@ module Mongoid
       def __consolidate__(klass)
         consolidated = {}
         each_pair do |key, value|
-          if key == '$rename'
-            #todo validate for collection column
+          if key =~ /\$/
+            is_rename = key == '$rename'
             value.each_pair do |_key, _value|
-              value[_key] = _value.to_s
-            end
-          elsif key =~ /\$/
-            value.each_pair do |_key, _value|
-              value[_key] = mongoize_for(key, klass, _key, _value)
+              value[_key] = is_rename ? _value.to_s : mongoize_for(key, klass, _key, _value)
             end
             (consolidated[key] ||= {}).merge!(value)
           else
