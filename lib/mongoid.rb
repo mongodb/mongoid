@@ -42,7 +42,7 @@ module Mongoid
   #
   # @example Set up configuration options.
   #   Mongoid.configure do |config|
-  #     config.use(name: "mongoid_test", host: "localhost", port: 27017)
+  #     config.connect_to("mongoid_test")
   #   end
   #
   # @return [ Config ] The configuration object.
