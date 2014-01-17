@@ -81,6 +81,7 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
 
           Person.all.includes(:houses).each do |person|
             expect(person.houses).to_not be_nil
+            epxect(person.houses.length).to be(3)
           end
         end
       end
