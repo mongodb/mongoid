@@ -386,6 +386,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3414 Backkport skip and limit options on aggregation. (Wojciech Piekutowski)
 
+* \#3469 Fix RegexpError: failed to allocate memory: /\./ on .hash_dot_syntax?  (Dmitry Krasnoukhov)
+
 ## 3.1.6
 
 ### Resolved Issues
