@@ -330,8 +330,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3492 $rename operations should not mongoize values. (Vladislav Melanitskiy)
+
 * \#3490 Allow localized fields to work with boolean `false` values.
-  (Aymeric Brisse)
 
 * \#3487 Map Boolean to Mongoid::Boolean in field definitions. (Arthur Neves)
 
