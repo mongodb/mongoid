@@ -11,6 +11,7 @@ if ENV["CI"]
   end
 end
 
+require "action_controller"
 require "mongoid"
 require "rspec"
 require "helpers"

@@ -547,6 +547,19 @@ describe Mongoid::Attributes do
         expect(person.map).to eq({})
       end
     end
+
+    context "when providing tainted parameters" do
+
+      let(:params) do
+        ActionController::Parameters.new(title: "sir")
+      end
+
+      it "raises an error" do
+        expect {
+          Person.new(params)
+        }.to raise_error(ActiveModel::ForbiddenAttributesError)
+      end
+    end
   end
 
   context "updating when attributes already exist" do
