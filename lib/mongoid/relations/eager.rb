@@ -1,3 +1,4 @@
+# encoding: utf-8
 require "mongoid/relations/eager/base"
 require "mongoid/relations/eager/belongs_to"
 require "mongoid/relations/eager/has_one"
