@@ -68,6 +68,22 @@ module Mongoid
         find_or(:create, attrs, &block)
       end
 
+      # Find the first +Document+ given the conditions, or creates a new document
+      # with the conditions that were supplied. If validation fails an
+      # exception will be raised.
+      #
+      # @example Find or create the document.
+      #   Person.find_or_create_by!(:attribute => "value")
+      #
+      # @param [ Hash ] attrs The attributes to check.
+      #
+      # @raise [ Errors::Validations ] on validation error.
+      #
+      # @return [ Document ] A matching or newly created document.
+      def find_or_create_by!(attrs = {}, &block)
+        find_or(:create!, attrs, &block)
+      end
+
       # Find the first +Document+ given the conditions, or initializes a new document
       # with the conditions that were supplied.
       #

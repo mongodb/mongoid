@@ -21,6 +21,7 @@ module Mongoid
       :extras,
       :find_and_modify,
       :find_or_create_by,
+      :find_or_create_by!,
       :find_or_initialize_by,
       :first_or_create,
       :first_or_create!,

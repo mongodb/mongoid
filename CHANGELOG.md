@@ -276,6 +276,8 @@ For instructions on upgrading to newer versions, visit
   https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields.rb#L16
   for the available mappings.
 
+* \#3496 Added class level and criteria level `find_or_create_by!`.
+
 * \#3479 Map/reduce now respects criteria no timeout options if output is not
   inline.
 
