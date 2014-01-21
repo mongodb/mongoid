@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gem "rake"
 gem "actionpack",  "~> 4.1.0.beta1"
-gem "activemodel", "~> 4.1.0"
+gem "activemodel", "~> 4.1.0.beta1"
 gem "tzinfo",      ">= 0.3.37"
 gem "moped",       "~> 2.0.beta5"
 gem "origin",      "~> 2.1"
