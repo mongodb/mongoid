@@ -20,5 +20,5 @@ notifications:
 services:
   - mongodb
 gemfile:
-  - Gemfile
+  - gemfiles/rails40.gemfile
   - gemfiles/rails41.gemfile
