@@ -1,9 +1,11 @@
 source "https://rubygems.org"
-gemspec
 
 gem "rake"
-gem "actionpack", "~> 4.1.0"
+gem "actionpack",  "~> 4.1.0"
 gem "activemodel", "~> 4.1.0"
+gem "tzinfo",      ">= 0.3.37"
+gem "moped",       "~> 2.0.beta5"
+gem "origin",      "~> 2.1"
 
 group :test do
   gem "rspec", "~> 3.0.0.beta1"
