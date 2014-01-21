@@ -19,3 +19,6 @@ notifications:
       - "irc.freenode.org#mongoid"
 services:
   - mongodb
+gemfiles:
+  - Gemfile
+  - gemfiles/rails41.gemfile
