@@ -6,7 +6,7 @@ rvm:
   - 2.1.0
   - jruby
   - jruby-head
-env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -J-Xms512m -J-Xmx1024m"
+env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
 matrix:
   allow_failures:
     - rvm: jruby-head
