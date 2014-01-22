@@ -1424,8 +1424,10 @@ describe Mongoid::Changeable do
       end
 
       after do
-        Acolyte._save_callbacks.reject! do |callback|
+        Acolyte._save_callbacks.select do |callback|
           callback.kind == :after
+        end.each do |callback|
+          Acolyte._save_callbacks.delete(callback)
         end
       end
 
@@ -1448,8 +1450,10 @@ describe Mongoid::Changeable do
       end
 
       after do
-        Acolyte._save_callbacks.reject! do |callback|
+        Acolyte._save_callbacks.select do |callback|
           callback.kind == :after
+        end.each do |callback|
+          Acolyte._save_callbacks.delete(callback)
         end
       end
 
