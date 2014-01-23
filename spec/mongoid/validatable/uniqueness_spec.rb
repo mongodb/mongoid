@@ -1032,9 +1032,9 @@ describe Mongoid::Validatable::UniquenessValidator do
         end
 
         context "when not allowing nil" do
+
           it "raises a validation error" do
-            zoo = Zoo.create!
-            expect { Feline.create! zoo: zoo }.to raise_error Mongoid::Errors::Validations
+            expect { LineItem.create! }.to raise_error Mongoid::Errors::Validations
           end
         end
 
