@@ -227,7 +227,7 @@ module Mongoid
       def to_validate(document, attribute, value)
         metadata = document.relations[attribute.to_s]
         if metadata && metadata.stores_foreign_key?
-          [ metadata.foreign_key, value.id ]
+          [ metadata.foreign_key, value && value.id ]
         else
           [ attribute, value ]
         end
