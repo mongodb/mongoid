@@ -1,4 +1,4 @@
-class Zoo
+class Keeper
   include Mongoid::Document
 
   has_many :felines
