@@ -555,6 +555,25 @@ describe Mongoid::Criteria::Modifiable do
         end
       end
 
+      context "when the criteria is on an embedded relation" do
+
+        let!(:band) do
+          Band.create(name: "Placebo")
+        end
+
+        let(:document) do
+          band.notes.permanent.first_or_create(text: "test")
+        end
+
+        it "returns a new document" do
+          expect(document.text).to eq("test")
+        end
+
+        it "returns a persisted document" do
+          expect(document).to be_persisted
+        end
+      end
+
       context "when a block is provided" do
 
         let(:document) do

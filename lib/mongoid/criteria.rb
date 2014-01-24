@@ -31,7 +31,7 @@ module Mongoid
     # @since 4.0.0
     CHECK = []
 
-    attr_accessor :embedded, :klass
+    attr_accessor :embedded, :klass, :parent_document, :metadata
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.

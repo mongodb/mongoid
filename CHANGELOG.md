@@ -342,6 +342,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#3449 Touch needs to work for create and update. (Greggory Rothmeier)
 
+* \#3347 Creating documents off of scopes for embedded relations now properly
+  sets the parent document on the created children.
+
 * \#3432 Fixed mongoization of DateTime losing precision.
 
 * \#3397 Fixed $ne matcher for embedded documents to match server behaviour.

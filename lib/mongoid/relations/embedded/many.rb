@@ -355,6 +355,8 @@ module Mongoid
           criterion = klass.scoped
           criterion.embedded = true
           criterion.documents = target
+          criterion.parent_document = base
+          criterion.metadata = relation_metadata
           Many.apply_ordering(criterion, __metadata)
         end
 

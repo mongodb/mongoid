@@ -160,13 +160,17 @@ module Mongoid
       #
       # @since 3.0.0
       def create_document(method, attrs = nil, &block)
-        klass.__send__(method,
-          selector.reduce(attrs || {}) do |hash, (key, value)|
-            unless key.to_s =~ /\$/ || value.is_a?(Hash)
-              hash[key] = value
-            end
-            hash
-          end, &block)
+        attributes = selector.reduce(attrs || {}) do |hash, (key, value)|
+          unless key.to_s =~ /\$/ || value.is_a?(Hash)
+            hash[key] = value
+          end
+          hash
+        end
+        if embedded?
+          attributes[:_parent] = parent_document
+          attributes[:__metadata] = metadata
+        end
+        klass.__send__(method, attributes, &block)
       end
 
       # Find the first object or create/initialize it.
