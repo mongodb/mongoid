@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::State do
+describe Mongoid::Stateful do
 
   describe "#new_record?" do
 

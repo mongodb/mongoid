@@ -13,7 +13,6 @@ require "mongoid/equality"
 require "mongoid/criteria"
 require "mongoid/factory"
 require "mongoid/fields"
-require "mongoid/state"
 require "mongoid/timestamps"
 require "mongoid/composable"
 

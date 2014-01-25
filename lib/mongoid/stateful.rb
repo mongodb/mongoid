@@ -3,7 +3,7 @@ module Mongoid
 
   # This module contains the behaviour for getting the various states a
   # document can transition through.
-  module State
+  module Stateful
 
     attr_writer :destroyed, :flagged_for_destroy, :new_record
 

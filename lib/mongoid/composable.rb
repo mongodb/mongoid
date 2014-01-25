@@ -11,6 +11,7 @@ require "mongoid/selectable"
 require "mongoid/scopable"
 require "mongoid/serializable"
 require "mongoid/shardable"
+require "mongoid/stateful"
 require "mongoid/traversable"
 require "mongoid/validatable"
 
@@ -50,7 +51,7 @@ module Mongoid
     include Serializable
     include Sessions
     include Shardable
-    include State
+    include Stateful
     include Threaded::Lifecycle
     include Traversable
     include Validatable
@@ -76,7 +77,7 @@ module Mongoid
       Serializable,
       Sessions,
       Shardable,
-      State,
+      Stateful,
       Threaded::Lifecycle,
       Traversable,
       Validatable,
