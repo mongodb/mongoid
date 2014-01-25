@@ -99,4 +99,44 @@ describe Mongoid::Stateful do
       end
     end
   end
+
+  describe "#readonly!" do
+
+    let(:document) do
+      Band.new
+    end
+
+    before do
+      document.readonly!
+    end
+
+    it "flags the document as readonly" do
+      expect(document).to be_readonly
+    end
+  end
+
+  describe "#readonly?" do
+
+    let(:document) do
+      Band.new
+    end
+
+    context "when the document is readonly" do
+
+      before do
+        document.readonly!
+      end
+
+      it "returns true" do
+        expect(document).to be_readonly
+      end
+    end
+
+    context "when no readonly has been set" do
+
+      it "returns false" do
+        expect(document).to_not be_readonly
+      end
+    end
+  end
 end
