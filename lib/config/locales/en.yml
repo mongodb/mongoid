@@ -389,6 +389,12 @@ en:
             can only have values set when the document is a new record."
           resolution: "Don't define '%{name}' as readonly, or do not attempt
             to update its value after the document is persisted."
+        readonly_document:
+          message: "Attempted to persist the readonly document '%{klass}'."
+          summary: "Documents loaded from the database using #only or
+            explicitly flagged as readonly using #readonly! cannot be persisted."
+          resolution: "Don't attempt to persist documents that are flagged as
+            readonly."
         scope_overwrite:
           message: "Cannot create scope :%{scope_name}, because of existing
             method %{model_name}.%{scope_name}."
