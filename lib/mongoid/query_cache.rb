@@ -153,7 +153,15 @@ module Mongoid
         return yield unless QueryCache.enabled?
         return yield if @collection =~ /^system./
         key = [@database, @collection, @selector]
-        QueryCache.cache_table[key] ||= yield
+        if QueryCache.cache_table.has_key? key
+          instrument(key) { QueryCache.cache_table[key] }
+        else
+          QueryCache.cache_table[key] = yield
+        end
+      end
+
+      def instrument(key, &block)
+        ActiveSupport::Notifications.instrument("query_cache.mongoid", key: key, &block)
       end
     end
   end

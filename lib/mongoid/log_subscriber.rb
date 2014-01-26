@@ -16,6 +16,13 @@ module Mongoid
       debug(payload[:prefix], payload[:ops], runtime)
     end
 
+    def query_cache(event)
+      return unless logger.debug?
+
+      database, collection, selector = event.payload[:key]
+      operation = "%-12s database=%s collection=%s selector=%s" % ["QUERY CACHE", database, collection, selector.inspect]
+      logger.debug operation
+    end
     # Log the provided operations.
     #
     # @example Delegates the operation to moped so it can log it.
@@ -45,3 +52,4 @@ module Mongoid
 end
 
 Mongoid::LogSubscriber.attach_to :moped
+Mongoid::LogSubscriber.attach_to :mongoid
