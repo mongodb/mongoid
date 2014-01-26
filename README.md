@@ -9,7 +9,7 @@ Project Tracking
 * [Mongoid Website and Documentation](http://mongoid.org)
 * [Mongoid Google Group](http://groups.google.com/group/mongoid)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/mongoid)
-* #mongoid on freenode IRC
+* [#mongoid](http://webchat.freenode.net/?channels=mongoid) on freenode IRC
 
 Compatibility
 -------------
