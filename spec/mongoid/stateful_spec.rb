@@ -100,21 +100,6 @@ describe Mongoid::Stateful do
     end
   end
 
-  describe "#readonly!" do
-
-    let(:document) do
-      Band.new
-    end
-
-    before do
-      document.readonly!
-    end
-
-    it "flags the document as readonly" do
-      expect(document).to be_readonly
-    end
-  end
-
   describe "#readonly?" do
 
     let(:document) do
@@ -124,7 +109,7 @@ describe Mongoid::Stateful do
     context "when the document is readonly" do
 
       before do
-        document.readonly!
+        document.__selected_fields = { test: 1 }
       end
 
       it "returns true" do
