@@ -119,13 +119,11 @@ module Mongoid
       # @since 3.0.0
       def each(&block)
         if block_given?
-          selecting do
-            documents_for_iteration.each do |doc|
-              yield_document(doc, &block)
-            end
-            @cache_loaded = true
-            self
+          documents_for_iteration.each do |doc|
+            yield_document(doc, &block)
           end
+          @cache_loaded = true
+          self
         else
           to_enum
         end
@@ -624,32 +622,11 @@ module Mongoid
         if cached? && !documents.empty?
           documents
         elsif eager_loadable?
-          docs = query.map{ |doc| Factory.from_db(klass, doc) }
+          docs = query.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
           eager_load(docs)
           docs
         else
           query
-        end
-      end
-
-      # If we are limiting results, we need to set the field limitations on a
-      # thread local to avoid overriding the default values.
-      #
-      # @example Execute with selection.
-      #   context.selecting do
-      #     collection.find
-      #   end
-      #
-      # @return [ Object ] The yielded value.
-      #
-      # @since 2.4.4
-      def selecting
-        begin
-          fields = criteria.options[:fields]
-          Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
-          yield
-        ensure
-          Threaded.delete_selection(criteria.object_id)
         end
       end
 
@@ -667,7 +644,7 @@ module Mongoid
       # @since 3.0.0
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
-          document : Factory.from_db(klass, document, criteria.object_id)
+          document : Factory.from_db(klass, document, criteria.options[:fields])
         yield(doc)
         documents.push(doc) if cacheable?
       end

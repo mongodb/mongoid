@@ -150,53 +150,6 @@ module Mongoid
       validations_for(document.class).delete_one(document.id)
     end
 
-    # Get the field selection options from the current thread.
-    #
-    # @example Get the field selection options.
-    #   Threaded.selection
-    #
-    # @param [ Integer ] criteria_instance_id The criteria instance id.
-    #
-    # @return [ Hash ] The field selection.
-    #
-    # @since 2.4.4
-    def selection(criteria_instance_id)
-      selections = Thread.current["[mongoid][selections]"]
-      selections[criteria_instance_id] if selections
-    end
-
-    # Set the field selection on the current thread.
-    #
-    # @example Set the field selection.
-    #   Threaded.set_selection(Person, { field: 1 })
-    #
-    # @param [ Integer ] criteria_instance_id The criteria instance id.
-    # @param [ Hash ] value The current field selection.
-    #
-    # @return [ Hash ] The field selection.
-    #
-    # @since 2.4.4
-    def set_selection(criteria_instance_id, value)
-      Thread.current["[mongoid][selections]"] ||= {}
-      Thread.current["[mongoid][selections]"][criteria_instance_id] = value
-    end
-
-    # Delete the field selection on the current thread.
-    #
-    # @example Delete the field selection.
-    #   Threaded.delete_selection(Person)
-    #
-    # @param [ Integer ] criteria_instance_id The criteria instance id.
-    #
-    # @return [ Boolean ] Whether there was a field selection.
-    #
-    # @since 3.0.7
-    def delete_selection(criteria_instance_id)
-      selections = Thread.current["[mongoid][selections]"]
-      return false unless selections
-      !!selections.delete(criteria_instance_id)
-    end
-
     # Get the global session override.
     #
     # @example Get the global session override.

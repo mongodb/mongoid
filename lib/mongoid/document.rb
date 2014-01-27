@@ -24,7 +24,7 @@ module Mongoid
     extend ActiveSupport::Concern
     include Composable
 
-    attr_accessor :criteria_instance_id
+    attr_accessor :__selected_fields
     attr_reader :new_record
 
     included do
@@ -300,16 +300,16 @@ module Mongoid
       #   Person.instantiate(:title => "Sir", :age => 30)
       #
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
-      # @param [ Integer ] criteria_instance_id The criteria id that
-      #   instantiated the document.
+      # @param [ Integer ] selected_fields The selected fields from the
+      #   criteria.
       #
       # @return [ Document ] A new document.
       #
       # @since 1.0.0
-      def instantiate(attrs = nil, criteria_instance_id = nil)
+      def instantiate(attrs = nil, selected_fields = nil)
         attributes = attrs || {}
         doc = allocate
-        doc.criteria_instance_id = criteria_instance_id
+        doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
         yield(doc) if block_given?

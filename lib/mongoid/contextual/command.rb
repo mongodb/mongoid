@@ -30,32 +30,6 @@ module Mongoid
       def session
         collection.database.session
       end
-
-      private
-
-      # Execute the block setting field limitations.
-      #
-      # @api private
-      #
-      # @example Execute with field limitations.
-      #   text_search.selecting do
-      #     #...
-      #   end
-      #
-      # @param [ Symbol ] param The name of the command parameter.
-      #
-      # @return [ Object ] The result of the yield.
-      #
-      # @since 4.0.0
-      def selecting(param)
-        begin
-          fields = command[param]
-          Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
-          yield
-        ensure
-          Threaded.delete_selection(criteria.object_id)
-        end
-      end
     end
   end
 end

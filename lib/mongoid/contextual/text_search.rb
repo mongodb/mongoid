@@ -24,10 +24,8 @@ module Mongoid
       # @since 4.0.0
       def each
         if block_given?
-          selecting(:project) do
-            documents.each do |doc|
-              yield doc
-            end
+          documents.each do |doc|
+            yield doc
           end
         else
           to_enum
@@ -158,7 +156,7 @@ module Mongoid
       # @since 4.0.0
       def documents
         results["results"].map do |attributes|
-          Factory.from_db(criteria.klass, attributes["obj"], criteria.object_id)
+          Factory.from_db(criteria.klass, attributes["obj"], command[:project])
         end
       end
 

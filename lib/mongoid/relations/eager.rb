@@ -12,12 +12,10 @@ module Mongoid
       attr_accessor :eager_loaded
 
       def with_eager_loading(document)
-        selecting do
-          return nil unless document
-          doc = Factory.from_db(klass, document, criteria.object_id)
-          eager_load_one(doc)
-          doc
-        end
+        return nil unless document
+        doc = Factory.from_db(klass, document, criteria.options[:fields])
+        eager_load_one(doc)
+        doc
       end
 
       def eager_load_one(doc)
