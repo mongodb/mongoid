@@ -94,11 +94,6 @@ describe Mongoid::Persistable::Savable do
         it "does not flag the excluded fields as dirty" do
           expect(limited.changes).to be_empty
         end
-
-        it "does not overwrite with the default" do
-          limited.save
-          expect(limited.reload.age).to eq(20)
-        end
       end
 
       context "when iterating over the documents" do
@@ -273,6 +268,23 @@ describe Mongoid::Persistable::Savable do
         end
       end
     end
+
+    context "when the document is readonly" do
+
+      let(:person) do
+        Person.only(:title).first
+      end
+
+      before do
+        Person.create(title: "sir")
+      end
+
+      it "raises an error" do
+        expect {
+          person.save
+        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+      end
+    end
   end
 
   describe "save!" do
@@ -426,6 +438,23 @@ describe Mongoid::Persistable::Savable do
 
       it "properly sets up the entire hierarchy" do
         expect(from_db.shapes.first.canvas).to eq(firefox)
+      end
+    end
+
+    context "when the document is readonly" do
+
+      let(:person) do
+        Person.only(:title).first
+      end
+
+      before do
+        Person.create(title: "sir")
+      end
+
+      it "raises an error" do
+        expect {
+          person.save!
+        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
       end
     end
   end

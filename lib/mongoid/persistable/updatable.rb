@@ -8,32 +8,6 @@ module Mongoid
     # @since 4.0.0
     module Updatable
 
-      # Update the document in the database.
-      #
-      # @example Update an existing document.
-      #   document.update
-      #
-      # @param [ Hash ] options Options to pass to update.
-      #
-      # @option options [ true, false ] :validate Whether or not to validate.
-      #
-      # @return [ true, false ] True if succeeded, false if not.
-      #
-      # @since 1.0.0
-      def update_document(options = {})
-        prepare_update(options) do
-          updates, conflicts = init_atomic_updates
-          unless updates.empty?
-            coll = _root.collection
-            selector = atomic_selector
-            coll.find(selector).update(positionally(selector, updates))
-            conflicts.each_pair do |key, value|
-              coll.find(selector).update(positionally(selector, { key => value }))
-            end
-          end
-        end
-      end
-
       # Update a single attribute and persist the entire document.
       # This skips validation but fires the callbacks.
       #
@@ -145,6 +119,33 @@ module Mongoid
           end
         end
         post_process_persist(result, options) and result
+      end
+
+      # Update the document in the database.
+      #
+      # @example Update an existing document.
+      #   document.update
+      #
+      # @param [ Hash ] options Options to pass to update.
+      #
+      # @option options [ true, false ] :validate Whether or not to validate.
+      #
+      # @return [ true, false ] True if succeeded, false if not.
+      #
+      # @since 1.0.0
+      def update_document(options = {})
+        raise Errors::ReadonlyDocument.new(self.class) if readonly?
+        prepare_update(options) do
+          updates, conflicts = init_atomic_updates
+          unless updates.empty?
+            coll = _root.collection
+            selector = atomic_selector
+            coll.find(selector).update(positionally(selector, updates))
+            conflicts.each_pair do |key, value|
+              coll.find(selector).update(positionally(selector, { key => value }))
+            end
+          end
+        end
       end
     end
   end
