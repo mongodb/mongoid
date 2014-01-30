@@ -4,8 +4,21 @@ describe Mongoid::Persistable::Deletable do
 
   describe "#delete" do
 
-    let(:person) do
+    let!(:person) do
       Person.create
+    end
+
+    context "when deleting a readonly document" do
+
+      let(:from_db) do
+        Person.only(:_id).first
+      end
+
+      it "raises an error" do
+        expect {
+          from_db.delete
+        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+      end
     end
 
     context "when removing a root document" do
