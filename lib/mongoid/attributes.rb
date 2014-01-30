@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "active_model/attribute_methods"
 require "mongoid/attributes/dynamic"
 require "mongoid/attributes/nested"
 require "mongoid/attributes/processing"
@@ -218,6 +219,24 @@ module Mongoid
       assign_attributes(attrs)
     end
     alias :attributes= :write_attributes
+
+    # Determine if the attribute is missing from the document, due to loading
+    # it from the database with missing fields.
+    #
+    # @example Is the attribute missing?
+    #   document.attribute_missing?("test")
+    #
+    # @param [ String ] name The name of the attribute.
+    #
+    # @return [ true, false ] If the attribute is missing.
+    #
+    # @since 4.0.0
+    def attribute_missing?(name)
+      selection = __selected_fields
+      return false unless selection
+      (selection.values.first == 0 && selection[name.to_s] == 0) ||
+        (selection.values.first == 1 && !selection.has_key?(name.to_s))
+    end
 
     private
 

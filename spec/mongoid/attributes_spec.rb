@@ -14,6 +14,39 @@ describe Mongoid::Attributes do
         expect(account.overridden).to eq("not recommended")
       end
     end
+
+    context "when the attribute was excluded in a criteria" do
+
+      let!(:person) do
+        Person.create(title: "sir")
+      end
+
+      context "when excluding with only" do
+
+        let(:from_db) do
+          Person.only(:_id).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.title
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+
+      context "when excluding with without" do
+
+        let(:from_db) do
+          Person.without(:title).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.title
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+    end
   end
 
   describe "#[]" do
@@ -650,6 +683,7 @@ describe Mongoid::Attributes do
   end
 
   describe "#read_attribute_before_type_cast" do
+
     let(:person) do
       Person.create
     end
@@ -669,7 +703,6 @@ describe Mongoid::Attributes do
       end
     end
   end
-
 
   describe "#attribute_present?" do
 

@@ -2611,7 +2611,9 @@ describe Mongoid::Criteria do
         end
 
         it "limits the returned fields" do
-          expect(criteria.first.name).to be_nil
+          expect {
+            criteria.first.name
+          }.to raise_error(ActiveModel::MissingAttributeError)
         end
 
         it "does not add _type to the fields" do
@@ -2630,7 +2632,9 @@ describe Mongoid::Criteria do
         end
 
         it "excludes the non included fields" do
-          expect(criteria.first.active).to be_nil
+          expect {
+            criteria.first.active
+          }.to raise_error(ActiveModel::MissingAttributeError)
         end
 
         it "does not add _type to the fields" do

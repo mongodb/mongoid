@@ -406,6 +406,9 @@ module Mongoid
       def create_field_getter(name, meth, field)
         generated_methods.module_eval do
           re_define_method(meth) do
+            if attribute_missing?(name)
+              raise ActiveModel::MissingAttributeError, "'#{name}' is not available on the document."
+            end
             raw = read_attribute(name)
             if lazy_settable?(field, raw)
               write_attribute(name, field.eval_default(self))
