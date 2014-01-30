@@ -103,6 +103,35 @@ describe Mongoid::Attributes do
         Person.create(title: "sir")
       end
 
+      context "when the attribute was excluded in a criteria" do
+
+        context "when excluding with only" do
+
+          let(:from_db) do
+            Person.only(:_id).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:title]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context "when excluding with without" do
+
+          let(:from_db) do
+            Person.without(:title).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:title]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+      end
+
       context "when the attribute does not exist" do
 
         before do
