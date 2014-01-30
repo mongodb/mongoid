@@ -227,6 +227,11 @@ For instructions on upgrading to newer versions, visit
 * `delete_all` and `destroy_all` no longer take a `:conditions` hash but
   just the raw attributes.
 
+* \#1908 Documents now loaded from criteria using `#only` or `#without` will now
+  raise an error when attempting to save, update, or delete these records.
+  Additionally fields excluded from the fields retrieved from the database will
+  also raise an exception when trying to access them.
+
 * \#1344 Atomic updates can now be executed in an `atomically` block, which will
   delay any atomic updates on the document the block was called on until the
   block is complete.
