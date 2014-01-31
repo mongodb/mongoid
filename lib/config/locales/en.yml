@@ -31,6 +31,13 @@ en:
           resolution: "Most likely this is caused by passing parameters directly
             through to the find, and the parameter either is not present or the
             key from which it is accessed is incorrect."
+        document_not_destroyed:
+          message: "%{klass} with id %{id} was not destroyed."
+          summary: "When calling %{klass}#destroy! and a callback halts the destroy
+            callback chain by returning a false value, the deletion will not
+            actually occur."
+          resolution: "Check the before/after destroy callbacks to ensure that the
+            return values are truthy for the chain to continue."
         document_not_found:
           message: "Document(s) not found for class %{klass} with id(s) %{missing}."
           summary: "When calling %{klass}.find with an id or array of ids, each

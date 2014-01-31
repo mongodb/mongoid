@@ -2,6 +2,7 @@
 require "mongoid/errors/mongoid_error"
 require "mongoid/errors/ambiguous_relationship"
 require "mongoid/errors/callback"
+require "mongoid/errors/document_not_destroyed"
 require "mongoid/errors/document_not_found"
 require "mongoid/errors/eager_load"
 require "mongoid/errors/invalid_collection"
