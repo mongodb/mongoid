@@ -2388,8 +2388,16 @@ describe Mongoid::Relations::Referenced::Many do
             movie.ratings.find([ rating_one.id, rating_two.id ])
           end
 
-          it "returns the matching documents" do
-            expect(ratings).to eq([ rating_one, rating_two ])
+          it "returns the first matching document" do
+            expect(ratings).to include(rating_one)
+          end
+
+          it "returns the second matching document" do
+            expect(ratings).to include(rating_two)
+          end
+
+          it "returns the correct number of documents" do
+            expect(ratings.size).to eq(2)
           end
         end
 

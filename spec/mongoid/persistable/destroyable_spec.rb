@@ -115,6 +115,37 @@ describe Mongoid::Persistable::Destroyable do
     end
   end
 
+  describe "#destroy!" do
+
+    context "when no validation callback returns false" do
+
+      let(:person) do
+        Person.create
+      end
+
+      it "returns true" do
+        expect(person.destroy!).to eq(true)
+      end
+    end
+
+    context "when a validation callback returns false" do
+
+      let(:album) do
+        Album.create
+      end
+
+      before do
+        expect(album).to receive(:set_parent_name).and_return(false)
+      end
+
+      it "raises an exception" do
+        expect {
+          album.destroy!
+        }.to raise_error(Mongoid::Errors::DocumentNotDestroyed)
+      end
+    end
+  end
+
   describe "#destroy_all" do
 
     let!(:person) do
