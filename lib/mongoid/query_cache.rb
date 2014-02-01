@@ -146,18 +146,19 @@ module Mongoid
       end
     end
 
-    class CachedCursor < Moped::Cursor # :nodoc:
-
-      def load_docs
-        with_cache { super }
-      end
+    # Module to include in objects which need to wrap caching behaviour around
+    # them.
+    #
+    # @since 4.0.0
+    module Cacheable
 
       private
+
       def with_cache
         return yield unless QueryCache.enabled?
-        return yield if @collection =~ /^system./
-        key = [@database, @collection, @selector]
-        if QueryCache.cache_table.has_key? key
+        return yield if system_collection?
+        key = cache_key
+        if QueryCache.cache_table.has_key?(key)
           instrument(key) { QueryCache.cache_table[key] }
         else
           QueryCache.cache_table[key] = yield
@@ -166,6 +167,36 @@ module Mongoid
 
       def instrument(key, &block)
         ActiveSupport::Notifications.instrument("query_cache.mongoid", key: key, &block)
+      end
+    end
+
+    # A Cursor that attempts to load documents from memory first before hitting
+    # the database if the same query has already been executed.
+    #
+    # @since 4.0.0
+    class CachedCursor < Moped::Cursor
+      include Cacheable
+
+      # Override the loading of docs to attempt to fetch from the cache.
+      #
+      # @example Load the documents.
+      #   cursor.load_docs
+      #
+      # @return [ Array<Hash> ] The documents.
+      #
+      # @since 4.0.0
+      def load_docs
+        with_cache { super }
+      end
+
+      private
+
+      def cache_key
+        [ @database, @collection, @selector ]
+      end
+
+      def system_collection?
+        @collection =~ /^system./
       end
     end
   end
