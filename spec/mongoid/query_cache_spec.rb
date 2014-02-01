@@ -9,7 +9,7 @@ describe Mongoid::QueryCache do
 
   context "when querying for a single document" do
 
-    [ :first, :one ].each do |method|
+    [ :first, :one, :last ].each do |method|
 
       before do
         Band.all.send(method)
