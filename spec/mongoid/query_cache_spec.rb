@@ -7,6 +7,47 @@ describe Mongoid::QueryCache do
     Mongoid::QueryCache.cache { spec.run }
   end
 
+  context "when querying for a single document" do
+
+    [ :first, :one ].each do |method|
+
+      before do
+        Band.all.send(method)
+      end
+
+      context "when query cache disable" do
+
+        before do
+          Mongoid::QueryCache.enabled = false
+        end
+
+        it "queries again" do
+          expect_query(1) do
+            Band.all.send(method)
+          end
+        end
+      end
+
+      context "with same selector" do
+
+        it "does not query again" do
+          expect_no_queries do
+            Band.all.send(method)
+          end
+        end
+      end
+
+      context "with different selector" do
+
+        it "queries again" do
+          expect_query(1) do
+            Band.where(id: 1).send(method)
+          end
+        end
+      end
+    end
+  end
+
   context "when querying in the same collection" do
 
     before do

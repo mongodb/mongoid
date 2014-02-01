@@ -123,29 +123,6 @@ module Mongoid
       end
     end
 
-    module Query
-      extend ActiveSupport::Concern
-
-      included do
-        extend QueryCache::Base
-        alias_method_chain :cursor, :cache
-        alias_query_cache_clear :remove, :remove_all, :update, :update_all, :upsert
-      end
-
-      def cursor_with_cache
-        CachedCursor.new(session, operation)
-      end
-    end
-
-    module Collection
-      extend ActiveSupport::Concern
-
-      included do
-        extend QueryCache::Base
-        alias_query_cache_clear :insert
-      end
-    end
-
     # Module to include in objects which need to wrap caching behaviour around
     # them.
     #
@@ -167,6 +144,69 @@ module Mongoid
 
       def instrument(key, &block)
         ActiveSupport::Notifications.instrument("query_cache.mongoid", key: key, &block)
+      end
+    end
+
+    # Adds behaviour around caching to a Moped Query object.
+    #
+    # @since 4.0.0
+    module Query
+      extend ActiveSupport::Concern
+      include Cacheable
+
+      included do
+        extend QueryCache::Base
+        alias_method_chain :cursor, :cache
+        alias_method_chain :first, :cache
+        alias_query_cache_clear :remove, :remove_all, :update, :update_all, :upsert
+      end
+
+      # Provide a wrapped query cache cursor.
+      #
+      # @example Get the wrapped caching cursor.
+      #   query.cursor_with_cache
+      #
+      # @return [ CachedCursor ] The cached cursor.
+      #
+      # @since 4.0.0
+      def cursor_with_cache
+        CachedCursor.new(session, operation)
+      end
+
+      # Override first with caching.
+      #
+      # @example Get the first with a cache.
+      #   query.first_with_cache
+      #
+      # @return [ Hash ] The first document.
+      #
+      # @since 4.0.0
+      def first_with_cache
+        with_cache do
+          first_without_cache
+        end
+      end
+
+      private
+
+      def cache_key
+        [ operation.database, operation.collection, operation.selector ]
+      end
+
+      def system_collection?
+        operation.collection =~ /^system./
+      end
+    end
+
+    # Adds behaviour to the query cache for collections.
+    #
+    # @since 4.0.0
+    module Collection
+      extend ActiveSupport::Concern
+
+      included do
+        extend QueryCache::Base
+        alias_query_cache_clear :insert
       end
     end
 
