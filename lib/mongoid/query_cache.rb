@@ -123,11 +123,13 @@ module Mongoid
       end
     end
 
-    module Query # :nodoc:
-      def self.included(base)
-        base.extend QueryCache::Base
-        base.alias_method_chain(:cursor, :cache)
-        base.alias_query_cache_clear(:remove, :remove_all, :update, :update_all, :upsert)
+    module Query
+      extend ActiveSupport::Concern
+
+      included do
+        extend QueryCache::Base
+        alias_method_chain :cursor, :cache
+        alias_query_cache_clear :remove, :remove_all, :update, :update_all, :upsert
       end
 
       def cursor_with_cache
@@ -135,10 +137,12 @@ module Mongoid
       end
     end
 
-    module Collection # :nodoc:
-      def self.included(base)
-        base.extend QueryCache::Base
-        base.alias_query_cache_clear(:insert)
+    module Collection
+      extend ActiveSupport::Concern
+
+      included do
+        extend QueryCache::Base
+        alias_query_cache_clear :insert
       end
     end
 
