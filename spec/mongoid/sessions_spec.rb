@@ -650,7 +650,7 @@ describe Mongoid::Sessions do
       it "raises an error" do
         expect {
           klass.store_in(database: :artists)
-        }.to raise_error(Mongoid::Errors::InvalidStorageOptions)
+        }.to raise_error(Mongoid::Errors::InvalidStorageParent)
       end
     end
 

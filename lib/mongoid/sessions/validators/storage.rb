@@ -19,9 +19,8 @@ module Mongoid
         #
         # @since 3.0.0
         def validate(klass, options)
-          if !valid_keys?(options) || !valid_parent?(klass)
-            raise Errors::InvalidStorageOptions.new(klass, options)
-          end
+          valid_keys?(options) or raise Errors::InvalidStorageOptions.new(klass, options)
+          valid_parent?(klass) or raise Errors::InvalidStorageParent.new(klass)
         end
 
         private
