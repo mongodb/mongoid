@@ -5,7 +5,7 @@ gem "rake"
 gem "actionpack", "~> 4.0"
 
 group :test do
-  gem "rspec", "~> 3.0.0.beta1"
+  gem "rspec", "~> 3.0.0.beta2"
 
   if ENV["CI"]
     gem "coveralls", require: false
