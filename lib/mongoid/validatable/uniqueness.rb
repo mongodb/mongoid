@@ -267,7 +267,10 @@ module Mongoid
       # @since 2.4.10
       def validate_root(document, attribute, value)
         klass = document.class
-        klass = klass.superclass while !klass.validators.include?(self)
+
+        while klass.superclass.respond_to?(:validators) && klass.superclass.validators.include?(self)
+          klass = klass.superclass
+        end
         criteria = create_criteria(klass, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
 
