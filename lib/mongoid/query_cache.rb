@@ -135,6 +135,7 @@ module Mongoid
         return yield unless QueryCache.enabled?
         return yield if system_collection?
         key = cache_key
+
         if QueryCache.cache_table.has_key?(key)
           instrument(key) { QueryCache.cache_table[key] }
         else
@@ -190,7 +191,7 @@ module Mongoid
       private
 
       def cache_key
-        [ operation.database, operation.collection, operation.selector ]
+        [ operation.database, operation.collection, operation.selector, operation.limit, operation.skip, operation.fields ]
       end
 
       def system_collection?
@@ -232,7 +233,7 @@ module Mongoid
       private
 
       def cache_key
-        [ @database, @collection, @selector ]
+        [ @database, @collection, @selector, @options[:limit], @options[:skip], @options[:fields] ]
       end
 
       def system_collection?
