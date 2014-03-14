@@ -720,6 +720,41 @@ describe Mongoid::Relations::Embedded::Many do
           Address.new
         end
 
+        (1..3).each do |address_count|
+          context "when adding #{address_count} addresses with BSON Id" do
+            before do
+              # If you add 1 address it work for all cases
+              # If you add 2 addresses it fail only for destroy each case
+              # IF you add 3 addresses it fail for all cases
+              address_count.times { |i| person.addresses.create!(id: BSON::ObjectId.new, no: i)}
+            end
+
+            it "destroy each correctly" do
+              expect(person.addresses.count).to be address_count
+              person.addresses.each { |a| a.destroy }
+              expect(person.reload.addresses).to be_empty
+            end
+
+            it "destroy_all correctly" do
+              expect(person.addresses.count).to be address_count
+              person.addresses.destroy_all
+              expect(person.reload.addresses).to be_empty
+            end
+
+            it "delete_all correctly" do
+              expect(person.addresses.count).to be address_count
+              person.addresses.delete_all
+              expect(person.reload.addresses).to be_empty
+            end
+
+            it "delete all correctly when setting directly" do
+              expect(person.addresses.count).to be address_count
+              person.addresses = []
+              expect(person.reload.addresses).to be_empty
+            end
+          end
+        end
+
         context "when setting directly" do
 
           before do
