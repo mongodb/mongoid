@@ -74,6 +74,28 @@ describe Mongoid::QueryCache do
           Band.all.to_a
         end
       end
+
+      context "when querying only the first" do
+        let(:game) { Game.create!(name: "2048") }
+
+        before do
+          game.ratings.where(:value.gt => 5).asc(:id).all.to_a
+        end
+
+        it "queries again" do
+          expect_query(1) do
+            game.ratings.where(:value.gt => 5).asc(:id).first
+          end
+        end
+      end
+
+      context "limiting the result" do
+        it "queries again" do
+          expect_query(1) do
+            Band.limit(2).all.to_a
+          end
+        end
+      end
     end
 
     context "with different selector" do
