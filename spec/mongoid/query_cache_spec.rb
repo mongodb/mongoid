@@ -96,6 +96,18 @@ describe Mongoid::QueryCache do
           end
         end
       end
+
+      context "specifying a different skip value" do
+        before do
+          Band.limit(2).skip(1).all.to_a
+        end
+
+        it "queries again" do
+          expect_query(1) do
+            Band.limit(2).skip(3).all.to_a
+          end
+        end
+      end
     end
 
     context "with different selector" do
