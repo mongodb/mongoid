@@ -2344,18 +2344,19 @@ describe Mongoid::Validatable::UniquenessValidator do
   end
 
   context "when validation works with inheritance" do
-
-    before do
-      Actor.validates_uniqueness_of :name
-      Actor.create!(name: "Johnny Depp")
+    class EuropeanActor < Actor
+      validates_uniqueness_of :name
     end
 
-    after do
-      Actor.reset_callbacks(:validate)
+    class SpanishActor < EuropeanActor
+    end
+
+    before do
+      EuropeanActor.create!(name: "Antonio Banderas")
     end
 
     let!(:subclass_document_with_duplicated_name) do
-      Actress.new(name: "Johnny Depp")
+      SpanishActor.new(name: "Antonio Banderas")
     end
 
     it "should be invalid" do
