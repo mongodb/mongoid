@@ -131,10 +131,10 @@ module Mongoid
 
       private
 
-      def with_cache
+      def with_cache(context = :cursor, &block)
         return yield unless QueryCache.enabled?
         return yield if system_collection?
-        key = cache_key
+        key = cache_key.push(context)
 
         if QueryCache.cache_table.has_key?(key)
           instrument(key) { QueryCache.cache_table[key] }
@@ -183,7 +183,7 @@ module Mongoid
       #
       # @since 4.0.0
       def first_with_cache
-        with_cache do
+        with_cache(:first) do
           first_without_cache
         end
       end
