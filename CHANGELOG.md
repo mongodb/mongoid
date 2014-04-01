@@ -345,6 +345,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3568 Fixed missing attributes error on present localized fields.
+
 * \#3514 Fixed query cache to work on first/last calls.
 
 * \#3383/\#3495 Fix has_and_belongs_to_many eager load. (Arthur Neves)

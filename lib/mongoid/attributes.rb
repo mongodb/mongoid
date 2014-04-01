@@ -91,7 +91,7 @@ module Mongoid
     # @since 1.0.0
     def read_attribute(name)
       normalized = database_field_name(name.to_s)
-      if attribute_missing?(name)
+      if attribute_missing?(normalized)
         raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
       end
       if hash_dot_syntax?(normalized)
@@ -237,12 +237,29 @@ module Mongoid
     def attribute_missing?(name)
       selection = __selected_fields
       return false unless selection
+      field = fields[name]
       selection.merge!({ "_id" => 1 })
-      (selection.values.first == 0 && selection[name.to_s] == 0) ||
-        (selection.values.first == 1 && !selection.has_key?(name.to_s))
+      (selection.values.first == 0 && selection_excluded?(name, selection, field)) ||
+        (selection.values.first == 1 && !selection_included?(name, selection, field))
     end
 
     private
+
+    def selection_excluded?(name, selection, field)
+      if field && field.localized?
+        selection["#{name}.#{::I18n.locale}"] == 0
+      else
+        selection[name] == 0
+      end
+    end
+
+    def selection_included?(name, selection, field)
+      if field && field.localized?
+        selection.has_key?("#{name}.#{::I18n.locale}")
+      else
+        selection.has_key?(name)
+      end
+    end
 
     # Does the string contain dot syntax for accessing hashes?
     #

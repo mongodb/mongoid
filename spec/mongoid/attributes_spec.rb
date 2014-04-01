@@ -21,6 +21,41 @@ describe Mongoid::Attributes do
         Person.create(title: "sir")
       end
 
+      context "when the attribute is localized" do
+
+        before do
+          person.update_attribute(:desc, "test")
+        end
+
+        context "when the context includes" do
+
+          context "when the attribute exists" do
+
+            let(:from_db) do
+              Person.only(:desc).first
+            end
+
+            it "does not raise an error" do
+              expect(from_db.desc).to eq("test")
+            end
+          end
+        end
+
+        context "when the context excludes" do
+
+          context "when the attribute exists" do
+
+            let(:from_db) do
+              Person.without(:pets).first
+            end
+
+            it "does not raise an error" do
+              expect(from_db.desc).to eq("test")
+            end
+          end
+        end
+      end
+
       context "when excluding with only" do
 
         let(:from_db) do
