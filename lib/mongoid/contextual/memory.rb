@@ -295,7 +295,7 @@ module Mongoid
           updates["$set"].merge!(doc.atomic_updates["$set"] || {})
           doc.move_changes
         end
-        collection.find(selector).update(updates)
+        collection.find(selector).update(updates) unless updates["$set"].empty?
       end
 
       # Get the limiting value.
