@@ -281,6 +281,10 @@ For instructions on upgrading to newer versions, visit
   https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields.rb#L16
   for the available mappings.
 
+* \#3580 Fields can now be reset to their default values, with the methods:
+
+    document.reset_name_to_default!
+
 * \#3513 Documents now have a `#destroy!` method that will raise a
   `Mongoid::Errors::DocumentNotDestroyed` error if a destroy callback returns
   a false value.

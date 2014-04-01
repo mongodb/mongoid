@@ -299,6 +299,7 @@ module Mongoid
           alias #{name}_change   #{original}_change
           alias #{name}_changed? #{original}_changed?
           alias reset_#{name}!   reset_#{original}!
+          alias reset_#{name}_to_default!   reset_#{original}_to_default!
           alias #{name}_was      #{original}_was
           alias #{name}_will_change! #{original}_will_change!
           alias #{name}_before_type_cast #{original}_before_type_cast

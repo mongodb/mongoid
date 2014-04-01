@@ -1142,6 +1142,83 @@ describe Mongoid::Changeable do
     end
   end
 
+  describe "#reset_attribute_to_default!" do
+
+    context "when a default is defined" do
+
+      context "when the document is new" do
+
+        let(:person) do
+          Person.new(pets: true)
+        end
+
+        before do
+          person.reset_pets_to_default!
+        end
+
+        it "resets to the default value" do
+          expect(person.pets).to eq(false)
+        end
+      end
+
+      context "when the document is persisted" do
+
+        let(:person) do
+          Person.create(pets: true)
+        end
+
+        before do
+          person.reset_pets_to_default!
+        end
+
+        it "resets to the default value" do
+          expect(person.pets).to eq(false)
+        end
+
+        it "flags the document dirty" do
+          expect(person).to be_pets_changed
+        end
+      end
+    end
+
+    context "when a default is not defined" do
+
+      context "when the document is new" do
+
+        let(:person) do
+          Person.new(title: "test")
+        end
+
+        before do
+          person.reset_title_to_default!
+        end
+
+        it "resets to nil" do
+          expect(person.title).to be_nil
+        end
+      end
+
+      context "when the document is persisted" do
+
+        let(:person) do
+          Person.create(title: "test")
+        end
+
+        before do
+          person.reset_title_to_default!
+        end
+
+        it "resets to nil" do
+          expect(person.title).to be_nil
+        end
+
+        it "flags the document dirty" do
+          expect(person).to be_title_changed
+        end
+      end
+    end
+  end
+
   context "when fields have been defined pre-dirty inclusion" do
 
     let(:document) do
