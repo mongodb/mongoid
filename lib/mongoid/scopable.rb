@@ -45,7 +45,7 @@ module Mongoid
       #     include Mongoid::Document
       #     field :active, type: Boolean
       #
-      #     scope :active, where(active: true)
+      #     scope :active, -> { where(active: true) }
       #   end
       #   Band.scopes
       #
@@ -127,14 +127,14 @@ module Mongoid
       #     field :active, type: Boolean
       #     field :count, type: Integer
       #
-      #     scope :active, where(active: true)
+      #     scope :active, -> { where(active: true) }
       #     scope :at_least, ->(count){ where(:count.gt => count) }
       #   end
       #
       # @param [ Symbol ] name The name of the scope.
-      # @param [ Proc, Criteria ] conditions The conditions of the scope.
+      # @param [ Proc ] conditions The conditions of the scope.
       #
-      # @raise [ Errors::InvalidScope ] If the scope is not a proc or criteria.
+      # @raise [ Errors::InvalidScope ] If the scope is not a proc.
       # @raise [ Errors::ScopeOverwrite ] If the scope name already exists.
       #
       # @since 1.0.0
