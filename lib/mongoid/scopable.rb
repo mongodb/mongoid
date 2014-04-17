@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 module Mongoid
 
   # This module contains behaviour for all Mongoid scoping - named scopes,
@@ -321,15 +322,15 @@ module Mongoid
       #
       # @since 3.0.0
       def define_scope_method(name)
-        singleton_class.class_eval <<-SCOPE, __FILE__, __LINE__ + 1
-          def #{name}(*args)
-            scoping = _declared_scopes[:#{name}]
+        singleton_class.class_eval do
+          define_method name do |*args|
+            scoping = _declared_scopes[name]
             scope, extension = scoping[:scope][*args], scoping[:extension]
             criteria = with_default_scope.merge(scope || queryable)
             criteria.extend(extension)
             criteria
           end
-        SCOPE
+        end
       end
 
       # Process the default scope value. If one already exists, we merge the
