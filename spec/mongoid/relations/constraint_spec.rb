@@ -20,6 +20,7 @@ describe Mongoid::Relations::Constraint do
           class_name: "Person",
           name: :person,
           inverse_class_name: "Post",
+          polymorphic: polymorphic,
           relation: Mongoid::Relations::Referenced::In
         )
       end
@@ -28,25 +29,55 @@ describe Mongoid::Relations::Constraint do
         described_class.new(metadata)
       end
 
-      context "when provided an object id" do
+      context "when the relation is not polymorphic" do
+        let (:polymorphic) { false }
 
-        let(:object) do
-          Moped::BSON::ObjectId.new
+        context "when provided an object id" do
+
+          let(:object) do
+            Moped::BSON::ObjectId.new
+          end
+
+          it "returns the object id" do
+            constraint.convert(object).should eq(object)
+          end
         end
 
-        it "returns the object id" do
-          constraint.convert(object).should eq(object)
+        context "when provided a string" do
+
+          let(:object) do
+            Moped::BSON::ObjectId.new
+          end
+
+          it "returns an object id from the string" do
+            constraint.convert(object.to_s).should eq(object)
+          end
         end
       end
 
-      context "when provided a string" do
+      context "when the relation is polymorphic" do
+        let (:polymorphic) { true }
 
-        let(:object) do
-          Moped::BSON::ObjectId.new
+        context "when provided an object id" do
+
+          let(:object) do
+            Moped::BSON::ObjectId.new
+          end
+
+          it "returns the object id" do
+            constraint.convert(object).should eq(object)
+          end
         end
 
-        it "returns an object id from the string" do
-          constraint.convert(object.to_s).should eq(object)
+        context "when provided a string" do
+
+          let(:object) do
+            Moped::BSON::ObjectId.new
+          end
+
+          it "returns an object id from the string" do
+            constraint.convert(object.to_s).should eq(object)
+          end
         end
       end
     end
