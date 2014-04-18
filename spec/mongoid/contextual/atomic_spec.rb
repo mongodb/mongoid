@@ -104,7 +104,7 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "does not error on non initialized fields" do
-        expect(smiths.reload.likes).to eq(0)
+        expect(smiths.reload.likes).to be_nil
       end
     end
 
