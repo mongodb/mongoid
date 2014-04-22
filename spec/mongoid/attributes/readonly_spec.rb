@@ -60,11 +60,11 @@ describe Mongoid::Attributes::Readonly do
     context "when updating an existing readonly field" do
 
       before do
-        Person.attr_readonly :title, :terms
+        Person.attr_readonly :title, :terms, :score
       end
 
       let(:person) do
-        Person.create(title: "sir", terms: true)
+        Person.create(title: "sir", terms: true, score: 1)
       end
 
       context "when updating via the setter" do
@@ -81,6 +81,16 @@ describe Mongoid::Attributes::Readonly do
         it "does not persist the changes" do
           expect(person.reload.title).to eq("sir")
         end
+      end
+
+      context "when updating via inc" do
+
+        it "raises an error" do
+          expect {
+            person.inc(score: 1)
+          }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+        end
+
       end
 
       context "when updating via []=" do
