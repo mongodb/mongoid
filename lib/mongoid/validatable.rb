@@ -14,7 +14,6 @@ module Mongoid
   # provide: validates_associated and validates_uniqueness_of.
   module Validatable
     extend ActiveSupport::Concern
-    include ActiveModel::Validations
 
     included do
       extend Macros
