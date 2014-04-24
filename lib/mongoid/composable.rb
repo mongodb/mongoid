@@ -26,13 +26,11 @@ module Mongoid
     # All modules that a +Document+ is composed of are defined in this
     # module, to keep the document class from getting too cluttered.
     included do
-      extend ActiveModel::Translation
       extend Findable
     end
 
-    include ActiveModel::Conversion
+    include ActiveModel::Model
     include ActiveModel::ForbiddenAttributesProtection
-    include ActiveModel::Naming
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
     include Atomic
