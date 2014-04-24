@@ -17,7 +17,7 @@ module Rails
     def create_indexes(*globs)
       models(*globs).each do |model|
         next if model.index_options.empty?
-        unless model.embedded?
+        if !model.embedded? || model.cyclic?
           model.create_indexes
           logger.info("MONGOID: Created indexes on #{model}:")
           model.index_options.each_pair do |index, options|
