@@ -3,6 +3,10 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## Unreleased
+
+* \#3397 Fixed $ne matcher for embedded documents to match server behaviour.
+
 ## 3.1.7
 
 ### Resolved Issues
