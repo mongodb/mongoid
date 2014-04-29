@@ -345,6 +345,11 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3619 Don't validate documents that are flagged for destruction.
+  (Christopher J. Bottaro)
+
+* \#3617 Don't skip index creation on cyclic documents. (shaiker)
+
 * \#3568 Fixed missing attributes error on present localized fields.
 
 * \#3514 Fixed query cache to work on first/last calls.
