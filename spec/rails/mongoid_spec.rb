@@ -84,6 +84,21 @@ describe "Rails::Mongoid" do
         indexes
       end
     end
+
+    context "when index is defined on self-embedded (cyclic) model" do
+      let(:klass) do
+        Draft
+      end
+
+      let(:model_paths) do
+        [ "spec/app/models/draft.rb" ]
+      end
+
+      it "creates the indexes for the models" do
+        klass.should_receive(:create_indexes).once
+        indexes
+      end      
+    end
   end
 
   describe ".remove_indexes" do
