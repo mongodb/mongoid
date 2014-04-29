@@ -13,7 +13,7 @@ describe "Mongoid::Tasks::Database" do
   end
 
   let(:models) do
-    [ User, Account, Address ]
+    [ User, Account, Address, Draft ]
   end
 
   describe ".create_indexes" do
@@ -66,6 +66,18 @@ describe "Mongoid::Tasks::Database" do
 
       it "does nothing, but logging" do
         expect(klass).to receive(:create_indexes).never
+        indexes
+      end
+    end
+
+    context "when index is defined on self-embedded (cyclic) model" do
+
+      let(:klass) do
+        Draft
+      end
+
+      it "creates the indexes for the models" do
+        expect(klass).to receive(:create_indexes).once
         indexes
       end
     end
