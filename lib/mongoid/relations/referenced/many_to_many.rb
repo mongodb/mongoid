@@ -54,13 +54,14 @@ module Mongoid
           documents.each do |doc|
             next unless doc
             append(doc)
+            doc_id = doc.send(__metadata.primary_key)
             if persistable? || _creating?
-              ids[doc.id] = true
+              ids[doc_id] = true
               save_or_delay(doc, docs, inserts)
             else
               existing = base.send(foreign_key)
-              unless existing.include?(doc.id)
-                existing.push(doc.id) and unsynced(base, foreign_key)
+              unless existing.include?(doc_id)
+                existing.push(doc_id) and unsynced(base, foreign_key)
               end
             end
           end

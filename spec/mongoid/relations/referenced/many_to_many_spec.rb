@@ -1676,6 +1676,24 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
       end
     end
+
+    context "when primary_key is setted" do
+      let(:dog) do
+        Dog.new
+      end
+
+      let(:fire_hydrant) do
+        FireHydrant.new(location: 'one')
+      end
+
+      before do
+        dog.fire_hydrants.concat([fire_hydrant])
+      end
+
+      it 'adds the pk value to the fk set' do
+        expect(dog.fire_hydrant_ids).to eq([fire_hydrant.location])
+      end
+    end
   end
 
   describe "#count" do
@@ -3516,7 +3534,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       it 'adds the pk value to the fk set' do
-        # this test fails
         expect(dog.fire_hydrant_ids).to eq(
           [fire_hydrant_one.location, fire_hydrant_two.location]
         )
