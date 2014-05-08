@@ -3485,5 +3485,42 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         expect(dog.fire_hydrant_ids).to eq([])
       end
     end
+
+    context "when assigns a value to a many to many" do
+      let(:fire_hydrant_one) do
+        FireHydrant.create(location: 'one')
+      end
+
+      before do
+        dog.fire_hydrants = [fire_hydrant_one]
+      end
+
+      it 'adds the pk value to the fk set' do
+        expect(dog.fire_hydrant_ids).to eq(
+          [fire_hydrant_one.location]
+        )
+      end
+    end
+
+    context "when assigns multiple values to a many to many" do
+      let(:fire_hydrant_one) do
+        FireHydrant.create(location: 'one')
+      end
+
+      let(:fire_hydrant_two) do
+        FireHydrant.create(location: 'two')
+      end
+
+      before do
+        dog.fire_hydrants = [fire_hydrant_one, fire_hydrant_two]
+      end
+
+      it 'adds the pk value to the fk set' do
+        # this test fails
+        expect(dog.fire_hydrant_ids).to eq(
+          [fire_hydrant_one.location, fire_hydrant_two.location]
+        )
+      end
+    end
   end
 end
