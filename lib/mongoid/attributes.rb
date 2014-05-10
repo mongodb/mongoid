@@ -224,7 +224,7 @@ module Mongoid
     alias :attributes= :write_attributes
 
     # Determine if the attribute is missing from the document, due to loading
-    # it from the database with missing fields, _id is always loaded
+    # it from the database with missing fields.
     #
     # @example Is the attribute missing?
     #   document.attribute_missing?("test")
@@ -238,7 +238,6 @@ module Mongoid
       selection = __selected_fields
       return false unless selection
       field = fields[name]
-      selection.merge!({ "_id" => 1 })
       (selection.values.first == 0 && selection_excluded?(name, selection, field)) ||
         (selection.values.first == 1 && !selection_included?(name, selection, field))
     end

@@ -2640,10 +2640,6 @@ describe Mongoid::Criteria do
         it "does not add _type to the fields" do
           expect(criteria.options[:fields]["_type"]).to be_nil
         end
-
-        it "always contains the id field" do
-          expect(criteria.first.id).to_not be_nil
-        end
       end
 
       context "when instantiating a class of another type inside the iteration" do
