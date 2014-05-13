@@ -161,7 +161,7 @@ module Mongoid
           @target.send(name, *args, &block)
         ensure
           set_persistence_options(@target, nil)
-         end
+        end
 
         def send(symbol, *args)
           __send__(symbol, *args)
