@@ -3443,7 +3443,27 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
   end
-
+  
+  context "when a document has embedded and references it saves correctly" do
+    let(:container) do
+      PackageContainer.new
+    end
+    let(:package) do
+      Package.new
+    end
+    let(:item) do
+      PackageItem.new
+    end
+    describe "save" do
+      it "will not raie an error" do
+        package.package_containers << container
+        package.package_item = item
+        package.save
+        expect(package.package_containers.size).to eq(1)
+      end
+    end  
+  end  
+  
   context "when #delete or #clear with after_remove callback" do
 
     let(:artist) do
