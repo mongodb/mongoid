@@ -6,7 +6,7 @@ gem "actionpack",  "~> 4.0.4"
 gem "activemodel", "~> 4.0.4"
 
 group :test do
-  gem "rspec", "~> 3.0.0.beta2"
+  gem "rspec", "~> 3.0.0.rc1"
 
   if ENV["CI"]
     gem "coveralls", require: false
