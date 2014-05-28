@@ -100,7 +100,6 @@ describe Mongoid::Attributes::Readonly do
             }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
           end
         end
-
       end
 
       context "when updating via bit" do
@@ -122,7 +121,6 @@ describe Mongoid::Attributes::Readonly do
             }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
           end
         end
-
       end
 
       context "when updating via []=" do

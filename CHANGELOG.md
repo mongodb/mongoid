@@ -345,6 +345,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3610 Don't allow atomic operations on read-only attributes
+  (Frederico Araujo)
+
 * \#3619 Don't validate documents that are flagged for destruction.
   (Christopher J. Bottaro)
 
