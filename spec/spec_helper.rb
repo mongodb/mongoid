@@ -62,6 +62,11 @@ def purge_database_alt!
   end
 end
 
+def mongodb_version
+  session = Mongoid::Sessions.default
+  session.command(buildinfo: 1)["version"]
+end
+
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
