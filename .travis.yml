@@ -1,15 +1,16 @@
+services: mongodb
 language: ruby
 bundler_args: --without development
 rvm:
   - 1.9.3
   - 2.0.0
-  - 2.1.1
+  - 2.1
   - jruby
-  - jruby-head
-env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+gemfile:
+  - Gemfile
+  - gemfiles/rails41.gemfile
 matrix:
   allow_failures:
-    - rvm: jruby-head
     - gemfile: gemfiles/rails41.gemfile
 notifications:
   email: false
@@ -18,8 +19,3 @@ notifications:
     on_failure: always
     channels:
       - "irc.freenode.org#mongoid"
-services:
-  - mongodb
-gemfile:
-  - Gemfile
-  - gemfiles/rails41.gemfile
