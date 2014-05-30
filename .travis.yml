@@ -8,11 +8,7 @@ rvm:
   - jruby
 gemfile:
   - Gemfile
-  - gemfiles/rails41.gemfile
 env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
-matrix:
-  allow_failures:
-    - gemfile: gemfiles/rails41.gemfile
 notifications:
   email: false
   irc:
