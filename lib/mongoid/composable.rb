@@ -79,7 +79,9 @@ module Mongoid
       Threaded::Lifecycle,
       Traversable,
       Validatable,
-      Equality
+      Equality,
+      ActiveModel::Model,
+      ActiveModel::Validations
     ]
 
     class << self
