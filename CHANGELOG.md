@@ -345,6 +345,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3620 Add ActiveModel module instance methods to prohibited_methods list.
+  (Arthur Neves)
+
 * \#3610 Don't allow atomic operations on read-only attributes
   (Frederico Araujo)
 
