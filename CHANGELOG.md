@@ -185,9 +185,6 @@ For instructions on upgrading to newer versions, visit
 * \#2956 Caching on queries now only happens when `cache` is specifically
   called. (Arthur Neves)
 
-* \#2898 Dirty attribute methods now properly handle field aliases.
-  (Niels Ganser)
-
 * \#2659 `Mongoid::Railtie` now properly uses only one initializer and
   the name has changed to `mongoid.load-config`.
 
@@ -344,6 +341,9 @@ For instructions on upgrading to newer versions, visit
 * \#2855 Multiple extensions can now be supplied to relations. (Daniel Libanori)
 
 ### Resolved Issues
+
+* \#2898 Dirty attribute methods now properly handle field aliases.
+  (Niels Ganser)
 
 * \#3620 Add ActiveModel module instance methods to prohibited_methods list.
   (Arthur Neves)
