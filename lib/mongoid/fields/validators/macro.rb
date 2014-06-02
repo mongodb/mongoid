@@ -51,8 +51,10 @@ module Mongoid
         #
         # @since 3.0.0
         def validate_name(klass, name, options)
-          if Mongoid.destructive_fields.include?(name)
-            raise Errors::InvalidField.new(klass, name)
+          [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
+            if Mongoid.destructive_fields.include?(n)
+              raise Errors::InvalidField.new(klass, n)
+            end
           end
 
           if !options[:overwrite] && klass.fields.keys.include?(name.to_s)
