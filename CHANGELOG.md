@@ -220,6 +220,9 @@ For instructions on upgrading to newer versions, visit
   apply the default scope to the document, if the scope is not complex.
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
+  `without_protection` option was also removed.
+  `attr_accessible` class method was removed.
+  Mongoid and Strong parameters should work fine for mass assignment protection.
 
 * `delete_all` and `destroy_all` no longer take a `:conditions` hash but
   just the raw attributes.
