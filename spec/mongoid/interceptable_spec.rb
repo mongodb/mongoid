@@ -421,6 +421,7 @@ describe Mongoid::Interceptable do
 
           before(:all) do
             Band.define_model_callbacks(:rearrange)
+            Band.after_rearrange { }
           end
 
           after(:all) do
