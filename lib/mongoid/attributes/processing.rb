@@ -94,6 +94,9 @@ module Mongoid
       def process_attribute(name, value)
         responds = respond_to?("#{name}=")
         raise Errors::UnknownAttribute.new(self.class, name) unless responds
+        if name.to_s == "_type" && self.class._types.exclude?(value)
+          raise Errors::InvalidSubclassType.new(self.class, value)
+        end
         send("#{name}=", value)
       end
 
