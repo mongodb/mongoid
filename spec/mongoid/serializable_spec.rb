@@ -231,6 +231,24 @@ describe Mongoid::Serializable do
           )
         end
       end
+
+      context "when only two attributes are loaded" do
+        before do
+          person.save
+        end
+
+        let(:from_db) do
+          Person.only("_id", "username").first
+        end
+
+        let(:hash) do
+          from_db.serializable_hash
+        end
+
+        it "returns those two attributes only" do
+          expect(hash.keys).to eq(["_id", "username"])
+        end
+      end
     end
 
     context "when a model has dynamic fields" do
