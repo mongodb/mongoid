@@ -345,6 +345,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3676 Make pluck work with embedded associations
+  (Arthur Neves)
+
 * \#2898 Dirty attribute methods now properly handle field aliases.
   (Niels Ganser)
 
