@@ -197,6 +197,17 @@ module Mongoid
         self
       end
 
+      def pluck(*fields)
+        fields = Array.wrap(fields)
+        documents.map do |doc|
+          if fields.size == 1
+            doc[fields.first]
+          else
+            fields.map { |n| doc[n] }.compact
+          end
+        end.compact
+      end
+
       # Skips the provided number of documents.
       #
       # @example Skip the documents.

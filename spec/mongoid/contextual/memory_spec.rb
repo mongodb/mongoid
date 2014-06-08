@@ -729,6 +729,63 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
+  describe "#pluck" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.all.tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when plucking" do
+
+      let!(:plucked) do
+        context.pluck(:street)
+      end
+
+      it "returns the values" do
+        expect(plucked).to eq([ "hobrecht", "friedel" ])
+      end
+    end
+
+    context "when plucking a field that doesnt exist" do
+
+      context "when pluck one field" do
+
+        let(:plucked) do
+          context.pluck(:foo)
+        end
+
+        it "returns a empty array" do
+          expect(plucked).to eq([])
+        end
+      end
+
+      context "when pluck multiple fields" do
+
+        let(:plucked) do
+          context.pluck(:foo, :bar)
+        end
+
+        it "returns a empty array" do
+          expect(plucked).to eq([[], []])
+        end
+      end
+    end
+  end
+
   describe "#skip" do
 
     let(:hobrecht) do
