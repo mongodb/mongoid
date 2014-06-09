@@ -379,11 +379,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should be false
+        person.send(:attribute_was, "pets").should be_falsy
       end
 
       it "allows access via (attribute)_was" do
-        person.pets_was.should be false
+        person.pets_was.should be_falsy
       end
     end
 
@@ -405,7 +405,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should be false
+        person.send(:attribute_was, "pets").should be_falsy
       end
     end
   end

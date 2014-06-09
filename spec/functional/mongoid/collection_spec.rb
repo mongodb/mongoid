@@ -23,7 +23,7 @@ describe Mongoid::Collection do
       end
 
       it "sets the capped size" do
-        options["size"].should eq(10000)
+        options["size"].should eq(10240)
       end
 
       it "sets the max capped documents" do
