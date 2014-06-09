@@ -11,7 +11,7 @@ jdk:
   - openjdk7
   - oraclejdk8
 
-env: CI="travis"
+env: TRAVIS_CI="true" JRUBY_OPTS="-J-Xmn1024m -J-Xms2048m -J-Xmx2048m"
 
 services:
   - mongodb
