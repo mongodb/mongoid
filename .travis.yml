@@ -13,6 +13,9 @@ jdk:
 
 env: CI="travis"
 
+services:
+  - mongodb
+
 matrix:
   exclude:
     - rvm: 1.9.3
