@@ -11,14 +11,14 @@ describe Mongoid::Matchers::All do
     context "when the attribute includes all of the values" do
 
       it "returns true" do
-        matcher.matches?("$all" => ["first", /\Asec.*\z/]).should be_true
+        matcher.matches?("$all" => ["first", /\Asec.*\z/]).should be_truthy
       end
     end
 
     context "when the attributes doesn't include all of the values" do
 
       it "returns false" do
-        matcher.matches?("$all" => ["second", "third", "fourth"]).should be_false
+        matcher.matches?("$all" => ["second", "third", "fourth"]).should be false
       end
     end
   end

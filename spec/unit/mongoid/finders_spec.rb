@@ -137,7 +137,7 @@ describe Mongoid::Finders do
         end
 
         it "returns true" do
-          Person.exists?(conditions).should be_true
+          Person.exists?(conditions).should be_truthy
         end
       end
 
@@ -148,7 +148,7 @@ describe Mongoid::Finders do
         end
 
         it "returns false" do
-          Person.exists?(conditions).should be_false
+          Person.exists?(conditions).should be false
         end
       end
     end
@@ -168,7 +168,7 @@ describe Mongoid::Finders do
         end
 
         it "returns true" do
-          Person.exists?.should be_true
+          Person.exists?.should be_truthy
         end
       end
 
@@ -179,7 +179,7 @@ describe Mongoid::Finders do
         end
 
         it "returns false" do
-          Person.exists?.should be_false
+          Person.exists?.should be false
         end
       end
     end

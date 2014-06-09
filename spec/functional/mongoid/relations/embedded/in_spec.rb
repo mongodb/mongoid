@@ -29,14 +29,14 @@ describe Mongoid::Relations::Embedded::In do
       context "when the document is a different instance" do
 
         it "returns false" do
-          (relation === Person.new).should be_false
+          (relation === Person.new).should be false
         end
       end
 
       context "when the document is the same instance" do
 
         it "returns true" do
-          (relation === target).should be_true
+          (relation === target).should be_truthy
         end
       end
     end

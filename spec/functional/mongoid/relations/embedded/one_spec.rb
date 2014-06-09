@@ -93,7 +93,7 @@ describe Mongoid::Relations::Embedded::One do
             end
 
             it "runs the destroy callbacks on the old document" do
-              pet_one.destroy_flag.should be_true
+              pet_one.destroy_flag.should be_truthy
             end
           end
         end

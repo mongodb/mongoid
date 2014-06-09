@@ -19,7 +19,7 @@ describe Mongoid::Extensions do
       end
 
       it "does not set the value" do
-        person.save.should be_true
+        person.save.should be_truthy
       end
     end
   end

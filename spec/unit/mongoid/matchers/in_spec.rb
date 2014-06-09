@@ -9,7 +9,7 @@ describe Mongoid::Matchers::In do
     context "when the values include the attribute" do
 
       it "returns true" do
-        matcher.matches?("$in" => [/\Afir.*\z/, "second"]).should be_true
+        matcher.matches?("$in" => [/\Afir.*\z/, "second"]).should be_truthy
       end
 
     end
@@ -17,7 +17,7 @@ describe Mongoid::Matchers::In do
     context "when the values don't include the attribute" do
 
       it "returns false" do
-        matcher.matches?("$in" => ["third"]).should be_false
+        matcher.matches?("$in" => ["third"]).should be false
       end
 
     end

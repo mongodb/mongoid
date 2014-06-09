@@ -58,7 +58,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when checking #{method}" do
 
         it "returns true" do
-          preferences.respond_to?(method).should be_true
+          preferences.respond_to?(method).should be_truthy
         end
       end
     end
@@ -68,7 +68,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when checking #{method}" do
 
         it "returns true" do
-          preferences.respond_to?(method).should be_true
+          preferences.respond_to?(method).should be_truthy
         end
       end
     end
@@ -78,7 +78,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context "when checking #{method}" do
 
         it "returns true" do
-          preferences.respond_to?(method).should be_true
+          preferences.respond_to?(method).should be_truthy
         end
       end
     end

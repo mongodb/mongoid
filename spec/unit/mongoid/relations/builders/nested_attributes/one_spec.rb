@@ -18,7 +18,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the option" do
-        builder.allow_destroy?.should be_true
+        builder.allow_destroy?.should be_truthy
       end
     end
 
@@ -29,7 +29,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.allow_destroy?.should be_false
+        builder.allow_destroy?.should be false
       end
     end
   end
@@ -195,7 +195,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns true" do
-          builder.reject?(builder, { :last_name => "Lang" }).should be_true
+          builder.reject?(builder, { :last_name => "Lang" }).should be_truthy
         end
       end
 
@@ -206,7 +206,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
         end
 
         it "returns false" do
-          builder.reject?(builder, { :first_name => "Lang" }).should be_false
+          builder.reject?(builder, { :first_name => "Lang" }).should be false
         end
       end
     end
@@ -218,7 +218,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.reject?(builder, { :first_name => "Lang" }).should be_false
+        builder.reject?(builder, { :first_name => "Lang" }).should be false
       end
     end
   end
@@ -232,7 +232,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns the option" do
-        builder.update_only?.should be_true
+        builder.update_only?.should be_truthy
       end
     end
 
@@ -243,7 +243,7 @@ describe Mongoid::Relations::Builders::NestedAttributes::One do
       end
 
       it "returns false" do
-        builder.update_only?.should be_false
+        builder.update_only?.should be false
       end
     end
   end

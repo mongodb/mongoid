@@ -234,7 +234,7 @@ describe Mongoid::Threaded do
     end
 
     it "returns the timeless value" do
-      described_class.timeless.should be_true
+      described_class.timeless.should be_truthy
     end
   end
 
@@ -315,14 +315,14 @@ describe Mongoid::Threaded do
       end
 
       it "returns true" do
-        described_class.validated?(person).should be_true
+        described_class.validated?(person).should be_truthy
       end
     end
 
     context "when the document is not validated" do
 
       it "returns false" do
-        described_class.validated?(person).should be_false
+        described_class.validated?(person).should be false
       end
     end
   end

@@ -41,11 +41,11 @@ describe Mongoid::Config::Options do
       end
 
       it "defines a getter" do
-        config.persist_in_safe_mode.should be_false
+        config.persist_in_safe_mode.should be false
       end
 
       it "defines a setter" do
-        (config.persist_in_safe_mode = true).should be_true
+        (config.persist_in_safe_mode = true).should be_truthy
       end
 
       it "defines a presence check" do
@@ -62,7 +62,7 @@ describe Mongoid::Config::Options do
     end
 
     it "resets the settings to the defaults" do
-      config.persist_in_safe_mode.should be_false
+      config.persist_in_safe_mode.should be false
     end
   end
 

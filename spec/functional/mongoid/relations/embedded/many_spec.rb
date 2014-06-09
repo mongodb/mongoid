@@ -1743,7 +1743,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns true" do
-        person.addresses.exists?.should be_true
+        person.addresses.exists?.should be_truthy
       end
     end
 
@@ -1754,7 +1754,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "returns false" do
-        person.addresses.exists?.should be_false
+        person.addresses.exists?.should be false
       end
     end
   end

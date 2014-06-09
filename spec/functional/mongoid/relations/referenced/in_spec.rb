@@ -85,7 +85,7 @@ describe Mongoid::Relations::Referenced::In do
       end
 
       it "allows saving of the embedded document" do
-        address.save.should be_true
+        address.save.should be_truthy
       end
     end
 

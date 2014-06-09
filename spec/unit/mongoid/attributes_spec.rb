@@ -110,7 +110,7 @@ describe Mongoid::Attributes do
       end
 
       it "should allow overwriting of the default value" do
-        person.terms.should be_true
+        person.terms.should be_truthy
       end
     end
   end
@@ -202,7 +202,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the rss field" do
-          article.is_rss.should be_true
+          article.is_rss.should be_truthy
         end
 
         it "does not set the user login field" do
@@ -230,7 +230,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the rss field" do
-          article.is_rss.should be_true
+          article.is_rss.should be_truthy
         end
       end
     end
@@ -300,7 +300,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the field for the default role" do
-          item.is_rss.should be_true
+          item.is_rss.should be_truthy
         end
 
         it "does not set the field for non default role title" do
@@ -355,7 +355,7 @@ describe Mongoid::Attributes do
         end
 
         it "sets the rss attribute" do
-          item.is_rss.should be_true
+          item.is_rss.should be_truthy
         end
       end
     end
@@ -929,7 +929,7 @@ describe Mongoid::Attributes do
 
         context "when attribute does not exist" do
           it "returns false" do
-            person.send(method, :owner_id).should be_false
+            person.send(method, :owner_id).should be false
           end
         end
 
@@ -939,7 +939,7 @@ describe Mongoid::Attributes do
           end
 
           it "returns true" do
-            person.send(method, :owner_id).should be_true
+            person.send(method, :owner_id).should be_truthy
           end
         end
       end
@@ -960,7 +960,7 @@ describe Mongoid::Attributes do
           end
 
           it "returns true" do
-            person.send(method, :age).should be_true
+            person.send(method, :age).should be_truthy
           end
         end
       end
@@ -975,14 +975,14 @@ describe Mongoid::Attributes do
 
             it "return true"  do
               person.terms = false
-              person.send(method, :terms).should be_true
+              person.send(method, :terms).should be_truthy
             end
           end
 
           context "when the value is false" do
             it "return true"  do
               person.terms = false
-              person.send(method, :terms).should be_true
+              person.send(method, :terms).should be_truthy
             end
           end
         end
@@ -994,7 +994,7 @@ describe Mongoid::Attributes do
         end
 
         it "return false" do
-          person.send(method, :title).should be_false
+          person.send(method, :title).should be false
         end
       end
     end
@@ -1056,7 +1056,7 @@ describe Mongoid::Attributes do
       end
 
       it "should allow overwriting of the default value" do
-        person.terms.should be_true
+        person.terms.should be_truthy
       end
     end
   end
@@ -1261,11 +1261,11 @@ describe Mongoid::Attributes do
       end
 
       it "aliases the existance check" do
-        product.cost?.should be_true
+        product.cost?.should be_truthy
       end
 
       it "aliases *_changed?" do
-        product.cost_changed?.should be_true
+        product.cost_changed?.should be_truthy
       end
 
       it "aliases *_change" do
@@ -1297,11 +1297,11 @@ describe Mongoid::Attributes do
       end
 
       it "aliases the existance check" do
-        product.price?.should be_true
+        product.price?.should be_truthy
       end
 
       it "aliases *_changed?" do
-        product.price_changed?.should be_true
+        product.price_changed?.should be_truthy
       end
 
       it "aliases *_change" do

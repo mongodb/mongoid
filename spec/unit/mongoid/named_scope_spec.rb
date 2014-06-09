@@ -23,14 +23,14 @@ describe Mongoid::NamedScope do
     context "when options are a hash" do
 
       it "adds the selector to the scope" do
-        Player.inactive.selector[:active].should be_false
+        Player.inactive.selector[:active].should be false
       end
     end
 
     context "when options are a criteria" do
 
       it "adds the selector to the scope" do
-        Player.active.selector[:active].should be_true
+        Player.active.selector[:active].should be_truthy
       end
     end
 
@@ -96,7 +96,7 @@ describe Mongoid::NamedScope do
       end
 
       it "retains the first criteria" do
-        selector[:active].should be_true
+        selector[:active].should be_truthy
       end
 
       it "retains the second criteria" do
@@ -128,7 +128,7 @@ describe Mongoid::NamedScope do
       end
 
       it "retains the first criteria" do
-        selector[:active].should be_true
+        selector[:active].should be_truthy
       end
 
       it "retains the second criteria" do

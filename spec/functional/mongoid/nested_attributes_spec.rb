@@ -4103,11 +4103,11 @@ describe Mongoid::NestedAttributes do
       end
 
       it "runs the before destroy callbacks" do
-        service.before_destroy_called.should be_true
+        service.before_destroy_called.should be_truthy
       end
 
       it "runs the after destroy callbacks" do
-        service.after_destroy_called.should be_true
+        service.after_destroy_called.should be_truthy
       end
 
       it "clears the delayed atomic pulls from the parent" do
@@ -4399,7 +4399,7 @@ describe Mongoid::NestedAttributes do
           end
 
           it "returns false" do
-            update.should be_false
+            update.should be false
           end
 
           it "does not update the child document" do

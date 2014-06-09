@@ -9,7 +9,7 @@ describe Mongoid::Fields::Internal::Boolean do
   describe "#deserialize" do
 
     it "returns the value" do
-      field.deserialize(true).should be_true
+      field.deserialize(true).should be_truthy
     end
   end
 
@@ -39,28 +39,28 @@ describe Mongoid::Fields::Internal::Boolean do
     context "when provided true" do
 
       it "returns true" do
-        field.serialize("true").should be_true
+        field.serialize("true").should be_truthy
       end
     end
 
     context "when provided false" do
 
       it "returns false" do
-        field.serialize("false").should be_false
+        field.serialize("false").should be false
       end
     end
 
     context "when provided 0" do
 
       it "returns false" do
-        field.serialize("0").should be_false
+        field.serialize("0").should be false
       end
     end
 
     context "when provided 1" do
 
       it "returns true" do
-        field.serialize("1").should be_true
+        field.serialize("1").should be_truthy
       end
     end
 

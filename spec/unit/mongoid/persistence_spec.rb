@@ -402,7 +402,7 @@ describe Mongoid::Persistence do
 
       it "writes attributes and performs an update" do
         update.expects(:persist).returns(true)
-        person.update_attributes!(:title => "Mam").should be_true
+        person.update_attributes!(:title => "Mam").should be_truthy
         person.title.should == "Mam"
       end
     end

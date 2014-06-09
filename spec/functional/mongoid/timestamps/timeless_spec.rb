@@ -29,7 +29,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "clears out the timeless option after save" do
-          Mongoid::Threaded.timeless.should be_false
+          Mongoid::Threaded.timeless.should be false
         end
 
         context "when subsequently persisting" do
@@ -59,7 +59,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "clears out the timeless option after save" do
-          Mongoid::Threaded.timeless.should be_false
+          Mongoid::Threaded.timeless.should be false
         end
 
         context "when subsequently persisting" do

@@ -9,7 +9,7 @@ describe Mongoid::Matchers::Nin do
     context "when the values do not contain the attribute" do
 
       it "returns true" do
-        matcher.matches?("$nin" => ["second", "third"]).should be_true
+        matcher.matches?("$nin" => ["second", "third"]).should be_truthy
       end
 
     end
@@ -17,7 +17,7 @@ describe Mongoid::Matchers::Nin do
     context "when the values contain the attribute" do
 
       it "returns false" do
-        matcher.matches?("$nin" => ["first"]).should be_false
+        matcher.matches?("$nin" => ["first"]).should be false
       end
 
     end

@@ -171,33 +171,33 @@ describe Mongoid::Criterion::Selector do
 
     context "when the key is not $or or $and" do
       it "returns false" do
-        selector.send(:proper_and_or_value?, "fubar", nil).should be_false
+        selector.send(:proper_and_or_value?, "fubar", nil).should be false
       end
     end
 
     context "when the key is $or or $and" do
       context "when the value is not an array" do
         it "returns false" do
-          selector.send(:proper_and_or_value?, "$or", nil).should be_false
+          selector.send(:proper_and_or_value?, "$or", nil).should be false
         end
       end
 
       context "when the value is an array" do
         context "when the entries are no hashes" do
           it "returns false" do
-            selector.send(:proper_and_or_value?, "$or", [nil]).should be_false
+            selector.send(:proper_and_or_value?, "$or", [nil]).should be false
           end
         end
 
         context "when the array is empty" do
           it "returns true" do
-            selector.send(:proper_and_or_value?, "$or", []).should be_true
+            selector.send(:proper_and_or_value?, "$or", []).should be_truthy
           end
         end
 
         context "when the entries are hashes" do
           it "returns true" do
-            selector.send(:proper_and_or_value?, "$or", [{}]).should be_true
+            selector.send(:proper_and_or_value?, "$or", [{}]).should be_truthy
           end
         end
       end

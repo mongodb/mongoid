@@ -126,7 +126,7 @@ describe Mongoid::Criterion::Optional do
     end
 
     it "sets the cache option on the criteria" do
-      criteria.options[:cache].should be_true
+      criteria.options[:cache].should be_truthy
     end
 
     it "returns a copy" do
@@ -143,14 +143,14 @@ describe Mongoid::Criterion::Optional do
       end
 
       it "returns true" do
-        criteria.cached?.should be_true
+        criteria.cached?.should be_truthy
       end
     end
 
     context "when the criteria has no cache option" do
 
       it "returns false" do
-        base.cached?.should be_false
+        base.cached?.should be false
       end
     end
   end

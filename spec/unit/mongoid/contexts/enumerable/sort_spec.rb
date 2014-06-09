@@ -20,12 +20,12 @@ describe Mongoid::Contexts::Enumerable::Sort do
 
     context "when direction is :asc" do
       let(:direction) { :asc }
-      it { should be_true }
+      it { should be_truthy }
     end
 
     context "when direction is :desc" do
       let(:direction) { :desc }
-      it { should be_false }
+      it { should be false }
     end
   end
 

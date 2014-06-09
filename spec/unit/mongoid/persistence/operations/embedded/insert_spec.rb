@@ -107,7 +107,7 @@ describe Mongoid::Persistence::Operations::Embedded::Insert do
 
         it "sets new_record to false" do
           root_insert_expectation.call
-          insert.persist.new_record?.should be_false
+          insert.persist.new_record?.should be false
         end
       end
 

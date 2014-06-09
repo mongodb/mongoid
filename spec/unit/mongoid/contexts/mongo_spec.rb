@@ -101,7 +101,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "returns false" do
-        context.blank?.should be_false
+        context.blank?.should be false
       end
     end
 
@@ -112,7 +112,7 @@ describe Mongoid::Contexts::Mongo do
       end
 
       it "returns true" do
-        context.blank?.should be_true
+        context.blank?.should be_truthy
       end
     end
   end

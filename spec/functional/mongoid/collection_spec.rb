@@ -19,7 +19,7 @@ describe Mongoid::Collection do
       end
 
       it "sets the capped option" do
-        options["capped"].should be_true
+        options["capped"].should be_truthy
       end
 
       it "sets the capped size" do

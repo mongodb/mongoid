@@ -162,7 +162,7 @@ describe Mongoid::Paranoia do
       end
 
       it "returns an embedded criteria" do
-        criteria.embedded.should be_true
+        criteria.embedded.should be_truthy
       end
     end
 
@@ -173,7 +173,7 @@ describe Mongoid::Paranoia do
       end
 
       it "returns an root criteria" do
-        criteria.embedded.should be_false
+        criteria.embedded.should be false
       end
     end
 

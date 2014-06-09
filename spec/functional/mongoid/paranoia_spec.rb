@@ -28,11 +28,11 @@ describe Mongoid::Paranoia do
       end
 
       it "executes the before destroy callbacks" do
-        post.before_destroy_called.should be_true
+        post.before_destroy_called.should be_truthy
       end
 
       it "executes the after destroy callbacks" do
-        post.after_destroy_called.should be_true
+        post.after_destroy_called.should be_truthy
       end
     end
 
@@ -59,11 +59,11 @@ describe Mongoid::Paranoia do
       end
 
       it "executes the before destroy callbacks" do
-        phone.before_destroy_called.should be_true
+        phone.before_destroy_called.should be_truthy
       end
 
       it "executes the after destroy callbacks" do
-        phone.after_destroy_called.should be_true
+        phone.after_destroy_called.should be_truthy
       end
     end
 
@@ -116,11 +116,11 @@ describe Mongoid::Paranoia do
       end
 
       it "executes the before destroy callbacks" do
-        post.before_destroy_called.should be_true
+        post.before_destroy_called.should be_truthy
       end
 
       it "executes the after destroy callbacks" do
-        post.after_destroy_called.should be_true
+        post.after_destroy_called.should be_truthy
       end
     end
 
@@ -157,11 +157,11 @@ describe Mongoid::Paranoia do
       end
 
       it "executes the before destroy callbacks" do
-        phone.before_destroy_called.should be_true
+        phone.before_destroy_called.should be_truthy
       end
 
       it "executes the after destroy callbacks" do
-        phone.after_destroy_called.should be_true
+        phone.after_destroy_called.should be_truthy
       end
     end
 

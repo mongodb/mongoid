@@ -242,11 +242,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns true" do
-        person.send(:attribute_changed?, "title").should be_true
+        person.send(:attribute_changed?, "title").should be_truthy
       end
 
       it "allows access via (attribute)_changed?" do
-        person.title_changed?.should be_true
+        person.title_changed?.should be_truthy
       end
     end
 
@@ -261,11 +261,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns true" do
-        person.send(:attribute_changed?, "pets").should be_true
+        person.send(:attribute_changed?, "pets").should be_truthy
       end
 
       it "allows access via (attribute)_changed?" do
-        person.pets_changed?.should be_true
+        person.pets_changed?.should be_truthy
       end
     end
 
@@ -276,7 +276,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns false" do
-        person.send(:attribute_changed?, "title").should be_false
+        person.send(:attribute_changed?, "title").should be false
       end
     end
 
@@ -291,7 +291,7 @@ describe Mongoid::Dirty do
           end
 
           it "returns true" do
-            person.send(:attribute_changed?, "pets").should be_true
+            person.send(:attribute_changed?, "pets").should be_truthy
           end
         end
 
@@ -302,7 +302,7 @@ describe Mongoid::Dirty do
           end
 
           it "returns false" do
-            person.send(:attribute_changed?, "pets").should be_false
+            person.send(:attribute_changed?, "pets").should be false
           end
         end
       end
@@ -379,11 +379,11 @@ describe Mongoid::Dirty do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should be_false
+        person.send(:attribute_was, "pets").should be false
       end
 
       it "allows access via (attribute)_was" do
-        person.pets_was.should be_false
+        person.pets_was.should be false
       end
     end
 
@@ -405,7 +405,7 @@ describe Mongoid::Dirty do
       end
 
       it "returns the default value" do
-        person.send(:attribute_was, "pets").should be_false
+        person.send(:attribute_was, "pets").should be false
       end
     end
   end

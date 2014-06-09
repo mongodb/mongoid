@@ -199,7 +199,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns true" do
-          criteria.blank?.should be_true
+          criteria.blank?.should be_truthy
         end
       end
 
@@ -210,7 +210,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns false" do
-          criteria.blank?.should be_false
+          criteria.blank?.should be false
         end
       end
     end
@@ -268,7 +268,7 @@ describe Mongoid::Criteria do
         end
 
         it "call the count context and return true if there are element" do
-          criteria.exists?.should be_true
+          criteria.exists?.should be_truthy
         end
       end
 
@@ -279,7 +279,7 @@ describe Mongoid::Criteria do
         end
 
         it "call the count context and return false if there are no element" do
-          criteria.exists?.should be_false
+          criteria.exists?.should be false
         end
       end
     end
@@ -890,35 +890,35 @@ describe Mongoid::Criteria do
     end
 
     it "is true when asking about a model's class method" do
-      criteria.respond_to?(:ages).should be_true
+      criteria.respond_to?(:ages).should be_truthy
     end
 
     it "is false when asking about a model's private class method even when including private methods" do
-      criteria.respond_to?(:alias_method, true).should be_false
+      criteria.respond_to?(:alias_method, true).should be false
     end
 
     it "is true when asking about a criteria's entries' instance method" do
-      criteria.respond_to?(:join).should be_true
+      criteria.respond_to?(:join).should be_truthy
     end
 
     it "is false when asking about a criteria's entries' private instance methods without including private methods" do
-      criteria.respond_to?(:fork).should be_false
+      criteria.respond_to?(:fork).should be false
     end
 
     it "is false when asking about a criteria's entries' private instance methods when including private methods" do
-      criteria.respond_to?(:fork, true).should be_true
+      criteria.respond_to?(:fork, true).should be_truthy
     end
 
     it "is true when asking about a criteria instance method" do
-      criteria.respond_to?(:context).should be_true
+      criteria.respond_to?(:context).should be_truthy
     end
 
     it "is false when asking about a private criteria instance method without including private methods" do
-      criteria.respond_to?(:puts).should be_false
+      criteria.respond_to?(:puts).should be false
     end
 
     it "is true when asking about a private criteria instance method when including private methods" do
-      criteria.respond_to?(:puts, true).should be_true
+      criteria.respond_to?(:puts, true).should be_truthy
     end
 
   end

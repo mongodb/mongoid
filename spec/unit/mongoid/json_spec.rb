@@ -15,7 +15,7 @@ describe Mongoid::JSON do
       end
 
       it "returns true" do
-        person.include_root_in_json.should be_true
+        person.include_root_in_json.should be_truthy
       end
     end
 
@@ -26,7 +26,7 @@ describe Mongoid::JSON do
       end
 
       it "returns false" do
-        person.include_root_in_json.should be_false
+        person.include_root_in_json.should be false
       end
     end
   end

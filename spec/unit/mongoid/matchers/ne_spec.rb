@@ -9,7 +9,7 @@ describe Mongoid::Matchers::Ne do
     context "when the values are not equal" do
 
       it "returns true" do
-        matcher.matches?("$ne" => "second").should be_true
+        matcher.matches?("$ne" => "second").should be_truthy
       end
 
     end
@@ -17,7 +17,7 @@ describe Mongoid::Matchers::Ne do
     context "when the values are equal" do
 
       it "returns false" do
-        matcher.matches?("$ne" => "first").should be_false
+        matcher.matches?("$ne" => "first").should be false
       end
 
     end

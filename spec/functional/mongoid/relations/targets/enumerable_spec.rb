@@ -172,7 +172,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "returns true" do
-        any.should be_true
+        any.should be_truthy
       end
 
       it "retains the correct length" do
@@ -864,7 +864,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       it "returns true" do
-        included.should be_true
+        included.should be_truthy
       end
 
       it "retains the correct length" do
@@ -1028,14 +1028,14 @@ describe Mongoid::Relations::Targets::Enumerable do
     context "when checking against enumerable" do
 
       it "returns true" do
-        enumerable.is_a?(::Enumerable).should be_true
+        enumerable.is_a?(::Enumerable).should be_truthy
       end
     end
 
     context "when checking against array" do
 
       it "returns true" do
-        enumerable.is_a?(Array).should be_true
+        enumerable.is_a?(Array).should be_truthy
       end
     end
   end
@@ -1184,14 +1184,14 @@ describe Mongoid::Relations::Targets::Enumerable do
     context "when checking against enumerable" do
 
       it "returns true" do
-        enumerable.kind_of?(::Enumerable).should be_true
+        enumerable.kind_of?(::Enumerable).should be_truthy
       end
     end
 
     context "when checking against array" do
 
       it "returns true" do
-        enumerable.kind_of?(Array).should be_true
+        enumerable.kind_of?(Array).should be_truthy
       end
     end
   end
@@ -1223,7 +1223,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     it "returns true" do
-      loaded.should be_true
+      loaded.should be_truthy
     end
 
     it "sets loaded to true" do

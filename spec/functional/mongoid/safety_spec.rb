@@ -55,7 +55,7 @@ describe Mongoid::Safety do
         context "when using .safely(false)" do
 
           it "should ignore mongodb error" do
-            Person.safely(false).create(:ssn => "432-97-1111").should be_true
+            Person.safely(false).create(:ssn => "432-97-1111").should be_truthy
           end
 
         end
@@ -178,7 +178,7 @@ describe Mongoid::Safety do
           context "when a mongodb error occurs" do
 
             it "should fail silently" do
-              Person.unsafely.create(:ssn => "432-97-1111").should be_true
+              Person.unsafely.create(:ssn => "432-97-1111").should be_truthy
             end
 
             it "should still use defaults for subsequent requests" do
@@ -203,7 +203,7 @@ describe Mongoid::Safety do
             end
 
             it "should fail silently" do
-              person.unsafely.save(:ssn => "432-97-1113").should be_true
+              person.unsafely.save(:ssn => "432-97-1113").should be_truthy
             end
 
             it "should still use defaults for subsequent requests" do

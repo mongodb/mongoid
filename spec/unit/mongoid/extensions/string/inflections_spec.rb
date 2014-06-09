@@ -97,14 +97,14 @@ describe Mongoid::Extensions::String::Inflections do
     context "when string is a reader" do
 
       it "returns false" do
-        "attribute".writer?.should be_false
+        "attribute".writer?.should be false
       end
     end
 
     context "when string is a writer" do
 
       it "returns true" do
-        "attribute=".writer?.should be_true
+        "attribute=".writer?.should be_truthy
       end
     end
 

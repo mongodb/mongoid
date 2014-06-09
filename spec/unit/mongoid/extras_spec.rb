@@ -15,7 +15,7 @@ describe Mongoid::Extras do
     end
 
     it "sets the cached boolean on the class" do
-      @klass.cached.should be_true
+      @klass.cached.should be_truthy
     end
 
   end

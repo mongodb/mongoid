@@ -196,8 +196,8 @@ describe Mongoid::Fields do
       end
 
       it "adds an existance method" do
-        person.testing?.should be_true
-        Person.new.testing?.should be_false
+        person.testing?.should be_truthy
+        Person.new.testing?.should be false
       end
 
       it "adds field methods in a module to allow overriding and preserve inheritance" do
@@ -209,7 +209,7 @@ describe Mongoid::Fields do
           end
         end
         person.testing = 'Test'
-        person.testing_override_called.should be_true
+        person.testing_override_called.should be_truthy
       end
     end
 
@@ -231,7 +231,7 @@ describe Mongoid::Fields do
       end
 
       it "adds an accessor method with a question mark" do
-        person.terms?.should be_true
+        person.terms?.should be_truthy
       end
     end
 
@@ -426,7 +426,7 @@ describe Mongoid::Fields do
         context "when the field is the _id" do
 
           it "returns true" do
-            Person.object_id_field?(:_id).should be_true
+            Person.object_id_field?(:_id).should be_truthy
           end
         end
 
@@ -435,14 +435,14 @@ describe Mongoid::Fields do
           context "when the relation is not polymorphic" do
 
             it "returns true" do
-              Post.object_id_field?(:person_id).should be_true
+              Post.object_id_field?(:person_id).should be_truthy
             end
           end
 
           context "when the relation is polymorphic" do
 
             it "returns true" do
-              Rating.object_id_field?(:ratable_id).should be_true
+              Rating.object_id_field?(:ratable_id).should be_truthy
             end
           end
         end
@@ -450,14 +450,14 @@ describe Mongoid::Fields do
         context "when the field is a multi foreign key" do
 
           it "returns true" do
-            Person.object_id_field?(:preference_ids).should be_true
+            Person.object_id_field?(:preference_ids).should be_truthy
           end
         end
 
         context "when the field is not a foreign key" do
 
           it "returns true" do
-            Person.object_id_field?(:bson_id).should be_true
+            Person.object_id_field?(:bson_id).should be_truthy
           end
         end
       end
@@ -467,28 +467,28 @@ describe Mongoid::Fields do
         context "when the field is an id" do
 
           it "returns false" do
-            Address.object_id_field?(:_id).should be_false
+            Address.object_id_field?(:_id).should be false
           end
         end
 
         context "when the field is a normal field" do
 
           it "returns false" do
-            Person.object_id_field?(:title).should be_false
+            Person.object_id_field?(:title).should be false
           end
         end
 
         context "when the field is a single foreign key" do
 
           it "returns true" do
-            Alert.object_id_field?(:account_id).should be_false
+            Alert.object_id_field?(:account_id).should be false
           end
         end
 
         context "when the field is a multi foreign key" do
 
           it "returns false" do
-            Agent.object_id_field?(:account_ids).should be_false
+            Agent.object_id_field?(:account_ids).should be false
           end
         end
       end
@@ -497,7 +497,7 @@ describe Mongoid::Fields do
     context "when the field does not exist" do
 
       it "returns false" do
-        Person.object_id_field?(:some_random_name).should be_false
+        Person.object_id_field?(:some_random_name).should be false
       end
     end
   end

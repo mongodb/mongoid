@@ -9,7 +9,7 @@ describe Mongoid::Fields::Serializable do
     end
 
     it "does not conflict with the ruby core hash" do
-      image.hash_is_hash.should be_true
+      image.hash_is_hash.should be_truthy
     end
   end
 

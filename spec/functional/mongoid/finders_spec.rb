@@ -33,8 +33,8 @@ describe Mongoid::Finders do
       end
 
       it "does not duplicate ids in the eager load query" do
-        Blog.where(:_id => blog.id).first.posts.should have(2).entries
-        Blog.where(:_id => blog.id).first.posts.should have(2).entries
+        Blog.where(:_id => blog.id).first.posts.size.should eq(2)
+        Blog.where(:_id => blog.id).first.posts.size.should eq(2)
       end
     end
 

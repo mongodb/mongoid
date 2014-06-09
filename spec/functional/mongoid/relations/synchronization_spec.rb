@@ -21,7 +21,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "does not attempt synchronization" do
-      expect { article.save }.to_not raise_error(TypeError)
+      expect { article.save }.to_not raise_error
     end
 
     it "sets the one side of the relation" do
@@ -48,7 +48,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "resets the synced flag" do
-      person.synced["preference_ids"].should be_false
+      person.synced["preference_ids"].should be false
     end
 
     context "when subsequently setting with keys" do

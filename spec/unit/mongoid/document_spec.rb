@@ -94,7 +94,7 @@ describe Mongoid::Document do
     context "when comparable is an instance of this document" do
 
       it "returns true" do
-        (klass === person).should be_true
+        (klass === person).should be_truthy
       end
     end
 
@@ -105,28 +105,28 @@ describe Mongoid::Document do
       end
 
       it "returns true" do
-        (klass === relation).should be_true
+        (klass === relation).should be_truthy
       end
     end
 
     context "when comparable is the same class" do
 
       it "returns true" do
-        (klass === Person).should be_true
+        (klass === Person).should be_truthy
       end
     end
 
     context "when the comparable is a subclass" do
 
       it "returns false" do
-        (Person === Doctor).should be_false
+        (Person === Doctor).should be false
       end
     end
 
     context "when the comparable is an instance of a subclass" do
 
       it "returns true" do
-        (Person === Doctor.new).should be_true
+        (Person === Doctor.new).should be_truthy
       end
     end
   end
@@ -138,14 +138,14 @@ describe Mongoid::Document do
       context "when the instance is different" do
 
         it "returns false" do
-          (person === Person.new).should be_false
+          (person === Person.new).should be false
         end
       end
 
       context "when the instance is the same" do
 
         it "returns true" do
-          (person === person).should be_true
+          (person === person).should be_truthy
         end
       end
     end
@@ -153,7 +153,7 @@ describe Mongoid::Document do
     context "when the comparable is a subclass" do
 
       it "returns false" do
-        (person === Doctor.new).should be_false
+        (person === Doctor.new).should be false
       end
     end
 
@@ -162,21 +162,21 @@ describe Mongoid::Document do
       context "when the class is the same" do
 
         it "returns true" do
-          (person === Person).should be_true
+          (person === Person).should be_truthy
         end
       end
 
       context "when the class is a subclass" do
 
         it "returns false" do
-          (person === Doctor).should be_false
+          (person === Doctor).should be false
         end
       end
 
       context "when the class is a superclass" do
 
         it "returns true" do
-          (Doctor.new === Person).should be_true
+          (Doctor.new === Person).should be_truthy
         end
       end
     end

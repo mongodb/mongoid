@@ -114,7 +114,7 @@ describe Mongoid::Config do
       end
 
       it "returns nil, which is interpreted as the local time_zone" do
-        described_class.use_utc.should be_false
+        described_class.use_utc.should be false
       end
 
       it "sets the logger to nil" do
@@ -129,7 +129,7 @@ describe Mongoid::Config do
       end
 
       it "sets the utc flag" do
-        described_class.use_utc.should be_true
+        described_class.use_utc.should be_truthy
       end
     end
 
@@ -217,7 +217,7 @@ describe Mongoid::Config do
     end
 
     it "returns nil, which is interpreted as the local time_zone" do
-      described_class.use_utc.should be_false
+      described_class.use_utc.should be false
     end
   end
 
@@ -343,70 +343,70 @@ describe Mongoid::Config do
     describe ".allow_dynamic_fields" do
 
       it "defaults to true" do
-        described_class.allow_dynamic_fields.should be_true
+        described_class.allow_dynamic_fields.should be_truthy
       end
     end
 
     describe ".identity_map_enabled" do
 
       it "defaults to false" do
-        described_class.identity_map_enabled.should be_false
+        described_class.identity_map_enabled.should be false
       end
     end
 
     describe ".include_root_in_json" do
 
       it "defaults to false" do
-        described_class.include_root_in_json.should be_false
+        described_class.include_root_in_json.should be false
       end
     end
 
     describe ".parameterize_keys" do
 
       it "defaults to true" do
-        described_class.parameterize_keys.should be_true
+        described_class.parameterize_keys.should be_truthy
       end
     end
 
     describe ".scope_overwrite_exception" do
 
       it "defaults to false" do
-        described_class.scope_overwrite_exception.should be_false
+        described_class.scope_overwrite_exception.should be false
       end
     end
 
     describe ".persist_in_safe_mode" do
 
       it "defaults to false" do
-        described_class.persist_in_safe_mode.should be_false
+        described_class.persist_in_safe_mode.should be false
       end
     end
 
     describe ".preload_models" do
 
       it "defaults to false" do
-        described_class.preload_models.should be_false
+        described_class.preload_models.should be false
       end
     end
 
     describe ".raise_not_found_error" do
 
       it "defaults to true" do
-        described_class.raise_not_found_error.should be_true
+        described_class.raise_not_found_error.should be_truthy
       end
     end
 
     describe ".autocreate_indexes" do
 
       it "defaults to false" do
-        described_class.autocreate_indexes.should be_false
+        described_class.autocreate_indexes.should be false
       end
     end
 
     describe ".skip_version_check" do
 
       it "defaults to false" do
-        described_class.skip_version_check.should be_false
+        described_class.skip_version_check.should be false
       end
     end
 

@@ -62,7 +62,7 @@ describe Mongoid::Relations::Referenced::In do
       context "when checking #{method}" do
 
         it "returns true" do
-          document.respond_to?(method).should be_true
+          document.respond_to?(method).should be_truthy
         end
       end
     end

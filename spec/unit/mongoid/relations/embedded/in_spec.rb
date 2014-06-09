@@ -44,7 +44,7 @@ describe Mongoid::Relations::Embedded::In do
     context "when the proxied document is same class" do
 
       it "returns true" do
-        (relation === target).should be_true
+        (relation === target).should be_truthy
       end
     end
   end
@@ -135,7 +135,7 @@ describe Mongoid::Relations::Embedded::In do
       context "when checking #{method}" do
 
         it "returns true" do
-          document.respond_to?(method).should be_true
+          document.respond_to?(method).should be_truthy
         end
       end
     end

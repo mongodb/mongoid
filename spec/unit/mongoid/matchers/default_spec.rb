@@ -13,14 +13,14 @@ describe Mongoid::Matchers::Default do
       context "when the values are equal" do
 
         it "returns true" do
-          matcher.matches?("Testing").should be_true
+          matcher.matches?("Testing").should be_truthy
         end
       end
 
       context "when the values are not equal" do
 
         it "returns false" do
-          matcher.matches?("Other").should be_false
+          matcher.matches?("Other").should be false
         end
       end
     end
@@ -38,14 +38,14 @@ describe Mongoid::Matchers::Default do
       context "when the values are equal" do
 
         it "returns true" do
-          matcher.matches?(object_id).should be_true
+          matcher.matches?(object_id).should be_truthy
         end
       end
 
       context "when the values are not equal" do
 
         it "returns false" do
-          matcher.matches?(BSON::ObjectId.new).should be_false
+          matcher.matches?(BSON::ObjectId.new).should be false
         end
       end
     end
@@ -59,14 +59,14 @@ describe Mongoid::Matchers::Default do
       context "when the attribute contains the value" do
 
         it "returns true" do
-          matcher.matches?("Test1").should be_true
+          matcher.matches?("Test1").should be_truthy
         end
       end
 
       context "when the attribute does not contain the value" do
 
         it "returns false" do
-          matcher.matches?("Test4").should be_false
+          matcher.matches?("Test4").should be false
         end
       end
     end
@@ -84,14 +84,14 @@ describe Mongoid::Matchers::Default do
       context "when the attribute contains the value" do
 
         it "returns true" do
-          matcher.matches?(object_id).should be_true
+          matcher.matches?(object_id).should be_truthy
         end
       end
 
       context "when the attribute does not contain the value" do
 
         it "returns false" do
-          matcher.matches?(BSON::ObjectId.new).should be_false
+          matcher.matches?(BSON::ObjectId.new).should be false
         end
       end
     end
@@ -105,14 +105,14 @@ describe Mongoid::Matchers::Default do
       context "when the attribute contains the value" do
 
         it "returns true" do
-          matcher.matches?(["Test1", "Test2", "Test3"]).should be_true
+          matcher.matches?(["Test1", "Test2", "Test3"]).should be_truthy
         end
       end
 
       context "when the attribute does not contain the value" do
 
         it "returns false" do
-          matcher.matches?(["Test1", "Test2"]).should be_false
+          matcher.matches?(["Test1", "Test2"]).should be false
         end
       end
     end

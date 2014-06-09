@@ -1331,7 +1331,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         end
 
         it "deletes the document" do
-          event.delete.should be_true
+          event.delete.should be_truthy
         end
       end
     end
@@ -2420,7 +2420,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     it "does not delete the target from the database" do
       expect {
         preference.reload
-      }.not_to raise_error(Mongoid::Errors::DocumentNotFound)
+      }.not_to raise_error
     end
   end
 

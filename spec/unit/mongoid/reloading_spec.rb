@@ -94,7 +94,7 @@ describe Mongoid::Reloading do
       end
 
       it "removes the instance variable" do
-        reloaded.instance_variable_defined?(:@name).should be_false
+        reloaded.instance_variable_defined?(:@name).should be false
       end
     end
   end

@@ -15,7 +15,7 @@ describe Mongoid::Relations::Options do
       end
 
       it "returns true" do
-        described_class.validate!(options).should be_true
+        described_class.validate!(options).should be_truthy
       end
     end
 

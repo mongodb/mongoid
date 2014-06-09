@@ -27,7 +27,7 @@ describe Mongoid::Matchers::And do
           end
 
           it "returns true" do
-            matches.should be_true
+            matches.should be_truthy
           end
         end
 
@@ -38,7 +38,7 @@ describe Mongoid::Matchers::And do
           end
 
           it "returns false" do
-            matches.should be_false
+            matches.should be false
           end
         end
       end
@@ -58,7 +58,7 @@ describe Mongoid::Matchers::And do
           end
 
           it "returns true" do
-            matches.should be_true
+            matches.should be_truthy
           end
         end
 
@@ -75,7 +75,7 @@ describe Mongoid::Matchers::And do
           end
 
           it "returns false" do
-            matches.should be_false
+            matches.should be false
           end
         end
 
@@ -86,7 +86,7 @@ describe Mongoid::Matchers::And do
           end
 
           it "returns true" do
-            matches.should be_true
+            matches.should be_truthy
           end
         end
       end
@@ -110,7 +110,7 @@ describe Mongoid::Matchers::And do
         end
 
         it "returns true" do
-          matches.should be_true
+          matches.should be_truthy
         end
       end
 
@@ -130,7 +130,7 @@ describe Mongoid::Matchers::And do
         end
 
         it "returns false" do
-          matches.should be_false
+          matches.should be false
         end
       end
 
@@ -153,7 +153,7 @@ describe Mongoid::Matchers::And do
           end
 
           it "returns true" do
-            matches.should be_true
+            matches.should be_truthy
           end
         end
       end

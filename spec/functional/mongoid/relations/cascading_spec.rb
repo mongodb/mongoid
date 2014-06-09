@@ -111,7 +111,7 @@ describe Mongoid::Relations::Cascading do
               end
 
               it "returns nil" do
-                book.send(method).should be_true
+                book.send(method).should be_truthy
               end
             end
           end

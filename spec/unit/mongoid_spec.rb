@@ -26,7 +26,7 @@ describe Mongoid do
       end
 
       it "sets the values on the config instance" do
-        Mongoid.allow_dynamic_fields.should be_false
+        Mongoid.allow_dynamic_fields.should be false
       end
     end
   end

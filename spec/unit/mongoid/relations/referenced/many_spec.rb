@@ -58,7 +58,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when checking #{method}" do
 
         it "returns true" do
-          posts.respond_to?(method).should be_true
+          posts.respond_to?(method).should be_truthy
         end
       end
     end
@@ -68,7 +68,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when checking #{method}" do
 
         it "returns true" do
-          posts.respond_to?(method).should be_true
+          posts.respond_to?(method).should be_truthy
         end
       end
     end
@@ -78,7 +78,7 @@ describe Mongoid::Relations::Referenced::Many do
       context "when checking #{method}" do
 
         it "returns true" do
-          posts.respond_to?(method).should be_true
+          posts.respond_to?(method).should be_truthy
         end
       end
     end

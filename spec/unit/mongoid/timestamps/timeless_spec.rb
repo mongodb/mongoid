@@ -21,7 +21,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "adds the timestamping options" do
-          Mongoid::Threaded.timeless.should be_true
+          Mongoid::Threaded.timeless.should be_truthy
         end
 
         it "returns the document" do
@@ -40,7 +40,7 @@ describe Mongoid::Timestamps::Timeless do
         end
 
         it "adds the timestamping options" do
-          Mongoid::Threaded.timeless.should be_true
+          Mongoid::Threaded.timeless.should be_truthy
         end
 
         it "returns the class" do

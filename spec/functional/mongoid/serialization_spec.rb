@@ -384,7 +384,7 @@ describe Mongoid::Serialization do
               end
 
               it "includes the first relation" do
-                relation_hash[0]["locations"].any? { |location| location['name'] == "Home" }.should be_true
+                relation_hash[0]["locations"].any? { |location| location['name'] == "Home" }.should be_truthy
               end
 
               context "after retrieved from database" do

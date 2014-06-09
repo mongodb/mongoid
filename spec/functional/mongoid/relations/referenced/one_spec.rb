@@ -203,11 +203,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            game.persisted?.should be_false
+            game.persisted?.should be false
           end
 
           it "leaves the new child persisted" do
-            new_game.persisted?.should be_true
+            new_game.persisted?.should be_truthy
           end
         end
 
@@ -234,11 +234,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child persisted" do
-            game.persisted?.should be_true
+            game.persisted?.should be_truthy
           end
 
           it "leaves the new child unpersisted" do
-            new_game.persisted?.should be_false
+            new_game.persisted?.should be false
           end
         end
       end
@@ -276,11 +276,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            game.persisted?.should be_false
+            game.persisted?.should be false
           end
 
           it "leaves the new child persisted" do
-            new_game.persisted?.should be_true
+            new_game.persisted?.should be_truthy
           end
         end
 
@@ -307,11 +307,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            game.persisted?.should be_false
+            game.persisted?.should be false
           end
 
           it "leaves the new child unpersisted" do
-            new_game.persisted?.should be_false
+            new_game.persisted?.should be false
           end
         end
       end
@@ -349,11 +349,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child persisted" do
-            cat.persisted?.should be_true
+            cat.persisted?.should be_truthy
           end
 
           it "leaves the new child persisted" do
-            new_cat.persisted?.should be_true
+            new_cat.persisted?.should be_truthy
           end
         end
 
@@ -380,11 +380,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child persisted" do
-            cat.persisted?.should be_true
+            cat.persisted?.should be_truthy
           end
 
           it "leaves the new child unpersisted" do
-            new_cat.persisted?.should be_false
+            new_cat.persisted?.should be false
           end
         end
       end
@@ -422,11 +422,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            cat.persisted?.should be_false
+            cat.persisted?.should be false
           end
 
           it "leaves the new child persisted" do
-            new_cat.persisted?.should be_true
+            new_cat.persisted?.should be_truthy
           end
         end
 
@@ -453,11 +453,11 @@ describe Mongoid::Relations::Referenced::One do
           end
 
           it "leaves the old child unpersisted" do
-            cat.persisted?.should be_false
+            cat.persisted?.should be false
           end
 
           it "leaves the new child unpersisted" do
-            new_cat.persisted?.should be_false
+            new_cat.persisted?.should be false
           end
         end
       end

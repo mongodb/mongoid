@@ -656,7 +656,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when checking #{method}" do
 
         it "returns true" do
-          addresses.respond_to?(method).should be_true
+          addresses.respond_to?(method).should be_truthy
         end
       end
     end
@@ -666,7 +666,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when checking #{method}" do
 
         it "returns true" do
-          addresses.respond_to?(method).should be_true
+          addresses.respond_to?(method).should be_truthy
         end
       end
     end
@@ -676,7 +676,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when checking #{method}" do
 
         it "returns true" do
-          addresses.respond_to?(method).should be_true
+          addresses.respond_to?(method).should be_truthy
         end
       end
     end

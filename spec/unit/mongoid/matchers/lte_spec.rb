@@ -9,7 +9,7 @@ describe Mongoid::Matchers::Lte do
       let(:matcher) { Mongoid::Matchers::Lte.new(5) }
 
       it "returns false" do
-        matcher.matches?("$lte" => 3).should be_false
+        matcher.matches?("$lte" => 3).should be false
       end
 
     end
@@ -19,7 +19,7 @@ describe Mongoid::Matchers::Lte do
       let(:matcher) { Mongoid::Matchers::Lte.new(5) }
 
       it "returns true" do
-        matcher.matches?("$lte" => 10).should be_true
+        matcher.matches?("$lte" => 10).should be_truthy
       end
 
     end
@@ -29,7 +29,7 @@ describe Mongoid::Matchers::Lte do
       let(:matcher) { Mongoid::Matchers::Lte.new(5) }
 
       it "returns true" do
-        matcher.matches?("$lte" => 5).should be_true
+        matcher.matches?("$lte" => 5).should be_truthy
       end
 
     end
@@ -39,7 +39,7 @@ describe Mongoid::Matchers::Lte do
       let(:matcher) { Mongoid::Matchers::Lte.new(nil) }
 
       it "returns false" do
-        matcher.matches?("$lte" => 5).should be_false
+        matcher.matches?("$lte" => 5).should be false
       end
 
     end

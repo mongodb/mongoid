@@ -29,7 +29,7 @@ describe Mongoid::Callbacks do
         end
 
         it "does not cascade to the child" do
-          band.run_callbacks(:rearrange).should be_true
+          band.run_callbacks(:rearrange).should be_truthy
         end
       end
     end
@@ -80,7 +80,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_create_called.should be_true
+              label.after_create_called.should be_truthy
             end
           end
 
@@ -99,7 +99,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_create_called.should be_true
+              label.after_create_called.should be_truthy
             end
           end
         end
@@ -120,7 +120,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not execute the callback" do
-            label.after_create_called.should be_false
+            label.after_create_called.should be false
           end
         end
       end
@@ -144,7 +144,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_save_called.should be_true
+              label.after_save_called.should be_truthy
             end
           end
 
@@ -163,7 +163,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_save_called.should be_true
+              label.after_save_called.should be_truthy
             end
           end
         end
@@ -183,7 +183,7 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            label.after_save_called.should be_true
+            label.after_save_called.should be_truthy
           end
         end
       end
@@ -207,7 +207,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              label.after_update_called.should be_false
+              label.after_update_called.should be false
             end
           end
 
@@ -226,7 +226,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              label.after_update_called.should be_false
+              label.after_update_called.should be false
             end
           end
         end
@@ -249,7 +249,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_update_called.should be_true
+              label.after_update_called.should be_truthy
             end
           end
 
@@ -264,7 +264,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              label.after_update_called.should be_false
+              label.after_update_called.should be false
             end
           end
         end
@@ -289,7 +289,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_validation_called.should be_true
+              label.after_validation_called.should be_truthy
             end
           end
 
@@ -308,7 +308,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              label.after_validation_called.should be_true
+              label.after_validation_called.should be_truthy
             end
           end
         end
@@ -328,7 +328,7 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            label.after_validation_called.should be_true
+            label.after_validation_called.should be_truthy
           end
         end
       end
@@ -352,7 +352,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_create_called.should be_true
+              record.before_create_called.should be_truthy
             end
           end
 
@@ -371,7 +371,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_create_called.should be_true
+              record.before_create_called.should be_truthy
             end
           end
         end
@@ -392,7 +392,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not execute the callback" do
-            record.before_create_called.should be_false
+            record.before_create_called.should be false
           end
         end
       end
@@ -416,11 +416,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_save_called.should be_true
+              record.before_save_called.should be_truthy
             end
 
             it "persists the change" do
-              band.reload.records.first.before_save_called.should be_true
+              band.reload.records.first.before_save_called.should be_truthy
             end
           end
 
@@ -439,11 +439,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_save_called.should be_true
+              record.before_save_called.should be_truthy
             end
 
             it "persists the change" do
-              band.reload.records.first.before_save_called.should be_true
+              band.reload.records.first.before_save_called.should be_truthy
             end
           end
         end
@@ -463,11 +463,11 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            record.before_save_called.should be_true
+            record.before_save_called.should be_truthy
           end
 
           it "persists the change" do
-            band.reload.records.first.before_save_called.should be_true
+            band.reload.records.first.before_save_called.should be_truthy
           end
         end
       end
@@ -491,7 +491,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              record.before_update_called.should be_false
+              record.before_update_called.should be false
             end
           end
 
@@ -510,7 +510,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              record.before_update_called.should be_false
+              record.before_update_called.should be false
             end
           end
         end
@@ -533,11 +533,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_update_called.should be_true
+              record.before_update_called.should be_truthy
             end
 
             it "persists the change" do
-              band.reload.records.first.before_update_called.should be_true
+              band.reload.records.first.before_update_called.should be_truthy
             end
           end
 
@@ -548,7 +548,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              record.before_update_called.should be_false
+              record.before_update_called.should be false
             end
           end
         end
@@ -573,11 +573,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_validation_called.should be_true
+              record.before_validation_called.should be_truthy
             end
 
             it "persists the change" do
-              band.reload.records.first.before_validation_called.should be_true
+              band.reload.records.first.before_validation_called.should be_truthy
             end
           end
 
@@ -596,11 +596,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              record.before_validation_called.should be_true
+              record.before_validation_called.should be_truthy
             end
 
             it "persists the change" do
-              band.reload.records.first.before_validation_called.should be_true
+              band.reload.records.first.before_validation_called.should be_truthy
             end
           end
         end
@@ -620,11 +620,11 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            record.before_validation_called.should be_true
+            record.before_validation_called.should be_truthy
           end
 
           it "persists the change" do
-            band.reload.records.first.before_validation_called.should be_true
+            band.reload.records.first.before_validation_called.should be_truthy
           end
         end
       end
@@ -655,7 +655,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_create_called.should be_true
+              track.before_create_called.should be_truthy
             end
           end
 
@@ -678,7 +678,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_create_called.should be_true
+              track.before_create_called.should be_truthy
             end
           end
         end
@@ -703,7 +703,7 @@ describe Mongoid::Callbacks do
           end
 
           it "does not execute the callback" do
-            track.before_create_called.should be_false
+            track.before_create_called.should be false
           end
         end
       end
@@ -735,11 +735,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_save_called.should be_true
+              track.before_save_called.should be_truthy
             end
 
             it "persists the change" do
-              reloaded.tracks.first.before_save_called.should be_true
+              reloaded.tracks.first.before_save_called.should be_truthy
             end
           end
 
@@ -766,11 +766,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_save_called.should be_true
+              track.before_save_called.should be_truthy
             end
 
             it "persists the change" do
-              reloaded.tracks.first.before_save_called.should be_true
+              reloaded.tracks.first.before_save_called.should be_truthy
             end
           end
         end
@@ -798,11 +798,11 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            track.before_save_called.should be_true
+            track.before_save_called.should be_truthy
           end
 
           it "persists the change" do
-            reloaded.tracks.first.before_save_called.should be_true
+            reloaded.tracks.first.before_save_called.should be_truthy
           end
         end
       end
@@ -830,7 +830,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              track.before_update_called.should be_false
+              track.before_update_called.should be false
             end
           end
 
@@ -853,7 +853,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              track.before_update_called.should be_false
+              track.before_update_called.should be false
             end
           end
         end
@@ -884,11 +884,11 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_update_called.should be_true
+              track.before_update_called.should be_truthy
             end
 
             it "persists the change" do
-              reloaded.tracks.first.before_update_called.should be_true
+              reloaded.tracks.first.before_update_called.should be_truthy
             end
           end
 
@@ -899,7 +899,7 @@ describe Mongoid::Callbacks do
             end
 
             it "does not execute the callback" do
-              track.before_update_called.should be_false
+              track.before_update_called.should be false
             end
           end
         end
@@ -928,7 +928,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_validation_called.should be_true
+              track.before_validation_called.should be_truthy
             end
           end
 
@@ -951,7 +951,7 @@ describe Mongoid::Callbacks do
             end
 
             it "executes the callback" do
-              track.before_validation_called.should be_true
+              track.before_validation_called.should be_truthy
             end
           end
         end
@@ -975,7 +975,7 @@ describe Mongoid::Callbacks do
           end
 
           it "executes the callback" do
-            track.before_validation_called.should be_true
+            track.before_validation_called.should be_truthy
           end
         end
       end

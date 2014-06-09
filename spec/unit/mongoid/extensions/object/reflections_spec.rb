@@ -19,11 +19,11 @@ describe Mongoid::Extensions::Object::Reflections do
       end
 
       it "removes the instance variable" do
-        document.instance_variable_defined?(:@testing).should be_false
+        document.instance_variable_defined?(:@testing).should be false
       end
 
       it "returns true" do
-        removal.should be_true
+        removal.should be_truthy
       end
     end
 
@@ -38,7 +38,7 @@ describe Mongoid::Extensions::Object::Reflections do
       end
 
       it "returns false" do
-        removal.should be_false
+        removal.should be false
       end
     end
   end

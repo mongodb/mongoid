@@ -9,7 +9,7 @@ describe Mongoid::Matchers::Size do
     context "when the attribute is the same size" do
 
       it "returns true" do
-        matcher.matches?("$size" => 2).should be_true
+        matcher.matches?("$size" => 2).should be_truthy
       end
 
     end
@@ -17,7 +17,7 @@ describe Mongoid::Matchers::Size do
     context "when the attribute is not the same size" do
 
       it "returns false" do
-        matcher.matches?("$size" => 5).should be_false
+        matcher.matches?("$size" => 5).should be false
       end
 
     end

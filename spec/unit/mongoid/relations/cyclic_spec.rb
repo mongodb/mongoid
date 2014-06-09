@@ -19,7 +19,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        document.cyclic.should be_truthy
       end
     end
 
@@ -38,7 +38,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        document.cyclic.should be_truthy
       end
     end
 
@@ -57,7 +57,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        document.cyclic.should be_truthy
       end
     end
 
@@ -76,7 +76,7 @@ describe Mongoid::Relations::Cyclic do
       end
 
       it "sets cyclic to true" do
-        document.cyclic.should be_true
+        document.cyclic.should be_truthy
       end
     end
 
@@ -107,7 +107,7 @@ describe Mongoid::Relations::Cyclic do
     end
 
     it "sets cyclic to true" do
-      document.cyclic.should be_true
+      document.cyclic.should be_truthy
     end
 
     context "when cascading callbacks are enabled" do
