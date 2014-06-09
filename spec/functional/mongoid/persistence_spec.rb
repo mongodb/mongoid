@@ -406,17 +406,6 @@ describe Mongoid::Persistence do
       end
     end
 
-    context "when saving with a hash field with invalid keys" do
-
-      before do
-        person.map = { "bad.key" => "value" }
-      end
-
-      it "raises an error" do
-        expect { person.save }.to raise_error(BSON::InvalidKeyName)
-      end
-    end
-
     context "when validation passes" do
 
       it "returns true" do
@@ -561,21 +550,6 @@ describe Mongoid::Persistence do
   end
 
   describe "save!" do
-
-    context "when saving with a hash field with invalid keys" do
-
-      let(:person) do
-        Person.new
-      end
-
-      before do
-        person.map = { "bad.key" => "value" }
-      end
-
-      it "raises an error" do
-        expect { person.save! }.to raise_error(BSON::InvalidKeyName)
-      end
-    end
 
     context "inserting with a field that is not unique" do
 
@@ -896,19 +870,6 @@ describe Mongoid::Persistence do
             person.reload.terms.should be false
           end
         end
-      end
-    end
-
-    context "when saving with a hash field with invalid keys" do
-
-      let(:person) do
-        Person.new
-      end
-
-      it "raises an error" do
-        expect {
-          person.update_attribute(:map, { "bad.key" => "value" })
-        }.to raise_error(BSON::InvalidKeyName)
       end
     end
 
