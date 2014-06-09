@@ -1,4 +1,4 @@
 # encoding: utf-8
 module Mongoid #:nodoc
-  VERSION = "2.8.1"
+  VERSION = "2.9.0"
 end
