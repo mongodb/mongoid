@@ -21,12 +21,12 @@ development:
         # read: secondary_preferred
 
         # How many times Moped should attempt to retry an operation after
-        # failure. (default: 30)
-        # max_retries: 30
+        # failure. (default: The number of nodes in the cluster)
+        # max_retries: 20
 
         # The time in seconds that Moped should wait before retrying an
-        # operation on failure. (default: 1)
-        # retry_interval: 1
+        # operation on failure. (default: 0.25)
+        # retry_interval: 0.25
   # Configure Mongoid specific options. (optional)
   options:
     # Includes the root model name in json serialization. (default: false)
