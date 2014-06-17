@@ -19,6 +19,17 @@ describe Mongoid::Attributes::Readonly do
       end
     end
 
+    context "when providing a field alias" do
+
+      before do
+        Person.attr_readonly :aliased_timestamp
+      end
+
+      it "adds the database field name to readonly attributes" do
+        expect(Person.readonly_attributes.to_a).to eq([ "at" ])
+      end
+    end
+
     context "when providing multiple fields" do
 
       before do
@@ -33,53 +44,70 @@ describe Mongoid::Attributes::Readonly do
     context "when creating a new document with a readonly field" do
 
       before do
-        Person.attr_readonly :title, :terms
+        Person.attr_readonly :title, :terms, :aliased_timestamp
       end
 
       let(:person) do
-        Person.create(title: "sir", terms: true)
+        Person.create(title: "sir", terms: true, aliased_timestamp: Time.at(42))
       end
 
       it "sets the first readonly value" do
         expect(person.title).to eq("sir")
       end
 
-      it "sets subsequent readonly values" do
+      it "sets the second readonly value" do
         expect(person.terms).to be true
+      end
+
+      it "sets the third readonly value" do
+        expect(person.aliased_timestamp).to eq(Time.at(42))
       end
 
       it "persists the first readonly value" do
         expect(person.reload.title).to eq("sir")
       end
 
-      it "persists subsequent readonly values" do
+      it "persists the second readonly value" do
         expect(person.reload.terms).to be true
+      end
+
+      it "persists the third readonly value" do
+        expect(person.reload.aliased_timestamp).to eq(Time.at(42))
       end
     end
 
     context "when updating an existing readonly field" do
 
       before do
-        Person.attr_readonly :title, :terms, :score
+        Person.attr_readonly :title, :terms, :score, :aliased_timestamp
       end
 
       let(:person) do
-        Person.create(title: "sir", terms: true, score: 1)
+        Person.create(title: "sir", terms: true, score: 1, aliased_timestamp: Time.at(42))
       end
 
       context "when updating via the setter" do
 
         before do
           person.title = "mr"
+          person.aliased_timestamp = Time.at(43)
           person.save
         end
 
-        it "does not update the field" do
+        it "does not update the first field" do
           expect(person.title).to eq("sir")
         end
 
-        it "does not persist the changes" do
+        it "does not update the second field" do
+          expect(person.aliased_timestamp).to eq(Time.at(42))
+        end
+
+        it "does not persist the first field" do
           expect(person.reload.title).to eq("sir")
+        end
+
+        it "does not persist the second field" do
+          expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
 
@@ -127,15 +155,24 @@ describe Mongoid::Attributes::Readonly do
 
         before do
           person[:title] = "mr"
+          person[:aliased_timestamp] = Time.at(43)
           person.save
         end
 
-        it "does not update the field" do
+        it "does not update the first field" do
           expect(person.title).to eq("sir")
         end
 
-        it "does not persist the changes" do
+        it "does not update the second field" do
+          expect(person.aliased_timestamp).to eq(Time.at(42))
+        end
+
+        it "does not persist the first field" do
           expect(person.reload.title).to eq("sir")
+        end
+
+        it "does not persist the second field" do
+          expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
 
@@ -143,47 +180,72 @@ describe Mongoid::Attributes::Readonly do
 
         before do
           person.write_attribute(:title, "mr")
+          person.write_attribute(:aliased_timestamp, Time.at(43))
           person.save
         end
 
-        it "does not update the field" do
+        it "does not update the first field" do
           expect(person.title).to eq("sir")
         end
 
-        it "does not persist the changes" do
+        it "does not update the second field" do
+          expect(person.aliased_timestamp).to eq(Time.at(42))
+        end
+
+        it "does not persist the first field" do
           expect(person.reload.title).to eq("sir")
+        end
+
+        it "does not persist the second field" do
+          expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
 
       context "when updating via update_attributes" do
 
         before do
-          person.update_attributes(title: "mr")
+          person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
           person.save
         end
 
-        it "does not update the field" do
+        it "does not update the first field" do
           expect(person.title).to eq("sir")
         end
 
-        it "does not persist the changes" do
+        it "does not update the second field" do
+          expect(person.aliased_timestamp).to eq(Time.at(42))
+        end
+
+        it "does not persist the first field" do
           expect(person.reload.title).to eq("sir")
+        end
+
+        it "does not persist the second field" do
+          expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
 
       context "when updating via update_attributes!" do
 
         before do
-          person.update_attributes!(title: "mr")
+          person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
           person.save
         end
 
-        it "does not update the field" do
+        it "does not update the first field" do
           expect(person.title).to eq("sir")
         end
 
-        it "does not persist the changes" do
+        it "does not update the second field" do
+          expect(person.aliased_timestamp).to eq(Time.at(42))
+        end
+
+        it "does not persist the first field" do
           expect(person.reload.title).to eq("sir")
+        end
+
+        it "does not persist the second field" do
+          expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
 
