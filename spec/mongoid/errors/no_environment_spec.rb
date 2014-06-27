@@ -16,7 +16,7 @@ describe Mongoid::Errors::NoEnvironment do
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Mongoid attempted to find the appropriate environment but no Rails.env"
+        "Mongoid attempted to find the appropriate environment but no MONGOID_ENV"
       )
     end
 

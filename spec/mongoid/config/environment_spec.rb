@@ -51,6 +51,22 @@ describe Mongoid::Config::Environment do
       end
     end
 
+    context "when the MONGOID_ENV variable is defined" do
+
+      before do
+        Object.send(:remove_const, :Rails) if defined?(Rails)
+        ENV["MONGOID_ENV"] = "acceptance"
+      end
+
+      after do
+        ENV["MONGOID_ENV"] = nil
+      end
+
+      it "returns the MONGOID_ENV" do
+        expect(described_class.env_name).to eq("acceptance")
+      end
+    end
+
     context "when the rack env variable is defined" do
 
       before do
