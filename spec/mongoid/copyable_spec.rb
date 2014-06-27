@@ -220,6 +220,37 @@ describe Mongoid::Copyable do
           person.new_record = false
         end
 
+        context "when a dynamic field exists and attributes are dynamic" do
+          let(:copy) do
+            person.send(method)
+          end
+          before do
+            person[:unmapped_attribute] = true
+          end
+          it "copies the dynamic field" do
+            expect(copy[:unmapped_attribute]).to eq(true)
+          end
+        end
+
+        context "when a dynamic field exists and attributes are not dynamic" do
+          let(:pet) do
+            Animal.new
+          end
+          before do
+            pet.new_record = false
+            pet[:unmapped_attribute] = true
+          end
+          let(:copy) do
+            pet.send(method)
+          end
+          it "does not raise an error" do
+            expect { copy }.to_not raise_error
+          end
+          it "does not copy the dynamic field" do
+            expect(copy[:unmapped_attribute]).to eq(nil)
+          end
+        end
+
         context "when there are changes" do
 
           let(:copy) do
