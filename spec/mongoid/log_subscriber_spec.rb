@@ -30,6 +30,7 @@ describe Mongoid::LogSubscriber do
         attr_reader :debugs
 
         def initialize
+          super
           @debugs = []
         end
 
