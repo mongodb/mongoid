@@ -56,7 +56,9 @@ describe Mongoid::Attributes do
         end
       end
 
-      context "when excluding with only" do
+      context "when excluding with only and raising missing attribute error" do
+
+        before { Mongoid.raise_missing_attribute_error = true }
 
         let(:from_db) do
           Person.only(:_id).first
@@ -69,7 +71,22 @@ describe Mongoid::Attributes do
         end
       end
 
-      context "when excluding with without" do
+      context "when excluding with only and not raising missing attribute error" do
+
+        before { Mongoid.raise_missing_attribute_error = false }
+
+        let(:from_db) do
+          Person.only(:_id).first
+        end
+
+        it "does not raise an error" do
+          expect(from_db.desc).to eq(nil)
+        end
+      end
+
+      context "when excluding with without and raising missing attribute error" do
+
+        before { Mongoid.raise_missing_attribute_error = true }
 
         let(:from_db) do
           Person.without(:title).first
@@ -79,6 +96,19 @@ describe Mongoid::Attributes do
           expect {
             from_db.title
           }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+
+      context "when excluding with without and not raising missing attribute error" do
+
+        before { Mongoid.raise_missing_attribute_error = false }
+
+        let(:from_db) do
+          Person.without(:title).first
+        end
+
+        it "does not raise an error" do
+          expect(from_db.desc).to eq(nil)
         end
       end
     end
@@ -140,7 +170,9 @@ describe Mongoid::Attributes do
 
       context "when the attribute was excluded in a criteria" do
 
-        context "when excluding with only" do
+        context "when excluding with only and raising missing attribute error" do
+
+          before { Mongoid.raise_missing_attribute_error = true }
 
           let(:from_db) do
             Person.only(:_id).first
@@ -153,7 +185,22 @@ describe Mongoid::Attributes do
           end
         end
 
-        context "when excluding with without" do
+        context "when excluding with only and not raising missing attribute error" do
+
+          before { Mongoid.raise_missing_attribute_error = false }
+
+          let(:from_db) do
+            Person.only(:_id).first
+          end
+
+          it "does not raise an error" do
+            expect(from_db.desc).to eq(nil)
+          end
+        end
+
+        context "when excluding with without and raise missing attribute error" do
+
+          before { Mongoid.raise_missing_attribute_error = true }
 
           let(:from_db) do
             Person.without(:title).first
@@ -163,6 +210,19 @@ describe Mongoid::Attributes do
             expect {
               from_db[:title]
             }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context "when excluding with without and not raise missing attribute error" do
+
+          before { Mongoid.raise_missing_attribute_error = false }
+
+          let(:from_db) do
+            Person.without(:title).first
+          end
+
+          it "does not raises an error" do
+            expect(from_db.desc).to eq(nil)
           end
         end
       end
