@@ -115,6 +115,25 @@ module Mongoid
       result
     end
 
+    # Find the first +Document+ given the conditions, or raises
+    # Mongoid::Errors::DocumentNotFound
+    #
+    # @example Find the document by attribute other than id
+    #   Person.find_by(:username => "superuser")
+    #
+    # @param [ Hash ] attrs The attributes to check.
+    #
+    # @raise [ Errors::DocumentNotFound ] If no document found.
+    #
+    # @return [ Document ] A matching document.
+    #
+    def find_by!(attrs = {})
+      result = where(attrs).first
+      raise(Errors::DocumentNotFound.new(self, attrs)) unless result
+      yield(result) if result && block_given?
+      result
+    end
+
     # Find the first +Document+ given the conditions.
     #
     # @example Find the first document.
