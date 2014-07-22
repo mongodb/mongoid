@@ -15,7 +15,6 @@ require "action_controller"
 require "mongoid"
 require "rspec"
 require "helpers"
-require "allocation_stats"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.
@@ -107,18 +106,4 @@ RSpec.configure do |config|
   config.filter_run_excluding(config: ->(value){
     return true if value == :mongohq && !mongohq_connectable?
   })
-
-  config.before(:suite) do
-    $count = 0
-  end
-
-  config.around do |example|
-    stats = AllocationStats.trace { example.run }
-    count = stats.allocations.from("threaded.rb").where(class: String).to_a.count
-    $count += count
-  end
-
-  config.after(:suite) do
-    puts "String allocations in threaded.rb: #{$count}"
-  end
 end
