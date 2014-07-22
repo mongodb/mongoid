@@ -6,6 +6,17 @@ module Mongoid
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
+    DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
+    SESSIONS_KEY = "[mongoid]:sessions"
+    SESSION_OVERRIDE_KEY = "[mongoid]:session-override"
+    SCOPE_STACK_KEY = "[mongoid]:scope-stack"
+    AUTOSAVES_KEY = "[mongoid]:autosaves"
+    VALIDATIONS_KEY = "[mongoid]:validations"
+
+    STACK_KEYS = Hash.new do |hash, key|
+      hash[key] = "[mongoid]:#{key}-stack"
+    end
+
     extend self
 
     # Begin entry into a named thread local stack.
@@ -31,7 +42,7 @@ module Mongoid
     #
     # @since 3.0.0
     def database_override
-      Thread.current["[mongoid]:db-override"]
+      Thread.current[DATABASE_OVERRIDE_KEY]
     end
 
     # Set the global database override.
@@ -45,7 +56,7 @@ module Mongoid
     #
     # @since 3.0.0
     def database_override=(name)
-      Thread.current["[mongoid]:db-override"] = name
+      Thread.current[DATABASE_OVERRIDE_KEY] = name
     end
 
     # Get the database sessions from the current thread.
@@ -57,7 +68,7 @@ module Mongoid
     #
     # @since 3.0.0
     def sessions
-      Thread.current["[mongoid]:sessions"] ||= {}
+      Thread.current[SESSIONS_KEY] ||= {}
     end
 
     # Are in the middle of executing the named stack
@@ -99,7 +110,7 @@ module Mongoid
     #
     # @since 2.4.0
     def stack(name)
-      Thread.current["[mongoid]:#{name}-stack"] ||= []
+      Thread.current[STACK_KEYS[name]] ||= []
     end
 
     # Begin autosaving a document on the current thread.
@@ -159,7 +170,7 @@ module Mongoid
     #
     # @since 3.0.0
     def session_override
-      Thread.current["[mongoid]:session-override"]
+      Thread.current[SESSION_OVERRIDE_KEY]
     end
 
     # Set the global session override.
@@ -173,7 +184,7 @@ module Mongoid
     #
     # @since 3.0.0
     def session_override=(name)
-      Thread.current["[mongoid]:session-override"] = name
+      Thread.current[SESSION_OVERRIDE_KEY] = name
     end
 
     # Get the mongoid scope stack for chained criteria.
@@ -185,7 +196,7 @@ module Mongoid
     #
     # @since 2.1.0
     def scope_stack
-      Thread.current["[mongoid]:scope-stack"] ||= {}
+      Thread.current[SCOPE_STACK_KEY] ||= {}
     end
 
     # Is the document autosaved on the current thread?
@@ -225,7 +236,7 @@ module Mongoid
     #
     # @since 3.0.0
     def autosaves
-      Thread.current["[mongoid]:autosaves"] ||= {}
+      Thread.current[AUTOSAVES_KEY] ||= {}
     end
 
     # Get all validations on the current thread.
@@ -237,7 +248,7 @@ module Mongoid
     #
     # @since 2.1.9
     def validations
-      Thread.current["[mongoid]:validations"] ||= {}
+      Thread.current[VALIDATIONS_KEY] ||= {}
     end
 
     # Get all autosaves on the current thread for the class.
