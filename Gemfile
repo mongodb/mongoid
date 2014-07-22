@@ -14,5 +14,6 @@ group :test do
     gem "guard"
     gem "guard-rspec"
     gem "rb-fsevent"
+    gem "allocation_stats"
   end
 end
