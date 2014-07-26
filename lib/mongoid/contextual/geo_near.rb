@@ -98,7 +98,20 @@ module Mongoid
       
       
       
-      
+      # Specify the minimum distance to find documents for, or get the value of
+      # the document with the furthest distance.
+      #
+      # @example Set the min distance.
+      #   geo_near.min_distance(0.5)
+      #
+      # @example Get the max distance.
+      #   geo_near.min_distance
+      #
+      # @param [ Integer, Float ] value The maximum distance.
+      #
+      # @return [ GeoNear, Float ] The GeoNear command or the value.
+      #
+      # @since 4.0  
       def min_distance(value = nil)
         if value
           command[:minDistance] = value
