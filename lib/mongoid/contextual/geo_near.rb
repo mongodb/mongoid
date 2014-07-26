@@ -89,12 +89,26 @@ module Mongoid
   class:      #{criteria.klass}
   near:       #{command[:near]}
   multiplier: #{command[:distanceMultiplier] || "N/A"}
+  min:        #{command[:minDistance] || "N/A"}
   max:        #{command[:maxDistance] || "N/A"}
   unique:     #{command[:unique].nil? ? true : command[:unique]}
   spherical:  #{command[:spherical] || false}>
 }
       end
-
+      
+      
+      
+      
+      def min_distance(value = nil)
+        if value
+          command[:minDistance] = value
+          self
+        else
+          stats["minDistance"]
+        end
+      end
+ 
+ 
       # Specify the maximum distance to find documents for, or get the value of
       # the document with the furthest distance.
       #
