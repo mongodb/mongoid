@@ -3,7 +3,7 @@ require "spec_helper"
 describe Mongoid::Contexts::Mongo do
 
   before do
-    [ Person, Product ].each(&:delete_all)
+    [ Person, Product, Player ].each(&:delete_all)
   end
 
   describe "#first" do
@@ -300,6 +300,19 @@ describe Mongoid::Contexts::Mongo do
 
       it "returns the minimum for the field" do
         Person.min(:age).should == 10.0
+      end
+
+      context "when the field is zero" do
+
+        before do
+          5.times do |n|
+            Player.create(:frags => n)
+          end
+        end
+
+        it "returns the minimum for the field" do
+          Player.min(:frags).should == 0
+        end
       end
 
       context "when the field is not defined" do
