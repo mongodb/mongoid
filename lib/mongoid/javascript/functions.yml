@@ -28,10 +28,10 @@ max_finalize:
 
 min:
   "function(obj, prev) {
-     if (obj.[field] && prev.min == 'start') {
+     if (!isNaN(obj.[field]) && prev.min == 'start') {
        prev.min = obj.[field];
      }
-     if (obj.[field] && prev.min > obj.[field]) {
+     if (!isNaN(obj.[field]) && prev.min > obj.[field]) {
        prev.min = obj.[field];
      }
    }"
