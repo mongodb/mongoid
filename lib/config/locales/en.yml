@@ -336,7 +336,7 @@ en:
             %{klass}.create! without setting the parent document as an
             attribute."
           resolution: "Ensure that you've set the parent relation if
-            instantiating the embedded document direcly, or always create new
+            instantiating the embedded document directly, or always create new
             embedded documents via the parent relation."
         no_session_config:
           message: "No configuration could be found for a session named
