@@ -179,6 +179,34 @@ describe Mongoid::Attributes::Nested do
         expect(post.person.title).to eq("Sir")
       end
     end
+
+    context "when the association is referenced in and polymorphic: true" do
+      before(:all) do
+        class Post
+          belongs_to :posteable, polymorphic: true
+          accepts_nested_attributes_for :posteable, autosave: true
+        end
+
+        class Website
+          include Mongoid::Document
+          has_one :post, as: :posteable
+          field :name, type: String
+        end
+      end
+
+      context "when the association is referenced in and polymorphic: true" do
+        it 'infers the class name of the polymorphic with the inverse type' do
+          expect {
+            Post.create!(
+              title: "My awesome title",
+              content: "My awesome content of 500 words",
+              posteable_type: "Website",
+              posteable_attributes: { name: 'My awesome website' }
+            )
+          }.not_to raise_error
+        end
+      end
+    end
   end
 
   describe "##{name}_attributes=" do
