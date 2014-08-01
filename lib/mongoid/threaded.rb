@@ -6,15 +6,15 @@ module Mongoid
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
-    DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
-    SESSIONS_KEY = "[mongoid]:sessions"
-    SESSION_OVERRIDE_KEY = "[mongoid]:session-override"
-    SCOPE_STACK_KEY = "[mongoid]:scope-stack"
-    AUTOSAVES_KEY = "[mongoid]:autosaves"
-    VALIDATIONS_KEY = "[mongoid]:validations"
+    DATABASE_OVERRIDE_KEY = "[mongoid]:db-override".freeze
+    SESSIONS_KEY = "[mongoid]:sessions".freeze
+    SESSION_OVERRIDE_KEY = "[mongoid]:session-override".freeze
+    SCOPE_STACK_KEY = "[mongoid]:scope-stack".freeze
+    AUTOSAVES_KEY = "[mongoid]:autosaves".freeze
+    VALIDATIONS_KEY = "[mongoid]:validations".freeze
 
     STACK_KEYS = Hash.new do |hash, key|
-      hash[key] = "[mongoid]:#{key}-stack"
+      hash[key] = "[mongoid]:#{key}-stack".freeze
     end
 
     extend self
