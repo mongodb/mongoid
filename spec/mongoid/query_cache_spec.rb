@@ -177,6 +177,23 @@ describe Mongoid::QueryCache do
     end
   end
 
+  context "when querying a very large collection" do
+
+    before do
+      123.times { Band.create! }
+      Band.all.to_a
+    end
+
+    it "should cache the complete result of the query" do
+      expect_no_queries do
+        Band.all.to_a
+      end
+
+      expect(Band.all.to_a.length).to eq(123)
+    end
+
+  end
+
   context "when inserting an index" do
 
     it "does not cache the query" do
