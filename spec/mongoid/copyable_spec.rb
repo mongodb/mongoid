@@ -407,6 +407,54 @@ describe Mongoid::Copyable do
           end
         end
       end
+
+      context "when cloning the document with embedded documents" do
+
+        before(:each) do
+          address.city = 'City'
+          person.save!
+        end
+
+        it "should clone embedded fields" do          
+          cloned_person = person.clone
+
+          expect(person.addresses.size).to eq 1
+          expect(cloned_person.addresses.size).to eq 1
+          expect(cloned_person.addresses.size).to eq person.addresses.size
+
+          address         = person.addresses.first
+          cloned_address  = cloned_person.addresses.first
+
+          expect(cloned_address.fields.keys).to eq address.fields.keys
+          expect(cloned_address.street).to eq address.street
+          expect(cloned_address.city).to eq address.city
+          expect(cloned_address.street).to eq 'Bond'
+          expect(cloned_address.city).to eq 'City'
+        end
+
+        it "should only clone current embedded fields" do
+          # Remove city field from address
+          address = person.addresses.first
+          address.unset('city')
+          address.save!
+
+          cloned_person = person.clone
+
+          expect(person.addresses.size).to eq 1
+          expect(cloned_person.addresses.size).to eq 1
+          expect(cloned_person.addresses.size).to eq person.addresses.size
+
+          address         = person.addresses.first
+          cloned_address  = cloned_person.addresses.first
+
+          expect(cloned_address.fields.keys).to eq address.fields.keys
+          expect(cloned_address.street).to eq address.street
+          expect(cloned_address.city).to eq nil
+          expect(cloned_address.street).to eq 'Bond'
+        end
+
+      end
+
     end
   end
 end
