@@ -408,53 +408,53 @@ describe Mongoid::Copyable do
         end
       end
 
-      context "when cloning the document with embedded documents" do
+      context "when cloning a document with embedded documents" do
 
-        before(:each) do
-          address.city = 'City'
+        let(:clone) do
+          person.clone
+        end
+
+        it "should clone embedded documents" do
+          expect(clone.addresses.size).to eq person.addresses.size
+        end
+
+        it "should clone embedded fields" do
+          expect(clone.addresses.first.fields.keys).to eq person.addresses.first.fields.keys
+        end
+
+        it "should clone dynamic fields" do
+          person[:unmapped_attribute] = true
           person.save!
+
+          expect(clone[:unmapped_attribute]).to eq person[:unmapped_attribute]
         end
 
-        it "should clone embedded fields" do          
-          cloned_person = person.clone
+        it "should clone embedded dynamic fields" do
+          class Address
+            include Mongoid::Attributes::Dynamic
+          end
 
-          expect(person.addresses.size).to eq 1
-          expect(cloned_person.addresses.size).to eq 1
-          expect(cloned_person.addresses.size).to eq person.addresses.size
-
-          address         = person.addresses.first
-          cloned_address  = cloned_person.addresses.first
-
-          expect(cloned_address.fields.keys).to eq address.fields.keys
-          expect(cloned_address.street).to eq address.street
-          expect(cloned_address.city).to eq address.city
-          expect(cloned_address.street).to eq 'Bond'
-          expect(cloned_address.city).to eq 'City'
-        end
-
-        it "should only clone current embedded fields" do
-          # Remove city field from address
-          address = person.addresses.first
-          address.unset('city')
+          address[:unmapped_attribute] = true
           address.save!
 
-          cloned_person = person.clone
-
-          expect(person.addresses.size).to eq 1
-          expect(cloned_person.addresses.size).to eq 1
-          expect(cloned_person.addresses.size).to eq person.addresses.size
-
-          address         = person.addresses.first
-          cloned_address  = cloned_person.addresses.first
-
-          expect(cloned_address.fields.keys).to eq address.fields.keys
-          expect(cloned_address.street).to eq address.street
-          expect(cloned_address.city).to eq nil
-          expect(cloned_address.street).to eq 'Bond'
+          expect(clone.addresses.first[:unmapped_attribute]).to eq address[:unmapped_attribute]
         end
 
-      end
+        it "should not clone changed fields" do
+          person.unset('title')
+          person.save!
 
+          expect(clone.title).to eq nil
+        end
+
+        it "should not clone embedded changed fields" do
+          address = person.addresses.first
+          address.unset('street')
+          address.save!
+
+          expect(clone.addresses.first.street).to eq nil
+        end
+      end
     end
   end
 end
