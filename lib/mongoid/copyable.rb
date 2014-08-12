@@ -44,7 +44,7 @@ module Mongoid
         embedded_attrs = {}
         self.embedded_relations.keys.each do |relation_key|
           embedded_attrs[relation_key] = self.send(self.embedded_relations[relation_key][:name]).map do |relation|
-            relation.clone_attr
+            relation.send(:clone_attr)
           end
         end
         attrs.merge!(embedded_attrs)
