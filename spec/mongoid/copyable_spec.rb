@@ -407,6 +407,54 @@ describe Mongoid::Copyable do
           end
         end
       end
+
+      context "when cloning a document with embedded documents" do
+
+        let(:clone) do
+          person.clone
+        end
+
+        it "should clone embedded documents" do
+          expect(clone.addresses.size).to eq person.addresses.size
+        end
+
+        it "should clone embedded fields" do
+          expect(clone.addresses.first.fields.keys).to eq person.addresses.first.fields.keys
+        end
+
+        it "should clone dynamic fields" do
+          person[:unmapped_attribute] = true
+          person.save!
+
+          expect(clone[:unmapped_attribute]).to eq person[:unmapped_attribute]
+        end
+
+        it "should clone embedded dynamic fields" do
+          class Address
+            include Mongoid::Attributes::Dynamic
+          end
+
+          address[:unmapped_attribute] = true
+          address.save!
+
+          expect(clone.addresses.first[:unmapped_attribute]).to eq address[:unmapped_attribute]
+        end
+
+        it "should not clone changed fields" do
+          person.unset('title')
+          person.save!
+
+          expect(clone.title).to eq nil
+        end
+
+        it "should not clone embedded changed fields" do
+          address = person.addresses.first
+          address.unset('street')
+          address.save!
+
+          expect(clone.addresses.first.street).to eq nil
+        end
+      end
     end
   end
 end
