@@ -3,6 +3,12 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 4.0.1
+
+### Resolved Issues
+
+* \#3773 Use nanoseconds for cache_key timestamp instead of plain seconds. (Máximo Mussini)
+
 ## 4.0.0
 
 ### Major Changes (Backwards Incompatible)
