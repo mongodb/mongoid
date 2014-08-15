@@ -144,7 +144,7 @@ describe Mongoid::Document do
       context "with updated_at" do
 
         let!(:updated_at) do
-          document.updated_at.utc.to_s(:number)
+          document.updated_at.utc.to_s(:nsec)
         end
 
         it "has the id and updated_at key name" do
@@ -182,7 +182,7 @@ describe Mongoid::Document do
       end
 
       let!(:updated_at) do
-        agent.updated_at.utc.to_s(:number)
+        agent.updated_at.utc.to_s(:nsec)
       end
 
       it "has the id and updated_at key name" do
