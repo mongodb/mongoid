@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3703 pluck method should not compact the values. (Arthur Neves)
+
 * \#3773 Use nanoseconds for cache_key timestamp instead of plain seconds. (Máximo Mussini)
 
 ## 4.0.0

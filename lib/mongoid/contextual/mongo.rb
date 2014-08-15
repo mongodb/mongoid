@@ -350,9 +350,9 @@ module Mongoid
           if normalized_select.size == 1
             doc[normalized_select.keys.first]
           else
-            normalized_select.keys.map { |n| doc[n] }.compact
+            normalized_select.keys.map { |n| doc[n] }
           end
-        end.compact
+        end
       end
 
       # Skips the provided number of documents.

@@ -2851,6 +2851,17 @@ describe Mongoid::Criteria do
       end
     end
 
+    context "when plucking existent and non-existent fields" do
+
+      let(:plucked) do
+        Band.all.pluck(:id, :fooz)
+      end
+
+      it "returns nil for the field that doesnt exist" do
+        expect(plucked).to eq([[depeche.id, nil], [tool.id, nil], [photek.id, nil] ])
+      end
+    end
+
     context "when plucking a field that doesnt exist" do
 
       context "when pluck one field" do
@@ -2859,8 +2870,8 @@ describe Mongoid::Criteria do
           Band.all.pluck(:foo)
         end
 
-        it "returns a empty array" do
-          expect(plucked).to eq([])
+        it "returns a array with nil values" do
+          expect(plucked).to eq([nil, nil, nil])
         end
       end
 
@@ -2870,8 +2881,8 @@ describe Mongoid::Criteria do
           Band.all.pluck(:foo, :bar)
         end
 
-        it "returns a empty array" do
-          expect(plucked).to eq([[], [], []])
+        it "returns a nil arrays" do
+          expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
         end
       end
     end
