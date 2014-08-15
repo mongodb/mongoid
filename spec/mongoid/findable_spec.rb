@@ -382,8 +382,8 @@ describe Mongoid::Findable do
         Band.pluck(:follows)
       end
 
-      it "returns an empty array" do
-        expect(plucked).to be_empty
+      it "returns a array with nil values" do
+        expect(plucked).to eq([nil, nil, nil])
       end
     end
   end
