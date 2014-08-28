@@ -408,18 +408,50 @@ describe Mongoid::Copyable do
         end
       end
 
-      context "when cloning a document with embedded documents" do
+      context "when cloning a document with embeds_one relation" do
 
         let(:clone) do
           person.clone
         end
 
-        it "should clone embedded documents" do
-          expect(clone.addresses.size).to eq person.addresses.size
+        it "should clone embedded document" do
+          expect(clone.name).to eq person.name
         end
 
-        it "should clone embedded fields" do
-          expect(clone.addresses.first.fields.keys).to eq person.addresses.first.fields.keys
+        it "should clone embedded document's fields" do
+          expect(clone.name.fields.keys).to eq person.name.fields.keys
+        end
+
+        it "should clone embedded document's dynamic fields" do
+          class Name
+            include Mongoid::Attributes::Dynamic
+          end
+
+          name[:unmapped_attribute] = true
+          name.save!
+
+          expect(clone.name[:unmapped_attribute]).to eq name[:unmapped_attribute]
+        end
+
+        it "should not clone embedded document's changed fields" do
+          name = person.name
+          name.unset('first_name')
+          name.save!
+
+          expect(clone.name.first_name).to eq nil
+        end
+
+        it "should not clone nil relation" do
+          expect(person.pet).to eq nil
+          expect(clone.pet).to eq nil
+        end
+
+      end
+
+      context "when cloning a document" do
+
+        let(:clone) do
+          person.clone
         end
 
         it "should clone dynamic fields" do
@@ -429,7 +461,30 @@ describe Mongoid::Copyable do
           expect(clone[:unmapped_attribute]).to eq person[:unmapped_attribute]
         end
 
-        it "should clone embedded dynamic fields" do
+        it "should not clone changed fields" do
+          person.unset('title')
+          person.save!
+
+          expect(clone.title).to eq nil
+        end
+
+      end
+
+      context "when cloning a document with embeds_many relation" do
+
+        let(:clone) do
+          person.clone
+        end
+
+        it "should clone embedded documents" do
+          expect(clone.addresses.size).to eq person.addresses.size
+        end
+
+        it "should clone embedded documents' fields" do
+          expect(clone.addresses.first.fields.keys).to eq person.addresses.first.fields.keys
+        end
+
+        it "should clone embedded documents' dynamic fields" do
           class Address
             include Mongoid::Attributes::Dynamic
           end
@@ -440,19 +495,17 @@ describe Mongoid::Copyable do
           expect(clone.addresses.first[:unmapped_attribute]).to eq address[:unmapped_attribute]
         end
 
-        it "should not clone changed fields" do
-          person.unset('title')
-          person.save!
-
-          expect(clone.title).to eq nil
-        end
-
-        it "should not clone embedded changed fields" do
+        it "should not clone embedded documents' changed fields" do
           address = person.addresses.first
           address.unset('street')
           address.save!
 
           expect(clone.addresses.first.street).to eq nil
+        end
+
+        it "should not clone empty relations" do
+          expect(person.messages.empty?).to eq true
+          expect(clone.messages.empty?).to eq true
         end
       end
     end
