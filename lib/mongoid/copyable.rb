@@ -42,12 +42,20 @@ module Mongoid
       attrs = clone_document.except("_id", "id")
       unless kind_of?(Mongoid::Attributes::Dynamic)      
         embedded_attrs = {}
+        
         self.embedded_relations.keys.each do |relation_key|
-          embedded_relation = [*self.send(self.embedded_relations[relation_key][:name])]
-          embedded_attrs[relation_key] = embedded_relation.map do |relation|
-            relation.send(:clone_attr)
+          case self.embedded_relations[relation_key][:relation].to_s 
+          when 'Mongoid::Relations::Embedded::Many'
+            embedded_relations = self.send(self.embedded_relations[relation_key][:name])
+            embedded_attrs[relation_key] = embedded_relations.map do |embedded_relation|
+              embedded_relation.send(:clone_attr)
+            end
+          when 'Mongoid::Relations::Embedded::One', 'Mongoid::Relations::Embedded::In'
+            embedded_relation = self.send(self.embedded_relations[relation_key][:name])
+            embedded_attrs[relation_key] = embedded_relation.send(:clone_attr) if embedded_relation
           end
         end
+
         attrs.merge!(embedded_attrs)
         attrs = attrs.slice(*self.fields.keys, *self.embedded_relations.keys, *embedded_attrs.keys) 
       end
