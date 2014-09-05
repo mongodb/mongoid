@@ -929,6 +929,21 @@ describe Mongoid::Interceptable do
             expect(band.reload.records.first.before_save_called).to be true
           end
         end
+
+        context "when the child is created" do
+
+          let!(:band) do
+            Band.create
+          end
+
+          let!(:label) do
+            band.create_label(name: 'Label')
+          end
+
+          it "only executes callback once" do
+            expect(label.before_save_count).to be 1
+          end
+        end
       end
 
       describe "#before_update" do

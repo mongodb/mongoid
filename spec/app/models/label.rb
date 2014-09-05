@@ -8,14 +8,21 @@ class Label
   field :after_update_called, type: Mongoid::Boolean, default: false
   field :after_validation_called, type: Mongoid::Boolean, default: false
 
+  field :before_save_count, type: Integer, default: 0
+
   embedded_in :artist
   embedded_in :band
 
+  before_save :before_save_stub
   after_create :after_create_stub
   after_save :after_save_stub
   after_update :after_update_stub
   after_validation :after_validation_stub
   before_validation :cleanup
+
+  def before_save_stub
+    self.before_save_count += 1
+  end
 
   def after_create_stub
     self.after_create_called = true
