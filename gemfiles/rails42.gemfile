@@ -1,0 +1,18 @@
+source "https://rubygems.org"
+gemspec path: '..'
+
+gem "rake"
+gem "actionpack",  "~> 4.2.0.beta1"
+gem "activemodel", "~> 4.2.0.beta1"
+
+group :test do
+  gem "rspec", "~> 3.0.0"
+
+  if ENV["CI"]
+    gem "coveralls", require: false
+  else
+    gem "guard"
+    gem "guard-rspec"
+    gem "rb-fsevent"
+  end
+end
