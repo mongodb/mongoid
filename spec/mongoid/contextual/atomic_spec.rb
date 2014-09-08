@@ -103,10 +103,8 @@ describe Mongoid::Contextual::Atomic do
         expect(depeche_mode.reload.likes).to eq(12)
       end
 
-      if mongodb_version > "2.5"
-        it "does not error on non initialized fields" do
-          expect(smiths.reload.likes).to eq(0)
-        end
+      it "does not error on non initialized fields" do
+        expect(smiths.reload.likes).to eq(0)
       end
     end
 
@@ -120,10 +118,8 @@ describe Mongoid::Contextual::Atomic do
         expect(depeche_mode.reload.likes).to eq(61)
       end
 
-      if mongodb_version > "2.5"
-        it "does not error on non initialized fields" do
-          expect(smiths.reload.likes).to eq(13)
-        end
+      it "does not error on non initialized fields" do
+        expect(smiths.reload.likes).to eq(13)
       end
     end
 
@@ -137,13 +133,11 @@ describe Mongoid::Contextual::Atomic do
         expect(depeche_mode.reload.likes).to eq(14)
       end
 
-      if mongodb_version > "2.5"
-        it "does not error on non initialized fields" do
-          expect(smiths.reload.likes).to eq(10)
-        end
+      it "does not error on non initialized fields" do
+        expect(smiths.reload.likes).to eq(10)
       end
     end
-  end
+  end if mongodb_version > "2.5"
 
   describe "#inc" do
 
