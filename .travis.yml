@@ -9,6 +9,7 @@ rvm:
 gemfile:
   - Gemfile
   - gemfiles/rails41.gemfile
+  - gemfiles/rails42.gemfile
 env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
 notifications:
   email: false
