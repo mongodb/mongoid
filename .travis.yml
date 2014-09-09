@@ -11,6 +11,9 @@ gemfile:
   - gemfiles/rails41.gemfile
   - gemfiles/rails42.gemfile
 env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+matrix:
+  allow_failures:
+    - gemfile: gemfiles/rails42.gemfile
 notifications:
   email: false
   irc:
