@@ -31,6 +31,8 @@ module Mongoid
     def attribute_present?(name)
       attribute = read_attribute(name)
       !attribute.blank? || attribute == false
+    rescue ActiveModel::MissingAttributeError
+      false
     end
 
     # Get the attributes that have not been cast.

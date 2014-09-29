@@ -853,6 +853,18 @@ describe Mongoid::Attributes do
         expect(person.attribute_present?(:title)).to be false
       end
     end
+
+    context "when the attribute is not on only list" do
+
+      before { Person.create }
+      let(:person) do
+        Person.only(:id).first
+      end
+
+      it "return false" do
+        expect(person.attribute_present?(:foobar)).to be false
+      end
+    end
   end
 
   describe "#has_attribute?" do
