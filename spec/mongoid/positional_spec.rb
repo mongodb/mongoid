@@ -172,11 +172,11 @@ describe Mongoid::Positional do
           "$set" => {
             "field" => "value",
             "children.$.field" => "value",
-            "children.0.children.$.children.3.field" => "value",
-            "children.0.children.$.children.3.field" => "value",
+            "children.$.children.1.children.3.field" => "value",
+            "children.$.children.1.children.3.field" => "value",
           },
           "$pushAll" => {
-            "children.0.children.$.children.3.fields" => [ "value", "value" ]
+            "children.$.children.1.children.3.fields" => [ "value", "value" ]
           }
         }
       end
@@ -206,11 +206,11 @@ describe Mongoid::Positional do
           "$set" => {
             "field" => "value",
             "children.$.field" => "value",
-            "children.0.children.1.children.$.field" => "value",
-            "children.0.children.1.children.$.field" => "value",
+            "children.$.children.1.children.3.field" => "value",
+            "children.$.children.1.children.3.field" => "value",
           },
           "$pushAll" => {
-            "children.0.children.1.children.$.fields" => [ "value", "value" ]
+            "children.$.children.1.children.3.fields" => [ "value", "value" ]
           }
         }
       end
