@@ -70,6 +70,7 @@ module Mongoid
         def mongoize(object)
           return nil if object.nil?
           return object if object.is_a?(::Hash)
+          object = Range.new($1, $4, $3 == "...") if object.is_a?(String) && object.match(/(\d+(\.\d+)?)(\.\.?\.)(\d+(\.\d+)?)/)
           hash = { "min" => object.first, "max" => object.last }
           if object.respond_to?(:exclude_end?) && object.exclude_end?
             hash.merge!("exclude_end" => true)
