@@ -32,7 +32,7 @@ development:
     # Includes the root model name in json serialization. (default: false)
     # include_root_in_json: false
 
-    # Include the _type field in serializaion. (default: false)
+    # Include the _type field in serialization. (default: false)
     # include_type_for_serialization: false
 
     # Preload all models in development, needed when models use
