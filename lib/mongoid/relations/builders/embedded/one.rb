@@ -15,7 +15,7 @@ module Mongoid
           # @param [ String ] type Not used in this context.
           #
           # @return [ Document ] A single document.
-          def build(type = nil)
+          def build(_type = nil)
             return object unless object.is_a?(Hash)
             if _loading? && base.persisted?
               Factory.from_db(klass, object)
