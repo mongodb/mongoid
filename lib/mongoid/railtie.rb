@@ -98,7 +98,7 @@ module Rails
       # Due to all models not getting loaded and messing up inheritance queries
       # and indexing, we need to preload the models in order to address this.
       #
-      # This will happen every request in development, once in ther other
+      # This will happen for every request in development, once in other
       # environments.
       #
       # @since 2.0.0
