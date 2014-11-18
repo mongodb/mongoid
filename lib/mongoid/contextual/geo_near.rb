@@ -92,9 +92,18 @@ module Mongoid
   max:        #{command[:maxDistance] || "N/A"}
   unique:     #{command[:unique].nil? ? true : command[:unique]}
   spherical:  #{command[:spherical] || false}>
+  limit:  #{command[:limit] || 100}>
 }
       end
 
+      def limit( value=nil )
+         if value
+            command[:limit] = value
+            self
+         else
+            stats["limit"]
+         end
+      end
       # Specify the maximum distance to find documents for, or get the value of
       # the document with the furthest distance.
       #
