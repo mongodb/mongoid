@@ -99,15 +99,16 @@ module Mongoid
             if id = attrs.extract_id
               first = existing.first
               converted = first ? convert_id(first.class, id) : id
-              doc = existing.find(converted)
-              if destroyable?(attrs)
-                destroy(parent, existing, doc)
-              else
-                update_document(doc, attrs)
+              if (doc = existing.find(converted))
+                if destroyable?(attrs)
+                  destroy(parent, existing, doc)
+                else
+                  update_document(doc, attrs)
+                end
+                return
               end
-            else
-              existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
             end
+            existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
           end
 
           # Destroy the child document, needs to do some checking for embedded
