@@ -10,9 +10,5 @@ group :test do
 
   if ENV["CI"]
     gem "coveralls", require: false
-  else
-    gem "guard"
-    gem "guard-rspec"
-    gem "rb-fsevent"
   end
 end
