@@ -192,6 +192,10 @@ describe Mongoid::QueryCache do
       expect(Band.all.to_a.length).to eq(123)
     end
 
+    it "#pluck returns the same count of objects" do
+      expect(Band.pluck(:name).length).to eq(123)
+    end
+
   end
 
   context "when inserting an index" do
