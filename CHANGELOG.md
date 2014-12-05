@@ -13,6 +13,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3773 Use nanoseconds for cache_key timestamp instead of plain seconds. (Máximo Mussini)
 
+* \#3847 Fix 'QueryCache#get_more' result, when collection has more documents than first query batch. (Angelica Korsun)
+
 ## 4.0.0
 
 ### Major Changes (Backwards Incompatible)
