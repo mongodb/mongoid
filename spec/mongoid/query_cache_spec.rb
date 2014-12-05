@@ -181,10 +181,16 @@ describe Mongoid::QueryCache do
 
     before do
       123.times { Band.create! }
-      Band.all.to_a
     end
 
+    it "should return the complete result of the query at the first run" do
+      expect(Band.all.to_a.length).to eq(123)
+    end
+
+
     it "should cache the complete result of the query" do
+      Band.all.to_a
+
       expect_no_queries do
         Band.all.to_a
       end
