@@ -137,7 +137,9 @@ module Mongoid
         key = cache_key.push(context)
 
         if more
-          QueryCache.cache_table[key].push(*yield)
+          documents = yield
+          QueryCache.cache_table[key].push(*documents)
+          documents
         elsif QueryCache.cache_table.has_key?(key)
           instrument(key) { QueryCache.cache_table[key] }
         else
