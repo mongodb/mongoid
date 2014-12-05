@@ -1,19 +1,28 @@
-services: mongodb
 language: ruby
+
+services: mongodb
+
 bundler_args: --without development
+
 rvm:
   - 1.9.3
   - 2.0.0
   - 2.1
   - jruby
+
 gemfile:
   - Gemfile
   - gemfiles/rails41.gemfile
   - gemfiles/rails42.gemfile
+
 env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+
+sudo: false
+
 matrix:
   allow_failures:
     - gemfile: gemfiles/rails42.gemfile
+
 notifications:
   email: false
   irc:
