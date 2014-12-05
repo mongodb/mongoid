@@ -17,7 +17,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.7
       def process_attributes(attrs = {})
-        sanitize_for_mass_assignment(attrs).reject do |name, value|
+        sanitize_for_mass_assignment(Hash(attrs)).reject do |name, value|
           pending_attribute?(name, value)
         end.each do |name, value|
           process_attribute(name, value)
