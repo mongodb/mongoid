@@ -12,7 +12,7 @@ module Mongoid
       # document is nil, then sets the relation on this document.
       #
       # @example Build the relation.
-      #   person.__build__(:addresses, { :id => 1 }, metadata)
+      #   person.__build__(:addresses, { :_id => 1 }, metadata)
       #
       # @param [ String, Symbol ] name The name of the relation.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
@@ -110,7 +110,7 @@ module Mongoid
 
       def needs_no_database_query?(object, metadata)
         object.is_a?(Document) && !object.embedded? &&
-          object.id == attributes[metadata.key]
+          object._id == attributes[metadata.key]
       end
 
       # Is the current code executing without autobuild functionality?

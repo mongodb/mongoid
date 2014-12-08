@@ -55,12 +55,12 @@ module Mongoid
             next unless doc
             append(doc)
             if persistable? || _creating?
-              ids[doc.id] = true
+              ids[doc._id] = true
               save_or_delay(doc, docs, inserts)
             else
               existing = base.send(foreign_key)
-              unless existing.include?(doc.id)
-                existing.push(doc.id) and unsynced(base, foreign_key)
+              unless existing.include?(doc._id)
+                existing.push(doc._id) and unsynced(base, foreign_key)
               end
             end
           end
@@ -90,7 +90,7 @@ module Mongoid
         # @since 2.0.0.beta.1
         def build(attributes = {}, type = nil)
           doc = Factory.build(type || klass, attributes)
-          base.send(foreign_key).push(doc.id)
+          base.send(foreign_key).push(doc._id)
           append(doc)
           doc.apply_post_processed_defaults
           unsynced(doc, inverse_foreign_key)
@@ -134,7 +134,7 @@ module Mongoid
             execute_callback :before_remove, doc
           end
           unless __metadata.forced_nil_inverse?
-            criteria.pull(inverse_foreign_key => base.id)
+            criteria.pull(inverse_foreign_key => base._id)
           end
           if persistable?
             base.set(foreign_key => base.send(foreign_key).clear)
