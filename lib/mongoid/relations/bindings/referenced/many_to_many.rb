@@ -55,7 +55,7 @@ module Mongoid
             if inverse_metadata
               base.__send__(inverse_metadata.primary_key)
             else
-              base.id
+              base._id
             end
           end
 

@@ -130,7 +130,7 @@ module Mongoid
         end
 
         if document.persisted? && !document.embedded?
-          selector.merge!(_id: { "$ne" => document.id })
+          selector.merge!(_id: { "$ne" => document._id })
         end
         selector
       end
@@ -227,7 +227,7 @@ module Mongoid
       def to_validate(document, attribute, value)
         metadata = document.relations[attribute.to_s]
         if metadata && metadata.stores_foreign_key?
-          [ metadata.foreign_key, value && value.id ]
+          [ metadata.foreign_key, value && value._id ]
         else
           [ attribute, value ]
         end

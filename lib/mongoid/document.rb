@@ -78,11 +78,11 @@ module Mongoid
     # @example Get the identity
     #   document.identity
     #
-    # @return [ Array ] An array containing [document.class, document.id]
+    # @return [ Array ] An array containing [document.class, document._id]
     #
     # @since 3.0.0
     def identity
-      [ self.class, self.id ]
+      [ self.class, self._id ]
     end
 
     # Instantiate a new +Document+, setting the Document's attributes if
@@ -199,7 +199,7 @@ module Mongoid
       end
 
       became = klass.new(clone_document)
-      became.id = id
+      became._id = _id
       became.instance_variable_set(:@changed_attributes, changed_attributes)
       became.instance_variable_set(:@errors, ActiveModel::Errors.new(became))
       became.errors.instance_variable_set(:@messages, errors.instance_variable_get(:@messages))
