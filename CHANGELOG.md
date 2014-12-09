@@ -7,6 +7,9 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3792/\#3881 Fix many internal calls to #_id instead of #id to avoid issues
+  when overloading #id (Gauthier Delacroix)
+
 * \#3847 Fix 'QueryCache#get_more' result, when collection has more documents than first query batch. (Angelica Korsun)
 
 * \#3684 Dont raise MissingAttributeError, when using a only() scope. (Arthur Neves)
