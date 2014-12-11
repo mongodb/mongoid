@@ -29,11 +29,7 @@ module Mongoid
           raise Errors::ReadonlyAttribute.new(normalized, value)
         end
         setter = "#{normalized}="
-        if respond_to?(setter)
-          send(setter, value)
-        else
-          write_attribute(database_field_name(normalized), value)
-        end
+        process_attribute(normalized, value)
         save(validate: false)
       end
 
