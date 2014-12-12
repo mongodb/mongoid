@@ -4,11 +4,25 @@ module Mongoid
   #
   # @since 4.0.0
   class LogSubscriber < ActiveSupport::LogSubscriber
+ 
+    def self.runtime=(value)
+      Thread.current['mongoid_rails_runtime'] = value
+    end
+
+    def self.runtime
+      Thread.current['mongoid_rails_runtime'] ||= 0
+    end
+
+    def self.reset_runtime
+      rt, self.runtime = runtime, 0
+      rt
+    end
 
     # Log the query operation on moped
     #
     # @since 4.0.0
     def query(event)
+      self.class.runtime+=event.duration
       return unless logger.debug?
 
       payload = event.payload
@@ -17,6 +31,7 @@ module Mongoid
     end
 
     def query_cache(event)
+      self.class.runtime+=event.duration
       return unless logger.debug?
 
       database, collection, selector = event.payload[:key]
