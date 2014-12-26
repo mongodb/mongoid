@@ -19,7 +19,7 @@ en:
           message: "Calling %{method} on %{klass} resulted in a false return
             from a callback."
           summary: "If a before callback returns false when using Document.create!,
-            Document#save!, or Documnet#update_attributes! this error will get raised
+            Document#save!, or Document#update_attributes! this error will get raised
             since the document did not actually get saved."
           resolution: "Double check all before callbacks to make sure they are
             not unintentionally returning false."
