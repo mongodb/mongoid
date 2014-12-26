@@ -131,7 +131,7 @@ module Mongoid
 
       private
 
-      def with_cache(context = :cursor, more = false, &block)
+      def with_cache(context = :cursor, more = false, &_block)
         return yield unless QueryCache.enabled?
         return yield if system_collection?
         key = cache_key.push(context)
@@ -140,7 +140,7 @@ module Mongoid
           docs = yield
           QueryCache.cache_table[key].push(*docs)
           docs
-        elsif QueryCache.cache_table.has_key?(key)
+        elsif QueryCache.cache_table.key?(key)
           instrument(key) { QueryCache.cache_table[key] }
         else
           QueryCache.cache_table[key] = yield
