@@ -329,9 +329,7 @@ module Mongoid
     # @since 3.0.10
     def process_flagged_destroys
       _assigning do
-        flagged_destroys.each do |block|
-          block.call
-        end
+        flagged_destroys.each(&:call)
       end
       flagged_destroys.clear
     end
@@ -373,7 +371,7 @@ module Mongoid
     # @since 3.0.6
     def touch_atomic_updates(field = nil)
       updates = atomic_updates
-      return {} unless atomic_updates.has_key?("$set")
+      return {} unless atomic_updates.key?("$set")
       touches = {}
       updates["$set"].each_pair do |key, value|
         touches.merge!({ key => value }) if key =~ /updated_at|#{field}/

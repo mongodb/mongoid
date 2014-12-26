@@ -35,7 +35,7 @@ module Mongoid
     #
     # @since 3.0.9
     def configured?
-      sessions.has_key?(:default)
+      sessions.key?(:default)
     end
 
     # Connect to the provided database name on the default session.
@@ -169,9 +169,7 @@ module Mongoid
     #
     # @since 2.0.2
     def purge!
-      Sessions.default.collections.each do |collection|
-        collection.drop
-      end and true
+      Sessions.default.collections.each(&:drop) and true
     end
 
     # Truncate all data in all collections, but not the indexes.
