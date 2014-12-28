@@ -37,7 +37,7 @@ module Mongoid
       if selector.size == 1 || selector.values.any? { |val| val.nil? }
         return operations
       end
-      keys = selector.keys.map{ |m| m.sub('._id','') } - ['_id']
+      keys = selector.keys.map { |m| m.sub('._id', '') } - ['_id']
       keys = keys.sort_by { |s| s.length*-1 }
       process_operations(keys, operations, processed)
     end
@@ -58,11 +58,16 @@ module Mongoid
       updates
     end
 
+    def positional_operator_nested?(position)
+      position =~ /.*\.\d+\..*\.\$/
+    end
+
     def replace_index(keys, position)
       # replace to $ only if that key is on the selector
       keys.each do |kk|
         if position =~ /^#{kk}\.\d+\.(.*)/
-          return "#{kk}.$.#{$1}"
+          with_positional_operator = "#{kk}.$.#{$1}"
+          return with_positional_operator unless positional_operator_nested?(with_positional_operator)
         end
       end
       position
