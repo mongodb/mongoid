@@ -111,11 +111,36 @@ module Mongoid
       #
       # @since 4.0.0
       def prepare_delete
-        cascade!
-        yield(self)
-        freeze
-        self.destroyed = true
-        true
+        if skip_deletion?
+          return
+        else
+          yield(self)
+          freeze
+          self.destroyed = true
+          true
+        end
+      end
+
+      # Check to skip deletion or not based on the
+      # cascade.
+      #
+      # @api private
+      #
+      # @example Check that delete or skip the deletion
+      #   if document.skip_deletion?
+      #     return false
+      #   else
+      #     # delete the record
+      #   end
+      #
+      # @return [ true, false ] True if skip the deletion, false if not.
+      #
+      # @since 4.0.2
+      def skip_deletion?
+        catch_result = catch(:skip_delete) do
+          cascade!
+        end
+        true if catch_result.nil?
       end
 
       module ClassMethods
