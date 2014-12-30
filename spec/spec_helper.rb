@@ -93,6 +93,8 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
 
+I18n.config.enforce_available_locales = false
+
 RSpec.configure do |config|
   config.include Mongoid::SpecHelpers
   config.raise_errors_for_deprecations!
