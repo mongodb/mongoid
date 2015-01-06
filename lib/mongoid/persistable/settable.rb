@@ -22,7 +22,7 @@ module Mongoid
       def set(setters)
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|
-            send("#{field}=", value)
+            process_attribute(field.to_s, value)
             ops[atomic_attribute_name(field)] = attributes[field]
           end
           { "$set" => ops }

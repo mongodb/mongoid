@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3888 raise UnknownAttributeError when 'set' is called on non existing field and Mongoid::Attributes::Dynamic is not included in model. (Shweta Kale)
+
+* \#3889 'set' will allow to set value of non existing field when Mongoid::Attributes::Dynamic is included in model. (Shweta Kale)
+
 * \#3792/\#3881 Fix many internal calls to #_id instead of #id to avoid issues
   when overloading #id (Gauthier Delacroix)
 
