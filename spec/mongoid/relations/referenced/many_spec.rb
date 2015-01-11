@@ -3555,4 +3555,27 @@ describe Mongoid::Relations::Referenced::Many do
       expect(person.posts.open).to eq([ post ])
     end
   end
+
+  context "when accessing a relation named parent" do
+    let!(:parent) do
+      Odd.create(name: "odd parent")
+    end
+
+    let(:child) do
+      Even.create(parent_id: parent.id, name: "original even child")
+    end
+
+    it "updates the child after accessing the parent" do
+      # Access parent relation on the child to make sure it is loaded
+      child.parent
+
+      new_child_name = "updated even child"
+
+      child.name = new_child_name
+      child.save!
+
+      reloaded = Even.find(child.id)
+      expect(reloaded.name).to eq(new_child_name)
+    end
+  end
 end
