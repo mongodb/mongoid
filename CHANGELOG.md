@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3911 Fix relations named "parent". (nkriege)
+
 * \#3792/\#3881 Fix many internal calls to #_id instead of #id to avoid issues
   when overloading #id (Gauthier Delacroix)
 
