@@ -67,7 +67,7 @@ namespace :db do
 
   namespace :mongoid do
     task :load_models do
-      ::Rails.application.eager_load!
+      ::Rails.application.eager_load! if defined?(Rails)
     end
   end
 end
