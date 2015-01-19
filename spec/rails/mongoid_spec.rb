@@ -5,7 +5,7 @@ describe "Rails::Mongoid" do
   before(:all) do
     require "rails/mongoid"
     ::Mongoid.models.delete_if do |model|
-      ![ User, Account, Address ].include?(model)
+      ![ User, Account, Address, AddressNumber ].include?(model)
     end
   end
 
@@ -132,12 +132,13 @@ describe "Rails::Mongoid" do
       end
 
       before(:all) do
-        Mongoid.preload_models = ["user"]
+        Mongoid.preload_models = ["user", "AddressNumber"]
       end
 
       it "loads selected models only" do
         allow(Dir).to receive(:glob).with("/rails/root/app/models/**/*.rb").and_return(files)
         expect(Rails::Mongoid).to receive(:load_model).with("user")
+        expect(Rails::Mongoid).to receive(:load_model).with("address_number")
         expect(Rails::Mongoid).to receive(:load_model).with("address").never
         Rails::Mongoid.load_models(app)
       end
