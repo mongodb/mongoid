@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 gemspec path: '..'
 
+gem "mongo", :github => "mongodb/mongo-ruby-driver"
 gem "rake"
 gem "actionpack",  "~> 4.1.8"
 gem "activemodel", "~> 4.1.8"

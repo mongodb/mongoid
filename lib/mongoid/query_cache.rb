@@ -219,7 +219,7 @@ module Mongoid
     # the database if the same query has already been executed.
     #
     # @since 4.0.0
-    class CachedCursor < Moped::Cursor
+    class CachedCursor < Mongo::Cursor
       include Cacheable
 
       # Override the loading of docs to attempt to fetch from the cache.
@@ -251,5 +251,6 @@ module Mongoid
   end
 end
 
-Moped::Query.__send__(:include, Mongoid::QueryCache::Query)
-Moped::Collection.__send__(:include, Mongoid::QueryCache::Collection)
+# @todo: Durran - get working normally first.
+# Moped::Query.__send__(:include, Mongoid::QueryCache::Query)
+# Moped::Collection.__send__(:include, Mongoid::QueryCache::Collection)

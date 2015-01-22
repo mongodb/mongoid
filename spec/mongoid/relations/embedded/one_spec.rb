@@ -947,7 +947,7 @@ describe Mongoid::Relations::Embedded::One do
     context "when a parent was removed outside of mongoid" do
 
       before do
-        person.collection.where(_id: person.id).update(
+        person.collection.find(_id: person.id).update_one(
           "$pull" => { "addresses" => { _id: address_one.id }}
         )
       end
@@ -982,7 +982,7 @@ describe Mongoid::Relations::Embedded::One do
     before do
       band.collection.
         find(_id: band.id).
-        update("$set" => { label: { name: "Mute" }})
+        update_one("$set" => { label: { name: "Mute" }})
     end
 
     context "when loading the documents" do

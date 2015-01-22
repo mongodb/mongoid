@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/sessions/mongo_uri"
 
 module Mongoid
   module Sessions
@@ -59,72 +58,16 @@ module Mongoid
       # @since 3.0.0
       def create_session(configuration)
         raise Errors::NoSessionsConfig.new unless configuration
-        config, options = parse(configuration)
-        configuration.merge!(config) if configuration.delete(:uri)
-
-        options[:instrumenter] = ActiveSupport::Notifications
-        session = Moped::Session.new(config[:hosts], options)
-        session.use(config[:database])
-        if authenticated?(config)
-          session.login(config[:username], config[:password])
-        end
-        session
-      end
-
-      # Are we authenticated with this session config?
-      #
-      # @api private
-      #
-      # @example Is this session authenticated?
-      #   Factory.authenticated?(config)
-      #
-      # @param [ Hash ] config The session config.
-      #
-      # @return [ true, false ] If we are authenticated.
-      #
-      # @since 3.0.0
-      def authenticated?(config)
-        config.has_key?(:username) && config.has_key?(:password)
-      end
-
-      # Parse the configuration. If a uri is provided we need to extract the
-      # elements of it, otherwise the options are left alone.
-      #
-      # @api private
-      #
-      # @example Parse the config.
-      #   Factory.parse(config)
-      #
-      # @param [ Hash ] config The configuration.
-      #
-      # @return [ Array<Hash> ] The configuration, parsed.
-      #
-      # @since 3.0.0
-      def parse(config)
-        options = config[:options].try(:dup) || {}
-        parsed = if config.has_key?(:uri)
-          MongoUri.new(config[:uri]).to_hash
+        if configuration[:uri]
+          Mongo::Client.new(configuration[:uri], options(configuration))
         else
-          inject_ports(config)
+          Mongo::Client.new(configuration[:hosts], options(configuration))
         end
-        [ parsed, options.symbolize_keys ]
       end
 
-      # Will inject the default port of 27017 if not supplied.
-      #
-      # @example Inject default ports.
-      #   factory.inject_ports(config)
-      #
-      # @param [ Hash ] config The session configuration.
-      #
-      # @return [ Hash ] The altered configuration.
-      #
-      # @since 3.1.0
-      def inject_ports(config)
-        config["hosts"] = config["hosts"].map do |host|
-          host =~ /:/ ? host : "#{host}:27017"
-        end
-        config
+      def options(configuration)
+        options = configuration[:options] || {}
+        options.merge(configuration.reject{ |k, v| k == :hosts }).to_hash.symbolize_keys!
       end
     end
   end

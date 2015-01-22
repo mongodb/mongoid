@@ -5,26 +5,29 @@ test:
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
-        read: primary
+        read:
+          mode: primary
     mongohq_single:
       database: <%=ENV["MONGOHQ_SINGLE_NAME"]%>
-      username: <%=ENV["MONGOHQ_SINGLE_USER"]%>
-      password: <%=ENV["MONGOHQ_SINGLE_PASS"]%>
       hosts:
         - <%=ENV["MONGOHQ_SINGLE_URL"]%>
       options:
+        user: <%=ENV["MONGOHQ_SINGLE_USER"]%>
+        password: <%=ENV["MONGOHQ_SINGLE_PASS"]%>
         write:
           w: 1
-        read: primary
+        read:
+          mode: primary
     mongohq_repl:
       database: <%=ENV["MONGOHQ_REPL_NAME"]%>
-      username: <%=ENV["MONGOHQ_REPL_USER"]%>
-      password: <%=ENV["MONGOHQ_REPL_PASS"]%>
       hosts:
         - <%=ENV["MONGOHQ_REPL_1_URL"]%>
         - <%=ENV["MONGOHQ_REPL_2_URL"]%>
       options:
-        read: primary
+        user: <%=ENV["MONGOHQ_REPL_USER"]%>
+        password: <%=ENV["MONGOHQ_REPL_PASS"]%>
+        read:
+          mode: primary
         write:
           w: majority
     mongohq_repl_uri:

@@ -75,7 +75,7 @@ describe Mongoid::Contextual::Atomic do
     end
   end
 
-  describe "#bit" do
+  pending "#bit" do
 
     let!(:depeche_mode) do
       Band.create(likes: 60)
@@ -137,7 +137,7 @@ describe Mongoid::Contextual::Atomic do
         expect(smiths.reload.likes).to eq(10)
       end
     end
-  end if mongodb_version > "2.5"
+  end
 
   describe "#inc" do
 

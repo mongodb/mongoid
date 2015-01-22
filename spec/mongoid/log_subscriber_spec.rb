@@ -2,18 +2,18 @@ require "spec_helper"
 
 describe Mongoid::LogSubscriber do
 
-  describe ".query" do
+  pending ".query" do
 
     let!(:subscribe) do
       Mongoid::LogSubscriber.log_subscribers.first
     end
 
     before do
-      @old_level, Moped.logger.level = Moped.logger.level, 0
+      @old_level, Mongo::Logger.logger.level = Mongo::Logger.logger.level, 0
     end
 
     after do
-      Moped.logger.level = @old_level
+      Mongo::Logger.logger.level = @old_level
     end
 
     context "when quering the database" do
@@ -48,7 +48,7 @@ describe Mongoid::LogSubscriber do
       end
 
       before do
-        ActiveSupport::LogSubscriber.attach_to :moped, test_subscriber
+        ActiveSupport::LogSubscriber.attach_to :mongo, test_subscriber
       end
 
       after do

@@ -18,14 +18,14 @@ require "helpers"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.
-ENV["MONGOID_SPEC_HOST"] ||= "localhost"
+ENV["MONGOID_SPEC_HOST"] ||= "127.0.0.1"
 ENV["MONGOID_SPEC_PORT"] ||= "27017"
 
 # These are used when creating any connection in the test suite.
 HOST = ENV["MONGOID_SPEC_HOST"]
 PORT = ENV["MONGOID_SPEC_PORT"].to_i
 
-# Moped.logger.level = Logger::DEBUG
+Mongo::Logger.logger.level = Logger::INFO
 # Mongoid.logger.level = Logger::DEBUG
 
 # When testing locally we use the database named mongoid_test. However when
@@ -44,7 +44,10 @@ CONFIG = {
   sessions: {
     default: {
       database: database_id,
-      hosts: [ "#{HOST}:#{PORT}" ]
+      hosts: [ "#{HOST}:#{PORT}" ],
+      options: {
+        server_selection_timeout: 0.10
+      }
     }
   }
 }
@@ -64,7 +67,7 @@ end
 
 def mongodb_version
   session = Mongoid::Sessions.default
-  session.command(buildinfo: 1)["version"]
+  session.command(buildinfo: 1).first["version"]
 end
 
 # Set the database that the spec suite connects to.

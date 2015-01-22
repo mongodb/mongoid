@@ -299,7 +299,7 @@ module Mongoid
       # @since 3.0.0
       def results
         raise Errors::NoMapReduceOutput.new(command) unless command[:out]
-        @results ||= __session__.command(command)
+        @results ||= __session__.command(command).first
       end
 
       # Get the session with the proper consistency.
@@ -316,7 +316,7 @@ module Mongoid
       # @since 3.0.15
       def __session__
         if command[:out][:inline] != 1
-          session.with(read: :primary)
+          session.with(read: { mode: :primary })
         else
           session
         end

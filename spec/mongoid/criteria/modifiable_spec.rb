@@ -954,7 +954,7 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it "does not update the last document" do
-            expect(from_db.posts.last.title).to eq("Second")
+            expect(from_db.posts[1].title).to eq("Second")
           end
         end
 
@@ -999,11 +999,11 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it "updates the first document" do
-            expect(from_db.preferences.first.name).to eq("London")
+            expect(from_db.preferences[0].name).to eq("London")
           end
 
           it "does not update the last document" do
-            expect(from_db.preferences.last.name).to eq("Second")
+            expect(from_db.preferences[1].name).to eq("Second")
           end
         end
 
@@ -1014,11 +1014,11 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it "updates the matching documents" do
-            expect(from_db.preferences.first.name).to eq("Berlin")
+            expect(from_db.preferences[0].name).to eq("Berlin")
           end
 
           it "does not update non matching documents" do
-            expect(from_db.preferences.last.name).to eq("Second")
+            expect(from_db.preferences[1].name).to eq("Second")
           end
         end
       end
@@ -1217,17 +1217,17 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it "updates the matching documents" do
-            expect(from_db.preferences.first.name).to eq("Berlin")
+            expect(from_db.preferences[0].name).to eq("Berlin")
           end
 
           it "does not update non matching documents" do
-            expect(from_db.preferences.last.name).to eq("Second")
+            expect(from_db.preferences[1].name).to eq("Second")
           end
         end
       end
     end
 
-    context "when update document structure" do
+    pending "when update document structure" do
 
       before do
         person = Person.new(username: "user_title", score: 25)
@@ -1235,7 +1235,7 @@ describe Mongoid::Criteria::Modifiable do
       end
 
       let(:from_db) do
-        Person.last
+        Person.first
       end
 
       it "rename document string field" do

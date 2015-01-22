@@ -28,7 +28,7 @@ module Mongoid
       #
       # @since 3.0.0
       def session
-        collection.database.session
+        collection.database.client
       end
     end
   end

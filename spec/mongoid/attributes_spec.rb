@@ -172,7 +172,7 @@ describe Mongoid::Attributes do
         before do
           person.collection
             .find({ _id: person.id })
-            .update({ "$unset" => { age: 1 }})
+            .update_one({ "$unset" => { age: 1 }})
         end
 
         context "when found" do
@@ -742,7 +742,7 @@ describe Mongoid::Attributes do
         before do
           person.collection
             .find({ _id: person.id })
-            .update({ "$unset" => { age: 1 }})
+            .update_one({ "$unset" => { age: 1 }})
           Mongoid.raise_not_found_error = false
           person.reload
           Mongoid.raise_not_found_error = true
@@ -829,7 +829,7 @@ describe Mongoid::Attributes do
         before do
           person.collection
             .find({ _id: person.id })
-            .update({ "$unset" => { age: 1 }})
+            .update_one({ "$unset" => { age: 1 }})
           Mongoid.raise_not_found_error = false
           person.reload
           Mongoid.raise_not_found_error = true

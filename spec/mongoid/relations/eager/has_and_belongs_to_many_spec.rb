@@ -41,7 +41,7 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
       Person.create!(houses: 3.times.map { House.create! })
     end
 
-    context "when including the has_and_belongs_to_many relation" do
+    pending "when including the has_and_belongs_to_many relation" do
 
       it "queries twice" do
         expect_query(2) do

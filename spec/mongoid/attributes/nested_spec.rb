@@ -2936,11 +2936,11 @@ describe Mongoid::Attributes::Nested do
               context "when reloading the document" do
 
                 it "updates the first existing document" do
-                  expect(person.posts(true).first.title).to eq("First")
+                  expect(person.posts(true)[0].title).to eq("First")
                 end
 
                 it "updates the second existing document" do
-                  expect(person.posts(true).last.title).to eq("Second")
+                  expect(person.posts(true)[1].title).to eq("Second")
                 end
 
                 it "does not add new documents" do
@@ -3094,11 +3094,11 @@ describe Mongoid::Attributes::Nested do
                     context "when reloading the document" do
 
                       it "does not ignore the marked document" do
-                        expect(person.posts(true).first.title).to eq("Another Title")
+                        expect(person.posts(true)[0].title).to eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.posts(true).last.title).to eq("New Title")
+                        expect(person.posts(true)[1].title).to eq("New Title")
                       end
 
                       it "does not add additional documents" do
@@ -3127,7 +3127,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.posts(true).last.title).to eq("New Title")
+                        expect(person.posts(true)[1].title).to eq("New Title")
                       end
                     end
                   end
@@ -3198,7 +3198,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.posts(true).last.title).to eq("New Title")
+                        expect(person.posts(true)[1].title).to eq("New Title")
                       end
                     end
                   end
@@ -3224,15 +3224,15 @@ describe Mongoid::Attributes::Nested do
               end
 
               it "builds a new first document" do
-                expect(person.posts.first.title).to eq("First")
+                expect(person.posts[0].title).to eq("First")
               end
 
               it "builds a new second document" do
-                expect(person.posts.second.title).to eq("Second")
+                expect(person.posts[1].title).to eq("Second")
               end
 
               it "builds a new third document" do
-                expect(person.posts.third.title).to eq("Third")
+                expect(person.posts[2].title).to eq("Third")
               end
 
               it "does not add extra documents" do
@@ -3776,7 +3776,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("My Blog")
+                        expect(person.preferences(true)[1].name).to eq("My Blog")
                       end
                     end
                   end
@@ -3811,11 +3811,11 @@ describe Mongoid::Attributes::Nested do
                     context "when reloading the document" do
 
                       it "does not ignore the marked document" do
-                        expect(person.preferences(true).first.name).to eq("Another Title")
+                        expect(person.preferences(true)[0].name).to eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
 
                       it "does not add additional documents" do
@@ -3844,7 +3844,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
                     end
                   end
@@ -3874,11 +3874,11 @@ describe Mongoid::Attributes::Nested do
                     context "when reloading" do
 
                       it "does not ignore the marked document" do
-                        expect(person.preferences(true).first.name).to eq("Another Title")
+                        expect(person.preferences(true)[0].name).to eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
 
                       it "does not add additional documents" do
@@ -3907,7 +3907,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
                     end
                   end

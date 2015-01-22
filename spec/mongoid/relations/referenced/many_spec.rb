@@ -292,7 +292,7 @@ describe Mongoid::Relations::Referenced::Many do
           it "raises an error" do
             expect {
               person.posts.send(method, post)
-            }.to raise_error(Moped::Errors::OperationFailure)
+            }.to raise_error(Mongo::Operation::Write::Failure)
           end
         end
       end
@@ -1536,7 +1536,7 @@ describe Mongoid::Relations::Referenced::Many do
               person.posts.create do |doc|
                 doc._id = existing.id
               end
-            }.to raise_error(Moped::Errors::OperationFailure)
+            }.to raise_error(Mongo::Operation::Write::Failure)
           end
         end
       end
@@ -3344,7 +3344,7 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         Post.collection.find({ _id: post_one.id }).
-          update({ "$set" => { title: "reloaded" }})
+          update_one({ "$set" => { title: "reloaded" }})
       end
 
       let(:reloaded) do

@@ -73,7 +73,7 @@ describe Mongoid::Relations::Eager::BelongsTo do
       3.times { |i| Account.create!(person: person, name: "savings#{i}") }
     end
 
-    context "when including the belongs_to relation" do
+    pending "when including the belongs_to relation" do
 
       it "queries twice" do
 

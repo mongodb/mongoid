@@ -3274,7 +3274,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
       before do
         Preference.collection.find({ _id: preference_one.id }).
-          update({ "$set" => { name: "reloaded" }})
+          update_one({ "$set" => { name: "reloaded" }})
       end
 
       let(:reloaded) do

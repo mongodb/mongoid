@@ -42,18 +42,20 @@ module Mongoid
 
         models.each do |model|
           unless model.embedded?
-            model.collection.indexes.each do |index|
-              # ignore default index
-              unless index['name'] == '_id_'
-                key = index['key'].symbolize_keys
-                spec = model.index_specification(key)
-                unless spec
-                  # index not specified
-                  undefined_by_model[model] ||= []
-                  undefined_by_model[model] << index
+            begin
+              model.collection.indexes.each do |index|
+                # ignore default index
+                unless index['name'] == '_id_'
+                  key = index['key'].symbolize_keys
+                  spec = model.index_specification(key)
+                  unless spec
+                    # index not specified
+                    undefined_by_model[model] ||= []
+                    undefined_by_model[model] << index
+                  end
                 end
               end
-            end
+            rescue Mongo::Operation::Read::NoNamespace; end
           end
         end
 
@@ -90,10 +92,14 @@ module Mongoid
       def remove_indexes(models = ::Mongoid.models)
         models.each do |model|
           next if model.embedded?
-          indexes = model.collection.indexes.map{ |doc| doc["name"] }
-          indexes.delete_one("_id_")
-          model.remove_indexes
-          logger.info("MONGOID: Removing indexes on: #{model} for: #{indexes.join(', ')}.")
+          begin
+            indexes = model.collection.indexes.map{ |doc| doc["name"] }
+            indexes.delete_one("_id_")
+            model.remove_indexes
+            logger.info("MONGOID: Removing indexes on: #{model} for: #{indexes.join(', ')}.")
+          rescue Mongo::Operation::Read::NoNamespace
+            next
+          end
           model
         end.compact
       end

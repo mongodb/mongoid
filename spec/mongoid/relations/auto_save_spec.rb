@@ -150,7 +150,7 @@ describe Mongoid::Relations::AutoSave do
           end
         end
 
-        context "when updating the child" do
+        pending "when updating the child" do
 
           before do
             person.account = account

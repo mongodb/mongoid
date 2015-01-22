@@ -209,7 +209,7 @@ module Mongoid
     def persist_atomic_operations(operations)
       if persisted?
         selector = atomic_selector
-        _root.collection.find(selector).update(positionally(selector, operations))
+        _root.collection.find(selector).update_one(positionally(selector, operations))
       end
     end
   end

@@ -5,7 +5,7 @@ describe Mongoid::Errors::NoSessionDatabase do
   describe "#message" do
 
     let(:error) do
-      described_class.new(:secondary, { hosts: [ "localhost:27017" ] })
+      described_class.new(:secondary, { hosts: [ "127.0.0.1:27017" ] })
     end
 
     it "contains the problem in the message" do

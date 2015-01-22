@@ -1178,7 +1178,7 @@ describe Mongoid::Relations::Referenced::One do
 
       before do
         Game.collection.find({ _id: game_one.id }).
-          update({ "$set" => { name: "Diablo 2" }})
+          update_one({ "$set" => { name: "Diablo 2" }})
       end
 
       let(:reloaded) do

@@ -70,7 +70,7 @@ module Mongoid
       # @since 3.0.0
       def delete
         self.count.tap do
-          query.remove_all
+          query.remove_many
         end
       end
       alias :delete_all :delete
@@ -146,7 +146,7 @@ module Mongoid
         return @count > 0 if instance_variable_defined?(:@count)
 
         try_cache(:exists) do
-          !!(query.dup.select(_id: 1).limit(1).first)
+          !!(query.dup.projection(_id: 1).limit(1).first)
         end
       end
 
@@ -318,7 +318,7 @@ module Mongoid
       #
       # @since 3.0.0
       def limit(value)
-        query.limit(value) and self
+        @query = query.limit(value) and self
       end
 
       # Initiate a map/reduce operation from the context.
@@ -356,7 +356,7 @@ module Mongoid
           hash
         end
 
-        query.dup.select(normalized_select).map do |doc|
+        query.dup.projection(normalized_select).map do |doc|
           if normalized_select.size == 1
             doc[normalized_select.keys.first]
           else
@@ -376,7 +376,7 @@ module Mongoid
       #
       # @since 3.0.0
       def skip(value)
-        query.skip(value) and self
+        @query = query.skip(value) and self
       end
 
       # Sorts the documents by the provided spec.
@@ -440,7 +440,7 @@ module Mongoid
       #
       # @since 3.0.0
       def update_all(attributes = nil)
-        update_documents(attributes, :update_all)
+        update_documents(attributes, :update_many)
       end
 
       private
@@ -476,7 +476,7 @@ module Mongoid
       # @return [ true, false ] If the update succeeded.
       #
       # @since 3.0.4
-      def update_documents(attributes, method = :update)
+      def update_documents(attributes, method = :update_one)
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
         query.send(method, attributes.__consolidate__(klass))
@@ -492,7 +492,7 @@ module Mongoid
       # @since 3.0.0
       def apply_fields
         if spec = criteria.options[:fields]
-          query.select(spec)
+          @query = query.projection(spec)
         end
       end
 
@@ -510,7 +510,8 @@ module Mongoid
           apply_option(name)
         end
         if criteria.options[:timeout] == false
-          query.no_timeout
+          # @todo: Durran: Implement.
+          @query = query#.no_timeout
         end
       end
 
@@ -524,7 +525,7 @@ module Mongoid
       # @since 3.1.0
       def apply_option(name)
         if spec = criteria.options[name]
-          query.send(name, spec)
+          @query = query.send(name, spec)
         end
       end
 
@@ -540,7 +541,7 @@ module Mongoid
       def with_sorting
         begin
           unless criteria.options.has_key?(:sort)
-            query.sort(_id: 1)
+            @query = query.sort(_id: 1)
           end
           yield
         ensure
@@ -559,9 +560,9 @@ module Mongoid
       def with_inverse_sorting
         begin
           if spec = criteria.options[:sort]
-            query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
+            @query = query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
           else
-            query.sort(_id: -1)
+            @query = query.sort(_id: -1)
           end
           yield
         ensure

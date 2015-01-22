@@ -47,7 +47,7 @@ module Mongoid
           doc.as_document
         end
         unless removed.empty?
-          collection.find(selector).update(
+          collection.find(selector).update_one(
             positionally(selector, "$pullAll" => { path => removed })
           )
         end
@@ -307,7 +307,7 @@ module Mongoid
           updates["$set"].merge!(doc.atomic_updates["$set"] || {})
           doc.move_changes
         end
-        collection.find(selector).update(updates) unless updates["$set"].empty?
+        collection.find(selector).update_one(updates) unless updates["$set"].empty?
       end
 
       # Get the limiting value.

@@ -75,6 +75,7 @@ module Mongoid
           {
             collection: name.collectionize.to_sym,
             session: :default,
+            # @todo: Handle URI's here.
             database: -> { Mongoid.sessions[session_name][:database] }
           }
         end

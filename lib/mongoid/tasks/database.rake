@@ -20,7 +20,7 @@ namespace :db do
 
     desc "Drops the default session"
     task :drop => :environment do
-      ::Mongoid::Sessions.default.drop
+      ::Mongoid::Sessions.default.database.drop
     end
 
     desc "Drop all collections except the system collections"

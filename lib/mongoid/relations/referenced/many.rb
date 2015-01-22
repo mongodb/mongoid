@@ -428,7 +428,7 @@ module Mongoid
         # @since 3.0.0
         def persist_delayed(docs, inserts)
           unless docs.empty?
-            collection.insert(inserts)
+            collection.insert_many(inserts)
             docs.each do |doc|
               doc.new_record = false
               doc.run_after_callbacks(:create, :save)

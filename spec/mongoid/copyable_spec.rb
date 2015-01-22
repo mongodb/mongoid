@@ -42,7 +42,7 @@ describe Mongoid::Copyable do
         end
 
         before do
-          Band.collection.find(_id: band.id).update("$set" => { "id" => 1234 })
+          Band.collection.find(_id: band.id).update_one("$set" => { "id" => 1234 })
         end
 
         let!(:cloned) do

@@ -8,7 +8,7 @@ module Mongoid
     end
 
     def instrument
-      subscriber = ActiveSupport::Notifications.subscribe('query.moped') do |*args|
+      subscriber = ActiveSupport::Notifications.subscribe('query.mongo') do |*args|
         @events << ActiveSupport::Notifications::Event.new(*args)
       end
       yield

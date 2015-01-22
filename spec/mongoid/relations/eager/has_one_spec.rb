@@ -81,7 +81,7 @@ describe Mongoid::Relations::Eager::HasOne do
       Cat.create!(person: Person.create!)
     end
 
-    context "when including the has_one relation" do
+    pending "when including the has_one relation" do
 
       it "queries twice" do
 
@@ -94,7 +94,7 @@ describe Mongoid::Relations::Eager::HasOne do
       end
     end
 
-    context "when including more than one has_one relation" do
+    pending "when including more than one has_one relation" do
 
       it "queries 3 times" do
 
@@ -107,7 +107,7 @@ describe Mongoid::Relations::Eager::HasOne do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    pending "when the relation is not polymorphic" do
 
       let!(:game) do
         person.create_game(name: "Tron")
@@ -135,7 +135,7 @@ describe Mongoid::Relations::Eager::HasOne do
       end
     end
 
-    context "when the relation is polymorphic" do
+    pending "when the relation is polymorphic" do
 
       let!(:book) do
         Book.create(name: "Game of Thrones")

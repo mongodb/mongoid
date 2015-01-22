@@ -1,4 +1,7 @@
 source "https://rubygems.org"
+
+gem "mongo", :github => "mongodb/mongo-ruby-driver"
+
 gemspec
 
 gem "rake"

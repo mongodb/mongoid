@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Contextual::FindAndModify do
 
-  describe "#result" do
+  pending "#result" do
 
     let!(:depeche) do
       Band.create(name: "Depeche Mode")

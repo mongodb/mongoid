@@ -23,7 +23,7 @@ describe Mongoid::Config do
           {
             default: {
               database: database_id,
-              hosts: [ "localhost:27017" ]
+              hosts: [ "127.0.0.1:27017" ]
             }
           }
         end
@@ -76,7 +76,7 @@ describe Mongoid::Config do
     context "when existing sessions exist in the configuration" do
 
       let(:session) do
-        Moped::Session.new([ "127.0.0.1:27017" ])
+        Mongo::Client.new([ "127.0.0.1:27017" ])
       end
 
       before do
@@ -197,7 +197,7 @@ describe Mongoid::Config do
             end
 
             it "sets the read option" do
-              expect(options["read"]).to eq("primary")
+              expect(options["read"]).to eq({ "mode" => "primary" })
             end
           end
         end
@@ -281,7 +281,7 @@ describe Mongoid::Config do
       context "when no database is provided" do
 
         let(:sessions) do
-          { "default" => { hosts: [ "localhost:27017" ] }}
+          { "default" => { hosts: [ "127.0.0.1:27017" ] }}
         end
 
         it "raises an error" do
@@ -295,7 +295,7 @@ describe Mongoid::Config do
 
         let(:sessions) do
           { "default" =>
-            { hosts: [ "localhost:27017" ], uri: "mongodb://localhost:27017" }
+            { hosts: [ "127.0.0.1:27017" ], uri: "mongodb://127.0.0.1:27017" }
           }
         end
 

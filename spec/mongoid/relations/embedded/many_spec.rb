@@ -3873,7 +3873,7 @@ describe Mongoid::Relations::Embedded::Many do
     before do
       band.collection.
         find(_id: band.id).
-        update("$set" => { records: [{ name: "Moderat" }]})
+        update_one("$set" => { records: [{ name: "Moderat" }]})
     end
 
     context "when loading the documents" do

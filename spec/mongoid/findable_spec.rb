@@ -40,7 +40,7 @@ describe Mongoid::Findable do
     end
   end
 
-  describe ".find_and_modify" do
+  pending ".find_and_modify" do
 
     let!(:person) do
       Person.create(title: "Senior")
@@ -486,7 +486,7 @@ describe Mongoid::Findable do
     end
   end
 
-  describe "#text_search" do
+  pending "#text_search" do
 
     before do
       Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)

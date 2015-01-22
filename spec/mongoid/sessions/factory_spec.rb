@@ -12,8 +12,8 @@ describe Mongoid::Sessions::Factory do
 
           let(:config) do
             {
-              default: { hosts: [ "localhost:27017" ], database: database_id },
-              secondary: { hosts: [ "localhost:27017" ], database: database_id }
+              default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
+              secondary: { hosts: [ "127.0.0.1:27017" ], database: database_id }
             }
           end
 
@@ -30,11 +30,11 @@ describe Mongoid::Sessions::Factory do
           end
 
           it "returns a session" do
-            expect(session).to be_a(Moped::Session)
+            expect(session).to be_a(Mongo::Client)
           end
 
           it "sets the cluster's seeds" do
-            expect(cluster.seeds.first.address.resolved).to eq("127.0.0.1:27017")
+            expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
           end
         end
 
@@ -43,7 +43,7 @@ describe Mongoid::Sessions::Factory do
           let(:config) do
             {
               default: { hosts: [ "127.0.0.1" ], database: database_id },
-              secondary: { hosts: [ "localhost" ], database: database_id }
+              secondary: { hosts: [ "127.0.0.1" ], database: database_id }
             }
           end
 
@@ -64,15 +64,15 @@ describe Mongoid::Sessions::Factory do
           end
 
           it "returns a session" do
-            expect(session).to be_a(Moped::Session)
+            expect(session).to be_a(Mongo::Client)
           end
 
           it "sets the cluster's seed ports to 27017" do
-            expect(cluster.seeds.first.address.original).to eq("localhost:27017")
+            expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
           end
 
           it "sets ips with no ports to 27017" do
-            expect(default.cluster.seeds.first.address.original).to eq("127.0.0.1:27017")
+            expect(default.cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
           end
         end
 
@@ -82,8 +82,8 @@ describe Mongoid::Sessions::Factory do
 
             let(:config) do
               {
-                default: { hosts: [ "localhost:27017" ], database: database_id },
-                secondary: { uri: "mongodb://localhost:27017/mongoid_test" }
+                default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
+                secondary: { uri: "mongodb://127.0.0.1:27017/mongoid_test" }
               }
             end
 
@@ -100,30 +100,15 @@ describe Mongoid::Sessions::Factory do
             end
 
             it "returns a session" do
-              expect(session).to be_a(Moped::Session)
+              expect(session).to be_a(Mongo::Client)
             end
 
             it "sets the cluster's seeds" do
-              expect(cluster.seeds.first.address.original).to eq("localhost:27017")
+              expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
             end
 
             it "sets the database" do
               expect(session.options[:database]).to eq("mongoid_test")
-            end
-
-            it "sets the database in the configuration" do
-              session
-              expect(Mongoid.sessions[:secondary]).to include(:database)
-            end
-
-            it "sets the hosts in the configuration" do
-              session
-              expect(Mongoid.sessions[:secondary]).to include(:hosts)
-            end
-
-            it "removes the uri from the configuration" do
-              session
-              expect(Mongoid.sessions[:secondary]).to_not include(:uri)
             end
           end
 
@@ -131,8 +116,8 @@ describe Mongoid::Sessions::Factory do
 
             let(:config) do
               {
-                default: { hosts: [ "localhost:27017" ], database: database_id },
-                secondary: { uri: "mongodb://localhost:27017,localhost:27017/mongoid_test" }
+                default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
+                secondary: { uri: "mongodb://127.0.0.1:27017,127.0.0.1:27018/mongoid_test" }
               }
             end
 
@@ -149,34 +134,15 @@ describe Mongoid::Sessions::Factory do
             end
 
             let(:seeds) do
-              cluster.seeds.map{ |node| node.address.original }
+              cluster.addresses.map{ |address| address.to_s }
             end
 
             it "returns a session" do
-              expect(session).to be_a(Moped::Session)
+              expect(session).to be_a(Mongo::Client)
             end
 
             it "sets the cluster's seeds" do
-              expect(seeds).to eq([ "localhost:27017", "localhost:27017" ])
-            end
-
-            it "sets the database" do
-              expect(session.options[:database]).to eq("mongoid_test")
-            end
-
-            it "sets the database in the configuration" do
-              session
-              expect(Mongoid.sessions[:secondary]).to include(:database)
-            end
-
-            it "sets the hosts in the configuration" do
-              session
-              expect(Mongoid.sessions[:secondary]).to include(:hosts)
-            end
-
-            it "removes the uri from the configuration" do
-              session
-              expect(Mongoid.sessions[:secondary]).to_not include(:uri)
+              expect(seeds).to eq([ "127.0.0.1:27017", "127.0.0.1:27018" ])
             end
           end
         end
@@ -195,7 +161,7 @@ describe Mongoid::Sessions::Factory do
     context "when no name is provided" do
 
       let(:config) do
-        { default: { hosts: ["localhost:27017"], database: database_id }}
+        { default: { hosts: ["127.0.0.1:27017"], database: database_id }}
       end
 
       before do
@@ -211,15 +177,15 @@ describe Mongoid::Sessions::Factory do
       end
 
       let(:seeds) do
-        cluster.seeds.map{ |node| node.address.original }
+        cluster.addresses.map{ |address| address.to_s }
       end
 
       it "returns the default session" do
-        expect(session).to be_a(Moped::Session)
+        expect(session).to be_a(Mongo::Client)
       end
 
       it "sets the cluster's seeds" do
-        expect(seeds).to eq([ "localhost:27017" ])
+        expect(seeds).to eq([ "127.0.0.1:27017" ])
       end
     end
 
@@ -240,7 +206,7 @@ describe Mongoid::Sessions::Factory do
   describe ".default" do
 
     let(:config) do
-      { default: { hosts: ["localhost:27017"], database: database_id }}
+      { default: { hosts: ["127.0.0.1:27017"], database: database_id }}
     end
 
     before do
@@ -256,15 +222,15 @@ describe Mongoid::Sessions::Factory do
     end
 
     let(:seeds) do
-      cluster.seeds.map{ |node| node.address.original }
+      cluster.addresses.map{ |address| address.to_s }
     end
 
     it "returns the default session" do
-      expect(session).to be_a(Moped::Session)
+      expect(session).to be_a(Mongo::Client)
     end
 
     it "sets the cluster's seeds" do
-      expect(seeds).to eq([ "localhost:27017" ])
+      expect(seeds).to eq([ "127.0.0.1:27017" ])
     end
   end
 
@@ -273,13 +239,10 @@ describe Mongoid::Sessions::Factory do
     let(:config) do
       {
         default: {
-          hosts: [ "localhost:27017" ],
+          hosts: [ "127.0.0.1:27017" ],
           database: database_id,
           options: {
-            "down_interval" => 10,
-            "max_retries" => 5,
-            "refresh_interval" => 30,
-            "retry_interval" => 0.1,
+            "server_selection_timeout" => 10,
             "write" => { "w" => 1 }
           }
         }
@@ -299,35 +262,23 @@ describe Mongoid::Sessions::Factory do
     end
 
     let(:seeds) do
-      cluster.seeds.map{ |node| node.address.original }
+      cluster.addresses.map{ |address| address.to_s }
     end
 
     it "returns the default session" do
-      expect(session).to be_a(Moped::Session)
+      expect(session).to be_a(Mongo::Client)
     end
 
     it "sets the cluster's seeds" do
-      expect(seeds).to eq([ "localhost:27017" ])
+      expect(seeds).to eq([ "127.0.0.1:27017" ])
     end
 
-    it "sets the cluster down interval" do
-      expect(cluster.down_interval).to eq(10)
-    end
-
-    it "sets the cluster max retries" do
-      expect(cluster.max_retries).to eq(5)
-    end
-
-    it "sets the cluster refresh interval" do
-      expect(cluster.refresh_interval).to eq(30)
-    end
-
-    it "sets the cluster retry interval" do
-      expect(cluster.retry_interval).to eq(0.1)
+    it "sets the server selection timeout" do
+      expect(cluster.options[:server_selection_timeout]).to eq(10)
     end
 
     it "sets the write concern" do
-      expect(session.write_concern).to be_a(Moped::WriteConcern::Propagate)
+      expect(session.write_concern).to be_a(Mongo::WriteConcern::Acknowledged)
     end
   end
 end

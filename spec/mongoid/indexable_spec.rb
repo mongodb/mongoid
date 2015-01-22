@@ -84,7 +84,7 @@ describe Mongoid::Indexable do
       end
 
       it "creates the indexes" do
-        expect(klass.collection.indexes[_type: 1]).to_not be_nil
+        expect(klass.collection.indexes.get(_type: 1)).to_not be_nil
       end
     end
 
@@ -107,7 +107,7 @@ describe Mongoid::Indexable do
       end
 
       it "creates the indexes" do
-        expect(indexes[_type: 1]).to_not be_nil
+        expect(indexes.get(_type: 1)).to_not be_nil
       end
     end
   end

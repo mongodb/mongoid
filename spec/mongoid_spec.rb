@@ -38,7 +38,7 @@ describe Mongoid do
     end
   end
 
-  describe ".disconnect_sessions" do
+  pending ".disconnect_sessions" do
 
     let(:sessions) do
       Mongoid::Threaded.sessions.values
@@ -46,15 +46,15 @@ describe Mongoid do
 
     before do
       Band.all.entries
-      Mongoid.disconnect_sessions
     end
 
     it "disconnects from all active sessions" do
       sessions.each do |session|
-        session.cluster.nodes.each do |node|
-          expect(node.send(:connected?)).to be false
+        session.cluster.servers.each do |server|
+          expect(server).to receive(:disconnect!).and_call_original
         end
       end
+      Mongoid.disconnect_sessions
     end
   end
 
