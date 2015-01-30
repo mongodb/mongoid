@@ -27,6 +27,38 @@ development:
         # The time in seconds that Moped should wait before retrying an
         # operation on failure. (default: 0.25)
         # retry_interval: 0.25
+        
+        # The connection pool size per-node.  This should match or exceed the
+        # number of threads for a multi-threaded application. (default: 5)
+        # pool_size: 5
+        
+        # The time in seconds that Moped should wait for the pool to provide
+        # an available connection.  This number should probably remain at the 
+        # default, unless for some reason you absolutely need to limit the
+        # pool_size, as this wait is only used when the pool is saturated.
+        # (default: 0.5)
+        # pool_timeout: 0.5
+
+        # The time in seconds before Moped will timeout connection and node
+        # operations. (default: 5)
+        # timeout: 5
+        
+        # The amount of time in seconds between forced refreshes of node 
+        # information including the discovery of new peers. (default: 300)
+        # refresh_interval: 300
+        
+        # The amount of time in seconds that a node will be flagged as down.
+        # (default: 30) 
+        # down_interval: 30
+        
+        # Whether connections should use SSL. (default: nil/false)
+        # ssl: false
+        
+        # Whether Moped will use the existing seeds/nodes to find other peers.
+        # (default: true)
+        # auto_discover: true
+
+
   # Configure Mongoid specific options. (optional)
   options:
     # Includes the root model name in json serialization. (default: false)
