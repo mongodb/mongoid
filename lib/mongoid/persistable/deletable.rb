@@ -19,7 +19,6 @@ module Mongoid
       #
       # @since 1.0.0
       def delete(options = {})
-        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_delete do
           if embedded?
             delete_as_embedded(options)

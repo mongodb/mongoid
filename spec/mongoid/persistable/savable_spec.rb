@@ -268,23 +268,6 @@ describe Mongoid::Persistable::Savable do
         end
       end
     end
-
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
-
-      before do
-        Person.create(title: "sir")
-      end
-
-      it "raises an error" do
-        expect {
-          person.save
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
-      end
-    end
   end
 
   describe "save!" do
@@ -438,23 +421,6 @@ describe Mongoid::Persistable::Savable do
 
       it "properly sets up the entire hierarchy" do
         expect(from_db.shapes.first.canvas).to eq(firefox)
-      end
-    end
-
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
-
-      before do
-        Person.create(title: "sir")
-      end
-
-      it "raises an error" do
-        expect {
-          person.save!
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
       end
     end
   end
