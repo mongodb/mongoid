@@ -40,18 +40,7 @@ def database_id_alt
   "mongoid_test_alt"
 end
 
-# Set up a root user so we can run tests with authentication.
-MONGOID_USER = Mongo::Auth::User.new(
-  database: Mongo::Database::ADMIN,
-  user: 'mongoid-user',
-  password: 'password',
-  roles: [
-    Mongo::Auth::Roles::USER_ADMIN_ANY_DATABASE,
-    Mongo::Auth::Roles::DATABASE_ADMIN_ANY_DATABASE,
-    Mongo::Auth::Roles::READ_WRITE_ANY_DATABASE,
-    Mongo::Auth::Roles::HOST_MANAGER
-  ]
-)
+require 'support/authorization'
 
 CONFIG = {
   sessions: {
@@ -61,9 +50,8 @@ CONFIG = {
       options: {
         server_selection_timeout: 0.5,
         max_pool_size: 1,
-        user: MONGOID_USER.name,
-        password: MONGOID_USER.password,
-        roles: MONGOID_USER.roles
+        user: MONGOID_TEST_USER.name,
+        password: MONGOID_TEST_USER.password
       }
     }
   }
@@ -120,13 +108,37 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
 
   config.before(:suite) do
-   begin
+    client = Mongo::Client.new(["#{HOST}:#{PORT}"])
+    begin
       # Create the root user administrator as the first user to be added to the
       # database. This user will need to be authenticated in order to add any
       # more users to any other databases.
-      p Mongo::Client.new([ "#{HOST}:#{PORT}" ]).database.users.create(MONGOID_USER)
+      client.database.users.create(MONGOID_ROOT_USER)
     rescue Exception => e
-      p e
+    end
+    begin
+      # Adds the test user to the test database with permissions on all
+      # databases that will be used in the test suite.
+      client.with(
+        user: MONGOID_ROOT_USER.name,
+        password: MONGOID_ROOT_USER.password
+      ).database.users.create(MONGOID_TEST_USER)
+    rescue Exception => e
+      # If we are on versions less than 2.6, we need to create a user for
+      # each database, since the users are not stored in the admin database
+      # but in the system.users collection on the datbases themselves. Also,
+      # roles in versions lower than 2.6 can only be strings, not hashes.
+      unless client.cluster.servers.first.features.write_command_enabled?
+        begin
+          client.with(
+            user: MONGOID_ROOT_USER.name,
+            password: MONGOID_ROOT_USER.password,
+            auth_source: Mongo::Database::ADMIN,
+            database: database_id
+          ).database.users.create(MONGOID_LEGACY_TEST_USER)
+        rescue Exception => e
+        end
+      end
     end
   end
 

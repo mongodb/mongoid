@@ -3,7 +3,11 @@ require "spec_helper"
 describe Mongoid::Contextual::TextSearch do
 
   before do
-    Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
+    Word.with(
+      user: MONGOID_ROOT_USER.name,
+      password: MONGOID_ROOT_USER.password,
+      database: "admin"
+    ).mongo_session.command(setParameter: 1, textSearchEnabled: true)
     Word.create_indexes
   end
 
