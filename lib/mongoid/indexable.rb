@@ -57,7 +57,7 @@ module Mongoid
                 collection.indexes.drop(spec["key"])
               end
             end
-          rescue Mongo::Operation::Read::NoNamespace; end
+          rescue Mongo::Error::CommandFailure; end
         end and true
       end
 

@@ -284,7 +284,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             person.update_attributes(map: { "bad.key" => "value" })
-          }.to raise_error(Mongo::Operation::Write::Failure)
+          }.to raise_error(Mongo::Error::CommandFailure)
         end
       end
 
@@ -320,7 +320,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             person.send(method, map: { "bad.key" => "value" })
-          }.to raise_error(Mongo::Operation::Write::Failure)
+          }.to raise_error(Mongo::Error::CommandFailure)
         end
       end
 

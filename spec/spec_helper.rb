@@ -40,13 +40,30 @@ def database_id_alt
   "mongoid_test_alt"
 end
 
+# Set up a root user so we can run tests with authentication.
+MONGOID_USER = Mongo::Auth::User.new(
+  database: Mongo::Database::ADMIN,
+  user: 'mongoid-user',
+  password: 'password',
+  roles: [
+    Mongo::Auth::Roles::USER_ADMIN_ANY_DATABASE,
+    Mongo::Auth::Roles::DATABASE_ADMIN_ANY_DATABASE,
+    Mongo::Auth::Roles::READ_WRITE_ANY_DATABASE,
+    Mongo::Auth::Roles::HOST_MANAGER
+  ]
+)
+
 CONFIG = {
   sessions: {
     default: {
       database: database_id,
       hosts: [ "#{HOST}:#{PORT}" ],
       options: {
-        server_selection_timeout: 0.10
+        server_selection_timeout: 0.5,
+        max_pool_size: 1,
+        user: MONGOID_USER.name,
+        password: MONGOID_USER.password,
+        roles: MONGOID_USER.roles
       }
     }
   }
@@ -101,6 +118,17 @@ I18n.config.enforce_available_locales = false
 RSpec.configure do |config|
   config.include Mongoid::SpecHelpers
   config.raise_errors_for_deprecations!
+
+  config.before(:suite) do
+   begin
+      # Create the root user administrator as the first user to be added to the
+      # database. This user will need to be authenticated in order to add any
+      # more users to any other databases.
+      p Mongo::Client.new([ "#{HOST}:#{PORT}" ]).database.users.create(MONGOID_USER)
+    rescue Exception => e
+      p e
+    end
+  end
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do

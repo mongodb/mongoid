@@ -55,7 +55,7 @@ module Mongoid
                   end
                 end
               end
-            rescue Mongo::Operation::Read::NoNamespace; end
+            rescue Mongo::Error::CommandFailure; end
           end
         end
 
@@ -97,7 +97,7 @@ module Mongoid
             indexes.delete_one("_id_")
             model.remove_indexes
             logger.info("MONGOID: Removing indexes on: #{model} for: #{indexes.join(', ')}.")
-          rescue Mongo::Operation::Read::NoNamespace
+          rescue Mongo::Error::CommandFailure
             next
           end
           model

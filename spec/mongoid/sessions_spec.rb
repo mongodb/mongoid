@@ -1029,7 +1029,7 @@ describe Mongoid::Sessions do
           it "bubbles up to the caller" do
             expect {
               Person.create(ssn: "432-97-1111")
-            }.to raise_error(Mongo::Operation::Write::Failure)
+            }.to raise_error(Mongo::Error::CommandFailure)
           end
         end
       end
@@ -1056,7 +1056,7 @@ describe Mongoid::Sessions do
           it "bubbles up to the caller" do
             expect {
               Person.create!(ssn: "432-97-1112")
-            }.to raise_error(Mongo::Operation::Write::Failure)
+            }.to raise_error(Mongo::Error::CommandFailure)
           end
         end
 
@@ -1089,7 +1089,7 @@ describe Mongoid::Sessions do
           it "bubbles up to the caller" do
             expect {
               person.save
-            }.to raise_error(Mongo::Operation::Write::Failure)
+            }.to raise_error(Mongo::Error::CommandFailure)
           end
         end
       end
@@ -1113,7 +1113,7 @@ describe Mongoid::Sessions do
           it "bubbles up to the caller" do
             expect {
               person.save!
-            }.to raise_error(Mongo::Operation::Write::Failure)
+            }.to raise_error(Mongo::Error::CommandFailure)
           end
         end
 
