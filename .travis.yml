@@ -1,14 +1,12 @@
 language: ruby
 
-services: mongodb
-
 bundler_args: --without development
 
 rvm:
   - 1.9.3
   - 2.0.0
-  - 2.1
-  - 2.2
+  - 2.1.5
+  - 2.2.0
   - jruby
 
 gemfile:
@@ -16,9 +14,20 @@ gemfile:
   - gemfiles/rails41.gemfile
   - gemfiles/rails42.gemfile
 
-env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+env:
+  global:
+    - CI="travis"
+    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+  matrix:
+    - MONGODB=2.4.12
+    - MONGODB=2.6.7
+    - MONGODB=3.0.0-rc8
 
-sudo: false
+before_script:
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
+  - tar -xvf /tmp/mongodb.tgz
+  - mkdir /tmp/data
+  - ${PWD}/mongodb-linux-x86_64-${MONGODB}/bin/mongod --dbpath /tmp/data --bind_ip 127.0.0.1 --auth &> /dev/null &
 
 notifications:
   email: false

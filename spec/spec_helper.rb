@@ -42,6 +42,21 @@ end
 
 require 'support/authorization'
 
+# Give MongoDB time to start up on the travis ci environment.
+if (ENV['CI'] == 'travis')
+  starting = true
+  client = Mongo::Client.new(['127.0.0.1:27017'])
+  while starting
+    begin
+      client.command(Mongo::Server::Monitor::STATUS)
+      break
+    rescue Mongo::Error::CommandFailure => e
+      sleep(2)
+      client.cluster.scan!
+    end
+  end
+end
+
 CONFIG = {
   sessions: {
     default: {
