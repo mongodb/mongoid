@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3626 Document#to_key, needs to return a ObjectId as String so we can query back using that id. (Arthur Neves)
+
 * \#3888 raise UnknownAttributeError when 'set' is called on non existing field and Mongoid::Attributes::Dynamic is not included in model. (Shweta Kale)
 
 * \#3889 'set' will allow to set value of non existing field when Mongoid::Attributes::Dynamic is included in model. (Shweta Kale)

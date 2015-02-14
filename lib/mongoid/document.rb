@@ -134,11 +134,11 @@ module Mongoid
     # @example Return the key.
     #   document.to_key
     #
-    # @return [ Object ] The id of the document or nil if new.
+    # @return [ String ] The id of the document or nil if new.
     #
     # @since 2.4.0
     def to_key
-      (persisted? || destroyed?) ? [ id ] : nil
+      (persisted? || destroyed?) ? [ id.to_s ] : nil
     end
 
     # Return an array with this +Document+ only in it.
