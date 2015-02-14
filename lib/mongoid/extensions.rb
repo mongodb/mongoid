@@ -12,6 +12,12 @@ class Symbol
   remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
 end
 
+class BSON::Document
+  def symbolize_keys
+    to_h.symbolize_keys
+  end
+end
+
 require "mongoid/extensions/array"
 require "mongoid/extensions/big_decimal"
 require "mongoid/extensions/boolean"
