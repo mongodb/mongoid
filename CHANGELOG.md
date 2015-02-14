@@ -7,6 +7,10 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3904 BSON::Document#symbolize_keys should return keys as symbols. (Arthur Neves)
+
+* \#3948 Fix remove_undefined_indexes on rails 4.2, to symbolize right the Document keys. (Adam Wróbel)
+
 * \#3626 Document#to_key, needs to return a ObjectId as String so we can query back using that id. (Arthur Neves)
 
 * \#3888 raise UnknownAttributeError when 'set' is called on non existing field and Mongoid::Attributes::Dynamic is not included in model. (Shweta Kale)
