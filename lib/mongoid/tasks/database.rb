@@ -45,7 +45,8 @@ module Mongoid
             model.collection.indexes.each do |index|
               # ignore default index
               unless index['name'] == '_id_'
-                key = index['key'].symbolize_keys
+                # to_h because BSON::Document does not allow symbolic keys
+                key = index['key'].to_h.symbolize_keys
                 spec = model.index_specification(key)
                 unless spec
                   # index not specified
@@ -72,7 +73,8 @@ module Mongoid
       def remove_undefined_indexes(models = ::Mongoid.models)
         undefined_indexes(models).each do |model, indexes|
           indexes.each do |index|
-            key = index['key'].symbolize_keys
+            # to_h because BSON::Document does not allow symbolic keys
+            key = index['key'].to_h.symbolize_keys
             model.collection.indexes.drop(key)
             logger.info("MONGOID: Removing index: #{index['name']} on #{model}.")
           end
