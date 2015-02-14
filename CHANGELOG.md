@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3935 fix multiple fields sorting on contextual memory. (chamnap)
+
 * \#3904 BSON::Document#symbolize_keys should return keys as symbols. (Arthur Neves)
 
 * \#3948 Fix remove_undefined_indexes on rails 4.2, to symbolize right the Document keys. (Adam Wróbel)
