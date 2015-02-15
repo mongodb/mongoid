@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3722 Use the right database name when combining #store_in and #with. (Arthur Neves)
+
 * \#3934 Dont apply sort when doing a find_by. (Arthur Neves)
 
 * \#3935 fix multiple fields sorting on contextual memory. (chamnap)

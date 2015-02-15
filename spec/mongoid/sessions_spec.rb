@@ -409,6 +409,36 @@ describe Mongoid::Sessions do
       end
     end
 
+    context "when overridden the database with store_in" do
+
+      before do
+        Band.store_in(database: database_id_alt)
+      end
+
+      context "on instance level" do
+
+        let(:band) do
+          Band.new.with({:read=>:primary})
+        end
+
+        it "uses the new database" do
+          expect(band.mongo_session.send(:current_database).name).to eq database_id_alt
+        end
+
+        context "when using another database before" do
+
+          before do
+            band
+            User.create!
+          end
+
+          it "uses the new database" do
+            expect(band.mongo_session.send(:current_database).name).to eq database_id_alt
+          end
+        end
+      end
+    end
+
     context "when overriding to a monghq single server", config: :mongohq do
 
       shared_examples_for "an overridden session to a mongohq single server" do
