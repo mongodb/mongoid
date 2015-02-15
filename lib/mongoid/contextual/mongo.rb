@@ -202,6 +202,16 @@ module Mongoid
       end
       alias :one :first
 
+      # Return the first result without applying sort
+      #
+      # @api private
+      #
+      # @since 4.0.2
+      def find_first
+        return documents.first if cached? && cache_loaded?
+        with_eager_loading(query.first)
+      end
+
       # Execute a $geoNear command against the database.
       #
       # @example Find documents close to 10, 10.
