@@ -128,6 +128,45 @@ describe Mongoid::Findable do
     end
   end
 
+  describe "find_by!" do
+
+    context "when the document is found" do
+
+      let!(:person) do
+        Person.create(title: "sir")
+      end
+
+      context "when no block is provided" do
+
+        it "returns the document" do
+          expect(Person.find_by!(title: "sir")).to eq(person)
+        end
+      end
+
+      context "when a block is provided" do
+
+        let(:result) do
+          Person.find_by!(title: "sir") do |peep|
+            peep.age = 50
+          end
+        end
+
+        it "yields the returned document" do
+          expect(result.age).to eq(50)
+        end
+      end
+    end
+
+    context "when the document is not found" do
+
+      it "raises an error" do
+        expect {
+          Person.find_by!(ssn: "333-22-1111")
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
+  end
+
   [ :first, :one ].each do |method|
 
     describe "##{method}" do
