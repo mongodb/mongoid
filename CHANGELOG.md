@@ -5,6 +5,10 @@ For instructions on upgrading to newer versions, visit
 
 ## 4.0.2 - Not released
 
+### New Features
+
+* \#3731 Add find_by! method. (Guillermo Iguaran)
+
 ### Resolved Issues
 
 * \#3722 Use the right database name when combining #store_in and #with. (Arthur Neves)
