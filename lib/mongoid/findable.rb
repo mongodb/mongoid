@@ -128,7 +128,7 @@ module Mongoid
     # @return [ Document ] A matching document.
     #
     def find_by!(attrs = {})
-      result = where(attrs).first
+      result = where(attrs).find_first
       raise(Errors::DocumentNotFound.new(self, attrs)) unless result
       yield(result) if result && block_given?
       result
