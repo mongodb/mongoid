@@ -53,6 +53,55 @@ describe Mongoid::Findable do
 
   describe ".find_by" do
 
+    context "when collection is a embeds_many" do
+
+      let(:person) do
+        Person.create(title: "sir")
+      end
+
+      let!(:message) do
+        person.messages.create!(body: 'foo')
+      end
+
+      context "when the document is found" do
+
+        it "returns the document" do
+          expect(person.messages.find_by(body: 'foo')).to eq(message)
+        end
+      end
+
+      context "when the document is not found" do
+
+        context "when raising a not found error" do
+
+          let!(:raise_option) { Mongoid.raise_not_found_error }
+
+          before { Mongoid.raise_not_found_error = true }
+
+          after { Mongoid.raise_not_found_error = raise_option }
+
+          it "raises an error" do
+            expect {
+              person.messages.find_by(body: 'bar')
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when raising no error" do
+
+          let!(:raise_option) { Mongoid.raise_not_found_error }
+
+          before { Mongoid.raise_not_found_error = false }
+
+          after { Mongoid.raise_not_found_error = raise_option }
+
+          it "returns nil" do
+            expect(person.messages.find_by(body: 'bar')).to be_nil
+          end
+        end
+      end
+    end
+
     context "when the document is found" do
 
       let!(:person) do

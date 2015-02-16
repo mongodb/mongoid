@@ -135,6 +135,7 @@ module Mongoid
         doc
       end
       alias :one :first
+      alias :find_first :first
 
       # Create the new in memory context.
       #
