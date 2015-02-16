@@ -20,10 +20,6 @@ env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
 
 sudo: false
 
-matrix:
-  allow_failures:
-    - gemfile: gemfiles/rails42.gemfile
-
 notifications:
   email: false
   irc:
