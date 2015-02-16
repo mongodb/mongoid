@@ -394,6 +394,47 @@ describe Mongoid::Persistable::Creatable do
           end
         end
       end
+
+      context "#find_or_create_by!" do
+
+        before do
+          container.vehicles.find_or_create_by!({ driver_id: driver.id }, Car)
+        end
+
+        it "creates the given type document" do
+          expect(container.vehicles.map(&:class)).to eq([ Car ])
+        end
+
+        it "creates with the given attributes" do
+          expect(container.vehicles.map(&:driver)).to eq([ driver ])
+        end
+
+        it "creates the correct number of documents" do
+          expect(container.vehicles.size).to eq(1)
+        end
+
+        context "when executing with a found document" do
+
+          before do
+            container.vehicles.find_or_create_by!({ driver_id: driver.id }, Car)
+          end
+
+          it "does not create an additional document" do
+            expect(container.vehicles.size).to eq(1)
+          end
+        end
+
+        context "when executing with an additional new document" do
+
+          before do
+            container.vehicles.find_or_create_by!({ driver_id: driver.id }, Truck)
+          end
+
+          it "creates the new additional document" do
+            expect(container.vehicles.size).to eq(2)
+          end
+        end
+      end
     end
   end
 
