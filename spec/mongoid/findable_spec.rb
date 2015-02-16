@@ -84,9 +84,11 @@ describe Mongoid::Findable do
 
       context "when raising a not found error" do
 
-        before do
-          Mongoid.raise_not_found_error = true
-        end
+        let!(:raise_option) { Mongoid.raise_not_found_error }
+
+        before { Mongoid.raise_not_found_error = true }
+
+        after { Mongoid.raise_not_found_error = raise_option }
 
         it "raises an error" do
           expect {
@@ -97,13 +99,11 @@ describe Mongoid::Findable do
 
       context "when raising no error" do
 
-        before do
-          Mongoid.raise_not_found_error = false
-        end
+        let!(:raise_option) { Mongoid.raise_not_found_error }
 
-        after do
-          Mongoid.raise_not_found_error = true
-        end
+        before { Mongoid.raise_not_found_error = false }
+
+        after { Mongoid.raise_not_found_error = raise_option }
 
         context "when no block is provided" do
 
