@@ -27,6 +27,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3889 'set' will allow to set value of non existing field when Mongoid::Attributes::Dynamic is included in model. (Shweta Kale)
 
+* \#3812 Fixed validation context when saving (Yaroslav Zemlyanuhin)
+
 ## 4.0.1
 
 ### Resolved Issues

@@ -8,6 +8,14 @@ describe Mongoid::Persistable::Savable do
       Person.create
     end
 
+    let(:contextable_item) do
+      ContextableItem.new
+    end
+
+    let(:persisted_contextable_item) do
+      ContextableItem.create(title: 'sir')
+    end
+
     context "when skipping validation" do
 
       context "when no relations are involved" do
@@ -283,6 +291,35 @@ describe Mongoid::Persistable::Savable do
         expect {
           person.save
         }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+      end
+    end
+
+    context "when validation context isn't assigned" do
+      it "returns true" do
+        expect(contextable_item.save).to be true
+      end
+    end
+
+    context "when validation context exists" do
+      context "on new document" do
+        it "returns true" do
+          contextable_item.title = "sir"
+          expect(contextable_item.save(context: :in_context)).to be true
+        end
+        it "returns false" do
+          expect(contextable_item.save(context: :in_context)).to be false
+        end
+      end
+
+      context "on persisted document" do
+        it "returns true" do
+          persisted_contextable_item.title = "lady"
+          expect(persisted_contextable_item.save(context: :in_context)).to be true
+        end
+        it "returns false" do
+          persisted_contextable_item.title = nil
+          expect(persisted_contextable_item.save(context: :in_context)).to be false
+        end
       end
     end
   end
