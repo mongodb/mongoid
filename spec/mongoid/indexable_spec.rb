@@ -47,7 +47,7 @@ describe Mongoid::Indexable do
         Class.new do
           include Mongoid::Document
           store_in collection: "test_db_remove"
-          index({ test: 1 }, { database: "mia_2" })
+          index({ test: 1 }, { database: "mongoid_optional" })
           index({ name: 1 }, { background: true })
         end
       end
@@ -58,7 +58,7 @@ describe Mongoid::Indexable do
       end
 
       let(:indexes) do
-        klass.with(database: "mia_2").collection.indexes
+        klass.with(database: "mongoid_optional").collection.indexes
       end
 
       it "creates the indexes" do
@@ -94,7 +94,7 @@ describe Mongoid::Indexable do
         Class.new do
           include Mongoid::Document
           store_in collection: "test_db_indexes"
-          index({ _type: 1 }, { database: "mia_1" })
+          index({ _type: 1 }, { database: "mongoid_optional" })
         end
       end
 
@@ -102,8 +102,12 @@ describe Mongoid::Indexable do
         klass.create_indexes
       end
 
+      after do
+        klass.remove_indexes
+      end
+
       let(:indexes) do
-        klass.with(database: "mia_1").collection.indexes
+        klass.with(database: "mongoid_optional").collection.indexes
       end
 
       it "creates the indexes" do
