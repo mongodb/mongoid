@@ -2120,6 +2120,80 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  describe "#find_or_create_by!" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:address) do
+      person.addresses.build(street: "Bourke", city: "Melbourne")
+    end
+
+    context "when the document exists" do
+
+      let(:found) do
+        person.addresses.find_or_create_by!(street: "Bourke")
+      end
+
+      it "returns the document" do
+        expect(found).to eq(address)
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:found) do
+        person.addresses.find_or_create_by!(street: "King") do |address|
+          address.state = "CA"
+        end
+      end
+
+      it "sets the new document attributes" do
+        expect(found.street).to eq("King")
+      end
+
+      it "returns a newly persisted document" do
+        expect(found).to be_persisted
+      end
+
+      it "calls the passed block" do
+        expect(found.state).to eq("CA")
+      end
+
+      context "when validation fails" do
+
+        it "raises an error" do
+          expect {
+            person.addresses.find_or_create_by!(street: "1")
+          }.to raise_error(Mongoid::Errors::Validations)
+        end
+      end
+    end
+
+    context "when the child belongs to another document" do
+
+      let(:product) do
+        Product.create
+      end
+
+      let(:purchase) do
+        Purchase.create
+      end
+
+      let(:line_item) do
+        purchase.line_items.find_or_create_by(
+            product_id: product.id,
+            product_type: product.class.name
+        )
+      end
+
+      it "properly creates the document" do
+        expect(line_item.product).to eq(product)
+      end
+    end
+  end
+
   describe "#find_or_initialize_by" do
 
     let(:person) do

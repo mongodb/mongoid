@@ -7,6 +7,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#3931 Add #find_or_create_by! method to many associations. (Tom Beynon)
+
 * \#3731 Add find_by! method. (Guillermo Iguaran)
 
 ### Resolved Issues
