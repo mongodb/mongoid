@@ -3,19 +3,21 @@ require "spec_helper"
 describe Mongoid::Contextual::TextSearch do
 
   before do
-    Word.with(
-      user: MONGOID_ROOT_USER.name,
-      password: MONGOID_ROOT_USER.password,
-      database: "admin"
-    ).mongo_session.command(setParameter: 1, textSearchEnabled: true)
-    Word.create_indexes
+    if non_legacy_server?
+      Word.with(
+        user: MONGOID_ROOT_USER.name,
+        password: MONGOID_ROOT_USER.password,
+        database: "admin"
+      ).mongo_session.command(setParameter: 1, textSearchEnabled: true)
+      Word.create_indexes
+    end
   end
 
   after(:all) do
     Word.remove_indexes
   end
 
-  pending "#each" do
+  describe "#each", if: non_legacy_server? do
 
     let(:collection) do
       Word.collection
@@ -63,7 +65,7 @@ describe Mongoid::Contextual::TextSearch do
     end
   end
 
-  pending "#execute" do
+  describe "#execute", if: non_legacy_server? do
 
     let(:collection) do
       Word.collection
@@ -91,7 +93,7 @@ describe Mongoid::Contextual::TextSearch do
     end
   end
 
-  describe "#initialize" do
+  describe "#initialize", if: non_legacy_server? do
 
     let(:collection) do
       Word.collection
@@ -130,7 +132,7 @@ describe Mongoid::Contextual::TextSearch do
     end
   end
 
-  describe "#language" do
+  describe "#language", if: non_legacy_server? do
 
     let(:collection) do
       Word.collection
@@ -157,7 +159,7 @@ describe Mongoid::Contextual::TextSearch do
     end
   end
 
-  describe "#project" do
+  describe "#project", if: non_legacy_server? do
 
     let(:collection) do
       Word.collection
@@ -184,7 +186,7 @@ describe Mongoid::Contextual::TextSearch do
     end
   end
 
-  pending "#stats" do
+  describe "#stats", if: non_legacy_server? do
 
     let(:collection) do
       Word.collection

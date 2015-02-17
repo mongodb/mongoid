@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Sessions::Options do
 
-  describe "#with" do
+  describe "#with", if: non_legacy_server? do
 
     context "when passing some options" do
 
@@ -52,7 +52,7 @@ describe Mongoid::Sessions::Options do
     end
   end
 
-  describe ".with" do
+  describe ".with", if: non_legacy_server? do
 
     let(:options) { { database: 'test' } }
 

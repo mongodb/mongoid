@@ -57,7 +57,7 @@ module Mongoid
                 collection.indexes.drop(spec["key"])
               end
             end
-          rescue Mongo::Error::CommandFailure; end
+          rescue Mongo::Error::OperationFailure; end
         end and true
       end
 

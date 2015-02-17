@@ -50,7 +50,7 @@ if (ENV['CI'] == 'travis')
     begin
       client.command(Mongo::Server::Monitor::STATUS)
       break
-    rescue Mongo::Error::CommandFailure => e
+    rescue Mongo::Error::OperationFailure => e
       sleep(2)
       client.cluster.scan!
     end
@@ -85,9 +85,8 @@ def purge_database_alt!
   end
 end
 
-def mongodb_version
-  session = Mongoid::Sessions.default
-  session.command(buildinfo: 1).first["version"]
+def non_legacy_server?
+  Mongoid::Sessions.default.cluster.servers.first.features.write_command_enabled?
 end
 
 # Set the database that the spec suite connects to.

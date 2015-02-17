@@ -41,7 +41,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when database specific options exist" do
+    context "when database specific options exist", if: non_legacy_server? do
 
       let(:klass) do
         Class.new do
@@ -88,7 +88,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when database options are specified" do
+    context "when database options are specified", if: non_legacy_server? do
 
       let(:klass) do
         Class.new do
