@@ -22,7 +22,9 @@ MONGOID_TEST_USER = Mongo::Auth::User.new(
     { role: Mongo::Auth::Roles::READ_WRITE, db: database_id_alt },
     { role: Mongo::Auth::Roles::DATABASE_ADMIN, db: database_id_alt },
     { role: Mongo::Auth::Roles::READ_WRITE, db: 'mongoid_optional' },
-    { role: Mongo::Auth::Roles::DATABASE_ADMIN, db: 'mongoid_optional' }
+    { role: Mongo::Auth::Roles::DATABASE_ADMIN, db: 'mongoid_optional' },
+    { role: Mongo::Auth::Roles::READ_WRITE, db: 'test' },
+    { role: Mongo::Auth::Roles::DATABASE_ADMIN, db: 'test' }
   ]
 )
 
