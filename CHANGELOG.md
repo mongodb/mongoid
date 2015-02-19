@@ -3,7 +3,9 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
-## 4.0.2 - Not released
+## 4.0.3 - Not released
+
+## 4.0.2
 
 ### New Features
 
