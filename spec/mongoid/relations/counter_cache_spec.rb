@@ -287,4 +287,38 @@ describe Mongoid::Relations::CounterCache do
       end
     end
   end
+
+  describe "#add_counter_cache_callbacks" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:drug) do
+      person.drugs.create
+    end
+
+    context "when parent is not frozen" do
+
+      before do
+        drug.destroy
+      end
+
+      it "before_destroy updates counter cache" do
+        expect(person.drugs_count).to eq(0)
+      end
+    end
+
+    context "when parent is frozen" do
+
+      before do
+        person.destroy
+        drug.destroy
+      end
+
+      it "before_destroy doesn't update counter cache" do
+        expect(person.drugs_count).to eq(1)
+      end
+    end
+  end
 end
