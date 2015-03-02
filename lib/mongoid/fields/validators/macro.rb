@@ -13,6 +13,7 @@ module Mongoid
           :identity,
           :label,
           :localize,
+          :fallbacks,
           :metadata,
           :pre_processed,
           :subtype,

@@ -274,8 +274,23 @@ describe Mongoid::Fields::Localized do
                   field.demongoize({ "en" => 1 })
                 end
 
-                it "returns the fallback translation" do
-                  expect(value).to eq(1)
+                context "and fallbacks are enabled" do
+
+                  it "returns the fallback translation" do
+                    expect(value).to eq(1)
+                  end
+                end
+
+
+                context "and fallbacks are disabled" do
+
+                  let(:field) do
+                    described_class.new(:description, localize: true, type: Integer, fallbacks: false)
+                  end
+
+                  it "returns nil" do
+                    expect(value).to be_nil
+                  end
                 end
               end
 
