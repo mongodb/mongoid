@@ -5,6 +5,10 @@ For instructions on upgrading to newer versions, visit
 
 ## 4.0.3 - Not released
 
+### New Features
+
+* \#3846 Allow #pluck when none is used in criteria. (Braulio Martinez)
+
 ## 4.0.2
 
 ### New Features

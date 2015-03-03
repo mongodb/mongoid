@@ -51,6 +51,19 @@ module Mongoid
       # @since 4.0.0
       def exists?; false; end
 
+
+      # Allow pluck for null context.
+      #
+      # @example Allow pluck for null context.
+      #   context.pluck(:name)
+      #
+      # @param [ String, Symbol, Array ] field or fields to pluck.
+      #
+      # @return [ Array ] Emtpy Array
+      def pluck(*args)
+        []
+      end
+
       # Create the new null context.
       #
       # @example Create the new context.
