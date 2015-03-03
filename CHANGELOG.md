@@ -11,6 +11,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
 
+* \#3937 Add fallbacks boolean option for localized fields, to allow
+  disabling them. (Braulio Martinez)
+
 ## 4.0.2
 
 ### New Features
