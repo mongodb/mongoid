@@ -100,7 +100,7 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "does not error on non initialized fields" do
-        smiths.reload.likes.should be_nil
+        smiths.reload.likes.should eq(0)
       end
     end
 
@@ -115,7 +115,7 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "does not error on non initialized fields" do
-        smiths.reload.likes.should be_nil
+        smiths.reload.likes.should eq(13)
       end
     end
 
@@ -130,7 +130,7 @@ describe Mongoid::Contextual::Atomic do
       end
 
       it "does not error on non initialized fields" do
-        smiths.reload.likes.should be_nil
+        smiths.reload.likes.should eq(10)
       end
     end
   end
