@@ -91,3 +91,5 @@ end
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
+
+I18n.enforce_available_locales = false
