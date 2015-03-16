@@ -4726,7 +4726,7 @@ describe Mongoid::Criteria do
     end
 
     it "executes the criteria while properly giving the hint to Mongo" do
-      expect { criteria.to_ary }.to raise_error(Moped::Errors::QueryFailure,  %r{failed with error 10113: "bad hint"})
+      expect { criteria.to_ary }.to raise_error(Moped::Errors::QueryFailure)
     end
   end
 
@@ -4741,7 +4741,7 @@ describe Mongoid::Criteria do
     end
 
     it "executes the criteria while properly giving the hint to Mongo" do
-      expect { criteria.to_ary }.to raise_error(Moped::Errors::QueryFailure,  %r{failed with error 10113: "bad hint"})
+      expect { criteria.to_ary }.to raise_error(Moped::Errors::QueryFailure)
     end
   end
 
