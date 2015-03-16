@@ -914,12 +914,26 @@ describe Mongoid::Criteria do
         Band.where(name: "Placebo")
       end
 
-      let(:result) do
-        criteria.find_and_modify("$inc" => { likes: 1 })
+      context "with upsert" do
+
+        let(:result) do
+          criteria.find_and_modify({"$inc" => { likes: 1 }}, upsert: true)
+        end
+
+        it 'returns nil' do
+          expect(result).to be_nil
+        end
       end
 
-      it "returns nil" do
-        expect(result).to be_nil
+      context "without upsert" do
+
+        let(:result) do
+          criteria.find_and_modify("$inc" => { likes: 1 })
+        end
+
+        it "returns nil" do
+          expect(result).to be_nil
+        end
       end
     end
   end

@@ -180,7 +180,7 @@ module Mongoid
       # @since 3.0.0
       def find_and_modify(update, options = {})
         if doc = FindAndModify.new(collection, criteria, update, options).result
-          Factory.from_db(klass, doc)
+          Factory.from_db(klass, doc) if doc.any?
         end
       end
 

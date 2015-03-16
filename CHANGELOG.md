@@ -9,6 +9,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3846 Allow #pluck when none is used in criteria. (Braulio Martinez)
 
+* \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
+
 ## 4.0.2
 
 ### New Features
