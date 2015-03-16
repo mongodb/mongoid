@@ -110,7 +110,8 @@ module Mongoid
       #
       # @since 4.0.0
       def prepare_update(options = {})
-        return false if performing_validations?(options) && invalid?(:update)
+        return false if performing_validations?(options) &&
+          invalid?(options[:context] || :update)
         process_flagged_destroys
         result = run_callbacks(:save) do
           run_callbacks(:update) do

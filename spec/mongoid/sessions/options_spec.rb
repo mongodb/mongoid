@@ -65,7 +65,8 @@ describe Mongoid::Sessions::Options do
     end
 
     it "passes down the options to collection" do
-      expect_any_instance_of(Moped::Session).to receive(:with).with(options).and_return({})
+      session = Band.mongo_session
+      expect_any_instance_of(Moped::Session).to receive(:with).with(options).and_return(session)
       instance.collection
     end
   end

@@ -125,7 +125,7 @@ module Mongoid
     # @return [ Hash ] The updates and their modifiers.
     #
     # @since 2.1.0
-    def atomic_updates(use_indexes = false)
+    def atomic_updates(_use_indexes = false)
       process_flagged_destroys
       mods = Modifiers.new
       generate_atomic_updates(mods, self)
@@ -206,7 +206,7 @@ module Mongoid
         path = nil
         ids = docs.map do |doc|
           path ||= doc.flag_as_destroyed
-          doc.id
+          doc._id
         end
         pulls[path] = { "_id" => { "$in" => ids }} and path = nil
       end

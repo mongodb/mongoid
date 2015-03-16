@@ -53,6 +53,55 @@ describe Mongoid::Findable do
 
   describe ".find_by" do
 
+    context "when collection is a embeds_many" do
+
+      let(:person) do
+        Person.create(title: "sir")
+      end
+
+      let!(:message) do
+        person.messages.create!(body: 'foo')
+      end
+
+      context "when the document is found" do
+
+        it "returns the document" do
+          expect(person.messages.find_by(body: 'foo')).to eq(message)
+        end
+      end
+
+      context "when the document is not found" do
+
+        context "when raising a not found error" do
+
+          let!(:raise_option) { Mongoid.raise_not_found_error }
+
+          before { Mongoid.raise_not_found_error = true }
+
+          after { Mongoid.raise_not_found_error = raise_option }
+
+          it "raises an error" do
+            expect {
+              person.messages.find_by(body: 'bar')
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when raising no error" do
+
+          let!(:raise_option) { Mongoid.raise_not_found_error }
+
+          before { Mongoid.raise_not_found_error = false }
+
+          after { Mongoid.raise_not_found_error = raise_option }
+
+          it "returns nil" do
+            expect(person.messages.find_by(body: 'bar')).to be_nil
+          end
+        end
+      end
+    end
+
     context "when the document is found" do
 
       let!(:person) do
@@ -84,9 +133,11 @@ describe Mongoid::Findable do
 
       context "when raising a not found error" do
 
-        before do
-          Mongoid.raise_not_found_error = true
-        end
+        let!(:raise_option) { Mongoid.raise_not_found_error }
+
+        before { Mongoid.raise_not_found_error = true }
+
+        after { Mongoid.raise_not_found_error = raise_option }
 
         it "raises an error" do
           expect {
@@ -97,13 +148,11 @@ describe Mongoid::Findable do
 
       context "when raising no error" do
 
-        before do
-          Mongoid.raise_not_found_error = false
-        end
+        let!(:raise_option) { Mongoid.raise_not_found_error }
 
-        after do
-          Mongoid.raise_not_found_error = true
-        end
+        before { Mongoid.raise_not_found_error = false }
+
+        after { Mongoid.raise_not_found_error = raise_option }
 
         context "when no block is provided" do
 
@@ -124,6 +173,45 @@ describe Mongoid::Findable do
             expect(result).to be_nil
           end
         end
+      end
+    end
+  end
+
+  describe "find_by!" do
+
+    context "when the document is found" do
+
+      let!(:person) do
+        Person.create(title: "sir")
+      end
+
+      context "when no block is provided" do
+
+        it "returns the document" do
+          expect(Person.find_by!(title: "sir")).to eq(person)
+        end
+      end
+
+      context "when a block is provided" do
+
+        let(:result) do
+          Person.find_by!(title: "sir") do |peep|
+            peep.age = 50
+          end
+        end
+
+        it "yields the returned document" do
+          expect(result.age).to eq(50)
+        end
+      end
+    end
+
+    context "when the document is not found" do
+
+      it "raises an error" do
+        expect {
+          Person.find_by!(ssn: "333-22-1111")
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
   end

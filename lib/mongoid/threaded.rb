@@ -122,7 +122,7 @@ module Mongoid
     #
     # @since 3.0.0
     def begin_autosave(document)
-      autosaves_for(document.class).push(document.id)
+      autosaves_for(document.class).push(document._id)
     end
 
     # Begin validating a document on the current thread.
@@ -134,7 +134,7 @@ module Mongoid
     #
     # @since 2.1.9
     def begin_validate(document)
-      validations_for(document.class).push(document.id)
+      validations_for(document.class).push(document._id)
     end
 
     # Exit autosaving a document on the current thread.
@@ -146,7 +146,7 @@ module Mongoid
     #
     # @since 3.0.0
     def exit_autosave(document)
-      autosaves_for(document.class).delete_one(document.id)
+      autosaves_for(document.class).delete_one(document._id)
     end
 
     # Exit validating a document on the current thread.
@@ -158,7 +158,7 @@ module Mongoid
     #
     # @since 2.1.9
     def exit_validate(document)
-      validations_for(document.class).delete_one(document.id)
+      validations_for(document.class).delete_one(document._id)
     end
 
     # Get the global session override.
@@ -210,7 +210,7 @@ module Mongoid
     #
     # @since 2.1.9
     def autosaved?(document)
-      autosaves_for(document.class).include?(document.id)
+      autosaves_for(document.class).include?(document._id)
     end
 
     # Is the document validated on the current thread?
@@ -224,7 +224,7 @@ module Mongoid
     #
     # @since 2.1.9
     def validated?(document)
-      validations_for(document.class).include?(document.id)
+      validations_for(document.class).include?(document._id)
     end
 
     # Get all autosaves on the current thread.

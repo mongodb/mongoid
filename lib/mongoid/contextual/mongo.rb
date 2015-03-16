@@ -54,7 +54,7 @@ module Mongoid
       def count(document = false, &block)
         return super(&block) if block_given?
         if document.is_a?(Document)
-          return collection.find(criteria.and(_id: document.id).selector).count
+          return collection.find(criteria.and(_id: document._id).selector).count
         end
         return query.count(document) if document
         try_cache(:count) { query.count }
@@ -201,6 +201,16 @@ module Mongoid
         end
       end
       alias :one :first
+
+      # Return the first result without applying sort
+      #
+      # @api private
+      #
+      # @since 4.0.2
+      def find_first
+        return documents.first if cached? && cache_loaded?
+        with_eager_loading(query.first)
+      end
 
       # Execute a $geoNear command against the database.
       #

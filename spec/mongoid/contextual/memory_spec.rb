@@ -926,8 +926,13 @@ describe Mongoid::Contextual::Memory do
         Address.new(street: "lenau", number: 5, name: "lenau")
       end
 
+      let(:kampuchea_krom) do
+        Address.new(street: "kampuchea krom", number: 5, name: "kampuchea krom")
+      end
+
       before do
         criteria.documents.unshift(lenau)
+        criteria.documents.unshift(kampuchea_krom)
       end
 
       context "when the sort is ascending" do
@@ -937,7 +942,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          expect(context.entries).to eq([ friedel, lenau, pfluger, hobrecht ])
+          expect(context.entries).to eq([ friedel, kampuchea_krom, lenau, pfluger, hobrecht ])
         end
 
         it "returns the context" do
@@ -952,7 +957,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          expect(context.entries).to eq([ hobrecht, pfluger, lenau, friedel ])
+          expect(context.entries).to eq([ hobrecht, pfluger, lenau, kampuchea_krom, friedel ])
         end
 
         it "returns the context" do

@@ -281,10 +281,10 @@ module Mongoid
         def substitute(replacement)
           if replacement
             new_docs, docs = replacement.compact, []
-            new_ids = new_docs.map { |doc| doc.id }
+            new_ids = new_docs.map { |doc| doc._id }
             remove_not_in(new_ids)
             new_docs.each do |doc|
-              docs.push(doc) if doc.send(foreign_key) != base.id
+              docs.push(doc) if doc.send(foreign_key) != base._id
             end
             concat(docs)
           else
@@ -304,7 +304,7 @@ module Mongoid
         # @since 2.4.0
         def unscoped
           klass.unscoped.where(
-            foreign_key => Conversions.flag(base.id, __metadata)
+            foreign_key => Conversions.flag(base._id, __metadata)
           )
         end
 
@@ -492,7 +492,7 @@ module Mongoid
             removed.update_all(foreign_key => nil)
           end
           in_memory.each do |doc|
-            if !ids.include?(doc.id)
+            if !ids.include?(doc._id)
               unbind_one(doc)
               target.delete(doc)
               if __metadata.destructive?

@@ -3,9 +3,50 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 4.0.3 - Not released
+
+### New Features
+
+* \#3846 Allow #pluck when none is used in criteria. (Braulio Martinez)
+
+## 4.0.2
+
+### New Features
+
+* \#3931 Add #find_or_create_by! method to many associations. (Tom Beynon)
+
+* \#3731 Add find_by! method. (Guillermo Iguaran)
+
+### Resolved Issues
+
+* \#3722 Use the right database name when combining #store_in and #with. (Arthur Neves)
+
+* \#3934 Dont apply sort when doing a find_by. (Arthur Neves)
+
+* \#3935 fix multiple fields sorting on contextual memory. (chamnap)
+
+* \#3904 BSON::Document#symbolize_keys should return keys as symbols. (Arthur Neves)
+
+* \#3948 Fix remove_undefined_indexes on rails 4.2, to symbolize right the Document keys. (Adam Wróbel)
+
+* \#3626 Document#to_key, needs to return a ObjectId as String so we can query back using that id. (Arthur Neves)
+
+* \#3888 raise UnknownAttributeError when 'set' is called on non existing field and Mongoid::Attributes::Dynamic is not included in model. (Shweta Kale)
+
+* \#3889 'set' will allow to set value of non existing field when Mongoid::Attributes::Dynamic is included in model. (Shweta Kale)
+
+* \#3812 Fixed validation context when saving (Yaroslav Zemlyanuhin)
+
 ## 4.0.1
 
 ### Resolved Issues
+
+* \#3911 Fix relations named "parent". (nkriege)
+
+* \#3792/\#3881 Fix many internal calls to #_id instead of #id to avoid issues
+  when overloading #id (Gauthier Delacroix)
+
+* \#3847 Fix 'QueryCache#get_more' result, when collection has more documents than first query batch. (Angelica Korsun)
 
 * \#3684 Dont raise MissingAttributeError, when using a only() scope. (Arthur Neves)
 

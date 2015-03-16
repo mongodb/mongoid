@@ -130,7 +130,7 @@ module Mongoid
         end
 
         if document.persisted? && !document.embedded?
-          selector.merge!(_id: { "$ne" => document.id })
+          selector.merge!(_id: { "$ne" => document._id })
         end
         selector
       end
@@ -164,7 +164,7 @@ module Mongoid
       # @return [ Criteria ] The scoped criteria.
       #
       # @since 2.3.0
-      def scope(criteria, document, attribute)
+      def scope(criteria, document, _attribute)
         Array.wrap(options[:scope]).each do |item|
           name = document.database_field_name(item)
           criteria = criteria.where(item => document.attributes[name])
@@ -227,7 +227,7 @@ module Mongoid
       def to_validate(document, attribute, value)
         metadata = document.relations[attribute.to_s]
         if metadata && metadata.stores_foreign_key?
-          [ metadata.foreign_key, value && value.id ]
+          [ metadata.foreign_key, value && value._id ]
         else
           [ attribute, value ]
         end

@@ -2560,6 +2560,136 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#find_or_create_by!" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:post) do
+        person.posts.create(title: "Testing")
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          person.posts.find_or_create_by!(title: "Testing")
+        end
+
+        it "returns the document" do
+          expect(found).to eq(post)
+        end
+
+        it "keeps the document in the relation" do
+          expect(found.person).to eq(person)
+        end
+      end
+
+      context "when the document does not exist" do
+
+        context "when there is no criteria attached" do
+
+          let(:found) do
+            person.posts.find_or_create_by!(title: "Test") do |post|
+              post.content = "The Content"
+            end
+          end
+
+          it "sets the new document attributes" do
+            expect(found.title).to eq("Test")
+          end
+
+          it "returns a newly persisted document" do
+            expect(found).to be_persisted
+          end
+
+          it "calls the passed block" do
+            expect(found.content).to eq("The Content")
+          end
+
+          it "keeps the document in the relation" do
+            expect(found.person).to eq(person)
+          end
+        end
+
+        context "when a criteria is attached" do
+
+          let(:found) do
+            person.posts.recent.find_or_create_by!(title: "Test")
+          end
+
+          it "sets the new document attributes" do
+            expect(found.title).to eq("Test")
+          end
+
+          it "returns a newly persisted document" do
+            expect(found).to be_persisted
+          end
+
+          it "keeps the document in the relation" do
+            expect(found.person).to eq(person)
+          end
+        end
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:movie) do
+        Movie.create
+      end
+
+      let!(:rating) do
+        movie.ratings.create(value: 1)
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          movie.ratings.find_or_create_by!(value: 1)
+        end
+
+        it "returns the document" do
+          expect(found).to eq(rating)
+        end
+
+        it "keeps the document in the relation" do
+          expect(found.ratable).to eq(movie)
+        end
+      end
+
+      context "when the document does not exist" do
+
+        let(:found) do
+          movie.ratings.find_or_create_by!(value: 3)
+        end
+
+        it "sets the new document attributes" do
+          expect(found.value).to eq(3)
+        end
+
+        it "returns a newly persisted document" do
+          expect(found).to be_persisted
+        end
+
+        it "keeps the document in the relation" do
+          expect(found.ratable).to eq(movie)
+        end
+
+        context "when validation fails" do
+
+          it "raises an error" do
+            expect {
+              movie.comments.find_or_create_by!(title: "")
+            }.to raise_error(Mongoid::Errors::Validations)
+          end
+        end
+      end
+    end
+  end
+
   describe "#find_or_initialize_by" do
 
     context "when the relation is not polymorphic" do
@@ -3553,6 +3683,29 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "returns the appropriate documents" do
       expect(person.posts.open).to eq([ post ])
+    end
+  end
+
+  context "when accessing a relation named parent" do
+    let!(:parent) do
+      Odd.create(name: "odd parent")
+    end
+
+    let(:child) do
+      Even.create(parent_id: parent.id, name: "original even child")
+    end
+
+    it "updates the child after accessing the parent" do
+      # Access parent relation on the child to make sure it is loaded
+      child.parent
+
+      new_child_name = "updated even child"
+
+      child.name = new_child_name
+      child.save!
+
+      reloaded = Even.find(child.id)
+      expect(reloaded.name).to eq(new_child_name)
     end
   end
 end

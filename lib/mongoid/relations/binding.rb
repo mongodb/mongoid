@@ -91,7 +91,7 @@ module Mongoid
       # @api private
       #
       # @example Bind the foreign key.
-      #   binding.bind_foreign_key(post, person.id)
+      #   binding.bind_foreign_key(post, person._id)
       #
       # @param [ Document ] keyed The document that stores the foreign key.
       # @param [ Object ] id The id of the bound document.

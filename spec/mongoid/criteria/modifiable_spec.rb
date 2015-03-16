@@ -934,12 +934,9 @@ describe Mongoid::Criteria::Modifiable do
 
       context "when the relation is a references many" do
 
-        let!(:post_one) do
-          person.posts.create(title: "First")
-        end
-
-        let!(:post_two) do
-          person.posts.create(title: "Second")
+        before do
+          person.posts.create!(title: "First")
+          person.posts.create!(title: "Second")
         end
 
         context "when updating the relation directly" do
@@ -948,12 +945,12 @@ describe Mongoid::Criteria::Modifiable do
             person.posts.update(title: "London")
           end
 
-          let!(:from_db) do
+          let(:from_db) do
             Person.first
           end
 
           it "updates the first document" do
-            expect(from_db.posts.first.title).to eq("London")
+            expect(from_db.posts.map(&:title)).to eq(["London", "Second"])
           end
 
           it "does not update the last document" do

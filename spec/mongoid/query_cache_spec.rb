@@ -181,17 +181,32 @@ describe Mongoid::QueryCache do
 
     before do
       123.times { Band.create! }
-      Band.all.to_a
     end
 
-    it "should cache the complete result of the query" do
-      expect_no_queries do
-        Band.all.to_a
-      end
-
+    it "returns the right number of records" do
       expect(Band.all.to_a.length).to eq(123)
     end
 
+    it "#pluck returns the same count of objects" do
+      expect(Band.pluck(:name).length).to eq(123)
+    end
+
+    context "when loading all the documents" do
+
+      before do
+        Band.all.to_a
+      end
+
+      it "caches the complete result of the query" do
+        expect_no_queries do
+          expect(Band.all.to_a.length).to eq(123)
+        end
+      end
+
+      it "returns the same count of objects when using #pluck" do
+        expect(Band.pluck(:name).length).to eq(123)
+      end
+    end
   end
 
   context "when inserting an index" do

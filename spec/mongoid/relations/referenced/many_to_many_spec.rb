@@ -2466,6 +2466,55 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "#find_or_create_by!" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:preference) do
+        person.preferences.create(name: "Testing")
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          person.preferences.find_or_create_by!(name: "Testing")
+        end
+
+        it "returns the document" do
+          expect(found).to eq(preference)
+        end
+      end
+
+      context "when the document does not exist" do
+
+        let(:found) do
+          person.preferences.find_or_create_by!(name: "Test")
+        end
+
+        it "sets the new document attributes" do
+          expect(found.name).to eq("Test")
+        end
+
+        it "returns a newly persisted document" do
+          expect(found).to be_persisted
+        end
+
+        context "when validation fails" do
+
+          it "raises an error" do
+            expect {
+              person.preferences.find_or_create_by!(name: "A")
+            }.to raise_error(Mongoid::Errors::Validations)
+          end
+        end
+      end
+    end
+  end
+
   describe "#find_or_initialize_by" do
 
     context "when the relation is not polymorphic" do

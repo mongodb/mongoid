@@ -1385,6 +1385,77 @@ describe Mongoid::Criteria do
 
     context "when including a belongs to relation" do
 
+      context "when the criteria is from the root" do
+
+        let!(:person_two) do
+          Person.create(age: 2)
+        end
+
+        let!(:post_one) do
+          person.posts.create(title: "one")
+        end
+
+        let!(:post_two) do
+          person_two.posts.create(title: "two")
+        end
+
+        context "when calling first" do
+
+          let(:criteria) do
+            Post.includes(:person)
+          end
+
+          let!(:document) do
+            criteria.first
+          end
+
+          it "eager loads the first document" do
+            expect_query(0) do
+              expect(document.person).to eq(person)
+            end
+          end
+
+          it "does not eager load the last document" do
+            doc = criteria.last
+            expect_query(1) do
+              expect(doc.person).to eq(person_two)
+            end
+          end
+
+          it "returns the first document" do
+            expect(document).to eq(post_one)
+          end
+        end
+
+        context "when calling last" do
+
+          let!(:criteria) do
+            Post.includes(:person)
+          end
+
+          let!(:document) do
+            criteria.last
+          end
+
+          it "eager loads the last document" do
+            expect_query(0) do
+              expect(document.person).to eq(person_two)
+            end
+          end
+
+          it "does not eager load the first document" do
+            doc = criteria.first
+            expect_query(1) do
+              expect(doc.person).to eq(person)
+            end
+          end
+
+          it "returns the last document" do
+            expect(document).to eq(post_two)
+          end
+        end
+      end
+
       context "when the criteria is from an embedded relation" do
 
         let(:peep) do
@@ -1506,77 +1577,6 @@ describe Mongoid::Criteria do
 
           it "returns the documents" do
             expect(documents).to eq([ address_one, address_two ])
-          end
-        end
-      end
-
-      context "when the criteria is from the root" do
-
-        let!(:person_two) do
-          Person.create(age: 2)
-        end
-
-        let!(:post_one) do
-          person.posts.create(title: "one")
-        end
-
-        let!(:post_two) do
-          person_two.posts.create(title: "two")
-        end
-
-        context "when calling first" do
-
-          let(:criteria) do
-            Post.includes(:person)
-          end
-
-          let!(:document) do
-            criteria.first
-          end
-
-          it "eager loads the first document" do
-            expect_query(0) do
-              expect(document.person).to eq(person)
-            end
-          end
-
-          it "does not eager load the last document" do
-            doc = criteria.last
-            expect_query(1) do
-              expect(doc.person).to eq(person_two)
-            end
-          end
-
-          it "returns the first document" do
-            expect(document).to eq(post_one)
-          end
-        end
-
-        context "when calling last" do
-
-          let!(:criteria) do
-            Post.includes(:person)
-          end
-
-          let!(:document) do
-            criteria.last
-          end
-
-          it "eager loads the last document" do
-            expect_query(0) do
-              expect(document.person).to eq(person_two)
-            end
-          end
-
-          it "does not eager load the first document" do
-            doc = criteria.first
-            expect_query(1) do
-              expect(doc.person).to eq(person)
-            end
-          end
-
-          it "returns the last document" do
-            expect(document).to eq(post_two)
           end
         end
       end
