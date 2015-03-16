@@ -133,7 +133,7 @@ describe Mongoid::Contextual::Atomic do
         smiths.reload.likes.should eq(10)
       end
     end
-  end
+  end if mongodb_version > "2.5"
 
   describe "#inc" do
 
