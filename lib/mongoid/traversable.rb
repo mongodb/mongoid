@@ -27,7 +27,7 @@ module Mongoid
     #
     # @return [ Array<Document> ] All child documents in the hierarchy.
     def _children
-      @__children ||= collect_children
+      collect_children
     end
 
     # Collect all the children of this document.
