@@ -71,7 +71,7 @@ module Mongoid
         # @return [ String, Symbol ] The path to the field.
         #
         # @since 2.1.0
-        def path(field = field)
+        def path(field = self.field)
           position = document.atomic_position
           position.blank? ? field : "#{position}.#{field}"
         end
