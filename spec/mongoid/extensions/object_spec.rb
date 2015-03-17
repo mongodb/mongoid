@@ -289,4 +289,31 @@ describe Mongoid::Extensions::Object do
       end
     end
   end
+
+  describe "not conflicts active_support concern class_methods" do
+    let(:klass) do
+      class Base
+        def self.foo
+          "origin"
+        end
+      end
+
+      require "active_support/core_ext/kernel/concern"
+      concern :M do
+        class_methods do
+          def foo
+            "overwrite"
+          end
+        end
+      end
+
+      Class.new(Base).tap do |klass|
+        klass.include(M)
+      end
+    end
+
+    it "returns overwrite" do
+      expect(klass.foo).to eq("overwrite")
+    end
+  end
 end
