@@ -816,6 +816,30 @@ describe Mongoid::Changeable do
       end
     end
 
+    context "when changed? has been called before and a deeply embedded child adds extra elements" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:address) do
+        person.addresses.create(street: "hobrecht")
+      end
+
+      let!(:location) do
+        address.locations.create(name: "home")
+      end
+
+      before do
+        person.changed?
+        address.locations.new
+      end
+
+      it "returns true" do
+        expect(person).to be_changed
+      end
+    end
+
     context "when a child is new" do
 
       let(:person) do
