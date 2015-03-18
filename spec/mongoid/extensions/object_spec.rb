@@ -290,7 +290,7 @@ describe Mongoid::Extensions::Object do
     end
   end
 
-  describe "not conflicts active_support concern class_methods" do
+  describe "not conflicts active_support concern class_methods", :if => ActiveSupport.version >= Gem::Version.new("4.2.0") do
     let(:klass) do
       class Base
         def self.foo
