@@ -17,7 +17,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
       type = (attributes || {})["_type"]
-      if type && klass._types.include?(type)
+      if type && klass._types.include?(type) && !::Mongoid::Config.ignore_type_attribute?
         type.constantize.new(attributes)
       else
         klass.new(attributes)
@@ -38,7 +38,7 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, selected_fields = nil)
       type = (attributes || {})["_type"]
-      if type.blank?
+      if type.blank? || ::Mongoid::Config.ignore_type_attribute?
         klass.instantiate(attributes, selected_fields)
       else
         type.camelize.constantize.instantiate(attributes, selected_fields)
