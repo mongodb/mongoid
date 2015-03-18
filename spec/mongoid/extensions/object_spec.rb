@@ -308,7 +308,7 @@ describe Mongoid::Extensions::Object do
       end
 
       Class.new(Base).tap do |klass|
-        klass.include(M)
+        klass.send(:include, M)
       end
     end
 
