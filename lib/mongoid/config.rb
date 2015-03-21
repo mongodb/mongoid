@@ -184,7 +184,7 @@ module Mongoid
     # @since 2.0.2
     def truncate!
       Sessions.default.database.collections.each do |collection|
-        collection.find.remove_many
+        collection.find.delete_many
       end and true
     end
 

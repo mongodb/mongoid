@@ -32,9 +32,9 @@ module Mongoid
           key, options = spec.key, spec.options
           if database = options[:database]
             with(read: { mode: :primary }, database: database).
-              collection.indexes.create(key, options.except(:database))
+              collection.indexes.create_one(key, options.except(:database))
           else
-            with(read: { mode: :primary }).collection.indexes.create(key, options)
+            with(read: { mode: :primary }).collection.indexes.create_one(key, options)
           end
         end and true
       end
@@ -54,7 +54,7 @@ module Mongoid
           begin
             collection.indexes.each do |spec|
               unless spec["name"] == "_id_"
-                collection.indexes.drop(spec["key"])
+                collection.indexes.drop_one(spec["key"])
               end
             end
           rescue Mongo::Error::OperationFailure; end

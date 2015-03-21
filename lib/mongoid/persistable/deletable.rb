@@ -78,7 +78,7 @@ module Mongoid
       #
       # @since 4.0.0
       def delete_as_root
-        collection.find(atomic_selector).remove_one
+        collection.find(atomic_selector).delete_one
         true
       end
 
@@ -140,7 +140,7 @@ module Mongoid
           selector.merge!(_type: name) if hereditary?
           coll = collection
           deleted = coll.find(selector).count
-          coll.find(selector).remove_many
+          coll.find(selector).delete_many
           deleted
         end
       end

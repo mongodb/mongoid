@@ -14,7 +14,6 @@ end
 require "action_controller"
 require "mongoid"
 require "rspec"
-require "helpers"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.
@@ -118,7 +117,6 @@ end
 I18n.config.enforce_available_locales = false
 
 RSpec.configure do |config|
-  config.include Mongoid::SpecHelpers
   config.raise_errors_for_deprecations!
 
   config.before(:suite) do

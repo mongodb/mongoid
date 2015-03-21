@@ -69,7 +69,7 @@ module Mongoid
       # @since 3.0.0
       def delete
         self.count.tap do
-          query.remove_many
+          query.delete_many
         end
       end
       alias :delete_all :delete
