@@ -293,7 +293,7 @@ module Mongoid
       options.merge!(criteria.options)
       self.documents = criteria.documents.dup unless criteria.documents.empty?
       self.scoping_options = criteria.scoping_options
-      self.inclusions = (inclusions + criteria.inclusions.dup).uniq
+      self.inclusions = (inclusions + criteria.inclusions).uniq
       self
     end
 
