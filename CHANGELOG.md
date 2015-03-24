@@ -13,7 +13,7 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
-* \##3993 dup/clone fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
+* \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
 
 ## 4.0.2
 
