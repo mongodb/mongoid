@@ -55,24 +55,14 @@ describe Mongoid::Copyable do
       end
 
       context "when using store_as" do
+
         context "and dynamic attributes are not set" do
+
           it "clones" do
-            class StoreAsDupTest1
-              include Mongoid::Document
-              embeds_one :store_as_dup_test2, :store_as => :t
-              field :name
-            end
-
-            class StoreAsDupTest2
-              include Mongoid::Document
-              embedded_in :store_as_dup_test1
-              field :name
-            end
-
             t = StoreAsDupTest1.new(:name => "hi")
             t.build_store_as_dup_test2(:name => "there")
             t.save
-            copy = t.__send__(method)
+            copy = t.send(method)
             expect(copy.store_as_dup_test2.name).to eq(t.store_as_dup_test2.name)
           end
         end
