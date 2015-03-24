@@ -11,6 +11,10 @@ For instructions on upgrading to newer versions, visit
 
 * \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
 
+### Resolved Issues
+
+* \##3993 dup/clone fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
+
 ## 4.0.2
 
 ### New Features
