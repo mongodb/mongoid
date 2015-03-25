@@ -31,7 +31,7 @@ module Mongoid
     def apply_default_scoping
       if default_scoping
         default_scoping.call.selector.each do |field, value|
-          attributes[field] = value unless value.respond_to?(:each_pair)
+          attributes[field] = value unless value.respond_to?(:each)
         end
       end
     end
