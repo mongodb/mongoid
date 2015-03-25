@@ -144,7 +144,7 @@ describe Mongoid::Document do
       context "with updated_at" do
 
         let!(:updated_at) do
-          document.updated_at.utc.to_s(:number)
+          document.updated_at.utc.to_s(:nsec)
         end
 
         it "has the id and updated_at key name" do
@@ -182,7 +182,7 @@ describe Mongoid::Document do
       end
 
       let!(:updated_at) do
-        agent.updated_at.utc.to_s(:number)
+        agent.updated_at.utc.to_s(:nsec)
       end
 
       it "has the id and updated_at key name" do
@@ -529,11 +529,15 @@ describe Mongoid::Document do
     context "when the document is not new" do
 
       let(:person) do
-        Person.instantiate("_id" => BSON::ObjectId.new)
+        Person.create!
       end
 
       it "returns the id in an array" do
-        expect(person.to_key).to eq([ person.id ])
+        expect(person.to_key).to eq([ person.id.to_s ])
+      end
+
+      it "can query using the key" do
+        expect(person.id).to eq Person.find(person.to_key).first.id
       end
     end
 
@@ -546,7 +550,7 @@ describe Mongoid::Document do
       end
 
       it "returns the id in an array" do
-        expect(person.to_key).to eq([ person.id ])
+        expect(person.to_key).to eq([ person.id.to_s ])
       end
     end
   end

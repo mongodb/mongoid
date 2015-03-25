@@ -11,6 +11,7 @@ if ENV["CI"]
   end
 end
 
+require "action_controller"
 require "mongoid"
 require "rspec"
 require "helpers"
@@ -61,6 +62,11 @@ def purge_database_alt!
   end
 end
 
+def mongodb_version
+  session = Mongoid::Sessions.default
+  session.command(buildinfo: 1)["version"]
+end
+
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
@@ -87,8 +93,11 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("address_components", "address_component")
 end
 
+I18n.config.enforce_available_locales = false
+
 RSpec.configure do |config|
   config.include Mongoid::SpecHelpers
+  config.raise_errors_for_deprecations!
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do

@@ -82,7 +82,7 @@ describe Mongoid::Relations::Metadata do
       end
 
       before do
-        metadata.should_receive(:inverse).and_return(:wheels)
+        expect(metadata).to receive(:inverse).and_return(:wheels)
       end
 
       it "returns inverse name + _count" do
@@ -315,11 +315,11 @@ describe Mongoid::Relations::Metadata do
     end
 
     before do
-      Mongoid::Relations::Options.should_receive(:validate!).at_least(:once)
+      expect(Mongoid::Relations::Options).to receive(:validate!).at_least(:once)
     end
 
     it "concatenates the result from #find_module and name.classify" do
-      metadata.should_receive(:find_module).once.and_return("Fruit")
+      expect(metadata).to receive(:find_module).once.and_return("Fruit")
       expect(classified).to eq("Fruit::Name")
     end
   end
@@ -339,7 +339,7 @@ describe Mongoid::Relations::Metadata do
     end
 
     before do
-      Mongoid::Relations::Options.should_receive(:validate!).at_least(:once)
+      expect(Mongoid::Relations::Options).to receive(:validate!).at_least(:once)
     end
 
     context "when inverse_class_name is nil" do
@@ -390,7 +390,7 @@ describe Mongoid::Relations::Metadata do
           end
 
           it "returns root namespace" do
-            expect(mod).to be_empty
+            expect(mod).to be_nil
           end
         end
 
@@ -1812,19 +1812,38 @@ describe Mongoid::Relations::Metadata do
 
     context "when multiple matches" do
 
-      before do
-        class_name.constantize.has_many(:evil_drugs, class_name: "Drug")
+      context "when the inverse_of is not nil" do
+
+        before do
+          class_name.constantize.has_many(:evil_drugs, class_name: "Drug")
+        end
+
+        after do
+          class_name.constantize.relations.delete("evil_drugs")
+          Person.reset_callbacks(:validate)
+        end
+
+        it "raises AmbiguousRelationship" do
+          expect {
+            inverse_relation
+          }.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+        end
       end
 
-      after do
-        class_name.constantize.relations.delete("evil_drugs")
-        Person.reset_callbacks(:validate)
-      end
+      context "when the inverse_of is nil" do
 
-      it "raises AmbiguousRelationship" do
-        expect {
-          inverse_relation
-        }.to raise_error(Mongoid::Errors::AmbiguousRelationship)
+        before do
+          class_name.constantize.has_many(:evil_drugs, class_name: "Drug", inverse_of: nil)
+        end
+
+        after do
+          class_name.constantize.relations.delete("evil_drugs")
+          Person.reset_callbacks(:validate)
+        end
+
+        it "returns the non-nil inverses" do
+          expect(inverse_relation).to eq(:drugs)
+        end
       end
     end
   end

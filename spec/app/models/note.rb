@@ -6,6 +6,8 @@ class Note
 
   after_save :update_saved
 
+  scope :permanent, ->{ where(saved: true) }
+
   def update_saved
     self.saved = true
   end

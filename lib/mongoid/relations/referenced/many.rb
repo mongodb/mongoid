@@ -245,7 +245,7 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def purge
-          unless metadata.destructive?
+          unless __metadata.destructive?
             nullify
           else
             after_remove_error = nil
@@ -281,10 +281,10 @@ module Mongoid
         def substitute(replacement)
           if replacement
             new_docs, docs = replacement.compact, []
-            new_ids = new_docs.map { |doc| doc.id }
+            new_ids = new_docs.map { |doc| doc._id }
             remove_not_in(new_ids)
             new_docs.each do |doc|
-              docs.push(doc) if doc.send(foreign_key) != base.id
+              docs.push(doc) if doc.send(foreign_key) != base._id
             end
             concat(docs)
           else
@@ -304,7 +304,7 @@ module Mongoid
         # @since 2.4.0
         def unscoped
           klass.unscoped.where(
-            foreign_key => Conversions.flag(base.id, metadata)
+            foreign_key => Conversions.flag(base._id, __metadata)
           )
         end
 
@@ -340,7 +340,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def binding
-          Bindings::Referenced::Many.new(base, target, metadata)
+          Bindings::Referenced::Many.new(base, target, __metadata)
         end
 
         # Get the collection of the relation in question.
@@ -366,8 +366,8 @@ module Mongoid
         # @since 2.0.0.beta.1
         def criteria
           Many.criteria(
-            metadata,
-            Conversions.flag(base.send(metadata.primary_key), metadata),
+            __metadata,
+            Conversions.flag(base.send(__metadata.primary_key), __metadata),
             base.class
           )
         end
@@ -385,8 +385,8 @@ module Mongoid
         # @since 2.1.0
         def cascade!(document)
           if persistable?
-            if metadata.destructive?
-              document.send(metadata.dependent)
+            if __metadata.destructive?
+              document.send(__metadata.dependent)
             else
               document.save
             end
@@ -410,7 +410,7 @@ module Mongoid
             target.send(name, *args, &block)
           else
             klass.send(:with_scope, criteria) do
-              criteria.send(name, *args, &block)
+              criteria.public_send(name, *args, &block)
             end
           end
         end
@@ -486,16 +486,16 @@ module Mongoid
         # @since 2.4.0
         def remove_not_in(ids)
           removed = criteria.not_in(_id: ids)
-          if metadata.destructive?
+          if __metadata.destructive?
             removed.delete_all
           else
             removed.update_all(foreign_key => nil)
           end
           in_memory.each do |doc|
-            if !ids.include?(doc.id)
+            if !ids.include?(doc._id)
               unbind_one(doc)
               target.delete(doc)
-              if metadata.destructive?
+              if __metadata.destructive?
                 doc.destroyed = true
               end
             end

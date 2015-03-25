@@ -248,6 +248,15 @@ module Mongoid
       attributes[attr] = changed_attributes.delete(attr) if attribute_changed?(attr)
     end
 
+    def reset_attribute_to_default!(attr)
+      attr = database_field_name(attr)
+      if field = fields[attr]
+        __send__("#{attr}=", field.eval_default(self))
+      else
+        __send__("#{attr}=", nil)
+      end
+    end
+
     module ClassMethods
 
       private
@@ -270,6 +279,7 @@ module Mongoid
         create_dirty_default_change_check(name, meth)
         create_dirty_previous_value_accessor(name, meth)
         create_dirty_reset(name, meth)
+        create_dirty_reset_to_default(name, meth)
       end
 
       # Creates the dirty change accessor.
@@ -370,6 +380,23 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method("reset_#{meth}!") do
             reset_attribute!(name)
+          end
+        end
+      end
+
+      # Creates the dirty change reset to default.
+      #
+      # @example Create the reset.
+      #   Model.create_dirty_reset_to_default("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 3.0.0
+      def create_dirty_reset_to_default(name, meth)
+        generated_methods.module_eval do
+          re_define_method("reset_#{meth}_to_default!") do
+            reset_attribute_to_default!(name)
           end
         end
       end

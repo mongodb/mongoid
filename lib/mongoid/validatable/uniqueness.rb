@@ -26,20 +26,6 @@ module Mongoid
     class UniquenessValidator < ActiveModel::EachValidator
       include Queryable
 
-      attr_reader :klass
-
-      # Unfortunately, we have to tie Uniqueness validators to a class.
-      #
-      # @example Setup the validator.
-      # UniquenessValidator.new.setup(Person)
-      #
-      # @param [ Class ] klass The class getting validated.
-      #
-      # @since 1.0.0
-      def setup(klass)
-        @klass = klass
-      end
-
       # Validate the document for uniqueness violations.
       #
       # @example Validate the document.
@@ -144,7 +130,7 @@ module Mongoid
         end
 
         if document.persisted? && !document.embedded?
-          selector.merge!(_id: { "$ne" => document.id })
+          selector.merge!(_id: { "$ne" => document._id })
         end
         selector
       end
@@ -178,7 +164,7 @@ module Mongoid
       # @return [ Criteria ] The scoped criteria.
       #
       # @since 2.3.0
-      def scope(criteria, document, attribute)
+      def scope(criteria, document, _attribute)
         Array.wrap(options[:scope]).each do |item|
           name = document.database_field_name(item)
           criteria = criteria.where(item => document.attributes[name])
@@ -241,7 +227,7 @@ module Mongoid
       def to_validate(document, attribute, value)
         metadata = document.relations[attribute.to_s]
         if metadata && metadata.stores_foreign_key?
-          [ metadata.foreign_key, value.id ]
+          [ metadata.foreign_key, value && value._id ]
         else
           [ attribute, value ]
         end
@@ -280,7 +266,12 @@ module Mongoid
       #
       # @since 2.4.10
       def validate_root(document, attribute, value)
-        criteria = create_criteria(klass || document.class, document, attribute, value)
+        klass = document.class
+
+        while klass.superclass.respond_to?(:validators) && klass.superclass.validators.include?(self)
+          klass = klass.superclass
+        end
+        criteria = create_criteria(klass, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
 
         if criteria.with(persistence_options(criteria)).exists?

@@ -61,7 +61,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          Moped::Query.any_instance.should_receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
         end
 
         let!(:update) do
@@ -88,7 +88,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          Moped::Query.any_instance.should_receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
         end
 
         let!(:update) do
@@ -116,7 +116,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          Moped::Query.any_instance.should_receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
         end
 
         let!(:update) do
@@ -153,7 +153,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          Moped::Query.any_instance.should_receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
         end
 
         let!(:update) do

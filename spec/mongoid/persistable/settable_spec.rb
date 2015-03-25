@@ -136,4 +136,27 @@ describe Mongoid::Persistable::Settable do
       end
     end
   end
+
+  context "when dynamic attributes are not enabled" do
+    let(:account) do
+      Account.create
+    end
+
+    it "raises exception for an unknown attribute " do
+      expect {
+        account.set(somethingnew: "somethingnew")
+      }.to raise_error(Mongoid::Errors::UnknownAttribute)
+    end
+  end
+
+  context "when dynamic attributes enabled" do
+    let(:person) do
+      Person.create
+    end
+
+    it "updates non existing attribute" do
+      person.set(somethingnew: "somethingnew")
+      expect(person.reload.somethingnew).to eq "somethingnew"
+    end
+  end
 end

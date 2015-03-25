@@ -49,7 +49,7 @@ describe Mongoid::Timestamps do
     end
 
     it "does not run the update callbacks" do
-      document.should_receive(:updated_at=).never
+      expect(document).to receive(:updated_at=).never
       document.save
     end
   end
@@ -66,7 +66,7 @@ describe Mongoid::Timestamps do
     end
 
     it "does not set updated at" do
-      document.should_receive(:updated_at=).never
+      expect(document).to receive(:updated_at=).never
       document.save
     end
   end

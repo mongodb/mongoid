@@ -127,7 +127,7 @@ describe Mongoid::Relations::Builders::Referenced::Many do
           it "returns an empty array" do
             Person.new do |p|
               expect(p.posts).to be_empty
-              expect(p.posts.metadata).to_not be_nil
+              expect(p.posts.__metadata).to_not be_nil
             end
           end
         end

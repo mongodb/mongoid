@@ -41,7 +41,7 @@ describe Mongoid::Relations::Builders::Referenced::One do
       end
 
       before do
-        criteria.should_receive(:first).and_return(post)
+        expect(criteria).to receive(:first).and_return(post)
       end
 
       let!(:documents) do

@@ -125,7 +125,13 @@ module Mongoid
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
       cascadable_children(kind).each do |child|
-        unless child.run_callbacks(child_callback_type(kind, child), *args)
+        # This is returning false for some destroy tests on 4.1.0.beta1,
+        # causing them to fail since 4.1.0 expects a block to be passed if the
+        # callbacks for the type are empty. If no block is passed then the nil
+        # return value gets interpreted as false and halts the chain.
+        #
+        # @see https://github.com/rails/rails/blob/master/activesupport/lib/active_support/callbacks.rb#L79
+        if child.run_callbacks(child_callback_type(kind, child), *args) == false
           return false
         end
       end
@@ -170,7 +176,7 @@ module Mongoid
           relation = send(name)
           Array.wrap(relation).each do |child|
             next if children.include?(child)
-            children.add(child) if cascadable_child?(kind, child)
+            children.add(child) if cascadable_child?(kind, child, metadata)
             child.send(:cascadable_children, kind, children)
           end
         end
@@ -189,10 +195,9 @@ module Mongoid
     # @return [ true, false ] If the child should fire the callback.
     #
     # @since 2.3.0
-    def cascadable_child?(kind, child)
-      if kind == :initialize || kind == :find
-        return false
-      end
+    def cascadable_child?(kind, child, metadata)
+      return false if kind == :initialize || kind == :find
+      return false if kind == :validate && metadata.validate?
       child.callback_executable?(kind) ? child.in_callback_state?(kind) : false
     end
 
@@ -252,12 +257,24 @@ module Mongoid
       unless respond_to?(name)
         chain = ActiveSupport::Callbacks::CallbackChain.new(name, {})
         send("_#{kind}_callbacks").each do |callback|
-          chain.push(callback) if callback.kind == place
+          chain.append(callback) if callback.kind == place
         end
-        class_eval <<-EOM
-          def #{name}() #{chain.compile} end
-          protected :#{name}
-        EOM
+
+        if Gem::Version.new("4.1.0") <= Gem::Version.new(ActiveSupport::VERSION::STRING)
+          self.class.send :define_method, name do
+            runner = ActiveSupport::Callbacks::Filters::Environment.new(self, false, nil)
+            chain.compile.call(runner).value
+          end
+          self.class.send :protected, name
+        else
+          class_eval <<-EOM
+            def #{name}()
+              #{chain.compile}
+            end
+            protected :#{name}
+          EOM
+        end
+
       end
       send(name)
     end

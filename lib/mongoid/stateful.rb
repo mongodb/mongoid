@@ -3,7 +3,7 @@ module Mongoid
 
   # This module contains the behaviour for getting the various states a
   # document can transition through.
-  module State
+  module Stateful
 
     attr_writer :destroyed, :flagged_for_destroy, :new_record
 
@@ -68,6 +68,18 @@ module Mongoid
         embedded_many? &&
         _parent.persisted? &&
         !_parent.delayed_atomic_sets[atomic_path]
+    end
+
+    # Is the document readonly?
+    #
+    # @example Is the document readonly?
+    #   document.readonly?
+    #
+    # @return [ true, false ] If the document is readonly.
+    #
+    # @since 4.0.0
+    def readonly?
+      __selected_fields != nil
     end
 
     # Determine if the document can be set.

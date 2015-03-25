@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::State do
+describe Mongoid::Stateful do
 
   describe "#new_record?" do
 
@@ -96,6 +96,31 @@ describe Mongoid::State do
 
       it "returns false" do
         expect(person).to_not be_destroyed
+      end
+    end
+  end
+
+  describe "#readonly?" do
+
+    let(:document) do
+      Band.new
+    end
+
+    context "when the document is readonly" do
+
+      before do
+        document.__selected_fields = { test: 1 }
+      end
+
+      it "returns true" do
+        expect(document).to be_readonly
+      end
+    end
+
+    context "when no readonly has been set" do
+
+      it "returns false" do
+        expect(document).to_not be_readonly
       end
     end
   end

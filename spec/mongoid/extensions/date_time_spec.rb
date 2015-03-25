@@ -14,7 +14,7 @@ describe Mongoid::Extensions::DateTime do
         date_time.__mongoize_time__
       end
 
-      pending "does not drop the precision" do
+      it "does not drop the precision" do
         expect(mongoized.to_f.to_s).to match(/\.123/)
       end
     end

@@ -13,7 +13,6 @@ require "mongoid/equality"
 require "mongoid/criteria"
 require "mongoid/factory"
 require "mongoid/fields"
-require "mongoid/state"
 require "mongoid/timestamps"
 require "mongoid/composable"
 
@@ -25,7 +24,7 @@ module Mongoid
     extend ActiveSupport::Concern
     include Composable
 
-    attr_accessor :criteria_instance_id
+    attr_accessor :__selected_fields
     attr_reader :new_record
 
     included do
@@ -79,11 +78,11 @@ module Mongoid
     # @example Get the identity
     #   document.identity
     #
-    # @return [ Array ] An array containing [document.class, document.id]
+    # @return [ Array ] An array containing [document.class, document._id]
     #
     # @since 3.0.0
     def identity
-      [ self.class, self.id ]
+      [ self.class, self._id ]
     end
 
     # Instantiate a new +Document+, setting the Document's attributes if
@@ -135,11 +134,11 @@ module Mongoid
     # @example Return the key.
     #   document.to_key
     #
-    # @return [ Object ] The id of the document or nil if new.
+    # @return [ String ] The id of the document or nil if new.
     #
     # @since 2.4.0
     def to_key
-      (persisted? || destroyed?) ? [ id ] : nil
+      (persisted? || destroyed?) ? [ id.to_s ] : nil
     end
 
     # Return an array with this +Document+ only in it.
@@ -200,7 +199,7 @@ module Mongoid
       end
 
       became = klass.new(clone_document)
-      became.id = id
+      became._id = _id
       became.instance_variable_set(:@changed_attributes, changed_attributes)
       became.instance_variable_set(:@errors, ActiveModel::Errors.new(became))
       became.errors.instance_variable_set(:@messages, errors.instance_variable_get(:@messages))
@@ -226,7 +225,7 @@ module Mongoid
     # plural model name.
     #
     # If new_record?     - will append /new
-    # If not             - will append /id-updated_at.to_s(:number)
+    # If not             - will append /id-updated_at.to_s(:nsec)
     # Without updated_at - will append /id
     #
     # This is usually called insode a cache() block
@@ -239,7 +238,7 @@ module Mongoid
     # @since 2.4.0
     def cache_key
       return "#{model_key}/new" if new_record?
-      return "#{model_key}/#{id}-#{updated_at.utc.to_s(:number)}" if do_or_do_not(:updated_at)
+      return "#{model_key}/#{id}-#{updated_at.utc.to_s(:nsec)}" if do_or_do_not(:updated_at)
       "#{model_key}/#{id}"
     end
 
@@ -301,16 +300,16 @@ module Mongoid
       #   Person.instantiate(:title => "Sir", :age => 30)
       #
       # @param [ Hash ] attrs The hash of attributes to instantiate with.
-      # @param [ Integer ] criteria_instance_id The criteria id that
-      #   instantiated the document.
+      # @param [ Integer ] selected_fields The selected fields from the
+      #   criteria.
       #
       # @return [ Document ] A new document.
       #
       # @since 1.0.0
-      def instantiate(attrs = nil, criteria_instance_id = nil)
+      def instantiate(attrs = nil, selected_fields = nil)
         attributes = attrs || {}
         doc = allocate
-        doc.criteria_instance_id = criteria_instance_id
+        doc.__selected_fields = selected_fields
         doc.instance_variable_set(:@attributes, attributes)
         doc.apply_defaults
         yield(doc) if block_given?

@@ -66,7 +66,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def binding
-          Bindings::Embedded::One.new(base, target, metadata)
+          Bindings::Embedded::One.new(base, target, __metadata)
         end
 
         # Are we able to persist this relation?

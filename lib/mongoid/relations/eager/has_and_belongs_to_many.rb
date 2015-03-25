@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Mongoid
   module Relations
     module Eager
@@ -9,18 +10,24 @@ module Mongoid
             set_relation(d, [])
           end
 
-          entries = Hash.new { |hash, key| hash[key] = [] }
+          entries = {}
           each_loaded_document do |doc|
-
-            ids = doc.send(key)
-            ids.each do |id|
-              entries[id] << doc
-            end
+            entries[doc.send(key)] = doc
           end
 
-          entries.each do |id, docs|
-            set_on_parent(id, docs)
+          @docs.each do |d|
+            keys = d.send(group_by_key)
+            docs = entries.values_at(*keys)
+            set_relation(d, docs)
           end
+        end
+
+        def keys_from_docs
+          keys = Set.new
+          @docs.each do |d|
+            keys += d.send(group_by_key)
+          end
+          keys.to_a
         end
 
         def set_relation(doc, element)
@@ -28,11 +35,11 @@ module Mongoid
         end
 
         def group_by_key
-          @metadata.primary_key
+          @metadata.foreign_key
         end
 
         def key
-          @metadata.inverse_foreign_key
+          @metadata.primary_key
         end
       end
     end

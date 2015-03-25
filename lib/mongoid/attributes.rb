@@ -1,4 +1,5 @@
 # encoding: utf-8
+require "active_model/attribute_methods"
 require "mongoid/attributes/dynamic"
 require "mongoid/attributes/nested"
 require "mongoid/attributes/processing"
@@ -30,6 +31,8 @@ module Mongoid
     def attribute_present?(name)
       attribute = read_attribute(name)
       !attribute.blank? || attribute == false
+    rescue ActiveModel::MissingAttributeError
+      false
     end
 
     # Get the attributes that have not been cast.
@@ -90,6 +93,9 @@ module Mongoid
     # @since 1.0.0
     def read_attribute(name)
       normalized = database_field_name(name.to_s)
+      if attribute_missing?(normalized)
+        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
+      end
       if hash_dot_syntax?(normalized)
         attributes.__nested__(normalized)
       else
@@ -219,7 +225,42 @@ module Mongoid
     end
     alias :attributes= :write_attributes
 
+    # Determine if the attribute is missing from the document, due to loading
+    # it from the database with missing fields.
+    #
+    # @example Is the attribute missing?
+    #   document.attribute_missing?("test")
+    #
+    # @param [ String ] name The name of the attribute.
+    #
+    # @return [ true, false ] If the attribute is missing.
+    #
+    # @since 4.0.0
+    def attribute_missing?(name)
+      selection = __selected_fields
+      return false unless selection
+      field = fields[name]
+      (selection.values.first == 0 && selection_excluded?(name, selection, field)) ||
+        (selection.values.first == 1 && !selection_included?(name, selection, field))
+    end
+
     private
+
+    def selection_excluded?(name, selection, field)
+      if field && field.localized?
+        selection["#{name}.#{::I18n.locale}"] == 0
+      else
+        selection[name] == 0
+      end
+    end
+
+    def selection_included?(name, selection, field)
+      if field && field.localized?
+        selection.has_key?("#{name}.#{::I18n.locale}")
+      else
+        selection.has_key?(name)
+      end
+    end
 
     # Does the string contain dot syntax for accessing hashes?
     #
@@ -232,7 +273,7 @@ module Mongoid
     #
     # @since 3.0.15
     def hash_dot_syntax?(string)
-      string =~ /\./
+      string.include?(".")
     end
 
     # Return the typecasted value for a field.
@@ -276,6 +317,7 @@ module Mongoid
           alias #{name}_change   #{original}_change
           alias #{name}_changed? #{original}_changed?
           alias reset_#{name}!   reset_#{original}!
+          alias reset_#{name}_to_default!   reset_#{original}_to_default!
           alias #{name}_was      #{original}_was
           alias #{name}_will_change! #{original}_will_change!
           alias #{name}_before_type_cast #{original}_before_type_cast

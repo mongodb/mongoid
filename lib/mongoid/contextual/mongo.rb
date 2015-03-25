@@ -54,7 +54,7 @@ module Mongoid
       def count(document = false, &block)
         return super(&block) if block_given?
         if document.is_a?(Document)
-          return collection.find(criteria.and(_id: document.id).selector).count
+          return collection.find(criteria.and(_id: document._id).selector).count
         end
         return query.count(document) if document
         try_cache(:count) { query.count }
@@ -119,13 +119,11 @@ module Mongoid
       # @since 3.0.0
       def each(&block)
         if block_given?
-          selecting do
-            documents_for_iteration.each do |doc|
-              yield_document(doc, &block)
-            end
-            @cache_loaded = true
-            self
+          documents_for_iteration.each do |doc|
+            yield_document(doc, &block)
           end
+          @cache_loaded = true
+          self
         else
           to_enum
         end
@@ -182,7 +180,7 @@ module Mongoid
       # @since 3.0.0
       def find_and_modify(update, options = {})
         if doc = FindAndModify.new(collection, criteria, update, options).result
-          Factory.from_db(klass, doc)
+          Factory.from_db(klass, doc) if doc.any?
         end
       end
 
@@ -203,6 +201,16 @@ module Mongoid
         end
       end
       alias :one :first
+
+      # Return the first result without applying sort
+      #
+      # @api private
+      #
+      # @since 4.0.2
+      def find_first
+        return documents.first if cached? && cache_loaded?
+        with_eager_loading(query.first)
+      end
 
       # Execute a $geoNear command against the database.
       #
@@ -352,9 +360,9 @@ module Mongoid
           if normalized_select.size == 1
             doc[normalized_select.keys.first]
           else
-            normalized_select.keys.map { |n| doc[n] }.compact
+            normalized_select.keys.map { |n| doc[n] }
           end
-        end.compact
+        end
       end
 
       # Skips the provided number of documents.
@@ -624,32 +632,11 @@ module Mongoid
         if cached? && !documents.empty?
           documents
         elsif eager_loadable?
-          docs = query.map{ |doc| Factory.from_db(klass, doc) }
+          docs = query.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
           eager_load(docs)
           docs
         else
           query
-        end
-      end
-
-      # If we are limiting results, we need to set the field limitations on a
-      # thread local to avoid overriding the default values.
-      #
-      # @example Execute with selection.
-      #   context.selecting do
-      #     collection.find
-      #   end
-      #
-      # @return [ Object ] The yielded value.
-      #
-      # @since 2.4.4
-      def selecting
-        begin
-          fields = criteria.options[:fields]
-          Threaded.set_selection(criteria.object_id, fields) unless fields.blank?
-          yield
-        ensure
-          Threaded.delete_selection(criteria.object_id)
         end
       end
 
@@ -667,7 +654,7 @@ module Mongoid
       # @since 3.0.0
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
-          document : Factory.from_db(klass, document, criteria.object_id)
+          document : Factory.from_db(klass, document, criteria.options[:fields])
         yield(doc)
         documents.push(doc) if cacheable?
       end

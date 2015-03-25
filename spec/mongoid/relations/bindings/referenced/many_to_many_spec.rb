@@ -39,7 +39,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "passes the binding options through to the inverse" do
-        person.should_receive(:save).never
+        expect(person).to receive(:save).never
       end
 
       it "syncs the base" do
@@ -60,7 +60,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "does not save the parent on bind" do
-        person.should_receive(:save).never
+        expect(person).to receive(:save).never
         binding.bind_one(preference_two)
       end
     end
@@ -68,7 +68,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     context "when the document is not bindable" do
 
       it "does nothing" do
-        person.preferences.should_receive(:<<).never
+        expect(person.preferences).to receive(:<<).never
         binding.bind_one(preference)
       end
     end
@@ -84,8 +84,8 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
 
       before do
         binding.bind_one(target.first)
-        person.should_receive(:delete).never
-        preference.should_receive(:delete).never
+        expect(person).to receive(:delete).never
+        expect(preference).to receive(:delete).never
         binding.unbind_one(target.first)
       end
 
@@ -113,10 +113,10 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "never performs a persistance operation" do
-        person.should_receive(:delete).never
-        person.should_receive(:save).never
-        preference.should_receive(:delete).never
-        preference.should_receive(:save).never
+        expect(person).to receive(:delete).never
+        expect(person).to receive(:save).never
+        expect(preference).to receive(:delete).never
+        expect(preference).to receive(:save).never
         binding.unbind_one(target.first)
       end
     end
@@ -124,7 +124,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
     context "when the documents are not unbindable" do
 
       it "does nothing" do
-        person.should_receive(:preferences=).never
+        expect(person).to receive(:preferences=).never
         binding.unbind_one(target.first)
       end
     end

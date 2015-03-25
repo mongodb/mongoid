@@ -56,7 +56,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         end
 
         it "does nothing" do
-          name.should_receive(:namable=).never
+          expect(name).to receive(:namable=).never
           binding.bind_one
         end
       end
@@ -88,11 +88,11 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         context "when the base has metadata" do
 
           before do
-            address.metadata = person_metadata
+            address.__metadata = person_metadata
           end
 
           it "does not overwrite the existing metadata" do
-            address.should_receive(:metadata=).never
+            expect(address).to receive(:__metadata=).never
             binding.bind_one
           end
         end
@@ -105,7 +105,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
         end
 
         it "does nothing" do
-          address.should_receive(:addressable=).never
+          expect(address).to receive(:addressable=).never
           binding.bind_one
         end
       end
@@ -135,7 +135,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
       context "when the document is not unbindable" do
 
         it "does nothing" do
-          name.should_receive(:namable=).never
+          expect(name).to receive(:namable=).never
           binding.unbind_one
         end
       end
@@ -162,7 +162,7 @@ describe Mongoid::Relations::Bindings::Embedded::In do
       context "when the document is not unbindable" do
 
         it "does nothing" do
-          address.should_receive(:addressable=).never
+          expect(address).to receive(:addressable=).never
           binding.unbind_one
         end
       end

@@ -1,5 +1,8 @@
 require 'mongoid'
 require 'mongoid/support/query_counter'
+require 'minitest/autorun'
+# Ensure backward compatibility with Minitest 4
+Minitest::Test = MiniTest::Unit::TestCase unless defined?(Minitest::Test)
 
 Mongoid.configure.connect_to("mongoid_test")
 
@@ -20,12 +23,16 @@ class Person
   field :name
 end
 
-p = Person.create!(name: 'arthurnn')
-post1 = Post.create!(person: p)
-post2 = Post.create!(person: p)
+class BugTest < Minitest::Test
+  def test_query_count
+    p = Person.create!(name: 'arthurnn')
+    Post.create!(person: p)
+    Post.create!(person: p)
 
-query_counter = count_queries do
-  Person.includes(:posts).all.to_a
+    query_counter = count_queries do
+      Person.includes(:posts).all.to_a
+    end
+
+    assert_equal 2, query_counter
+  end
 end
-
-p query_counter

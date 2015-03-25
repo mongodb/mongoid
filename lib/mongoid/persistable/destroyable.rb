@@ -18,11 +18,16 @@ module Mongoid
       # @return [ true, false ] True if successful, false if not.
       #
       # @since 1.0.0
-      def destroy(options = {})
+      def destroy(options = nil)
+        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         self.flagged_for_destroy = true
-        result = run_callbacks(:destroy) { delete(options) }
+        result = run_callbacks(:destroy) { delete(options || {}) }
         self.flagged_for_destroy = false
         result
+      end
+
+      def destroy!(options = {})
+        destroy || raise(Errors::DocumentNotDestroyed.new(id, self.class))
       end
 
       module ClassMethods

@@ -19,7 +19,7 @@ en:
           message: "Calling %{method} on %{klass} resulted in a false return
             from a callback."
           summary: "If a before callback returns false when using Document.create!,
-            Document#save!, or Documnet#update_attributes! this error will get raised
+            Document#save!, or Document#update_attributes! this error will get raised
             since the document did not actually get saved."
           resolution: "Double check all before callbacks to make sure they are
             not unintentionally returning false."
@@ -31,6 +31,13 @@ en:
           resolution: "Most likely this is caused by passing parameters directly
             through to the find, and the parameter either is not present or the
             key from which it is accessed is incorrect."
+        document_not_destroyed:
+          message: "%{klass} with id %{id} was not destroyed."
+          summary: "When calling %{klass}#destroy! and a callback halts the destroy
+            callback chain by returning a false value, the deletion will not
+            actually occur."
+          resolution: "Check the before/after destroy callbacks to ensure that the
+            return values are truthy for the chain to continue."
         document_not_found:
           message: "Document(s) not found for class %{klass} with id(s) %{missing}."
           summary: "When calling %{klass}.find with an id or array of ids, each
@@ -119,6 +126,7 @@ en:
             has the correct options.\n\n
             Valid options are:\n
             \_\_background: true|false\n
+            \_\_database: 'database_name'\n
             \_\_drop_dups: true|false\n
             \_\_name: 'index_name'\n
             \_\_sparse: true|false\n
@@ -128,6 +136,7 @@ en:
             \_\_bits: 26\n
             \_\_bucket_size : 1\n
             \_\_weights: { content: 1, title: 2 }\n
+            \_\_expire_after_seconds: number_of_seconds\n
             Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
@@ -156,15 +165,11 @@ en:
         invalid_scope:
           message: "Defining a scope of value %{value} on %{klass} is not
             allowed."
-          summary: "Scopes in Mongoid must be either criteria objects or procs
-            that wrap criteria objects."
-          resolution: "Change the scope to be a criteria or proc wrapped
-            critera.\n\n
+          summary: "Scopes in Mongoid must be procs that wrap criteria objects."
+          resolution: "Change the scope to be a proc wrapped critera.\n\n
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
-            \_\_\_\_field :active, type: Boolean, default: true\n
-            \_\_\_\_scope :active, where(active: true)\n
             \_\_\_\_scope :inactive, ->{ where(active: false) }\n
             \_\_end\n\n"
         invalid_storage_options:
@@ -179,6 +184,12 @@ en:
             \_\_\_\_include Mongoid::Document\n
             \_\_\_\_store_in collection: 'artists', database: 'secondary'\n
             \_\_end\n\n"
+        invalid_storage_parent:
+          message: "Invalid store_in call on class %{klass}."
+          summary: "The :store_in macro can only be called on a base Mongoid Document"
+          resolution: "Remove the store_in call on class %{klass}, as it will use its
+            parent store configuration. Or remove the hierarchy extension for this
+            class."
         invalid_time:
           message: "'%{value}' is not a valid Time."
           summary: "Mongoid tries to serialize the values for Date, DateTime, and
@@ -325,7 +336,7 @@ en:
             %{klass}.create! without setting the parent document as an
             attribute."
           resolution: "Ensure that you've set the parent relation if
-            instantiating the embedded document direcly, or always create new
+            instantiating the embedded document directly, or always create new
             embedded documents via the parent relation."
         no_session_config:
           message: "No configuration could be found for a session named
@@ -391,6 +402,12 @@ en:
             can only have values set when the document is a new record."
           resolution: "Don't define '%{name}' as readonly, or do not attempt
             to update its value after the document is persisted."
+        readonly_document:
+          message: "Attempted to persist the readonly document '%{klass}'."
+          summary: "Documents loaded from the database using #only
+            cannot be persisted."
+          resolution: "Don't attempt to persist documents that are flagged as
+            readonly."
         scope_overwrite:
           message: "Cannot create scope :%{scope_name}, because of existing
             method %{model_name}.%{scope_name}."

@@ -268,7 +268,9 @@ module Mongoid
       # @since 3.0.0
       def documents
         return results["results"] if results.has_key?("results")
-        session[output_collection].find
+        query = session[output_collection].find
+        query.no_timeout if criteria.options[:timeout] == false
+        query
       end
 
       # Get the collection that the map/reduce results were stored in.

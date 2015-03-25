@@ -29,7 +29,7 @@ module Mongoid
           return concat(docs) if docs.size > 1
           if doc = docs.first
             append(doc)
-            base.add_to_set(foreign_key => doc.send(metadata.primary_key))
+            base.add_to_set(foreign_key => doc.send(__metadata.primary_key))
             if child_persistable?(doc)
               doc.save
             end
@@ -55,12 +55,12 @@ module Mongoid
             next unless doc
             append(doc)
             if persistable? || _creating?
-              ids[doc.id] = true
+              ids[doc._id] = true
               save_or_delay(doc, docs, inserts)
             else
               existing = base.send(foreign_key)
-              unless existing.include?(doc.id)
-                existing.push(doc.id) and unsynced(base, foreign_key)
+              unless existing.include?(doc._id)
+                existing.push(doc._id) and unsynced(base, foreign_key)
               end
             end
           end
@@ -90,7 +90,7 @@ module Mongoid
         # @since 2.0.0.beta.1
         def build(attributes = {}, type = nil)
           doc = Factory.build(type || klass, attributes)
-          base.send(foreign_key).push(doc.id)
+          base.send(foreign_key).push(doc._id)
           append(doc)
           doc.apply_post_processed_defaults
           unsynced(doc, inverse_foreign_key)
@@ -114,7 +114,7 @@ module Mongoid
         def delete(document)
           doc = super
           if doc && persistable?
-            base.pull(foreign_key => doc.send(metadata.primary_key))
+            base.pull(foreign_key => doc.send(__metadata.primary_key))
             target._unloaded = criteria
             unsynced(base, foreign_key)
           end
@@ -133,8 +133,8 @@ module Mongoid
           target.each do |doc|
             execute_callback :before_remove, doc
           end
-          unless metadata.forced_nil_inverse?
-            criteria.pull(inverse_foreign_key => base.id)
+          unless __metadata.forced_nil_inverse?
+            criteria.pull(inverse_foreign_key => base._id)
           end
           if persistable?
             base.set(foreign_key => base.send(foreign_key).clear)
@@ -142,7 +142,7 @@ module Mongoid
           after_remove_error = nil
           many_to_many = target.clear do |doc|
             unbind_one(doc)
-            unless metadata.forced_nil_inverse?
+            unless __metadata.forced_nil_inverse?
               doc.changed_attributes.delete(inverse_foreign_key)
             end
             begin
@@ -221,7 +221,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def binding
-          Bindings::Referenced::ManyToMany.new(base, target, metadata)
+          Bindings::Referenced::ManyToMany.new(base, target, __metadata)
         end
 
         # Determine if the child document should be persisted.
@@ -238,7 +238,7 @@ module Mongoid
         # @since 3.0.20
         def child_persistable?(doc)
           (persistable? || _creating?) &&
-            !(doc.persisted? && metadata.forced_nil_inverse?)
+            !(doc.persisted? && __metadata.forced_nil_inverse?)
         end
 
         # Returns the criteria object for the target class with its documents set
@@ -249,7 +249,7 @@ module Mongoid
         #
         # @return [ Criteria ] A new criteria.
         def criteria
-          ManyToMany.criteria(metadata, base.send(foreign_key))
+          ManyToMany.criteria(__metadata, base.send(foreign_key))
         end
 
         # Flag the base as unsynced with respect to the foreign key.

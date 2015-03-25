@@ -729,6 +729,63 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
+  describe "#pluck" do
+
+    let(:hobrecht) do
+      Address.new(street: "hobrecht")
+    end
+
+    let(:friedel) do
+      Address.new(street: "friedel")
+    end
+
+    let(:criteria) do
+      Address.all.tap do |crit|
+        crit.documents = [ hobrecht, friedel ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    context "when plucking" do
+
+      let!(:plucked) do
+        context.pluck(:street)
+      end
+
+      it "returns the values" do
+        expect(plucked).to eq([ "hobrecht", "friedel" ])
+      end
+    end
+
+    context "when plucking a field that doesnt exist" do
+
+      context "when pluck one field" do
+
+        let(:plucked) do
+          context.pluck(:foo)
+        end
+
+        it "returns a empty array" do
+          expect(plucked).to eq([])
+        end
+      end
+
+      context "when pluck multiple fields" do
+
+        let(:plucked) do
+          context.pluck(:foo, :bar)
+        end
+
+        it "returns a empty array" do
+          expect(plucked).to eq([[], []])
+        end
+      end
+    end
+  end
+
   describe "#skip" do
 
     let(:hobrecht) do
@@ -869,8 +926,13 @@ describe Mongoid::Contextual::Memory do
         Address.new(street: "lenau", number: 5, name: "lenau")
       end
 
+      let(:kampuchea_krom) do
+        Address.new(street: "kampuchea krom", number: 5, name: "kampuchea krom")
+      end
+
       before do
         criteria.documents.unshift(lenau)
+        criteria.documents.unshift(kampuchea_krom)
       end
 
       context "when the sort is ascending" do
@@ -880,7 +942,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          expect(context.entries).to eq([ friedel, lenau, pfluger, hobrecht ])
+          expect(context.entries).to eq([ friedel, kampuchea_krom, lenau, pfluger, hobrecht ])
         end
 
         it "returns the context" do
@@ -895,7 +957,7 @@ describe Mongoid::Contextual::Memory do
         end
 
         it "sorts the documents" do
-          expect(context.entries).to eq([ hobrecht, pfluger, lenau, friedel ])
+          expect(context.entries).to eq([ hobrecht, pfluger, lenau, kampuchea_krom, friedel ])
         end
 
         it "returns the context" do

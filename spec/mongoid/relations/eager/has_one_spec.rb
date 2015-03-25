@@ -114,7 +114,7 @@ describe Mongoid::Relations::Eager::HasOne do
       end
 
       let!(:eager) do
-        Person.all.includes(:game).first
+        Person.where(_id: person.id).includes(:game).first
       end
 
       it "puts the documents in the parent document" do

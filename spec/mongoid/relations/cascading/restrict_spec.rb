@@ -34,7 +34,7 @@ describe Mongoid::Relations::Cascading::Restrict do
       context "when person has no drugs" do
 
         before do
-          person.should_receive(:drugs).and_return([ ])
+          expect(person).to receive(:drugs).and_return([ ])
         end
 
         it "deletes the person" do
@@ -45,7 +45,7 @@ describe Mongoid::Relations::Cascading::Restrict do
       context "when person has drugs" do
 
         before do
-          person.should_receive(:drugs).and_return([ drug ])
+          expect(person).to receive(:drugs).and_return([ drug ])
         end
 
         it "it raises an error" do
@@ -56,11 +56,11 @@ describe Mongoid::Relations::Cascading::Restrict do
 
     context "when no document exists" do
       before do
-        person.should_receive(:drugs).and_return([])
+        expect(person).to receive(:drugs).and_return([])
       end
 
       it "doesn't delete anything" do
-        drug.should_receive(:delete).never
+        expect(drug).to receive(:delete).never
         strategy.cascade
       end
     end

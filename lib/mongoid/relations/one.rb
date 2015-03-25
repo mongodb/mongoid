@@ -53,7 +53,7 @@ module Mongoid
       #
       # @since 4.0.0
       def __evolve_object_id__
-        target.id
+        target._id
       end
     end
   end

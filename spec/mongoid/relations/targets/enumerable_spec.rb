@@ -787,7 +787,7 @@ describe Mongoid::Relations::Targets::Enumerable do
           end
 
           it "receives query only once" do
-            criteria.should_receive(:first).once
+            expect(criteria).to receive(:first).once
             first
           end
         end
@@ -1212,7 +1212,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         it "receives query only once" do
-          criteria.should_receive(:last).once
+          expect(criteria).to receive(:last).once
           last
         end
       end

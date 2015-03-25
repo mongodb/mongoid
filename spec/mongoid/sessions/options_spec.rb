@@ -34,6 +34,21 @@ describe Mongoid::Sessions::Options do
           expect(klass.persistence_options).to eq(options)
         end
       end
+
+      context "when returning a criteria" do
+
+        let(:criteria) do
+          klass.all
+        end
+
+        it "sets the options into the criteria object" do
+          expect(criteria.persistence_options).to eq(options)
+        end
+
+        it "doesnt set the options on class level" do
+          expect(Band.new.persistence_options).to be_nil
+        end
+      end
     end
   end
 
@@ -50,7 +65,8 @@ describe Mongoid::Sessions::Options do
     end
 
     it "passes down the options to collection" do
-      Moped::Session.any_instance.should_receive(:with).with(options).and_return({})
+      session = Band.mongo_session
+      expect_any_instance_of(Moped::Session).to receive(:with).with(options).and_return(session)
       instance.collection
     end
   end

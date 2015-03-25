@@ -3,9 +3,77 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+## 4.0.3 - Not released
+
+### New Features
+
+* \#3846 Allow #pluck when none is used in criteria. (Braulio Martinez)
+
+* \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
+
+## 4.0.2
+
+### New Features
+
+* \#3931 Add #find_or_create_by! method to many associations. (Tom Beynon)
+
+* \#3731 Add find_by! method. (Guillermo Iguaran)
+
+### Resolved Issues
+
+* \#3722 Use the right database name when combining #store_in and #with. (Arthur Neves)
+
+* \#3934 Dont apply sort when doing a find_by. (Arthur Neves)
+
+* \#3935 fix multiple fields sorting on contextual memory. (chamnap)
+
+* \#3904 BSON::Document#symbolize_keys should return keys as symbols. (Arthur Neves)
+
+* \#3948 Fix remove_undefined_indexes on rails 4.2, to symbolize right the Document keys. (Adam Wróbel)
+
+* \#3626 Document#to_key, needs to return a ObjectId as String so we can query back using that id. (Arthur Neves)
+
+* \#3888 raise UnknownAttributeError when 'set' is called on non existing field and Mongoid::Attributes::Dynamic is not included in model. (Shweta Kale)
+
+* \#3889 'set' will allow to set value of non existing field when Mongoid::Attributes::Dynamic is included in model. (Shweta Kale)
+
+* \#3812 Fixed validation context when saving (Yaroslav Zemlyanuhin)
+
+## 4.0.1
+
+### Resolved Issues
+
+* \#3911 Fix relations named "parent". (nkriege)
+
+* \#3792/\#3881 Fix many internal calls to #_id instead of #id to avoid issues
+  when overloading #id (Gauthier Delacroix)
+
+* \#3847 Fix 'QueryCache#get_more' result, when collection has more documents than first query batch. (Angelica Korsun)
+
+* \#3684 Dont raise MissingAttributeError, when using a only() scope. (Arthur Neves)
+
+* \#3703 pluck method should not compact the values. (Arthur Neves)
+
+* \#3773 Use nanoseconds for cache_key timestamp instead of plain seconds. (Máximo Mussini)
+
 ## 4.0.0
 
 ### Major Changes (Backwards Incompatible)
+
+* \#3320 Remove Rails dependencies on database rake tasks. (Arthur Neves)
+
+    All db:* rake tasks should work as before when using Rails.
+    When not in a Rails, just load the database tasks using:
+
+        load 'mongoid/tasks/database.rake'
+
+* Mongoid 4 now only supports MongoDB 2.4.0 and higher.
+
+* `Document#metadata` has been renamed to `Document#relation_metadata` to
+  avoid common conflicts. Relation proxies also have this renamed to the
+  same as well.
+
+* Scopes and default scopes must now all be defined within lambdas or procs.
 
 * `skip_version_check` config option was removed.
 
@@ -123,7 +191,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#3138 `update_attributes` can now be accessed simply by calling `update`.
 
-* \#3083 A new rake task: `rake mongoid:remove_undefined_indexes` has been added to
+* \#3083 A new rake task: `rake db:mongoid:remove_undefined_indexes` has been added to
   remove indexes from the database that are not explicitly defined in the models.
   (Aidan Feldman)
 
@@ -170,9 +238,6 @@ For instructions on upgrading to newer versions, visit
 * \#2956 Caching on queries now only happens when `cache` is specifically
   called. (Arthur Neves)
 
-* \#2898 Dirty attribute methods now properly handle field aliases.
-  (Niels Ganser)
-
 * \#2659 `Mongoid::Railtie` now properly uses only one initializer and
   the name has changed to `mongoid.load-config`.
 
@@ -208,9 +273,17 @@ For instructions on upgrading to newer versions, visit
   apply the default scope to the document, if the scope is not complex.
 
 * \#2200 Mass assignment security now mirrors Rails 4's behavior.
+  `without_protection` option was also removed.
+  `attr_accessible` class method was removed.
+  Mongoid and Strong parameters should work fine for mass assignment protection.
 
 * `delete_all` and `destroy_all` no longer take a `:conditions` hash but
   just the raw attributes.
+
+* \#1908 Documents now loaded from criteria using `#only` or `#without` will now
+  raise an error when attempting to save, update, or delete these records.
+  Additionally fields excluded from the fields retrieved from the database will
+  also raise an exception when trying to access them.
 
 * \#1344 Atomic updates can now be executed in an `atomically` block, which will
   delay any atomic updates on the document the block was called on until the
@@ -257,9 +330,41 @@ For instructions on upgrading to newer versions, visit
       ..
     end
 
+* Field types can now use symbols as well as class names. See:
+  https://github.com/mongoid/mongoid/blob/master/lib/mongoid/fields.rb#L16
+  for the available mappings.
+
+* \#3580 Fields can now be reset to their default values, with the methods:
+
+    document.reset_name_to_default!
+
+* \#3513 Documents now have a `#destroy!` method that will raise a
+  `Mongoid::Errors::DocumentNotDestroyed` error if a destroy callback returns
+  a false value.
+
+* \#3496 Added class level and criteria level `find_or_create_by!`.
+
+* \#3479 Map/reduce now respects criteria no timeout options if output is not
+  inline.
+
+* \#3478 Criteria objects now have a #none method that will cause the criteria to
+  never hit the database and always have zero documents.
+
+    Band.none
+    Band.none.where(name: "Tool") # Always has zero documents.
+
+* \#3410 Mongoid now has a query cache that can be used as a middleware in
+  Rack applications. (Arthur Neves)
+
+    For Rails:
+
+      config.middleware.use(Mongoid::QueryCache::Middleware)
+
 * \#3319 Counters can now be reset from a document instance:
 
     document.reset_counters(:relation)
+
+* \#3310 embedded_in relations now accept a `touch` option to update parents.
 
 * \#3302 Aliasing using `alias_attribute` now properly handles aliases in criteria.
 
@@ -293,7 +398,45 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#3676 Make pluck work with embedded associations
+  (Arthur Neves)
+
+* \#2898 Dirty attribute methods now properly handle field aliases.
+  (Niels Ganser)
+
+* \#3620 Add ActiveModel module instance methods to prohibited_methods list.
+  (Arthur Neves)
+
+* \#3610 Don't allow atomic operations on read-only attributes
+  (Frederico Araujo)
+
+* \#3619 Don't validate documents that are flagged for destruction.
+  (Christopher J. Bottaro)
+
+* \#3617 Don't skip index creation on cyclic documents. (shaiker)
+
+* \#3568 Fixed missing attributes error on present localized fields.
+
+* \#3514 Fixed query cache to work on first/last calls.
+
+* \#3383/\#3495 Fix has_and_belongs_to_many eager load. (Arthur Neves)
+
+* \#3492 $rename operations should not mongoize values. (Vladislav Melanitskiy)
+
+* \#3490 Allow localized fields to work with boolean `false` values.
+
+* \#3487 Map Boolean to Mongoid::Boolean in field definitions. (Arthur Neves)
+
+* \#3449 Touch needs to work for create and update. (Greggory Rothmeier)
+
+* \#3347 Creating documents off of scopes for embedded relations now properly
+  sets the parent document on the created children.
+
+* \#3432 Fixed mongoization of DateTime losing precision.
+
 * \#3397 Fixed $ne matcher for embedded documents to match server behaviour.
+
+* \#3352 Allow named scopes named "open" to work through 1-n relations.
 
 * \#3348 Fixing compounded indexes having the same keys with
   different directions. (Arthur Neves)
@@ -305,6 +448,9 @@ For instructions on upgrading to newer versions, visit
 * \#3278 Counter cache should update the document in memory too. (Arthur Neves)
 
 * \#3242 Has_many relation must use the inverse foreign_key. (Arthur Neves)
+
+* \#3233 Don't double call validation callbacks when cascading children and
+  relation validation is turned on.
 
 * \#3197 Improvements in the calls to `aggregates` on root and embedded
   collections. (Wojciech Piekutowski)
@@ -321,7 +467,20 @@ For instructions on upgrading to newer versions, visit
 * \#3063 `Document#becomes` now properly sets base object on errors.
   (Adam Ross Cohen)
 
+* \#3019 Atomic operations will no longer attempt to persist if the document
+  is not persisted.
+
 * \#2903 Removed unused string `to_a` extension.
+
+## 3.1.7
+
+### Resolved Issues
+
+* \#3465 Fixed ambigous relation errors where inverse_of is set to nil.
+
+* \#3414 Backkport skip and limit options on aggregation. (Wojciech Piekutowski)
+
+* \#3469 Fix RegexpError: failed to allocate memory: /\./ on .hash_dot_syntax?  (Dmitry Krasnoukhov)
 
 ## 3.1.6
 

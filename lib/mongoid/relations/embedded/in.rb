@@ -61,7 +61,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def binding
-          Bindings::Embedded::In.new(base, target, metadata)
+          Bindings::Embedded::In.new(base, target, __metadata)
         end
 
         # Characterize the document.
@@ -73,8 +73,8 @@ module Mongoid
         #
         # @since 2.1.0
         def characterize_one(document)
-          unless base.metadata
-            base.metadata = metadata.inverse_metadata(document)
+          unless base.__metadata
+            base.__metadata = __metadata.inverse_metadata(document)
           end
         end
 
@@ -209,7 +209,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :autobuild, :cyclic, :polymorphic ]
+            [ :autobuild, :cyclic, :polymorphic, :touch ]
           end
 
           # Get the default validation setting for the relation. Determines if

@@ -4,6 +4,6 @@ class Tree
   field :name
   field :evergreen, type: Mongoid::Boolean
 
-  scope :verdant, where(evergreen: true)
-  default_scope asc(:name)
+  scope :verdant, ->{ where(evergreen: true) }
+  default_scope ->{ asc(:name) }
 end

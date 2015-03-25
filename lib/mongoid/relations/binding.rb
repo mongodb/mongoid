@@ -91,7 +91,7 @@ module Mongoid
       # @api private
       #
       # @example Bind the foreign key.
-      #   binding.bind_foreign_key(post, person.id)
+      #   binding.bind_foreign_key(post, person._id)
       #
       # @param [ Document ] keyed The document that stores the foreign key.
       # @param [ Object ] id The id of the bound document.
@@ -193,7 +193,7 @@ module Mongoid
       def set_base_metadata
         inverse_metadata = metadata.inverse_metadata(target)
         if inverse_metadata != metadata && !inverse_metadata.nil?
-          base.metadata = inverse_metadata
+          base.__metadata = inverse_metadata
         end
       end
 

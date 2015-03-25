@@ -8,7 +8,7 @@ module Mongoid
       # Create the new error.
       #
       # @example Create the new error.
-      #   InvalidStorageOptions.new(:collection_name)
+      #   InvalidStorageOptions.new(Person, invalid_option: 'name')
       #
       # @param [ Class ] klass The model class.
       # @param [ Hash, String, Symbol ] options The provided options.

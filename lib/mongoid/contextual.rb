@@ -2,6 +2,7 @@
 require "mongoid/contextual/queryable"
 require "mongoid/contextual/mongo"
 require "mongoid/contextual/memory"
+require "mongoid/contextual/none"
 
 module Mongoid
   module Contextual
@@ -48,6 +49,7 @@ module Mongoid
     #
     # @since 3.0.0
     def create_context
+      return None.new(self) if empty_and_chainable?
       embedded ? Memory.new(self) : Mongo.new(self)
     end
   end

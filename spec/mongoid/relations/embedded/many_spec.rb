@@ -41,7 +41,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(address.metadata).to_not be_nil
+          expect(address.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -181,7 +181,7 @@ describe Mongoid::Relations::Embedded::Many do
           end
 
           it "sets the metadata on the child" do
-            expect(child_role.metadata).to_not be_nil
+            expect(child_role.__metadata).to_not be_nil
           end
 
           it "sets the index on the child" do
@@ -205,6 +205,37 @@ describe Mongoid::Relations::Embedded::Many do
 
           it "saves the new document" do
             expect(child_role).to be_persisted
+          end
+        end
+      end
+
+      context "when the child has one sided many to many relation" do
+        let(:person) do
+          Person.create
+        end
+
+        let(:message) do
+          Message.new
+        end
+
+        context "assign parent first" do
+          before do
+            message.person = person
+            message.receviers.send(method, person)
+          end
+
+          it "appends to the relation array" do
+            expect(message.receviers).to include(person)
+          end
+        end
+
+        context "not assign parent" do
+          before do
+            message.receviers.send(method, person)
+          end
+
+          it "appends to the relation array" do
+            expect(message.receviers).to include(person)
           end
         end
       end
@@ -252,7 +283,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -603,7 +634,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(child_role.metadata).to_not be_nil
+          expect(child_role.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -950,7 +981,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(address.metadata).to_not be_nil
+          expect(address.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -993,7 +1024,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(child_role.metadata).to_not be_nil
+          expect(child_role.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1182,7 +1213,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -1216,7 +1247,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       before do
-        person.addresses.should_not_receive(:batch_insert)
+        expect(person.addresses).to_not receive(:batch_insert)
         person.addresses.concat([])
       end
 
@@ -1289,7 +1320,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         it "sets the metadata on the child" do
-          expect(child_role.metadata).to_not be_nil
+          expect(child_role.__metadata).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1396,7 +1427,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -1495,7 +1526,7 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       it "sets the metadata on the child" do
-        expect(address.metadata).to_not be_nil
+        expect(address.__metadata).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -2080,6 +2111,80 @@ describe Mongoid::Relations::Embedded::Many do
         purchase.line_items.find_or_create_by(
           product_id: product.id,
           product_type: product.class.name
+        )
+      end
+
+      it "properly creates the document" do
+        expect(line_item.product).to eq(product)
+      end
+    end
+  end
+
+  describe "#find_or_create_by!" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let!(:address) do
+      person.addresses.build(street: "Bourke", city: "Melbourne")
+    end
+
+    context "when the document exists" do
+
+      let(:found) do
+        person.addresses.find_or_create_by!(street: "Bourke")
+      end
+
+      it "returns the document" do
+        expect(found).to eq(address)
+      end
+    end
+
+    context "when the document does not exist" do
+
+      let(:found) do
+        person.addresses.find_or_create_by!(street: "King") do |address|
+          address.state = "CA"
+        end
+      end
+
+      it "sets the new document attributes" do
+        expect(found.street).to eq("King")
+      end
+
+      it "returns a newly persisted document" do
+        expect(found).to be_persisted
+      end
+
+      it "calls the passed block" do
+        expect(found.state).to eq("CA")
+      end
+
+      context "when validation fails" do
+
+        it "raises an error" do
+          expect {
+            person.addresses.find_or_create_by!(street: "1")
+          }.to raise_error(Mongoid::Errors::Validations)
+        end
+      end
+    end
+
+    context "when the child belongs to another document" do
+
+      let(:product) do
+        Product.create
+      end
+
+      let(:purchase) do
+        Purchase.create
+      end
+
+      let(:line_item) do
+        purchase.line_items.find_or_create_by(
+            product_id: product.id,
+            product_type: product.class.name
         )
       end
 
@@ -3547,7 +3652,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "with errors" do
 
       before do
-        artist.should_receive(:before_add_song).and_raise
+        expect(artist).to receive(:before_add_song).and_raise
       end
 
       it "does not add the document to the relation" do
@@ -3577,7 +3682,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when errors are raised" do
 
       before do
-        artist.should_receive(:after_add_label).and_raise
+        expect(artist).to receive(:after_add_label).and_raise
       end
 
       it "adds the document to the relation" do
@@ -3638,7 +3743,7 @@ describe Mongoid::Relations::Embedded::Many do
       context "when errors are raised" do
 
         before do
-          artist.should_receive(:before_remove_song).and_raise
+          expect(artist).to receive(:before_remove_song).and_raise
         end
 
         describe "#delete" do
@@ -3706,7 +3811,7 @@ describe Mongoid::Relations::Embedded::Many do
     context "when errors are raised" do
 
       before do
-        artist.should_receive(:after_remove_label).and_raise
+        expect(artist).to receive(:after_remove_label).and_raise
       end
 
       describe "#delete" do

@@ -5,6 +5,7 @@ require "delegate"
 require "time"
 require "set"
 
+require "active_support"
 require "active_support/core_ext"
 require "active_support/json"
 require "active_support/inflector"
@@ -20,6 +21,8 @@ require "mongoid/loggable"
 require "mongoid/sessions"
 require "mongoid/document"
 require "mongoid/log_subscriber"
+require "mongoid/tasks/database"
+require "mongoid/query_cache"
 
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
@@ -40,7 +43,7 @@ module Mongoid
   #
   # @example Set up configuration options.
   #   Mongoid.configure do |config|
-  #     config.use(name: "mongoid_test", host: "localhost", port: 27017)
+  #     config.connect_to("mongoid_test")
   #   end
   #
   # @return [ Config ] The configuration object.

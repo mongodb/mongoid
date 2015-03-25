@@ -1,16 +1,25 @@
 language: ruby
+
+services: mongodb
+
 bundler_args: --without development
+
 rvm:
   - 1.9.3
   - 2.0.0
-  - ruby-head
+  - 2.1
+  - 2.2
   - jruby
-  - jruby-head
-env: JRUBY_OPTS="--server -Xcompile.invokedynamic=false -J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-noverify -J-Xms512m -J-Xmx1024m"
-matrix:
-  allow_failures:
-    - rvm: ruby-head
-    - rvm: jruby-head
+
+gemfile:
+  - Gemfile
+  - gemfiles/rails41.gemfile
+  - gemfiles/rails42.gemfile
+
+env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+
+sudo: false
+
 notifications:
   email: false
   irc:
@@ -18,5 +27,3 @@ notifications:
     on_failure: always
     channels:
       - "irc.freenode.org#mongoid"
-services:
-  - mongodb

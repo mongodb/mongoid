@@ -31,7 +31,7 @@ module Mongoid
     # @since 4.0.0
     CHECK = []
 
-    attr_accessor :embedded, :klass
+    attr_accessor :embedded, :klass, :parent_document, :metadata
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.
@@ -295,6 +295,31 @@ module Mongoid
       self.scoping_options = criteria.scoping_options
       self.inclusions = (inclusions + criteria.inclusions.dup).uniq
       self
+    end
+
+    # Returns a criteria that will always contain zero results and never hits
+    # the database.
+    #
+    # @example Return a none criteria.
+    #   criteria.none
+    #
+    # @return [ Criteria ] The none criteria.
+    #
+    # @since 4.0.0
+    def none
+      @none = true and self
+    end
+
+    # Is the criteria an empty but chainable criteria?
+    #
+    # @example Is the criteria a none criteria?
+    #   criteria.empty_and_chainable?
+    #
+    # @return [ true, false ] If the criteria is a none.
+    #
+    # @since 4.0.0
+    def empty_and_chainable?
+      !!@none
     end
 
     # Overriden to include _type in the fields.

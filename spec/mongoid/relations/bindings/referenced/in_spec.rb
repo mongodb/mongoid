@@ -33,8 +33,8 @@ describe Mongoid::Relations::Bindings::Referenced::In do
       context "when the document is bindable with default pk" do
 
         before do
-          person.should_receive(:save).never
-          game.should_receive(:save).never
+          expect(person).to receive(:save).never
+          expect(game).to receive(:save).never
           binding.bind_one
         end
 
@@ -52,8 +52,8 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         before do
           Game.belongs_to :person, index: true, validate: true, primary_key: :username
 
-          person.should_receive(:save).never
-          game.should_receive(:save).never
+          expect(person).to receive(:save).never
+          expect(game).to receive(:save).never
           binding.bind_one
         end
 
@@ -81,7 +81,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "does nothing" do
-          game.should_receive(:person=).never
+          expect(game).to receive(:person=).never
           binding.bind_one
         end
       end
@@ -96,8 +96,8 @@ describe Mongoid::Relations::Bindings::Referenced::In do
       context "when the document is bindable" do
 
         before do
-          person.should_receive(:save).never
-          post.should_receive(:save).never
+          expect(person).to receive(:save).never
+          expect(post).to receive(:save).never
           binding.bind_one
         end
 
@@ -117,7 +117,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
         end
 
         it "does nothing" do
-          post.should_receive(:person=).never
+          expect(post).to receive(:person=).never
           binding.bind_one
         end
       end
@@ -136,8 +136,8 @@ describe Mongoid::Relations::Bindings::Referenced::In do
 
         before do
           binding.bind_one
-          person.should_receive(:delete).never
-          game.should_receive(:delete).never
+          expect(person).to receive(:delete).never
+          expect(game).to receive(:delete).never
           binding.unbind_one
         end
 
@@ -153,7 +153,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
       context "when the document is not unbindable" do
 
         it "does nothing" do
-          game.should_receive(:person=).never
+          expect(game).to receive(:person=).never
           binding.unbind_one
         end
       end
@@ -169,8 +169,8 @@ describe Mongoid::Relations::Bindings::Referenced::In do
 
         before do
           binding.bind_one
-          person.should_receive(:delete).never
-          post.should_receive(:delete).never
+          expect(person).to receive(:delete).never
+          expect(post).to receive(:delete).never
           binding.unbind_one
         end
 
@@ -186,7 +186,7 @@ describe Mongoid::Relations::Bindings::Referenced::In do
       context "when the document is not unbindable" do
 
         it "does nothing" do
-          post.should_receive(:person=).never
+          expect(post).to receive(:person=).never
           binding.unbind_one
         end
       end

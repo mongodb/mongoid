@@ -11,6 +11,7 @@ require "mongoid/selectable"
 require "mongoid/scopable"
 require "mongoid/serializable"
 require "mongoid/shardable"
+require "mongoid/stateful"
 require "mongoid/traversable"
 require "mongoid/validatable"
 
@@ -25,13 +26,11 @@ module Mongoid
     # All modules that a +Document+ is composed of are defined in this
     # module, to keep the document class from getting too cluttered.
     included do
-      extend ActiveModel::Translation
       extend Findable
     end
 
-    include ActiveModel::Conversion
+    include ActiveModel::Model
     include ActiveModel::ForbiddenAttributesProtection
-    include ActiveModel::Naming
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
     include Atomic
@@ -50,7 +49,7 @@ module Mongoid
     include Serializable
     include Sessions
     include Shardable
-    include State
+    include Stateful
     include Threaded::Lifecycle
     include Traversable
     include Validatable
@@ -76,11 +75,13 @@ module Mongoid
       Serializable,
       Sessions,
       Shardable,
-      State,
+      Stateful,
       Threaded::Lifecycle,
       Traversable,
       Validatable,
-      Equality
+      Equality,
+      ActiveModel::Model,
+      ActiveModel::Validations
     ]
 
     class << self

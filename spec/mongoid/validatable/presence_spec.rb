@@ -136,7 +136,7 @@ describe Mongoid::Validatable::PresenceValidator do
           end
 
           it "adds no errors" do
-            product.errors[:sku].should be_empty
+            expect(product.errors[:sku]).to be_empty
           end
         end
 
@@ -147,7 +147,7 @@ describe Mongoid::Validatable::PresenceValidator do
           end
 
           it "adds errors" do
-            product.errors[:sku].should eq(["can't be blank"])
+            expect(product.errors[:sku]).to eq(["can't be blank"])
           end
         end
       end
@@ -161,7 +161,7 @@ describe Mongoid::Validatable::PresenceValidator do
           end
 
           it "adds no errors" do
-            product.errors[:stock_keeping_unit].should be_empty
+            expect(product.errors[:stock_keeping_unit]).to be_empty
           end
         end
 
@@ -172,7 +172,7 @@ describe Mongoid::Validatable::PresenceValidator do
           end
 
           it "adds errors" do
-            product.errors[:stock_keeping_unit].should eq(["can't be blank"])
+            expect(product.errors[:stock_keeping_unit]).to eq(["can't be blank"])
           end
         end
       end
@@ -186,7 +186,7 @@ describe Mongoid::Validatable::PresenceValidator do
           end
 
           it "adds no errors" do
-            product.errors[:tagline].should be_empty
+            expect(product.errors[:tagline]).to be_empty
           end
         end
 
@@ -200,7 +200,7 @@ describe Mongoid::Validatable::PresenceValidator do
           end
 
           it "adds errors" do
-            product.errors[:tagline].should eq(["can't be blank in fr"])
+            expect(product.errors[:tagline]).to eq(["can't be blank in fr"])
           end
         end
       end

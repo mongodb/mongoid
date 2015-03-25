@@ -30,6 +30,7 @@ describe Mongoid::LogSubscriber do
         attr_reader :debugs
 
         def initialize
+          super
           @debugs = []
         end
 
@@ -54,15 +55,15 @@ describe Mongoid::LogSubscriber do
         TestLogSubscriber.log_subscribers.pop
       end
 
-      it "pushes 2 log subscribers" do
-        expect(Mongoid::LogSubscriber.subscribers.size).to eq(2)
+      it "pushes the new log subscriber" do
+        expect(Mongoid::LogSubscriber.subscribers.last).to be_a TestLogSubscriber
       end
 
       context "when quering the database" do
 
         before do
           expect(subscribe).to receive(:debug).once
-          Band.all.to_a
+          PetOwner.all.to_a
         end
 
         it "sends operations logs to TestLogSubscriber" do

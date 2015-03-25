@@ -458,7 +458,7 @@ describe Mongoid::Validatable::UniquenessValidator do
                 end
 
                 it "does not touch the database" do
-                  Dictionary.should_receive(:where).never
+                  expect(Dictionary).to receive(:where).never
                   from_db.valid?
                 end
               end
@@ -470,11 +470,11 @@ describe Mongoid::Validatable::UniquenessValidator do
 
           before do
             Dictionary.validates_uniqueness_of :name
-            Dictionary.default_scope(Dictionary.where(year: 1990))
+            Dictionary.default_scope(->{ Dictionary.where(year: 1990) })
           end
 
           after do
-            Dictionary.send(:strip_default_scope, Dictionary.where(year: 1990))
+            Dictionary.default_scoping = nil
             Dictionary.reset_callbacks(:validate)
           end
 
@@ -1028,6 +1028,13 @@ describe Mongoid::Validatable::UniquenessValidator do
                 expect(dictionary).to be_valid
               end
             end
+          end
+        end
+
+        context "when not allowing nil" do
+
+          it "raises a validation error" do
+            expect { LineItem.create! }.to raise_error Mongoid::Errors::Validations
           end
         end
 
@@ -2337,18 +2344,19 @@ describe Mongoid::Validatable::UniquenessValidator do
   end
 
   context "when validation works with inheritance" do
-
-    before do
-      Actor.validates_uniqueness_of :name
-      Actor.create!(name: "Johnny Depp")
+    class EuropeanActor < Actor
+      validates_uniqueness_of :name
     end
 
-    after do
-      Actor.reset_callbacks(:validate)
+    class SpanishActor < EuropeanActor
+    end
+
+    before do
+      EuropeanActor.create!(name: "Antonio Banderas")
     end
 
     let!(:subclass_document_with_duplicated_name) do
-      Actress.new(name: "Johnny Depp")
+      SpanishActor.new(name: "Antonio Banderas")
     end
 
     it "should be invalid" do

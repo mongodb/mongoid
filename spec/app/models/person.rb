@@ -64,6 +64,7 @@ class Person
   embeds_many :services, cascade_callbacks: true, validate: false
   embeds_many :symptoms, validate: false
   embeds_many :appointments, validate: false
+  embeds_many :messages, validate: false
 
   embeds_one :passport, autobuild: true, store_as: :pass, validate: false
   embeds_one :pet, class_name: "Animal", validate: false
@@ -124,8 +125,8 @@ class Person
   accepts_nested_attributes_for :quiz
   accepts_nested_attributes_for :services, allow_destroy: true
 
-  scope :minor, where(:age.lt => 18)
-  scope :without_ssn, without(:ssn)
+  scope :minor, ->{ where(:age.lt => 18) }
+  scope :without_ssn, ->{ without(:ssn) }
   scope :search, ->(query){ any_of({ title: query }) }
 
   def score_with_rescoring=(score)

@@ -12,9 +12,9 @@ module Mongoid
       #
       # @since 3.0.0
       def __mongoize_time__
-        return self if utc? && Mongoid.use_utc?
+        return to_time if utc? && Mongoid.use_utc?
         if Mongoid.use_activesupport_time_zone?
-          in_time_zone(::Time.zone)
+          in_time_zone(::Time.zone).to_time
         else
           time = to_time
           time.respond_to?(:getlocal) ? time.getlocal : time

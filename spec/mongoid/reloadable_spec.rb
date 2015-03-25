@@ -261,5 +261,28 @@ describe Mongoid::Reloadable do
         end
       end
     end
+
+    context "when overriding #id alias" do
+
+      let!(:object) do
+        IdKey.create(key: 'foo')
+      end
+
+      let!(:from_db) do
+        IdKey.find(object._id).tap do |object|
+          object.key = 'bar'
+          object.save
+        end
+      end
+
+      it "reloads the object attributes from the db" do
+        object.reload
+        expect(object.key).to eq('bar')
+      end
+
+      it "reload should return self" do
+        expect(object.reload).to eq(from_db)
+      end
+    end
   end
 end

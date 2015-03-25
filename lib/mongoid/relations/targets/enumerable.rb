@@ -59,7 +59,7 @@ module Mongoid
         #
         # @since 2.1.0
         def <<(document)
-          _added[document.id] = document
+          _added[document._id] = document
           self
         end
         alias :push :<<
@@ -110,9 +110,9 @@ module Mongoid
         #
         # @since 2.1.0
         def delete(document)
-          doc = (_loaded.delete(document.id) || _added.delete(document.id))
+          doc = (_loaded.delete(document._id) || _added.delete(document._id))
           unless doc
-            if _unloaded && _unloaded.where(_id: document.id).exists?
+            if _unloaded && _unloaded.where(_id: document._id).exists?
               yield(document) if block_given?
               return document
             end
@@ -128,7 +128,7 @@ module Mongoid
         #
         # @example Delete all matching documents.
         #   enumerable.delete_if do |doc|
-        #     dod.id == id
+        #     dod._id == _id
         #   end
         #
         # @return [ Array<Document> ] The remaining docs.
@@ -138,8 +138,8 @@ module Mongoid
           load_all!
           deleted = in_memory.select(&block)
           deleted.each do |doc|
-            _loaded.delete(doc.id)
-            _added.delete(doc.id)
+            _loaded.delete(doc._id)
+            _added.delete(doc._id)
           end
           self
         end
@@ -179,8 +179,8 @@ module Mongoid
             end
           else
             unloaded_documents.each do |doc|
-              document = _added.delete(doc.id) || _loaded.delete(doc.id) || doc
-              _loaded[document.id] = document
+              document = _added.delete(doc._id) || _loaded.delete(doc._id) || doc
+              _loaded[document._id] = document
               yield(document)
             end
           end
@@ -237,7 +237,7 @@ module Mongoid
           else
             @_added, @executed = {}, true
             @_loaded = target.inject({}) do |_target, doc|
-              _target[doc.id] = doc
+              _target[doc._id] = doc
               _target
             end
           end
@@ -255,7 +255,7 @@ module Mongoid
         # @since 3.0.0
         def include?(doc)
           return super unless _unloaded
-          _unloaded.where(_id: doc.id).exists? || _added.has_key?(doc.id)
+          _unloaded.where(_id: doc._id).exists? || _added.has_key?(doc._id)
         end
 
         # Inspection will just inspect the entries for nice array-style

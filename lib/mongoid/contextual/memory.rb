@@ -135,6 +135,7 @@ module Mongoid
         doc
       end
       alias :one :first
+      alias :find_first :first
 
       # Create the new in memory context.
       #
@@ -195,6 +196,17 @@ module Mongoid
       def limit(value)
         self.limiting = value
         self
+      end
+
+      def pluck(*fields)
+        fields = Array.wrap(fields)
+        documents.map do |doc|
+          if fields.size == 1
+            doc[fields.first]
+          else
+            fields.map { |n| doc[n] }.compact
+          end
+        end.compact
       end
 
       # Skips the provided number of documents.
@@ -295,7 +307,7 @@ module Mongoid
           updates["$set"].merge!(doc.atomic_updates["$set"] || {})
           doc.move_changes
         end
-        collection.find(selector).update(updates)
+        collection.find(selector).update(updates) unless updates["$set"].empty?
       end
 
       # Get the limiting value.
@@ -410,12 +422,11 @@ module Mongoid
       #
       # @since 3.0.0
       def in_place_sort(values)
-        values.keys.reverse.each do |field|
-          documents.sort! do |a, b|
+        documents.sort! do |a, b|
+          values.map do |field, direction|
             a_value, b_value = a[field], b[field]
-            value = compare(a_value.__sortable__, b_value.__sortable__)
-            values[field] < 0 ? value * -1 : value
-          end
+            direction * compare(a_value.__sortable__, b_value.__sortable__)
+          end.find { |value| !value.zero? } || 0
         end
       end
 

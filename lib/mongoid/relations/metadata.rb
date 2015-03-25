@@ -910,9 +910,13 @@ module Mongoid
       # @since 3.0.0
       def find_from_parts(modules)
         modules.find do |mod|
-          ActiveSupport::Inflector.constantize(mod).constants.include?(
-            name.to_s.classify.to_sym
-          )
+          if mod.blank?
+            false
+          else
+            ActiveSupport::Inflector.constantize(mod).constants.include?(
+              name.to_s.classify.to_sym
+            )
+          end
         end
       end
 
@@ -1044,7 +1048,7 @@ module Mongoid
       def inverse_relation_candidates
         relations_metadata.select do |meta|
           next if meta.name == name
-          meta.class_name == inverse_class_name
+          (meta.class_name == inverse_class_name) && !meta.forced_nil_inverse?
         end
       end
 

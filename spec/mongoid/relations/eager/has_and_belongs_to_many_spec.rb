@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Relations::Eager::HasAndBelongsToMany do
 
-  describe ".grouped_docs" do
+  describe ".keys_from_docs" do
 
     let(:docs) do
       Person.all.to_a
@@ -26,40 +26,8 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
       end
     end
 
-    it "aggregates by the parent primary key" do
-      expect(eager.grouped_docs.keys).to eq([person.id])
-    end
-  end
-
-  describe ".set_on_parent" do
-
-    let(:docs) do
-      Person.all.to_a
-    end
-
-    let!(:person) do
-      Person.create!(houses: [house])
-    end
-
-    let!(:house) do
-      House.create!
-    end
-
-    let(:metadata) do
-      Person.reflect_on_association(:houses)
-    end
-
-    let(:eager) do
-      described_class.new([metadata], docs).tap do |b|
-        b.shift_metadata
-      end
-    end
-
-    it "sets the relation into the parent" do
-      docs.each do |doc|
-        expect(doc).to receive(:__build__).once.with(:houses, :foo, metadata)
-      end
-      eager.set_on_parent(person.id, :foo)
+    it "aggregates by the foreign key" do
+      expect(eager.keys_from_docs).to eq([house.id])
     end
   end
 
@@ -76,12 +44,18 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
     context "when including the has_and_belongs_to_many relation" do
 
       it "queries twice" do
-
         expect_query(2) do
-
           Person.all.includes(:houses).each do |person|
             expect(person.houses).to_not be_nil
+
+            expect(person.houses.length).to be(3)
           end
+        end
+      end
+
+      it "has all items" do
+        Person.all.includes(:houses).each do |person|
+          expect(person.ivar(:houses).length).to be(3)
         end
       end
     end

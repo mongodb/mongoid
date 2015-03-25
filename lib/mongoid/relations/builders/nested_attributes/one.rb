@@ -68,7 +68,7 @@ module Mongoid
           # @since 2.0.0
           def acceptable_id?
             id = convert_id(existing.class, attributes[:id])
-            existing.id == id || id.nil? || (existing.id != id && update_only?)
+            existing._id == id || id.nil? || (existing._id != id && update_only?)
           end
 
           # Can the existing relation be deleted?

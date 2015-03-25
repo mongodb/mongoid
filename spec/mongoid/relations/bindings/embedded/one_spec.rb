@@ -42,7 +42,7 @@ describe Mongoid::Relations::Bindings::Embedded::One do
       end
 
       it "does nothing" do
-        person.should_receive(:name=).never
+        expect(person).to receive(:name=).never
         binding.bind_one
       end
     end
@@ -69,7 +69,7 @@ describe Mongoid::Relations::Bindings::Embedded::One do
     context "when the document is not unbindable" do
 
       it "does nothing" do
-        person.should_receive(:name=).never
+        expect(person).to receive(:name=).never
         binding.unbind_one
       end
     end

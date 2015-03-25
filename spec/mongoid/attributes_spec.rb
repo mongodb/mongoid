@@ -14,6 +14,74 @@ describe Mongoid::Attributes do
         expect(account.overridden).to eq("not recommended")
       end
     end
+
+    context "when the attribute was excluded in a criteria" do
+
+      let!(:person) do
+        Person.create(title: "sir")
+      end
+
+      context "when the attribute is localized" do
+
+        before do
+          person.update_attribute(:desc, "test")
+        end
+
+        context "when the context includes" do
+
+          context "when the attribute exists" do
+
+            let(:from_db) do
+              Person.only(:desc).first
+            end
+
+            it "does not raise an error" do
+              expect(from_db.desc).to eq("test")
+            end
+          end
+        end
+
+        context "when the context excludes" do
+
+          context "when the attribute exists" do
+
+            let(:from_db) do
+              Person.without(:pets).first
+            end
+
+            it "does not raise an error" do
+              expect(from_db.desc).to eq("test")
+            end
+          end
+        end
+      end
+
+      context "when excluding with only" do
+
+        let(:from_db) do
+          Person.only(:_id).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.title
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+
+      context "when excluding with without" do
+
+        let(:from_db) do
+          Person.without(:title).first
+        end
+
+        it "raises an error" do
+          expect {
+            from_db.title
+          }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
+    end
   end
 
   describe "#[]" do
@@ -68,6 +136,35 @@ describe Mongoid::Attributes do
 
       let!(:person) do
         Person.create(title: "sir")
+      end
+
+      context "when the attribute was excluded in a criteria" do
+
+        context "when excluding with only" do
+
+          let(:from_db) do
+            Person.only(:_id).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:title]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context "when excluding with without" do
+
+          let(:from_db) do
+            Person.without(:title).first
+          end
+
+          it "raises an error" do
+            expect {
+              from_db[:title]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
       end
 
       context "when the attribute does not exist" do
@@ -151,6 +248,17 @@ describe Mongoid::Attributes do
     it "delegates to #id" do
       expect(person._id).to eq(person.id)
     end
+
+    context "when #id alias is overridden" do
+
+      let(:object) do
+        IdKey.new(key: 'foo')
+      end
+
+      it "delegates to another method" do
+        expect(object.id).to eq(object.key)
+      end
+    end
   end
 
   describe "#_id=" do
@@ -217,6 +325,19 @@ describe Mongoid::Attributes do
           expect(person.id).to eq(2)
         end
       end
+
+      context "when #id= alias is overridden" do
+
+        let(:object) do
+          IdKey.new(key: 'foo')
+        end
+
+        it "delegates to another method" do
+          object.id = 'bar'
+          expect(object.id).to eq('bar')
+        end
+      end
+
     end
 
     context "when using string ids" do
@@ -547,6 +668,19 @@ describe Mongoid::Attributes do
         expect(person.map).to eq({})
       end
     end
+
+    context "when providing tainted parameters" do
+
+      let(:params) do
+        ActionController::Parameters.new(title: "sir")
+      end
+
+      it "raises an error" do
+        expect {
+          Person.new(params)
+        }.to raise_error(ActiveModel::ForbiddenAttributesError)
+      end
+    end
   end
 
   context "updating when attributes already exist" do
@@ -637,6 +771,7 @@ describe Mongoid::Attributes do
   end
 
   describe "#read_attribute_before_type_cast" do
+
     let(:person) do
       Person.create
     end
@@ -656,7 +791,6 @@ describe Mongoid::Attributes do
       end
     end
   end
-
 
   describe "#attribute_present?" do
 
@@ -741,6 +875,18 @@ describe Mongoid::Attributes do
 
       it "return false" do
         expect(person.attribute_present?(:title)).to be false
+      end
+    end
+
+    context "when the attribute is not on only list" do
+
+      before { Person.create }
+      let(:person) do
+        Person.only(:id).first
+      end
+
+      it "return false" do
+        expect(person.attribute_present?(:foobar)).to be false
       end
     end
   end
@@ -1044,7 +1190,7 @@ describe Mongoid::Attributes do
       end
 
       it "can set a Hash value" do
-        person.map.should eq( { somekey: "somevalue" } )
+        expect(person.map).to eq( { somekey: "somevalue" } )
       end
     end
 
@@ -1052,7 +1198,7 @@ describe Mongoid::Attributes do
       let(:person) { Person.new aliases: [ :alias_1 ] }
 
       it "can set an Array Value" do
-        person.aliases.should eq [ :alias_1 ]
+        expect(person.aliases).to eq([ :alias_1 ])
       end
 
       it "raises an error when try to set an invalid value" do
@@ -1079,7 +1225,7 @@ describe Mongoid::Attributes do
     context "when the key has not been specified as a field" do
 
       before do
-        person.stub(:fields).and_return({})
+        allow(person).to receive(:fields).and_return({})
       end
 
       it "returns the value" do

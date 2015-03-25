@@ -6,6 +6,7 @@ tmp/*
 *.gem
 .bundle
 Gemfile.lock
+gemfiles/*.lock
 rdoc/*
 TODO
 ISSUES

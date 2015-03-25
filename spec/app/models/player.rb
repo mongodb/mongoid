@@ -6,13 +6,13 @@ class Player
   field :impressions, type: Integer, default: 0
   field :status
 
-  scope :active, where(active: true) do
+  scope :active, ->{ where(active: true) } do
     def extension
       "extension"
     end
   end
 
-  scope :inactive, where(active: false)
+  scope :inactive, ->{ where(active: false) }
   scope :frags_over, ->(count) { where(:frags.gt => count) }
   scope :deaths_under, ->(count) { where(:deaths.lt => count) }
   scope :deaths_over, ->(count) { where(:deaths.gt => count) }

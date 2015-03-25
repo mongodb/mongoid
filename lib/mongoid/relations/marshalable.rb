@@ -12,7 +12,7 @@ module Mongoid
       #
       # @since 3.0.15
       def marshal_dump
-        [ base, target, metadata ]
+        [ base, target, __metadata ]
       end
 
       # Takes the provided data and sets it back on the proxy.
@@ -24,8 +24,8 @@ module Mongoid
       #
       # @since 3.0.15
       def marshal_load(data)
-        @base, @target, @metadata = data
-        extend_proxy(metadata.extension) if metadata.extension?
+        @base, @target, @__metadata = data
+        extend_proxy(__metadata.extension) if __metadata.extension?
       end
     end
   end

@@ -4,8 +4,21 @@ describe Mongoid::Persistable::Destroyable do
 
   describe "#destroy" do
 
-    let(:person) do
+    let!(:person) do
       Person.create
+    end
+
+    context "when destroying a readonly document" do
+
+      let(:from_db) do
+        Person.only(:_id).first
+      end
+
+      it "raises an error" do
+        expect {
+          from_db.destroy
+        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+      end
     end
 
     context "when removing a root document" do
@@ -98,6 +111,37 @@ describe Mongoid::Persistable::Destroyable do
         it "resets the flagged for destroy flag" do
           expect(location).to_not be_flagged_for_destroy
         end
+      end
+    end
+  end
+
+  describe "#destroy!" do
+
+    context "when no validation callback returns false" do
+
+      let(:person) do
+        Person.create
+      end
+
+      it "returns true" do
+        expect(person.destroy!).to eq(true)
+      end
+    end
+
+    context "when a validation callback returns false" do
+
+      let(:album) do
+        Album.create
+      end
+
+      before do
+        expect(album).to receive(:set_parent_name).and_return(false)
+      end
+
+      it "raises an exception" do
+        expect {
+          album.destroy!
+        }.to raise_error(Mongoid::Errors::DocumentNotDestroyed)
       end
     end
   end

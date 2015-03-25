@@ -13,19 +13,6 @@ module Rails
     # @since 2.0.0
     class Railtie < Rails::Railtie
 
-      # Determine which generator to use. app_generators was introduced after
-      # 3.0.0.
-      #
-      # @example Get the generators method.
-      #   railtie.generators
-      #
-      # @return [ Symbol ] The method name to use.
-      #
-      # @since 2.0.0.rc.4
-      def self.generator
-        config.respond_to?(:app_generators) ? :app_generators : :generators
-      end
-
       # Mapping of rescued exceptions to HTTP responses
       #
       # @example
@@ -41,7 +28,7 @@ module Rails
         }
       end
 
-      config.send(generator).orm :mongoid, migration: false
+      config.app_generators.orm :mongoid, migration: false
 
       if config.action_dispatch.rescue_responses
         config.action_dispatch.rescue_responses.merge!(rescue_responses)
@@ -98,7 +85,7 @@ module Rails
       # Due to all models not getting loaded and messing up inheritance queries
       # and indexing, we need to preload the models in order to address this.
       #
-      # This will happen every request in development, once in ther other
+      # This will happen for every request in development, once in other
       # environments.
       #
       # @since 2.0.0

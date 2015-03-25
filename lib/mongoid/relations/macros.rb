@@ -55,6 +55,7 @@ module Mongoid
           self.embedded = true
           relate(name, meta)
           builder(name, meta).creator(name, meta)
+          touchable(meta)
           add_counter_cache_callbacks(meta) if meta.counter_cached?
           meta
         end

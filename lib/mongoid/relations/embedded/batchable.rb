@@ -198,7 +198,7 @@ module Mongoid
         def normalize_docs(docs)
           if docs.first.is_a?(::Hash)
             docs.map do |doc|
-              attributes = { metadata: metadata, _parent: base }
+              attributes = { __metadata: __metadata, _parent: base }
               attributes.merge!(doc)
               Factory.build(klass, attributes)
             end

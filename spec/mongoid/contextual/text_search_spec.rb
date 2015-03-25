@@ -37,7 +37,9 @@ describe Mongoid::Contextual::TextSearch do
       end
 
       it "limits the fields to the projection" do
-        expect(documents.first.origin).to be_nil
+        expect {
+          documents.first.origin
+        }.to raise_error(ActiveModel::MissingAttributeError)
       end
     end
 

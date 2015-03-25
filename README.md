@@ -1,5 +1,9 @@
-Mongoid [![Build Status](https://secure.travis-ci.org/mongoid/mongoid.png?branch=master)](http://travis-ci.org/mongoid/mongoid) [![Code Climate](https://codeclimate.com/github/mongoid/mongoid.png)](https://codeclimate.com/github/mongoid/mongoid) [![Coverage Status](https://coveralls.io/repos/mongoid/mongoid/badge.png?branch=master)](https://coveralls.io/r/mongoid/mongoid?branch=master) [![Gem Version](https://badge.fury.io/rb/mongoid.png)](http://badge.fury.io/rb/mongoid)
-========
+# Mongoid
+[![Build Status](https://travis-ci.org/mongoid/mongoid.svg?branch=master)](https://travis-ci.org/mongoid/mongoid) 
+[![Code Climate](https://codeclimate.com/github/mongoid/mongoid.svg)](https://codeclimate.com/github/mongoid/mongoid)
+[![Coverage Status](https://img.shields.io/coveralls/mongoid/mongoid/master.svg)](https://coveralls.io/r/mongoid/mongoid?branch=master)
+[![Dependency Status](https://www.versioneye.com/ruby/mongoid/4.0.0/badge.svg)](https://www.versioneye.com/ruby/mongoid/4.0.0)
+
 
 Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
 
@@ -9,12 +13,12 @@ Project Tracking
 * [Mongoid Website and Documentation](http://mongoid.org)
 * [Mongoid Google Group](http://groups.google.com/group/mongoid)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/mongoid)
-* #mongoid on freenode IRC
+* [#mongoid](http://webchat.freenode.net/?channels=mongoid) on freenode IRC
 
 Compatibility
 -------------
 
-Mongoid is tested against MRI 1.9.3, 2.0.0, and JRuby (1.9).
+Mongoid is tested against MRI 1.9.3, 2.0.0, 2.1.0 and JRuby (1.9).
 
 Documentation
 -------------

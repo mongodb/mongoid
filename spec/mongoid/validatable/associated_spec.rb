@@ -56,6 +56,29 @@ describe Mongoid::Validatable::AssociatedValidator do
           expect(description).to_not be_valid
         end
       end
+
+      context "when the documents are flagged for destroy" do
+
+        let(:user) do
+          User.new(name: "test")
+        end
+
+        let(:description) do
+          Description.new
+        end
+
+        before do
+          description.flagged_for_destroy = true
+          user.descriptions << description
+        end
+
+        it "does not run validation on them" do
+          expect(description).to receive(:valid?).never
+          expect(user).to be_valid
+        end
+
+      end
+
     end
   end
 
@@ -85,11 +108,11 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is valid" do
 
         let(:associated) do
-          double(valid?: true)
+          double(valid?: true, flagged_for_destroy?: false)
         end
 
         before do
-          associated.should_receive(:validated?).and_return(false)
+          expect(associated).to receive(:validated?).and_return(false)
           validator.validate_each(person, :name, associated)
         end
 
@@ -101,11 +124,11 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is invalid" do
 
         let(:associated) do
-          double(valid?: false)
+          double(valid?: false, flagged_for_destroy?: false)
         end
 
         before do
-          associated.should_receive(:validated?).and_return(false)
+          expect(associated).to receive(:validated?).and_return(false)
           validator.validate_each(person, :name, associated)
         end
 
@@ -135,11 +158,11 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association has invalid documents" do
 
         let(:associated) do
-          double(valid?: false)
+          double(valid?: false, flagged_for_destroy?: false)
         end
 
         before do
-          associated.should_receive(:validated?).and_return(false)
+          expect(associated).to receive(:validated?).and_return(false)
           validator.validate_each(person, :addresses, [ associated ])
         end
 
@@ -151,11 +174,11 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the assocation has all valid documents" do
 
         let(:associated) do
-          double(valid?: true)
+          double(valid?: true, flagged_for_destroy?: false)
         end
 
         before do
-          associated.should_receive(:validated?).and_return(false)
+          expect(associated).to receive(:validated?).and_return(false)
           validator.validate_each(person, :addresses, [ associated ])
         end
 

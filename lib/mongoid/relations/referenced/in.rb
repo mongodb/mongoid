@@ -71,7 +71,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def binding
-          Bindings::Referenced::In.new(base, target, metadata)
+          Bindings::Referenced::In.new(base, target, __metadata)
         end
 
         # Normalize the value provided as a replacement for substitution.
@@ -88,7 +88,7 @@ module Mongoid
         # @since 3.1.5
         def normalize(replacement)
           return replacement if replacement.is_a?(Document)
-          metadata.builder(klass, replacement).build
+          __metadata.builder(klass, replacement).build
         end
 
         # Are we able to persist this relation?

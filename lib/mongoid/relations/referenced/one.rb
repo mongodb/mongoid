@@ -53,13 +53,13 @@ module Mongoid
         def substitute(replacement)
           unbind_one
           if persistable?
-            if metadata.destructive?
-              send(metadata.dependent)
+            if __metadata.destructive?
+              send(__metadata.dependent)
             else
               save if persisted?
             end
           end
-          One.new(base, replacement, metadata) if replacement
+          One.new(base, replacement, __metadata) if replacement
         end
 
         private
@@ -73,7 +73,7 @@ module Mongoid
         #
         # @return [ Binding ] The binding object.
         def binding
-          Bindings::Referenced::One.new(base, target, metadata)
+          Bindings::Referenced::One.new(base, target, __metadata)
         end
 
         # Are we able to persist this relation?

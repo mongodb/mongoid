@@ -45,7 +45,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           end
 
           it "does not persist the child document" do
-            preference.should_receive(:save).never
+            expect(preference).to receive(:save).never
             article.preferences.send(method, preference)
           end
         end
@@ -515,7 +515,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           context "when errors are raised" do
 
             before do
-              post.should_receive(:before_add_tag).and_raise
+              expect(post).to receive(:before_add_tag).and_raise
             end
 
             it "does not add the document to the relation" do
@@ -537,7 +537,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
           context "when errors are raised" do
 
             before do
-              post.should_receive(:after_add_tag).and_raise
+              expect(post).to receive(:after_add_tag).and_raise
             end
 
             it "adds the document to the relation" do
@@ -1185,7 +1185,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:before_remove_tag).and_raise
+            expect(post).to receive(:before_remove_tag).and_raise
           end
 
           it "does not remove the document from the relation" do
@@ -1217,7 +1217,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:after_remove_tag).and_raise
+            expect(post).to receive(:after_remove_tag).and_raise
           end
 
           it "removes the document from the relation" do
@@ -2119,7 +2119,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:before_remove_tag).and_raise
+            expect(post).to receive(:before_remove_tag).and_raise
           end
 
           it "does not remove the document from the relation" do
@@ -2151,7 +2151,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         context "when errors are raised" do
 
           before do
-            post.should_receive(:after_remove_tag).and_raise
+            expect(post).to receive(:after_remove_tag).and_raise
           end
 
           it "removes the document from the relation" do
@@ -2461,6 +2461,55 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
         it "returns a newly persisted document" do
           expect(found).to be_persisted
+        end
+      end
+    end
+  end
+
+  describe "#find_or_create_by!" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:preference) do
+        person.preferences.create(name: "Testing")
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          person.preferences.find_or_create_by!(name: "Testing")
+        end
+
+        it "returns the document" do
+          expect(found).to eq(preference)
+        end
+      end
+
+      context "when the document does not exist" do
+
+        let(:found) do
+          person.preferences.find_or_create_by!(name: "Test")
+        end
+
+        it "sets the new document attributes" do
+          expect(found.name).to eq("Test")
+        end
+
+        it "returns a newly persisted document" do
+          expect(found).to be_persisted
+        end
+
+        context "when validation fails" do
+
+          it "raises an error" do
+            expect {
+              person.preferences.find_or_create_by!(name: "A")
+            }.to raise_error(Mongoid::Errors::Validations)
+          end
         end
       end
     end

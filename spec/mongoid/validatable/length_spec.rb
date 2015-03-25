@@ -101,7 +101,7 @@ describe Mongoid::Validatable::LengthValidator do
           end
 
           it "adds no errors" do
-            product.errors[:sku].should be_empty
+            expect(product.errors[:sku]).to be_empty
           end
         end
 
@@ -112,7 +112,7 @@ describe Mongoid::Validatable::LengthValidator do
           end
 
           it "adds errors" do
-            product.errors[:sku].should eq(["is too long (maximum is 5 characters)"])
+            expect(product.errors[:sku]).to eq(["is too long (maximum is 5 characters)"])
           end
         end
       end
@@ -130,7 +130,7 @@ describe Mongoid::Validatable::LengthValidator do
           end
 
           it "adds no errors" do
-            product.errors[:stock_keeping_unit].should be_empty
+            expect(product.errors[:stock_keeping_unit]).to be_empty
           end
         end
 
@@ -141,7 +141,7 @@ describe Mongoid::Validatable::LengthValidator do
           end
 
           it "adds errors" do
-            product.errors[:stock_keeping_unit].should eq(["is too long (maximum is 5 characters)"])
+            expect(product.errors[:stock_keeping_unit]).to eq(["is too long (maximum is 5 characters)"])
           end
         end
       end
@@ -159,7 +159,7 @@ describe Mongoid::Validatable::LengthValidator do
           end
 
           it "adds no errors" do
-            product.errors[:tagline].should be_empty
+            expect(product.errors[:tagline]).to be_empty
           end
         end
 
@@ -173,7 +173,7 @@ describe Mongoid::Validatable::LengthValidator do
           end
 
           it "adds errors" do
-            product.errors[:tagline].should eq(["is too long (maximum is 5 characters)"])
+            expect(product.errors[:tagline]).to eq(["is too long (maximum is 5 characters)"])
           end
         end
 
@@ -184,7 +184,7 @@ describe Mongoid::Validatable::LengthValidator do
           end
 
           it "adds errors" do
-            product.errors[:tagline].should eq(["is too long (maximum is 5 characters)"])
+            expect(product.errors[:tagline]).to eq(["is too long (maximum is 5 characters)"])
           end
         end
       end

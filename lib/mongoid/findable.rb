@@ -21,6 +21,7 @@ module Mongoid
       :extras,
       :find_and_modify,
       :find_or_create_by,
+      :find_or_create_by!,
       :find_or_initialize_by,
       :first_or_create,
       :first_or_create!,
@@ -31,6 +32,7 @@ module Mongoid
       :map_reduce,
       :max,
       :min,
+      :none,
       :pluck,
       :sum,
       :text_search,
@@ -88,6 +90,31 @@ module Mongoid
       with_default_scope.find(*args)
     end
 
+    # Find the first +Document+ given the conditions.
+    # If a matching Document is not found and
+    # Mongoid.raise_not_found_error is true it raises
+    # Mongoid::Errors::DocumentNotFound, return null nil elsewise.
+    #
+    # @example Find the document by attribute other than id
+    #   Person.find_by(:username => "superuser")
+    #
+    # @param [ Hash ] attrs The attributes to check.
+    #
+    # @raise [ Errors::DocumentNotFound ] If no document found
+    # and Mongoid.raise_not_found_error is true.
+    #
+    # @return [ Document, nil ] A matching document.
+    #
+    # @since 3.0.0
+    def find_by(attrs = {})
+      result = where(attrs).find_first
+      if result.nil? && Mongoid.raise_not_found_error
+        raise(Errors::DocumentNotFound.new(self, attrs))
+      end
+      yield(result) if result && block_given?
+      result
+    end
+
     # Find the first +Document+ given the conditions, or raises
     # Mongoid::Errors::DocumentNotFound
     #
@@ -100,12 +127,9 @@ module Mongoid
     #
     # @return [ Document ] A matching document.
     #
-    # @since 3.0.0
-    def find_by(attrs = {})
-      result = where(attrs).first
-      if result.nil? && Mongoid.raise_not_found_error
-        raise(Errors::DocumentNotFound.new(self, attrs))
-      end
+    def find_by!(attrs = {})
+      result = where(attrs).find_first
+      raise(Errors::DocumentNotFound.new(self, attrs)) unless result
       yield(result) if result && block_given?
       result
     end

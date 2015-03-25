@@ -6,6 +6,17 @@ module Mongoid
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
+    DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
+    SESSIONS_KEY = "[mongoid]:sessions"
+    SESSION_OVERRIDE_KEY = "[mongoid]:session-override"
+    SCOPE_STACK_KEY = "[mongoid]:scope-stack"
+    AUTOSAVES_KEY = "[mongoid]:autosaves"
+    VALIDATIONS_KEY = "[mongoid]:validations"
+
+    STACK_KEYS = Hash.new do |hash, key|
+      hash[key] = "[mongoid]:#{key}-stack"
+    end
+
     extend self
 
     # Begin entry into a named thread local stack.
@@ -31,7 +42,7 @@ module Mongoid
     #
     # @since 3.0.0
     def database_override
-      Thread.current["[mongoid]:db-override"]
+      Thread.current[DATABASE_OVERRIDE_KEY]
     end
 
     # Set the global database override.
@@ -45,7 +56,7 @@ module Mongoid
     #
     # @since 3.0.0
     def database_override=(name)
-      Thread.current["[mongoid]:db-override"] = name
+      Thread.current[DATABASE_OVERRIDE_KEY] = name
     end
 
     # Get the database sessions from the current thread.
@@ -57,7 +68,7 @@ module Mongoid
     #
     # @since 3.0.0
     def sessions
-      Thread.current["[mongoid]:sessions"] ||= {}
+      Thread.current[SESSIONS_KEY] ||= {}
     end
 
     # Are in the middle of executing the named stack
@@ -99,7 +110,7 @@ module Mongoid
     #
     # @since 2.4.0
     def stack(name)
-      Thread.current["[mongoid]:#{name}-stack"] ||= []
+      Thread.current[STACK_KEYS[name]] ||= []
     end
 
     # Begin autosaving a document on the current thread.
@@ -111,7 +122,7 @@ module Mongoid
     #
     # @since 3.0.0
     def begin_autosave(document)
-      autosaves_for(document.class).push(document.id)
+      autosaves_for(document.class).push(document._id)
     end
 
     # Begin validating a document on the current thread.
@@ -123,7 +134,7 @@ module Mongoid
     #
     # @since 2.1.9
     def begin_validate(document)
-      validations_for(document.class).push(document.id)
+      validations_for(document.class).push(document._id)
     end
 
     # Exit autosaving a document on the current thread.
@@ -135,7 +146,7 @@ module Mongoid
     #
     # @since 3.0.0
     def exit_autosave(document)
-      autosaves_for(document.class).delete_one(document.id)
+      autosaves_for(document.class).delete_one(document._id)
     end
 
     # Exit validating a document on the current thread.
@@ -147,54 +158,7 @@ module Mongoid
     #
     # @since 2.1.9
     def exit_validate(document)
-      validations_for(document.class).delete_one(document.id)
-    end
-
-    # Get the field selection options from the current thread.
-    #
-    # @example Get the field selection options.
-    #   Threaded.selection
-    #
-    # @param [ Integer ] criteria_instance_id The criteria instance id.
-    #
-    # @return [ Hash ] The field selection.
-    #
-    # @since 2.4.4
-    def selection(criteria_instance_id)
-      selections = Thread.current["[mongoid][selections]"]
-      selections[criteria_instance_id] if selections
-    end
-
-    # Set the field selection on the current thread.
-    #
-    # @example Set the field selection.
-    #   Threaded.set_selection(Person, { field: 1 })
-    #
-    # @param [ Integer ] criteria_instance_id The criteria instance id.
-    # @param [ Hash ] value The current field selection.
-    #
-    # @return [ Hash ] The field selection.
-    #
-    # @since 2.4.4
-    def set_selection(criteria_instance_id, value)
-      Thread.current["[mongoid][selections]"] ||= {}
-      Thread.current["[mongoid][selections]"][criteria_instance_id] = value
-    end
-
-    # Delete the field selection on the current thread.
-    #
-    # @example Delete the field selection.
-    #   Threaded.delete_selection(Person)
-    #
-    # @param [ Integer ] criteria_instance_id The criteria instance id.
-    #
-    # @return [ Boolean ] Whether there was a field selection.
-    #
-    # @since 3.0.7
-    def delete_selection(criteria_instance_id)
-      selections = Thread.current["[mongoid][selections]"]
-      return false unless selections
-      !!selections.delete(criteria_instance_id)
+      validations_for(document.class).delete_one(document._id)
     end
 
     # Get the global session override.
@@ -206,7 +170,7 @@ module Mongoid
     #
     # @since 3.0.0
     def session_override
-      Thread.current["[mongoid]:session-override"]
+      Thread.current[SESSION_OVERRIDE_KEY]
     end
 
     # Set the global session override.
@@ -220,7 +184,7 @@ module Mongoid
     #
     # @since 3.0.0
     def session_override=(name)
-      Thread.current["[mongoid]:session-override"] = name
+      Thread.current[SESSION_OVERRIDE_KEY] = name
     end
 
     # Get the mongoid scope stack for chained criteria.
@@ -232,7 +196,7 @@ module Mongoid
     #
     # @since 2.1.0
     def scope_stack
-      Thread.current["[mongoid]:scope-stack"] ||= {}
+      Thread.current[SCOPE_STACK_KEY] ||= {}
     end
 
     # Is the document autosaved on the current thread?
@@ -246,7 +210,7 @@ module Mongoid
     #
     # @since 2.1.9
     def autosaved?(document)
-      autosaves_for(document.class).include?(document.id)
+      autosaves_for(document.class).include?(document._id)
     end
 
     # Is the document validated on the current thread?
@@ -260,7 +224,7 @@ module Mongoid
     #
     # @since 2.1.9
     def validated?(document)
-      validations_for(document.class).include?(document.id)
+      validations_for(document.class).include?(document._id)
     end
 
     # Get all autosaves on the current thread.
@@ -272,7 +236,7 @@ module Mongoid
     #
     # @since 3.0.0
     def autosaves
-      Thread.current["[mongoid]:autosaves"] ||= {}
+      Thread.current[AUTOSAVES_KEY] ||= {}
     end
 
     # Get all validations on the current thread.
@@ -284,7 +248,7 @@ module Mongoid
     #
     # @since 2.1.9
     def validations
-      Thread.current["[mongoid]:validations"] ||= {}
+      Thread.current[VALIDATIONS_KEY] ||= {}
     end
 
     # Get all autosaves on the current thread for the class.
