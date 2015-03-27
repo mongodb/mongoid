@@ -37,7 +37,8 @@ module Mongoid
   extend Loggable
   extend self
 
-  MONGODB_VERSION = "2.2.0"
+  # The minimum MongoDB version supported.
+  MONGODB_VERSION = "2.4.0"
 
   # Sets the Mongoid configuration options. Best used by passing a block.
   #
