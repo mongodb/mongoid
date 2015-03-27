@@ -48,6 +48,18 @@ module Mongoid
 
       private
 
+      # Are fallbacks enabled for the field?
+      #
+      # @example Are fallbacks enabled for the field?
+      #   field.fallbacks?
+      #
+      # @return [ true, false ]
+      def fallbacks?
+        return true if options[:fallbacks].nil?
+
+        !!options[:fallbacks]
+      end
+
       # Lookup the value from the provided object.
       #
       # @api private
@@ -62,7 +74,7 @@ module Mongoid
       # @since 3.0.0
       def lookup(object)
         locale = ::I18n.locale
-        if ::I18n.respond_to?(:fallbacks)
+        if fallbacks? && ::I18n.respond_to?(:fallbacks)
           object[::I18n.fallbacks[locale].map(&:to_s).find{ |loc| object.has_key?(loc) }]
         else
           object[locale.to_s]
