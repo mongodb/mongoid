@@ -54,6 +54,20 @@ describe Mongoid::Copyable do
         end
       end
 
+      context "when using store_as" do
+
+        context "and dynamic attributes are not set" do
+
+          it "clones" do
+            t = StoreAsDupTest1.new(:name => "hi")
+            t.build_store_as_dup_test2(:name => "there")
+            t.save
+            copy = t.send(method)
+            expect(copy.store_as_dup_test2.name).to eq(t.store_as_dup_test2.name)
+          end
+        end
+      end
+
       context "when cloning a document with multiple languages field" do
 
         before do
