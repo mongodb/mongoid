@@ -159,4 +159,20 @@ describe Mongoid::Persistable::Settable do
       expect(person.reload.somethingnew).to eq "somethingnew"
     end
   end
+
+  context "with an attribute with private setter" do
+    let(:agent) do
+      Agent.create
+    end
+
+    let(:title) do
+      "Double-Oh Seven"
+    end
+
+    it "updates the attribute" do
+      agent.singleton_class.send :private, :title=
+      agent.set(title: title)
+      expect(agent.reload.title).to eq title
+    end
+  end
 end
