@@ -92,7 +92,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.7
       def process_attribute(name, value)
-        responds = respond_to?("#{name}=")
+        responds = respond_to?("#{name}=", true)
         raise Errors::UnknownAttribute.new(self.class, name) unless responds
         send("#{name}=", value)
       end
