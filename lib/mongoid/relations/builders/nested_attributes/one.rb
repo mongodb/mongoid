@@ -22,14 +22,14 @@ module Mongoid
           # @return [ Document ] The built document.
           #
           # @since 2.0.0
-          def build(parent)
+          def build(parent, opts = {})
             return if reject?(parent, attributes)
             @existing = parent.send(metadata.name)
             if update?
               attributes.delete_id
               existing.assign_attributes(attributes)
             elsif replace?
-              parent.send(metadata.setter, Factory.build(metadata.klass, attributes))
+              parent.send(metadata.setter, Factory.build(metadata.klass, attributes, opts))
             elsif delete?
               parent.send(metadata.setter, nil)
             end

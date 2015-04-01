@@ -100,14 +100,15 @@ module Mongoid
     # @return [ Document ] A new document.
     #
     # @since 1.0.0
-    def initialize(attrs = nil)
+    def initialize(attrs = nil, opts = {})
       _building do
+        @opts = opts
         @new_record = true
         @attributes ||= {}
         with(self.class.persistence_options)
         apply_pre_processed_defaults
         apply_default_scoping
-        process_attributes(attrs) do
+        process_attributes(attrs, opts[:allow_dynamic_attrs]) do
           yield(self) if block_given?
         end
         apply_post_processed_defaults

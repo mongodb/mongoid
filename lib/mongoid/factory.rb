@@ -15,12 +15,12 @@ module Mongoid
     # @param [ Hash ] options The mass assignment scoping options.
     #
     # @return [ Document ] The instantiated document.
-    def build(klass, attributes = nil)
+    def build(klass, attributes = nil, opts = {})
       type = (attributes || {})["_type"]
       if type && klass._types.include?(type)
-        type.constantize.new(attributes)
+        type.constantize.new(attributes, opts)
       else
-        klass.new(attributes)
+        klass.new(attributes, opts)
       end
     end
 
