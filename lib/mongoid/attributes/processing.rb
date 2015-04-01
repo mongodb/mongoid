@@ -16,13 +16,13 @@ module Mongoid
       # @param [ Hash ] attrs The attributes to set.
       #
       # @since 2.0.0.rc.7
-      def process_attributes(attrs = nil)
+      def process_attributes(attrs = nil, allow_dynamic = false)
         attrs ||= {}
         if !attrs.empty?
           attrs = sanitize_for_mass_assignment(attrs)
           attrs.each_pair do |key, value|
             next if pending_attribute?(key, value)
-            process_attribute(key, value)
+            process_attribute(key, value, allow_dynamic)
           end
         end
         yield self if block_given?
@@ -91,13 +91,18 @@ module Mongoid
       # @param [ Object ] value The value of the field.
       #
       # @since 2.0.0.rc.7
-      def process_attribute(name, value)
+      def process_attribute(name, value, allow_dynamic = false)
         if store_as = aliased_fields.invert[name.to_s]
           name = store_as
         end
         responds = respond_to?("#{name}=")
-        raise Errors::UnknownAttribute.new(self.class, name) unless responds
-        send("#{name}=", value)
+        if responds
+          send("#{name}=", value)
+        elsif allow_dynamic
+          write_attribute(name, value)
+        else
+          raise Errors::UnknownAttribute.new(self.class, name) unless responds
+        end
       end
 
       # Process all the pending nested attributes that needed to wait until
@@ -139,7 +144,7 @@ module Mongoid
         pending_relations.each_pair do |name, value|
           metadata = relations[name]
           if value.is_a?(Hash)
-            metadata.nested_builder(value, {}).build(self)
+            metadata.nested_builder(value, {}).build(self, @opts)
           else
             send("#{name}=", value)
           end
