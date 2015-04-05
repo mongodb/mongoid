@@ -150,5 +150,14 @@ describe Mongoid::Relations::Eager::BelongsTo do
         }.to raise_error(Mongoid::Errors::EagerLoad)
       end
     end
+
+    context "when setting the foreign key id directly" do
+
+      it "works" do
+        id = BSON::ObjectId.new
+        game = Game.new(:person_id => id)
+        expect(game.person_id).to eql(id)
+      end
+    end
   end
 end
