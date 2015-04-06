@@ -92,7 +92,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.7
       def process_attribute(name, value)
-        if store_as = aliased_fields.invert[name.to_s]
+        if !respond_to?("#{name}=") && store_as = aliased_fields.invert[name.to_s]
           name = store_as
         end
         responds = respond_to?("#{name}=")
