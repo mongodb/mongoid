@@ -15,6 +15,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
 
+* \#3740 Fixes `Missing attribute: '_id'` error when using methods only or without (dx7)
+
 ## 4.0.2
 
 ### New Features
