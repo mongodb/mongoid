@@ -23,7 +23,7 @@ module Mongoid
       #
       # @since 3.0.0
       def attribute_writable?(name)
-        new_record? || !readonly_attributes.include?(name.to_s)
+        new_record? || !readonly_attributes.include?(database_field_name(name))
       end
 
       module ClassMethods
@@ -47,7 +47,7 @@ module Mongoid
         # @since 3.0.0
         def attr_readonly(*names)
           names.each do |name|
-            readonly_attributes << name.to_s
+            readonly_attributes << database_field_name(name)
           end
         end
       end
