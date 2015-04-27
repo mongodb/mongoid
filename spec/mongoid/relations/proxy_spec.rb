@@ -2,6 +2,34 @@ require "spec_helper"
 
 describe Mongoid::Relations::Proxy do
 
+  describe "#find" do
+    let(:person) do
+      Person.create
+    end
+
+    let(:messages) do
+      person.messages
+    end
+
+    let(:msg1) do
+      messages.create(body: 'msg1')
+    end
+
+    it "returns nil with no arguments" do
+      expect(messages.find).to be_nil
+      expect(messages.send(:find)).to be_nil
+      expect(messages.__send__(:find)).to be_nil
+      expect(messages.public_send(:find)).to be_nil
+    end
+
+    it "returns the object corresponding to the id" do
+      expect(messages.find(msg1.id)).to eq(msg1)
+      expect(messages.send(:find, msg1.id)).to eq(msg1)
+      expect(messages.__send__(:find, msg1.id)).to eq(msg1)
+      expect(messages.public_send(:find, msg1.id)).to eq(msg1)
+    end
+  end
+
   describe "#extend" do
 
     before(:all) do
