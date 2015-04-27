@@ -251,7 +251,7 @@ describe Mongoid::Document do
         end
 
         it "does not set the default scoping" do
-          expect(audio.likes).to be_nil
+          expect(audio.attributes.except('_id')).to be_empty
         end
       end
     end
