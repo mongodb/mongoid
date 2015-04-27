@@ -415,6 +415,10 @@ describe Mongoid::Sessions do
         Band.store_in(database: database_id_alt)
       end
 
+      after do
+        Band.store_in(database: database_id)
+      end
+
       context "on instance level" do
 
         let(:band) do
