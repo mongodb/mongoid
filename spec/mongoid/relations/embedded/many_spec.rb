@@ -3933,4 +3933,15 @@ describe Mongoid::Relations::Embedded::Many do
       expect(loaded.extension).to eq("Testing")
     end
   end
+
+  context "deleting embedded documents" do
+    it "able to delete embedded documents upon condition" do
+      company = Company.new
+      4.times { |i| company.staffs << Staff.new(age: 50 + i)}
+      2.times { |i| company.staffs << Staff.new(age: 40)}
+      company.save
+      company.staffs.delete_if {|x| x.age >= 50}
+      expect(company.staffs.count).to eq(2)
+    end
+  end
 end
