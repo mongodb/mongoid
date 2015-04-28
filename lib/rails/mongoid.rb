@@ -15,7 +15,7 @@ module Rails
       app.config.paths["app/models"].each do |path|
         preload = ::Mongoid.preload_models
         if preload.resizable?
-          files = preload.map { |model| "#{path}/#{model}.rb" }
+          files = preload.map { |model| "#{path}/#{model.underscore}.rb" }
         else
           files = Dir.glob("#{path}/**/*.rb")
         end
