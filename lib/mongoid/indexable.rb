@@ -142,7 +142,7 @@ module Mongoid
       #
       # @since 4.0.0
       def index_keys
-        index_specifications.map{ |spec| spec.key }
+        index_specifications.map(&:key)
       end
     end
   end

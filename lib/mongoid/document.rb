@@ -168,7 +168,7 @@ module Mongoid
       embedded_relations.each_pair do |name, meta|
         without_autobuild do
           relation, stored = send(name), meta.store_as
-          if attributes.has_key?(stored) || !relation.blank?
+          if attributes.key?(stored) || !relation.blank?
             if relation
               attributes[stored] = relation.as_document
             else
@@ -327,7 +327,7 @@ module Mongoid
       #
       # @since 1.0.0
       def _types
-        @_type ||= (descendants + [ self ]).uniq.map { |t| t.to_s }
+        @_type ||= (descendants + [ self ]).uniq.map(&:to_s)
       end
 
       # Set the i18n scope to overwrite ActiveModel.

@@ -81,6 +81,7 @@ describe Mongoid::Fields::Localized do
       context "when a locale is provided" do
 
         before do
+          I18n.enforce_available_locales = false
           ::I18n.locale = :de
         end
 

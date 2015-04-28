@@ -217,6 +217,7 @@ describe Mongoid::Persistable::Updatable do
       end
 
       before do
+        I18n.enforce_available_locales = false
         ::I18n.locale = :de
         product.update_attribute(:description, "Die Bombe")
       end

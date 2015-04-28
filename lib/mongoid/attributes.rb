@@ -58,7 +58,7 @@ module Mongoid
     #
     # @since 3.0.0
     def has_attribute?(name)
-      attributes.has_key?(name.to_s)
+      attributes.key?(name.to_s)
     end
 
     # Does the document have the provided attribute before it was assigned
@@ -74,7 +74,7 @@ module Mongoid
     #
     # @since 3.1.0
     def has_attribute_before_type_cast?(name)
-      attributes_before_type_cast.has_key?(name.to_s)
+      attributes_before_type_cast.key?(name.to_s)
     end
 
     # Read a value from the document attributes. If the value does not exist
@@ -119,7 +119,7 @@ module Mongoid
     # @since 3.1.0
     def read_attribute_before_type_cast(name)
       attr = name.to_s
-      if attributes_before_type_cast.has_key?(attr)
+      if attributes_before_type_cast.key?(attr)
         attributes_before_type_cast[attr]
       else
         read_attribute(attr)
@@ -256,9 +256,9 @@ module Mongoid
 
     def selection_included?(name, selection, field)
       if field && field.localized?
-        selection.has_key?("#{name}.#{::I18n.locale}")
+        selection.key?("#{name}.#{::I18n.locale}")
       else
-        selection.has_key?(name)
+        selection.key?(name)
       end
     end
 
@@ -288,7 +288,7 @@ module Mongoid
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].mongoize(value) : value.mongoize
+      fields.key?(key) ? fields[key].mongoize(value) : value.mongoize
     end
 
     module ClassMethods
