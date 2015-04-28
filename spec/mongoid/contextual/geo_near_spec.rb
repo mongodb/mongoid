@@ -317,6 +317,41 @@ describe Mongoid::Contextual::GeoNear do
     end
   end
 
+  describe "#min_distance" do
+
+    let!(:collection) do
+      Pub.collection
+    end
+
+    before do
+      Pub.create_indexes
+    end
+
+    let!(:bar_one) do
+      Pub.create(location: [ 52.30, 13.25 ])
+    end
+
+    let!(:bar_two) do
+      Pub.create(location: [ 52.30, 13.35 ])
+    end
+
+    context "when results are returned" do
+
+      let(:criteria) do
+        Pub.all
+      end
+
+      let(:geo_near) do
+        described_class.new(collection, criteria, [ 52, 13 ]).spherical.min_distance(0.0)
+      end
+
+      it "sets the min distance" do
+        expect(geo_near.to_a).to include(bar_one)
+        expect(geo_near.to_a).to include(bar_two)
+      end
+    end
+  end
+
   describe "#inspect" do
 
     let!(:collection) do
