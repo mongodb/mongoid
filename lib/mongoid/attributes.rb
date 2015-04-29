@@ -273,7 +273,7 @@ module Mongoid
     #
     # @since 3.0.15
     def hash_dot_syntax?(string)
-      string.include?(".")
+      string.include?(".".freeze)
     end
 
     # Return the typecasted value for a field.
