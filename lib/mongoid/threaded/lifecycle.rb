@@ -1,7 +1,12 @@
 # encoding: utf-8
 module Mongoid
   module Threaded
-
+    BIND = 'bind'.freeze
+    ASSIGN = 'assign'.freeze
+    BUILD = 'build'.freeze
+    LOAD = 'load'.freeze
+    CREATE = 'create'.freeze
+    
     # This module contains convenience methods for document lifecycle that
     # resides on thread locals.
     module Lifecycle
@@ -22,10 +27,10 @@ module Mongoid
       #
       # @since 2.2.0
       def _assigning
-        Threaded.begin_execution("assign")
+        Threaded.begin_execution(ASSIGN)
         yield
       ensure
-        Threaded.exit_execution("assign")
+        Threaded.exit_execution(ASSIGN)
       end
 
       # Is the current thread in assigning mode?
@@ -37,7 +42,7 @@ module Mongoid
       #
       # @since 2.1.0
       def _assigning?
-        Threaded.executing?("assign")
+        Threaded.executing?(ASSIGN)
       end
 
       # Execute a block in binding mode.
@@ -51,10 +56,10 @@ module Mongoid
       #
       # @since 2.1.0
       def _binding
-        Threaded.begin_execution("bind")
+        Threaded.begin_execution(BIND)
         yield
       ensure
-        Threaded.exit_execution("bind")
+        Threaded.exit_execution(BIND)
       end
 
       # Is the current thread in binding mode?
@@ -66,7 +71,7 @@ module Mongoid
       #
       # @since 2.1.0
       def _binding?
-        Threaded.executing?("bind")
+        Threaded.executing?(BIND)
       end
 
       # Execute a block in building mode.
@@ -80,10 +85,10 @@ module Mongoid
       #
       # @since 2.1.0
       def _building
-        Threaded.begin_execution("build")
+        Threaded.begin_execution(BUILD)
         yield
       ensure
-        Threaded.exit_execution("build")
+        Threaded.exit_execution(BUILD)
       end
 
       # Is the current thread in building mode?
@@ -95,7 +100,7 @@ module Mongoid
       #
       # @since 2.1.0
       def _building?
-        Threaded.executing?("build")
+        Threaded.executing?(BUILD)
       end
 
       # Is the current thread in creating mode?
@@ -107,7 +112,7 @@ module Mongoid
       #
       # @since 2.1.0
       def _creating?
-        Threaded.executing?("create")
+        Threaded.executing?(CREATE)
       end
 
       # Execute a block in loading mode.
@@ -121,10 +126,10 @@ module Mongoid
       #
       # @since 2.3.2
       def _loading
-        Threaded.begin_execution("load")
+        Threaded.begin_execution(LOAD)
         yield
       ensure
-        Threaded.exit_execution("load")
+        Threaded.exit_execution(LOAD)
       end
 
       # Is the current thread in loading mode?
@@ -136,7 +141,7 @@ module Mongoid
       #
       # @since 2.3.2
       def _loading?
-        Threaded.executing?("load")
+        Threaded.executing?(LOAD)
       end
 
       module ClassMethods
@@ -152,10 +157,10 @@ module Mongoid
         #
         # @since 2.1.0
         def _creating
-          Threaded.begin_execution("create")
+          Threaded.begin_execution(CREATE)
           yield
         ensure
-          Threaded.exit_execution("create")
+          Threaded.exit_execution(CREATE)
         end
 
       end
