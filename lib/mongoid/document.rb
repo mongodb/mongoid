@@ -262,7 +262,7 @@ module Mongoid
     #
     # @since 2.4.0
     def model_key
-      @model_cache_key ||= "#{self.class.model_name.cache_key}"
+      @model_cache_key ||= self.class.model_name.cache_key
     end
 
     # Implement this for calls to flatten on array.
