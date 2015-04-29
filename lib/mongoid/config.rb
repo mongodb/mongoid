@@ -18,6 +18,7 @@ module Mongoid
 
     option :include_root_in_json, default: false
     option :include_type_for_serialization, default: false
+    option :ignore_type_attribute, default: false
     option :preload_models, default: false
     option :raise_not_found_error, default: true
     option :scope_overwrite_exception, default: false

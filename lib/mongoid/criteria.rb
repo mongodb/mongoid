@@ -335,7 +335,7 @@ module Mongoid
     def only(*args)
       return clone if args.flatten.empty?
       args = args.flatten
-      if klass.hereditary?
+      if klass.hereditary? && !::Mongoid::Config.ignore_type_attribute?
         super(*args.push(:_type))
       else
         super(*args)
@@ -550,7 +550,8 @@ module Mongoid
     def type_selectable?
       klass.hereditary? &&
         !selector.keys.include?("_type") &&
-        !selector.keys.include?(:_type)
+        !selector.keys.include?(:_type) &&
+        !::Mongoid::Config.ignore_type_attribute?
     end
 
     # Get the selector for type selection.

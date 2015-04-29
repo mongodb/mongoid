@@ -2707,6 +2707,20 @@ describe Mongoid::Criteria do
       it "adds _type to the fields" do
         expect(criteria.options[:fields]["_type"]).to eq(1)
       end
+
+      context "when ignore_type_attribute is true" do
+        before do
+          ::Mongoid::Config.ignore_type_attribute = true
+        end
+
+        after do
+          ::Mongoid::Config.ignore_type_attribute = false
+        end
+
+        it "does not add _type to the fields" do
+          expect(criteria.options[:fields]["_type"]).to be_nil
+        end
+      end
     end
 
     context "when limiting to embedded documents" do

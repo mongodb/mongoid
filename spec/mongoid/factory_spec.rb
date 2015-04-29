@@ -41,6 +41,20 @@ describe Mongoid::Factory do
         it "instantiates the subclass" do
           expect(person.class).to eq(Doctor)
         end
+
+        context "when ignore_type_attribute is true" do
+          before do
+            ::Mongoid::Config.ignore_type_attribute = true
+          end
+
+          after do
+            ::Mongoid::Config.ignore_type_attribute = false
+          end
+
+          it "instantiates the calling class" do
+            expect(person.class).to eq(Person)
+          end
+        end
       end
 
       context "when type is an empty string" do
@@ -125,6 +139,20 @@ describe Mongoid::Factory do
 
         it "sets the attributes" do
           expect(document.title).to eq("Sir")
+        end
+
+        context "when ignore_type_attribute is true" do
+          before do
+            ::Mongoid::Config.ignore_type_attribute = true
+          end
+
+          after do
+            ::Mongoid::Config.ignore_type_attribute = false
+          end
+
+          it "instantiates the calling class" do
+            expect(document.class).to eq(Address)
+          end
         end
       end
 

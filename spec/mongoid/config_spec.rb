@@ -107,6 +107,10 @@ describe Mongoid::Config do
         expect(described_class.include_type_for_serialization).to be false
       end
 
+      it "sets the ignore type attribute option" do
+        expect(described_class.ignore_type_attribute).to be false
+      end
+
       it "sets the scope overwrite option" do
         expect(described_class.scope_overwrite_exception).to be false
       end
@@ -151,6 +155,10 @@ describe Mongoid::Config do
 
         it "sets the include type with serialization option" do
           expect(described_class.include_type_for_serialization).to be false
+        end
+
+        it "sets the ignore type attribute option" do
+          expect(described_class.ignore_type_attribute).to be false
         end
 
         it "sets the scope overwrite option" do
