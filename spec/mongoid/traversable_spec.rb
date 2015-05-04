@@ -71,14 +71,14 @@ describe Mongoid::Traversable do
     context "when the document is a subclass" do
 
       it "returns true" do
-        expect(Circle).to be_hereditary
+        expect(Circle.hereditary?).to be true
       end
     end
 
     context "when the document is not a subclass" do
 
       it "returns false" do
-        expect(Shape).to_not be_hereditary
+        expect(Shape.hereditary?).to be false
       end
     end
   end

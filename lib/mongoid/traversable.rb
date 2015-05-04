@@ -161,7 +161,7 @@ module Mongoid
       #
       # @return [ true, false ] True if hereditary, false if not.
       def hereditary?
-        Mongoid::Document > superclass
+        !!(Mongoid::Document > superclass)
       end
 
       # When inheriting, we want to copy the fields from the parent class and
