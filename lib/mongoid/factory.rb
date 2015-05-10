@@ -5,6 +5,8 @@ module Mongoid
   module Factory
     extend self
 
+    TYPE = "_type".freeze
+
     # Builds a new +Document+ from the supplied attributes.
     #
     # @example Build the document.
@@ -16,7 +18,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      type = (attributes || {})["_type"]
+      type = (attributes || {})[TYPE]
       if type && klass._types.include?(type)
         type.constantize.new(attributes)
       else
@@ -37,7 +39,7 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, selected_fields = nil)
-      type = (attributes || {})["_type"]
+      type = (attributes || {})[TYPE]
       if type.blank?
         klass.instantiate(attributes, selected_fields)
       else
