@@ -335,11 +335,29 @@ module Mongoid
     def only(*args)
       return clone if args.flatten.empty?
       args = args.flatten
+      if (args & [:_id, :id, "_id", "id"]).empty?
+        args.unshift(:_id)
+      end
       if klass.hereditary?
         super(*args.push(:_type))
       else
         super(*args)
       end
+    end
+
+    # Overriden to exclude _id from the fields.
+    #
+    # @example Exclude fields returned from the database.
+    #   Band.without(:name)
+    #
+    # @param [ Array<Symbol> ] args The names of the fields.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 4.0.3
+    def without(*args)
+      args -= [:_id, :id, "_id", "id"]
+      super(*args)
     end
 
     # Returns true if criteria responds to the given method.

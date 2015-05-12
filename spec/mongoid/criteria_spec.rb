@@ -752,8 +752,8 @@ describe Mongoid::Criteria do
       Band.only(:name)
     end
 
-    it "returns the fields minus type" do
-      expect(criteria.field_list).to eq([ "name" ])
+    it "returns the fields with required _id minus type" do
+      expect(criteria.field_list).to eq([ "_id", "name" ])
     end
   end
 
@@ -2635,6 +2635,19 @@ describe Mongoid::Criteria do
         end
       end
 
+      context "when not including id" do
+
+        let(:criteria) do
+          Band.only(:name)
+        end
+
+        it "responds to id anyway" do
+          expect {
+            criteria.first.id
+          }.to_not raise_error
+        end
+      end
+
       context "when passing an array" do
 
         let(:criteria) do
@@ -2718,7 +2731,7 @@ describe Mongoid::Criteria do
         end
 
         it "properly uses the database field name" do
-          expect(criteria.options).to eq(fields: { "mobile_phones" => 1 })
+          expect(criteria.options).to eq(fields: { "_id" => 1, "mobile_phones" => 1 })
         end
       end
     end
@@ -3431,6 +3444,10 @@ describe Mongoid::Criteria do
 
   describe "#without" do
 
+    let!(:person) do
+      Person.create!(username: "davinci", age: 50, pets: false)
+    end
+
     context "when omitting to embedded documents" do
 
       context "when the embedded documents are aliased" do
@@ -3442,6 +3459,23 @@ describe Mongoid::Criteria do
         it "properly uses the database field name" do
           expect(criteria.options).to eq(fields: { "mobile_phones" => 0 })
         end
+      end
+    end
+
+    context "when excluding id" do
+
+      let(:criteria) do
+        Person.without(:_id, :id, "_id", "id")
+      end
+
+      it "does not raise error" do
+        expect {
+          criteria.first.id
+        }.to_not raise_error
+      end
+
+      it "returns id anyway" do
+        expect(criteria.first.id).to_not be_nil
       end
     end
   end
