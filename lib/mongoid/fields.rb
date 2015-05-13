@@ -32,6 +32,11 @@ module Mongoid
       time: Time
     }.with_indifferent_access
 
+    # Constant for all names of the id field in a document.
+    #
+    # @since 5.0.0
+    IDS = [ :_id, :id, '_id', 'id' ].freeze
+
     included do
       class_attribute :aliased_fields
       class_attribute :localized_fields

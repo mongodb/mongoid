@@ -335,7 +335,7 @@ module Mongoid
     def only(*args)
       return clone if args.flatten.empty?
       args = args.flatten
-      if (args & [:_id, :id, "_id", "id"]).empty?
+      if (args & Fields::IDS).empty?
         args.unshift(:_id)
       end
       if klass.hereditary?
@@ -356,7 +356,7 @@ module Mongoid
     #
     # @since 4.0.3
     def without(*args)
-      args -= [:_id, :id, "_id", "id"]
+      args -= Fields::IDS
       super(*args)
     end
 
