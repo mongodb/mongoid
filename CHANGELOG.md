@@ -15,6 +15,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
 
+* \#3631 Fixes issue where `before_save` callback can get called twice after a child create
+
 ## 4.0.2
 
 ### New Features
