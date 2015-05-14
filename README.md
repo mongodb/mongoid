@@ -7,6 +7,18 @@
 
 Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
 
+Project Move and Support
+------------------------
+
+For the upcoming 5.0.0 release, the repository will be getting moved to the MongoDB
+organization. Please pay special attention to the following information with regards
+to this move:
+
+* 5.0.0 and higher releases of Mongoid will be officially supported by MongoDB with a dedicated team.
+* Issues tagged 5.0.0 and higher in Github will be migrated to the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/) upon the release. There will be no more Github issues.
+* 4.x and 3.x releases will no longer be supported. Fixes to these branches will need to be maintained in community forks, although not recommended.
+* 5.0.0 release will still be supporting Rails 4.x, although there will be some backwards incompatible changes with respect to the configuration options. The Mongoid public API itself will not be changed.
+
 Project Tracking
 ----------------
 
@@ -26,21 +38,10 @@ Documentation
 Please see the new Mongoid website for up-to-date documentation:
 [mongoid.org](http://mongoid.org)
 
-Donating
---------
-
-[Support Mongoid at Pledgie](http://www.pledgie.com/campaigns/7757)
-
-<a href='http://www.pledgie.com/campaigns/7757'>
-<img alt='Click here to lend your support to: Mongoid and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/7757.png?skin_name=chrome' border='0'/>
-</a>
-
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=durran&url=http://github.com/mongoid&title=mongoid&language=&tags=github&category=software)
-
 License
 -------
 
-Copyright (c) 2009-2013 Durran Jordan
+Copyright (c) 2009-2015 Durran Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
