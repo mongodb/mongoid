@@ -17,6 +17,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3740 Fixes `Missing attribute: '_id'` error when using methods only or without (dx7)
 
+* \#3631 Fixes issue where `before_save` callback can get called twice after a child create
+
 ## 4.0.2
 
 ### New Features
