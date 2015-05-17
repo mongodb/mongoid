@@ -16,7 +16,7 @@ module Mongoid
     #
     # @since 2.4.0
     def changed
-      changed_attributes.keys
+      changed_attributes.keys.select { |attr| attribute_change(attr) }
     end
 
     # Has the document changed?
