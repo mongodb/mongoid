@@ -98,7 +98,12 @@ describe Mongoid::Relations::Touchable do
         context "when no attribute is provided" do
 
           let!(:touched) do
+            agent.title = "changed"
             agent.touch
+          end
+
+          it "does not modify dirty attributes" do
+            expect(agent.reload.title).not_to eq "changed"
           end
 
           it "sets the updated at to the current time" do

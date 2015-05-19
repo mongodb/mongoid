@@ -61,8 +61,12 @@ module Mongoid
       def delete_as_embedded(options = {})
         _parent.remove_child(self) if notifying_parent?(options)
         if _parent.persisted?
+          _parent.touch_without_saving
           selector = _parent.atomic_selector
-          _root.collection.find(selector).update(positionally(selector, atomic_deletes))
+          mods = Atomic::Modifiers.new
+          atomic_root_timestamp_updates(mods)
+          mods.merge! positionally(selector, atomic_deletes)
+          _root.collection.find(selector).update(mods)
         end
         true
       end

@@ -137,6 +137,7 @@ module Mongoid
       def update_document(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_update(options) do
+          touch_without_saving if changed?
           updates, conflicts = init_atomic_updates
           unless updates.empty?
             coll = _root.collection
