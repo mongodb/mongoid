@@ -40,6 +40,7 @@ def database_id_alt
 end
 
 require 'support/authorization'
+require 'support/expectations'
 
 # Give MongoDB time to start up on the travis ci environment.
 if (ENV['CI'] == 'travis')
@@ -70,11 +71,6 @@ CONFIG = {
     }
   }
 }
-
-# Can we connect to MongoHQ from this box?
-def mongohq_connectable?
-  ENV["MONGOHQ_REPL_PASS"].present?
-end
 
 def purge_database_alt!
   session = Mongoid::Sessions.default
@@ -118,6 +114,7 @@ I18n.config.enforce_available_locales = false
 
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
+  config.include(Mongoid::Expectations)
 
   config.before(:suite) do
     client = Mongo::Client.new(["#{HOST}:#{PORT}"])
@@ -158,9 +155,4 @@ RSpec.configure do |config|
   config.before(:each) do
     Mongoid.purge!
   end
-
-  # Filter out MongoHQ specs if we can't connect to it.
-  config.filter_run_excluding(config: ->(value){
-    return true if value == :mongohq && !mongohq_connectable?
-  })
 end

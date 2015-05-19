@@ -9,31 +9,6 @@ test:
         password: "password"
         read:
           mode: primary
-    mongohq_single:
-      database: <%=ENV["MONGOHQ_SINGLE_NAME"]%>
-      hosts:
-        - <%=ENV["MONGOHQ_SINGLE_URL"]%>
-      options:
-        user: <%=ENV["MONGOHQ_SINGLE_USER"]%>
-        password: <%=ENV["MONGOHQ_SINGLE_PASS"]%>
-        write:
-          w: 1
-        read:
-          mode: primary
-    mongohq_repl:
-      database: <%=ENV["MONGOHQ_REPL_NAME"]%>
-      hosts:
-        - <%=ENV["MONGOHQ_REPL_1_URL"]%>
-        - <%=ENV["MONGOHQ_REPL_2_URL"]%>
-      options:
-        user: <%=ENV["MONGOHQ_REPL_USER"]%>
-        password: <%=ENV["MONGOHQ_REPL_PASS"]%>
-        read:
-          mode: primary
-        write:
-          w: majority
-    mongohq_repl_uri:
-      uri: <%= ENV["MONGOHQ_REPL_URI"]%>
   options:
     include_root_in_json: false
     include_type_for_serialization: false

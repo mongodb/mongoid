@@ -75,7 +75,7 @@ module Mongoid
         undefined_indexes(models).each do |model, indexes|
           indexes.each do |index|
             key = index['key'].symbolize_keys
-            model.collection.indexes.drop(key)
+            model.collection.indexes.drop_one(key)
             logger.info("MONGOID: Removing index: #{index['name']} on #{model}.")
           end
         end

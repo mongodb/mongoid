@@ -107,15 +107,66 @@ module Mongoid
       end
     end
 
-    module Base # :nodoc:
+    # A Cursor that attempts to load documents from memory first before hitting
+    # the database if the same query has already been executed.
+    #
+    # @since 5.0.0
+    class CachedCursor < Mongo::Cursor
+
+      # We iterate over the cached documents if they exist already in the
+      # cursor otherwise proceed as normal.
+      #
+      # @example Iterate over the documents.
+      #   cursor.each do |doc|
+      #     # ...
+      #   end
+      #
+      # @since 5.0.0
+      def each
+        if @cached_documents
+          @cached_documents.each{ |doc| yield doc }
+        else
+          super
+        end
+      end
+
+      # Get a human-readable string representation of +Cursor+.
+      #
+      # @example Inspect the cursor.
+      #   cursor.inspect
+      #
+      # @return [ String ] A string representation of a +Cursor+ instance.
+      #
+      # @since 2.0.0
+      def inspect
+        "#<Mongoid::QueryCache::CachedCursor:0x#{object_id} @view=#{@view.inspect}>"
+      end
+
+      private
+
+      def process(result)
+        @remaining -= result.returned_count if limited?
+        @cursor_id = result.cursor_id
+        @coll_name ||= result.namespace.sub("#{database.name}.", '') if result.namespace
+        documents = result.documents
+        (@cached_documents ||= []).concat(documents)
+        documents
+      end
+    end
+
+    # Included to add behaviour for clearing out the query cache on certain
+    # operations.
+    #
+    # @since 4.0.0
+    module Base
 
       def alias_query_cache_clear(*method_names)
         method_names.each do |method_name|
           class_eval <<-CODE, __FILE__, __LINE__ + 1
-              def #{method_name}_with_clear_cache(*args)   # def upsert_with_clear_cache(*args)
-                QueryCache.clear_cache                     #   QueryCache.clear_cache
-                #{method_name}_without_clear_cache(*args)  #   upsert_without_clear_cache(*args)
-              end                                          # end
+              def #{method_name}_with_clear_cache(*args)
+                QueryCache.clear_cache
+                #{method_name}_without_clear_cache(*args)
+              end
             CODE
 
           alias_method_chain method_name, :clear_cache
@@ -123,134 +174,76 @@ module Mongoid
       end
     end
 
-    # Module to include in objects which need to wrap caching behaviour around
-    # them.
+    # Contains enhancements to the Mongo::Collection::View in order to get a
+    # cached cursor or a regular cursor on iteration.
     #
-    # @since 4.0.0
-    module Cacheable
-
-      private
-
-      def with_cache(context = :cursor, more = false, &_block)
-        return yield unless QueryCache.enabled?
-        return yield if system_collection?
-        key = cache_key.push(context)
-
-        if more
-          docs = yield
-          QueryCache.cache_table[key].push(*docs)
-          docs
-        elsif QueryCache.cache_table.key?(key)
-          instrument(key) { QueryCache.cache_table[key] }
-        else
-          QueryCache.cache_table[key] = yield
-        end
-      end
-
-      def instrument(key, &block)
-        ActiveSupport::Notifications.instrument("query_cache.mongoid", key: key, &block)
-      end
-    end
-
-    # Adds behaviour around caching to a Moped Query object.
-    #
-    # @since 4.0.0
-    module Query
+    # @since 5.0.0
+    module View
       extend ActiveSupport::Concern
-      include Cacheable
 
       included do
         extend QueryCache::Base
-        alias_method_chain :cursor, :cache
-        alias_method_chain :first, :cache
-        alias_query_cache_clear :remove, :remove_all, :update, :update_all, :upsert
+        alias_query_cache_clear :delete_one,
+                                :delete_many,
+                                :update_one,
+                                :update_many,
+                                :replace_one,
+                                :find_one_and_delete,
+                                :find_one_and_replace,
+                                :find_one_and_update
       end
 
-      # Provide a wrapped query cache cursor.
+      # Override the default enumeration to handle if the cursor can be cached
+      # or not.
       #
-      # @example Get the wrapped caching cursor.
-      #   query.cursor_with_cache
+      # @example Iterate over the view.
+      #   view.each do |doc|
+      #     # ...
+      #   end
       #
-      # @return [ CachedCursor ] The cached cursor.
-      #
-      # @since 4.0.0
-      def cursor_with_cache
-        CachedCursor.new(session, operation)
-      end
-
-      # Override first with caching.
-      #
-      # @example Get the first with a cache.
-      #   query.first_with_cache
-      #
-      # @return [ Hash ] The first document.
-      #
-      # @since 4.0.0
-      def first_with_cache
-        with_cache(:first) do
-          first_without_cache
+      # @since 5.0.0
+      def each
+        if system_collection? || !QueryCache.enabled?
+          super
+        else
+          key = cache_key
+          cursor = QueryCache.cache_table[key]
+          unless cursor
+            server = read.select_server(cluster)
+            cursor = CachedCursor.new(view, send_initial_query(server), server)
+            QueryCache.cache_table[key] = cursor
+          end
+          cursor.each do |doc|
+            yield doc
+          end if block_given?
+          cursor
         end
       end
 
       private
 
       def cache_key
-        [ operation.database, operation.collection, operation.selector, operation.limit, operation.skip, operation.fields ]
+        [ collection.namespace, selector, limit, skip, projection ]
       end
 
       def system_collection?
-        operation.collection =~ /^system./
+        collection.namespace =~ /^system./
       end
     end
 
     # Adds behaviour to the query cache for collections.
     #
-    # @since 4.0.0
+    # @since 5.0.0
     module Collection
       extend ActiveSupport::Concern
 
       included do
         extend QueryCache::Base
-        alias_query_cache_clear :insert
-      end
-    end
-
-    # A Cursor that attempts to load documents from memory first before hitting
-    # the database if the same query has already been executed.
-    #
-    # @since 4.0.0
-    class CachedCursor < Mongo::Cursor
-      include Cacheable
-
-      # Override the loading of docs to attempt to fetch from the cache.
-      #
-      # @example Load the documents.
-      #   cursor.load_docs
-      #
-      # @return [ Array<Hash> ] The documents.
-      #
-      # @since 4.0.0
-      def load_docs
-        with_cache { super }
-      end
-
-      def get_more
-        with_cache(:cursor, true) { super }
-      end
-
-      private
-
-      def cache_key
-        [ @database, @collection, @selector, @options[:limit], @options[:skip], @options[:fields] ]
-      end
-
-      def system_collection?
-        @collection =~ /^system./
+        alias_query_cache_clear :insert_one, :insert_many
       end
     end
   end
 end
 
-# @todo: Durran - get working normally first.
-# Moped::Query.__send__(:include, Mongoid::QueryCache::Query)
-# Moped::Collection.__send__(:include, Mongoid::QueryCache::Collection)
+Mongo::Collection.__send__(:include, Mongoid::QueryCache::Collection)
+Mongo::Collection::View.__send__(:include, Mongoid::QueryCache::View)

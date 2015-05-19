@@ -7,7 +7,7 @@ describe Mongoid::QueryCache do
     Mongoid::QueryCache.cache { spec.run }
   end
 
-  pending "when querying for a single document" do
+  context "when querying for a single document" do
 
     [ :first, :one, :last ].each do |method|
 
@@ -15,7 +15,7 @@ describe Mongoid::QueryCache do
         Band.all.send(method)
       end
 
-      pending "when query cache disable" do
+      context "when query cache is disabled" do
 
         before do
           Mongoid::QueryCache.enabled = false
@@ -28,7 +28,7 @@ describe Mongoid::QueryCache do
         end
       end
 
-      pending "with same selector" do
+      context "with same selector" do
 
         it "does not query again" do
           expect_no_queries do
@@ -37,7 +37,7 @@ describe Mongoid::QueryCache do
         end
       end
 
-      pending "with different selector" do
+      context "with different selector" do
 
         it "queries again" do
           expect_query(1) do
@@ -48,13 +48,13 @@ describe Mongoid::QueryCache do
     end
   end
 
-  pending "when querying in the same collection" do
+  context "when querying in the same collection" do
 
     before do
       Band.all.to_a
     end
 
-    pending "when query cache disable" do
+    context "when query cache is disabled" do
 
       before do
         Mongoid::QueryCache.enabled = false
@@ -67,7 +67,7 @@ describe Mongoid::QueryCache do
       end
     end
 
-    pending "with same selector" do
+    context "with same selector" do
 
       it "does not query again" do
         expect_no_queries do
@@ -75,21 +75,25 @@ describe Mongoid::QueryCache do
         end
       end
 
-      pending "when querying only the first" do
-        let(:game) { Game.create!(name: "2048") }
+      context "when querying only the first" do
+
+        let(:game) do
+          Game.create!(name: "2048")
+        end
 
         before do
           game.ratings.where(:value.gt => 5).asc(:id).all.to_a
         end
 
-        it "queries again" do
-          expect_query(1) do
+        it "does not query again" do
+          expect_no_queries do
             game.ratings.where(:value.gt => 5).asc(:id).first
           end
         end
       end
 
-      pending "limiting the result" do
+      context "when limiting the result" do
+
         it "queries again" do
           expect_query(1) do
             Band.limit(2).all.to_a
@@ -97,7 +101,8 @@ describe Mongoid::QueryCache do
         end
       end
 
-      pending "specifying a different skip value" do
+      context "when specifying a different skip value" do
+
         before do
           Band.limit(2).skip(1).all.to_a
         end
@@ -110,7 +115,7 @@ describe Mongoid::QueryCache do
       end
     end
 
-    pending "with different selector" do
+    context "with different selector" do
 
       it "queries again" do
         expect_query(1) do
@@ -120,7 +125,7 @@ describe Mongoid::QueryCache do
     end
   end
 
-  pending "when querying in different collection" do
+  context "when querying in different collection" do
 
     before do
       Person.all.to_a
@@ -133,7 +138,7 @@ describe Mongoid::QueryCache do
     end
   end
 
-  pending "when inserting a new document" do
+  context "when inserting a new document" do
 
     before do
       Band.all.to_a
@@ -147,7 +152,7 @@ describe Mongoid::QueryCache do
     end
   end
 
-  pending "when deleting all documents" do
+  context "when deleting all documents" do
 
     before do
       Band.create!
@@ -162,7 +167,7 @@ describe Mongoid::QueryCache do
     end
   end
 
-  pending "when destroying all documents" do
+  context "when destroying all documents" do
 
     before do
       Band.create!
@@ -177,7 +182,7 @@ describe Mongoid::QueryCache do
     end
   end
 
-  pending "when querying a very large collection" do
+  context "when querying a very large collection" do
 
     before do
       123.times { Band.create! }
@@ -191,7 +196,7 @@ describe Mongoid::QueryCache do
       expect(Band.pluck(:name).length).to eq(123)
     end
 
-    pending "when loading all the documents" do
+    context "when loading all the documents" do
 
       before do
         Band.all.to_a
@@ -209,11 +214,11 @@ describe Mongoid::QueryCache do
     end
   end
 
-  pending "when inserting an index" do
+  context "when inserting an index" do
 
     it "does not cache the query" do
       expect(Mongoid::QueryCache).to receive(:cache_table).never
-      Band.collection.indexes.create(name: 1)
+      Band.collection.indexes.create_one(name: 1)
     end
   end
 end
@@ -224,7 +229,7 @@ describe Mongoid::QueryCache::Middleware do
     Mongoid::QueryCache::Middleware.new(app)
   end
 
-  pending "when not touching mongoid on the app" do
+  context "when not touching mongoid on the app" do
 
     let(:app) do
       ->(env) { @enabled = Mongoid::QueryCache.enabled?; [200, env, "app"] }
@@ -241,7 +246,7 @@ describe Mongoid::QueryCache::Middleware do
     end
   end
 
-  pending "when querying on the app" do
+  context "when querying on the app" do
 
     let(:app) do
       ->(env) {

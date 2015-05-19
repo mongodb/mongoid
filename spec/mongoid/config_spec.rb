@@ -201,21 +201,6 @@ describe Mongoid::Config do
             end
           end
         end
-
-        context "when a secondary is provided", config: :mongohq do
-
-          before do
-            described_class.load!(file)
-          end
-
-          let(:secondary) do
-            described_class.sessions[:mongohq_single]
-          end
-
-          it "sets the secondary host" do
-            expect(secondary["hosts"]).to eq([ ENV["MONGOHQ_SINGLE_URL"] ])
-          end
-        end
       end
     end
   end

@@ -100,7 +100,7 @@ describe "Mongoid::Tasks::Database" do
     context "with extra index on model collection" do
 
       before(:each) do
-        User.collection.indexes.create(account_expires: 1)
+        User.collection.indexes.create_one(account_expires: 1)
       end
 
       let(:names) do
@@ -121,7 +121,7 @@ describe "Mongoid::Tasks::Database" do
 
     before(:each) do
       Mongoid::Tasks::Database.create_indexes(models)
-      indexes.create(account_expires: 1)
+      indexes.create_one(account_expires: 1)
       Mongoid::Tasks::Database.remove_undefined_indexes(models)
     end
 
