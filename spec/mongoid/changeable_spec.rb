@@ -661,6 +661,24 @@ describe Mongoid::Changeable do
       it "returns an array of changed field names" do
         expect(person.changed).to include("title")
       end
+
+    end
+
+    context "When the document has changed but changed back to the original" do
+
+      let(:person) do
+        Person.instantiate(title: "Grand Poobah")
+      end
+
+      before do
+        person.title = "Captain Obvious"
+        person.title = nil
+      end
+
+      it "returns an array of changed field names" do
+        expect(person.changed).not_to include("title")
+      end
+
     end
 
     context "when the document has not changed" do
