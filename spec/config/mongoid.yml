@@ -5,8 +5,6 @@ test:
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
-        user: "mongoid-test-user"
-        password: "password"
         read:
           mode: primary
   options:

@@ -21,7 +21,7 @@ env:
   matrix:
     - MONGODB=2.4.12
     - MONGODB=2.6.7
-    - MONGODB=3.0.0-rc8
+    - MONGODB=3.0.3
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
