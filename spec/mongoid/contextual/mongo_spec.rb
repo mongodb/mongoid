@@ -557,7 +557,7 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  pending "#find_and_modify" do
+  describe "#find_one_and_update" do
 
     let!(:depeche) do
       Band.create(name: "Depeche Mode")
@@ -580,7 +580,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify("$inc" => { likes: 1 })
+          context.find_one_and_update("$inc" => { likes: 1 })
         end
 
         it "returns the first matching document" do
@@ -603,7 +603,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify("$inc" => { likes: 1 })
+          context.find_one_and_update("$inc" => { likes: 1 })
         end
 
         it "returns the first matching document" do
@@ -626,7 +626,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify("$inc" => { likes: 1 })
+          context.find_one_and_update("$inc" => { likes: 1 })
         end
 
         it "returns the first matching document" do
@@ -653,7 +653,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify({ "$inc" => { likes: 1 }}, new: true)
+          context.find_one_and_update({ "$inc" => { likes: 1 }}, return_document: :after)
         end
 
         it "returns the first matching document" do
@@ -676,7 +676,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify({}, remove: true)
+          context.find_one_and_delete
         end
 
         it "returns the first matching document" do
@@ -702,7 +702,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:result) do
-        context.find_and_modify("$inc" => { likes: 1 })
+        context.find_one_and_update("$inc" => { likes: 1 })
       end
 
       it "returns nil" do

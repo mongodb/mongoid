@@ -40,14 +40,14 @@ describe Mongoid::Findable do
     end
   end
 
-  pending ".find_and_modify" do
+  describe ".find_one_and_update" do
 
     let!(:person) do
       Person.create(title: "Senior")
     end
 
     it "returns the document" do
-      expect(Person.find_and_modify(title: "Junior")).to eq(person)
+      expect(Person.find_one_and_update(title: "Junior")).to eq(person)
     end
   end
 

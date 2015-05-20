@@ -164,21 +164,59 @@ module Mongoid
       # $findAndModify.
       #
       # @example Execute the command.
-      #   context.find_and_modify({ "$inc" => { likes: 1 }}, new: true)
+      #   context.find_one_and_update({ "$inc" => { likes: 1 }})
       #
       # @param [ Hash ] update The updates.
       # @param [ Hash ] options The command options.
       #
-      # @option options [ true, false ] :new Return the updated document.
-      # @option options [ true, false ] :remove Delete the first document.
+      # @option options [ :before, :after ] :return_document Return the updated document
+      #   from before or after update.
       # @option options [ true, false ] :upsert Create the document if it doesn't exist.
       #
       # @return [ Document ] The result of the command.
       #
-      # @since 3.0.0
-      def find_and_modify(update, options = {})
-        if doc = FindAndModify.new(collection, criteria, update, options).result
-          Factory.from_db(klass, doc) if doc.any?
+      # @since 5.0.0
+      def find_one_and_update(update, options = {})
+        if doc = query.find_one_and_update(update, options)
+          Factory.from_db(klass, doc)
+        end
+      end
+
+      # Execute the find and modify command, used for MongoDB's
+      # $findAndModify.
+      #
+      # @example Execute the command.
+      #   context.find_one_and_update({ likes: 1 })
+      #
+      # @param [ Hash ] update The updates.
+      # @param [ Hash ] options The command options.
+      #
+      # @option options [ :before, :after ] :return_document Return the updated document
+      #   from before or after update.
+      # @option options [ true, false ] :upsert Create the document if it doesn't exist.
+      #
+      # @return [ Document ] The result of the command.
+      #
+      # @since 5.0.0
+      def find_one_and_replace(replacement, options = {})
+        if doc = query.find_one_and_replace(replacement, options)
+          Factory.from_db(klass, doc)
+        end
+      end
+
+      # Execute the find and modify command, used for MongoDB's
+      # $findAndModify. This deletes the found document.
+      #
+      # @example Execute the command.
+      #   context.find_one_and_delete
+      #
+      # @return [ Document ] The result of the command.
+      #
+      # @since 5.0.0
+      def find_one_and_delete
+        if doc = query.find_one_and_delete
+          Factory.from_db(klass, doc)
+>>>>>>> Implement find and modify related operations
         end
       end
 
