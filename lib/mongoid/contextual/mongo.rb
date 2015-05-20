@@ -15,8 +15,8 @@ module Mongoid
       include Relations::Eager
       include Queryable
 
-      # @attribute [r] query The Moped query.
-      attr_reader :query
+      # @attribute [r] view The Mongo collection view.
+      attr_reader :view
 
       # Is the context cached?
       #
@@ -54,8 +54,8 @@ module Mongoid
         if document.is_a?(Document)
           return collection.find(criteria.and(_id: document._id).selector).count
         end
-        return query.count(document) if document
-        try_cache(:count) { query.count }
+        return view.count(document) if document
+        try_cache(:count) { view.count }
       end
 
       # Delete all documents in the database that match the selector.
@@ -68,7 +68,7 @@ module Mongoid
       # @since 3.0.0
       def delete
         self.count.tap do
-          query.delete_many
+          view.delete_many
         end
       end
       alias :delete_all :delete
@@ -101,7 +101,7 @@ module Mongoid
       #
       # @since 3.0.0
       def distinct(field)
-        query.distinct(klass.database_field_name(field))
+        view.distinct(klass.database_field_name(field))
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -144,7 +144,7 @@ module Mongoid
         return @count > 0 if instance_variable_defined?(:@count)
 
         try_cache(:exists) do
-          !!(query.dup.projection(_id: 1).limit(1).first)
+          !!(view.projection(_id: 1).limit(1).first)
         end
       end
 
@@ -157,7 +157,7 @@ module Mongoid
       #
       # @since 3.0.0
       def explain
-        query.explain
+        view.explain
       end
 
       # Execute the find and modify command, used for MongoDB's
@@ -177,7 +177,7 @@ module Mongoid
       #
       # @since 5.0.0
       def find_one_and_update(update, options = {})
-        if doc = query.find_one_and_update(update, options)
+        if doc = view.find_one_and_update(update, options)
           Factory.from_db(klass, doc)
         end
       end
@@ -199,7 +199,7 @@ module Mongoid
       #
       # @since 5.0.0
       def find_one_and_replace(replacement, options = {})
-        if doc = query.find_one_and_replace(replacement, options)
+        if doc = view.find_one_and_replace(replacement, options)
           Factory.from_db(klass, doc)
         end
       end
@@ -214,7 +214,7 @@ module Mongoid
       #
       # @since 5.0.0
       def find_one_and_delete
-        if doc = query.find_one_and_delete
+        if doc = view.find_one_and_delete
           Factory.from_db(klass, doc)
 >>>>>>> Implement find and modify related operations
         end
@@ -232,7 +232,7 @@ module Mongoid
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
           with_sorting do
-            with_eager_loading(query.first)
+            with_eager_loading(view.first)
           end
         end
       end
@@ -308,7 +308,7 @@ module Mongoid
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         @collection = @klass.with(criteria.persistence_options || {}).collection
         criteria.send(:merge_type_selection)
-        @query = collection.find(criteria.selector)
+        @view = collection.find(criteria.selector)
         apply_options
       end
 
@@ -325,7 +325,7 @@ module Mongoid
       def last
         try_cache(:last) do
           with_inverse_sorting do
-            with_eager_loading(query.first)
+            with_eager_loading(view.first)
           end
         end
       end
@@ -354,7 +354,7 @@ module Mongoid
       #
       # @since 3.0.0
       def limit(value)
-        @query = query.limit(value) and self
+        @view = view.limit(value) and self
       end
 
       # Initiate a map/reduce operation from the context.
@@ -392,7 +392,7 @@ module Mongoid
           hash
         end
 
-        query.dup.projection(normalized_select).map do |doc|
+        view.projection(normalized_select).map do |doc|
           if normalized_select.size == 1
             doc[normalized_select.keys.first]
           else
@@ -412,7 +412,7 @@ module Mongoid
       #
       # @since 3.0.0
       def skip(value)
-        @query = query.skip(value) and self
+        @view = view.skip(value) and self
       end
 
       # Sorts the documents by the provided spec.
@@ -435,20 +435,6 @@ module Mongoid
           apply_option(:sort)
           self
         end
-      end
-
-      # Execute a text command against the database.
-      #
-      # @example Find documents with the text "phase"
-      #   context.text_search("phase")
-      #
-      # @param [ String ] query The text search query.
-      #
-      # @return [ TextSearch ] The TextSearch command.
-      #
-      # @since 4.0.0
-      def text_search(query)
-        TextSearch.new(collection, criteria, query)
       end
 
       # Update the first matching document atomically.
@@ -515,7 +501,7 @@ module Mongoid
       def update_documents(attributes, method = :update_one)
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        query.send(method, attributes.__consolidate__(klass))
+        view.send(method, attributes.__consolidate__(klass))
       end
 
       # Apply the field limitations.
@@ -528,7 +514,7 @@ module Mongoid
       # @since 3.0.0
       def apply_fields
         if spec = criteria.options[:fields]
-          @query = query.projection(spec)
+          @view = view.projection(spec)
         end
       end
 
@@ -547,7 +533,7 @@ module Mongoid
         end
         if criteria.options[:timeout] == false
           # @todo: Durran: Implement.
-          @query = query#.no_timeout
+          @view = view#.no_timeout
         end
       end
 
@@ -561,7 +547,7 @@ module Mongoid
       # @since 3.1.0
       def apply_option(name)
         if spec = criteria.options[name]
-          @query = query.send(name, spec)
+          @view = view.send(name, spec)
         end
       end
 
@@ -577,7 +563,7 @@ module Mongoid
       def with_sorting
         begin
           unless criteria.options.has_key?(:sort)
-            @query = query.sort(_id: 1)
+            @view = view.sort(_id: 1)
           end
           yield
         ensure
@@ -596,9 +582,9 @@ module Mongoid
       def with_inverse_sorting
         begin
           if spec = criteria.options[:sort]
-            @query = query.sort(Hash[spec.map{|k, v| [k, -1*v]}])
+            @view = view.sort(Hash[spec.map{|k, v| [k, -1*v]}])
           else
-            @query = query.sort(_id: -1)
+            @view = view.sort(_id: -1)
           end
           yield
         ensure
@@ -669,11 +655,11 @@ module Mongoid
         if cached? && !documents.empty?
           documents
         elsif eager_loadable?
-          docs = query.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
+          docs = view.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
           eager_load(docs)
           docs
         else
-          query
+          view
         end
       end
 
