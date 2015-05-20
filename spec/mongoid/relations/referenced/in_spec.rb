@@ -446,7 +446,7 @@ describe Mongoid::Relations::Referenced::In do
 
         context "when parent exists" do
 
-          pending "when child touch the parent" do
+          context "when child touch the parent" do
 
             let!(:account_from_db) { account.reload }
 

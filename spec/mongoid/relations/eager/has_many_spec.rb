@@ -76,7 +76,7 @@ describe Mongoid::Relations::Eager::HasMany do
       Person.create!
     end
 
-    pending "when including the has_many relation" do
+    context "when including the has_many relation" do
 
       before do
         3.times { Drug.create!(person: person) }
