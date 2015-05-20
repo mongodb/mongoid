@@ -485,25 +485,4 @@ describe Mongoid::Findable do
       end
     end
   end
-
-  pending "#text_search" do
-
-    before do
-      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
-      Word.create_indexes
-      Word.create!(name: "phase", origin: "latin")
-    end
-
-    after(:all) do
-      Word.remove_indexes
-    end
-
-    let(:search) do
-      Word.text_search("phase")
-    end
-
-    it "returns all fields" do
-      expect(search.first.origin).to eq("latin")
-    end
-  end
 end

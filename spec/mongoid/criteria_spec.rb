@@ -3117,31 +3117,6 @@ describe Mongoid::Criteria do
     end
   end
 
-  pending "#text_search" do
-
-    let(:criteria) do
-      Word.all
-    end
-
-    before do
-      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
-      Word.create_indexes
-      Word.create!(name: "phase", origin: "latin")
-    end
-
-    after(:all) do
-      Word.remove_indexes
-    end
-
-    let(:search) do
-      criteria.text_search("phase")
-    end
-
-    it "returns all fields" do
-      expect(search.first.origin).to eq("latin")
-    end
-  end
-
   describe "#to_criteria" do
 
     let(:criteria) do
