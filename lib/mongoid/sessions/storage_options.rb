@@ -75,8 +75,7 @@ module Mongoid
           {
             collection: name.collectionize.to_sym,
             session: :default,
-            # @todo: Handle URI's here.
-            database: -> { Mongoid.sessions[session_name][:database] }
+            database: -> { configured_database }
           }
         end
 
@@ -134,6 +133,17 @@ module Mongoid
         def __evaluate__(name)
           return nil unless name
           name.respond_to?(:call) ? name.call.to_sym : name.to_sym
+        end
+
+        def configured_database
+          session = Mongoid.sessions[session_name]
+          if db = session[:database]
+            db
+          elsif uri = session[:uri]
+            session[:database] = Mongo::URI.new(uri).database
+          else
+            nil
+          end
         end
       end
     end
