@@ -75,7 +75,7 @@ describe Mongoid::Contextual::Atomic do
     end
   end
 
-  pending "#bit" do
+  describe "#bit" do
 
     let!(:depeche_mode) do
       Band.create(likes: 60)

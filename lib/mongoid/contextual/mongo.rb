@@ -2,7 +2,6 @@
 require "mongoid/contextual/atomic"
 require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
-require "mongoid/contextual/find_and_modify"
 require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
 require "mongoid/relations/eager"
