@@ -95,6 +95,16 @@ module Rails
         end
       end
 
+      # Expose database runtime to controller for logging.
+      initializer "mongoid.log_runtime" do
+        require "mongoid/railties/controller_runtime"
+        ActiveSupport.on_load(:action_controller) do
+          include ::Mongoid::Railties::ControllerRuntime
+        end
+      end
+
+
+
       config.after_initialize do
         # Unicorn clears the START_CTX when a worker is forked, so if we have
         # data in START_CTX then we know we're being preloaded. Unicorn does
