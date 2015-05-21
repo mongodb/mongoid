@@ -13,7 +13,14 @@ module Mongoid
 
       payload = event.payload
       runtime = ("%.4fms" % event.duration)
-      debug(payload[:prefix], payload[:ops], runtime)
+      
+      if payload[:exception]
+        prefix = payload[:prefix] + " ERROR: " + payload[:exception].join(' - ')
+      else
+        prefix = payload[:prefix]
+      end
+
+      debug(prefix, payload[:ops], runtime)      
     end
 
     def query_cache(event)
