@@ -39,6 +39,7 @@ def database_id_alt
   "mongoid_test_alt"
 end
 
+require 'support/authorization'
 require 'support/expectations'
 
 # Give MongoDB time to start up on the travis ci environment.
@@ -63,7 +64,9 @@ CONFIG = {
       hosts: [ "#{HOST}:#{PORT}" ],
       options: {
         server_selection_timeout: 0.5,
-        max_pool_size: 1
+        max_pool_size: 1,
+        user: MONGOID_TEST_USER.name,
+        password: MONGOID_TEST_USER.password
       }
     }
   }
@@ -112,6 +115,43 @@ I18n.config.enforce_available_locales = false
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.include(Mongoid::Expectations)
+
+  config.before(:suite) do
+    client = Mongo::Client.new(["#{HOST}:#{PORT}"])
+    begin
+      # Create the root user administrator as the first user to be added to the
+      # database. This user will need to be authenticated in order to add any
+      # more users to any other databases.
+      client.database.users.create(MONGOID_ROOT_USER)
+    rescue Exception => e
+    end
+    begin
+      # Adds the test user to the test database with permissions on all
+      # databases that will be used in the test suite.
+      client.with(
+        user: MONGOID_ROOT_USER.name,
+        password: MONGOID_ROOT_USER.password
+      ).database.users.create(MONGOID_TEST_USER)
+    rescue Exception => e
+      # If we are on versions less than 2.6, we need to create a user for
+      # each database, since the users are not stored in the admin database
+      # but in the system.users collection on the datbases themselves. Also,
+      # roles in versions lower than 2.6 can only be strings, not hashes.
+      unless client.cluster.servers.first.features.write_command_enabled?
+        begin
+          client.with(
+            user: MONGOID_ROOT_USER.name,
+            password: MONGOID_ROOT_USER.password,
+            auth_source: Mongo::Database::ADMIN,
+            database: database_id
+          ).database.users.create(MONGOID_LEGACY_TEST_USER)
+        rescue Exception => e
+        end
+      end
+    end
+  end
+
+  # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
     Mongoid.purge!
   end
