@@ -65,8 +65,9 @@ CONFIG = {
       options: {
         server_selection_timeout: 0.5,
         max_pool_size: 1,
-        user: MONGOID_TEST_USER.name,
-        password: MONGOID_TEST_USER.password
+        user: MONGOID_ROOT_USER.name,
+        password: MONGOID_ROOT_USER.password,
+        auth_source: Mongo::Database::ADMIN
       }
     }
   }

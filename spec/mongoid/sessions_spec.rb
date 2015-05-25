@@ -703,29 +703,6 @@ describe Mongoid::Sessions do
     end
   end
 
-  describe "when the default database uses a uri" do
-
-    let(:config) do
-      { default: { uri: "mongodb://127.0.0.1:#{PORT}/#{database_id}" }}
-    end
-
-    before do
-      Mongoid::Threaded.sessions.clear
-      Mongoid.sessions = config
-    end
-
-    context "when creating a document" do
-
-      let!(:band) do
-        Band.create(name: "Placebo")
-      end
-
-      it "persists the document to the correct database" do
-        expect(Band.find(band.id)).to eq(band)
-      end
-    end
-  end
-
   context "when overriding the default database", if: non_legacy_server? do
 
     let(:file) do

@@ -1408,7 +1408,7 @@ describe Mongoid::Criteria do
             end
           end
 
-          pending "does not eager load the last document" do
+          it "does not eager load the last document" do
             doc = criteria.last
             expect_query(1) do
               expect(doc.person).to eq(person_two)
@@ -1436,7 +1436,7 @@ describe Mongoid::Criteria do
             end
           end
 
-          pending "does not eager load the first document" do
+          it "does not eager load the first document" do
             doc = criteria.first
             expect_query(1) do
               expect(doc.person).to eq(person)
@@ -1498,7 +1498,7 @@ describe Mongoid::Criteria do
             end
           end
 
-          pending "does not eager load the last document" do
+          it "does not eager load the last document" do
             doc = criteria.last
             expect_query(1) do
               expect(doc.band).to eq(tool)
@@ -1530,7 +1530,7 @@ describe Mongoid::Criteria do
             end
           end
 
-          pending "does not eager load the first document" do
+          it "does not eager load the first document" do
             doc = criteria.first
             expect_query(1) do
               expect(doc.band).to eq(depeche)
