@@ -217,22 +217,6 @@ module Mongoid
       @sessions ||= {}
     end
 
-    # Set the session configuration options.
-    #
-    # @example Set the session configuration options.
-    #   config.sessions = { default: { hosts: [ "localhost:27017" ] }}
-    #
-    # @param [ Hash ] sessions The configuration options.
-    #
-    # @since 3.0.0
-    def sessions=(sessions)
-      raise Errors::NoSessionsConfig.new unless sessions
-      sess = sessions.with_indifferent_access
-      Validators::Session.validate(sess)
-      @sessions = sess
-      sess
-    end
-
     # Get the time zone to use.
     #
     # @example Get the time zone.
@@ -255,6 +239,16 @@ module Mongoid
     # @since 3.0.11
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
+    end
+
+    private
+
+    def sessions=(sessions)
+      raise Errors::NoSessionsConfig.new unless sessions
+      sess = sessions.with_indifferent_access
+      Validators::Session.validate(sess)
+      @sessions = sess
+      sess
     end
   end
 end

@@ -18,7 +18,7 @@ describe Mongoid::Sessions::Factory do
           end
 
           before do
-            Mongoid::Config.sessions = config
+            Mongoid::Config.send(:sessions=, config)
           end
 
           let(:session) do
@@ -48,7 +48,7 @@ describe Mongoid::Sessions::Factory do
           end
 
           before do
-            Mongoid::Config.sessions = config
+            Mongoid::Config.send(:sessions=, config)
           end
 
           let(:session) do
@@ -88,7 +88,7 @@ describe Mongoid::Sessions::Factory do
             end
 
             before do
-              Mongoid::Config.sessions = config
+              Mongoid::Config.send(:sessions=, config)
             end
 
             let(:session) do
@@ -122,7 +122,7 @@ describe Mongoid::Sessions::Factory do
             end
 
             before do
-              Mongoid::Config.sessions = config
+              Mongoid::Config.send(:sessions=, config)
             end
 
             let(:session) do
@@ -165,7 +165,7 @@ describe Mongoid::Sessions::Factory do
       end
 
       before do
-        Mongoid::Config.sessions = config
+        Mongoid::Config.send(:sessions=, config)
       end
 
       let(:session) do
@@ -210,7 +210,7 @@ describe Mongoid::Sessions::Factory do
     end
 
     before do
-      Mongoid::Config.sessions = config
+      Mongoid::Config.send(:sessions=, config)
     end
 
     let(:session) do
@@ -250,7 +250,7 @@ describe Mongoid::Sessions::Factory do
     end
 
     before do
-      Mongoid::Config.sessions = config
+      Mongoid::Config.send(:sessions=, config)
     end
 
     let(:session) do

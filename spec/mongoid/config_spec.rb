@@ -29,7 +29,7 @@ describe Mongoid::Config do
         end
 
         before do
-          described_class.sessions = config
+          described_class.send(:sessions=, config)
         end
 
         it "returns true" do
@@ -234,7 +234,7 @@ describe Mongoid::Config do
 
       it "raises an error" do
         expect {
-          described_class.sessions = nil
+          described_class.send(:sessions=, nil)
         }.to raise_error(Mongoid::Errors::NoSessionsConfig)
       end
     end
@@ -243,7 +243,7 @@ describe Mongoid::Config do
 
       it "raises an error" do
         expect {
-          described_class.sessions = {}
+          described_class.send(:sessions=, {})
         }.to raise_error(Mongoid::Errors::NoDefaultSession)
       end
     end
@@ -258,7 +258,7 @@ describe Mongoid::Config do
 
         it "raises an error" do
           expect {
-            described_class.sessions = sessions
+            described_class.send(:sessions=, sessions)
           }.to raise_error(Mongoid::Errors::NoSessionHosts)
         end
       end
@@ -271,7 +271,7 @@ describe Mongoid::Config do
 
         it "raises an error" do
           expect {
-            described_class.sessions = sessions
+            described_class.send(:sessions=, sessions)
           }.to raise_error(Mongoid::Errors::NoSessionDatabase)
         end
       end
@@ -286,7 +286,7 @@ describe Mongoid::Config do
 
         it "raises an error" do
           expect {
-            described_class.sessions = sessions
+            described_class.send(:sessions=, sessions)
           }.to raise_error(Mongoid::Errors::MixedSessionConfiguration)
         end
       end
