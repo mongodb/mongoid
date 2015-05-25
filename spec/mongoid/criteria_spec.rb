@@ -2233,17 +2233,6 @@ describe Mongoid::Criteria do
         ])
       end
     end
-
-    pending "when timeout options are provided" do
-
-      let(:map_reduce) do
-        Band.limit(2).no_timeout.map_reduce(map, reduce).out(replace: "test_bands")
-      end
-
-      it "sets the timeout option on the query" do
-        expect(map_reduce.send(:documents).operation.flags).to eq([ :no_cursor_timeout ])
-      end
-    end
   end
 
   describe "#max" do

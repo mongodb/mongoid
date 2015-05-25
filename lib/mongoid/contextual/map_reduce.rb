@@ -269,7 +269,7 @@ module Mongoid
       def documents
         return results["results"] if results.has_key?("results")
         view = session[output_collection].find
-        view.no_timeout if criteria.options[:timeout] == false
+        view.no_cursor_timeout if criteria.options[:timeout] == false
         view
       end
 

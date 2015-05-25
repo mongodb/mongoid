@@ -532,8 +532,7 @@ module Mongoid
           apply_option(name)
         end
         if criteria.options[:timeout] == false
-          # @todo: Durran: Implement.
-          @view = view#.no_timeout
+          @view = view.no_cursor_timeout
         end
       end
 

@@ -852,10 +852,6 @@ describe Mongoid::Contextual::Mongo do
     it "sets the view selector" do
       expect(context.view.selector).to eq({ "name" => "Depeche Mode" })
     end
-
-    pending "sets timeout options" do
-      expect(context.view.operation.flags).to eq([ :no_cursor_timeout ])
-    end
   end
 
   pending "#last" do
