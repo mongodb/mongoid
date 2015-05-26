@@ -81,10 +81,6 @@ describe Mongoid::Contextual::Atomic do
       Band.create(likes: 60)
     end
 
-    let!(:smiths) do
-      Band.create
-    end
-
     let(:criteria) do
       Band.all
     end
@@ -102,10 +98,6 @@ describe Mongoid::Contextual::Atomic do
       it "performs the bitwise operation on initialized fields" do
         expect(depeche_mode.reload.likes).to eq(12)
       end
-
-      it "does not error on non initialized fields" do
-        expect(smiths.reload.likes).to eq(0)
-      end
     end
 
     context "when performing a bitwise or" do
@@ -117,10 +109,6 @@ describe Mongoid::Contextual::Atomic do
       it "performs the bitwise operation on initialized fields" do
         expect(depeche_mode.reload.likes).to eq(61)
       end
-
-      it "does not error on non initialized fields" do
-        expect(smiths.reload.likes).to eq(13)
-      end
     end
 
     context "when chaining bitwise operations" do
@@ -131,10 +119,6 @@ describe Mongoid::Contextual::Atomic do
 
       it "performs the bitwise operation on initialized fields" do
         expect(depeche_mode.reload.likes).to eq(14)
-      end
-
-      it "does not error on non initialized fields" do
-        expect(smiths.reload.likes).to eq(10)
       end
     end
   end
