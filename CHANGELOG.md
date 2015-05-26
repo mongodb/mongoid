@@ -3,7 +3,19 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
-## 4.0.3 - Not released
+## 5.0.0 - Not released
+
+### Major Changes (Backwards Incompatible)
+
+* Mongoid now uses the official Mongo Ruby Driver 2.x instead of Moped.
+
+* Most driver specific configuration options have changed, please see [here](http://docs.mongodb.org/ecosystem/tutorial/ruby-driver-tutorial/#ruby-options) for the new options.
+
+* `find_and_modify` has been removed and replaced with 3 options: `find_one_and_update`, `find_one_and_delete` and `find_one_and_replace`.
+
+* `text_search` has been removed as it is now a `$text` option in a query from 2.6 on.
+
+* Mongoid no longer supports MongoDB 2.2 - support is now for only 2.4 and higher.
 
 ### New Features
 
