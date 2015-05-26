@@ -921,7 +921,7 @@ describe Mongoid::Criteria do
       context "without upsert" do
 
         let(:result) do
-          criteria.find_and_modify("$inc" => { likes: 1 })
+          criteria.find_one_and_update("$inc" => { likes: 1 })
         end
 
         it "returns nil" do

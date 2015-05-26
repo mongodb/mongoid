@@ -65,9 +65,7 @@ describe Mongoid::Sessions::Options do
     end
 
     it "passes down the options to collection" do
-      session = Band.mongo_session
-      expect_any_instance_of(Mongo::Client).to receive(:with).with(options).and_return(session)
-      instance.collection
+      expect(instance.collection.database.name).to eq('test')
     end
   end
 

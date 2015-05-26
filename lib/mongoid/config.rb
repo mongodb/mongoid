@@ -169,7 +169,7 @@ module Mongoid
     #
     # @since 2.0.2
     def purge!
-      Sessions.default.collections.each(&:drop) and true
+      Sessions.default.database.collections.each(&:drop) and true
     end
 
     # Truncate all data in all collections, but not the indexes.

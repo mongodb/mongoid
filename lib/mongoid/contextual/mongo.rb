@@ -212,7 +212,6 @@ module Mongoid
       def find_one_and_delete
         if doc = view.find_one_and_delete
           Factory.from_db(klass, doc)
->>>>>>> Implement find and modify related operations
         end
       end
 
@@ -241,7 +240,7 @@ module Mongoid
       # @since 4.0.2
       def find_first
         return documents.first if cached? && cache_loaded?
-        with_eager_loading(query.first)
+        with_eager_loading(view.first)
       end
 
       # Execute a $geoNear command against the database.
