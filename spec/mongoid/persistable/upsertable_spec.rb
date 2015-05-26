@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Persistable::Upsertable do
 
-  pending "#upsert" do
+  describe "#upsert" do
 
     context "when the document validates on upsert" do
 

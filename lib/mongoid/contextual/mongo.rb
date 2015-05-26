@@ -35,27 +35,23 @@ module Mongoid
       # @example Get the number of matching documents.
       #   context.count
       #
-      # @example Get the count of documents matching the provided.
-      #   context.count(document)
+      # @example Get the count of documents with the provided options.
+      #   context.count(limit: 1)
       #
       # @example Get the count for where the provided block is true.
       #   context.count do |doc|
       #     doc.likes > 1
       #   end
       #
-      # @param [ Document ] document A document to match or true if wanting
-      #   skip and limit to be factored into the count.
+      # @param [ Hash ] options The options, such as skip and limit to be factored
+      #   into the count.
       #
       # @return [ Integer ] The number of matches.
       #
       # @since 3.0.0
-      def count(document = false, &block)
+      def count(options = {}, &block)
         return super(&block) if block_given?
-        if document.is_a?(Document)
-          return collection.find(criteria.and(_id: document._id).selector).count
-        end
-        return view.count(document) if document
-        try_cache(:count) { view.count }
+        try_cache(:count) { view.count(options) }
       end
 
       # Delete all documents in the database that match the selector.

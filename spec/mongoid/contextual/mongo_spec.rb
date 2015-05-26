@@ -164,21 +164,21 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when provided limit true" do
+    context "when provided limit" do
 
       before do
         2.times { Band.create(name: "Depeche Mode") }
       end
 
       let(:context) do
-        described_class.new(criteria.limit(2))
+        described_class.new(criteria)
       end
 
       let(:count) do
-        context.count(true)
+        context.count(limit: 2)
       end
 
-      pending "returns the number of documents that match" do
+      it "returns the number of documents that match" do
         expect(count).to eq(2)
       end
     end

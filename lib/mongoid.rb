@@ -20,7 +20,6 @@ require "mongoid/config"
 require "mongoid/loggable"
 require "mongoid/sessions"
 require "mongoid/document"
-require "mongoid/log_subscriber"
 require "mongoid/tasks/database"
 require "mongoid/query_cache"
 

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Persistable::Pushable do
 
-  pending "#add_to_set" do
+  describe "#add_to_set" do
 
     context "when the document is a root document" do
 
@@ -125,7 +125,7 @@ describe Mongoid::Persistable::Pushable do
     end
   end
 
-  pending "#push" do
+  describe "#push" do
 
     context "when the document is a root document" do
 

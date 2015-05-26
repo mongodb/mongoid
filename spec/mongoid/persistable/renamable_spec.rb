@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Persistable::Renamable do
 
-  pending "#rename" do
+  describe "#rename" do
 
     context "when the document is a root document" do
 

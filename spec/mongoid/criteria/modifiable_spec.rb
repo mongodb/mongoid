@@ -1226,27 +1226,5 @@ describe Mongoid::Criteria::Modifiable do
         end
       end
     end
-
-    pending "when update document structure" do
-
-      before do
-        person = Person.new(username: "user_title", score: 25)
-        person.save
-      end
-
-      let(:from_db) do
-        Person.first
-      end
-
-      it "rename document string field" do
-        Person.where(username: "user_title").update_all("$rename" => { username: "title" })
-        expect(from_db.title).to eq("user_title")
-      end
-
-      it "rename document integer field" do
-        Person.where(score: 25).update_all("$rename" => { score: "age" })
-        expect(from_db.age).to eq( 25 )
-      end
-    end
   end
 end
