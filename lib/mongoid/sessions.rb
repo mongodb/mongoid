@@ -46,7 +46,9 @@ module Mongoid
       #
       # @since 3.1.0
       def disconnect
-        Threaded.sessions.values.each(&:disconnect)
+        Threaded.sessions.values.each do |session|
+          # session.close
+        end
       end
 
       # Get a session with the provided name.
