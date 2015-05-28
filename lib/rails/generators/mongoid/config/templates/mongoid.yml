@@ -13,12 +13,13 @@ development:
       options:
         # Change the default write concern. (default = { w: 1 })
         # write:
-        # w: 1
+        #   w: 1
 
         # Change the default consistency model to primary, secondary.
         # 'secondary' will send reads to secondaries, 'primary' sends everything
         # to master. (default: primary)
-        # read: secondary_preferred
+        # read:
+        #   mode: secondary_preferred
 
         # How many times Moped should attempt to retry an operation after
         # failure. (default: The number of nodes in the cluster)
@@ -27,13 +28,13 @@ development:
         # The time in seconds that Moped should wait before retrying an
         # operation on failure. (default: 0.25)
         # retry_interval: 0.25
-        
+
         # The connection pool size per-node.  This should match or exceed the
         # number of threads for a multi-threaded application. (default: 5)
         # pool_size: 5
-        
+
         # The time in seconds that Moped should wait for the pool to provide
-        # an available connection.  This number should probably remain at the 
+        # an available connection.  This number should probably remain at the
         # default, unless for some reason you absolutely need to limit the
         # pool_size, as this wait is only used when the pool is saturated.
         # (default: 0.5)
@@ -42,18 +43,18 @@ development:
         # The time in seconds before Moped will timeout connection and node
         # operations. (default: 5)
         # timeout: 5
-        
-        # The amount of time in seconds between forced refreshes of node 
+
+        # The amount of time in seconds between forced refreshes of node
         # information including the discovery of new peers. (default: 300)
         # refresh_interval: 300
-        
+
         # The amount of time in seconds that a node will be flagged as down.
-        # (default: 30) 
+        # (default: 30)
         # down_interval: 30
-        
+
         # Whether connections should use SSL. (default: nil/false)
         # ssl: false
-        
+
         # Whether Moped will use the existing seeds/nodes to find other peers.
         # (default: true)
         # auto_discover: true
@@ -94,7 +95,9 @@ test:
       hosts:
         - localhost:27017
       options:
-        read: primary
+        read:
+          mode: primary
+        # tag
         # In the test environment we lower the retries and retry interval to
         # low amounts for fast failures.
         max_retries: 1
