@@ -126,30 +126,6 @@ RSpec.configure do |config|
       client.database.users.create(MONGOID_ROOT_USER)
     rescue Exception => e
     end
-    begin
-      # Adds the test user to the test database with permissions on all
-      # databases that will be used in the test suite.
-      client.with(
-        user: MONGOID_ROOT_USER.name,
-        password: MONGOID_ROOT_USER.password
-      ).database.users.create(MONGOID_TEST_USER)
-    rescue Exception => e
-      # If we are on versions less than 2.6, we need to create a user for
-      # each database, since the users are not stored in the admin database
-      # but in the system.users collection on the datbases themselves. Also,
-      # roles in versions lower than 2.6 can only be strings, not hashes.
-      unless client.cluster.servers.first.features.write_command_enabled?
-        begin
-          client.with(
-            user: MONGOID_ROOT_USER.name,
-            password: MONGOID_ROOT_USER.password,
-            auth_source: Mongo::Database::ADMIN,
-            database: database_id
-          ).database.users.create(MONGOID_LEGACY_TEST_USER)
-        rescue Exception => e
-        end
-      end
-    end
   end
 
   # Drop all collections and clear the identity map before each spec.
