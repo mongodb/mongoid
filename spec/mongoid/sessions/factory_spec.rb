@@ -194,7 +194,7 @@ describe Mongoid::Sessions::Factory do
       let(:config) { nil }
 
       before do
-        Mongoid.sessions[:default] = nil
+        Mongoid.clients[:default] = nil
       end
 
       it "raises NoSessionsConfig error" do

@@ -24,7 +24,7 @@ module Mongoid
       # @example Get the session.
       #   command.session
       #
-      # @return [ Session ] The Moped session.
+      # @return [ Mongo::Client ] The Mongo client.
       #
       # @since 3.0.0
       def session

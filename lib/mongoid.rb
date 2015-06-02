@@ -34,6 +34,7 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 
 module Mongoid
   extend Loggable
+  extend Gem::Deprecate
   extend self
 
   # The minimum MongoDB version supported.
@@ -56,38 +57,44 @@ module Mongoid
   # Convenience method for getting the default session.
   #
   # @example Get the default session.
-  #   Mongoid.default_session
+  #   Mongoid.default_client
   #
-  # @return [ Moped::Session ] The default session.
+  # @return [ Mongo::Client ] The default client.
   #
   # @since 3.0.0
-  def default_session
+  def default_client
     Sessions.default
   end
+  alias :default_session :default_client
+  deprecate :default_session, :default_client, 2015, 12
 
-  # Disconnect all active sessions.
+  # Disconnect all active clients.
   #
-  # @example Disconnect all active sessions.
-  #   Mongoid.disconnect_sessions
+  # @example Disconnect all active clients.
+  #   Mongoid.disconnect_clients
   #
   # @return [ true ] True.
   #
   # @since 3.1.0
-  def disconnect_sessions
+  def disconnect_clients
     Sessions.disconnect
   end
+  alias :disconnect_sessions :disconnect_clients
+  deprecate :disconnect_sessions, :disconnect_clients, 2015, 12
 
-  # Convenience method for getting a named session.
+  # Convenience method for getting a named client.
   #
-  # @example Get a named session.
-  #   Mongoid.session(:default)
+  # @example Get a named client.
+  #   Mongoid.client(:default)
   #
-  # @return [ Moped::Session ] The named session.
+  # @return [ Mongo::Client ] The named client.
   #
   # @since 3.0.0
-  def session(name)
+  def client(name)
     Sessions.with_name(name)
   end
+  alias :session :client
+  deprecate :session, :client, 2015, 12
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.

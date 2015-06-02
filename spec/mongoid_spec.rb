@@ -31,14 +31,14 @@ describe Mongoid do
     end
   end
 
-  describe ".default_session" do
+  describe ".default_client" do
 
-    it "returns the default session" do
-      expect(Mongoid.default_session).to eq(Mongoid::Sessions.default)
+    it "returns the default client" do
+      expect(Mongoid.default_client).to eq(Mongoid::Sessions.default)
     end
   end
 
-  describe ".disconnect_sessions" do
+  describe ".disconnect_clients" do
 
     let(:sessions) do
       Mongoid::Threaded.sessions.values
@@ -48,18 +48,18 @@ describe Mongoid do
       Band.all.entries
     end
 
-    pending "disconnects from all active sessions" do
+    pending "disconnects from all active clients" do
       sessions.each do |session|
         expect(session.cluster).to receive(:disconnect!).and_call_original
       end
-      Mongoid.disconnect_sessions
+      Mongoid.disconnect_clients
     end
   end
 
-  describe ".session" do
+  describe ".client" do
 
-    it "returns the named session" do
-      expect(Mongoid.session(:default)).to eq(Mongoid::Sessions.default)
+    it "returns the named client" do
+      expect(Mongoid.client(:default)).to eq(Mongoid::Sessions.default)
     end
   end
 

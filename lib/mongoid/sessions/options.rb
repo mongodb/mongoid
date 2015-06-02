@@ -3,9 +3,10 @@ module Mongoid
   module Sessions
     module Options
       extend ActiveSupport::Concern
+      extend Gem::Deprecate
 
       # Tell the next persistance operation to store in a specific collection,
-      # database or session.
+      # database or client.
       #
       # @example Save the current document to a different collection.
       #   model.with(collection: "secondary").save
@@ -13,7 +14,7 @@ module Mongoid
       # @example Save the current document to a different database.
       #   model.with(database: "secondary").save
       #
-      # @example Save the current document to a different session.
+      # @example Save the current document to a different client.
       #   model.with(session: "replica_set").save
       #
       # @example Save with a combination of options.
@@ -23,7 +24,7 @@ module Mongoid
       #
       # @option options [ String, Symbol ] :collection The collection name.
       # @option options [ String, Symbol ] :database The database name.
-      # @option options [ String, Symbol ] :session The session name.
+      # @option options [ String, Symbol ] :session The client name.
       #
       # @return [ Document ] The current document.
       #
@@ -37,17 +38,19 @@ module Mongoid
         @persistence_options
       end
 
-      def mongo_session
+      def mongo_client
         if persistence_options
           if persistence_options[:session]
-            session = Sessions.with_name(persistence_options[:session])
+            client = Sessions.with_name(persistence_options[:session])
           else
-            session = Sessions.with_name(self.class.session_name)
-            session.use(self.class.database_name)
+            client = Sessions.with_name(self.class.client_name)
+            client.use(self.class.database_name)
           end
-          session.with(persistence_options)
+          client.with(persistence_options)
         end
       end
+      alias :mongo_session :mongo_client
+      deprecate :mongo_session, :mongo_client, 2015, 12
 
       def collection_name
         if persistence_options && v = persistence_options[:collection]
@@ -91,14 +94,17 @@ module Mongoid
       end
 
       module ClassMethods
+        extend Gem::Deprecate
         include Threaded
 
-        def session_name
+        def client_name
           if persistence_options && v = persistence_options[:session]
             return v.to_sym
           end
           super
         end
+        alias :session_name :client_name
+        deprecate :session_name, :client_name, 2015, 12
 
         def collection_name
           if persistence_options && v = persistence_options[:collection]

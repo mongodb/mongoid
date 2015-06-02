@@ -8,11 +8,13 @@ require "mongoid/sessions/options"
 module Mongoid
   module Sessions
     extend ActiveSupport::Concern
+    extend Gem::Deprecate
     include StorageOptions
     include ThreadOptions
     include Options
 
     class << self
+
       # Clear all sessions from the current thread.
       #
       # @example Clear all sessions.
@@ -30,7 +32,7 @@ module Mongoid
       # @example Get the default session.
       #   Mongoid::Sessions.default
       #
-      # @return [ Moped::Session ] The default session.
+      # @return [ Mongo::Client ] The default client.
       #
       # @since 3.0.0
       def default
@@ -58,15 +60,15 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the session.
       #
-      # @return [ Moped::Session ] The named session.
+      # @return [ Mongo::Client ] The named client.
       #
       # @since 3.0.0
       def with_name(name)
         Threaded.sessions[name.to_sym] ||= Sessions::Factory.create(name)
       end
 
-      def set(name, session)
-        Threaded.sessions[name.to_sym] = session
+      def set(name, client)
+        Threaded.sessions[name.to_sym] = client
       end
     end
 
@@ -77,40 +79,46 @@ module Mongoid
     # @example Get the model's collection.
     #   Model.collection
     #
-    # @return [ Moped::Collection ] The collection.
+    # @return [ Mongo::Collection ] The collection.
     #
     # @since 3.0.0
     def collection
-      mongo_session[collection_name]
+      mongo_client[collection_name]
     end
 
-    def mongo_session
-      super || self.class.mongo_session
+    def mongo_client
+      super || self.class.mongo_client
     end
+    alias :mongo_session :mongo_client
+    deprecate :mongo_session, :mongo_client, 2015, 12
 
     def collection_name
       super || self.class.collection_name
     end
 
     module ClassMethods
+      extend Gem::Deprecate
 
-      # Get the session for this model. This is determined in the following order:
+      # Get the client for this model. This is determined in the following order:
       #
       #   1. Any custom configuration provided by the 'store_in' macro.
-      #   2. The 'default' session as provided in the mongoid.yml
+      #   2. The 'default' client as provided in the mongoid.yml
       #
-      # @example Get the session.
-      #   Model.mongo_session
+      # @example Get the client.
+      #   Model.mongo_client
       #
-      # @return [ Moped::Session ] The default moped session.
+      # @return [ Mongo::Client ] The default mongo client.
       #
       # @since 3.0.0
-      def mongo_session
-        session = Sessions.with_name(session_name)
-        session = session.use(database_name)
-        session = self.persistence_options.blank? ? session : session.with(self.persistence_options)
-        Sessions.set(session_name, session)
+      def mongo_client
+        name = client_name
+        client = Sessions.with_name(name)
+        client = client.use(database_name)
+        client = self.persistence_options.blank? ? client : client.with(self.persistence_options)
+        Sessions.set(name, client)
       end
+      alias :mongo_session :mongo_client
+      deprecate :mongo_session, :mongo_client, 2015, 12
 
       # Get the collection for this model from the session. Will check for an
       # overridden collection name from the store_in macro or the collection
@@ -119,11 +127,11 @@ module Mongoid
       # @example Get the model's collection.
       #   Model.collection
       #
-      # @return [ Moped::Collection ] The collection.
+      # @return [ Mongo::Collection ] The collection.
       #
       # @since 3.0.0
       def collection
-        mongo_session[collection_name]
+        mongo_client[collection_name]
       end
     end
   end

@@ -8,6 +8,7 @@ module Mongoid
   # This module defines all the configuration options for Mongoid, including the
   # database connections.
   module Config
+    extend Gem::Deprecate
     extend self
     extend Options
 
@@ -205,17 +206,19 @@ module Mongoid
       end
     end
 
-    # Get the session configuration or an empty hash.
+    # Get the client configuration or an empty hash.
     #
-    # @example Get the sessions configuration.
-    #   config.sessions
+    # @example Get the clients configuration.
+    #   config.clients
     #
-    # @return [ Hash ] The sessions configuration.
+    # @return [ Hash ] The clients configuration.
     #
     # @since 3.0.0
-    def sessions
+    def clients
       @sessions ||= {}
     end
+    alias :sessions :clients
+    deprecate :sessions, :clients, 2015, 12
 
     # Get the time zone to use.
     #

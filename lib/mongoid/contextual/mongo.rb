@@ -291,7 +291,7 @@ module Mongoid
       end
 
       # Create the new Mongo context. This delegates operations to the
-      # underlying driver - in Mongoid's case Moped.
+      # underlying driver.
       #
       # @example Create the new context.
       #   Mongo.new(criteria)
@@ -642,7 +642,7 @@ module Mongoid
       # @example Get the documents for iteration.
       #   context.documents_for_iteration
       #
-      # @return [ Array<Document>, Moped::Query ] The docs to iterate.
+      # @return [ Array<Document>, Mongo::Collection::View ] The docs to iterate.
       #
       # @since 3.0.0
       def documents_for_iteration

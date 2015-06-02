@@ -12,6 +12,7 @@ module Mongoid
       end
 
       module ClassMethods
+        extend Gem::Deprecate
 
         # Give this model specific custom default storage options.
         #
@@ -93,15 +94,17 @@ module Mongoid
 
         # Get the session name for the model.
         #
-        # @example Get the session name.
-        #   Model.session_name
+        # @example Get the client name.
+        #   Model.client_name
         #
-        # @return [ Symbol ] The name of the session.
+        # @return [ Symbol ] The name of the client.
         #
         # @since 3.0.0
-        def session_name
+        def client_name
           __evaluate__(storage_options[:session])
         end
+        alias :session_name :client_name
+        deprecate :session_name, :client_name, 2015, 12
 
         # Get the database name for the model.
         #
@@ -136,11 +139,11 @@ module Mongoid
         end
 
         def configured_database
-          session = Mongoid.sessions[session_name]
-          if db = session[:database]
+          client = Mongoid.clients[client_name]
+          if db = client[:database]
             db
-          elsif uri = session[:uri]
-            session[:database] = Mongo::URI.new(uri).database
+          elsif uri = client[:uri]
+            client[:database] = Mongo::URI.new(uri).database
           else
             nil
           end

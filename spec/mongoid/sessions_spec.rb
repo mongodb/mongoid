@@ -277,7 +277,7 @@ describe Mongoid::Sessions do
       context "when accessing from the instance" do
 
         it "returns the overridden value" do
-          expect(band.mongo_session.options[:database].to_s).to eq(database_id_alt)
+          expect(band.mongo_client.options[:database].to_s).to eq(database_id_alt)
         end
       end
 
@@ -288,7 +288,7 @@ describe Mongoid::Sessions do
         end
 
         it "session returns the overridden value" do
-          expect(klass.mongo_session.options[:database].to_s).to eq(database_id_alt)
+          expect(klass.mongo_client.options[:database].to_s).to eq(database_id_alt)
         end
       end
     end
@@ -339,11 +339,11 @@ describe Mongoid::Sessions do
       let(:session_name) { :alternative }
 
       before do
-        Mongoid.sessions[session_name] = { database: database_id_alt, hosts: [ "#{HOST}:#{PORT}" ] }
+        Mongoid.clients[session_name] = { database: database_id_alt, hosts: [ "#{HOST}:#{PORT}" ] }
       end
 
       after do
-        Mongoid.sessions.delete(session_name)
+        Mongoid.clients.delete(session_name)
       end
 
       context "when overriding the persistence options" do
@@ -381,7 +381,7 @@ describe Mongoid::Sessions do
     before do
       described_class.clear
       Mongoid.load!(file, :test)
-      Mongoid.sessions[:default][:database] = database_id
+      Mongoid.clients[:default][:database] = database_id
     end
 
     context "when getting the default" do
@@ -393,19 +393,19 @@ describe Mongoid::Sessions do
       before do
         described_class.clear
         Mongoid.load!(file, :test)
-        Mongoid.sessions[:default][:database] = database_id
+        Mongoid.clients[:default][:database] = database_id
       end
 
       let!(:band) do
         Band.new
       end
 
-      let!(:mongo_session) do
-        band.mongo_session
+      let!(:mongo_client) do
+        band.mongo_client
       end
 
-      it "returns the default session" do
-        expect(mongo_session.options[:database].to_s).to eq(database_id)
+      it "returns the default client" do
+        expect(mongo_client.options[:database].to_s).to eq(database_id)
       end
     end
 
@@ -421,13 +421,13 @@ describe Mongoid::Sessions do
 
       it "raises an error" do
         expect {
-          band.mongo_session
+          band.mongo_client
         }.to raise_error(Mongoid::Errors::NoSessionConfig)
       end
     end
   end
 
-  describe ".mongo_session", if: non_legacy_server? do
+  describe ".mongo_client", if: non_legacy_server? do
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -436,7 +436,7 @@ describe Mongoid::Sessions do
     before do
       described_class.clear
       Mongoid.load!(file, :test)
-      Mongoid.sessions[:default][:database] = database_id
+      Mongoid.clients[:default][:database] = database_id
     end
 
     after do
@@ -453,15 +453,15 @@ describe Mongoid::Sessions do
         Band.reset_storage_options!
         described_class.clear
         Mongoid.load!(file, :test)
-        Mongoid.sessions[:default][:database] = database_id
+        Mongoid.clients[:default][:database] = database_id
       end
 
-      let!(:mongo_session) do
-        Band.mongo_session
+      let!(:mongo_client) do
+        Band.mongo_client
       end
 
-      it "returns the default session" do
-        expect(mongo_session.options[:database].to_s).to eq(database_id)
+      it "returns the default client" do
+        expect(mongo_client.options[:database].to_s).to eq(database_id)
       end
     end
 
@@ -473,7 +473,7 @@ describe Mongoid::Sessions do
 
       it "raises an error" do
         expect {
-          Band.mongo_session
+          Band.mongo_client
         }.to raise_error(Mongoid::Errors::NoSessionConfig)
       end
     end
@@ -729,7 +729,7 @@ describe Mongoid::Sessions do
       end
 
       it "persists to the overridden database" do
-        Band.mongo_session.with(database: :mongoid_optional) do |sess|
+        Band.mongo_client.with(database: :mongoid_optional) do |sess|
           expect(sess[:bands].find(name: "Tool")).to_not be_nil
         end
       end

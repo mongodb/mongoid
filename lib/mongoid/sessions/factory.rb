@@ -17,12 +17,12 @@ module Mongoid
       #
       # @raise [ Errors::NoSessionConfig ] If no config could be found.
       #
-      # @return [ Moped::Session ] The new session.
+      # @return [ Mongo::Client ] The new session.
       #
       # @since 3.0.0
       def create(name = nil)
         return default unless name
-        config = Mongoid.sessions[name]
+        config = Mongoid.clients[name]
         raise Errors::NoSessionConfig.new(name) unless config
         create_session(config)
       end
@@ -35,11 +35,11 @@ module Mongoid
       # @raise [ Errors::NoSessionConfig ] If no default configuration is
       #   found.
       #
-      # @return [ Moped::Session ] The default session.
+      # @return [ Mongo::Client ] The default session.
       #
       # @since 3.0.0
       def default
-        create_session(Mongoid.sessions[:default])
+        create_session(Mongoid.clients[:default])
       end
 
       private
@@ -53,7 +53,7 @@ module Mongoid
       #
       # @param [ Hash ] configuration The session config.
       #
-      # @return [ Moped::Session ] The session.
+      # @return [ Mongo::Client ] The session.
       #
       # @since 3.0.0
       def create_session(configuration)
