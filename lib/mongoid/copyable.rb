@@ -18,15 +18,49 @@ module Mongoid
     #
     # @return [ Document ] The new document.
     def clone
-      # @note This next line is here to address #2704, even though having an
-      # _id and id field in the document would cause problems with Mongoid
-      # elsewhere.
-      attrs = clone_document.except("_id", "id")
+      attrs = clone_attr
       self.class.new(attrs)
     end
     alias :dup :clone
 
     private
+
+    # Build a hash of attributes used for cloning
+    # Includes embedded document attributes
+    # Ignores dynamic attribtues
+    #
+    # @api private
+    #
+    # @example clone attr
+    #   model.clone_attr
+    #
+    # @return [ Hash ] A hash with key/values used for cloning the document
+    def clone_attr
+      # @note This next line is here to address #2704, even though having an
+      # _id and id field in the document would cause problems with Mongoid
+      # elsewhere.
+      attrs = clone_document.except("_id", "id")
+      unless kind_of?(Mongoid::Attributes::Dynamic)      
+        embedded_attrs = {}
+        
+        self.embedded_relations.keys.each do |relation_key|
+          case self.embedded_relations[relation_key][:relation].to_s 
+          when 'Mongoid::Relations::Embedded::Many'
+            embedded_relations = self.send(self.embedded_relations[relation_key][:name])
+            embedded_attrs[relation_key] = embedded_relations.map do |embedded_relation|
+              embedded_relation.send(:clone_attr)
+            end
+          when 'Mongoid::Relations::Embedded::One', 'Mongoid::Relations::Embedded::In'
+            embedded_relation = self.send(self.embedded_relations[relation_key][:name])
+            embedded_attrs[relation_key] = embedded_relation.send(:clone_attr) if embedded_relation
+          end
+        end
+
+        attrs.merge!(embedded_attrs)
+        attrs = attrs.slice(*self.fields.keys, *self.embedded_relations.keys, *embedded_attrs.keys) 
+      end
+      attrs
+    end
 
     # Clone the document attributes
     #
