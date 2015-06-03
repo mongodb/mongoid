@@ -249,9 +249,9 @@ en:
             for each parent up the hierarchy."
           resolution: "Consider not embedding %{embedded}, or do the key
             storage and access in a custom manner in the application code."
-        mixed_session_configuration:
+        mixed_client_configuration:
           message: "Both uri and standard configuration options defined for
-            session: '%{name}'."
+            client: '%{name}'."
           summary: "Instead of simply giving uri or standard options a
             preference order, Mongoid assumes that you have made a mistake in
             your configuration and requires that you provide one or the other,
@@ -276,15 +276,15 @@ en:
             \_\_\_\_has_many :albums\n
             \_\_\_\_accepts_nested_attributes_for :albums\n
             \_\_end\n\n"
-        no_default_session:
-          message: "No default session configuration is defined."
+        no_default_client:
+          message: "No default client configuration is defined."
           summary: "The configuration provided settings for: %{keys}, but
             Mongoid requires a :default to be defined at minimum."
           resolution: "If configuring via a mongoid.yml, ensure that within
-            your :sessions section a :default session is defined.\n\n
+            your :clients section a :default client is defined.\n\n
             Example:\n
             \_\_development:\n
-            \_\_\_\_sessions:\n
+            \_\_\_\_clients:\n
             \_\_\_\_\_\_default:\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
@@ -338,59 +338,59 @@ en:
           resolution: "Ensure that you've set the parent relation if
             instantiating the embedded document directly, or always create new
             embedded documents via the parent relation."
-        no_session_config:
-          message: "No configuration could be found for a session named
+        no_client_config:
+          message: "No configuration could be found for a client named
             '%{name}'."
-          summary: "When attempting to create the new session, Mongoid could
-            not find a session configuration for the name: '%{name}'. This is
+          summary: "When attempting to create the new client, Mongoid could
+            not find a client configuration for the name: '%{name}'. This is
             necessary in order to know the host, port, and options needed
             to connect."
           resolution: "Double check your mongoid.yml to make sure under the
-            sessions key that a configuration exists for '%{name}'. If you
+            clients key that a configuration exists for '%{name}'. If you
             have set the configuration programatically, ensure that '%{name}'
             exists in the configuration hash."
-        no_sessions_config:
-          message: "No sessions configuration provided."
+        no_clients_config:
+          message: "No clients configuration provided."
           summary: "Mongoid's configuration requires that you provide details
-            about each session that can be connected to, and requires in
-            the sessions config at least 1 default session to exist."
+            about each client that can be connected to, and requires in
+            the clients config at least 1 default client to exist."
           resolution: "Double check your mongoid.yml to make sure that you
-            have a top-level sessions key with at least 1 default session
+            have a top-level clients key with at least 1 default client
             configuration for it. You can regenerate a new mongoid.yml for
             assistance via `rails g mongoid:config`.\n\n
             Example:\n
             \_\_development:\n
-            \_\_\_\_sessions:\n
+            \_\_\_\_clients:\n
             \_\_\_\_\_\_default:\n
             \_\_\_\_\_\_\_\_database: mongoid_dev\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
-        no_session_database:
-          message: "No database provided for session configuration: :%{name}."
-          summary: "Each session configuration must provide a database so Mongoid
+        no_client_database:
+          message: "No database provided for client configuration: :%{name}."
+          summary: "Each client configuration must provide a database so Mongoid
             knows where the default database to persist to. What was provided
             was: %{config}."
           resolution: "If configuring via a mongoid.yml, ensure that within
-            your :%{name} section a :database value for the session's default
+            your :%{name} section a :database value for the client's default
             database is defined.\n\n
             Example:\n
             \_\_development:\n
-            \_\_\_\_sessions:\n
+            \_\_\_\_clients:\n
             \_\_\_\_\_\_%{name}:\n
             \_\_\_\_\_\_\_\_database: my_app_db\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
-        no_session_hosts:
-          message: "No hosts provided for session configuration: :%{name}."
-          summary: "Each session configuration must provide hosts so Mongoid
+        no_client_hosts:
+          message: "No hosts provided for client configuration: :%{name}."
+          summary: "Each client configuration must provide hosts so Mongoid
             knows where the database server is located. What was provided
             was: %{config}."
           resolution: "If configuring via a mongoid.yml, ensure that within
-            your :%{name} section a :hosts value for the session hosts is
+            your :%{name} section a :hosts value for the client hosts is
             defined.\n\n
             Example:\n
             \_\_development:\n
-            \_\_\_\_sessions:\n
+            \_\_\_\_clients:\n
             \_\_\_\_\_\_%{name}:\n
             \_\_\_\_\_\_\_\_database: my_app_db\n
             \_\_\_\_\_\_\_\_hosts:\n

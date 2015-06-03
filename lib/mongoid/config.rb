@@ -27,7 +27,7 @@ module Mongoid
     option :use_utc, default: false
 
     # Has Mongoid been configured? This is checking that at least a valid
-    # session config exists.
+    # client config exists.
     #
     # @example Is Mongoid configured?
     #   config.configured?
@@ -39,7 +39,7 @@ module Mongoid
       clients.key?(:default)
     end
 
-    # Connect to the provided database name on the default session.
+    # Connect to the provided database name on the default client.
     #
     # @note Use only in development or test environments for convenience.
     #
@@ -50,7 +50,7 @@ module Mongoid
     #
     # @since 3.0.0
     def connect_to(name, options = { read: { mode: :primary }})
-      self.sessions = {
+      self.clients = {
         default: {
           database: name,
           hosts: [ "localhost:27017" ],
@@ -217,7 +217,7 @@ module Mongoid
     #
     # @since 3.0.0
     def clients
-      @sessions ||= {}
+      @clients ||= {}
     end
     alias :sessions :clients
     deprecate :sessions, :clients, 2015, 12
@@ -248,12 +248,11 @@ module Mongoid
 
     private
 
-    def clients=(sessions)
-      raise Errors::NoSessionsConfig.new unless sessions
-      sess = sessions.with_indifferent_access
-      Validators::Session.validate(sess)
-      @sessions = sess
-      sess
+    def clients=(clients)
+      raise Errors::NoClientsConfig.new unless clients
+      c = clients.with_indifferent_access
+      Validators::Client.validate(c)
+      @clients = c
     end
     alias :sessions= :clients=
     deprecate :sessions=, :clients=, 2015, 12

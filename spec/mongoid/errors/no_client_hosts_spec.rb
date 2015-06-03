@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Errors::NoSessionHosts do
+describe Mongoid::Errors::NoClientHosts do
 
   describe "#message" do
 
@@ -10,13 +10,13 @@ describe Mongoid::Errors::NoSessionHosts do
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "No hosts provided for session configuration: :secondary."
+        "No hosts provided for client configuration: :secondary."
       )
     end
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Each session configuration must provide hosts so Mongoid"
+        "Each client configuration must provide hosts so Mongoid"
       )
     end
 

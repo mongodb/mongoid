@@ -1,28 +1,28 @@
 require "spec_helper"
 
-describe Mongoid::Errors::NoSessionDatabase do
+describe Mongoid::Errors::NoClientConfig do
 
   describe "#message" do
 
     let(:error) do
-      described_class.new(:secondary, { hosts: [ "127.0.0.1:27017" ] })
+      described_class.new(:secondary)
     end
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "No database provided for session configuration: :secondary."
+        "No configuration could be found for a client named 'secondary'."
       )
     end
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "Each session configuration must provide a database so Mongoid"
+        "When attempting to create the new client, Mongoid could not find a client"
       )
     end
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "If configuring via a mongoid.yml, ensure that within your :secondary"
+        "Double check your mongoid.yml to make sure under the clients"
       )
     end
   end

@@ -18,19 +18,19 @@ describe Mongoid::Sessions::Factory do
           end
 
           before do
-            Mongoid::Config.send(:sessions=, config)
+            Mongoid::Config.send(:clients=, config)
           end
 
-          let(:session) do
+          let(:client) do
             described_class.create(:secondary)
           end
 
           let(:cluster) do
-            session.cluster
+            client.cluster
           end
 
-          it "returns a session" do
-            expect(session).to be_a(Mongo::Client)
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
           end
 
           it "sets the cluster's seeds" do
@@ -48,10 +48,10 @@ describe Mongoid::Sessions::Factory do
           end
 
           before do
-            Mongoid::Config.send(:sessions=, config)
+            Mongoid::Config.send(:clients=, config)
           end
 
-          let(:session) do
+          let(:client) do
             described_class.create(:secondary)
           end
 
@@ -60,11 +60,11 @@ describe Mongoid::Sessions::Factory do
           end
 
           let(:cluster) do
-            session.cluster
+            client.cluster
           end
 
-          it "returns a session" do
-            expect(session).to be_a(Mongo::Client)
+          it "returns a client" do
+            expect(client).to be_a(Mongo::Client)
           end
 
           it "sets the cluster's seed ports to 27017" do
@@ -88,19 +88,19 @@ describe Mongoid::Sessions::Factory do
             end
 
             before do
-              Mongoid::Config.send(:sessions=, config)
+              Mongoid::Config.send(:clients=, config)
             end
 
-            let(:session) do
+            let(:client) do
               described_class.create(:secondary)
             end
 
             let(:cluster) do
-              session.cluster
+              client.cluster
             end
 
-            it "returns a session" do
-              expect(session).to be_a(Mongo::Client)
+            it "returns a client" do
+              expect(client).to be_a(Mongo::Client)
             end
 
             it "sets the cluster's seeds" do
@@ -108,7 +108,7 @@ describe Mongoid::Sessions::Factory do
             end
 
             it "sets the database" do
-              expect(session.options[:database]).to eq("mongoid_test")
+              expect(client.options[:database]).to eq("mongoid_test")
             end
           end
 
@@ -122,23 +122,23 @@ describe Mongoid::Sessions::Factory do
             end
 
             before do
-              Mongoid::Config.send(:sessions=, config)
+              Mongoid::Config.send(:clients=, config)
             end
 
-            let(:session) do
+            let(:client) do
               described_class.create(:secondary)
             end
 
             let(:cluster) do
-              session.cluster
+              client.cluster
             end
 
             let(:seeds) do
               cluster.addresses.map{ |address| address.to_s }
             end
 
-            it "returns a session" do
-              expect(session).to be_a(Mongo::Client)
+            it "returns a client" do
+              expect(client).to be_a(Mongo::Client)
             end
 
             it "sets the cluster's seeds" do
@@ -153,7 +153,7 @@ describe Mongoid::Sessions::Factory do
         it "raises an error" do
           expect {
             described_class.create(:unknown)
-          }.to raise_error(Mongoid::Errors::NoSessionConfig)
+          }.to raise_error(Mongoid::Errors::NoClientConfig)
         end
       end
     end
@@ -165,23 +165,23 @@ describe Mongoid::Sessions::Factory do
       end
 
       before do
-        Mongoid::Config.send(:sessions=, config)
+        Mongoid::Config.send(:clients=, config)
       end
 
-      let(:session) do
+      let(:client) do
         described_class.create
       end
 
       let(:cluster) do
-        session.cluster
+        client.cluster
       end
 
       let(:seeds) do
         cluster.addresses.map{ |address| address.to_s }
       end
 
-      it "returns the default session" do
-        expect(session).to be_a(Mongo::Client)
+      it "returns the default client" do
+        expect(client).to be_a(Mongo::Client)
       end
 
       it "sets the cluster's seeds" do
@@ -197,8 +197,8 @@ describe Mongoid::Sessions::Factory do
         Mongoid.clients[:default] = nil
       end
 
-      it "raises NoSessionsConfig error" do
-        expect{ Mongoid::Sessions::Factory.create(config) }.to raise_error(Mongoid::Errors::NoSessionsConfig)
+      it "raises NoClientsConfig error" do
+        expect{ Mongoid::Sessions::Factory.create(config) }.to raise_error(Mongoid::Errors::NoClientsConfig)
       end
     end
   end
@@ -210,23 +210,23 @@ describe Mongoid::Sessions::Factory do
     end
 
     before do
-      Mongoid::Config.send(:sessions=, config)
+      Mongoid::Config.send(:clients=, config)
     end
 
-    let(:session) do
+    let(:client) do
       described_class.default
     end
 
     let(:cluster) do
-      session.cluster
+      client.cluster
     end
 
     let(:seeds) do
       cluster.addresses.map{ |address| address.to_s }
     end
 
-    it "returns the default session" do
-      expect(session).to be_a(Mongo::Client)
+    it "returns the default client" do
+      expect(client).to be_a(Mongo::Client)
     end
 
     it "sets the cluster's seeds" do
@@ -250,23 +250,23 @@ describe Mongoid::Sessions::Factory do
     end
 
     before do
-      Mongoid::Config.send(:sessions=, config)
+      Mongoid::Config.send(:clients=, config)
     end
 
-    let(:session) do
+    let(:client) do
       described_class.default
     end
 
     let(:cluster) do
-      session.cluster
+      client.cluster
     end
 
     let(:seeds) do
       cluster.addresses.map{ |address| address.to_s }
     end
 
-    it "returns the default session" do
-      expect(session).to be_a(Mongo::Client)
+    it "returns the default client" do
+      expect(client).to be_a(Mongo::Client)
     end
 
     it "sets the cluster's seeds" do
@@ -278,7 +278,7 @@ describe Mongoid::Sessions::Factory do
     end
 
     it "sets the write concern" do
-      expect(session.write_concern).to be_a(Mongo::WriteConcern::Acknowledged)
+      expect(client.write_concern).to be_a(Mongo::WriteConcern::Acknowledged)
     end
   end
 end

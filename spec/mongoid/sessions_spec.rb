@@ -422,7 +422,7 @@ describe Mongoid::Sessions do
       it "raises an error" do
         expect {
           band.mongo_client
-        }.to raise_error(Mongoid::Errors::NoSessionConfig)
+        }.to raise_error(Mongoid::Errors::NoClientConfig)
       end
     end
   end
@@ -474,7 +474,7 @@ describe Mongoid::Sessions do
       it "raises an error" do
         expect {
           Band.mongo_client
-        }.to raise_error(Mongoid::Errors::NoSessionConfig)
+        }.to raise_error(Mongoid::Errors::NoClientConfig)
       end
     end
   end

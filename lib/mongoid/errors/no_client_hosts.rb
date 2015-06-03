@@ -2,13 +2,13 @@
 module Mongoid
   module Errors
 
-    # This error is raised when a session is configured without a database.
-    class NoSessionDatabase < MongoidError
+    # This error is raised when a client is configured without hosts.
+    class NoClientHosts < MongoidError
 
       # Create the new error.
       #
       # @example Create the new error.
-      #   NoSessionDatabase.new(:default, {}})
+      #   NoClientHosts.new(:default, {}})
       #
       # @param [ Symbol, String ] name The db config key.
       # @param [ Hash ] config The hash configuration options.
@@ -17,7 +17,7 @@ module Mongoid
       def initialize(name, config)
         super(
           compose_message(
-            "no_session_database",
+            "no_client_hosts",
             { name: name, config: config }
           )
         )

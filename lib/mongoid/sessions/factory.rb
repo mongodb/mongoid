@@ -5,59 +5,59 @@ module Mongoid
     module Factory
       extend self
 
-      # Create a new session given the named configuration. If no name is
-      # provided, return a new session with the default configuration. If a
+      # Create a new client given the named configuration. If no name is
+      # provided, return a new client with the default configuration. If a
       # name is provided for which no configuration exists, an error will be
       # raised.
       #
-      # @example Create the session.
+      # @example Create the client.
       #   Factory.create(:secondary)
       #
-      # @param [ String, Symbol ] name The named session configuration.
+      # @param [ String, Symbol ] name The named client configuration.
       #
-      # @raise [ Errors::NoSessionConfig ] If no config could be found.
+      # @raise [ Errors::NoClientConfig ] If no config could be found.
       #
-      # @return [ Mongo::Client ] The new session.
+      # @return [ Mongo::Client ] The new client.
       #
       # @since 3.0.0
       def create(name = nil)
         return default unless name
         config = Mongoid.clients[name]
-        raise Errors::NoSessionConfig.new(name) unless config
-        create_session(config)
+        raise Errors::NoClientConfig.new(name) unless config
+        create_client(config)
       end
 
-      # Get the default session.
+      # Get the default client.
       #
-      # @example Get the default session.
+      # @example Get the default client.
       #   Factory.default
       #
-      # @raise [ Errors::NoSessionConfig ] If no default configuration is
+      # @raise [ Errors::NoClientConfig ] If no default configuration is
       #   found.
       #
-      # @return [ Mongo::Client ] The default session.
+      # @return [ Mongo::Client ] The default client.
       #
       # @since 3.0.0
       def default
-        create_session(Mongoid.clients[:default])
+        create_client(Mongoid.clients[:default])
       end
 
       private
 
-      # Create the session for the provided config.
+      # Create the client for the provided config.
       #
       # @api private
       #
-      # @example Create the session.
-      #   Factory.create_session(config)
+      # @example Create the client.
+      #   Factory.create_client(config)
       #
-      # @param [ Hash ] configuration The session config.
+      # @param [ Hash ] configuration The client config.
       #
-      # @return [ Mongo::Client ] The session.
+      # @return [ Mongo::Client ] The client.
       #
       # @since 3.0.0
-      def create_session(configuration)
-        raise Errors::NoSessionsConfig.new unless configuration
+      def create_client(configuration)
+        raise Errors::NoClientsConfig.new unless configuration
         if configuration[:uri]
           Mongo::Client.new(configuration[:uri], options(configuration))
         else

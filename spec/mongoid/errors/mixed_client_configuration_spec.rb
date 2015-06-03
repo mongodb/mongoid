@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Errors::MixedSessionConfiguration do
+describe Mongoid::Errors::MixedClientConfiguration do
 
   describe "#message" do
 

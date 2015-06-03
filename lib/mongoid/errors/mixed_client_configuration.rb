@@ -2,23 +2,23 @@
 module Mongoid
   module Errors
 
-    # This error is raised when a session configuration contains both a uri and
+    # This error is raised when a client configuration contains both a uri and
     # other standard options.
-    class MixedSessionConfiguration < MongoidError
+    class MixedClientConfiguration < MongoidError
 
       # Initialize the error.
       #
       # @example Initialize the error.
-      #   MixedSessionConfiguration.new(:name, {})
+      #   MixedClientConfiguration.new(:name, {})
       #
-      # @param [ Symbol ] name The name of the session config.
+      # @param [ Symbol ] name The name of the client config.
       # @param [ Hash ] config The configuration options.
       #
       # @since 3.0.0
       def initialize(name, config)
         super(
           compose_message(
-            "mixed_session_configuration",
+            "mixed_client_configuration",
             { name: name, config: config }
           )
         )

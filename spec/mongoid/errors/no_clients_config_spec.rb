@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Errors::NoSessionsConfig do
+describe Mongoid::Errors::NoClientsConfig do
 
   describe "#message" do
 
@@ -10,7 +10,7 @@ describe Mongoid::Errors::NoSessionsConfig do
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "No sessions configuration provided."
+        "No clients configuration provided."
       )
     end
 

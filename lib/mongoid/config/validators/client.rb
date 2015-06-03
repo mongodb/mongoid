@@ -4,81 +4,84 @@ module Mongoid
     module Validators
 
       # Validator for client specific configuration.
-      module Session
+      module Client
         extend self
 
-        STANDARD = [ :database, :hosts, :username, :password ]
+        # Standard configuration options.
+        #
+        # @since 3.0.0
+        STANDARD = [ :database, :hosts, :username, :password ].freeze
 
         # Validate the client configuration.
         #
-        # @example Validate the session config.
-        #   Session.validate({ default: { hosts: [ "localhost:27017" ] }})
+        # @example Validate the client config.
+        #   Client.validate({ default: { hosts: [ "localhost:27017" ] }})
         #
-        # @param [ Hash ] sessions The sessions config.
+        # @param [ Hash ] clients The clients config.
         #
         # @since 3.0.0
-        def validate(sessions)
-          unless sessions.has_key?(:default)
-            raise Errors::NoDefaultSession.new(sessions.keys)
+        def validate(clients)
+          unless clients.has_key?(:default)
+            raise Errors::NoDefaultClient.new(clients.keys)
           end
-          sessions.each_pair do |name, config|
-            validate_session_database(name, config)
-            validate_session_hosts(name, config)
-            validate_session_uri(name, config)
+          clients.each_pair do |name, config|
+            validate_client_database(name, config)
+            validate_client_hosts(name, config)
+            validate_client_uri(name, config)
           end
         end
 
         private
 
-        # Validate that the session config has database.
+        # Validate that the client config has database.
         #
         # @api private
         #
-        # @example Validate the session has database.
-        #   validator.validate_session_database(:default, {})
+        # @example Validate the client has database.
+        #   validator.validate_client_database(:default, {})
         #
         # @param [ String, Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
         #
         # @since 3.0.0
-        def validate_session_database(name, config)
+        def validate_client_database(name, config)
           if no_database_or_uri?(config)
-            raise Errors::NoSessionDatabase.new(name, config)
+            raise Errors::NoClientDatabase.new(name, config)
           end
         end
 
-        # Validate that the session config has hosts.
+        # Validate that the client config has hosts.
         #
         # @api private
         #
-        # @example Validate the session has hosts.
-        #   validator.validate_session_hosts(:default, {})
+        # @example Validate the client has hosts.
+        #   validator.validate_client_hosts(:default, {})
         #
         # @param [ String, Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
         #
         # @since 3.0.0
-        def validate_session_hosts(name, config)
+        def validate_client_hosts(name, config)
           if no_hosts_or_uri?(config)
-            raise Errors::NoSessionHosts.new(name, config)
+            raise Errors::NoClientHosts.new(name, config)
           end
         end
 
         # Validate that not both a uri and standard options are provided for a
-        # single session.
+        # single client.
         #
         # @api private
         #
         # @example Validate the uri and options.
-        #   validator.validate_session_uri(:default, {})
+        #   validator.validate_client_uri(:default, {})
         #
         # @param [ String, Symbol ] name The config key.
         # @param [ Hash ] config The configuration.
         #
         # @since 3.0.0
-        def validate_session_uri(name, config)
+        def validate_client_uri(name, config)
           if both_uri_and_standard?(config)
-            raise Errors::MixedSessionConfiguration.new(name, config)
+            raise Errors::MixedClientConfiguration.new(name, config)
           end
         end
 
