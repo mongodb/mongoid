@@ -12,9 +12,13 @@ module Mongoid
     # Constant for the key to store clients.
     #
     # @since 5.0.0
-    CLIENTS_KEY = "[mongoid]:sessions"
+    CLIENTS_KEY = "[mongoid]:clients"
 
-    SESSION_OVERRIDE_KEY = "[mongoid]:session-override"
+    # The key to override the client.
+    #
+    # @since 5.0.0
+    CLIENT_OVERRIDE_KEY = "[mongoid]:client-override"
+
     SCOPE_STACK_KEY = "[mongoid]:scope-stack"
     AUTOSAVES_KEY = "[mongoid]:autosaves"
     VALIDATIONS_KEY = "[mongoid]:validations"
@@ -73,7 +77,7 @@ module Mongoid
     #
     # @return [ Hash ] The clients.
     #
-    # @since 3.0.0
+    # @since 5.0.0
     def clients
       Thread.current[CLIENTS_KEY] ||= {}
     end
@@ -170,31 +174,35 @@ module Mongoid
       validations_for(document.class).delete_one(document._id)
     end
 
-    # Get the global session override.
+    # Get the global client override.
     #
-    # @example Get the global session override.
-    #   Threaded.session_override
+    # @example Get the global client override.
+    #   Threaded.client_override
     #
     # @return [ String, Symbol ] The override.
     #
-    # @since 3.0.0
-    def session_override
-      Thread.current[SESSION_OVERRIDE_KEY]
+    # @since 5.0.0
+    def client_override
+      Thread.current[CLIENT_OVERRIDE_KEY]
     end
+    alias :session_override :client_override
+    deprecate :session_override, :client_override, 2015, 12
 
-    # Set the global session override.
+    # Set the global client override.
     #
-    # @example Set the global session override.
-    #   Threaded.session_override = :testing
+    # @example Set the global client override.
+    #   Threaded.client_override = :testing
     #
     # @param [ String, Symbol ] The global override name.
     #
     # @return [ String, Symbol ] The override.
     #
     # @since 3.0.0
-    def session_override=(name)
-      Thread.current[SESSION_OVERRIDE_KEY] = name
+    def client_override=(name)
+      Thread.current[CLIENT_OVERRIDE_KEY] = name
     end
+    alias :session_override= :client_override=
+    deprecate :session_override=, :client_override=, 2015, 12
 
     # Get the mongoid scope stack for chained criteria.
     #

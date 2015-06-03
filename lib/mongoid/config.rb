@@ -36,7 +36,7 @@ module Mongoid
     #
     # @since 3.0.9
     def configured?
-      sessions.key?(:default)
+      clients.key?(:default)
     end
 
     # Connect to the provided database name on the default session.

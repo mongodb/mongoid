@@ -41,7 +41,7 @@ describe Mongoid::Config do
     context "when no default session config exists" do
 
       before do
-        described_class.sessions.clear
+        described_class.clients.clear
       end
 
       it "returns false" do
