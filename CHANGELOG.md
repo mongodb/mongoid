@@ -11,6 +11,8 @@ For instructions on upgrading to newer versions, visit
 
 * Most driver specific configuration options have changed, please see [here](http://docs.mongodb.org/ecosystem/tutorial/ruby-driver-tutorial/#ruby-options) for the new options.
 
+* All references to `session` are now replaced with `client`. This includes the mongoid.yml configuration, `store_in` options, and all exceptions and modules with `Session` in the name.
+
 * `find_and_modify` has been removed and replaced with 3 options: `find_one_and_update`, `find_one_and_delete` and `find_one_and_replace`.
 
 * `text_search` has been removed as it is now a `$text` option in a query from 2.6 on.

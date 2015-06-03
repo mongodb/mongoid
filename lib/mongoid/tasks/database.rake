@@ -20,7 +20,7 @@ namespace :db do
 
     desc "Drops the default client database"
     task :drop => :environment do
-      ::Mongoid::Sessions.default.database.drop
+      ::Mongoid::Clients.default.database.drop
     end
 
     desc "Drop all collections except the system collections"

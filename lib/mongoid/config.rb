@@ -83,8 +83,8 @@ module Mongoid
     def load!(path, environment = nil)
       settings = Environment.load_yaml(path, environment)
       if settings.present?
-        Sessions.disconnect
-        Sessions.clear
+        Clients.disconnect
+        Clients.clear
         load_configuration(settings)
       end
       settings
@@ -172,7 +172,7 @@ module Mongoid
     #
     # @since 2.0.2
     def purge!
-      Sessions.default.database.collections.each(&:drop) and true
+      Clients.default.database.collections.each(&:drop) and true
     end
 
     # Truncate all data in all collections, but not the indexes.
@@ -186,7 +186,7 @@ module Mongoid
     #
     # @since 2.0.2
     def truncate!
-      Sessions.default.database.collections.each do |collection|
+      Clients.default.database.collections.each do |collection|
         collection.find.delete_many
       end and true
     end

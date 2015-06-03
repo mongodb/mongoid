@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Sessions::Factory do
+describe Mongoid::Clients::Factory do
 
   describe ".create" do
 
@@ -198,7 +198,7 @@ describe Mongoid::Sessions::Factory do
       end
 
       it "raises NoClientsConfig error" do
-        expect{ Mongoid::Sessions::Factory.create(config) }.to raise_error(Mongoid::Errors::NoClientsConfig)
+        expect{ Mongoid::Clients::Factory.create(config) }.to raise_error(Mongoid::Errors::NoClientsConfig)
       end
     end
   end

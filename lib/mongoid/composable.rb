@@ -35,6 +35,7 @@ module Mongoid
     include ActiveModel::Serializers::Xml
     include Atomic
     include Changeable
+    include Clients
     include Attributes
     include Evolvable
     include Fields
@@ -47,7 +48,6 @@ module Mongoid
     include Scopable
     include Selectable
     include Serializable
-    include Sessions
     include Shardable
     include Stateful
     include Threaded::Lifecycle
@@ -73,7 +73,7 @@ module Mongoid
       Reloadable,
       Scopable,
       Serializable,
-      Sessions,
+      Clients,
       Shardable,
       Stateful,
       Threaded::Lifecycle,

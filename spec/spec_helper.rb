@@ -74,16 +74,8 @@ CONFIG = {
   }
 }
 
-def purge_database_alt!
-  client = Mongoid::Sessions.default
-  client.use(database_id_alt)
-  client.collections.each do |collection|
-    collection.drop
-  end
-end
-
 def non_legacy_server?
-  Mongoid::Sessions.default.cluster.servers.first.features.write_command_enabled?
+  Mongoid::Clients.default.cluster.servers.first.features.write_command_enabled?
 end
 
 # Set the database that the spec suite connects to.

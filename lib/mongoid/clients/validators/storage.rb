@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Sessions
+  module Clients
     module Validators
 
       # Validates the options passed to :store_in.

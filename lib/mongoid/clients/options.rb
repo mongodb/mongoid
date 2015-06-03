@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Sessions
+  module Clients
     module Options
       extend ActiveSupport::Concern
       extend Gem::Deprecate
@@ -41,9 +41,9 @@ module Mongoid
       def mongo_client
         if persistence_options
           if persistence_options[:client]
-            client = Sessions.with_name(persistence_options[:client])
+            client = Clients.with_name(persistence_options[:client])
           else
-            client = Sessions.with_name(self.class.client_name)
+            client = Clients.with_name(self.class.client_name)
             client.use(self.class.database_name)
           end
           client.with(persistence_options)

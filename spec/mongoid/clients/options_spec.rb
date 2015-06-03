@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Sessions::Options do
+describe Mongoid::Clients::Options do
 
   describe "#with", if: non_legacy_server? do
 

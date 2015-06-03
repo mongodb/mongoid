@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Sessions do
+describe Mongoid::Clients do
 
   describe "#collection" do
 

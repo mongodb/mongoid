@@ -34,7 +34,7 @@ describe Mongoid do
   describe ".default_client" do
 
     it "returns the default client" do
-      expect(Mongoid.default_client).to eq(Mongoid::Sessions.default)
+      expect(Mongoid.default_client).to eq(Mongoid::Clients.default)
     end
   end
 
@@ -59,7 +59,7 @@ describe Mongoid do
   describe ".client" do
 
     it "returns the named client" do
-      expect(Mongoid.client(:default)).to eq(Mongoid::Sessions.default)
+      expect(Mongoid.client(:default)).to eq(Mongoid::Clients.default)
     end
   end
 

@@ -1,6 +1,6 @@
 # encoding: utf-8
 module Mongoid
-  module Sessions
+  module Clients
     module ThreadOptions
       extend ActiveSupport::Concern
 

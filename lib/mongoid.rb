@@ -18,7 +18,7 @@ require "mongo"
 require "mongoid/version"
 require "mongoid/config"
 require "mongoid/loggable"
-require "mongoid/sessions"
+require "mongoid/clients"
 require "mongoid/document"
 require "mongoid/tasks/database"
 require "mongoid/query_cache"
@@ -63,7 +63,7 @@ module Mongoid
   #
   # @since 3.0.0
   def default_client
-    Sessions.default
+    Clients.default
   end
   alias :default_session :default_client
   deprecate :default_session, :default_client, 2015, 12
@@ -77,7 +77,7 @@ module Mongoid
   #
   # @since 3.1.0
   def disconnect_clients
-    Sessions.disconnect
+    Clients.disconnect
   end
   alias :disconnect_sessions :disconnect_clients
   deprecate :disconnect_sessions, :disconnect_clients, 2015, 12
@@ -91,7 +91,7 @@ module Mongoid
   #
   # @since 3.0.0
   def client(name)
-    Sessions.with_name(name)
+    Clients.with_name(name)
   end
   alias :session :client
   deprecate :session, :client, 2015, 12

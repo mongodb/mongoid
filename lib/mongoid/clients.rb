@@ -1,12 +1,12 @@
 # encoding: utf-8
-require "mongoid/sessions/factory"
-require "mongoid/sessions/validators"
-require "mongoid/sessions/storage_options"
-require "mongoid/sessions/thread_options"
-require "mongoid/sessions/options"
+require "mongoid/clients/factory"
+require "mongoid/clients/validators"
+require "mongoid/clients/storage_options"
+require "mongoid/clients/thread_options"
+require "mongoid/clients/options"
 
 module Mongoid
-  module Sessions
+  module Clients
     extend ActiveSupport::Concern
     extend Gem::Deprecate
     include StorageOptions
@@ -18,7 +18,7 @@ module Mongoid
       # Clear all clients from the current thread.
       #
       # @example Clear all clients.
-      #   Mongoid::Sessions.clear
+      #   Mongoid::Clients.clear
       #
       # @return [ Array ] The empty clients.
       #
@@ -30,19 +30,19 @@ module Mongoid
       # Get the default client.
       #
       # @example Get the default client.
-      #   Mongoid::Sessions.default
+      #   Mongoid::Clients.default
       #
       # @return [ Mongo::Client ] The default client.
       #
       # @since 3.0.0
       def default
-        Threaded.clients[:default] ||= Sessions::Factory.default
+        Threaded.clients[:default] ||= Clients::Factory.default
       end
 
       # Disconnect all active clients.
       #
       # @example Disconnect all active clients.
-      #   Mongoid::Sessions.disconnect
+      #   Mongoid::Clients.disconnect
       #
       # @return [ true ] True.
       #
@@ -56,7 +56,7 @@ module Mongoid
       # Get a client with the provided name.
       #
       # @example Get a client with the name.
-      #   Mongoid::Sessions.with_name(:replica)
+      #   Mongoid::Clients.with_name(:replica)
       #
       # @param [ Symbol ] name The name of the client.
       #
@@ -64,7 +64,7 @@ module Mongoid
       #
       # @since 3.0.0
       def with_name(name)
-        Threaded.clients[name.to_sym] ||= Sessions::Factory.create(name)
+        Threaded.clients[name.to_sym] ||= Clients::Factory.create(name)
       end
 
       def set(name, client)
@@ -112,10 +112,10 @@ module Mongoid
       # @since 3.0.0
       def mongo_client
         name = client_name
-        client = Sessions.with_name(name)
+        client = Clients.with_name(name)
         client = client.use(database_name)
         client = self.persistence_options.blank? ? client : client.with(self.persistence_options)
-        Sessions.set(name, client)
+        Clients.set(name, client)
       end
       alias :mongo_session :mongo_client
       deprecate :mongo_session, :mongo_client, 2015, 12

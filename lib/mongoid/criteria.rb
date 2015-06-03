@@ -4,7 +4,6 @@ require "mongoid/criteria/inspectable"
 require "mongoid/criteria/marshalable"
 require "mongoid/criteria/modifiable"
 require "mongoid/criteria/scopable"
-require "mongoid/sessions/options"
 
 module Mongoid
 
@@ -23,7 +22,7 @@ module Mongoid
     include Marshalable
     include Modifiable
     include Scopable
-    include Sessions::Options
+    include Clients::Options
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
