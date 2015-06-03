@@ -40,7 +40,7 @@ describe Mongoid do
 
   describe ".disconnect_clients" do
 
-    let(:sessions) do
+    let(:clients) do
       Mongoid::Threaded.clients.values
     end
 
@@ -49,8 +49,8 @@ describe Mongoid do
     end
 
     pending "disconnects from all active clients" do
-      sessions.each do |session|
-        expect(session.cluster).to receive(:disconnect!).and_call_original
+      clients.each do |client|
+        expect(client.cluster).to receive(:disconnect!).and_call_original
       end
       Mongoid.disconnect_clients
     end

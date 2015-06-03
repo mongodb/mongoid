@@ -54,9 +54,9 @@ module Mongoid
     block_given? ? yield(Config) : Config
   end
 
-  # Convenience method for getting the default session.
+  # Convenience method for getting the default client.
   #
-  # @example Get the default session.
+  # @example Get the default client.
   #   Mongoid.default_client
   #
   # @return [ Mongo::Client ] The default client.

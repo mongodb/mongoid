@@ -120,7 +120,7 @@ module Mongoid
       alias :mongo_session :mongo_client
       deprecate :mongo_session, :mongo_client, 2015, 12
 
-      # Get the collection for this model from the session. Will check for an
+      # Get the collection for this model from the client. Will check for an
       # overridden collection name from the store_in macro or the collection
       # with a pluralized model name.
       #

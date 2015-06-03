@@ -2382,7 +2382,7 @@ describe Mongoid::Validatable::UniquenessValidator do
       Person.reset_callbacks(:validate)
     end
 
-    it "transfers the options to the cloned session" do
+    it "transfers the options to the cloned client" do
       expect {
         Person.create!(ssn: "132-11-1111", username: "asdfsdfA")
       }.to raise_error

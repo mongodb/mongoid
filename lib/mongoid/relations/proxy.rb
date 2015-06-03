@@ -85,7 +85,7 @@ module Mongoid
       end
 
       # Tell the next persistance operation to store in a specific collection,
-      # database or session.
+      # database or client.
       #
       # @example Save the current document to a different collection.
       #   model.with(collection: "secondary").save
@@ -93,17 +93,17 @@ module Mongoid
       # @example Save the current document to a different database.
       #   model.with(database: "secondary").save
       #
-      # @example Save the current document to a different session.
-      #   model.with(session: "replica_set").save
+      # @example Save the current document to a different client.
+      #   model.with(client: "replica_set").save
       #
       # @example Save with a combination of options.
-      #   model.with(session: "sharded", database: "secondary").save
+      #   model.with(client: "sharded", database: "secondary").save
       #
       # @param [ Hash ] options The storage options.
       #
       # @option options [ String, Symbol ] :collection The collection name.
       # @option options [ String, Symbol ] :database The database name.
-      # @option options [ String, Symbol ] :session The session name.
+      # @option options [ String, Symbol ] :client The client name.
       #
       # @return [ Document ] The current document.
       #

@@ -15,7 +15,7 @@ describe Mongoid::Config do
       described_class.connect_to(database_id, read: :primary)
     end
 
-    context "when a default session config exists" do
+    context "when a default client config exists" do
 
       context "when a default database is configured" do
 
@@ -29,7 +29,7 @@ describe Mongoid::Config do
         end
 
         before do
-          described_class.send(:sessions=, config)
+          described_class.send(:clients=, config)
         end
 
         it "returns true" do
@@ -38,7 +38,7 @@ describe Mongoid::Config do
       end
     end
 
-    context "when no default session config exists" do
+    context "when no default client config exists" do
 
       before do
         described_class.clients.clear
@@ -73,18 +73,18 @@ describe Mongoid::Config do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
     end
 
-    context "when existing sessions exist in the configuration" do
+    context "when existing clients exist in the configuration" do
 
-      let(:session) do
+      let(:client) do
         Mongo::Client.new([ "127.0.0.1:27017" ])
       end
 
       before do
-        Mongoid::Threaded.clients[:test] = session
+        Mongoid::Threaded.clients[:test] = client
         described_class.load!(file, :test)
       end
 
-      it "clears the previous sessions" do
+      it "clears the previous clients" do
         expect(Mongoid::Threaded.clients[:test]).to be_nil
       end
     end

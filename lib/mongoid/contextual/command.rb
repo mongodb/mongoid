@@ -2,6 +2,7 @@
 module Mongoid
   module Contextual
     module Command
+      extend Gem::Deprecate
 
       # @attribute [r] collection The collection to query against.
       # @attribute [r] criteria The criteria for the context.
@@ -19,17 +20,19 @@ module Mongoid
         @command ||= {}
       end
 
-      # Get the database session.
+      # Get the database client.
       #
-      # @example Get the session.
-      #   command.session
+      # @example Get the client.
+      #   command.client
       #
       # @return [ Mongo::Client ] The Mongo client.
       #
       # @since 3.0.0
-      def session
+      def client
         collection.database.client
       end
+      alias :session :client
+      deprecate :session, :client, 2015, 12
     end
   end
 end

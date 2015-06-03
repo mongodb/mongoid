@@ -92,7 +92,7 @@ module Mongoid
           __evaluate__(storage_options[:collection])
         end
 
-        # Get the session name for the model.
+        # Get the client name for the model.
         #
         # @example Get the client name.
         #   Model.client_name
@@ -111,7 +111,7 @@ module Mongoid
         # @example Get the database name.
         #   Model.database_name
         #
-        # @return [ Symbol ] The name of the session.
+        # @return [ Symbol ] The name of the client.
         #
         # @since 4.0.0
         def database_name
