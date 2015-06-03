@@ -15,21 +15,21 @@ module Mongoid
 
     class << self
 
-      # Clear all sessions from the current thread.
+      # Clear all clients from the current thread.
       #
-      # @example Clear all sessions.
+      # @example Clear all clients.
       #   Mongoid::Sessions.clear
       #
-      # @return [ Array ] The empty sessions.
+      # @return [ Array ] The empty clients.
       #
       # @since 3.0.0
       def clear
         Threaded.clients.clear
       end
 
-      # Get the default session.
+      # Get the default client.
       #
-      # @example Get the default session.
+      # @example Get the default client.
       #   Mongoid::Sessions.default
       #
       # @return [ Mongo::Client ] The default client.
@@ -39,26 +39,26 @@ module Mongoid
         Threaded.clients[:default] ||= Sessions::Factory.default
       end
 
-      # Disconnect all active sessions.
+      # Disconnect all active clients.
       #
-      # @example Disconnect all active sessions.
+      # @example Disconnect all active clients.
       #   Mongoid::Sessions.disconnect
       #
       # @return [ true ] True.
       #
       # @since 3.1.0
       def disconnect
-        Threaded.clients.values.each do |session|
-          # session.close
+        Threaded.clients.values.each do |client|
+          # client.close
         end
       end
 
-      # Get a session with the provided name.
+      # Get a client with the provided name.
       #
-      # @example Get a session with the name.
+      # @example Get a client with the name.
       #   Mongoid::Sessions.with_name(:replica)
       #
-      # @param [ Symbol ] name The name of the session.
+      # @param [ Symbol ] name The name of the client.
       #
       # @return [ Mongo::Client ] The named client.
       #
@@ -72,7 +72,7 @@ module Mongoid
       end
     end
 
-    # Get the collection for this model from the session. Will check for an
+    # Get the collection for this model from the client. Will check for an
     # overridden collection name from the store_in macro or the collection
     # with a pluralized model name.
     #

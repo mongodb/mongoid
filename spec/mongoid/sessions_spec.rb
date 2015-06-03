@@ -66,12 +66,12 @@ describe Mongoid::Sessions do
 
         before do
           Band.store_in collection: "artists"
-          Band.store_in session: "another"
+          Band.store_in client: "another"
         end
 
         it "should merge the options together" do
           expect(Band.storage_options[:collection]).to eq("artists")
-          expect(Band.storage_options[:session]).to eq("another")
+          expect(Band.storage_options[:client]).to eq("another")
         end
       end
 
@@ -287,7 +287,7 @@ describe Mongoid::Sessions do
           expect(klass.database_name.to_s).to eq(database_id_alt)
         end
 
-        it "session returns the overridden value" do
+        it "client returns the overridden value" do
           expect(klass.mongo_client.options[:database].to_s).to eq(database_id_alt)
         end
       end
@@ -334,22 +334,22 @@ describe Mongoid::Sessions do
       it_behaves_like "an overridden database name"
     end
 
-    context "when overriding using the session" do
+    context "when overriding using the client" do
 
-      let(:session_name) { :alternative }
+      let(:client_name) { :alternative }
 
       before do
-        Mongoid.clients[session_name] = { database: database_id_alt, hosts: [ "#{HOST}:#{PORT}" ] }
+        Mongoid.clients[client_name] = { database: database_id_alt, hosts: [ "#{HOST}:#{PORT}" ] }
       end
 
       after do
-        Mongoid.clients.delete(session_name)
+        Mongoid.clients.delete(client_name)
       end
 
       context "when overriding the persistence options" do
 
         let(:klass) do
-          Band.with(session: session_name)
+          Band.with(client: client_name)
         end
 
         it_behaves_like "an overridden database name"
@@ -360,7 +360,7 @@ describe Mongoid::Sessions do
         let(:klass) { Band }
 
         before do
-          Band.store_in(session: session_name)
+          Band.store_in(client: client_name)
         end
 
         after do
@@ -372,7 +372,7 @@ describe Mongoid::Sessions do
     end
   end
 
-  describe "#mongo_session", if: non_legacy_server? do
+  describe "#mongo_client", if: non_legacy_server? do
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -409,10 +409,10 @@ describe Mongoid::Sessions do
       end
     end
 
-    context "when no session exists with the key" do
+    context "when no client exists with the key" do
 
       before(:all) do
-        Band.store_in(session: :nonexistant)
+        Band.store_in(client: :nonexistant)
       end
 
       let(:band) do
@@ -465,10 +465,10 @@ describe Mongoid::Sessions do
       end
     end
 
-    context "when no session exists with the key" do
+    context "when no client exists with the key" do
 
       before(:all) do
-        Band.store_in(session: :nonexistant)
+        Band.store_in(client: :nonexistant)
       end
 
       it "raises an error" do

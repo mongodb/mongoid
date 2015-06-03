@@ -28,10 +28,10 @@ module Mongoid
         #     store_in database: "echo_shard"
         #   end
         #
-        # @example Store this model by default in a different session.
+        # @example Store this model by default in a different client.
         #   class Band
         #     include Mongoid::Document
-        #     store_in session: "secondary"
+        #     store_in client: "secondary"
         #   end
         #
         # @example Store this model with a combination of options.
@@ -44,7 +44,7 @@ module Mongoid
         #
         # @option options [ String, Symbol ] :collection The collection name.
         # @option options [ String, Symbol ] :database The database name.
-        # @option options [ String, Symbol ] :session The session name.
+        # @option options [ String, Symbol ] :client The client name.
         #
         # @return [ Class ] The model class.
         #
@@ -75,7 +75,7 @@ module Mongoid
         def storage_options_defaults
           {
             collection: name.collectionize.to_sym,
-            session: :default,
+            client: :default,
             database: -> { configured_database }
           }
         end
@@ -101,7 +101,7 @@ module Mongoid
         #
         # @since 3.0.0
         def client_name
-          __evaluate__(storage_options[:session])
+          __evaluate__(storage_options[:client])
         end
         alias :session_name :client_name
         deprecate :session_name, :client_name, 2015, 12
