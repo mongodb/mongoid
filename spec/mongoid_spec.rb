@@ -41,7 +41,7 @@ describe Mongoid do
   describe ".disconnect_clients" do
 
     let(:sessions) do
-      Mongoid::Threaded.sessions.values
+      Mongoid::Threaded.clients.values
     end
 
     before do

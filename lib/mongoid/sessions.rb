@@ -24,7 +24,7 @@ module Mongoid
       #
       # @since 3.0.0
       def clear
-        Threaded.sessions.clear
+        Threaded.clients.clear
       end
 
       # Get the default session.
@@ -36,7 +36,7 @@ module Mongoid
       #
       # @since 3.0.0
       def default
-        Threaded.sessions[:default] ||= Sessions::Factory.default
+        Threaded.clients[:default] ||= Sessions::Factory.default
       end
 
       # Disconnect all active sessions.
@@ -48,7 +48,7 @@ module Mongoid
       #
       # @since 3.1.0
       def disconnect
-        Threaded.sessions.values.each do |session|
+        Threaded.clients.values.each do |session|
           # session.close
         end
       end
@@ -64,11 +64,11 @@ module Mongoid
       #
       # @since 3.0.0
       def with_name(name)
-        Threaded.sessions[name.to_sym] ||= Sessions::Factory.create(name)
+        Threaded.clients[name.to_sym] ||= Sessions::Factory.create(name)
       end
 
       def set(name, client)
-        Threaded.sessions[name.to_sym] = client
+        Threaded.clients[name.to_sym] = client
       end
     end
 

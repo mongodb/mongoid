@@ -80,12 +80,12 @@ describe Mongoid::Config do
       end
 
       before do
-        Mongoid::Threaded.sessions[:test] = session
+        Mongoid::Threaded.clients[:test] = session
         described_class.load!(file, :test)
       end
 
       it "clears the previous sessions" do
-        expect(Mongoid::Threaded.sessions[:test]).to be_nil
+        expect(Mongoid::Threaded.clients[:test]).to be_nil
       end
     end
 

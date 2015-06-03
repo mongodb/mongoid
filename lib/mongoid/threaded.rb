@@ -6,8 +6,14 @@ module Mongoid
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
+
     DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
-    SESSIONS_KEY = "[mongoid]:sessions"
+
+    # Constant for the key to store clients.
+    #
+    # @since 5.0.0
+    CLIENTS_KEY = "[mongoid]:sessions"
+
     SESSION_OVERRIDE_KEY = "[mongoid]:session-override"
     SCOPE_STACK_KEY = "[mongoid]:scope-stack"
     AUTOSAVES_KEY = "[mongoid]:autosaves"
@@ -17,6 +23,7 @@ module Mongoid
       hash[key] = "[mongoid]:#{key}-stack"
     end
 
+    extend Gem::Deprecate
     extend self
 
     # Begin entry into a named thread local stack.
@@ -59,17 +66,19 @@ module Mongoid
       Thread.current[DATABASE_OVERRIDE_KEY] = name
     end
 
-    # Get the database sessions from the current thread.
+    # Get the database clients from the current thread.
     #
-    # @example Get the database sessions.
-    #   Threaded.sessions
+    # @example Get the database clients.
+    #   Threaded.clients
     #
-    # @return [ Hash ] The sessions.
+    # @return [ Hash ] The clients.
     #
     # @since 3.0.0
-    def sessions
-      Thread.current[SESSIONS_KEY] ||= {}
+    def clients
+      Thread.current[CLIENTS_KEY] ||= {}
     end
+    alias :sessions :clients
+    deprecate :sessions, :clients, 2015, 12
 
     # Are in the middle of executing the named stack
     #
