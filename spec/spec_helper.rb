@@ -58,7 +58,7 @@ if (ENV['CI'] == 'travis')
 end
 
 CONFIG = {
-  sessions: {
+  clients: {
     default: {
       database: database_id,
       hosts: [ "#{HOST}:#{PORT}" ],
@@ -75,9 +75,9 @@ CONFIG = {
 }
 
 def purge_database_alt!
-  session = Mongoid::Sessions.default
-  session.use(database_id_alt)
-  session.collections.each do |collection|
+  client = Mongoid::Sessions.default
+  client.use(database_id_alt)
+  client.collections.each do |collection|
     collection.drop
   end
 end

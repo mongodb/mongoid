@@ -1,5 +1,5 @@
 test:
-  sessions:
+  clients:
     default:
       database: mongoid_test
       hosts:

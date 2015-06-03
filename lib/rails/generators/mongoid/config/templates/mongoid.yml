@@ -1,12 +1,12 @@
 development:
-  # Configure available database sessions. (required)
-  sessions:
-    # Defines the default session. (required)
+  # Configure available database clients. (required)
+  clients:
+    # Defines the default client. (required)
     default:
       # Defines the name of the default database that Mongoid can connect to.
       # (required).
       database: <%= database_name || app_name %>_development
-      # Provides the hosts the default session can connect to. Must be an array
+      # Provides the hosts the default client can connect to. Must be an array
       # of host:port pairs. (required)
       hosts:
         - localhost:27017
@@ -110,9 +110,6 @@ development:
     # inheritance. (default: false)
     # preload_models: false
 
-    # Protect id and type from mass assignment. (default: true)
-    # protect_sensitive_fields: true
-
     # Raise an error when performing a #find and the document is not found.
     # (default: true)
     # raise_not_found_error: true
@@ -127,7 +124,7 @@ development:
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
 test:
-  sessions:
+  clients:
     default:
       database: <%= database_name || app_name %>_test
       hosts:

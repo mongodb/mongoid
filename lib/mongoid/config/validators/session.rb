@@ -3,13 +3,13 @@ module Mongoid
   module Config
     module Validators
 
-      # Validator for session specific configuration.
+      # Validator for client specific configuration.
       module Session
         extend self
 
         STANDARD = [ :database, :hosts, :username, :password ]
 
-        # Validate the session configuration.
+        # Validate the client configuration.
         #
         # @example Validate the session config.
         #   Session.validate({ default: { hosts: [ "localhost:27017" ] }})

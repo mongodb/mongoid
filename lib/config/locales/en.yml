@@ -175,7 +175,7 @@ en:
         invalid_storage_options:
           message: "Invalid options passed to %{klass}.store_in: %{options}."
           summary: "The :store_in macro takes only a hash of parameters with
-            the keys :database, :collection, or :session."
+            the keys :database, :collection, or :client."
           resolution: "Change the options passed to store_in to match the
             documented API, and ensure all keys in the options hash are
             symbols.\n\n

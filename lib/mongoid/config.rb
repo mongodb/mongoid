@@ -128,7 +128,7 @@ module Mongoid
     def load_configuration(settings)
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
-      self.sessions = configuration[:sessions]
+      self.clients = configuration[:clients]
     end
 
     # Override the database to use globally.
@@ -145,19 +145,21 @@ module Mongoid
       Threaded.database_override = name
     end
 
-    # Override the session to use globally.
+    # Override the client to use globally.
     #
-    # @example Override the session globally.
-    #   config.override_session(:optional)
+    # @example Override the client globally.
+    #   config.override_client(:optional)
     #
-    # @param [ String, Symbol ] name The name of the session.
+    # @param [ String, Symbol ] name The name of the client.
     #
     # @return [ String, Symbol ] The global override.
     #
     # @since 3.0.0
-    def override_session(name)
-      Threaded.session_override = name ? name.to_s : nil
+    def override_client(name)
+      Threaded.client_override = name ? name.to_s : nil
     end
+    alias :override_session :override_client
+    deprecate :override_session, :override_client, 2015, 12
 
     # Purge all data in all collections, including indexes.
     #
@@ -246,12 +248,14 @@ module Mongoid
 
     private
 
-    def sessions=(sessions)
+    def clients=(sessions)
       raise Errors::NoSessionsConfig.new unless sessions
       sess = sessions.with_indifferent_access
       Validators::Session.validate(sess)
       @sessions = sess
       sess
     end
+    alias :sessions= :clients=
+    deprecate :sessions=, :clients=, 2015, 12
   end
 end
