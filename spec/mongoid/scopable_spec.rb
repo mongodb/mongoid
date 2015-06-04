@@ -567,13 +567,9 @@ describe Mongoid::Scopable do
 
       context "when both scopes are or queries" do
 
-        let(:time) do
-          Time.now
-        end
-
         before do
           Band.scope(:xxx, ->{ Band.any_of({ :aaa.gt => 0 }, { :bbb.gt => 0 }) })
-          Band.scope(:yyy, ->{ Band.any_of({ :ccc => nil }, { :ccc.gt => time }) })
+          Band.scope(:yyy, ->{ Band.any_of({ :ccc => nil }, { :ccc.gt => 1 }) })
         end
 
         after do
@@ -592,7 +588,7 @@ describe Mongoid::Scopable do
           expect(criteria.selector).to eq({
             "$or" => [
               { "ccc" => nil },
-              { "ccc" => { "$gt" => time }},
+              { "ccc" => { "$gt" => 1.0 }},
               { "aaa" => { "$gt" => 0.0 }},
               { "bbb" => { "$gt" => 0.0 }}
             ]
@@ -642,6 +638,35 @@ describe Mongoid::Scopable do
 
       it "includes superclass scopes in subclass scope list" do
         expect(circle_scope_keys).to match_array([:located_at, :with_radius])
+      end
+    end
+
+    context "when calling a scope defined in a parent class" do
+      before do
+        Shape.class_eval do
+          scope :visible, -> { large }
+          scope :large, -> { all }
+        end
+        Circle.class_eval do
+          scope :large, -> { where(radius: 5) }
+        end
+      end
+
+      after do
+        class << Shape
+          undef_method :visible
+          undef_method :large
+        end
+        Shape._declared_scopes.clear
+
+        class << Circle
+          undef_method :large
+        end
+        Circle._declared_scopes.clear
+      end
+
+      it "uses sublcass context for all the other used scopes" do
+        expect(Circle.visible.selector).to eq("radius" => 5)
       end
     end
   end

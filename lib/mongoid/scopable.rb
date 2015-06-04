@@ -325,7 +325,8 @@ module Mongoid
         singleton_class.class_eval do
           define_method name do |*args|
             scoping = _declared_scopes[name]
-            scope, extension = scoping[:scope][*args], scoping[:extension]
+            scope = instance_exec(*args, &scoping[:scope])
+            extension = scoping[:extension]
             criteria = with_default_scope.merge(scope || queryable)
             criteria.extend(extension)
             criteria
