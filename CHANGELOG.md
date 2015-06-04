@@ -41,6 +41,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3874 Adding snapshot option to context.
 
+* \#3868 Loading models in rake tasks now expands the rails path.
+
 * \#3740 Fixes `Missing attribute: '_id'` error when using methods only or without (dx7)
 
 * \#3631 Fixes issue where `before_save` callback can get called twice after a child create

@@ -12,7 +12,7 @@ module Rails
     #
     # @param [ Application ] app The rails application.
     def load_models(app)
-      app.config.paths["app/models"].each do |path|
+      app.config.paths["app/models"].expanded.each do |path|
         preload = ::Mongoid.preload_models
         if preload.resizable?
           files = preload.map { |model| "#{path}/#{model.underscore}.rb" }
