@@ -37,6 +37,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
 
+* \#3874 Adding snapshot option to context.
+
 * \#3740 Fixes `Missing attribute: '_id'` error when using methods only or without (dx7)
 
 * \#3631 Fixes issue where `before_save` callback can get called twice after a child create

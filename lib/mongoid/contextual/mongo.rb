@@ -15,6 +15,11 @@ module Mongoid
       include Relations::Eager
       include Queryable
 
+      # Options constant.
+      #
+      # @since 5.0.0
+      OPTIONS = [ :hint, :limit, :skip, :sort, :batch_size, :max_scan, :snapshot, :comment ].freeze
+
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
 
@@ -533,7 +538,7 @@ module Mongoid
       # @since 3.1.0
       def apply_options
         apply_fields
-        [ :hint, :limit, :skip, :sort, :batch_size, :max_scan ].each do |name|
+        OPTIONS.each do |name|
           apply_option(name)
         end
         if criteria.options[:timeout] == false
