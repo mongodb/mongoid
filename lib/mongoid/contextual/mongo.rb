@@ -220,15 +220,19 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
+      # @note Mongoid previously added an _id sort when no sort parameters were
+      #   provided explicitly by the user. This caused bad performance issues
+      #   and was not expected, so #first/#last will no longer guarantee order
+      #   if no sorting parameters are provided. For order guarantees - a sort
+      #   must be explicitly provided.
+      #
       # @return [ Document ] The first document.
       #
       # @since 3.0.0
       def first
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
-          with_sorting do
-            with_eager_loading(view.first)
-          end
+          with_eager_loading(view.first)
         end
       end
       alias :one :first
@@ -313,6 +317,12 @@ module Mongoid
       #
       # @example Get the last document.
       #   context.last
+      #
+      # @note Mongoid previously added an _id sort when no sort parameters were
+      #   provided explicitly by the user. This caused bad performance issues
+      #   and was not expected, so #first/#last will no longer guarantee order
+      #   if no sorting parameters are provided. For order guarantees - a sort
+      #   must be explicitly provided.
       #
       # @return [ Document ] The last document.
       #
@@ -545,29 +555,9 @@ module Mongoid
         end
       end
 
-      # Apply an ascending id sort for use with #first queries, only if no
-      # other sorting is provided.
-      #
-      # @api private
-      #
-      # @example Apply the id sorting params to the given block
-      #   context.with_sorting
-      #
-      # @since 3.0.0
-      def with_sorting
-        begin
-          unless criteria.options.has_key?(:sort)
-            @view = view.sort(_id: 1)
-          end
-          yield
-        ensure
-          apply_option(:sort)
-        end
-      end
-
       # Map the inverse sort symbols to the correct MongoDB values.
       #
-      #  @api private
+      # @api private
       #
       # @example Apply the inverse sorting params to the given block
       #   context.with_inverse_sorting
@@ -577,8 +567,6 @@ module Mongoid
         begin
           if spec = criteria.options[:sort]
             @view = view.sort(Hash[spec.map{|k, v| [k, -1*v]}])
-          else
-            @view = view.sort(_id: -1)
           end
           yield
         ensure

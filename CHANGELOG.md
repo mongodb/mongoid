@@ -19,6 +19,8 @@ For instructions on upgrading to newer versions, visit
 
 * Mongoid no longer supports MongoDB 2.2 - support is now for only 2.4 and higher.
 
+* \#3768 `first` and `last` no longer add an `_id` sort when no sorting options have been provided. In order to guarantee that a document is the first or last, it needs to now contain an explicit sort.
+
 ### New Features
 
 * \#3846 Allow #pluck when none is used in criteria. (Braulio Martinez)

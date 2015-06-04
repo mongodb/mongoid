@@ -45,7 +45,7 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
 
       it "queries twice" do
         expect_query(2) do
-          Person.all.includes(:houses).each do |person|
+          Person.asc(:_id).includes(:houses).each do |person|
             expect(person.houses).to_not be_nil
 
             expect(person.houses.length).to be(3)
@@ -54,7 +54,7 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
       end
 
       it "has all items" do
-        Person.all.includes(:houses).each do |person|
+        Person.asc(:_id).includes(:houses).each do |person|
           expect(person.ivar(:houses).length).to be(3)
         end
       end
@@ -63,7 +63,7 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
     context "when the relation is not polymorphic" do
 
       let(:eager) do
-        Person.includes(:preferences).last
+        Person.asc(:_id).includes(:preferences).last
       end
 
       context "when the eager load has returned documents" do
