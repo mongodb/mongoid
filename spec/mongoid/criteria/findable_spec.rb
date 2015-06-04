@@ -239,6 +239,203 @@ describe Mongoid::Criteria::Findable do
           end
         end
       end
+
+      context "when providing a single id as extended json" do
+
+        context "when the id matches" do
+
+          let(:found) do
+            Band.find(band.id.as_json)
+          end
+
+          it "returns the matching document" do
+            expect(found).to eq(band)
+          end
+        end
+
+        context "when the id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(BSON::ObjectId.new.as_json)
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(BSON::ObjectId.new.as_json)
+            end
+
+            it "returns nil" do
+              expect(found).to be_nil
+            end
+          end
+        end
+      end
+
+      context "when providing a splat of extended json ids" do
+
+        let!(:band_two) do
+          Band.create(name: "Tool")
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find(band.id.as_json, band_two.id.as_json)
+          end
+
+          it "contains the first match" do
+            expect(found).to include(band)
+          end
+
+          it "contains the second match" do
+            expect(found).to include(band_two)
+          end
+
+          context "when ids are duplicates" do
+
+            let(:found) do
+              Band.find(band.id, band.id)
+            end
+
+            it "contains only the first match" do
+              expect(found).to eq([band])
+            end
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(band.id.as_json, BSON::ObjectId.new.as_json)
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find(band.id.as_json, BSON::ObjectId.new.as_json)
+            end
+
+            it "returns only the matching documents" do
+              expect(found).to eq([ band ])
+            end
+          end
+        end
+      end
+
+      context "when providing an array of extended json ids" do
+
+        let!(:band_two) do
+          Band.create(name: "Tool")
+        end
+
+        context "when all ids match" do
+
+          let(:found) do
+            Band.find([ band.id.as_json, band_two.id.as_json ])
+          end
+
+          it "contains the first match" do
+            expect(found).to include(band)
+          end
+
+          it "contains the second match" do
+            expect(found).to include(band_two)
+          end
+
+          context "when ids are duplicates" do
+
+            let(:found) do
+              Band.find([ band.id, band.id ])
+            end
+
+            it "contains only the first match" do
+              expect(found).to eq([band])
+            end
+          end
+        end
+
+        context "when any id does not match" do
+
+          context "when raising a not found error" do
+
+            before do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find([ band.id.as_json, BSON::ObjectId.new.as_json ])
+            end
+
+            it "raises an error" do
+              expect {
+                found
+              }.to raise_error(Mongoid::Errors::DocumentNotFound)
+            end
+          end
+
+          context "when raising no error" do
+
+            before do
+              Mongoid.raise_not_found_error = false
+            end
+
+            after do
+              Mongoid.raise_not_found_error = true
+            end
+
+            let(:found) do
+              Band.find([ band.id.as_json, BSON::ObjectId.new.as_json ])
+            end
+
+            it "returns only the matching documents" do
+              expect(found).to eq([ band ])
+            end
+          end
+        end
+      end
     end
 
     context "when using string ids" do

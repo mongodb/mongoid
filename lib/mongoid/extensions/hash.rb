@@ -24,7 +24,11 @@ module Mongoid
       #
       # @since 3.0.0
       def __mongoize_object_id__
-        update_values(&:__mongoize_object_id__)
+        if id = self['$oid']
+          BSON::ObjectId.from_string(id)
+        else
+          update_values(&:__mongoize_object_id__)
+        end
       end
 
       # Consolidate the key/values in the hash under an atomic $set.
