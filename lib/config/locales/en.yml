@@ -292,8 +292,8 @@ en:
           message: "Could not load the configuration since no environment
             was defined."
           summary: "Mongoid attempted to find the appropriate environment
-            but no Rails.env, Sinatra::Base.environment, RACK_ENV, or
-            MONGOID_ENV could be found."
+            but no MONGOID_ENV, Rails.env, Sinatra::Base.environment or RACK_ENV
+             could be found."
           resolution: "Make sure some environment is set from the mentioned
             options. Mongoid cannot load configuration from the yaml without
             knowing which environment it is in, and we have considered

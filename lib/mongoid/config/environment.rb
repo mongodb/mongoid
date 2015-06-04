@@ -7,7 +7,7 @@ module Mongoid
       extend self
 
       # Get the name of the environment that we are running under. This first
-      # looks for Rails, then Sinatra, then a RACK_ENV environment variable,
+      # looks for MONGOID_ENV, then Rails, then Sinatra, then a RACK_ENV environment variable,
       # and if none of those are found raises an error.
       #
       # @example Get the env name.
@@ -19,9 +19,10 @@ module Mongoid
       #
       # @since 2.3.0
       def env_name
+        return ENV["MONGOID_ENV"] if ENV["MONGOID_ENV"]
         return Rails.env if defined?(Rails)
         return Sinatra::Base.environment.to_s if defined?(Sinatra)
-        ENV["RACK_ENV"] || ENV["MONGOID_ENV"] || raise(Errors::NoEnvironment.new)
+        ENV["RACK_ENV"] || raise(Errors::NoEnvironment.new)
       end
 
       # Load the yaml from the provided path and return the settings for the
