@@ -16,7 +16,7 @@ module Mongoid
       #
       # @param [ Hash ] setters The field/value pairs to set.
       #
-      # @return [ true ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def set(setters)

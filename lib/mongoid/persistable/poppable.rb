@@ -21,7 +21,7 @@ module Mongoid
       #
       # @param [ Hash ] pops The field/value pop operations.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def pop(pops)
