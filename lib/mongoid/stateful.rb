@@ -55,7 +55,6 @@ module Mongoid
     def destroyed?
       @destroyed ||= false
     end
-    alias :deleted? :destroyed?
 
     # Determine if the document can be pushed.
     #

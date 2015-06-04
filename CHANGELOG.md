@@ -21,6 +21,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3768 `first` and `last` no longer add an `_id` sort when no sorting options have been provided. In order to guarantee that a document is the first or last, it needs to now contain an explicit sort.
 
+* `Document#deleted?` alias has been removed, please continue to use `Document#destroyed?`.
+
 ### New Features
 
 * \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
