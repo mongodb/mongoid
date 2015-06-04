@@ -31,6 +31,8 @@ For instructions on upgrading to newer versions, visit
 
 ### Resolved Issues
 
+* \#4005 Fixed inclusion of mongoid with Rails components that don't have the Rails environment.
+
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
 
 * \#3740 Fixes `Missing attribute: '_id'` error when using methods only or without (dx7)
