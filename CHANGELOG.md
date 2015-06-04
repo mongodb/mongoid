@@ -25,6 +25,8 @@ For instructions on upgrading to newer versions, visit
 
 ### New Features
 
+* \#4016 Allow private and protected setters on fields for atomic operations. (Rob Smith)
+
 * \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
 
 * \#3963 Allow extended JSON object ids to be passed to `find`.
