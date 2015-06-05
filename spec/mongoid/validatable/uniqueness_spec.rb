@@ -147,6 +147,35 @@ describe Mongoid::Validatable::UniquenessValidator do
                 Dictionary.reset_callbacks(:validate)
               end
 
+              context "when no attribute is set" do
+
+                context "when no document with no value exists in the database" do
+
+                  let(:dictionary) do
+                    Dictionary.new
+                  end
+
+                  it "returns true" do
+                    expect(dictionary).to be_valid
+                  end
+                end
+
+                context "when a document with no value exists in the database" do
+
+                  before do
+                    Dictionary.create
+                  end
+
+                  let(:dictionary) do
+                    Dictionary.new
+                  end
+
+                  it "returns false" do
+                    expect(dictionary).to_not be_valid
+                  end
+                end
+              end
+
               context "when the attribute is unique" do
 
                 context "when single localization" do

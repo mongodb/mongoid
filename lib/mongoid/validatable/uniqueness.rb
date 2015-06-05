@@ -122,8 +122,8 @@ module Mongoid
       def criterion(document, attribute, value)
         field = document.database_field_name(attribute)
 
-        if localized?(document, field)
-          conditions = value.inject([]) { |acc, (k,v)| acc << { "#{field}.#{k}" => filter(v) } }
+        if value && localized?(document, field)
+          conditions = (value || {}).inject([]) { |acc, (k,v)| acc << { "#{field}.#{k}" => filter(v) }}
           selector = { "$or" => conditions }
         else
           selector = { field => filter(value) }
