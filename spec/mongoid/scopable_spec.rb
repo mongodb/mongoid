@@ -144,11 +144,11 @@ describe Mongoid::Scopable do
       end
 
       before do
-        Band.scope_stack.push(criteria)
+        Mongoid::Threaded.current_scope = criteria
       end
 
       after do
-        Band.scope_stack.clear
+        Mongoid::Threaded.current_scope = nil
       end
 
       it "returns the criteria on the stack" do
@@ -642,6 +642,7 @@ describe Mongoid::Scopable do
     end
 
     context "when calling a scope defined in a parent class" do
+
       before do
         Shape.class_eval do
           scope :visible, -> { large }
@@ -667,35 +668,6 @@ describe Mongoid::Scopable do
 
       it "uses sublcass context for all the other used scopes" do
         expect(Circle.visible.selector).to eq("radius" => 5)
-      end
-    end
-  end
-
-  describe ".scope_stack" do
-
-    context "when the scope stack has not been accessed" do
-
-      it "returns an empty array" do
-        expect(Band.scope_stack).to eq([])
-      end
-    end
-
-    context "when a criteria exists on the current thread" do
-
-      let(:criteria) do
-        Band.where(active: true)
-      end
-
-      before do
-        Mongoid::Threaded.scope_stack[Band.object_id] = [ criteria ]
-      end
-
-      after do
-        Mongoid::Threaded.scope_stack[Band.object_id].clear
-      end
-
-      it "returns the criteria in the array" do
-        expect(Band.scope_stack).to eq([ criteria ])
       end
     end
   end
@@ -809,6 +781,22 @@ describe Mongoid::Scopable do
           expect(unscoped.selector).to be_empty
         end
       end
+
+      context "when default scope is in a super class" do
+
+        before do
+          Band.scope(:active, ->{ Band.where(active: true) })
+        end
+
+        let(:unscoped) do
+          class U2 < Band; end
+          U2.unscoped.active
+        end
+
+        it "clears default scope" do
+          expect(unscoped.selector).to eq({ "active" => true })
+        end
+      end
     end
 
     context "when used with a block" do
@@ -913,7 +901,7 @@ describe Mongoid::Scopable do
 
     it "pops the criteria off the stack" do
       Band.with_scope(criteria) {}
-      expect(Band.scope_stack).to be_empty
+      expect(Mongoid::Threaded.current_scope).to be_nil
     end
   end
 

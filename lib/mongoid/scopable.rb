@@ -115,7 +115,7 @@ module Mongoid
       #
       # @since 3.0.0
       def queryable
-        scope_stack.last || Criteria.new(self)
+        Threaded.current_scope || Criteria.new(self)
       end
 
       # Create a scope that can be accessed from the class level or chained to
@@ -148,18 +148,6 @@ module Mongoid
           extension: Module.new(&block)
         }
         define_scope_method(normalized)
-      end
-
-      # Initializes and returns the current scope stack.
-      #
-      # @example Get the scope stack.
-      #   Person.scope_stack
-      #
-      # @return [ Array<Criteria> ] The scope stack.
-      #
-      # @since 1.0.0
-      def scope_stack
-        Threaded.scope_stack[object_id] ||= []
       end
 
       # Get a criteria for the document with normal scoping.
@@ -234,11 +222,11 @@ module Mongoid
       #
       # @since 1.0.0
       def with_scope(criteria)
-        scope_stack.push(criteria)
+        Threaded.current_scope = criteria
         begin
           yield criteria
         ensure
-          scope_stack.pop
+          Threaded.current_scope = nil
         end
       end
 

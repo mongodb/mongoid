@@ -19,7 +19,11 @@ module Mongoid
     # @since 5.0.0
     CLIENT_OVERRIDE_KEY = "[mongoid]:client-override"
 
-    SCOPE_STACK_KEY = "[mongoid]:scope-stack"
+    # The key for the current thread's scope stack.
+    #
+    # @since 2.0.0
+    CURRENT_SCOPE_KEY = "[mongoid]:current-scope"
+
     AUTOSAVES_KEY = "[mongoid]:autosaves"
     VALIDATIONS_KEY = "[mongoid]:validations"
 
@@ -204,16 +208,30 @@ module Mongoid
     alias :session_override= :client_override=
     deprecate :session_override=, :client_override=, 2015, 12
 
-    # Get the mongoid scope stack for chained criteria.
+    # Get the current Mongoid scope.
     #
-    # @example Get the scope stack.
-    #   Threaded.scope_stack
+    # @example Get the scope.
+    #   Threaded.current_scope
     #
-    # @return [ Hash ] The scope stack.
+    # @return [ Criteria ] The scope.
     #
-    # @since 2.1.0
-    def scope_stack
-      Thread.current[SCOPE_STACK_KEY] ||= {}
+    # @since 5.0.0
+    def current_scope
+      Thread.current[CURRENT_SCOPE_KEY]
+    end
+
+    # Set the current Mongoid scope.
+    #
+    # @example Set the scope.
+    #   Threaded.current_scope = scope
+    #
+    # @param [ Criteria ] scope The current scope.
+    #
+    # @return [ Criteria ] The scope.
+    #
+    # @since 5.0.0
+    def current_scope=(scope)
+      Thread.current[CURRENT_SCOPE_KEY] = scope
     end
 
     # Is the document autosaved on the current thread?

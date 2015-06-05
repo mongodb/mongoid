@@ -106,13 +106,6 @@ describe Mongoid::Threaded do
     end
   end
 
-  describe "#scope_stack" do
-
-    it "returns the default with the scope stack key" do
-      expect(described_class.scope_stack).to be_a(Hash)
-    end
-  end
-
   describe "#begin_validate" do
 
     let(:person) do
