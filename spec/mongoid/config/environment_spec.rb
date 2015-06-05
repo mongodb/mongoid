@@ -14,11 +14,13 @@ describe Mongoid::Config::Environment do
       context "when no environment exists" do
 
         before do
+          Object.send(:remove_const, :Rails) if defined?(Rails)
           module Rails
           end
         end
 
         after do
+          RailsTemp = Rails
           Object.send(:remove_const, :Rails)
         end
 
