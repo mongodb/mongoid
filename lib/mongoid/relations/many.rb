@@ -5,6 +5,7 @@ module Mongoid
     # This is the superclass for all many to one and many to many relation
     # proxies.
     class Many < Proxy
+      include ::Enumerable
 
       delegate :avg, :max, :min, :sum, to: :criteria
       delegate :length, :size, to: :target

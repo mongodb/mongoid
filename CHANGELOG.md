@@ -37,6 +37,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#4091 Use sublcass context when calling a scope defined in a superclass. (Edgars Beigarts)
 
+* \#4077 Many relations now include Enumerable.
+
 * \#4052 Fixed uniqueness validation on localized fields with no value.
 
 * \#4030 Dup/clone exceptions auto-include dynamic attributes.
