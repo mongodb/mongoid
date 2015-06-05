@@ -11,26 +11,6 @@ describe Mongoid::Config::Environment do
 
     context "when using rails" do
 
-      context "when no environment exists" do
-
-        before do
-          Object.send(:remove_const, :Rails) if defined?(Rails)
-          module Rails
-          end
-        end
-
-        after do
-          RailsTemp = Rails
-          Object.send(:remove_const, :Rails)
-        end
-
-        it "returns the rails environment" do
-          expect {
-            described_class.env_name
-          }.to raise_error(Mongoid::Errors::NoEnvironment)
-        end
-      end
-
       context "when an environment exists" do
 
         before do
