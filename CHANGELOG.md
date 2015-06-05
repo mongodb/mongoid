@@ -39,6 +39,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#4052 Fixed uniqueness validation on localized fields with no value.
 
+* \#4030 Dup/clone exceptions auto-include dynamic attributes.
+
 * \#4005 Fixed inclusion of mongoid with Rails components that don't have the Rails environment.
 
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic

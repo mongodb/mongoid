@@ -54,6 +54,25 @@ describe Mongoid::Copyable do
         end
       end
 
+      context "when a document has old renamed fields" do
+
+        let!(:actor) do
+          Actor.create(name: "test")
+        end
+
+        before do
+          Actor.collection.find(_id: actor.id).update_one("$set" => { "this_is_not_a_field" => 1 })
+        end
+
+        let(:cloned) do
+          actor.reload.send(method)
+        end
+
+        it "copies the document without error" do
+          expect(cloned.this_is_not_a_field).to eq(1)
+        end
+      end
+
       context "when using store_as" do
 
         context "and dynamic attributes are not set" do

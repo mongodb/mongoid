@@ -22,7 +22,12 @@ module Mongoid
       # _id and id field in the document would cause problems with Mongoid
       # elsewhere.
       attrs = clone_document.except("_id", "id")
-      self.class.new(attrs)
+      begin
+        self.class.new(attrs)
+      rescue Errors::UnknownAttribute
+        self.class.include(Attributes::Dynamic)
+        self.class.new(attrs)
+      end
     end
     alias :dup :clone
 
