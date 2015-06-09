@@ -2164,30 +2164,24 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#find" do
 
-    context "when the identity map is enabled" do
+    context "when iterating after the find" do
 
-      context "when the document is in the map" do
+      let(:person) do
+        Person.create!
+      end
 
-        let(:person) do
-          Person.create
-        end
+      let(:post_id) do
+        person.posts.first.id
+      end
 
-        before do
-          person.posts.create(title: "Test")
-        end
+      before do
+        5.times { person.posts.create! }
+      end
 
-        context "when the document does not belong to the relation" do
-
-          let!(:post) do
-            Post.create(title: "testing")
-          end
-
-          it "raises an error" do
-            expect {
-              person.posts.find(post.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
-          end
-        end
+      it "does not change the in memory size" do
+        expect {
+          person.posts.find(post_id)
+        }.not_to change { person.posts.to_a.size }
       end
     end
 
