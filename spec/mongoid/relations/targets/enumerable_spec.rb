@@ -122,6 +122,13 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
     end
 
+    context "when compared to an enumerable class" do
+
+      it "returns true" do
+        expect(enumerable === described_class).to be true
+      end
+    end
+
     context "when compared to a different class" do
 
       it "returns false" do

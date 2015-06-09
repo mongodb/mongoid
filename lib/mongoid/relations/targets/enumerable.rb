@@ -45,7 +45,7 @@ module Mongoid
         #
         # @since 3.1.4
         def ===(other)
-          other.class == Class ? Array == other : self == other
+          other.class == Class ? (Array == other || Enumerable == other) : self == other
         end
 
         # Append a document to the enumerable.
