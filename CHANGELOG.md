@@ -37,6 +37,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#4091 Use sublcass context when calling a scope defined in a superclass. (Edgars Beigarts)
 
+* \#4071 Fixed loading of enumerable relation to check the added documents when iterating.
+
 * \#4077 Many relations now include Enumerable.
 
 * \#4052 Fixed uniqueness validation on localized fields with no value.
