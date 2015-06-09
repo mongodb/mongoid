@@ -2801,6 +2801,35 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#last" do
+
+    let(:person) do
+      Person.create!
+    end
+
+    let!(:persisted_post) do
+      person.posts.create!
+    end
+
+    context "when a new document is added" do
+
+      let!(:new_post) do
+        person.posts.new
+      end
+
+      context "when the target is subsequently loaded" do
+
+        before do
+          person.posts.entries
+        end
+
+        it "returns the expected last document" do
+          expect(person.posts.last).to eq(new_post)
+        end
+      end
+    end
+  end
+
   describe ".macro" do
 
     it "returns has_many" do
@@ -3681,6 +3710,7 @@ describe Mongoid::Relations::Referenced::Many do
   end
 
   context "when accessing a relation named parent" do
+
     let!(:parent) do
       Odd.create(name: "odd parent")
     end

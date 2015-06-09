@@ -59,6 +59,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#3599 Fixed application of default scopes from superclass in subclasses.
 
+* \#3104 Fixed enumerable targets to check first/last in proper order.
+
 ## 4.0.2
 
 ### New Features
