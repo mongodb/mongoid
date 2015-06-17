@@ -3935,6 +3935,7 @@ describe Mongoid::Relations::Embedded::Many do
   end
 
   context "deleting embedded documents" do
+
     it "able to delete embedded documents upon condition" do
       company = Company.new
       4.times { |i| company.staffs << Staff.new(age: 50 + i)}
@@ -3942,6 +3943,116 @@ describe Mongoid::Relations::Embedded::Many do
       company.save
       company.staffs.delete_if {|x| x.age >= 50}
       expect(company.staffs.count).to eq(2)
+    end
+  end
+
+  context "when substituting polymorphic documents" do
+
+    before(:all) do
+      class DNS; end
+
+      class DNS::Zone
+        include Mongoid::Document
+        embeds_many :rrsets, class_name: 'DNS::RRSet',  inverse_of: :zone
+        embeds_one  :soa,    class_name: 'DNS::Record', as: :container
+      end
+
+      class DNS::RRSet
+        include Mongoid::Document
+        embedded_in :zone, class_name: 'DNS::Zone',   inverse_of: :rrsets
+        embeds_many :records, class_name: 'DNS::Record', as: :container
+      end
+
+      class DNS::Record
+        include Mongoid::Document
+        embedded_in :container, polymorphic: true
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :DNS)
+    end
+
+    context "when the parent is new" do
+
+      let(:zone) do
+        DNS::Zone.new
+      end
+
+      let(:soa_1) do
+        DNS::Record.new
+      end
+
+      context "when replacing the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa = soa_2).to eq(soa_2)
+        end
+      end
+
+      context "when deleting the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa.delete).to be true
+        end
+      end
+    end
+
+    context "when the parent is persisted" do
+
+      let(:zone) do
+        DNS::Zone.create
+      end
+
+      let(:soa_1) do
+        DNS::Record.new
+      end
+
+      context "when replacing the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa = soa_2).to eq(soa_2)
+        end
+      end
+
+      context "when deleting the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa.delete).to be true
+        end
+      end
     end
   end
 end
