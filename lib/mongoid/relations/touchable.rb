@@ -31,7 +31,7 @@ module Mongoid
         touches = touch_atomic_updates(field)
         unless touches.empty?
           selector = atomic_selector
-          _root.collection.find(selector).update_one(positionally(selector, touches))
+          _root.collection.find(selector).update_one(touches)
         end
         run_callbacks(:touch)
         true

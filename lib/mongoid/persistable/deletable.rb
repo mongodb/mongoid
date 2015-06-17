@@ -62,7 +62,7 @@ module Mongoid
         _parent.remove_child(self) if notifying_parent?(options)
         if _parent.persisted?
           selector = _parent.atomic_selector
-          _root.collection.find(selector).update_one(positionally(selector, atomic_deletes))
+          _root.collection.find(selector).update_one(atomic_deletes)
         end
         true
       end

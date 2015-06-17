@@ -6,7 +6,6 @@ module Mongoid
       # Contains behaviour for executing operations in batch on embedded
       # documents.
       module Batchable
-        include Positional
 
         # Insert new documents as a batch push ($pushAll). This ensures that
         # all callbacks are run at the appropriate time and only 1 request is
@@ -37,9 +36,7 @@ module Mongoid
         def batch_clear(docs)
           pre_process_batch_remove(docs, :delete)
           unless docs.empty?
-            collection.find(selector).update_one(
-              positionally(selector, "$unset" => { path => true })
-            )
+            collection.find(selector).update_one("$unset" => { path => true })
             post_process_batch_remove(docs, :delete)
           end
           _unscoped.clear
@@ -57,9 +54,7 @@ module Mongoid
         def batch_remove(docs, method = :delete)
           removals = pre_process_batch_remove(docs, method)
           if !docs.empty?
-            collection.find(selector).update_one(
-              positionally(selector, "$pullAll" => { path => removals })
-            )
+            collection.find(selector).update_one("$pullAll" => { path => removals })
             post_process_batch_remove(docs, method)
           end
           reindex
@@ -130,9 +125,7 @@ module Mongoid
           self.inserts_valid = true
           inserts = pre_process_batch_insert(docs)
           if insertable?
-            collection.find(selector).update_one(
-              positionally(selector, operation => { path => inserts })
-            )
+            collection.find(selector).update_one(operation => { path => inserts })
             post_process_batch_insert(docs)
           end
           inserts

@@ -43,6 +43,8 @@ For instructions on upgrading to newer versions, visit
 
 * \#4052 Fixed uniqueness validation on localized fields with no value.
 
+* \#4033 Removed all uses of the $ positional operator in atomic udpates.
+
 * \#4030 Dup/clone exceptions auto-include dynamic attributes.
 
 * \#4005 Fixed inclusion of mongoid with Rails components that don't have the Rails environment.

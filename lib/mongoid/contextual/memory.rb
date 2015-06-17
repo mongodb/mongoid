@@ -9,7 +9,6 @@ module Mongoid
       include Aggregable::Memory
       include Relations::Eager
       include Queryable
-      include Positional
 
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
@@ -47,9 +46,7 @@ module Mongoid
           doc.as_document
         end
         unless removed.empty?
-          collection.find(selector).update_one(
-            positionally(selector, "$pullAll" => { path => removed })
-          )
+          collection.find(selector).update_one("$pullAll" => { path => removed })
         end
         deleted
       end
