@@ -75,8 +75,12 @@ module Mongoid
         undefined_indexes(models).each do |model, indexes|
           indexes.each do |index|
             key = index['key'].symbolize_keys
-            model.collection.indexes.drop_one(key)
-            logger.info("MONGOID: Removing index: #{index['name']} on #{model}.")
+            collection = model.collection
+            collection.indexes.drop_one(key)
+            logger.info(
+              "MONGOID: Removed index '#{index['name']}' on collection " +
+              "'#{collection.name}' in database '#{collection.database.name}'."
+            )
           end
         end
       end
@@ -93,10 +97,7 @@ module Mongoid
         models.each do |model|
           next if model.embedded?
           begin
-            indexes = model.collection.indexes.map{ |doc| doc["name"] }
-            indexes.delete_one("_id_")
             model.remove_indexes
-            logger.info("MONGOID: Removing indexes on: #{model} for: #{indexes.join(', ')}.")
           rescue Mongo::Error::OperationFailure
             next
           end

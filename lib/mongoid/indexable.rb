@@ -55,6 +55,10 @@ module Mongoid
             collection.indexes.each do |spec|
               unless spec["name"] == "_id_"
                 collection.indexes.drop_one(spec["key"])
+                logger.info(
+                  "MONGOID: Removed index '#{spec["name"]}' on collection " +
+                  "'#{collection.name}' in database '#{database}'."
+                )
               end
             end
           rescue Mongo::Error::OperationFailure; end
