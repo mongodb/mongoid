@@ -124,6 +124,21 @@ module Mongoid
         child.move_changes
         child.new_record = false
       end
+      _reset_memoized_children!
+    end
+
+    # Resets the memoized children on the object. Called internally when an
+    # embedded array changes size.
+    #
+    # @api semiprivate
+    #
+    # @example Reset the memoized children.
+    #   document._reset_memoized_children!
+    #
+    # @return [ nil ] nil.
+    #
+    # @since 5.0.0
+    def _reset_memoized_children!
       @__children = nil
     end
 

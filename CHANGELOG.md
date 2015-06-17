@@ -49,6 +49,9 @@ For instructions on upgrading to newer versions, visit
 
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
 
+* \#3991 Fixed emebdded documents not flagging as changed after calling #changed? and modifying the
+child elements.
+
 * \#3874 Adding snapshot option to context.
 
 * \#3868 Loading models in rake tasks now expands the rails path.

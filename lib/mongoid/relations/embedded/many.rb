@@ -84,6 +84,7 @@ module Mongoid
           doc.apply_post_processed_defaults
           yield(doc) if block_given?
           doc.run_callbacks(:build) { doc }
+          base._reset_memoized_children!
           doc
         end
         alias :new :build

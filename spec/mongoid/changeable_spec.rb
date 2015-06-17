@@ -811,6 +811,58 @@ describe Mongoid::Changeable do
       end
     end
 
+    context "when changed? has been called before child elements size change" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:address) do
+        person.addresses.create(street: "hobrecht")
+      end
+
+      let!(:location) do
+        address.locations.create(name: "home")
+      end
+
+      before do
+        person.changed?
+      end
+
+      context "when adding via new" do
+
+        before do
+          address.locations.new
+        end
+
+        it "returns true" do
+          expect(person).to be_changed
+        end
+      end
+
+      context "when adding via build" do
+
+        before do
+          address.locations.build
+        end
+
+        it "returns true" do
+          expect(person).to be_changed
+        end
+      end
+
+      context "when adding via create" do
+
+        before do
+          address.locations.create
+        end
+
+        it "returns false" do
+          expect(person).to_not be_changed
+        end
+      end
+    end
+
     context "when a deeply embedded child has changed" do
 
       let(:person) do
