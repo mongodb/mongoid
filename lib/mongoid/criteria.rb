@@ -344,6 +344,22 @@ module Mongoid
       end
     end
 
+    # Set the read preference for the criteria.
+    #
+    # @example Set the read preference.
+    #   criteria.read(mode: :primary_preferred)
+    #
+    # @param [ Hash ] value The mode preference.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 5.0.0
+    def read(value = nil)
+      clone.tap do |criteria|
+        criteria.options.merge!(read: value)
+      end
+    end
+
     # Overriden to exclude _id from the fields.
     #
     # @example Exclude fields returned from the database.

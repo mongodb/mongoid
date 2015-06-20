@@ -320,6 +320,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
+          # @todo: remove?
           document.with(@persistence_options) if @persistence_options
 
           execute_callback :before_add, document

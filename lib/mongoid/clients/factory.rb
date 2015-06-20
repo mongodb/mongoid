@@ -66,8 +66,9 @@ module Mongoid
       end
 
       def options(configuration)
-        options = configuration[:options] || {}
-        options.merge(configuration.reject{ |k, v| k == :hosts }).to_hash.symbolize_keys!
+        config = configuration.dup
+        options = config.delete(:options) || {}
+        options.reject{ |k, v| k == :hosts }.to_hash.symbolize_keys!
       end
     end
   end

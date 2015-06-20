@@ -49,7 +49,7 @@ module Mongoid
       # @since 3.1.0
       def disconnect
         Threaded.clients.values.each do |client|
-          # client.close
+          client.close
         end
       end
 
@@ -114,7 +114,7 @@ module Mongoid
         name = client_name
         client = Clients.with_name(name)
         client = client.use(database_name)
-        client = self.persistence_options.blank? ? client : client.with(self.persistence_options)
+        client = client.with(self.persistence_options)
         Clients.set(name, client)
       end
       alias :mongo_session :mongo_client

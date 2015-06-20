@@ -316,6 +316,7 @@ module Mongoid
       # @since 3.0.15
       def __client__
         if command[:out][:inline] != 1
+          # @todo: close
           client.with(read: { mode: :primary })
         else
           client

@@ -20,6 +20,11 @@ module Mongoid
       # @example Save with a combination of options.
       #   model.with(client: "sharded", database: "secondary").save
       #
+      # @note This method will instantiate a new client under the covers and
+      #   can be expensive. It is also recommended that the user manually
+      #   closes the extra client after using it, otherwise an excessive amount
+      #   of connections to the server will be eventually opened.
+      #
       # @param [ Hash ] options The storage options.
       #
       # @option options [ String, Symbol ] :collection The collection name.
@@ -46,7 +51,7 @@ module Mongoid
             client = Clients.with_name(self.class.client_name)
             client.use(self.class.database_name)
           end
-          client.with(persistence_options)
+          client.with(persistence_options.reject{ |k, v| k == :collection || k == :client })
         end
       end
       alias :mongo_session :mongo_client

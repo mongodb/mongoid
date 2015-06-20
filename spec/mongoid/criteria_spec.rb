@@ -148,6 +148,21 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#read" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:criteria) do
+      Person.read(mode: :secondary)
+    end
+
+    it "adds the read option" do
+      expect(criteria.options[:read]).to eq(mode: :secondary)
+    end
+  end
+
   describe "#aggregates" do
 
     context "when provided a single field" do

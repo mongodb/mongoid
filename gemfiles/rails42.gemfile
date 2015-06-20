@@ -1,10 +1,10 @@
 source "https://rubygems.org"
 gemspec path: '..'
 
-gem "mongo", :github => "mongodb/mongo-ruby-driver"
 gem "rake"
 gem "actionpack",  "~> 4.2.0"
 gem "activemodel", "~> 4.2.0"
+gem "mongo", :github => "mongodb/mongo-ruby-driver"
 
 group :test do
   gem "rspec", "~> 3.1.0"
