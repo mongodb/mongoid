@@ -61,7 +61,10 @@ module Mongoid
         if configuration[:uri]
           Mongo::Client.new(configuration[:uri], options(configuration))
         else
-          Mongo::Client.new(configuration[:hosts], options(configuration))
+          Mongo::Client.new(
+            configuration[:hosts],
+            options(configuration).merge(database: configuration[:database])
+          )
         end
       end
 
