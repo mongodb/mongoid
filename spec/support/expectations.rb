@@ -2,7 +2,7 @@ module Mongoid
   module Expectations
 
     def expect_query(number)
-      expect(Mongo::Logger).to receive(:debug).exactly(number).times
+      expect(Mongo::Logger).to receive(:allow?).with(:debug).exactly(number).times.and_call_original
       yield
     end
 

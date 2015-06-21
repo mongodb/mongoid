@@ -48,7 +48,7 @@ describe Mongoid do
       Band.all.entries
     end
 
-    pending "disconnects from all active clients" do
+    it "disconnects from all active clients" do
       clients.each do |client|
         expect(client.cluster).to receive(:disconnect!).and_call_original
       end
