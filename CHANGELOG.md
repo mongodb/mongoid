@@ -45,7 +45,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#4052 Fixed uniqueness validation on localized fields with no value.
 
-* \#4033 Removed all uses of the $ positional operator in atomic udpates.
+* \#4033 Removed all uses of the $ positional operator in atomic updates.
 
 * \#4030 Dup/clone exceptions auto-include dynamic attributes.
 
