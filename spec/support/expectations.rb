@@ -2,7 +2,8 @@ module Mongoid
   module Expectations
 
     def expect_query(number)
-      expect(Mongo::Logger).to receive(:allow?).with(:debug).exactly(number).times.and_call_original
+      # There are both start and complete events for each query.
+      expect(Mongo::Logger.logger).to receive(:debug?).exactly(number * 2).times.and_call_original
       yield
     end
 
