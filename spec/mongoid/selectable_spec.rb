@@ -82,10 +82,8 @@ describe Mongoid::Selectable do
           person.create_name(first_name: "test", last_name: "user")
         end
 
-        it "returns the hash with the selector" do
-          expect(name.atomic_selector).to eq(
-            { "_id" => person.id, "name._id" => name.id }
-          )
+        it "returns the hash with the root selector" do
+          expect(name.atomic_selector).to eq({ "_id" => person.id })
         end
       end
 
@@ -95,10 +93,8 @@ describe Mongoid::Selectable do
           person.addresses.create(street: "kreuzbergstr")
         end
 
-        it "returns the hash with the selector" do
-          expect(address.atomic_selector).to eq(
-            { "_id" => person.id, "addresses._id" => address.id }
-          )
+        it "returns the hash with the root selector" do
+          expect(address.atomic_selector).to eq({ "_id" => person.id })
         end
 
         context "when the document's id changes" do
@@ -118,14 +114,8 @@ describe Mongoid::Selectable do
             address.locations.create
           end
 
-          it "returns a hash with the selector" do
-            expect(location.atomic_selector).to eq(
-              {
-                "_id" => person.id,
-                "addresses._id" => address.id,
-                "addresses.0.locations._id" => location.id
-              }
-            )
+          it "returns a hash with the root selector" do
+            expect(location.atomic_selector).to eq({ "_id" => person.id })
           end
         end
       end
