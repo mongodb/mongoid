@@ -25,7 +25,7 @@ module Mongoid
       begin
         self.class.new(attrs)
       rescue Errors::UnknownAttribute
-        self.class.include(Attributes::Dynamic)
+        self.class.send(:include, Attributes::Dynamic)
         self.class.new(attrs)
       end
     end
