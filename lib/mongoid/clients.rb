@@ -24,7 +24,7 @@ module Mongoid
       #
       # @since 3.0.0
       def clear
-        Threaded.clients.clear
+        clients.clear
       end
 
       # Get the default client.
@@ -36,7 +36,7 @@ module Mongoid
       #
       # @since 3.0.0
       def default
-        Threaded.clients[:default] ||= Clients::Factory.default
+        clients[:default] ||= Clients::Factory.default
       end
 
       # Disconnect all active clients.
@@ -48,7 +48,7 @@ module Mongoid
       #
       # @since 3.1.0
       def disconnect
-        Threaded.clients.values.each do |client|
+        clients.values.each do |client|
           client.close
         end
       end
@@ -64,11 +64,15 @@ module Mongoid
       #
       # @since 3.0.0
       def with_name(name)
-        Threaded.clients[name.to_sym] ||= Clients::Factory.create(name)
+        clients[name.to_sym] ||= Clients::Factory.create(name)
       end
 
       def set(name, client)
-        Threaded.clients[name.to_sym] = client
+        clients[name.to_sym] = client
+      end
+
+      def clients
+        @clients ||= {}
       end
     end
 

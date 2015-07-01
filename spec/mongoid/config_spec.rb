@@ -80,12 +80,12 @@ describe Mongoid::Config do
       end
 
       before do
-        Mongoid::Threaded.clients[:test] = client
+        Mongoid::Clients.clients[:test] = client
         described_class.load!(file, :test)
       end
 
       it "clears the previous clients" do
-        expect(Mongoid::Threaded.clients[:test]).to be_nil
+        expect(Mongoid::Clients.clients[:test]).to be_nil
       end
     end
 

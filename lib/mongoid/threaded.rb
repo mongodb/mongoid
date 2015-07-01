@@ -74,20 +74,6 @@ module Mongoid
       Thread.current[DATABASE_OVERRIDE_KEY] = name
     end
 
-    # Get the database clients from the current thread.
-    #
-    # @example Get the database clients.
-    #   Threaded.clients
-    #
-    # @return [ Hash ] The clients.
-    #
-    # @since 5.0.0
-    def clients
-      Thread.current[CLIENTS_KEY] ||= {}
-    end
-    alias :sessions :clients
-    deprecate :sessions, :clients, 2015, 12
-
     # Are in the middle of executing the named stack
     #
     # @example Are we in the stack execution?
