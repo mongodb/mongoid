@@ -51,7 +51,7 @@ class Person
   embeds_many :videos, order: [[ :title, :asc ]], validate: false
   embeds_many :phone_numbers, class_name: "Phone", validate: false
   embeds_many :phones, store_as: :mobile_phones, validate: false
-  embeds_many :addresses, as: :addressable, validate: false do
+  embeds_many :addresses, as: :addressable do
     def extension
       "Testing"
     end
@@ -61,13 +61,13 @@ class Person
   end
 
   embeds_many :address_components, validate: false
-  embeds_many :services, cascade_callbacks: true, validate: false
+  embeds_many :services, cascade_callbacks: true
   embeds_many :symptoms, validate: false
   embeds_many :appointments, validate: false
   embeds_many :messages, validate: false
 
   embeds_one :passport, autobuild: true, store_as: :pass, validate: false
-  embeds_one :pet, class_name: "Animal", validate: false
+  embeds_one :pet, class_name: "Animal"
   embeds_one :name, as: :namable, validate: false do
     def extension
       "Testing"
@@ -78,7 +78,7 @@ class Person
   end
   embeds_one :quiz, validate: false
 
-  has_one :game, dependent: :destroy, validate: false do
+  has_one :game, dependent: :destroy do
     def extension
       "Testing"
     end
@@ -86,8 +86,7 @@ class Person
 
   has_many \
     :posts,
-    dependent: :delete,
-    validate: false do
+    dependent: :delete do
     def extension
       "Testing"
     end
@@ -96,8 +95,8 @@ class Person
   has_and_belongs_to_many \
     :preferences,
     index: true,
-    dependent: :nullify,
-    validate: false
+    dependent: :nullify
+
   has_and_belongs_to_many :user_accounts, validate: false
   has_and_belongs_to_many :houses, validate: false
   has_and_belongs_to_many :ordered_preferences, order: :value.desc, validate: false
