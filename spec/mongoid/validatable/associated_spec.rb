@@ -57,6 +57,36 @@ describe Mongoid::Validatable::AssociatedValidator do
         end
       end
 
+      context "when the associated document is not validable" do
+
+        let(:user) do
+          User.new(name: "test")
+        end
+
+        let(:post) do
+          # Instantiate Post with invalid title
+          Post.new(title: "$$$")
+        end
+
+        before do
+          user.posts << post
+        end
+
+        it "only validates the parent once" do
+          expect(user).to be_valid
+        end
+
+        it "adds the errors from the relation" do
+          user.valid?
+          expect(user.errors[:posts]).to be_empty
+        end
+
+        it "only validates the child once" do
+          expect(post).to_not be_valid
+        end
+
+      end
+
       context "when the documents are flagged for destroy" do
 
         let(:user) do
@@ -108,7 +138,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is valid" do
 
         let(:associated) do
-          double(valid?: true, flagged_for_destroy?: false)
+          double(valid?: true, flagged_for_destroy?: false, associated_validatable?: true)
         end
 
         before do
@@ -124,7 +154,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is invalid" do
 
         let(:associated) do
-          double(valid?: false, flagged_for_destroy?: false)
+          double(valid?: false, flagged_for_destroy?: false, associated_validatable?: true)
         end
 
         before do
@@ -140,6 +170,22 @@ describe Mongoid::Validatable::AssociatedValidator do
           expect(person.errors[:name][0]).to eq("is invalid")
         end
       end
+
+      context "when the association is invalid and is not validatable" do
+
+        let(:associated) do
+          double(valid?: false, flagged_for_destroy?: false, associated_validatable?: false)
+        end
+
+        before do
+          validator.validate_each(person, :name, associated)
+        end
+
+        it "adds no errors" do
+          expect(person.errors[:name]).to be_empty
+        end
+      end
+
     end
 
     context "when the association is a one to many" do
@@ -158,7 +204,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association has invalid documents" do
 
         let(:associated) do
-          double(valid?: false, flagged_for_destroy?: false)
+          double(valid?: false, flagged_for_destroy?: false, associated_validatable?: true)
         end
 
         before do
@@ -174,7 +220,7 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the assocation has all valid documents" do
 
         let(:associated) do
-          double(valid?: true, flagged_for_destroy?: false)
+          double(valid?: true, flagged_for_destroy?: false, associated_validatable?: true)
         end
 
         before do
@@ -186,6 +232,22 @@ describe Mongoid::Validatable::AssociatedValidator do
           expect(person.errors[:addresses]).to be_empty
         end
       end
+
+      context "when the association is invalid and is not validatable" do
+
+        let(:associated) do
+          double(valid?: false, flagged_for_destroy?: false, associated_validatable?: false)
+        end
+
+        before do
+          validator.validate_each(person, :addresses, [ associated ] )
+        end
+
+        it "adds no errors" do
+          expect(person.errors[:addresses]).to be_empty
+        end
+      end
+
     end
   end
 
