@@ -121,6 +121,20 @@ module Mongoid
       self.class.validating_with_query?
     end
 
+    # Adds an associated validator for the relation if the validate option
+    # was not provided or set to true.
+    #
+    # @example Set up validation.
+    #   person.validates_relation?
+    #
+    # @return [ true, false ] True if valid, false if not.
+    # @since 4.0.2
+
+    def associated_validatable?
+      return true if !self.__metadata || self.__metadata.validate?
+      false
+    end
+
     module ClassMethods
 
       # Adds an associated validator for the relation if the validate option
