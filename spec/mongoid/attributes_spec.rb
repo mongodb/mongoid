@@ -1207,6 +1207,19 @@ describe Mongoid::Attributes do
         }.to raise_error(Mongoid::Errors::InvalidValue)
       end
     end
+
+    context "when attribute is localized and #attributes is a BSON::Document" do
+      let(:dictionary) { Dictionary.new }
+
+      before do
+        allow(dictionary).to receive(:attributes).and_return(BSON::Document.new)
+      end
+
+      it "sets the value for the current locale" do
+        dictionary.write_attribute(:description, 'foo')
+        expect(dictionary.description).to eq('foo')
+      end
+    end
   end
 
   describe "#typed_value_for" do
