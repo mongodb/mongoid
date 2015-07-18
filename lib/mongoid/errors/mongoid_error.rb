@@ -21,10 +21,14 @@ module Mongoid
         @problem = problem(key, attributes)
         @summary = summary(key, attributes)
         @resolution = resolution(key, attributes)
+        @problem_title = translate("message_title", {})
+        @summary_title = translate("summary_title", {})
+        @resolution_title = translate("resolution_title", {})
 
-        "\nProblem:\n  #{@problem}"+
-        "\nSummary:\n  #{@summary}"+
-        "\nResolution:\n  #{@resolution}"
+
+        "\n#{@problem_title}:\n  #{@problem}"+
+        "\n#{@summary_title}:\n  #{@summary}"+
+        "\n#{@resolution_title}:\n  #{@resolution}"
       end
 
       private
