@@ -4,6 +4,9 @@ en:
       messages:
         blank_in_locale:
           "can't be blank in %{location}"
+        message_title: "message"
+        summary_title: "summary"
+        resolution_title: "resolution"
         ambiguous_relationship:
           message: "Ambiguous relations %{candidates} defined on %{klass}."
           summary:
