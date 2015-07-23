@@ -4,8 +4,12 @@
 [![Coverage Status](https://img.shields.io/coveralls/mongoid/mongoid/master.svg)](https://coveralls.io/r/mongoid/mongoid?branch=master)
 [![Dependency Status](https://www.versioneye.com/ruby/mongoid/4.0.0/badge.svg)](https://www.versioneye.com/ruby/mongoid/4.0.0)
 
-
 Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
+
+Issues
+------
+
+Issues are now in the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/).
 
 Project Move and Support
 ------------------------
@@ -15,7 +19,7 @@ organization. Please pay special attention to the following information with reg
 to this move:
 
 * 5.0.0 and higher releases of Mongoid will be officially supported by MongoDB with a dedicated team.
-* Issues tagged 5.0.0 and higher in Github will be migrated to the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/) upon the release. There will be no more Github issues.
+* Issues are now in the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/).
 * 4.x and 3.x releases will no longer be supported. Fixes to these branches will need to be maintained in community forks, although not recommended.
 * 5.0.0 release will still be supporting Rails 4.x, although there will be some backwards incompatible changes with respect to the configuration options. The Mongoid public API itself will not be changed.
 
