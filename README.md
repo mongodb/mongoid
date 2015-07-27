@@ -1,5 +1,5 @@
 # Mongoid
-[![Build Status](https://travis-ci.org/mongodb/mongoid.svg?branch=master)](https://travis-ci.org/mongoid/mongoid) 
+[![Build Status](https://travis-ci.org/mongodb/mongoid.svg?branch=master)](https://travis-ci.org/mongodb/mongoid)
 [![Code Climate](https://codeclimate.com/github/mongodb/mongoid.svg)](https://codeclimate.com/github/mongodb/mongoid)
 [![Coverage Status](https://img.shields.io/coveralls/mongodb/mongoid/master.svg)](https://coveralls.io/r/mongodb/mongoid?branch=master)
 [![Dependency Status](https://www.versioneye.com/ruby/mongoid/4.0.0/badge.svg)](https://www.versioneye.com/ruby/mongoid/4.0.0)
