@@ -1,7 +1,7 @@
 # Mongoid
-[![Build Status](https://travis-ci.org/mongoid/mongoid.svg?branch=master)](https://travis-ci.org/mongoid/mongoid) 
-[![Code Climate](https://codeclimate.com/github/mongoid/mongoid.svg)](https://codeclimate.com/github/mongoid/mongoid)
-[![Coverage Status](https://img.shields.io/coveralls/mongoid/mongoid/master.svg)](https://coveralls.io/r/mongoid/mongoid?branch=master)
+[![Build Status](https://travis-ci.org/mongodb/mongoid.svg?branch=master)](https://travis-ci.org/mongoid/mongoid) 
+[![Code Climate](https://codeclimate.com/github/mongodb/mongoid.svg)](https://codeclimate.com/github/mongoid/mongoid)
+[![Coverage Status](https://img.shields.io/coveralls/mongodb/mongoid/master.svg)](https://coveralls.io/r/mongoid/mongoid?branch=master)
 [![Dependency Status](https://www.versioneye.com/ruby/mongoid/4.0.0/badge.svg)](https://www.versioneye.com/ruby/mongoid/4.0.0)
 
 Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
@@ -10,18 +10,6 @@ Issues
 ------
 
 Issues are now in the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/).
-
-Project Move and Support
-------------------------
-
-For the upcoming 5.0.0 release, the repository will be getting moved to the MongoDB
-organization. Please pay special attention to the following information with regards
-to this move:
-
-* 5.0.0 and higher releases of Mongoid will be officially supported by MongoDB with a dedicated team.
-* Issues are now in the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/).
-* 4.x and 3.x releases will no longer be supported. Fixes to these branches will need to be maintained in community forks, although not recommended.
-* 5.0.0 release will still be supporting Rails 4.x, although there will be some backwards incompatible changes with respect to the configuration options. The Mongoid public API itself will not be changed.
 
 Project Tracking
 ----------------
@@ -39,8 +27,7 @@ Mongoid is tested against MRI 1.9.3, 2.0.0, 2.1.0. 2.2.0 and JRuby (1.9).
 Documentation
 -------------
 
-Please see the new Mongoid website for up-to-date documentation:
-[mongoid.org](http://mongoid.org)
+Please see the [MongoDB website](http://docs.mongodb.org/ecosystem/tutorial/ruby-mongoid-tutorial/#ruby-mongoid-tutorial) for up-to-date documentation on 5.0.0:
 
 License
 -------
