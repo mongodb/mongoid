@@ -118,8 +118,7 @@ module Mongoid
         name = client_name
         client = Clients.with_name(name)
         client = client.use(database_name)
-        client = client.with(self.persistence_options)
-        Clients.set(name, client)
+        client.with(self.persistence_options)
       end
       alias :mongo_session :mongo_client
       deprecate :mongo_session, :mongo_client, 2015, 12

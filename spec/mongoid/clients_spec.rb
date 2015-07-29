@@ -519,6 +519,21 @@ describe Mongoid::Clients do
 
   describe ".with", if: non_legacy_server? do
 
+    context "when changing write concern options" do
+
+      let(:client_one) do
+        Band.with(write: { w: 2 }).mongo_client
+      end
+
+      let(:client_two) do
+        Band.mongo_client
+      end
+
+      it "does not carry over the options" do
+        expect(client_one.write_concern).to_not eq(client_two.write_concern)
+      end
+    end
+
     context "when sending operations to a different database" do
 
       after do
