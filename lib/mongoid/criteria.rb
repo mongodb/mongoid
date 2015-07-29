@@ -195,7 +195,7 @@ module Mongoid
     end
 
     # Eager loads all the provided relations. Will load all the documents
-    # into the identity map who's ids match based on the extra query for the
+    # into the identity map whose ids match based on the extra query for the
     # ids.
     #
     # @note This will work for embedded relations that reference another
