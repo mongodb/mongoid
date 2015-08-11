@@ -107,7 +107,7 @@ module Mongoid
 
       private
       def logger
-        @logger ||= Logger.new($stdout)
+        Mongoid.logger
       end
     end
   end
