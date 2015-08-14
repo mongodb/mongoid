@@ -60,7 +60,7 @@ module Rails
             ::Mongoid.load!(config_file)
           rescue ::Mongoid::Errors::NoClientsConfig => e
             handle_configuration_error(e)
-          rescue ::Mongoid::Errors::NoDefaultSession => e
+          rescue ::Mongoid::Errors::NoDefaultClient => e
             handle_configuration_error(e)
           rescue ::Mongoid::Errors::NoSessionDatabase => e
             handle_configuration_error(e)
