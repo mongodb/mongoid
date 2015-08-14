@@ -60,11 +60,11 @@ module Rails
             ::Mongoid.load!(config_file)
           rescue ::Mongoid::Errors::NoClientsConfig => e
             handle_configuration_error(e)
-          rescue ::Mongoid::Errors::NoDefaultSession => e
+          rescue ::Mongoid::Errors::NoDefaultClient => e
             handle_configuration_error(e)
-          rescue ::Mongoid::Errors::NoSessionDatabase => e
+          rescue ::Mongoid::Errors::NoClientDatabase => e
             handle_configuration_error(e)
-          rescue ::Mongoid::Errors::NoSessionHosts => e
+          rescue ::Mongoid::Errors::NoClientHosts => e
             handle_configuration_error(e)
           end
         end
