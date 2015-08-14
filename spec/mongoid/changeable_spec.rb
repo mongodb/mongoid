@@ -1691,6 +1691,21 @@ describe Mongoid::Changeable do
             it 'saves the lowest level embedded document' do
               expect(reloaded.addresses.first.code).to eq(code)
             end
+
+            context 'when embedding further' do
+
+              let!(:deepest) do
+                reloaded.addresses.first.code.build_deepest
+              end
+
+              before do
+                reloaded.save
+              end
+
+              it 'saves the deepest embedded document' do
+                expect(reloaded.reload.addresses.first.code.deepest).to eq(deepest)
+              end
+            end
           end
         end
       end

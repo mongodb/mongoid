@@ -139,6 +139,7 @@ module Mongoid
     #
     # @since 5.0.0
     def _reset_memoized_children!
+      _parent._reset_memoized_children! if _parent
       @__children = nil
     end
 
