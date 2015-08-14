@@ -20,6 +20,7 @@ module Mongoid
             characterize_one(target)
             bind_one
             characterize_one(target)
+            base._reset_memoized_children!
             target.save if persistable?
           end
         end

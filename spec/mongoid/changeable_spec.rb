@@ -1625,4 +1625,75 @@ describe Mongoid::Changeable do
       expect(person.setters).to_not eq({ "addresses" => nil })
     end
   end
+
+  context 'when nesting deeply embedded documents' do
+
+    context 'when persisting the root document' do
+
+      let!(:person) do
+        Person.create
+      end
+
+      it 'is not marked as changed' do
+        expect(person).to_not be_changed
+      end
+
+      context 'when creating a new first level embedded document' do
+
+        let!(:address) do
+          person.addresses.new(street: 'goltzstr.')
+        end
+
+        it 'flags the root document as changed' do
+          expect(person).to be_changed
+        end
+
+        it 'flags the first level child as changed' do
+          expect(address).to be_changed
+        end
+
+        context 'when building the lowest level document' do
+
+          before do
+            person.save
+          end
+
+          let!(:code) do
+            address.build_code
+          end
+
+          it 'flags the root document as changed' do
+            expect(person).to be_changed
+          end
+
+          it 'flags the first level embedded document as changed' do
+            expect(address).to be_changed
+          end
+
+          it 'flags the lowest level embedded document as changed' do
+            expect(code).to be_changed
+          end
+
+          context 'when saving the hierarchy' do
+
+            before do
+              person.save
+            end
+
+            let(:reloaded) do
+              Person.find(person.id)
+            end
+
+            it 'saves the first embedded document' do
+              expect(reloaded.addresses.first).to eq(address)
+            end
+
+            it 'saves the lowest level embedded document' do
+              expect(reloaded.addresses.first.code).to eq(code)
+            end
+          end
+        end
+      end
+    end
+  end
 end
