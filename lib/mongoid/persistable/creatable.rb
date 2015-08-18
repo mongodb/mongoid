@@ -61,7 +61,7 @@ module Mongoid
           _parent.insert
         else
           selector = _parent.atomic_selector
-          _root.collection.find(selector).update(positionally(selector, atomic_inserts))
+          _root.collection.find(selector).update(atomic_inserts)
         end
       end
 

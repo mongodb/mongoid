@@ -27,7 +27,6 @@ module Mongoid
     include Incrementable
     include Logical
     include Poppable
-    include Positional
     include Pullable
     include Pushable
     include Renamable
@@ -209,7 +208,7 @@ module Mongoid
     def persist_atomic_operations(operations)
       if persisted?
         selector = atomic_selector
-        _root.collection.find(selector).update(positionally(selector, operations))
+        _root.collection.find(selector).update(operations)
       end
     end
   end
