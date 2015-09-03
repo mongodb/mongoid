@@ -1,5 +1,7 @@
 language: ruby
 
+sudo: false
+
 bundler_args: --without development
 
 rvm:
