@@ -42,7 +42,6 @@ module Rails
       #   module MyApplication
       #     class Application < Rails::Application
       #       config.mongoid.logger = Logger.new($stdout, :warn)
-      #       config.mongoid.persist_in_safe_mode = true
       #     end
       #   end
       #
