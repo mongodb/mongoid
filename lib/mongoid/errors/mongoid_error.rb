@@ -7,6 +7,8 @@ module Mongoid
     # translating the messages.
     class MongoidError < StandardError
 
+      attr_reader :problem, :summary, :resolution
+
       BASE_KEY = "mongoid.errors.messages"
 
       # Compose the message.
@@ -18,9 +20,9 @@ module Mongoid
       #
       # @since 3.0.0
       def compose_message(key, attributes)
-        @problem = problem(key, attributes)
-        @summary = summary(key, attributes)
-        @resolution = resolution(key, attributes)
+        @problem = translate_problem(key, attributes)
+        @summary = translate_summary(key, attributes)
+        @resolution = translate_resolution(key, attributes)
         @problem_title = translate("message_title", {})
         @summary_title = translate("summary_title", {})
         @resolution_title = translate("resolution_title", {})
@@ -58,7 +60,7 @@ module Mongoid
       # @return [ String ] The problem.
       #
       # @since 3.0.0
-      def problem(key, attributes)
+      def translate_problem(key, attributes)
         translate("#{key}.message", attributes)
       end
 
@@ -73,7 +75,7 @@ module Mongoid
       # @return [ String ] The summary.
       #
       # @since 3.0.0
-      def summary(key, attributes)
+      def translate_summary(key, attributes)
         translate("#{key}.summary", attributes)
       end
 
@@ -88,7 +90,7 @@ module Mongoid
       # @return [ String ] The resolution.
       #
       # @since 3.0.0
-      def resolution(key, attributes)
+      def translate_resolution(key, attributes)
         translate("#{key}.resolution", attributes)
       end
     end

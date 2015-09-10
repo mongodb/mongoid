@@ -23,15 +23,15 @@ describe Mongoid::Errors::MongoidError do
   describe "#compose_message" do
 
     it "sets ivar problem" do
-      expect(error.instance_variable_get(:@problem)).to be
+      expect(error.problem).to be
     end
 
     it "sets ivar summary" do
-      expect(error.instance_variable_get(:@summary)).to be
+      expect(error.summary).to be
     end
 
     it "sets ivar resolution" do
-      expect(error.instance_variable_get(:@resolution)).to be
+      expect(error.resolution).to be
     end
 
     it "sets ivar problem_title" do
