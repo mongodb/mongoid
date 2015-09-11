@@ -9,7 +9,7 @@ test:
         password: "password"
         auth_source: "admin"
         read:
-          mode: primary
+          mode: :primary
         max_pool_size: 1
   options:
     include_root_in_json: false
