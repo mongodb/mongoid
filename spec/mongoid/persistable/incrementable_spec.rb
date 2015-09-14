@@ -169,5 +169,57 @@ describe Mongoid::Persistable::Incrementable do
         it_behaves_like "an incrementable embedded document"
       end
     end
+
+    context "when the document is embedded in another embedded document" do
+      shared_examples_for "an incrementable embedded document in another embedded document" do
+
+        it "increments a positive value" do
+          expect(second_answer.position).to eq(2)
+        end
+
+        it "persists a positive inc" do
+          expect(second_answer.reload.position).to eq(2)
+        end
+
+        it "clears out dirty changes" do
+          expect(second_answer).to_not be_changed
+        end
+      end
+
+      let(:survey) do
+        Survey.create
+      end
+
+      let(:question) do
+        survey.questions.create(content: 'foo')
+      end
+
+      let!(:first_answer) do
+        question.answers.create(position: 99)
+      end
+
+      let!(:second_answer) do
+        question.answers.create(position: 1)
+      end
+
+      context "when providing string fields" do
+
+        let!(:inc) do
+          second_answer.inc("position" => 1)
+        end
+
+        it_behaves_like "an incrementable embedded document in another embedded document"
+
+      end
+
+      context "when providing symbol fields" do
+
+        let!(:inc) do
+          second_answer.inc(position: 1)
+        end
+
+        it_behaves_like "an incrementable embedded document in another embedded document"
+      end
+    end
   end
 end
