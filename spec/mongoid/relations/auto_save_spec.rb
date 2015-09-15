@@ -219,7 +219,7 @@ describe Mongoid::Relations::AutoSave do
         end
       end
 
-      context "when it has two ralations with autosaves" do
+      context "when it has two relations with autosaves" do
 
         before do
           Person.autosave(Person.relations["drugs"].merge!(autosave: true))
