@@ -26,7 +26,7 @@ module Mongoid
           self.updated_at = Time.now.utc unless updated_at_changed?
         end
 
-        self.class.clear_timeless_option
+        clear_timeless_option
       end
 
       # Is the updated timestamp able to be set?
