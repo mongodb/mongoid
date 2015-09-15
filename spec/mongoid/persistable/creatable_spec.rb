@@ -393,6 +393,26 @@ describe Mongoid::Persistable::Creatable do
             expect(container.vehicles.size).to eq(2)
           end
         end
+
+        context 'when searching by a Time value' do
+
+          let!(:account) do
+            Account.destroy_all
+            Account.create!(name: 'test', period_started_at: Time.now.utc)
+          end
+
+          let!(:queried_consumption) do
+            account.consumption_periods.find_or_create_by(started_at: account.period_started_at)
+          end
+
+          before do
+            account.reload
+          end
+
+          it 'does not change the Time value' do
+            expect(queried_consumption).to eq(account.current_consumption)
+          end
+        end
       end
 
       context "#find_or_create_by!" do
