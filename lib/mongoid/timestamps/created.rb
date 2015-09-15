@@ -27,7 +27,7 @@ module Mongoid
           self.created_at = time
         end
 
-        self.class.clear_timeless_option
+        clear_timeless_option
       end
     end
   end

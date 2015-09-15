@@ -36,6 +36,15 @@ module Mongoid
         self.class.timeless?
       end
 
+      def clear_timeless_option
+        if self.persisted?
+          self.class.clear_timeless_option_on_update
+        else
+          self.class.clear_timeless_option
+        end
+        true
+      end
+
       class << self
 
         def timeless_table
@@ -64,16 +73,27 @@ module Mongoid
           self
         end
 
+        def clear_timeless_option_on_update
+          if counter = Timeless[name]
+            counter -= 1 if self < Mongoid::Timestamps::Created
+            counter -= 1 if self < Mongoid::Timestamps::Updated
+            set_timeless_counter(counter)
+          end
+        end
+
         def clear_timeless_option
           if counter = Timeless[name]
             counter -= 1
-            Timeless[name] = (counter == 0) ? nil : counter
+            set_timeless_counter(counter)
           end
-          true
         end
 
         def timeless?
           !!Timeless[name]
+        end
+
+        def set_timeless_counter(counter)
+          Timeless[name] = (counter == 0) ? nil : counter
         end
       end
     end
