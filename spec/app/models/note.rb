@@ -11,4 +11,7 @@ class Note
   def update_saved
     self.saved = true
   end
+
+  embedded_in :page
+  field :message, :type => String
 end
