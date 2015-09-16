@@ -170,6 +170,61 @@ describe Mongoid::Interceptable do
     it "runs after document instantiation" do
       expect(game.name).to eq("Testing")
     end
+
+    context 'when the document is embedded' do
+
+      after do
+        Book.destroy_all
+      end
+
+      let(:book) do
+        book = Book.new({
+          :pages => [
+            {
+              content: "Page 1",
+              notes: [
+                { message: "Page 1 / Note A" },
+                { message: "Page 1 / Note B" }
+              ]
+            },
+            {
+              content: "Page 2",
+              notes: [
+                { message: "Page 2 / Note A" },
+                { message: "Page 2 / Note B" }
+              ]
+            }
+          ]
+        })
+        book.id = '123'
+        book.save
+        book
+      end
+
+      let(:new_message) do
+        'Note C'
+      end
+
+      before do
+        book.pages.each do | page |
+          page.notes.destroy_all
+          page.notes.new(message: new_message)
+          page.save
+        end
+      end
+
+      let(:expected_messages) do
+        book.reload.pages.reduce([]) do |messages, p|
+          messages += p.notes.reduce([]) do |msgs, n|
+            msgs << n.message
+          end
+        end
+      end
+
+      it 'runs the callback on the embedded documents and saves the parent document' do
+        expect(expected_messages.all? { |m| m == new_message }).to be(true)
+      end
+    end
   end
 
   describe ".after_build" do
