@@ -397,7 +397,6 @@ describe Mongoid::Persistable::Creatable do
         context 'when searching by a Time value' do
 
           let!(:account) do
-            Account.destroy_all
             Account.create!(name: 'test', period_started_at: Time.now.utc)
           end
 
