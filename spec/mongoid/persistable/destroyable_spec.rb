@@ -188,5 +188,27 @@ describe Mongoid::Persistable::Destroyable do
         end
       end
     end
+
+    context 'when removing embedded documents' do
+
+      let(:word) do
+        Word.create!(name: 'driver')
+      end
+
+      after do
+        Word.destroy_all
+      end
+
+      before do
+        word.definitions.find_or_create_by(description: 'database connector')
+        word.definitions.find_or_create_by(description: 'chauffeur')
+        word.update_attributes!(origin: 'English')
+        word.definitions.destroy_all
+      end
+
+      it 'removes all embedded documents' do
+        expect(word.definitions.size).to eq(0)
+      end
+    end
   end
 end
