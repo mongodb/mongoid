@@ -83,6 +83,24 @@ describe Mongoid::Persistable::Savable do
             end
           end
         end
+
+        context 'when the embedded document is unchanged' do
+
+          let(:kangaroo) do
+            Kangaroo.new
+          end
+
+          after do
+            Kangaroo.destroy_all
+          end
+
+          it 'only makes one call to the database' do
+            allow(Kangaroo.collection).to receive(:insert).once
+            expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).never
+            kangaroo.build_baby
+            kangaroo.save
+          end
+        end
       end
     end
 
