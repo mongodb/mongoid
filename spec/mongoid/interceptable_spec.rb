@@ -173,33 +173,29 @@ describe Mongoid::Interceptable do
 
     context 'when the document is embedded' do
 
-      before do
-        Book.destroy_all
-      end
-
       after do
         Book.destroy_all
       end
 
       let(:book) do
         book = Book.new({
-                            :pages => [
-                                {
-                                    content: "Page 1",
-                                    notes: [
-                                                 { message: "Page 1 / Note A" },
-                                                 { message: "Page 1 / Note B" }
-                                             ]
-                                },
-                                {
-                                    content: "Page 2",
-                                    notes: [
-                                                 { message: "Page 2 / Note A" },
-                                                 { message: "Page 2 / Note B" }
-                                             ]
-                                }
-                            ]
-                        })
+          :pages => [
+            {
+              content: "Page 1",
+              notes: [
+                { message: "Page 1 / Note A" },
+                { message: "Page 1 / Note B" }
+              ]
+            },
+            {
+              content: "Page 2",
+              notes: [
+                { message: "Page 2 / Note A" },
+                { message: "Page 2 / Note B" }
+              ]
+            }
+          ]
+        })
         book.id = '123'
         book.save
         book
