@@ -82,6 +82,35 @@ describe Mongoid::Persistable::Destroyable do
           expect(from_db.addresses).to be_empty
         end
       end
+
+      context 'when removing from a list of embedded documents' do
+
+        context 'when the embedded documents list is reversed in memory' do
+
+          let(:word) do
+            Word.create!(name: 'driver')
+          end
+
+          let(:from_db) do
+            Word.find(word.id)
+          end
+
+          before do
+            word.definitions.find_or_create_by(description: 'database connector')
+            word.definitions.find_or_create_by(description: 'chauffeur')
+            word.definitions = word.definitions.reverse
+            word.definitions.last.destroy
+          end
+
+          it 'removes the embedded document in memory' do
+            expect(word.definitions.size).to eq(1)
+          end
+
+          it 'removes the embedded document in the database' do
+            expect(from_db.definitions.size).to eq(1)
+          end
+        end
+      end
     end
 
     context "when removing deeply embedded documents" do
@@ -195,10 +224,6 @@ describe Mongoid::Persistable::Destroyable do
 
         let(:word) do
           Word.create!(name: 'driver')
-        end
-
-        after do
-          Word.destroy_all
         end
 
         before do
