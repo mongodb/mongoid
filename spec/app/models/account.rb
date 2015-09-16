@@ -25,4 +25,12 @@ class Account
   def overridden
     self[:overridden] = "not recommended"
   end
+
+  # MONGOID-3365
+  field :period_started_at, type: Time
+  has_many :consumption_periods, dependent: :destroy, validate: false
+
+  def current_consumption
+    consumption_periods.find_or_create_by(started_at: period_started_at)
+  end
 end
