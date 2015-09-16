@@ -188,5 +188,30 @@ describe Mongoid::Persistable::Destroyable do
         end
       end
     end
+
+    context 'when removing a list of embedded documents' do
+
+      context 'when the embedded documents list is reversed in memory' do
+
+        let(:word) do
+          Word.create!(name: 'driver')
+        end
+
+        after do
+          Word.destroy_all
+        end
+
+        before do
+          word.definitions.find_or_create_by(description: 'database connector')
+          word.definitions.find_or_create_by(description: 'chauffeur')
+          word.definitions = word.definitions.reverse
+          word.definitions.destroy_all
+        end
+
+        it 'removes all embedded documents' do
+          expect(word.definitions.size).to eq(0)
+        end
+      end
+    end
   end
 end
