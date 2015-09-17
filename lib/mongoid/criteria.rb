@@ -271,6 +271,7 @@ module Mongoid
     #
     # @return [ Criteria ] A cloned self.
     def merge(other)
+      return self if empty_and_chainable?
       crit = clone
       crit.merge!(other)
       crit

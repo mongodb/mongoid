@@ -398,6 +398,41 @@ describe Mongoid::Scopable do
         end
       end
 
+      context 'when the block is an none scope' do
+
+        context 'when there is no default scope' do
+
+          before do
+            Band.scope(:nothing, ->{ none })
+          end
+
+          it 'returns no results' do
+            expect(Band.nothing).to be_empty
+          end
+        end
+
+        context 'when there is a default scope' do
+
+          let(:criteria) do
+            Band.where(name: "Depeche Mode")
+          end
+
+          before do
+            Band.default_scope ->{ criteria }
+            Band.scope(:nothing, ->{ none })
+          end
+
+          after do
+            Band.default_scoping = nil
+          end
+
+          it 'returns no results' do
+            expect(Band.nothing).to be_empty
+          end
+        end
+
+      end
+
       context "when no block is provided" do
 
         before do
