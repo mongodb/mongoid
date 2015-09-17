@@ -1805,4 +1805,22 @@ describe Mongoid::Contextual::Mongo do
       end
     end
   end
+
+  describe '#pipeline' do
+
+    context 'when the criteria has a selector' do
+
+      let(:criteria) do
+        Band.where(name: "New Order")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      it 'creates a pipeline with the selector as the $match criteria' do
+        expect(context.send(:pipeline, 'name').first['$match']).to eq(criteria.selector)
+      end
+    end
+  end
 end
