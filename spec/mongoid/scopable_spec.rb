@@ -398,6 +398,45 @@ describe Mongoid::Scopable do
         end
       end
 
+      context 'when the block is an none scope' do
+
+        before do
+          Simple.create!(name: 'Emily')
+        end
+
+        context 'when there is no default scope' do
+
+          before do
+            Simple.scope(:nothing, ->{ none })
+          end
+
+          it 'returns no results' do
+            expect(Simple.nothing).to be_empty
+          end
+        end
+
+        context 'when there is a default scope' do
+
+          let(:criteria) do
+            Simple.where(name: "Emily")
+          end
+
+          before do
+            Simple.default_scope ->{ criteria }
+            Simple.scope(:nothing, ->{ none })
+          end
+
+          after do
+            Simple.default_scoping = nil
+          end
+
+          it 'returns no results' do
+            expect(Simple.nothing).to be_empty
+          end
+        end
+
+      end
+
       context "when no block is provided" do
 
         before do
