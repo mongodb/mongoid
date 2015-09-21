@@ -290,26 +290,71 @@ describe Mongoid::Relations::CounterCache do
 
   describe "#add_counter_cache_callbacks" do
 
-    let(:person) do
-      Person.create
-    end
-
-    let!(:drug) do
-      person.drugs.create
-    end
-
     context "when parent is not frozen" do
 
-      before do
-        drug.destroy
+      context 'when #destroy is called on the object' do
+
+        let(:person) do
+          Person.create
+        end
+
+        let!(:drug) do
+          person.drugs.create
+        end
+
+        before do
+          drug.destroy
+        end
+
+        it "updates the counter cache" do
+          expect(person.reload.drugs_count).to eq(0)
+        end
       end
 
-      it "before_destroy updates counter cache" do
-        expect(person.drugs_count).to eq(0)
+      context 'when #create is called on the object' do
+
+        let(:person) do
+          Person.create { |p| p.drugs += [Drug.create, Drug.create] }
+        end
+
+        it "updates the counter cache" do
+          expect(person.drugs_count).to eq(2)
+        end
+      end
+
+      context 'when #update is called on the object' do
+
+        let(:person1) do
+          Person.create { |p| p.drugs += [Drug.create, Drug.create] }
+        end
+
+        let(:drug) do
+          person1.drugs.first
+        end
+
+        let(:person2) do
+          Person.create
+        end
+
+        before do
+          drug.update_attribute(:person, person2)
+        end
+
+        it "updates the counter cache" do
+          expect(person1.reload.drugs_count).to eq(1)
+        end
       end
     end
 
     context "when parent is frozen" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:drug) do
+        person.drugs.create
+      end
 
       before do
         person.destroy
