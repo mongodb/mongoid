@@ -153,7 +153,7 @@ module Mongoid
     def _root
       object = self
       while (object._parent) do object = object._parent; end
-      object || self
+      object.with(@persistence_options) || self
     end
 
     # Is this document the root document of the hierarchy?
