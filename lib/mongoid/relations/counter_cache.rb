@@ -105,9 +105,10 @@ module Mongoid
 
           after_update do
             if record = __send__(name)
+              id_field = "#{name}_id"
 
-              if __send__("#{name}_id_changed?".to_sym)
-                original, current = __send__("#{name}_id_change".to_sym)
+              if attribute_changed?(id_field)
+                original, current = attribute_change(id_field)
 
                 unless original.nil?
                   record.class.decrement_counter(cache_column, original)
