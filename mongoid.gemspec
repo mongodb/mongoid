@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Durran Jordan"]
   s.email       = ["durran@gmail.com"]
   s.homepage    = "http://mongoid.org"
-  s.summary     = "Elegant Persistance in Ruby for MongoDB."
+  s.summary     = "Elegant Persistence in Ruby for MongoDB."
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
   s.license     = "MIT"
 

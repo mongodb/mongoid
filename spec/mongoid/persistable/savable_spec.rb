@@ -413,7 +413,7 @@ describe Mongoid::Persistable::Savable do
         end
       end
 
-      it "reads for persistance as a UTC Time" do
+      it "reads for persistence as a UTC Time" do
         expect(user.changes["last_login"].last.class).to eq(Time)
       end
 
@@ -432,7 +432,7 @@ describe Mongoid::Persistable::Savable do
         end
       end
 
-      it "reads for persistance as a UTC Time" do
+      it "reads for persistence as a UTC Time" do
         expect(user.changes["account_expires"].last.class).to eq(Time)
       end
 

@@ -84,7 +84,7 @@ module Mongoid
         target
       end
 
-      # Tell the next persistance operation to store in a specific collection,
+      # Tell the next persistence operation to store in a specific collection,
       # database or client.
       #
       # @example Save the current document to a different collection.
