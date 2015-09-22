@@ -2,6 +2,28 @@ require "spec_helper"
 
 describe Mongoid::Relations::Proxy do
 
+  describe '#with', if: non_legacy_server? do
+
+    let(:circus) do
+      Circus.new
+    end
+
+    let(:animal) do
+      Animal.new
+    end
+
+    before do
+      circus.animals << animal
+      circus.save
+    end
+
+    it 'uses the new persistence options' do
+      expect {
+        animal.with(write: { w: 100 }).update_attribute(:name, 'kangaroo')
+      }.to raise_exception(Mongo::Error::OperationFailure)
+    end
+  end
+
   describe "#find" do
     let(:person) do
       Person.create
