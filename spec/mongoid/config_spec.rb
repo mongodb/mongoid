@@ -218,7 +218,7 @@ describe Mongoid::Config do
       end
     end
 
-    context "when provided a non-existant option" do
+    context "when provided a non-existent option" do
 
       it "raises an error" do
         expect {

@@ -2957,7 +2957,7 @@ child elements.
 
 * \#1394 Fix exists? to work when count is greater than 1. (Nick Hoffman)
 
-* \#1392 Return 0 on aggregation functions where field is nonexistant.
+* \#1392 Return 0 on aggregation functions where field is nonexistent.
 
 * \#1391 Uniqueness validation now works properly on embedded documents that are
   using primary key definitions.

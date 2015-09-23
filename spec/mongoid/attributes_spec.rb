@@ -1465,7 +1465,7 @@ describe Mongoid::Attributes do
         expect(product.cost).to eq(500)
       end
 
-      it "aliases the existance check" do
+      it "aliases the existence check" do
         expect(product.cost?).to be true
       end
 
@@ -1506,7 +1506,7 @@ describe Mongoid::Attributes do
         expect(product.price).to eq(500)
       end
 
-      it "aliases the existance check" do
+      it "aliases the existence check" do
         expect(product.price?).to be true
       end
 

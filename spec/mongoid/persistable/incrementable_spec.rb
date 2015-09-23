@@ -16,7 +16,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(person.score).to eq(90)
         end
 
-        it "sets a nonexistant value" do
+        it "sets a nonexistent value" do
           expect(person.inte).to eq(30)
         end
 
@@ -32,7 +32,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(person.reload.score).to eq(90)
         end
 
-        it "persists a nonexistant inc" do
+        it "persists a nonexistent inc" do
           expect(person.reload.inte).to eq(30)
         end
 
@@ -97,7 +97,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(address.no).to eq(90)
         end
 
-        it "sets a nonexistant value" do
+        it "sets a nonexistent value" do
           expect(address.house).to eq(30)
         end
 
@@ -113,7 +113,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(address.reload.no).to eq(90)
         end
 
-        it "persists a nonexistant inc" do
+        it "persists a nonexistent inc" do
           expect(address.reload.house).to eq(30)
         end
 

@@ -254,7 +254,7 @@ describe Mongoid::Contextual::Atomic do
       expect(depeche_mode.reload.members).to eq([ "Dave" ])
     end
 
-    it "does not error on non existant fields" do
+    it "does not error on non existent fields" do
       expect(smiths.reload.members).to be_nil
     end
   end
@@ -285,7 +285,7 @@ describe Mongoid::Contextual::Atomic do
       expect(depeche_mode.reload.members).to eq([ "Fletch" ])
     end
 
-    it "does not error on non existant fields" do
+    it "does not error on non existent fields" do
       expect(smiths.reload.members).to be_nil
     end
   end
@@ -316,7 +316,7 @@ describe Mongoid::Contextual::Atomic do
       expect(depeche_mode.reload.members).to eq([ "Dave", "Alan" ])
     end
 
-    it "pushes to non existant fields" do
+    it "pushes to non existent fields" do
       expect(smiths.reload.members).to eq([ "Alan" ])
     end
   end
@@ -347,7 +347,7 @@ describe Mongoid::Contextual::Atomic do
       expect(depeche_mode.reload.members).to eq([ "Dave", "Alan", "Fletch" ])
     end
 
-    it "pushes to non existant fields" do
+    it "pushes to non existent fields" do
       expect(smiths.reload.members).to eq([ "Alan", "Fletch" ])
     end
   end
@@ -378,7 +378,7 @@ describe Mongoid::Contextual::Atomic do
       expect(depeche_mode.reload.artists).to eq([ "Dave" ])
     end
 
-    it "does not rename non existant fields" do
+    it "does not rename non existent fields" do
       expect(smiths.reload).to_not respond_to(:artists)
     end
   end
@@ -409,7 +409,7 @@ describe Mongoid::Contextual::Atomic do
       expect(depeche_mode.reload.name).to eq("Recoil")
     end
 
-    it "sets non existant fields" do
+    it "sets non existent fields" do
       expect(smiths.reload.name).to eq("Recoil")
     end
   end

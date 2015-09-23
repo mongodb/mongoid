@@ -294,7 +294,7 @@ module Mongoid
     module ClassMethods
 
       # Alias the provided name to the original field. This will provide an
-      # aliased getter, setter, existance check, and all dirty attribute
+      # aliased getter, setter, existence check, and all dirty attribute
       # methods.
       #
       # @example Alias the attribute.

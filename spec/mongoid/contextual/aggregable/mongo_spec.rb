@@ -145,7 +145,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
       context "when the field does not exist" do
 
         let(:aggregates) do
-          context.aggregates(:non_existant)
+          context.aggregates(:non_existent)
         end
 
         it "returns an avg" do
@@ -234,7 +234,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         let(:aggregates) do
-          context.aggregates(:non_existant)
+          context.aggregates(:non_existent)
         end
 
         it "returns nil" do

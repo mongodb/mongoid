@@ -123,7 +123,7 @@ describe Mongoid::Fields::Standard do
       end
     end
 
-    context "when getting a non existant value" do
+    context "when getting a non existent value" do
 
       it "returns nil" do
         expect(hash[:key]).to be_nil
