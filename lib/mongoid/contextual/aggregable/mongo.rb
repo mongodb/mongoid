@@ -124,7 +124,8 @@ module Mongoid
         def pipeline(field)
           db_field = "$#{database_field_name(field)}"
           pipeline = []
-          pipeline << { "$match" => criteria.nin(field => nil).selector }
+          pipeline << { "$match" => criteria.selector }
+          pipeline << { "$match" =>  criteria.exists(field => true).selector }
           pipeline << { "$sort" => criteria.options[:sort] } if criteria.options[:sort]
           pipeline << { "$skip" => criteria.options[:skip] } if criteria.options[:skip]
           pipeline << { "$limit" => criteria.options[:limit] } if criteria.options[:limit]

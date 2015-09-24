@@ -302,6 +302,29 @@ describe Mongoid::Contextual::Aggregable::Mongo do
 
   describe "#max" do
 
+    context 'when the field does not exist in any document' do
+
+      let!(:depeche) do
+        Band.create(name: "Depeche Mode", likes: 1000)
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      let(:max) do
+        context.max(:non_existent)
+      end
+
+      it 'returns nil' do
+        expect(max).to be(nil)
+      end
+    end
+
     context "when provided a single field" do
 
       let!(:depeche) do
