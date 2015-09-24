@@ -1818,16 +1818,16 @@ describe Mongoid::Contextual::Mongo do
         described_class.new(criteria)
       end
 
-      let(:matches) do
+      let(:matches_operators) do
         context.send(:pipeline, 'name').select { |o| o['$match'] }
       end
 
-      it 'creates a pipeline with the selector as one $match criteria' do
-        expect(matches).to include('$match' => criteria.selector)
+      it 'creates a pipeline with the selector as one of the $match criteria' do
+        expect(matches_operators).to include('$match' => criteria.selector)
       end
 
-      it 'creates a pipeline with the selector as one $match criteria' do
-        expect(matches).to include('$match' => { 'name' => { :$exists => true } })
+      it 'creates a pipeline with the $exists operator as one of the $match criteria' do
+        expect(matches_operators).to include('$match' => { 'name' => { '$exists' => true } })
       end
     end
   end
