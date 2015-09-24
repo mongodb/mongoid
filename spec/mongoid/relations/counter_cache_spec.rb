@@ -307,7 +307,7 @@ describe Mongoid::Relations::CounterCache do
         end
 
         it "updates the counter cache" do
-          expect(person.reload.drugs_count).to eq(0)
+          expect(person.drugs_count).to eq(0)
         end
       end
 
@@ -340,7 +340,15 @@ describe Mongoid::Relations::CounterCache do
           drug.update_attribute(:person, person2)
         end
 
-        it "updates the counter cache" do
+        it "updates the current counter cache" do
+          expect(drug.person.drugs_count).to eq(1)
+        end
+
+        it "updates the current counter cache" do
+          expect(person2.drugs_count).to eq(1)
+        end
+
+        it "updates the original object's counter cache" do
           expect(person1.reload.drugs_count).to eq(1)
         end
       end
