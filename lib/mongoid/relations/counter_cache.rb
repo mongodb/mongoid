@@ -103,6 +103,25 @@ module Mongoid
           name = meta.name
           cache_column = meta.counter_cache_column_name.to_sym
 
+          after_update do
+            if record = __send__(name)
+              id_field = "#{name}_id"
+
+              if attribute_changed?(id_field)
+                original, current = attribute_change(id_field)
+
+                unless original.nil?
+                  record.class.decrement_counter(cache_column, original)
+                end
+
+                unless current.nil?
+                  record[cache_column] = (record[cache_column] || 0) + 1
+                  record.class.increment_counter(cache_column, current) if record.persisted?
+                end
+              end
+            end
+          end
+
           after_create do
             if record = __send__(name)
               record[cache_column] = (record[cache_column] || 0) + 1
