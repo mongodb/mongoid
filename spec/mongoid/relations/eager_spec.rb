@@ -131,6 +131,17 @@ describe Mongoid::Relations::Eager do
 
         context.eager_load(docs)
       end
+
+      context 'when combined with a #find_by' do
+
+        let!(:person) do
+          Person.create!(title: 'manager')
+        end
+
+        it 'executes the find_by' do
+          expect(criteria.find_by(title: 'manager')).to eq(person)
+        end
+      end
     end
 
     context "when including multiple relations" do
