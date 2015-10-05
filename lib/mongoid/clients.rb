@@ -120,7 +120,7 @@ module Mongoid
         if self.persistence_options
           client.with(self.persistence_options.merge(database: database_name))
         else
-          client.use(database_name)
+          client.with(database: database_name)
         end
       end
       alias :mongo_session :mongo_client
