@@ -65,12 +65,14 @@ module Mongoid
 
         # Run the preloader.
         #
-        # @example Iterate over the documents loadded for the current relation
+        # @example Iterate over the documents loaded for the current relation
         #   loader.each_loaded_document { |doc| }
         #
         # @since 4.0.0
         def each_loaded_document
-          @metadata.klass.any_in(key => keys_from_docs).each do |doc|
+          criteria = @metadata.klass.any_in(key => keys_from_docs)
+          criteria.inclusions = criteria.inclusions - [ @metadata ]
+          criteria.each do |doc|
             yield doc
           end
         end
