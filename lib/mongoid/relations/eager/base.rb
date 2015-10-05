@@ -71,7 +71,7 @@ module Mongoid
         # @since 4.0.0
         def each_loaded_document
           criteria = @metadata.klass.any_in(key => keys_from_docs)
-          criteria.instance_variable_set(:@inclusions, nil)
+          criteria.inclusions = criteria.inclusions - [ @metadata ]
           criteria.each do |doc|
             yield doc
           end
