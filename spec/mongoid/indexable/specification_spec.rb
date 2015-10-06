@@ -96,7 +96,7 @@ describe Mongoid::Indexable::Specification do
     end
 
     it "normalizes the options" do
-      expect(spec.options).to eq(background: true, dropDups: true)
+      expect(spec.options).to eq(background: true, drop_dups: true)
     end
   end
 end
