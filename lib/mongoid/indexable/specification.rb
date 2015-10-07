@@ -12,9 +12,7 @@ module Mongoid
       #
       # @since 4.0.0
       MAPPINGS = {
-        bucket_size: :bucketSize,
-        drop_dups: :dropDups,
-        expire_after_seconds: :expireAfterSeconds
+        expire_after_seconds: :expire_after
       }
 
       # @!attribute klass

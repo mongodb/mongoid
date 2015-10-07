@@ -192,8 +192,8 @@ describe Mongoid::Indexable do
         klass.index_specification(name: 1).options
       end
 
-      it "sets the index with dropDups options" do
-        expect(options).to eq(dropDups: true)
+      it "sets the index with drop_dups option" do
+        expect(options).to eq(drop_dups: true)
       end
     end
 
@@ -327,7 +327,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when providing a geo haystack index" do
+    context "when providing a geo haystack index with a bucket_size" do
 
       before do
         klass.index({ location: "geoHaystack" }, { min: -200, max: 200, bucket_size: 0.5 })
@@ -337,8 +337,8 @@ describe Mongoid::Indexable do
         klass.index_specification(location: "geoHaystack").options
       end
 
-      it "sets the geo haystack index" do
-        expect(options).to eq({ min: -200, max: 200, bucketSize: 0.5 })
+      it "sets the geo haystack index with the bucket_size option" do
+        expect(options).to eq({ min: -200, max: 200, bucket_size: 0.5 })
       end
     end
 
@@ -490,8 +490,8 @@ describe Mongoid::Indexable do
         klass.index_specification(name: 1).options
       end
 
-      it "sets the index with sparse options" do
-        expect(options).to eq(expireAfterSeconds: 3600)
+      it "sets the index with expire_after option" do
+        expect(options).to eq(expire_after: 3600)
       end
     end
 
