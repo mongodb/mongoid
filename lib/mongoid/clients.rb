@@ -121,13 +121,8 @@ module Mongoid
       # @since 3.0.0
       def mongo_client
         client = Clients.with_name(client_name)
-        opts = {}
+        opts = self.persistence_options ? self.persistence_options.dup : {}
         opts.merge!(database: database_name) unless client.database.name.to_sym == database_name.to_sym
-        if self.persistence_options
-          self.persistence_options.each do |opt, value|
-            opts.merge!(opt => value) if NEW_CLIENT_OPTS.include?(opt)
-          end
-        end
         client.with(opts)
       end
       alias :mongo_session :mongo_client
