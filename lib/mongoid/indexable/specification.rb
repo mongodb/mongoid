@@ -7,8 +7,8 @@ module Mongoid
     # @since 4.0.0
     class Specification
 
-      # The mappings of nice Ruby-style names to the corresponding MongoDB
-      # name.
+      # The mappings of nice Ruby-style names to the corresponding driver
+      # option name.
       #
       # @since 4.0.0
       MAPPINGS = {
