@@ -13,6 +13,11 @@ module Mongoid
     include ThreadOptions
     include Options
 
+    # Options that a new client should be created with.
+    #
+    # @since 5.0.1
+    NEW_CLIENT_OPTS = [ :read, :write ]
+
     class << self
 
       # Clear all clients from the current thread.
@@ -115,13 +120,15 @@ module Mongoid
       #
       # @since 3.0.0
       def mongo_client
-        name = client_name
-        client = Clients.with_name(name)
+        client = Clients.with_name(client_name)
+        opts = {}
+        opts.merge!(database: database_name) unless client.database.name.to_sym == database_name.to_sym
         if self.persistence_options
-          client.with(self.persistence_options.merge(database: database_name))
-        else
-          client.with(database: database_name)
+          self.persistence_options.each do |opt, value|
+            opts.merge!(opt => value) if NEW_CLIENT_OPTS.include?(opt)
+          end
         end
+        client.with(opts)
       end
       alias :mongo_session :mongo_client
       deprecate :mongo_session, :mongo_client, 2015, 12
