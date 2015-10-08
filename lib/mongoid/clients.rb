@@ -13,11 +13,6 @@ module Mongoid
     include ThreadOptions
     include Options
 
-    # Options that a new client should be created with.
-    #
-    # @since 5.0.1
-    NEW_CLIENT_OPTS = [ :read, :write ]
-
     class << self
 
       # Clear all clients from the current thread.
