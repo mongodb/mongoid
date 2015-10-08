@@ -22,7 +22,11 @@ module Mongoid
           :bucket_size,
           :expire_after_seconds,
           :weights,
-          :storage_engine
+          :storage_engine,
+          :key,
+          :sphere_version,
+          :text_version,
+          :version
         ]
 
         VALID_TYPES = [
