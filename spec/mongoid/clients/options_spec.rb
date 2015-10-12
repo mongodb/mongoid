@@ -47,10 +47,6 @@ describe Mongoid::Clients::Options do
           it 'uses that collection' do
             expect(klass.collection.name).to eq(options[:collection])
           end
-
-          it 'does not create a new cluster' do
-            expect(klass.mongo_client.cluster).to be(cluster)
-          end
         end
       end
 
