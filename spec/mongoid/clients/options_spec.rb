@@ -79,7 +79,6 @@ describe Mongoid::Clients::Options do
       Band.new.with(options)
     end
 
-
     it "sets the options into" do
       expect(instance.persistence_options).to eq(options)
     end
