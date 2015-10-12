@@ -8,6 +8,10 @@ describe Mongoid::Clients::Options do
 
       let(:options) { { database: 'test' } }
 
+      let!(:cluster) do
+        Band.mongo_client.cluster
+      end
+
       let!(:klass) do
         Band.with(options)
       end
@@ -32,6 +36,17 @@ describe Mongoid::Clients::Options do
 
         it "keeps the options" do
           expect(klass.persistence_options).to eq(options)
+        end
+
+        context 'when changing the collection' do
+
+          let(:options) do
+            { collection: 'other' }
+          end
+
+          it 'uses that collection' do
+            expect(klass.collection.name).to eq(options[:collection])
+          end
         end
       end
 

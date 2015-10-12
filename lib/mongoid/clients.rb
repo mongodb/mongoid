@@ -115,13 +115,10 @@ module Mongoid
       #
       # @since 3.0.0
       def mongo_client
-        name = client_name
-        client = Clients.with_name(name)
-        if self.persistence_options
-          client.with(self.persistence_options.merge(database: database_name))
-        else
-          client.with(database: database_name)
-        end
+        client = Clients.with_name(client_name)
+        opts = self.persistence_options ? self.persistence_options.dup : {}
+        opts.merge!(database: database_name) unless client.database.name.to_sym == database_name.to_sym
+        client.with(opts)
       end
       alias :mongo_session :mongo_client
       deprecate :mongo_session, :mongo_client, 2015, 12
