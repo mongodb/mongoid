@@ -20,6 +20,8 @@ development:
         # (default: primary)
         # read:
         #   mode: :secondary_preferred
+        #   tag_sets:
+        #     - use: web
 
         # The name of the user for authentication.
         # user: 'user'
