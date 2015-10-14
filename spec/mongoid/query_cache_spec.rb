@@ -123,6 +123,25 @@ describe Mongoid::QueryCache do
         end
       end
     end
+
+    context "when query caching is enabled and the batch_size is set" do
+
+      around(:each) do |example|
+        query_cache_enabled = Mongoid::QueryCache.enabled?
+        Mongoid::QueryCache.enabled = true
+        example.run
+        Mongoid::QueryCache.enabled = query_cache_enabled
+      end
+
+      it "does not raise an error when requesting the second batch" do
+        expect {
+          Band.batch_size(4).where(:views.gte => 0).each do |doc|
+            doc.set(likes: Random.rand(100))
+          end
+        }.not_to raise_error
+      end
+
+    end
   end
 
   context "when querying in different collection" do
