@@ -197,7 +197,8 @@ describe Mongoid::Config do
             end
 
             it "sets the read option" do
-              expect(options["read"]).to eq({ "mode" => :primary })
+              expect(options["read"]).to eq({ "mode" => :primary_preferred,
+                                              "tag_sets" => [{ "use" => "web" }]})
             end
           end
         end
