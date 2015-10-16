@@ -485,4 +485,15 @@ describe Mongoid::Findable do
       end
     end
   end
+
+  it "able to apply distinct query on string fields" do
+    class Person
+      include Mongoid::Document 
+
+      field :name, type: String
+    end
+
+    Person.create(name: 'Siva')
+    expect(Person.distinct(:name)).to match_array(['Siva'])
+  end
 end
