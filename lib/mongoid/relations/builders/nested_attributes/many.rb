@@ -106,7 +106,8 @@ module Mongoid
                 update_document(doc, attrs)
               end
             else
-              existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
+              klass = attrs[:_type].try(:constantize) || metadata.klass
+              existing.push(Factory.build(klass, attrs)) unless destroyable?(attrs)
             end
           end
 
