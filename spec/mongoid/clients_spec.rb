@@ -749,6 +749,10 @@ describe Mongoid::Clients do
           expect(sess[:bands].find(name: "Tool")).to_not be_nil
         end
       end
+
+      it 'uses that database for the model mongo_client' do
+        expect(Band.mongo_client.database.name).to eq('mongoid_optional')
+      end
     end
   end
 end
