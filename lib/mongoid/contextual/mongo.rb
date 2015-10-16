@@ -403,7 +403,9 @@ module Mongoid
         end
 
         view.projection(normalized_select).map do |doc|
-          if normalized_select.size == 1
+          if (key = normalized_select.keys.first) =~ /\./
+            doc[key.partition('.')[0]].first
+          elsif normalized_select.size == 1
             doc[normalized_select.keys.first]
           else
             normalized_select.keys.map { |n| doc[n] }
