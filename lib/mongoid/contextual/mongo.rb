@@ -102,7 +102,14 @@ module Mongoid
       #
       # @since 3.0.0
       def distinct(field)
-        view.distinct(klass.database_field_name(field))
+        distinct_values = view.distinct(klass.database_field_name(field))
+        if !Mongoid.use_utc && Mongoid.use_activesupport_time_zone
+          zone = Time.zone.try(:name)
+          distinct_values = distinct_values.map do |value|
+            value.class == Time ? value.in_time_zone(zone).to_time : value
+          end
+        end
+        distinct_values
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
