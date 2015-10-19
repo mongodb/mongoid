@@ -2821,6 +2821,60 @@ describe Mongoid::Criteria do
             expect(criteria.first.likes).to eq(3)
           end
         end
+
+        context 'when the field is a subdocument' do
+
+          let(:criteria) do
+            Band.where(name: 'FKA Twigs')
+          end
+
+          context 'when a top-level field and a subdocument field are plucked' do
+
+            before do
+              Band.create(name: 'FKA Twigs')
+              Band.create(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+            end
+
+            let(:embedded_pluck) do
+              criteria.pluck(:name, 'records.name')
+            end
+
+            let(:expected) do
+              [
+                ["FKA Twigs", nil],
+                ['FKA Twigs', [{ "name" => "LP1" }]]
+              ]
+            end
+
+            it 'returns the list of top-level field and subdocument values' do
+              expect(embedded_pluck). to eq(expected)
+            end
+          end
+
+          context 'when only a subdocument field is plucked' do
+
+            before do
+              Band.create(name: 'FKA Twigs')
+              Band.create(name: 'FKA Twigs', records: [ Record.new(name: 'LP1') ])
+            end
+
+            let(:embedded_pluck) do
+              criteria.pluck('records.name')
+            end
+
+            let(:expected) do
+              [
+                nil,
+                [{ "name" => "LP1" }]
+              ]
+            end
+
+            it 'returns the list of subdocument values' do
+              expect(embedded_pluck). to eq(expected)
+            end
+          end
+
+        end
       end
 
       context "when plucking mult-fields" do
