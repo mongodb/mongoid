@@ -19,7 +19,7 @@ module Mongoid
       # @since 3.1.0
       def average_distance
         average = stats["avgDistance"]
-        average.nan? ? nil : average
+        (average.nil? || average.nan?) ? nil : average
       end
 
       # Iterates over each of the documents in the $geoNear, excluding the
