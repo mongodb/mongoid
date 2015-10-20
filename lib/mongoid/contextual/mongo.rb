@@ -402,12 +402,11 @@ module Mongoid
           hash
         end
 
-        view.projection(normalized_select).map do |doc|
-          if normalized_select.size == 1
-            doc[normalized_select.keys.first]
-          else
-            normalized_select.keys.map { |n| doc[n] }
+        view.projection(normalized_select).reduce([]) do |plucked, doc|
+          values = normalized_select.keys.map do |n|
+            n =~ /\./ ? doc[n.partition('.')[0]] : doc[n]
           end
+          plucked << (values.size == 1 ? values.first : values)
         end
       end
 
