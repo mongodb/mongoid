@@ -494,6 +494,7 @@ describe Mongoid::Findable do
       field :name, default: '' 
     end
 
+    Mongoid.use_utc = false
     Mongoid.use_activesupport_time_zone = true
     Time.zone = "Asia/Kolkata"
     time = Time.zone.now
