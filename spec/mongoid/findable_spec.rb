@@ -511,6 +511,7 @@ describe Mongoid::Findable do
       field :name, default: '' 
     end
 
+    Mongoid.use_utc = true
     Mongoid.use_activesupport_time_zone = false
     time = Time.now
 
