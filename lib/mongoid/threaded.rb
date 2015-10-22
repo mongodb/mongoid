@@ -197,13 +197,22 @@ module Mongoid
     # Get the current Mongoid scope.
     #
     # @example Get the scope.
+    #   Threaded.current_scope(klass)
     #   Threaded.current_scope
+    #
+    # @param [ Klass ] klass The class type of the scope.
     #
     # @return [ Criteria ] The scope.
     #
     # @since 5.0.0
-    def current_scope
-      Thread.current[CURRENT_SCOPE_KEY]
+    def current_scope(klass = nil)
+      if klass && Thread.current[CURRENT_SCOPE_KEY].respond_to?(:keys)
+        Thread.current[CURRENT_SCOPE_KEY][
+            Thread.current[CURRENT_SCOPE_KEY].keys.find { |k| k <= klass }
+        ]
+      else
+        Thread.current[CURRENT_SCOPE_KEY]
+      end
     end
 
     # Set the current Mongoid scope.
@@ -218,6 +227,29 @@ module Mongoid
     # @since 5.0.0
     def current_scope=(scope)
       Thread.current[CURRENT_SCOPE_KEY] = scope
+    end
+
+    # Set the current Mongoid scope. Safe for multi-model scope chaining.
+    #
+    # @example Set the scope.
+    #   Threaded.current_scope(scope, klass)
+    #
+    # @param [ Criteria ] scope The current scope.
+    # @param [ Class ] klass The current model class.
+    #
+    # @return [ Criteria ] The scope.
+    #
+    # @since 5.0.1
+    def set_current_scope(scope, klass)
+      if scope.nil?
+        if Thread.current[CURRENT_SCOPE_KEY]
+          Thread.current[CURRENT_SCOPE_KEY].delete(klass)
+          Thread.current[CURRENT_SCOPE_KEY] = nil if Thread.current[CURRENT_SCOPE_KEY].empty?
+        end
+      else
+        Thread.current[CURRENT_SCOPE_KEY] ||= {}
+        Thread.current[CURRENT_SCOPE_KEY][klass] = scope
+      end
     end
 
     # Is the document autosaved on the current thread?

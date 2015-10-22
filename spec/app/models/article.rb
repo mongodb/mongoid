@@ -1,6 +1,8 @@
 class Article
   include Mongoid::Document
 
+  field :author_id, type: Integer
+  field :public, type: Mongoid::Boolean
   field :title, type: String
   field :is_rss, type: Mongoid::Boolean, default: false
   field :user_login, type: String
