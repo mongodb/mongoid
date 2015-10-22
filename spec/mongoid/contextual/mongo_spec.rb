@@ -854,15 +854,12 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
-  pending "#last" do
+  context "#last" do
 
     context "when no default scope" do
 
-      let!(:depeche_mode) do
+      before do
         Band.create(name: "Depeche Mode")
-      end
-
-      let!(:new_order) do
         Band.create(name: "New Order")
       end
 
@@ -875,7 +872,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "returns the last matching document" do
-        expect(context.last).to eq(new_order)
+        expect(context.last['name']).to eq('New Order')
       end
     end
 
@@ -920,7 +917,7 @@ describe Mongoid::Contextual::Mongo do
         described_class.new(criteria)
       end
 
-      it "returns the correnct document" do
+      it "returns the correct document" do
         expect(context.last).to eq(new_order)
         expect(context.first).to eq(depeche_mode)
       end
