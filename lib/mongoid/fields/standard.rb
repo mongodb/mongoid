@@ -231,7 +231,11 @@ module Mongoid
       # @since 2.4.4
       def evaluated_default(doc)
         if default_val.respond_to?(:call)
-          evaluate_default_proc(doc)
+          begin
+            evaluate_default_proc(doc)
+          rescue NoMethodError => e
+            return nil
+          end
         else
           serialize_default(default_val.__deep_copy__)
         end
