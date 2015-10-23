@@ -500,7 +500,7 @@ describe Mongoid::Findable do
     time = Time.zone.now
 
     Kid.create(birth_time: time, name: 'Tom')
-    expect(Kid.distinct(:birth_time).first.to_s).to eql(time.to_time.to_s)
+    expect(Kid.distinct(:birth_time).first.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
     expect(Kid.distinct(:name)).to match_array(['Tom'])
   end
 
