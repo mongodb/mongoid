@@ -757,7 +757,7 @@ describe Mongoid::Contextual::Mongo do
 
         context "when subsequently calling #last" do
 
-          it "returns the correnct document" do
+          it "returns the correct document" do
             expect(context.send(method)).to eq(new_order)
             expect(context.last).to eq(depeche_mode)
           end
@@ -783,7 +783,7 @@ describe Mongoid::Contextual::Mongo do
 
         context "when subsequently calling #last" do
 
-          it "returns the correnct document" do
+          it "returns the correct document" do
             expect(context.send(method)).to eq(new_order)
             expect(context.last).to eq(depeche_mode)
           end
@@ -851,79 +851,6 @@ describe Mongoid::Contextual::Mongo do
 
     it "sets the view selector" do
       expect(context.view.selector).to eq({ "name" => "Depeche Mode" })
-    end
-  end
-
-  pending "#last" do
-
-    context "when no default scope" do
-
-      let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
-      end
-
-      let!(:new_order) do
-        Band.create(name: "New Order")
-      end
-
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns the last matching document" do
-        expect(context.last).to eq(new_order)
-      end
-    end
-
-    context "when default scope" do
-
-      let!(:palm) do
-        Tree.create(name: "Palm")
-      end
-
-      let!(:maple) do
-        Tree.create(name: "Maple")
-      end
-
-      let(:criteria) do
-        Tree.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "respects default scope" do
-        expect(context.last).to eq(palm)
-      end
-    end
-
-    context "when subsequently calling #first" do
-
-      let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
-      end
-
-      let!(:new_order) do
-        Band.create(name: "New Order")
-      end
-
-      let(:criteria) do
-        Band.asc(:name)
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns the correnct document" do
-        expect(context.last).to eq(new_order)
-        expect(context.first).to eq(depeche_mode)
-      end
     end
   end
 
