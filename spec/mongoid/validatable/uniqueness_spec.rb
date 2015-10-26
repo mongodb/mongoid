@@ -789,6 +789,23 @@ describe Mongoid::Validatable::UniquenessValidator do
           end
         end
 
+        context "when a range scope is provided" do
+
+          before do
+            Dictionary.validates_uniqueness_of(:name, :scope => Dictionary.where(:year.gte => 1900, :year.lt => 2000))
+            Dictionary.create(name: "French-English", year: 1950)
+            Dictionary.create(name: "French-English", year: 1960)
+          end
+
+          after do
+            Dictionary.reset_callbacks(:validate)
+          end
+
+          it "successfully prevents uniqueness violation" do
+            expect(Dictionary.all.size).to eq(1)
+          end
+        end
+
         context "when multiple scopes are provided" do
 
           before do
