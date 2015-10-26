@@ -115,7 +115,7 @@ module Mongoid
       #
       # @since 3.0.0
       def queryable
-        Threaded.current_scope || Criteria.new(self)
+        Threaded.current_scope(self) || Criteria.new(self)
       end
 
       # Create a scope that can be accessed from the class level or chained to
@@ -222,11 +222,11 @@ module Mongoid
       #
       # @since 1.0.0
       def with_scope(criteria)
-        Threaded.current_scope = criteria
+        Threaded.set_current_scope(criteria, self)
         begin
           yield criteria
         ensure
-          Threaded.current_scope = nil
+          Threaded.set_current_scope(nil, self)
         end
       end
 

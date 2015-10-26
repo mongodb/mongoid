@@ -143,16 +143,34 @@ describe Mongoid::Scopable do
         Band.where(name: "Depeche Mode")
       end
 
-      before do
-        Mongoid::Threaded.current_scope = criteria
+      context "when using #current_scope=scope" do
+
+        before do
+          Mongoid::Threaded.current_scope = criteria
+        end
+
+        after do
+          Mongoid::Threaded.current_scope = nil
+        end
+
+        it "returns the criteria on the stack" do
+          expect(Band.queryable).to eq(criteria)
+        end
       end
 
-      after do
-        Mongoid::Threaded.current_scope = nil
-      end
+      context "when using #set_current_scope(scope, klass)" do
 
-      it "returns the criteria on the stack" do
-        expect(Band.queryable).to eq(criteria)
+        before do
+          Mongoid::Threaded.set_current_scope(criteria, Band)
+        end
+
+        after do
+          Mongoid::Threaded.set_current_scope(nil, Band)
+        end
+
+        it "returns the criteria on the stack" do
+          expect(Band.queryable).to eq(criteria)
+        end
       end
     end
   end
@@ -548,6 +566,58 @@ describe Mongoid::Scopable do
               expect(criteria.selector).to eq({ "origin" => "England" })
             end
           end
+
+          context "when chaining scopes through more than one model" do
+
+            before do
+              Author.scope(:author, -> { where(author: true) } )
+              Article.scope(:is_public, -> { where(public: true) } )
+              Article.scope(:authored, -> {
+                author_ids = Author.author.pluck(:id)
+                where(:author_id.in => author_ids)
+              })
+
+              Author.create(author: true, id: 1)
+              Author.create(author: true, id: 2)
+              Author.create(author: true, id: 3)
+              Article.create(author_id: 1, public: true)
+              Article.create(author_id: 2, public: true)
+              Article.create(author_id: 3, public: false)
+            end
+
+            after do
+              class << Article
+                undef_method :is_public
+                undef_method :authored
+              end
+              Article._declared_scopes.clear
+              class << Author
+                undef_method :author
+              end
+              Author._declared_scopes.clear
+            end
+
+            context "when calling another model's scope from within a scope" do
+
+              let(:authored_count) do
+                Article.authored.size
+              end
+
+              it "returns the correct documents" do
+                expect(authored_count).to eq(3)
+              end
+            end
+
+            context "when calling another model's scope from within a chained scope" do
+              let(:is_public_authored_count) do
+                Article.is_public.authored.size
+              end
+
+              it "returns the correct documents" do
+                expect(is_public_authored_count).to eq(2)
+              end
+            end
+          end
         end
       end
 
@@ -823,17 +893,38 @@ describe Mongoid::Scopable do
 
       context "when default scope is in a super class" do
 
-        before do
-          Band.scope(:active, ->{ Band.where(active: true) })
+        context "when scope is already defined in parent class" do
+
+          let(:unscoped) do
+            class U1 < Kaleidoscope; end
+            U1.unscoped.activated
+          end
+
+          it "clears default scope" do
+            expect(unscoped.selector).to eq({ "active" => true })
+          end
         end
 
-        let(:unscoped) do
-          class U2 < Band; end
-          U2.unscoped.active
-        end
+        context "when the scope is created dynamically" do
 
-        it "clears default scope" do
-          expect(unscoped.selector).to eq({ "active" => true })
+          before do
+            Band.scope(:active, ->{ Band.where(active: true) })
+          end
+
+          after do
+            class << Band
+              undef_method :active
+            end
+          end
+
+          let(:unscoped) do
+            class U2 < Band; end
+            U2.unscoped.active
+          end
+
+          it "clears default scope" do
+            expect(unscoped.selector).to eq({ "active" => true })
+          end
         end
       end
     end
@@ -938,9 +1029,20 @@ describe Mongoid::Scopable do
       end
     end
 
-    it "pops the criteria off the stack" do
-      Band.with_scope(criteria) {}
-      expect(Mongoid::Threaded.current_scope).to be_nil
+    context "when using #current_scope" do
+
+      it "pops the criteria off the stack" do
+        Band.with_scope(criteria) do;end
+        expect(Mongoid::Threaded.current_scope).to be_nil
+      end
+    end
+
+    context "when using #current_scope(klass)" do
+
+      it "pops the criteria off the stack" do
+        Band.with_scope(criteria) do;end
+        expect(Mongoid::Threaded.current_scope(Band)).to be_nil
+      end
     end
   end
 
