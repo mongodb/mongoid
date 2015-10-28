@@ -198,7 +198,7 @@ module Mongoid
         # @since 3.0.0
         def mongoize(object)
           return if object.nil?
-          evolve(object).update_values { |value| value.mongoize }
+          evolve(object).each_with_object({}) { |(key, value), new_hash| new_hash[key] = value.mongoize }
         end
 
         # Can the size of this object change?

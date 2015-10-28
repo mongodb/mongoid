@@ -281,6 +281,10 @@ describe Mongoid::Extensions::Hash do
       it "converts the elements properly" do
         expect(mongoized[:date]).to eq(Time.utc(2012, 1, 1, 0, 0, 0))
       end
+
+      it "does not modify its argument" do
+        expect(Hash.mongoize(hash.freeze)).to be_a(Hash)
+      end
     end
 
     context "when object is nil" do
