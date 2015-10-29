@@ -3,7 +3,53 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
-## 5.0.1 - Not released
+## 5.0.1
+
+### Resolved Issues
+
+* [MONGOID-3020](https://jira.mongodb.org/browse/MONGOID-3020) Test added to show it's no longer an issue.
+* [MONGOID-3025](https://jira.mongodb.org/browse/MONGOID-3025) Test added to show it's no longer an issue.
+* [MONGOID-3061](https://jira.mongodb.org/browse/MONGOID-3061) No longer an issue.
+* [MONGOID-3073](https://jira.mongodb.org/browse/MONGOID-3073) Test added to show it's no longer an issue.
+* [MONGOID-3085](https://jira.mongodb.org/browse/MONGOID-3085) Test added to show it's no longer an issue.
+* [MONGOID-3101](https://jira.mongodb.org/browse/MONGOID-3101) No longer an issue.
+* [MONGOID-3160](https://jira.mongodb.org/browse/MONGOID-3160) No longer an issue.
+* [MONGOID-3176](https://jira.mongodb.org/browse/MONGOID-3176) No longer an issue.
+* [MONGOID-3214](https://jira.mongodb.org/browse/MONGOID-3214) Test added to show it's no longer an issue.
+* [MONGOID-3296](https://jira.mongodb.org/browse/MONGOID-3296) Add update callback for counter_cache.
+* [MONGOID-3326](https://jira.mongodb.org/browse/MONGOID-3326) Test added to show it's no longer an issue.
+* [MONGOID-3361](https://jira.mongodb.org/browse/MONGOID-3361) No longer an issue.
+* [MONGOID-3365](https://jira.mongodb.org/browse/MONGOID-3365) Test added to show it's no longer an issue.
+* [MONGOID-3402](https://jira.mongodb.org/browse/MONGOID-3402) Apply persistence options to parent.
+* [MONGOID-3524](https://jira.mongodb.org/browse/MONGOID-3524) No longer an issue.
+* [MONGOID-3529](https://jira.mongodb.org/browse/MONGOID-3529) Test exists already showing it's not an issue.
+* [MONGOID-3543](https://jira.mongodb.org/browse/MONGOID-3543) Test exists already showing it's not an issue.
+* [MONGOID-3611](https://jira.mongodb.org/browse/MONGOID-3611) Test added to show it's no longer an issue.
+* [MONGOID-3650](https://jira.mongodb.org/browse/MONGOID-3650) No longer an issue.
+* [MONGOID-3826](https://jira.mongodb.org/browse/MONGOID-3826), [MONGOID-4109](https://jira.mongodb.org/browse/MONGOID-4109) Fix Timelessness leaks.
+* [MONGOID-3946](https://jira.mongodb.org/browse/MONGOID-3946) Test added to show it's no longer an issue.
+* [MONGOID-3969](https://jira.mongodb.org/browse/MONGOID-3969) Test added to show it's no longer an issue.
+* [MONGOID-3971](https://jira.mongodb.org/browse/MONGOID-3971) Not an issue.
+* [MONGOID-3979](https://jira.mongodb.org/browse/MONGOID-3979) Not an issue, tests exist already.
+* [MONGOID-3985](https://jira.mongodb.org/browse/MONGOID-3985) Not an issue.
+* [MONGOID-4078](https://jira.mongodb.org/browse/MONGOID-4078) Behavior is intended.
+* [MONGOID-4079](https://jira.mongodb.org/browse/MONGOID-4079) Not an issue.
+* [MONGOID-4088](https://jira.mongodb.org/browse/MONGOID-4088) Account for sub-document dot notation with #pluck results.
+* [MONGOID-4098](https://jira.mongodb.org/browse/MONGOID-4098) Fixed by a change to the Ruby driver. See RUBY-1029.
+* [MONGOID-4101](https://jira.mongodb.org/browse/MONGOID-4101) Not an issue.
+* [MONGOID-4106](https://jira.mongodb.org/browse/MONGOID-4106) Not an issue.
+* [MONGOID-4110](https://jira.mongodb.org/browse/MONGOID-4110) Not an issue.
+* [MONGOID-4119](https://jira.mongodb.org/browse/MONGOID-4119) Ensure that criteria selector becomes pipeline operator value.
+* [MONGOID-4121](https://jira.mongodb.org/browse/MONGOID-4121) Not an issue.
+* [MONGOID-4123](https://jira.mongodb.org/browse/MONGOID-4123) Fixed as a result of MONGOID-4159.
+* [MONGOID-4125](https://jira.mongodb.org/browse/MONGOID-4125) Make sure none scopes referenced in procs are applied.
+* [MONGOID-4132](https://jira.mongodb.org/browse/MONGOID-4132) Not an issue.
+* [MONGOID-4157](https://jira.mongodb.org/browse/MONGOID-4157) Fixed by version 2.1.2 of the Ruby driver.
+* [MONGOID-4162](https://jira.mongodb.org/browse/MONGOID-4162) Adapt index option mappings to new driver. (@Nielsomat)
+* [MONGOID-3737](https://jira.mongodb.org/browse/MONGOID-3737) Test added to show it's no longer an issue.
+* [MONGOID-3621](https://jira.mongodb.org/browse/MONGOID-3621) Not an issue.
+* [MONGOID-3551](https://jira.mongodb.org/browse/MONGOID-3551) Not an issue.
+
 
 ## 5.0.0
 
