@@ -59,7 +59,7 @@ module Mongoid
     end
 
     def replace_index(keys, position)
-      # replace index with $ only if that key is on the selector and it is only
+      # replace index with $ only if that key is in the selector and it is only
       # nested a single level deep.
       matches = position.scan(/\.\d+\./)
       if matches.size == 1
