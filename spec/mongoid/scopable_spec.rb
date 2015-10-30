@@ -51,7 +51,7 @@ describe Mongoid::Scopable do
       end
 
       let(:rand_criteria) do
-        ->{ Band.gt(likes: rand(100)) }
+        ->{ Band.gt(likes: Mongo::Monitoring.next_operation_id) }
       end
 
       before do

@@ -18,7 +18,7 @@ describe Mongoid::Atomic::Paths do
     Name.new
   end
 
-  describe "#.atomic_delete_modifier" do
+  describe "#atomic_delete_modifier" do
 
     before do
       person.addresses << address
@@ -40,7 +40,7 @@ describe Mongoid::Atomic::Paths do
     end
   end
 
-  describe "#.atomic_insert_modifier" do
+  describe "#atomic_insert_modifier" do
 
     before do
       person.addresses << address
@@ -62,7 +62,7 @@ describe Mongoid::Atomic::Paths do
     end
   end
 
-  describe "#.atomic_path" do
+  describe "#atomic_path" do
 
     context "when the document is a parent" do
 
@@ -95,7 +95,7 @@ describe Mongoid::Atomic::Paths do
     end
   end
 
-  describe "#.atomic_selector" do
+  describe "#atomic_selector" do
 
     context "when the document is a parent" do
 
@@ -111,7 +111,9 @@ describe Mongoid::Atomic::Paths do
       end
 
       it "returns the association with id.atomic_selector" do
-        expect(address.atomic_selector).to eq({ "_id" => person.id })
+        expect(address.atomic_selector).to eq(
+          { "_id" => person.id, "addresses._id" => address.id }
+        )
       end
     end
 
@@ -122,13 +124,19 @@ describe Mongoid::Atomic::Paths do
         person.addresses << address
       end
 
-      it "returns the JSON notation to the document with id" do
-        expect(location.atomic_selector).to eq({ "_id" => person.id })
+      it "returns the JSON notation to the document with ids" do
+        expect(location.atomic_selector).to eq(
+          {
+            "_id" => person.id,
+            "addresses._id" => address.id,
+            "addresses.locations._id" => location.id
+          }
+        )
       end
     end
   end
 
-  describe "#.atomic_position" do
+  describe "#atomic_position" do
 
     context "when the document is a parent" do
 
@@ -194,7 +202,7 @@ describe Mongoid::Atomic::Paths do
     end
   end
 
-  describe "#.atomic_path" do
+  describe "#atomic_path" do
 
     context "when the document is a parent" do
 
@@ -255,7 +263,6 @@ describe Mongoid::Atomic::Paths do
         it "returns the.atomic_path plus index" do
           expect(location.atomic_path).to eq("addresses.0.locations")
         end
-
       end
     end
   end
