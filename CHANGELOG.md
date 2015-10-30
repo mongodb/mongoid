@@ -49,6 +49,8 @@ For instructions on upgrading to newer versions, visit
 * [MONGOID-3737](https://jira.mongodb.org/browse/MONGOID-3737) Test added to show it's no longer an issue.
 * [MONGOID-3621](https://jira.mongodb.org/browse/MONGOID-3621) Not an issue.
 * [MONGOID-3551](https://jira.mongodb.org/browse/MONGOID-3551) Not an issue.
+* [MONGOID-3696](https://jira.mongodb.org/browse/MONGOID-3696) Test added to show it's no longer an issue.
+* [MONGOID-3858](https://jira.mongodb.org/browse/MONGOID-3858) Test added to show it's no longer an issue.
 
 
 ## 5.0.0
