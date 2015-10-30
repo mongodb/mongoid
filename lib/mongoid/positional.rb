@@ -59,10 +59,14 @@ module Mongoid
     end
 
     def replace_index(keys, position)
-      # replace to $ only if that key is on the selector
-      keys.each do |kk|
-        if position =~ /^#{kk}\.\d+\.(.*)/
-          return "#{kk}.$.#{$1}"
+      # replace index with $ only if that key is on the selector and it is only
+      # nested a single level deep.
+      matches = position.scan(/\.\d+\./)
+      if matches.size == 1
+        keys.each do |kk|
+          if position =~ /^#{kk}\.\d+\.(.*)/
+            return "#{kk}.$.#{$1}"
+          end
         end
       end
       position
