@@ -111,7 +111,9 @@ describe Mongoid::Atomic::Paths do
       end
 
       it "returns the association with id.atomic_selector" do
-        expect(address.atomic_selector).to eq({ "_id" => person.id })
+        expect(address.atomic_selector).to eq(
+          { "_id" => person.id, "addresses._id" => address.id }
+        )
       end
     end
 
@@ -122,8 +124,14 @@ describe Mongoid::Atomic::Paths do
         person.addresses << address
       end
 
-      it "returns the JSON notation to the document with id" do
-        expect(location.atomic_selector).to eq({ "_id" => person.id })
+      it "returns the JSON notation to the document with ids" do
+        expect(location.atomic_selector).to eq(
+          {
+            "_id" => person.id,
+            "addresses._id" => address.id,
+            "addresses.locations._id" => location.id
+          }
+        )
       end
     end
   end
