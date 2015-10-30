@@ -2748,26 +2748,55 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let!(:location) do
-        address.locations.create(name: "work")
+        address.locations.create(name: "vacation", number: 0)
+        address.locations.create(name: "work", number: 3)
       end
 
-      context "when updating with a hash" do
+      context "when updating with replacement of embedded array" do
+
+        context "when updating with a hash" do
+
+          before do
+            address.update_attributes(locations: [{ name: "home" }])
+          end
+
+          it "updates the attributes" do
+            expect(address.locations.first.name).to eq("home")
+          end
+
+          it "overwrites the existing documents" do
+            expect(address.locations.count).to eq(1)
+          end
+
+          it "persists the changes" do
+            expect(address.reload.locations.count).to eq(1)
+          end
+        end
+      end
+
+      context "when updating a field in a document of the embedded array" do
 
         before do
-          address.update_attributes(locations: [{ name: "home" }])
+          location.number = 7
+          location.save
         end
 
-        it "updates the attributes" do
-          expect(address.locations.first.name).to eq("home")
+        let(:updated_location_number) do
+          person.reload.addresses.first.locations.find(location.id).number
         end
 
-        it "overwrites the existing documents" do
-          expect(address.locations.count).to eq(1)
+        let(:updated_location_name) do
+          person.reload.addresses.first.locations.find(location.id).name
         end
 
-        it "persists the changes" do
-          expect(address.reload.locations.count).to eq(1)
+        it "the change is persisted" do
+          expect(updated_location_number).to eq(7)
         end
+
+        it "the other field remains unaffected" do
+          expect(updated_location_name).to eq("work")
+        end
+
       end
     end
 
