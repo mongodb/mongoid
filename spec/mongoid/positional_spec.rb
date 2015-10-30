@@ -151,7 +151,7 @@ describe Mongoid::Positional do
           positionable.positionally(selector, updates)
         end
 
-        it "replaces the first index with the positional operator" do
+        it "does not replace the index with the positional operator" do
           expect(processed).to eq(expected)
         end
       end
