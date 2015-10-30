@@ -963,7 +963,7 @@ describe Mongoid::Relations::Embedded::One do
         end
 
         before do
-          person.reload.addresses.first.code = code
+          address_two.code = code
         end
 
         it "reloads the correct number" do
