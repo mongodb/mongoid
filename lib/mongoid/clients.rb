@@ -116,7 +116,11 @@ module Mongoid
       # @since 3.0.0
       def mongo_client
         client = Clients.with_name(client_name)
-        opts = self.persistence_options ? self.persistence_options.dup : {}
+        if self.persistence_options && defined?(Mongo::Client::VALID_OPTIONS)
+          opts = self.persistence_options & Mongo::Client::VALID_OPTIONS
+        else
+          opts = self.persistence_options ? self.persistence_options.dup : {}
+        end
         opts.merge!(database: database_name) unless client.database.name.to_sym == database_name.to_sym
         client.with(opts)
       end
