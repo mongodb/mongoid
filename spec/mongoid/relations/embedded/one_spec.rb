@@ -1019,4 +1019,18 @@ describe Mongoid::Relations::Embedded::One do
       end
     end
   end
+
+  context "when parent validation of child is set to false" do
+
+    let(:building) do
+      building = Building.create
+      building.building_address = BuildingAddress.new
+      building.save
+      building.reload
+    end
+
+    it "parent successfully embeds an invalid child" do
+      expect(building.building_address).to be_a(BuildingAddress)
+    end
+  end
 end
