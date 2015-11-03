@@ -22,3 +22,4 @@ doc/*
 *.profile.pdf
 *.symbols
 .idea
+gem-private_key.pem
