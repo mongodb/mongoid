@@ -53,7 +53,7 @@ For instructions on upgrading to newer versions, visit
 * [MONGOID-3858](https://jira.mongodb.org/browse/MONGOID-3858) Test added to show it's no longer an issue.
 * [MONGOID-3672](https://jira.mongodb.org/browse/MONGOID-3672) Not an issue.
 * [MONGOID-4172](https://jira.mongodb.org/browse/MONGOID-4172) Use positional operator only on 1 level deep nesting.
-
+* Added public cert to repo and sign gem if private key is present
 
 ## 5.0.0
 
