@@ -3531,6 +3531,37 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  context "when the association has an order defined" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:message_one) do
+      Message.new(priority: 5, body: 'This is a test')
+    end
+
+    let(:message_two) do
+      Message.new(priority: 10, body: 'This is a test')
+    end
+
+    let(:message_three) do
+      Message.new(priority: 20, body: 'Zee test')
+    end
+
+    before do
+      person.messages.push(message_one, message_two, message_three)
+    end
+
+    let(:criteria) do
+      person.messages.order_by(:body.asc, :priority.desc)
+    end
+
+    it "properly orders the related objects" do
+      expect(criteria.to_a).to eq([message_two, message_one, message_three])
+    end
+  end
+
   context "when using dot notation in a criteria" do
 
     let(:person) do
