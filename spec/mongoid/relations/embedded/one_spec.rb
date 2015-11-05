@@ -768,6 +768,37 @@ describe Mongoid::Relations::Embedded::One do
     end
   end
 
+  describe "when the relationship is polymorphic" do
+
+    context "when updating an aliased embedded document" do
+
+      context "when the embedded document inherits its relationship" do
+
+        let(:courier_job) do
+          CourierJob.create
+        end
+
+        let(:old_child) do
+          ShipmentAddress.new
+        end
+
+        let(:new_child) do
+          ShipmentAddress.new
+        end
+
+        before do
+          courier_job.drop_address = old_child
+          courier_job.update_attribute(:drop_address, new_child)
+          courier_job.reload
+        end
+
+        it "the child is embedded correctly" do
+          expect(courier_job.drop_address).to eq(new_child)
+        end
+      end
+    end
+  end
+
   describe ".embedded?" do
 
     it "returns true" do
