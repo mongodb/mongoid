@@ -613,25 +613,49 @@ describe Mongoid::Document do
       Person.new
     end
 
-    context "when not frozen" do
+    context "when freezing the model" do
 
-      it "freezes attributes" do
-        expect(person.freeze).to eq(person)
-        expect { person.title = "something" }.to raise_error
+      context "when not frozen" do
+
+        it "freezes attributes" do
+          expect(person.freeze).to eq(person)
+          expect { person.title = "something" }.to raise_error
+        end
+      end
+
+      context "when frozen" do
+
+        before do
+          person.raw_attributes.freeze
+        end
+
+        it "keeps things frozen" do
+          person.freeze
+          expect {
+            person.title = "something"
+          }.to raise_error
+        end
       end
     end
 
-    context "when frozen" do
+    context "when freezing attributes of the model" do
 
-      before do
-        person.raw_attributes.freeze
-      end
+      context "when assigning a frozen value" do
 
-      it "keeps things frozen" do
-        person.freeze
-        expect {
-          person.title = "something"
-        }.to raise_error
+        context "when the frozen value is a hash" do
+
+          let(:hash) do
+            {"foo" => {"bar" => {"baz" => [1,2,3]}}}
+          end
+
+          let(:assign_hash) do
+            person.map = hash.freeze
+          end
+
+          it "no mutation occurs during assignment" do
+            expect{ assign_hash }.not_to raise_error
+          end
+        end
       end
     end
   end
