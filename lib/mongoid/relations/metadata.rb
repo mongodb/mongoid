@@ -126,6 +126,10 @@ module Mongoid
         @class_name ||= (self[:class_name] || classify).sub(/\A::/,"")
       end
 
+      def class_name=(name)
+        self[:class_name], @class_name = name
+      end
+
       # Get the foreign key contraint for the metadata.
       #
       # @example Get the constaint.
@@ -586,7 +590,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def klass
-        @klass ||= class_name.constantize
+        @klass = class_name.constantize
       end
 
       # Is this metadata representing a one to many or many to many relation?
