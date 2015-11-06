@@ -586,6 +586,22 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  context "when the association is polymorphic" do
+
+    let(:metadata) do
+      described_class.new(
+        name: :ratable,
+        relation: Mongoid::Relations::Referenced::In,
+        polymorphic: true,
+        inverse_class_name: "Rating"
+      )
+    end
+
+    it "returns the polymorphic class name" do
+      expect(metadata.class_name).to eq("Ratable")
+    end
+  end
+
   describe "#destructive?" do
 
     context "when the relation has a destructive dependent option" do
