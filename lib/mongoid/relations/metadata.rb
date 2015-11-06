@@ -663,6 +663,9 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def nested_builder(attributes, options)
+        if polymorphic? && options[:class_name]
+          self[:class_name] = options[:class_name]
+        end
         relation.nested_builder(self, attributes, options)
       end
 

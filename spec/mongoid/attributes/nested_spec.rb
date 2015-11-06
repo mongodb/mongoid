@@ -102,6 +102,19 @@ describe Mongoid::Attributes::Nested do
       end
     end
 
+    context "when the association is referenced in and polymorphic" do
+
+      it "infers the class name of the polymorphic with the inverse type" do
+        expect {
+          Post.create!(
+            title: "Some title",
+            posteable_type: "Sandwich",
+            posteable_attributes: { name: 'Grilled Cheese' }
+          )
+        }.not_to raise_error
+      end
+    end
+
     context "when the relation is an embedded in" do
 
       before do

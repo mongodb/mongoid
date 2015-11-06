@@ -6,4 +6,6 @@ class Message
 
   embedded_in :person
   has_and_belongs_to_many :receviers, class_name: "Person", inverse_of: nil
+
+  has_one :post, as: :posteable
 end

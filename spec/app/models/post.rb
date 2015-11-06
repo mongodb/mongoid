@@ -15,6 +15,9 @@ class Post
   has_many :videos, validate: false
   has_many :roles, validate: false
 
+  belongs_to :posteable, polymorphic: true
+  accepts_nested_attributes_for :posteable, autosave: true
+
   scope :recent, ->{ where(created_at: { "$lt" => Time.now, "$gt" => 30.days.ago }) }
   scope :posting, ->{ where(:content.in => [ "Posting" ]) }
   scope :open, ->{ where(title: "open") }
