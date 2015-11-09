@@ -77,6 +77,7 @@ module Rails
         unless config.action_dispatch.rescue_responses
           ActionDispatch::ShowExceptions.rescue_responses.update(Railtie.rescue_responses)
         end
+        Mongo::Logger.logger = ::Mongoid.logger
       end
 
       # Due to all models not getting loaded and messing up inheritance queries
