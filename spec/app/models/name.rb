@@ -14,6 +14,7 @@ class Name
   embeds_many :translations, validate: false
   embeds_one :language, as: :translatable, validate: false
   embedded_in :namable, polymorphic: true
+  embedded_in :person
 
   accepts_nested_attributes_for :language
 
