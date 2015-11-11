@@ -3468,4 +3468,37 @@ describe Mongoid::Criteria do
       end
     end
   end
+
+  describe "#type_selection" do
+
+    context "when only one subclass exists" do
+
+      let(:criteria) do
+        described_class.new(Firefox)
+      end
+
+      let(:selection) do
+        criteria.send(:type_selection)
+      end
+
+      it "does not use an $in query" do
+        expect(selection).to eq({ _type: "Firefox" })
+      end
+    end
+
+    context "when more than one subclass exists" do
+
+      let(:criteria) do
+        described_class.new(Browser)
+      end
+
+      let(:selection) do
+        criteria.send(:type_selection)
+      end
+
+      it "does not use an $in query" do
+        expect(selection).to eq({ _type: { "$in" => [ "Firefox", "Browser" ]}})
+      end
+    end
+  end
 end

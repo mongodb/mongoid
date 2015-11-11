@@ -597,7 +597,12 @@ module Mongoid
     #
     # @since 3.0.3
     def type_selection
-      { _type: { "$in" => klass._types }}
+      klasses = klass._types
+      if klasses.size > 1
+        { _type: { "$in" => klass._types }}
+      else
+        { _type: klass._types[0] }
+      end
     end
 
     # Get a new selector with type selection in it.
