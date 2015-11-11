@@ -8,8 +8,4 @@ gem "activemodel", "~> 4.0.12"
 
 group :test do
   gem "rspec", "~> 3.1.0"
-
-  if ENV["CI"]
-    gem "coveralls", require: false
-  end
 end
