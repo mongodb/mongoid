@@ -3254,6 +3254,25 @@ describe Mongoid::Criteria do
           expect(criteria.selector).to eq({ "agent_ids" => [ id_one, id_two ]})
         end
       end
+
+      context "when querying on a big decimal" do
+
+        let(:sales) do
+          BigDecimal.new('0.1')
+        end
+
+        let!(:band) do
+          Band.create(name: "Boards of Canada", sales: sales)
+        end
+
+        let(:from_db) do
+          Band.where(sales: sales).first
+        end
+
+        it "finds the document by the big decimal value" do
+          expect(from_db).to eq(band)
+        end
+      end
     end
   end
 
