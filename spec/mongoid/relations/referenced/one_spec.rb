@@ -1213,4 +1213,28 @@ describe Mongoid::Relations::Referenced::One do
       end
     end
   end
+
+  context "when dependent is set to delete for child" do
+
+    context "when autobuild is true for child" do
+
+      let(:explosion) do
+        Explosion.create
+      end
+
+      let(:bomb) do
+        bomb = Bomb.create
+        bomb.explosion = explosion
+        bomb
+      end
+
+      let(:clear_child) do
+        bomb.explosion.clear
+      end
+
+      it "clearing the child raises no error" do
+        expect{ clear_child }.not_to raise_error
+      end
+    end
+  end
 end
