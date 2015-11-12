@@ -79,8 +79,12 @@ module Mongoid
           if docs.blank?
             if _assigning? && !empty?
               base.add_atomic_unset(first)
+              target_duplicate = target.dup
+              pre_process_batch_remove(target_duplicate, :delete)
+              post_process_batch_remove(target_duplicate, :delete)
+            else
+              batch_remove(target.dup)
             end
-            batch_remove(target.dup)
           else
             base.delayed_atomic_sets.clear unless _assigning?
             docs = normalize_docs(docs).compact

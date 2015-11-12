@@ -4801,38 +4801,84 @@ describe Mongoid::Attributes::Nested do
         league.divisions.create(name: "Old Name")
       end
 
-      let(:params) do
-        { divisions_attributes:
-          { "0" => { id: division.id.to_s, name: "New Name" }}
-        }
-      end
-
-      before do
-        league.update_attributes(params)
-      end
-
-      it "sets the nested attributes" do
-        expect(league.reload.divisions.first.name).to eq("New Name")
-      end
-
-      context "with corrupted data" do
+      context "when additional validation is set" do
 
         before do
-          league[:league] = params
+          League.validates_presence_of(:divisions)
         end
 
-        let(:new_params) do
+        after do
+          League.reset_callbacks(:validate)
+        end
+
+        context "when validation fails" do
+
+          let(:division) do
+            Division.new
+          end
+
+          let(:league) do
+            League.create!(divisions: [division])
+          end
+
+          let(:error_raising_update) do
+            league.update!(:divisions => nil)
+          end
+
+          before do
+            league.update(:divisions => nil)
+            league.reload
+          end
+
+          it "the update raises an error" do
+            expect{ error_raising_update }.to raise_error
+          end
+
+          it "the update does not occur" do
+            expect(league.divisions.first).to eq(division)
+          end
+
+          it "the document is inaccurately marked destroyed (you fixed the bug if you broke this!)" do
+            expect(division).to be_destroyed
+          end
+        end
+      end
+
+      context "when no additional validation is set" do
+
+        let(:params) do
           { divisions_attributes:
-            { "0" => { id: division.id.to_s, name: "Name" }}
+            { "0" => { id: division.id.to_s, name: "New Name" }}
           }
         end
 
         before do
-          league.update_attributes(new_params)
+          league.update_attributes(params)
         end
 
         it "sets the nested attributes" do
-          expect(league.reload.divisions.first.name).to eq("Name")
+          expect(league.reload.divisions.first.name).to eq("New Name")
+        end
+
+        context "with corrupted data" do
+
+          before do
+            league[:league] = params
+          end
+
+          let(:new_params) do
+            { divisions_attributes:
+              { "0" => { id: division.id.to_s, name: "Name" }}
+            }
+          end
+
+          before do
+            league.update_attributes(new_params)
+          end
+
+          it "sets the nested attributes" do
+            expect(league.reload.divisions.first.name).to eq("Name")
+          end
         end
       end
     end
