@@ -99,4 +99,29 @@ describe Mongoid::Indexable::Specification do
       expect(spec.options).to eq(background: true, drop_dups: true)
     end
   end
+
+  describe '#name' do
+
+    context 'when there is only one field' do
+
+      let(:spec) do
+        described_class.new(Band, { name: 1 })
+      end
+
+      it 'returns the key and direction separated by an underscore' do
+        expect(spec.name).to eq('name_1')
+      end
+    end
+
+    context 'when there are two fields' do
+
+      let(:spec) do
+        described_class.new(Band, { name: 1, title: -1 })
+      end
+
+      it 'returns the keys and directions separated by underscores' do
+        expect(spec.name).to eq('name_1_title_-1')
+      end
+    end
+  end
 end
