@@ -31,7 +31,6 @@ module Mongoid
       hash[key] = "[mongoid]:#{key}-stack"
     end
 
-    extend Gem::Deprecate
     extend self
 
     # Begin entry into a named thread local stack.
@@ -175,8 +174,6 @@ module Mongoid
     def client_override
       Thread.current[CLIENT_OVERRIDE_KEY]
     end
-    alias :session_override :client_override
-    deprecate :session_override, :client_override, 2015, 12
 
     # Set the global client override.
     #
@@ -191,8 +188,6 @@ module Mongoid
     def client_override=(name)
       Thread.current[CLIENT_OVERRIDE_KEY] = name
     end
-    alias :session_override= :client_override=
-    deprecate :session_override=, :client_override=, 2015, 12
 
     # Get the current Mongoid scope.
     #

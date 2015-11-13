@@ -8,7 +8,6 @@ require "mongoid/clients/options"
 module Mongoid
   module Clients
     extend ActiveSupport::Concern
-    extend Gem::Deprecate
     include StorageOptions
     include ThreadOptions
     include Options
@@ -93,15 +92,12 @@ module Mongoid
     def mongo_client
       super || self.class.mongo_client
     end
-    alias :mongo_session :mongo_client
-    deprecate :mongo_session, :mongo_client, 2015, 12
 
     def collection_name
       super || self.class.collection_name
     end
 
     module ClassMethods
-      extend Gem::Deprecate
 
       # Get the client for this model. This is determined in the following order:
       #
@@ -123,8 +119,6 @@ module Mongoid
         opts.merge!(database: database_name) unless client.database.name.to_sym == database_name.to_sym
         client.with(opts)
       end
-      alias :mongo_session :mongo_client
-      deprecate :mongo_session, :mongo_client, 2015, 12
 
       # Get the collection for this model from the client. Will check for an
       # overridden collection name from the store_in macro or the collection

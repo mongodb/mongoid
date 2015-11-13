@@ -8,7 +8,6 @@ module Mongoid
   # This module defines all the configuration options for Mongoid, including the
   # database connections.
   module Config
-    extend Gem::Deprecate
     extend self
     extend Options
 
@@ -158,8 +157,6 @@ module Mongoid
     def override_client(name)
       Threaded.client_override = name ? name.to_s : nil
     end
-    alias :override_session :override_client
-    deprecate :override_session, :override_client, 2015, 12
 
     # Purge all data in all collections, including indexes.
     #
@@ -219,8 +216,6 @@ module Mongoid
     def clients
       @clients ||= {}
     end
-    alias :sessions :clients
-    deprecate :sessions, :clients, 2015, 12
 
     # Get the time zone to use.
     #
@@ -254,7 +249,5 @@ module Mongoid
       Validators::Client.validate(c)
       @clients = c
     end
-    alias :sessions= :clients=
-    deprecate :sessions=, :clients=, 2015, 12
   end
 end

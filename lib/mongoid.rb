@@ -34,7 +34,6 @@ I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml
 
 module Mongoid
   extend Loggable
-  extend Gem::Deprecate
   extend self
 
   # The minimum MongoDB version supported.
@@ -65,8 +64,6 @@ module Mongoid
   def default_client
     Clients.default
   end
-  alias :default_session :default_client
-  deprecate :default_session, :default_client, 2015, 12
 
   # Disconnect all active clients.
   #
@@ -79,8 +76,6 @@ module Mongoid
   def disconnect_clients
     Clients.disconnect
   end
-  alias :disconnect_sessions :disconnect_clients
-  deprecate :disconnect_sessions, :disconnect_clients, 2015, 12
 
   # Convenience method for getting a named client.
   #
@@ -93,8 +88,6 @@ module Mongoid
   def client(name)
     Clients.with_name(name)
   end
-  alias :session :client
-  deprecate :session, :client, 2015, 12
 
   # Take all the public instance methods from the Config singleton and allow
   # them to be accessed through the Mongoid module directly.

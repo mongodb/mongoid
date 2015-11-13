@@ -12,7 +12,6 @@ module Mongoid
       end
 
       module ClassMethods
-        extend Gem::Deprecate
 
         # Give this model specific custom default storage options.
         #
@@ -103,8 +102,6 @@ module Mongoid
         def client_name
           __evaluate__(storage_options[:client])
         end
-        alias :session_name :client_name
-        deprecate :session_name, :client_name, 2015, 12
 
         # Get the database name for the model.
         #

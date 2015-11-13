@@ -3,7 +3,6 @@ module Mongoid
   module Clients
     module Options
       extend ActiveSupport::Concern
-      extend Gem::Deprecate
 
       # Tell the next persistence operation to store in a specific collection,
       # database or client.
@@ -54,8 +53,6 @@ module Mongoid
           client.with(persistence_options.reject{ |k, v| k == :collection || k == :client })
         end
       end
-      alias :mongo_session :mongo_client
-      deprecate :mongo_session, :mongo_client, 2015, 12
 
       def collection_name
         if persistence_options && v = persistence_options[:collection]
@@ -99,7 +96,6 @@ module Mongoid
       end
 
       module ClassMethods
-        extend Gem::Deprecate
         include Threaded
 
         def client_name
@@ -108,8 +104,6 @@ module Mongoid
           end
           super
         end
-        alias :session_name :client_name
-        deprecate :session_name, :client_name, 2015, 12
 
         def collection_name
           if persistence_options && v = persistence_options[:collection]
