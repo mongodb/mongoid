@@ -747,7 +747,7 @@ module Mongoid
         # @since 6.0.0
         def mongoize(object)
           return if object.nil?
-          evolve(object).update_values { |value| value.mongoize }
+          evolve(object.dup).update_values { |value| value.mongoize }
         end
 
         # Can the size of this object change?
