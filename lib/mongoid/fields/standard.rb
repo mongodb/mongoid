@@ -2,12 +2,23 @@
 module Mongoid
   module Fields
     class Standard
+      using Refinements::Extension
 
       # Defines the behaviour for defined fields in the document.
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :name, :options
 
-      delegate :demongoize, :evolve, :mongoize, to: :type
+      def demongoize(object)
+        type.demongoize(object)
+      end
+
+      def evolve(object)
+        type.evolve(object)
+      end
+
+      def mongoize(object)
+        type.mongoize(object)
+      end
 
       # Adds the atomic changes for this type of resizable field.
       #

@@ -2,6 +2,7 @@
 module Mongoid
   module Contextual
     module Atomic
+      using Refinements::Extension
 
       # Execute an atomic $addToSet on the matching documents.
       #
@@ -163,7 +164,7 @@ module Mongoid
       #
       # @since 3.0.0
       def unset(*args)
-        fields = args.__find_args__.collect { |f| [database_field_name(f), true] }
+        fields = args.as_find_arguments.collect { |f| [database_field_name(f), true] }
         view.update_many("$unset" => Hash[fields])
       end
 

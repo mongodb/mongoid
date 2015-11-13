@@ -124,7 +124,6 @@ RSpec.configure do |config|
     end
   end
 
-  # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
     Mongoid.purge!
   end

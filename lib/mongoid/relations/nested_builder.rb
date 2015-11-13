@@ -6,6 +6,8 @@ module Mongoid
     # creation, deletion, and updates of documents through that ever so lovely
     # #accepts_nested_attributes_for.
     class NestedBuilder
+      using Refinements::Extension
+
       attr_accessor :attributes, :existing, :metadata, :options
 
       # Determines if destroys are allowed for this document.

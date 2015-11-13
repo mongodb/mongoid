@@ -14,6 +14,7 @@ module Mongoid
     include Nested
     include Processing
     include Readonly
+    using Refinements::Extension
 
     attr_reader :attributes
     alias :raw_attributes :attributes
@@ -97,7 +98,7 @@ module Mongoid
         raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
       end
       if hash_dot_syntax?(normalized)
-        attributes.__nested__(normalized)
+        attributes.nested_value(normalized)
       else
         attributes[normalized]
       end

@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::AutoSave do
+  using Mongoid::Refinements::Extension
 
   describe ".auto_save" do
 

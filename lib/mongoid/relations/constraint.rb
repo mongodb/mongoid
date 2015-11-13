@@ -8,6 +8,9 @@ module Mongoid
     # @note Durran: The name of this class is this way to match the metadata
     #   getter, and foreign_key was already taken there.
     class Constraint
+      using Refinements::Extension
+
+      # @return [ Metadata ] metadata The relation metadata.
       attr_reader :metadata
 
       # Create the new constraint with the metadata.

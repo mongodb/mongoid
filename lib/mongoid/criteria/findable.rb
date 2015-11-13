@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Findable
+      using Refinements::Extension
 
       # Execute the criteria or raise an error if no documents found.
       #
@@ -35,7 +36,7 @@ module Mongoid
       #
       # @since 1.0.0
       def find(*args)
-        ids = args.__find_args__
+        ids = args.as_find_arguments
         raise_invalid if ids.any?(&:nil?)
         for_ids(ids).execute_or_raise(ids, args.multi_arged?)
       end

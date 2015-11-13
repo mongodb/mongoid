@@ -2,6 +2,7 @@
 module Mongoid
   module Fields
     class ForeignKey < Standard
+      using Refinements::Extension
 
       # Adds the atomic changes for this type of resizable field.
       #
@@ -66,7 +67,7 @@ module Mongoid
           if metadata.polymorphic? && constraint
             constraint.convert(object)
           else
-            object.__evolve_object_id__
+            object.evolve_object_id
           end
         else
           related_id_field.evolve(object)
@@ -97,7 +98,7 @@ module Mongoid
       # @since 3.0.0
       def mongoize(object)
         if type.resizable? || object_id_field?
-          type.__mongoize_fk__(constraint, object)
+          type.mongoize_fk(constraint, object)
         else
           related_id_field.mongoize(object)
         end

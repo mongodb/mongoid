@@ -10,6 +10,7 @@ module Mongoid
       include Relations::Eager
       include Queryable
       include Positional
+      using Refinements::Extension
 
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
@@ -425,7 +426,7 @@ module Mongoid
         documents.sort! do |a, b|
           values.map do |field, direction|
             a_value, b_value = a[field], b[field]
-            direction * compare(a_value.__sortable__, b_value.__sortable__)
+            direction * compare(a_value.sortable, b_value.sortable)
           end.find { |value| !value.zero? } || 0
         end
       end

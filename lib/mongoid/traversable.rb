@@ -6,6 +6,7 @@ module Mongoid
   # @since 4.0.0
   module Traversable
     extend ActiveSupport::Concern
+    using Refinements::Extension
 
     def _parent
       @__parent

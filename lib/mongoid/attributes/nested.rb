@@ -14,6 +14,7 @@ module Mongoid
       end
 
       module ClassMethods
+        using Refinements::Extension
 
         REJECT_ALL_BLANK_PROC = ->(attributes){
           attributes.all? { |key, value| key == '_destroy' || value.blank? }

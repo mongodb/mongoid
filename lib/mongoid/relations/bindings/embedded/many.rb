@@ -6,6 +6,7 @@ module Mongoid
 
         # Binding class for embeds_many relations.
         class Many < Binding
+          using Refinements::Extension
 
           # Binds a single document with the inverse relation. Used
           # specifically when appending to the proxy.

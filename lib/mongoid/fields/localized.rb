@@ -2,6 +2,7 @@
 module Mongoid
   module Fields
     class Localized < Standard
+      using Refinements::Extension
 
       # Demongoize the object based on the current locale. Will look in the
       # hash for the current locale.

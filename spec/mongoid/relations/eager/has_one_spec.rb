@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::Eager::HasOne do
+  using Mongoid::Refinements::Extension
 
   describe ".grouped_doc" do
 

@@ -8,6 +8,7 @@ module Mongoid
       # handles both cases or a combination of the two.
       class Enumerable
         include ::Enumerable
+        using Refinements::Extension
 
         # The three main instance variables are collections of documents.
         #
@@ -465,7 +466,7 @@ module Mongoid
         end
 
         def unloaded_documents
-          _unloaded.selector.values.any?(&:blank_criteria?) ? [] : _unloaded
+          _unloaded.selector.values.blank_criteria? ? [] : _unloaded
         end
       end
     end

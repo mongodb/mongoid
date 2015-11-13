@@ -6,6 +6,7 @@ module Mongoid
 
         # Binding class for all references_and_referenced_in_many relations.
         class ManyToMany < Binding
+          using Refinements::Extension
 
           # Binds a single document with the inverse relation. Used
           # specifically when appending to the proxy.

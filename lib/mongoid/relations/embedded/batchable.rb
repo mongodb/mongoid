@@ -7,6 +7,7 @@ module Mongoid
       # documents.
       module Batchable
         include Positional
+        using Refinements::Extension
 
         # Insert new documents as a batch push ($pushAll). This ensures that
         # all callbacks are run at the appropriate time and only 1 request is

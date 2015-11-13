@@ -6,6 +6,7 @@ module Mongoid
     # both sides of a many to many relations.
     module Synchronization
       extend ActiveSupport::Concern
+      using Refinements::Extension
 
       # Is the document able to be synced on the inverse side? This is only if
       # the key has changed and the relation bindings have not been run.

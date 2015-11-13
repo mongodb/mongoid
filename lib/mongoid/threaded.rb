@@ -6,6 +6,7 @@ module Mongoid
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
+    using Refinements::Extension
 
     DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
 

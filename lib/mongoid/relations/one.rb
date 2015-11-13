@@ -47,12 +47,12 @@ module Mongoid
       # Evolve the proxy document into an object id.
       #
       # @example Evolve the proxy document.
-      #   proxy.__evolve_object_id__
+      #   proxy.evolve_object_id
       #
       # @return [ Object ] The proxy document's id.
       #
       # @since 4.0.0
-      def __evolve_object_id__
+      def evolve_object_id
         target._id
       end
     end

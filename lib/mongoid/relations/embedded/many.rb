@@ -9,6 +9,7 @@ module Mongoid
       # documents within in it as an array.
       class Many < Relations::Many
         include Batchable
+        using Refinements::Extension
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.

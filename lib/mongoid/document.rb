@@ -23,6 +23,7 @@ module Mongoid
   module Document
     extend ActiveSupport::Concern
     include Composable
+    using Refinements::Extension
 
     attr_accessor :__selected_fields
     attr_reader :new_record

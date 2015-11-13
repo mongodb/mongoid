@@ -5,6 +5,7 @@ module Mongoid
     # Contains utility methods for object id conversion.
     module Conversions
       extend self
+      using Refinements::Extension
 
       # Mark the provided object as unconvertable to bson or not, and always
       # return the provided object.

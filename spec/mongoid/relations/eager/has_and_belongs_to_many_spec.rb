@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::Eager::HasAndBelongsToMany do
+  using Mongoid::Refinements::Extension
 
   describe ".keys_from_docs" do
 

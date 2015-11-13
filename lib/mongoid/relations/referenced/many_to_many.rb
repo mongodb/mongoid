@@ -6,6 +6,7 @@ module Mongoid
       # This class defines the behaviour for all relations that are a
       # many-to-many between documents in different collections.
       class ManyToMany < Many
+        using Refinements::Extension
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.

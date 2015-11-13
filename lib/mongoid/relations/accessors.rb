@@ -7,6 +7,7 @@ module Mongoid
     # create new ones.
     module Accessors
       extend ActiveSupport::Concern
+      using Refinements::Extension
 
       # Builds the related document and creates the relation unless the
       # document is nil, then sets the relation on this document.
@@ -143,6 +144,7 @@ module Mongoid
       end
 
       module ClassMethods
+        using Refinements::Extension
 
         # Adds the existence check for relations.
         #

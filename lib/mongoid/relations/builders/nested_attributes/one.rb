@@ -4,6 +4,7 @@ module Mongoid
     module Builders
       module NestedAttributes
         class One < NestedBuilder
+          using Refinements::Extension
 
           attr_accessor :destroy
 

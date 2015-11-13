@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::Conversions do
+  using Mongoid::Refinements::Extension
 
   describe ".flag" do
 
@@ -79,7 +80,7 @@ describe Mongoid::Relations::Conversions do
         end
 
         it "marks the string as unconvertable" do
-          expect(flagged).to be_unconvertable_to_bson
+          expect(flagged.unconvertable_to_bson?).to be true
         end
       end
     end
@@ -120,7 +121,7 @@ describe Mongoid::Relations::Conversions do
         end
 
         it "marks the integer as unconvertable" do
-          expect(flagged).to be_unconvertable_to_bson
+          expect(flagged.unconvertable_to_bson?).to be true
         end
       end
     end

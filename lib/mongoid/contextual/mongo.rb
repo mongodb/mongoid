@@ -14,6 +14,7 @@ module Mongoid
       include Atomic
       include Relations::Eager
       include Queryable
+      using Refinements::Extension
 
       # Options constant.
       #
@@ -510,7 +511,7 @@ module Mongoid
       def update_documents(attributes, method = :update_one)
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        view.send(method, attributes.__consolidate__(klass))
+        view.send(method, attributes.consolidate(klass))
       end
 
       # Apply the field limitations.

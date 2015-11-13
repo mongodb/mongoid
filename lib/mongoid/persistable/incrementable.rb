@@ -7,6 +7,7 @@ module Mongoid
     # @since 4.0.0
     module Incrementable
       extend ActiveSupport::Concern
+      using Refinements::Extension
 
       # Increment the provided fields by the corresponding values. Values can
       # be positive or negative, and if no value exists for the field it will
@@ -23,7 +24,7 @@ module Mongoid
       def inc(increments)
         prepare_atomic_operation do |ops|
           process_atomic_operations(increments) do |field, value|
-            increment = value.__to_inc__
+            increment = value.to_inc
             current = attributes[field]
             attributes[field] = (current || 0) + increment
             ops[atomic_attribute_name(field)] = increment

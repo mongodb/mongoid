@@ -5,6 +5,7 @@ module Mongoid
     # Superclass for all objects that bind relations together.
     class Binding
       include Threaded::Lifecycle
+      using Refinements::Extension
 
       attr_reader :base, :target, :metadata
 

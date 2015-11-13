@@ -7,6 +7,7 @@ module Mongoid
     # @since 4.0.0
     module Dynamic
       extend ActiveSupport::Concern
+      using Refinements::Extension
 
       # Override respond_to? so it responds properly for dynamic attributes.
       #

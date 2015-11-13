@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Scopable
+      using Refinements::Extension
 
       # Applies the default scope to the criteria.
       #

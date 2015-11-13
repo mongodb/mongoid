@@ -7,12 +7,12 @@ module Mongoid
     # Evolve the document into an object id.
     #
     # @example Evolve the document.
-    #   document.__evolve_object_id__
+    #   document.evolve_object_id
     #
     # @return [ Object ] The document's id.
     #
     # @since 3.0.0
-    def __evolve_object_id__
+    def evolve_object_id
       id
     end
   end

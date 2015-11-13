@@ -5,6 +5,7 @@ module Mongoid
     # The "Grand Poobah" of information about any relation is this class. It
     # contains everything you could ever possible want to know.
     class Metadata < Hash
+      using Refinements::Extension
 
       delegate :foreign_key_default, :stores_foreign_key?, to: :relation
 
@@ -534,7 +535,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def inverse_setter(other = nil)
-        inverse(other).__setter__
+        inverse(other).setter
       end
 
       # Returns the name of the field in which to store the name of the class
@@ -560,7 +561,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def inverse_type_setter
-        @inverse_type_setter ||= inverse_type.__setter__
+        @inverse_type_setter ||= inverse_type.setter
       end
 
       # This returns the key that is to be used to grab the attributes for the
@@ -755,7 +756,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def type_setter
-        @type_setter ||= type.__setter__
+        @type_setter ||= type.setter
       end
 
 

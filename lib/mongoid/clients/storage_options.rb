@@ -12,6 +12,7 @@ module Mongoid
       end
 
       module ClassMethods
+        using Refinements::Extension
 
         # Give this model specific custom default storage options.
         #

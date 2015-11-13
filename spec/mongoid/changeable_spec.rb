@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Changeable do
+  using Mongoid::Refinements::Extension
 
   describe "#attribute_change" do
 
