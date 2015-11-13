@@ -51,7 +51,8 @@ module Mongoid
       # @since 3.0.0
       def pull(modifications)
         modifications.each_pair do |field, value|
-          pulls[field] = value
+          mods = pull_conflict?(field) ? conflicting_pulls : pulls
+          mods[field] = value
           pull_fields[field.split(".", 2)[0]] = field
         end
       end
@@ -169,6 +170,21 @@ module Mongoid
           (push_fields.keys.count { |item| item =~ /#{name}/ } > 1)
       end
 
+      # Is the operation going to be a conflict for a $pull?
+      #
+      # @example Is this a conflict for a pull?
+      #   modifiers.pull_conflict?(field)
+      #
+      # @param [ String ] field The field.
+      #
+      # @return [ true, false ] If this field is a conflict.
+      #
+      # @since 2.2.0
+      def pull_conflict?(field)
+        name = field.split(".", 2)[0]
+        pull_fields.has_key?(name) || push_fields.has_key?(name) || set_fields.has_key?(name)
+      end
+
       # Get the conflicting pull modifications.
       #
       # @example Get the conflicting pulls.
@@ -178,7 +194,7 @@ module Mongoid
       #
       # @since 2.2.0
       def conflicting_pulls
-        conflicts["$pullAll"] ||= {}
+        conflicts["$pull"] ||= {}
       end
 
       # Get the conflicting push modifications.
