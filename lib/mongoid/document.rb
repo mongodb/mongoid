@@ -1,7 +1,6 @@
 # encoding: utf-8
 require "mongoid/positional"
 require "mongoid/evolvable"
-require "mongoid/extensions"
 require "mongoid/errors"
 require "mongoid/threaded"
 require "mongoid/relations"
