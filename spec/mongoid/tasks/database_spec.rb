@@ -132,6 +132,25 @@ describe "Mongoid::Tasks::Database" do
     it "returns the removed indexes" do
       expect(removed_indexes).to be_empty
     end
+
+    context 'when the index is a text index', if: non_legacy_server? do
+
+      before do
+        class Band
+          index origin: Mongo::Index::TEXT
+        end
+        Mongoid::Tasks::Database.create_indexes([Band])
+        Mongoid::Tasks::Database.remove_undefined_indexes([Band])
+      end
+
+      let(:indexes) do
+        Band.collection.indexes
+      end
+
+      it 'does not delete the text index' do
+        expect(indexes.find { |i| i['name'] == 'origin_text' }).not_to be_nil
+      end
+    end
   end
 
   describe ".remove_indexes" do

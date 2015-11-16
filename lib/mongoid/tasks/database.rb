@@ -47,7 +47,7 @@ module Mongoid
                 # ignore default index
                 unless index['name'] == '_id_'
                   key = index['key'].symbolize_keys
-                  spec = model.index_specification(key)
+                  spec = model.index_specification(key, index['name'])
                   unless spec
                     # index not specified
                     undefined_by_model[model] ||= []

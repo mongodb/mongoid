@@ -113,9 +113,11 @@ module Mongoid
       # @return [ Specification ] The found specification.
       #
       # @since 4.0.0
-      def index_specification(index_hash)
+      def index_specification(index_hash, index_name = nil)
         index = OpenStruct.new(fields: index_hash.keys, key: index_hash)
-        index_specifications.detect { |spec| spec == index }
+        index_specifications.detect do |spec|
+          spec == index || (index_name && index_name == spec.name)
+        end
       end
 
       private

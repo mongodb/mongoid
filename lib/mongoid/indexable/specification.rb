@@ -56,6 +56,20 @@ module Mongoid
         @options = normalize_options(options.dup)
       end
 
+      # Get the index name, generated using the index key.
+      #
+      # @example Get the index name.
+      #   specification.name
+      #
+      # @return [ String ] name The index name.
+      #
+      # @since 5.0.2
+      def name
+        @name ||= key.reduce([]) do |n, (k,v)|
+          n << "#{k}_#{v}"
+        end.join('_')
+      end
+
       private
 
       # Normalize the spec, in case aliased fields are provided.
