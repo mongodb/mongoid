@@ -76,13 +76,27 @@ module Mongoid
           Thread.current["[mongoid][#{klass}]:persistence-options"]
         end
 
+        # Get the client with special options for the current thread.
+        #
+        # @example Get the client with options.
+        #   Threaded.client_with_options(Band)
+        #
+        # @param [ Class ] klass The model class.
+        #
+        # @return [ Mongo::Client ] The client.
+        #
+        # @since 5.1.0
+        def client_with_options(klass = self)
+          Thread.current["[mongoid][#{klass}]:mongo-client"]
+        end
+
         private
         # Set the persistence options on the current thread.
         #
         # @api private
         #
         # @example Set the persistence options.
-        #   Threaded.set_persistence_options(Band, { safe: { fsync: true }})
+        #   Threaded.set_persistence_options(Band, { write: { w: 3 }})
         #
         # @param [ Class ] klass The model class.
         # @param [ Hash ] options The persistence options.
@@ -92,6 +106,97 @@ module Mongoid
         # @since 4.0.0
         def set_persistence_options(klass, options)
           Thread.current["[mongoid][#{klass}]:persistence-options"] = options
+        end
+
+        # Unset the persistence options on the current thread.
+        #
+        # @api private
+        #
+        # @example Unset the persistence options.
+        #   Threaded.unset_persistence_options(Band)
+        #
+        # @param [ Class ] klass The model class.
+        #
+        # @return [ nil ] nil.
+        #
+        # @since 5.1.0
+        def unset_persistence_options(klass)
+          Thread.current["[mongoid][#{klass}]:persistence-options"] = nil
+        end
+
+        # Set the persistence options and client with those options on the current thread.
+        # Note that a client will only be set if its cluster differs from the cluster of the
+        # original client.
+        #
+        # @api private
+        #
+        # @example Set the persistence options and client with those options on the current thread.
+        #   Threaded.set_options(Band, { write: { w: 3 }})
+        #
+        # @param [ Class ] klass The model class.
+        # @param [ Mongo::Client ] client The client with options.
+        #
+        # @return [ Mongo::Client, nil ] The client or nil if the cluster does not change.
+        #
+        # @since 5.1.0
+        def set_options(klass, options)
+          original_cluster = mongo_client.cluster
+          set_persistence_options(klass, options)
+          m = mongo_client
+          set_client_with_options(klass, m) unless m.cluster == original_cluster
+        end
+
+        # Set the client with special options on the current thread.
+        #
+        # @api private
+        #
+        # @example Set the client with options.
+        #   Threaded.set_client_with_options(Band, client)
+        #
+        # @param [ Class ] klass The model class.
+        # @param [ Mongo::Client ] client The client with options.
+        #
+        # @return [ Mongo::Client ] The client.
+        #
+        # @since 5.1.0
+        def set_client_with_options(klass, client)
+          Thread.current["[mongoid][#{klass}]:mongo-client"] = client
+        end
+
+        # Unset the client with special options on the current thread.
+        #
+        # @api private
+        #
+        # @example Unset the client with options.
+        #   Threaded.unset_client_with_options(Band)
+        #
+        # @param [ Class ] klass The model class.
+        #
+        # @return [ nil ] nil.
+        #
+        # @since 5.1.0
+        def unset_client_with_options(klass)
+          if Thread.current["[mongoid][#{klass}]:mongo-client"]
+            Thread.current["[mongoid][#{klass}]:mongo-client"].close
+          end
+          Thread.current["[mongoid][#{klass}]:mongo-client"] = nil
+        end
+
+        # Unset the persistence options and client with special options on the current thread.
+        #
+        # @api private
+        #
+        # @example Unset the persistence options and client with options.
+        #   Threaded.unset_options(Band)
+        #
+        # @param [ Class ] klass The model class.
+        #
+        # @return [ nil ] nil.
+        #
+        # @since 5.1.0
+        def unset_options(klass)
+          unset_persistence_options(klass)
+          unset_client_with_options(klass)
         end
       end
 
@@ -144,7 +249,13 @@ module Mongoid
         #
         # @since 3.0.0
         def with(options)
-          Proxy.new(self, (persistence_options || {}).merge(options))
+          if block_given?
+            set_options(self, options)
+            yield self
+            unset_options(self)
+          else
+            Proxy.new(self, (persistence_options || {}).merge(options))
+          end
         end
       end
 
@@ -174,7 +285,7 @@ module Mongoid
           end
           ret
         ensure
-          set_persistence_options(@target, nil)
+          unset_persistence_options(@target)
         end
 
         def send(symbol, *args)
