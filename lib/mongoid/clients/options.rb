@@ -176,10 +176,10 @@ module Mongoid
         #
         # @since 5.1.0
         def unset_client_with_options(klass)
-          if Thread.current["[mongoid][#{klass}]:mongo-client"]
-            Thread.current["[mongoid][#{klass}]:mongo-client"].close
+          if client = Thread.current["[mongoid][#{klass}]:mongo-client"]
+            client.close
+            Thread.current["[mongoid][#{klass}]:mongo-client"] = nil
           end
-          Thread.current["[mongoid][#{klass}]:mongo-client"] = nil
         end
 
         # Unset the persistence options and client with special options on the current thread.
