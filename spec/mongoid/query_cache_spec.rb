@@ -75,6 +75,55 @@ describe Mongoid::QueryCache do
         end
       end
 
+      context "when the first query has no limit" do
+
+        let(:game) do
+          Game.create!(name: "2048")
+        end
+
+        before do
+          game.ratings.where(:value.gt => 5).asc(:id).all.to_a
+        end
+
+        context "when the next query has a limit" do
+
+          it "uses the cache" do
+            expect_no_queries do
+              game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+            end
+          end
+        end
+      end
+
+      context "when the first query has a limit" do
+
+        let(:game) do
+          Game.create!(name: "2048")
+        end
+
+        before do
+          game.ratings.where(:value.gt => 5).limit(3).asc(:id).all.to_a
+        end
+
+        context "when the next query has a limit" do
+
+          it "queries again" do
+            expect_query(1) do
+              game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+            end
+          end
+        end
+
+        context "when the new query does not have a limit" do
+
+          it "queries again" do
+            expect_query(1) do
+              game.ratings.where(:value.gt => 5).asc(:id).to_a
+            end
+          end
+        end
+      end
+
       context "when querying only the first" do
 
         let(:game) do
@@ -94,8 +143,8 @@ describe Mongoid::QueryCache do
 
       context "when limiting the result" do
 
-        it "queries again" do
-          expect_query(1) do
+        it "does not query again" do
+          expect_query(0) do
             Band.limit(2).all.to_a
           end
         end
