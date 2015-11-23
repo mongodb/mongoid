@@ -237,7 +237,7 @@ module Mongoid
       def first
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
-          with_eager_loading(view.first)
+          with_eager_loading(view.limit(-1).first)
         end
       end
       alias :one :first
@@ -335,7 +335,7 @@ module Mongoid
       def last
         try_cache(:last) do
           with_inverse_sorting do
-            with_eager_loading(view.first)
+            with_eager_loading(view.limit(-1).first)
           end
         end
       end
