@@ -144,7 +144,7 @@ module Mongoid
     #
     # @return [ Document ] The first matching document.
     def first
-      with_default_scope.first
+      with_default_scope.limit(-1).first
     end
     alias :one :first
 
