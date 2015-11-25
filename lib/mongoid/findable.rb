@@ -15,6 +15,7 @@ module Mongoid
     delegate \
       :aggregates,
       :avg,
+      :create_with,
       :distinct,
       :each,
       :each_with_index,
@@ -144,7 +145,7 @@ module Mongoid
     #
     # @return [ Document ] The first matching document.
     def first
-      with_default_scope.limit(-1).first
+      with_default_scope.first
     end
     alias :one :first
 

@@ -1227,4 +1227,110 @@ describe Mongoid::Criteria::Modifiable do
       end
     end
   end
+
+  describe '#create_with' do
+
+    context 'when called on the class' do
+
+      let(:attrs) do
+        { 'username' => 'Turnip' }
+      end
+
+      it 'returns a criteria with the defined attributes' do
+        expect(Person.create_with(attrs).selector).to eq(attrs)
+      end
+
+      context 'when a method is chained' do
+
+        context 'when a write method is chained' do
+
+          it 'executes the method' do
+            expect(Person.create_with(attrs).new.username).to eq(attrs['username'])
+          end
+        end
+
+        context 'when a query method is chained' do
+
+          let(:new_person) do
+            Person.create_with(attrs).find_or_create_by('age' => 50)
+          end
+
+          it 'executes the query' do
+            expect(new_person.username).to eq(attrs['username'])
+            expect(new_person.age).to eq(50)
+          end
+        end
+      end
+    end
+
+    context 'when called on a criteria' do
+
+      let(:criteria) do
+        Person.where(query)
+      end
+
+      context 'when the original criteria shares attributes with the attribute args' do
+
+        context 'when all the original attributes are shared with the new attributes' do
+
+          let(:query) do
+            { 'username' => 'Artichoke', 'age' => 25 }
+          end
+
+          let(:attrs) do
+            { 'username' => 'Beet', 'age' => 50 }
+          end
+
+          it 'overwrites all the original attributes' do
+            expect(criteria.create_with(attrs).selector).to eq(attrs)
+          end
+        end
+      end
+
+      context 'when only some of the original attributes are shared with the attribute args' do
+
+        let(:query) do
+          { 'username' => 'Artichoke', 'age' => 25 }
+        end
+
+        let(:attrs) do
+          { 'username' => 'Beet' }
+        end
+
+        it 'only overwrites the shared attributes' do
+          expect(criteria.create_with(attrs).selector).to eq(query.merge!(attrs))
+        end
+      end
+
+      context 'when a method is chained' do
+
+        let(:query) do
+          { 'username' => 'Artichoke', 'age' => 25 }
+        end
+
+        let(:attrs) do
+          { 'username' => 'Beet' }
+        end
+
+        context 'when a write method is chained' do
+
+          it 'executes the method' do
+            expect(criteria.create_with(attrs).new.username).to eq(attrs['username'])
+          end
+        end
+
+        context 'when a query method is chained' do
+
+          let(:new_person) do
+            criteria.create_with(attrs).find_or_create_by(query)
+          end
+
+          it 'executes the query' do
+            expect(new_person.username).to eq(attrs['username'])
+            expect(new_person.age).to eq(25)
+          end
+        end
+      end
+    end
+  end
 end
