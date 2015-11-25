@@ -206,12 +206,10 @@ module Mongoid
         if system_collection? || !QueryCache.enabled?
           super
         else
-          key = cache_key
-          cursor = QueryCache.cache_table[key]
-          unless cursor
+          unless cursor = cached_cursor
             server = read.select_server(cluster)
             cursor = CachedCursor.new(view, send_initial_query(server), server)
-            QueryCache.cache_table[key] = cursor
+            QueryCache.cache_table[cache_key] = cursor
           end
           cursor.each do |doc|
             yield doc
@@ -221,6 +219,18 @@ module Mongoid
       end
 
       private
+
+      def cached_cursor
+        if limit
+          key = [ collection.namespace, selector, nil, skip, projection ]
+          cursor = QueryCache.cache_table[key]
+          if cursor
+            limited_docs = cursor.to_a[0...limit.abs]
+            cursor.instance_variable_set(:@cached_documents, limited_docs)
+          end
+        end
+        cursor || QueryCache.cache_table[cache_key]
+      end
 
       def cache_key
         [ collection.namespace, selector, limit, skip, projection ]
