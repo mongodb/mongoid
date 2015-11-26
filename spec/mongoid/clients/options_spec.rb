@@ -28,7 +28,7 @@ describe Mongoid::Clients::Options do
         expect(Band.new.persistence_options).to be_nil
       end
 
-      context 'when passed a block' do
+      context 'when passed a block', if: testing_locally? do
 
         let!(:connections_before) do
           Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
