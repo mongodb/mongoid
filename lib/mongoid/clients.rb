@@ -111,6 +111,7 @@ module Mongoid
       #
       # @since 3.0.0
       def mongo_client
+        return client_with_options if client_with_options
         client = Clients.with_name(client_name)
         opts = self.persistence_options ? self.persistence_options.dup : {}
         if defined?(Mongo::Client::VALID_OPTIONS)

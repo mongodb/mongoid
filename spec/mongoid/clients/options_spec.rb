@@ -28,6 +28,41 @@ describe Mongoid::Clients::Options do
         expect(Band.new.persistence_options).to be_nil
       end
 
+      context 'when passed a block', if: testing_locally? do
+
+        let!(:connections_before) do
+          Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+        end
+
+        before do
+          Band.with(options) do |klass|
+            klass.where(name: 'emily').to_a
+          end
+        end
+
+        let(:connections_after) do
+          Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+        end
+
+        context 'when a new cluster is created by the driver' do
+
+          let(:options) { { connect_timeout: 2 } }
+
+          it 'disconnects the new cluster' do
+            expect(connections_after).to eq(connections_before)
+          end
+        end
+
+        context 'when the same cluster is used by the new client' do
+
+          let(:options) { { database: 'same-cluster' } }
+
+          it 'does not disconnect the original cluster' do
+            expect(connections_after).to eq(connections_before)
+          end
+        end
+      end
+
       context "when calling .collection method" do
 
         before do

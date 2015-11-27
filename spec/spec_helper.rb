@@ -71,6 +71,10 @@ def non_legacy_server?
   Mongoid::Clients.default.cluster.servers.first.features.write_command_enabled?
 end
 
+def testing_locally?
+  !(ENV['CI'] == 'travis')
+end
+
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
