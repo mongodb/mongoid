@@ -1545,6 +1545,38 @@ describe Mongoid::Relations::Embedded::Many do
           person.addresses.create!(street: "1")
         }.to raise_error(Mongoid::Errors::Validations)
       end
+
+      context 'when the presence of the embedded relation is validated' do
+
+        before do
+          class Book
+            validates :pages, presence: true
+          end
+        end
+
+        let(:book) do
+          Book.new.tap do |b|
+            b.pages = [Page.new]
+            b.save!
+          end
+        end
+
+        let(:num_pages) do
+          book.pages.size
+        end
+
+        let(:reloaded) do
+          book.reload
+        end
+
+        before do
+          begin; book.update_attributes!({"pages"=>nil}); rescue; end
+        end
+
+        it 'does not delete the embedded relation' do
+          expect(reloaded.pages.size).to eq(num_pages)
+        end
+      end
     end
   end
 
