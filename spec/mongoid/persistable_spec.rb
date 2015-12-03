@@ -203,4 +203,19 @@ describe Mongoid::Persistable do
       }.to raise_error(Mongoid::Errors::Callback)
     end
   end
+
+  example "able use set value using dot notation" do
+    class Customer
+      include Mongoid::Document
+
+      field :address, type: Hash, default: -> {{}}
+    end
+
+    customer = Customer.new 
+    customer.save
+    customer.set 'address.country' => 'India'
+    expect(customer.address).to eql({ 'country' => 'India' })
+    customer.set 'address.country.state' => 'MH'
+    expect(customer.address).to eql({'country' => { 'state' => 'MH' }})
+  end
 end
