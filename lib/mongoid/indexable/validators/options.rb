@@ -26,7 +26,8 @@ module Mongoid
           :key,
           :sphere_version,
           :text_version,
-          :version
+          :version,
+          :partial_filter_expression
         ]
 
         VALID_TYPES = [
