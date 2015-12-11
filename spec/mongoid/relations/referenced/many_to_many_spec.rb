@@ -3535,4 +3535,39 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
     end
   end
+
+  example "HABTM should update refereces from two sides" do
+    class Band
+      include Mongoid::Document
+
+      field :n, type: String, as: :name
+
+      has_and_belongs_to_many :tags,
+        foreign_key: :t_ids,
+        inverse_of: 'b',
+        inverse_class_name: 'Tag'
+    end
+
+    class Tag
+      include Mongoid::Document
+
+      field :n, type: String, as: :name
+
+      has_and_belongs_to_many :bands,
+        foreign_key: :b_ids,
+        inverse_of: 't',
+        inverse_class_name: 'Band'
+    end
+
+    b1 = Band.create name: 'Foo'
+    b2 = Band.create name: 'Bar'
+    t1 = Tag.create name: 'Rock'
+    t2 = Tag.create name: 'Soul'
+    b1.tags << t1
+    expect(b1.t_ids).to match_array([t1.id])
+    expect(t1.b_ids).to match_array([b1.id])
+    t2.bands << b2
+    expect(t2.b_ids).to match_array([b2.id])
+    expect(b2.t_ids).to match_array([t2.id])
+  end
 end
