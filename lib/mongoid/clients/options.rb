@@ -143,7 +143,7 @@ module Mongoid
           original_cluster = mongo_client.cluster
           set_persistence_options(klass, options)
           m = mongo_client
-          set_client_with_options(klass, m) unless m.cluster == original_cluster
+          set_client_with_options(klass, m) unless m.cluster.equal?(original_cluster)
         end
 
         # Set the client with special options on the current thread.
