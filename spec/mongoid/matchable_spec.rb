@@ -149,7 +149,8 @@ describe Mongoid::Matchable do
         Address.new(
           services: ["first", "second", "third"],
           number: 100,
-          map: { key: "value" }
+          map: { key: "value" },
+          street: "Clarkenwell Road"
         )
       end
 
@@ -299,6 +300,131 @@ describe Mongoid::Matchable do
 
           it "returns false" do
             expect(document.matches?(selector)).to be false
+          end
+        end
+      end
+
+      context "with a $not selector" do
+
+        context "regexes" do
+
+          context "when the predicate matches" do
+
+            let(:selector) do
+              {
+                street: {"$not" => /Avenue/}
+              }
+            end
+
+            it "returns true" do
+              expect(document.matches?(selector)).to be true
+            end
+          end
+
+          context "when the predicate does not match" do
+
+            let(:selector) do
+              {
+                street: {"$not" => /Road/}
+              }
+            end
+
+            it "returns false" do
+              expect(document.matches?(selector)).to be false
+            end
+          end
+        end
+
+        context "other operators" do
+
+          context "numerical comparisons" do
+
+            context "$lt and $gt" do
+
+              context "when the predicate matches" do
+
+                let(:selector) do
+                  {
+                    number: {"$not" => {"$lt" => 0}}
+                  }
+                end
+
+                it "returns true" do
+                  expect(document.matches?(selector)).to be true
+                end
+              end
+
+              context "when the predicate does not match" do
+
+                let(:selector) do
+                  {
+                    number: {"$not" => {"$gt" => 50}}
+                  }
+                end
+
+                it "returns false" do
+                  expect(document.matches?(selector)).to be false
+                end
+              end
+            end
+
+            context "$in" do
+
+              context "when the predicate matches" do
+
+                let(:selector) do
+                  {
+                    number: {"$not" => {"$in" => [10]}}
+                  }
+                end
+
+                it "returns true" do
+                  expect(document.matches?(selector)).to be true
+                end
+              end
+
+              context "when the predicate does not match" do
+
+                let(:selector) do
+                  {
+                    number: {"$not" => {"$in" => [100]}}
+                  }
+                end
+
+                it "returns false" do
+                  expect(document.matches?(selector)).to be false
+                end
+              end
+            end
+          end
+        end
+
+        context "symbol keys" do
+
+          context "when the predicate matches" do
+
+            let(:selector) do
+              {
+                street: {:$not => /Avenue/}
+              }
+            end
+
+            it "returns true" do
+              expect(document.matches?(selector)).to be true
+            end
+          end
+
+          context "when the predicate does not match" do
+
+            let(:selector) do
+              {
+                street: {:$not => /Road/}
+              }
+            end
+
+            it "returns false" do
+              expect(document.matches?(selector)).to be false
+            end
           end
         end
       end

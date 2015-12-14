@@ -55,7 +55,12 @@ module Mongoid
       selector.each_pair do |key, value|
         if value.is_a?(Hash)
           value.each do |item|
-            return false unless matcher(self, key, Hash[*item]).matches?(Hash[*item])
+            if item[0].to_s == "$not".freeze
+              item = item[1]
+              return false if matcher(self, key, item).matches?(item)
+            else
+              return false unless matcher(self, key, Hash[*item]).matches?(Hash[*item])
+            end
           end
         else
           return false unless matcher(self, key, value).matches?(value)
