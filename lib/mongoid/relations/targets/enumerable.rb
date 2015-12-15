@@ -340,7 +340,7 @@ module Mongoid
         #
         # @since 3.0.15
         def marshal_dump
-          [ _added, _loaded, _unloaded ]
+          [ _added, _loaded, _unloaded, @executed]
         end
 
         # Loads the data needed to Marshal.load an enumerable proxy.
@@ -352,7 +352,7 @@ module Mongoid
         #
         # @since 3.0.15
         def marshal_load(data)
-          @_added, @_loaded, @_unloaded = data
+          @_added, @_loaded, @_unloaded, @executed = data
         end
 
         # Reset the enumerable back to its persisted state.
