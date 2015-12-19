@@ -655,4 +655,19 @@ describe Mongoid::Matchable do
       end
     end
   end
+
+  example "should not throw error for lt, lte, gt and gte on strings" do
+    class Foo
+      include Mongoid::Document
+
+      field :foo
+    end
+
+    Foo.create foo: 3
+
+    expect(Foo.where(foo: 3).first.matches?({ foo: { '$lt' => '3.1' }})).to be(false)
+    expect(Foo.where(foo: 3).first.matches?({ foo: { '$lte' => '3.1' }})).to be(false)
+    expect(Foo.where(foo: 3).first.matches?({ foo: { '$gt' => '3.1' }})).to be(false)
+    expect(Foo.where(foo: 3).first.matches?({ foo: { '$gte' => '3.1' }})).to be(false)
+  end
 end
