@@ -3537,37 +3537,38 @@ describe Mongoid::Relations::Referenced::ManyToMany do
   end
 
   example "HABTM should update refereces from two sides" do
-    class Band
+    class Project
       include Mongoid::Document
 
       field :n, type: String, as: :name
 
-      has_and_belongs_to_many :tags,
-        foreign_key: :t_ids,
-        inverse_of: 'b',
-        inverse_class_name: 'Tag'
+      has_and_belongs_to_many :distributors,
+        foreign_key: :d_ids,
+        inverse_of: 'p',
+        inverse_class_name: 'Distributor'
     end
 
-    class Tag
+    class Distributor
       include Mongoid::Document
 
       field :n, type: String, as: :name
 
-      has_and_belongs_to_many :bands,
-        foreign_key: :b_ids,
-        inverse_of: 't',
-        inverse_class_name: 'Band'
+      has_and_belongs_to_many :projects,
+        foreign_key: :p_ids,
+        inverse_of: 'd',
+        inverse_class_name: 'Project'
     end
 
-    b1 = Band.create name: 'Foo'
-    b2 = Band.create name: 'Bar'
-    t1 = Tag.create name: 'Rock'
-    t2 = Tag.create name: 'Soul'
-    b1.tags << t1
-    expect(b1.t_ids).to match_array([t1.id])
-    expect(t1.b_ids).to match_array([b1.id])
-    t2.bands << b2
-    expect(t2.b_ids).to match_array([b2.id])
-    expect(b2.t_ids).to match_array([t2.id])
+    p1 = Project.create name: 'Foo'
+    p2 = Project.create name: 'Bar'
+    d1 = Distributor.create name: 'Rock'
+    d2 = Distributor.create name: 'Soul'
+
+    p1.distributors << d1
+    expect(p1.d_ids).to match_array([d1.id])
+    expect(d1.p_ids).to match_array([p1.id])
+    d2.projects << p2
+    expect(d2.p_ids).to match_array([p2.id])
+    expect(p2.d_ids).to match_array([d2.id])
   end
 end
