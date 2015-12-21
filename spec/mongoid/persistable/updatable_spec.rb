@@ -112,6 +112,18 @@ describe Mongoid::Persistable::Updatable do
       end
     end
 
+    context "when dynamic attributes are not enabled" do
+      let(:account) do
+        Account.create
+      end
+
+      it "raises exception for an unknown attribute " do
+        expect {
+          account.update_attribute(:somethingnew, "somethingnew")
+        }.to raise_error(Mongoid::Errors::UnknownAttribute)
+      end
+    end
+
     context "when provided a symbol attribute name" do
 
       let(:post) do
