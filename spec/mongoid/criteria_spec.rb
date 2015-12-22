@@ -1147,12 +1147,48 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when providing a hash" do
+    context "when providing a list of associations" do
 
-      it "raises an error" do
-        expect {
-          Person.includes(preferences: :members)
-        }.to raise_error(Mongoid::Errors::InvalidIncludes)
+      let!(:user) do
+        User.create
+      end
+
+      let(:results) do
+        User.includes(:posts, :descriptions).to_a
+      end
+
+      it "executes the query" do
+        expect(results.first).to eq(user)
+      end
+    end
+
+    context "when providing a nested association" do
+
+      let!(:user) do
+        User.create
+      end
+
+      let(:results) do
+        User.includes(:posts => [:alerts]).to_a
+      end
+
+      it "executes the query" do
+        expect(results.first).to eq(user)
+      end
+    end
+
+    context "when providing a deeply nested association" do
+
+      let!(:user) do
+        User.create
+      end
+
+      let(:results) do
+        User.includes(:posts => [{ :alerts => :items }]).to_a
+      end
+
+      it "executes the query" do
+        expect(results.first).to eq(user)
       end
     end
 

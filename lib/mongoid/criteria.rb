@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/criteria/findable"
+require "mongoid/criteria/includable"
 require "mongoid/criteria/inspectable"
 require "mongoid/criteria/marshalable"
 require "mongoid/criteria/modifiable"
@@ -19,6 +20,7 @@ module Mongoid
     include Origin::Queryable
     include Findable
     include Inspectable
+    include Includable
     include Marshalable
     include Modifiable
     include Scopable
@@ -216,10 +218,12 @@ module Mongoid
     #
     # @since 2.2.0
     def includes(*relations)
-      relations.flatten.each do |name|
-        metadata = klass.reflect_on_association(name)
-        raise Errors::InvalidIncludes.new(klass, relations) unless metadata
-        inclusions.push(metadata) unless inclusions.include?(metadata)
+      relations.flatten.each do |relation|
+        if relation.is_a?(Hash)
+          extract_nested_relation(klass, relation)
+        else
+          add_inclusion(klass, relation)
+        end
       end
       clone
     end
