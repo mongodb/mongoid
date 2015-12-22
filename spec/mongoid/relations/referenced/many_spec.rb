@@ -3732,4 +3732,28 @@ describe Mongoid::Relations::Referenced::Many do
       expect(reloaded.name).to eq(new_child_name)
     end
   end
+
+  context 'when a document has referenced and embedded relations' do
+
+    let(:agent) do
+      Agent.new
+    end
+
+    let(:basic) do
+      Basic.new
+    end
+
+    let(:address) do
+      Address.new
+    end
+
+    before do
+      agent.basics << basic
+      agent.address = address
+    end
+
+    it 'saves the document correctly' do
+      expect(agent.save).to be(true)
+    end
+  end
 end
