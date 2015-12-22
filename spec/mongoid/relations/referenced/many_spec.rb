@@ -3732,4 +3732,29 @@ describe Mongoid::Relations::Referenced::Many do
       expect(reloaded.name).to eq(new_child_name)
     end
   end
+
+  example "should evaluate default procs as default values" do
+    class Project
+      include Mongoid::Document
+
+      has_many :rules
+
+      field :name
+    end
+
+    class Rule
+      include Mongoid::Document
+
+      belongs_to :project
+
+      field :project_name, default: -> { project.name }
+      field :name
+    end
+
+    project = Project.create(name: "test project")
+    rule = project.rules.create(name: 'test rule')
+    _rule = Rule.create(name: 'test rule', project: project)
+    expect(rule.project_name).to eq('test project')
+    expect(_rule.project_name).to eq('test project')
+  end
 end
