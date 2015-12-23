@@ -1173,9 +1173,7 @@ describe Mongoid::Criteria do
         a = Alert.new
         p.alerts << a
         a.save
-        p.save
         user.posts << p
-        p.save
         user.save
       end
 

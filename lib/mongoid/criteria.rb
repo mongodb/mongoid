@@ -220,7 +220,7 @@ module Mongoid
     def includes(*relations)
       relations.flatten.each do |relation|
         if relation.is_a?(Hash)
-          extract_nested_relation(klass, relation)
+          extract_nested_inclusion(klass, relation)
         else
           add_inclusion(klass, relation)
         end
