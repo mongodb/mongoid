@@ -34,8 +34,7 @@ module Mongoid
         if k.is_a?(Class)
           k.reflect_on_association(n)
         else
-          k = k.to_s.classify.constantize
-          k.reflect_on_association(n)
+          k.to_s.classify.constantize.reflect_on_association(n)
         end
       end
     end

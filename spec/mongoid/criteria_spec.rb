@@ -1168,6 +1168,17 @@ describe Mongoid::Criteria do
         User.create
       end
 
+      before do
+        p = Post.new
+        a = Alert.new
+        p.alerts << a
+        a.save
+        p.save
+        user.posts << p
+        p.save
+        user.save
+      end
+
       let(:results) do
         User.includes(:posts => [:alerts]).to_a
       end

@@ -45,10 +45,12 @@ module Mongoid
         #
         # @since 4.0.0
         def run
+          @loaded = []
           while shift_metadata
             preload
+            @loaded << @docs.collect { |d| d.send(@metadata.name) }
           end
-          @docs
+          @loaded.flatten
         end
 
         # Preload the current relation.
