@@ -3514,6 +3514,24 @@ describe Mongoid::Relations::Referenced::Many do
         expect(artist.albums).to eq([ album ])
       end
     end
+
+    context 'when the relation already exists' do
+
+      before do
+        artist.albums << album
+        album.save
+        artist.save
+        expect(artist).not_to receive(:after_add_album)
+      end
+
+      let(:reloaded_album) do
+        Album.where(artist_id: artist.id).first
+      end
+
+      it 'does not execute the callback when the relation is accessed' do
+        expect(reloaded_album.artist.after_add_referenced_called).to be(nil)
+      end
+    end
   end
 
   context "when #delete or #clear with before_remove callback" do

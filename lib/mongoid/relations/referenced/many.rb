@@ -322,12 +322,23 @@ module Mongoid
         def append(document)
           # @todo: remove?
           document.with(@persistence_options) if @persistence_options
+          with_add_callbacks(document, already_related?(document)) do
+            target.push(document)
+            characterize_one(document)
+            bind_one(document)
+          end
+        end
 
-          execute_callback :before_add, document
-          target.push(document)
-          characterize_one(document)
-          bind_one(document)
-          execute_callback :after_add, document
+        def with_add_callbacks(document, already_related)
+          execute_callback :before_add, document unless already_related
+          yield
+          execute_callback :after_add, document unless already_related
+        end
+
+        def already_related?(document)
+          document.persisted? &&
+            document.__metadata &&
+              document.__send__(document.__metadata.foreign_key) == base.id
         end
 
         # Instantiate the binding associated with this relation.
