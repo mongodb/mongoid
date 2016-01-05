@@ -320,14 +320,46 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
-          # @todo: remove?
           document.with(@persistence_options) if @persistence_options
+          with_add_callbacks(document, already_related?(document)) do
+            target.push(document)
+            characterize_one(document)
+            bind_one(document)
+          end
+        end
 
-          execute_callback :before_add, document
-          target.push(document)
-          characterize_one(document)
-          bind_one(document)
-          execute_callback :after_add, document
+        # Execute before/after add callbacks around the block unless the objects
+        # already have a persisted relation.
+        #
+        # @example Execute before/after add callbacks around the block.
+        #   relation.with_add_callbacks(document, false)
+        #
+        # @param [ Document ] document The document to append to the target.
+        # @param [ true, false ] already_related Whether the document is already related
+        #   to the target.
+        #
+        # @since 5.1.0
+        def with_add_callbacks(document, already_related)
+          execute_callback :before_add, document unless already_related
+          yield
+          execute_callback :after_add, document unless already_related
+        end
+
+        # Whether the document and the base already have a persisted relation.
+        #
+        # @example Is the document already related to the base.
+        #   relation.already_related?(document)
+        #
+        # @param [ Document ] document The document to possibly append to the target.
+        #
+        # @return [ true, false ] Whether the document is already related to the base and the
+        #   relation is persisted.
+        #
+        # @since 5.1.0
+        def already_related?(document)
+          document.persisted? &&
+            document.__metadata &&
+              document.__send__(document.__metadata.foreign_key) == base.id
         end
 
         # Instantiate the binding associated with this relation.
