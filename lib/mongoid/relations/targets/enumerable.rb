@@ -241,7 +241,7 @@ module Mongoid
           else
             @_added, @executed = {}, true
             @_loaded = target.inject({}) do |_target, doc|
-              _target[doc._id] = doc
+              _target[doc._id] = doc if doc
               _target
             end
           end
