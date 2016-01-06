@@ -200,6 +200,24 @@ describe Mongoid::Relations::Referenced::Many do
             expect(person.changed).to eq([])
           end
 
+          context "when the related item has embedded relations" do
+
+            let!(:user) do
+              User.create
+            end
+
+            before do
+              p = Post.create(roles: [ Role.create ])
+              user.posts = [ p ]
+              user.save
+            end
+
+            it "add the document to the target" do
+              expect(user.posts.size).to eq(1)
+              expect(user.posts.first.roles.size).to eq(1)
+            end
+          end
+
           context "when saving another post" do
 
             before do

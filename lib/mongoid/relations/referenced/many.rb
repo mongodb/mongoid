@@ -359,7 +359,8 @@ module Mongoid
         def already_related?(document)
           document.persisted? &&
             document.__metadata &&
-              document.__send__(document.__metadata.foreign_key) == base.id
+              document.respond_to?(document.__metadata.foreign_key) &&
+                document.__send__(document.__metadata.foreign_key) == base.id
         end
 
         # Instantiate the binding associated with this relation.
