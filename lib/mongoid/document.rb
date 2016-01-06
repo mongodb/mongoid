@@ -180,6 +180,27 @@ module Mongoid
       attributes
     end
 
+    # Calls #as_json on the document with additional, Mongoid-specific options.
+    #
+    # @example Get the document as json.
+    #   document.as_json(compact: true)
+    #
+    # @param [ Hash ] options The options.
+    #
+    # @option options [ true, false ] :compact Whether to include fields with
+    #   nil values in the json document.
+    #
+    # @return [ Hash ] The document as json.
+    #
+    # @since 5.1.0
+    def as_json(options = nil)
+      if options && (options[:compact] == true)
+        super(options).reject! { |k,v| v.nil? }
+      else
+        super(options)
+      end
+    end
+
     # Returns an instance of the specified class with the attributes,
     # errors, and embedded documents of the current document.
     #
