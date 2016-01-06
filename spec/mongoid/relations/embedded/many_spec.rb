@@ -3592,6 +3592,22 @@ describe Mongoid::Relations::Embedded::Many do
     it "properly orders the related objects" do
       expect(criteria.to_a).to eq([message_two, message_one, message_three])
     end
+
+    context "when the field to order on is an array of documents" do
+
+      before do
+        person.aliases = [ { name: "A", priority: 3 }, { name: "B", priority: 4 }]
+        person.save
+      end
+
+      let!(:person2) do
+        Person.create( aliases: [ { name: "C", priority: 1 }, { name: "D", priority: 2 }])
+      end
+
+      it "allows ordering on a key of an embedded document" do
+        expect(Person.all.order_by("aliases.0.priority" => 1).first).to eq(person2)
+      end
+    end
   end
 
   context "when using dot notation in a criteria" do
