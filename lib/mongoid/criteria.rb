@@ -196,64 +196,6 @@ module Mongoid
       klass ? super(klass.aliased_fields, klass.fields) : super({}, {})
     end
 
-    # Eager loads all the provided relations. Will load all the documents
-    # into the identity map whose ids match based on the extra query for the
-    # ids.
-    #
-    # @note This will work for embedded relations that reference another
-    #   collection via belongs_to as well.
-    #
-    # @note Eager loading brings all the documents into memory, so there is a
-    #   sweet spot on the performance gains. Internal benchmarks show that
-    #   eager loading becomes slower around 100k documents, but this will
-    #   naturally depend on the specific application.
-    #
-    # @example Eager load the provided relations.
-    #   Person.includes(:posts, :game)
-    #
-    # @param [ Array<Symbol> ] relations The names of the relations to eager
-    #   load.
-    #
-    # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 2.2.0
-    def includes(*relations)
-      relations.flatten.each do |relation|
-        if relation.is_a?(Hash)
-          extract_nested_inclusion(klass, relation)
-        else
-          add_inclusion(klass, relation)
-        end
-      end
-      clone
-    end
-
-    # Get a list of criteria that are to be executed for eager loading.
-    #
-    # @example Get the eager loading inclusions.
-    #   Person.includes(:game).inclusions
-    #
-    # @return [ Array<Metadata> ] The inclusions.
-    #
-    # @since 2.2.0
-    def inclusions
-      @inclusions ||= []
-    end
-
-    # Set the inclusions for the criteria.
-    #
-    # @example Set the inclusions.
-    #   criteria.inclusions = [ meta ]
-    #
-    # @param [ Array<Metadata> ] The inclusions.
-    #
-    # @return [ Array<Metadata> ] The new inclusions.
-    #
-    # @since 3.0.0
-    def inclusions=(value)
-      @inclusions = value
-    end
-
     # Merges another object with this +Criteria+ and returns a new criteria.
     # The other object may be a +Criteria+ or a +Hash+. This is used to
     # combine multiple scopes together, where a chained scope situation

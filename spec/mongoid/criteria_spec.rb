@@ -1150,15 +1150,28 @@ describe Mongoid::Criteria do
     context "when providing a list of associations" do
 
       let!(:user) do
-        User.create
+        User.create(posts: [ post1 ], descriptions: [ description1 ])
       end
 
-      let(:results) do
-        User.includes(:posts, :descriptions).to_a
+      let!(:post1) do
+        Post.create
+      end
+
+      let!(:description1) do
+        Description.create(details: 1)
+      end
+
+      let(:result) do
+        User.includes(:posts, :descriptions).first
       end
 
       it "executes the query" do
-        expect(results.first).to eq(user)
+        expect(result).to eq(user)
+      end
+
+      it "includes the related objects" do
+        expect(result.posts).to eq([ post1 ])
+        expect(result.descriptions).to eq([ description1 ])
       end
     end
 
@@ -1169,20 +1182,22 @@ describe Mongoid::Criteria do
       end
 
       before do
-        p = Post.new
-        a = Alert.new
-        p.alerts << a
-        a.save
-        user.posts << p
+        p = Post.create(alerts: [ Alert.create ])
+        user.posts = [ p ]
         user.save
       end
 
-      let(:results) do
-        User.includes(:posts => [:alerts]).to_a
+      let(:result) do
+        User.includes(:posts => [:alerts]).first
       end
 
       it "executes the query" do
-        expect(results.first).to eq(user)
+        expect(result).to eq(user)
+      end
+
+      it "includes the related objects" do
+        expect(result.posts.size).to eq(1)
+        expect(result.posts.first.alerts.size).to eq(1)
       end
     end
 
