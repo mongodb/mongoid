@@ -1759,6 +1759,22 @@ describe Mongoid::Criteria do
         person.preferences.create(name: "two")
       end
 
+      context "when one of the related items is deleted" do
+
+        before do
+          person.preferences = [ preference_one, preference_two ]
+          preference_two.delete
+        end
+
+        let(:criteria) do
+          Person.where(id: person.id).includes(:preferences)
+        end
+
+        it "only loads the existing related items" do
+          expect(criteria.entries.first.preferences).to eq([ preference_one ])
+        end
+      end
+
       context "when the criteria has no options" do
 
         let!(:criteria) do
