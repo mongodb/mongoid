@@ -117,6 +117,28 @@ describe Mongoid::Clients::Options do
     it "passes down the options to collection" do
       expect(instance.collection.database.name).to eq('test')
     end
+
+    context "when the object is shared between threads" do
+
+      before do
+        threads = []
+        doc = Band.create(name: "Beatles")
+        100.times do |i|
+          threads << Thread.new do
+            if i % 2 == 0
+              doc.with(nil).set(name: "Rolling Stones")
+            else
+              doc.with(options).set(name: "Beatles")
+            end
+          end
+        end
+        threads.join
+      end
+
+      it "does not share the persistence options" do
+        expect(Band.persistence_options).to eq(nil)
+      end
+    end
   end
 
   describe "#persistence_options" do

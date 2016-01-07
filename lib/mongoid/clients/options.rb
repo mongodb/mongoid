@@ -43,14 +43,14 @@ module Mongoid
       end
 
       def mongo_client
-        if persistence_options
-          if persistence_options[:client]
-            client = Clients.with_name(persistence_options[:client])
+        if opts = persistence_options && persistence_options.dup
+          if opts[:client]
+            client = Clients.with_name(opts[:client])
           else
             client = Clients.with_name(self.class.client_name)
             client.use(self.class.database_name)
           end
-          client.with(persistence_options.reject{ |k, v| k == :collection || k == :client })
+          client.with(opts.reject{ |k, v| k == :collection || k == :client })
         end
       end
 
