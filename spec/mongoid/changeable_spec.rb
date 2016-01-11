@@ -940,7 +940,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns a hash with indifferent access" do
-        expect(person.changes["title"]).to eq(
+        expect(person.changes[:title]).to eq(
           [ nil, "Captain Obvious" ]
         )
       end

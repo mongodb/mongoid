@@ -64,7 +64,7 @@ module Mongoid
     #
     # @since 2.4.0
     def changes
-      _changes = {}
+      _changes = ActiveSupport::HashWithIndifferentAccess.new
       changed.each do |attr|
         change = attribute_change(attr)
         _changes[attr] = change if change
