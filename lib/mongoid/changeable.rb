@@ -64,12 +64,12 @@ module Mongoid
     #
     # @since 2.4.0
     def changes
-      _changes = ActiveSupport::HashWithIndifferentAccess.new
+      _changes = {}
       changed.each do |attr|
         change = attribute_change(attr)
         _changes[attr] = change if change
       end
-      _changes
+      _changes.with_indifferent_access
     end
 
     # Call this method after save, so the changes can be properly switched.
