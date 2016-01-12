@@ -60,6 +60,23 @@ describe Mongoid::Config do
     end
   end
 
+  context "when the log level is not set in the configuration" do
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it "sets the Mongoid logger level to the default" do
+      expect(Mongoid.logger.level).to eq(Logger::INFO)
+    end
+
+    it "sets the Mongo driver logger level to the default" do
+      expect(Mongo::Logger.logger.level).to eq(Logger::INFO)
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do
@@ -86,6 +103,27 @@ describe Mongoid::Config do
 
       it "clears the previous clients" do
         expect(Mongoid::Clients.clients[:test]).to be_nil
+      end
+    end
+
+    context "when the log level is set in the configuration" do
+
+      before do
+        described_class.load!(file, :test)
+      end
+
+      after do
+        Mongoid.configure do |config|
+          config.load_configuration(CONFIG)
+        end
+      end
+
+      it "sets the Mongoid logger level" do
+        expect(Mongoid.logger.level).to eq(Logger::WARN)
+      end
+
+      it "sets the Mongo driver logger level" do
+        expect(Mongo::Logger.logger.level).to eq(Logger::WARN)
       end
     end
 
