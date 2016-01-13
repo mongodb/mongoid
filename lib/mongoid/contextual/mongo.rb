@@ -543,6 +543,12 @@ module Mongoid
         if criteria.options[:timeout] == false
           @view = view.no_cursor_timeout
         end
+        if criteria.options[:cursor_type]
+          # @todo: update to use #cursor_type method on view when driver 2.3 is released.
+          # See RUBY-1080
+          @view = view.clone
+          @view.options.merge!(cursor_type: criteria.options[:cursor_type])
+        end
       end
 
       # Apply an option.
