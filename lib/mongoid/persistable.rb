@@ -55,7 +55,7 @@ module Mongoid
     # @since 4.0.0
     def atomically
       begin
-        @atomic_updates_to_execute = {}
+        @atomic_updates_to_execute = @atomic_updates_to_execute || {}
         yield(self) if block_given?
         persist_atomic_operations(@atomic_updates_to_execute)
         true
@@ -207,7 +207,7 @@ module Mongoid
     #
     # @since 4.0.0
     def persist_atomic_operations(operations)
-      if persisted?
+      if persisted? && operations
         selector = atomic_selector
         _root.collection.find(selector).update_one(positionally(selector, operations))
       end
