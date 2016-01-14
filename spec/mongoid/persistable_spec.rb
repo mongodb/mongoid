@@ -168,6 +168,30 @@ describe Mongoid::Persistable do
 
         it_behaves_like "an atomically updatable root document"
       end
+
+      context "when nesting atomically calls" do
+
+        before do
+          class Band
+            def my_updates
+              atomically do |d|
+                d.set(name: "Placebo")
+                d.unset(:origin)
+              end
+            end
+          end
+        end
+
+        let!(:update) do
+          document.atomically do |doc|
+            doc.inc(member_count: 10)
+            doc.bit(likes: { and: 13 })
+            doc.my_updates
+          end
+        end
+
+        it_behaves_like "an atomically updatable root document"
+      end
     end
 
     context "when providing no block "do
