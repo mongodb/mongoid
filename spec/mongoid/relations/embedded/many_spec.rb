@@ -649,7 +649,7 @@ describe Mongoid::Relations::Embedded::Many do
         end
 
         let(:child_role) do
-          Role.new
+          Role.new(name: 'CTO-2')
         end
 
         before do

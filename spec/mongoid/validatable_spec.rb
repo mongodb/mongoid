@@ -140,7 +140,7 @@ describe Mongoid::Validatable do
 
             it "adds the errors to the document" do
               movie.valid?
-              expect(movie.errors[:ratings]).to eq([ "is invalid" ])
+              expect(movie.errors[:ratings]).to eq([{:value=>["must be less than 100"]}])
             end
           end
 
@@ -186,7 +186,7 @@ describe Mongoid::Validatable do
 
             it "adds the errors to the document" do
               person.valid?
-              expect(person.errors[:services]).to eq([ "is invalid" ])
+              expect(person.errors[:services]).to eq([{:sid=>["is not a number"]}])
             end
           end
 

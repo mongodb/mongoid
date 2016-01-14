@@ -4,4 +4,6 @@ class Role
   belongs_to :user
   belongs_to :post
   recursively_embeds_many
+
+  validates :name, presence: true
 end

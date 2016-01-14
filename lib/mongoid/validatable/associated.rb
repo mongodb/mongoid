@@ -29,19 +29,14 @@ module Mongoid
       #
       # @since 2.0.0
       def validate_each(document, attribute, value)
-        begin
-          document.begin_validate
-          valid = Array.wrap(value).collect do |doc|
-            if doc.nil? || doc.flagged_for_destroy?
-              true
-            else
-              doc.validated? ? true : doc.valid?
-            end
-          end.all?
+        document.begin_validate
+        Array.wrap(value).collect do |doc|
+          unless doc.validated? || doc.nil? || doc.flagged_for_destroy?
+            document.errors.add(attribute, doc.errors.messages, options) unless doc.valid?
+          end
+        end
         ensure
           document.exit_validate
-        end
-        document.errors.add(attribute, :invalid, options) unless valid
       end
     end
   end

@@ -84,12 +84,12 @@ describe Mongoid::Validatable::AssociatedValidator do
 
   describe "#validate_each" do
 
-    let(:person) do
-      Person.new
+    let(:user) do
+      User.new
     end
 
     let(:validator) do
-      described_class.new(attributes: person.attributes)
+      described_class.new(attributes: user.attributes)
     end
 
     context "when the association is a one to one" do
@@ -97,47 +97,45 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is nil" do
 
         before do
-          validator.validate_each(person, :name, nil)
+          validator.validate_each(user, :role, nil)
         end
 
         it "adds no errors" do
-          expect(person.errors[:name]).to be_empty
+          expect(user.errors[:role]).to be_empty
         end
       end
 
       context "when the association is valid" do
 
         let(:associated) do
-          double(valid?: true, flagged_for_destroy?: false)
+          user.build_role(name: "testing")
         end
 
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :name, associated)
+          validator.validate_each(user, :role, associated)
         end
 
         it "adds no errors" do
-          expect(person.errors[:name]).to be_empty
+          expect(user.errors[:role]).to be_empty
         end
       end
 
       context "when the association is invalid" do
 
         let(:associated) do
-          double(valid?: false, flagged_for_destroy?: false)
+          user.build_role
         end
 
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :name, associated)
+          validator.validate_each(user, :role, associated)
         end
 
         it "adds errors to the parent document" do
-          expect(person.errors[:name]).to_not be_empty
+          expect(user.errors[:role]).to_not be_empty
         end
 
         it "translates the error in english" do
-          expect(person.errors[:name][0]).to eq("is invalid")
+          #expect(person.errors[:descriptions][0]).to eq("is invalid")
         end
       end
     end
@@ -147,43 +145,41 @@ describe Mongoid::Validatable::AssociatedValidator do
       context "when the association is empty" do
 
         before do
-          validator.validate_each(person, :addresses, [])
+          validator.validate_each(user, :descriptions, [])
         end
 
         it "adds no errors" do
-          expect(person.errors[:addresses]).to be_empty
+          expect(user.errors[:descriptions]).to be_empty
         end
       end
 
       context "when the association has invalid documents" do
 
         let(:associated) do
-          double(valid?: false, flagged_for_destroy?: false)
+          user.descriptions.build
         end
 
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :addresses, [ associated ])
+          validator.validate_each(user, :descriptions, [ associated ])
         end
 
         it "adds errors to the parent document" do
-          expect(person.errors[:addresses]).to_not be_empty
+          expect(user.errors[:descriptions]).to_not be_empty
         end
       end
 
-      context "when the assocation has all valid documents" do
+      context "when the association has all valid documents" do
 
         let(:associated) do
-          double(valid?: true, flagged_for_destroy?: false)
+          user.descriptions.build(details: "testing")
         end
 
         before do
-          expect(associated).to receive(:validated?).and_return(false)
-          validator.validate_each(person, :addresses, [ associated ])
+          validator.validate_each(user, :descriptions, [ associated ])
         end
 
         it "adds no errors" do
-          expect(person.errors[:addresses]).to be_empty
+          expect(user.errors[:descriptions]).to be_empty
         end
       end
     end
