@@ -87,7 +87,8 @@ module Mongoid
       # @return [ Proc ] The default scope.
       #
       # @since 1.0.0
-      def default_scope(value)
+      def default_scope(value = nil)
+        value = Proc.new { yield } if block_given?
         check_scope_validity(value)
         self.default_scoping = process_default_scope(value)
       end

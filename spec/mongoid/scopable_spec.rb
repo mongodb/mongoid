@@ -27,6 +27,29 @@ describe Mongoid::Scopable do
       end
     end
 
+    context "when provided a block" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      before do
+        Band.default_scope { criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it "adds the default scope to the class" do
+        expect(Band.default_scoping.call).to eq(criteria)
+      end
+
+      it "flags as being default scoped" do
+        expect(Band).to be_default_scoping
+      end
+    end
+
     context "when provided a non proc" do
 
       it "raises an error" do
