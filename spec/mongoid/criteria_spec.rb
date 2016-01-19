@@ -772,7 +772,208 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#find_one_and_delete" do
+
+    context "when no options are specified" do
+
+      let(:band) do
+        Band.create(name: "Beatles", records: [ Record.new(name: "Revolver", year: 1966) ])
+      end
+
+      let!(:result) do
+        band.records.where(name: "Revolver").find_one_and_delete
+      end
+
+      it "returns the parent document" do
+        expect(result).to be_a(Band)
+      end
+
+      it "returns the original document" do
+        expect(result.records.first.name).to eq("Revolver")
+      end
+
+      it "deletes the object" do
+        expect(result.reload.records).to be_empty
+      end
+    end
+
+    context "when sorting" do
+
+      let(:band) do
+        Band.create(name: "Beatles", records: [ Record.new(name: "Revolver", year: 1966) ])
+      end
+
+      let(:result) do
+        band.records.desc(:name).where(name: "Revolver").find_one_and_delete
+      end
+
+      it "raises an exception" do
+        expect {
+          result
+        }.to raise_error(Mongoid::Errors::InvalidEmbeddedFindAndModify)
+      end
+    end
+  end
+
+  describe "#find_one_and_replace" do
+
+    context "when the collection is embedded" do
+
+      let(:band) do
+        Band.create(name: "Beatles", records: [ Record.new(name: "Revolver", year: 1966) ])
+      end
+
+      context "when returning the replaced document" do
+
+        let!(:result) do
+          band.records.where(name: "Revolver").find_one_and_replace({ name: "Let it Be" }, return_document: :after)
+        end
+
+        it "returns the parent document" do
+          expect(result).to be_a(Band)
+        end
+
+        it "returns the updated document" do
+          expect(result.records.first.year).to be_nil
+          expect(result.records.first.name).to eq("Let it Be")
+        end
+      end
+
+      context "when not returning the replaced document" do
+
+        let!(:result) do
+          band.records.where(name: "Revolver").find_one_and_replace({ name: "Let it Be" }, return_document: :before)
+        end
+
+        it "returns the parent document" do
+          expect(result).to be_a(Band)
+        end
+
+        it "returns the document before the update" do
+          expect(result.records.first.year).to eq(1966)
+          expect(result.records.first.name).to eq("Revolver")
+        end
+      end
+
+      context "when not providing options" do
+
+        let!(:result) do
+          band.records.where(name: "Revolver").find_one_and_replace({ name: "Let it Be" })
+        end
+
+        it "returns the parent document" do
+          expect(result).to be_a(Band)
+        end
+
+        it "returns the document before the replacement" do
+          expect(result.records.first.name).to eq("Revolver")
+          expect(result.records.first.year).to eq(1966)
+        end
+      end
+
+      context "when sorting" do
+
+        let(:result) do
+          band.records.desc(:name).find_one_and_replace({ name: "Revolver" })
+        end
+
+        it "raises an exception" do
+          expect{
+            result
+          }.to raise_error(Mongoid::Errors::InvalidEmbeddedFindAndModify)
+        end
+      end
+
+      context "when the selector does not match" do
+
+        let(:result) do
+          band.records.where(name: "White Album").find_one_and_replace({ name: "Rubber Soul" })
+        end
+
+        it "returns nil" do
+          expect(result).to be_nil
+        end
+      end
+    end
+  end
+
   describe "#find_one_and_update" do
+
+    context "when the collection is embedded" do
+
+      let(:band) do
+        Band.create(name: "Beatles", records: [ Record.new(name: "Revolver") ])
+      end
+
+      context "when returning the updated document" do
+
+        let!(:result) do
+          band.records.where(name: "Revolver").find_one_and_update({ "$set" => { name: "Let it Be" } }, return_document: :after)
+        end
+
+        it "returns the parent document" do
+          expect(result).to be_a(Band)
+        end
+
+        it "returns the updated document" do
+          expect(result.records.first.name).to eq("Let it Be")
+        end
+      end
+
+      context "when not returning the updated document" do
+
+        let!(:result) do
+          band.records.where(name: "Revolver").find_one_and_update({ "$set" => { name: "Let it Be" } }, return_document: :before)
+        end
+
+        it "returns the parent document" do
+          expect(result).to be_a(Band)
+        end
+
+        it "returns the document before the update" do
+          expect(result.records.first.name).to eq("Revolver")
+        end
+      end
+
+      context "when not providing options" do
+
+        let!(:result) do
+          band.records.where(name: "Revolver").find_one_and_update({ "$set" => { name: "Let it Be" } })
+        end
+
+        it "returns the parent document" do
+          expect(result).to be_a(Band)
+        end
+
+        it "returns the document before the update" do
+          expect(result.records.first.name).to eq("Revolver")
+        end
+      end
+
+      context "when sorting" do
+
+        let(:result) do
+          band.records.desc(:name).find_one_and_update({ "$set" => { name: "Let it Be" } }, return_document: :before)
+        end
+
+        it "raises an exception" do
+          expect{
+            result
+          }.to raise_error(Mongoid::Errors::InvalidEmbeddedFindAndModify)
+        end
+      end
+
+      context "when the selector does not match" do
+
+        let!(:result) do
+          band.records.where(name: "White Album").find_one_and_update({ "$set" => { name: "Let it Be" } })
+        end
+
+        it "returns nil" do
+          expect(result).to be_nil
+        end
+      end
+    end
 
     let!(:depeche) do
       Band.create(name: "Depeche Mode")

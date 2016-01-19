@@ -14,7 +14,7 @@ module Mongoid
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
       # @attribute [r] selector The root document selector.
-      # @attribute [r] matching The in memory documents that match the selector.
+      # @attribute [r] documents The in memory documents that match the selector.
       attr_reader :documents, :path, :root, :selector
 
       # Check if the context is equal to the other object.
@@ -30,6 +30,38 @@ module Mongoid
       def ==(other)
         return false unless other.respond_to?(:entries)
         entries == other.entries
+      end
+
+      def find_one_and_update(update, options = {})
+        execute_find_and_modify do
+          view = collection.find(relation_selector)
+          sel = update["$set"].inject({}) do |s,(field, value)|
+            s.merge!("#{relation_name}.$.#{field}" => value)
+          end
+          if doc = view.find_one_and_update({ "$set" => sel }, options)
+            Factory.from_db(root.class, doc)
+          end
+        end
+      end
+
+      def find_one_and_replace(replacement, options = {})
+        execute_find_and_modify do
+          view = collection.find(relation_selector)
+          sel = { "#{relation_name}.$" => replacement }
+          if doc = view.find_one_and_update({ "$set" => sel }, options)
+            Factory.from_db(root.class, doc)
+          end
+        end
+      end
+
+      def find_one_and_delete
+        execute_find_and_modify do
+          view = collection.find(root.atomic_selector)
+          sel = { relation_name => criteria.selector }
+          if doc = view.find_one_and_update({ "$pull" => sel })
+            Factory.from_db(root.class, doc)
+          end
+        end
       end
 
       # Delete all documents in the database that match the selector.
@@ -268,6 +300,23 @@ module Mongoid
       end
 
       private
+
+      def execute_find_and_modify
+        raise Mongoid::Errors::InvalidEmbeddedFindAndModify.new(criteria) if criteria.options[:sort]
+        unless documents.empty?
+          yield
+        end
+      end
+
+      def relation_name
+        @relation_name ||= first.atomic_path
+      end
+
+      def relation_selector
+        @selector = criteria.selector.inject({}) do | sel, (field, value)|
+          sel.merge!([relation_name, field].join('.') => value)
+        end.merge!(root.atomic_selector)
+      end
 
       # Get the documents the context should iterate. This follows 3 rules:
       #
