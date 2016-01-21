@@ -116,7 +116,9 @@ module Mongoid
       #
       # @since 3.0.0
       def queryable
-        Threaded.current_scope(self) || Criteria.new(self)
+        crit = Threaded.current_scope(self) || Criteria.new(self)
+        crit.embedded = true if crit.klass.embedded
+        crit
       end
 
       # Create a scope that can be accessed from the class level or chained to

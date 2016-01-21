@@ -158,6 +158,31 @@ describe Mongoid::Scopable do
       it "returns an empty criteria" do
         expect(Band.queryable.selector).to be_empty
       end
+
+      context "when the class is not embedded" do
+
+        it "returns a criteria with embedded set to nil" do
+          expect(Band.queryable.embedded).to be(nil)
+        end
+      end
+
+      context "when the class is embedded" do
+
+        it "returns a criteria with embedded set to true" do
+          expect(Address.queryable.embedded).to be(true)
+        end
+
+        context "when scopes are chained" do
+
+          let(:person) do
+            Person.create
+          end
+
+          it "constructs a criteria for an embedded relation" do
+            expect(person.addresses.without_postcode_ordered.embedded).to be(true)
+          end
+        end
+      end
     end
 
     context "when a criteria exists on the stack" do
