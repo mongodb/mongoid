@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/criteria/findable"
+require "mongoid/criteria/includable"
 require "mongoid/criteria/inspectable"
 require "mongoid/criteria/marshalable"
 require "mongoid/criteria/modifiable"
@@ -19,6 +20,7 @@ module Mongoid
     include Origin::Queryable
     include Findable
     include Inspectable
+    include Includable
     include Marshalable
     include Modifiable
     include Scopable
@@ -192,62 +194,6 @@ module Mongoid
     def initialize(klass)
       @klass = klass
       klass ? super(klass.aliased_fields, klass.fields) : super({}, {})
-    end
-
-    # Eager loads all the provided relations. Will load all the documents
-    # into the identity map whose ids match based on the extra query for the
-    # ids.
-    #
-    # @note This will work for embedded relations that reference another
-    #   collection via belongs_to as well.
-    #
-    # @note Eager loading brings all the documents into memory, so there is a
-    #   sweet spot on the performance gains. Internal benchmarks show that
-    #   eager loading becomes slower around 100k documents, but this will
-    #   naturally depend on the specific application.
-    #
-    # @example Eager load the provided relations.
-    #   Person.includes(:posts, :game)
-    #
-    # @param [ Array<Symbol> ] relations The names of the relations to eager
-    #   load.
-    #
-    # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 2.2.0
-    def includes(*relations)
-      relations.flatten.each do |name|
-        metadata = klass.reflect_on_association(name)
-        raise Errors::InvalidIncludes.new(klass, relations) unless metadata
-        inclusions.push(metadata) unless inclusions.include?(metadata)
-      end
-      clone
-    end
-
-    # Get a list of criteria that are to be executed for eager loading.
-    #
-    # @example Get the eager loading inclusions.
-    #   Person.includes(:game).inclusions
-    #
-    # @return [ Array<Metadata> ] The inclusions.
-    #
-    # @since 2.2.0
-    def inclusions
-      @inclusions ||= []
-    end
-
-    # Set the inclusions for the criteria.
-    #
-    # @example Set the inclusions.
-    #   criteria.inclusions = [ meta ]
-    #
-    # @param [ Array<Metadata> ] The inclusions.
-    #
-    # @return [ Array<Metadata> ] The new inclusions.
-    #
-    # @since 3.0.0
-    def inclusions=(value)
-      @inclusions = value
     end
 
     # Merges another object with this +Criteria+ and returns a new criteria.

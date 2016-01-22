@@ -1147,12 +1147,72 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when providing a hash" do
+    context "when providing a list of associations" do
 
-      it "raises an error" do
-        expect {
-          Person.includes(preferences: :members)
-        }.to raise_error(Mongoid::Errors::InvalidIncludes)
+      let!(:user) do
+        User.create(posts: [ post1 ], descriptions: [ description1 ])
+      end
+
+      let!(:post1) do
+        Post.create
+      end
+
+      let!(:description1) do
+        Description.create(details: 1)
+      end
+
+      let(:result) do
+        User.includes(:posts, :descriptions).first
+      end
+
+      it "executes the query" do
+        expect(result).to eq(user)
+      end
+
+      it "includes the related objects" do
+        expect(result.posts).to eq([ post1 ])
+        expect(result.descriptions).to eq([ description1 ])
+      end
+    end
+
+    context "when providing a nested association" do
+
+      let!(:user) do
+        User.create
+      end
+
+      before do
+        p = Post.create(alerts: [ Alert.create ])
+        user.posts = [ p ]
+        user.save
+      end
+
+      let(:result) do
+        User.includes(:posts => [:alerts]).first
+      end
+
+      it "executes the query" do
+        expect(result).to eq(user)
+      end
+
+      it "includes the related objects" do
+        expect(result.posts.size).to eq(1)
+        expect(result.posts.first.alerts.size).to eq(1)
+      end
+    end
+
+    context "when providing a deeply nested association" do
+
+      let!(:user) do
+        User.create
+      end
+
+      let(:results) do
+        User.includes(:posts => [{ :alerts => :items }]).to_a
+      end
+
+      it "executes the query" do
+        expect(results.first).to eq(user)
       end
     end
 
