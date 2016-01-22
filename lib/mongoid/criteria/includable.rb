@@ -88,7 +88,7 @@ module Mongoid
       #   criteria.extract_relations_list(:posts, [{ :alerts => :items }])
       #
       # @param [ Symbol ] association The name of the association.
-      # @param [ Array, Symbol ] relations Either the relation name or a list of associations.
+      # @param [ Array ] relations A list of associations.
       #
       # @since 5.1.0
       def extract_relations_list(association, relations)
