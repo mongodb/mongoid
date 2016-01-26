@@ -63,7 +63,11 @@ module Mongoid
       # @since 3.0.0
       def evolve(object)
         if object_id_field? || object.is_a?(Document)
-          object.__evolve_object_id__
+          if metadata.polymorphic? && constraint
+            constraint.convert(object)
+          else
+            object.__evolve_object_id__
+          end
         else
           related_id_field.evolve(object)
         end
