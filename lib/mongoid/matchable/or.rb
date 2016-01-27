@@ -21,7 +21,7 @@ module Mongoid
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            res &&= Matchable.matcher(document, key, value).matches?(value)
+            res &&= document.matches?(key => value)
             break unless res
           end
           return res if res

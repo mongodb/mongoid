@@ -20,7 +20,7 @@ module Mongoid
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            return false unless Matchable.matcher(document, key, value).matches?(value)
+            return false unless document.matches?(key => value)
           end
         end
         true
