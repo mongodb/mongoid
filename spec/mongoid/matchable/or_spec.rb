@@ -37,6 +37,31 @@ describe Mongoid::Matchable::Or do
           expect(matcher.matches?([])).to be false
         end
       end
+
+      context "when the expression is a $not" do
+
+        let(:matches) do
+          matcher.matches?([ { title: {:$not => /Foobar/ } }])
+        end
+
+        context "when the value matches" do
+
+          it "returns true" do
+            expect(matches).to be true
+          end
+        end
+
+        context "when the value does not match" do
+
+          before do
+            person.title = "Foobar baz"
+          end
+
+          it "returns false" do
+            expect(matches).to be false
+          end
+        end
+      end
     end
 
     context "when provided a complex expression" do
