@@ -2,8 +2,8 @@ source "https://rubygems.org"
 gemspec path: '..'
 
 gem "rake"
-gem "actionpack",  github: "/rails/rails"
-gem "activemodel", github: "/rails/rails"
+gem "actionpack",  github: "rails/rails"
+gem "activemodel", github: "rails/rails"
 
 group :test do
   gem "rspec", "~> 3.1.0"
