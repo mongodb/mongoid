@@ -3,9 +3,6 @@ class BSON::ObjectId
   def as_json(options = nil)
     { "$oid" => to_s }
   end
-  def to_xml(options = nil)
-    ActiveSupport::XmlMini.to_tag(options[:root], self.to_s, options)
-  end
 end
 
 class Symbol
