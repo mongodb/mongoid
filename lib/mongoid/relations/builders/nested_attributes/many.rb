@@ -172,7 +172,7 @@ module Mongoid
           # @param [ String, BSON::ObjectId ] id of the related document.
           # @param [ Hash ] attrs The single document attributes to process.
           #
-          # @since 5.0.2
+          # @since 6.0.0
           def update_nested_relation(parent, id, attrs)
             first = existing.first
             converted = first ? convert_id(first.class, id) : id
