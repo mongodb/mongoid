@@ -97,14 +97,7 @@ module Mongoid
           def process_attributes(parent, attrs)
             return if reject?(parent, attrs)
             if id = attrs.extract_id
-              first = existing.first
-              converted = first ? convert_id(first.class, id) : id
-              doc = existing.find(converted)
-              if destroyable?(attrs)
-                destroy(parent, existing, doc)
-              else
-                update_document(doc, attrs)
-              end
+              update_nested_relation(parent, id, attrs)
             else
               existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
             end
@@ -165,6 +158,38 @@ module Mongoid
               doc.assign_attributes(attrs)
             else
               doc.update_attributes(attrs)
+            end
+          end
+
+          # Update nested relation.
+          #
+          # @api private
+          #
+          # @example Update nested relation.
+          #   builder.update_nested_relation(parent, id, attrs)
+          #
+          # @param [ Document ] parent The parent document.
+          # @param [ String, BSON::ObjectId ] id of the related document.
+          # @param [ Hash ] attrs The single document attributes to process.
+          #
+          # @since 5.0.2
+          def update_nested_relation(parent, id, attrs)
+            first = existing.first
+            converted = first ? convert_id(first.class, id) : id
+
+            if existing.where(id: converted).exists?
+              # document exists in relation
+              doc = existing.find(converted)
+              if destroyable?(attrs)
+                destroy(parent, existing, doc)
+              else
+                update_document(doc, attrs)
+              end
+            else
+              # push existing document to relation
+              doc = existing.unscoped.find(converted)
+              update_document(doc, attrs)
+              existing.push(doc) unless destroyable?(attrs)
             end
           end
         end
