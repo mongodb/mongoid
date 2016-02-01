@@ -1434,6 +1434,25 @@ describe Mongoid::Interceptable do
         end
       end
 
+      describe '#after_destroy' do
+
+        context 'when the parent is updated in a child after_destroy callback' do
+
+          let!(:person) do
+            Person.create!(ordered_posts: [OrderedPost.new])
+          end
+
+          before do
+            post = OrderedPost.first
+            post.destroy
+          end
+
+          it 'updates the parent' do
+            expect(person.reload.title).to eq('Minus one ordered post.')
+          end
+        end
+      end
+
       describe "#before_validation" do
 
         context "when the child is new" do
