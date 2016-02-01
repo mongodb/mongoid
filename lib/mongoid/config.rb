@@ -246,7 +246,7 @@ module Mongoid
     private
 
     def set_log_levels
-      Mongoid.logger.level = Mongoid::Config.log_level
+      Mongoid.logger.level = Mongoid::Config.log_level unless defined?(::Rails)
       Mongo::Logger.logger.level = Mongoid.logger.level
     end
 
