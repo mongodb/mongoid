@@ -109,17 +109,19 @@ module Mongoid
       # @return [ true, false ] The result of the update.
       #
       # @since 4.0.0
-      def prepare_update(options = {})
-        return false if performing_validations?(options) &&
+      def prepare_update(**options)
+        return false if performing_validations?(**options) &&
           invalid?(options[:context] || :update)
         process_flagged_destroys
+        # Here is the difficult part... We may have to implement our own
+        # callbacks.
         result = run_callbacks(:save) do
           run_callbacks(:update) do
             yield(self)
             true
           end
         end
-        post_process_persist(result, options) and result
+        post_process_persist(result, **options) and result
       end
 
       # Update the document in the database.
@@ -134,12 +136,14 @@ module Mongoid
       # @return [ true, false ] True if succeeded, false if not.
       #
       # @since 1.0.0
-      def update_document(options = {})
+      def update_document(mongo_context: Context.new, **options)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
-        prepare_update(options) do
+        prepare_update(**options) do
           updates, conflicts = init_atomic_updates
           unless updates.empty?
-            coll = _root.collection
+            # Get the collection from the context instead of the document or
+            # class.
+            coll = mongo_context.collection
             selector = atomic_selector
             coll.find(selector).update_one(positionally(selector, updates))
             conflicts.each_pair do |key, value|

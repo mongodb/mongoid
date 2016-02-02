@@ -19,7 +19,7 @@ module Mongoid
       # @return [ Document ] The persisted document.
       #
       # @since 1.0.0
-      def insert(options = {})
+      def insert(mongo_context: Context.new, **options)
         prepare_insert(options) do
           if embedded?
             insert_as_embedded
