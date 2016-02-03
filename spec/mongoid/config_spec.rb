@@ -63,6 +63,11 @@ describe Mongoid::Config do
   context "when the log level is not set in the configuration" do
 
     before do
+      if defined?(Rails)
+        RailsTemp = Rails
+        Object.send(:remove_const, :Rails)
+      end
+
       Mongoid.configure do |config|
         config.load_configuration(CONFIG)
       end
@@ -124,6 +129,35 @@ describe Mongoid::Config do
 
       it "sets the Mongo driver logger level" do
         expect(Mongo::Logger.logger.level).to eq(Logger::WARN)
+      end
+
+      context "when in a Rails environment" do
+
+        before do
+          module Rails
+            def self.logger
+              ::Logger.new($stdout)
+            end
+          end
+          Mongoid.logger = Rails.logger
+          described_class.load!(file, :test)
+        end
+
+        after do
+          if defined?(Rails)
+            RailsTemp = Rails
+            Object.send(:remove_const, :Rails)
+          end
+        end
+
+        it "keeps the Mongoid logger level the same as the Rails logger" do
+          expect(Mongoid.logger.level).to eq(Rails.logger.level)
+          expect(Mongoid.logger.level).not_to eq(Mongoid::Config.log_level)
+        end
+
+        it "sets the Mongo driver logger level to Mongoid's logger level" do
+          expect(Mongo::Logger.logger.level).to eq(Mongoid.logger.level)
+        end
       end
     end
 

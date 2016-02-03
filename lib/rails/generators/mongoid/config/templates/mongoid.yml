@@ -125,6 +125,11 @@ development:
 
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
+
+    # Set the Mongoid and Ruby driver log levels when not in a Rails
+    # environment. The Mongoid logger will be set to the Rails logger
+    # otherwise.(default: :info)
+    # log_level: :info
 test:
   clients:
     default:
