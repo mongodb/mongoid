@@ -577,8 +577,6 @@ module Mongoid
         begin
           if spec = criteria.options[:sort]
             @view = view.sort(Hash[spec.map{|k, v| [k, -1*v]}])
-          else
-            @view = view.sort(_id: -1)
           end
           yield
         ensure
