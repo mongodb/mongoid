@@ -19,7 +19,7 @@ module Mongoid
             "invalid_field",
             {
               name: name,
-              origin: origin(klass, name),
+              queryable: origin(klass, name),
               file: location(klass, name)[0],
               line: location(klass, name)[1]
             }
@@ -29,10 +29,10 @@ module Mongoid
 
       private
 
-      # Get the origin of the method.
+      # Get the queryable of the method.
       #
       # @example Get the originating class or module.
-      #   error.origin(Person, :crazy_method_name)
+      #   error.queryable(Person, :crazy_method_name)
       #
       # @param [ Class ] klass The document class.
       # @param [ Symbol ] name The method name.
