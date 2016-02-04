@@ -1,8 +1,6 @@
 # encoding: utf-8
 module Mongoid
-
   class Criteria
-
     module Queryable
 
       # An queryable selectable is selectable, in that it has the ability to select

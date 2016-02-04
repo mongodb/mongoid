@@ -1,8 +1,6 @@
 # encoding: utf-8
 module Mongoid
-
   class Criteria
-
     module Queryable
 
       # The selector is a special kind of hash that knows how to serialize values

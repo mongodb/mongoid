@@ -1,10 +1,7 @@
 # encoding: utf-8
 module Mongoid
-
   class Criteria
-
     module Queryable
-
       module Extensions
 
         # This module contains additional time behaviour.

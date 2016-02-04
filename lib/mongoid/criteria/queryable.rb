@@ -13,7 +13,6 @@ require "mongoid/criteria/queryable/selectable"
 require "mongoid/criteria/queryable/selector"
 
 module Mongoid
-
   class Criteria
 
     # A queryable is any object that needs queryable's dsl injected into it to build

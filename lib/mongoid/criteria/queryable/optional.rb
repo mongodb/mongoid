@@ -1,8 +1,6 @@
 # encoding: utf-8
 module Mongoid
-
   class Criteria
-
     module Queryable
 
       # The optional module includes all behaviour that has to do with extra

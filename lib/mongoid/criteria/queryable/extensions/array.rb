@@ -1,10 +1,7 @@
 # encoding: utf-8
 module Mongoid
-
   class Criteria
-
     module Queryable
-
       module Extensions
 
         # The array module adds custom behaviour for Origin onto the Array class.

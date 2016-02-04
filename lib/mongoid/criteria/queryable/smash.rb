@@ -1,8 +1,6 @@
 # encoding: utf-8
 module Mongoid
-
   class Criteria
-
     module Queryable
 
       # This is a smart hash for use with options and selectors.

@@ -1,8 +1,6 @@
 # encoding: utf-8
 module Mongoid
-
   class Criteria
-
     module Queryable
 
       # Contains behaviour for merging existing selection with new selection.

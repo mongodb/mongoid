@@ -2,10 +2,8 @@
 require "set"
 
 module Mongoid
-
   class Criteria
     module Queryable
-
       module Extensions
 
         # This module contains additional object behaviour.

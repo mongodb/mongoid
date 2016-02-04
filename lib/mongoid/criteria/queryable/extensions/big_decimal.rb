@@ -2,11 +2,8 @@
 require "bigdecimal"
 
 module Mongoid
-
   class Criteria
-
     module Queryable
-
       module Extensions
 
         # The big decimal module adds custom behaviour for Origin onto the
