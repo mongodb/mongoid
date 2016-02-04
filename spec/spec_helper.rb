@@ -96,6 +96,12 @@ module MyApp
   end
 end
 
+module Mongoid
+  class Query
+    include Mongoid::Criteria::Queryable
+  end
+end
+
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.irregular("canvas", "canvases")
   inflect.singular("address_components", "address_component")

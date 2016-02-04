@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Origin::Selector do
+describe Mongoid::Criteria::Queryable::Selector do
 
   describe "merge!" do
 
@@ -543,6 +543,7 @@ describe Origin::Selector do
 
           after(:all) do
             Object.send(:remove_const, :Field)
+            ::I18n.locale = :en
           end
 
           let(:selector) do

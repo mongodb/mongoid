@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Origin::Key do
+describe Mongoid::Criteria::Queryable::Key do
 
   describe "#initialize" do
 

@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Origin::Selectable do
+describe Mongoid::Criteria::Queryable::Selectable do
 
   let(:query) do
-    Origin::Query.new("id" => "_id")
+   Mongoid::Query.new("id" => "_id")
   end
 
   shared_examples_for "a cloning selection" do
@@ -127,7 +127,7 @@ describe Origin::Selectable do
         end
 
         let!(:query) do
-          Origin::Query.new({}, { "field" => Field.new })
+          Mongoid::Query.new({}, { "field" => Field.new })
         end
 
         context "when providing an array" do
@@ -315,7 +315,7 @@ describe Origin::Selectable do
           end
 
           let!(:query) do
-            Origin::Query.new({}, { "field" => Field.new })
+            Mongoid::Query.new({}, { "field" => Field.new })
           end
 
           context "when the strategy is the default (union)" do
@@ -3344,7 +3344,7 @@ describe Origin::Selectable do
       end
 
       it "returns the cloned selectable" do
-        expect(selection).to be_a(Origin::Selectable)
+        expect(selection).to be_a(Mongoid::Criteria::Queryable::Selectable)
       end
 
       context "when providing text search options" do
@@ -3454,7 +3454,7 @@ describe Origin::Selectable do
         context "when the key needs evolution" do
 
           let(:query) do
-            Origin::Query.new({ "user" => "user_id" })
+            Mongoid::Query.new({ "user" => "user_id" })
           end
 
           let(:document) do
@@ -3812,7 +3812,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3831,7 +3831,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3850,7 +3850,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3869,7 +3869,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3888,7 +3888,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3907,7 +3907,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3926,7 +3926,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3945,7 +3945,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3964,7 +3964,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -3983,7 +3983,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -4002,7 +4002,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -4021,7 +4021,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -4040,7 +4040,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -4059,7 +4059,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selection key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -4079,7 +4079,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do
@@ -4098,7 +4098,7 @@ describe Origin::Selectable do
       end
 
       it "returns a selecton key" do
-        expect(key).to be_a(Origin::Key)
+        expect(key).to be_a(Mongoid::Criteria::Queryable::Key)
       end
 
       it "sets the name as the key" do

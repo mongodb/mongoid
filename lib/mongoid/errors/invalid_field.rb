@@ -19,7 +19,7 @@ module Mongoid
             "invalid_field",
             {
               name: name,
-              queryable: origin(klass, name),
+              origin: origin(klass, name),
               file: location(klass, name)[0],
               line: location(klass, name)[1]
             }

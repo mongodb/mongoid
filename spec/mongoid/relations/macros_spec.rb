@@ -132,8 +132,8 @@ describe Mongoid::Relations::Macros do
         expect(metadata.order).to_not be_nil
       end
 
-      it "returns Origin::Key" do
-        expect(metadata.order).to be_kind_of(Origin::Key)
+      it "returns Mongoid::Criteria::Queryable::Key" do
+        expect(metadata.order).to be_kind_of(Mongoid::Criteria::Queryable::Key)
       end
     end
 
@@ -364,8 +364,8 @@ describe Mongoid::Relations::Macros do
         expect(metadata.order).to_not be_nil
       end
 
-      it "returns Origin::Key" do
-        expect(metadata.order).to be_kind_of(Origin::Key)
+      it "returns Mongoid::Criteria::Queryable::Key" do
+        expect(metadata.order).to be_kind_of(Mongoid::Criteria::Queryable::Key)
       end
     end
 
@@ -429,8 +429,8 @@ describe Mongoid::Relations::Macros do
           expect(metadata.order).to_not be_nil
         end
 
-        it "returns Origin::Key" do
-          expect(metadata.order).to be_kind_of(Origin::Key)
+        it "returns Mongoid::Criteria::Queryable::Key" do
+          expect(metadata.order).to be_kind_of(Mongoid::Criteria::Queryable::Key)
         end
       end
 

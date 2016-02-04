@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Origin::Aggregable do
+describe Mongoid::Criteria::Queryable::Aggregable do
 
   let(:query) do
-    Origin::Query.new("id" => "_id", "alias" => "a")
+    Mongoid::Query.new("id" => "_id", "alias" => "a")
   end
 
   shared_examples_for "an aggregable object" do

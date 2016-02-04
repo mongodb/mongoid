@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Origin::Query do
+describe Mongoid::Query do
 
   describe "#==" do
 
@@ -107,7 +107,7 @@ describe Origin::Query do
     end
 
     it "returns a query" do
-      expect(cloned).to be_a(Origin::Query)
+      expect(cloned).to be_a(Mongoid::Query)
     end
 
     it "returns a new instance" do

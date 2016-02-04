@@ -1,9 +1,9 @@
 require "spec_helper"
 
-describe Origin::Optional do
+describe Mongoid::Criteria::Queryable::Optional do
 
   let(:query) do
-    Origin::Query.new
+    Mongoid::Query.new
   end
 
   shared_examples_for "a cloning option" do
@@ -144,7 +144,7 @@ describe Origin::Optional do
       context "when using the mongo-1.x driver syntax" do
 
         let(:query) do
-          Origin::Query.new({}, {}, :mongo1x)
+          Mongoid::Query.new({}, {}, :mongo1x)
         end
 
         context "when provided symbols" do
@@ -417,7 +417,7 @@ describe Origin::Optional do
       context "when using the mongo-1.x driver syntax" do
 
         let(:query) do
-          Origin::Query.new({}, {}, :mongo1x)
+          Mongoid::Query.new({}, {}, :mongo1x)
         end
 
         context "when provided symbols" do
@@ -1124,7 +1124,7 @@ describe Origin::Optional do
       context "when using the mongo-1.x driver syntax" do
 
         let(:query) do
-          Origin::Query.new({}, {}, :mongo1x)
+          Mongoid::Query.new({}, {}, :mongo1x)
         end
 
         context "when provided a hash" do

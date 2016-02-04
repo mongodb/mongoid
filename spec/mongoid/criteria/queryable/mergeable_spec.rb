@@ -1,11 +1,11 @@
 require "spec_helper"
 
-describe Origin::Mergeable do
+describe Mongoid::Criteria::Queryable::Mergeable do
 
   describe "#intersect" do
 
     let(:query) do
-      Origin::Query.new
+      Mongoid::Query.new
     end
 
     before do
@@ -20,7 +20,7 @@ describe Origin::Mergeable do
   describe "#override" do
 
     let(:query) do
-      Origin::Query.new
+      Mongoid::Query.new
     end
 
     before do
@@ -35,7 +35,7 @@ describe Origin::Mergeable do
   describe "#union" do
 
     let(:query) do
-      Origin::Query.new
+      Mongoid::Query.new
     end
 
     before do

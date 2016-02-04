@@ -15,7 +15,7 @@ describe Symbol do
     end
 
     it "adds the method to symbol" do
-      expect(fubar).to be_a(Origin::Key)
+      expect(fubar).to be_a(Mongoid::Criteria::Queryable::Key)
     end
 
     it "sets the key name" do

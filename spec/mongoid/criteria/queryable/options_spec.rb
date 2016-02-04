@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Origin::Options do
+describe Mongoid::Criteria::Queryable::Options do
 
   describe "#__deep_copy__" do
 
@@ -230,6 +230,7 @@ describe Origin::Options do
 
           after(:all) do
             Object.send(:remove_const, :Field)
+            ::I18n.locale = :en
           end
 
           let(:options) do

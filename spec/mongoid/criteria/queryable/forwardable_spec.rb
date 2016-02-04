@@ -1,14 +1,14 @@
 require "spec_helper"
 
-describe Origin::Forwardable do
+describe Mongoid::Criteria::Queryable::Forwardable do
 
   describe ".select_with" do
 
     context "when extending from a class" do
 
       before(:all) do
-        class Band
-          extend Origin::Forwardable
+        class Mountain
+          extend Mongoid::Criteria::Queryable::Forwardable
           select_with :queryable
 
           def self.queryable
@@ -18,22 +18,22 @@ describe Origin::Forwardable do
       end
 
       after(:all) do
-        Object.send(:remove_const, :Band)
+        Object.send(:remove_const, :Mountain)
       end
 
       context "when provided a symbol" do
 
-        Origin::Selectable.forwardables.each do |method|
+        Mongoid::Criteria::Queryable::Selectable.forwardables.each do |method|
 
           it "forwards #{method} to the provided method name" do
-            expect(Band).to respond_to(method)
+            expect(Mountain).to respond_to(method)
           end
         end
 
-        Origin::Optional.forwardables.each do |method|
+        Mongoid::Criteria::Queryable::Optional.forwardables.each do |method|
 
           it "forwards #{method} to the provided method name" do
-            expect(Band).to respond_to(method)
+            expect(Mountain).to respond_to(method)
           end
         end
       end
@@ -43,7 +43,7 @@ describe Origin::Forwardable do
 
       before(:all) do
         module Finders
-          extend Origin::Forwardable
+          extend Mongoid::Criteria::Queryable::Forwardable
           select_with :queryable
 
           def self.queryable
@@ -59,26 +59,26 @@ describe Origin::Forwardable do
       context "when provided a symbol" do
 
         before(:all) do
-          class Band
+          class Mountain
             extend Finders
           end
         end
 
         after(:all) do
-          Object.send(:remove_const, :Band)
+          Object.send(:remove_const, :Mountain)
         end
 
-        Origin::Selectable.forwardables.each do |method|
+        Mongoid::Criteria::Queryable::Selectable.forwardables.each do |method|
 
           it "forwards #{method} to the provided method name" do
-            expect(Band).to respond_to(method)
+            expect(Mountain).to respond_to(method)
           end
         end
 
-        Origin::Optional.forwardables.each do |method|
+        Mongoid::Criteria::Queryable::Optional.forwardables.each do |method|
 
           it "forwards #{method} to the provided method name" do
-            expect(Band).to respond_to(method)
+            expect(Mountain).to respond_to(method)
           end
         end
       end

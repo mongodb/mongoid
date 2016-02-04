@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Origin::Pipeline do
+describe Mongoid::Criteria::Queryable::Pipeline do
 
   describe "#__deep_copy" do
 

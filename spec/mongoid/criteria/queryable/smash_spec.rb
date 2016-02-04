@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Origin::Smash do
+describe Mongoid::Criteria::Queryable::Smash do
 
   let(:smash) do
     described_class.new(ns: :namespace)
