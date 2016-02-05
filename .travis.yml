@@ -13,6 +13,7 @@ gemfile:
   - Gemfile
   - gemfiles/rails41.gemfile
   - gemfiles/rails42.gemfile
+  - gemfiles/rails50.gemfile
 
 env:
   global:
@@ -23,6 +24,15 @@ env:
     - MONGODB=2.6.11
     - MONGODB=3.0.7
     - MONGODB=3.2.0
+
+matrix:
+  exclude:
+    - rvm: 1.9.3
+      gemfile: gemfiles/rails50.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/rails50.gemfile
+    - rvm: 2.1
+      gemfile: gemfiles/rails50.gemfile
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
