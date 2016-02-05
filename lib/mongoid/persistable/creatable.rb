@@ -20,7 +20,7 @@ module Mongoid
       #
       # @since 1.0.0
       def insert(mongo_context: Context.new(self), **options)
-        prepare_insert(options) do
+        prepare_insert(**options) do
           if embedded?
             insert_as_embedded(mongo_context: mongo_context)
           else
@@ -113,7 +113,7 @@ module Mongoid
       #
       # @since 4.0.0
       def prepare_insert(**options)
-        return self if performing_validations?(options) &&
+        return self if performing_validations?(**options) &&
           invalid?(options[:context] || :create)
         result = run_callbacks(:save) do
           run_callbacks(:create) do
@@ -121,7 +121,7 @@ module Mongoid
             post_process_insert
           end
         end
-        post_process_persist(result, options) and self
+        post_process_persist(result, **options) and self
       end
 
       module ClassMethods
@@ -142,10 +142,12 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create(attributes_list = nil, mongo_context: Context.new(self), **attributes, &block)
+        def create(attributes_list = nil, mongo_context: Context.new(self), **attributes_hash, &block)
+          attributes = attributes_list.respond_to?(:keys) && attributes_hash ?
+                         attributes_list.merge(attributes_hash) : (attributes_list || attributes_hash)
           _creating do
-            if attributes_list.is_a?(Array)
-              attributes_list.map { |attrs| create(mongo_context: mongo_context, **attrs, &block) }
+            if attributes.is_a?(Array)
+              attributes.map { |attrs| create(attrs, mongo_context: mongo_context, &block) }
             else
               doc = new(attributes, &block)
               doc.save
@@ -173,7 +175,9 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create!(attributes_list = nil, mongo_context: Context.new(self), **attributes, &block)
+        def create!(attributes_list = nil, mongo_context: Context.new(self), **attributes_hash, &block)
+          attributes = attributes_list.respond_to?(:keys) && attributes_hash ?
+              attributes_list.merge(attributes_hash) : (attributes_list || attributes_hash)
           _creating do
             if attributes_list.is_a?(::Array)
               attributes_list.map { |attrs| create!(mongo_context: mongo_context, **attrs, &block) }
