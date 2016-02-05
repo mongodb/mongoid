@@ -14,6 +14,7 @@ require "mongoid/shardable"
 require "mongoid/stateful"
 require "mongoid/traversable"
 require "mongoid/validatable"
+require 'active_model/serializers/xml'
 
 module Mongoid
 
