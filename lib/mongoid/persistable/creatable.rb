@@ -19,12 +19,12 @@ module Mongoid
       # @return [ Document ] The persisted document.
       #
       # @since 1.0.0
-      def insert(options = {})
-        prepare_insert(options) do
+      def insert(mongo_context: Context.new(self), **options)
+        prepare_insert(**options) do
           if embedded?
-            insert_as_embedded
+            insert_as_embedded(mongo_context: mongo_context)
           else
-            insert_as_root
+            insert_as_root(mongo_context: mongo_context)
           end
         end
       end
@@ -55,12 +55,13 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def insert_as_embedded
+      def insert_as_embedded(mongo_context: Context.new(self))
         raise Errors::NoParent.new(self.class.name) unless _parent
         if _parent.new_record?
-          _parent.insert
+          _parent.insert(mongo_context: mongo_context)
         else
           selector = _parent.atomic_selector
+          # get collection from mongo_context
           _root.collection.find(selector).update_one(positionally(selector, atomic_inserts))
         end
       end
@@ -75,7 +76,8 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def insert_as_root
+      def insert_as_root(mongo_context: Context.new(self))
+        # get collection from mongo_context
         collection.insert_one(as_document)
       end
 
@@ -110,8 +112,8 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def prepare_insert(options = {})
-        return self if performing_validations?(options) &&
+      def prepare_insert(**options)
+        return self if performing_validations?(**options) &&
           invalid?(options[:context] || :create)
         result = run_callbacks(:save) do
           run_callbacks(:create) do
@@ -119,7 +121,7 @@ module Mongoid
             post_process_insert
           end
         end
-        post_process_persist(result, options) and self
+        post_process_persist(result, **options) and self
       end
 
       module ClassMethods
@@ -140,10 +142,12 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create(attributes = nil, &block)
+        def create(attributes_list = nil, mongo_context: Context.new(self), **attributes_hash, &block)
+          attributes = attributes_list.respond_to?(:keys) && attributes_hash ?
+                         attributes_list.merge(attributes_hash) : (attributes_list || attributes_hash)
           _creating do
-            if attributes.is_a?(::Array)
-              attributes.map { |attrs| create(attrs, &block) }
+            if attributes.is_a?(Array)
+              attributes.map { |attrs| create(attrs, mongo_context: mongo_context, &block) }
             else
               doc = new(attributes, &block)
               doc.save
@@ -171,10 +175,12 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create!(attributes = nil, &block)
+        def create!(attributes_list = nil, mongo_context: Context.new(self), **attributes_hash, &block)
+          attributes = attributes_list.respond_to?(:keys) && attributes_hash ?
+              attributes_list.merge(attributes_hash) : (attributes_list || attributes_hash)
           _creating do
-            if attributes.is_a?(::Array)
-              attributes.map { |attrs| create!(attrs, &block) }
+            if attributes_list.is_a?(::Array)
+              attributes_list.map { |attrs| create!(mongo_context: mongo_context, **attrs, &block) }
             else
               doc = new(attributes, &block)
               doc.fail_due_to_validation! unless doc.insert.errors.empty?
