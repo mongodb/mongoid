@@ -141,9 +141,10 @@ module Mongoid
     # @return [ Object ] The result of the operation.
     #
     # @since 4.0.0
-    def prepare_atomic_operation
+    def prepare_atomic_operation(options = {})
+      context = options[:mongo_context] || Context.new(self)
       operations = yield({})
-      persist_or_delay_atomic_operation(operations)
+      persist_or_delay_atomic_operation(operations, mongo_context: context)
       self
     end
 
@@ -163,7 +164,7 @@ module Mongoid
     # @return [ Hash ] The operations.
     #
     # @since 4.0.0
-    def process_atomic_operations(operations)
+    def process_atomic_operations(operations, options = {})
       operations.each do |field, value|
         unless attribute_writable?(field)
           raise Errors::ReadonlyAttribute.new(field, value)
@@ -185,14 +186,15 @@ module Mongoid
     # @param [ Hash ] operation The operation.
     #
     # @since 4.0.0
-    def persist_or_delay_atomic_operation(operation)
+    def persist_or_delay_atomic_operation(operation, options = {})
+      context = options[:mongo_context] || Context.new(self)
       if executing_atomically?
         operation.each do |(name, hash)|
           @atomic_updates_to_execute[name] ||= {}
           @atomic_updates_to_execute[name].merge!(hash)
         end
       else
-        persist_atomic_operations(operation)
+        persist_atomic_operations(operation, mongo_context: context)
       end
     end
 
@@ -206,10 +208,11 @@ module Mongoid
     # @param [ Hash ] operations The atomic operations.
     #
     # @since 4.0.0
-    def persist_atomic_operations(operations)
+    def persist_atomic_operations(operations, options = {})
+      context = options[:mongo_context] || Context.new(self)
       if persisted? && operations
         selector = atomic_selector
-        _root.collection.find(selector).update_one(positionally(selector, operations))
+        context.collection(_root).find(selector).update_one(positionally(selector, operations))
       end
     end
   end

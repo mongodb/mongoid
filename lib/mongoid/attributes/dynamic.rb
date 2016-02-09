@@ -94,10 +94,11 @@ module Mongoid
       # @param [ Object ] value The value of the field.
       #
       # @since 4.0.0
-      def process_attribute(name, value)
+      def process_attribute(name, value, options = {})
+        context = options[:mongo_context] || Context.new(self)
         responds = respond_to?("#{name}=")
         if !responds
-          write_attribute(name, value)
+          write_attribute(name, value, mongo_context: context)
         else
           send("#{name}=", value)
         end

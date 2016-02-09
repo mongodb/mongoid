@@ -20,8 +20,9 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def inc(increments)
-        prepare_atomic_operation do |ops|
+      def inc(increments, options = {})
+        context = options[:mongo_context] || Context.new(self)
+        prepare_atomic_operation(mongo_context: context) do |ops|
           process_atomic_operations(increments) do |field, value|
             increment = value.__to_inc__
             current = attributes[field]

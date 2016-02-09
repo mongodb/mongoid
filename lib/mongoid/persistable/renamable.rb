@@ -20,8 +20,9 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def rename(renames)
-        prepare_atomic_operation do |ops|
+      def rename(renames, options = {})
+        context = options[:mongo_context] || Context.new(self)
+        prepare_atomic_operation(mongo_context: context) do |ops|
           process_atomic_operations(renames) do |old_field, new_field|
             new_name = new_field.to_s
             attributes[new_name] = attributes.delete(old_field)

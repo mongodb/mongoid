@@ -24,8 +24,9 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def pop(pops)
-        prepare_atomic_operation do |ops|
+      def pop(pops, options = {})
+        context = options[:mongo_context] || Context.new(self)
+        prepare_atomic_operation(mongo_context: context) do |ops|
           process_atomic_operations(pops) do |field, value|
             values = send(field)
             value > 0 ? values.pop : values.shift

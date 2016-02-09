@@ -20,10 +20,11 @@ module Mongoid
       # @raise [ Errors::ReadonlyAttribute ] If the field cannot be changed due
       #   to being flagged as reaodnly.
       #
-      # @return [ true, false ] True if save was successfull, false if not.
+      # @return [ true, false ] True if save was successful, false if not.
       #
       # @since 2.0.0
-      def update_attribute(name, value)
+      def update_attribute(name, value, options = {})
+        context = options[:mongo_context] || Context.new(self)
         normalized = name.to_s
         unless attribute_writable?(normalized)
           raise Errors::ReadonlyAttribute.new(normalized, value)
@@ -32,9 +33,10 @@ module Mongoid
         if respond_to?(setter)
           send(setter, value)
         else
+          # todo pass context
           write_attribute(database_field_name(normalized), value)
         end
-        save(validate: false)
+        save(validate: false, mongo_context: context)
       end
 
       # Update the document attributes in the database.
@@ -47,9 +49,11 @@ module Mongoid
       # @return [ true, false ] True if validation passed, false if not.
       #
       # @since 1.0.0
-      def update(attributes = {})
+      def update(attributes = {}, options = {})
+        context = options[:mongo_context] || Context.new(self)
+        # todo: pass context
         assign_attributes(attributes)
-        save
+        save(mongo_context: context)
       end
       alias :update_attributes :update
 
@@ -67,8 +71,9 @@ module Mongoid
       # @return [ true, false ] True if validation passed.
       #
       # @since 1.0.0
-      def update!(attributes = {})
-        result = update_attributes(attributes)
+      def update!(attributes = {}, options = {})
+        context = options[:mongo_context] || Context.new(self)
+        result = update_attributes(attributes, mongo_context: context)
         unless result
           fail_due_to_validation! unless errors.empty?
           fail_due_to_callback!(:update_attributes!)
@@ -135,11 +140,12 @@ module Mongoid
       #
       # @since 1.0.0
       def update_document(options = {})
+        context = options[:mongo_context] || Context.new(self)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_update(options) do
           updates, conflicts = init_atomic_updates
           unless updates.empty?
-            coll = _root.collection
+            coll = context.collection(_root)
             selector = atomic_selector
             coll.find(selector).update_one(positionally(selector, updates))
             conflicts.each_pair do |key, value|
