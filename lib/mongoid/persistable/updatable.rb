@@ -33,7 +33,6 @@ module Mongoid
         if respond_to?(setter)
           send(setter, value)
         else
-          # todo pass context
           write_attribute(database_field_name(normalized), value)
         end
         save(validate: false, mongo_context: context)

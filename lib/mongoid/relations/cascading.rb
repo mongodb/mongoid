@@ -26,7 +26,6 @@ module Mongoid
       # @since 2.0.0.rc.1
       def cascade!(options = {})
         context = options[:mongo_context] || Context.new(self)
-        # todo: pass context below
         cascades.each do |name|
           if meta = relations[name]
             strategy = meta.cascade_strategy
