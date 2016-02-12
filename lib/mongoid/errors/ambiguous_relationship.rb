@@ -24,7 +24,7 @@ module Mongoid
       #
       # @example Create the error.
       #   AmbiguousRelationship.new(
-      #     Person, Drug, :person, [ :drugs, #   :evil_drugs ]
+      #     Person, Drug, :person, [ :drugs, :evil_drugs ]
       #   )
       #
       # @param [ Class ] klass The base class.

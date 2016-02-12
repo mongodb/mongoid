@@ -4,6 +4,7 @@ require "mongoid/criteria/includable"
 require "mongoid/criteria/inspectable"
 require "mongoid/criteria/marshalable"
 require "mongoid/criteria/modifiable"
+require "mongoid/criteria/queryable"
 require "mongoid/criteria/scopable"
 
 module Mongoid
@@ -17,7 +18,7 @@ module Mongoid
   class Criteria
     include Enumerable
     include Contextual
-    include Origin::Queryable
+    include Queryable
     include Findable
     include Inspectable
     include Includable

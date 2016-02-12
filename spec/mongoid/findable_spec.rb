@@ -476,7 +476,7 @@ describe Mongoid::Findable do
     end
   end
 
-  Origin::Selectable.forwardables.each do |method|
+  Mongoid::Criteria::Queryable::Selectable.forwardables.each do |method|
 
     describe "##{method}" do
 
