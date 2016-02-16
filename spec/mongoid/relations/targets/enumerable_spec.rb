@@ -622,6 +622,22 @@ describe Mongoid::Relations::Targets::Enumerable do
       it "becomes loaded" do
         expect(enumerable).to be__loaded
       end
+
+      context 'when there are multiple related documents' do
+
+        before do
+          Post.create(person_id: person.id)
+          Post.create(person_id: person.id)
+        end
+
+        let(:enumerable) do
+          described_class.new(criteria)
+        end
+
+        it "sets each base document to the same object" do
+          expect(enumerable.collect(&:person).uniq.size).to eq(1)
+        end
+      end
     end
 
     context "when only an array target exists" do
