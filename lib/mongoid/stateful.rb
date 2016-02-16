@@ -104,5 +104,11 @@ module Mongoid
     def updateable?
       persisted? && changed?
     end
+
+    private
+
+    def reset_readonly
+      self.__selected_fields = nil
+    end
   end
 end

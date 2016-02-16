@@ -284,5 +284,20 @@ describe Mongoid::Reloadable do
         expect(object.reload).to eq(from_db)
       end
     end
+
+    context 'when the document is readonly' do
+
+      before do
+        Person.create
+      end
+
+      let(:reloaded) do
+        Person.only(:name).first.reload
+      end
+
+      it 'resets the readonly state after reloading' do
+        expect(reloaded.readonly?).to be(false)
+      end
+    end
   end
 end

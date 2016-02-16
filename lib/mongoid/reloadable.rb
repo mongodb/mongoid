@@ -26,6 +26,7 @@ module Mongoid
       @attributes = reloaded
       @attributes_before_type_cast = {}
       changed_attributes.clear
+      reset_readonly
       apply_defaults
       reload_relations
       run_callbacks(:find) unless _find_callbacks.empty?
