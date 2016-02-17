@@ -92,7 +92,7 @@ development:
         # A passphrase for the private key.
         # ssl_key_pass_phrase: password
 
-        # Whether or not to do peer certification validation. (default: false)
+        # Whether or not to do peer certification validation. (default: true)
         # ssl_verify: true
 
         # The file containing a set of concatenated certification authority certifications
