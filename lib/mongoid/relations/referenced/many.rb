@@ -181,7 +181,6 @@ module Mongoid
         def each
           if block_given?
             target.each do |doc|
-              doc.set_relation(__metadata.inverse_of, base)
               yield(doc)
             end
           else
@@ -234,7 +233,7 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def initialize(base, target, metadata)
-          init(base, Targets::Enumerable.new(target), metadata) do
+          init(base, Targets::Enumerable.new(target, base, metadata), metadata) do
             raise_mixed if klass.embedded? && !klass.cyclic?
           end
         end
