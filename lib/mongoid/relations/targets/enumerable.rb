@@ -484,7 +484,7 @@ module Mongoid
         end
 
         def set_base(doc)
-          unless @metadata && @metadata[:relation] == Mongoid::Relations::Referenced::ManyToMany
+          unless @metadata && @metadata.relation == Mongoid::Relations::Referenced::ManyToMany
             doc.set_relation(@metadata.inverse_of, @base) if (doc && @base)
           end
           doc
