@@ -59,6 +59,8 @@ module Mongoid
         #
         # @since 2.1.0
         def <<(document)
+          # todo: test
+          set_base(document)
           _added[document._id] = document
           self
         end
@@ -80,6 +82,7 @@ module Mongoid
         # @since 2.1.0
         def clear
           if block_given?
+            # todo: test
             in_memory { |doc| yield(doc) }
           end
           _loaded.clear and _added.clear
@@ -113,6 +116,7 @@ module Mongoid
           doc = (_loaded.delete(document._id) || _added.delete(document._id))
           unless doc
             if _unloaded && _unloaded.where(_id: document._id).exists?
+              set_base(document)
               yield(document) if block_given?
               return document
             end
@@ -174,18 +178,22 @@ module Mongoid
             return to_enum
           end
           if _loaded?
+            # todo: test
             _loaded.each_pair do |id, doc|
               document = _added.delete(doc._id) || doc
               yield(document)
             end
           else
             unloaded_documents.each do |doc|
+              # todo: test
               document = _added.delete(doc._id) || _loaded.delete(doc._id) || doc
+              set_base(document)
               _loaded[document._id] = document
               yield(document)
             end
           end
           _added.each_pair do |id, doc|
+            # todo: test
             yield(doc)
           end
           @executed = true
@@ -218,10 +226,11 @@ module Mongoid
         #
         # @since 2.1.0
         def first
-          _loaded.try(:values).try(:first) ||
+          # todo: test
+          set_base(_loaded.try(:values).try(:first) ||
             _added[(ul = _unloaded.try(:first)).try(:id)] ||
             ul ||
-            _added.values.try(:first)
+            _added.values.try(:first))
         end
 
         # Initialize the new enumerable either with a criteria or an array.
@@ -235,12 +244,16 @@ module Mongoid
         # @param [ Criteria, Array<Document> ] target The wrapped object.
         #
         # @since 2.1.0
-        def initialize(target)
+        def initialize(target, base = nil, metadata = nil)
+          @base = base
+          @metadata = metadata
           if target.is_a?(Criteria)
             @_added, @executed, @_loaded, @_unloaded = {}, false, {}, target
           else
             @_added, @executed = {}, true
             @_loaded = target.inject({}) do |_target, doc|
+              # todo: test
+              set_base(doc)
               _target[doc._id] = doc if doc
               _target
             end
@@ -287,6 +300,7 @@ module Mongoid
         #
         # @since 2.1.0
         def in_memory
+          # todo: test
           docs = (_loaded.values + _added.values)
           docs.each { |doc| yield(doc) } if block_given?
           docs
@@ -302,10 +316,11 @@ module Mongoid
         #
         # @since 2.1.0
         def last
-          _added.values.try(:last) ||
+          # todo: test
+          set_base(_added.values.try(:last) ||
             _loaded.try(:values).try(:last) ||
             _added[(ul = _unloaded.try(:last)).try(:id)] ||
-            ul
+            ul)
         end
 
         # Loads all the documents in the enumerable from the database.
@@ -466,6 +481,13 @@ module Mongoid
 
         def unloaded_documents
           _unloaded.selector.values.any?(&:blank_criteria?) ? [] : _unloaded
+        end
+
+        def set_base(doc)
+          unless @metadata && @metadata[:relation] == Mongoid::Relations::Referenced::ManyToMany
+            doc.set_relation(@metadata.inverse_of, @base) if (doc && @base)
+          end
+          doc
         end
       end
     end
