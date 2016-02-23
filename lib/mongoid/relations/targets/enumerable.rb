@@ -59,7 +59,6 @@ module Mongoid
         #
         # @since 2.1.0
         def <<(document)
-          # todo: test
           set_base(document)
           _added[document._id] = document
           self
@@ -484,8 +483,8 @@ module Mongoid
         end
 
         def set_base(doc)
-          unless @metadata && @metadata.relation == Mongoid::Relations::Referenced::ManyToMany
-            doc.set_relation(@metadata.inverse_of, @base) if (doc && @base)
+          if @metadata && @metadata.relation != Mongoid::Relations::Referenced::ManyToMany
+            doc.set_relation(@metadata.inverse_of, @base) if (doc && @base && @metadata.inverse_of)
           end
           doc
         end
