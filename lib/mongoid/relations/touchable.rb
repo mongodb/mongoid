@@ -29,7 +29,7 @@ module Mongoid
         write_attribute(field, current) if field
 
         touches = touch_atomic_updates(field)
-        unless touches.empty?
+        unless touches["$set"].blank?
           selector = atomic_selector
           _root.collection.find(selector).update_one(positionally(selector, touches))
         end
