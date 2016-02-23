@@ -190,6 +190,21 @@ describe Mongoid::Relations::Targets::Enumerable do
         expect(added).to eq([ post ])
       end
     end
+
+    context 'when the relation is one-to-many' do
+
+      let(:post) do
+        Post.create
+      end
+
+      let(:added) do
+        person.posts << post
+      end
+
+      it 'sets the base object on the added document' do
+        expect(person).to be(added.first.person)
+      end
+    end
   end
 
   describe "#any?" do

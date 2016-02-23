@@ -88,6 +88,7 @@ class Person
   has_many \
     :posts,
     dependent: :delete,
+    inverse_of: :person,
     validate: false do
     def extension
       "Testing"
