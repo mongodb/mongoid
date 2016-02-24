@@ -2,6 +2,15 @@ require "spec_helper"
 
 describe Mongoid::Relations::Polymorphic do
 
+  describe "::find_or_create_by" do
+    it 'can find or create by polymorphic value' do
+      movie = Movie.create!
+      rating = Rating.find_or_create_by!(ratable: movie)
+      expect(rating.ratable_id).to eq(movie.id)
+      expect(rating.ratable_type).to eq('Movie')
+    end
+  end
+
   describe "#polymorph" do
 
     let(:klass) do
