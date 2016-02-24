@@ -20,5 +20,12 @@ describe Mongoid::Composable do
         end
       end
     end
+
+    Mongoid::Composable::RESERVED_METHOD_NAMES.each do |name|
+
+      it "includes the method names #{name}" do
+        expect(methods).to include(name)
+      end
+    end
   end
 end

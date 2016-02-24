@@ -84,6 +84,13 @@ module Mongoid
       ActiveModel::Validations
     ]
 
+    RESERVED_METHOD_NAMES = [ :fields,
+                              :aliased_fields,
+                              :localized_fields,
+                              :pre_processed_defaults,
+                              :post_processed_defaults
+                            ]
+
     class << self
 
       # Get a list of methods that would be a bad idea to define as field names
@@ -98,7 +105,7 @@ module Mongoid
       def prohibited_methods
         @prohibited_methods ||= MODULES.flat_map do |mod|
           mod.instance_methods.map(&:to_sym)
-        end
+        end + RESERVED_METHOD_NAMES
       end
     end
   end

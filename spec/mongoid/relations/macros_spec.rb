@@ -21,6 +21,19 @@ describe Mongoid::Relations::Macros do
       expect(klass).to respond_to(:embedded_in)
     end
 
+    context 'when the relation name is invalid' do
+
+      let(:relation) do
+        klass.embedded_in(:fields)
+      end
+
+      it 'raises an InvalidRelation exception' do
+        expect {
+          relation
+        }.to raise_exception(Mongoid::Errors::InvalidRelation)
+      end
+    end
+
     context "when defining the relation" do
 
       before do
@@ -73,6 +86,19 @@ describe Mongoid::Relations::Macros do
     end
 
     context "when defining the relation" do
+
+      context 'when the relation name is invalid' do
+
+        let(:relation) do
+          klass.embeds_many(:fields)
+        end
+
+        it 'raises an InvalidRelation exception' do
+          expect {
+            relation
+          }.to raise_exception(Mongoid::Errors::InvalidRelation)
+        end
+      end
 
       before do
         klass.embeds_many(:addresses)
@@ -156,6 +182,19 @@ describe Mongoid::Relations::Macros do
     end
 
     context "when defining the relation" do
+
+      context 'when the relation name is invalid' do
+
+        let(:relation) do
+          klass.embeds_one(:fields)
+        end
+
+        it 'raises an InvalidRelation exception' do
+          expect {
+            relation
+          }.to raise_exception(Mongoid::Errors::InvalidRelation)
+        end
+      end
 
       before do
         klass.embeds_one(:name)
@@ -247,6 +286,19 @@ describe Mongoid::Relations::Macros do
 
     context "when defining the relation" do
 
+      context 'when the relation name is invalid' do
+
+        let(:relation) do
+          klass.belongs_to(:fields)
+        end
+
+        it 'raises an InvalidRelation exception' do
+          expect {
+            relation
+          }.to raise_exception(Mongoid::Errors::InvalidRelation)
+        end
+      end
+
       before do
         klass.belongs_to(:person)
       end
@@ -305,6 +357,19 @@ describe Mongoid::Relations::Macros do
     end
 
     context "when defining the relation" do
+
+      context 'when the relation name is invalid' do
+
+        let(:relation) do
+          klass.has_many(:fields)
+        end
+
+        it 'raises an InvalidRelation exception' do
+          expect {
+            relation
+          }.to raise_exception(Mongoid::Errors::InvalidRelation)
+        end
+      end
 
       before do
         klass.has_many(:posts)
@@ -389,6 +454,19 @@ describe Mongoid::Relations::Macros do
 
     context "when defining the relation" do
 
+      context 'when the relation name is invalid' do
+
+        let(:relation) do
+          klass.has_and_belongs_to_many(:fields)
+        end
+
+        it 'raises an InvalidRelation exception' do
+          expect {
+            relation
+          }.to raise_exception(Mongoid::Errors::InvalidRelation)
+        end
+      end
+
       before do
         klass.has_and_belongs_to_many(:preferences)
       end
@@ -458,6 +536,19 @@ describe Mongoid::Relations::Macros do
     end
 
     context "when defining the relation" do
+
+      context 'when the relation name is invalid' do
+
+        let(:relation) do
+          klass.has_one(:fields)
+        end
+
+        it 'raises an InvalidRelation exception' do
+          expect {
+            relation
+          }.to raise_exception(Mongoid::Errors::InvalidRelation)
+        end
+      end
 
       before do
         klass.has_one(:game)

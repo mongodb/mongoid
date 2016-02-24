@@ -349,6 +349,7 @@ module Mongoid
         # @param [ Symbol ] name The name of the relation.
         # @param [ Metadata ] metadata The metadata for the relation.
         def relate(name, metadata)
+          Fields::Validators::Macro.validate_relation(self, name)
           self.relations = relations.merge(name.to_s => metadata)
           getter(name, metadata).setter(name, metadata).existence_check(name)
         end

@@ -165,6 +165,19 @@ en:
             collection. Double check the relation definitions and fix any
             instances where embedded documents are improperly referenced
             from other collections."
+        invalid_relation:
+          message: "Defining a relation named '%{name}' is not allowed."
+          summary: "Defining this relation would override the method '%{name}',
+            which would cause issues with expectations around the original
+            method and cause extremely hard to debug issues. The original
+            method was defined in:\n
+            \_\_Object: %{origin}\n
+            \_\_File: %{file}\n
+            \_\_Line: %{line}"
+          resolution: "Use Mongoid.destructive_fields to see what names are not
+            allowed, and don't use these names. These include names that also
+            conflict with core Ruby methods on Object, Module, Enumerable, or
+            included gems that inject methods into these or Mongoid internals."
         invalid_scope:
           message: "Defining a scope of value %{value} on %{klass} is not
             allowed."
