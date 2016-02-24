@@ -81,7 +81,6 @@ module Mongoid
         # @since 2.1.0
         def clear
           if block_given?
-            # todo: test
             in_memory { |doc| yield(doc) }
           end
           _loaded.clear and _added.clear
@@ -177,14 +176,12 @@ module Mongoid
             return to_enum
           end
           if _loaded?
-            # todo: test
             _loaded.each_pair do |id, doc|
               document = _added.delete(doc._id) || doc
               yield(document)
             end
           else
             unloaded_documents.each do |doc|
-              # todo: test
               document = _added.delete(doc._id) || _loaded.delete(doc._id) || doc
               set_base(document)
               _loaded[document._id] = document
@@ -192,7 +189,6 @@ module Mongoid
             end
           end
           _added.each_pair do |id, doc|
-            # todo: test
             yield(doc)
           end
           @executed = true
@@ -225,7 +221,6 @@ module Mongoid
         #
         # @since 2.1.0
         def first
-          # todo: test
           set_base(_loaded.try(:values).try(:first) ||
             _added[(ul = _unloaded.try(:first)).try(:id)] ||
             ul ||
@@ -251,7 +246,6 @@ module Mongoid
           else
             @_added, @executed = {}, true
             @_loaded = target.inject({}) do |_target, doc|
-              # todo: test
               set_base(doc)
               _target[doc._id] = doc if doc
               _target
@@ -299,7 +293,6 @@ module Mongoid
         #
         # @since 2.1.0
         def in_memory
-          # todo: test
           docs = (_loaded.values + _added.values)
           docs.each { |doc| yield(doc) } if block_given?
           docs
@@ -315,7 +308,6 @@ module Mongoid
         #
         # @since 2.1.0
         def last
-          # todo: test
           set_base(_added.values.try(:last) ||
             _loaded.try(:values).try(:last) ||
             _added[(ul = _unloaded.try(:last)).try(:id)] ||
