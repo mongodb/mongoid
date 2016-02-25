@@ -3349,6 +3349,21 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(band)
         end
       end
+
+      context 'when querying on a polymorphic relation' do
+
+        let(:movie) do
+          Movie.create
+        end
+
+        let(:selector) do
+          Rating.where(ratable: movie).selector
+        end
+
+        it 'properly converts the object to an ObjectId' do
+          expect(selector['ratable_id']).to eq(movie.id)
+        end
+      end
     end
   end
 
