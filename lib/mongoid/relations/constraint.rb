@@ -34,7 +34,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.7
       def convert(object)
-        return object if metadata.polymorphic?
+        return convert_polymorphic(object) if metadata.polymorphic?
         klass, field = metadata.klass, metadata.klass.fields["_id"]
         if klass.using_object_ids?
           BSON::ObjectId.mongoize(object)
@@ -43,6 +43,12 @@ module Mongoid
         else
           field.mongoize(object)
         end
+      end
+
+      private
+      
+      def convert_polymorphic(object)
+        object.respond_to?(:id) ? object.id : object
       end
     end
   end
