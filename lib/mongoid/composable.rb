@@ -84,6 +84,27 @@ module Mongoid
       ActiveModel::Validations
     ]
 
+    # These are methods names defined in included blocks that may conflict
+    # with user-defined relation or field names.
+    # They won't be in the list of Module.instance_methods on which the
+    # #prohibited_methods code below is dependent so we must track them
+    # separately.
+    #
+    # @return [ Array<Symbol> ] A list of reserved method names.
+    #
+    # @since 6.0.0
+    RESERVED_METHOD_NAMES = [ :fields,
+                              :aliased_fields,
+                              :localized_fields,
+                              :index_specifications,
+                              :shard_key_fields,
+                              :nested_attributes,
+                              :readonly_attributes,
+                              :storage_options,
+                              :cascades,
+                              :cyclic
+                            ]
+
     class << self
 
       # Get a list of methods that would be a bad idea to define as field names
@@ -98,7 +119,7 @@ module Mongoid
       def prohibited_methods
         @prohibited_methods ||= MODULES.flat_map do |mod|
           mod.instance_methods.map(&:to_sym)
-        end
+        end + RESERVED_METHOD_NAMES
       end
     end
   end
