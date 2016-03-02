@@ -164,7 +164,8 @@ module Mongoid
     # @param [ Object ] value The value to set for the attribute.
     #
     # @since 1.0.0
-    def write_attribute(name, value)
+    def write_attribute(name, value, options = {})
+      #context = options[:mongo_context] || Context.new(self)
       access = database_field_name(name.to_s)
       if attribute_writable?(access)
         _assigning do

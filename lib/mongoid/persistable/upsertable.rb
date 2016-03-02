@@ -20,8 +20,9 @@ module Mongoid
       #
       # @since 3.0.0
       def upsert(options = {})
+        context = options[:mongo_context] || Context.new(self)
         prepare_upsert(options) do
-          collection.find(atomic_selector).update_one(as_document, upsert: true)
+          context.collection.find(atomic_selector).update_one(as_document, upsert: true)
         end
       end
 

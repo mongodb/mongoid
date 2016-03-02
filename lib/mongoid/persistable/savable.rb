@@ -19,10 +19,11 @@ module Mongoid
       #
       # @since 1.0.0
       def save(options = {})
+        context = options[:mongo_context] || Context.new(self)
         if new_record?
-          !insert(options).new_record?
+          !insert(options.merge(mongo_context: context)).new_record?
         else
-          update_document(options)
+          update_document(options.merge(mongo_context: context))
         end
       end
 
@@ -41,7 +42,8 @@ module Mongoid
       #
       # @since 1.0.0
       def save!(options = {})
-        unless save(options)
+        context = options[:mongo_context] || Context.new(self)
+        unless save(options.merge(mongo_context: context))
           fail_due_to_validation! unless errors.empty?
           fail_due_to_callback!(:save!)
         end

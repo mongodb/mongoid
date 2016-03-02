@@ -19,8 +19,9 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def bit(operations)
-        prepare_atomic_operation do |ops|
+      def bit(operations, options = {})
+        context = options[:mongo_context] || Context.new(self)
+        prepare_atomic_operation(mongo_context: context) do |ops|
           process_atomic_operations(operations) do |field, values|
             value = attributes[field]
             values.each do |op, val|

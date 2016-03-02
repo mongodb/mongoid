@@ -19,12 +19,13 @@ module Mongoid
       #
       # @since 1.0.0
       def delete(options = {})
+        context = options[:mongo_context] || Context.new(self)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
-        prepare_delete do
+        prepare_delete(mongo_context: context) do
           if embedded?
-            delete_as_embedded(options)
+            delete_as_embedded(options.merge(mongo_context: context))
           else
-            delete_as_root
+            delete_as_root(mongo_context: context)
           end
         end
       end
@@ -59,10 +60,11 @@ module Mongoid
       #
       # @since 4.0.0
       def delete_as_embedded(options = {})
+        context = options[:mongo_context] || Context.new(self)
         _parent.remove_child(self) if notifying_parent?(options)
         if _parent.persisted?
           selector = _parent.atomic_selector
-          _root.collection.find(selector).update_one(positionally(selector, atomic_deletes))
+          context.collection(_root).find(selector).update_one(positionally(selector, atomic_deletes))
         end
         true
       end
@@ -77,8 +79,9 @@ module Mongoid
       # @return [ true ] If the document was removed.
       #
       # @since 4.0.0
-      def delete_as_root
-        collection.find(atomic_selector).delete_one
+      def delete_as_root(options = {})
+        context = options[:mongo_context] || Context.new(self)
+        context.collection.find(atomic_selector).delete_one
         true
       end
 
@@ -110,8 +113,9 @@ module Mongoid
       # @return [ Object ] The result of the block.
       #
       # @since 4.0.0
-      def prepare_delete
-        cascade!
+      def prepare_delete(options = {})
+        context = options[:mongo_context] || Context.new(self)
+        cascade!(mongo_context: context)
         yield(self)
         freeze
         self.destroyed = true
@@ -135,10 +139,11 @@ module Mongoid
         # @return [ Integer ] The number of documents deleted.
         #
         # @since 1.0.0
-        def delete_all(conditions = nil)
+        def delete_all(conditions = nil, options = {})
+          context = options[:mongo_context] || Context.new(self)
           selector = conditions || {}
           selector.merge!(_type: name) if hereditary?
-          coll = collection
+          coll = context.collection
           deleted = coll.find(selector).count
           coll.find(selector).delete_many
           deleted

@@ -20,11 +20,12 @@ module Mongoid
       #
       # @since 1.0.0
       def insert(options = {})
+        context = options[:mongo_context] || Context.new(self)
         prepare_insert(options) do
           if embedded?
-            insert_as_embedded
+            insert_as_embedded(mongo_context: context)
           else
-            insert_as_root
+            insert_as_root(mongo_context: context)
           end
         end
       end
@@ -55,13 +56,14 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def insert_as_embedded
+      def insert_as_embedded(options = {})
+        context = options[:mongo_context] || Context.new(self)
         raise Errors::NoParent.new(self.class.name) unless _parent
         if _parent.new_record?
-          _parent.insert
+          _parent.insert(mongo_context: context)
         else
           selector = _parent.atomic_selector
-          _root.collection.find(selector).update_one(positionally(selector, atomic_inserts))
+          context.collection(_root).find(selector).update_one(positionally(selector, atomic_inserts))
         end
       end
 
@@ -75,8 +77,9 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def insert_as_root
-        collection.insert_one(as_document)
+      def insert_as_root(options = {})
+        context = options[:mongo_context] || Context.new(self)
+        context.collection.insert_one(as_document)
       end
 
       # Post process an insert, which sets the new record attribute to false
@@ -140,10 +143,11 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create(attributes = nil, &block)
+        def create(attributes = nil, options = {}, &block)
+          context = options[:mongo_context] || Context.new(self)
           _creating do
             if attributes.is_a?(::Array)
-              attributes.map { |attrs| create(attrs, &block) }
+              attributes.map { |attrs| create(attrs, { mongo_context: context }, &block) }
             else
               doc = new(attributes, &block)
               doc.save
@@ -171,10 +175,11 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create!(attributes = nil, &block)
+        def create!(attributes = nil, options = {}, &block)
+          context = options[:mongo_context] || Context.new(self)
           _creating do
             if attributes.is_a?(::Array)
-              attributes.map { |attrs| create!(attrs, &block) }
+              attributes.map { |attrs| create!(attrs, { mongo_context: context }, &block) }
             else
               doc = new(attributes, &block)
               doc.fail_due_to_validation! unless doc.insert.errors.empty?

@@ -19,11 +19,13 @@ module Mongoid
       # @return [ Document ] The document.
       #
       # @since 4.0.0
-      def set(setters)
-        prepare_atomic_operation do |ops|
+      def set(setters, options = {})
+        context = options[:mongo_context] || Context.new(self)
+        prepare_atomic_operation(mongo_context: context) do |ops|
           process_atomic_operations(setters) do |field, value|
             field_and_value_hash = hasherizer(field.split('.'), value)
             field = field_and_value_hash.keys.first
+            # todo: pass context
             process_attribute(field, field_and_value_hash[field])
             ops[atomic_attribute_name(field)] = attributes[field]
           end
@@ -31,6 +33,8 @@ module Mongoid
         end
       end
     end
+
+    private
 
     def hasherizer(keys, value)
       return value if keys.empty?
