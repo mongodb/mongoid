@@ -16,6 +16,7 @@ require "mongo"
 
 require "mongoid/version"
 require "mongoid/config"
+require "mongoid/persistence_context"
 require "mongoid/loggable"
 require "mongoid/clients"
 require "mongoid/document"

@@ -74,8 +74,7 @@ module Mongoid
         def storage_options_defaults
           {
             collection: name.collectionize.to_sym,
-            client: :default,
-            database: -> { configured_database }
+            client: :default
           }
         end
 
@@ -133,17 +132,6 @@ module Mongoid
         def __evaluate__(name)
           return nil unless name
           name.respond_to?(:call) ? name.call.to_sym : name.to_sym
-        end
-
-        def configured_database
-          client = Mongoid.clients[client_name]
-          if db = client[:database]
-            db
-          elsif uri = client[:uri]
-            client[:database] = Mongo::URI.new(uri).database
-          else
-            nil
-          end
         end
       end
     end

@@ -12,7 +12,7 @@ module Mongoid
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
-          method =~ /(^__|^send|^object_id|^respond_to|^tap|^public_send|extend_proxy|extend_proxies)/
+            method =~ /(^__|^send|^object_id|^respond_to|^tap|^public_send|extend_proxy|extend_proxies)/
       end
 
       include Threaded::Lifecycle
@@ -84,35 +84,6 @@ module Mongoid
         target
       end
 
-      # Tell the next persistence operation to store in a specific collection,
-      # database or client.
-      #
-      # @example Save the current document to a different collection.
-      #   model.with(collection: "secondary").save
-      #
-      # @example Save the current document to a different database.
-      #   model.with(database: "secondary").save
-      #
-      # @example Save the current document to a different client.
-      #   model.with(client: "replica_set").save
-      #
-      # @example Save with a combination of options.
-      #   model.with(client: "sharded", database: "secondary").save
-      #
-      # @param [ Hash ] options The storage options.
-      #
-      # @option options [ String, Symbol ] :collection The collection name.
-      # @option options [ String, Symbol ] :database The database name.
-      # @option options [ String, Symbol ] :client The client name.
-      #
-      # @return [ Document ] The current document.
-      #
-      # @since 3.0.0
-      def with(options)
-        @persistence_options = options
-        self
-      end
-
       protected
 
       # Get the collection from the root of the hierarchy.
@@ -125,7 +96,6 @@ module Mongoid
       # @since 2.0.0
       def collection
         root = base._root
-        root.with(@persistence_options)
         root.collection unless root.embedded?
       end
 

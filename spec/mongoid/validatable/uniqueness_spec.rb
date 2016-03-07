@@ -19,34 +19,44 @@ describe Mongoid::Validatable::UniquenessValidator do
         context "when persisting to another collection" do
 
           before do
-            Dictionary.with(collection: "dicts").create(name: "websters")
+            Dictionary.with(collection: "dicts") do |klass|
+              klass.create(name: "websters")
+            end
           end
 
           context "when the document is not valid" do
 
             let(:websters) do
-              Dictionary.with(collection: "dicts").new(name: "websters")
+              valid = nil
+              object = nil
+              Dictionary.with(collection: "dicts") do |klass|
+                object = klass.new(name: "websters")
+                valid = object.valid?
+              end
+              { :valid => valid, :object => object }
             end
 
             it "performs the validation on the correct collection" do
-              expect(websters).to_not be_valid
+              expect(websters[:valid]).to be(false)
             end
 
             it "adds the uniqueness error" do
-              websters.valid?
-              expect(websters.errors[:name]).to_not be_nil
+              expect(websters[:object].errors[:name]).to_not be_nil
             end
 
             it "clears the persistence options in the thread local" do
-              websters.valid?
-              expect(Dictionary.persistence_options).to be_nil
+              expect(Dictionary.persistence_context).to eq(Mongoid::PersistenceContext.new(Dictionary))
             end
           end
 
           context "when the document is valid" do
 
             let(:oxford) do
-              Dictionary.with(collection: "dicts").new(name: "oxford")
+              obj = nil
+              Dictionary.with(collection: "dicts") do |klass|
+                obj = klass.new(name: "oxford")
+              end
+              obj
             end
 
             it "performs the validation on the correct collection" do

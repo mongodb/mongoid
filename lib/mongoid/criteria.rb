@@ -25,7 +25,6 @@ module Mongoid
     include Marshalable
     include Modifiable
     include Scopable
-    include Clients::Options
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
