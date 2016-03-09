@@ -12,7 +12,7 @@ module Mongoid
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
-            method =~ /(^__|^send|^object_id|^respond_to|^tap|^public_send|extend_proxy|extend_proxies)/
+          method =~ /(^__|^send|^object_id|^respond_to|^tap|^public_send|extend_proxy|extend_proxies)/
       end
 
       include Threaded::Lifecycle

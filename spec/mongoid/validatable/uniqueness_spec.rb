@@ -52,11 +52,9 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the document is valid" do
 
             let(:oxford) do
-              obj = nil
               Dictionary.with(collection: "dicts") do |klass|
-                obj = klass.new(name: "oxford")
+                klass.new(name: "oxford")
               end
-              obj
             end
 
             it "performs the validation on the correct collection" do

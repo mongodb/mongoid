@@ -104,11 +104,10 @@ describe Mongoid::Clients::Options do
       context 'when returning a criteria' do
 
         let(:context_and_criteria) do
-          cxt = nil
           collection = nil
-          Band.with(read: :secondary) do |klass|
+          cxt = Band.with(read: :secondary) do |klass|
             collection = klass.all.collection
-            cxt = klass.persistence_context
+            klass.persistence_context
           end
           [ cxt, collection ]
         end

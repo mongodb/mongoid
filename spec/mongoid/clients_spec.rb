@@ -29,19 +29,15 @@ describe Mongoid::Clients do
     context "when overriding the persistence options" do
 
       let(:instance_collection) do
-        coll = nil
         Band.with(collection: "artists") do |klass|
-          coll = klass.new.collection
+          klass.new.collection
         end
-        coll
       end
 
       let(:class_collection) do
-        coll = nil
         Band.with(collection: "artists") do |klass|
-          coll = klass.collection
+          klass.collection
         end
-        coll
       end
 
       it_behaves_like "an overridden collection at the class level"
@@ -58,19 +54,15 @@ describe Mongoid::Clients do
       end
 
       let(:instance_collection) do
-        coll = nil
         Band.with(collection: "artists") do |klass|
-          coll = klass.new.collection
+          klass.new.collection
         end
-        coll
       end
 
       let(:class_collection) do
-        coll = nil
         Band.with(collection: "artists") do |klass|
-          coll = klass.collection
+          klass.collection
         end
-        coll
       end
 
       it_behaves_like "an overridden collection at the class level"
@@ -204,19 +196,15 @@ describe Mongoid::Clients do
     context "when overriding the persistence options" do
 
       let(:instance_collection_name) do
-        name = nil
         Band.with(collection: "artists") do |klass|
-          name = klass.new.collection_name
+          klass.new.collection_name
         end
-        name
       end
 
       let(:class_collection_name) do
-        name = nil
         Band.with(collection: "artists") do |klass|
-          name = klass.collection_name
+          klass.collection_name
         end
-        name
       end
 
       it_behaves_like "an overridden collection name at the class level"
@@ -225,19 +213,15 @@ describe Mongoid::Clients do
     context "when overriding store_in and persistence options" do
 
       let(:instance_collection_name) do
-        name = nil
         Band.with(collection: "artists") do |klass|
-          name = klass.new.collection_name
+          klass.new.collection_name
         end
-        name
       end
 
       let(:class_collection_name) do
-        name = nil
         Band.with(collection: "artists") do |klass|
-          name = klass.collection_name
+          klass.collection_name
         end
-        name
       end
 
       before do
@@ -354,42 +338,23 @@ describe Mongoid::Clients do
     end
 
     context "when overriding the persistence options" do
-      #
-      # let(:klass) do
-      #   db = nil
-      #   Band.with(database: database_id_alt) do |k|
-      #     kl = k
-      #   end
-      #   binding.pry
-      #   kl
-      # end
-      #
-      # let(:band) do
-      #   klass.new
-      # end
 
       let(:instance_database) do
-        db = nil
         Band.with(database: database_id_alt) do |klass|
-          db = klass.new.mongo_client.database
+          klass.new.mongo_client.database
         end
-        db
       end
 
       let(:class_database) do
-        db = nil
         Band.with(database: database_id_alt) do |klass|
-          db = klass.mongo_client.database
+          klass.mongo_client.database
         end
-        db
       end
 
       let(:class_mongo_client) do
-        client = nil
         Band.with(database: database_id_alt) do |klass|
-          client = klass.new.mongo_client
+          klass.new.mongo_client
         end
-        client
       end
 
       it_behaves_like "an overridden database name"
@@ -423,27 +388,21 @@ describe Mongoid::Clients do
     context "when overriding store_in and persistence options" do
 
       let(:instance_database) do
-        db = nil
         Band.with(database: database_id_alt) do |klass|
-          db = klass.new.mongo_client.database
+          klass.new.mongo_client.database
         end
-        db
       end
 
       let(:class_database) do
-        db = nil
         Band.with(database: database_id_alt) do |klass|
-          db = klass.mongo_client.database
+          klass.mongo_client.database
         end
-        db
       end
 
       let(:class_mongo_client) do
-        client = nil
         Band.with(database: database_id_alt) do |klass|
-          client = klass.new.mongo_client
+          klass.new.mongo_client
         end
-        client
       end
 
       before do
@@ -472,27 +431,21 @@ describe Mongoid::Clients do
       context "when overriding the persistence options" do
 
         let(:instance_database) do
-          db = nil
           Band.with(client: :alternative) do |klass|
-            db = klass.new.mongo_client.database
+            klass.new.mongo_client.database
           end
-          db
         end
 
         let(:class_database) do
-          db = nil
           Band.with(client: :alternative) do |klass|
-            db = klass.mongo_client.database
+            klass.mongo_client.database
           end
-          db
         end
 
         let(:class_mongo_client) do
-          client = nil
           Band.with(client: :alternative) do |klass|
-            client = klass.new.mongo_client
+            klass.new.mongo_client
           end
-          client
         end
 
         it_behaves_like "an overridden database name"
@@ -674,11 +627,9 @@ describe Mongoid::Clients do
     context "when changing write concern options" do
 
       let(:client_one) do
-        client = nil
         Band.with(write: { w: 2 }) do |klass|
-          client = klass.mongo_client
+          klass.mongo_client
         end
-        client
       end
 
       let(:client_two) do
@@ -701,11 +652,9 @@ describe Mongoid::Clients do
       describe ".create" do
 
         let!(:band) do
-          b = nil
           Band.with(database: database_id_alt) do |klass|
-            b = klass.create
+            klass.create
           end
-          b
         end
 
         it "does not persist to the default database" do
@@ -715,11 +664,9 @@ describe Mongoid::Clients do
         end
 
         let(:from_db) do
-          object = nil
           Band.with(database: database_id_alt) do |klass|
-            object = klass.find(band.id)
+            klass.find(band.id)
           end
-          object
         end
 
         it "persists to the specified database" do
@@ -727,11 +674,9 @@ describe Mongoid::Clients do
         end
 
         let(:count) do
-          c = nil
           Band.with(database: database_id_alt) do |klass|
-            c = klass.count
+            klass.count
           end
-          c
         end
 
         it "persists the correct number of documents" do
@@ -745,11 +690,9 @@ describe Mongoid::Clients do
       describe ".create" do
 
         let!(:band) do
-          b = nil
           Band.with(collection: "artists") do |klass|
-            b = klass.create
+            klass.create
           end
-          b
         end
 
         it "does not persist to the default database" do
@@ -759,11 +702,9 @@ describe Mongoid::Clients do
         end
 
         let(:from_db) do
-          from = nil
           Band.with(collection: "artists") do |klass|
-            from = klass.find(band.id)
+            klass.find(band.id)
           end
-          from
         end
 
         it "persists to the specified database" do
@@ -771,11 +712,9 @@ describe Mongoid::Clients do
         end
 
         let(:count) do
-          c = nil
           Band.with(collection: "artists") do |klass|
-            c = klass.count
+            klass.count
           end
-          c
         end
 
         it "persists the correct number of documents" do
