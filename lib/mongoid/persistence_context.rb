@@ -64,8 +64,9 @@ module Mongoid
       def with_options(object, options)
         original_cluster = object.persistence_context.cluster
         set(object, options)
-        yield object
+        result = yield object
         clear(object, original_cluster)
+        result
       end
 
       def get(object)

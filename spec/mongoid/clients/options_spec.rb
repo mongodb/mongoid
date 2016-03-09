@@ -1,178 +1,315 @@
-# require "spec_helper"
-#
-# describe Mongoid::Clients::Options do
-#
-#   describe "#with", if: non_legacy_server? do
-#
-#     context "when passing some options" do
-#
-#       let(:options) { { database: 'test' } }
-#
-#       # let!(:cluster) do
-#       #   Band.mongo_client.cluster
-#       # end
-#
-#       # let!(:klass) do
-#       #   Band.with(options)
-#       # end
-#
-#       # it "sets the options into the class" do
-#       #   expect(klass.persistence_options).to eq(options)
-#       # end
-#       #
-#       # it "sets the options into the instance" do
-#       #   expect(klass.new.persistence_options).to eq(options)
-#       # end
-#       #
-#       # it "doesnt set the options on class level" do
-#       #   expect(Band.new.persistence_options).to be_nil
-#       # end
-#
-#       context 'when passed a block', if: testing_locally? do
-#
-#         # let!(:connections_before) do
-#         #   Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
-#         # end
-#
-#         before do
-#           Band.with(options) do |klass|
-#             klass.where(name: 'emily').to_a
-#           end
-#         end
-#
-#         let(:connections_after) do
-#           Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
-#         end
-#
-#         context 'when a new cluster is created by the driver' do
-#
-#           let(:options) { { connect_timeout: 2 } }
-#
-#           it 'disconnects the new cluster' do
-#             expect(connections_after).to eq(connections_before)
-#           end
-#         end
-#
-#         context 'when the same cluster is used by the new client' do
-#
-#           let(:options) { { database: 'same-cluster' } }
-#
-#           it 'does not disconnect the original cluster' do
-#             expect(connections_after).to eq(connections_before)
-#           end
-#         end
-#       end
-#
-#       context "when calling .collection method" do
-#
-#         before do
-#           klass.collection
-#         end
-#
-#         it "keeps the options" do
-#           expect(klass.persistence_options).to eq(options)
-#         end
-#
-#         context 'when changing the collection' do
-#
-#           let(:options) do
-#             { collection: 'other' }
-#           end
-#
-#           it 'uses that collection' do
-#             expect(klass.collection.name).to eq(options[:collection])
-#           end
-#         end
-#       end
-#
-#       context "when returning a criteria" do
-#
-#         let(:criteria) do
-#           klass.all
-#         end
-#
-#         it "sets the options into the criteria object" do
-#           expect(criteria.persistence_options).to eq(options)
-#         end
-#
-#         it "doesnt set the options on class level" do
-#           expect(Band.new.persistence_options).to be_nil
-#         end
-#       end
-#     end
-#   end
-#
-#   describe ".with", if: non_legacy_server? do
-#
-#     let(:options) { { database: 'test' } }
-#
-#     let(:instance) do
-#       Band.new.with(options)
-#     end
-#
-#     it "sets the options into" do
-#       expect(instance.persistence_options).to eq(options)
-#     end
-#
-#     it "passes down the options to collection" do
-#       expect(instance.collection.database.name).to eq('test')
-#     end
-#
-#     context "when the object is shared between threads" do
-#
-#       before do
-#         threads = []
-#         doc = Band.create(name: "Beatles")
-#         100.times do |i|
-#           threads << Thread.new do
-#             if i % 2 == 0
-#               doc.with(nil).set(name: "Rolling Stones")
-#             else
-#               doc.with(options).set(name: "Beatles")
-#             end
-#           end
-#         end
-#         threads.join
-#       end
-#
-#       it "does not share the persistence options" do
-#         expect(Band.persistence_options).to eq(nil)
-#       end
-#     end
-#   end
-#
-#   describe "#persistence_options" do
-#
-#     it "touches the thread local" do
-#       expect(Thread.current).to receive(:[]).with("[mongoid][Band]:persistence-options").and_return({foo: :bar})
-#       expect(Band.persistence_options).to eq({foo: :bar})
-#     end
-#
-#     it "cannot force a value on thread local" do
-#       expect {
-#         Band.set_persistence_options(Band, {})
-#       }.to raise_error(NoMethodError)
-#     end
-#   end
-#
-#   describe ".persistence_options" do
-#
-#     context "when options exist on the current thread" do
-#
-#       let(:klass) do
-#         Band.with(write: { w: 2 })
-#       end
-#
-#       it "returns the options" do
-#         expect(klass.persistence_options).to eq(write: { w: 2 })
-#       end
-#     end
-#
-#     context "when there are no options on the current thread" do
-#
-#       it "returns nil" do
-#         expect(Band.persistence_options).to be_nil
-#       end
-#     end
-#   end
-# end
+require "spec_helper"
+
+describe Mongoid::Clients::Options do
+
+  describe '#with', if: non_legacy_server? do
+
+    context 'when passing some options' do
+
+      let(:options) { { database: 'other' } }
+
+      let(:context) do
+        Band.with(options) do |klass|
+          klass.persistence_context
+        end
+      end
+
+      it 'sets the options on the client' do
+        expect(context.client.options['database']).to eq(options[:database])
+      end
+
+      it 'doesnt set the options on class level' do
+        expect(Band.persistence_context.client.options['database']).to eq('mongoid_test')
+      end
+
+      context 'when passing a block', if: testing_locally? do
+
+        let!(:connections_before) do
+          Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+        end
+
+        let!(:connections_and_cluster_during) do
+          connections = nil
+          cluster = Band.with(options) do |klass|
+            klass.where(name: 'emily').to_a
+            connections = Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+          end
+          [ connections, cluster ]
+        end
+
+        let(:connections_during) do
+          connections_and_cluster_during[0]
+        end
+
+        let(:cluster_during) do
+          connections_and_cluster_during[1]
+        end
+
+        let(:connections_after) do
+          Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+        end
+
+        let!(:cluster_before) do
+          Band.persistence_context.cluster
+        end
+
+        let(:cluster_after) do
+          Band.persistence_context.cluster
+        end
+
+        context 'when the options create a new cluster' do
+
+          let(:options) do
+            { connect_timeout: 2 }
+          end
+
+          it 'creates a new cluster' do
+            expect(connections_before).to be <(connections_during)
+            expect(cluster_before).not_to be(cluster_during)
+          end
+
+          it 'disconnects the new cluster when the block exits' do
+            expect(connections_before).to eq(connections_after)
+          end
+        end
+
+        context 'when the options do not create a new cluster' do
+
+          let(:options) do
+            { database: 'same-cluster' }
+          end
+
+          it 'does not create a new cluster' do
+            expect(connections_during).to eq(connections_before)
+          end
+
+          it 'does not disconnect the original cluster' do
+            expect(connections_after).to eq(connections_before)
+            expect(cluster_before).to be(cluster_after)
+          end
+        end
+      end
+
+      context 'when changing the collection' do
+
+        let(:options) do
+          { collection: 'other' }
+        end
+
+        it 'uses that collection' do
+          expect(context.collection.name).to eq(options[:collection])
+        end
+      end
+
+      context 'when returning a criteria' do
+
+        let(:context_and_criteria) do
+          cxt = nil
+          collection = nil
+          Band.with(read: :secondary) do |klass|
+            collection = klass.all.collection
+            cxt = klass.persistence_context
+          end
+          [ cxt, collection ]
+        end
+
+        let(:context) do
+          context_and_criteria[0]
+        end
+
+        let(:client) do
+          context_and_criteria[1].client
+        end
+
+        it 'applies the options to the criteria client' do
+          expect(client.options['read']).to eq(:secondary)
+        end
+      end
+
+      context 'when the object is shared between threads' do
+
+        before do
+          threads = []
+          100.times do |i|
+            threads << Thread.new do
+              if i % 2 == 0
+                Band.with(collection: 'British') do |klass|
+                  klass.create(name: 'realised')
+                end
+              else
+                Band.with(collection: 'American') do |klass|
+                  klass.create(name: 'realized')
+                end
+              end
+            end
+          end
+          threads.collect { |t| t.value }
+        end
+
+        let(:british_count) do
+          Band.with(collection: 'British') do |klass|
+            klass.all.count
+          end
+        end
+
+        let(:american_count) do
+          Band.with(collection: 'American') do |klass|
+            klass.all.count
+          end
+        end
+
+        it "does not share the persistence options" do
+          expect(british_count).to eq(50)
+          expect(american_count).to eq(50)
+        end
+      end
+    end
+  end
+
+  describe ".with", if: non_legacy_server? do
+
+    context "when passing some options" do
+
+      let(:options) do
+        { database: 'other' }
+      end
+
+      let(:band) do
+        Band.create
+      end
+
+      let(:context) do
+        band.with(options) do |klass|
+          klass.persistence_context
+        end
+      end
+
+      it 'sets the options on the client' do
+        expect(context.client.options['database']).to eq(options[:database])
+      end
+
+      it 'does not set the options on instance level' do
+        expect(band.persistence_context.client.database.name).to eq('mongoid_test')
+      end
+
+      context 'when passing a block', if: testing_locally? do
+
+        let!(:connections_before) do
+          band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+        end
+
+        let!(:connections_and_cluster_during) do
+          connections = nil
+          cluster = band.with(options) do |b|
+            b.reload
+            connections = band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+            b.persistence_context.cluster
+          end
+          [ connections, cluster ]
+        end
+
+        let(:connections_during) do
+          connections_and_cluster_during[0]
+        end
+
+        let(:cluster_during) do
+          connections_and_cluster_during[1]
+        end
+
+        let(:connections_after) do
+          band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+        end
+
+        let!(:cluster_before) do
+          band.persistence_context.cluster
+        end
+
+        let(:cluster_after) do
+          band.persistence_context.cluster
+        end
+
+        context 'when the options create a new cluster' do
+
+          let(:options) do
+            { connect_timeout: 2 }
+          end
+
+          it 'creates a new cluster' do
+            expect(connections_before).to be <(connections_during)
+            expect(cluster_before).not_to be(cluster_during)
+          end
+
+          it 'disconnects the new cluster when the block exits' do
+            expect(connections_before).to eq(connections_after)
+          end
+        end
+
+        context 'when the options do not create a new cluster' do
+
+          let(:options) { { read: :secondary } }
+
+          it 'does not create a new cluster' do
+            expect(connections_during).to eq(connections_before)
+          end
+
+          it 'does not disconnect the original cluster' do
+            expect(connections_after).to eq(connections_before)
+            expect(cluster_before).to be(cluster_after)
+          end
+        end
+      end
+
+      context 'when changing the collection' do
+
+        let(:options) do
+          { collection: 'other' }
+        end
+
+        it 'uses that collection' do
+          expect(context.collection.name).to eq(options[:collection])
+        end
+      end
+
+      context 'when the object is shared between threads' do
+
+        before do
+          threads = []
+          100.times do |i|
+            band = Band.create
+            threads << Thread.new do
+              if i % 2 == 0
+                band.with(collection: 'British') do |b|
+                  b.name = "realised"
+                  b.upsert
+                end
+              else
+                band.with(collection: 'American') do |b|
+                  b.name = "realized"
+                  b.upsert
+                end
+              end
+            end
+          end
+          threads.collect { |t| t.value }
+        end
+
+        let(:british_count) do
+          Band.with(collection: 'British') do |klass|
+            klass.all.count
+          end
+        end
+
+        let(:american_count) do
+          Band.with(collection: 'British') do |klass|
+            klass.all.count
+          end
+        end
+
+        it "does not share the persistence options" do
+          expect(british_count).to eq(50)
+          expect(american_count).to eq(50)
+        end
+      end
+    end
+  end
+end
