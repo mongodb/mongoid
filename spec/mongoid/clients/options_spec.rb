@@ -12,6 +12,16 @@ describe Mongoid::Clients::Options do
         end
       end
 
+      let(:options) { { database: 'other' } }
+
+      it 'sets the options on the client' do
+        expect(persistence_context.client.options['database']).to eq(options[:database])
+      end
+
+      it 'doesnt set the options on class level' do
+        expect(Band.persistence_context.client.options['database']).to eq('mongoid_test')
+      end
+
       context 'when the options are not valid mongo client options' do
 
         let(:persistence_context) do
@@ -51,16 +61,6 @@ describe Mongoid::Clients::Options do
           expect(persistence_context.client.options[:collection]).to be_nil
           expect(persistence_context.client.options['collection']).to be_nil
         end
-      end
-
-      let(:options) { { database: 'other' } }
-
-      it 'sets the options on the client' do
-        expect(persistence_context.client.options['database']).to eq(options[:database])
-      end
-
-      it 'doesnt set the options on class level' do
-        expect(Band.persistence_context.client.options['database']).to eq('mongoid_test')
       end
 
       context 'when passing a block', if: testing_locally? do
@@ -127,6 +127,31 @@ describe Mongoid::Clients::Options do
           it 'does not disconnect the original cluster' do
             expect(connections_after).to eq(connections_before)
             expect(cluster_before).to be(cluster_after)
+          end
+        end
+
+        context 'when the client options were configured using a uri' do
+
+          let(:config) do
+            {
+                default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
+                secondary: { uri: "mongodb://127.0.0.1:27017/secondary-db" }
+            }
+          end
+
+          before do
+            Mongoid::Config.send(:clients=, config)
+          end
+
+          let(:persistence_context) do
+            Band.with(client: :secondary) do |klass|
+              klass.persistence_context
+            end
+          end
+
+          it 'uses the database specified in the uri' do
+            expect(persistence_context.database_name).to eq('secondary-db')
+            expect(persistence_context.client.database.name).to eq('secondary-db')
           end
         end
       end
@@ -210,6 +235,28 @@ describe Mongoid::Clients::Options do
 
     context 'when passing some options' do
 
+      let(:options) do
+        { database: 'other' }
+      end
+
+      let(:band) do
+        Band.create
+      end
+
+      let(:persistence_context) do
+        band.with(options) do |object|
+          object.persistence_context
+        end
+      end
+
+      it 'sets the options on the client' do
+        expect(persistence_context.client.options['database']).to eq(options[:database])
+      end
+
+      it 'does not set the options on instance level' do
+        expect(band.persistence_context.client.database.name).to eq('mongoid_test')
+      end
+
       context 'when the options are not valid mongo client options' do
 
         let(:persistence_context) do
@@ -232,26 +279,29 @@ describe Mongoid::Clients::Options do
         end
       end
 
-      let(:options) do
-        { database: 'other' }
-      end
+      context 'when the client options were configured using a uri' do
 
-      let(:band) do
-        Band.create
-      end
-
-      let(:persistence_context) do
-        band.with(options) do |object|
-          object.persistence_context
+        let(:config) do
+          {
+              default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
+              secondary: { uri: "mongodb://127.0.0.1:27017/secondary-db" }
+          }
         end
-      end
 
-      it 'sets the options on the client' do
-        expect(persistence_context.client.options['database']).to eq(options[:database])
-      end
+        before do
+          Mongoid::Config.send(:clients=, config)
+        end
 
-      it 'does not set the options on instance level' do
-        expect(band.persistence_context.client.database.name).to eq('mongoid_test')
+        let(:persistence_context) do
+          band.with(client: :secondary) do |object|
+            object.persistence_context
+          end
+        end
+
+        it 'uses the database specified in the uri' do
+          expect(persistence_context.database_name).to eq('secondary-db')
+          expect(persistence_context.client.database.name).to eq('secondary-db')
+        end
       end
 
       context 'when passing a block', if: testing_locally? do

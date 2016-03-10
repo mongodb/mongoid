@@ -29,7 +29,7 @@ module Mongoid
 
     def client
       @client ||= (client = Clients.with_name(client_name)
-      client = client.use(database_name) if database_name
+      client = client.use(database_name) if database_name_option
       client.with(client_options))
     end
 
@@ -39,8 +39,7 @@ module Mongoid
     end
 
     def database_name
-      # @todo: take db in uri into account
-      @database_name ||= options[:database] || Threaded.database_override || storage_options && storage_options[:database]
+      database_name_option || client.database.name
     end
 
     private
@@ -71,6 +70,12 @@ module Mongoid
 
     def storage_options
       @object.storage_options
+    end
+
+    def database_name_option
+      @database_name_option ||= options[:database] ||
+          Threaded.database_override ||
+          storage_options && storage_options[:database]
     end
 
     class << self
