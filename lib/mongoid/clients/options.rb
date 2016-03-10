@@ -23,7 +23,6 @@ module Mongoid
         set_persistence_context(options)
         yield self
       ensure
-        # @todo: test that this is cleared upon error
         clear_persistence_context(original_cluster)
       end
 
@@ -96,7 +95,6 @@ module Mongoid
           PersistenceContext.set(self, options)
           yield self
         ensure
-          # @todo: test that this is cleared upon error
           PersistenceContext.clear(self, original_cluster)
         end
 

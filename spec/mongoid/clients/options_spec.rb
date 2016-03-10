@@ -12,22 +12,27 @@ describe Mongoid::Clients::Options do
         end
       end
 
-      # context 'when the options are not valid mongo client options' do
-      #
-      #   let(:context) do
-      #     Band.with(invalid_options) do |klass|
-      #       klass.persistence_context
-      #     end
-      #   end
-      #
-      #   let(:invalid_options) { { bad: 'option' } }
-      #
-      #   it 'raises an error' do
-      #     expect {
-      #       context
-      #     }.to raise_exception(Mongoid::Errors::InvalidPersistenceOption)
-      #   end
-      # end
+      context 'when the options are not valid mongo client options' do
+
+        let(:persistence_context) do
+          Band.with(invalid_options) do |klass|
+            klass.persistence_context
+          end
+        end
+
+        let(:invalid_options) { { bad: 'option' } }
+
+        it 'raises an error' do
+          expect {
+            persistence_context
+          }.to raise_exception(Mongoid::Errors::InvalidPersistenceOption)
+        end
+
+        it 'clears the persistence context' do
+          begin; persistence_context; rescue Mongoid::Errors::InvalidPersistenceOption; end
+          expect(Band.persistence_context).to eq(Mongoid::PersistenceContext.new(Band))
+        end
+      end
 
       context 'when the options include a collection' do
 
@@ -201,9 +206,31 @@ describe Mongoid::Clients::Options do
     end
   end
 
-  describe ".with", if: non_legacy_server? do
+  describe '.with', if: non_legacy_server? do
 
-    context "when passing some options" do
+    context 'when passing some options' do
+
+      context 'when the options are not valid mongo client options' do
+
+        let(:persistence_context) do
+          band.with(invalid_options) do |object|
+            object.persistence_context
+          end
+        end
+
+        let(:invalid_options) { { bad: 'option' } }
+
+        it 'raises an error' do
+          expect {
+            persistence_context
+          }.to raise_exception(Mongoid::Errors::InvalidPersistenceOption)
+        end
+
+        it 'clears the persistence context' do
+          begin; persistence_context; rescue Mongoid::Errors::InvalidPersistenceOption; end
+          expect(band.persistence_context).to eq(Mongoid::PersistenceContext.new(band))
+        end
+      end
 
       let(:options) do
         { database: 'other' }
@@ -214,8 +241,8 @@ describe Mongoid::Clients::Options do
       end
 
       let(:persistence_context) do
-        band.with(options) do |klass|
-          klass.persistence_context
+        band.with(options) do |object|
+          object.persistence_context
         end
       end
 
@@ -314,12 +341,12 @@ describe Mongoid::Clients::Options do
             threads << Thread.new do
               if i % 2 == 0
                 band.with(collection: 'British') do |b|
-                  b.name = "realised"
+                  b.name = 'realised'
                   b.upsert
                 end
               else
                 band.with(collection: 'American') do |b|
-                  b.name = "realized"
+                  b.name = 'realized'
                   b.upsert
                 end
               end
@@ -340,7 +367,7 @@ describe Mongoid::Clients::Options do
           end
         end
 
-        it "does not share the persistence options" do
+        it 'does not share the persistence options' do
           expect(british_count).to eq(50)
           expect(american_count).to eq(50)
         end

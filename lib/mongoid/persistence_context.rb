@@ -4,35 +4,60 @@ module Mongoid
 
     def_delegators :client, :cluster
 
-    def initialize(object, options = {})
+    attr_reader :options
+
+    EXTRA_OPTIONS = [ :client,
+                      :collection
+                    ].freeze
+
+    VALID_OPTIONS = (Mongo::Client::VALID_OPTIONS + EXTRA_OPTIONS).freeze
+
+    def initialize(object, opts = {})
       @object = object
-      @options = options.dup || {}
-      @collection = @options.delete(:collection)
-      @client_name = @options.delete(:client)
+      set_options!(opts)
     end
 
     def collection(parent = nil)
-      name = parent ? parent.collection_name : collection_name
-      client[name.to_sym]
+      @collection ||= (name = parent ? parent.collection_name : collection_name
+      client[name.to_sym])
     end
 
     def collection_name
-      __evaluate__(@collection || storage_options[:collection])
+      @collection_name ||= (__evaluate__(options[:collection] ||
+                              storage_options[:collection]))
     end
 
     def client
       @client ||= (client = Clients.with_name(client_name)
       client = client.use(database_name) if database_name
-      client.with(options))
+      client.with(client_options))
     end
 
-    def client_name
-      @client_name || Threaded.client_override || storage_options && storage_options[:client]
+    def ==(other)
+      return false unless other.is_a?(PersistenceContext)
+      options == other.options
     end
 
     def database_name
       # @todo: take db in uri into account
-      options[:database] || Threaded.database_override || storage_options && storage_options[:database]
+      @database_name ||= options[:database] || Threaded.database_override || storage_options && storage_options[:database]
+    end
+
+    private
+
+    def client_name
+      @client_name ||= (options[:client] ||
+          Threaded.client_override ||
+          storage_options && storage_options[:client])
+    end
+
+    def set_options!(opts)
+      @options ||= opts.each.reduce({}) do |_options, (key, value)|
+        unless VALID_OPTIONS.include?(key.to_sym)
+          raise Errors::InvalidPersistenceOption.new(key.to_sym, VALID_OPTIONS)
+        end
+        value ? _options.merge!(key => value) : _options
+      end
     end
 
     def __evaluate__(name)
@@ -40,22 +65,12 @@ module Mongoid
       name.respond_to?(:call) ? name.call.to_sym : name.to_sym
     end
 
-    def options
-      @opts ||= @options.each.reduce({}) do |opts, (key, value)|
-        unless Mongo::Client::VALID_OPTIONS.include?(key.to_sym)
-          raise Errors::InvalidPersistenceOption.new(key.to_sym, Mongo::Client::VALID_OPTIONS + [:client, :collection])
-        end
-        value ? opts.merge!(key => value) : opts
-      end
+    def client_options
+      @client_options ||= options.select { |k, v| Mongo::Client::VALID_OPTIONS.include?(k.to_sym) }
     end
 
     def storage_options
       @object.storage_options
-    end
-
-    def ==(other)
-      return false unless other.is_a?(PersistenceContext)
-      options == other.options
     end
 
     class << self
