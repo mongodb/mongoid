@@ -39,6 +39,25 @@ describe Mongoid::Attributes do
               expect(from_db.desc).to eq("test")
             end
           end
+
+          context 'when the attribute is a hash field' do
+
+            before do
+              person.update_attribute(:map, map)
+            end
+
+            let(:map) do
+              { 'dates' => { 'y' => { '2016' => 'Berlin' } } }
+            end
+
+            let(:from_db) do
+              Person.only('map.dates.y.2016').first
+            end
+
+            it "does not raise an error" do
+              expect(from_db.map).to eq(map)
+            end
+          end
         end
 
         context "when the context excludes" do
