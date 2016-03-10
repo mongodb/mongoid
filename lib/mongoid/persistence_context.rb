@@ -8,6 +8,7 @@ module Mongoid
       @object = object
       @options = options.dup || {}
       @collection = @options.delete(:collection)
+      @client_name = @options.delete(:client)
     end
 
     def collection(parent = nil)
@@ -26,12 +27,12 @@ module Mongoid
     end
 
     def client_name
-      options[:client] || Threaded.client_override || storage_options[:client]
+      @client_name || Threaded.client_override || storage_options && storage_options[:client]
     end
 
     def database_name
       # @todo: take db in uri into account
-      options[:database] || Threaded.database_override || storage_options[:database]
+      options[:database] || Threaded.database_override || storage_options && storage_options[:database]
     end
 
     def __evaluate__(name)
@@ -42,9 +43,9 @@ module Mongoid
     def options
       @opts ||= @options.each.reduce({}) do |opts, (key, value)|
         unless Mongo::Client::VALID_OPTIONS.include?(key.to_sym)
-          raise Errors::InvalidPersistenceOption.new(key.to_sym, Mongo::Client::VALID_OPTIONS + [:collection])
+          raise Errors::InvalidPersistenceOption.new(key.to_sym, Mongo::Client::VALID_OPTIONS + [:client, :collection])
         end
-        value ? opts.merge!(key => value) : value
+        value ? opts.merge!(key => value) : opts
       end
     end
 
