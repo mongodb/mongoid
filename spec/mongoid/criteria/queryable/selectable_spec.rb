@@ -1371,6 +1371,23 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
+      context "when providing an array without a field" do
+
+        let(:selection) do
+          query.in([ 1, 2 ])
+        end
+
+        it "adds the $in selector" do
+          expect(selection.selector).to eq({
+            "_id" =>  { "$in" => [ 1, 2 ] }
+          })
+        end
+
+        it "returns a cloned query" do
+          expect(selection).to_not equal(query)
+        end
+      end
+
       context "when providing a range" do
 
         let(:selection) do
