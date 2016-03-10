@@ -6,16 +6,52 @@ describe Mongoid::Clients::Options do
 
     context 'when passing some options' do
 
-      let(:options) { { database: 'other' } }
-
-      let(:context) do
+      let(:persistence_context) do
         Band.with(options) do |klass|
           klass.persistence_context
         end
       end
 
+      # context 'when the options are not valid mongo client options' do
+      #
+      #   let(:context) do
+      #     Band.with(invalid_options) do |klass|
+      #       klass.persistence_context
+      #     end
+      #   end
+      #
+      #   let(:invalid_options) { { bad: 'option' } }
+      #
+      #   it 'raises an error' do
+      #     expect {
+      #       context
+      #     }.to raise_exception(Mongoid::Errors::InvalidPersistenceOption)
+      #   end
+      # end
+
+      context 'when the options include a collection' do
+
+        let(:options) { { collection: 'another-collection' } }
+
+        it 'uses the collection' do
+          expect(persistence_context.collection_name).to eq(options[:collection].to_sym)
+          expect(persistence_context.collection.name).to eq(options[:collection])
+        end
+
+        it 'does not raise an error' do
+          expect(persistence_context.client).to be_a(Mongo::Client)
+        end
+
+        it 'does not include the collection option in the client options' do
+          expect(persistence_context.client.options[:collection]).to be_nil
+          expect(persistence_context.client.options['collection']).to be_nil
+        end
+      end
+
+      let(:options) { { database: 'other' } }
+
       it 'sets the options on the client' do
-        expect(context.client.options['database']).to eq(options[:database])
+        expect(persistence_context.client.options['database']).to eq(options[:database])
       end
 
       it 'doesnt set the options on class level' do
@@ -97,7 +133,7 @@ describe Mongoid::Clients::Options do
         end
 
         it 'uses that collection' do
-          expect(context.collection.name).to eq(options[:collection])
+          expect(persistence_context.collection.name).to eq(options[:collection])
         end
       end
 
@@ -112,7 +148,7 @@ describe Mongoid::Clients::Options do
           [ cxt, collection ]
         end
 
-        let(:context) do
+        let(:persistence_context) do
           context_and_criteria[0]
         end
 
@@ -177,14 +213,14 @@ describe Mongoid::Clients::Options do
         Band.create
       end
 
-      let(:context) do
+      let(:persistence_context) do
         band.with(options) do |klass|
           klass.persistence_context
         end
       end
 
       it 'sets the options on the client' do
-        expect(context.client.options['database']).to eq(options[:database])
+        expect(persistence_context.client.options['database']).to eq(options[:database])
       end
 
       it 'does not set the options on instance level' do
@@ -265,7 +301,7 @@ describe Mongoid::Clients::Options do
         end
 
         it 'uses that collection' do
-          expect(context.collection.name).to eq(options[:collection])
+          expect(persistence_context.collection.name).to eq(options[:collection])
         end
       end
 

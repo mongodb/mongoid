@@ -3469,26 +3469,33 @@ describe Mongoid::Criteria do
     end
   end
 
-  # describe "#with" do
-  #
-  #   let!(:criteria) do
-  #     binding.pry
-  #     crit = nil
-  #     Band.where(name: "Depeche Mode").with(collection: "artists") do |c|
-  #       crit = c
-  #     end
-  #     crit
-  #   end
-  #
-  #   it "retains the criteria selection" do
-  #     binding.pry
-  #     expect(criteria.selector).to eq("name" => "Depeche Mode")
-  #   end
-  #
-  #   it "sets the persistence options" do
-  #     expect(criteria.persistence_options).to eq(collection: "artists")
-  #   end
-  # end
+  describe "#with" do
+
+    let!(:criteria_and_collection) do
+      collection = nil
+      criteria = Band.where(name: "Depeche Mode").with(collection: "artists") do |crit|
+        collection = crit.collection
+        crit
+      end
+      [ criteria, collection ]
+    end
+
+    let(:criteria) do
+      criteria_and_collection[0]
+    end
+
+    let(:collection) do
+      criteria_and_collection[1]
+    end
+
+    it "retains the criteria selection" do
+      expect(criteria.selector).to eq("name" => "Depeche Mode")
+    end
+
+    it "sets the persistence options" do
+      expect(collection.name).to eq("artists")
+    end
+  end
 
   describe "#geo_spacial" do
 

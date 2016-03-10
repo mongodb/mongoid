@@ -165,6 +165,12 @@ en:
             collection. Double check the relation definitions and fix any
             instances where embedded documents are improperly referenced
             from other collections."
+        invalid_persistence_option:
+          message: "Invalid persistence option :%{invalid}."
+          summary: "The options used to change the persistence context must be one
+             of the valid options for a mongo client, or a collection name."
+          resolution: "Valid options are: %{valid}, make sure these are the ones
+             you are using."
         invalid_relation:
           message: "Defining a relation named '%{name}' is not allowed."
           summary: "Defining this relation would override the method '%{name}',

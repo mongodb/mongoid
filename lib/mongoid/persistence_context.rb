@@ -6,7 +6,8 @@ module Mongoid
 
     def initialize(object, options = {})
       @object = object
-      @options = options || {}
+      @options = options.dup || {}
+      @collection = @options.delete(:collection)
     end
 
     def collection(parent = nil)
@@ -15,7 +16,7 @@ module Mongoid
     end
 
     def collection_name
-      __evaluate__(options[:collection] || storage_options[:collection])
+      __evaluate__(@collection || storage_options[:collection])
     end
 
     def client
@@ -24,9 +25,6 @@ module Mongoid
       client.with(options))
     end
 
-    # 1) Get the client from the context options
-    # 2) Get the client from the Threaded.client_override
-    # 3) Get the client from the storage options
     def client_name
       options[:client] || Threaded.client_override || storage_options[:client]
     end
@@ -43,10 +41,10 @@ module Mongoid
 
     def options
       @opts ||= @options.each.reduce({}) do |opts, (key, value)|
-        #if value && Mongo::Client::VALID_OPTIONS.include?(key.to_sym)
-          opts[key] = value if value
-        #end
-        opts
+        unless Mongo::Client::VALID_OPTIONS.include?(key.to_sym)
+          raise Errors::InvalidPersistenceOption.new(key.to_sym, Mongo::Client::VALID_OPTIONS + [:collection])
+        end
+        value ? opts.merge!(key => value) : value
       end
     end
 
@@ -61,19 +59,9 @@ module Mongoid
 
     class << self
 
-      def with_options(object, options)
-        original_cluster = object.persistence_context.cluster
-        set(object, options)
-        result = yield object
-        clear(object, original_cluster)
-        result
-      end
-
       def get(object)
         Thread.current["[mongoid][#{object.object_id}]:context"]
       end
-
-      private
 
       def set(object, options)
         Thread.current["[mongoid][#{object.object_id}]:context"] = PersistenceContext.new(object, options)
