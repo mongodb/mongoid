@@ -265,7 +265,7 @@ module Mongoid
       #   context.geo_near([ 10, 10 ]).spherical
       #
       # @example Find with a max distance.
-      #   context.geo_near([ 10, 10 ]).max_distance(0.5n)
+      #   context.geo_near([ 10, 10 ]).max_distance(0.5)
       #
       # @example Provide a distance multiplier.
       #   context.geo_near([ 10, 10 ]).distance_multiplier(1133)
@@ -564,7 +564,6 @@ module Mongoid
       #
       # @since 3.1.0
       def apply_option(name)
-        #binding.pry
         if spec = criteria.options[name]
           @view = view.send(name, spec)
         end
