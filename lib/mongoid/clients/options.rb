@@ -50,7 +50,7 @@ module Mongoid
         PersistenceContext.set(self, options)
       end
 
-      def clear_persistence_context(original_cluster)
+      def clear_persistence_context(original_cluster = nil)
         PersistenceContext.clear(self, original_cluster)
       end
 
