@@ -1,6 +1,10 @@
 # encoding: utf-8
 module Mongoid
   class Criteria
+
+    # Module containing functionality for getting options on a Criteria object.
+    #
+    # @since 6.0.0
     module Options
 
       private

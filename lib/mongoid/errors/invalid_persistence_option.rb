@@ -2,13 +2,15 @@
 module Mongoid
   module Errors
 
-    # Raised when invalid options are passed to a relation macro.
+    # Raised when invalid options are used to create a persistence context.
+    #
+    # @since 6.0.0
     class InvalidPersistenceOption < MongoidError
 
-      # Instantiate the persistence option error.
+      # Instantiate the persistence context option error.
       #
       # @example Create the error.
-      #   InvalidPersistenceOptions.new(:invalid_options, [ :connect_timeout, :database ])
+      #   InvalidPersistenceOption.new(:invalid_option, [ :connect_timeout, :database ])
       #
       # @param [ Symbol ] invalid The invalid option.
       # @param [ Array<Symbol> ] valid The allowed options.
