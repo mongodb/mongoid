@@ -1649,4 +1649,35 @@ describe Mongoid::Attributes do
       end
     end
   end
+
+  context 'when calling the attribute check method' do
+
+    context 'when the attribute is localized' do
+      let(:person) do
+        Person.create(desc: 'localized')
+      end
+
+      before do
+        person.desc = nil
+      end
+
+      it 'applies the localization when checking the attribute' do
+        expect(person.desc?).to be(false)
+      end
+    end
+
+    context 'when the attribute is not localized' do
+      let(:person) do
+        Person.create(username: 'localized')
+      end
+
+      before do
+        person.username = nil
+      end
+
+      it 'does not apply localization when checking the attribute' do
+        expect(person.name?).to be(false)
+      end
+    end
+  end
 end
