@@ -27,11 +27,10 @@ describe Mongoid::Validatable::UniquenessValidator do
           context "when the document is not valid" do
 
             let(:websters) do
-              valid = nil
               object = nil
-              Dictionary.with(collection: "dicts") do |klass|
+              valid = Dictionary.with(collection: "dicts") do |klass|
                 object = klass.new(name: "websters")
-                valid = object.valid?
+                object.valid?
               end
               { :valid => valid, :object => object }
             end
