@@ -480,8 +480,8 @@ module Mongoid
       def create_field_check(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}?") do
-            attr = read_attribute(name)
-            attr == true || attr.present?
+            value = read_attribute(name)
+            lookup_attribute_presence(name, value)
           end
         end
       end
