@@ -9,6 +9,8 @@ module Mongoid
 
     # Delegate the cluster method to the client.
     def_delegators :client, :cluster
+
+    # Delegate the storage options method to the object.
     def_delegators :@object, :storage_options
 
     # The options defining this persistence context.
@@ -65,8 +67,8 @@ module Mongoid
     #
     # @since 6.0.0
     def collection(parent = nil)
-      @collection ||= (name = parent ? parent.collection_name : collection_name
-      client[name.to_sym])
+      name = parent ? parent.collection_name : collection_name
+      client[name.to_sym]
     end
 
     # Get the collection name for this persistence context.
