@@ -1664,6 +1664,17 @@ describe Mongoid::Attributes do
       it 'applies the localization when checking the attribute' do
         expect(person.desc?).to be(false)
       end
+
+      context 'when the field is a boolean' do
+
+        before do
+          person.desc = false
+        end
+
+        it 'applies the localization when checking the attribute' do
+          expect(person.desc?).to be(false)
+        end
+      end
     end
 
     context 'when the attribute is not localized' do

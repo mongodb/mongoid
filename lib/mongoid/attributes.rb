@@ -350,7 +350,7 @@ module Mongoid
       if localized_fields.has_key?(name)
         value = localized_fields[name].send(:lookup, value)
       end
-      value == true || value.present?
+      !!value
     end
   end
 end
