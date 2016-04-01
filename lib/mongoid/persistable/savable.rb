@@ -18,11 +18,11 @@ module Mongoid
       # @return [ true, false ] True is success, false if not.
       #
       # @since 1.0.0
-      def save(options = {})
+      def save(mongo_context: Context.new, **options)
         if new_record?
-          !insert(options).new_record?
+          !insert(mongo_context: mongo_context, **options).new_record?
         else
-          update_document(options)
+          update_document(mongo_context: mongo_context, **options)
         end
       end
 
