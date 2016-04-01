@@ -58,7 +58,9 @@ module Mongoid
       #
       # @since 2.0.0
       def shard_key(*names)
-        self.shard_key_fields = names
+        names.each do |name|
+          self.shard_key_fields << self.database_field_name(name).to_sym
+        end
       end
     end
   end
