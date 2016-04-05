@@ -133,7 +133,7 @@ module Mongoid
     def client_name
       @client_name ||= options[:client] ||
                          Threaded.client_override ||
-                         storage_options && storage_options[:client]
+                         storage_options && __evaluate__(storage_options[:client])
     end
 
     def set_options!(opts)

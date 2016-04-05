@@ -250,14 +250,14 @@ describe Mongoid::PersistenceContext do
           { }
         end
 
+        after do
+          object.reset_storage_options!
+        end
+
         context 'when the storage options is static' do
 
           before do
             object.store_in collection: :schmands
-          end
-
-          after do
-            object.reset_storage_options!
           end
 
           it 'uses the storage options' do
@@ -269,10 +269,6 @@ describe Mongoid::PersistenceContext do
 
           before do
             object.store_in collection: ->{ :schmands }
-          end
-
-          after do
-            object.reset_storage_options!
           end
 
           it 'uses the storage options' do
@@ -287,14 +283,14 @@ describe Mongoid::PersistenceContext do
           { collection: 'other' }
         end
 
+        after do
+          object.reset_storage_options!
+        end
+
         context 'when the storage options is static' do
 
           before do
             object.store_in collection: :schmands
-          end
-
-          after do
-            object.reset_storage_options!
           end
 
           it 'uses the persistence context options' do
@@ -306,10 +302,6 @@ describe Mongoid::PersistenceContext do
 
           before do
             object.store_in collection: ->{ :schmands }
-          end
-
-          after do
-            object.reset_storage_options!
           end
 
           it 'uses the persistence context options' do
@@ -352,6 +344,10 @@ describe Mongoid::PersistenceContext do
           { }
         end
 
+        after do
+          object.reset_storage_options!
+        end
+
         context 'when there is a database override' do
 
           before do
@@ -377,10 +373,6 @@ describe Mongoid::PersistenceContext do
             object.store_in database: :musique
           end
 
-          after do
-            object.reset_storage_options!
-          end
-
           it 'uses the storage options' do
             expect(persistence_context.database_name).to eq(:musique)
           end
@@ -391,11 +383,6 @@ describe Mongoid::PersistenceContext do
           before do
             object.store_in database: ->{ :musique }
           end
-
-          after do
-            object.reset_storage_options!
-          end
-
           it 'uses the storage options' do
             expect(persistence_context.database_name).to eq(:musique)
           end
@@ -548,16 +535,30 @@ describe Mongoid::PersistenceContext do
 
       context 'when there are storage options set' do
 
-        before do
-          object.store_in client: :other
-        end
-
         after do
           object.reset_storage_options!
         end
 
-        it 'uses the client option' do
-          expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in client: :other
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in client: ->{ :other }
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
         end
       end
     end
@@ -585,16 +586,30 @@ describe Mongoid::PersistenceContext do
 
       context 'when there are storage options set' do
 
-        before do
-          object.store_in client: :alternative
-        end
-
         after do
           object.reset_storage_options!
         end
 
-        it 'uses the client storage option' do
-          expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in client: :alternative
+          end
+
+          it 'uses the client storage option' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in client: ->{ :alternative }
+          end
+
+          it 'uses the client storage option' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
         end
 
         context 'when there is a client override' do
