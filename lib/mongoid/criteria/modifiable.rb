@@ -173,8 +173,14 @@ module Mongoid
       # @since 3.0.0
       def create_document(method, attrs = nil, &block)
         attributes = selector.reduce(attrs ? attrs.dup : {}) do |hash, (key, value)|
-          unless key.to_s =~ /\$/ || (value.is_a?(Hash) && !attribute_names.include?(key))
-            hash[key] = value
+          unless key.to_s =~ /\$/
+            if value.is_a?(Hash)
+              if value.keys.none? { |k| k.to_s =~ /\$/ } && attribute_names.include?(key)
+                hash[key] = value
+              end
+            else
+              hash[key] = value
+            end
           end
           hash
         end

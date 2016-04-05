@@ -623,6 +623,18 @@ describe Mongoid::Criteria::Modifiable do
           expect(document.map).to eq({ foo: :bar })
         end
       end
+
+      context 'when the criteria selector contains special ($) operators' do
+
+        let(:document) do
+          Person.in(aliases: "foobar").first_or_create(username: "foobar")
+        end
+
+        it 'ignore the special operator' do
+          expect(document.aliases).to eq(nil)
+          expect(document.username).to eq("foobar")
+        end
+      end
     end
   end
 
