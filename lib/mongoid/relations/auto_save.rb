@@ -71,9 +71,9 @@ module Mongoid
                         end
                       end
                     else
-                      Array(relation).each do |d|
-                        if changed_for_autosave?(d)
-                          d.with(persistence_context.options) do |d|
+                      Array(relation).each do |doc|
+                        if changed_for_autosave?(doc)
+                          doc.with(persistence_context.options) do |d|
                             d.save
                           end
                         end
