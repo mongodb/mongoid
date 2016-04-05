@@ -150,7 +150,7 @@ describe Mongoid::PersistenceContext do
     context 'when options are passed' do
 
       let(:options) do
-        { connect_timeout: 10 }
+        { connect_timeout: 3 }
       end
 
       context 'when the options are valid client options' do
@@ -617,7 +617,7 @@ describe Mongoid::PersistenceContext do
     context 'when there are client options set' do
 
       let(:options) do
-        { connect_timeout: 10 }
+        { connect_timeout: 3 }
       end
 
       it 'applies the options to the client' do
