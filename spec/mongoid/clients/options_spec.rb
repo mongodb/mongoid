@@ -135,7 +135,7 @@ describe Mongoid::Clients::Options do
           let(:config) do
             {
                 default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
-                secondary: { uri: "mongodb://127.0.0.1:27017/secondary-db" }
+                secondary: { uri: "mongodb://127.0.0.1:27017/secondary-db?connectTimeoutMS=3000" }
             }
           end
 
@@ -152,6 +152,10 @@ describe Mongoid::Clients::Options do
           it 'uses the database specified in the uri' do
             expect(persistence_context.database_name).to eq('secondary-db')
             expect(persistence_context.client.database.name).to eq('secondary-db')
+          end
+
+          it 'uses the options specified in the uri' do
+            expect(persistence_context.client.options[:connect_timeout]).to eq(3)
           end
         end
       end
