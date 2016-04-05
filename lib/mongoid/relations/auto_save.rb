@@ -59,18 +59,25 @@ module Mongoid
           if metadata.autosave? && !metadata.embedded?
             save_method = :"autosave_documents_for_#{metadata.name}"
             define_method(save_method) do
-
               if before_callback_halted?
                 self.before_callback_halted = false
               else
                 __autosaving__ do
                   if relation = ivar(metadata.name)
                     if :belongs_to == metadata.macro
-                      # @todo apply persistence_context to relation
-                      relation.save if changed_for_autosave?(relation)
+                      if changed_for_autosave?(relation)
+                        relation.with(persistence_context.options) do |_relation|
+                          _relation.save
+                        end
+                      end
                     else
-                      # @todo apply persistence_context to relation
-                      Array(relation).each { |d| d.save if changed_for_autosave?(d) }
+                      Array(relation).each do |d|
+                        if changed_for_autosave?(d)
+                          d.with(persistence_context.options) do |d|
+                            d.save
+                          end
+                        end
+                      end
                     end
                   end
                 end
