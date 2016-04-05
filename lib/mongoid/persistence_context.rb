@@ -95,7 +95,7 @@ module Mongoid
     #
     # @since 6.0.0
     def database_name
-      database_name_option || client.database.name
+      __evaluate__(database_name_option) || client.database.name
     end
 
     # Get the client for this persistence context.
@@ -164,20 +164,6 @@ module Mongoid
 
     class << self
 
-      # Get the persistence context for a particular class or model instance.
-      #
-      # @example Get the persistence context for a class or model instance.
-      #  PersistenceContext.get(model)
-      #
-      # @param [ Object ] object The class or model instance.
-      #
-      # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
-      #
-      # @since 6.0.0
-      def get(object)
-        Thread.current["[mongoid][#{object.object_id}]:context"]
-      end
-
       # Set the persistence context for a particular class or model instance.
       #
       # @example Set the persistence context for a class or model instance.
@@ -191,6 +177,20 @@ module Mongoid
       # @since 6.0.0
       def set(object, options)
         Thread.current["[mongoid][#{object.object_id}]:context"] = PersistenceContext.new(object, options)
+      end
+
+      # Get the persistence context for a particular class or model instance.
+      #
+      # @example Get the persistence context for a class or model instance.
+      #  PersistenceContext.get(model)
+      #
+      # @param [ Object ] object The class or model instance.
+      #
+      # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
+      #
+      # @since 6.0.0
+      def get(object)
+        Thread.current["[mongoid][#{object.object_id}]:context"]
       end
 
       # Get the persistence context for a particular class or model instance.
