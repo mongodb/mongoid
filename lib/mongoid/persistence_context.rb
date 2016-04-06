@@ -1,7 +1,7 @@
 module Mongoid
 
-  # Object encapsulating logic for setting/getting a collection name and a client
-  # with particular options to use when persisting models.
+  # Object encapsulating logic for setting/getting a collection and database name
+  # and a client with particular options to use when persisting models.
   #
   # @since 6.0.0
   class PersistenceContext
@@ -45,7 +45,7 @@ module Mongoid
     #   PersistenceContext.new(model, collection: 'other')
     #
     # @param [ Object ] parent The class or model instance for which a persistence context
-    # should be created.
+    #   should be created.
     # @param [ Hash ] opts The persistence context options.
     #
     # @since 6.0.0
@@ -170,8 +170,8 @@ module Mongoid
       #  PersistenceContext.set(model)
       #
       # @param [ Object ] object The class or model instance.
-      # @param [ Hash, PersistenceContext ] options_or_context The persistence options or
-      #   a persistence context object.
+      # @param [ Hash, Mongoid::PersistenceContext ] options_or_context The persistence
+      #   options or a persistence context object.
       #
       # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
       #
@@ -201,7 +201,7 @@ module Mongoid
       # @example Get the persistence context for a class or model instance.
       #  PersistenceContext.get(model)
       #
-      # @param [ Object ] object The class or model instance.
+      # @param [ Class, Object ] object The class or model instance.
       # @param [ Mongo::Cluster ] cluster The original cluster before this context was used.
       #
       # @since 6.0.0
