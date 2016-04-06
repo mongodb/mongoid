@@ -18,7 +18,7 @@ describe Mongoid::Clients::Options do
         expect(persistence_context.client.options['database']).to eq(options[:database])
       end
 
-      it 'doesnt set the options on class level' do
+      it 'does not set the options on class level' do
         expect(Band.persistence_context.client.options['database']).to eq('mongoid_test')
       end
 
@@ -230,6 +230,47 @@ describe Mongoid::Clients::Options do
         it "does not share the persistence options" do
           expect(british_count).to eq(50)
           expect(american_count).to eq(50)
+        end
+      end
+    end
+
+    context 'when passing a persistence context' do
+
+      context 'when the object is a class' do
+
+        let(:persistence_context) do
+          Band.with(options) do |klass|
+            klass.persistence_context
+          end
+        end
+
+        let(:options) { { database: 'other' } }
+
+        it 'sets the persistence context on the object' do
+          Band.with(persistence_context) do |band_class|
+            expect(band_class.persistence_context).to be(persistence_context)
+          end
+        end
+      end
+
+      context 'when the object is an instance' do
+
+        let(:instance) do
+          Band.new
+        end
+
+        let(:persistence_context) do
+          instance.with(options) do |inst|
+            inst.persistence_context
+          end
+        end
+
+        let(:options) { { database: 'other' } }
+
+        it 'sets the persistence context on the object' do
+          Band.new.with(persistence_context) do |band_instance|
+            expect(band_instance.persistence_context).to be(persistence_context)
+          end
         end
       end
     end

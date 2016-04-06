@@ -11,16 +11,17 @@ module Mongoid
       #     m.save
       #   end
       #
-      # @param [ Hash ] options The storage options.
+      # @param [ Hash, Mongoid::PersistenceContext ] options_or_context
+      #   The storage options or a persistence context.
       #
       # @option options [ String, Symbol ] :collection The collection name.
       # @option options [ String, Symbol ] :database The database name.
       # @option options [ String, Symbol ] :client The client name.
       #
       # @since 6.0.0
-      def with(options, &block)
+      def with(options_or_context, &block)
         original_cluster = persistence_context.cluster
-        set_persistence_context(options)
+        set_persistence_context(options_or_context)
         yield self
       ensure
         clear_persistence_context(original_cluster)
@@ -46,8 +47,8 @@ module Mongoid
 
       private
 
-      def set_persistence_context(options)
-        PersistenceContext.set(self, options)
+      def set_persistence_context(options_or_context)
+        PersistenceContext.set(self, options_or_context)
       end
 
       def clear_persistence_context(original_cluster = nil)

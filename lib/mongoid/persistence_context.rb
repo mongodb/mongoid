@@ -170,13 +170,16 @@ module Mongoid
       #  PersistenceContext.set(model)
       #
       # @param [ Object ] object The class or model instance.
-      # @param [ Hash ] options The persistence options.
+      # @param [ Hash, PersistenceContext ] options_or_context The persistence options or
+      #   a persistence context object.
       #
       # @return [ Mongoid::PersistenceContext ] The persistence context for the object.
       #
       # @since 6.0.0
-      def set(object, options)
-        Thread.current["[mongoid][#{object.object_id}]:context"] = PersistenceContext.new(object, options)
+      def set(object, options_or_context)
+        context = options_or_context.is_a?(PersistenceContext) ?
+                    options_or_context : PersistenceContext.new(object, options_or_context)
+        Thread.current["[mongoid][#{object.object_id}]:context"] = context
       end
 
       # Get the persistence context for a particular class or model instance.
