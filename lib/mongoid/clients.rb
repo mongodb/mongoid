@@ -2,14 +2,12 @@
 require "mongoid/clients/factory"
 require "mongoid/clients/validators"
 require "mongoid/clients/storage_options"
-require "mongoid/clients/thread_options"
 require "mongoid/clients/options"
 
 module Mongoid
   module Clients
     extend ActiveSupport::Concern
     include StorageOptions
-    include ThreadOptions
     include Options
 
     class << self
@@ -72,67 +70,6 @@ module Mongoid
 
       def clients
         @clients ||= {}
-      end
-    end
-
-    # Get the collection for this model from the client. Will check for an
-    # overridden collection name from the store_in macro or the collection
-    # with a pluralized model name.
-    #
-    # @example Get the model's collection.
-    #   Model.collection
-    #
-    # @return [ Mongo::Collection ] The collection.
-    #
-    # @since 3.0.0
-    def collection
-      mongo_client[collection_name]
-    end
-
-    def mongo_client
-      super || self.class.mongo_client
-    end
-
-    def collection_name
-      super || self.class.collection_name
-    end
-
-    module ClassMethods
-
-      # Get the client for this model. This is determined in the following order:
-      #
-      #   1. Any custom configuration provided by the 'store_in' macro.
-      #   2. The 'default' client as provided in the mongoid.yml
-      #
-      # @example Get the client.
-      #   Model.mongo_client
-      #
-      # @return [ Mongo::Client ] The default mongo client.
-      #
-      # @since 3.0.0
-      def mongo_client
-        return client_with_options if client_with_options
-        client = Clients.with_name(client_name)
-        opts = self.persistence_options ? self.persistence_options.dup : {}
-        if defined?(Mongo::Client::VALID_OPTIONS)
-          opts.reject! { |k, v| !Mongo::Client::VALID_OPTIONS.include?(k.to_sym) }
-        end
-        opts.merge!(database: database_name) unless client.database.name.to_sym == database_name.to_sym
-        client.with(opts)
-      end
-
-      # Get the collection for this model from the client. Will check for an
-      # overridden collection name from the store_in macro or the collection
-      # with a pluralized model name.
-      #
-      # @example Get the model's collection.
-      #   Model.collection
-      #
-      # @return [ Mongo::Collection ] The collection.
-      #
-      # @since 3.0.0
-      def collection
-        mongo_client[collection_name]
       end
     end
   end

@@ -74,76 +74,8 @@ module Mongoid
         def storage_options_defaults
           {
             collection: name.collectionize.to_sym,
-            client: :default,
-            database: -> { configured_database }
+            client: :default
           }
-        end
-
-        # Get the name of the collection this model persists to.
-        #
-        # @example Get the collection name.
-        #   Model.collection_name
-        #
-        # @return [ Symbol ] The name of the collection.
-        #
-        # @since 3.0.0
-        def collection_name
-          __evaluate__(storage_options[:collection])
-        end
-
-        # Get the client name for the model.
-        #
-        # @example Get the client name.
-        #   Model.client_name
-        #
-        # @return [ Symbol ] The name of the client.
-        #
-        # @since 3.0.0
-        def client_name
-          __evaluate__(storage_options[:client])
-        end
-
-        # Get the database name for the model.
-        #
-        # @example Get the database name.
-        #   Model.database_name
-        #
-        # @return [ Symbol ] The name of the client.
-        #
-        # @since 4.0.0
-        def database_name
-          __evaluate__(storage_options[:database])
-        end
-
-        private
-
-        # Eval the provided value, either byt calling it if it responds to call
-        # or returning the value itself.
-        #
-        # @api private
-        #
-        # @example Evaluate the name.
-        #   Model.__evaluate__(:name)
-        #
-        # @param [ String, Symbol, Proc ] name The name.
-        #
-        # @return [ Symbol ] The value as a symbol.
-        #
-        # @since 3.1.0
-        def __evaluate__(name)
-          return nil unless name
-          name.respond_to?(:call) ? name.call.to_sym : name.to_sym
-        end
-
-        def configured_database
-          client = Mongoid.clients[client_name]
-          if db = client[:database]
-            db
-          elsif uri = client[:uri]
-            client[:database] = Mongo::URI.new(uri).database
-          else
-            nil
-          end
         end
       end
     end

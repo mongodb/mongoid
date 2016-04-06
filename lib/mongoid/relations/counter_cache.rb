@@ -15,7 +15,9 @@ module Mongoid
       #
       # @since 4.0.0
       def reset_counters(*counters)
-        self.class.reset_counters(self, *counters)
+        self.class.with(persistence_context) do |_class|
+          _class.reset_counters(self, *counters)
+        end
       end
 
       module ClassMethods
@@ -111,12 +113,16 @@ module Mongoid
                 original, current = attribute_change(id_field)
 
                 unless original.nil?
-                  record.class.decrement_counter(cache_column, original)
+                  record.class.with(persistence_context) do |_class|
+                    _class.decrement_counter(cache_column, original)
+                  end
                 end
 
                 unless current.nil?
                   record[cache_column] = (record[cache_column] || 0) + 1
-                  record.class.increment_counter(cache_column, current) if record.persisted?
+                  record.class.with(record.persistence_context) do |_class|
+                    _class.increment_counter(cache_column, current) if record.persisted?
+                  end
                 end
               end
             end
@@ -127,7 +133,9 @@ module Mongoid
               record[cache_column] = (record[cache_column] || 0) + 1
 
               if record.persisted?
-                record.class.increment_counter(cache_column, record._id)
+                record.class.with(record.persistence_context) do |_class|
+                  _class.increment_counter(cache_column, record._id)
+                end
                 record.remove_change(cache_column)
               end
             end
@@ -138,7 +146,9 @@ module Mongoid
               record[cache_column] = (record[cache_column] || 0) - 1 unless record.frozen?
 
               if record.persisted?
-                record.class.decrement_counter(cache_column, record._id)
+                record.class.with(record.persistence_context) do |_class|
+                  _class.decrement_counter(cache_column, record._id)
+                end
                 record.remove_change(cache_column)
               end
             end

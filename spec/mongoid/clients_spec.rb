@@ -6,34 +6,38 @@ describe Mongoid::Clients do
 
     shared_examples_for "an overridden collection at the class level" do
 
-      let(:band) do
-        klass.new
-      end
-
       it "returns the collection for the model" do
-        expect(band.collection).to be_a(Mongo::Collection)
+        expect(instance_collection).to be_a(Mongo::Collection)
       end
 
       it "sets the correct collection name" do
-        expect(band.collection.name).to eq("artists")
+        expect(instance_collection.name).to eq("artists")
       end
 
       context "when accessing from the class level" do
 
         it "returns the collection for the model" do
-          expect(klass.collection).to be_a(Mongo::Collection)
+          expect(class_collection).to be_a(Mongo::Collection)
         end
 
         it "sets the correct collection name" do
-          expect(klass.collection.name).to eq("artists")
+          expect(class_collection.name).to eq("artists")
         end
       end
     end
 
     context "when overriding the persistence options" do
 
-      let(:klass) do
-        Band.with(collection: "artists")
+      let(:instance_collection) do
+        Band.with(collection: "artists") do |klass|
+          klass.new.collection
+        end
+      end
+
+      let(:class_collection) do
+        Band.with(collection: "artists") do |klass|
+          klass.collection
+        end
       end
 
       it_behaves_like "an overridden collection at the class level"
@@ -41,16 +45,24 @@ describe Mongoid::Clients do
 
     context "when overriding store_in and persistence options" do
 
-      let(:klass) do
-        Band.with(collection: "artists")
-      end
-
       before do
         Band.store_in collection: "foo"
       end
 
       after do
         Band.reset_storage_options!
+      end
+
+      let(:instance_collection) do
+        Band.with(collection: "artists") do |klass|
+          klass.new.collection
+        end
+      end
+
+      let(:class_collection) do
+        Band.with(collection: "artists") do |klass|
+          klass.collection
+        end
       end
 
       it_behaves_like "an overridden collection at the class level"
@@ -77,18 +89,22 @@ describe Mongoid::Clients do
 
       context "when overriding with a proc" do
 
-        let(:klass) { Band }
-
         before do
           Band.store_in(collection: ->{ "artists" })
+        end
+
+        let(:instance_collection) do
+          Band.new.collection
+        end
+
+        let(:class_collection) do
+          Band.collection
         end
 
         it_behaves_like "an overridden collection at the class level"
       end
 
       context "when overriding with a string" do
-
-        let(:klass) { Band }
 
         before do
           Band.store_in(collection: "artists")
@@ -98,19 +114,33 @@ describe Mongoid::Clients do
           Band.reset_storage_options!
         end
 
+        let(:instance_collection) do
+          Band.new.collection
+        end
+
+        let(:class_collection) do
+          Band.collection
+        end
+
         it_behaves_like "an overridden collection at the class level"
       end
 
       context "when overriding with a symbol" do
 
-        let(:klass) { Band }
-
         before do
-          klass.store_in(collection: :artists)
+          Band.store_in(collection: :artists)
         end
 
         after do
-          klass.reset_storage_options!
+          Band.reset_storage_options!
+        end
+
+        let(:instance_collection) do
+          Band.new.collection
+        end
+
+        let(:class_collection) do
+          Band.collection
         end
 
         it_behaves_like "an overridden collection at the class level"
@@ -148,29 +178,33 @@ describe Mongoid::Clients do
 
     shared_examples_for "an overridden collection name at the class level" do
 
-      let(:band) do
-        klass.new
-      end
-
       context "when accessing from the instance" do
 
         it "returns the overridden value" do
-          expect(band.collection_name).to eq(:artists)
+          expect(instance_collection_name).to eq(:artists)
         end
       end
 
       context "when accessing from the class level" do
 
         it "returns the overridden value" do
-          expect(klass.collection_name).to eq(:artists)
+          expect(class_collection_name).to eq(:artists)
         end
       end
     end
 
     context "when overriding the persistence options" do
 
-      let(:klass) do
-        Band.with(collection: "artists")
+      let(:instance_collection_name) do
+        Band.with(collection: "artists") do |klass|
+          klass.new.collection_name
+        end
+      end
+
+      let(:class_collection_name) do
+        Band.with(collection: "artists") do |klass|
+          klass.collection_name
+        end
       end
 
       it_behaves_like "an overridden collection name at the class level"
@@ -178,8 +212,16 @@ describe Mongoid::Clients do
 
     context "when overriding store_in and persistence options" do
 
-      let(:klass) do
-        Band.with(collection: "artists")
+      let(:instance_collection_name) do
+        Band.with(collection: "artists") do |klass|
+          klass.new.collection_name
+        end
+      end
+
+      let(:class_collection_name) do
+        Band.with(collection: "artists") do |klass|
+          klass.collection_name
+        end
       end
 
       before do
@@ -195,7 +237,13 @@ describe Mongoid::Clients do
 
     context "when overriding the default with store_in" do
 
-      let(:klass) { Band }
+      let(:instance_collection_name) do
+        Band.new.collection_name
+      end
+
+      let(:class_collection_name) do
+        Band.collection_name
+      end
 
       after do
         Band.reset_storage_options!
@@ -266,38 +314,47 @@ describe Mongoid::Clients do
     end
   end
 
-  describe "#database_name", if: non_legacy_server? do
+  describe "#database_name" do
 
     shared_examples_for "an overridden database name" do
-
-      let(:band) do
-        klass.new
-      end
 
       context "when accessing from the instance" do
 
         it "returns the overridden value" do
-          # @todo
-          # expect(band.mongo_client.options[:database].to_s).to eq(database_id_alt)
+          expect(instance_database.name.to_s).to eq(database_id_alt)
         end
       end
 
       context "when accessing from the class level" do
 
         it "returns the overridden value" do
-          expect(klass.database_name.to_s).to eq(database_id_alt)
+          expect(class_database.name.to_s).to eq(database_id_alt)
         end
 
         it "client returns the overridden value" do
-          expect(klass.mongo_client.options[:database].to_s).to eq(database_id_alt)
+          expect(class_mongo_client.database.name).to eq(database_id_alt)
         end
       end
     end
 
     context "when overriding the persistence options" do
 
-      let(:klass) do
-        Band.with(database: database_id_alt)
+      let(:instance_database) do
+        Band.with(database: database_id_alt) do |klass|
+          klass.new.mongo_client.database
+        end
+      end
+
+      let(:class_database) do
+        Band.with(database: database_id_alt) do |klass|
+          klass.mongo_client.database
+        end
+      end
+
+      let(:class_mongo_client) do
+        Band.with(database: database_id_alt) do |klass|
+          klass.new.mongo_client
+        end
       end
 
       it_behaves_like "an overridden database name"
@@ -305,7 +362,17 @@ describe Mongoid::Clients do
 
     context "when overriding with store_in" do
 
-      let(:klass) { Band }
+      let(:instance_database) do
+        Band.new.mongo_client.database
+      end
+
+      let(:class_database) do
+        Band.mongo_client.database
+      end
+
+      let(:class_mongo_client) do
+        Band.mongo_client
+      end
 
       before do
         Band.store_in database: database_id_alt
@@ -320,8 +387,22 @@ describe Mongoid::Clients do
 
     context "when overriding store_in and persistence options" do
 
-      let(:klass) do
-        Band.with(database: database_id_alt)
+      let(:instance_database) do
+        Band.with(database: database_id_alt) do |klass|
+          klass.new.mongo_client.database
+        end
+      end
+
+      let(:class_database) do
+        Band.with(database: database_id_alt) do |klass|
+          klass.mongo_client.database
+        end
+      end
+
+      let(:class_mongo_client) do
+        Band.with(database: database_id_alt) do |klass|
+          klass.new.mongo_client
+        end
       end
 
       before do
@@ -349,8 +430,22 @@ describe Mongoid::Clients do
 
       context "when overriding the persistence options" do
 
-        let(:klass) do
-          Band.with(client: client_name)
+        let(:instance_database) do
+          Band.with(client: :alternative) do |klass|
+            klass.new.mongo_client.database
+          end
+        end
+
+        let(:class_database) do
+          Band.with(client: :alternative) do |klass|
+            klass.mongo_client.database
+          end
+        end
+
+        let(:class_mongo_client) do
+          Band.with(client: :alternative) do |klass|
+            klass.new.mongo_client
+          end
         end
 
         it_behaves_like "an overridden database name"
@@ -358,7 +453,17 @@ describe Mongoid::Clients do
 
       context "when overriding with store_in" do
 
-        let(:klass) { Band }
+        let(:instance_database) do
+          Band.new.mongo_client.database
+        end
+
+        let(:class_database) do
+          Band.mongo_client.database
+        end
+
+        let(:class_mongo_client) do
+          Band.mongo_client
+        end
 
         before do
           Band.store_in(client: client_name)
@@ -373,7 +478,7 @@ describe Mongoid::Clients do
     end
   end
 
-  describe "#mongo_client", if: non_legacy_server? do
+  describe "#mongo_client" do
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -428,7 +533,7 @@ describe Mongoid::Clients do
     end
   end
 
-  describe ".mongo_client", if: non_legacy_server? do
+  describe ".mongo_client" do
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -491,7 +596,7 @@ describe Mongoid::Clients do
       end
     end
 
-    context "when provided a class that extend another document" do
+    context "when provided a class that extends another document" do
 
       let(:klass) do
         Class.new(Band)
@@ -522,7 +627,9 @@ describe Mongoid::Clients do
     context "when changing write concern options" do
 
       let(:client_one) do
-        Band.with(write: { w: 2 }).mongo_client
+        Band.with(write: { w: 2 }) do |klass|
+          klass.mongo_client
+        end
       end
 
       let(:client_two) do
@@ -537,13 +644,17 @@ describe Mongoid::Clients do
     context "when sending operations to a different database" do
 
       after do
-        Band.with(database: database_id_alt).delete_all
+        Band.with(database: database_id_alt) do |klass|
+          klass.delete_all
+        end
       end
 
       describe ".create" do
 
         let!(:band) do
-          Band.with(database: database_id_alt).create
+          Band.with(database: database_id_alt) do |klass|
+            klass.create
+          end
         end
 
         it "does not persist to the default database" do
@@ -553,15 +664,23 @@ describe Mongoid::Clients do
         end
 
         let(:from_db) do
-          Band.with(database: database_id_alt).find(band.id)
+          Band.with(database: database_id_alt) do |klass|
+            klass.find(band.id)
+          end
         end
 
         it "persists to the specified database" do
           expect(from_db).to eq(band)
         end
 
+        let(:count) do
+          Band.with(database: database_id_alt) do |klass|
+            klass.count
+          end
+        end
+
         it "persists the correct number of documents" do
-          expect(Band.with(database: database_id_alt).count).to eq(1)
+          expect(count).to eq(1)
         end
       end
     end
@@ -571,7 +690,9 @@ describe Mongoid::Clients do
       describe ".create" do
 
         let!(:band) do
-          Band.with(collection: "artists").create
+          Band.with(collection: "artists") do |klass|
+            klass.create
+          end
         end
 
         it "does not persist to the default database" do
@@ -581,15 +702,23 @@ describe Mongoid::Clients do
         end
 
         let(:from_db) do
-          Band.with(collection: "artists").find(band.id)
+          Band.with(collection: "artists") do |klass|
+            klass.find(band.id)
+          end
         end
 
         it "persists to the specified database" do
           expect(from_db).to eq(band)
         end
 
+        let(:count) do
+          Band.with(collection: "artists") do |klass|
+            klass.count
+          end
+        end
+
         it "persists the correct number of documents" do
-          expect(Band.with(collection: "artists").count).to eq(1)
+          expect(count).to eq(1)
         end
       end
     end
@@ -719,7 +848,7 @@ describe Mongoid::Clients do
     end
   end
 
-  context "when overriding the default database", if: non_legacy_server? do
+  context "when overriding the default database" do
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")

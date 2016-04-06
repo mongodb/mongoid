@@ -58,7 +58,9 @@ describe Mongoid::Indexable do
       end
 
       let(:indexes) do
-        klass.with(database: "mongoid_optional").collection.indexes
+        klass.with(database: "mongoid_optional") do |klass|
+          klass.collection.indexes
+        end
       end
 
       it "creates the indexes" do
@@ -107,7 +109,9 @@ describe Mongoid::Indexable do
       end
 
       let(:indexes) do
-        klass.with(database: "mongoid_optional").collection.indexes
+        klass.with(database: "mongoid_optional") do |klass|
+          klass.collection.indexes
+        end
       end
 
       it "creates the indexes" do

@@ -31,8 +31,9 @@ module Mongoid
         index_specifications.each do |spec|
           key, options = spec.key, spec.options
           if database = options[:database]
-            with(database: database).
-              collection.indexes.create_one(key, options.except(:database))
+            with(database: database) do |klass|
+              klass.collection.indexes.create_one(key, options.except(:database))
+            end
           else
             collection.indexes.create_one(key, options)
           end
@@ -50,18 +51,19 @@ module Mongoid
       # @since 3.0.0
       def remove_indexes
         indexed_database_names.each do |database|
-          collection = with(database: database).collection
-          begin
-            collection.indexes.each do |spec|
-              unless spec["name"] == "_id_"
-                collection.indexes.drop_one(spec["key"])
-                logger.info(
-                  "MONGOID: Removed index '#{spec["name"]}' on collection " +
-                  "'#{collection.name}' in database '#{database}'."
-                )
+          with(database: database) do |klass|
+            begin
+              klass.collection.indexes.each do |spec|
+                unless spec["name"] == "_id_"
+                  klass.collection.indexes.drop_one(spec["key"])
+                  logger.info(
+                    "MONGOID: Removed index '#{spec["name"]}' on collection " +
+                    "'#{klass.collection.name}' in database '#{database}'."
+                  )
+                end
               end
-            end
-          rescue Mongo::Error::OperationFailure; end
+            rescue Mongo::Error::OperationFailure; end
+          end
         end and true
       end
 

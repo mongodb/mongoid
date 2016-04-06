@@ -590,7 +590,8 @@ describe Mongoid::Criteria do
 
     let!(:match) do
       Band.create(name: "Depeche Mode").tap do |band|
-        band.records.create(name: "101")
+        r = band.records
+        r.create(name: "101")
       end
     end
 
@@ -3470,8 +3471,21 @@ describe Mongoid::Criteria do
 
   describe "#with" do
 
-    let!(:criteria) do
-      Band.where(name: "Depeche Mode").with(collection: "artists")
+    let!(:criteria_and_collection) do
+      collection = nil
+      criteria = Band.where(name: "Depeche Mode").with(collection: "artists") do |crit|
+        collection = crit.collection
+        crit
+      end
+      [ criteria, collection ]
+    end
+
+    let(:criteria) do
+      criteria_and_collection[0]
+    end
+
+    let(:collection) do
+      criteria_and_collection[1]
     end
 
     it "retains the criteria selection" do
@@ -3479,7 +3493,7 @@ describe Mongoid::Criteria do
     end
 
     it "sets the persistence options" do
-      expect(criteria.persistence_options).to eq(collection: "artists")
+      expect(collection.name).to eq("artists")
     end
   end
 

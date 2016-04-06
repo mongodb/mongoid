@@ -139,7 +139,7 @@ module Mongoid
         prepare_update(options) do
           updates, conflicts = init_atomic_updates
           unless updates.empty?
-            coll = _root.collection
+            coll = collection(_root)
             selector = atomic_selector
             coll.find(selector).update_one(positionally(selector, updates))
             conflicts.each_pair do |key, value|

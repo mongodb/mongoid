@@ -320,7 +320,6 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
-          document.with(@persistence_options) if @persistence_options
           with_add_callbacks(document, already_related?(document)) do
             target.push(document)
             characterize_one(document)

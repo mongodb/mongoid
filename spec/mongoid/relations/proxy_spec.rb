@@ -19,7 +19,9 @@ describe Mongoid::Relations::Proxy do
 
     it 'uses the new persistence options' do
       expect {
-        animal.with(write: { w: 100 }).update_attribute(:name, 'kangaroo')
+        animal.with(write: { w: 100 }) do |an|
+          an.update_attribute(:name, 'kangaroo')
+        end
       }.to raise_exception(Mongo::Error::OperationFailure)
     end
   end

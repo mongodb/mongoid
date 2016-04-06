@@ -310,7 +310,7 @@ module Mongoid
       # @since 3.0.0
       def initialize(criteria)
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
-        @collection = @klass.with(criteria.persistence_options || {}).collection
+        @collection = @klass.collection
         criteria.send(:merge_type_selection)
         @view = collection.find(criteria.selector)
         apply_options
