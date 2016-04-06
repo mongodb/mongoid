@@ -4,6 +4,25 @@ describe Mongoid::Reloadable do
 
   describe "#reload" do
 
+    context 'when persistence options are set' do
+
+      let(:person) do
+        Person.with(collection: 'other') do |person_class|
+          person_class.create
+        end
+      end
+
+      let(:reloaded) do
+        Person.with(collection: 'other') do |person_class|
+          person_class.first
+        end
+      end
+
+      it 'applies the persistence options' do
+        expect(person).to eq(reloaded)
+      end
+    end
+
     context "when using bson ids" do
 
       let(:person) do
@@ -105,6 +124,38 @@ describe Mongoid::Reloadable do
       end
 
       context "when embedded a single level" do
+
+        context 'when persistence options are set' do
+
+          let(:person) do
+            Person.with(collection: 'other') do |person_class|
+              person_class.create
+            end
+          end
+
+          let!(:address) do
+            person.with(collection: 'other') do |person_object|
+              person_object.addresses.create(street: "Abbey Road", number: 4)
+            end
+          end
+
+          before do
+            Person.mongo_client[:other].find(
+                { "_id" => person.id }
+            ).update_one({ "$set" => { "addresses.0.number" => 3 }})
+          end
+
+          let!(:reloaded) do
+            person.with(collection: 'other') do |person_class|
+              person.addresses.first.reload
+            end
+          end
+
+          it "reloads the embedded document attributes" do
+            expect(reloaded.number).to eq(3)
+          end
+
+        end
 
         context "when the relation is an embeds many" do
 

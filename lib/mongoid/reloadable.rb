@@ -71,7 +71,7 @@ module Mongoid
     # @since 2.3.2
     def reload_embedded_document
       extract_embedded_attributes({}.merge(
-        _root.collection.find(_id: _root._id).read(mode: :primary).first
+        collection(_root).find(_id: _root._id).read(mode: :primary).first
       ))
     end
 
