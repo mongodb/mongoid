@@ -177,8 +177,8 @@ module Mongoid
       #
       # @since 6.0.0
       def set(object, options_or_context)
-        context = options_or_context.is_a?(PersistenceContext) ?
-                    options_or_context : PersistenceContext.new(object, options_or_context)
+        context = PersistenceContext.new(object, options_or_context.is_a?(PersistenceContext) ?
+                                                   options_or_context.options : options_or_context)
         Thread.current["[mongoid][#{object.object_id}]:context"] = context
       end
 

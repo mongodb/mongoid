@@ -66,14 +66,14 @@ module Mongoid
                   if relation = ivar(metadata.name)
                     if :belongs_to == metadata.macro
                       if changed_for_autosave?(relation)
-                        relation.with(persistence_context.options) do |_relation|
+                        relation.with(persistence_context) do |_relation|
                           _relation.save
                         end
                       end
                     else
                       Array(relation).each do |doc|
                         if changed_for_autosave?(doc)
-                          doc.with(persistence_context.options) do |d|
+                          doc.with(persistence_context) do |d|
                             d.save
                           end
                         end
