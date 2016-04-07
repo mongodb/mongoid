@@ -5,7 +5,7 @@ module Mongoid
     # The "Grand Poobah" of information about any relation is this class. It
     # contains everything you could ever possible want to know.
     class Metadata < Hash
-      using Refinements::Extension
+      using Refinements
 
       delegate :foreign_key_default, :stores_foreign_key?, to: :relation
 

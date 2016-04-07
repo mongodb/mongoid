@@ -2,7 +2,7 @@
 module Mongoid
   class Criteria
     module Findable
-      using Refinements::Extension
+      using Refinements
 
       # Execute the criteria or raise an error if no documents found.
       #

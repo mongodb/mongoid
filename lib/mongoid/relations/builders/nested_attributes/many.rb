@@ -4,7 +4,7 @@ module Mongoid
     module Builders
       module NestedAttributes
         class Many < NestedBuilder
-          using Refinements::Extension
+          using Refinements
 
           # Builds the relation depending on the attributes and the options
           # passed to the macro.

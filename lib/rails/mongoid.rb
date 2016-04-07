@@ -2,7 +2,7 @@
 module Rails
   module Mongoid
     extend self
-    using ::Mongoid::Refinements::Extension
+    using ::Mongoid::Refinements
 
     # Use the application configuration to get every model and require it, so
     # that indexing and inheritance work in both development and production

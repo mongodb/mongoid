@@ -14,7 +14,7 @@ module Mongoid
       include Atomic
       include Relations::Eager
       include Queryable
-      using Refinements::Extension
+      using Refinements
 
       # Options constant.
       #

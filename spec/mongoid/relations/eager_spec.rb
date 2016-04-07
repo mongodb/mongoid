@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::Eager do
-  using Mongoid::Refinements::Extension
+  using Mongoid::Refinements
 
   describe ".preload" do
 

@@ -6,7 +6,7 @@ module Mongoid
 
         # Binding class for embeds_one relations.
         class One < Binding
-          using Refinements::Extension
+          using Refinements
 
           # Binds the base object to the inverse of the relation. This is so we
           # are referenced to the actual objects themselves on both sides.

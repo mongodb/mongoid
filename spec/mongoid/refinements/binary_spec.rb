@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe BSON::Binary do
-  using Mongoid::Refinements::Extension
+  using Mongoid::Refinements
 
   describe "#mongoize" do
 

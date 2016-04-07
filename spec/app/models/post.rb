@@ -1,7 +1,7 @@
 class Post
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic
-  using Mongoid::Refinements::Extension
+  using Mongoid::Refinements
 
   field :title, type: String
   field :content, type: String

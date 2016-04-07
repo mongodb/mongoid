@@ -215,7 +215,7 @@ module Mongoid
     end
 
     module ClassMethods
-      using Refinements::Extension
+      using Refinements
 
       # Returns an array of names for the attributes available on this object.
       #

@@ -2,7 +2,7 @@
 module Mongoid
   module Contextual
     module Atomic
-      using Refinements::Extension
+      using Refinements
 
       # Execute an atomic $addToSet on the matching documents.
       #

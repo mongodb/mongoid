@@ -14,7 +14,7 @@ module Mongoid
     include Nested
     include Processing
     include Readonly
-    using Refinements::Extension
+    using Refinements
 
     attr_reader :attributes
     alias :raw_attributes :attributes

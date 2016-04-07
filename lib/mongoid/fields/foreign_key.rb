@@ -2,7 +2,7 @@
 module Mongoid
   module Fields
     class ForeignKey < Standard
-      using Refinements::Extension
+      using Refinements
 
       # Adds the atomic changes for this type of resizable field.
       #

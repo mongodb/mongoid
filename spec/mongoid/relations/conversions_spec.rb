@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::Conversions do
-  using Mongoid::Refinements::Extension
+  using Mongoid::Refinements
 
   describe ".flag" do
 

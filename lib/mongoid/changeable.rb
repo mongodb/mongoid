@@ -6,7 +6,7 @@ module Mongoid
   # @since 4.0.0
   module Changeable
     extend ActiveSupport::Concern
-    using Refinements::Extension
+    using Refinements
 
     # Get the changed attributes for the document.
     #
@@ -257,7 +257,7 @@ module Mongoid
     end
 
     module ClassMethods
-      using Refinements::Extension
+      using Refinements
 
       private
 

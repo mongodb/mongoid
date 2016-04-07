@@ -1,7 +1,7 @@
 require "spec_helper"
 
-describe Mongoid::Refinements::Extension do
-  using Mongoid::Refinements::Extension
+describe Mongoid::Refinements do
+  using Mongoid::Refinements
 
   describe "#demongoize" do
 

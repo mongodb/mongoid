@@ -8,7 +8,7 @@ module Mongoid
       # handles both cases or a combination of the two.
       class Enumerable
         include ::Enumerable
-        using Refinements::Extension
+        using Refinements
 
         # The three main instance variables are collections of documents.
         #

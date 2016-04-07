@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Boolean do
-  using Mongoid::Refinements::Extension
+  using Mongoid::Refinements
 
   describe ".demongoize" do
 

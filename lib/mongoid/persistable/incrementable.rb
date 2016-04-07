@@ -7,7 +7,7 @@ module Mongoid
     # @since 4.0.0
     module Incrementable
       extend ActiveSupport::Concern
-      using Refinements::Extension
+      using Refinements
 
       # Increment the provided fields by the corresponding values. Values can
       # be positive or negative, and if no value exists for the field it will

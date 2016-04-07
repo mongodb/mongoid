@@ -2,7 +2,7 @@
 module Mongoid
   module Fields
     class Standard
-      using Refinements::Extension
+      using Refinements
 
       # Defines the behaviour for defined fields in the document.
       # Set readers for the instance variables.

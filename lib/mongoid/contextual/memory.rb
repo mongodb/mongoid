@@ -10,7 +10,7 @@ module Mongoid
       include Relations::Eager
       include Queryable
       include Positional
-      using Refinements::Extension
+      using Refinements
 
       # @attribute [r] root The root document.
       # @attribute [r] path The atomic path.
