@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Criteria::Findable do
+  using Mongoid::Refinements
 
   describe "#find" do
 

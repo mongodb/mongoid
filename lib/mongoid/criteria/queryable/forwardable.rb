@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Queryable
+      using Refinements
 
       # Allows for easy delegation of queryable queryable instance methods to a
       # specific method.

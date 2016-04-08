@@ -1,5 +1,9 @@
 # encoding: utf-8
 
+unless defined?(Boolean)
+  class Boolean; end
+end
+
 module Mongoid
   class Boolean
   end

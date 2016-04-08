@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Modifiable
+      using Refinements
 
       # Build a document given the selector and return it.
       # Complex criteria, such as $in and $or operations will get ignored.

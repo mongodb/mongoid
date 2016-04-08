@@ -1,6 +1,8 @@
 require "spec_helper"
 
 describe Array do
+  using Mongoid::Refinements
+
   describe ".evolve" do
 
     context "when provided an Array" do

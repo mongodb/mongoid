@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Set do
+  using Mongoid::Refinements
 
   describe ".evolve" do
 

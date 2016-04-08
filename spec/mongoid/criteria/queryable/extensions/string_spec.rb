@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe String do
+  using Mongoid::Refinements
 
   describe "#__evolve_date__" do
 

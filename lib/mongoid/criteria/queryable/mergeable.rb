@@ -5,6 +5,7 @@ module Mongoid
 
       # Contains behaviour for merging existing selection with new selection.
       module Mergeable
+        using Refinements
 
         # @attribute [rw] strategy The name of the current strategy.
         attr_accessor :strategy
@@ -236,10 +237,24 @@ module Mongoid
         # @since 1.0.0
         def with_strategy(strategy, criterion, operator)
           selection(criterion) do |selector, field, value|
-            selector.store(
-              field,
-              selector[field].send(strategy, prepare(field, operator, value))
-            )
+            case strategy
+              when :__intersect__
+                selector.store(
+                    field,
+                    selector[field].__intersect__(prepare(field, operator, value))
+                )
+              when :__union__
+                selector.store(
+                    field,
+                    selector[field].__union__(prepare(field, operator, value))
+                )
+              when :__override__
+                selector.store(
+                    field,
+                    selector[field].__override__(prepare(field, operator, value))
+                )
+
+            end
           end
         end
 

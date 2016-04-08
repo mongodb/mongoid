@@ -4,6 +4,7 @@ module Mongoid
 
     # Module providing functionality for parsing (nested) inclusion definitions.
     module Includable
+      using Refinements
 
       # Eager loads all the provided relations. Will load all the documents
       # into the identity map whose ids match based on the extra query for the

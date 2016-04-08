@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Range do
+  using Mongoid::Refinements
 
   describe "#__array__" do
 

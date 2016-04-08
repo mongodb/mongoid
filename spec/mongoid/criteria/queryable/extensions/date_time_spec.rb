@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe DateTime do
+  using Mongoid::Refinements
 
   describe "#__evolve_time" do
 

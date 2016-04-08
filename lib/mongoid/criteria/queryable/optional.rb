@@ -7,6 +7,7 @@ module Mongoid
       # options surrounding queries, like skip, limit, sorting, etc.
       module Optional
         extend Macroable
+        using Refinements
 
         # @attribute [rw] options The query options.
         attr_accessor :options

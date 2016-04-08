@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Marshalable
+      using Refinements
 
       # Provides the data needed to Marshal.dump a criteria.
       #

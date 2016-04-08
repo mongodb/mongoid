@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe ActiveSupport::TimeWithZone do
+  using Mongoid::Refinements
 
   let(:time_zone) do
     ActiveSupport::TimeZone.new("Eastern Time (US & Canada)")

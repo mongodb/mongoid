@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Hash do
+  using Mongoid::Refinements
 
   describe "#__add__" do
 

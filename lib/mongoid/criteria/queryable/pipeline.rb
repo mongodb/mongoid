@@ -7,6 +7,7 @@ module Mongoid
       #
       # @since 2.0.0
       class Pipeline < Array
+        using Refinements
 
         # @attribute [r] aliases The field aliases.
         attr_reader :aliases

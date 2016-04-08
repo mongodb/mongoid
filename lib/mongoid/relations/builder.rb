@@ -7,6 +7,7 @@ module Mongoid
     # supplied attributes hash.
     class Builder
       include Threaded::Lifecycle
+      using Refinements
 
       attr_reader :base, :metadata, :object
 

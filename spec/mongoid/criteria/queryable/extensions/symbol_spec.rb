@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Symbol do
+  using Mongoid::Refinements
 
   describe ".add_key" do
 
