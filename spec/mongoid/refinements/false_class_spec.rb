@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Refinements do
+describe FalseClass do
   using Mongoid::Refinements
 
   describe "#sortable" do

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Refinements do
+describe BSON::ObjectId do
   using Mongoid::Refinements
 
   let(:object_id) do

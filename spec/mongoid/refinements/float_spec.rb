@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Refinements do
+describe Float do
   using Mongoid::Refinements
 
   let(:number) do
