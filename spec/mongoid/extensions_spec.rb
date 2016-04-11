@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe BSON::ObjectId do
+  using Mongoid::Refinements
 
   describe "#as_json" do
 
@@ -15,6 +16,7 @@ describe BSON::ObjectId do
 end
 
 describe BSON::Document do
+  using Mongoid::Refinements
 
   describe "#symbolize_keys" do
 
