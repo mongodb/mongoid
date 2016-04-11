@@ -237,7 +237,13 @@ module Mongoid
         # @since 1.0.0
         def with_strategy(strategy, criterion, operator)
           selection(criterion) do |selector, field, value|
+            # Note that you can't use #send for methods defined as a refinement.
             case strategy
+              when :__add__
+                selector.store(
+                    field,
+                    selector[field].__add__(prepare(field, operator, value))
+                )
               when :__intersect__
                 selector.store(
                     field,

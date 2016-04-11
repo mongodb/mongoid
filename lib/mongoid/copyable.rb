@@ -4,6 +4,7 @@ module Mongoid
   # This module contains the behaviour of Mongoid's clone/dup of documents.
   module Copyable
     extend ActiveSupport::Concern
+    using Refinements
 
     # Clone or dup the current +Document+. This will return all attributes with
     # the exception of the document's id, and will reset all the

@@ -4,6 +4,7 @@ module Mongoid
     class GeoNear
       include Enumerable
       include Command
+      using Refinements
 
       delegate :[], to: :results
       delegate :==, :empty?, to: :entries

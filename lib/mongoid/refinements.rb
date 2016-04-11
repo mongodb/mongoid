@@ -5,8 +5,7 @@ unless defined?(Boolean)
 end
 
 module Mongoid
-  class Boolean
-  end
+  class Boolean; end
 end
 
 class BSON::ObjectId
