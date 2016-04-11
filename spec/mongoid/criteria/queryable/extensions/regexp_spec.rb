@@ -1,7 +1,6 @@
 require "spec_helper"
 
-
-describe Regexp do
+describe Mongoid::Refinements do
   using Mongoid::Refinements
 
   describe ".evolve" do
@@ -85,7 +84,10 @@ describe Regexp do
     end
 
     it "returns true" do
-      expect(regexp).to be_regexp
+      # Note that you can't rely on Rspec's "be_xx" matcher here.
+      # It eventually calls regexp.respond_to?(:regexp), which will return
+      # false for the methods defined in Mongoid's Regexp refinement.
+      expect(regexp.regexp?).to be(true)
     end
   end
 end
