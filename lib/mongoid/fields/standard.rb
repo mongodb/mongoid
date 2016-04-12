@@ -8,17 +8,7 @@ module Mongoid
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :name, :options
 
-      def demongoize(object)
-        type.demongoize(object)
-      end
-
-      def evolve(object)
-        type.evolve(object)
-      end
-
-      def mongoize(object)
-        type.mongoize(object)
-      end
+      delegate :demongoize, :evolve, :mongoize, to: :type
 
       # Adds the atomic changes for this type of resizable field.
       #
