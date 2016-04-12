@@ -74,7 +74,10 @@ module Mongoid
         #
         # @since 1.0.0
         def __add__(criterion, operator)
-          with_strategy(:__add__, criterion, operator)
+          selection(criterion) do |selector, field, value|
+            selector.store( field, selector[field].__add__(
+                                     prepare(field, operator, value)))
+          end
         end
 
         # Adds the criterion to the existing selection.
@@ -130,7 +133,10 @@ module Mongoid
         #
         # @since 1.0.0
         def __intersect__(criterion, operator)
-          with_strategy(:__intersect__, criterion, operator)
+          selection(criterion) do |selector, field, value|
+            selector.store( field, selector[field].__intersect__(
+                                     prepare(field, operator, value)))
+          end
         end
 
         # Adds the criterion to the existing selection.
@@ -200,7 +206,10 @@ module Mongoid
         #
         # @since 1.0.0
         def __union__(criterion, operator)
-          with_strategy(:__union__, criterion, operator)
+          selection(criterion) do |selector, field, value|
+            selector.store( field, selector[field].__union__(
+                                     prepare(field, operator, value)))
+          end
         end
 
         # Use the named strategy for the next operation.
@@ -218,49 +227,6 @@ module Mongoid
         def use(strategy)
           tap do |mergeable|
             mergeable.strategy = strategy
-          end
-        end
-
-        # Add criterion to the selection with the named strategy.
-        #
-        # @api private
-        #
-        # @example Add criterion with a strategy.
-        #   mergeable.with_strategy(:__union__, [ 1, 2, 3 ], "$in")
-        #
-        # @param [ Symbol ] strategy The name of the strategy method.
-        # @param [ Object ] criterion The criterion to add.
-        # @param [ String ] operator The MongoDB operator.
-        #
-        # @return [ Mergeable ] The cloned query.
-        #
-        # @since 1.0.0
-        def with_strategy(strategy, criterion, operator)
-          selection(criterion) do |selector, field, value|
-            # Note that you can't use #send for methods defined as a refinement.
-            case strategy
-              when :__add__
-                selector.store(
-                    field,
-                    selector[field].__add__(prepare(field, operator, value))
-                )
-              when :__intersect__
-                selector.store(
-                    field,
-                    selector[field].__intersect__(prepare(field, operator, value))
-                )
-              when :__union__
-                selector.store(
-                    field,
-                    selector[field].__union__(prepare(field, operator, value))
-                )
-              when :__override__
-                selector.store(
-                    field,
-                    selector[field].__override__(prepare(field, operator, value))
-                )
-
-            end
           end
         end
 
