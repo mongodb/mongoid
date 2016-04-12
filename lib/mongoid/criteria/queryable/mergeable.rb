@@ -75,8 +75,8 @@ module Mongoid
         # @since 1.0.0
         def __add__(criterion, operator)
           selection(criterion) do |selector, field, value|
-            selector.store( field, selector[field].__add__(
-                                     prepare(field, operator, value)))
+            selector.store(field, selector[field].__add__(
+                                    prepare(field, operator, value)))
           end
         end
 
@@ -134,8 +134,8 @@ module Mongoid
         # @since 1.0.0
         def __intersect__(criterion, operator)
           selection(criterion) do |selector, field, value|
-            selector.store( field, selector[field].__intersect__(
-                                     prepare(field, operator, value)))
+            selector.store(field, selector[field].__intersect__(
+                                    prepare(field, operator, value)))
           end
         end
 
@@ -207,8 +207,8 @@ module Mongoid
         # @since 1.0.0
         def __union__(criterion, operator)
           selection(criterion) do |selector, field, value|
-            selector.store( field, selector[field].__union__(
-                                     prepare(field, operator, value)))
+            selector.store(field, selector[field].__union__(
+                                    prepare(field, operator, value)))
           end
         end
 
