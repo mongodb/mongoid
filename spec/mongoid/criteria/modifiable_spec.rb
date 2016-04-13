@@ -1456,8 +1456,7 @@ describe Mongoid::Criteria::Modifiable do
             end
 
             it 'gives the write method args precedence' do
-              #  @todo: uncomment when MONGOID-4193 is closed
-              #expect(new_person.username).to eq('Beet')
+              expect(new_person.username).to eq('Beet')
               expect(new_person.age).to eq(50)
             end
           end
@@ -1513,8 +1512,7 @@ describe Mongoid::Criteria::Modifiable do
         context 'when a write method is chained' do
 
           it 'executes the method' do
-            #  @todo: uncomment when MONGOID-4193 is closed
-            #expect(criteria.create_with(attrs).new.username).to eq('Beet')
+            expect(criteria.create_with(attrs).new.username).to eq('Turnip')
             expect(criteria.create_with(attrs).new.age).to eq(25)
           end
         end
@@ -1526,9 +1524,8 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it 'executes the query' do
-            #  @todo: uncomment when MONGOID-4193 is closed
-            #expect(new_person.username).to eq('Beet')
-            #expect(new_person.age).to eq(50)
+            expect(new_person.username).to eq('Beet')
+            expect(new_person.age).to eq(50)
           end
         end
       end
