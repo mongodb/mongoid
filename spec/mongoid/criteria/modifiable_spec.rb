@@ -811,6 +811,59 @@ describe Mongoid::Criteria::Modifiable do
           expect(document.map).to eq({ foo: :bar })
         end
       end
+
+      context 'when attributes contain keys also in the criteria selector' do
+
+        context 'when the selector has symbol keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_create!(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_create!('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+        end
+
+        context 'when the selector has string keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_create!(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_create!('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+        end
+      end
     end
   end
 
@@ -902,6 +955,59 @@ describe Mongoid::Criteria::Modifiable do
 
           it "returns a non persisted document" do
             expect(document).to_not be_persisted
+          end
+        end
+      end
+
+      context 'when attributes contain keys also in the criteria selector' do
+
+        context 'when the selector has symbol keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_initialize(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_initialize('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+        end
+
+        context 'when the selector has string keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_initialize(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_initialize('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
           end
         end
       end
