@@ -538,6 +538,59 @@ describe Mongoid::Criteria::Modifiable do
         it "sets the additional attributes" do
           expect(document.origin).to eq("Essex")
         end
+
+        context 'when attributes contain keys also in the criteria selector' do
+
+          context 'when the selector has symbol keys' do
+
+            context 'when the attributes use symbol keys' do
+
+              let(:document) do
+                Band.where(name: 'Tool').first_or_create(name: 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+
+            context 'when the attributes use string keys' do
+
+              let(:document) do
+                Band.where(name: 'Tool').first_or_create('name' => 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+          end
+
+          context 'when the selector has string keys' do
+
+            context 'when the attributes use symbol keys' do
+
+              let(:document) do
+                Band.where('name' => 'Tool').first_or_create(name: 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+
+            context 'when the attributes use string keys' do
+
+              let(:document) do
+                Band.where('name' => 'Tool').first_or_create('name' => 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+          end
+        end
       end
 
       context "when attributes are not provided" do
