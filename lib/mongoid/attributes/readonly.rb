@@ -25,7 +25,7 @@ module Mongoid
       #
       # @deprecated Use #as_writable_attribute! instead.
       def attribute_writable?(name)
-          new_record? || !readonly_attributes.include?(database_field_name(name))
+        new_record? || !readonly_attributes.include?(database_field_name(name))
       end
 
       private
