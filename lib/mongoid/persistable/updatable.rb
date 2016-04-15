@@ -24,17 +24,16 @@ module Mongoid
       #
       # @since 2.0.0
       def update_attribute(name, value)
-        normalized = name.to_s
-        unless attribute_writable?(normalized)
-          raise Errors::ReadonlyAttribute.new(normalized, value)
+        as_writable_attribute!(name, value) do |access|
+          normalized = name.to_s
+          setter = "#{normalized}="
+          if respond_to?(setter)
+            send(setter, value)
+          else
+            write_attribute(access, value)
+          end
+          save(validate: false)
         end
-        setter = "#{normalized}="
-        if respond_to?(setter)
-          send(setter, value)
-        else
-          write_attribute(database_field_name(normalized), value)
-        end
-        save(validate: false)
       end
 
       # Update the document attributes in the database.
@@ -135,7 +134,6 @@ module Mongoid
       #
       # @since 1.0.0
       def update_document(options = {})
-        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_update(options) do
           updates, conflicts = init_atomic_updates
           unless updates.empty?

@@ -22,8 +22,24 @@ module Mongoid
       #   readonly.
       #
       # @since 3.0.0
+      #
+      # @deprecated Use #as_writable_attribute! instead.
       def attribute_writable?(name)
-        new_record? || !readonly_attributes.include?(database_field_name(name))
+          new_record? || !readonly_attributes.include?(database_field_name(name))
+      end
+
+      private
+
+      def as_writable_attribute!(name, value = :nil)
+        normalized_name = database_field_name(name)
+        if !new_record? && (readonly_attributes.include?(normalized_name) || not_loaded?(normalized_name))
+          raise Errors::ReadonlyAttribute.new(name, value)
+        end
+        yield(normalized_name)
+      end
+
+      def not_loaded?(name)
+        __selected_fields && !__selected_fields.include?(name)
       end
 
       module ClassMethods
