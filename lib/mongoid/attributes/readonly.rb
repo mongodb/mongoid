@@ -32,14 +32,20 @@ module Mongoid
 
       def as_writable_attribute!(name, value = :nil)
         normalized_name = database_field_name(name)
-        if !new_record? && (readonly_attributes.include?(normalized_name) || not_loaded?(normalized_name))
+        if new_record? || (!readonly_attributes.include?(normalized_name) && loaded?(normalized_name))
+          yield(normalized_name)
+        else
           raise Errors::ReadonlyAttribute.new(name, value)
         end
-        yield(normalized_name)
       end
 
-      def not_loaded?(name)
-        __selected_fields && !__selected_fields.include?(name)
+      def loaded?(name)
+        __selected_fields.nil? || projected_field?(name)
+      end
+
+      def projected_field?(name)
+        projected = (__selected_fields || {}).keys.select { |f| __selected_fields[f] == 1 }
+        projected.empty? || projected.include?(name)
       end
 
       module ClassMethods

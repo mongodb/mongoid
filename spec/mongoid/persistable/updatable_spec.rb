@@ -368,6 +368,52 @@ describe Mongoid::Persistable::Updatable do
         end
       end
     end
+
+    context 'when fields are explicitly not loaded' do
+
+      before do
+        Person.create(title: 'Captain')
+      end
+
+      context 'when the loaded attribute is updated' do
+
+        let(:person) do
+          Person.without(:age).first.tap do |_person|
+            _person.update_attribute(:title, 'Esteemed')
+          end
+        end
+
+        it 'allows the field to be updated' do
+          expect(person.title).to eq('Esteemed')
+        end
+
+        it 'persists the updated field' do
+          expect(person.reload.title).to eq('Esteemed')
+        end
+      end
+
+      context 'when the non-loaded attribute is updated' do
+
+        let(:person) do
+          Person.without(:title).first
+        end
+
+        it 'does not allow the field to be updated' do
+          expect {
+            person.update_attribute(:title, 20)
+          }.to raise_exception(ActiveModel::MissingAttributeError)
+        end
+
+        context 'when referring to the attribute with a string' do
+
+          it 'does not allow the field to be updated' do
+            expect {
+              person.update_attribute('title', 20)
+            }.to raise_exception(ActiveModel::MissingAttributeError)
+          end
+        end
+      end
+    end
   end
 
   [:update_attributes, :update].each do |method|
