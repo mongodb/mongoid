@@ -1652,6 +1652,16 @@ describe Mongoid::Attributes do
 
   context 'when calling the attribute check method' do
 
+    context 'when the attribute is blank' do
+      let(:person) do
+        Person.create(title: '')
+      end
+
+      it 'returns false' do
+        expect(person.title?).to be(false)
+      end
+    end
+
     context 'when the attribute is localized' do
       let(:person) do
         Person.create(desc: 'localized')
