@@ -324,7 +324,7 @@ describe Mongoid::Persistable::Savable do
 
         it "saves the document" do
           person.aliased_timestamp = Time.now
-          expect(person.save).to be true
+          expect(person.save(validate: false)).to be true
         end
       end
     end
