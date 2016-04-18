@@ -7,6 +7,15 @@ module Mongoid
       # one-to-one between documents in different collections.
       class One < Relations::One
 
+        VALID_OPTIONS = [
+          :as,
+          :autobuild,
+          :autosave,
+          :dependent,
+          :foreign_key,
+          :primary_key
+        ].freeze
+
         # Instantiate a new references_one relation. Will set the foreign key
         # and the base on the inverse object.
         #
@@ -256,7 +265,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :as, :autobuild, :autosave, :dependent, :foreign_key, :primary_key ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

@@ -7,6 +7,19 @@ module Mongoid
       # many-to-many between documents in different collections.
       class ManyToMany < Many
 
+        VALID_OPTIONS = [
+          :after_add,
+          :after_remove,
+          :autosave,
+          :before_add,
+          :before_remove,
+          :dependent,
+          :foreign_key,
+          :index,
+          :order,
+          :primary_key
+        ].freeze
+
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
@@ -439,18 +452,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [
-              :after_add,
-              :after_remove,
-              :autosave,
-              :before_add,
-              :before_remove,
-              :dependent,
-              :foreign_key,
-              :index,
-              :order,
-              :primary_key
-            ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if
