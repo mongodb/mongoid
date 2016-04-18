@@ -16,6 +16,7 @@ describe Mongoid::Relations::Macros do
   end
 
   after do
+    klass.relations.clear
     klass.validators.clear
   end
 
@@ -333,7 +334,6 @@ describe Mongoid::Relations::Macros do
               let(:default_require) { true }
 
               it 'does not require the association' do
-                binding.pry
                 expect(relation.save).to be(true)
               end
             end
