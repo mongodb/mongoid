@@ -82,6 +82,64 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the belongs_to_required_by_default option is not set in the config' do
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'sets the Mongoid.belongs_to_required_by_default value to true' do
+      expect(Mongoid.belongs_to_required_by_default).to be(true)
+    end
+  end
+
+  context 'when the belongs_to_required_by_default option is set in the config' do
+
+    context 'when the value is set to true' do
+
+      let(:opts) do
+        { belongs_to_required_by_default: true }
+      end
+
+      let(:conf) do
+        CONFIG.merge( options: { belongs_to_required_by_default: true })
+      end
+
+      before do
+        Mongoid.configure do |config|
+          config.load_configuration(conf)
+        end
+      end
+
+      it 'sets the Mongoid.belongs_to_required_by_default value to true' do
+        expect(Mongoid.belongs_to_required_by_default).to be(conf[:options][:belongs_to_required_by_default])
+      end
+    end
+
+    context 'when the value is set to false' do
+
+      let(:opts) do
+        { belongs_to_required_by_default: true }
+      end
+
+      let(:conf) do
+        CONFIG.merge( options: { belongs_to_required_by_default: false })
+      end
+
+      before do
+        Mongoid.configure do |config|
+          config.load_configuration(conf)
+        end
+      end
+
+      it 'sets the Mongoid.belongs_to_required_by_default value to false' do
+        expect(Mongoid.belongs_to_required_by_default).to be(conf[:options][:belongs_to_required_by_default])
+      end
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do
