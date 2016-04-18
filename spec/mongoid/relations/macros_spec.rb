@@ -267,32 +267,46 @@ describe Mongoid::Relations::Macros do
 
   describe ".belongs_to" do
 
+    let(:_class) do
+      class RelationsTestClass
+        include Mongoid::Document
+      end
+    end
+
+    let(:conf) do
+      CONFIG.merge( options: { belongs_to_required_by_default: default_require })
+    end
+
+    let(:relation) do
+      _class.new
+    end
+
+    let(:options) { {} }
+
+    let(:default_require) { Mongoid.belongs_to_required_by_default }
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+      _class.belongs_to(:person, options)
+    end
+
+    after do
+      Object.send(:remove_const, _class.name)
+    end
+
+    after(:all) do
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
     it "defines the macro" do
-      expect(klass).to respond_to(:belongs_to)
+      expect(_class).to respond_to(:belongs_to)
     end
 
     context 'when the relation has options' do
-
-      before do
-        Mongoid.configure do |config|
-          config.load_configuration(conf)
-        end
-        klass.belongs_to(:person, options)
-      end
-
-      after(:all) do
-        Mongoid.configure do |config|
-          config.load_configuration(CONFIG)
-        end
-      end
-
-      let(:conf) do
-        CONFIG.merge( options: { belongs_to_required_by_default: default_require })
-      end
-
-      let(:relation) do
-        klass.new
-      end
 
       context 'when the relation has the option :required' do
 
@@ -334,7 +348,7 @@ describe Mongoid::Relations::Macros do
               let(:default_require) { true }
 
               it 'does not require the association' do
-                expect(relation.save).to be(true)
+                expect(relation.save!).to be(true)
               end
             end
 
@@ -425,8 +439,8 @@ describe Mongoid::Relations::Macros do
 
                 let(:default_require) { true }
 
-                it 'requires the association' do
-                  expect(relation.save).to be(false)
+                it 'does not require the association' do
+                  expect(relation.save).to be(true)
                 end
               end
 
@@ -485,7 +499,7 @@ describe Mongoid::Relations::Macros do
 
               let(:default_require) { true }
 
-              it 'requires the association' do
+              it 'does not require the association' do
                 expect(relation.save).to be(true)
               end
             end
@@ -494,7 +508,7 @@ describe Mongoid::Relations::Macros do
 
               let(:default_require) { false }
 
-              it 'requires the association' do
+              it 'does not require' do
                 expect(relation.save).to be(true)
               end
             end
@@ -528,29 +542,7 @@ describe Mongoid::Relations::Macros do
       end
     end
 
-
     context 'when the relation does not have options' do
-
-      before do
-        Mongoid.configure do |config|
-          config.load_configuration(conf)
-        end
-        klass.belongs_to(:person)
-      end
-
-      after(:all) do
-        Mongoid.configure do |config|
-          config.load_configuration(CONFIG)
-        end
-      end
-
-      let(:conf) do
-        CONFIG.merge( options: { belongs_to_required_by_default: default_require })
-      end
-
-      let(:relation) do
-        klass.new
-      end
 
       context 'when the relation does not have the option :optional' do
 

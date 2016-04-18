@@ -91,7 +91,7 @@ describe Mongoid::Config do
     end
 
     it 'sets the Mongoid.belongs_to_required_by_default value to true' do
-      expect(Mongoid.belongs_to_required_by_default).to be(true)
+      expect(Mongoid.belongs_to_required_by_default).to be(false)
     end
   end
 

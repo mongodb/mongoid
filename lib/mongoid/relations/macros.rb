@@ -357,7 +357,7 @@ module Mongoid
 
         def require_association?(options = {})
           required = options[:required] if options.key?(:required)
-          required = !options[:optional] if required.nil?
+          required = !options[:optional] if options.key?(:optional) && required.nil?
           required.nil? ? Mongoid.belongs_to_required_by_default : required
         end
       end
