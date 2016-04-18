@@ -15,6 +15,10 @@ describe Mongoid::Relations::Macros do
     klass._validators.clear
   end
 
+  after do
+    klass.validators.clear
+  end
+
   describe ".embedded_in" do
 
     it "defines the macro" do
@@ -264,6 +268,310 @@ describe Mongoid::Relations::Macros do
 
     it "defines the macro" do
       expect(klass).to respond_to(:belongs_to)
+    end
+
+    context 'when the relation has options' do
+
+      before do
+        Mongoid.configure do |config|
+          config.load_configuration(conf)
+        end
+        klass.belongs_to(:person, options)
+      end
+
+      after(:all) do
+        Mongoid.configure do |config|
+          config.load_configuration(CONFIG)
+        end
+      end
+
+      let(:conf) do
+        CONFIG.merge( options: { belongs_to_required_by_default: default_require })
+      end
+
+      let(:relation) do
+        klass.new
+      end
+
+      context 'when the relation has the option :required' do
+
+        context 'when the relation does not have the :optional option' do
+
+          context 'when :required is true' do
+
+            let(:options) do
+              { required: true }
+            end
+
+            context 'when the default config is to require the association' do
+
+              let(:default_require) { true }
+
+              it 'requires the association' do
+                expect(relation.save).to be(false)
+              end
+            end
+
+            context 'when the default config is to not require the association' do
+
+              let(:default_require) { false }
+
+              it 'requires the association' do
+                expect(relation.save).to be(false)
+              end
+            end
+          end
+
+          context 'when :required is false' do
+
+            let(:options) do
+              { required: false }
+            end
+
+            context 'when the default config is to require the association' do
+
+              let(:default_require) { true }
+
+              it 'does not require the association' do
+                binding.pry
+                expect(relation.save).to be(true)
+              end
+            end
+
+            context 'when the default config is to not require the association' do
+
+              let(:default_require) { false }
+
+              it 'does not require the association' do
+                expect(relation.save).to be(true)
+              end
+            end
+          end
+        end
+
+        context 'when the relation has the option :optional' do
+
+          context 'when :required is true' do
+
+            context 'when :optional is true' do
+
+              let(:options) do
+                {
+                  required: true,
+                  optional: true
+                }
+              end
+
+              context 'when the default config is to require the association' do
+
+                let(:default_require) { true }
+
+                it 'requires the association' do
+                  expect(relation.save).to be(false)
+                end
+              end
+
+              context 'when the default config is to not require the association' do
+
+                let(:default_require) { false }
+
+                it 'requires the association' do
+                  expect(relation.save).to be(false)
+                end
+              end
+            end
+
+            context 'when :optional is false' do
+
+              let(:options) do
+                {
+                  required: true,
+                  optional: false
+                }
+              end
+
+              context 'when the default config is to require the association' do
+
+                let(:default_require) { true }
+
+                it 'requires the association' do
+                  expect(relation.save).to be(false)
+                end
+              end
+
+              context 'when the default config is to not require the association' do
+
+                let(:default_require) { false }
+
+                it 'requires the association' do
+                  expect(relation.save).to be(false)
+                end
+              end
+            end
+          end
+
+          context 'when :required is false' do
+
+            context 'when :optional is true' do
+
+              let(:options) do
+                {
+                  required: false,
+                  optional: true
+                }
+              end
+
+              context 'when the default config is to require the association' do
+
+                let(:default_require) { true }
+
+                it 'requires the association' do
+                  expect(relation.save).to be(false)
+                end
+              end
+
+              context 'when the default config is to not require the association' do
+
+                let(:default_require) { true }
+
+                it 'does not require the association' do
+                  expect(relation.save).to be(true)
+                end
+              end
+            end
+
+            context 'when :optional is false' do
+
+              let(:options) do
+                {
+                  required: false,
+                  optional: false
+                }
+              end
+
+              context 'when the default config is to require the association' do
+
+                let(:default_require) { true }
+
+                it 'does not require the association' do
+                  expect(relation.save).to be(true)
+                end
+              end
+
+              context 'when the default config is to not require the association' do
+
+                let(:default_require) { false }
+
+                it 'does not require the association' do
+                  expect(relation.save).to be(true)
+                end
+              end
+            end
+          end
+        end
+      end
+
+      context 'when the relation does not have the option :required' do
+
+        context 'when the relation has the option :optional' do
+
+          context 'when :optional is true' do
+
+            let(:options) do
+              { optional: true }
+            end
+
+            context 'when the default config is to require the association' do
+
+              let(:default_require) { true }
+
+              it 'requires the association' do
+                expect(relation.save).to be(true)
+              end
+            end
+
+            context 'when the default config is to not require the association' do
+
+              let(:default_require) { false }
+
+              it 'requires the association' do
+                expect(relation.save).to be(true)
+              end
+            end
+          end
+
+          context 'when :optional is false' do
+
+            let(:options) do
+              { optional: false }
+            end
+
+            context 'when the default config is to require the association' do
+
+              let(:default_require) { true }
+
+              it 'requires the association' do
+                expect(relation.save).to be(false)
+              end
+            end
+
+            context 'when the default config is to not require the association' do
+
+              let(:default_require) { false }
+
+              it 'requires the association' do
+                expect(relation.save).to be(false)
+              end
+            end
+          end
+        end
+      end
+    end
+
+
+    context 'when the relation does not have options' do
+
+      before do
+        Mongoid.configure do |config|
+          config.load_configuration(conf)
+        end
+        klass.belongs_to(:person)
+      end
+
+      after(:all) do
+        Mongoid.configure do |config|
+          config.load_configuration(CONFIG)
+        end
+      end
+
+      let(:conf) do
+        CONFIG.merge( options: { belongs_to_required_by_default: default_require })
+      end
+
+      let(:relation) do
+        klass.new
+      end
+
+      context 'when the relation does not have the option :optional' do
+
+        context 'when the default config is to require the association' do
+
+          let(:default_require) { true }
+
+          it 'requires the association' do
+            expect(relation.save).to be(false)
+          end
+        end
+
+        context 'when the default config is to not require the association' do
+
+          let(:default_require) { false }
+
+          it 'does not require the association' do
+            expect(relation.save).to be(true)
+          end
+        end
+      end
     end
 
     context "when the relation is polymorphic" do
