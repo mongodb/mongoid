@@ -1697,7 +1697,7 @@ describe Mongoid::Attributes do
       end
 
       it 'does not apply localization when checking the attribute' do
-        expect(person.name?).to be(false)
+        expect(person.username?).to be(false)
       end
     end
   end
