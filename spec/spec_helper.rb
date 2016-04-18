@@ -64,6 +64,9 @@ CONFIG = {
         auth_source: Mongo::Database::ADMIN,
       }
     }
+  },
+  options: {
+    belongs_to_required_by_default: false
   }
 }
 
