@@ -7,6 +7,10 @@ describe Mongoid::Config do
     if defined?(RailsTemp)
       Rails = RailsTemp
     end
+
+    Mongoid.configure do |config|
+      config.load_configuration(CONFIG)
+    end
   end
 
   describe "#configured?" do
@@ -97,6 +101,12 @@ describe Mongoid::Config do
 
   context 'when the belongs_to_required_by_default option is set in the config' do
 
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
     context 'when the value is set to true' do
 
       let(:opts) do
@@ -105,12 +115,6 @@ describe Mongoid::Config do
 
       let(:conf) do
         CONFIG.merge( options: { belongs_to_required_by_default: true })
-      end
-
-      before do
-        Mongoid.configure do |config|
-          config.load_configuration(conf)
-        end
       end
 
       it 'sets the Mongoid.belongs_to_required_by_default value to true' do
@@ -173,12 +177,6 @@ describe Mongoid::Config do
 
       before do
         described_class.load!(file, :test)
-      end
-
-      after do
-        Mongoid.configure do |config|
-          config.load_configuration(CONFIG)
-        end
       end
 
       it "sets the Mongoid logger level" do
