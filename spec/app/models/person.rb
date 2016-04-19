@@ -134,7 +134,8 @@ class Person
     self.score_without_rescoring = score
   end
 
-  alias_method_chain :score=, :rescoring
+  alias_method :score_without_rescoring=, :score=
+  alias_method :score=, :score_with_rescoring=
 
   def update_addresses
     addresses.each do |address|

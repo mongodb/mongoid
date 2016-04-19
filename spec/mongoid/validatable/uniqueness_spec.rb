@@ -2438,7 +2438,7 @@ describe Mongoid::Validatable::UniquenessValidator do
     it "transfers the options to the cloned client" do
       expect {
         Person.create!(ssn: "132-11-1111", username: "asdfsdfA")
-      }.to raise_error
+      }.to raise_error(Mongo::Error::OperationFailure)
     end
   end
 end

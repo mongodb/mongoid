@@ -70,7 +70,8 @@ describe Mongoid::Relations::Embedded::One do
               name_without_default or (self.name = Name.new)
             end
             class << person
-              alias_method_chain :name, :default
+              alias_method :name_without_default, :name
+              alias_method :name, :name_with_default
             end
           end
 

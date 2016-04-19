@@ -516,12 +516,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
             before do
               expect(post).to receive(:before_add_tag).and_raise
+              begin; post.tags.send(method, tag); rescue; end;
             end
 
             it "does not add the document to the relation" do
-              expect {
-                post.tags.send(method, tag)
-              }.to raise_error
               expect(post.tags).to be_empty
             end
           end
@@ -538,12 +536,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
             before do
               expect(post).to receive(:after_add_tag).and_raise
+              begin; post.tags.send(method, tag); rescue; end
             end
 
             it "adds the document to the relation" do
-              expect {
-                post.tags.send(method, tag)
-              }.to raise_error
               expect(post.tags).to eq([ tag ])
             end
           end
@@ -1186,12 +1182,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           before do
             expect(post).to receive(:before_remove_tag).and_raise
+            begin; post.tags.clear; rescue; end
           end
 
           it "does not remove the document from the relation" do
-            expect {
-              post.tags.clear
-            }.to raise_error
             expect(post.tags).to eq([ tag ])
           end
         end
@@ -1218,12 +1212,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           before do
             expect(post).to receive(:after_remove_tag).and_raise
+            begin; post.tags.clear; rescue; end
           end
 
           it "removes the document from the relation" do
-            expect {
-              post.tags.clear
-            }.to raise_error
             expect(post.tags).to be_empty
           end
         end
@@ -2120,12 +2112,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           before do
             expect(post).to receive(:before_remove_tag).and_raise
+            begin; post.tags.delete(tag); rescue; end
           end
 
           it "does not remove the document from the relation" do
-            expect {
-              post.tags.delete tag
-            }.to raise_error
             expect(post.tags).to eq([ tag ])
           end
         end
@@ -2152,12 +2142,10 @@ describe Mongoid::Relations::Referenced::ManyToMany do
 
           before do
             expect(post).to receive(:after_remove_tag).and_raise
+            begin; post.tags.delete(tag); rescue; end
           end
 
           it "removes the document from the relation" do
-            expect {
-              post.tags.delete(tag)
-            }.to raise_error
             expect(post.tags).to be_empty
           end
         end

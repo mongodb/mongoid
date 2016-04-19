@@ -1,11 +1,8 @@
 source "https://rubygems.org"
-
-gemspec
+gemspec path: '..'
 
 gem "rake"
-#gem "actionpack",  github: "rails/rails"
 gem "actionpack",  '5.0.0.beta3'
-#gem "activemodel", github: "rails/rails"
 gem "activemodel", '5.0.0.beta3'
 
 group :test do

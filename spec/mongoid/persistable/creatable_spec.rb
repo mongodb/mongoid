@@ -529,7 +529,7 @@ describe Mongoid::Persistable::Creatable do
         it "raises an error" do
           expect {
             4.times { Person.create!(ssn: "555-55-1029") }
-          }.to raise_error
+          }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
     end
@@ -562,7 +562,7 @@ describe Mongoid::Persistable::Creatable do
       end
     end
 
-    context "when a callback returns false" do
+    context "when a callback aborts the chain" do
 
       it "raises a callback error" do
         expect { Oscar.create! }.to raise_error(Mongoid::Errors::Callback)

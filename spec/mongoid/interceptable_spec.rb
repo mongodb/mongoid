@@ -280,11 +280,16 @@ describe Mongoid::Interceptable do
       end
     end
 
-    context "callback returns false" do
+    context "callback aborts the callback chain" do
 
       before do
-        expect(artist).to receive(:before_create_stub).once.and_return(false)
+        Artist.before_create(:before_create_fail_stub)
+        expect(artist).to receive(:before_create_fail_stub).once.and_call_original
         artist.save
+      end
+
+      after do
+        Artist.reset_callbacks(:create)
       end
 
       it "does not get saved" do
@@ -316,13 +321,18 @@ describe Mongoid::Interceptable do
         end
       end
 
-      context "when callback returns false" do
+      context "when callback halts the callback chain" do
 
         before do
-          expect(artist).to receive(:before_save_stub).once.and_return(false)
+          Artist.before_save(:before_save_fail_stub)
+        end
+
+        after do
+          Artist.reset_callbacks(:save)
         end
 
         it "the save returns false" do
+          expect(artist).to receive(:before_save_fail_stub).once.and_call_original
           expect(artist.save).to be false
         end
       end
@@ -343,7 +353,7 @@ describe Mongoid::Interceptable do
       context "when the callback returns true" do
 
         before do
-          expect(artist).to receive(:before_save_stub).once.and_return(true)
+          expect(artist).to receive(:before_update_stub).once.and_return(true)
         end
 
         it "the save returns true" do
@@ -351,13 +361,18 @@ describe Mongoid::Interceptable do
         end
       end
 
-      context "when the callback returns false" do
+      context "when the callback halts the callback chain" do
 
         before do
-          expect(artist).to receive(:before_save_stub).once.and_return(false)
+          Artist.before_update(:before_update_fail_stub)
+        end
+
+        after do
+          Artist.reset_callbacks(:update)
         end
 
         it "the save returns false" do
+          expect(artist).to receive(:before_update_fail_stub).once.and_call_original
           expect(artist.save).to be false
         end
       end
@@ -389,13 +404,18 @@ describe Mongoid::Interceptable do
       end
     end
 
-    context "when the callback returns false" do
+    context "when the callback halts the callback chain" do
 
       before do
-        expect(artist).to receive(:before_destroy_stub).once.and_return(false)
+        Artist.before_destroy(:before_destroy_fail_stub)
+      end
+
+      after do
+        Artist.reset_callbacks(:destroy)
       end
 
       it "the destroy returns false" do
+        expect(artist).to receive(:before_destroy_fail_stub).once.and_call_original
         expect(artist.destroy).to be false
       end
     end
@@ -1563,7 +1583,7 @@ describe Mongoid::Interceptable do
 
     before(:all) do
       Person.before_save do |doc|
-        doc.mode != :prevent_save
+        throw(:abort) if doc.mode == :prevent_save
       end
     end
 

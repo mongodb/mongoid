@@ -675,7 +675,7 @@ describe Mongoid::Document do
 
         it "freezes attributes" do
           expect(person.freeze).to eq(person)
-          expect { person.title = "something" }.to raise_error
+          expect { person.title = "something" }.to raise_error(RuntimeError)
         end
       end
 
@@ -689,7 +689,7 @@ describe Mongoid::Document do
           person.freeze
           expect {
             person.title = "something"
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
     end
@@ -1215,22 +1215,20 @@ describe Mongoid::Document do
 
   context "when marshalling the document" do
 
-    let(:person) do
-      Person.new.tap do |person|
-        person.addresses.extension
-      end
+    let(:agency) do
+      Agency.new
     end
 
-    let!(:account) do
-      person.create_account(name: "savings")
+    let!(:agent) do
+      agency.agents.build(title: "VIP")
     end
 
     describe Marshal, ".dump" do
 
       it "successfully dumps the document" do
         expect {
-          Marshal.dump(person)
-          Marshal.dump(account)
+          Marshal.dump(agency)
+          Marshal.dump(agent)
         }.not_to raise_error
       end
     end
@@ -1238,7 +1236,7 @@ describe Mongoid::Document do
     describe Marshal, ".load" do
 
       it "successfully loads the document" do
-        expect { Marshal.load(Marshal.dump(person)) }.not_to raise_error
+        expect(Marshal.load(Marshal.dump(agency))).to eq(agency)
       end
     end
   end
@@ -1253,22 +1251,26 @@ describe Mongoid::Document do
 
       describe "#fetch" do
 
-        let!(:person) do
-          Person.new
+        let(:agency) do
+          Agency.new
         end
 
-        let!(:account) do
-          person.create_account(name: "savings")
+        let(:agent) do
+          agency.agents.build(title: "VIP", address: address)
+        end
+
+        let(:address) do
+          Address.new(city: 'Berlin')
         end
 
         it "stores the parent object" do
-          expect(cache.fetch("key") { person }).to eq(person)
-          expect(cache.fetch("key")).to eq(person)
+          expect(cache.fetch("key") { agency }).to eq(agency)
+          expect(cache.fetch("key")).to eq(agency)
         end
 
         it "stores the embedded object" do
-          expect(cache.fetch("key") { account }).to eq(account)
-          expect(cache.fetch("key")).to eq(account)
+          expect(cache.fetch("key") { agent }).to eq(agent)
+          expect(cache.fetch("key").address).to eq(agent.address)
         end
       end
     end

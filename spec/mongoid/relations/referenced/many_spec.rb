@@ -3493,12 +3493,10 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         expect(artist).to receive(:before_add_album).and_raise
+        begin; artist.albums << album; rescue; end
       end
 
       it "does not add the document to the relation" do
-        expect {
-          artist.albums << album
-        }.to raise_error
         expect(artist.albums).to be_empty
       end
     end
@@ -3523,12 +3521,10 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         expect(artist).to receive(:after_add_album).and_raise
+        begin; artist.albums << album; rescue; end
       end
 
       it "adds the document to the relation" do
-        expect {
-          artist.albums << album
-        }.to raise_error
         expect(artist.albums).to eq([ album ])
       end
     end
@@ -3607,9 +3603,7 @@ describe Mongoid::Relations::Referenced::Many do
         describe "#delete" do
 
           before do
-            expect {
-              artist.albums.delete album
-            }.to raise_error
+            begin; artist.albums.delete(album); rescue; end
           end
 
           it "does not remove the document from the relation" do
@@ -3620,9 +3614,7 @@ describe Mongoid::Relations::Referenced::Many do
         describe "#clear" do
 
           before do
-            expect {
-              artist.albums.clear
-            }.to raise_error
+            begin; artist.albums.clear; rescue; end
           end
 
           it "does not clear the relation" do
@@ -3682,9 +3674,7 @@ describe Mongoid::Relations::Referenced::Many do
       describe "#delete" do
 
         before do
-          expect {
-            artist.albums.delete album
-          }.to raise_error
+          begin; artist.albums.delete(album); rescue; end
         end
 
         it "removes the documents from the relation" do
@@ -3695,9 +3685,7 @@ describe Mongoid::Relations::Referenced::Many do
       describe "#clear" do
 
         before do
-          expect {
-            artist.albums.clear
-          }.to raise_error
+          begin; artist.albums.clear; rescue; end
         end
 
         it "removes the documents from the relation" do

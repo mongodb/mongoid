@@ -280,7 +280,7 @@ describe Mongoid::Validatable::PresenceValidator do
             end
 
             it "does not save the relation" do
-              expect { game.reload }.to raise_error
+              expect { game.reload }.to raise_error(Mongoid::Errors::DocumentNotFound)
             end
           end
         end

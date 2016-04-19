@@ -169,7 +169,8 @@ module Mongoid
               end
             CODE
 
-          alias_method_chain method_name, :clear_cache
+          alias_method "#{method_name}_without_clear_cache", method_name
+          alias_method method_name, "#{method_name}_with_clear_cache"
         end
       end
     end

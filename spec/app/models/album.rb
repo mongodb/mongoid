@@ -9,6 +9,10 @@ class Album
   private
 
   def set_parent_name
-    artist.name = "destroyed"
+    artist.name = "destroyed" if artist
+  end
+
+  def set_parent_name_fail
+    throw(:abort)
   end
 end

@@ -64,7 +64,7 @@ describe Mongoid::Config do
 
     before do
       if defined?(Rails)
-        RailsTemp = Rails
+        RailsTemp = Rails unless defined?(RailsTemp)
         Object.send(:remove_const, :Rails)
       end
 
@@ -145,7 +145,7 @@ describe Mongoid::Config do
 
         after do
           if defined?(Rails)
-            RailsTemp = Rails
+            RailsTemp = Rails unless defined?(RailsTemp)
             Object.send(:remove_const, :Rails)
           end
         end

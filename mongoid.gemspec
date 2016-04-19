@@ -16,8 +16,8 @@ Gem::Specification.new do |s|
   s.license     = "MIT"
 
   if File.exists?('gem-private_key.pem')
-    s.signing_key     = 'gem-private_key.pem'
-    s.cert_chain      = ['gem-public_cert.pem']
+    s.signing_key = 'gem-private_key.pem'
+    s.cert_chain = ['gem-public_cert.pem']
   else
     warn "[#{s.name}] Warning: No private key present, creating unsigned gem."
   end
@@ -26,9 +26,9 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "mongoid"
 
-  s.add_dependency("activemodel", ["~> 4.0"])
+  s.add_dependency("activemodel", ["= 5.0.0.beta3"])
   s.add_dependency("tzinfo", [">= 0.3.37"])
-  s.add_dependency("mongo", ["~> 2.1"])
+  s.add_dependency("mongo", ["~> 2.2"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.test_files   = Dir.glob("spec/**/*")

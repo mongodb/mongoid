@@ -7,9 +7,8 @@ class Oscar
   def complain
     if destroy_after_save?
       destroy
-      true
     else
-      false
+      throw(:abort)
     end
   end
 end

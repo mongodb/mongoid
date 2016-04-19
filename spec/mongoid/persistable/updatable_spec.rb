@@ -168,7 +168,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             post.update_attribute(:title, "something")
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
     end
@@ -360,7 +360,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             person.send(method, title: "something")
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
 
@@ -543,7 +543,7 @@ describe Mongoid::Persistable::Updatable do
 
   describe "#update!" do
 
-    context "when a callback returns false" do
+    context "when a callback aborts the callback chain" do
 
       let(:oscar) do
         Oscar.new
