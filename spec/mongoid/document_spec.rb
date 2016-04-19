@@ -1213,66 +1213,66 @@ describe Mongoid::Document do
     end
   end
 
-  # context "when marshalling the document" do
-  #
-  #   let(:person) do
-  #     Person.new.tap do |person|
-  #       person.addresses.extension
-  #     end
-  #   end
-  #
-  #   let!(:account) do
-  #     person.create_account(name: "savings")
-  #   end
-  #
-  #   describe Marshal, ".dump" do
-  #
-  #     it "successfully dumps the document" do
-  #       expect {
-  #         Marshal.dump(person)
-  #         Marshal.dump(account)
-  #       }.not_to raise_error
-  #     end
-  #   end
-  #
-  #   describe Marshal, ".load" do
-  #
-  #     it "successfully loads the document" do
-  #       expect { Marshal.load(Marshal.dump(person)) }.not_to raise_error
-  #     end
-  #   end
-  # end
+  context "when marshalling the document" do
 
-  # context "when putting a document in the cache" do
-  #
-  #   describe ActiveSupport::Cache do
-  #
-  #     let(:cache) do
-  #       ActiveSupport::Cache::MemoryStore.new
-  #     end
-  #
-  #     describe "#fetch" do
-  #
-  #       let!(:person) do
-  #         Person.new
-  #       end
-  #
-  #       let!(:account) do
-  #         person.create_account(name: "savings")
-  #       end
-  #
-  #       it "stores the parent object" do
-  #         expect(cache.fetch("key") { person }).to eq(person)
-  #         expect(cache.fetch("key")).to eq(person)
-  #       end
-  #
-  #       it "stores the embedded object" do
-  #         binding.pry
-  #         a = account
-  #         expect(cache.fetch("key") { a }).to eq(a)
-  #         #expect(cache.fetch("key")).to eq(account)
-  #       end
-  #     end
-  #   end
-  # end
+    let(:agency) do
+      Agency.new
+    end
+
+    let!(:agent) do
+      agency.agents.build(title: "VIP")
+    end
+
+    describe Marshal, ".dump" do
+
+      it "successfully dumps the document" do
+        expect {
+          Marshal.dump(agency)
+          Marshal.dump(agent)
+        }.not_to raise_error
+      end
+    end
+
+    describe Marshal, ".load" do
+
+      it "successfully loads the document" do
+        expect(Marshal.load(Marshal.dump(agency))).to eq(agency)
+      end
+    end
+  end
+
+  context "when putting a document in the cache" do
+
+    describe ActiveSupport::Cache do
+
+      let(:cache) do
+        ActiveSupport::Cache::MemoryStore.new
+      end
+
+      describe "#fetch" do
+
+        let(:agency) do
+          Agency.new
+        end
+
+        let(:agent) do
+          agency.agents.build(title: "VIP", address: address)
+        end
+
+        let(:address) do
+          Address.new(city: 'Berlin')
+        end
+
+        it "stores the parent object" do
+          expect(cache.fetch("key") { agency }).to eq(agency)
+          expect(cache.fetch("key")).to eq(agency)
+        end
+
+        it "stores the embedded object" do
+          expect(cache.fetch("key") { agent }).to eq(agent)
+          expect(cache.fetch("key").address).to eq(agent.address)
+        end
+      end
+    end
+  end
 end
