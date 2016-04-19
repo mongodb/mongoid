@@ -4010,29 +4010,6 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  # context "when embedded documents get marshalled" do
-  #
-  #   let(:person) do
-  #     Person.create
-  #   end
-  #
-  #   let!(:addresses) do
-  #     person.addresses
-  #   end
-  #
-  #   let!(:dumped) do
-  #     Marshal.dump(addresses)
-  #   end
-  #
-  #   let!(:loaded) do
-  #     Marshal.load(dumped)
-  #   end
-  #
-  #   it "keeps the proxy extensions when remarshalling" do
-  #     expect(loaded.extension).to eq("Testing")
-  #   end
-  # end
-
   context "deleting embedded documents" do
 
     it "able to delete embedded documents upon condition" do
