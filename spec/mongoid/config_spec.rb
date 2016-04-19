@@ -115,7 +115,7 @@ describe Mongoid::Config do
       end
 
       let(:conf) do
-        CONFIG.merge( options: { belongs_to_required_by_default: true })
+        CONFIG.merge(options: { belongs_to_required_by_default: true })
       end
 
       it 'sets the Mongoid.belongs_to_required_by_default value to true' do
@@ -130,7 +130,7 @@ describe Mongoid::Config do
       end
 
       let(:conf) do
-        CONFIG.merge( options: { belongs_to_required_by_default: false })
+        CONFIG.merge(options: { belongs_to_required_by_default: false })
       end
 
       before do

@@ -274,7 +274,7 @@ describe Mongoid::Relations::Macros do
     end
 
     let(:conf) do
-      CONFIG.merge( options: { belongs_to_required_by_default: default_require })
+      CONFIG.merge(options: { belongs_to_required_by_default: default_require })
     end
 
     let(:relation) do
@@ -348,7 +348,7 @@ describe Mongoid::Relations::Macros do
               let(:default_require) { true }
 
               it 'does not require the association' do
-                expect(relation.save!).to be(true)
+                expect(relation.save).to be(true)
               end
             end
 
