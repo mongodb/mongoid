@@ -508,7 +508,7 @@ describe Mongoid::Relations::Macros do
 
               let(:default_require) { false }
 
-              it 'does not require' do
+              it 'does not require the association' do
                 expect(relation.save).to be(true)
               end
             end
@@ -544,24 +544,21 @@ describe Mongoid::Relations::Macros do
 
     context 'when the relation does not have options' do
 
-      context 'when the relation does not have the option :optional' do
+      context 'when the default config is to require the association' do
 
-        context 'when the default config is to require the association' do
+        let(:default_require) { true }
 
-          let(:default_require) { true }
-
-          it 'requires the association' do
-            expect(relation.save).to be(false)
-          end
+        it 'requires the association' do
+          expect(relation.save).to be(false)
         end
+      end
 
-        context 'when the default config is to not require the association' do
+      context 'when the default config is to not require the association' do
 
-          let(:default_require) { false }
+        let(:default_require) { false }
 
-          it 'does not require the association' do
-            expect(relation.save).to be(true)
-          end
+        it 'does not require the association' do
+          expect(relation.save).to be(true)
         end
       end
     end
