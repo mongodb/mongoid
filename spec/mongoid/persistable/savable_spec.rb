@@ -357,8 +357,8 @@ describe Mongoid::Persistable::Savable do
           Person.create!(ssn: "555-55-9999")
         end
 
-        it "raises an error" do
-          expect { person.save! }.to raise_error
+        it "raises an OperationFailure" do
+          expect { person.save! }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
     end
@@ -374,8 +374,8 @@ describe Mongoid::Persistable::Savable do
       end
 
       it "raises an error with multiple save attempts" do
-        expect { subject.save! }.to raise_error
-        expect { subject.save! }.to raise_error
+        expect { service.save! }.to raise_error(Mongoid::Errors::Validations)
+        expect { service.save! }.to raise_error(Mongoid::Errors::Validations)
       end
     end
 

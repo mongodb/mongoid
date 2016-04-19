@@ -529,7 +529,7 @@ describe Mongoid::Persistable::Creatable do
         it "raises an error" do
           expect {
             4.times { Person.create!(ssn: "555-55-1029") }
-          }.to raise_error
+          }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
     end

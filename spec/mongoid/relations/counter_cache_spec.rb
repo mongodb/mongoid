@@ -34,7 +34,7 @@ describe Mongoid::Relations::CounterCache do
       it "expect to raise an error" do
         expect {
           person.reset_counters(:not_exist)
-        }.to raise_error
+        }.to raise_error(NoMethodError)
       end
     end
 
@@ -131,7 +131,7 @@ describe Mongoid::Relations::CounterCache do
       it "expect to raise an error" do
         expect {
           Person.reset_counters "1", :drugs
-        }.to raise_error
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
 
@@ -144,7 +144,7 @@ describe Mongoid::Relations::CounterCache do
       it "expect to raise an error" do
         expect {
           Person.reset_counters person.id, :not_exist
-        }.to raise_error
+        }.to raise_error(NoMethodError)
       end
     end
 

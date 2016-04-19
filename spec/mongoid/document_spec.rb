@@ -675,7 +675,7 @@ describe Mongoid::Document do
 
         it "freezes attributes" do
           expect(person.freeze).to eq(person)
-          expect { person.title = "something" }.to raise_error
+          expect { person.title = "something" }.to raise_error(RuntimeError)
         end
       end
 
@@ -689,7 +689,7 @@ describe Mongoid::Document do
           person.freeze
           expect {
             person.title = "something"
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
     end

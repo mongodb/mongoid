@@ -168,7 +168,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             post.update_attribute(:title, "something")
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
     end
@@ -360,7 +360,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             person.send(method, title: "something")
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
 
