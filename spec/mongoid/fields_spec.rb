@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Fields do
+  using Mongoid::Refinements
 
   before(:all) do
     Mongoid.use_activesupport_time_zone = false

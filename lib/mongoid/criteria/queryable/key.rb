@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Queryable
+      using Refinements
 
       # The key is a representation of a field in a queryable, that can be
       # expanded to special MongoDB selectors.

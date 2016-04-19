@@ -6,6 +6,7 @@ module Mongoid
   # @since 4.0.0
   module Selectable
     extend ActiveSupport::Concern
+    using Refinements
 
     # Get the atomic selector for the document. This is a hash in the simplest
     # case { "_id" => id }, but can become more complex for embedded documents

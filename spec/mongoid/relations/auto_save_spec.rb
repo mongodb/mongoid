@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::AutoSave do
+  using Mongoid::Refinements
 
   describe ".auto_save" do
 
@@ -181,7 +182,7 @@ describe Mongoid::Relations::AutoSave do
           end
         end
 
-        pending "when updating the child" do
+        context "when updating the child" do
 
           before do
             person.account = account
@@ -191,7 +192,9 @@ describe Mongoid::Relations::AutoSave do
           it "sends one insert" do
             account.name = "account"
             expect_query(1) do
-              person.with(write: {w:0}).save
+              person.with(write: {w:0}) do |p|
+                p.save
+              end
             end
           end
         end

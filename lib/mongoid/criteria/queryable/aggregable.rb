@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Queryable
+      using Refinements
 
       # Provides a DSL around crafting aggregation framework commands.
       #

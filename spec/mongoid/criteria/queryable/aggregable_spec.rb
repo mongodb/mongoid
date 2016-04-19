@@ -322,8 +322,6 @@ describe Mongoid::Criteria::Queryable::Aggregable do
       end
     end
 
-    pending "when the expression fields are aliased" do
-
       context "when using full notation" do
 
         let(:aggregation) do
@@ -335,12 +333,19 @@ describe Mongoid::Criteria::Queryable::Aggregable do
         end
 
         it "adds the group operation to the pipeline" do
+          pending "when the expression fields are aliased"
+          fail
           expect(pipeline).to eq([
             { "$group" => { "count" => { "$sum" => 1 }, "max" => { "$max" => "a" }}}
           ])
         end
 
-        it_behaves_like "an aggregable object"
+        it_behaves_like "an aggregable object" do
+          before do
+            pending "when the expression fields are aliased"
+            fail
+          end
+        end
       end
 
       context "when using symbol shortcuts" do
@@ -354,13 +359,19 @@ describe Mongoid::Criteria::Queryable::Aggregable do
         end
 
         it "adds the group operation to the pipeline" do
+          pending "when the expression fields are aliased"
+          fail
           expect(pipeline).to eq([
             { "$group" => { "count" => { "$sum" => 1 }, "max" => { "$max" => "a" }}}
           ])
         end
 
-        it_behaves_like "an aggregable object"
+        it_behaves_like "an aggregable object" do
+          before do
+            pending "when the expression fields are aliased"
+            fail
+          end
+        end
       end
-    end
   end
 end

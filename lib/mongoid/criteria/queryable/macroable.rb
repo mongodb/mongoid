@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Queryable
+      using Refinements
 
       # Adds macro behaviour for adding symbol methods.
       module Macroable

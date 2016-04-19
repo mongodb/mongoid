@@ -8,6 +8,7 @@ module Mongoid
       # to the selectable that has to do with building MongoDB selectors.
       module Selectable
         extend Macroable
+        using Refinements
 
         # Constant for a LineString $geometry.
         #

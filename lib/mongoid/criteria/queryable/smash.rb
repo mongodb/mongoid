@@ -5,6 +5,7 @@ module Mongoid
 
       # This is a smart hash for use with options and selectors.
       class Smash < Hash
+        using Refinements
 
         # @attribute [r] aliases The aliases.
         # @attribute [r] serializers The serializers.

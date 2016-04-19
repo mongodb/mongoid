@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Permission
+      using Refinements
 
       [:all,
        :all_in,

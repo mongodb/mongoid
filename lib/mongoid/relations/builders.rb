@@ -50,6 +50,7 @@ module Mongoid
       end
 
       module ClassMethods
+        using Refinements
 
         # Defines a builder method for an embeds_one relation. This is
         # defined as #build_name.

@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Relations::Eager::HasMany do
+  using Mongoid::Refinements
 
   describe ".grouped_docs" do
 

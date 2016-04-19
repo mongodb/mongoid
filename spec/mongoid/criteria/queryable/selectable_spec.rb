@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Criteria::Queryable::Selectable do
+  using Mongoid::Refinements
 
   let(:query) do
    Mongoid::Query.new("id" => "_id")

@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/criteria/queryable/extensions"
 require "mongoid/criteria/queryable/forwardable"
 require "mongoid/criteria/queryable/key"
 require "mongoid/criteria/queryable/macroable"
@@ -27,6 +26,7 @@ module Mongoid
       include Aggregable
       include Selectable
       include Optional
+      using Refinements
 
       # @attribute [r] aliases The aliases.
       # @attribute [r] driver The Mongo driver being used.

@@ -25,6 +25,7 @@ module Mongoid
     #   end
     class UniquenessValidator < ActiveModel::EachValidator
       include Queryable
+      using Refinements
 
       # Validate the document for uniqueness violations.
       #

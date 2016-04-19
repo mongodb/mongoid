@@ -28,6 +28,7 @@ module Mongoid
     include Scopable
     include Clients::Options
     include Options
+    using Refinements
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.

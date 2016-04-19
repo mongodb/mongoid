@@ -6,6 +6,7 @@ module Mongoid
     # different collections.
     module AutoSave
       extend ActiveSupport::Concern
+      using Refinements
 
       # Used to prevent infinite loops in associated autosaves.
       #

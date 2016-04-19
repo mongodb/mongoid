@@ -6,6 +6,7 @@ module Mongoid
       # The selector is a special kind of hash that knows how to serialize values
       # coming into it as well as being alias and locale aware for key names.
       class Selector < Smash
+        using Refinements
 
         # Merges another selector into this one.
         #

@@ -5,6 +5,7 @@ module Mongoid
     # Contains all the default behavior for checking for matching documents
     # given MongoDB expressions.
     class Default
+      using Refinements
 
       attr_accessor :attribute, :document
 

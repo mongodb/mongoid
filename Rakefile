@@ -25,6 +25,7 @@ end
 
 RSpec::Core::RakeTask.new("spec") do |spec|
   spec.pattern = "spec/**/*_spec.rb"
+  puts system "bundle list"
 end
 
 RSpec::Core::RakeTask.new('spec:progress') do |spec|

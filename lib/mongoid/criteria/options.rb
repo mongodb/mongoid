@@ -6,6 +6,7 @@ module Mongoid
     #
     # @since 6.0.0
     module Options
+      using Refinements
 
       private
 

@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Criteria::Queryable::Selector do
+  using Mongoid::Refinements
 
   describe "merge!" do
 

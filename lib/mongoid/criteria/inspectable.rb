@@ -2,6 +2,7 @@
 module Mongoid
   class Criteria
     module Inspectable
+      using Refinements
 
       # Get a pretty string representation of the criteria, including the
       # selector, options, matching count and documents for inspection.
