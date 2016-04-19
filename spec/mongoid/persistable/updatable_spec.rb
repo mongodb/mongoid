@@ -543,7 +543,7 @@ describe Mongoid::Persistable::Updatable do
 
   describe "#update!" do
 
-    context "when a callback returns false" do
+    context "when a callback aborts the callback chain" do
 
       let(:oscar) do
         Oscar.new

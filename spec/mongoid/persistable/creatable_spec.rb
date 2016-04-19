@@ -562,7 +562,7 @@ describe Mongoid::Persistable::Creatable do
       end
     end
 
-    context "when a callback returns false" do
+    context "when a callback aborts the chain" do
 
       it "raises a callback error" do
         expect { Oscar.create! }.to raise_error(Mongoid::Errors::Callback)

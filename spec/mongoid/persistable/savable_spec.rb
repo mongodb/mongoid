@@ -379,7 +379,7 @@ describe Mongoid::Persistable::Savable do
       end
     end
 
-    context "when a callback returns false" do
+    context "when a callback aborts the callback chain" do
 
       let(:oscar) do
         Oscar.new

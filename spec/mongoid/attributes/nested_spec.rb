@@ -1434,7 +1434,7 @@ describe Mongoid::Attributes::Nested do
                       Person.create(age: 42)
                     end
 
-                    context "when the child returns false in a before callback" do
+                    context "when the child halts the callback chain in a before callback" do
 
                       context "when the child is not paranoid" do
 
