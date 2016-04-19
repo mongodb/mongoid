@@ -164,7 +164,11 @@ describe Mongoid::Persistable::Destroyable do
       end
 
       before do
-        expect(album).to receive(:set_parent_name).and_return(false)
+        Album.before_destroy(:set_parent_name_fail)
+      end
+
+      after do
+        Album.reset_callbacks(:destroy)
       end
 
       it "raises an exception" do
