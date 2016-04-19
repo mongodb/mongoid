@@ -89,13 +89,14 @@ describe Mongoid::Config do
   context 'when the belongs_to_required_by_default option is not set in the config' do
 
     before do
+      Mongoid::Config.reset
       Mongoid.configure do |config|
-        config.load_configuration(CONFIG)
+        config.load_configuration(clients: CONFIG[:clients])
       end
     end
 
     it 'sets the Mongoid.belongs_to_required_by_default value to true' do
-      expect(Mongoid.belongs_to_required_by_default).to be(false)
+      expect(Mongoid.belongs_to_required_by_default).to be(true)
     end
   end
 
@@ -118,7 +119,7 @@ describe Mongoid::Config do
       end
 
       it 'sets the Mongoid.belongs_to_required_by_default value to true' do
-        expect(Mongoid.belongs_to_required_by_default).to be(conf[:options][:belongs_to_required_by_default])
+        expect(Mongoid.belongs_to_required_by_default).to be(true)
       end
     end
 
@@ -139,7 +140,7 @@ describe Mongoid::Config do
       end
 
       it 'sets the Mongoid.belongs_to_required_by_default value to false' do
-        expect(Mongoid.belongs_to_required_by_default).to be(conf[:options][:belongs_to_required_by_default])
+        expect(Mongoid.belongs_to_required_by_default).to be(false)
       end
     end
   end
