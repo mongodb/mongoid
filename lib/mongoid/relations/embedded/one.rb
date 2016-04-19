@@ -7,6 +7,11 @@ module Mongoid
       # relations.
       class One < Relations::One
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
         VALID_OPTIONS = [
           :autobuild,
           :as,

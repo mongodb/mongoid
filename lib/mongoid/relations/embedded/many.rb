@@ -10,6 +10,11 @@ module Mongoid
       class Many < Relations::Many
         include Batchable
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
         VALID_OPTIONS = [
           :as,
           :cascade_callbacks,

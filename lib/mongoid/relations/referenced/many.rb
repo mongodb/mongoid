@@ -10,7 +10,11 @@ module Mongoid
         delegate :count, to: :criteria
         delegate :first, :in_memory, :last, :reset, :uniq, to: :target
 
-
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
         VALID_OPTIONS = [
           :after_add,
           :after_remove,
