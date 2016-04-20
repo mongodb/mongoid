@@ -295,20 +295,37 @@ describe Mongoid::Persistable::Savable do
       end
     end
 
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
+    context "when the changed attribute is not writable" do
 
       before do
         Person.create(title: "sir")
       end
 
+      let(:person) do
+        Person.only(:title).first
+      end
+
       it "raises an error" do
         expect {
+          person.username = 'unloaded-attribute'
           person.save
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+      end
+
+      context 'when the changed attribute is aliased' do
+
+        before do
+          Person.create(at: Time.now)
+        end
+
+        let(:person) do
+          Person.only(:at).first
+        end
+
+        it "saves the document" do
+          person.aliased_timestamp = Time.now
+          expect(person.save(validate: false)).to be true
+        end
       end
     end
 
@@ -493,23 +510,6 @@ describe Mongoid::Persistable::Savable do
 
       it "properly sets up the entire hierarchy" do
         expect(from_db.shapes.first.canvas).to eq(firefox)
-      end
-    end
-
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
-
-      before do
-        Person.create(title: "sir")
-      end
-
-      it "raises an error" do
-        expect {
-          person.save!
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
       end
     end
   end

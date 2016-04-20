@@ -165,12 +165,10 @@ module Mongoid
     # @since 4.0.0
     def process_atomic_operations(operations)
       operations.each do |field, value|
-        unless attribute_writable?(field)
-          raise Errors::ReadonlyAttribute.new(field, value)
+        as_writable_attribute!(field, value) do |access|
+          yield(access, value)
+          remove_change(access)
         end
-        normalized = database_field_name(field)
-        yield(normalized, value)
-        remove_change(normalized)
       end
     end
 

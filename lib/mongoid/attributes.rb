@@ -139,14 +139,12 @@ module Mongoid
     #
     # @since 1.0.0
     def remove_attribute(name)
-      access = name.to_s
-      unless attribute_writable?(name)
-        raise Errors::ReadonlyAttribute.new(name, :nil)
-      end
-      _assigning do
-        attribute_will_change!(access)
-        delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
-        attributes.delete(access)
+      as_writable_attribute!(name) do |access|
+        _assigning do
+          attribute_will_change!(access)
+          delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
+          attributes.delete(access)
+        end
       end
     end
 
@@ -165,8 +163,7 @@ module Mongoid
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      access = database_field_name(name.to_s)
-      if attribute_writable?(access)
+      as_writable_attribute!(name) do |access|
         _assigning do
           validate_attribute_value(access, value)
           localized = fields[access].try(:localized?)

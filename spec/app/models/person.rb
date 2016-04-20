@@ -36,6 +36,7 @@ class Person
   field :overridden_setter, type: String
   field :arrays, type: Array
   field :range, type: Range
+  field :species, type: Symbol
 
   index age: 1
   index addresses: 1
