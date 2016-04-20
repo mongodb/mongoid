@@ -7,7 +7,9 @@ describe Mongoid::Config do
     if defined?(RailsTemp)
       Rails = RailsTemp
     end
+  end
 
+  after do
     Mongoid.configure do |config|
       config.load_configuration(CONFIG)
     end
@@ -110,10 +112,6 @@ describe Mongoid::Config do
 
     context 'when the value is set to true' do
 
-      let(:opts) do
-        { belongs_to_required_by_default: true }
-      end
-
       let(:conf) do
         CONFIG.merge(options: { belongs_to_required_by_default: true })
       end
@@ -124,10 +122,6 @@ describe Mongoid::Config do
     end
 
     context 'when the value is set to false' do
-
-      let(:opts) do
-        { belongs_to_required_by_default: true }
-      end
 
       let(:conf) do
         CONFIG.merge(options: { belongs_to_required_by_default: false })

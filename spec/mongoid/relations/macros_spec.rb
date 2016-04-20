@@ -281,7 +281,7 @@ describe Mongoid::Relations::Macros do
       _class.new
     end
 
-    let(:options) { {} }
+    let(:relation_options) { {} }
 
     let(:default_require) { Mongoid.belongs_to_required_by_default }
 
@@ -289,7 +289,7 @@ describe Mongoid::Relations::Macros do
       Mongoid.configure do |config|
         config.load_configuration(conf)
       end
-      _class.belongs_to(:person, options)
+      _class.belongs_to(:person, relation_options)
     end
 
     after do
@@ -314,7 +314,7 @@ describe Mongoid::Relations::Macros do
 
           context 'when :required is true' do
 
-            let(:options) do
+            let(:relation_options) do
               { required: true }
             end
 
@@ -339,7 +339,7 @@ describe Mongoid::Relations::Macros do
 
           context 'when :required is false' do
 
-            let(:options) do
+            let(:relation_options) do
               { required: false }
             end
 
@@ -369,7 +369,7 @@ describe Mongoid::Relations::Macros do
 
             context 'when :optional is true' do
 
-              let(:options) do
+              let(:relation_options) do
                 {
                   required: true,
                   optional: true
@@ -397,7 +397,7 @@ describe Mongoid::Relations::Macros do
 
             context 'when :optional is false' do
 
-              let(:options) do
+              let(:relation_options) do
                 {
                   required: true,
                   optional: false
@@ -428,7 +428,7 @@ describe Mongoid::Relations::Macros do
 
             context 'when :optional is true' do
 
-              let(:options) do
+              let(:relation_options) do
                 {
                   required: false,
                   optional: true
@@ -456,7 +456,7 @@ describe Mongoid::Relations::Macros do
 
             context 'when :optional is false' do
 
-              let(:options) do
+              let(:relation_options) do
                 {
                   required: false,
                   optional: false
@@ -491,7 +491,7 @@ describe Mongoid::Relations::Macros do
 
           context 'when :optional is true' do
 
-            let(:options) do
+            let(:relation_options) do
               { optional: true }
             end
 
@@ -516,7 +516,7 @@ describe Mongoid::Relations::Macros do
 
           context 'when :optional is false' do
 
-            let(:options) do
+            let(:relation_options) do
               { optional: false }
             end
 
