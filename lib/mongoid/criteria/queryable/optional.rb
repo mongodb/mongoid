@@ -193,8 +193,9 @@ module Mongoid
         #
         # @since 2.1.0
         def reorder(*spec)
-          options.delete(:sort)
-          order_by(*spec)
+          clone.tap do |query|
+            query.options.delete(:sort)
+          end.order_by(*spec)
         end
 
         # Add the number of documents to skip.

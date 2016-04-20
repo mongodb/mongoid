@@ -1411,12 +1411,16 @@ describe Mongoid::Criteria::Queryable::Optional do
       query.order_by(field_one: 1, field_two: -1)
     end
 
-    let(:reordered) do
+    let!(:reordered) do
       selection.reorder(field_three: 1)
     end
 
     it "replaces all order options with the new options" do
       expect(reordered.options).to eq(sort: { "field_three" => 1 })
+    end
+
+    it 'does not alter the original criteria object' do
+      expect(selection.options[:sort]).to eq({ 'field_one' => 1, 'field_two' => -1 })
     end
   end
 
