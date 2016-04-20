@@ -277,7 +277,7 @@ describe Mongoid::Persistable::Updatable do
       end
 
       after do
-        Person.readonly_attributes.reject! { |a| a == 'species' }
+        Person.readonly_attributes.reject! { |a| a.to_s == 'species' }
       end
 
       let(:person) do
@@ -306,7 +306,7 @@ describe Mongoid::Persistable::Updatable do
         end
 
         after do
-          Person.readonly_attributes.reject! { |a| a == 'at' }
+          Person.readonly_attributes.reject! { |a| a.to_s == 'at' }
         end
 
         it 'raises an error when trying to set the attribute using the db name' do
@@ -358,12 +358,20 @@ describe Mongoid::Persistable::Updatable do
           }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
         end
 
+        it 'does not persist the change' do
+          expect(person.reload.age).to eq(100)
+        end
+
         context 'when referring to the attribute with a string' do
 
           it 'does not allow the field to be updated' do
             expect {
               person.update_attribute('age', 20)
             }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+          end
+
+          it 'does not persist the change' do
+            expect(person.reload.age).to eq(100)
           end
         end
       end
@@ -400,16 +408,24 @@ describe Mongoid::Persistable::Updatable do
 
         it 'does not allow the field to be updated' do
           expect {
-            person.update_attribute(:title, 20)
+            person.update_attribute(:title, 'Esteemed')
           }.to raise_exception(ActiveModel::MissingAttributeError)
+        end
+
+        it 'does not persist the change' do
+          expect(person.reload.title).to eq('Captain')
         end
 
         context 'when referring to the attribute with a string' do
 
           it 'does not allow the field to be updated' do
             expect {
-              person.update_attribute('title', 20)
+              person.update_attribute('title', 'Esteemed')
             }.to raise_exception(ActiveModel::MissingAttributeError)
+          end
+
+          it 'does not persist the change' do
+            expect(person.reload.title).to eq('Captain')
           end
         end
       end
