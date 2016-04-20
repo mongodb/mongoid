@@ -69,6 +69,22 @@ describe Mongoid::Validatable do
       it "uses the provided context" do
         expect(account).to be_valid(:update)
       end
+
+      context 'when multiple contexts are provided' do
+
+        let(:princess) do
+          Princess.new
+        end
+
+        let(:validation) do
+          princess.valid?([:create, :update])
+        end
+
+        it 'validates using each context' do
+          expect(validation).to be(false)
+          expect(princess.errors.messages.keys).to eq([:color, :name])
+        end
+      end
     end
 
     context "when not provided a context" do
