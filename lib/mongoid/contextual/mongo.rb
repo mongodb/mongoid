@@ -233,7 +233,7 @@ module Mongoid
       #
       # @param [ Hash ] opts The options for the query returning the first document.
       #
-      # @option opts [ Symbol ] :none Don't apply a sort on _id if no other sort
+      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
       #   is defined on the criteria.
       #
       # @return [ Document ] The first document.
@@ -242,7 +242,7 @@ module Mongoid
       def first(opts = {})
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
-          if sort = view.sort || ({ _id: 1 } unless opts[:sort] == :none)
+          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
             with_eager_loading(view.sort(sort).limit(-1).first)
           else
             with_eager_loading(view.limit(-1).first)
@@ -340,7 +340,7 @@ module Mongoid
       #
       # @param [ Hash ] opts The options for the query returning the first document.
       #
-      # @option opts [ Symbol ] :none Don't apply a sort on _id if no other sort
+      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
       #   is defined on the criteria.
       #
       # @since 3.0.0
@@ -587,7 +587,7 @@ module Mongoid
       # @since 3.0.0
       def with_inverse_sorting(opts = {})
         begin
-          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:sort] == :none )
+          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
             @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
           end
           yield

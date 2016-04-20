@@ -790,7 +790,7 @@ describe Mongoid::Contextual::Mongo do
         context 'with option { sort: :none }' do
 
           let(:opts) do
-            { sort: :none }
+            { id_sort: :none }
           end
 
           it 'does not apply the sort on _id' do
@@ -833,7 +833,7 @@ describe Mongoid::Contextual::Mongo do
         context 'with option { sort: :none }' do
 
           let(:opts) do
-            { sort: :none }
+            { id_sort: :none }
           end
 
           it 'applies the criteria sort' do
