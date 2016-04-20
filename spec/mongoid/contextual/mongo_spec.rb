@@ -764,6 +764,92 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
+      context "with no criteria" do
+
+        let(:criteria) do
+          Band.all
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        context "when there is not criteria the context" do
+
+          it "returns the first object" do
+            expect(context.send(method)).to eq(depeche_mode)
+          end
+        end
+
+        context "when subsequently calling #last" do
+
+          it "returns the correct document" do
+            expect(context.send(method)).to eq(depeche_mode)
+            expect(context.last).to eq(new_order)
+          end
+        end
+      end
+
+      context 'with flag :none' do
+        context 'and no criteria' do
+          let(:criteria) do
+            Band.all
+          end
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          let(:flag) do
+            {sort: :none}
+          end
+
+          context "when there is not criteria the context" do
+
+            it "returns the first object" do
+              expect(context.send(method, flag)).to eq(depeche_mode)
+            end
+          end
+
+          context "when subsequently calling #last" do
+
+            it "returns the correct document" do
+              expect(context.send(method, flag)).to eq(depeche_mode)
+              expect(context.last(flag)).to eq(depeche_mode)
+            end
+          end
+        end
+
+        context 'and .sort criteria' do
+          let(:criteria) do
+            Band.desc(:name)
+          end
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          let(:flag) do
+            {sort: :none}
+          end
+
+          context "when there is not criteria the context" do
+
+            it "returns the first object" do
+              expect(context.send(method, flag)).to eq(new_order)
+            end
+          end
+
+          context "when subsequently calling #last" do
+
+            it "returns the correct document" do
+              expect(context.send(method, flag)).to eq(new_order)
+              expect(context.last(flag)).to eq(depeche_mode)
+            end
+          end
+        end
+      end
+
       context "when using .sort" do
 
         let(:criteria) do

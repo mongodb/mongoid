@@ -234,10 +234,14 @@ module Mongoid
       # @return [ Document ] The first document.
       #
       # @since 3.0.0
-      def first
+      def first(flag={})
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
-          with_eager_loading(view.limit(-1).first)
+          if flag[:sort] == :none
+            with_eager_loading(view.limit(-1).first)
+          else
+            with_eager_loading(view.sort(view.sort || {_id: 1}).limit(-1).first)
+          end
         end
       end
       alias :one :first
@@ -332,9 +336,9 @@ module Mongoid
       # @return [ Document ] The last document.
       #
       # @since 3.0.0
-      def last
+      def last(flag={})
         try_cache(:last) do
-          with_inverse_sorting do
+          with_inverse_sorting(flag) do
             with_eager_loading(view.limit(-1).first)
           end
         end
@@ -573,9 +577,10 @@ module Mongoid
       #   context.with_inverse_sorting
       #
       # @since 3.0.0
-      def with_inverse_sorting
+      def with_inverse_sorting(flag={})
         begin
-          if spec = criteria.options[:sort]
+          new_criteria = flag[:sort] == :none ? nil : {_id: 1}
+          if spec = criteria.options[:sort] || new_criteria
             @view = view.sort(Hash[spec.map{|k, v| [k, -1*v]}])
           end
           yield
