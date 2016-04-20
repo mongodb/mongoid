@@ -278,6 +278,8 @@ module Mongoid
         create_dirty_previous_value_accessor(name, meth)
         create_dirty_reset(name, meth)
         create_dirty_reset_to_default(name, meth)
+        create_dirty_previously_changed?(name, meth)
+        create_dirty_previous_change(name, meth)
       end
 
       # Creates the dirty change accessor.
@@ -395,6 +397,40 @@ module Mongoid
         generated_methods.module_eval do
           re_define_method("reset_#{meth}_to_default!") do
             reset_attribute_to_default!(name)
+          end
+        end
+      end
+
+      # Creates the dirty change check.
+      #
+      # @example Create the dirty change check.
+      #   Model.create_dirty_previously_changed?("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 6.0.0
+      def create_dirty_previously_changed?(name, meth)
+        generated_methods.module_eval do
+          re_define_method("#{meth}_previously_changed?") do
+            previous_changes.keys.include?(name)
+          end
+        end
+      end
+
+      # Creates the dirty change accessor.
+      #
+      # @example Create the dirty change accessor.
+      #   Model.create_dirty_previous_change("name", "alias")
+      #
+      # @param [ String ] name The attribute name.
+      # @param [ String ] meth The name of the accessor.
+      #
+      # @since 6.0.0
+      def create_dirty_previous_change(name, meth)
+        generated_methods.module_eval do
+          re_define_method("#{meth}_previous_change") do
+            previous_changes[name]
           end
         end
       end
