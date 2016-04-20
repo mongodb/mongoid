@@ -10,6 +10,24 @@ module Mongoid
       class In < Relations::One
         include Evolvable
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
+        VALID_OPTIONS = [
+          :autobuild,
+          :autosave,
+          :dependent,
+          :foreign_key,
+          :index,
+          :polymorphic,
+          :primary_key,
+          :touch,
+          :optional,
+          :required
+        ].freeze
+
         # Instantiate a new referenced_in relation.
         #
         # @example Create the new relation.
@@ -267,16 +285,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [
-              :autobuild,
-              :autosave,
-              :dependent,
-              :foreign_key,
-              :index,
-              :polymorphic,
-              :primary_key,
-              :touch
-            ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

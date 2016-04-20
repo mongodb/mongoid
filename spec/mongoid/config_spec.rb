@@ -9,6 +9,12 @@ describe Mongoid::Config do
     end
   end
 
+  after do
+    Mongoid.configure do |config|
+      config.load_configuration(CONFIG)
+    end
+  end
+
   describe "#configured?" do
 
     after do
@@ -82,6 +88,57 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the belongs_to_required_by_default option is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(clients: CONFIG[:clients])
+      end
+    end
+
+    it 'sets the Mongoid.belongs_to_required_by_default value to true' do
+      expect(Mongoid.belongs_to_required_by_default).to be(true)
+    end
+  end
+
+  context 'when the belongs_to_required_by_default option is set in the config' do
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is set to true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { belongs_to_required_by_default: true })
+      end
+
+      it 'sets the Mongoid.belongs_to_required_by_default value to true' do
+        expect(Mongoid.belongs_to_required_by_default).to be(true)
+      end
+    end
+
+    context 'when the value is set to false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { belongs_to_required_by_default: false })
+      end
+
+      before do
+        Mongoid.configure do |config|
+          config.load_configuration(conf)
+        end
+      end
+
+      it 'sets the Mongoid.belongs_to_required_by_default value to false' do
+        expect(Mongoid.belongs_to_required_by_default).to be(false)
+      end
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do
@@ -115,12 +172,6 @@ describe Mongoid::Config do
 
       before do
         described_class.load!(file, :test)
-      end
-
-      after do
-        Mongoid.configure do |config|
-          config.load_configuration(CONFIG)
-        end
       end
 
       it "sets the Mongoid logger level" do

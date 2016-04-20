@@ -7,6 +7,19 @@ module Mongoid
       # relations.
       class One < Relations::One
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
+        VALID_OPTIONS = [
+          :autobuild,
+          :as,
+          :cascade_callbacks,
+          :cyclic,
+          :store_as
+        ].freeze
+
         # Instantiate a new embeds_one relation.
         #
         # @example Create the new proxy.
@@ -202,7 +215,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :autobuild, :as, :cascade_callbacks, :cyclic, :store_as ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

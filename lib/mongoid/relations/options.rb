@@ -17,7 +17,7 @@ module Mongoid
         :name,
         :relation,
         :validate
-      ]
+      ].freeze
 
       # Determine if the provided options are valid for the relation.
       #
@@ -32,7 +32,7 @@ module Mongoid
       #
       # @since 2.1.0
       def validate!(options)
-        valid_options = options[:relation].valid_options.concat(COMMON)
+        valid_options = options[:relation]::VALID_OPTIONS + COMMON
         options.keys.each do |key|
           if !valid_options.include?(key)
             raise Errors::InvalidOptions.new(

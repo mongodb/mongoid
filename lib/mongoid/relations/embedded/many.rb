@@ -10,6 +10,23 @@ module Mongoid
       class Many < Relations::Many
         include Batchable
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
+        VALID_OPTIONS = [
+          :as,
+          :cascade_callbacks,
+          :cyclic,
+          :order,
+          :store_as,
+          :before_add,
+          :after_add,
+          :before_remove,
+          :after_remove
+         ].freeze
+
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
@@ -618,10 +635,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [
-              :as, :cascade_callbacks, :cyclic, :order, :store_as,
-              :before_add, :after_add, :before_remove, :after_remove
-            ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

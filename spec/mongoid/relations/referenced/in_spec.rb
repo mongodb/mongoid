@@ -1066,7 +1066,9 @@ describe Mongoid::Relations::Referenced::In do
           :index,
           :polymorphic,
           :primary_key,
-          :touch
+          :touch,
+          :optional,
+          :required
         ]
       )
     end
