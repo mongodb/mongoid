@@ -764,7 +764,7 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "with no criteria" do
+      context 'when the criteria has no sort' do
 
         let(:criteria) do
           Band.all
@@ -774,77 +774,77 @@ describe Mongoid::Contextual::Mongo do
           described_class.new(criteria)
         end
 
-        context "when there is not criteria the context" do
 
-          it "returns the first object" do
-            expect(context.send(method)).to eq(depeche_mode)
-          end
+        it 'applies a sort on _id' do
+          expect(context.send(method)).to eq(depeche_mode)
         end
 
-        context "when subsequently calling #last" do
+        context 'when calling #last' do
 
-          it "returns the correct document" do
+          it 'returns the last document, sorted by _id' do
             expect(context.send(method)).to eq(depeche_mode)
             expect(context.last).to eq(new_order)
           end
         end
-      end
 
-      context 'with flag :none' do
-        context 'and no criteria' do
-          let(:criteria) do
-            Band.all
+        context 'with option { sort: :none }' do
+
+          let(:opts) do
+            { sort: :none }
           end
 
-          let(:context) do
-            described_class.new(criteria)
+          it 'does not apply the sort on _id' do
+            expect(context.send(method, opts)).to eq(depeche_mode)
           end
 
-          let(:flag) do
-            {sort: :none}
-          end
+          context 'when calling #last' do
 
-          context "when there is not criteria the context" do
-
-            it "returns the first object" do
-              expect(context.send(method, flag)).to eq(depeche_mode)
-            end
-          end
-
-          context "when subsequently calling #last" do
-
-            it "returns the correct document" do
-              expect(context.send(method, flag)).to eq(depeche_mode)
-              expect(context.last(flag)).to eq(depeche_mode)
+            it 'does not apply a sort on _id' do
+              expect(context.send(method, opts)).to eq(depeche_mode)
+              expect(context.last(opts)).to eq(depeche_mode)
             end
           end
         end
+      end
 
-        context 'and .sort criteria' do
-          let(:criteria) do
-            Band.desc(:name)
+      context 'when the criteria has a sort' do
+
+        let(:criteria) do
+          Band.desc(:name)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+
+        it 'applies the criteria sort' do
+          expect(context.send(method)).to eq(new_order)
+        end
+
+        context 'when calling #last' do
+
+          it 'applies the criteria sort' do
+            expect(context.send(method)).to eq(new_order)
+            expect(context.last).to eq(depeche_mode)
+          end
+        end
+
+        context 'with option { sort: :none }' do
+
+          let(:opts) do
+            { sort: :none }
           end
 
-          let(:context) do
-            described_class.new(criteria)
+          it 'applies the criteria sort' do
+            expect(context.send(method, opts)).to eq(new_order)
           end
 
-          let(:flag) do
-            {sort: :none}
-          end
+          context 'when calling #last' do
 
-          context "when there is not criteria the context" do
-
-            it "returns the first object" do
-              expect(context.send(method, flag)).to eq(new_order)
-            end
-          end
-
-          context "when subsequently calling #last" do
-
-            it "returns the correct document" do
-              expect(context.send(method, flag)).to eq(new_order)
-              expect(context.last(flag)).to eq(depeche_mode)
+            it 'applies the criteria sort' do
+              expect(context.send(method, opts)).to eq(new_order)
+              expect(context.last(opts)).to eq(depeche_mode)
             end
           end
         end
