@@ -7,5 +7,5 @@ gem "actionpack",  "~> 4.0.12"
 gem "activemodel", "~> 4.0.12"
 
 group :test do
-  gem "rspec", "~> 3.1.0"
+  gem "rspec", "~> 3.4.0"
 end
