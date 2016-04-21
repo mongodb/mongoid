@@ -394,7 +394,7 @@ describe Mongoid::Serializable do
             hash["addresses"]
           end
 
-          pending "when the ids were not loaded" do
+          context "when the ids were not loaded" do
 
             before do
               person.save
@@ -409,6 +409,8 @@ describe Mongoid::Serializable do
             end
 
             it "does not generate new ids" do
+              pending
+              fail
               expect(hash["addresses"].first["_id"]).to be_nil
             end
           end
