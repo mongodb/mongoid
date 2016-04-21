@@ -728,7 +728,7 @@ describe Mongoid::Relations::Accessors do
         game.save
       end
 
-      it "keeps the the foreign key as ObjectID" do
+      it "keeps the foreign key as ObjectID" do
         expect(game.reload.person_id).to eq(person.id)
       end
     end
