@@ -665,17 +665,6 @@ describe Mongoid::Criteria::Modifiable do
           end
         end
       end
-
-      context 'when the criteria selector includes a hash field' do
-
-        let(:document) do
-          Person.where(map: { foo: :bar }).first_or_create
-        end
-
-        it 'sets the hash field' do
-          expect(document.map).to eq({ foo: :bar })
-        end
-      end
     end
   end
 
@@ -798,17 +787,6 @@ describe Mongoid::Criteria::Modifiable do
           it "returns a persisted document" do
             expect(document).to be_persisted
           end
-        end
-      end
-
-      context 'when the criteria selector includes a hash field' do
-
-        let(:document) do
-          Person.where(map: { foo: :bar }).first_or_create
-        end
-
-        it 'sets the hash field' do
-          expect(document.map).to eq({ foo: :bar })
         end
       end
 
