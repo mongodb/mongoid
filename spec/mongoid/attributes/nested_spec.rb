@@ -1970,7 +1970,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.addresses.size).to eq(1)
                   end
 
@@ -2031,7 +2031,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.addresses.first.street).to eq("Maybachufer")
                   end
 
@@ -2091,7 +2091,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.addresses.first.street).to eq("Maybachufer")
                   end
 
@@ -3431,7 +3431,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.posts.size).to eq(1)
                   end
 
@@ -3492,7 +3492,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.posts.first.title).to eq("New Blog")
                   end
 
@@ -3552,7 +3552,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.posts.first.title).to eq("New Blog")
                   end
 
@@ -4097,7 +4097,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.preferences.size).to eq(1)
                   end
 
@@ -4158,7 +4158,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.preferences.first.name).to eq("New Blog")
                   end
 
@@ -4218,7 +4218,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.preferences.first.name).to eq("New Blog")
                   end
 

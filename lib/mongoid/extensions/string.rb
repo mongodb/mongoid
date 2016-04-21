@@ -72,7 +72,8 @@ module Mongoid
         self =~ /\A(|_)id$/
       end
 
-      # Is the string a number?
+      # Is the string a number? The literals "NaN", "Infinity", and "-Infinity"
+      # are counted as numbers.
       #
       # @example Is the string a number.
       #   "1234.23".numeric?
@@ -81,7 +82,7 @@ module Mongoid
       #
       # @since 3.0.0
       def numeric?
-        true if Float(self) rescue (self == "NaN")
+        true if Float(self) rescue (self =~ /^NaN|\-?Infinity$/)
       end
 
       # Get the string as a getter string.
