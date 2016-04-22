@@ -7,6 +7,95 @@ describe Mongoid::QueryCache do
     Mongoid::QueryCache.cache { spec.run }
   end
 
+  context 'when iterating over objects sharing the same base' do
+
+    let(:server) do
+      relations.first.mongo_client.cluster.next_primary
+    end
+
+    before do
+      person = Person.create
+      3.times do
+        person.send(relation).create
+      end
+      person.save
+    end
+
+    let!(:relations) do
+      Person.first.send(relation).to_a
+    end
+
+    context 'when the association is has-many' do
+
+      let(:relation) do
+        :posts
+      end
+
+      context 'when query cache is disabled' do
+
+        before do
+          Mongoid::QueryCache.enabled = false
+        end
+
+        it 'queries for each access to the base' do
+          expect(server).to receive(:context).exactly(relations.size).times.and_call_original
+          relations.each do |object|
+            object.person
+          end
+        end
+      end
+
+      context 'when query cache is enabled' do
+
+        before do
+          Mongoid::QueryCache.enabled = true
+        end
+
+        it 'queries only once for the base' do
+          expect(server).to receive(:context).exactly(1).times.and_call_original
+          relations.each do |object|
+            object.person
+          end
+        end
+      end
+    end
+
+    context 'when the association is embeds-many' do
+
+      let(:relation) do
+        :symptoms
+      end
+
+      context 'when query cache is disabled' do
+
+        before do
+          Mongoid::QueryCache.enabled = false
+        end
+
+        it 'does not query for access to the base' do
+          expect(server).to receive(:context).exactly(0).times.and_call_original
+          relations.each do |object|
+            object.person
+          end
+        end
+      end
+
+      context 'when query cache is enabled' do
+
+        before do
+          Mongoid::QueryCache.enabled = true
+        end
+
+        it 'does not query for access to the base' do
+          expect(server).to receive(:context).exactly(0).times.and_call_original
+          relations.each do |object|
+            object.person
+          end
+        end
+      end
+    end
+  end
+
   context "when querying for a single document" do
 
     [ :first, :one, :last ].each do |method|
