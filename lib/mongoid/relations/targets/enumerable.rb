@@ -123,7 +123,7 @@ module Mongoid
           doc
         end
 
-        # Deletes every document in the enumerable for where the block returns
+        # Deletes every document in the enumerable for which the block returns
         # true.
         #
         # @note This operation loads all documents from the database.
@@ -475,10 +475,24 @@ module Mongoid
         end
 
         def set_base(doc)
-          if @metadata && @metadata.relation != Mongoid::Relations::Referenced::ManyToMany
-            doc.set_relation(@metadata.inverse_of, @base) if (doc && @base && @metadata.inverse_of)
+          if doc && @base
+            doc.set_relation(@metadata.inverse_of, @base) if base_can_be_set?
+            doc
           end
-          doc
+        end
+
+        # The base can only be set for a Referenced::Many type, as the base is already
+        # loaded from the database.
+        # It cannot be set for Reference::ManyToMany because it's not guaranteed that all
+        # related objects are loaded.
+        #
+        # @api private
+        #
+        # @since 6.0.0
+        def base_can_be_set?
+          @metadata &&
+              @metadata.relation == Mongoid::Relations::Referenced::Many &&
+              @metadata.inverse_of
         end
       end
     end
