@@ -54,7 +54,7 @@ describe Mongoid::Copyable do
         end
       end
 
-      context "when a document has old renamed fields" do
+      context "when a document has fields from a legacy schema" do
 
         let!(:actor) do
           Actor.create(name: "test")
@@ -68,8 +68,12 @@ describe Mongoid::Copyable do
           actor.reload.send(method)
         end
 
-        it "copies the document without error" do
-          expect(cloned.this_is_not_a_field).to eq(1)
+        it "sets the legacy attribute" do
+          expect(cloned.attributes['this_is_not_a_field']).to eq(1)
+        end
+
+        it "copies the known attriutes" do
+          expect(cloned.name).to eq('test')
         end
       end
 
