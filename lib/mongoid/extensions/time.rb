@@ -76,7 +76,7 @@ module Mongoid
               ::Time.at(time.to_i, time.usec).utc
             end
           rescue ArgumentError
-            EPOCH
+            nil
           end
         end
       end

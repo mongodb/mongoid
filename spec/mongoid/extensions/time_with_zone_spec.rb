@@ -203,13 +203,8 @@ describe Mongoid::Extensions::TimeWithZone do
       end
 
       context "when the string is an invalid time" do
-
-        let(:epoch) do
-          Time.utc(1970, 1, 1, 0, 0, 0)
-        end
-
-        it "returns epoch" do
-          expect(ActiveSupport::TimeWithZone.mongoize("time")).to eq(epoch)
+        it "returns nil" do
+          expect(ActiveSupport::TimeWithZone.mongoize("time")).to eq(nil)
         end
       end
 

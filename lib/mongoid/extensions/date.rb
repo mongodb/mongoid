@@ -64,7 +64,7 @@ module Mongoid
               time = object.__mongoize_time__
               ::Time.utc(time.year, time.month, time.day)
             rescue ArgumentError
-              EPOCH
+              nil
             end
           end
         end
