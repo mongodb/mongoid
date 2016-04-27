@@ -67,7 +67,11 @@ module Mongoid
                     if :belongs_to == metadata.macro
                       if changed_for_autosave?(relation)
                         relation.with(persistence_context) do |_relation|
-                          _relation.save
+                          unless _relation.save
+                            self.remove_attribute(metadata.foreign_key)
+                            self.send("#{metadata.name}=", nil)
+                            save(validate: false)
+                          end
                         end
                       end
                     else
@@ -87,7 +91,6 @@ module Mongoid
             after_save save_method, unless: :autosaved?
           end
         end
-
       end
     end
   end
