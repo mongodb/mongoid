@@ -49,6 +49,7 @@ describe Mongoid::Matchable::Lte do
     end
 
     context "when the value is an array" do
+
       context "there are value valid" do
         let(:matcher) do
           described_class.new([3, 4])
@@ -67,7 +68,17 @@ describe Mongoid::Matchable::Lte do
         it "returns false" do
           expect(matcher.matches?("$lte" => 5)).to be false
         end
+      end
+    end
 
+    context "when the value is not numeric" do
+
+      let(:matcher) do
+        described_class.new(5)
+      end
+
+      it "returns false" do
+        expect(matcher.matches?("$lte" => '5.1')).to be false
       end
     end
   end

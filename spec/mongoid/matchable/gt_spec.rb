@@ -71,5 +71,16 @@ describe Mongoid::Matchable::Gt do
         end
       end
     end
+
+    context "when the value is not numeric" do
+
+      let(:matcher) do
+        described_class.new(5)
+      end
+
+      it "returns false" do
+        expect(matcher.matches?("$gt" => '4.9')).to be false
+      end
+    end
   end
 end
