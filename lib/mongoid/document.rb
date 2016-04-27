@@ -241,27 +241,6 @@ module Mongoid
       became
     end
 
-    # Print out the cache key. This will append different values on the
-    # plural model name.
-    #
-    # If new_record?     - will append /new
-    # If not             - will append /id-updated_at.to_s(:nsec)
-    # Without updated_at - will append /id
-    #
-    # This is usually called insode a cache() block
-    #
-    # @example Returns the cache key
-    #   document.cache_key
-    #
-    # @return [ String ] the string with or without updated_at
-    #
-    # @since 2.4.0
-    def cache_key
-      return "#{model_key}/new" if new_record?
-      return "#{model_key}/#{id}-#{updated_at.utc.to_s(:nsec)}" if do_or_do_not(:updated_at)
-      "#{model_key}/#{id}"
-    end
-
     private
 
     # Returns the logger
