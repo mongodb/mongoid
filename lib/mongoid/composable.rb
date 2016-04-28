@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "mongoid/changeable"
+require "mongoid/cacheable"
 require "mongoid/findable"
 require "mongoid/indexable"
 require "mongoid/inspectable"
@@ -34,6 +35,7 @@ module Mongoid
     include ActiveModel::Serializers::JSON
     include Atomic
     include Changeable
+    include Cacheable
     include Clients
     include Attributes
     include Evolvable
@@ -61,6 +63,7 @@ module Mongoid
       Attributes,
       Copyable,
       Changeable,
+      Cacheable,
       Evolvable,
       Fields,
       Indexable,
@@ -101,7 +104,8 @@ module Mongoid
                               :readonly_attributes,
                               :storage_options,
                               :cascades,
-                              :cyclic
+                              :cyclic,
+                              :cache_timestamp_format
                             ]
 
     class << self
