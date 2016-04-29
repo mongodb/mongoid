@@ -104,7 +104,8 @@ module Mongoid
                               :readonly_attributes,
                               :storage_options,
                               :cascades,
-                              :cyclic
+                              :cyclic,
+                              :cache_timestamp_format
                             ]
 
     class << self

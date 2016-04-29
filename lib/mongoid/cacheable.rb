@@ -2,6 +2,8 @@
 module Mongoid
 
   # Encapsulates behaviour around caching.
+  #
+  # @since 6.0.0
   module Cacheable
     extend ActiveSupport::Concern
 
@@ -26,15 +28,9 @@ module Mongoid
     #
     # @since 2.4.0
     def cache_key
-      case
-      when new_record
-        "#{model_key}/new"
-      when do_or_do_not(:updated_at)
-        timestamp = updated_at.utc.to_s(cache_timestamp_format)
-        "#{model_key}/#{id}-#{timestamp}"
-      else
-        "#{model_key}/#{id}"
-      end
+      return "#{model_key}/new" if new_record?
+      return "#{model_key}/#{id}-#{updated_at.utc.to_s(cache_timestamp_format)}" if do_or_do_not(:updated_at)
+      "#{model_key}/#{id}"
     end
   end
 end
