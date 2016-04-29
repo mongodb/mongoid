@@ -220,12 +220,16 @@ module Mongoid
       private
 
       def invalid_key?(hash, key)
-        key.to_s =~ BSON::String::ILLEGAL_KEY || hash.key?(key.to_sym) || hash.key?(key)
+        # @todo Change this to BSON::String::ILLEGAL_KEY when ruby driver 2.3.0 is
+        # released and mongoid is updated to depend on driver >= 2.3.0
+        key.to_s =~ Mongoid::Document::ILLEGAL_KEY || hash.key?(key.to_sym) || hash.key?(key)
       end
 
       def invalid_embedded_doc?(value)
+        # @todo Change this to BSON::String::ILLEGAL_KEY when ruby driver 2.3.0 is
+        # released and mongoid is updated to depend on driver >= 2.3.0
         value.is_a?(Hash) && value.any? do |key, v|
-          key.to_s =~ BSON::String::ILLEGAL_KEY || invalid_embedded_doc?(v)
+          key.to_s =~ Mongoid::Document::ILLEGAL_KEY || invalid_embedded_doc?(v)
         end
       end
     end
