@@ -591,6 +591,82 @@ describe Mongoid::Criteria::Modifiable do
             end
           end
         end
+
+        context 'when the query criteria is on a hash attribute' do
+
+          let(:document) do
+            Person.where(map: { foo: :bar }).first_or_create
+          end
+
+          it 'uses the values from the attributes' do
+            expect(document.map).to eq({ foo: :bar })
+          end
+        end
+
+        context 'when the criteria has a selector with query operators' do
+
+          let(:document) do
+            Band.in(genres: ['Hiphop', 'Soul']).first_or_create(name: 'Smooth')
+          end
+
+          it 'does not create a document with the query operators' do
+            expect(document.attributes.keys).not_to include('genres')
+          end
+        end
+
+        context 'when the criteria has a nested selector with query operators' do
+
+          let(:band) do
+            record = Record.new(producers: ['testing'])
+            band = Band.create(records: [record])
+          end
+
+          let(:document) do
+            band.records.in(producers: ['nonexistent']).first_or_create(name: 'new-embedded-doc')
+            band.reload
+          end
+
+          it 'creates a new embedded document' do
+            expect(document.records.size).to eq(2)
+          end
+
+          it 'does not alter the existing embedded document' do
+            expect(document.records[0].producers).to eq(['testing'])
+          end
+
+          it 'does not create a document with the query operators as attributes' do
+            expect(document.records[1].producers).to be_nil
+          end
+
+          it 'applies the attribute to the new embedded document' do
+            expect(document.records[1].name).to eq('new-embedded-doc')
+          end
+        end
+
+        context 'when the criteria has a deeply-nested selector with query operators' do
+
+          let(:criteria) do
+            band = Band.create
+            Mongoid::Criteria.new(Record) do |criteria|
+              criteria.embedded = true
+              criteria.metadata = Band.reflect_on_association(:records)
+              criteria.parent_document = band
+              criteria.selector = { "records" => { "producers"=>{"$in"=>["nonexistent"] } } }
+            end
+          end
+
+          let(:document) do
+            criteria.first_or_create(name: 'new-record')
+          end
+
+          it 'does not create a document with the query operators' do
+            expect(document.attributes.keys).not_to include('producers')
+          end
+
+          it 'applies the attribute to the new embedded document' do
+            expect(document.name).to eq('new-record')
+          end
+        end
       end
 
       context "when attributes are not provided" do

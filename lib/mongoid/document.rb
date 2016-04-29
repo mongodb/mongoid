@@ -31,6 +31,15 @@ module Mongoid
       Mongoid.register_model(self)
     end
 
+    # Regex for matching illegal BSON keys.
+    # Note that bson 4.1 has the constant BSON::String::ILLEGAL_KEY
+    # that should be used instead.
+    # When ruby driver 2.3.0 is released and Mongoid can be updated
+    # to require >= 2.3.0, the BSON constant can be used.
+    #
+    # @since 6.0.0
+    ILLEGAL_KEY = /(\A[$])|(\.)/.freeze
+
     # Freezes the internal attributes of the document.
     #
     # @example Freeze the document
