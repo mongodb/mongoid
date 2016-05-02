@@ -486,38 +486,48 @@ describe Mongoid::Findable do
     end
   end
 
-  example "it should return datetime values in time zone instead of UTC if time zone is set" do
-    class Kid
-      include Mongoid::Document
+  context 'when Mongoid is configured to use activesupport time zone' do
 
-      field :birth_time, type: DateTime
-      field :name, default: '' 
+    before do
+      Mongoid.use_utc = false
+      Mongoid.use_activesupport_time_zone = true
+      Time.zone = "Asia/Kolkata"
     end
 
-    Mongoid.use_utc = false
-    Mongoid.use_activesupport_time_zone = true
-    Time.zone = "Asia/Kolkata"
-    time = Time.zone.now
+    let!(:time) do
+      Time.zone.now.tap do |t|
+        User.create(last_login: t, name: 'Tom')
+      end
+    end
 
-    Kid.create(birth_time: time, name: 'Tom')
-    expect(Kid.distinct(:birth_time).first.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
-    expect(Kid.distinct(:name)).to match_array(['Tom'])
+    it 'uses activesupport time zone' do
+      expect(User.distinct(:last_login).first.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
+    end
+
+    it 'loads other fields accurately' do
+      expect(User.distinct(:name)).to match_array(['Tom'])
+    end
   end
 
-  example "it should return datetime values in utc if time zone is not set" do
-    class Kid
-      include Mongoid::Document
+  context 'when Mongoid is not configured to use activesupport time zone' do
 
-      field :birth_time, type: DateTime
-      field :name, default: '' 
+    before do
+      Mongoid.use_utc = true
+      Mongoid.use_activesupport_time_zone = false
     end
 
-    Mongoid.use_utc = true
-    Mongoid.use_activesupport_time_zone = false
-    time = Time.now
+    let!(:time) do
+      Time.now.tap do |t|
+        User.create(last_login: t, name: 'Tom')
+      end
+    end
 
-    Kid.create(birth_time: time, name: 'Tom')
-    expect(Kid.distinct(:birth_time).first.to_s).to eql(time.utc.to_s)
-    expect(Kid.distinct(:name)).to match_array(['Tom'])
+    it 'uses utc' do
+      expect(User.distinct(:last_login).first.to_s).to eql(time.utc.to_s)
+    end
+
+    it 'loads other fields accurately' do
+      expect(User.distinct(:name)).to match_array(['Tom'])
+    end
   end
 end
