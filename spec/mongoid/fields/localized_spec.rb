@@ -174,6 +174,21 @@ describe Mongoid::Fields::Localized do
                 expect(value).to be_nil
               end
             end
+
+            context 'when fallbacks are empty' do
+
+              before do
+                ::I18n.fallbacks[:de] = [ ]
+              end
+
+              let(:value) do
+                field.demongoize({ 'de' => 'testen' })
+              end
+
+              it "returns the value" do
+                expect(value).to eq('testen')
+              end
+            end
           end
         end
       end
