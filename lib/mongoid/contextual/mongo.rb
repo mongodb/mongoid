@@ -102,7 +102,9 @@ module Mongoid
       #
       # @since 3.0.0
       def distinct(field)
-        view.distinct(klass.database_field_name(field))
+        view.distinct(klass.database_field_name(field)).map do |value|
+          value.class.demongoize(value)
+        end
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid

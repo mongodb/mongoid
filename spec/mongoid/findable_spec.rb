@@ -485,4 +485,39 @@ describe Mongoid::Findable do
       end
     end
   end
+
+  example "it should return datetime values in time zone instead of UTC if time zone is set" do
+    class Kid
+      include Mongoid::Document
+
+      field :birth_time, type: DateTime
+      field :name, default: '' 
+    end
+
+    Mongoid.use_utc = false
+    Mongoid.use_activesupport_time_zone = true
+    Time.zone = "Asia/Kolkata"
+    time = Time.zone.now
+
+    Kid.create(birth_time: time, name: 'Tom')
+    expect(Kid.distinct(:birth_time).first.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
+    expect(Kid.distinct(:name)).to match_array(['Tom'])
+  end
+
+  example "it should return datetime values in utc if time zone is not set" do
+    class Kid
+      include Mongoid::Document
+
+      field :birth_time, type: DateTime
+      field :name, default: '' 
+    end
+
+    Mongoid.use_utc = true
+    Mongoid.use_activesupport_time_zone = false
+    time = Time.now
+
+    Kid.create(birth_time: time, name: 'Tom')
+    expect(Kid.distinct(:birth_time).first.to_s).to eql(time.utc.to_s)
+    expect(Kid.distinct(:name)).to match_array(['Tom'])
+  end
 end
