@@ -7,7 +7,7 @@ bundler_args: --without development
 rvm:
   - 2.2.2
   - 2.3.0
-  - jruby-9.0.5
+  - jruby-9.0
 
 gemfile:
   - Gemfile
