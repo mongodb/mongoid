@@ -7,12 +7,12 @@ bundler_args: --without development
 rvm:
   - 2.2.2
   - 2.3.0
-  - jruby-9.0
+  - jruby-9.0.5.0
 
 gemfile:
   - Gemfile
   - gemfiles/rails5master.gemfile
-  - gemfiles/rails5beta4.gemfile
+  - gemfiles/rails5rc1.gemfile
 
 env:
   global:
