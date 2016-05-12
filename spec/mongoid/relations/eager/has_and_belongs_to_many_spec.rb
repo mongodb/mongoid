@@ -113,5 +113,21 @@ describe Mongoid::Relations::Eager::HasAndBelongsToMany do
         end
       end
     end
+
+    context "when some related documents no longer exist" do
+      before do
+        # Deleting the first one to meet Builders::Referenced::ManyToMany#query?
+        House.collection.find(_id: Person.first.house_ids.first).delete_one
+      end
+
+      it "does not accidentally trigger an extra query" do
+        expect_query(2) do
+          Person.asc(:_id).includes(:houses).each do |person|
+            expect(person.houses).to_not be_nil
+            expect(person.houses.length).to be(2)
+          end
+        end
+      end
+    end
   end
 end
