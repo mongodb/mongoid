@@ -17,7 +17,7 @@ module Mongoid
 
           @docs.each do |d|
             keys = d.send(group_by_key)
-            docs = entries.values_at(*keys)
+            docs = entries.values_at(*keys).compact
             set_relation(d, docs)
           end
         end
