@@ -6,13 +6,13 @@ bundler_args: --without development
 
 rvm:
   - 2.2.2
-  - 2.3.0
-  - jruby-9.0.5.0
+  - 2.3.1
+  - jruby-9.1.2.0
 
 gemfile:
   - Gemfile
-  - gemfiles/rails5master.gemfile
   - gemfiles/rails5rc1.gemfile
+  - gemfiles/rails5master.gemfile
 
 env:
   global:
@@ -20,9 +20,9 @@ env:
     - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
   matrix:
     - MONGODB=2.4.14
-    - MONGODB=2.6.11
-    - MONGODB=3.0.7
-    - MONGODB=3.2.0
+    - MONGODB=2.6.12
+    - MONGODB=3.0.12
+    - MONGODB=3.2.7
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
