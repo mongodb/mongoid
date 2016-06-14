@@ -18,7 +18,7 @@ module Mongoid
       # Options constant.
       #
       # @since 5.0.0
-      OPTIONS = [ :hint, :limit, :skip, :sort, :batch_size, :max_scan, :snapshot, :comment, :read ].freeze
+      OPTIONS = [ :hint, :limit, :skip, :sort, :batch_size, :max_scan, :max_time_ms, :snapshot, :comment, :read ].freeze
 
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
