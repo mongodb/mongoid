@@ -107,6 +107,20 @@ module Mongoid
           option(value) { |options| options.store(:max_scan, value) }
         end
 
+        # Adds a cumulative time limit in milliseconds for processing operations on a cursor.
+        #
+        # @example Add the max time ms option.
+        #   optional.max_time_ms(200)
+        #
+        # @param [ Integer ] value The max time in milliseconds for processing operations on a cursor.
+        #
+        # @return [ Optional ] The cloned optional.
+        #
+        # @since 6.0.0
+        def max_time_ms(value = nil)
+          option(value) { |options| options.store(:max_time_ms, value) }
+        end
+
         # Tell the query not to timeout.
         #
         # @example Tell the query not to timeout.
