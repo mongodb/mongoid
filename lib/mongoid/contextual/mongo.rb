@@ -305,8 +305,7 @@ module Mongoid
         if block_given?
           super(&block)
         else
-          field = field.to_sym
-          criteria.only(field).map(&field.to_proc)
+          criteria.pluck(field)
         end
       end
 

@@ -1089,11 +1089,6 @@ describe Mongoid::Contextual::Mongo do
 
     context "when passed the symbol field name" do
 
-      it "limits query to that field" do
-        expect(criteria).to receive(:only).with(:name).and_call_original
-        context.map(:name)
-      end
-
       it "performs mapping" do
         expect(context.map(:name)).to eq ["Depeche Mode", "New Order"]
       end
