@@ -11,7 +11,7 @@ rvm:
 
 gemfile:
   - Gemfile
-  - gemfiles/rails5rc1.gemfile
+  - gemfiles/rails5rc2.gemfile
   - gemfiles/rails5master.gemfile
 
 env:
