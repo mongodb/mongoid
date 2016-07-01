@@ -5,8 +5,8 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  - 2.2.2
-  - 2.3.1
+  #- 2.2.2
+  #- 2.3.1
   - jruby-9.1.2.0
 
 gemfile:
@@ -15,7 +15,7 @@ gemfile:
 env:
   global:
     - CI="travis"
-    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx2g"
   matrix:
     - MONGODB=2.4.14
     - MONGODB=2.6.12
