@@ -74,8 +74,12 @@ module Mongoid
         # @return [ String ] The normalized key.
         #
         # @since 1.0.0
-        def normalized_key(name, serializer)
-          serializer && serializer.localized? ? "#{name}.#{::I18n.locale}" : name
+        def normalized_key(name, serializer, opts = {})
+          if serializer && serializer.localized? && opts[:localize] != false
+            "#{name}.#{::I18n.locale}"
+          else
+            name
+          end
         end
 
         # Get the pair of objects needed to store the value in a hash by the

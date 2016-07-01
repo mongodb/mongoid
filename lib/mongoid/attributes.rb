@@ -254,7 +254,7 @@ module Mongoid
 
     def selection_included?(name, selection, field)
       if field && field.localized?
-        selection.key?("#{name}.#{::I18n.locale}")
+        selection.key?("#{name}.#{::I18n.locale}") || selection.key?(name.to_s)
       else
         selection.keys.collect { |k| k.partition('.').first }.include?(name)
       end

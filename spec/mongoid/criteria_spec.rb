@@ -2802,6 +2802,66 @@ describe Mongoid::Criteria do
         end
       end
     end
+
+    context 'when the field is localized' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create(description: 'english-text')
+        I18n.locale = :de
+        d.reload.description = 'deutsch-text'
+        d.save
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      context 'when localize is false' do
+
+        let(:dictionary) do
+          Dictionary.only(:description, localize: false).first
+        end
+
+        it 'loads all translations' do
+          expect(dictionary.description_translations.keys).to include('de', 'en')
+        end
+
+        it 'returns the field value for the current locale' do
+          expect(dictionary.description).to eq('deutsch-text')
+        end
+      end
+
+      context 'when localize is not specified' do
+
+        let(:dictionary) do
+          Dictionary.only(:description).first
+        end
+
+        it 'loads all translations' do
+          expect(dictionary.description_translations.keys).to include('de', 'en')
+        end
+
+        it 'returns the field value for the current locale' do
+          expect(dictionary.description).to eq('deutsch-text')
+        end
+      end
+
+      context 'when localize is true' do
+
+        let(:dictionary) do
+          Dictionary.only(:description, localize: true).first
+        end
+
+        it 'only loads the local translation' do
+          expect(dictionary.description_translations.keys).to eq(['de'])
+        end
+
+        it 'returns the field value for the current locale' do
+          expect(dictionary.description).to eq('deutsch-text')
+        end
+      end
+    end
   end
 
   [ :or, :any_of ].each do |method|
@@ -2954,7 +3014,7 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "when plucking mult-fields" do
+      context "when plucking multi-fields" do
 
         let(:plucked) do
           Band.where(:name.exists => true).pluck(:name, :likes)
@@ -3032,6 +3092,29 @@ describe Mongoid::Criteria do
         it "returns a nil arrays" do
           expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
         end
+      end
+    end
+
+    context 'when plucking a localized field' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create(description: 'english-text')
+        I18n.locale = :de
+        d.reload.description = 'deutsch-text'
+        d.save
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      let(:plucked) do
+        Dictionary.all.pluck(:description)
+      end
+
+      it 'returns all translations' do
+        expect(plucked.first.keys).to include('en', 'de')
       end
     end
   end
