@@ -148,13 +148,8 @@ module Mongoid
         #
         # @since 1.0.0
         def only(*args)
-          if args[-1].is_a?(Hash)
-           opts = args[-1]
-           args = args[0...-1].flatten
-          else
-            opts = {}
-            args = args.flatten
-          end
+          opts = args.extract_options!
+          args = args.flatten
           opts[:localize] = opts.fetch(:localize, false)
           option(*args) do |options|
             options.store(
