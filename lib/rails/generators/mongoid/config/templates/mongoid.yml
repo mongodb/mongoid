@@ -38,7 +38,8 @@ development:
         # on 2.4 and 2.6 is :plain)
         # auth_mech: :scram
 
-        # The database or source to authenticate the user against. (default: admin)
+        # The database or source to authenticate the user against.
+        # (default: the database specified above or admin)
         # auth_source: admin
 
         # Force a the driver cluster to behave in a certain manner instead of auto-
