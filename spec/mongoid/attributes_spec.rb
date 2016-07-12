@@ -38,6 +38,42 @@ describe Mongoid::Attributes do
             it "does not raise an error" do
               expect(from_db.desc).to eq("test")
             end
+
+            context "accessing via []" do
+
+              it "does not raise an error" do
+                expect(from_db["desc"]).to eq("en" => "test")
+              end
+            end
+
+            context "when calling only on a sub-document" do
+
+              let(:title) {"Executive"}
+              let(:city) {"NYC"}
+              let!(:agent) do
+                agent = Agent.new(:title => title)
+                agent.build_address(:city => city)
+                agent.save()
+                agent
+              end
+              let(:from_db) do
+                Agent.only(:title, "address.city").first
+              end
+
+              context "when the field is in the only" do
+
+                it "does not raise an error" do
+                  expect(from_db.address.city).to eq(city)
+                end
+              end
+
+              context "accessing via []" do
+
+                it "does not raise an error" do
+                  expect(from_db["address.city"]).to eq(city)
+                end
+              end
+            end
           end
 
           context 'when the attribute is a hash field' do
@@ -85,6 +121,15 @@ describe Mongoid::Attributes do
           expect {
             from_db.title
           }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+
+        context "accessing via []" do
+
+          it "raises an error" do
+            expect {
+              from_db["title"]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
         end
       end
 
