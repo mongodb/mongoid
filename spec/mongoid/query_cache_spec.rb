@@ -173,6 +173,27 @@ describe Mongoid::QueryCache do
       end
     end
 
+    context "when sorting documents" do
+      before do
+        Band.asc(:id).to_a
+      end
+
+      context "with different selector" do
+
+        it "queries again" do
+          expect_query(1) do
+            Band.desc(:id).to_a
+          end
+        end
+      end
+
+      it "does not query again" do
+        expect_query(0) do
+          Band.asc(:id).to_a
+        end
+      end
+    end
+
     context "when query caching is enabled and the batch_size is set" do
 
       around(:each) do |example|
