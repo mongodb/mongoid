@@ -5,11 +5,9 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  #- 2.2.2
-  #- 2.3.1
-  - jruby-9.0.0.0
-  - jruby-9.0.1.0
-  - jruby-9.1.0.0
+  - 2.2.2
+  - 2.3.1
+  - jruby-9.1.2.0
 
 gemfile:
   - Gemfile
