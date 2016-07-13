@@ -68,6 +68,20 @@ module Mongoid
           push("$project" => evolve(entry))
         end
 
+        # Add the $lookup entry to the pipeline.
+        #
+        # @example Add the lookup.
+        #   pipeline.lookup(entry)
+        #
+        # @param [ Hash ] entry The left outer join.
+        #
+        # @return [ Pipeline ] The pipeline.
+        #
+        # @since 3.2.0
+        def lookup(entry)
+          push("$lookup" => evolve(entry))
+        end
+
         # Add the $unwind entry to the pipeline.
         #
         # @example Add the unwind.

@@ -71,6 +71,22 @@ module Mongoid
           end
         end
 
+        # Add a lookup ($lookUp) to the aggregation pipeline.
+        #
+        # @example Add a lookup to the pipeline.
+        #   aggregable.lookup(from: 'rightCollection', localField: 'leftVal', foreignField: 'rightVal', as: 'embeddedData')
+        #
+        # @param [ Hash ] criterion The lookup to make.
+        #
+        # @return [ Aggregable ] The aggregable.
+        #
+        # @since 3.2.0
+        def lookup(operation)
+          aggregation(operation) do |pipeline|
+            pipeline.lookup(operation)
+          end
+        end
+
         # Add an unwind ($unwind) to the aggregation pipeline.
         #
         # @example Add an unwind to the pipeline.

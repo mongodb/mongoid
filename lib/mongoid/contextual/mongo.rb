@@ -323,8 +323,12 @@ module Mongoid
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
-        @view = collection.find(criteria.selector)
-        apply_options
+        if criteria.aggregating?
+          @view = collection.aggregate(criteria.pipeline)
+        else
+          @view = collection.find(criteria.selector)
+          apply_options
+        end
       end
 
       delegate(:database_field_name, to: :@klass)
