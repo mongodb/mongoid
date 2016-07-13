@@ -256,7 +256,7 @@ module Mongoid
       if field && field.localized?
         selection.key?("#{name}.#{::I18n.locale}")
       else
-        selection.keys.collect { |k| k.partition('.').first }.include?(name)
+        selection.key?(name) || selection.keys.collect { |k| k.partition('.').first }.include?(name)
       end
     end
 
