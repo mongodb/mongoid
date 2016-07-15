@@ -20,7 +20,7 @@ describe Mongoid::Copyable do
       end
 
       let!(:address) do
-        person.addresses.build(street: "Bond")
+        person.addresses.build(street: "Bond", name: "Bond")
       end
 
       let!(:name) do
@@ -97,6 +97,7 @@ describe Mongoid::Copyable do
           I18n.enforce_available_locales = false
           I18n.locale = 'pt_BR'
           person.desc = "descrição"
+          person.addresses.first.name = "descrição"
           person.save
         end
 
@@ -125,6 +126,16 @@ describe Mongoid::Copyable do
         it "sets to nil an nonexistent lang" do
           I18n.locale = :fr
           expect(copy.desc).to be_nil
+        end
+
+        it 'sets embedded translations' do
+          I18n.locale = 'pt_BR'
+          expect(copy.addresses.first.name).to eq("descrição")
+        end
+
+        it 'sets embedded english version' do
+          I18n.locale = :en
+          expect(copy.addresses.first.name).to eq("Bond")
         end
       end
 
