@@ -97,4 +97,28 @@ describe Mongoid::Relations::Proxy do
       end
     end
   end
+
+  describe "equality" do
+    let(:messages) do
+      Person.create.messages
+    end
+
+    it "is #equal? to itself" do
+      expect(messages.equal?(messages)).to eq(true)
+    end
+
+    it "is == to itself" do
+      expect(messages == messages).to eq(true)
+    end
+
+    it "is not #equal? to its target" do
+      expect(messages.equal?(messages.target)).to eq(false)
+      expect(messages.target.equal?(messages)).to eq(false)
+    end
+
+    it "is == to its target" do
+      expect(messages == messages.target).to eq(true)
+      expect(messages.target == messages).to eq(true)
+    end
+  end
 end
