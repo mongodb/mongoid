@@ -23,7 +23,7 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|
             process_attribute(field.to_s, value)
-            ops[atomic_attribute_name(field)] = attributes[field]
+            ops[atomic_attribute_name(field)] = value
           end
           { "$set" => ops }
         end

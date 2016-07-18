@@ -137,6 +137,34 @@ describe Mongoid::Persistable::Settable do
     end
   end
 
+  context "when the document has embedded fields" do
+    let(:person) do
+      Person.create
+    end
+
+    let(:pet) do
+      Animal.new(name: "somepet")
+    end
+
+    let(:home_phone) do
+      Phone.new(number: "555-555-5555")
+    end
+
+    let(:office_phone) do
+      Phone.new(number: "666-666-6666")
+    end
+
+    it "should persist changes of embeds_one field" do
+      person.set({pet: pet.as_document})
+      expect(person.reload.pet).to eq(pet)
+    end
+
+    it "should persist changes of embeds_many fields" do
+      person.set({ phone_numbers: [home_phone, office_phone].map { |p| p.as_document} })
+      expect(person.reload.phone_numbers).to eq([home_phone, office_phone])
+    end
+  end
+
   context "when dynamic attributes are not enabled" do
     let(:account) do
       Account.create
