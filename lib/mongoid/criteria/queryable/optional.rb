@@ -139,16 +139,25 @@ module Mongoid
         #   optional.only(:name, :dob)
         #
         # @param [ Array<Symbol> ] args The fields to return.
+        # @param [ Hash ] opts The options.
+        #
+        # @option opts [ true, false ] :localize (false) Whether to only query for the
+        #   locale translation.
         #
         # @return [ Optional ] The cloned optional.
         #
         # @since 1.0.0
         def only(*args)
+          opts = args.extract_options!
           args = args.flatten
+          opts[:localize] = opts.fetch(:localize, false)
           option(*args) do |options|
             options.store(
-              :fields, args.inject(options[:fields] || {}){ |sub, field| sub.tap { sub[field] = 1 }}
-            )
+              :fields,
+              args.inject(options[:fields] || {}) do |sub, field|
+                sub.tap { sub[field] = 1 }
+              end,
+              opts)
           end
         end
 
