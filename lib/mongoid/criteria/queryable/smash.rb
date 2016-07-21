@@ -60,13 +60,14 @@ module Mongoid
 
         private
 
-        # Get the normalized value for the key. If localization is in play the
-        # current locale will be appended to the key in MongoDB dot notation.
+        # Get the localized value for the key if needed. If the field uses
+        # localization the current locale will be appended to the key in
+        # MongoDB dot notation.
         #
         # @api private
         #
         # @example Get the normalized key name.
-        #   smash.normalized_key("field", serializer)
+        #   smash.localized_key("field", serializer)
         #
         # @param [ String ] name The name of the field.
         # @param [ Object ] serializer The optional field serializer.
@@ -74,7 +75,7 @@ module Mongoid
         # @return [ String ] The normalized key.
         #
         # @since 1.0.0
-        def normalized_key(name, serializer)
+        def localized_key(name, serializer)
           serializer && serializer.localized? ? "#{name}.#{::I18n.locale}" : name
         end
 

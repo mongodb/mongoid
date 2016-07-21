@@ -67,8 +67,8 @@ module Mongoid
         # @return [ Object ] The stored object.
         #
         # @since 1.0.0
-        def store(key, value)
-          super(key, evolve(value))
+        def store(key, value, localize = true)
+          super(key, evolve(value, localize))
         end
         alias :[]= :store
 
@@ -102,10 +102,10 @@ module Mongoid
         # @return [ Object ] The serialized object.
         #
         # @since 1.0.0
-        def evolve(value)
+        def evolve(value, localize = true)
           case value
           when Hash
-            evolve_hash(value)
+            evolve_hash(value, localize)
           else
             value
           end
@@ -123,10 +123,11 @@ module Mongoid
         # @return [ Object ] The serialized hash.
         #
         # @since 1.0.0
-        def evolve_hash(value)
+        def evolve_hash(value, localize = true)
           value.inject({}) do |hash, (field, _value)|
             name, serializer = storage_pair(field)
-            hash[normalized_key(name, serializer)] = _value
+            name = localized_key(name, serializer) if localize
+            hash[name] = _value
             hash
           end
         end

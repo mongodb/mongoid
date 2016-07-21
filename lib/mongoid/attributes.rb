@@ -245,19 +245,11 @@ module Mongoid
     private
 
     def selection_excluded?(name, selection, field)
-      if field && field.localized?
-        selection["#{name}.#{::I18n.locale}"] == 0
-      else
-        selection[name] == 0
-      end
+      selection[name] == 0
     end
 
     def selection_included?(name, selection, field)
-      if field && field.localized?
-        selection.key?("#{name}.#{::I18n.locale}")
-      else
-        selection.key?(name) || selection.keys.collect { |k| k.partition('.').first }.include?(name)
-      end
+      selection.key?(name) || selection.keys.collect { |k| k.partition('.').first }.include?(name)
     end
 
     # Does the string contain dot syntax for accessing hashes?
