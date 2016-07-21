@@ -2802,6 +2802,93 @@ describe Mongoid::Criteria do
         end
       end
     end
+
+    context 'when the field is localized' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create(description: 'english-text')
+        I18n.locale = :de
+        d.description = 'deutsch-text'
+        d.save
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      context 'when entire field is included' do
+
+        let(:dictionary) do
+          Dictionary.only(:description).first
+
+        end
+
+        it 'loads all translations' do
+          expect(dictionary.description_translations.keys).to include('de', 'en')
+        end
+
+        it 'returns the field value for the current locale' do
+          I18n.locale = :en
+          expect(dictionary.description).to eq('english-text')
+          I18n.locale = :de
+          expect(dictionary.description).to eq('deutsch-text')
+        end
+      end
+
+      context 'when a specific locale is included' do
+
+        let(:dictionary) do
+          Dictionary.only(:'description.de').first
+        end
+
+        it 'loads translations only for the included locale' do
+          expect(dictionary.description_translations.keys).to include('de')
+          expect(dictionary.description_translations.keys).to_not include('en')
+        end
+
+        it 'returns the field value for the included locale' do
+          I18n.locale = :en
+          expect(dictionary.description).to be_nil
+          I18n.locale = :de
+          expect(dictionary.description).to eq('deutsch-text')
+        end
+      end
+
+      context 'when entire field is excluded' do
+
+        let(:dictionary) do
+          Dictionary.without(:description).first
+        end
+
+        it 'does not load all translations' do
+          expect(dictionary.description_translations.keys).to_not include('de', 'en')
+        end
+
+        it 'raises an ActiveModel::MissingAttributeError when attempting to access the field' do
+          expect{dictionary.description}.to raise_error ActiveModel::MissingAttributeError
+        end
+      end
+
+      context 'when a specific locale is excluded' do
+
+        let(:dictionary) do
+          Dictionary.without(:'description.de').first
+        end
+
+        it 'does not load excluded translations' do
+          expect(dictionary.description_translations.keys).to_not include('de')
+          expect(dictionary.description_translations.keys).to include('en')
+        end
+
+        it 'returns nil for excluded translations' do
+          I18n.locale = :en
+          expect(dictionary.description).to eq('english-text')
+          I18n.locale = :de
+          expect(dictionary.description).to be_nil
+        end
+      end
+    end
   end
 
   [ :or, :any_of ].each do |method|
@@ -2954,7 +3041,7 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "when plucking mult-fields" do
+      context "when plucking multi-fields" do
 
         let(:plucked) do
           Band.where(:name.exists => true).pluck(:name, :likes)
@@ -3031,6 +3118,43 @@ describe Mongoid::Criteria do
 
         it "returns a nil arrays" do
           expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
+        end
+      end
+    end
+
+    context 'when plucking a localized field' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create(description: 'english-text')
+        I18n.locale = :de
+        d.description = 'deutsch-text'
+        d.save
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      context 'when plucking the entire field' do
+
+        let(:plucked) do
+          Dictionary.all.pluck(:description)
+        end
+
+        it 'returns all translations' do
+          expect(plucked.first).to eq({'en' => 'english-text', 'de' => 'deutsch-text'})
+        end
+      end
+
+      context 'when plucking a specific locale' do
+
+        let(:plucked) do
+          Dictionary.all.pluck(:'description.de')
+        end
+
+        it 'returns the specific translations' do
+          expect(plucked.first).to eq({'de' => 'deutsch-text'})
         end
       end
     end

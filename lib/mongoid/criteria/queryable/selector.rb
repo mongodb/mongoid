@@ -48,7 +48,7 @@ module Mongoid
           if multi_selection?(name)
             super(name, evolve_multi(value))
           else
-            super(normalized_key(name, serializer), evolve(serializer, value))
+            super(localized_key(name, serializer), evolve(serializer, value))
           end
         end
         alias :[]= :store
@@ -87,7 +87,7 @@ module Mongoid
             Hash[val.map do |key, _value|
               _value = evolve_multi(_value) if multi_selection?(key)
               name, serializer = storage_pair(key)
-              [ normalized_key(name, serializer), evolve(serializer, _value) ]
+              [ localized_key(name, serializer), evolve(serializer, _value) ]
             end]
           end.uniq
         end
