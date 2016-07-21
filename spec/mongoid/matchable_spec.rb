@@ -112,6 +112,126 @@ describe Mongoid::Matchable do
         end
       end
 
+      context "when using $elemMatch" do
+
+        context "one predicate" do
+
+          let(:selector) do
+            {
+              "occupants" => {"$elemMatch" => {"name" => "Tim"}}
+            }
+          end
+
+          context "and there is a matching sub document" do
+
+            it "returns true" do
+              expect(document.locations.first.matches?(selector)).to be true
+            end
+
+            context "using $in" do
+              let(:selector) do
+                {
+                  "occupants" => {"$elemMatch" => {"name" => {"$in" => ["Tim", "Alice"]}}}
+                }
+              end
+
+              it "returns true" do
+                expect(document.locations.first.matches?(selector)).to be true
+              end
+            end
+          end
+
+          context "and there is not a matching sub document" do
+
+            let(:selector) do
+              {
+                "occupants" => {"$elemMatch" => {"name" => "Lyle"}}
+              }
+            end
+
+            it "returns false" do
+              expect(document.locations.first.matches?(selector)).to be false
+            end
+
+            context "using $in" do
+              let(:selector) do
+                {
+                  "occupants" => {"$elemMatch" => {"name" => {"$in" => ["Lyfe", "Alice"]}}}
+                }
+              end
+
+              it "returns false" do
+                expect(document.locations.first.matches?(selector)).to be false
+              end
+            end
+          end
+        end
+
+        context "multiple predicates" do
+
+          before do
+            document.locations = [
+              Location.new(
+                name: 'No.1',
+                info: { 'door' => 'Red'},
+                occupants: [{'name' => 'Tim', 'eye_color' => 'brown'}, {'name' => 'Alice', 'eye_color' => 'blue'}]
+              )
+            ]
+          end
+
+          let(:selector) do
+            {
+              "occupants" => {"$elemMatch" => {"name" => "Tim", "eye_color" => "brown"}}
+            }
+          end
+
+          context "and there is a matching sub document" do
+
+            it "returns true" do
+              expect(document.locations.first.matches?(selector)).to be true
+            end
+
+            context "using $in and $ne in the $elemMatch to include the element" do
+
+              let(:selector) do
+                {
+                  "occupants" => {"$elemMatch" => {"name" => {"$in" => ["Tim"]}, "eye_color" => {"$ne" => "blue"}}}
+                }
+              end
+
+              it "returns true" do
+                expect(document.locations.first.matches?(selector)).to be true
+              end
+            end
+          end
+
+          context "and there is not a matching sub document" do
+
+            let(:selector) do
+              {
+                "occupants" => {"$elemMatch" => {"name" => "Tim", "eye_color" => "blue"}}
+              }
+            end
+
+            it "returns false" do
+              expect(document.locations.first.matches?(selector)).to be false
+            end
+
+            context "using $ne in the $elemMatch to exclude the element" do
+
+              let(:selector) do
+                {
+                  "occupants" => {"$elemMatch" => {"name" => {"$in" => ["Tim"]}, "eye_color" => {"$ne" => "brown"}}}
+                }
+              end
+
+              it "returns false" do
+                expect(document.locations.first.matches?(selector)).to be false
+              end
+            end
+          end
+        end
+      end
     end
 
     context "when performing simple matching" do

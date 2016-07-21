@@ -12,6 +12,7 @@ require "mongoid/matchable/ne"
 require "mongoid/matchable/nin"
 require "mongoid/matchable/or"
 require "mongoid/matchable/size"
+require "mongoid/matchable/elem_match"
 
 module Mongoid
 
@@ -27,6 +28,7 @@ module Mongoid
     # @since 1.0.0
     MATCHERS = {
       "$all" => All,
+      "$elemMatch" => ElemMatch,
       "$and" => And,
       "$exists" => Exists,
       "$gt" => Gt,
@@ -149,7 +151,11 @@ module Mongoid
             end
           end
         else
-          document.attributes[key_string]
+          if document.is_a?(Hash)
+            document[key_string]
+          else
+            document.attributes[key_string]
+          end
         end
       end
     end
