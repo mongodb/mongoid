@@ -2809,7 +2809,7 @@ describe Mongoid::Criteria do
         I18n.locale = :en
         d = Dictionary.create(description: 'english-text')
         I18n.locale = :de
-        d.reload.description = 'deutsch-text'
+        d.description = 'deutsch-text'
         d.save
       end
 
@@ -3128,7 +3128,7 @@ describe Mongoid::Criteria do
         I18n.locale = :en
         d = Dictionary.create(description: 'english-text')
         I18n.locale = :de
-        d.reload.description = 'deutsch-text'
+        d.description = 'deutsch-text'
         d.save
       end
 
