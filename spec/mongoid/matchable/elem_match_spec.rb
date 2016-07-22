@@ -38,6 +38,13 @@ describe Mongoid::Matchable::ElemMatch do
         it "returns true" do
           expect(matcher.matches?("$elemMatch" => {"a" => 1, "b" => 2})).to be true
         end
+
+        context "when the $elemMatch document keys are out of order" do
+
+          it "returns true" do
+            expect(matcher.matches?("$elemMatch" => {"b" => 2, "a" => 1})).to be true
+          end
+        end
       end
 
       context "when using other operators that match" do

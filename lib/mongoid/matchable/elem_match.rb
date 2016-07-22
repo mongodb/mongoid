@@ -17,20 +17,11 @@ module Mongoid
           return false
         end
 
-        @attribute.each do |sub_document|
-          entire_expression_matches = true
-          value["$elemMatch"].each do |k, v|
-            if !Matchable.matcher(sub_document, k, v).matches?(v)
-              entire_expression_matches = false
-              break
-            end
-          end
-          if entire_expression_matches
-            return true
+        return @attribute.any? do |sub_document|
+          value["$elemMatch"].all? do |k, v|
+            Matchable.matcher(sub_document, k, v).matches?(v)
           end
         end
-
-        return false
       end
     end
   end
