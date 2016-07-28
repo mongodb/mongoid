@@ -1,0 +1,73 @@
+====================
+Rails Considerations
+====================
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Mongoid was built and targeted towards Rails applications, even though it will
+work in any environment. However if you are using Rails consult the next sections
+on how Mongoid hooks into a Rails application.
+
+Railties
+--------
+
+Mongoid provides some railties and initializers that one should be aware of when writing
+a Rails application with Mongoid.
+
+Configuration
+*************
+
+You can set Mongoid configuration options in your application.rb along with other Rails
+environment specific options by accessing config.mongoid. Options set here will override
+those set in your ``config/mongoid.yml``.
+
+.. code-block:: ruby
+
+  module MyApplication
+    class Application < Rails::Application
+      config.mongoid.logger = Logger.new($stdout, :warn)
+    end
+  end
+
+Model Preloading
+****************
+
+In order to properly set up single collection inheritance, Mongoid needs to preload all
+models before every request in development mode. This can get slow, so if you are not
+using any inheritance it is recommended you turn this feature off.
+
+.. code-block:: ruby
+
+  config.mongoid.preload_models = false
+
+Exceptions
+**********
+
+Similar to Active Record, Mongoid tells raise to return specific http codes when some errors are raised.
+
+.. code-block:: ruby
+
+  Mongoid::Errors::DocumentNotFound : 404
+  Mongoid::Errors::Validations : 422
+
+Rake Tasks
+----------
+
+Mongoid provides the following rake tasks when used in a Rails 3 environment:
+
+- ``db:create``: Exists only for dependency purposes, does not actually do anything.
+- ``db:create_indexes``: Reads all index definitions from the models and attempts to create them in the database.
+- ``db:remove_indexes``: Reads all secondary index definitions from the models.
+- ``db:drop``: Drops all collections in the database with the exception of the system collections.
+- ``db:migrate``: Exists only for dependency purposes, does not actually do anything.
+- ``db:purge``: Deletes all data, including indexes, from the database. Since 3.1.0
+- ``db:schema:load``: Exists only for framework dependency purposes, does not actually do anything.
+- ``db:seed``: Seeds the database from db/seeds.rb
+- ``db:setup``: Creates indexes and seeds the database.
+- ``db:test:prepare``: Exists only for framework dependency purposes, does not actually do anything.

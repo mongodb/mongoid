@@ -1,0 +1,628 @@
+=======
+Queries
+=======
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+One of MongoDB's greatest features is its ability to execute dynamic
+queries, which Origin abstracts in a familiar Arel-style DSL that
+Mongoid includes.
+
+Queries
+-------
+
+All queries in Mongoid are ``Mongoid::Criteria``, which is a chainable and
+lazily evaluated wrapper to a MongoDB dynamic query. Criteria only
+touch the database when they need to, for example on iteration of the
+results, and when executed wrap a cursor in order to keep memory
+management and performance predictable.
+
+Queryable DSL
+*************
+
+Mongoid's main query DSL is provided by Origin. Any method that is available
+on an ``Origin::Queryable`` exists on a ``Mongoid::Criteria``
+*as well as* off the model's class.
+
+.. code-block:: ruby
+
+  Band.where(name: "Depeche Mode")
+  Band.
+    where(:founded.gte => "1980-1-1").
+    in(name: [ "Tool", "Deftones" ]).
+    union.
+    in(name: [ "Melvins" ])
+
+With each chained method on a criteria, a newly cloned criteria
+is returned with the new query added. This is so that with scoping
+or exposures, for example, the original queries are unmodified
+and remain reusable.
+
+Additional Query Methods
+************************
+
+In addition to behavior that Origin provides, Mongoid also has some helpful
+methods on criteria.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Operation
+     - Example
+
+   * - ``Criteria#count``
+
+       *Get a count of persisted documents. Note this will always hit
+       the database for the count.*
+
+     -
+        .. code-block:: ruby
+
+          Band.count
+          Band.where(name: "Photek").count
+
+   * - ``Criteria#distinct``
+
+       *Get a list of distinct values for a single field. Note this will always hit
+       the database for the distinct values.*
+
+     -
+        .. code-block:: ruby
+
+          Band.distinct(:name)
+          Band.where(:fans.gt => 100000).
+            distinct(:name)
+
+   * - ``Criteria#each``
+
+       *Iterate over all matching documents in the criteria.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(members: 1).each do |band|
+            p band.name
+          end
+
+   * - ``Criteria#exists?``
+
+       *Determine if any matching documents exist. Will return true if there
+       are 1 or more.*
+
+     -
+        .. code-block:: ruby
+
+          Band.exists?
+          Band.where(name: "Photek").exists?
+
+   * - ``Criteria#find``
+
+       *Find a document or multiple documents by their ids. Will raise
+       an error by default if any of the ids do not match.*
+
+     -
+        .. code-block:: ruby
+
+          Band.find("4baa56f1230048567300485c")
+          Band.find(
+            "4baa56f1230048567300485c",
+            "4baa56f1230048567300485d"
+          )
+          Band.where(name: "Photek").find(
+            "4baa56f1230048567300485c"
+          )
+
+   * - ``Criteria#find_by``
+
+       *Find a document by the provided attributes, and if not found
+       raise an error or return nil depending on the
+       * ``raise_not_found_error`` *configuration option.*
+
+     -
+        .. code-block:: ruby
+
+          Band.find_by(name: "Photek")
+
+          Band.find_by(name: "Tool") do |band|
+            band.impressions += 1
+          end
+
+   * - ``Criteria#find_or_create_by``
+
+       *Find a document by the provided attributes, and if not found
+       create and return a newly persisted one.*
+
+     -
+        .. code-block:: ruby
+
+          Band.find_or_create_by(name: "Photek")
+          Band.where(:likes.gt => 10).find_or_create_by(name: "Photek")
+
+   * - ``Criteria#find_or_initialize_by``
+
+       *Find a document by the provided attributes, and if not found
+       return a new one.*
+
+     -
+        .. code-block:: ruby
+
+          Band.find_or_initialize_by(name: "Photek")
+          Band.where(:likes.gt => 10).find_or_initialize_by(name: "Photek")
+
+   * - ``Criteria#first|last``
+
+       *Finds a single document given the provided criteria. This guarantees no order.*
+
+     -
+        .. code-block:: ruby
+
+          Band.first
+          Band.where(:members.with_size => 3).first
+          Band.where(:members.with_size => 3).last
+
+   * - ``Criteria#first_or_create``
+
+       *Find the first document by the provided attributes, and if not found
+       create and return a newly persisted one.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").first_or_create
+
+   * - ``Criteria#first_or_create!``
+
+       *Find the first document by the provided attributes, and if not found
+       create and return a newly persisted one using* ``create!``.
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").first_or_create!
+
+   * - ``Criteria#first_or_initialize``
+
+       *Find the first document by the provided attributes, and if not found
+       return a new one.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").first_or_initialize
+
+   * - ``Criteria#for_js``
+
+       *Find documents for a provided javascript expression. This will
+       wrap the javascript in a `BSON::Code` object which is the
+       safe way to avoid javascript injection attacks.**
+
+     -
+        .. code-block:: ruby
+
+          Band.for_js("this.name = param", param: "Tool")
+
+   * - ``Criteria#length|size``
+
+       *Same as count but caches subsequent calls to the database*
+
+     -
+        .. code-block:: ruby
+
+          Band.length
+          Band.where(name: "FKA Twigs").size
+
+   * - ``Criteria#pluck``
+
+       *Get all the values for the provided field.
+       Returns nil for unset fields and for non-existent fields.*
+
+     -
+        .. code-block:: ruby
+
+          Band.all.pluck(:name)
+
+
+Eager Loading
+*************
+
+Mongoid provides a facility to eager load documents
+from relations to prevent the n+1 issue when
+iterating over documents with relation access. Eager loaded is supported on
+all relations with the exception of polymorphic ``belongs_to``
+associations.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    belongs_to :band
+  end
+
+  Band.includes(:albums).each do |band|
+    p band.albums.first.name # Does not hit the database again.
+  end
+
+
+Queries + Persistence
+---------------------
+
+Mongoid supports persistence operations off of criteria
+in a light capacity for when you want to expressively perform multi
+document inserts, updates, and deletion.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Operation
+     - Example
+
+   * - ``Criteria#create``
+
+       *Create a newly persisted document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").create
+
+   * - ``Criteria#create!``
+
+       *Create a newly persisted document and raise an exception on validation failure.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").create!
+
+   * - ``Criteria#build|new``
+
+       *Create a new (unsaved) document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").build
+          Band.where(name: "Photek").new
+
+   * - ``Criteria#update``
+
+       *Update attributes of the first matching document.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").update(label: "Mute")
+
+   * - ``Criteria#update_all``
+
+       *Update attributes of all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(members: 2).update_all(label: "Mute")
+
+   * - ``Criteria#add_to_set``
+
+       *Perform an $addToSet on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").add_to_set(label: "Mute")
+
+   * - ``Criteria#bit``
+
+       *Perform a $bit on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
+
+   * - ``Criteria#inc``
+
+       *Perform an $inc on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").inc(likes: 123)
+
+   * - ``Criteria#pop``
+
+       *Perform a $pop on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Photek").pop(members: -1)
+          Band.where(name: "Photek").pop(members: 1)
+
+   * - ``Criteria#pull``
+
+       *Perform a $pull on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").pull(members: "Maynard")
+
+   * - ``Criteria#pull_all``
+
+       *Perform a $pullAll on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            pull_all(:members, [ "Maynard", "Danny" ])
+
+   * - ``Criteria#push``
+
+       *Perform a $push on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").push(members: "Maynard")
+
+   * - ``Criteria#push_all``
+
+       *Perform a $pushAll on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").
+            push_all(members: [ "Maynard", "Danny" ])
+
+   * - ``Criteria#rename``
+
+       *Perform a $rename on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").rename(name: :title)
+
+   * - ``Criteria#set``
+
+       *Perform a $set on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").set(likes: 10000)
+
+   * - ``Criteria#unset``
+
+       *Perform a $unset on all matching documents.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(name: "Tool").unset(:likes)
+
+   * - ``Criteria#delete``
+
+       *Deletes all matching documents in the database.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").delete
+
+   * - ``Criteria#destroy``
+
+       *Deletes all matching documents in the database while running callbacks for all.
+       This loads all documents into memory and can be an expensive operation.*
+
+     -
+        .. code-block:: ruby
+
+          Band.where(label: "Mute").destroy
+
+Scoping
+-------
+
+Scopes provide a convenient way to reuse common criteria with more
+business domain style syntax.
+
+Named Scopes
+************
+
+Named scopes are simply criteria defined at class load that are referenced
+by a provided name. Just like normal criteria, they are lazy and chainable.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :country, type: String
+    field :genres, type: Array
+
+    scope :english, ->{ where(country: "England") }
+    scope :rock, ->{ where(:genres.in => [ "rock" ]) }
+  end
+
+  Band.english.rock # Get the English rock bands.
+
+
+Named scopes can take procs and blocks for accepting parameters or
+extending functionality.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :country, type: String
+    field :active, type: Boolean, default: true
+
+    scope :named, ->(name){ where(name: name) }
+    scope :active, ->{
+      where(active: true) do
+        def deutsch
+          tap |scope| do
+            scope.selector.store("origin" => "Deutschland")
+          end
+        end
+      end
+    }
+  end
+
+  Band.named("Depeche Mode") # Find Depeche Mode.
+  Band.active.deutsch # Find active German bands.
+
+Default Scopes
+**************
+
+Default scopes can be useful when you find yourself applying the same
+criteria to most queries, and want something to be there by default.
+Default scopes take procs that return criteria objects.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :active, type: Boolean, default: true
+
+    default_scope ->{ where(active: true) }
+  end
+
+  Band.each do |band|
+    # All bands here are active.
+  end
+
+You can tell Mongoid not to apply the default scope by using
+``unscoped``, which can be inline or take a block.
+
+.. code-block:: ruby
+
+  Band.unscoped.where(name: "Depeche Mode")
+  Band.unscoped do
+    Band.where(name: "Depeche Mode")
+  end
+
+You can also tell Mongoid to explicitly apply the default scope
+again later to always ensure it's there.
+
+.. code-block:: ruby
+
+  Band.unscoped.where(name: "Depeche Mode").scoped
+
+If you are using a default scope on a model that is part of a relation,
+you must reload the relation to have scoping reapplied.
+This is important to note if you change a value of a document in the relation
+that would affect its visibility within the scoped relation.
+
+.. code-block:: ruby
+
+  class Label
+    include Mongoid::Document
+    embeds_many :bands
+  end
+
+  class Band
+    include Mongoid::Document
+    field :active, default: true
+    embedded_in :label
+    default_scoped ->{ where(active: true) }
+  end
+
+  label.bands.push(band)
+  label.bands # [ band ]
+  band.update_attribute(:active, false)
+  label.bands # [ band ] Must reload.
+  label.reload.bands # []
+
+
+Class Methods
+*************
+
+Class methods on models that return criteria objects are also
+treated like scopes, and can be chained as well.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :active, type: Boolean, default: true
+
+    def self.active
+      where(active: true)
+    end
+  end
+
+  Band.active
+
+Map/Reduce
+----------
+
+Mongoid provides a DSL around MongoDB's map/reduce framework, for performing
+custom map/reduce jobs or simple aggregations.
+
+Execution
+*********
+
+You can tell Mongoid off the class or a criteria to perform a map/reduce
+by calling ``map_reduce`` and providing map and reduce javascript
+functions.
+
+.. code-block:: ruby
+
+  map = %Q{
+    function() {
+      emit(this.name, { likes: this.likes });
+    }
+  }
+
+  reduce = %Q{
+    function(key, values) {
+      var result = { likes: 0 };
+      values.forEach(function(value) {
+        result.likes += value.likes;
+      });
+      return result;
+    }
+  }
+
+  Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: true)
+
+Just like criteria, map/reduce calls are lazily evaluated. So nothing will
+hit the database until you iterate over the results, or make a call on the
+wrapper that would need to force a database hit.
+
+.. code-block:: ruby
+
+  Band.map_reduce(map, reduce).out(replace: "mr-results").each do |document|
+    p document # { "_id" => "Tool", "value" => { "likes" => 200 }}
+  end
+
+The only required thing you provide along with a map/reduce is where to
+output the results. If you do not provide this an error will be raised.
+Valid options to ``#out`` are:
+
+- ``inline: 1``: Don't store the output in a collection.
+- ``replace: "name"``: Store in a collection with the
+  provided name, and overwrite any documents that exist in it.
+- ``merge: "name"``: Store in a collection with the
+  provided name, and merge the results with the existing documents.
+- ``reduce: "name"``: Store in a collection with the
+  provided name, and reduce all existing results in that collection.
