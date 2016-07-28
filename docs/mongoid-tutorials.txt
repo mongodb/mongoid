@@ -1,0 +1,52 @@
+.. http://docs.mongodb.org/ecosystem/tutorial/ruby-mongoid-tutorial/
+
+.. _ruby-mongoid-tutorial:
+
+=============================
+Mongoid Documentation (5.1.0)
+=============================
+
+.. default-domain:: mongodb
+
+Mongoid is the officially supported ODM (Object-Document-Mapper)
+framework for MongoDB in Ruby. The Mongoid documentation has the
+following tutorials:
+
+.. toctree::
+   :titlesonly:
+
+   /tutorials/mongoid-installation
+   /tutorials/mongoid-documents
+   /tutorials/mongoid-persistence
+   /tutorials/mongoid-queries
+   /tutorials/mongoid-relations
+   /tutorials/mongoid-nested-attributes
+   /tutorials/mongoid-callbacks
+   /tutorials/mongoid-validation
+   /tutorials/mongoid-indexes
+   /tutorials/mongoid-rails
+   /tutorials/mongoid-upgrade
+
+Mongoid 3 and 4
+----------------
+
+For documentation for Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
+
+Additional Mappers
+------------------
+
+In addition to Mongoid, several other mappers are available:
+
+- `MongoMapper <http://mongomapper.com/>`_ from John Nunemaker
+
+- `Mongomatic <http://mongomatic.com/>`_ from Ben Myles
+
+- `MongoODM <https://github.com/carlosparamio/mongo_odm>`_ from Carlos Paramio
+
+- `MongoModel <http://www.mongomodel.org/>`_ from Sam Pohlenz
+
+- `DriverAPILayer <http://alexeypetrushin.github.com/mongodb/driver.html>`_ from Alexey Petrushin
+
+All the mappers build on top of the basic Ruby driver and so some
+knowledge of that is useful, especially if you work with a custom
+MongoDB configuration.
