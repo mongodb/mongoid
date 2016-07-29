@@ -3,7 +3,7 @@
 .. _ruby-mongoid-tutorial:
 
 =============================
-Mongoid Documentation (5.1.0)
+Mongoid Documentation (6.0.0)
 =============================
 
 .. default-domain:: mongodb
