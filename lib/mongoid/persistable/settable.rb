@@ -23,9 +23,11 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|
             process_attribute(field.to_s, value)
-            ops[atomic_attribute_name(field)] = attributes[field]
+            unless relations.include?(field.to_s)
+              ops[atomic_attribute_name(field)] = attributes[field]
+            end
           end
-          { "$set" => ops }
+          { "$set" => ops } unless ops.empty?
         end
       end
     end
