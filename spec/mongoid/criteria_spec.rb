@@ -2976,7 +2976,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the values" do
-          expect(plucked).to eq([ "Depeche Mode", "Tool", "Photek" ])
+          expect(plucked).to contain_exactly("Depeche Mode", "Tool", "Photek")
         end
 
         context "when subsequently executing the criteria without a pluck" do
@@ -3048,7 +3048,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the values" do
-          expect(plucked).to eq([ ["Depeche Mode", 3], ["Tool", 3], ["Photek", 1] ])
+          expect(plucked).to contain_exactly(["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
         end
       end
 
@@ -3059,7 +3059,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the duplicates" do
-          expect(plucked).to eq([ 3, 3, 1 ])
+          expect(plucked).to contain_exactly(3, 3, 1)
         end
       end
     end

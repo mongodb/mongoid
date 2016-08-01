@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Indexable do
 
+  after do
+    Person.collection.drop
+  end
+
   describe ".included" do
 
     let(:klass) do
@@ -154,6 +158,10 @@ describe Mongoid::Indexable do
         include Mongoid::Document
         field :a, as: :authentication_token
       end
+    end
+
+    after do
+      klass.collection.drop
     end
 
     context "when indexing a field that is aliased" do

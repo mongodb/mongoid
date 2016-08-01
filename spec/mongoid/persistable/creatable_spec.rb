@@ -523,7 +523,12 @@ describe Mongoid::Persistable::Creatable do
       context "when a unique index exists" do
 
         before do
+          Person.index({ ssn: 1 }, { unique: true })
           Person.create_indexes
+        end
+
+        after do
+          Person.collection.drop
         end
 
         it "raises an error" do

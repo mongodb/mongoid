@@ -21,6 +21,10 @@ describe Mongoid::Clients::Factory do
             Mongoid::Config.send(:clients=, config)
           end
 
+          after do
+            client.close
+          end
+
           let(:client) do
             described_class.create(:secondary)
           end
@@ -49,6 +53,10 @@ describe Mongoid::Clients::Factory do
 
           before do
             Mongoid::Config.send(:clients=, config)
+          end
+
+          after do
+            client.close
           end
 
           let(:client) do
@@ -91,6 +99,10 @@ describe Mongoid::Clients::Factory do
               Mongoid::Config.send(:clients=, config)
             end
 
+            after do
+              client.close
+            end
+
             let(:client) do
               described_class.create(:secondary)
             end
@@ -123,6 +135,10 @@ describe Mongoid::Clients::Factory do
 
             before do
               Mongoid::Config.send(:clients=, config)
+            end
+
+            after do
+              client.close
             end
 
             let(:client) do
@@ -166,6 +182,10 @@ describe Mongoid::Clients::Factory do
 
       before do
         Mongoid::Config.send(:clients=, config)
+      end
+
+      after do
+        client.close
       end
 
       let(:client) do
@@ -213,6 +233,10 @@ describe Mongoid::Clients::Factory do
       Mongoid::Config.send(:clients=, config)
     end
 
+    after do
+      client.close
+    end
+
     let(:client) do
       described_class.default
     end
@@ -251,6 +275,10 @@ describe Mongoid::Clients::Factory do
 
     before do
       Mongoid::Config.send(:clients=, config)
+    end
+
+    after do
+      client.close
     end
 
     let(:client) do
