@@ -1896,6 +1896,21 @@ describe Mongoid::Relations::Metadata do
       end
     end
 
+    context "when touch specifies additional field" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :versions,
+          relation: Mongoid::Relations::Referenced::In,
+          touch: :changed_at
+        )
+      end
+
+      it "returns true" do
+        expect(metadata).to be_touchable
+      end
+    end
+
     context "when touch is nil" do
 
       let(:metadata) do
