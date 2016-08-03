@@ -11,8 +11,7 @@ Queries
    :class: singlecol
 
 One of MongoDB's greatest features is its ability to execute dynamic
-queries, which Origin abstracts in a familiar Arel-style DSL that
-Mongoid includes.
+queries, provided through a familiar Arel-style DSL.
 
 Queries
 -------
@@ -26,8 +25,7 @@ management and performance predictable.
 Queryable DSL
 *************
 
-Mongoid's main query DSL is provided by Origin. Any method that is available
-on an ``Origin::Queryable`` exists on a ``Mongoid::Criteria``
+Query methods are available off a ``Mongoid::Criteria`` object
 *as well as* off the model's class.
 
 .. code-block:: ruby
@@ -44,11 +42,23 @@ is returned with the new query added. This is so that with scoping
 or exposures, for example, the original queries are unmodified
 and remain reusable.
 
+Query Cache
+***********
+
+If Mongoid's QueryCache is enabled, it will cache queries and avoid sending requests
+to the database for identical queries.
+
+To enable the QueryCache:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.enabled = true
+
+
 Additional Query Methods
 ************************
 
-In addition to behavior that Origin provides, Mongoid also has some helpful
-methods on criteria.
+Mongoid also has some helpful methods on criteria.
 
 .. list-table::
    :header-rows: 1
