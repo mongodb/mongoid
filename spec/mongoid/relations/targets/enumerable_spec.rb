@@ -190,6 +190,21 @@ describe Mongoid::Relations::Targets::Enumerable do
         expect(added).to eq([ post ])
       end
     end
+
+    context 'when the relation is one-to-many' do
+
+      let(:post) do
+        Post.create
+      end
+
+      let(:added) do
+        person.posts << post
+      end
+
+      it 'sets the base object on the added document' do
+        expect(person).to be(added.first.person)
+      end
+    end
   end
 
   describe "#any?" do
@@ -599,6 +614,14 @@ describe Mongoid::Relations::Targets::Enumerable do
       Post.create(person_id: person.id)
     end
 
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
+    end
+
+    let(:unique_base_objects) do
+      enumerable.collect(&:person).uniq
+    end
+
     context "when only a criteria target exists" do
 
       let(:criteria) do
@@ -606,7 +629,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       let!(:enumerable) do
-        described_class.new(criteria)
+        described_class.new(criteria, person, metadata)
       end
 
       let!(:iterated) do
@@ -622,12 +645,40 @@ describe Mongoid::Relations::Targets::Enumerable do
       it "becomes loaded" do
         expect(enumerable).to be__loaded
       end
+
+      it 'sets the same base on each document' do
+        expect(unique_base_objects.size).to eq(1)
+      end
+
+      it 'sets the base object on each document' do
+        expect(unique_base_objects.first).to be(person)
+      end
+
+      context 'when there are multiple related documents' do
+
+        before do
+          Post.create(person_id: person.id)
+          Post.create(person_id: person.id)
+        end
+
+        let(:enumerable) do
+          described_class.new(criteria, person, metadata)
+        end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
+        end
+      end
     end
 
     context "when only an array target exists" do
 
       let!(:enumerable) do
-        described_class.new([ post ])
+        described_class.new([ post ], person, metadata)
       end
 
       let!(:iterated) do
@@ -643,6 +694,14 @@ describe Mongoid::Relations::Targets::Enumerable do
       it "stays loaded" do
         expect(enumerable).to be__loaded
       end
+
+      it 'sets the same base on each document' do
+        expect(unique_base_objects.size).to eq(1)
+      end
+
+      it 'sets the base object on each document' do
+        expect(unique_base_objects.first).to be(person)
+      end
     end
 
     context "when a criteria and added exist" do
@@ -652,7 +711,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       let!(:enumerable) do
-        described_class.new(criteria)
+        described_class.new(criteria, person, metadata)
       end
 
       let(:post_two) do
@@ -682,6 +741,14 @@ describe Mongoid::Relations::Targets::Enumerable do
         it "stays loaded" do
           expect(enumerable).to be__loaded
         end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
+        end
       end
 
       context "when the added contains unloaded docs" do
@@ -703,6 +770,14 @@ describe Mongoid::Relations::Targets::Enumerable do
         it "stays loaded" do
           expect(enumerable).to be__loaded
         end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
+        end
       end
     end
 
@@ -719,7 +794,6 @@ describe Mongoid::Relations::Targets::Enumerable do
       it "returns an enumerator" do
         expect(enumerable.each.class.include?(Enumerable)).to be true
       end
-
     end
   end
 
@@ -733,8 +807,16 @@ describe Mongoid::Relations::Targets::Enumerable do
       Post.where(person_id: person.id)
     end
 
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
+    end
+
     let!(:enumerable) do
-      described_class.new(criteria)
+      described_class.new(criteria, person, metadata)
+    end
+
+    let(:unique_base_objects) do
+      enumerable.collect(&:person).uniq
     end
 
     context "when the added contains a persisted document" do
@@ -754,6 +836,14 @@ describe Mongoid::Relations::Targets::Enumerable do
       it "yields to the in memory documents first" do
         expect(entries.first).to equal(post)
       end
+
+      it 'sets the same base on each document' do
+        expect(unique_base_objects.size).to eq(1)
+      end
+
+      it 'sets the base object on each document' do
+        expect(unique_base_objects.first).to be(person)
+      end
     end
   end
 
@@ -763,6 +853,14 @@ describe Mongoid::Relations::Targets::Enumerable do
       Person.create
     end
 
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
+    end
+
+    let(:unique_base_objects) do
+      enumerable.collect(&:person).uniq
+    end
+
     context "when the enumerable is not loaded" do
 
       let(:criteria) do
@@ -770,7 +868,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       let(:enumerable) do
-        described_class.new(criteria)
+        described_class.new(criteria, person, metadata)
       end
 
       context "when unloaded is not empty" do
@@ -796,6 +894,14 @@ describe Mongoid::Relations::Targets::Enumerable do
           it "receives query only once" do
             expect(criteria).to receive(:first).once
             first
+          end
+
+          it 'sets the same base on each document' do
+            expect(unique_base_objects.size).to eq(1)
+          end
+
+          it 'sets the base object on each document' do
+            expect(unique_base_objects.first).to be(person)
           end
         end
 
@@ -826,6 +932,14 @@ describe Mongoid::Relations::Targets::Enumerable do
             it "does not load the enumerable" do
               expect(enumerable).to_not be__loaded
             end
+
+            it 'sets the same base on each document' do
+              expect(unique_base_objects.size).to eq(1)
+            end
+
+            it 'sets the base object on each document' do
+              expect(unique_base_objects.first).to be(person)
+            end
           end
         end
       end
@@ -850,6 +964,14 @@ describe Mongoid::Relations::Targets::Enumerable do
 
         it "does not load the enumerable" do
           expect(enumerable).to_not be__loaded
+        end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
         end
       end
 
@@ -878,7 +1000,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         let(:enumerable) do
-          described_class.new([ post ])
+          described_class.new([ post ], person, metadata)
         end
 
         let(:first) do
@@ -887,6 +1009,14 @@ describe Mongoid::Relations::Targets::Enumerable do
 
         it "returns the first loaded doc" do
           expect(first).to eq(post)
+        end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
         end
       end
 
@@ -897,7 +1027,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         let(:enumerable) do
-          described_class.new([])
+          described_class.new([], person, metadata)
         end
 
         before do
@@ -911,12 +1041,20 @@ describe Mongoid::Relations::Targets::Enumerable do
         it "returns the first added doc" do
           expect(first).to eq(post)
         end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
+        end
       end
 
       context "when loaded and added are empty" do
 
         let(:enumerable) do
-          described_class.new([])
+          described_class.new([], person, metadata)
         end
 
         let(:first) do
@@ -942,6 +1080,10 @@ describe Mongoid::Relations::Targets::Enumerable do
 
     let!(:post_two) do
       Post.create(person_id: person.id)
+    end
+
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
     end
 
     context "when no criteria exists" do
@@ -972,7 +1114,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       context "when the enumerable contains an added document" do
 
         let!(:enumerable) do
-          described_class.new([])
+          described_class.new([], person, metadata)
         end
 
         let(:post_three) do
@@ -1087,6 +1229,14 @@ describe Mongoid::Relations::Targets::Enumerable do
       Person.new
     end
 
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
+    end
+
+    let(:unique_base_objects) do
+      enumerable.collect(&:person).uniq
+    end
+
     context "when the enumerable is loaded" do
 
       let(:post) do
@@ -1094,7 +1244,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       let(:enumerable) do
-        described_class.new([ post ])
+        described_class.new([ post ], person, metadata)
       end
 
       let(:post_two) do
@@ -1112,6 +1262,14 @@ describe Mongoid::Relations::Targets::Enumerable do
       it "returns the loaded and added docs" do
         expect(in_memory).to eq([ post, post_two ])
       end
+
+      it 'sets the same base on each document' do
+        expect(unique_base_objects.size).to eq(1)
+      end
+
+      it 'sets the base object on each document' do
+        expect(unique_base_objects.first).to be(person)
+      end
     end
 
     context "when the enumerable is not loaded" do
@@ -1121,7 +1279,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       let(:enumerable) do
-        described_class.new(Post.where(person_id: person.id))
+        described_class.new(Post.where(person_id: person.id), person, metadata)
       end
 
       let(:post_two) do
@@ -1139,12 +1297,20 @@ describe Mongoid::Relations::Targets::Enumerable do
       it "returns the added docs" do
         expect(in_memory).to eq([ post_two ])
       end
+
+      it 'sets the same base on each document' do
+        expect(unique_base_objects.size).to eq(1)
+      end
+
+      it 'sets the base object on each document' do
+        expect(unique_base_objects.first).to be(person)
+      end
     end
 
     context "when passed a block" do
 
       let(:enumerable) do
-        described_class.new(Post.where(person_id: person.id))
+        described_class.new(Post.where(person_id: person.id), person, metadata)
       end
 
       let(:post_two) do
@@ -1159,6 +1325,14 @@ describe Mongoid::Relations::Targets::Enumerable do
         enumerable.in_memory do |doc|
           expect(doc).to eq(post_two)
         end
+      end
+
+      it 'sets the same base on each document' do
+        expect(unique_base_objects.size).to eq(1)
+      end
+
+      it 'sets the base object on each document' do
+        expect(unique_base_objects.first).to be(person)
       end
     end
   end
@@ -1190,6 +1364,14 @@ describe Mongoid::Relations::Targets::Enumerable do
       Person.create
     end
 
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
+    end
+
+    let(:unique_base_objects) do
+      enumerable.collect(&:person).uniq
+    end
+
     context "when the enumerable is not loaded" do
 
       let(:criteria) do
@@ -1197,7 +1379,7 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
 
       let(:enumerable) do
-        described_class.new(criteria)
+        described_class.new(criteria, person, metadata)
       end
 
       context "when unloaded is not empty" do
@@ -1222,6 +1404,14 @@ describe Mongoid::Relations::Targets::Enumerable do
           expect(criteria).to receive(:last).once
           last
         end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
+        end
       end
 
       context "when unloaded is empty" do
@@ -1244,6 +1434,14 @@ describe Mongoid::Relations::Targets::Enumerable do
 
         it "does not load the enumerable" do
           expect(enumerable).to_not be__loaded
+        end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
         end
       end
 
@@ -1281,6 +1479,14 @@ describe Mongoid::Relations::Targets::Enumerable do
           it "returns the last document" do
             expect(post_one.reload.person.posts.asc(:_id).last).to eq(post_two)
           end
+
+          it 'sets the same base on each document' do
+            expect(unique_base_objects.size).to eq(1)
+          end
+
+          it 'sets the base object on each document' do
+            expect(unique_base_objects.first).to be(person)
+          end
         end
       end
     end
@@ -1294,7 +1500,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         let(:enumerable) do
-          described_class.new([ post ])
+          described_class.new([ post ], person, metadata)
         end
 
         let(:last) do
@@ -1303,6 +1509,14 @@ describe Mongoid::Relations::Targets::Enumerable do
 
         it "returns the last loaded doc" do
           expect(last).to eq(post)
+        end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
         end
       end
 
@@ -1313,7 +1527,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         end
 
         let(:enumerable) do
-          described_class.new([])
+          described_class.new([], person, metadata)
         end
 
         before do
@@ -1326,6 +1540,14 @@ describe Mongoid::Relations::Targets::Enumerable do
 
         it "returns the last added doc" do
           expect(last).to eq(post)
+        end
+
+        it 'sets the same base on each document' do
+          expect(unique_base_objects.size).to eq(1)
+        end
+
+        it 'sets the base object on each document' do
+          expect(unique_base_objects.first).to be(person)
         end
       end
 
@@ -1382,11 +1604,19 @@ describe Mongoid::Relations::Targets::Enumerable do
     end
 
     let!(:enumerable) do
-      described_class.new(criteria)
+      described_class.new(criteria, person, metadata)
     end
 
     let!(:loaded) do
       enumerable.load_all!
+    end
+
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
+    end
+
+    let(:unique_base_objects) do
+      enumerable.collect(&:person).uniq
     end
 
     it "loads all the unloaded documents" do
@@ -1399,6 +1629,14 @@ describe Mongoid::Relations::Targets::Enumerable do
 
     it "sets loaded to true" do
       expect(enumerable).to be__loaded
+    end
+
+    it 'sets the same base on each document' do
+      expect(unique_base_objects.size).to eq(1)
+    end
+
+    it 'sets the base object on each document' do
+      expect(unique_base_objects.first).to be(person)
     end
   end
 
@@ -1693,8 +1931,12 @@ describe Mongoid::Relations::Targets::Enumerable do
       Post.where(person_id: person.id)
     end
 
+    let(:metadata) do
+      Person.reflect_on_association(:posts)
+    end
+
     let!(:enumerable) do
-      described_class.new(criteria)
+      described_class.new(criteria, person, metadata)
     end
 
     before do
@@ -1712,6 +1954,10 @@ describe Mongoid::Relations::Targets::Enumerable do
 
     it "sets loaded to true" do
       expect(enumerable).to be__loaded
+    end
+
+    it 'sets the base object on the document' do
+      expect(uniq.first.person).to be(person)
     end
   end
 end
