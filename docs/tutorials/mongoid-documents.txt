@@ -411,7 +411,7 @@ For cases when you do not want to have ``BSON::ObjectId`` ids, you can override 
 Dynamic Fields
 --------------
 
-By default Mongoid doesn't supports dynamic fields. You can tell mongoid that you want
+By default Mongoid doesn't support dynamic fields. You can tell mongoid that you want
 to add dynamic fields by including ``Mongoid::Attributes::Dynamic`` in model.
 ``Mongoid::Attributes::Dynamic`` will allow attributes to get set and persisted on the
 document even if a field was not defined for them. There is a slight 'gotcha' however when
@@ -636,7 +636,7 @@ Readonly Attributes
 -------------------
 
 You can tell Mongoid that certain attributes are readonly. This will allow documents to be
-created with theses attributes, but changes to them will be filtered out.
+created with these attributes, but changes to them will be filtered out.
 
 .. code-block:: ruby
 
