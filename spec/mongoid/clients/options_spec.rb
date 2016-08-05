@@ -143,6 +143,10 @@ describe Mongoid::Clients::Options do
             Mongoid::Config.send(:clients=, config)
           end
 
+          after do
+            persistence_context.client.close
+          end
+
           let(:persistence_context) do
             Band.with(client: :secondary) do |klass|
               klass.persistence_context

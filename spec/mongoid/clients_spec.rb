@@ -318,6 +318,10 @@ describe Mongoid::Clients do
 
     shared_examples_for "an overridden database name" do
 
+      after do
+        class_mongo_client.close
+      end
+
       context "when accessing from the instance" do
 
         it "returns the overridden value" do
@@ -380,6 +384,7 @@ describe Mongoid::Clients do
 
       after do
         Band.reset_storage_options!
+        class_mongo_client.close
       end
 
       it_behaves_like "an overridden database name"
@@ -411,6 +416,7 @@ describe Mongoid::Clients do
 
       after do
         Band.reset_storage_options!
+        class_mongo_client.close
       end
 
       it_behaves_like "an overridden database name"
@@ -471,6 +477,7 @@ describe Mongoid::Clients do
 
         after do
           Band.reset_storage_options!
+          class_mongo_client.close
         end
 
         it_behaves_like "an overridden database name"
@@ -500,6 +507,10 @@ describe Mongoid::Clients do
         described_class.clear
         Mongoid.load!(file, :test)
         Mongoid.clients[:default][:database] = database_id
+      end
+
+      after do
+        mongo_client.close
       end
 
       let!(:band) do
@@ -728,8 +739,13 @@ describe Mongoid::Clients do
       describe ".create" do
 
         before do
+          Person.index({ ssn: 1 }, { unique: true })
           Person.create_indexes
           Person.create(ssn: "432-97-1111")
+        end
+
+        after do
+          Person.collection.drop
         end
 
         context "when no error occurs" do
@@ -755,6 +771,10 @@ describe Mongoid::Clients do
           Person.create!(ssn: "432-97-1112")
         end
 
+        after do
+          Person.collection.drop
+        end
+
         context "when no error occurs" do
 
           it "inserts the document" do
@@ -765,7 +785,12 @@ describe Mongoid::Clients do
         context "when a mongodb error occurs" do
 
           before do
+            Person.index({ ssn: 1 }, { unique: true })
             Person.create_indexes
+          end
+
+          after do
+            Person.collection.drop
           end
 
           it "bubbles up to the caller" do
@@ -798,7 +823,12 @@ describe Mongoid::Clients do
           end
 
           before do
+            Person.index({ ssn: 1 }, { unique: true })
             Person.create_indexes
+          end
+
+          after do
+            Person.collection.drop
           end
 
           it "bubbles up to the caller" do
@@ -822,7 +852,12 @@ describe Mongoid::Clients do
           end
 
           before do
+            Person.index({ ssn: 1 }, { unique: true })
             Person.create_indexes
+          end
+
+          after do
+            Person.collection.drop
           end
 
           it "bubbles up to the caller" do
@@ -866,6 +901,7 @@ describe Mongoid::Clients do
 
       after do
         Band.delete_all
+        Band.mongo_client.close
         Mongoid.override_database(nil)
       end
 

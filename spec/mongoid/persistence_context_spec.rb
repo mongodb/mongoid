@@ -514,6 +514,10 @@ describe Mongoid::PersistenceContext do
         { client: :alternative }
       end
 
+      after do
+        persistence_context.client.close
+      end
+
       it 'uses the client option' do
         expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
       end
@@ -525,6 +529,7 @@ describe Mongoid::PersistenceContext do
         end
 
         after do
+          persistence_context.client.close
           Mongoid::Threaded.client_override = nil
         end
 

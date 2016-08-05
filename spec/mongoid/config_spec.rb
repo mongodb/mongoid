@@ -163,6 +163,10 @@ describe Mongoid::Config do
         described_class.load!(file, :test)
       end
 
+      after do
+        client.close
+      end
+
       it "clears the previous clients" do
         expect(Mongoid::Clients.clients[:test]).to be_nil
       end

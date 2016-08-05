@@ -44,8 +44,6 @@ class Person
   index name: 1
   index title: 1
 
-  index({ ssn: 1 }, { unique: true })
-
   attr_reader :rescored
 
   embeds_many :favorites, order: :title.desc, inverse_of: :perp, validate: false

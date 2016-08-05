@@ -370,8 +370,13 @@ describe Mongoid::Persistable::Savable do
         end
 
         before do
+          Person.index({ ssn: 1 }, { unique: true })
           Person.create_indexes
           Person.create!(ssn: "555-55-9999")
+        end
+
+        after do
+          Person.collection.drop
         end
 
         it "raises an OperationFailure" do
