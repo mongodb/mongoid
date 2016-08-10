@@ -172,7 +172,7 @@ module Mongoid
     #
     # @since 1.0.0
     def as_document
-      return attributes if frozen?
+      return BSON::Document.new(attributes) if frozen?
       embedded_relations.each_pair do |name, meta|
         without_autobuild do
           relation, stored = send(name), meta.store_as
@@ -185,7 +185,7 @@ module Mongoid
           end
         end
       end
-      attributes
+      BSON::Document.new(attributes)
     end
 
     # Calls #as_json on the document with additional, Mongoid-specific options.

@@ -879,6 +879,36 @@ describe Mongoid::Relations::Embedded::Many do
       Person.create
     end
 
+    context 'when a string is used to access an attribute' do
+
+      let!(:address) do
+        person.addresses.create(street: "one")
+      end
+
+      let(:document) do
+        person.reload.addresses.as_document.first
+      end
+
+      it "returns the attribute value" do
+        expect(document['street']).to eq('one')
+      end
+    end
+
+    context 'when a symbol is used to access an attribute' do
+
+      let!(:address) do
+        person.addresses.create(street: "one")
+      end
+
+      let(:document) do
+        person.reload.addresses.as_document.first
+      end
+
+      it "returns the attribute value" do
+        expect(document[:street]).to eq('one')
+      end
+    end
+
     context "when the relation has no default scope" do
 
       let!(:address) do

@@ -450,12 +450,24 @@ describe Mongoid::Document do
       expect(person.as_document).to have_key("name")
     end
 
+    it "includes embeds one attributes as a symbol" do
+      expect(person.as_document).to have_key(:name)
+    end
+
     it "includes embeds many attributes" do
       expect(person.as_document).to have_key("addresses")
     end
 
+    it "includes embeds many attributes as a symbol" do
+      expect(person.as_document).to have_key(:addresses)
+    end
+
     it "includes second level embeds many attributes" do
       expect(person.as_document["addresses"].first).to have_key("locations")
+    end
+
+    it "includes second level embeds many attributes as a symbol" do
+      expect(person.as_document["addresses"].first).to have_key(:locations)
     end
 
     context "with relation define store_as option in embeded_many" do
@@ -466,6 +478,10 @@ describe Mongoid::Document do
 
       it 'includes the store_as key association' do
         expect(person.as_document).to have_key("mobile_phones")
+      end
+
+      it 'includes the store_as key association as a symbol' do
+        expect(person.as_document).to have_key(:mobile_phones)
       end
 
       it 'should not include the key of association' do
