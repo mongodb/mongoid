@@ -1400,6 +1400,65 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
+    context "when the output specifies a different db" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      after do
+        Band.with(database: 'another-db') do |b|
+          b.all.delete
+        end
+      end
+
+      context 'when db is a string' do
+
+        let(:results) do
+          context.map_reduce(map, reduce).out(merge: :mr_output, db: 'another-db')
+        end
+
+        it "returns the correct number of documents" do
+          expect(results.count).to eq(1)
+        end
+
+        it "contains the entire results" do
+          expect(results).to eq([
+                                    { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+                                ])
+        end
+
+        it 'writes to the specified db' do
+          expect(Band.mongo_client.with(database: 'another-db')[:mr_output].find.count).to eq(1)
+        end
+      end
+
+      context 'when db is a symbol' do
+
+        let(:results) do
+          context.map_reduce(map, reduce).out(merge: :mr_output, 'db' => 'another-db')
+        end
+
+        it "returns the correct number of documents" do
+          expect(results.count).to eq(1)
+        end
+
+        it "contains the entire results" do
+          expect(results).to eq([
+                                    { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+                                ])
+        end
+
+        it 'writes to the specified db' do
+          expect(Band.mongo_client.with(database: 'another-db')[:mr_output].find.count).to eq(1)
+        end
+      end
+    end
+
     context "when providing no output" do
 
       let(:criteria) do
