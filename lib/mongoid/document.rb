@@ -49,7 +49,7 @@ module Mongoid
     #
     # @since 2.0.0
     def freeze
-      as_document.freeze and self
+      as_attributes.freeze and self
     end
 
     # Checks if the document is frozen
@@ -172,20 +172,7 @@ module Mongoid
     #
     # @since 1.0.0
     def as_document
-      return BSON::Document.new(attributes) if frozen?
-      embedded_relations.each_pair do |name, meta|
-        without_autobuild do
-          relation, stored = send(name), meta.store_as
-          if attributes.key?(stored) || !relation.blank?
-            if relation
-              attributes[stored] = relation.as_document
-            else
-              attributes.delete(stored)
-            end
-          end
-        end
-      end
-      BSON::Document.new(attributes)
+      BSON::Document.new(as_attributes)
     end
 
     # Calls #as_json on the document with additional, Mongoid-specific options.
@@ -283,6 +270,25 @@ module Mongoid
     # @since 2.1.0
     def to_ary
       nil
+    end
+
+    private
+
+    def as_attributes
+      return attributes if frozen?
+      embedded_relations.each_pair do |name, meta|
+        without_autobuild do
+          relation, stored = send(name), meta.store_as
+          if attributes.key?(stored) || !relation.blank?
+            if relation
+              attributes[stored] = relation.as_document
+            else
+              attributes.delete(stored)
+            end
+          end
+        end
+      end
+      attributes
     end
 
     module ClassMethods
