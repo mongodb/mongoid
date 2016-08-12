@@ -13,6 +13,10 @@ rvm:
   - jruby-19mode
   - jruby-9.1.2.0
 
+matrix:
+  allow_failures:
+    - rvm: jruby-9.1.2.0
+
 gemfile:
   - Gemfile
   - gemfiles/rails41.gemfile
@@ -21,7 +25,7 @@ gemfile:
 env:
   global:
     - CI="travis"
-    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
   matrix:
     - MONGODB=2.4.14
     - MONGODB=2.6.11
