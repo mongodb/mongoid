@@ -38,7 +38,7 @@ describe Mongoid::QueryCache do
         end
 
         it 'queries for each access to the base' do
-          expect(server).to receive(:context).exactly(relations.size).times.and_call_original
+          expect(server).to receive(:with_connection).exactly(relations.size).times.and_call_original
           relations.each do |object|
             object.person
           end
@@ -52,7 +52,7 @@ describe Mongoid::QueryCache do
         end
 
         it 'queries only once for the base' do
-          expect(server).to receive(:context).exactly(1).times.and_call_original
+          expect(server).to receive(:with_connection).exactly(1).times.and_call_original
           relations.each do |object|
             object.person
           end
