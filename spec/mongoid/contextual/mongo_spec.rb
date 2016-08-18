@@ -115,21 +115,6 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when provided a document" do
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      let(:count) do
-        context.count(depeche)
-      end
-
-      it "returns the number of documents that match" do
-        expect(count).to eq(1)
-      end
-    end
-
     context "when provided a block" do
 
       let(:context) do
