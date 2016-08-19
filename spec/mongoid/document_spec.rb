@@ -1222,4 +1222,32 @@ describe Mongoid::Document do
       end
     end
   end
+
+  context "when encountering invalid _type" do
+    describe "when type mismatch happens" do
+      it "currently is not handled gracefully" do
+        person = Person.new({username: "testperson"})
+        person.save!
+
+        # change _type
+        Mongoid::default_client[:people].update_one(
+          {username: "testperson"},
+          {'$set' => {'_type': 'lol'}}
+        )
+
+        # it fails here
+        expect {
+          Person.find(person._id)
+        }.to raise_error(NameError, "uninitialized constant Lol")
+
+        # the way to circumvent
+        person_from_factory = Mongoid::Factory.build(
+          Person,
+          Mongoid::default_client[:people].find({username: "testperson"}).first
+        )
+        expect(person_from_factory._id).to eq(person._id)
+        expect(person_from_factory._type).to eq("lol")
+      end
+    end
+  end
 end
