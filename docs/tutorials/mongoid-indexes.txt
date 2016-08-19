@@ -114,3 +114,14 @@ Mongoid also provides a rake task to delete all secondary indexes.
 
    $ rake db:mongoid:remove_indexes
 
+These create/remove indexes commands also works for just one model by running
+
+.. code-block:: ruby
+
+   Model.create_indexes
+   
+or 
+
+.. code-block:: ruby
+
+   Model.remove_indexes
