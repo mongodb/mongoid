@@ -1385,6 +1385,21 @@ describe Mongoid::Attributes do
     end
   end
 
+  describe "#typed_attributes"  do
+    
+    let(:date_time) do
+      DateTime.current
+    end
+
+    let(:user) do
+      User.new(last_login: date_time)
+    end
+
+    it 'returns typecasted attributes' do
+      expect(user.typed_attributes).to include("last_login" => date_time)
+    end
+  end
+
   [:attributes=, :write_attributes].each do |method|
 
     describe "##{method}" do
