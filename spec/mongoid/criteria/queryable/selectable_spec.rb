@@ -4156,4 +4156,28 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
   end
+
+  context "'where' strategy, 'in' strategy should match" do
+    before do
+      class Project
+        include Mongoid::Document
+      end
+
+      class Booking
+        include Mongoid::Document
+
+        belongs_to :project
+      end
+    end
+  
+    it "on querying 'where', 'in' strageries should generate same criteria" do
+      bookings = Booking.where(:project_id.in => [1, 2])
+      bookings = bookings.where(:project_id.in => [1])
+
+      in_bookings = Booking.in(project_id: [1, 2])
+      in_bookings = in_bookings.in(project_id: [1])
+
+      expect(bookings.criteria.selector).to eql(in_bookings.criteria.selector)
+    end
+  end
 end
