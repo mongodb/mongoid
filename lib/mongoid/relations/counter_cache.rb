@@ -105,10 +105,10 @@ module Mongoid
 
           after_update do
             if record = __send__(name)
-              id_field = "#{name}_id"
+              foreign_key = meta.foreign_key
 
-              if attribute_changed?(id_field)
-                original, current = attribute_change(id_field)
+              if attribute_changed?(foreign_key)
+                original, current = attribute_change(foreign_key)
 
                 unless original.nil?
                   record.class.decrement_counter(cache_column, original)

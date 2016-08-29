@@ -351,6 +351,18 @@ describe Mongoid::Relations::CounterCache do
         it "updates the original object's counter cache" do
           expect(person1.reload.drugs_count).to eq(1)
         end
+
+        context 'when foreign_key differs from model name' do
+
+          let(:genre) { PostGenre.create }
+
+          let(:post) { Post.create }
+
+          it 'updates correct counter cache' do
+            post.update post_genre: genre
+            expect(genre.reload.posts_count).to eq 1
+          end
+        end
       end
     end
 
