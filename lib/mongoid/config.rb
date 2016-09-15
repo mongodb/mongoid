@@ -24,6 +24,8 @@ module Mongoid
     option :duplicate_fields_exception, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
+    option :log_level, default: :info
+    option :belongs_to_required_by_default, default: true
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
@@ -128,6 +130,7 @@ module Mongoid
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
       self.clients = configuration[:clients]
+      set_log_levels
     end
 
     # Override the database to use globally.
@@ -242,6 +245,11 @@ module Mongoid
     end
 
     private
+
+    def set_log_levels
+      Mongoid.logger.level = Mongoid::Config.log_level unless defined?(::Rails)
+      Mongo::Logger.logger.level = Mongoid.logger.level
+    end
 
     def clients=(clients)
       raise Errors::NoClientsConfig.new unless clients

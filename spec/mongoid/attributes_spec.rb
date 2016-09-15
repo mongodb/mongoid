@@ -38,6 +38,61 @@ describe Mongoid::Attributes do
             it "does not raise an error" do
               expect(from_db.desc).to eq("test")
             end
+
+            context "accessing via []" do
+
+              it "does not raise an error" do
+                expect(from_db["desc"]).to eq("en" => "test")
+              end
+            end
+
+            context "when calling only on a sub-document" do
+
+              let(:title) {"Executive"}
+              let(:city) {"NYC"}
+              let!(:agent) do
+                agent = Agent.new(:title => title)
+                agent.build_address(:city => city)
+                agent.save()
+                agent
+              end
+              let(:from_db) do
+                Agent.only(:title, "address.city").first
+              end
+
+              context "when the field is in the only" do
+
+                it "does not raise an error" do
+                  expect(from_db.address.city).to eq(city)
+                end
+              end
+
+              context "accessing via []" do
+
+                it "does not raise an error" do
+                  expect(from_db["address.city"]).to eq(city)
+                end
+              end
+            end
+          end
+
+          context 'when the attribute is a hash field' do
+
+            before do
+              person.update_attribute(:map, map)
+            end
+
+            let(:map) do
+              { 'dates' => { 'y' => { '2016' => 'Berlin' } } }
+            end
+
+            let(:from_db) do
+              Person.only('map.dates.y.2016').first
+            end
+
+            it "does not raise an error" do
+              expect(from_db.map).to eq(map)
+            end
           end
         end
 
@@ -66,6 +121,15 @@ describe Mongoid::Attributes do
           expect {
             from_db.title
           }.to raise_error(ActiveModel::MissingAttributeError)
+        end
+
+        context "accessing via []" do
+
+          it "raises an error" do
+            expect {
+              from_db["title"]
+            }.to raise_error(ActiveModel::MissingAttributeError)
+          end
         end
       end
 
@@ -1041,6 +1105,69 @@ describe Mongoid::Attributes do
         expect(person.delayed_atomic_unsets).to be_empty
       end
     end
+
+    context "when the attribute is aliased" do
+
+      context 'when the database name is used' do
+
+        let(:person) do
+          Person.create(at: Time.now)
+        end
+
+        before do
+          person.remove_attribute(:at)
+        end
+
+        it "removes the attribute" do
+          expect(person.at).to be_nil
+        end
+
+        it "removes the key from the attributes hash" do
+          expect(person.has_attribute?(:at)).to be false
+        end
+
+        context "when saving after the removal" do
+
+          before do
+            person.save
+          end
+
+          it "persists the removal" do
+            expect(person.reload.has_attribute?(:at)).to be false
+          end
+        end
+      end
+
+      context 'when the alias is used' do
+
+        let(:person) do
+          Person.create(aliased_timestamp: Time.now)
+        end
+
+        before do
+          person.remove_attribute(:aliased_timestamp)
+        end
+
+        it "removes the attribute" do
+          expect(person.aliased_timestamp).to be_nil
+        end
+
+        it "removes the key from the attributes hash" do
+          expect(person.has_attribute?(:aliased_timestamp)).to be false
+        end
+
+        context "when saving after the removal" do
+
+          before do
+            person.save
+          end
+
+          it "persists the removal" do
+            expect(person.reload.has_attribute?(:aliased_timestamp)).to be false
+          end
+        end
+      end
+    end
   end
 
   describe "#respond_to?" do
@@ -1627,6 +1754,58 @@ describe Mongoid::Attributes do
         it "applies the defaults after all attributes are set" do
           expect(from_db).to be_balanced
         end
+      end
+    end
+  end
+
+  context 'when calling the attribute check method' do
+
+    context 'when the attribute is blank' do
+      let(:person) do
+        Person.create(title: '')
+      end
+
+      it 'returns false' do
+        expect(person.title?).to be(false)
+      end
+    end
+
+    context 'when the attribute is localized' do
+      let(:person) do
+        Person.create(desc: 'localized')
+      end
+
+      before do
+        person.desc = nil
+      end
+
+      it 'applies the localization when checking the attribute' do
+        expect(person.desc?).to be(false)
+      end
+
+      context 'when the field is a boolean' do
+
+        before do
+          person.desc = false
+        end
+
+        it 'applies the localization when checking the attribute' do
+          expect(person.desc?).to be(false)
+        end
+      end
+    end
+
+    context 'when the attribute is not localized' do
+      let(:person) do
+        Person.create(username: 'localized')
+      end
+
+      before do
+        person.username = nil
+      end
+
+      it 'does not apply localization when checking the attribute' do
+        expect(person.username?).to be(false)
       end
     end
   end

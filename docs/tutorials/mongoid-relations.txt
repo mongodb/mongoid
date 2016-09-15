@@ -1,0 +1,692 @@
+=========
+Relations
+=========
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Common Behaviour
+----------------
+
+Attributes
+**********
+
+All relations contain a ``target``, which is the proxied document or documents, a ``base``
+which is the document the relation hangs off, and ``metadata`` which provides information
+about the relation.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     embeds_many :addresses
+   end
+   
+   person.addresses = [ address ]
+   person.addresses.target # returns [ address ]
+   person.addresses.base # returns person
+   person.addresses.metadata # returns the metadata
+
+Extensions
+**********
+
+All relations can have extensions, which provides a way to add application specific
+functionality to the relation. They are defined by providing a block to the relation definition.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     embeds_many :addresses do
+       def find_by_country(country)
+         where(country: country).first
+       end
+       def chinese
+         @target.select { |address| address.country == "China" }
+       end
+     end
+   end
+  
+   person.addresses.find_by_country("Mongolia") # returns address
+   person.addresses.chinese # returns [ address ]
+
+Custom Relation Names
+*********************
+
+You can name your relations whatever you like, but if the class cannot be inferred by
+Mongoid from the name, and neither can the opposite side you'll want to provide the
+macro with some additional options to tell Mongoid how to hook them up.
+
+.. code-block:: ruby
+
+   class Lush
+     include Mongoid::Document
+     embeds_one :whiskey, class_name: "Drink", inverse_of: :alcoholic
+   end
+   
+   class Drink
+     include Mongoid::Document
+     embedded_in :alcoholic, class_name: "Lush", inverse_of: :whiskey
+   end
+
+Validations
+***********
+
+It is important to note that by default, Mongoid will validate the children of any
+relation that are loaded into memory via a ``validates_associated``. The relations that
+this applies to are:
+
+- ``embeds_many``
+- ``embeds_one``
+- ``has_many``
+- ``has_one``
+- ``has_and_belongs_to_many``
+
+If you do not want this behavior, you may turn it off when defining the relation.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+   
+     embeds_many :addresses, validate: false
+     has_many :posts, validate: false
+   end
+
+Polymorphism
+************
+
+When a child embedded document can belong to more than one type of parent document, you can
+tell Mongoid to support this by adding the ``as`` option to the definition on the parents,
+and the ``polymorphic`` option on the child. On the child object, an additional field will
+be stored that indicates the type of the parent. Polymorphic behavior is allowed on all
+relations with the exception of ``has_and_belongs_to_many``.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     embeds_many :photos, as: :photographic
+     has_one :address, as: :addressable
+   end
+   
+   class Photo
+     include Mongoid::Document
+     embedded_in :photographic, polymorphic: true
+   end
+   
+   class Address
+     include Mongoid::Document
+     belongs_to :addressable, polymorphic: true
+   end
+
+Cascading Callbacks
+*******************
+
+If you want the embedded document callbacks to fire when calling a persistence operation on
+its parent, you will need to provide the cascade callbacks option to the relation.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     embeds_many :albums, cascade_callbacks: true
+     embeds_one :label, cascade_callbacks: true
+   end
+
+  band.save # Fires all save callbacks on the band, albums, and label.
+
+Dependent Behaviour
+*******************
+
+You can provide dependent options to referenced associations to instruct Mongoid
+how to handle situations where one side of the relation is deleted, or is attempted
+to be deleted. The options are as follows:
+
+- ``:delete``: Delete the child document without running any of the model callbacks.
+- ``:destroy``: Destroy the child document and run all of the model callbacks.
+- ``:nullify``: Orphan the child document.
+- ``:restrict``: Raise an error if the child is not empty.
+
+The default behavior of each association when no dependent option is provided is to nullify.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     has_many :albums, dependent: :delete
+     belongs_to :label, dependent: :nullify
+   end
+  
+   class Album
+     include Mongoid::Document
+     belongs_to :band
+   end
+  
+   class Label
+     include Mongoid::Document
+     has_many :bands, dependent: :restrict
+   end
+  
+   label = Label.first
+   label.bands.push(Band.first)
+   label.delete # Raises an error since bands is not empty.
+  
+   Band.first.delete # Will delete all associated albums.
+
+Autosaving
+**********
+
+One core difference between Mongoid and Active Record from a behavior standpoint
+is that Mongoid does not automatically save child relations for relational associations.
+This is for performance reasons.
+
+To enable an autosave on a relational association (embedded associations do not need
+this since they are actually part of the parent in the database) add the autosave
+option to the relation.
+
+Note that autosave functionality will automatically be added to a relation when using
+``accepts_nested_attributes_for`` or validating presence of the relation.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     has_many :albums, autosave: true
+   end
+ 
+   band = Band.first
+   band.albums.build(name: "101")
+   band.save # Will save the album as well.
+
+Recursive Embedding
+*******************
+
+A document can recursively embed itself using ``recursively_embeds_one`` or ``recursively_embeds_many``,
+which provides accessors for the parent and children via ``parent_`` and ``child_`` methods.
+
+.. code-block:: ruby
+
+   class Tag
+     include Mongoid::Document
+     recursively_embeds_many
+   end
+  
+   root = Tag.new(name: "programming")
+   child_one = root.child_tags.build
+   child_two = root.child_tags.build
+  
+   root.child_tags # [ child_one, child_two ]
+   child_one.parent_tag # [ root ]
+   child_two.parent_tag # [ root ]
+  
+   class Node
+     include Mongoid::Document
+     recursively_embeds_one
+   end
+  
+   root = Node.new
+   child = Node.new
+   root.child_node = child
+  
+   root.child # child
+   child.parent_node # root
+
+Existence Predicates
+********************
+
+All relations have existence predicates on them in the form of ``name?`` and ``has_name?``
+to check if the relation is blank.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     embeds_one :label
+     embeds_many :albums
+   end
+ 
+   band.label?
+   band.has_label?
+   band.albums?
+   band.has_albums?
+
+Autobuilding
+************
+
+One to one relations (``embeds_one``, ``has_one``) have an autobuild option which tells
+Mongoid to instantiate a new document when the relation is accessed and it is ``nil``.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     embeds_one :label, autobuild: true
+     has_one :producer, autobuild: true
+   end
+  
+   band = Band.new
+   band.label # Returns a new empty label.
+   band.producer # Returns a new empty producer.
+
+Touching
+********
+
+Any ``belongs_to`` relation, no matter where it hangs off from, can take an optional ``:touch``
+option which will call the touch method on it and any parent relations with the option defined
+when the base document calls ``#touch``.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     belongs_to :label, touch: true
+   end
+  
+   band = Band.first
+   band.touch # Calls touch on the parent label.
+
+Metadata
+--------
+
+All relations in Mongoid contain metadata that holds information about the relation in
+question, and is a valuable tool for third party developers to use to extend Mongoid.
+
+You can access the metadata of the relation in a few different ways.
+
+.. code-block:: ruby
+
+   # Get the metadata for a named relation from the class or document.
+   Model.reflect_on_association(:relation_name)
+   model.reflect_on_association(:relation_name)
+ 
+   # Get the metadata that the current object has in its relation.
+   model.metadata
+ 
+   # Get the metadata with a specific relation itself on a specific
+   # document.
+   person.addresses.metadata
+
+The Metadata Object
+*******************
+
+The metadata object itself contains more information than one might know what to do
+with, and is useful for developers of extensions to Mongoid.
+
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Method
+     - Description
+   * - ``Metadata#as``
+     - Returns the name of the parent to a polymorphic child.
+   * - ``Metadata#as?``
+     - Returns whether or not an as option exists.
+   * - ``Metadata#autobuilding?``
+     - Returns whether or not the relation is autobuilding.
+   * - ``Metadata#autosaving?``
+     - Returns whether or not the relation is autosaving.
+   * - ``Metadata#cascading_callbacks?``
+     - Returns whether the relation has callbacks cascaded down from the parent.
+   * - ``Metadata#class_name``
+     - Returns the class name of the proxied document.
+   * - ``Metadata#cyclic?``
+     - Returns whether the relation is a cyclic relation.
+   * - ``Metadata#dependent``
+     - Returns the relation's dependent option.
+   * - ``Metadata#dependent?``
+     - Returns whether the relation is a dependent relation.
+   * - ``Metadata#destructive?``
+     - Returns true if the relation has a dependent delete or destroy.
+   * - ``Metadata#embedded?``
+     - Returns whether the relation is embedded in another document.
+   * - ``Metadata#forced_nil_inverse?``
+     - Returns whether the relation has a nil inverse defined.
+   * - ``Metadata#foreign_key``
+     - Returns the name of the foreign key field.
+   * - ``Metadata#foreign_key_check``
+     - Returns the name of the foreign key field dirty check method.
+   * - ``Metadata#foreign_key_setter``
+     - Returns the name of the foreign key field setter.
+   * - ``Metadata#indexed?``
+     - Returns whether the foreign key is auto indexed.
+   * - ``Metadata#inverses``
+     - Returns the names of all inverse relation.
+   * - ``Metadata#inverse``
+     - Returns the name of a single inverse relation.
+   * - ``Metadata#inverse_class_name``
+     - Returns the class name of the relation on the inverse side.
+   * - ``Metadata#inverse_foreign_key``
+     - Returns the name of the foreign key field on the inverse side.
+   * - ``Metadata#inverse_klass``
+     - Returns the class of the relation on the inverse side.
+   * - ``Metadata#inverse_metadata``
+     - Returns the metadata of the relation on the inverse side.
+   * - ``Metadata#inverse_of``
+     - Returns the explicitly defined name of the inverse relation.
+   * - ``Metadata#inverse_of?``
+     - Returns whether an inverse_of option is defined.
+   * - ``Metadata#inverse_setter``
+     - Returns the name of the method used to set the inverse.
+   * - ``Metadata#inverse_type``
+     - Returns the name for the polymorphic type field of the inverse.
+   * - ``Metadata#inverse_type_setter``
+     - Returns the name for the polymorphic type field setter of the inverse.
+   * - ``Metadata#key``
+     - Returns the name of the field in the attributes hash to use to get the relation.
+   * - ``Metadata#klass``
+     - Returns the class of the proxied documents in the relation.
+   * - ``Metadata#macro``
+     - Returns the relation's macro.
+   * - ``Metadata#name``
+     - Returns the relation name.
+   * - ``Metadata#options``
+     - Returns self, for API compatibility with Active Record.
+   * - ``Metadata#order``
+     - Returns the custom sorting options on the relation.
+   * - ``Metadata#order?``
+     - Returns whether custom sorting options are set.
+   * - ``Metadata#polymorphic?``
+     - Returns whether the relation is polymorphic.
+   * - ``Metadata#setter``
+     - Returns the name of the field to set the relation.
+   * - ``Metadata#store_as``
+     - Returns the name of the attribute to store an embedded relation in.
+   * - ``Metadata#touchable?``
+     - Returns whether or not the relation has a touch option.
+   * - ``Metadata#type``
+     - Returns the name of the field to get the polymorphic type.
+   * - ``Metadata#type_setter``
+     - Returns the name of the field to set the polymorphic type.
+   * - ``Metadata#validate?``
+     - Returns whether the relation has an associated validation.
+
+Embeds One
+----------
+
+One to one relationships where the children are embedded in the parent document are defined
+using Mongoid's ``embeds_one`` and ``embedded_in`` macros.
+
+Defining
+********
+
+The parent document of the relation should use the ``embeds_one`` macro to indicate is has 1
+embedded child, where the document that is embedded uses ``embedded_in``. Definitions are required
+on both sides to the relation in order for it to work properly.
+
+.. code-block:: ruby
+
+   class Band
+     include Mongoid::Document
+     embeds_one :label
+   end
+  
+   class Label
+     include Mongoid::Document
+     field :name, type: String
+     embedded_in :band
+   end
+
+Storage
+*******
+
+Documents that are embedded using the ``embeds_one`` macro are stored as a hash inside the
+parent in the parent's database collection.
+
+.. code-block:: ruby
+
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
+    "label" : {
+      "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
+      "name" : "Mute",
+    }
+  }
+
+You can optionally tell Mongoid to store the embedded document in a different attribute other
+than the name, by providing a ``:store_as`` option.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_one :label, store_as: "lab"
+  end
+
+
+Embeds Many
+-----------
+
+One to many relationships where the children are embedded in the parent document are defined
+using Mongoid's ``embeds_many`` and ``embedded_in`` macros.
+
+Defining
+********
+
+The parent document of the relation should use the ``embeds_many`` macro to indicate it has n
+number of embedded children, where the document that is embedded uses ``embedded_in``. Definitions
+are required on both sides to the relation in order for it to work properly.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    field :name, type: String
+    embedded_in :band
+  end
+
+Storage
+*******
+
+Documents that are embedded using the ``embeds_many`` macro are stored as an array of hashes
+inside the parent in the parent's database collection.
+
+.. code-block:: ruby
+
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
+    "albums" : [
+      {
+        "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
+        "name" : "Violator",
+      }
+    ]
+  }
+
+You can optionally tell Mongoid to store the embedded document in a different attribute other
+than the name, by providing a ``:store_as`` option.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :albums, store_as: "albs"
+  end
+
+
+Has One
+-------
+
+One to one relationships where the children are referenced in the parent document are defined
+using Mongoid's ``has_one`` and ``belongs_to`` macros.
+
+Defining
+********
+
+The parent document of the relation should use the ``has_one`` macro to indicate is has 1 referenced
+child, where the document that is referenced in it uses ``belongs_to``.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_one :studio
+  end
+
+  class Studio
+    include Mongoid::Document
+    field :name, type: String
+    belongs_to :band
+  end
+
+Definitions are required on both sides to the relation in order for it to work properly, unless
+one of the models is embedded.
+
+Storage
+*******
+
+When defining a relation of this nature, each document is stored in its respective collection,
+but the child document contains a "foreign key" reference to the parent.
+
+.. code-block:: ruby
+
+  # The parent band document.
+  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+
+  # The child studio document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
+    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
+  }
+
+
+Has Many
+--------
+
+One to many relationships where the children are stored in a separate collection from the parent
+document are defined using Mongoid's ``has_many`` and ``belongs_to`` macros. This exhibits similar
+behavior to Active Record.
+
+Defining
+********
+
+The parent document of the relation should use the ``has_many`` macro to indicate is has n number
+of referenced children, where the document that is referenced uses ``belongs_to``.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_many :members
+  end
+
+  class Member
+    include Mongoid::Document
+    field :name, type: String
+    belongs_to :band
+  end
+
+Definitions are required on both sides to the relation in order for it to work properly,
+unless one of the models is embedded.
+
+Storage
+*******
+
+When defining a relation of this nature, each document is stored in its respective collection,
+but the child document contains a "foreign key" reference to the parent.
+
+.. code-block:: ruby
+
+  # The parent band document.
+  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+
+  # A child member document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
+    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
+  }
+
+Has And Belongs To Many
+-----------------------
+
+Many to many relationships where the inverse documents are stored in a separate collection
+from the base document are defined using Mongoid's ``has_and_belongs_to_many`` macro. This
+exhibits similar behavior to Active Record with the exception that no join collection is needed,
+the foreign key ids are stored as arrays on either side of the relation.
+
+Defining
+********
+
+Both sides of the relation use the same macro.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_and_belongs_to_many :tags
+  end
+
+  class Tag
+    include Mongoid::Document
+    field :name, type: String
+    has_and_belongs_to_many :bands
+  end
+
+You can create a one sided many to many if you want to mimic a has_many that stores the keys
+as an array on the parent.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_and_belongs_to_many :tags, inverse_of: nil
+  end
+
+  class Tag
+    include Mongoid::Document
+    field :name, type: String
+  end
+
+Storage
+*******
+
+When defining a relation of this nature, each document is stored in its respective collection,
+and each document contains a "foreign key" reference to the other in the form of an array.
+
+.. code-block:: ruby
+
+  # The band document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
+    "tag_ids" : [ ObjectId("4d3ed089fb60ab534684b7f2") ]
+  }
+
+  # The tag document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f2"),
+    "band_ids" : [ ObjectId("4d3ed089fb60ab534684b7e9") ]
+  }
+
+The counter_cache option
+------------------------
+
+As with ActiveRecord, the :counter_cache option can be used on a relation to make finding the
+number of belonging objects more efficient. Also similar to ActiveRecord, you must take into
+account that there will be an extra attribute on the associated model. This means that with Mongoid,
+you need to include ``Mongoid::Attributes::Dynamic`` on the associated model.
+For example:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+    belongs_to :customer, counter_cache: true
+  end
+
+  class Customer
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+    has_many :orders
+  end

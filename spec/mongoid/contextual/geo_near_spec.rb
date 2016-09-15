@@ -437,4 +437,23 @@ describe Mongoid::Contextual::GeoNear do
       expect(geo_near.time).to_not be_nil
     end
   end
+
+  describe "#empty_and_chainable" do
+
+    let!(:collection) do
+      Bar.collection
+    end
+
+    let(:criteria) do
+      Bar.all
+    end
+
+    let(:geo_near) do
+      described_class.new(collection, criteria, [ 52, 13 ])
+    end
+
+    it "returns true" do
+      expect(geo_near.empty_and_chainable?).to be(true)
+    end
+  end
 end

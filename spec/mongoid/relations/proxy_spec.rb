@@ -19,7 +19,9 @@ describe Mongoid::Relations::Proxy do
 
     it 'uses the new persistence options' do
       expect {
-        animal.with(write: { w: 100 }).update_attribute(:name, 'kangaroo')
+        animal.with(write: { w: 100 }) do |an|
+          an.update_attribute(:name, 'kangaroo')
+        end
       }.to raise_exception(Mongo::Error::OperationFailure)
     end
   end
@@ -93,6 +95,30 @@ describe Mongoid::Relations::Proxy do
       it "extends the proxy" do
         expect(found).to eq(address)
       end
+    end
+  end
+
+  describe "equality" do
+    let(:messages) do
+      Person.create.messages
+    end
+
+    it "is #equal? to itself" do
+      expect(messages.equal?(messages)).to eq(true)
+    end
+
+    it "is == to itself" do
+      expect(messages == messages).to eq(true)
+    end
+
+    it "is not #equal? to its target" do
+      expect(messages.equal?(messages.target)).to eq(false)
+      expect(messages.target.equal?(messages)).to eq(false)
+    end
+
+    it "is == to its target" do
+      expect(messages == messages.target).to eq(true)
+      expect(messages.target == messages).to eq(true)
     end
   end
 end

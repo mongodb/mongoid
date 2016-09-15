@@ -8,6 +8,18 @@ module Mongoid
       # multiple documents.
       class In < Relations::One
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
+        VALID_OPTIONS = [
+          :autobuild,
+          :cyclic,
+          :polymorphic,
+          :touch
+         ].freeze
+
         # Instantiate a new embedded_in relation.
         #
         # @example Create the new relation.
@@ -209,7 +221,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [ :autobuild, :cyclic, :polymorphic, :touch ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

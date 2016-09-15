@@ -115,21 +115,6 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when provided a document" do
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      let(:count) do
-        context.count(depeche)
-      end
-
-      it "returns the number of documents that match" do
-        expect(count).to eq(1)
-      end
-    end
-
     context "when provided a block" do
 
       let(:context) do
@@ -764,6 +749,92 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
+      context 'when the criteria has no sort' do
+
+        let(:criteria) do
+          Band.all
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+
+        it 'applies a sort on _id' do
+          expect(context.send(method)).to eq(depeche_mode)
+        end
+
+        context 'when calling #last' do
+
+          it 'returns the last document, sorted by _id' do
+            expect(context.send(method)).to eq(depeche_mode)
+            expect(context.last).to eq(new_order)
+          end
+        end
+
+        context 'with option { sort: :none }' do
+
+          let(:opts) do
+            { id_sort: :none }
+          end
+
+          it 'does not apply the sort on _id' do
+            expect(context.send(method, opts)).to eq(depeche_mode)
+          end
+
+          context 'when calling #last' do
+
+            it 'does not apply a sort on _id' do
+              expect(context.send(method, opts)).to eq(depeche_mode)
+              expect(context.last(opts)).to eq(depeche_mode)
+            end
+          end
+        end
+      end
+
+      context 'when the criteria has a sort' do
+
+        let(:criteria) do
+          Band.desc(:name)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+
+        it 'applies the criteria sort' do
+          expect(context.send(method)).to eq(new_order)
+        end
+
+        context 'when calling #last' do
+
+          it 'applies the criteria sort' do
+            expect(context.send(method)).to eq(new_order)
+            expect(context.last).to eq(depeche_mode)
+          end
+        end
+
+        context 'with option { sort: :none }' do
+
+          let(:opts) do
+            { id_sort: :none }
+          end
+
+          it 'applies the criteria sort' do
+            expect(context.send(method, opts)).to eq(new_order)
+          end
+
+          context 'when calling #last' do
+
+            it 'applies the criteria sort' do
+              expect(context.send(method, opts)).to eq(new_order)
+              expect(context.last(opts)).to eq(depeche_mode)
+            end
+          end
+        end
+      end
+
       context "when using .sort" do
 
         let(:criteria) do
@@ -1002,11 +1073,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when passed the symbol field name" do
-
-      it "limits query to that field" do
-        expect(criteria).to receive(:only).with(:name).and_call_original
-        context.map(:name)
-      end
 
       it "performs mapping" do
         expect(context.map(:name)).to eq ["Depeche Mode", "New Order"]
@@ -1316,6 +1382,65 @@ describe Mongoid::Contextual::Mongo do
         expect(results).to eq([
           { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
         ])
+      end
+    end
+
+    context "when the output specifies a different db" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      after do
+        Band.with(database: 'another-db') do |b|
+          b.all.delete
+        end
+      end
+
+      context 'when db is a string' do
+
+        let(:results) do
+          context.map_reduce(map, reduce).out(merge: :mr_output, db: 'another-db')
+        end
+
+        it "returns the correct number of documents" do
+          expect(results.count).to eq(1)
+        end
+
+        it "contains the entire results" do
+          expect(results).to eq([
+                                    { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+                                ])
+        end
+
+        it 'writes to the specified db' do
+          expect(Band.mongo_client.with(database: 'another-db')[:mr_output].find.count).to eq(1)
+        end
+      end
+
+      context 'when db is a symbol' do
+
+        let(:results) do
+          context.map_reduce(map, reduce).out(merge: :mr_output, 'db' => 'another-db')
+        end
+
+        it "returns the correct number of documents" do
+          expect(results.count).to eq(1)
+        end
+
+        it "contains the entire results" do
+          expect(results).to eq([
+                                    { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+                                ])
+        end
+
+        it 'writes to the specified db' do
+          expect(Band.mongo_client.with(database: 'another-db')[:mr_output].find.count).to eq(1)
+        end
       end
     end
 

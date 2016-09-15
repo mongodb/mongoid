@@ -23,7 +23,7 @@ describe Mongoid::Extensions::Integer do
 
   describe ".demongoize" do
 
-    context "when the the value is an integer" do
+    context "when the value is an integer" do
 
       it "returns a integer" do
         expect(Integer.demongoize(number)).to eq(number)
@@ -131,6 +131,13 @@ describe Mongoid::Extensions::Integer do
 
     it "returns self" do
       expect(number.mongoize).to eq(number)
+    end
+  end
+
+  describe "#numeric?" do
+
+    it "returns true" do
+      expect(number.numeric?).to eq(true)
     end
   end
 end

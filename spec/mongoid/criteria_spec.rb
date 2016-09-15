@@ -590,7 +590,8 @@ describe Mongoid::Criteria do
 
     let!(:match) do
       Band.create(name: "Depeche Mode").tap do |band|
-        band.records.create(name: "101")
+        r = band.records
+        r.create(name: "101")
       end
     end
 
@@ -1147,12 +1148,72 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when providing a hash" do
+    context "when providing a list of associations" do
 
-      it "raises an error" do
-        expect {
-          Person.includes(preferences: :members)
-        }.to raise_error(Mongoid::Errors::InvalidIncludes)
+      let!(:user) do
+        User.create(posts: [ post1 ], descriptions: [ description1 ])
+      end
+
+      let!(:post1) do
+        Post.create
+      end
+
+      let!(:description1) do
+        Description.create(details: 1)
+      end
+
+      let(:result) do
+        User.includes(:posts, :descriptions).first
+      end
+
+      it "executes the query" do
+        expect(result).to eq(user)
+      end
+
+      it "includes the related objects" do
+        expect(result.posts).to eq([ post1 ])
+        expect(result.descriptions).to eq([ description1 ])
+      end
+    end
+
+    context "when providing a nested association" do
+
+      let!(:user) do
+        User.create
+      end
+
+      before do
+        p = Post.create(alerts: [ Alert.create ])
+        user.posts = [ p ]
+        user.save
+      end
+
+      let(:result) do
+        User.includes(:posts => [:alerts]).first
+      end
+
+      it "executes the query" do
+        expect(result).to eq(user)
+      end
+
+      it "includes the related objects" do
+        expect(result.posts.size).to eq(1)
+        expect(result.posts.first.alerts.size).to eq(1)
+      end
+    end
+
+    context "when providing a deeply nested association" do
+
+      let!(:user) do
+        User.create
+      end
+
+      let(:results) do
+        User.includes(:posts => [{ :alerts => :items }]).to_a
+      end
+
+      it "executes the query" do
+        expect(results.first).to eq(user)
       end
     end
 
@@ -1757,6 +1818,22 @@ describe Mongoid::Criteria do
 
       let!(:preference_two) do
         person.preferences.create(name: "two")
+      end
+
+      context "when one of the related items is deleted" do
+
+        before do
+          person.preferences = [ preference_one, preference_two ]
+          preference_two.delete
+        end
+
+        let(:criteria) do
+          Person.where(id: person.id).includes(:preferences)
+        end
+
+        it "only loads the existing related items" do
+          expect(criteria.entries.first.preferences).to eq([ preference_one ])
+        end
       end
 
       context "when the criteria has no options" do
@@ -2725,6 +2802,93 @@ describe Mongoid::Criteria do
         end
       end
     end
+
+    context 'when the field is localized' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create(description: 'english-text')
+        I18n.locale = :de
+        d.description = 'deutsch-text'
+        d.save
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      context 'when entire field is included' do
+
+        let(:dictionary) do
+          Dictionary.only(:description).first
+
+        end
+
+        it 'loads all translations' do
+          expect(dictionary.description_translations.keys).to include('de', 'en')
+        end
+
+        it 'returns the field value for the current locale' do
+          I18n.locale = :en
+          expect(dictionary.description).to eq('english-text')
+          I18n.locale = :de
+          expect(dictionary.description).to eq('deutsch-text')
+        end
+      end
+
+      context 'when a specific locale is included' do
+
+        let(:dictionary) do
+          Dictionary.only(:'description.de').first
+        end
+
+        it 'loads translations only for the included locale' do
+          expect(dictionary.description_translations.keys).to include('de')
+          expect(dictionary.description_translations.keys).to_not include('en')
+        end
+
+        it 'returns the field value for the included locale' do
+          I18n.locale = :en
+          expect(dictionary.description).to be_nil
+          I18n.locale = :de
+          expect(dictionary.description).to eq('deutsch-text')
+        end
+      end
+
+      context 'when entire field is excluded' do
+
+        let(:dictionary) do
+          Dictionary.without(:description).first
+        end
+
+        it 'does not load all translations' do
+          expect(dictionary.description_translations.keys).to_not include('de', 'en')
+        end
+
+        it 'raises an ActiveModel::MissingAttributeError when attempting to access the field' do
+          expect{dictionary.description}.to raise_error ActiveModel::MissingAttributeError
+        end
+      end
+
+      context 'when a specific locale is excluded' do
+
+        let(:dictionary) do
+          Dictionary.without(:'description.de').first
+        end
+
+        it 'does not load excluded translations' do
+          expect(dictionary.description_translations.keys).to_not include('de')
+          expect(dictionary.description_translations.keys).to include('en')
+        end
+
+        it 'returns nil for excluded translations' do
+          I18n.locale = :en
+          expect(dictionary.description).to eq('english-text')
+          I18n.locale = :de
+          expect(dictionary.description).to be_nil
+        end
+      end
+    end
   end
 
   [ :or, :any_of ].each do |method|
@@ -2812,7 +2976,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the values" do
-          expect(plucked).to eq([ "Depeche Mode", "Tool", "Photek" ])
+          expect(plucked).to contain_exactly("Depeche Mode", "Tool", "Photek")
         end
 
         context "when subsequently executing the criteria without a pluck" do
@@ -2877,14 +3041,14 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "when plucking mult-fields" do
+      context "when plucking multi-fields" do
 
         let(:plucked) do
           Band.where(:name.exists => true).pluck(:name, :likes)
         end
 
         it "returns the values" do
-          expect(plucked).to eq([ ["Depeche Mode", 3], ["Tool", 3], ["Photek", 1] ])
+          expect(plucked).to contain_exactly(["Depeche Mode", 3], ["Tool", 3], ["Photek", 1])
         end
       end
 
@@ -2895,7 +3059,7 @@ describe Mongoid::Criteria do
         end
 
         it "returns the duplicates" do
-          expect(plucked).to eq([ 3, 3, 1 ])
+          expect(plucked).to contain_exactly(3, 3, 1)
         end
       end
     end
@@ -2954,6 +3118,43 @@ describe Mongoid::Criteria do
 
         it "returns a nil arrays" do
           expect(plucked).to eq([[nil, nil], [nil, nil], [nil, nil]])
+        end
+      end
+    end
+
+    context 'when plucking a localized field' do
+
+      before do
+        I18n.locale = :en
+        d = Dictionary.create(description: 'english-text')
+        I18n.locale = :de
+        d.description = 'deutsch-text'
+        d.save
+      end
+
+      after do
+        I18n.locale = :en
+      end
+
+      context 'when plucking the entire field' do
+
+        let(:plucked) do
+          Dictionary.all.pluck(:description)
+        end
+
+        it 'returns all translations' do
+          expect(plucked.first).to eq({'en' => 'english-text', 'de' => 'deutsch-text'})
+        end
+      end
+
+      context 'when plucking a specific locale' do
+
+        let(:plucked) do
+          Dictionary.all.pluck(:'description.de')
+        end
+
+        it 'returns the specific translations' do
+          expect(plucked.first).to eq({'de' => 'deutsch-text'})
         end
       end
     end
@@ -3273,6 +3474,21 @@ describe Mongoid::Criteria do
           expect(from_db).to eq(band)
         end
       end
+
+      context 'when querying on a polymorphic relation' do
+
+        let(:movie) do
+          Movie.create
+        end
+
+        let(:selector) do
+          Rating.where(ratable: movie).selector
+        end
+
+        it 'properly converts the object to an ObjectId' do
+          expect(selector['ratable_id']).to eq(movie.id)
+        end
+      end
     end
   end
 
@@ -3379,8 +3595,21 @@ describe Mongoid::Criteria do
 
   describe "#with" do
 
-    let!(:criteria) do
-      Band.where(name: "Depeche Mode").with(collection: "artists")
+    let!(:criteria_and_collection) do
+      collection = nil
+      criteria = Band.where(name: "Depeche Mode").with(collection: "artists") do |crit|
+        collection = crit.collection
+        crit
+      end
+      [ criteria, collection ]
+    end
+
+    let(:criteria) do
+      criteria_and_collection[0]
+    end
+
+    let(:collection) do
+      criteria_and_collection[1]
     end
 
     it "retains the criteria selection" do
@@ -3388,7 +3617,7 @@ describe Mongoid::Criteria do
     end
 
     it "sets the persistence options" do
-      expect(criteria.persistence_options).to eq(collection: "artists")
+      expect(collection.name).to eq("artists")
     end
   end
 

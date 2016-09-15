@@ -87,7 +87,8 @@ module Mongoid
       # @return [ Proc ] The default scope.
       #
       # @since 1.0.0
-      def default_scope(value)
+      def default_scope(value = nil)
+        value = Proc.new { yield } if block_given?
         check_scope_validity(value)
         self.default_scoping = process_default_scope(value)
       end
@@ -115,7 +116,9 @@ module Mongoid
       #
       # @since 3.0.0
       def queryable
-        Threaded.current_scope(self) || Criteria.new(self)
+        crit = Threaded.current_scope(self) || Criteria.new(self)
+        crit.embedded = true if crit.klass.embedded?
+        crit
       end
 
       # Create a scope that can be accessed from the class level or chained to

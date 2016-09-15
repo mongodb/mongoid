@@ -18,7 +18,7 @@ module Mongoid
       # Options constant.
       #
       # @since 5.0.0
-      OPTIONS = [ :hint, :limit, :skip, :sort, :batch_size, :max_scan, :snapshot, :comment, :read ].freeze
+      OPTIONS = [ :hint, :limit, :skip, :sort, :batch_size, :max_scan, :max_time_ms, :snapshot, :comment, :read ].freeze
 
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
@@ -102,7 +102,9 @@ module Mongoid
       #
       # @since 3.0.0
       def distinct(field)
-        view.distinct(klass.database_field_name(field))
+        view.distinct(klass.database_field_name(field)).map do |value|
+          value.class.demongoize(value)
+        end
       end
 
       # Iterate over the context. If provided a block, yield to a Mongoid
@@ -225,19 +227,28 @@ module Mongoid
       # @example Get the first document.
       #   context.first
       #
-      # @note Mongoid previously added an _id sort when no sort parameters were
-      #   provided explicitly by the user. This caused bad performance issues
-      #   and was not expected, so #first/#last will no longer guarantee order
-      #   if no sorting parameters are provided. For order guarantees - a sort
-      #   must be explicitly provided.
+      # @note Automatically adding a sort on _id when no other sort is
+      #   defined on the criteria has the potential to cause bad performance issues.
+      #   If you experience unexpected poor performance when using #first or #last
+      #   and have no sort defined on the criteria, use the option { sort: :none }.
+      #   Be aware that #first/#last won't guarantee order in this case.
+      #
+      # @param [ Hash ] opts The options for the query returning the first document.
+      #
+      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
+      #   is defined on the criteria.
       #
       # @return [ Document ] The first document.
       #
       # @since 3.0.0
-      def first
+      def first(opts = {})
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
-          with_eager_loading(view.limit(-1).first)
+          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
+            with_eager_loading(view.sort(sort).limit(-1).first)
+          else
+            with_eager_loading(view.limit(-1).first)
+          end
         end
       end
       alias :one :first
@@ -294,8 +305,7 @@ module Mongoid
         if block_given?
           super(&block)
         else
-          field = field.to_sym
-          criteria.only(field).map(&field.to_proc)
+          criteria.pluck(field)
         end
       end
 
@@ -310,7 +320,7 @@ module Mongoid
       # @since 3.0.0
       def initialize(criteria)
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
-        @collection = @klass.with(criteria.persistence_options || {}).collection
+        @collection = @klass.collection
         criteria.send(:merge_type_selection)
         @view = collection.find(criteria.selector)
         apply_options
@@ -323,18 +333,21 @@ module Mongoid
       # @example Get the last document.
       #   context.last
       #
-      # @note Mongoid previously added an _id sort when no sort parameters were
-      #   provided explicitly by the user. This caused bad performance issues
-      #   and was not expected, so #first/#last will no longer guarantee order
-      #   if no sorting parameters are provided. For order guarantees - a sort
-      #   must be explicitly provided.
+      # @note Automatically adding a sort on _id when no other sort is
+      #   defined on the criteria has the potential to cause bad performance issues.
+      #   If you experience unexpected poor performance when using #first or #last
+      #   and have no sort defined on the criteria, use the option { sort: :none }.
+      #   Be aware that #first/#last won't guarantee order in this case.
       #
-      # @return [ Document ] The last document.
+      # @param [ Hash ] opts The options for the query returning the first document.
+      #
+      # @option opts [ :none ] :id_sort Don't apply a sort on _id if no other sort
+      #   is defined on the criteria.
       #
       # @since 3.0.0
-      def last
+      def last(opts = {})
         try_cache(:last) do
-          with_inverse_sorting do
+          with_inverse_sorting(opts) do
             with_eager_loading(view.limit(-1).first)
           end
         end
@@ -543,6 +556,12 @@ module Mongoid
         if criteria.options[:timeout] == false
           @view = view.no_cursor_timeout
         end
+        if criteria.options[:cursor_type]
+          # @todo: update to use #cursor_type method on view when driver 2.3 is released.
+          # See RUBY-1080
+          @view = view.clone
+          @view.options.merge!(cursor_type: criteria.options[:cursor_type])
+        end
       end
 
       # Apply an option.
@@ -567,10 +586,10 @@ module Mongoid
       #   context.with_inverse_sorting
       #
       # @since 3.0.0
-      def with_inverse_sorting
+      def with_inverse_sorting(opts = {})
         begin
-          if spec = criteria.options[:sort]
-            @view = view.sort(Hash[spec.map{|k, v| [k, -1*v]}])
+          if sort = criteria.options[:sort] || ( { _id: 1 } unless opts[:id_sort] == :none )
+            @view = view.sort(Hash[sort.map{|k, v| [k, -1*v]}])
           end
           yield
         ensure

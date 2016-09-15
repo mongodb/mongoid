@@ -268,9 +268,27 @@ module Mongoid
       # @since 3.0.0
       def documents
         return results["results"] if results.has_key?("results")
-        view = client[output_collection].find
+        view = output_database[output_collection].find
         view.no_cursor_timeout if criteria.options[:timeout] == false
         view
+      end
+
+      # Get the database that the map/reduce results were stored in.
+      #
+      # @api private
+      #
+      # @example Get the output database.
+      #   map_reduce.output_database
+      #
+      # @return [ Mongo::Database ] The output database.
+      #
+      # @since 6.0.0
+      def output_database
+        if db = command[:out].fetch(:db, command[:out]['db'])
+          client.with(database: db).database
+        else
+          client.database
+        end
       end
 
       # Get the collection that the map/reduce results were stored in.

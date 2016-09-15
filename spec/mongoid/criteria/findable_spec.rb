@@ -54,6 +54,17 @@ describe Mongoid::Criteria::Findable do
           it "returns the matching document" do
             expect(found).to eq(band)
           end
+
+          context "when finding by a JSON-dumped id" do
+
+            let(:found) do
+              Band.find(JSON.load(JSON.dump(band.id)))
+            end
+
+            it "properly parses the id format" do
+              expect(found).to eq(band)
+            end
+          end
         end
 
         context "when the id does not match" do

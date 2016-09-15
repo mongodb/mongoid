@@ -174,6 +174,21 @@ describe Mongoid::Fields::Localized do
                 expect(value).to be_nil
               end
             end
+
+            context 'when fallbacks are empty' do
+
+              before do
+                ::I18n.fallbacks[:de] = [ ]
+              end
+
+              let(:value) do
+                field.demongoize({ 'de' => 'testen' })
+              end
+
+              it "returns the value" do
+                expect(value).to eq('testen')
+              end
+            end
           end
         end
       end
@@ -269,32 +284,50 @@ describe Mongoid::Fields::Localized do
                 ::I18n.fallbacks[:de] = [ :de, :en, :es ]
               end
 
-              context "when the first fallback translation exists" do
+              context 'when fallbacks are enabled' do
 
-                let(:value) do
-                  field.demongoize({ "en" => 1 })
+                context "when the first fallback translation exists" do
+
+                  let(:value) do
+                    field.demongoize({ "en" => 1 })
+                  end
+
+                  it "returns the fallback translation" do
+                    expect(value).to eq(1)
+                  end
                 end
 
-                it "returns the fallback translation" do
-                  expect(value).to eq(1)
+                context "when another fallback translation exists" do
+
+                  let(:value) do
+                    field.demongoize({ "es" => 100 })
+                  end
+
+                  it "returns the fallback translation" do
+                    expect(value).to eq(100)
+                  end
+                end
+
+                context "when the fallback translation does not exist" do
+
+                  let(:value) do
+                    field.demongoize({ "fr" => 50 })
+                  end
+
+                  it "returns nil" do
+                    expect(value).to be_nil
+                  end
                 end
               end
 
-              context "when another fallback translation exists" do
+              context 'when fallbacks are disabled' do
+
+                let(:field) do
+                  described_class.new(:description, localize: true, type: Integer, fallbacks: false)
+                end
 
                 let(:value) do
                   field.demongoize({ "es" => 100 })
-                end
-
-                it "returns the fallback translation" do
-                  expect(value).to eq(100)
-                end
-              end
-
-              context "when the fallback translation does not exist" do
-
-                let(:value) do
-                  field.demongoize({ "fr" => 50 })
                 end
 
                 it "returns nil" do

@@ -140,6 +140,7 @@ module Mongoid
           aliased_fields[name.to_s] = meta.foreign_key
           touchable(meta)
           add_counter_cache_callbacks(meta) if meta.counter_cached?
+          validates(name, presence: true) if require_association?(options)
           meta
         end
 
@@ -349,8 +350,15 @@ module Mongoid
         # @param [ Symbol ] name The name of the relation.
         # @param [ Metadata ] metadata The metadata for the relation.
         def relate(name, metadata)
+          Fields::Validators::Macro.validate_relation(self, name)
           self.relations = relations.merge(name.to_s => metadata)
           getter(name, metadata).setter(name, metadata).existence_check(name)
+        end
+
+        def require_association?(options = {})
+          required = options[:required] if options.key?(:required)
+          required = !options[:optional] if options.key?(:optional) && required.nil?
+          required.nil? ? Mongoid.belongs_to_required_by_default : required
         end
       end
     end

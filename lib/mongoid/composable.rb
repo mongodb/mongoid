@@ -12,6 +12,7 @@ require "mongoid/scopable"
 require "mongoid/serializable"
 require "mongoid/shardable"
 require "mongoid/stateful"
+require "mongoid/cacheable"
 require "mongoid/traversable"
 require "mongoid/validatable"
 
@@ -32,7 +33,6 @@ module Mongoid
     include ActiveModel::Model
     include ActiveModel::ForbiddenAttributesProtection
     include ActiveModel::Serializers::JSON
-    include ActiveModel::Serializers::Xml
     include Atomic
     include Changeable
     include Clients
@@ -50,6 +50,7 @@ module Mongoid
     include Serializable
     include Shardable
     include Stateful
+    include Cacheable
     include Threaded::Lifecycle
     include Traversable
     include Validatable
@@ -76,6 +77,7 @@ module Mongoid
       Clients,
       Shardable,
       Stateful,
+      Cacheable,
       Threaded::Lifecycle,
       Traversable,
       Validatable,
@@ -83,6 +85,28 @@ module Mongoid
       ActiveModel::Model,
       ActiveModel::Validations
     ]
+
+    # These are methods names defined in included blocks that may conflict
+    # with user-defined relation or field names.
+    # They won't be in the list of Module.instance_methods on which the
+    # #prohibited_methods code below is dependent so we must track them
+    # separately.
+    #
+    # @return [ Array<Symbol> ] A list of reserved method names.
+    #
+    # @since 6.0.0
+    RESERVED_METHOD_NAMES = [ :fields,
+                              :aliased_fields,
+                              :localized_fields,
+                              :index_specifications,
+                              :shard_key_fields,
+                              :nested_attributes,
+                              :readonly_attributes,
+                              :storage_options,
+                              :cascades,
+                              :cyclic,
+                              :cache_timestamp_format
+                            ]
 
     class << self
 
@@ -98,7 +122,7 @@ module Mongoid
       def prohibited_methods
         @prohibited_methods ||= MODULES.flat_map do |mod|
           mod.instance_methods.map(&:to_sym)
-        end
+        end + RESERVED_METHOD_NAMES
       end
     end
   end

@@ -69,6 +69,21 @@ module Mongoid
       def settings
         @settings ||= {}
       end
+
+      # Get the log level.
+      #
+      # @example Get the log level.
+      #   config.log_level
+      #
+      # @return [ Integer ] The log level.
+      #
+      # @since 5.1.0
+      def log_level
+        if settings[:log_level]
+          level = settings[:log_level].upcase.to_s
+          "Logger::#{level}".constantize
+        end
+      end
     end
   end
 end

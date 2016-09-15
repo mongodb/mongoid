@@ -14,6 +14,7 @@ class Post
   has_and_belongs_to_many :tags, before_add: :before_add_tag, after_add: :after_add_tag, before_remove: :before_remove_tag, after_remove: :after_remove_tag
   has_many :videos, validate: false
   has_many :roles, validate: false
+  has_many :alerts
 
   belongs_to :posteable, polymorphic: true
   accepts_nested_attributes_for :posteable, autosave: true

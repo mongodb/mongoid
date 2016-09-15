@@ -301,6 +301,27 @@ describe Mongoid::Extensions::String do
         expect("blah").to_not be_numeric
       end
     end
+
+    context "when the string is NaN" do
+
+      it "returns true" do
+        expect("NaN").to be_numeric
+      end
+    end
+
+    context "when the string is Infinity" do
+
+      it "returns true" do
+        expect("Infinity").to be_numeric
+      end
+    end
+
+    context "when the string is -Infinity" do
+
+      it "returns true" do
+        expect("-Infinity").to be_numeric
+      end
+    end
   end
 
   describe "#singularize" do

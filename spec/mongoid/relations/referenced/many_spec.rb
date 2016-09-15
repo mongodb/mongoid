@@ -200,6 +200,24 @@ describe Mongoid::Relations::Referenced::Many do
             expect(person.changed).to eq([])
           end
 
+          context "when the related item has embedded relations" do
+
+            let!(:user) do
+              User.create
+            end
+
+            before do
+              p = Post.create(roles: [ Role.create ])
+              user.posts = [ p ]
+              user.save
+            end
+
+            it "add the document to the target" do
+              expect(user.posts.size).to eq(1)
+              expect(user.posts.first.roles.size).to eq(1)
+            end
+          end
+
           context "when saving another post" do
 
             before do
@@ -3475,12 +3493,10 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         expect(artist).to receive(:before_add_album).and_raise
+        begin; artist.albums << album; rescue; end
       end
 
       it "does not add the document to the relation" do
-        expect {
-          artist.albums << album
-        }.to raise_error
         expect(artist.albums).to be_empty
       end
     end
@@ -3505,13 +3521,29 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         expect(artist).to receive(:after_add_album).and_raise
+        begin; artist.albums << album; rescue; end
       end
 
       it "adds the document to the relation" do
-        expect {
-          artist.albums << album
-        }.to raise_error
         expect(artist.albums).to eq([ album ])
+      end
+    end
+
+    context 'when the relation already exists' do
+
+      before do
+        artist.albums << album
+        album.save
+        artist.save
+        expect(artist).not_to receive(:after_add_album)
+      end
+
+      let(:reloaded_album) do
+        Album.where(artist_id: artist.id).first
+      end
+
+      it 'does not execute the callback when the relation is accessed' do
+        expect(reloaded_album.artist.after_add_referenced_called).to be(nil)
       end
     end
   end
@@ -3571,9 +3603,7 @@ describe Mongoid::Relations::Referenced::Many do
         describe "#delete" do
 
           before do
-            expect {
-              artist.albums.delete album
-            }.to raise_error
+            begin; artist.albums.delete(album); rescue; end
           end
 
           it "does not remove the document from the relation" do
@@ -3584,9 +3614,7 @@ describe Mongoid::Relations::Referenced::Many do
         describe "#clear" do
 
           before do
-            expect {
-              artist.albums.clear
-            }.to raise_error
+            begin; artist.albums.clear; rescue; end
           end
 
           it "does not clear the relation" do
@@ -3646,9 +3674,7 @@ describe Mongoid::Relations::Referenced::Many do
       describe "#delete" do
 
         before do
-          expect {
-            artist.albums.delete album
-          }.to raise_error
+          begin; artist.albums.delete(album); rescue; end
         end
 
         it "removes the documents from the relation" do
@@ -3659,9 +3685,7 @@ describe Mongoid::Relations::Referenced::Many do
       describe "#clear" do
 
         before do
-          expect {
-            artist.albums.clear
-          }.to raise_error
+          begin; artist.albums.clear; rescue; end
         end
 
         it "removes the documents from the relation" do
@@ -3730,6 +3754,30 @@ describe Mongoid::Relations::Referenced::Many do
 
       reloaded = Even.find(child.id)
       expect(reloaded.name).to eq(new_child_name)
+    end
+  end
+
+  context 'when a document has referenced and embedded relations' do
+
+    let(:agent) do
+      Agent.new
+    end
+
+    let(:basic) do
+      Basic.new
+    end
+
+    let(:address) do
+      Address.new
+    end
+
+    before do
+      agent.basics << basic
+      agent.address = address
+    end
+
+    it 'saves the document correctly' do
+      expect(agent.save).to be(true)
     end
   end
 end

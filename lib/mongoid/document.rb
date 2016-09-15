@@ -31,6 +31,15 @@ module Mongoid
       Mongoid.register_model(self)
     end
 
+    # Regex for matching illegal BSON keys.
+    # Note that bson 4.1 has the constant BSON::String::ILLEGAL_KEY
+    # that should be used instead.
+    # When ruby driver 2.3.0 is released and Mongoid can be updated
+    # to require >= 2.3.0, the BSON constant can be used.
+    #
+    # @since 6.0.0
+    ILLEGAL_KEY = /(\A[$])|(\.)/.freeze
+
     # Freezes the internal attributes of the document.
     #
     # @example Freeze the document
@@ -40,7 +49,7 @@ module Mongoid
     #
     # @since 2.0.0
     def freeze
-      as_document.freeze and self
+      as_attributes.freeze and self
     end
 
     # Checks if the document is frozen
@@ -104,7 +113,6 @@ module Mongoid
       _building do
         @new_record = true
         @attributes ||= {}
-        with(self.class.persistence_options)
         apply_pre_processed_defaults
         apply_default_scoping
         process_attributes(attrs) do
@@ -164,20 +172,28 @@ module Mongoid
     #
     # @since 1.0.0
     def as_document
-      return attributes if frozen?
-      embedded_relations.each_pair do |name, meta|
-        without_autobuild do
-          relation, stored = send(name), meta.store_as
-          if attributes.key?(stored) || !relation.blank?
-            if relation
-              attributes[stored] = relation.as_document
-            else
-              attributes.delete(stored)
-            end
-          end
-        end
+      BSON::Document.new(as_attributes)
+    end
+
+    # Calls #as_json on the document with additional, Mongoid-specific options.
+    #
+    # @example Get the document as json.
+    #   document.as_json(compact: true)
+    #
+    # @param [ Hash ] options The options.
+    #
+    # @option options [ true, false ] :compact Whether to include fields with
+    #   nil values in the json document.
+    #
+    # @return [ Hash ] The document as json.
+    #
+    # @since 5.1.0
+    def as_json(options = nil)
+      if options && (options[:compact] == true)
+        super(options).reject! { |k,v| v.nil? }
+      else
+        super(options)
       end
-      attributes
     end
 
     # Returns an instance of the specified class with the attributes,
@@ -221,27 +237,6 @@ module Mongoid
       became
     end
 
-    # Print out the cache key. This will append different values on the
-    # plural model name.
-    #
-    # If new_record?     - will append /new
-    # If not             - will append /id-updated_at.to_s(:nsec)
-    # Without updated_at - will append /id
-    #
-    # This is usually called insode a cache() block
-    #
-    # @example Returns the cache key
-    #   document.cache_key
-    #
-    # @return [ String ] the string with or without updated_at
-    #
-    # @since 2.4.0
-    def cache_key
-      return "#{model_key}/new" if new_record?
-      return "#{model_key}/#{id}-#{updated_at.utc.to_s(:nsec)}" if do_or_do_not(:updated_at)
-      "#{model_key}/#{id}"
-    end
-
     private
 
     # Returns the logger
@@ -275,6 +270,25 @@ module Mongoid
     # @since 2.1.0
     def to_ary
       nil
+    end
+
+    private
+
+    def as_attributes
+      return attributes if frozen?
+      embedded_relations.each_pair do |name, meta|
+        without_autobuild do
+          relation, stored = send(name), meta.store_as
+          if attributes.key?(stored) || !relation.blank?
+            if relation
+              attributes[stored] = relation.as_document
+            else
+              attributes.delete(stored)
+            end
+          end
+        end
+      end
+      attributes
     end
 
     module ClassMethods

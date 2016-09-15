@@ -70,13 +70,44 @@ describe Mongoid::Relations::AutoSave do
 
         context "when saving a new parent document" do
 
-          before do
-            person.drugs << drug
-            person.save
+          context 'when persistence options are not set on the parent' do
+            before do
+              person.drugs << drug
+              person.save
+            end
+
+            it "saves the relation" do
+              expect(drug).to be_persisted
+            end
           end
 
-          it "saves the relation" do
-            expect(drug).to be_persisted
+          context 'when persistence options are set on the parent' do
+
+            let(:other_database) do
+              :other
+            end
+
+            after do
+              Person.with(database: other_database) do |person_class|
+                person_class.delete_all
+              end
+              Drug.with(database: other_database) do |drug_class|
+                drug_class.delete_all
+              end
+            end
+
+            before do
+              person.with(database: other_database) do |per|
+                per.drugs << drug
+                per.save
+              end
+            end
+
+            it 'saves the relation with the persistence options' do
+              Drug.with(database: other_database) do |drug_class|
+                expect(drug_class.count).to eq(1)
+              end
+            end
           end
         end
 
@@ -150,7 +181,7 @@ describe Mongoid::Relations::AutoSave do
           end
         end
 
-        pending "when updating the child" do
+        context "when updating the child" do
 
           before do
             person.account = account
@@ -160,7 +191,9 @@ describe Mongoid::Relations::AutoSave do
           it "sends one insert" do
             account.name = "account"
             expect_query(1) do
-              person.with(write: {w:0}).save
+              person.with(write: {w:0}) do |_person|
+                _person.save
+              end
             end
           end
         end

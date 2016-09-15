@@ -48,7 +48,7 @@ module Mongoid
     # @since 3.0.0
     def default_logger
       logger = Logger.new($stdout)
-      logger.level = Logger::INFO
+      logger.level = Mongoid::Config.log_level
       logger
     end
 

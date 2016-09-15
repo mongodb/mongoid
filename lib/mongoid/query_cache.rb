@@ -169,7 +169,8 @@ module Mongoid
               end
             CODE
 
-          alias_method_chain method_name, :clear_cache
+          alias_method "#{method_name}_without_clear_cache", method_name
+          alias_method method_name, "#{method_name}_with_clear_cache"
         end
       end
     end
@@ -222,7 +223,7 @@ module Mongoid
 
       def cached_cursor
         if limit
-          key = [ collection.namespace, selector, nil, skip, projection ]
+          key = [ collection.namespace, selector, nil, skip, sort, projection ]
           cursor = QueryCache.cache_table[key]
           if cursor
             limited_docs = cursor.to_a[0...limit.abs]
@@ -233,7 +234,7 @@ module Mongoid
       end
 
       def cache_key
-        [ collection.namespace, selector, limit, skip, projection ]
+        [ collection.namespace, selector, limit, skip, sort, projection ]
       end
 
       def system_collection?

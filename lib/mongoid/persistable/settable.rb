@@ -22,12 +22,12 @@ module Mongoid
       def set(setters)
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|
-            field_and_value_hash = hasherizer(field.split('.'), value)
-            field = field_and_value_hash.keys.first
-            process_attribute(field, field_and_value_hash[field])
-            ops[atomic_attribute_name(field)] = attributes[field]
+            process_attribute(field.to_s, value)
+            unless relations.include?(field.to_s)
+              ops[atomic_attribute_name(field)] = attributes[field]
+            end
           end
-          { "$set" => ops }
+          { "$set" => ops } unless ops.empty?
         end
       end
     end

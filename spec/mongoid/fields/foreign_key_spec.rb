@@ -444,6 +444,29 @@ describe Mongoid::Fields::ForeignKey do
         end
       end
     end
+
+    context "when the metadata is polymoprhic" do
+
+      let(:metadata) do
+        Agent.reflect_on_association(:names)
+      end
+
+      let(:field) do
+        described_class.new(:nameable_id, type: Object, metadata: metadata)
+      end
+
+      let(:value) do
+        BSON::ObjectId.new().to_s
+      end
+
+      let(:evolved) do
+        field.evolve(value)
+      end
+
+      it "does not change the foreign key" do
+        expect(evolved).to be(value)
+      end
+    end
   end
 
   describe "#lazy?" do

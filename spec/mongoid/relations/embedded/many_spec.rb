@@ -879,6 +879,36 @@ describe Mongoid::Relations::Embedded::Many do
       Person.create
     end
 
+    context 'when a string is used to access an attribute' do
+
+      let!(:address) do
+        person.addresses.create(street: "one")
+      end
+
+      let(:document) do
+        person.reload.addresses.as_document.first
+      end
+
+      it "returns the attribute value" do
+        expect(document['street']).to eq('one')
+      end
+    end
+
+    context 'when a symbol is used to access an attribute' do
+
+      let!(:address) do
+        person.addresses.create(street: "one")
+      end
+
+      let(:document) do
+        person.reload.addresses.as_document.first
+      end
+
+      it "returns the attribute value" do
+        expect(document[:street]).to eq('one')
+      end
+    end
+
     context "when the relation has no default scope" do
 
       let!(:address) do
@@ -3592,6 +3622,22 @@ describe Mongoid::Relations::Embedded::Many do
     it "properly orders the related objects" do
       expect(criteria.to_a).to eq([message_two, message_one, message_three])
     end
+
+    context "when the field to order on is an array of documents" do
+
+      before do
+        person.aliases = [ { name: "A", priority: 3 }, { name: "B", priority: 4 }]
+        person.save
+      end
+
+      let!(:person2) do
+        Person.create( aliases: [ { name: "C", priority: 1 }, { name: "D", priority: 2 }])
+      end
+
+      it "allows ordering on a key of an embedded document" do
+        expect(Person.all.order_by("aliases.0.priority" => 1).first).to eq(person2)
+      end
+    end
   end
 
   context "when using dot notation in a criteria" do
@@ -3745,12 +3791,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         expect(artist).to receive(:before_add_song).and_raise
+        begin; artist.songs << song; rescue; end
       end
 
       it "does not add the document to the relation" do
-        expect {
-          artist.songs << song
-        }.to raise_error
         expect(artist.songs).to be_empty
       end
     end
@@ -3775,12 +3819,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         expect(artist).to receive(:after_add_label).and_raise
+        begin; artist.labels << label; rescue; end
       end
 
       it "adds the document to the relation" do
-        expect {
-          artist.labels << label
-        }.to raise_error
         expect(artist.labels).to eq([ label ])
       end
     end
@@ -3841,19 +3883,18 @@ describe Mongoid::Relations::Embedded::Many do
         describe "#delete" do
 
           it "does not remove the document from the relation" do
-            expect {
-              artist.songs.delete(song)
-            }.to raise_error
+            begin; artist.songs.delete(song); rescue; end
             expect(artist.songs).to eq([ song ])
           end
         end
 
         describe "#clear" do
 
+          before do
+            begin; artist.songs.clear; rescue; end
+          end
+
           it "removes the documents from the relation" do
-            expect {
-              artist.songs.clear
-            }.to raise_error
             expect(artist.songs).to eq([ song ])
           end
         end
@@ -3909,9 +3950,7 @@ describe Mongoid::Relations::Embedded::Many do
       describe "#delete" do
 
         before do
-          expect {
-            artist.labels.delete(label)
-          }.to raise_error
+          begin; artist.labels.delete(label); rescue; end
         end
 
         it "removes the document from the relation" do
@@ -3922,9 +3961,7 @@ describe Mongoid::Relations::Embedded::Many do
       describe "#clear" do
 
         before do
-          expect {
-            artist.labels.clear
-          }.to raise_error
+          begin; artist.labels.clear; rescue; end
         end
 
         it "should remove from collection" do
@@ -4000,29 +4037,6 @@ describe Mongoid::Relations::Embedded::Many do
           expect(record.reload.name).to eq("Apparat")
         end
       end
-    end
-  end
-
-  context "when embedded documents get marshalled" do
-
-    let(:person) do
-      Person.create
-    end
-
-    let!(:addresses) do
-      person.addresses
-    end
-
-    let!(:dumped) do
-      Marshal.dump(addresses)
-    end
-
-    let!(:loaded) do
-      Marshal.load(dumped)
-    end
-
-    it "keeps the proxy extensions when remarshalling" do
-      expect(loaded.extension).to eq("Testing")
     end
   end
 

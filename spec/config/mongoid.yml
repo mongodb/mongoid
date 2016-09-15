@@ -21,3 +21,5 @@ test:
     raise_not_found_error: true
     use_activesupport_time_zone: true
     use_utc: false
+    log_level: :warn
+    belongs_to_required_by_default: false

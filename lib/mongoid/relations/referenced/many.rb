@@ -10,6 +10,24 @@ module Mongoid
         delegate :count, to: :criteria
         delegate :first, :in_memory, :last, :reset, :uniq, to: :target
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
+        VALID_OPTIONS = [
+          :after_add,
+          :after_remove,
+          :as,
+          :autosave,
+          :before_add,
+          :before_remove,
+          :dependent,
+          :foreign_key,
+          :order,
+          :primary_key
+        ].freeze
+
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
@@ -320,14 +338,46 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def append(document)
-          # @todo: remove?
-          document.with(@persistence_options) if @persistence_options
+          with_add_callbacks(document, already_related?(document)) do
+            target.push(document)
+            characterize_one(document)
+            bind_one(document)
+          end
+        end
 
-          execute_callback :before_add, document
-          target.push(document)
-          characterize_one(document)
-          bind_one(document)
-          execute_callback :after_add, document
+        # Execute before/after add callbacks around the block unless the objects
+        # already have a persisted relation.
+        #
+        # @example Execute before/after add callbacks around the block.
+        #   relation.with_add_callbacks(document, false)
+        #
+        # @param [ Document ] document The document to append to the target.
+        # @param [ true, false ] already_related Whether the document is already related
+        #   to the target.
+        #
+        # @since 5.1.0
+        def with_add_callbacks(document, already_related)
+          execute_callback :before_add, document unless already_related
+          yield
+          execute_callback :after_add, document unless already_related
+        end
+
+        # Whether the document and the base already have a persisted relation.
+        #
+        # @example Is the document already related to the base.
+        #   relation.already_related?(document)
+        #
+        # @param [ Document ] document The document to possibly append to the target.
+        #
+        # @return [ true, false ] Whether the document is already related to the base and the
+        #   relation is persisted.
+        #
+        # @since 5.1.0
+        def already_related?(document)
+          document.persisted? &&
+            document.__metadata &&
+              document.respond_to?(document.__metadata.foreign_key) &&
+                document.__send__(document.__metadata.foreign_key) == base.id
         end
 
         # Instantiate the binding associated with this relation.
@@ -698,18 +748,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [
-              :after_add,
-              :after_remove,
-              :as,
-              :autosave,
-              :before_add,
-              :before_remove,
-              :dependent,
-              :foreign_key,
-              :order,
-              :primary_key
-            ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

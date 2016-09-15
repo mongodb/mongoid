@@ -14,6 +14,7 @@ DONATE
 SPECS.txt
 .yardoc/*
 doc/*
+yard-docs
 *.swp
 *.un~
 *~
@@ -23,3 +24,4 @@ doc/*
 *.symbols
 .idea
 gem-private_key.pem
+examples

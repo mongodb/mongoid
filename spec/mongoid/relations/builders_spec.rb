@@ -185,20 +185,47 @@ describe Mongoid::Relations::Builders do
 
         context "when a document already exists" do
 
-          let!(:game_two) do
-            person.create_game(name: "Skyrim")
+          context "when the relation belongs_to is already set" do
+
+            let!(:game_one) do
+              game = person.create_game(name: "Starcraft")
+              game.person = person
+            end
+
+            let!(:game_two) do
+              person.create_game(name: "Skyrim")
+            end
+
+            it "replaces the existing document" do
+              expect(person.game).to eq(game_two)
+            end
+
+            it "persists the change" do
+              expect(person.game(true)).to eq(game_two)
+            end
+
+            it "removes the old document from the database" do
+              expect(Game.collection.find.count).to eq(1)
+            end
           end
 
-          it "replaces the existing document" do
-            expect(person.game).to eq(game_two)
-          end
+          context 'when the relation belongs_to is not already set' do
 
-          it "persists the change" do
-            expect(person.game(true)).to eq(game_two)
-          end
+            let!(:game_two) do
+              person.create_game(name: "Skyrim")
+            end
 
-          it "removes the old document from the database" do
-            expect(Game.collection.find.count).to eq(1)
+            it "replaces the existing document" do
+              expect(person.game).to eq(game_two)
+            end
+
+            it "persists the change" do
+              expect(person.game(true)).to eq(game_two)
+            end
+
+            it "removes the old document from the database" do
+              expect(Game.collection.find.count).to eq(1)
+            end
           end
         end
       end

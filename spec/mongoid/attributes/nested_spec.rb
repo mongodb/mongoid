@@ -176,6 +176,27 @@ describe Mongoid::Attributes::Nested do
       it "sets the nested attributes" do
         expect(person.preferences.first.name).to eq("First")
       end
+
+      context "when adding existing document to a relation" do
+        let(:preference) { Preference.create(name: 'sample preference') }
+        let(:person) do
+          Person.new(
+            preferences_attributes: { 0 => { id: preference.id, name: preference.name } }
+          )
+        end
+
+        it "sets the nested attributes" do
+          expect(person.preferences.map(&:name)).to eq([preference.name])
+        end
+
+        it "updates attributes of existing document which is added to relation" do
+          preference_name = 'updated preference'
+          person = Person.new(
+            preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
+          )
+          expect(person.preferences.map(&:name)).to eq([preference_name])
+        end
+      end
     end
 
     context "when the relation is a referenced in" do
@@ -1314,7 +1335,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.addresses_attributes =
                     { "foo" => { "id" => "test", "street" => "Test" } }
-                }.to raise_error
+                }.to raise_error(Mongoid::Errors::DocumentNotFound)
               end
             end
           end
@@ -1413,7 +1434,7 @@ describe Mongoid::Attributes::Nested do
                       Person.create(age: 42)
                     end
 
-                    context "when the child returns false in a before callback" do
+                    context "when the child halts the callback chain in a before callback" do
 
                       context "when the child is not paranoid" do
 
@@ -1949,7 +1970,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.addresses.size).to eq(1)
                   end
 
@@ -2010,7 +2031,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.addresses.first.street).to eq("Maybachufer")
                   end
 
@@ -2070,7 +2091,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.addresses.first.street).to eq("Maybachufer")
                   end
 
@@ -3007,7 +3028,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.posts_attributes =
                     { "foo" => { "id" => "test", "title" => "Test" } }
-                }.to raise_error
+                }.to raise_error(Mongoid::Errors::DocumentNotFound)
               end
             end
           end
@@ -3410,7 +3431,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.posts.size).to eq(1)
                   end
 
@@ -3471,7 +3492,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.posts.first.title).to eq("New Blog")
                   end
 
@@ -3531,7 +3552,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.posts.first.title).to eq("New Blog")
                   end
 
@@ -3724,7 +3745,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.preferences_attributes =
                     { "foo" => { "id" => "test", "name" => "Test" } }
-                }.to raise_error
+                }.to raise_error(Mongoid::Errors::DocumentNotFound)
               end
             end
           end
@@ -4076,7 +4097,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.preferences.size).to eq(1)
                   end
 
@@ -4137,7 +4158,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.preferences.first.name).to eq("New Blog")
                   end
 
@@ -4197,7 +4218,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.preferences.first.name).to eq("New Blog")
                   end
 
@@ -4831,7 +4852,7 @@ describe Mongoid::Attributes::Nested do
           end
 
           it "the update raises an error" do
-            expect{ error_raising_update }.to raise_error
+            expect{ error_raising_update }.to raise_error(Mongoid::Errors::Validations)
           end
 
           it "the update does not occur" do

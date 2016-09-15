@@ -1,6 +1,7 @@
 class Record
   include Mongoid::Document
   field :name, type: String
+  field :producers, type: Array
 
   field :before_create_called, type: Mongoid::Boolean, default: false
   field :before_save_called, type: Mongoid::Boolean, default: false

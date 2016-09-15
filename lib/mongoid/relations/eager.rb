@@ -34,11 +34,18 @@ module Mongoid
       end
 
       def preload(relations, docs)
-
-        relations.group_by do |metadata|
-          metadata.relation
-        end.each do |relation, associations|
-          relation.eager_load_klass.new(associations, docs).run
+        grouped_relations = relations.group_by do |metadata|
+          metadata.inverse_class_name
+        end
+        grouped_relations.keys.each do |_klass|
+          grouped_relations[_klass] = grouped_relations[_klass].group_by do |metadata|
+            metadata.relation
+          end
+        end
+        grouped_relations.each do |_klass, associations|
+          docs = associations.collect do |_relation, association|
+            _relation.eager_load_klass.new(association, docs).run
+          end.flatten
         end
       end
     end

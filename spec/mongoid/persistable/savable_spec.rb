@@ -295,20 +295,37 @@ describe Mongoid::Persistable::Savable do
       end
     end
 
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
+    context "when the changed attribute is not writable" do
 
       before do
         Person.create(title: "sir")
       end
 
+      let(:person) do
+        Person.only(:title).first
+      end
+
       it "raises an error" do
         expect {
+          person.username = 'unloaded-attribute'
           person.save
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+      end
+
+      context 'when the changed attribute is aliased' do
+
+        before do
+          Person.create(at: Time.now)
+        end
+
+        let(:person) do
+          Person.only(:at).first
+        end
+
+        it "saves the document" do
+          person.aliased_timestamp = Time.now
+          expect(person.save(validate: false)).to be true
+        end
       end
     end
 
@@ -353,12 +370,17 @@ describe Mongoid::Persistable::Savable do
         end
 
         before do
+          Person.index({ ssn: 1 }, { unique: true })
           Person.create_indexes
           Person.create!(ssn: "555-55-9999")
         end
 
-        it "raises an error" do
-          expect { person.save! }.to raise_error
+        after do
+          Person.collection.drop
+        end
+
+        it "raises an OperationFailure" do
+          expect { person.save! }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
     end
@@ -374,12 +396,12 @@ describe Mongoid::Persistable::Savable do
       end
 
       it "raises an error with multiple save attempts" do
-        expect { subject.save! }.to raise_error
-        expect { subject.save! }.to raise_error
+        expect { service.save! }.to raise_error(Mongoid::Errors::Validations)
+        expect { service.save! }.to raise_error(Mongoid::Errors::Validations)
       end
     end
 
-    context "when a callback returns false" do
+    context "when a callback aborts the callback chain" do
 
       let(:oscar) do
         Oscar.new
@@ -493,23 +515,6 @@ describe Mongoid::Persistable::Savable do
 
       it "properly sets up the entire hierarchy" do
         expect(from_db.shapes.first.canvas).to eq(firefox)
-      end
-    end
-
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
-
-      before do
-        Person.create(title: "sir")
-      end
-
-      it "raises an error" do
-        expect {
-          person.save!
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
       end
     end
   end

@@ -538,6 +538,135 @@ describe Mongoid::Criteria::Modifiable do
         it "sets the additional attributes" do
           expect(document.origin).to eq("Essex")
         end
+
+        context 'when attributes contain keys also in the criteria selector' do
+
+          context 'when the selector has symbol keys' do
+
+            context 'when the attributes use symbol keys' do
+
+              let(:document) do
+                Band.where(name: 'Tool').first_or_create(name: 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+
+            context 'when the attributes use string keys' do
+
+              let(:document) do
+                Band.where(name: 'Tool').first_or_create('name' => 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+          end
+
+          context 'when the selector has string keys' do
+
+            context 'when the attributes use symbol keys' do
+
+              let(:document) do
+                Band.where('name' => 'Tool').first_or_create(name: 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+
+            context 'when the attributes use string keys' do
+
+              let(:document) do
+                Band.where('name' => 'Tool').first_or_create('name' => 'Essex')
+              end
+
+              it 'uses the values from the attributes' do
+                expect(document.name).to eq('Essex')
+              end
+            end
+          end
+        end
+
+        context 'when the query criteria is on a hash attribute' do
+
+          let(:document) do
+            Person.where(map: { foo: :bar }).first_or_create
+          end
+
+          it 'uses the values from the attributes' do
+            expect(document.map).to eq({ foo: :bar })
+          end
+        end
+
+        context 'when the criteria has a selector with query operators' do
+
+          let(:document) do
+            Band.in(genres: ['Hiphop', 'Soul']).first_or_create(name: 'Smooth')
+          end
+
+          it 'does not create a document with the query operators' do
+            expect(document.attributes.keys).not_to include('genres')
+          end
+        end
+
+        context 'when the criteria has a nested selector with query operators' do
+
+          let(:band) do
+            record = Record.new(producers: ['testing'])
+            band = Band.create(records: [record])
+          end
+
+          let(:document) do
+            band.records.in(producers: ['nonexistent']).first_or_create(name: 'new-embedded-doc')
+            band.reload
+          end
+
+          it 'creates a new embedded document' do
+            expect(document.records.size).to eq(2)
+          end
+
+          it 'does not alter the existing embedded document' do
+            expect(document.records[0].producers).to eq(['testing'])
+          end
+
+          it 'does not create a document with the query operators as attributes' do
+            expect(document.records[1].producers).to be_nil
+          end
+
+          it 'applies the attribute to the new embedded document' do
+            expect(document.records[1].name).to eq('new-embedded-doc')
+          end
+        end
+
+        context 'when the criteria has a deeply-nested selector with query operators' do
+
+          let(:criteria) do
+            band = Band.create
+            Mongoid::Criteria.new(Record) do |criteria|
+              criteria.embedded = true
+              criteria.metadata = Band.reflect_on_association(:records)
+              criteria.parent_document = band
+              criteria.selector = { "records" => { "producers"=>{"$in"=>["nonexistent"] } } }
+            end
+          end
+
+          let(:document) do
+            criteria.first_or_create(name: 'new-record')
+          end
+
+          it 'does not create a document with the query operators' do
+            expect(document.attributes.keys).not_to include('producers')
+          end
+
+          it 'applies the attribute to the new embedded document' do
+            expect(document.name).to eq('new-record')
+          end
+        end
       end
 
       context "when attributes are not provided" do
@@ -736,6 +865,59 @@ describe Mongoid::Criteria::Modifiable do
           end
         end
       end
+
+      context 'when attributes contain keys also in the criteria selector' do
+
+        context 'when the selector has symbol keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_create!(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_create!('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+        end
+
+        context 'when the selector has string keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_create!(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_create!('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+        end
+      end
     end
   end
 
@@ -827,6 +1009,59 @@ describe Mongoid::Criteria::Modifiable do
 
           it "returns a non persisted document" do
             expect(document).to_not be_persisted
+          end
+        end
+      end
+
+      context 'when attributes contain keys also in the criteria selector' do
+
+        context 'when the selector has symbol keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_initialize(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where(name: 'Tool').first_or_initialize('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+        end
+
+        context 'when the selector has string keys' do
+
+          context 'when the attributes use symbol keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_initialize(name: 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
+          end
+
+          context 'when the attributes use string keys' do
+
+            let(:document) do
+              Band.where('name' => 'Tool').first_or_initialize('name' => 'Essex')
+            end
+
+            it 'uses the values from the attributes' do
+              expect(document.name).to eq('Essex')
+            end
           end
         end
       end
@@ -1275,8 +1510,7 @@ describe Mongoid::Criteria::Modifiable do
             end
 
             it 'gives the write method args precedence' do
-              #  @todo: uncomment when MONGOID-4193 is closed
-              #expect(new_person.username).to eq('Beet')
+              expect(new_person.username).to eq('Beet')
               expect(new_person.age).to eq(50)
             end
           end
@@ -1332,8 +1566,7 @@ describe Mongoid::Criteria::Modifiable do
         context 'when a write method is chained' do
 
           it 'executes the method' do
-            #  @todo: uncomment when MONGOID-4193 is closed
-            #expect(criteria.create_with(attrs).new.username).to eq('Beet')
+            expect(criteria.create_with(attrs).new.username).to eq('Turnip')
             expect(criteria.create_with(attrs).new.age).to eq(25)
           end
         end
@@ -1345,9 +1578,8 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it 'executes the query' do
-            #  @todo: uncomment when MONGOID-4193 is closed
-            #expect(new_person.username).to eq('Beet')
-            #expect(new_person.age).to eq(50)
+            expect(new_person.username).to eq('Beet')
+            expect(new_person.age).to eq(50)
           end
         end
       end

@@ -173,7 +173,7 @@ module Mongoid
       # @since 3.0.0
       def create_document(method, attrs = nil, &block)
         attributes = selector.reduce(attrs ? attrs.dup : {}) do |hash, (key, value)|
-          unless key.to_s =~ /\$/ || value.is_a?(Hash)
+          unless invalid_key?(hash, key) || invalid_embedded_doc?(value)
             hash[key] = value
           end
           hash
@@ -215,6 +215,22 @@ module Mongoid
       # @since 3.1.0
       def first_or(method, attrs = {}, &block)
         first || create_document(method, attrs, &block)
+      end
+
+      private
+
+      def invalid_key?(hash, key)
+        # @todo Change this to BSON::String::ILLEGAL_KEY when ruby driver 2.3.0 is
+        # released and mongoid is updated to depend on driver >= 2.3.0
+        key.to_s =~ Mongoid::Document::ILLEGAL_KEY || hash.key?(key.to_sym) || hash.key?(key)
+      end
+
+      def invalid_embedded_doc?(value)
+        # @todo Change this to BSON::String::ILLEGAL_KEY when ruby driver 2.3.0 is
+        # released and mongoid is updated to depend on driver >= 2.3.0
+        value.is_a?(Hash) && value.any? do |key, v|
+          key.to_s =~ Mongoid::Document::ILLEGAL_KEY || invalid_embedded_doc?(v)
+        end
       end
     end
   end

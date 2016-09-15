@@ -70,5 +70,16 @@ describe Mongoid::Matchable::Lt do
 
       end
     end
+
+    context "when the value is not numeric" do
+
+      let(:matcher) do
+        described_class.new(5)
+      end
+
+      it "returns false" do
+        expect(matcher.matches?("$lt" => '5.1')).to be false
+      end
+    end
   end
 end

@@ -3,6 +3,8 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
+### As of version 5.0.2, please refer to the github releases for change logs.
+
 ## 5.0.1
 
 ### Resolved Issues

@@ -38,7 +38,8 @@ development:
         # on 2.4 and 2.6 is :plain)
         # auth_mech: :scram
 
-        # The database or source to authenticate the user against. (default: admin)
+        # The database or source to authenticate the user against.
+        # (default: the database specified above or admin)
         # auth_source: admin
 
         # Force a the driver cluster to behave in a certain manner instead of auto-
@@ -92,7 +93,7 @@ development:
         # A passphrase for the private key.
         # ssl_key_pass_phrase: password
 
-        # Whether or not to do peer certification validation. (default: false)
+        # Whether or not to do peer certification validation. (default: true)
         # ssl_verify: true
 
         # The file containing a set of concatenated certification authority certifications
@@ -125,6 +126,11 @@ development:
 
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
+
+    # Set the Mongoid and Ruby driver log levels when not in a Rails
+    # environment. The Mongoid logger will be set to the Rails logger
+    # otherwise.(default: :info)
+    # log_level: :info
 test:
   clients:
     default:

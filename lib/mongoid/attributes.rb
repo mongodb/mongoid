@@ -139,14 +139,12 @@ module Mongoid
     #
     # @since 1.0.0
     def remove_attribute(name)
-      access = name.to_s
-      unless attribute_writable?(name)
-        raise Errors::ReadonlyAttribute.new(name, :nil)
-      end
-      _assigning do
-        attribute_will_change!(access)
-        delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
-        attributes.delete(access)
+      as_writable_attribute!(name) do |access|
+        _assigning do
+          attribute_will_change!(access)
+          delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
+          attributes.delete(access)
+        end
       end
     end
 
@@ -165,8 +163,7 @@ module Mongoid
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      access = database_field_name(name.to_s)
-      if attribute_writable?(access)
+      as_writable_attribute!(name) do |access|
         _assigning do
           validate_attribute_value(access, value)
           localized = fields[access].try(:localized?)
@@ -248,19 +245,11 @@ module Mongoid
     private
 
     def selection_excluded?(name, selection, field)
-      if field && field.localized?
-        selection["#{name}.#{::I18n.locale}"] == 0
-      else
-        selection[name] == 0
-      end
+      selection[name] == 0
     end
 
     def selection_included?(name, selection, field)
-      if field && field.localized?
-        selection.key?("#{name}.#{::I18n.locale}")
-      else
-        selection.key?(name)
-      end
+      selection.key?(name) || selection.keys.collect { |k| k.partition('.').first }.include?(name)
     end
 
     # Does the string contain dot syntax for accessing hashes?
@@ -344,6 +333,13 @@ module Mongoid
           raise Mongoid::Errors::InvalidValue.new(fields[access].type, value.class)
         end
       end
+    end
+
+    def lookup_attribute_presence(name, value)
+      if localized_fields.has_key?(name)
+        value = localized_fields[name].send(:lookup, value)
+      end
+      value.present?
     end
   end
 end

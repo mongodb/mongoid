@@ -26,6 +26,7 @@ module Mongoid
       @attributes = reloaded
       @attributes_before_type_cast = {}
       changed_attributes.clear
+      reset_readonly
       apply_defaults
       reload_relations
       run_callbacks(:find) unless _find_callbacks.empty?
@@ -70,7 +71,7 @@ module Mongoid
     # @since 2.3.2
     def reload_embedded_document
       extract_embedded_attributes({}.merge(
-        _root.collection.find(_id: _root._id).read(mode: :primary).first
+        collection(_root).find(_id: _root._id).read(mode: :primary).first
       ))
     end
 

@@ -27,6 +27,29 @@ describe Mongoid::Scopable do
       end
     end
 
+    context "when provided a block" do
+
+      let(:criteria) do
+        Band.where(name: "Depeche Mode")
+      end
+
+      before do
+        Band.default_scope { criteria }
+      end
+
+      after do
+        Band.default_scoping = nil
+      end
+
+      it "adds the default scope to the class" do
+        expect(Band.default_scoping.call).to eq(criteria)
+      end
+
+      it "flags as being default scoped" do
+        expect(Band).to be_default_scoping
+      end
+    end
+
     context "when provided a non proc" do
 
       it "raises an error" do
@@ -135,6 +158,31 @@ describe Mongoid::Scopable do
       it "returns an empty criteria" do
         expect(Band.queryable.selector).to be_empty
       end
+
+      context "when the class is not embedded" do
+
+        it "returns a criteria with embedded set to nil" do
+          expect(Band.queryable.embedded).to be(nil)
+        end
+      end
+
+      context "when the class is embedded" do
+
+        it "returns a criteria with embedded set to true" do
+          expect(Address.queryable.embedded).to be(true)
+        end
+
+        context "when scopes are chained" do
+
+          let(:person) do
+            Person.create
+          end
+
+          it "constructs a criteria for an embedded relation" do
+            expect(person.addresses.without_postcode_ordered.embedded).to be(true)
+          end
+        end
+      end
     end
 
     context "when a criteria exists on the stack" do
@@ -178,6 +226,25 @@ describe Mongoid::Scopable do
   describe ".scope" do
 
     context "when provided a criteria" do
+
+      context "when the lambda includes a geo_near query" do
+
+        before do
+          Bar.scope(:near_by, lambda{ |location| geo_near(location) })
+        end
+
+        after do
+          class << Bar
+            undef_method :near_by
+          end
+          Bar._declared_scopes.clear
+        end
+
+        it "allows the scope to be defined" do
+          expect(Bar.near_by([ 51.545099, -0.0106 ])).to be_a(Mongoid::Contextual::GeoNear)
+        end
+
+      end
 
       context "when a block is provided" do
 

@@ -45,10 +45,12 @@ module Mongoid
         #
         # @since 4.0.0
         def run
+          @loaded = []
           while shift_metadata
             preload
+            @loaded << @docs.collect { |d| d.send(@metadata.name) if d.respond_to?(@metadata.name) }
           end
-          @docs
+          @loaded.flatten
         end
 
         # Preload the current relation.
@@ -97,12 +99,12 @@ module Mongoid
         # @example Return a hash with the current documents grouped by key.
         #   loader.grouped_docs
         #
-        # @return [ Hash ] hash with groupd documents.
+        # @return [ Hash ] hash with grouped documents.
         #
         # @since 4.0.0
         def grouped_docs
           @grouped_docs[@metadata.name] ||= @docs.group_by do |doc|
-            doc.send(group_by_key)
+            doc.send(group_by_key) if doc.respond_to?(group_by_key)
           end
         end
 

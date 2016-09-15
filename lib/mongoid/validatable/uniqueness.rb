@@ -169,7 +169,6 @@ module Mongoid
           name = document.database_field_name(item)
           criteria = criteria.where(item => document.attributes[name])
         end
-        criteria = criteria.with(document.persistence_options)
         criteria
       end
 
@@ -274,7 +273,7 @@ module Mongoid
         criteria = create_criteria(klass, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
 
-        if criteria.with(criteria.persistence_options).read(mode: :primary).exists?
+        if criteria.read(mode: :primary).exists?
           add_error(document, attribute, value)
         end
       end

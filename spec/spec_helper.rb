@@ -64,6 +64,9 @@ CONFIG = {
         auth_source: Mongo::Database::ADMIN,
       }
     }
+  },
+  options: {
+    belongs_to_required_by_default: false
   }
 }
 
@@ -93,6 +96,12 @@ end
 
 module MyApp
   class Application < Rails::Application
+  end
+end
+
+module Mongoid
+  class Query
+    include Mongoid::Criteria::Queryable
   end
 end
 

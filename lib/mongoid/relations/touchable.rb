@@ -29,7 +29,7 @@ module Mongoid
         write_attribute(field, current) if field
 
         touches = touch_atomic_updates(field)
-        unless touches.empty?
+        unless touches["$set"].blank?
           selector = atomic_selector
           _root.collection.find(selector).update_one(positionally(selector, touches))
         end
@@ -53,7 +53,8 @@ module Mongoid
         def touchable(metadata)
           if metadata.touchable?
             name = metadata.name
-            method_name = define_relation_touch_method(name)
+            field = metadata[:touch].is_a?(Symbol) ? metadata[:touch] : nil
+            method_name = define_relation_touch_method(name, field)
             after_save method_name
             after_destroy method_name
             after_touch method_name
@@ -70,19 +71,21 @@ module Mongoid
         #
         # @example Define the touch relation.
         #   Model.define_relation_touch_method(:band)
+        #   Model.define_relation_touch_method(:band, :band_updated_at)
         #
         # @param [ Symbol ] name The name of the relation.
+        # @param [ Symbol ] extra_field Additional timestamp field to update.
         #
         # @since 3.1.0
         #
         # @return [ Symbol ] The method name.
-        def define_relation_touch_method(name)
+        def define_relation_touch_method(name, extra_field = nil)
           method_name = "touch_#{name}_after_create_or_destroy"
           class_eval <<-TOUCH
             def #{method_name}
               without_autobuild do
                 relation = __send__(:#{name})
-                relation.touch if relation
+                relation.touch #{":#{extra_field}" if extra_field} if relation
               end
             end
           TOUCH

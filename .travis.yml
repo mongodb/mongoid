@@ -5,25 +5,26 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.1
-  - 2.2
-  - jruby
+  - 2.2.2
+  - 2.3.1
+  - jruby-9.1.2.0
+
+matrix:
+  allow_failures:
+    - rvm: jruby-9.1.2.0
 
 gemfile:
   - Gemfile
-  - gemfiles/rails41.gemfile
-  - gemfiles/rails42.gemfile
 
 env:
   global:
     - CI="travis"
-    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
   matrix:
     - MONGODB=2.4.14
-    - MONGODB=2.6.10
-    - MONGODB=3.0.3
+    - MONGODB=2.6.12
+    - MONGODB=3.0.12
+    - MONGODB=3.2.7
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz

@@ -940,7 +940,7 @@ describe Mongoid::Changeable do
       end
 
       it "returns a hash with indifferent access" do
-        expect(person.changes["title"]).to eq(
+        expect(person.changes[:title]).to eq(
           [ nil, "Captain Obvious" ]
         )
       end
@@ -1285,6 +1285,64 @@ describe Mongoid::Changeable do
         it "flags the document dirty" do
           expect(person).to be_title_changed
         end
+      end
+    end
+  end
+
+  describe '#previously_changed?' do
+
+    let(:person) do
+      Person.new(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    context "when the document has been saved" do
+
+      before do
+        person.save!
+      end
+
+      it "returns true" do
+        expect(person.title_previously_changed?).to be(true)
+      end
+    end
+
+    context "when the document has not been saved" do
+
+      it "returns false" do
+        expect(person.title_previously_changed?).to be(false)
+      end
+    end
+  end
+
+  describe '#previous_change' do
+
+    let(:person) do
+      Person.new(title: "Grand Poobah")
+    end
+
+    before do
+      person.title = "Captain Obvious"
+    end
+
+    context "when the document has been saved" do
+
+      before do
+        person.save!
+      end
+
+      it "returns the changes" do
+        expect(person.title_previous_change).to eq([ nil, "Captain Obvious" ])
+      end
+    end
+
+    context "when the document has not been saved" do
+
+      it "returns no changes" do
+        expect(person.title_previous_change).to eq(nil)
       end
     end
   end

@@ -476,13 +476,58 @@ describe Mongoid::Findable do
     end
   end
 
-  Origin::Selectable.forwardables.each do |method|
+  Mongoid::Criteria::Queryable::Selectable.forwardables.each do |method|
 
     describe "##{method}" do
 
       it "forwards the #{method} to the criteria" do
         expect(Band).to respond_to(method)
       end
+    end
+  end
+
+  context 'when Mongoid is configured to use activesupport time zone' do
+
+    before do
+      Mongoid.use_utc = false
+      Mongoid.use_activesupport_time_zone = true
+      Time.zone = "Asia/Kolkata"
+    end
+
+    let!(:time) do
+      Time.zone.now.tap do |t|
+        User.create(last_login: t, name: 'Tom')
+      end
+    end
+
+    it 'uses activesupport time zone' do
+      expect(User.distinct(:last_login).first.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
+    end
+
+    it 'loads other fields accurately' do
+      expect(User.distinct(:name)).to match_array(['Tom'])
+    end
+  end
+
+  context 'when Mongoid is not configured to use activesupport time zone' do
+
+    before do
+      Mongoid.use_utc = true
+      Mongoid.use_activesupport_time_zone = false
+    end
+
+    let!(:time) do
+      Time.now.tap do |t|
+        User.create(last_login: t, name: 'Tom')
+      end
+    end
+
+    it 'uses utc' do
+      expect(User.distinct(:last_login).first.to_s).to eql(time.utc.to_s)
+    end
+
+    it 'loads other fields accurately' do
+      expect(User.distinct(:name)).to match_array(['Tom'])
     end
   end
 end

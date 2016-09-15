@@ -329,5 +329,34 @@ describe Mongoid::Relations::Touchable do
         end
       end
     end
+
+    context "when other document attributes have been changed" do
+
+      let(:band) do
+        Band.create(name: "Placebo")
+      end
+
+      context "when an attribute is provided" do
+        before do
+          band.name = 'Nocebo'
+          band.touch(:last_release)
+        end
+
+        it "does not persist other attribute changes" do
+          expect(band.reload.name).not_to eq('Nocebo')
+        end
+      end
+
+      context "when an attribute is not provided" do
+        before do
+          band.name = 'Nocebo'
+          band.touch
+        end
+
+        it "does not persist other attribute changes" do
+          expect(band.reload.name).not_to eq('Nocebo')
+        end
+      end
+    end
   end
 end
