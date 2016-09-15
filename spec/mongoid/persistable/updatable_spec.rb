@@ -113,14 +113,20 @@ describe Mongoid::Persistable::Updatable do
     end
 
     context "when dynamic attributes are not enabled" do
-      let(:account) do
-        Account.create
-      end
 
       it "raises exception for an unknown attribute " do
+        account = Account.create
+
         expect {
           account.update_attribute(:somethingnew, "somethingnew")
         }.to raise_error(Mongoid::Errors::UnknownAttribute)
+      end
+
+      it "will update value of aliased field" do
+        person = Person.create
+        person.update_attribute(:t, "test_value")
+        expect(person.reload.t).to eq "test_value"
+        expect(person.test).to eq "test_value"
       end
     end
 
