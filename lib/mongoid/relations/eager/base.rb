@@ -145,7 +145,7 @@ module Mongoid
         #
         # @since 4.0.0
         def set_relation(doc, element)
-          doc.set_relation(@metadata.name, element)
+          doc.set_relation(@metadata.name, element) unless doc.blank?
         end
       end
     end
