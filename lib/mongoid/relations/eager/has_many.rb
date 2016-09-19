@@ -22,7 +22,7 @@ module Mongoid
         end
 
         def set_relation(doc, element)
-          doc.__build__(@metadata.name, element, @metadata)
+          doc.__build__(@metadata.name, element, @metadata) unless doc.blank?
         end
 
         def group_by_key
