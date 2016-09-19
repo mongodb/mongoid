@@ -27,7 +27,7 @@ Using Mongoid with an existing Rails application
 If you're starting to use an existing Rails application with Mongoid, you'll have to update your
 ``config/application.rb`` file to remove the ``require 'rails/all'`` line and only include the
 frameworks you want. You must also ensure that you remove all references to ActiveRecord in the
-config directory and models directory.
+``config`` directory and ``models`` directory.
 
 Railties
 --------
