@@ -105,6 +105,7 @@ module Mongoid
         keys = string.split(".")
         value = self
         keys.each do |key|
+          return nil if value.nil?
           nested = value[key] || value[key.to_i]
           value = nested
         end
