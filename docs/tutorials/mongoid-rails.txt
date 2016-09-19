@@ -14,6 +14,21 @@ Mongoid was built and targeted towards Rails applications, even though it will
 work in any environment. However if you are using Rails consult the next sections
 on how Mongoid hooks into a Rails application.
 
+
+Using Mongoid with a new Rails application
+------------------------------------------
+
+If you are creating a new Rails application, you'll have to use the ``--skip-active-record``
+flag with ``rails new``.
+
+Using Mongoid with an existing Rails application
+------------------------------------------------
+
+If you're starting to use an existing Rails application with Mongoid, you'll have to update your
+``config/application.rb`` file to remove the ``require 'rails/all'`` line and only include the
+frameworks you want. You must also ensure that you remove all references to ActiveRecord in the
+config directory and models directory.
+
 Railties
 --------
 
