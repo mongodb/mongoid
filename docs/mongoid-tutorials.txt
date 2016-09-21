@@ -1,52 +1,30 @@
-.. http://docs.mongodb.org/ecosystem/tutorial/ruby-mongoid-tutorial/
-
-.. _ruby-mongoid-tutorial:
-
-=============================
-Mongoid Documentation (6.0.0)
-=============================
+===============
+Mongoid (6.0.0)
+===============
 
 .. default-domain:: mongodb
 
-Mongoid is the officially supported ODM (Object-Document-Mapper)
-framework for MongoDB in Ruby. The Mongoid documentation has the
-following tutorials:
+The Mongoid documentation has the following tutorials:
+
+.. COMMENT Consider moving the toc landing pages to docs-ruby instead.
+.. Pros: 
+      Avoid the somewhat unwieldy toc structure below which requires regexing of "version" during the build process.
+      Easier to maintain and update structure of the docs
+   Cons:
+      Odd that one or two pages (albeit only toc pages) wouldn't be together.
+      If we add new page, the toc tree page is in the repo with the new page.
 
 .. toctree::
    :titlesonly:
 
-   /tutorials/mongoid-installation
-   /tutorials/mongoid-documents
-   /tutorials/mongoid-persistence
-   /tutorials/mongoid-queries
-   /tutorials/mongoid-relations
-   /tutorials/mongoid-nested-attributes
-   /tutorials/mongoid-callbacks
-   /tutorials/mongoid-validation
-   /tutorials/mongoid-indexes
-   /tutorials/mongoid-rails
-   /tutorials/mongoid-upgrade
-
-Mongoid 3 and 4
-----------------
-
-For documentation for Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
-
-Additional Mappers
-------------------
-
-In addition to Mongoid, several other mappers are available:
-
-- `MongoMapper <http://mongomapper.com/>`_ from John Nunemaker
-
-- `Mongomatic <http://mongomatic.com/>`_ from Ben Myles
-
-- `MongoODM <https://github.com/carlosparamio/mongo_odm>`_ from Carlos Paramio
-
-- `MongoModel <http://www.mongomodel.org/>`_ from Sam Pohlenz
-
-- `DriverAPILayer <http://alexeypetrushin.github.com/mongodb/driver.html>`_ from Alexey Petrushin
-
-All the mappers build on top of the basic Ruby driver and so some
-knowledge of that is useful, especially if you work with a custom
-MongoDB configuration.
+   /tutorials/version/mongoid-installation
+   /tutorials/version/mongoid-documents
+   /tutorials/version/mongoid-persistence
+   /tutorials/version/mongoid-queries
+   /tutorials/version/mongoid-relations
+   /tutorials/version/mongoid-nested-attributes
+   /tutorials/version/mongoid-callbacks
+   /tutorials/version/mongoid-validation
+   /tutorials/version/mongoid-indexes
+   /tutorials/version/mongoid-rails
+   /tutorials/version/mongoid-upgrade
