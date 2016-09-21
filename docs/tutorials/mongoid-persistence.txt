@@ -311,49 +311,41 @@ Runtime Persistence Options
 ***************************
 
 You can change at runtime where to store, query, update, or remove documents by prefixing
-any operation with ``#with``.
+any operation with ``#with`` and passing a block.
 
 .. code-block:: ruby
 
-   Band.with(database: "music-non-stop").create
-   Band.with(collection: "artists").delete_all
-   band.with(client: :tertiary).save!
+   Band.with(database: "music-non-stop") do |klass|
+     klass.create
+   end
+   Band.with(collection: "artists") do |klass|
+     klass.delete_all
+   end
+   band.with(client: :tertiary) do |band_object|
+     band_object.save!
+   end
 
-Persisting using with is a one time switch in the persistence context - it creates a new
-client under the covers which will get garbage collected after use. Mongoid will not remember
+Persisting using with is a one-time switch in the persistence context - it creates a new
+client under the covers which will get closed and garbage collected after use. Mongoid will not remember
 anything specific on the document level regarding how it was saved when using this method.
 A potential gotcha with this is persisting a document via with and then immediately updating it after.
 
 .. code-block:: ruby
 
    band = Band.new(name: "Scuba")
-   band.with(collection: "artists").save!
-   band.update_attribute(likes: 1000) # This will not save - tries the collection "bands"
-   band.with(collection: "artists").update_attribute(likes: 1000) # This will update the document.
-
-Also note another important gotcha that could result in the number of connections continually growing
-with each use of #with. Because a new client is created under the covers in #with, any options that would
-cause a driver cluster configuration change will instantiate a client that would *never* get garbage collected
-due to the new cluster's monitor threads.
-There are two ways to avoid opening up new connections via the driver that are never closed. 
-As of Mongoid 5.1, you can pass a block to #with. If a new cluster is created, then its monitoring threads
-will be stopped and the client will be closed when the block completes.
-
-.. code-block:: ruby
-
-   Band.with(connect_timeout: 2) do |klass|
-     klass.where(name: 'emily').to_a
+   band.with(collection: "artists") do |band_object|
+     band_object.save!
    end
-   # The new cluster's monitoring threads are stopped and the client is closed.
+   band.update_attribute(likes: 1000) # This will not save - queries the collection "bands"
+   band.with(collection: "artists") do |band_object|
+     band_object.update_attribute(likes: 1000) # This will update the document.
+   end
 
-The second way to avoid this is to *only* use ``with`` when changing the following options, as a new cluster
-will not be created:
-
-- ``database``
-- ``collection``
-- ``client``
-- ``read``
-- ``write``
+The Mongoid API was changed in version 6.0 to always require that a block be passed to #with. This is because
+a new client is created under the covers with the options passed to #with. A new client may spin up new
+monitor threads for keeping track of the MongoDB cluster, depending on what options are specified. This may in
+turn cause the number of connections to continually grow with each use of #with. Now that a block is required,
+Mongoid can properly stop the monitor threads and close the client after the block is called.
 
 If you want to switch the persistence context for all operations at runtime, but don't want
 to be using with all over your code, Mongoid provides the ability to do this as the client
