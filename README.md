@@ -21,7 +21,7 @@ Project Tracking
 Compatibility
 -------------
 
-Mongoid is tested against MRI 1.9.3, 2.0.0, 2.1.0. 2.2.0 and JRuby (1.9).
+Mongoid is tested against MRI 2.2, 2.3 and JRuby (9.1).
 
 Documentation
 -------------
