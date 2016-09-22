@@ -138,16 +138,16 @@ comments above each key.
   development:
     # Configure available database clients. (required)
     clients:
-      # Defines the default client. (required)
+      # Define the default client. (required)
       default:
         # A uri may be defined for a client:
         # uri: 'mongodb://user:password@myhost1.mydomain.com:27017/my_db'
         # Please see driver documentation for details. Alternatively, you can define the following:
         #
-        # Defines the name of the default database that Mongoid can connect to.
+        # Define the name of the default database that Mongoid can connect to.
         # (required).
         database: my_db
-        # Provides the hosts the default client can connect to. Must be an array
+        # Provide the hosts the default client can connect to. Must be an array
         # of host:port pairs. (required)
         hosts:
           - myhost1.mydomain.com:27017
@@ -184,12 +184,12 @@ comments above each key.
           # The database or source to authenticate the user against. (default: admin)
           auth_source: admin
 
-          # Force a the driver cluster to behave in a certain manner instead of auto-
+          # Force the driver to connect in a specific way instead of auto-
           # discovering. Can be one of: :direct, :replica_set, :sharded. Set to :direct
           # when connecting to hidden members of a replica set.
           connect: :direct
 
-          # Changes the default time in seconds the server monitors refresh their status
+          # Change the default time in seconds the server monitors refresh their status
           # via ismaster commands. (default: 10)
           heartbeat_frequency: 10
 
@@ -244,7 +244,7 @@ comments above each key.
 
     # Configure Mongoid specific options. (optional)
     options:
-      # Includes the root model name in json serialization. (default: false)
+      # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
 
       # Include the _type field in serialization. (default: false)
