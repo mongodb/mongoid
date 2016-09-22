@@ -73,7 +73,7 @@ supported on your runtime and server.
      - Yes
      - Yes
 
-.. _mongoid-configuration:
+.. _mongoid-configuration-5.x:
 
 Configuration
 -------------

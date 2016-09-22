@@ -13,7 +13,7 @@ documentation for help with that API.
 
 All Mongoid configuration options have changed, as the underlying driver has changed
 from Moped to the core MongoDB Ruby driver. Please see the
-:ref:`configuration section <mongoid-configuration>` for a detailed description of all new options.
+:ref:`configuration section <mongoid-configuration-5.x>` for a detailed description of all new options.
 
 All references to session are now replaced with client. This includes the ``mongoid.yml``
 configuration, ``store_in`` options, and all exceptions and modules with Session in the name.
