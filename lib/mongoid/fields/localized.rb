@@ -76,6 +76,7 @@ module Mongoid
       #
       # @since 3.0.0
       def lookup(object)
+        return object.to_s if object.is_a?(String)
         locale = ::I18n.locale
         if value = object[locale.to_s]
           value
