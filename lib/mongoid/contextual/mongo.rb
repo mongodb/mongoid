@@ -643,15 +643,9 @@ module Mongoid
       #
       # @since 3.0.0
       def documents_for_iteration
-        if cached? && !documents.empty?
-          documents
-        elsif eager_loadable?
-          docs = view.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
-          eager_load(docs)
-          docs
-        else
-          view
-        end
+        return documents if cached? && !documents.empty?
+        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
+        eager_load(docs)
       end
 
       # Yield to the document.
@@ -667,10 +661,8 @@ module Mongoid
       #
       # @since 3.0.0
       def yield_document(document, &block)
-        doc = document.respond_to?(:_id) ?
-          document : Factory.from_db(klass, document, criteria.options[:fields])
-        yield(doc)
-        documents.push(doc) if cacheable?
+        yield(document)
+        documents.push(document) if cacheable?
       end
     end
   end
