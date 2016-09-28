@@ -1505,14 +1505,6 @@ describe Mongoid::Criteria do
             end
           end
 
-          it "does not eager load the first document" do
-            skip "Why shouldn't the first document be eager loaded?"
-            doc = criteria.first
-            expect_query(1) do
-              expect(doc.person).to eq(person)
-            end
-          end
-
           it "returns the last document" do
             expect(document).to eq(post_two)
           end
@@ -1568,14 +1560,6 @@ describe Mongoid::Criteria do
             end
           end
 
-          it "does not eager load the last document" do
-            skip "Why shouldn't the last document be eager loaded?"
-            doc = criteria.last
-            expect_query(1) do
-              expect(doc.band).to eq(tool)
-            end
-          end
-
           it "returns the document" do
             expect(document).to eq(address_one)
           end
@@ -1598,14 +1582,6 @@ describe Mongoid::Criteria do
           it "eager loads the last document" do
             expect_query(0) do
               expect(document.band).to eq(tool)
-            end
-          end
-
-          it "does not eager load the first document" do
-            skip "Why shouldn't the last document be eager loaded?"
-            doc = criteria.first
-            expect_query(1) do
-              expect(doc.band).to eq(depeche)
             end
           end
 
