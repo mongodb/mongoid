@@ -9,19 +9,6 @@ module Mongoid
   module Relations
     module Eager
 
-      attr_accessor :eager_loaded
-
-      def with_eager_loading(document)
-        if document
-          doc = Factory.from_db(klass, document, criteria.options[:fields])
-          eager_load_one(doc)
-        end
-      end
-
-      def eager_load_one(doc)
-        eager_load([doc]).first
-      end
-
       def eager_loadable?(document = nil)
         !criteria.inclusions.empty?
       end
