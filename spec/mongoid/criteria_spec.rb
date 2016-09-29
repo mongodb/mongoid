@@ -1678,7 +1678,7 @@ describe Mongoid::Criteria do
           end
 
           before do
-            expect(new_context).to receive(:eager_load_one).with(person).once.and_call_original
+            expect(new_context).to receive(:eager_load).with([person]).once.and_call_original
           end
 
           let!(:from_db) do
@@ -1729,7 +1729,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          expect(context).to receive(:eager_load_one).with(person).once.and_call_original
+          expect(context).to receive(:eager_load).with([person]).once.and_call_original
         end
 
         let!(:from_db) do

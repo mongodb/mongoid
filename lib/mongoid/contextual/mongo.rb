@@ -245,9 +245,11 @@ module Mongoid
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
           if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
-            with_eager_loading(view.sort(sort).limit(-1).first)
+            doc = Factory.from_db(klass, view.sort(sort).limit(-1).first, criteria.options[:fields])
+            eager_load([doc]).first
           else
-            with_eager_loading(view.limit(-1).first)
+            doc = Factory.from_db(klass, view.limit(-1).first, criteria.options[:fields])
+            eager_load([doc]).first
           end
         end
       end
@@ -260,7 +262,8 @@ module Mongoid
       # @since 4.0.2
       def find_first
         return documents.first if cached? && cache_loaded?
-        with_eager_loading(view.first)
+        doc = Factory.from_db(klass, view.first, criteria.options[:fields])
+        eager_load([doc]).first
       end
 
       # Execute a $geoNear command against the database.
@@ -348,7 +351,8 @@ module Mongoid
       def last(opts = {})
         try_cache(:last) do
           with_inverse_sorting(opts) do
-            with_eager_loading(view.limit(-1).first)
+            doc = Factory.from_db(klass, view.limit(-1).first, criteria.options[:fields])
+            eager_load([doc]).first
           end
         end
       end
