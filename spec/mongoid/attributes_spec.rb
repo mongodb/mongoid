@@ -1772,15 +1772,22 @@ describe Mongoid::Attributes do
 
     context 'when the attribute is localized' do
       let(:person) do
-        Person.create(desc: 'localized')
+        Person.create
       end
 
-      before do
-        person.desc = nil
+      context 'after initialization when the field is nil' do
+
+        it 'returns false' do
+          expect(person.desc?).to be(false)
+        end
       end
 
-      it 'applies the localization when checking the attribute' do
-        expect(person.desc?).to be(false)
+      context 'when setting the field to nil' do
+
+        it 'applies the localization when checking the attribute' do
+          person.desc = nil
+          expect(person.desc?).to be(false)
+        end
       end
 
       context 'when the field is a boolean' do

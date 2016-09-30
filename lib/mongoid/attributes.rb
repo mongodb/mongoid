@@ -336,7 +336,7 @@ module Mongoid
     end
 
     def lookup_attribute_presence(name, value)
-      if localized_fields.has_key?(name)
+      if localized_fields.has_key?(name) && value
         value = localized_fields[name].send(:lookup, value)
       end
       value.present?
