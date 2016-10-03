@@ -21,7 +21,7 @@ module Mongoid
             # @since 1.0.0
             def evolve(object)
               __evolve__(object) do |obj|
-                obj.to_s =~ (/(true|t|yes|y|1|1.0)$/i) ? true : false
+                obj.to_s =~ (/(true|t|yes|y|on|1|1.0)$/i) ? true : false
               end
             end
           end
