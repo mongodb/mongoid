@@ -29,7 +29,8 @@ module Mongoid
       def includes(*relations)
         relations.flatten.each do |relation|
           if relation.is_a?(Hash)
-            extract_nested_inclusion(klass, relation)
+            association_class_name = Object.const_get(_klass.relations[association.to_s][:class_name])
+            extract_relations_list(association_class_name, _inclusion)
           else
             add_inclusion(klass, relation)
           end
