@@ -7,11 +7,11 @@ bundler_args: --without development
 rvm:
   - 2.2.2
   - 2.3.1
-  - jruby-9.1.2.0
+  - jruby-9.1.5.0
 
 matrix:
   allow_failures:
-    - rvm: jruby-9.1.2.0
+    - rvm: jruby-9.1.5.0
 
 gemfile:
   - Gemfile
