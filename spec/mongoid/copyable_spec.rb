@@ -61,7 +61,8 @@ describe Mongoid::Copyable do
         end
 
         before do
-          Actor.collection.find(_id: actor.id).update_one("$set" => { "this_is_not_a_field" => 1 })
+          legacy_fields = { "this_is_not_a_field" => 1, "this_legacy_field_is_nil" => nil }
+          Actor.collection.find(_id: actor.id).update_one("$set" => legacy_fields)
         end
 
         let(:cloned) do
@@ -72,7 +73,11 @@ describe Mongoid::Copyable do
           expect(cloned.attributes['this_is_not_a_field']).to eq(1)
         end
 
-        it "copies the known attriutes" do
+        it "contains legacy attributes that are nil" do
+          expect(cloned.attributes.key?('this_legacy_field_is_nil')).to eq(true)
+        end
+
+        it "copies the known attributes" do
           expect(cloned.name).to eq('test')
         end
       end
