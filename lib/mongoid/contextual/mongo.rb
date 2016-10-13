@@ -237,7 +237,10 @@ module Mongoid
       def first
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
-          with_eager_loading(view.limit(-1).first)
+          if raw_doc = view.limit(-1).first
+            doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+            eager_load([doc]).first
+          end
         end
       end
       alias :one :first
@@ -249,7 +252,10 @@ module Mongoid
       # @since 4.0.2
       def find_first
         return documents.first if cached? && cache_loaded?
-        with_eager_loading(view.first)
+        if raw_doc = view.first
+          doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+          eager_load([doc]).first
+        end
       end
 
       # Execute a $geoNear command against the database.
@@ -334,7 +340,10 @@ module Mongoid
       def last
         try_cache(:last) do
           with_inverse_sorting do
-            with_eager_loading(view.limit(-1).first)
+            if raw_doc = view.limit(-1).first
+              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              eager_load([doc]).first
+            end
           end
         end
       end
@@ -643,15 +652,9 @@ module Mongoid
       #
       # @since 3.0.0
       def documents_for_iteration
-        if cached? && !documents.empty?
-          documents
-        elsif eager_loadable?
-          docs = view.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
-          eager_load(docs)
-          docs
-        else
-          view
-        end
+        return documents if cached? && !documents.empty?
+        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
+        eager_load(docs)
       end
 
       # Yield to the document.
@@ -667,10 +670,8 @@ module Mongoid
       #
       # @since 3.0.0
       def yield_document(document, &block)
-        doc = document.respond_to?(:_id) ?
-          document : Factory.from_db(klass, document, criteria.options[:fields])
-        yield(doc)
-        documents.push(doc) if cacheable?
+        yield(document)
+        documents.push(document) if cacheable?
       end
     end
   end

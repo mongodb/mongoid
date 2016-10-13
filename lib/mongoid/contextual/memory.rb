@@ -130,9 +130,7 @@ module Mongoid
       #
       # @since 3.0.0
       def first
-        doc = documents.first
-        eager_load_one(doc)
-        doc
+        eager_load([documents.first]).first
       end
       alias :one :first
       alias :find_first :first
@@ -165,9 +163,7 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        doc = documents.last
-        eager_load_one(doc)
-        doc
+        eager_load([documents.last]).first
       end
 
       # Get the length of matching documents in the context.

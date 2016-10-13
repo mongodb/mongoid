@@ -1504,13 +1504,6 @@ describe Mongoid::Criteria do
             end
           end
 
-          it "does not eager load the first document" do
-            doc = criteria.first
-            expect_query(1) do
-              expect(doc.person).to eq(person)
-            end
-          end
-
           it "returns the last document" do
             expect(document).to eq(post_two)
           end
@@ -1566,13 +1559,6 @@ describe Mongoid::Criteria do
             end
           end
 
-          it "does not eager load the last document" do
-            doc = criteria.last
-            expect_query(1) do
-              expect(doc.band).to eq(tool)
-            end
-          end
-
           it "returns the document" do
             expect(document).to eq(address_one)
           end
@@ -1595,13 +1581,6 @@ describe Mongoid::Criteria do
           it "eager loads the last document" do
             expect_query(0) do
               expect(document.band).to eq(tool)
-            end
-          end
-
-          it "does not eager load the first document" do
-            doc = criteria.first
-            expect_query(1) do
-              expect(doc.band).to eq(depeche)
             end
           end
 
@@ -1698,7 +1677,7 @@ describe Mongoid::Criteria do
           end
 
           before do
-            expect(new_context).to receive(:eager_load_one).with(person).once.and_call_original
+            expect(new_context).to receive(:eager_load).with([person]).once.and_call_original
           end
 
           let!(:from_db) do
@@ -1749,7 +1728,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          expect(context).to receive(:eager_load_one).with(person).once.and_call_original
+          expect(context).to receive(:eager_load).with([person]).once.and_call_original
         end
 
         let!(:from_db) do
@@ -2128,7 +2107,7 @@ describe Mongoid::Criteria do
         end
 
         before do
-          expect(context).to receive(:eager_load).with([ game_one, game_two ]).once.and_call_original
+          expect(context).to receive(:preload).twice.and_call_original
         end
 
         let!(:documents) do
@@ -2191,7 +2170,7 @@ describe Mongoid::Criteria do
       end
 
       before do
-        expect(context).to receive(:eager_load).with([ person ]).once.and_call_original
+        expect(context).to receive(:preload).twice.and_call_original
       end
 
       let!(:documents) do
