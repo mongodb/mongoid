@@ -9,7 +9,7 @@ module Mongoid
   module Relations
     module Eager
 
-      def eager_loadable?(document = nil)
+      def eager_loadable?
         !criteria.inclusions.empty?
       end
 
