@@ -73,11 +73,11 @@ describe Mongoid::Copyable do
           expect(cloned.attributes['this_is_not_a_field']).to eq(1)
         end
 
-        it "contains legacy attribute that are nil" do
+        it "contains legacy attributes that are nil" do
           expect(cloned.attributes.key?('this_legacy_field_is_nil')).to eq(true)
         end
 
-        it "copies the known attriutes" do
+        it "copies the known attributes" do
           expect(cloned.name).to eq('test')
         end
       end
