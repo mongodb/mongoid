@@ -244,16 +244,17 @@ module Mongoid
       def first(opts = {})
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
-          doc = if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
+          if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
             if raw_doc = view.sort(sort).limit(-1).first
               doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
-            else
-              if raw_doc = view.limit(-1).first
-                doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
-              end
-              end
+              eager_load([doc]).first
+            end
+          else
+            if raw_doc = view.limit(-1).first
+              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              eager_load([doc]).first
+            end
           end
-          eager_load([doc]).first
         end
       end
       alias :one :first
