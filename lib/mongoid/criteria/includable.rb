@@ -27,13 +27,7 @@ module Mongoid
       #
       # @since 2.2.0
       def includes(*relations)
-        relations.flatten.each do |relation|
-          if relation.is_a?(Hash)
-            extract_nested_inclusion(klass, relation)
-          else
-            add_inclusion(klass, relation)
-          end
-        end
+        extract_includes_list(klass, relations)
         clone
       end
 
@@ -76,65 +70,24 @@ module Mongoid
       # @raise [ Errors::InvalidIncludes ] If no relation is found.
       #
       # @since 5.1.0
-      def add_inclusion(_klass, relation)
-        metadata = get_inclusion_metadata(_klass, relation)
-        raise Errors::InvalidIncludes.new(_klass, [ relation ]) unless metadata
+      def add_inclusion(_klass, metadata)
         inclusions.push(metadata) unless inclusions.include?(metadata)
       end
 
-      # Extract inclusion definitions from a list.
-      #
-      # @example Extract the inclusions from a list.
-      #   criteria.extract_relations_list(:posts, [{ :alerts => :items }])
-      #
-      # @param [ Symbol ] association The name of the association.
-      # @param [ Array ] relations A list of associations.
-      #
-      # @since 5.1.0
-      def extract_relations_list(association, relations)
-        relations.each do |relation|
-          if relation.is_a?(Hash)
-            extract_nested_inclusion(association, relation)
+      def extract_includes_list(_parent_class, *relations_list)
+        relations_list.flatten.each do |relation_object|
+          if relation_object.is_a?(Hash)
+            relation_object.each do |relation, _includes|
+              metadata = _parent_class.reflect_on_association(relation)
+              raise Errors::InvalidIncludes.new(_klass, [ relation ]) unless metadata
+              add_inclusion(_parent_class, metadata)
+              extract_includes_list(metadata.klass, _includes)
+            end
           else
-            add_inclusion(association, relation)
+            metadata = _parent_class.reflect_on_association(relation_object)
+            raise Errors::InvalidIncludes.new(_parent_class, [ relation_object ]) unless metadata
+            add_inclusion(_parent_class, metadata)
           end
-        end
-      end
-
-      # Extract nested inclusion.
-      #
-      # @example Extract the inclusions from a nested definition.
-      #   criteria.extract_nested_inclusion(User, { :posts => [:alerts] })
-      #
-      # @param [ Class, Symbol ] _klass The class for which the inclusion should be added.
-      # @param [ Hash ] relation The nested inclusion.
-      #
-      # @since 5.1.0
-      def extract_nested_inclusion(_klass, relation)
-        relation.each do |association, _inclusion|
-          add_inclusion(_klass, association)
-          if _inclusion.is_a?(Array)
-            extract_relations_list(association, _inclusion)
-          else
-            add_inclusion(association, _inclusion)
-          end
-        end
-      end
-
-      # Get the metadata for an inclusion.
-      #
-      # @example Get the metadata for an inclusion definition.
-      #   criteria.get_inclusion_metadata(User, :posts)
-      #
-      # @param [ Class, Symbol, String ] _klass The class for determining the association metadata
-      # @param [ Symbol  ] association The name of the association.
-      #
-      # @since 5.1.0
-      def get_inclusion_metadata(_klass, association)
-        if _klass.is_a?(Class)
-          _klass.reflect_on_association(association)
-        else
-          _klass.to_s.classify.constantize.reflect_on_association(association)
         end
       end
     end
