@@ -1148,6 +1148,29 @@ describe Mongoid::Criteria do
       end
     end
 
+    context "when providing one association" do
+
+      let!(:user) do
+        User.create(posts: [ post1 ])
+      end
+
+      let!(:post1) do
+        Post.create
+      end
+
+      let(:result) do
+        User.includes(:posts).first
+      end
+
+      it "executes the query" do
+        expect(result).to eq(user)
+      end
+
+      it "includes the related objects" do
+        expect(result.posts).to eq([ post1 ])
+      end
+    end
+
     context "when providing a list of associations" do
 
       let!(:user) do

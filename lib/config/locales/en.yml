@@ -115,10 +115,7 @@ en:
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
-            to %{klass}.includes that are the names of relations on the %{klass}
-            model, and only supports one level of eager loading. (ie, eager loading
-            associations not on the %{klass} but one step away via another relation
-            is not allowed."
+            to %{klass}.includes that are the names of relations on the %{klass}."
           resolution: "Ensure that each parameter passed to %{klass}.includes is
             a valid name of a relation on the %{klass} model. These are: %{relations}."
         invalid_index:
