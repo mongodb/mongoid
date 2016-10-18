@@ -204,4 +204,116 @@ describe Mongoid::Persistable::Settable do
       expect(agent.reload.title).to eq title
     end
   end
+
+  context 'when the field is already set locally' do
+
+    let(:church) do
+      Church.new.tap do |a|
+        a.location = { 'city' => 'Berlin' }
+        a.name = 'Church1'
+        a.save
+      end
+    end
+
+    context 'when the field is a Hash type' do
+
+      before do
+        church.set('location.neighborhood' => 'Kreuzberg')
+      end
+
+      it 'updates the hash while keeping existing key and values locally' do
+        expect(church.location).to eq({ 'city' => 'Berlin', 'neighborhood' => 'Kreuzberg'})
+      end
+
+      it 'updates the hash in the database' do
+        expect(church.reload.location).to eq({ 'city' => 'Berlin', 'neighborhood' => 'Kreuzberg'})
+      end
+    end
+
+    context 'when the field type is String' do
+
+      before do
+        church.set('name' => 'Church2')
+      end
+
+      it 'updates the field locally' do
+        expect(church.name).to eq('Church2')
+      end
+
+      it 'updates the hash in the database' do
+        expect(church.reload.name).to eq('Church2')
+      end
+    end
+
+    context 'when there are two fields of type Hash and String' do
+
+      before do
+        church.set('name' => 'Church2', 'location.street' => 'Yorckstr.')
+      end
+
+      it 'updates the field locally' do
+        expect(church.name).to eq('Church2')
+        expect(church.location).to eq({ 'city' => 'Berlin', 'street' => 'Yorckstr.'})
+      end
+
+      it 'updates the hash in the database' do
+        expect(church.reload.name).to eq('Church2')
+        expect(church.reload.location).to eq({ 'city' => 'Berlin', 'street' => 'Yorckstr.'})
+      end
+    end
+  end
+
+  context 'when the field is not already set locally' do
+
+    let(:church) do
+      Church.create
+    end
+
+    context 'when the field is a Hash type' do
+
+      before do
+        church.set('location.neighborhood' => 'Kreuzberg')
+      end
+
+      it 'updates the hash while keeping existing key and values locally' do
+        expect(church.location).to eq({ 'neighborhood' => 'Kreuzberg'})
+      end
+
+      it 'updates the hash in the database' do
+        expect(church.reload.location).to eq({ 'neighborhood' => 'Kreuzberg'})
+      end
+    end
+
+    context 'when the field type is String' do
+
+      before do
+        church.set('name' => 'Church2')
+      end
+
+      it 'updates the field locally' do
+        expect(church.name).to eq('Church2')
+      end
+
+      it 'updates the hash in the database' do
+        expect(church.reload.name).to eq('Church2')
+      end
+    end
+
+    context 'when there are two fields of type Hash and String' do
+
+      before do
+        church.set('name' => 'Church2', 'location.street' => 'Yorckstr.')
+      end
+
+      it 'updates the field locally' do
+        expect(church.name).to eq('Church2')
+        expect(church.location).to eq({ 'street' => 'Yorckstr.'})
+      end
+
+      it 'updates the hash in the database' do
+        expect(church.reload.name).to eq('Church2')
+        expect(church.reload.location).to eq({ 'street' => 'Yorckstr.'})
+      end
+    end
+  end
 end
