@@ -135,6 +135,27 @@ describe Mongoid::Criteria::Queryable::Selector do
       end
     end
 
+    context 'when an object does not support the | operator' do
+
+      before do
+        selector['start'] = selection
+        selector.merge!(other)
+      end
+
+      let(:selection) do
+        { '$lt' => Time.now }
+      end
+
+      let(:other) do
+        { 'start' => selection, 'name' => 'test',  }
+      end
+
+      it "merges" do
+        expect(selector['name']).to eq('test')
+        expect(selector['start']).to eq(selection)
+      end
+    end
+
     context "when the selector contains an $or" do
 
       let(:initial) do
