@@ -63,7 +63,7 @@ describe Mongoid::Criteria::Queryable::Selector do
         end
 
         it "combines the two $nin queries into one" do
-          expect(selector).to eq({
+          expect(selector).to include({
             "field" => { "$nin" => ["foo", "bar"] }
           })
         end
