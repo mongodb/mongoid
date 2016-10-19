@@ -240,7 +240,7 @@ describe Mongoid::Persistable::Settable do
         expect(church.name).to eq('Church2')
       end
 
-      it 'updates the hash in the database' do
+      it 'updates the field in the database' do
         expect(church.reload.name).to eq('Church2')
       end
     end
@@ -251,12 +251,12 @@ describe Mongoid::Persistable::Settable do
         church.set('name' => 'Church2', 'location.street' => 'Yorckstr.')
       end
 
-      it 'updates the field locally' do
+      it 'updates the fields locally' do
         expect(church.name).to eq('Church2')
         expect(church.location).to eq({ 'city' => 'Berlin', 'street' => 'Yorckstr.'})
       end
 
-      it 'updates the hash in the database' do
+      it 'updates the fields in the database' do
         expect(church.reload.name).to eq('Church2')
         expect(church.reload.location).to eq({ 'city' => 'Berlin', 'street' => 'Yorckstr.'})
       end
@@ -275,11 +275,11 @@ describe Mongoid::Persistable::Settable do
         church.set('location.neighborhood' => 'Kreuzberg')
       end
 
-      it 'updates the hash while keeping existing key and values locally' do
+      it 'sets the hash locally' do
         expect(church.location).to eq({ 'neighborhood' => 'Kreuzberg'})
       end
 
-      it 'updates the hash in the database' do
+      it 'sets the hash in the database' do
         expect(church.reload.location).to eq({ 'neighborhood' => 'Kreuzberg'})
       end
     end
@@ -290,11 +290,11 @@ describe Mongoid::Persistable::Settable do
         church.set('name' => 'Church2')
       end
 
-      it 'updates the field locally' do
+      it 'sets the field locally' do
         expect(church.name).to eq('Church2')
       end
 
-      it 'updates the hash in the database' do
+      it 'sets the field in the database' do
         expect(church.reload.name).to eq('Church2')
       end
     end
@@ -305,12 +305,12 @@ describe Mongoid::Persistable::Settable do
         church.set('name' => 'Church2', 'location.street' => 'Yorckstr.')
       end
 
-      it 'updates the field locally' do
+      it 'sets the fields locally' do
         expect(church.name).to eq('Church2')
         expect(church.location).to eq({ 'street' => 'Yorckstr.'})
       end
 
-      it 'updates the hash in the database' do
+      it 'sets the fields in the database' do
         expect(church.reload.name).to eq('Church2')
         expect(church.reload.location).to eq({ 'street' => 'Yorckstr.'})
       end
