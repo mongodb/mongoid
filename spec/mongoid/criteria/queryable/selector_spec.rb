@@ -70,6 +70,51 @@ describe Mongoid::Criteria::Queryable::Selector do
       end
     end
 
+    context "when selector contains a $in" do
+
+      let(:initial) do
+        { "$in" => [1, 2] }
+      end
+
+      before do
+        selector["field"] = initial
+      end
+
+      context "when merging in a new $in with an intersecting value" do
+
+        let(:other) do
+          { "field" => { "$in" => [1] } }
+        end
+
+        before do
+          selector.merge!(other)
+        end
+
+        it "intersects the $in values" do
+          expect(selector).to eq({
+                                     "field" => { "$in" => [1] }
+                                 })
+        end
+      end
+
+      context "when merging in a new $in with no intersecting values" do
+
+        let(:other) do
+          { "field" => { "$in" => [3] } }
+        end
+
+        before do
+          selector.merge!(other)
+        end
+
+        it "intersects the $in values" do
+          expect(selector).to eq({
+                                     "field" => { "$in" => [] }
+                                 })
+        end
+      end
+    end
+
     context "when selector is not nested" do
 
       before do
