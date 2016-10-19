@@ -22,7 +22,16 @@ module Mongoid
       def set(setters)
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|
-            process_attribute(field.to_s, value)
+
+            field_and_value_hash = hasherizer(field.split('.'), value)
+            field = field_and_value_hash.keys.first.to_s
+
+            if fields[field] && fields[field].type == Hash && attributes.key?(field)
+              process_attribute(field.to_s, attributes[field].merge(field_and_value_hash[field]))
+            else
+              process_attribute(field.to_s, field_and_value_hash[field])
+            end
+
             unless relations.include?(field.to_s)
               ops[atomic_attribute_name(field)] = attributes[field]
             end
