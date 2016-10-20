@@ -3203,14 +3203,14 @@ describe Mongoid::Criteria do
       context "when not including private methods" do
 
         it "returns false" do
-          expect(criteria).to_not respond_to(:fork)
+          expect(criteria).to_not respond_to(:initialize_copy)
         end
       end
 
       context "when including private methods" do
 
         it "returns true" do
-          expect(criteria.respond_to?(:fork, true)).to be true
+          expect(criteria.respond_to?(:initialize_copy, true)).to be true
         end
       end
     end
