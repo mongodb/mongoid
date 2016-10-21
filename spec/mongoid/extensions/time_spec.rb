@@ -281,7 +281,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "does not alter seconds with fractions" do
-        expect(DateTime.mongoize(11.11).to_f).to eq(11.11)
+        expect(DateTime.mongoize(1.11).to_f).to eq(1.11)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -344,7 +344,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "does not alter seconds with fractions" do
-        expect(Time.mongoize(102.63).to_f).to eq(102.63)
+        expect(Time.mongoize(102.25).to_f).to eq(102.25)
       end
     end
 
