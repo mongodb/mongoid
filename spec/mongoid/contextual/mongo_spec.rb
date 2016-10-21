@@ -1860,26 +1860,31 @@ describe Mongoid::Contextual::Mongo do
 
   describe '#pipeline' do
 
-    context 'when the criteria has a selector' do
+    context 'when the criteria has a selector', if: non_legacy_server? do
+
+      before do
+        Artist.index(name: "text")
+        Artist.create_indexes
+      end
 
       let(:criteria) do
-        Band.where(name: "New Order")
+        Artist.text_search("New Order")
       end
 
       let(:context) do
         described_class.new(criteria)
       end
 
-      let(:matches_operators) do
-        context.send(:pipeline, 'name').select { |o| o['$match'] }
+      let(:pipeline_match) do
+        context.send(:pipeline, :some_field).first['$match']
       end
 
       it 'creates a pipeline with the selector as one of the $match criteria' do
-        expect(matches_operators).to include('$match' => criteria.selector)
+        expect(pipeline_match).to include({ :'$text' => { :'$search' => "New Order" } })
       end
 
       it 'creates a pipeline with the $exists operator as one of the $match criteria' do
-        expect(matches_operators).to include('$match' => { 'name' => { '$exists' => true } })
+        expect(pipeline_match).to include({ 'some_field' => { '$exists' => true } })
       end
     end
   end
