@@ -9,8 +9,13 @@ rvm:
   - 2.3.1
   - jruby-9.1.5.0
 
+matrix:
+  allow_failures:
+    - gemfile: gemfiles/rails_master.gemfile
+
 gemfile:
   - Gemfile
+  - gemfiles/rails_master.gemfile
 
 env:
   global:

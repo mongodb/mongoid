@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+gemspec path: '..'
+
+gem 'rake'
+gem 'actionpack', git: 'https://github.com/rails/rails'
+gem 'activemodel', git: 'https://github.com/rails/rails'
+
+group :test do
+  gem 'rspec', '~> 3.4.0'
+end
