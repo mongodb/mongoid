@@ -430,6 +430,97 @@ describe Mongoid::Fields::Localized do
           expect(value).to eq({ "de" => 100 })
         end
       end
+
+      context 'when the type is Boolean' do
+
+        before do
+          I18n.enforce_available_locales = false
+          ::I18n.locale = :de
+        end
+
+        after do
+          ::I18n.locale = :en
+        end
+
+        context "when the value is false" do
+
+          let(:field) do
+            described_class.new(:boolean_value, localize: true, type: Boolean)
+          end
+
+          let(:value) do
+            field.demongoize({ "de" => false })
+          end
+
+          it "returns the boolean value from the set locale" do
+            expect(value).to eq(false)
+          end
+        end
+
+        context "when the value is true" do
+
+          let(:field) do
+            described_class.new(:boolean_value, localize: true, type: Boolean)
+          end
+
+          let(:value) do
+            field.demongoize({"de" => true})
+          end
+
+          it "returns the boolean value from the set locale" do
+            expect(value).to eq(true)
+          end
+        end
+
+        context "when fallbacks are defined" do
+
+          before(:all) do
+            require "i18n/backend/fallbacks"
+            I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+          end
+
+          context "when the lookup does not need to use fallbacks" do
+
+            context "when the value is false" do
+
+              before do
+                ::I18n.fallbacks[:de] = [:en, :es]
+              end
+
+              let(:field) do
+                described_class.new(:boolean_value, localize: true, type: Boolean)
+              end
+
+              let(:value) do
+                field.demongoize({"de" => false})
+              end
+
+              it "returns the boolean value from the set locale" do
+                expect(value).to eq(false)
+              end
+            end
+
+            context "when the value is true" do
+
+              before do
+                ::I18n.fallbacks[:de] = [:en, :es]
+              end
+
+              let(:field) do
+                described_class.new(:boolean_value, localize: true, type: Boolean)
+              end
+
+              let(:value) do
+                field.demongoize({"de" => true})
+              end
+
+              it "returns the boolean value from the set locale" do
+                expect(value).to eq(true)
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
