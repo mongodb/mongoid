@@ -10,4 +10,6 @@ class Book
   after_initialize do |doc|
     doc.chapters = 5
   end
+
+  embeds_many :pages
 end

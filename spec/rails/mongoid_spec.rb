@@ -20,7 +20,11 @@ describe "Rails::Mongoid" do
     end
 
     let(:paths) do
-      { "app/models" => [ "/rails/root/app/models" ] }
+      double('[]' => path)
+    end
+
+    let(:path) do
+      double(expanded: [ "/rails/root/app/models" ])
     end
 
     context "when preload models config is false" do
@@ -98,7 +102,11 @@ describe "Rails::Mongoid" do
     end
 
     let(:paths) do
-      { "app/models" => [ "/rails/root/app/models" ] }
+      double('[]' => path)
+    end
+
+    let(:path) do
+      double(expanded: [ "/rails/root/app/models" ])
     end
 
     context "even when preload models config is false" do

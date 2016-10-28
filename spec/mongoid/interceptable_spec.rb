@@ -170,6 +170,61 @@ describe Mongoid::Interceptable do
     it "runs after document instantiation" do
       expect(game.name).to eq("Testing")
     end
+
+    context 'when the document is embedded' do
+
+      after do
+        Book.destroy_all
+      end
+
+      let(:book) do
+        book = Book.new({
+          :pages => [
+            {
+              content: "Page 1",
+              notes: [
+                { message: "Page 1 / Note A" },
+                { message: "Page 1 / Note B" }
+              ]
+            },
+            {
+              content: "Page 2",
+              notes: [
+                { message: "Page 2 / Note A" },
+                { message: "Page 2 / Note B" }
+              ]
+            }
+          ]
+        })
+        book.id = '123'
+        book.save
+        book
+      end
+
+      let(:new_message) do
+        'Note C'
+      end
+
+      before do
+        book.pages.each do | page |
+          page.notes.destroy_all
+          page.notes.new(message: new_message)
+          page.save
+        end
+      end
+
+      let(:expected_messages) do
+        book.reload.pages.reduce([]) do |messages, p|
+          messages += p.notes.reduce([]) do |msgs, n|
+            msgs << n.message
+          end
+        end
+      end
+
+      it 'runs the callback on the embedded documents and saves the parent document' do
+        expect(expected_messages.all? { |m| m == new_message }).to be(true)
+      end
+    end
   end
 
   describe ".after_build" do
@@ -225,11 +280,16 @@ describe Mongoid::Interceptable do
       end
     end
 
-    context "callback returns false" do
+    context "callback aborts the callback chain" do
 
       before do
-        expect(artist).to receive(:before_create_stub).once.and_return(false)
+        Artist.before_create(:before_create_fail_stub)
+        expect(artist).to receive(:before_create_fail_stub).once.and_call_original
         artist.save
+      end
+
+      after do
+        Artist.reset_callbacks(:create)
       end
 
       it "does not get saved" do
@@ -261,13 +321,18 @@ describe Mongoid::Interceptable do
         end
       end
 
-      context "when callback returns false" do
+      context "when callback halts the callback chain" do
 
         before do
-          expect(artist).to receive(:before_save_stub).once.and_return(false)
+          Artist.before_save(:before_save_fail_stub)
+        end
+
+        after do
+          Artist.reset_callbacks(:save)
         end
 
         it "the save returns false" do
+          expect(artist).to receive(:before_save_fail_stub).once.and_call_original
           expect(artist.save).to be false
         end
       end
@@ -288,7 +353,7 @@ describe Mongoid::Interceptable do
       context "when the callback returns true" do
 
         before do
-          expect(artist).to receive(:before_save_stub).once.and_return(true)
+          expect(artist).to receive(:before_update_stub).once.and_return(true)
         end
 
         it "the save returns true" do
@@ -296,13 +361,18 @@ describe Mongoid::Interceptable do
         end
       end
 
-      context "when the callback returns false" do
+      context "when the callback halts the callback chain" do
 
         before do
-          expect(artist).to receive(:before_save_stub).once.and_return(false)
+          Artist.before_update(:before_update_fail_stub)
+        end
+
+        after do
+          Artist.reset_callbacks(:update)
         end
 
         it "the save returns false" do
+          expect(artist).to receive(:before_update_fail_stub).once.and_call_original
           expect(artist.save).to be false
         end
       end
@@ -334,13 +404,18 @@ describe Mongoid::Interceptable do
       end
     end
 
-    context "when the callback returns false" do
+    context "when the callback halts the callback chain" do
 
       before do
-        expect(artist).to receive(:before_destroy_stub).once.and_return(false)
+        Artist.before_destroy(:before_destroy_fail_stub)
+      end
+
+      after do
+        Artist.reset_callbacks(:destroy)
       end
 
       it "the destroy returns false" do
+        expect(artist).to receive(:before_destroy_fail_stub).once.and_call_original
         expect(artist.destroy).to be false
       end
     end
@@ -929,6 +1004,21 @@ describe Mongoid::Interceptable do
             expect(band.reload.records.first.before_save_called).to be true
           end
         end
+
+        context "when the child is created" do
+
+          let!(:band) do
+            Band.create
+          end
+
+          let!(:label) do
+            band.create_label(name: 'Label')
+          end
+
+          it "only executes callback once" do
+            expect(label.before_save_count).to be 1
+          end
+        end
       end
 
       describe "#before_update" do
@@ -1364,6 +1454,25 @@ describe Mongoid::Interceptable do
         end
       end
 
+      describe '#after_destroy' do
+
+        context 'when the parent is updated in a child after_destroy callback' do
+
+          let!(:person) do
+            Person.create!(ordered_posts: [OrderedPost.new])
+          end
+
+          before do
+            post = OrderedPost.first
+            post.destroy
+          end
+
+          it 'updates the parent' do
+            expect(person.reload.title).to eq('Minus one ordered post.')
+          end
+        end
+      end
+
       describe "#before_validation" do
 
         context "when the child is new" do
@@ -1474,7 +1583,7 @@ describe Mongoid::Interceptable do
 
     before(:all) do
       Person.before_save do |doc|
-        doc.mode != :prevent_save
+        throw(:abort) if doc.mode == :prevent_save
       end
     end
 

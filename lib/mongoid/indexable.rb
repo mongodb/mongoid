@@ -31,10 +31,11 @@ module Mongoid
         index_specifications.each do |spec|
           key, options = spec.key, spec.options
           if database = options[:database]
-            with(read: :primary, database: database).
-              collection.indexes.create(key, options.except(:database))
+            with(database: database) do |klass|
+              klass.collection.indexes.create_one(key, options.except(:database))
+            end
           else
-            with(read: :primary).collection.indexes.create(key, options)
+            collection.indexes.create_one(key, options)
           end
         end and true
       end
@@ -50,11 +51,18 @@ module Mongoid
       # @since 3.0.0
       def remove_indexes
         indexed_database_names.each do |database|
-          collection = with(read: :primary, database: database).collection
-          collection.indexes.each do |spec|
-            unless spec["name"] == "_id_"
-              collection.indexes.drop(spec["key"])
-            end
+          with(database: database) do |klass|
+            begin
+              klass.collection.indexes.each do |spec|
+                unless spec["name"] == "_id_"
+                  klass.collection.indexes.drop_one(spec["key"])
+                  logger.info(
+                    "MONGOID: Removed index '#{spec["name"]}' on collection " +
+                    "'#{klass.collection.name}' in database '#{database}'."
+                  )
+                end
+              end
+            rescue Mongo::Error::OperationFailure; end
           end
         end and true
       end
@@ -107,9 +115,11 @@ module Mongoid
       # @return [ Specification ] The found specification.
       #
       # @since 4.0.0
-      def index_specification(index_hash)
+      def index_specification(index_hash, index_name = nil)
         index = OpenStruct.new(fields: index_hash.keys, key: index_hash)
-        index_specifications.detect { |spec| spec == index }
+        index_specifications.detect do |spec|
+          spec == index || (index_name && index_name == spec.name)
+        end
       end
 
       private

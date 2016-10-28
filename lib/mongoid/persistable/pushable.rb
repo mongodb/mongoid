@@ -16,7 +16,7 @@ module Mongoid
       #
       # @param [ Hash ] adds The field/value pairs to add.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def add_to_set(adds)
@@ -43,7 +43,7 @@ module Mongoid
       #
       # @param [ Hash ] pushes The $push operations.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def push(pushes)

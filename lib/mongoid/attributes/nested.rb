@@ -53,6 +53,9 @@ module Mongoid
             autosave_nested_attributes(metadata)
             re_define_method(meth) do |attrs|
               _assigning do
+                if metadata.polymorphic? and metadata.inverse_type
+                  options = options.merge!(:class_name => self.send(metadata.inverse_type))
+                end
                 metadata.nested_builder(attrs, options).build(self)
               end
             end

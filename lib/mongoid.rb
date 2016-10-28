@@ -12,15 +12,14 @@ require "active_support/inflector"
 require "active_support/time_with_zone"
 require "active_model"
 
-require "origin"
-require "moped"
+require "mongo"
 
 require "mongoid/version"
 require "mongoid/config"
+require "mongoid/persistence_context"
 require "mongoid/loggable"
-require "mongoid/sessions"
+require "mongoid/clients"
 require "mongoid/document"
-require "mongoid/log_subscriber"
 require "mongoid/tasks/database"
 require "mongoid/query_cache"
 
@@ -54,40 +53,40 @@ module Mongoid
     block_given? ? yield(Config) : Config
   end
 
-  # Convenience method for getting the default session.
+  # Convenience method for getting the default client.
   #
-  # @example Get the default session.
-  #   Mongoid.default_session
+  # @example Get the default client.
+  #   Mongoid.default_client
   #
-  # @return [ Moped::Session ] The default session.
+  # @return [ Mongo::Client ] The default client.
   #
-  # @since 3.0.0
-  def default_session
-    Sessions.default
+  # @since 5.0.0
+  def default_client
+    Clients.default
   end
 
-  # Disconnect all active sessions.
+  # Disconnect all active clients.
   #
-  # @example Disconnect all active sessions.
-  #   Mongoid.disconnect_sessions
+  # @example Disconnect all active clients.
+  #   Mongoid.disconnect_clients
   #
   # @return [ true ] True.
   #
-  # @since 3.1.0
-  def disconnect_sessions
-    Sessions.disconnect
+  # @since 5.0.0
+  def disconnect_clients
+    Clients.disconnect
   end
 
-  # Convenience method for getting a named session.
+  # Convenience method for getting a named client.
   #
-  # @example Get a named session.
-  #   Mongoid.session(:default)
+  # @example Get a named client.
+  #   Mongoid.client(:default)
   #
-  # @return [ Moped::Session ] The named session.
+  # @return [ Mongo::Client ] The named client.
   #
-  # @since 3.0.0
-  def session(name)
-    Sessions.with_name(name)
+  # @since 5.0.0
+  def client(name)
+    Clients.with_name(name)
   end
 
   # Take all the public instance methods from the Config singleton and allow

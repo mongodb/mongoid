@@ -2,7 +2,7 @@
 module Mongoid
   module Matchable
 
-    # Checks for existance.
+    # Checks for existence.
     class Exists < Default
 
       # Return true if the attribute exists and checking for existence or

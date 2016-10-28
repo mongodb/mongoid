@@ -7,14 +7,12 @@ module Mongoid
     # @since 4.0.0
     class Specification
 
-      # The mappings of nice Ruby-style names to the corresponding MongoDB
-      # name.
+      # The mappings of nice Ruby-style names to the corresponding driver
+      # option name.
       #
       # @since 4.0.0
       MAPPINGS = {
-        bucket_size: :bucketSize,
-        drop_dups: :dropDups,
-        expire_after_seconds: :expireAfterSeconds
+        expire_after_seconds: :expire_after
       }
 
       # @!attribute klass
@@ -56,6 +54,20 @@ module Mongoid
         @key = normalize_key(key)
         @fields = @key.keys
         @options = normalize_options(options.dup)
+      end
+
+      # Get the index name, generated using the index key.
+      #
+      # @example Get the index name.
+      #   specification.name
+      #
+      # @return [ String ] name The index name.
+      #
+      # @since 5.0.2
+      def name
+        @name ||= key.reduce([]) do |n, (k,v)|
+          n << "#{k}_#{v}"
+        end.join('_')
       end
 
       private

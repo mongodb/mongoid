@@ -22,7 +22,19 @@ module Mongoid
       # _id and id field in the document would cause problems with Mongoid
       # elsewhere.
       attrs = clone_document.except("_id", "id")
-      self.class.new(attrs)
+      dynamic_attrs = {}
+      attrs.reject! do |attr_name, value|
+        dynamic_attrs.merge!(attr_name => value) unless self.attribute_names.include?(attr_name)
+      end
+      self.class.new(attrs).tap do |object|
+        dynamic_attrs.each do |attr_name, value|
+          if object.respond_to?("#{attr_name}=")
+            object.send("#{attr_name}=", value)
+          else
+            object.attributes[attr_name] = value
+          end
+        end
+      end
     end
     alias :dup :clone
 
@@ -40,7 +52,7 @@ module Mongoid
     # @since 3.0.22
     def clone_document
       attrs = as_document.__deep_copy__
-      process_localized_attributes(attrs)
+      process_localized_attributes(self, attrs)
       attrs
     end
 
@@ -55,10 +67,21 @@ module Mongoid
     # @param [ Hash ] attrs The attributes.
     #
     # @since 3.0.20
-    def process_localized_attributes(attrs)
-      localized_fields.keys.each do |name|
+    def process_localized_attributes(klass, attrs)
+      klass.localized_fields.keys.each do |name|
         if value = attrs.delete(name)
           attrs["#{name}_translations"] = value
+        end
+      end
+      klass.embedded_relations.each do |_, metadata|
+        next unless attrs.present? && attrs[metadata.key].present?
+
+        if metadata.macro == :embeds_many
+          attrs[metadata.key].each do |attr|
+            process_localized_attributes(metadata.klass, attr)
+          end
+        else
+          process_localized_attributes(metadata.klass, attrs[metadata.key])
         end
       end
     end

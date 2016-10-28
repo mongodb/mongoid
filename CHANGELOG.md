@@ -3,17 +3,126 @@
 For instructions on upgrading to newer versions, visit
 [mongoid.org](http://mongoid.org/en/mongoid/docs/upgrading.html).
 
-## 4.0.3 - Not released
+### As of version 5.0.2, please refer to the github releases for change logs.
 
-### New Features
-
-* \#3846 Allow #pluck when none is used in criteria. (Braulio Martinez)
-
-* \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
+## 5.0.1
 
 ### Resolved Issues
 
+* [MONGOID-3020](https://jira.mongodb.org/browse/MONGOID-3020) Test added to show it's no longer an issue.
+* [MONGOID-3025](https://jira.mongodb.org/browse/MONGOID-3025) Test added to show it's no longer an issue.
+* [MONGOID-3061](https://jira.mongodb.org/browse/MONGOID-3061) No longer an issue.
+* [MONGOID-3073](https://jira.mongodb.org/browse/MONGOID-3073) Test added to show it's no longer an issue.
+* [MONGOID-3085](https://jira.mongodb.org/browse/MONGOID-3085) Test added to show it's no longer an issue.
+* [MONGOID-3101](https://jira.mongodb.org/browse/MONGOID-3101) No longer an issue.
+* [MONGOID-3160](https://jira.mongodb.org/browse/MONGOID-3160) No longer an issue.
+* [MONGOID-3176](https://jira.mongodb.org/browse/MONGOID-3176) No longer an issue.
+* [MONGOID-3214](https://jira.mongodb.org/browse/MONGOID-3214) Test added to show it's no longer an issue.
+* [MONGOID-3296](https://jira.mongodb.org/browse/MONGOID-3296) Add update callback for counter_cache.
+* [MONGOID-3326](https://jira.mongodb.org/browse/MONGOID-3326) Test added to show it's no longer an issue.
+* [MONGOID-3361](https://jira.mongodb.org/browse/MONGOID-3361) No longer an issue.
+* [MONGOID-3365](https://jira.mongodb.org/browse/MONGOID-3365) Test added to show it's no longer an issue.
+* [MONGOID-3402](https://jira.mongodb.org/browse/MONGOID-3402) Apply persistence options to parent.
+* [MONGOID-3524](https://jira.mongodb.org/browse/MONGOID-3524) No longer an issue.
+* [MONGOID-3529](https://jira.mongodb.org/browse/MONGOID-3529) Test exists already showing it's not an issue.
+* [MONGOID-3543](https://jira.mongodb.org/browse/MONGOID-3543) Test exists already showing it's not an issue.
+* [MONGOID-3611](https://jira.mongodb.org/browse/MONGOID-3611) Test added to show it's no longer an issue.
+* [MONGOID-3650](https://jira.mongodb.org/browse/MONGOID-3650) No longer an issue.
+* [MONGOID-3826](https://jira.mongodb.org/browse/MONGOID-3826), [MONGOID-4109](https://jira.mongodb.org/browse/MONGOID-4109) Fix Timelessness leaks.
+* [MONGOID-3946](https://jira.mongodb.org/browse/MONGOID-3946) Test added to show it's no longer an issue.
+* [MONGOID-3969](https://jira.mongodb.org/browse/MONGOID-3969) Test added to show it's no longer an issue.
+* [MONGOID-3971](https://jira.mongodb.org/browse/MONGOID-3971) Not an issue.
+* [MONGOID-3979](https://jira.mongodb.org/browse/MONGOID-3979) Not an issue, tests exist already.
+* [MONGOID-3985](https://jira.mongodb.org/browse/MONGOID-3985) Not an issue.
+* [MONGOID-4078](https://jira.mongodb.org/browse/MONGOID-4078) Behavior is intended.
+* [MONGOID-4079](https://jira.mongodb.org/browse/MONGOID-4079) Not an issue.
+* [MONGOID-4088](https://jira.mongodb.org/browse/MONGOID-4088) Account for sub-document dot notation with #pluck results.
+* [MONGOID-4098](https://jira.mongodb.org/browse/MONGOID-4098) Fixed by a change to the Ruby driver. See RUBY-1029.
+* [MONGOID-4101](https://jira.mongodb.org/browse/MONGOID-4101) Not an issue.
+* [MONGOID-4106](https://jira.mongodb.org/browse/MONGOID-4106) Not an issue.
+* [MONGOID-4110](https://jira.mongodb.org/browse/MONGOID-4110) Not an issue.
+* [MONGOID-4119](https://jira.mongodb.org/browse/MONGOID-4119) Ensure that criteria selector becomes pipeline operator value.
+* [MONGOID-4121](https://jira.mongodb.org/browse/MONGOID-4121) Not an issue.
+* [MONGOID-4123](https://jira.mongodb.org/browse/MONGOID-4123) Fixed as a result of MONGOID-4159.
+* [MONGOID-4125](https://jira.mongodb.org/browse/MONGOID-4125) Make sure none scopes referenced in procs are applied.
+* [MONGOID-4132](https://jira.mongodb.org/browse/MONGOID-4132) Not an issue.
+* [MONGOID-4157](https://jira.mongodb.org/browse/MONGOID-4157) Fixed by version 2.1.2 of the Ruby driver.
+* [MONGOID-4162](https://jira.mongodb.org/browse/MONGOID-4162) Adapt index option mappings to new driver. (@Nielsomat)
+* [MONGOID-3737](https://jira.mongodb.org/browse/MONGOID-3737) Test added to show it's no longer an issue.
+* [MONGOID-3621](https://jira.mongodb.org/browse/MONGOID-3621) Not an issue.
+* [MONGOID-3551](https://jira.mongodb.org/browse/MONGOID-3551) Not an issue.
+* [MONGOID-3696](https://jira.mongodb.org/browse/MONGOID-3696) Test added to show it's no longer an issue.
+* [MONGOID-3858](https://jira.mongodb.org/browse/MONGOID-3858) Test added to show it's no longer an issue.
+* [MONGOID-3672](https://jira.mongodb.org/browse/MONGOID-3672) Not an issue.
+* [MONGOID-4172](https://jira.mongodb.org/browse/MONGOID-4172) Use positional operator only on 1 level deep nesting.
+* Added public cert to repo and sign gem if private key is present
+
+## 5.0.0
+
+### Major Changes (Backwards Incompatible)
+
+* Mongoid now uses the official Mongo Ruby Driver 2.x instead of Moped.
+
+* Most driver specific configuration options have changed, please see [here](http://docs.mongodb.org/ecosystem/tutorial/ruby-driver-tutorial/#ruby-options) for the new options.
+
+* All references to `session` are now replaced with `client`. This includes the mongoid.yml configuration, `store_in` options, and all exceptions and modules with `Session` in the name.
+
+* `find_and_modify` has been removed and replaced with 3 options: `find_one_and_update`, `find_one_and_delete` and `find_one_and_replace`.
+
+* `text_search` has been removed as it is now a `$text` option in a query from 2.6 on.
+
+* Mongoid no longer supports MongoDB 2.2 - support is now for only 2.4 and higher.
+
+* \#3768 `first` and `last` no longer add an `_id` sort when no sorting options have been provided. In order to guarantee that a document is the first or last, it needs to now contain an explicit sort.
+
+* `Document#deleted?` alias has been removed, please continue to use `Document#destroyed?`.
+
+### New Features
+
+* \#4016 Allow private and protected setters on fields for atomic operations. (Rob Smith)
+
+* \#3985 Return nil when using `{upsert: true}` in `find_and_modify` (Adrien Siami)
+
+* \#3963 Allow extended JSON object ids to be passed to `find`.
+
+* \#3846 Allow #pluck when none is used in criteria. (Braulio Martinez)
+
+### Resolved Issues
+
+* \#4091 Use sublcass context when calling a scope defined in a superclass. (Edgars Beigarts)
+
+* \#4075 Made remove index logging specific to each index that was actually getting removed.
+
+* \#4071 Fixed loading of enumerable relation to check the added documents when iterating.
+
+* \#4077 Many relations now include Enumerable.
+
+* \#4052 Fixed uniqueness validation on localized fields with no value.
+
+* \#4033 Removed all uses of the $ positional operator in atomic updates.
+
+* \#4030 Dup/clone exceptions auto-include dynamic attributes.
+
+* \#4005 Fixed inclusion of mongoid with Rails components that don't have the Rails environment.
+
 * \#3993 Fixes issue where `dup`/`clone` fails for embedded documents that use store_as without using Mongoid::Atributes::Dynamic
+
+* \#3991 Fixed emebdded documents not flagging as changed after calling #changed? and modifying the
+child elements.
+
+* \#3874 Adding snapshot option to context.
+
+* \#3868 Loading models in rake tasks now expands the rails path.
+
+* \#3764 Fixed case statement check for enumerable targets.
+
+* \#3740 Fixes `Missing attribute: '_id'` error when using methods only or without (dx7)
+
+* \#3631 Fixes issue where `before_save` callback can get called twice after a child create
+
+* \#3599 Fixed application of default scopes from superclass in subclasses.
+
+* \#3104 Fixed enumerable targets to check first/last in proper order.
 
 ## 4.0.2
 
@@ -2900,7 +3009,7 @@ For instructions on upgrading to newer versions, visit
 
 * \#1394 Fix exists? to work when count is greater than 1. (Nick Hoffman)
 
-* \#1392 Return 0 on aggregation functions where field is nonexistant.
+* \#1392 Return 0 on aggregation functions where field is nonexistent.
 
 * \#1391 Uniqueness validation now works properly on embedded documents that are
   using primary key definitions.

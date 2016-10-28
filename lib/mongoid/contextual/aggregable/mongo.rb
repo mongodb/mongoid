@@ -23,7 +23,7 @@ module Mongoid
         #
         # @since 3.0.0
         def aggregates(field)
-          result = collection.aggregate(pipeline(field)).to_a
+          result = collection.find.aggregate(pipeline(field)).to_a
           if result.empty?
             { "count" => 0, "sum" => nil, "avg" => nil, "min" => nil, "max" => nil }
           else
@@ -124,7 +124,7 @@ module Mongoid
         def pipeline(field)
           db_field = "$#{database_field_name(field)}"
           pipeline = []
-          pipeline << { "$match" => criteria.nin(field => nil).selector }
+          pipeline << { "$match" =>  criteria.exists(field => true).selector }
           pipeline << { "$sort" => criteria.options[:sort] } if criteria.options[:sort]
           pipeline << { "$skip" => criteria.options[:skip] } if criteria.options[:skip]
           pipeline << { "$limit" => criteria.options[:limit] } if criteria.options[:limit]

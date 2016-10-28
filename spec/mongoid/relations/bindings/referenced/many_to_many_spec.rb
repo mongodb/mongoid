@@ -112,7 +112,7 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
         binding.bind_one(target.first)
       end
 
-      it "never performs a persistance operation" do
+      it "never performs a persistence operation" do
         expect(person).to receive(:delete).never
         expect(person).to receive(:save).never
         expect(preference).to receive(:delete).never

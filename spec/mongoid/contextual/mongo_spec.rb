@@ -107,26 +107,11 @@ describe Mongoid::Contextual::Mongo do
       end
 
       before do
-        expect(context.query).to receive(:count).once.and_return(1)
+        expect(context.view).to receive(:count).once.and_return(1)
       end
 
       it "returns the count cached value after first call" do
         2.times { expect(context.count).to eq(1) }
-      end
-    end
-
-    context "when provided a document" do
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      let(:count) do
-        context.count(depeche)
-      end
-
-      it "returns the number of documents that match" do
-        expect(count).to eq(1)
       end
     end
 
@@ -164,18 +149,18 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when provided limit true" do
+    context "when provided limit" do
 
       before do
         2.times { Band.create(name: "Depeche Mode") }
       end
 
       let(:context) do
-        described_class.new(criteria.limit(2))
+        described_class.new(criteria)
       end
 
       let(:count) do
-        context.count(true)
+        context.count(limit: 2)
       end
 
       it "returns the number of documents that match" do
@@ -497,7 +482,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "hits the database again" do
-          expect(context).to receive(:query).once.and_call_original
+          expect(context).to receive(:view).once.and_call_original
           expect(context).to be_exists
         end
       end
@@ -520,7 +505,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "does not hit the database" do
-          expect(context).to receive(:query).never
+          expect(context).to receive(:view).never
           expect(context).to be_exists
         end
       end
@@ -534,7 +519,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "does not hit the database" do
-            expect(context).to receive(:query).never
+            expect(context).to receive(:view).never
             expect(context).to be_exists
           end
         end
@@ -553,11 +538,11 @@ describe Mongoid::Contextual::Mongo do
     end
 
     it "returns the criteria explain path" do
-      expect(context.explain["cursor"]).to eq("BasicCursor")
+      expect(context.explain).to_not be_empty
     end
   end
 
-  describe "#find_and_modify" do
+  describe "#find_one_and_update" do
 
     let!(:depeche) do
       Band.create(name: "Depeche Mode")
@@ -580,7 +565,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify("$inc" => { likes: 1 })
+          context.find_one_and_update("$inc" => { likes: 1 })
         end
 
         it "returns the first matching document" do
@@ -603,7 +588,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify("$inc" => { likes: 1 })
+          context.find_one_and_update("$inc" => { likes: 1 })
         end
 
         it "returns the first matching document" do
@@ -626,7 +611,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify("$inc" => { likes: 1 })
+          context.find_one_and_update("$inc" => { likes: 1 })
         end
 
         it "returns the first matching document" do
@@ -653,7 +638,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify({ "$inc" => { likes: 1 }}, new: true)
+          context.find_one_and_update({ "$inc" => { likes: 1 }}, return_document: :after)
         end
 
         it "returns the first matching document" do
@@ -676,7 +661,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_and_modify({}, remove: true)
+          context.find_one_and_delete
         end
 
         it "returns the first matching document" do
@@ -702,7 +687,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:result) do
-        context.find_and_modify("$inc" => { likes: 1 })
+        context.find_one_and_update("$inc" => { likes: 1 })
       end
 
       it "returns nil" do
@@ -757,9 +742,95 @@ describe Mongoid::Contextual::Mongo do
 
         context "when subsequently calling #last" do
 
-          it "returns the correnct document" do
+          it "returns the correct document" do
             expect(context.send(method)).to eq(new_order)
             expect(context.last).to eq(depeche_mode)
+          end
+        end
+      end
+
+      context 'when the criteria has no sort' do
+
+        let(:criteria) do
+          Band.all
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+
+        it 'applies a sort on _id' do
+          expect(context.send(method)).to eq(depeche_mode)
+        end
+
+        context 'when calling #last' do
+
+          it 'returns the last document, sorted by _id' do
+            expect(context.send(method)).to eq(depeche_mode)
+            expect(context.last).to eq(new_order)
+          end
+        end
+
+        context 'with option { sort: :none }' do
+
+          let(:opts) do
+            { id_sort: :none }
+          end
+
+          it 'does not apply the sort on _id' do
+            expect(context.send(method, opts)).to eq(depeche_mode)
+          end
+
+          context 'when calling #last' do
+
+            it 'does not apply a sort on _id' do
+              expect(context.send(method, opts)).to eq(depeche_mode)
+              expect(context.last(opts)).to eq(depeche_mode)
+            end
+          end
+        end
+      end
+
+      context 'when the criteria has a sort' do
+
+        let(:criteria) do
+          Band.desc(:name)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+
+        it 'applies the criteria sort' do
+          expect(context.send(method)).to eq(new_order)
+        end
+
+        context 'when calling #last' do
+
+          it 'applies the criteria sort' do
+            expect(context.send(method)).to eq(new_order)
+            expect(context.last).to eq(depeche_mode)
+          end
+        end
+
+        context 'with option { sort: :none }' do
+
+          let(:opts) do
+            { id_sort: :none }
+          end
+
+          it 'applies the criteria sort' do
+            expect(context.send(method, opts)).to eq(new_order)
+          end
+
+          context 'when calling #last' do
+
+            it 'applies the criteria sort' do
+              expect(context.send(method, opts)).to eq(new_order)
+              expect(context.last(opts)).to eq(depeche_mode)
+            end
           end
         end
       end
@@ -783,7 +854,7 @@ describe Mongoid::Contextual::Mongo do
 
         context "when subsequently calling #last" do
 
-          it "returns the correnct document" do
+          it "returns the correct document" do
             expect(context.send(method)).to eq(new_order)
             expect(context.last).to eq(depeche_mode)
           end
@@ -807,7 +878,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first document without touching the database" do
-            expect(context).to receive(:query).never
+            expect(context).to receive(:view).never
             expect(context.send(method)).to eq(depeche_mode)
           end
         end
@@ -819,7 +890,7 @@ describe Mongoid::Contextual::Mongo do
           end
 
           it "returns the first document without touching the database" do
-            expect(context).to receive(:query).never
+            expect(context).to receive(:view).never
             expect(context.send(method)).to eq(depeche_mode)
           end
         end
@@ -845,89 +916,12 @@ describe Mongoid::Contextual::Mongo do
       expect(context.klass).to eq(Band)
     end
 
-    it "sets the query" do
-      expect(context.query).to be_a(Moped::Query)
+    it "sets the view" do
+      expect(context.view).to be_a(Mongo::Collection::View)
     end
 
-    it "sets the query selector" do
-      expect(context.query.selector).to eq({ "name" => "Depeche Mode" })
-    end
-
-    it "sets timeout options" do
-      expect(context.query.operation.flags).to eq([ :no_cursor_timeout ])
-    end
-  end
-
-  describe "#last" do
-
-    context "when no default scope" do
-
-      let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
-      end
-
-      let!(:new_order) do
-        Band.create(name: "New Order")
-      end
-
-      let(:criteria) do
-        Band.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns the last matching document" do
-        expect(context.last).to eq(new_order)
-      end
-    end
-
-    context "when default scope" do
-
-      let!(:palm) do
-        Tree.create(name: "Palm")
-      end
-
-      let!(:maple) do
-        Tree.create(name: "Maple")
-      end
-
-      let(:criteria) do
-        Tree.all
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "respects default scope" do
-        expect(context.last).to eq(palm)
-      end
-    end
-
-    context "when subsequently calling #first" do
-
-      let!(:depeche_mode) do
-        Band.create(name: "Depeche Mode")
-      end
-
-      let!(:new_order) do
-        Band.create(name: "New Order")
-      end
-
-      let(:criteria) do
-        Band.asc(:name)
-      end
-
-      let(:context) do
-        described_class.new(criteria)
-      end
-
-      it "returns the correnct document" do
-        expect(context.last).to eq(new_order)
-        expect(context.first).to eq(depeche_mode)
-      end
+    it "sets the view selector" do
+      expect(context.view.selector).to eq({ "name" => "Depeche Mode" })
     end
   end
 
@@ -957,7 +951,7 @@ describe Mongoid::Contextual::Mongo do
         context "when calling more than once" do
 
           before do
-            expect(context.query).to receive(:count).once.and_return(2)
+            expect(context.view).to receive(:count).once.and_return(2)
           end
 
           it "returns the cached value for subsequent calls" do
@@ -969,7 +963,7 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             context.entries
-            expect(context.query).to receive(:count).once.and_return(2)
+            expect(context.view).to receive(:count).once.and_return(2)
           end
 
           it "returns the cached value for all calls" do
@@ -1006,7 +1000,7 @@ describe Mongoid::Contextual::Mongo do
         context "when calling more than once" do
 
           before do
-            expect(context.query).to receive(:count).once.and_return(1)
+            expect(context.view).to receive(:count).once.and_return(1)
           end
 
           it "returns the cached value for subsequent calls" do
@@ -1018,7 +1012,7 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             context.entries
-            expect(context.query).to receive(:count).once.and_return(1)
+            expect(context.view).to receive(:count).once.and_return(1)
           end
 
           it "returns the cached value for all calls" do
@@ -1079,11 +1073,6 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when passed the symbol field name" do
-
-      it "limits query to that field" do
-        expect(criteria).to receive(:only).with(:name).and_call_original
-        context.map(:name)
-      end
 
       it "performs mapping" do
         expect(context.map(:name)).to eq ["Depeche Mode", "New Order"]
@@ -1396,6 +1385,65 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
+    context "when the output specifies a different db" do
+
+      let(:criteria) do
+        Band.limit(1)
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      after do
+        Band.with(database: 'another-db') do |b|
+          b.all.delete
+        end
+      end
+
+      context 'when db is a string' do
+
+        let(:results) do
+          context.map_reduce(map, reduce).out(merge: :mr_output, db: 'another-db')
+        end
+
+        it "returns the correct number of documents" do
+          expect(results.count).to eq(1)
+        end
+
+        it "contains the entire results" do
+          expect(results).to eq([
+                                    { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+                                ])
+        end
+
+        it 'writes to the specified db' do
+          expect(Band.mongo_client.with(database: 'another-db')[:mr_output].find.count).to eq(1)
+        end
+      end
+
+      context 'when db is a symbol' do
+
+        let(:results) do
+          context.map_reduce(map, reduce).out(merge: :mr_output, 'db' => 'another-db')
+        end
+
+        it "returns the correct number of documents" do
+          expect(results.count).to eq(1)
+        end
+
+        it "contains the entire results" do
+          expect(results).to eq([
+                                    { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
+                                ])
+        end
+
+        it 'writes to the specified db' do
+          expect(Band.mongo_client.with(database: 'another-db')[:mr_output].find.count).to eq(1)
+        end
+      end
+    end
+
     context "when providing no output" do
 
       let(:criteria) do
@@ -1513,59 +1561,6 @@ describe Mongoid::Contextual::Mongo do
 
       it "sorts the results in memory" do
         expect(sorted).to eq([ new_order, depeche_mode ])
-      end
-    end
-  end
-
-  describe "#text_search" do
-
-    let(:criteria) do
-      Word.all
-    end
-
-    let(:context) do
-      described_class.new(criteria)
-    end
-
-    before do
-      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
-      Word.create_indexes
-      Word.create!(name: "phase", origin: "latin")
-    end
-
-    after(:all) do
-      Word.remove_indexes
-    end
-
-    context "when the search is projecting" do
-
-      let(:search) do
-        context.text_search("phase").project(name: 1)
-      end
-
-      let(:documents) do
-        search.entries
-      end
-
-      it "limits the fields to the projection" do
-        expect {
-          documents.first.origin
-        }.to raise_error(ActiveModel::MissingAttributeError)
-      end
-    end
-
-    context "when the search is not projecting" do
-
-      let(:search) do
-        context.text_search("phase")
-      end
-
-      let(:documents) do
-        search.entries
-      end
-
-      it "returns all fields" do
-        expect(documents.first.origin).to eq("latin")
       end
     end
   end
@@ -1859,6 +1854,37 @@ describe Mongoid::Contextual::Mongo do
 
       it "returns false" do
         expect(context.update_all).to be false
+      end
+    end
+  end
+
+  describe '#pipeline' do
+
+    context 'when the criteria has a selector', if: non_legacy_server? do
+
+      before do
+        Artist.index(name: "text")
+        Artist.create_indexes
+      end
+
+      let(:criteria) do
+        Artist.text_search("New Order")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:pipeline_match) do
+        context.send(:pipeline, :some_field).first['$match']
+      end
+
+      it 'creates a pipeline with the selector as one of the $match criteria' do
+        expect(pipeline_match).to include({ :'$text' => { :'$search' => "New Order" } })
+      end
+
+      it 'creates a pipeline with the $exists operator as one of the $match criteria' do
+        expect(pipeline_match).to include({ 'some_field' => { '$exists' => true } })
       end
     end
   end

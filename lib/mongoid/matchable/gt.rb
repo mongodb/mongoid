@@ -15,6 +15,8 @@ module Mongoid
       # @return [ true, false ] If a value exists.
       def matches?(value)
         determine(value, :>)
+      rescue ArgumentError
+        false
       end
     end
   end

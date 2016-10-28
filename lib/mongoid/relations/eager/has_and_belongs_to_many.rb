@@ -17,7 +17,7 @@ module Mongoid
 
           @docs.each do |d|
             keys = d.send(group_by_key)
-            docs = entries.values_at(*keys)
+            docs = entries.values_at(*keys).compact
             set_relation(d, docs)
           end
         end
@@ -31,7 +31,7 @@ module Mongoid
         end
 
         def set_relation(doc, element)
-          doc.__build__(@metadata.name, element, @metadata)
+          doc.__build__(@metadata.name, element, @metadata) unless doc.blank?
         end
 
         def group_by_key

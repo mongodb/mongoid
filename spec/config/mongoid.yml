@@ -1,34 +1,18 @@
 test:
-  sessions:
+  clients:
     default:
       database: mongoid_test
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
       options:
-        read: primary
-    mongohq_single:
-      database: <%=ENV["MONGOHQ_SINGLE_NAME"]%>
-      username: <%=ENV["MONGOHQ_SINGLE_USER"]%>
-      password: <%=ENV["MONGOHQ_SINGLE_PASS"]%>
-      hosts:
-        - <%=ENV["MONGOHQ_SINGLE_URL"]%>
-      options:
-        write:
-          w: 1
-        read: primary
-    mongohq_repl:
-      database: <%=ENV["MONGOHQ_REPL_NAME"]%>
-      username: <%=ENV["MONGOHQ_REPL_USER"]%>
-      password: <%=ENV["MONGOHQ_REPL_PASS"]%>
-      hosts:
-        - <%=ENV["MONGOHQ_REPL_1_URL"]%>
-        - <%=ENV["MONGOHQ_REPL_2_URL"]%>
-      options:
-        read: primary
-        write:
-          w: majority
-    mongohq_repl_uri:
-      uri: <%= ENV["MONGOHQ_REPL_URI"]%>
+        user: "mongoid-user"
+        password: "password"
+        auth_source: "admin"
+        read:
+          mode: :primary_preferred
+          tag_sets:
+            - use: web
+        max_pool_size: 1
   options:
     include_root_in_json: false
     include_type_for_serialization: false
@@ -37,3 +21,5 @@ test:
     raise_not_found_error: true
     use_activesupport_time_zone: true
     use_utc: false
+    log_level: :warn
+    belongs_to_required_by_default: false

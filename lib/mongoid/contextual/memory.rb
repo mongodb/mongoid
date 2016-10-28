@@ -47,7 +47,7 @@ module Mongoid
           doc.as_document
         end
         unless removed.empty?
-          collection.find(selector).update(
+          collection.find(selector).update_one(
             positionally(selector, "$pullAll" => { path => removed })
           )
         end
@@ -130,9 +130,7 @@ module Mongoid
       #
       # @since 3.0.0
       def first
-        doc = documents.first
-        eager_load_one(doc)
-        doc
+        eager_load([documents.first]).first
       end
       alias :one :first
       alias :find_first :first
@@ -165,9 +163,7 @@ module Mongoid
       #
       # @since 3.0.0
       def last
-        doc = documents.last
-        eager_load_one(doc)
-        doc
+        eager_load([documents.last]).first
       end
 
       # Get the length of matching documents in the context.
@@ -307,7 +303,7 @@ module Mongoid
           updates["$set"].merge!(doc.atomic_updates["$set"] || {})
           doc.move_changes
         end
-        collection.find(selector).update(updates) unless updates["$set"].empty?
+        collection.find(selector).update_one(updates) unless updates["$set"].empty?
       end
 
       # Get the limiting value.

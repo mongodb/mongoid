@@ -16,7 +16,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(person.score).to eq(90)
         end
 
-        it "sets a nonexistant value" do
+        it "sets a nonexistent value" do
           expect(person.inte).to eq(30)
         end
 
@@ -32,7 +32,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(person.reload.score).to eq(90)
         end
 
-        it "persists a nonexistant inc" do
+        it "persists a nonexistent inc" do
           expect(person.reload.inte).to eq(30)
         end
 
@@ -97,7 +97,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(address.no).to eq(90)
         end
 
-        it "sets a nonexistant value" do
+        it "sets a nonexistent value" do
           expect(address.house).to eq(30)
         end
 
@@ -113,7 +113,7 @@ describe Mongoid::Persistable::Incrementable do
           expect(address.reload.no).to eq(90)
         end
 
-        it "persists a nonexistant inc" do
+        it "persists a nonexistent inc" do
           expect(address.reload.house).to eq(30)
         end
 
@@ -167,6 +167,58 @@ describe Mongoid::Persistable::Incrementable do
         end
 
         it_behaves_like "an incrementable embedded document"
+      end
+    end
+
+    context "when the document is embedded in another embedded document" do
+      shared_examples_for "an incrementable embedded document in another embedded document" do
+
+        it "increments a positive value" do
+          expect(second_answer.position).to eq(2)
+        end
+
+        it "persists a positive inc" do
+          expect(second_answer.reload.position).to eq(2)
+        end
+
+        it "clears out dirty changes" do
+          expect(second_answer).to_not be_changed
+        end
+      end
+
+      let(:survey) do
+        Survey.create
+      end
+
+      let(:question) do
+        survey.questions.create(content: 'foo')
+      end
+
+      let!(:first_answer) do
+        question.answers.create(position: 99)
+      end
+
+      let!(:second_answer) do
+        question.answers.create(position: 1)
+      end
+
+      context "when providing string fields" do
+
+        let!(:inc) do
+          second_answer.inc("position" => 1)
+        end
+
+        it_behaves_like "an incrementable embedded document in another embedded document"
+
+      end
+
+      context "when providing symbol fields" do
+
+        let!(:inc) do
+          second_answer.inc(position: 1)
+        end
+
+        it_behaves_like "an incrementable embedded document in another embedded document"
       end
     end
   end

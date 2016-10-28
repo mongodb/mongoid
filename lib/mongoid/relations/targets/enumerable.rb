@@ -45,7 +45,7 @@ module Mongoid
         #
         # @since 3.1.4
         def ===(other)
-          other.class == Class ? Array == other : self == other
+          other.class == Class ? (Array == other || Enumerable == other) : self == other
         end
 
         # Append a document to the enumerable.
@@ -175,7 +175,8 @@ module Mongoid
           end
           if _loaded?
             _loaded.each_pair do |id, doc|
-              yield(doc)
+              document = _added.delete(doc._id) || doc
+              yield(document)
             end
           else
             unloaded_documents.each do |doc|
@@ -217,7 +218,10 @@ module Mongoid
         #
         # @since 2.1.0
         def first
-          matching_document(:first)
+          _loaded.try(:values).try(:first) ||
+            _added[(ul = _unloaded.try(:first)).try(:id)] ||
+            ul ||
+            _added.values.try(:first)
         end
 
         # Initialize the new enumerable either with a criteria or an array.
@@ -237,7 +241,7 @@ module Mongoid
           else
             @_added, @executed = {}, true
             @_loaded = target.inject({}) do |_target, doc|
-              _target[doc._id] = doc
+              _target[doc._id] = doc if doc
               _target
             end
           end
@@ -298,7 +302,10 @@ module Mongoid
         #
         # @since 2.1.0
         def last
-          matching_document(:last)
+          _added.values.try(:last) ||
+            _loaded.try(:values).try(:last) ||
+            _added[(ul = _unloaded.try(:last)).try(:id)] ||
+            ul
         end
 
         # Loads all the documents in the enumerable from the database.
@@ -333,7 +340,7 @@ module Mongoid
         #
         # @since 3.0.15
         def marshal_dump
-          [ _added, _loaded, _unloaded ]
+          [ _added, _loaded, _unloaded, @executed]
         end
 
         # Loads the data needed to Marshal.load an enumerable proxy.
@@ -345,7 +352,7 @@ module Mongoid
         #
         # @since 3.0.15
         def marshal_load(data)
-          @_added, @_loaded, @_unloaded = data
+          @_added, @_loaded, @_unloaded, @executed = data
         end
 
         # Reset the enumerable back to its persisted state.
@@ -455,13 +462,6 @@ module Mongoid
 
         def method_missing(name, *args, &block)
           entries.send(name, *args, &block)
-        end
-
-        def matching_document(location)
-          _loaded.try(:values).try(location) ||
-            _added[(ul = _unloaded.try(location)).try(:id)] ||
-            ul ||
-            _added.values.try(location)
         end
 
         def unloaded_documents

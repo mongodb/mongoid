@@ -394,7 +394,7 @@ describe Mongoid::Serializable do
             hash["addresses"]
           end
 
-          pending "when the ids were not loaded" do
+          context "when the ids were not loaded" do
 
             before do
               person.save
@@ -409,6 +409,8 @@ describe Mongoid::Serializable do
             end
 
             it "does not generate new ids" do
+              pending
+              fail
               expect(hash["addresses"].first["_id"]).to be_nil
             end
           end
@@ -824,56 +826,6 @@ describe Mongoid::Serializable do
         it "serializes only the relation" do
           expect(json).to include(post.title)
         end
-      end
-    end
-  end
-
-  describe "#to_xml" do
-
-    context "BSON::ObjectId" do
-
-      let(:person) do
-        Person.new
-      end
-
-      it "serializes as string" do
-        expect(person.to_xml).to include("<_id>#{person.id}</_id>")
-      end
-    end
-
-    context "when an Array field is defined" do
-
-      let(:person) do
-        Person.new(
-          aliases: [ "Kelly", "Machine Gun" ]
-        )
-      end
-
-      it "properly types the array" do
-        expect(person.to_xml).to include("<aliases type=\"array\">")
-      end
-
-      it "serializes the array" do
-        expect(person.to_xml).to include("<alias>Kelly</alias>")
-        expect(person.to_xml).to include("<alias>Machine Gun</alias>")
-      end
-    end
-
-    context "when a Hash field is defined" do
-
-      let(:person) do
-        Person.new(
-          map: { lat: 24.5, long: 22.1 }
-        )
-      end
-
-      it "properly types the hash" do
-        expect(person.to_xml).to include("<map>")
-      end
-
-      it "serializes the hash" do
-        expect(person.to_xml).to include("<lat type=\"float\">24.5</lat>")
-        expect(person.to_xml).to include("<long type=\"float\">22.1</long>")
       end
     end
   end

@@ -19,16 +19,16 @@ module Mongoid
         @command ||= {}
       end
 
-      # Get the database session.
+      # Get the database client.
       #
-      # @example Get the session.
-      #   command.session
+      # @example Get the client.
+      #   command.client
       #
-      # @return [ Session ] The Moped session.
+      # @return [ Mongo::Client ] The Mongo client.
       #
       # @since 3.0.0
-      def session
-        collection.database.session
+      def client
+        collection.database.client
       end
     end
   end

@@ -879,6 +879,36 @@ describe Mongoid::Relations::Embedded::Many do
       Person.create
     end
 
+    context 'when a string is used to access an attribute' do
+
+      let!(:address) do
+        person.addresses.create(street: "one")
+      end
+
+      let(:document) do
+        person.reload.addresses.as_document.first
+      end
+
+      it "returns the attribute value" do
+        expect(document['street']).to eq('one')
+      end
+    end
+
+    context 'when a symbol is used to access an attribute' do
+
+      let!(:address) do
+        person.addresses.create(street: "one")
+      end
+
+      let(:document) do
+        person.reload.addresses.as_document.first
+      end
+
+      it "returns the attribute value" do
+        expect(document[:street]).to eq('one')
+      end
+    end
+
     context "when the relation has no default scope" do
 
       let!(:address) do
@@ -1544,6 +1574,38 @@ describe Mongoid::Relations::Embedded::Many do
         expect {
           person.addresses.create!(street: "1")
         }.to raise_error(Mongoid::Errors::Validations)
+      end
+
+      context 'when the presence of the embedded relation is validated' do
+
+        before do
+          class Book
+            validates :pages, presence: true
+          end
+        end
+
+        let(:book) do
+          Book.new.tap do |b|
+            b.pages = [Page.new]
+            b.save!
+          end
+        end
+
+        let(:num_pages) do
+          book.pages.size
+        end
+
+        let(:reloaded) do
+          book.reload
+        end
+
+        before do
+          begin; book.update_attributes!({"pages"=>nil}); rescue; end
+        end
+
+        it 'does not delete the embedded relation' do
+          expect(reloaded.pages.size).to eq(num_pages)
+        end
       end
     end
   end
@@ -2748,26 +2810,55 @@ describe Mongoid::Relations::Embedded::Many do
       end
 
       let!(:location) do
-        address.locations.create(name: "work")
+        address.locations.create(name: "vacation", number: 0)
+        address.locations.create(name: "work", number: 3)
       end
 
-      context "when updating with a hash" do
+      context "when updating with replacement of embedded array" do
+
+        context "when updating with a hash" do
+
+          before do
+            address.update_attributes(locations: [{ name: "home" }])
+          end
+
+          it "updates the attributes" do
+            expect(address.locations.first.name).to eq("home")
+          end
+
+          it "overwrites the existing documents" do
+            expect(address.locations.count).to eq(1)
+          end
+
+          it "persists the changes" do
+            expect(address.reload.locations.count).to eq(1)
+          end
+        end
+      end
+
+      context "when updating a field in a document of the embedded array" do
 
         before do
-          address.update_attributes(locations: [{ name: "home" }])
+          location.number = 7
+          location.save
         end
 
-        it "updates the attributes" do
-          expect(address.locations.first.name).to eq("home")
+        let(:updated_location_number) do
+          person.reload.addresses.first.locations.find(location.id).number
         end
 
-        it "overwrites the existing documents" do
-          expect(address.locations.count).to eq(1)
+        let(:updated_location_name) do
+          person.reload.addresses.first.locations.find(location.id).name
         end
 
-        it "persists the changes" do
-          expect(address.reload.locations.count).to eq(1)
+        it "the change is persisted" do
+          expect(updated_location_number).to eq(7)
         end
+
+        it "the other field remains unaffected" do
+          expect(updated_location_name).to eq("work")
+        end
+
       end
     end
 
@@ -3502,6 +3593,53 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
+  context "when the association has an order defined" do
+
+    let(:person) do
+      Person.create
+    end
+
+    let(:message_one) do
+      Message.new(priority: 5, body: 'This is a test')
+    end
+
+    let(:message_two) do
+      Message.new(priority: 10, body: 'This is a test')
+    end
+
+    let(:message_three) do
+      Message.new(priority: 20, body: 'Zee test')
+    end
+
+    before do
+      person.messages.push(message_one, message_two, message_three)
+    end
+
+    let(:criteria) do
+      person.messages.order_by(:body.asc, :priority.desc)
+    end
+
+    it "properly orders the related objects" do
+      expect(criteria.to_a).to eq([message_two, message_one, message_three])
+    end
+
+    context "when the field to order on is an array of documents" do
+
+      before do
+        person.aliases = [ { name: "A", priority: 3 }, { name: "B", priority: 4 }]
+        person.save
+      end
+
+      let!(:person2) do
+        Person.create( aliases: [ { name: "C", priority: 1 }, { name: "D", priority: 2 }])
+      end
+
+      it "allows ordering on a key of an embedded document" do
+        expect(Person.all.order_by("aliases.0.priority" => 1).first).to eq(person2)
+      end
+    end
+  end
+
   context "when using dot notation in a criteria" do
 
     let(:person) do
@@ -3653,12 +3791,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         expect(artist).to receive(:before_add_song).and_raise
+        begin; artist.songs << song; rescue; end
       end
 
       it "does not add the document to the relation" do
-        expect {
-          artist.songs << song
-        }.to raise_error
         expect(artist.songs).to be_empty
       end
     end
@@ -3683,12 +3819,10 @@ describe Mongoid::Relations::Embedded::Many do
 
       before do
         expect(artist).to receive(:after_add_label).and_raise
+        begin; artist.labels << label; rescue; end
       end
 
       it "adds the document to the relation" do
-        expect {
-          artist.labels << label
-        }.to raise_error
         expect(artist.labels).to eq([ label ])
       end
     end
@@ -3749,19 +3883,18 @@ describe Mongoid::Relations::Embedded::Many do
         describe "#delete" do
 
           it "does not remove the document from the relation" do
-            expect {
-              artist.songs.delete(song)
-            }.to raise_error
+            begin; artist.songs.delete(song); rescue; end
             expect(artist.songs).to eq([ song ])
           end
         end
 
         describe "#clear" do
 
+          before do
+            begin; artist.songs.clear; rescue; end
+          end
+
           it "removes the documents from the relation" do
-            expect {
-              artist.songs.clear
-            }.to raise_error
             expect(artist.songs).to eq([ song ])
           end
         end
@@ -3817,9 +3950,7 @@ describe Mongoid::Relations::Embedded::Many do
       describe "#delete" do
 
         before do
-          expect {
-            artist.labels.delete(label)
-          }.to raise_error
+          begin; artist.labels.delete(label); rescue; end
         end
 
         it "removes the document from the relation" do
@@ -3830,9 +3961,7 @@ describe Mongoid::Relations::Embedded::Many do
       describe "#clear" do
 
         before do
-          expect {
-            artist.labels.clear
-          }.to raise_error
+          begin; artist.labels.clear; rescue; end
         end
 
         it "should remove from collection" do
@@ -3873,7 +4002,7 @@ describe Mongoid::Relations::Embedded::Many do
     before do
       band.collection.
         find(_id: band.id).
-        update("$set" => { records: [{ name: "Moderat" }]})
+        update_one("$set" => { records: [{ name: "Moderat" }]})
     end
 
     context "when loading the documents" do
@@ -3911,30 +4040,8 @@ describe Mongoid::Relations::Embedded::Many do
     end
   end
 
-  context "when embedded documents get marshalled" do
-
-    let(:person) do
-      Person.create
-    end
-
-    let!(:addresses) do
-      person.addresses
-    end
-
-    let!(:dumped) do
-      Marshal.dump(addresses)
-    end
-
-    let!(:loaded) do
-      Marshal.load(dumped)
-    end
-
-    it "keeps the proxy extensions when remarshalling" do
-      expect(loaded.extension).to eq("Testing")
-    end
-  end
-
   context "deleting embedded documents" do
+
     it "able to delete embedded documents upon condition" do
       company = Company.new
       4.times { |i| company.staffs << Staff.new(age: 50 + i)}
@@ -3942,6 +4049,116 @@ describe Mongoid::Relations::Embedded::Many do
       company.save
       company.staffs.delete_if {|x| x.age >= 50}
       expect(company.staffs.count).to eq(2)
+    end
+  end
+
+  context "when substituting polymorphic documents" do
+
+    before(:all) do
+      class DNS; end
+
+      class DNS::Zone
+        include Mongoid::Document
+        embeds_many :rrsets, class_name: 'DNS::RRSet',  inverse_of: :zone
+        embeds_one  :soa,    class_name: 'DNS::Record', as: :container
+      end
+
+      class DNS::RRSet
+        include Mongoid::Document
+        embedded_in :zone, class_name: 'DNS::Zone',   inverse_of: :rrsets
+        embeds_many :records, class_name: 'DNS::Record', as: :container
+      end
+
+      class DNS::Record
+        include Mongoid::Document
+        embedded_in :container, polymorphic: true
+      end
+    end
+
+    after(:all) do
+      Object.send(:remove_const, :DNS)
+    end
+
+    context "when the parent is new" do
+
+      let(:zone) do
+        DNS::Zone.new
+      end
+
+      let(:soa_1) do
+        DNS::Record.new
+      end
+
+      context "when replacing the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa = soa_2).to eq(soa_2)
+        end
+      end
+
+      context "when deleting the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa.delete).to be true
+        end
+      end
+    end
+
+    context "when the parent is persisted" do
+
+      let(:zone) do
+        DNS::Zone.create
+      end
+
+      let(:soa_1) do
+        DNS::Record.new
+      end
+
+      context "when replacing the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa = soa_2).to eq(soa_2)
+        end
+      end
+
+      context "when deleting the set document" do
+
+        let(:soa_2) do
+          DNS::Record.new
+        end
+
+        before do
+          zone.soa = soa_1
+        end
+
+        it "properly sets the metadata" do
+          expect(zone.soa.delete).to be true
+        end
+      end
     end
   end
 end

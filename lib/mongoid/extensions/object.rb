@@ -115,8 +115,9 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def ivar(name)
-        if instance_variable_defined?("@_#{name}")
-          return instance_variable_get("@_#{name}")
+        var_name = "@_#{name}"
+        if instance_variable_defined?(var_name)
+          return instance_variable_get(var_name)
         else
           false
         end

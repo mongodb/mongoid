@@ -1,10 +1,12 @@
 # encoding: utf-8
 require "mongoid/criteria/findable"
+require "mongoid/criteria/includable"
 require "mongoid/criteria/inspectable"
 require "mongoid/criteria/marshalable"
 require "mongoid/criteria/modifiable"
+require "mongoid/criteria/queryable"
 require "mongoid/criteria/scopable"
-require "mongoid/sessions/options"
+require "mongoid/criteria/options"
 
 module Mongoid
 
@@ -17,13 +19,15 @@ module Mongoid
   class Criteria
     include Enumerable
     include Contextual
-    include Origin::Queryable
+    include Queryable
     include Findable
     include Inspectable
+    include Includable
     include Marshalable
     include Modifiable
     include Scopable
-    include Sessions::Options
+    include Clients::Options
+    include Options
 
     # Static array used to check with method missing - we only need to ever
     # instantiate once.
@@ -195,62 +199,6 @@ module Mongoid
       klass ? super(klass.aliased_fields, klass.fields) : super({}, {})
     end
 
-    # Eager loads all the provided relations. Will load all the documents
-    # into the identity map who's ids match based on the extra query for the
-    # ids.
-    #
-    # @note This will work for embedded relations that reference another
-    #   collection via belongs_to as well.
-    #
-    # @note Eager loading brings all the documents into memory, so there is a
-    #   sweet spot on the performance gains. Internal benchmarks show that
-    #   eager loading becomes slower around 100k documents, but this will
-    #   naturally depend on the specific application.
-    #
-    # @example Eager load the provided relations.
-    #   Person.includes(:posts, :game)
-    #
-    # @param [ Array<Symbol> ] relations The names of the relations to eager
-    #   load.
-    #
-    # @return [ Criteria ] The cloned criteria.
-    #
-    # @since 2.2.0
-    def includes(*relations)
-      relations.flatten.each do |name|
-        metadata = klass.reflect_on_association(name)
-        raise Errors::InvalidIncludes.new(klass, relations) unless metadata
-        inclusions.push(metadata) unless inclusions.include?(metadata)
-      end
-      clone
-    end
-
-    # Get a list of criteria that are to be executed for eager loading.
-    #
-    # @example Get the eager loading inclusions.
-    #   Person.includes(:game).inclusions
-    #
-    # @return [ Array<Metadata> ] The inclusions.
-    #
-    # @since 2.2.0
-    def inclusions
-      @inclusions ||= []
-    end
-
-    # Set the inclusions for the criteria.
-    #
-    # @example Set the inclusions.
-    #   criteria.inclusions = [ meta ]
-    #
-    # @param [ Array<Metadata> ] The inclusions.
-    #
-    # @return [ Array<Metadata> ] The new inclusions.
-    #
-    # @since 3.0.0
-    def inclusions=(value)
-      @inclusions = value
-    end
-
     # Merges another object with this +Criteria+ and returns a new criteria.
     # The other object may be a +Criteria+ or a +Hash+. This is used to
     # combine multiple scopes together, where a chained scope situation
@@ -335,11 +283,45 @@ module Mongoid
     def only(*args)
       return clone if args.flatten.empty?
       args = args.flatten
+      if (args & Fields::IDS).empty?
+        args.unshift(:_id)
+      end
       if klass.hereditary?
         super(*args.push(:_type))
       else
         super(*args)
       end
+    end
+
+    # Set the read preference for the criteria.
+    #
+    # @example Set the read preference.
+    #   criteria.read(mode: :primary_preferred)
+    #
+    # @param [ Hash ] value The mode preference.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 5.0.0
+    def read(value = nil)
+      clone.tap do |criteria|
+        criteria.options.merge!(read: value)
+      end
+    end
+
+    # Overriden to exclude _id from the fields.
+    #
+    # @example Exclude fields returned from the database.
+    #   Band.without(:name)
+    #
+    # @param [ Array<Symbol> ] args The names of the fields.
+    #
+    # @return [ Criteria ] The cloned criteria.
+    #
+    # @since 4.0.3
+    def without(*args)
+      args -= Fields::IDS
+      super(*args)
     end
 
     # Returns true if criteria responds to the given method.
@@ -564,7 +546,12 @@ module Mongoid
     #
     # @since 3.0.3
     def type_selection
-      { _type: { "$in" => klass._types }}
+      klasses = klass._types
+      if klasses.size > 1
+        { _type: { "$in" => klass._types }}
+      else
+        { _type: klass._types[0] }
+      end
     end
 
     # Get a new selector with type selection in it.

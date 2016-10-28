@@ -23,7 +23,7 @@ describe Mongoid::Extensions::Float do
 
   describe ".demongoize" do
 
-    context "when the the value is a float" do
+    context "when the value is a float" do
 
       it "returns a float" do
         expect(Float.demongoize(number)).to eq(number)
@@ -142,6 +142,13 @@ describe Mongoid::Extensions::Float do
 
     it "returns self" do
       expect(number.mongoize).to eq(number)
+    end
+  end
+
+  describe "#numeric?" do
+
+    it "returns true" do
+      expect(number.numeric?).to eq(true)
     end
   end
 end

@@ -32,6 +32,11 @@ module Mongoid
       time: Time
     }.with_indifferent_access
 
+    # Constant for all names of the id field in a document.
+    #
+    # @since 5.0.0
+    IDS = [ :_id, :id, '_id', 'id' ].freeze
+
     included do
       class_attribute :aliased_fields
       class_attribute :localized_fields
@@ -475,8 +480,8 @@ module Mongoid
       def create_field_check(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}?") do
-            attr = read_attribute(name)
-            attr == true || attr.present?
+            value = read_attribute(name)
+            lookup_attribute_presence(name, value)
           end
         end
       end

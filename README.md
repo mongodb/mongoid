@@ -1,11 +1,14 @@
 # Mongoid
-[![Build Status](https://travis-ci.org/mongoid/mongoid.svg?branch=master)](https://travis-ci.org/mongoid/mongoid) 
-[![Code Climate](https://codeclimate.com/github/mongoid/mongoid.svg)](https://codeclimate.com/github/mongoid/mongoid)
-[![Coverage Status](https://img.shields.io/coveralls/mongoid/mongoid/master.svg)](https://coveralls.io/r/mongoid/mongoid?branch=master)
+[![Build Status](https://travis-ci.org/mongodb/mongoid.svg?branch=master)](https://travis-ci.org/mongodb/mongoid)
+[![Code Climate](https://codeclimate.com/github/mongodb/mongoid.svg)](https://codeclimate.com/github/mongodb/mongoid)
 [![Dependency Status](https://www.versioneye.com/ruby/mongoid/4.0.0/badge.svg)](https://www.versioneye.com/ruby/mongoid/4.0.0)
 
-
 Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
+
+Issues
+------
+
+Issues are now in the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/).
 
 Project Tracking
 ----------------
@@ -18,29 +21,17 @@ Project Tracking
 Compatibility
 -------------
 
-Mongoid is tested against MRI 1.9.3, 2.0.0, 2.1.0 and JRuby (1.9).
+Mongoid is tested against MRI 2.2, 2.3 and JRuby (9.1).
 
 Documentation
 -------------
 
-Please see the new Mongoid website for up-to-date documentation:
-[mongoid.org](http://mongoid.org)
-
-Donating
---------
-
-[Support Mongoid at Pledgie](http://www.pledgie.com/campaigns/7757)
-
-<a href='http://www.pledgie.com/campaigns/7757'>
-<img alt='Click here to lend your support to: Mongoid and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/7757.png?skin_name=chrome' border='0'/>
-</a>
-
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=durran&url=http://github.com/mongoid&title=mongoid&language=&tags=github&category=software)
+Please see the [MongoDB website](http://docs.mongodb.org/ecosystem/tutorial/ruby-mongoid-tutorial/#ruby-mongoid-tutorial) for up-to-date documentation on 5.0.0:
 
 License
 -------
 
-Copyright (c) 2009-2013 Durran Jordan
+Copyright (c) 2009-2016 Durran Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

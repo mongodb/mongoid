@@ -11,6 +11,7 @@ module Mongoid
           :background,
           :database,
           :default_language,
+          :language_override,
           :drop_dups,
           :name,
           :sparse,
@@ -20,7 +21,13 @@ module Mongoid
           :bits,
           :bucket_size,
           :expire_after_seconds,
-          :weights
+          :weights,
+          :storage_engine,
+          :key,
+          :sphere_version,
+          :text_version,
+          :version,
+          :partial_filter_expression
         ]
 
         VALID_TYPES = [

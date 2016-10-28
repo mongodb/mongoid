@@ -18,9 +18,9 @@ namespace :db do
       ::Mongoid::Tasks::Database.remove_indexes
     end
 
-    desc "Drops the default session"
+    desc "Drops the default client database"
     task :drop => :environment do
-      ::Mongoid::Sessions.default.drop
+      ::Mongoid::Clients.default.database.drop
     end
 
     desc "Drop all collections except the system collections"

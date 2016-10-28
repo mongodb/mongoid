@@ -204,12 +204,8 @@ describe Mongoid::Extensions::Time do
 
       context "when the string is an invalid time" do
 
-        let(:epoch) do
-          Time.utc(1970, 1, 1, 0, 0, 0, 0)
-        end
-
-        it "converts the time to epoch" do
-          expect(Time.mongoize("time")).to eq(epoch)
+        it "converts the time to nil" do
+          expect(Time.mongoize("time")).to eq(nil)
         end
       end
 
@@ -281,7 +277,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "does not alter seconds with fractions" do
-        expect(DateTime.mongoize(11.11).to_f).to eq(11.11)
+        expect(DateTime.mongoize(1.11).to_f).to eq(1.11)
       end
 
       context "when using the ActiveSupport time zone" do
@@ -344,7 +340,7 @@ describe Mongoid::Extensions::Time do
       end
 
       it "does not alter seconds with fractions" do
-        expect(Time.mongoize(102.63).to_f).to eq(102.63)
+        expect(Time.mongoize(102.25).to_f).to eq(102.25)
       end
     end
 

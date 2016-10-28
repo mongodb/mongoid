@@ -13,14 +13,35 @@ class Artist
   after_create :create_songs
   before_save :before_save_stub
   before_destroy :before_destroy_stub
+  before_update :before_update_stub
 
   protected
   def before_create_stub
     true
   end
 
+  def before_update_stub
+    true
+  end
+
+  def before_update_fail_stub
+    throw(:abort)
+  end
+
+  def before_save_fail_stub
+    throw(:abort)
+  end
+
+  def before_create_fail_stub
+    throw(:abort)
+  end
+
   def before_save_stub
     true
+  end
+
+  def before_destroy_fail_stub
+    throw(:abort)
   end
 
   def before_destroy_stub

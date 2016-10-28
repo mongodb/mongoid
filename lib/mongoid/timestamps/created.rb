@@ -26,8 +26,7 @@ module Mongoid
           self.updated_at = time if is_a?(Updated) && !updated_at_changed?
           self.created_at = time
         end
-
-        self.class.clear_timeless_option
+        clear_timeless_option
       end
     end
   end

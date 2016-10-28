@@ -19,7 +19,7 @@ module Mongoid
       # @since 3.1.0
       def average_distance
         average = stats["avgDistance"]
-        average.nan? ? nil : average
+        (average.nil? || average.nan?) ? nil : average
       end
 
       # Iterates over each of the documents in the $geoNear, excluding the
@@ -198,6 +198,18 @@ module Mongoid
         stats["time"]
       end
 
+      # Is this context's criteria considered empty?
+      #
+      # @example Is this context's criteria considered empty?
+      #   geo_near.empty_and_chainable?
+      #
+      # @return [ true ] Always true.
+      #
+      # @since 5.1.0
+      def empty_and_chainable?
+        true
+      end
+
       private
 
       # Apply criteria specific options - query, limit.
@@ -246,7 +258,7 @@ module Mongoid
       #
       # @since 3.0.0
       def results
-        @results ||= session.command(command)
+        @results ||= client.command(command).first
       end
     end
   end

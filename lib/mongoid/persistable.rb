@@ -55,7 +55,7 @@ module Mongoid
     # @since 4.0.0
     def atomically
       begin
-        @atomic_updates_to_execute = {}
+        @atomic_updates_to_execute = @atomic_updates_to_execute || {}
         yield(self) if block_given?
         persist_atomic_operations(@atomic_updates_to_execute)
         true
@@ -165,12 +165,10 @@ module Mongoid
     # @since 4.0.0
     def process_atomic_operations(operations)
       operations.each do |field, value|
-        unless attribute_writable?(field)
-          raise Errors::ReadonlyAttribute.new(field, value)
+        as_writable_attribute!(field, value) do |access|
+          yield(access, value)
+          remove_change(access)
         end
-        normalized = database_field_name(field)
-        yield(normalized, value)
-        remove_change(normalized)
       end
     end
 
@@ -207,9 +205,9 @@ module Mongoid
     #
     # @since 4.0.0
     def persist_atomic_operations(operations)
-      if persisted?
+      if persisted? && operations
         selector = atomic_selector
-        _root.collection.find(selector).update(positionally(selector, operations))
+        _root.collection.find(selector).update_one(positionally(selector, operations))
       end
     end
   end

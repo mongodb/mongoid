@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Hash ] increments The field/inc increment pairs.
       #
-      # @return [ true, false ] If the increment succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def inc(increments)

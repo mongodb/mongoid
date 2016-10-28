@@ -17,7 +17,7 @@ module Mongoid
       # @param [ Array<String, Symbol> ] fields The names of the fields to
       #   unset.
       #
-      # @return [ true ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def unset(*fields)

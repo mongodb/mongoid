@@ -895,7 +895,7 @@ describe Mongoid::Fields do
         (person.testing = expect("Testy")).to eq("Testy")
       end
 
-      it "adds an existance method" do
+      it "adds an existence method" do
         expect(Person.new.testing?).to be false
       end
 

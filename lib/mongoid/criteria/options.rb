@@ -1,0 +1,25 @@
+# encoding: utf-8
+module Mongoid
+  class Criteria
+
+    # Module containing functionality for getting options on a Criteria object.
+    #
+    # @since 6.0.0
+    module Options
+
+      private
+
+      def persistence_context
+        klass.persistence_context
+      end
+
+      def set_persistence_context(options)
+        PersistenceContext.set(klass, options)
+      end
+
+      def clear_persistence_context(original_cluster)
+        PersistenceContext.clear(klass, original_cluster)
+      end
+    end
+  end
+end

@@ -34,7 +34,7 @@ describe Mongoid::Relations::CounterCache do
       it "expect to raise an error" do
         expect {
           person.reset_counters(:not_exist)
-        }.to raise_error
+        }.to raise_error(NoMethodError)
       end
     end
 
@@ -85,6 +85,26 @@ describe Mongoid::Relations::CounterCache do
         expect(subscription.reload[:packs_count]).to eq(1)
       end
     end
+
+    context 'when there are persistence options set' do
+
+      let(:subscription) do
+        Subscription.new
+      end
+
+      before do
+        subscription.with(collection: 'other') do |sub|
+          sub.save
+          sub.packs.create
+        end
+      end
+
+      it 'applies the persistence options when resetting the counter' do
+        subscription.with(collection: 'other') do |sub|
+          expect(sub.reload[:packs_count]).to eq(1)
+        end
+      end
+    end
   end
 
   describe ".reset_counters" do
@@ -111,7 +131,7 @@ describe Mongoid::Relations::CounterCache do
       it "expect to raise an error" do
         expect {
           Person.reset_counters "1", :drugs
-        }.to raise_error
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
 
@@ -124,7 +144,7 @@ describe Mongoid::Relations::CounterCache do
       it "expect to raise an error" do
         expect {
           Person.reset_counters person.id, :not_exist
-        }.to raise_error
+        }.to raise_error(NoMethodError)
       end
     end
 
@@ -256,6 +276,26 @@ describe Mongoid::Relations::CounterCache do
         expect(person.reload.drugs_count).to eq(3)
       end
     end
+
+    context 'when there are persistence options set' do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.with(collection: 'other') do |per|
+          per.save
+          per.drugs.create
+        end
+      end
+
+      it 'applies the persistence options when resetting the counter' do
+        person.with(collection: 'other') do |per|
+          expect(per.drugs_count).to eq(1)
+        end
+      end
+    end
   end
 
   describe "#decrement_counter" do
@@ -286,30 +326,116 @@ describe Mongoid::Relations::CounterCache do
         expect(person.reload.drugs_count).to eq(0)
       end
     end
+
+    context 'when there are persistence options set' do
+
+      let(:person) do
+        Person.new
+      end
+
+      before do
+        person.with(collection: 'other') do |per|
+          per.save
+          drug = per.drugs.create
+          drug.destroy
+        end
+      end
+
+      it 'applies the persistence options when resetting the counter' do
+        person.with(collection: 'other') do |per|
+          expect(per.reload.drugs_count).to eq(0)
+        end
+      end
+    end
   end
 
   describe "#add_counter_cache_callbacks" do
 
-    let(:person) do
-      Person.create
-    end
-
-    let!(:drug) do
-      person.drugs.create
-    end
-
     context "when parent is not frozen" do
 
-      before do
-        drug.destroy
+      context 'when #destroy is called on the object' do
+
+        let(:person) do
+          Person.create
+        end
+
+        let!(:drug) do
+          person.drugs.create
+        end
+
+        before do
+          drug.destroy
+        end
+
+        it "updates the counter cache" do
+          expect(person.drugs_count).to eq(0)
+        end
       end
 
-      it "before_destroy updates counter cache" do
-        expect(person.drugs_count).to eq(0)
+      context 'when #create is called on the object' do
+
+        let(:person) do
+          Person.create { |p| p.drugs += [Drug.create, Drug.create] }
+        end
+
+        it "updates the counter cache" do
+          expect(person.drugs_count).to eq(2)
+        end
+      end
+
+      context 'when #update is called on the object' do
+
+        let(:person1) do
+          Person.create { |p| p.drugs += [Drug.create, Drug.create] }
+        end
+
+        let(:drug) do
+          person1.drugs.first
+        end
+
+        let(:person2) do
+          Person.create
+        end
+
+        before do
+          drug.update_attribute(:person, person2)
+        end
+
+        it "updates the current counter cache" do
+          expect(drug.person.drugs_count).to eq(1)
+        end
+
+        it "updates the current counter cache" do
+          expect(person2.drugs_count).to eq(1)
+        end
+
+        it "updates the original object's counter cache" do
+          expect(person1.reload.drugs_count).to eq(1)
+        end
+
+        context 'when foreign_key differs from model name' do
+
+          let(:genre) { PostGenre.create }
+
+          let(:post) { Post.create }
+
+          it 'updates correct counter cache' do
+            post.update post_genre: genre
+            expect(genre.reload.posts_count).to eq 1
+          end
+        end
       end
     end
 
     context "when parent is frozen" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:drug) do
+        person.drugs.create
+      end
 
       before do
         person.destroy

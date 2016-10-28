@@ -24,9 +24,11 @@ module Mongoid
     option :duplicate_fields_exception, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
+    option :log_level, default: :info
+    option :belongs_to_required_by_default, default: true
 
     # Has Mongoid been configured? This is checking that at least a valid
-    # session config exists.
+    # client config exists.
     #
     # @example Is Mongoid configured?
     #   config.configured?
@@ -35,10 +37,10 @@ module Mongoid
     #
     # @since 3.0.9
     def configured?
-      sessions.key?(:default)
+      clients.key?(:default)
     end
 
-    # Connect to the provided database name on the default session.
+    # Connect to the provided database name on the default client.
     #
     # @note Use only in development or test environments for convenience.
     #
@@ -48,8 +50,8 @@ module Mongoid
     # @param [ String ] name The database name.
     #
     # @since 3.0.0
-    def connect_to(name, options = { read: :primary })
-      self.sessions = {
+    def connect_to(name, options = { read: { mode: :primary }})
+      self.clients = {
         default: {
           database: name,
           hosts: [ "localhost:27017" ],
@@ -82,8 +84,8 @@ module Mongoid
     def load!(path, environment = nil)
       settings = Environment.load_yaml(path, environment)
       if settings.present?
-        Sessions.disconnect
-        Sessions.clear
+        Clients.disconnect
+        Clients.clear
         load_configuration(settings)
       end
       settings
@@ -127,7 +129,8 @@ module Mongoid
     def load_configuration(settings)
       configuration = settings.with_indifferent_access
       self.options = configuration[:options]
-      self.sessions = configuration[:sessions]
+      self.clients = configuration[:clients]
+      set_log_levels
     end
 
     # Override the database to use globally.
@@ -144,18 +147,18 @@ module Mongoid
       Threaded.database_override = name
     end
 
-    # Override the session to use globally.
+    # Override the client to use globally.
     #
-    # @example Override the session globally.
-    #   config.override_session(:optional)
+    # @example Override the client globally.
+    #   config.override_client(:optional)
     #
-    # @param [ String, Symbol ] name The name of the session.
+    # @param [ String, Symbol ] name The name of the client.
     #
     # @return [ String, Symbol ] The global override.
     #
     # @since 3.0.0
-    def override_session(name)
-      Threaded.session_override = name ? name.to_s : nil
+    def override_client(name)
+      Threaded.client_override = name ? name.to_s : nil
     end
 
     # Purge all data in all collections, including indexes.
@@ -169,7 +172,7 @@ module Mongoid
     #
     # @since 2.0.2
     def purge!
-      Sessions.default.collections.each(&:drop) and true
+      Clients.default.database.collections.each(&:drop) and true
     end
 
     # Truncate all data in all collections, but not the indexes.
@@ -183,8 +186,8 @@ module Mongoid
     #
     # @since 2.0.2
     def truncate!
-      Sessions.default.collections.each do |collection|
-        collection.find.remove_all
+      Clients.default.database.collections.each do |collection|
+        collection.find.delete_many
       end and true
     end
 
@@ -205,32 +208,16 @@ module Mongoid
       end
     end
 
-    # Get the session configuration or an empty hash.
+    # Get the client configuration or an empty hash.
     #
-    # @example Get the sessions configuration.
-    #   config.sessions
+    # @example Get the clients configuration.
+    #   config.clients
     #
-    # @return [ Hash ] The sessions configuration.
-    #
-    # @since 3.0.0
-    def sessions
-      @sessions ||= {}
-    end
-
-    # Set the session configuration options.
-    #
-    # @example Set the session configuration options.
-    #   config.sessions = { default: { hosts: [ "localhost:27017" ] }}
-    #
-    # @param [ Hash ] sessions The configuration options.
+    # @return [ Hash ] The clients configuration.
     #
     # @since 3.0.0
-    def sessions=(sessions)
-      raise Errors::NoSessionsConfig.new unless sessions
-      sess = sessions.with_indifferent_access
-      Validators::Session.validate(sess)
-      @sessions = sess
-      sess
+    def clients
+      @clients ||= {}
     end
 
     # Get the time zone to use.
@@ -255,6 +242,20 @@ module Mongoid
     # @since 3.0.11
     def running_with_passenger?
       @running_with_passenger ||= defined?(PhusionPassenger)
+    end
+
+    private
+
+    def set_log_levels
+      Mongoid.logger.level = Mongoid::Config.log_level unless defined?(::Rails)
+      Mongo::Logger.logger.level = Mongoid.logger.level
+    end
+
+    def clients=(clients)
+      raise Errors::NoClientsConfig.new unless clients
+      c = clients.with_indifferent_access
+      Validators::Client.validate(c)
+      @clients = c
     end
   end
 end

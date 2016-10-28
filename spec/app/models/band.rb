@@ -15,6 +15,7 @@ class Band
   field :sales, type: BigDecimal
   field :y, as: :years, type: Integer
   field :founded, type: Date
+  field :deleted, type: Boolean
 
   embeds_many :records, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false

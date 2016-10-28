@@ -87,7 +87,8 @@ module Mongoid
       # @return [ Proc ] The default scope.
       #
       # @since 1.0.0
-      def default_scope(value)
+      def default_scope(value = nil)
+        value = Proc.new { yield } if block_given?
         check_scope_validity(value)
         self.default_scoping = process_default_scope(value)
       end
@@ -115,7 +116,9 @@ module Mongoid
       #
       # @since 3.0.0
       def queryable
-        scope_stack.last || Criteria.new(self)
+        crit = Threaded.current_scope(self) || Criteria.new(self)
+        crit.embedded = true if crit.klass.embedded?
+        crit
       end
 
       # Create a scope that can be accessed from the class level or chained to
@@ -148,18 +151,6 @@ module Mongoid
           extension: Module.new(&block)
         }
         define_scope_method(normalized)
-      end
-
-      # Initializes and returns the current scope stack.
-      #
-      # @example Get the scope stack.
-      #   Person.scope_stack
-      #
-      # @return [ Array<Criteria> ] The scope stack.
-      #
-      # @since 1.0.0
-      def scope_stack
-        Threaded.scope_stack[object_id] ||= []
       end
 
       # Get a criteria for the document with normal scoping.
@@ -234,11 +225,11 @@ module Mongoid
       #
       # @since 1.0.0
       def with_scope(criteria)
-        scope_stack.push(criteria)
+        Threaded.set_current_scope(criteria, self)
         begin
           yield criteria
         ensure
-          scope_stack.pop
+          Threaded.set_current_scope(nil, self)
         end
       end
 
@@ -323,10 +314,12 @@ module Mongoid
       # @since 3.0.0
       def define_scope_method(name)
         singleton_class.class_eval do
-          define_method name do |*args|
+          define_method(name) do |*args|
             scoping = _declared_scopes[name]
-            scope, extension = scoping[:scope][*args], scoping[:extension]
-            criteria = with_default_scope.merge(scope || queryable)
+            scope = instance_exec(*args, &scoping[:scope])
+            extension = scoping[:extension]
+            to_merge = scope || queryable
+            criteria = to_merge.empty_and_chainable? ? to_merge : with_default_scope.merge(to_merge)
             criteria.extend(extension)
             criteria
           end

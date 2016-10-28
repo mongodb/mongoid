@@ -177,6 +177,43 @@ describe Mongoid::Relations::Eager::HasMany do
           expect(eager.last.ivar(:posts)).to be_empty
         end
       end
+
+      context "when the child has a default scope" do
+
+        let(:criteria) do
+          Exhibitor.where(:status.ne => "removed")
+        end
+
+        let(:exhibitorPresent) do
+          Exhibitor.create!(status: "present")
+        end
+
+        let(:exhibitorRemoved) do
+          Exhibitor.create!(status: "removed")
+        end
+
+        let(:exhibitionIncludesExhibitors) do
+          Exhibition.includes(:exhibitors).first
+        end
+
+        before do
+          Exhibitor.default_scope ->{ criteria }
+          exhibition = Exhibition.create!
+          exhibition.exhibitors << exhibitorPresent
+          exhibition.exhibitors << exhibitorRemoved
+          exhibitionIncludesExhibitors
+        end
+
+        after do
+          Exhibitor.default_scoping = nil
+        end
+
+        it "does not send another query when the children are accessed" do
+          expect_query(0) do
+            expect(exhibitionIncludesExhibitors.exhibitors).to eq( [exhibitorPresent] )
+          end
+        end
+      end
     end
 
     context "when the relation is polymorphic" do

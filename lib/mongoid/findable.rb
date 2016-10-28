@@ -6,20 +6,23 @@ module Mongoid
   #
   # @since 4.0.0
   module Findable
-    extend Origin::Forwardable
+    extend Mongoid::Criteria::Queryable::Forwardable
 
     select_with :with_default_scope
 
     # These are methods defined on the criteria that should also be accessible
-    # directly from the the class level.
+    # directly from the class level.
     delegate \
       :aggregates,
       :avg,
+      :create_with,
       :distinct,
       :each,
       :each_with_index,
       :extras,
-      :find_and_modify,
+      :find_one_and_delete,
+      :find_one_and_replace,
+      :find_one_and_update,
       :find_or_create_by,
       :find_or_create_by!,
       :find_or_initialize_by,
@@ -34,6 +37,7 @@ module Mongoid
       :min,
       :none,
       :pluck,
+      :read,
       :sum,
       :text_search,
       :update,

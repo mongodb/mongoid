@@ -459,6 +459,20 @@ module Mongoid
         @inverse_foreign_key ||= determine_inverse_foreign_key
       end
 
+      # Used for relational many to many only. This determines the name of the
+      # foreign key field setter on the inverse side of the relation, since in this
+      # case there are keys on both sides.
+      #
+      # @example Find the inverse foreign key setter.
+      #   metadata.inverse_foreign_key_setter
+      #
+      # @return [ String ] The foreign key setter on the inverse.
+      #
+      # @since 2.0.0.rc.1
+      def inverse_foreign_key_setter
+        @inverse_foreign_key_setter ||= "#{inverse_foreign_key}="
+      end
+
       # Returns the inverse class of the proxied relation.
       #
       # @example Get the inverse class.
@@ -649,6 +663,9 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def nested_builder(attributes, options)
+        if polymorphic? && options[:class_name]
+          self[:class_name] = options[:class_name]
+        end
         relation.nested_builder(self, attributes, options)
       end
 

@@ -247,6 +247,21 @@ describe Mongoid::Extensions::Hash do
     end
   end
 
+  context "when the parent key is not present" do
+
+    let(:hash) do
+      { "101" => { "name" => "hundred and one" } }
+    end
+
+    let(:nested) do
+      hash.__nested__("100.name")
+    end
+
+    it "should return nil" do
+      expect(nested).to eq(nil)
+    end
+  end
+
   describe ".demongoize" do
 
     let(:hash) do

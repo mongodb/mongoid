@@ -6,10 +6,24 @@ module Mongoid
   # This module contains logic for easy access to objects that have a lifecycle
   # on the current thread.
   module Threaded
+
     DATABASE_OVERRIDE_KEY = "[mongoid]:db-override"
-    SESSIONS_KEY = "[mongoid]:sessions"
-    SESSION_OVERRIDE_KEY = "[mongoid]:session-override"
-    SCOPE_STACK_KEY = "[mongoid]:scope-stack"
+
+    # Constant for the key to store clients.
+    #
+    # @since 5.0.0
+    CLIENTS_KEY = "[mongoid]:clients"
+
+    # The key to override the client.
+    #
+    # @since 5.0.0
+    CLIENT_OVERRIDE_KEY = "[mongoid]:client-override"
+
+    # The key for the current thread's scope stack.
+    #
+    # @since 2.0.0
+    CURRENT_SCOPE_KEY = "[mongoid]:current-scope"
+
     AUTOSAVES_KEY = "[mongoid]:autosaves"
     VALIDATIONS_KEY = "[mongoid]:validations"
 
@@ -57,18 +71,6 @@ module Mongoid
     # @since 3.0.0
     def database_override=(name)
       Thread.current[DATABASE_OVERRIDE_KEY] = name
-    end
-
-    # Get the database sessions from the current thread.
-    #
-    # @example Get the database sessions.
-    #   Threaded.sessions
-    #
-    # @return [ Hash ] The sessions.
-    #
-    # @since 3.0.0
-    def sessions
-      Thread.current[SESSIONS_KEY] ||= {}
     end
 
     # Are in the middle of executing the named stack
@@ -161,42 +163,88 @@ module Mongoid
       validations_for(document.class).delete_one(document._id)
     end
 
-    # Get the global session override.
+    # Get the global client override.
     #
-    # @example Get the global session override.
-    #   Threaded.session_override
+    # @example Get the global client override.
+    #   Threaded.client_override
     #
     # @return [ String, Symbol ] The override.
     #
-    # @since 3.0.0
-    def session_override
-      Thread.current[SESSION_OVERRIDE_KEY]
+    # @since 5.0.0
+    def client_override
+      Thread.current[CLIENT_OVERRIDE_KEY]
     end
 
-    # Set the global session override.
+    # Set the global client override.
     #
-    # @example Set the global session override.
-    #   Threaded.session_override = :testing
+    # @example Set the global client override.
+    #   Threaded.client_override = :testing
     #
     # @param [ String, Symbol ] The global override name.
     #
     # @return [ String, Symbol ] The override.
     #
     # @since 3.0.0
-    def session_override=(name)
-      Thread.current[SESSION_OVERRIDE_KEY] = name
+    def client_override=(name)
+      Thread.current[CLIENT_OVERRIDE_KEY] = name
     end
 
-    # Get the mongoid scope stack for chained criteria.
+    # Get the current Mongoid scope.
     #
-    # @example Get the scope stack.
-    #   Threaded.scope_stack
+    # @example Get the scope.
+    #   Threaded.current_scope(klass)
+    #   Threaded.current_scope
     #
-    # @return [ Hash ] The scope stack.
+    # @param [ Klass ] klass The class type of the scope.
     #
-    # @since 2.1.0
-    def scope_stack
-      Thread.current[SCOPE_STACK_KEY] ||= {}
+    # @return [ Criteria ] The scope.
+    #
+    # @since 5.0.0
+    def current_scope(klass = nil)
+      if klass && Thread.current[CURRENT_SCOPE_KEY].respond_to?(:keys)
+        Thread.current[CURRENT_SCOPE_KEY][
+            Thread.current[CURRENT_SCOPE_KEY].keys.find { |k| k <= klass }
+        ]
+      else
+        Thread.current[CURRENT_SCOPE_KEY]
+      end
+    end
+
+    # Set the current Mongoid scope.
+    #
+    # @example Set the scope.
+    #   Threaded.current_scope = scope
+    #
+    # @param [ Criteria ] scope The current scope.
+    #
+    # @return [ Criteria ] The scope.
+    #
+    # @since 5.0.0
+    def current_scope=(scope)
+      Thread.current[CURRENT_SCOPE_KEY] = scope
+    end
+
+    # Set the current Mongoid scope. Safe for multi-model scope chaining.
+    #
+    # @example Set the scope.
+    #   Threaded.current_scope(scope, klass)
+    #
+    # @param [ Criteria ] scope The current scope.
+    # @param [ Class ] klass The current model class.
+    #
+    # @return [ Criteria ] The scope.
+    #
+    # @since 5.0.1
+    def set_current_scope(scope, klass)
+      if scope.nil?
+        if Thread.current[CURRENT_SCOPE_KEY]
+          Thread.current[CURRENT_SCOPE_KEY].delete(klass)
+          Thread.current[CURRENT_SCOPE_KEY] = nil if Thread.current[CURRENT_SCOPE_KEY].empty?
+        end
+      else
+        Thread.current[CURRENT_SCOPE_KEY] ||= {}
+        Thread.current[CURRENT_SCOPE_KEY][klass] = scope
+      end
     end
 
     # Is the document autosaved on the current thread?

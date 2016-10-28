@@ -34,7 +34,7 @@ describe Mongoid::Relations::Reflections do
     context "when the name does not exist" do
 
       let(:relation) do
-        klass.reflect_on_association(:nonexistant)
+        klass.reflect_on_association(:nonexistent)
       end
 
       it "returns nil" do

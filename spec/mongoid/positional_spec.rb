@@ -68,11 +68,10 @@ describe Mongoid::Positional do
           {
             "$set" => {
               "field" => "value",
-              "child.children.$.children.3.field" => "value",
+              "child.children.1.children.3.field" => "value",
             }
           }
         end
-
 
         let(:processed) do
           positionable.positionally(selector, ops)
@@ -112,10 +111,10 @@ describe Mongoid::Positional do
             "$set" => {
               "field" => "value",
               "children.$.field" => "value",
-              "children.$.children.1.children.3.field" => "value"
+              "children.0.children.1.children.3.field" => "value"
             },
             "$pushAll" => {
-              "children.$.children.1.children.3.fields" => [ "value", "value" ]
+              "children.0.children.1.children.3.fields" => [ "value", "value" ]
             }
           }
         end
@@ -152,7 +151,7 @@ describe Mongoid::Positional do
           positionable.positionally(selector, updates)
         end
 
-        it "replaces the first index with the positional operator" do
+        it "does not replace the index with the positional operator" do
           expect(processed).to eq(expected)
         end
       end
@@ -169,10 +168,10 @@ describe Mongoid::Positional do
           "$set" => {
             "field" => "value",
             "children.$.field" => "value",
-            "children.0.children.$.children.3.field" => "value"
+            "children.0.children.1.children.3.field" => "value"
           },
           "$pushAll" => {
-            "children.0.children.$.children.3.fields" => [ "value", "value" ]
+            "children.0.children.1.children.3.fields" => [ "value", "value" ]
           }
         }
       end
@@ -202,10 +201,10 @@ describe Mongoid::Positional do
           "$set" => {
             "field" => "value",
             "children.$.field" => "value",
-            "children.0.children.1.children.$.field" => "value"
+            "children.0.children.1.children.3.field" => "value"
           },
           "$pushAll" => {
-            "children.0.children.1.children.$.fields" => [ "value", "value" ]
+            "children.0.children.1.children.3.fields" => [ "value", "value" ]
           }
         }
       end

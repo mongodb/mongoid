@@ -289,4 +289,15 @@ describe Mongoid::Extensions::Object do
       end
     end
   end
+
+  describe "#numeric?" do
+
+    let(:object) do
+      Object.new
+    end
+
+    it "returns false" do
+      expect(object.numeric?).to eq(false)
+    end
+  end
 end

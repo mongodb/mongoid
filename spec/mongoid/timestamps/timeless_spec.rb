@@ -27,6 +27,23 @@ describe Mongoid::Timestamps::Timeless do
       Object.send(:remove_const, :Egg)
     end
 
+    context "when timeless is used on one instance and then not used on another instance" do
+
+      let!(:first_instance) do
+        egg = Egg.create!
+        egg.timeless.save!
+        egg
+      end
+
+      let!(:second_instance) do
+        Egg.create!
+      end
+
+      it "second instance's created_at is not nil" do
+        expect(second_instance.created_at).to_not be_nil
+      end
+    end
+
     context "when others persist in the scope of the chain" do
 
       context "when the root executes normally" do

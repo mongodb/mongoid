@@ -102,6 +102,19 @@ describe Mongoid::Attributes::Nested do
       end
     end
 
+    context "when the association is referenced in and polymorphic" do
+
+      it "infers the class name of the polymorphic with the inverse type" do
+        expect {
+          Post.create!(
+            title: "Some title",
+            posteable_type: "Sandwich",
+            posteable_attributes: { name: 'Grilled Cheese' }
+          )
+        }.not_to raise_error
+      end
+    end
+
     context "when the relation is an embedded in" do
 
       before do
@@ -162,6 +175,27 @@ describe Mongoid::Attributes::Nested do
 
       it "sets the nested attributes" do
         expect(person.preferences.first.name).to eq("First")
+      end
+
+      context "when adding existing document to a relation" do
+        let(:preference) { Preference.create(name: 'sample preference') }
+        let(:person) do
+          Person.new(
+            preferences_attributes: { 0 => { id: preference.id, name: preference.name } }
+          )
+        end
+
+        it "sets the nested attributes" do
+          expect(person.preferences.map(&:name)).to eq([preference.name])
+        end
+
+        it "updates attributes of existing document which is added to relation" do
+          preference_name = 'updated preference'
+          person = Person.new(
+            preferences_attributes: { 0 => { id: preference.id, name: preference_name } }
+          )
+          expect(person.preferences.map(&:name)).to eq([preference_name])
+        end
       end
     end
 
@@ -1301,7 +1335,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.addresses_attributes =
                     { "foo" => { "id" => "test", "street" => "Test" } }
-                }.to raise_error
+                }.to raise_error(Mongoid::Errors::DocumentNotFound)
               end
             end
           end
@@ -1400,7 +1434,7 @@ describe Mongoid::Attributes::Nested do
                       Person.create(age: 42)
                     end
 
-                    context "when the child returns false in a before callback" do
+                    context "when the child halts the callback chain in a before callback" do
 
                       context "when the child is not paranoid" do
 
@@ -1936,7 +1970,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.addresses.size).to eq(1)
                   end
 
@@ -1997,7 +2031,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.addresses.first.street).to eq("Maybachufer")
                   end
 
@@ -2057,7 +2091,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.addresses.first.street).to eq("Maybachufer")
                   end
 
@@ -2936,11 +2970,11 @@ describe Mongoid::Attributes::Nested do
               context "when reloading the document" do
 
                 it "updates the first existing document" do
-                  expect(person.posts(true).first.title).to eq("First")
+                  expect(person.posts(true)[0].title).to eq("First")
                 end
 
                 it "updates the second existing document" do
-                  expect(person.posts(true).last.title).to eq("Second")
+                  expect(person.posts(true)[1].title).to eq("Second")
                 end
 
                 it "does not add new documents" do
@@ -2994,7 +3028,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.posts_attributes =
                     { "foo" => { "id" => "test", "title" => "Test" } }
-                }.to raise_error
+                }.to raise_error(Mongoid::Errors::DocumentNotFound)
               end
             end
           end
@@ -3094,11 +3128,11 @@ describe Mongoid::Attributes::Nested do
                     context "when reloading the document" do
 
                       it "does not ignore the marked document" do
-                        expect(person.posts(true).first.title).to eq("Another Title")
+                        expect(person.posts(true)[0].title).to eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.posts(true).last.title).to eq("New Title")
+                        expect(person.posts(true)[1].title).to eq("New Title")
                       end
 
                       it "does not add additional documents" do
@@ -3127,7 +3161,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.posts(true).last.title).to eq("New Title")
+                        expect(person.posts(true)[1].title).to eq("New Title")
                       end
                     end
                   end
@@ -3198,7 +3232,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.posts(true).last.title).to eq("New Title")
+                        expect(person.posts(true)[1].title).to eq("New Title")
                       end
                     end
                   end
@@ -3224,15 +3258,15 @@ describe Mongoid::Attributes::Nested do
               end
 
               it "builds a new first document" do
-                expect(person.posts.first.title).to eq("First")
+                expect(person.posts[0].title).to eq("First")
               end
 
               it "builds a new second document" do
-                expect(person.posts.second.title).to eq("Second")
+                expect(person.posts[1].title).to eq("Second")
               end
 
               it "builds a new third document" do
-                expect(person.posts.third.title).to eq("Third")
+                expect(person.posts[2].title).to eq("Third")
               end
 
               it "does not add extra documents" do
@@ -3397,7 +3431,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.posts.size).to eq(1)
                   end
 
@@ -3458,7 +3492,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.posts.first.title).to eq("New Blog")
                   end
 
@@ -3518,7 +3552,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.posts.first.title).to eq("New Blog")
                   end
 
@@ -3711,7 +3745,7 @@ describe Mongoid::Attributes::Nested do
                 expect {
                   person.preferences_attributes =
                     { "foo" => { "id" => "test", "name" => "Test" } }
-                }.to raise_error
+                }.to raise_error(Mongoid::Errors::DocumentNotFound)
               end
             end
           end
@@ -3776,7 +3810,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("My Blog")
+                        expect(person.preferences(true)[1].name).to eq("My Blog")
                       end
                     end
                   end
@@ -3811,11 +3845,11 @@ describe Mongoid::Attributes::Nested do
                     context "when reloading the document" do
 
                       it "does not ignore the marked document" do
-                        expect(person.preferences(true).first.name).to eq("Another Title")
+                        expect(person.preferences(true)[0].name).to eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
 
                       it "does not add additional documents" do
@@ -3844,7 +3878,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
                     end
                   end
@@ -3874,11 +3908,11 @@ describe Mongoid::Attributes::Nested do
                     context "when reloading" do
 
                       it "does not ignore the marked document" do
-                        expect(person.preferences(true).first.name).to eq("Another Title")
+                        expect(person.preferences(true)[0].name).to eq("Another Title")
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
 
                       it "does not add additional documents" do
@@ -3907,7 +3941,7 @@ describe Mongoid::Attributes::Nested do
                       end
 
                       it "does not delete the unmarked document" do
-                        expect(person.preferences(true).last.name).to eq("New Title")
+                        expect(person.preferences(true)[1].name).to eq("New Title")
                       end
                     end
                   end
@@ -4063,7 +4097,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "ignores the the marked document" do
+                  it "ignores the marked document" do
                     expect(person.preferences.size).to eq(1)
                   end
 
@@ -4124,7 +4158,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.preferences.first.name).to eq("New Blog")
                   end
 
@@ -4184,7 +4218,7 @@ describe Mongoid::Attributes::Nested do
                       }
                   end
 
-                  it "adds the the marked document" do
+                  it "adds the marked document" do
                     expect(person.preferences.first.name).to eq("New Blog")
                   end
 
@@ -4788,38 +4822,84 @@ describe Mongoid::Attributes::Nested do
         league.divisions.create(name: "Old Name")
       end
 
-      let(:params) do
-        { divisions_attributes:
-          { "0" => { id: division.id.to_s, name: "New Name" }}
-        }
-      end
-
-      before do
-        league.update_attributes(params)
-      end
-
-      it "sets the nested attributes" do
-        expect(league.reload.divisions.first.name).to eq("New Name")
-      end
-
-      context "with corrupted data" do
+      context "when additional validation is set" do
 
         before do
-          league[:league] = params
+          League.validates_presence_of(:divisions)
         end
 
-        let(:new_params) do
+        after do
+          League.reset_callbacks(:validate)
+        end
+
+        context "when validation fails" do
+
+          let(:division) do
+            Division.new
+          end
+
+          let(:league) do
+            League.create!(divisions: [division])
+          end
+
+          let(:error_raising_update) do
+            league.update!(:divisions => nil)
+          end
+
+          before do
+            league.update(:divisions => nil)
+            league.reload
+          end
+
+          it "the update raises an error" do
+            expect{ error_raising_update }.to raise_error(Mongoid::Errors::Validations)
+          end
+
+          it "the update does not occur" do
+            expect(league.divisions.first).to eq(division)
+          end
+
+          it "the document is inaccurately marked destroyed (you fixed the bug if you broke this!)" do
+            expect(division).to be_destroyed
+          end
+        end
+      end
+
+      context "when no additional validation is set" do
+
+        let(:params) do
           { divisions_attributes:
-            { "0" => { id: division.id.to_s, name: "Name" }}
+            { "0" => { id: division.id.to_s, name: "New Name" }}
           }
         end
 
         before do
-          league.update_attributes(new_params)
+          league.update_attributes(params)
         end
 
         it "sets the nested attributes" do
-          expect(league.reload.divisions.first.name).to eq("Name")
+          expect(league.reload.divisions.first.name).to eq("New Name")
+        end
+
+        context "with corrupted data" do
+
+          before do
+            league[:league] = params
+          end
+
+          let(:new_params) do
+            { divisions_attributes:
+              { "0" => { id: division.id.to_s, name: "Name" }}
+            }
+          end
+
+          before do
+            league.update_attributes(new_params)
+          end
+
+          it "sets the nested attributes" do
+            expect(league.reload.divisions.first.name).to eq("Name")
+          end
         end
       end
     end

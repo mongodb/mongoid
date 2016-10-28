@@ -728,7 +728,7 @@ describe Mongoid::Relations::Accessors do
         game.save
       end
 
-      it "keeps the the foreign key as ObjectID" do
+      it "keeps the foreign key as ObjectID" do
         expect(game.reload.person_id).to eq(person.id)
       end
     end
@@ -746,6 +746,75 @@ describe Mongoid::Relations::Accessors do
 
       it "sets the appropriate relation" do
         expect(game.person).to eq(person)
+      end
+    end
+  end
+
+  context 'when setting the relation more than once' do
+
+    let(:person) do
+      Person.create
+    end
+
+    context 'when the relation is a references one' do
+
+      let(:game) do
+        Game.create
+      end
+
+      before do
+        person.game = game
+        game.person = person
+      end
+
+      it 'allows the object to be set twice' do
+        expect(person.game = game).to be(game)
+      end
+    end
+
+    context 'when the relation is a references many' do
+
+      let!(:preference) do
+        Preference.create(name: "Setting")
+      end
+
+      before do
+        person.preferences << Preference.last
+      end
+
+      it 'allows the object to be set twice' do
+        expect(person.preferences << Preference.last).to be_a(Array)
+      end
+    end
+
+    context 'when the relation is an embeds one' do
+
+      let!(:name) do
+        Name.new
+      end
+
+      before do
+        person.name = name
+        name.person = person
+      end
+
+      it 'allows the object to be set twice' do
+        expect(person.name = name).to be(name)
+      end
+    end
+
+    context 'when the relation is an embeds many' do
+
+      let!(:address) do
+        Address.new
+      end
+
+      before do
+        person.addresses << address
+      end
+
+      it 'allows the object to be set twice' do
+        expect(person.addresses << address).to be_a(Array)
       end
     end
   end

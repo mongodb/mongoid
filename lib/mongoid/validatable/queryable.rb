@@ -4,7 +4,7 @@ module Mongoid
     module Queryable
 
       # Wrap the validation inside the an execution block that alert's the
-      # session not to clear its persistence options.
+      # client not to clear its persistence options.
       #
       # @example Execute the validation with a query.
       #   with_query(document) do
