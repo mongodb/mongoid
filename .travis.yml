@@ -17,6 +17,7 @@ gemfile:
   - Gemfile
   - gemfiles/rails41.gemfile
   - gemfiles/rails42.gemfile
+  - gemfiles/driver_master.gemfile
 
 env:
   global:
