@@ -398,8 +398,21 @@ describe Mongoid::Contextual::Mongo do
 
         context "when iterating with next" do
 
+          before do
+            10.times { |i| Band.create(name: "Test #{i}") }
+          end
+
+          let(:criteria) do
+            Band.batch_size(5)
+          end
+
           it "yields mongoid documents" do
             expect(enum.next).to be_a(Mongoid::Document)
+          end
+
+          it "does not load all documents" do
+            expect(Mongo::Logger.logger).to receive(:debug?).exactly(2).times.and_call_original
+            enum.next
           end
         end
       end
