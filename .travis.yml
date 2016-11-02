@@ -28,11 +28,11 @@ env:
     - MONGODB=2.6.11
     - MONGODB=3.0.7
     - MONGODB=3.2.0
-  exclude:
-    - rvm: jruby-9.1.5.0
-      gemfile: gemfiles/driver_master.gemfile
-    - rvm: jruby-19mode
-      gemfile: gemfiles/driver_master.gemfile
+    exclude:
+      - rvm: jruby-9.1.5.0
+        gemfile: gemfiles/driver_master.gemfile
+      - rvm: jruby-19mode
+        gemfile: gemfiles/driver_master.gemfile
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
