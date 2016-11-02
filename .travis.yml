@@ -12,10 +12,14 @@ rvm:
 matrix:
   allow_failures:
     - gemfile: gemfiles/rails_master.gemfile
+  exclude:
+    - rvm: jruby-9.1.5.0
+      gemfile: gemfiles/driver_master.gemfile
 
 gemfile:
   - Gemfile
   - gemfiles/rails_master.gemfile
+  - gemfiles/driver_master.gemfile
 
 env:
   global:
