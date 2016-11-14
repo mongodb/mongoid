@@ -331,6 +331,31 @@ describe Mongoid::Contextual::MapReduce do
     end
   end
 
+  describe "#raw" do
+    let(:criteria) { Band.all }
+    let(:client) { collection.database.client }
+    let(:map_reduce) { described_class.new(collection, criteria, map, reduce) }
+
+    subject { map_reduce.raw }
+
+    it { expect{subject}.to raise_error(Mongoid::Errors::NoMapReduceOutput) }
+
+    context "when providing inline" do
+      let!(:out) { map_reduce.out(inline: 1) }
+
+      before { allow(client).to receive(:command).and_return(['result', 'from', 'client.command']) }
+
+      it "passes the command to the client, using the client options" do
+        expect(client).to receive(:command).with(out.command, client.options)
+        subject
+      end
+
+      it "returns the first element from the result array of client.command" do
+        expect(subject).to eq('result')
+      end
+    end
+  end
+
   describe "#reduced" do
 
     let(:criteria) do
