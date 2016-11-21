@@ -5,9 +5,9 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  - 2.2.2
-  - 2.3.1
-  - jruby-9.1.5.0
+  - 2.2
+  - 2.3
+  - jruby-9.1.6.0
 
 matrix:
   allow_failures:
