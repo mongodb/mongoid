@@ -317,7 +317,7 @@ module Mongoid
       # @since 3.0.0
       def results
         raise Errors::NoMapReduceOutput.new(command) unless command[:out]
-        @results ||= __client__.command(command).first
+        @results ||= __client__.command(command,__client__.options).first
       end
 
       # Get the client with the proper consistency.
