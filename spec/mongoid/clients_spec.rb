@@ -524,6 +524,10 @@ describe Mongoid::Clients do
       it "returns the default client" do
         expect(mongo_client.options[:database].to_s).to eq(database_id)
       end
+
+      it "sets the platform to Mongoid's platform constant" do
+        expect(mongo_client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
+      end
     end
 
     context "when no client exists with the key" do
@@ -540,6 +544,38 @@ describe Mongoid::Clients do
         expect {
           band.mongo_client
         }.to raise_error(Mongoid::Errors::NoClientConfig)
+      end
+    end
+
+    context "when getting a client by name" do
+
+      let(:file) do
+        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
+      end
+
+      before do
+        described_class.clear
+        Mongoid.load!(file, :test)
+      end
+
+      after do
+        mongo_client.close
+      end
+
+      let!(:band) do
+        Band.store_in(client: :reports)
+      end
+
+      let!(:mongo_client) do
+        Band.new.mongo_client
+      end
+
+      it "returns the reports client" do
+        expect(mongo_client.options[:database].to_s).to eq('reports')
+      end
+
+      it "sets the platform to Mongoid's platform constant" do
+        expect(mongo_client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
       end
     end
   end
@@ -579,6 +615,10 @@ describe Mongoid::Clients do
 
       it "returns the default client" do
         expect(mongo_client.options[:database].to_s).to eq(database_id)
+      end
+
+      it "sets the platform to Mongoid's platform constant" do
+        expect(mongo_client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
       end
     end
 
