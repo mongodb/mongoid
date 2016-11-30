@@ -528,6 +528,10 @@ describe Mongoid::Clients do
       it "sets the platform to Mongoid's platform constant" do
         expect(mongo_client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
       end
+
+      it "sets the app_name to the config value" do
+        expect(mongo_client.options[:app_name]).to eq('testing')
+      end
     end
 
     context "when no client exists with the key" do
@@ -556,26 +560,47 @@ describe Mongoid::Clients do
       before do
         described_class.clear
         Mongoid.load!(file, :test)
+        Band.store_in(client: :reports)
       end
 
       after do
         mongo_client.close
+        Mongoid::Config.reset
+        Band.reset_storage_options!
       end
 
-      let!(:band) do
-        Band.store_in(client: :reports)
-      end
-
-      let!(:mongo_client) do
+      let(:mongo_client) do
         Band.new.mongo_client
       end
 
-      it "returns the reports client" do
+      it "uses the reports client" do
         expect(mongo_client.options[:database].to_s).to eq('reports')
       end
 
       it "sets the platform to Mongoid's platform constant" do
         expect(mongo_client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
+      end
+
+      it "sets the app_name to the config value" do
+        expect(mongo_client.options[:app_name]).to eq('testing')
+      end
+    end
+
+    context 'when the app_name is not set in the config' do
+
+      before do
+        Mongoid::Config.reset
+        Mongoid.configure do |config|
+          config.load_configuration(CONFIG)
+        end
+      end
+
+      let(:mongo_client) do
+        Band.new.mongo_client
+      end
+
+      it 'does not set the Mongoid.app_name option' do
+        expect(mongo_client.options.has_key?(:app_name)).to be(false)
       end
     end
   end
@@ -619,6 +644,10 @@ describe Mongoid::Clients do
 
       it "sets the platform to Mongoid's platform constant" do
         expect(mongo_client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
+      end
+
+      it "sets the app_name to the config value" do
+        expect(mongo_client.options[:app_name]).to eq('testing')
       end
     end
 

@@ -26,6 +26,7 @@ module Mongoid
     option :use_utc, default: false
     option :log_level, default: :info
     option :belongs_to_required_by_default, default: true
+    option :app_name, default: nil
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
