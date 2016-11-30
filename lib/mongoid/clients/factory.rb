@@ -71,6 +71,7 @@ module Mongoid
       def options(configuration)
         config = configuration.dup
         options = config.delete(:options) || {}
+        options[:platform] = PLATFORM_DETAILS
         options.reject{ |k, v| k == :hosts }.to_hash.symbolize_keys!
       end
     end
