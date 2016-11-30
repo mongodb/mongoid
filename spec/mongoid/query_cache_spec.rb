@@ -360,6 +360,37 @@ describe Mongoid::QueryCache do
     end
   end
 
+  context "when reloading a document" do
+
+    let!(:band_id) do
+      Band.create.id
+    end
+
+    context 'when query cache is disabled' do
+
+      before do
+        Mongoid::QueryCache.enabled = false
+      end
+
+      it "queries again" do
+        band = Band.find(band_id)
+        expect_query(1) do
+          band.reload
+        end
+      end
+    end
+
+    context 'when query cache is enabled' do
+
+      it "queries again" do
+        band = Band.find(band_id)
+        expect_query(1) do
+          band.reload
+        end
+      end
+    end
+  end
+
   context "when querying a very large collection" do
 
     before do
