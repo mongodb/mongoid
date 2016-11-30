@@ -9,7 +9,7 @@ rvm:
   - 2.0
   - 2.1
   - 2.2
-  - 2.3.2
+  - 2.3.3
   - jruby-19mode
   - jruby-9.1.6.0
 
@@ -21,7 +21,7 @@ gemfile:
 
 matrix:
   exclude:
-    - rvm: jruby-9.1.5.0
+    - rvm: jruby-9.1.6.0
       gemfile: gemfiles/driver_master.gemfile
     - rvm: jruby-19mode
       gemfile: gemfiles/driver_master.gemfile
@@ -33,8 +33,9 @@ env:
   matrix:
     - MONGODB=2.4.14
     - MONGODB=2.6.11
-    - MONGODB=3.0.7
-    - MONGODB=3.2.0
+    - MONGODB=3.0.12
+    - MONGODB=3.2.11
+    - MONGODB=3.4.0
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
