@@ -70,6 +70,20 @@ module Mongoid
       ensure
         QueryCache.enabled = enabled
       end
+
+      # Execute the block with the query cache disabled.
+      #
+      # @example Execute without the cache.
+      #   QueryCache.uncached { collection.find }
+      #
+      # @return [ Object ] The result of the block.
+      def uncached
+        enabled = QueryCache.enabled?
+        QueryCache.enabled = false
+        yield
+      ensure
+        QueryCache.enabled = enabled
+      end
     end
 
     # The middleware to be added to a rack application in order to activate the
@@ -253,8 +267,16 @@ module Mongoid
         alias_query_cache_clear :insert_one, :insert_many
       end
     end
+
+    # Bypass the query cache when reloading a document.
+    module Document
+      def reload
+        QueryCache.uncached { super }
+      end
+    end
   end
 end
 
 Mongo::Collection.__send__(:include, Mongoid::QueryCache::Collection)
 Mongo::Collection::View.__send__(:include, Mongoid::QueryCache::View)
+Mongoid::Document.__send__(:include, Mongoid::QueryCache::Document)
