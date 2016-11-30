@@ -40,6 +40,10 @@ describe Mongoid::Clients::Factory do
           it "sets the cluster's seeds" do
             expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
           end
+
+          it "sets the platform to Mongoid's platform constant" do
+            expect(client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
+          end
         end
 
         context "when the configuration has no ports" do
@@ -307,6 +311,10 @@ describe Mongoid::Clients::Factory do
 
     it "sets the write concern" do
       expect(client.write_concern).to be_a(Mongo::WriteConcern::Acknowledged)
+    end
+
+    it "sets the platform to Mongoid's platform constant" do
+      expect(client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
     end
   end
 end
