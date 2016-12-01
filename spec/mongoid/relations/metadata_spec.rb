@@ -1236,6 +1236,14 @@ describe Mongoid::Relations::Metadata do
           it "returns the name of the inverse_of property" do
             expect(metadata.inverse).to eq(:crazy_name)
           end
+
+          it "will have have an inverse_of key" do
+            expect(metadata.key?(:inverse_of)).to be true
+          end
+
+          it "will NOT have an inverse_of_field key" do
+            expect(metadata.key?(:inverse_of_field)).to be false
+          end
         end
       end
 
