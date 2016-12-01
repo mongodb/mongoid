@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "mongoid"
 
   s.add_dependency("activemodel", ["~> 5.0"])
-  s.add_dependency("mongo", ["~> 2.3"])
+  s.add_dependency("mongo", ["~> 2.4"])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.test_files   = Dir.glob("spec/**/*")
