@@ -157,6 +157,7 @@ describe Mongoid::Indexable do
       Class.new do
         include Mongoid::Document
         field :a, as: :authentication_token
+        store_in collection: :specs
       end
     end
 
