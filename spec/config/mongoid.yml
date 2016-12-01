@@ -32,3 +32,13 @@ test:
     log_level: :warn
     belongs_to_required_by_default: false
     app_name: 'testing'
+test_with_max_staleness:
+  clients:
+    default:
+      database: mongoid_test
+      hosts:
+        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+      options:
+        read:
+          mode: :primary_preferred
+          max_staleness: 100
