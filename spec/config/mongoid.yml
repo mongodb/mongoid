@@ -31,3 +31,13 @@ test:
     use_utc: false
     log_level: :warn
     app_name: 'testing'
+test_with_max_staleness:
+  clients:
+    default:
+      database: mongoid_test
+      hosts:
+        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+      options:
+        read:
+          mode: :primary_preferred
+          max_staleness: 100
