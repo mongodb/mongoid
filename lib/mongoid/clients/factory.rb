@@ -72,6 +72,7 @@ module Mongoid
         config = configuration.dup
         options = config.delete(:options) || {}
         options[:platform] = PLATFORM_DETAILS
+        options[:app_name] = Mongoid::Config.app_name if Mongoid::Config.app_name
         options.reject{ |k, v| k == :hosts }.to_hash.symbolize_keys!
       end
     end

@@ -82,6 +82,37 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the app_name is set in the config' do
+
+    let(:conf) do
+      CONFIG.merge(options: {app_name: 'admin-reporting'})
+    end
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    it 'sets the Mongoid.app_name to the provided value' do
+      expect(Mongoid.app_name).to eq('admin-reporting')
+    end
+  end
+
+  context 'when the app_name is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'does not set the Mongoid.app_name option' do
+      expect(Mongoid.app_name).to be_nil
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do
