@@ -225,7 +225,13 @@ module Mongoid
       # @since 3.0.0
       def mongo_session
         session = __session__
-        session.use(database_override || current_database_name(session))
+        session.use(
+            if storage_options && storage_options[:skip_database_override]
+              current_database_name(session)
+            else
+              database_override || current_database_name(session)
+            end
+        )
         session
       end
 

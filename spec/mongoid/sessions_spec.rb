@@ -1018,7 +1018,7 @@ describe Mongoid::Sessions do
     end
   end
 
-  context "when overriding the default database "do
+  context "when overriding the default database" do
 
     let(:file) do
       File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
@@ -1046,6 +1046,33 @@ describe Mongoid::Sessions do
       it "persists to the overridden database" do
         Band.mongo_session.with(database: :mongoid_optional) do |sess|
           sess[:bands].find(name: "Tool").should_not be_nil
+        end
+      end
+    end
+
+    context "skip global override" do
+
+      before do
+        Mongoid.override_database(:mongoid_optional)
+      end
+
+      after do
+        Domain.delete_all
+        Mongoid.override_database(nil)
+      end
+
+      let!(:domain) do
+        Domain.create(name: 'test.com')
+      end
+
+      it "persists to the default database" do
+        Domain.mongo_session.with(database: :default) do |sess|
+          sess[:domains].find(name: 'test.com').to_a.size.should eq(1)
+        end
+      end
+      it "not persists to the database override" do
+        Domain.mongo_session.with(database: :mongoid_optional) do |sess|
+          sess[:domains].find(name: 'test.com').to_a.size.should eq(0)
         end
       end
     end
