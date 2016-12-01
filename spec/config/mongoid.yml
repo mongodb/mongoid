@@ -31,3 +31,4 @@ test:
     use_utc: false
     log_level: :warn
     belongs_to_required_by_default: false
+    app_name: 'testing'
