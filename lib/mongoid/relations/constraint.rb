@@ -34,8 +34,12 @@ module Mongoid
       #
       # @since 2.0.0.rc.7
       def convert(object)
-        return object if metadata.polymorphic?
-        klass, field = metadata.klass, metadata.klass.fields["_id"]
+        klass = if metadata.polymorphic?
+          metadata.inverse_class_name.constantize
+        else
+          metadata.klass
+        end
+        field = klass.fields["_id"]
         if klass.using_object_ids?
           Moped::BSON::ObjectId.mongoize(object)
         elsif object.is_a?(::Array)
