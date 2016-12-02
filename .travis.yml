@@ -13,7 +13,7 @@ matrix:
   allow_failures:
     - gemfile: gemfiles/rails_master.gemfile
   exclude:
-    - rvm: jruby-9.1.6.0
+    - rvm: jruby-9.1.5.0
       gemfile: gemfiles/driver_master.gemfile
 
 gemfile:
