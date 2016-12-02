@@ -803,8 +803,8 @@ module Mongoid
           # @since 3.0.0
           def with_inverse_field_criterion(criteria, metadata)
             inverse_metadata = metadata.inverse_metadata(metadata.klass)
-            if inverse_metadata.try(:inverse_of_field)
-              criteria.any_in(inverse_metadata.inverse_of_field => [ metadata.name, nil ])
+            if inverse_metadata.try(:inverse_of)
+              criteria.any_in(inverse_metadata.inverse_of => [ metadata.name, nil ])
             else
               criteria
             end
