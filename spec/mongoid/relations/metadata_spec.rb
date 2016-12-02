@@ -1982,5 +1982,4 @@ describe Mongoid::Relations::Metadata do
       end
     end
   end
-
 end
