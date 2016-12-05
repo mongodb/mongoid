@@ -25,9 +25,9 @@ For the following ``Person`` class, the collection the document would get stored
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-  end
+   class Person
+     include Mongoid::Document
+   end
 
 Model class names cannot end with "s", because it will be considered as the pluralized form of
 the word. For example "Status" would be considered as the plural form of "Statu",
@@ -40,9 +40,9 @@ named ``Status``.
 
 .. code-block:: ruby
 
-  ActiveSupport::Inflector.inflections do |inflect|
-    inflect.singular("status", "status")
-  end
+   ActiveSupport::Inflector.inflections do |inflect|
+     inflect.singular("status", "status")
+   end
 
 The collection for the model's documents can be changed at the class level if you would like
 them persisted elsewhere. You can also change the database and client the model gets persisted
@@ -50,40 +50,40 @@ in from the defaults.
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    store_in collection: "citizens", database: "other", client: "secondary"
-  end
+   class Person
+     include Mongoid::Document
+     store_in collection: "citizens", database: "other", client: "secondary"
+   end
 
 The ``store_in`` macro can also take lambdas - a common case for this is multi-tenant applications.
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-    store_in database: ->{ Thread.current[:database] }
-  end
+   class Band
+     include Mongoid::Document
+     store_in database: ->{ Thread.current[:database] }
+   end
 
 When a document is stored in the database the ruby object will get serialized into BSON
 and have a structure like so:
 
 .. code-block:: ruby
 
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
-    "title" : "Sir",
-    "name" : {
-      "_id" : ObjectId("4d3ed089fb60ab534684b7ff"),
-      "first_name" : "Durran"
-    },
-    "addresses" : [
-      {
-        "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
-        "city" : "Berlin",
-        "country" : "Deutschland"
-      }
-    ]
-  }
+   {
+     "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
+     "title" : "Sir",
+     "name" : {
+       "_id" : ObjectId("4d3ed089fb60ab534684b7ff"),
+       "first_name" : "Durran"
+     },
+     "addresses" : [
+       {
+         "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
+         "city" : "Berlin",
+         "country" : "Deutschland"
+       }
+     ]
+   }
 
 Fields
 ------
@@ -96,19 +96,19 @@ in a ``Mongoid::Document``.
 Keep in mind that the field definitions determine how Mongoid behaves when writing and reading
 fields from the database. Changing the Model definition in the Model file does not change existing
 data. If you'd like to update a field type or options of existing data, you must write a script to do so.
- You will get errors otherwise.
+You will get errors otherwise.
 
 Consider a simple class for modeling a person in an application. A person may have a first name,
 last name, and middle name. We can define these attributes on a person by using the fields macro.
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    field :first_name, type: String
-    field :middle_name, type: String
-    field :last_name, type: String
-  end
+   class Person
+     include Mongoid::Document
+     field :first_name, type: String
+     field :middle_name, type: String
+     field :last_name, type: String
+   end
 
 Below is a list of valid types for fields.
 
@@ -140,12 +140,12 @@ A rule of thumb for what fields you can use are:
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    field :first_name
-    field :middle_name
-    field :last_name
-  end
+   class Person
+     include Mongoid::Document
+     field :first_name
+     field :middle_name
+     field :last_name
+   end
 
 Types that are not supported as dynamic attributes since they cannot be cast are:
 
@@ -161,63 +161,63 @@ When a field is defined, Mongoid provides several different ways of accessing th
 
 .. code-block:: ruby
 
-  # Get the value of the first_name field
-  person.first_name
-  person[:first_name]
-  person.read_attribute(:first_name)
+   # Get the value of the first_name field
+   person.first_name
+   person[:first_name]
+   person.read_attribute(:first_name)
 
 
-  # Set the value for the first_name field
-  person.first_name = "Jean"
-  person[:first_name] = "Jean"
-  person.write_attribute(:first_name, "Jean")
+   # Set the value for the first_name field
+   person.first_name = "Jean"
+   person[:first_name] = "Jean"
+   person.write_attribute(:first_name, "Jean")
 
 If you have defined custom getter/setter, those will be used when using the dot notation.
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
+   class Person
+     include Mongoid::Document
 
-    field :first_name
+     field :first_name
 
-    # custom getter
-    def first_name
-      "My name is Johnny"
-    end
+     # custom getter
+     def first_name
+       "My name is Johnny"
+     end
 
-    # custom setter
-    def first_name=(value)
-      p 'Setting.. '
-      self.first_name = value
-      p '.. done!'
-    end
-  end
+     # custom setter
+     def first_name=(value)
+       p 'Setting.. '
+       self.first_name = value
+       p '.. done!'
+     end
+   end
 
-  # Like this:
-  person.first_name = 'John'
-  # Setting..
-  # .. done!
+   # Like this:
+   person.first_name = 'John'
+   # Setting..
+   # .. done!
 
-  person.first_name                  # My name is Johnny
-  person[:first_name]                # John
-  person.read_attribute(:first_name) # John
+   person.first_name                  # My name is Johnny
+   person[:first_name]                # John
+   person.read_attribute(:first_name) # John
 
 In cases where you want to set multiple field values at once, there are a few different ways
 of handling this as well.
 
 .. code-block:: ruby
 
-  # Get the field values as a hash.
-  person.attributes
+   # Get the field values as a hash.
+   person.attributes
 
-  # Set the field values in the document.
-  Person.new(first_name: "Jean-Baptiste", middle_name: "Emmanuel")
-  person.attributes = { first_name: "Jean-Baptiste", middle_name: "Emmanuel" }
-  person.write_attributes(
-    first_name: "Jean-Baptiste",
-    middle_name: "Emmanuel"
-  )
+   # Set the field values in the document.
+   Person.new(first_name: "Jean-Baptiste", middle_name: "Emmanuel")
+   person.attributes = { first_name: "Jean-Baptiste", middle_name: "Emmanuel" }
+   person.write_attributes(
+     first_name: "Jean-Baptiste",
+     middle_name: "Emmanuel"
+   )
 
 Hash Fields
 ***********
@@ -228,25 +228,25 @@ or else the values will not store properly.
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    field :first_name
-    field :url, type: Hash
+   class Person
+     include Mongoid::Document
+     field :first_name
+     field :url, type: Hash
 
-    # will update the fields properly and save the values
-    def set_vals
-      self.first_name = 'Daniel'
-      self.url = {'home_page' => 'http://www.homepage.com'}
-      save
-    end
+     # will update the fields properly and save the values
+     def set_vals
+       self.first_name = 'Daniel'
+       self.url = {'home_page' => 'http://www.homepage.com'}
+       save
+     end
 
-    # all data will fail to save due to the illegal hashkey
-    def set_vals_fail
-      self.first_name = 'Daniel'
-      self.url = {'home.page' => 'http://www.homepage.com'}
-      save
-    end
-  end
+     # all data will fail to save due to the illegal hashkey
+     def set_vals_fail
+       self.first_name = 'Daniel'
+       self.url = {'home.page' => 'http://www.homepage.com'}
+       save
+     end
+   end
 
 Defaults
 ********
@@ -256,11 +256,11 @@ Defaults are either static values or lambdas.
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    field :blood_alcohol_level, type: Float, default: 0.40
-    field :last_drink, type: Time, default: ->{ 10.minutes.ago }
-  end
+   class Person
+     include Mongoid::Document
+     field :blood_alcohol_level, type: Float, default: 0.40
+     field :last_drink, type: Time, default: ->{ 10.minutes.ago }
+   end
 
 Be wary that default values that are not defined as lambdas or procs are evaluated
 at class load time, so the following 2 definitions are not equivalent.
@@ -268,15 +268,15 @@ at class load time, so the following 2 definitions are not equivalent.
 
 .. code-block:: ruby
 
-  field :dob, type: Time, default: Time.now
-  field :dob, type: Time, default: ->{ Time.now }
+   field :dob, type: Time, default: Time.now
+   field :dob, type: Time, default: ->{ Time.now }
 
 If you want to set a default with a dependency on the document's state, self inside a lambda
 or proc evaluates to the document instance.
 
 .. code-block:: ruby
 
-  field :intoxicated_at, type: Time, default: ->{ new_record? ? 2.hours.ago : Time.now }
+   field :intoxicated_at, type: Time, default: ->{ new_record? ? 2.hours.ago : Time.now }
 
 When defining a default value as a proc, Mongoid will apply the default after all other
 attributes are set. If you want this to happen before the other attributes, set ``pre_processed: true``.
@@ -293,16 +293,16 @@ performing the conversion for you.
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-    field :n, as: :name, type: String
-  end
+   class Band
+     include Mongoid::Document
+     field :n, as: :name, type: String
+   end
 
-  band = Band.new(name: "Placebo")
-  band.attributes # { "n" => "Placebo" }
+   band = Band.new(name: "Placebo")
+   band.attributes # { "n" => "Placebo" }
 
-  criteria = Band.where(name: "Placebo")
-  criteria.selector # { "n" => "Placebo" }
+   criteria = Band.where(name: "Placebo")
+   criteria.selector # { "n" => "Placebo" }
 
 Custom Fields
 *************
@@ -313,52 +313,52 @@ from MongoDB friendly values.
 
 .. code-block:: ruby
 
-  class Profile
-    include Mongoid::Document
-    field :location, type: Point
-  end
+   class Profile
+     include Mongoid::Document
+     field :location, type: Point
+   end
 
-  class Point
+   class Point
 
-    attr_reader :x, :y
+     attr_reader :x, :y
 
-    def initialize(x, y)
-      @x, @y = x, y
-    end
+     def initialize(x, y)
+       @x, @y = x, y
+     end
 
-    # Converts an object of this instance into a database friendly value.
-    def mongoize
-      [ x, y ]
-    end
+     # Converts an object of this instance into a database friendly value.
+     def mongoize
+       [ x, y ]
+     end
 
-    class << self
+     class << self
 
-      # Get the object as it was stored in the database, and instantiate
-      # this custom class from it.
-      def demongoize(object)
-        Point.new(object[0], object[1])
-      end
+       # Get the object as it was stored in the database, and instantiate
+       # this custom class from it.
+       def demongoize(object)
+         Point.new(object[0], object[1])
+       end
 
-      # Takes any possible object and converts it to how it would be
-      # stored in the database.
-      def mongoize(object)
-        case object
-        when Point then object.mongoize
-        when Hash then Point.new(object[:x], object[:y]).mongoize
-        else object
-        end
-      end
+       # Takes any possible object and converts it to how it would be
+       # stored in the database.
+       def mongoize(object)
+         case object
+         when Point then object.mongoize
+         when Hash then Point.new(object[:x], object[:y]).mongoize
+         else object
+         end
+       end
 
-      # Converts the object that was supplied to a criteria and converts it
-      # into a database friendly form.
-      def evolve(object)
-        case object
-        when Point then object.mongoize
-        else object
-        end
-      end
-    end
-  end
+       # Converts the object that was supplied to a criteria and converts it
+       # into a database friendly form.
+       def evolve(object)
+         case object
+         when Point then object.mongoize
+         else object
+         end
+       end
+     end
+   end
 
 The instance method ``mongoize`` takes an instance of your object, and converts it
 into how it will be stored in the database. In our example above, we want to store our
@@ -374,17 +374,17 @@ This is for cases where you are not passing your model instances of your custom 
 
 .. code-block:: ruby
 
-  point = Point.new(12, 24)
-  venue = Venue.new(location: point) # This uses the mongoize instance method.
-  venue = Venue.new(location: [ 12, 24 ]) # This uses the mongoize class method.
+   point = Point.new(12, 24)
+   venue = Venue.new(location: point) # This uses the mongoize instance method.
+   venue = Venue.new(location: [ 12, 24 ]) # This uses the mongoize class method.
 
 The class method ``evolve`` takes an object, and determines how it is to be transformed
 for use in criteria. For example we may want to write a query like so:
 
 .. code-block:: ruby
 
-  point = Point.new(12, 24)
-  Venue.where(location: point)
+   point = Point.new(12, 24)
+   Venue.where(location: point)
 
 Not that when accessing custom fields from the document, you will get a new instance
 of that object with each call to the getter. This is because Mongoid is generating a new
@@ -409,11 +409,11 @@ For cases when you do not want to have ``BSON::ObjectId`` ids, you can override 
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-    field :_id, type: String, default: ->{ name }
-  end
+   class Band
+     include Mongoid::Document
+     field :name, type: String
+     field :_id, type: String, default: ->{ name }
+   end
 
 Dynamic Fields
 --------------
@@ -427,10 +427,10 @@ dealing with dynamic attributes in that Mongoid is not completely lenient about 
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    include Mongoid::Attributes::Dynamic
-  end
+   class Person
+     include Mongoid::Document
+     include Mongoid::Attributes::Dynamic
+   end
 
 When dealing with dynamic attributes the following rules apply:
 
@@ -440,12 +440,12 @@ getter and setter methods. For example, consider a person who has an attribute o
 
 .. code-block:: ruby
 
-  # Set the person's gender to male.
-  person[:gender] = "Male"
-  person.gender = "Male"
+   # Set the person's gender to male.
+   person[:gender] = "Male"
+   person.gender = "Male"
 
-  # Get the person's gender.
-  person.gender
+   # Get the person's gender.
+   person.gender
 
 If the attribute does not already exist on the document, Mongoid will not provide you with
 the getters and setters and will enforce normal ``method_missing`` behavior. In this case you
@@ -454,17 +454,17 @@ must use the other provided accessor methods:
 
 .. code-block:: ruby
 
-  # Raise a NoMethodError if value isn't set.
-  person.gender
-  person.gender = "Male"
+   # Raise a NoMethodError if value isn't set.
+   person.gender
+   person.gender = "Male"
 
-  # Retrieve a dynamic field safely.
-  person[:gender]
-  person.read_attribute(:gender)
+   # Retrieve a dynamic field safely.
+   person[:gender]
+   person.read_attribute(:gender)
 
-  # Write a dynamic field safely.
-  person[:gender] = "Male"
-  person.write_attribute(:gender, "Male")
+   # Write a dynamic field safely.
+   person[:gender] = "Male"
+   person.write_attribute(:gender, "Male")
 
 Localized Fields
 ----------------
@@ -473,33 +473,33 @@ Mongoid now supports localized fields without the need of any external gem.
 
 .. code-block:: ruby
 
-  class Product
-    include Mongoid::Document
-    field :description, localize: true
-  end
+   class Product
+     include Mongoid::Document
+     field :description, localize: true
+   end
 
 By telling the field to ``localize``, Mongoid will under the covers store the field
 as a hash of locale/value pairs, but normal access to it will behave like a string.
 
 .. code-block:: ruby
 
-  I18n.default_locale = :en
-  product = Product.new
-  product.description = "Marvelous!"
-  I18n.locale = :de
-  product.description = "Fantastisch!"
+   I18n.default_locale = :en
+   product = Product.new
+   product.description = "Marvelous!"
+   I18n.locale = :de
+   product.description = "Fantastisch!"
 
-  product.attributes
-  # { "description" => { "en" => "Marvelous!", "de" => "Fantastisch!" }
+   product.attributes
+   # { "description" => { "en" => "Marvelous!", "de" => "Fantastisch!" }
 
 You can get and set all the translations at once by using the corresponding ``_translations`` method.
 
 .. code-block:: ruby
 
-  product.description_translations
-  # { "en" => "Marvelous!", "de" => "Fantastisch!" }
-  product.description_translations =
-    { "en" => "Marvelous!", "de" => "Wunderbar!" }
+   product.description_translations
+   # { "en" => "Marvelous!", "de" => "Fantastisch!" }
+   product.description_translations =
+     { "en" => "Marvelous!", "de" => "Wunderbar!" }
 
 Fallbacks
 *********
@@ -510,27 +510,27 @@ For Rails applications, set the fallbacks configuration setting to true in your 
 
 .. code-block:: ruby
 
-  config.i18n.fallbacks = true
+   config.i18n.fallbacks = true
 
 For non-rails applications, you must include the fallbacks module straight to the I18n gem.
 
 .. code-block:: ruby
 
-  require "i18n/backend/fallbacks"
-  I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+   require "i18n/backend/fallbacks"
+   I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
 Then when the fallbacks are defined, if a translation is not present Mongoid will fallback
 in order of the defined locales.
 
 .. code-block:: ruby
 
-  I18n.default_locale = :en
-  I18n.fallbacks = true
-  ::I18n.fallbacks[:de] = [ :de, :en, :es ]
-  product = Product.new
-  product.description = "Marvelous!"
-  I18n.locale = :de
-  product.description # "Marvelous!"
+   I18n.default_locale = :en
+   I18n.fallbacks = true
+   ::I18n.fallbacks[:de] = [ :de, :en, :es ]
+   product = Product.new
+   product.description = "Marvelous!"
+   I18n.locale = :de
+   product.description # "Marvelous!"
 
 Querying
 ********
@@ -540,9 +540,9 @@ alter the criteria to match the current locale.
 
 .. code-block:: ruby
 
-  # Match all prodcucts with Marvelous as the description. Locale is en.
-  Product.where(description: "Marvelous!")
-  # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
+   # Match all prodcucts with Marvelous as the description. Locale is en.
+   Product.where(description: "Marvelous!")
+   # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
 
 Indexing
 ********
@@ -552,13 +552,13 @@ locales that you plan on searching on.
 
 .. code-block:: ruby
 
-  class Product
-    include Mongoid::Document
-    field :description, localize: true
+   class Product
+     include Mongoid::Document
+     field :description, localize: true
 
-    index "description.de" => 1
-    index "description.en" => 1
-  end
+     index "description.de" => 1
+     index "description.en" => 1
+   end
 
 Dirty Tracking
 --------------
@@ -576,31 +576,31 @@ the database up to the time it is saved. Any persistence operation clears the ch
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    field :name, type: String
-  end
+   class Person
+     include Mongoid::Document
+     field :name, type: String
+   end
 
-  person = Person.first
-  person.name = "Alan Garner"
+   person = Person.first
+   person.name = "Alan Garner"
 
-  # Check to see if the document has changed.
-  person.changed? # true
+   # Check to see if the document has changed.
+   person.changed? # true
 
-  # Get an array of the names of the changed fields.
-  person.changed # [ :name ]
+   # Get an array of the names of the changed fields.
+   person.changed # [ :name ]
 
-  # Get a hash of the old and changed values for each field.
-  person.changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
+   # Get a hash of the old and changed values for each field.
+   person.changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
 
-  # Check if a specific field has changed.
-  person.name_changed? # true
+   # Check if a specific field has changed.
+   person.name_changed? # true
 
-  # Get the changes for a specific field.
-  person.name_change # [ "Alan Parsons", "Alan Garner" ]
+   # Get the changes for a specific field.
+   person.name_change # [ "Alan Parsons", "Alan Garner" ]
 
-  # Get the previous value for a field.
-  person.name_was # "Alan Parsons"
+   # Get the previous value for a field.
+   person.name_was # "Alan Parsons"
 
 Resetting Changes
 *****************
@@ -609,12 +609,12 @@ You can reset changes of a field to its previous value by calling the reset meth
 
 .. code-block:: ruby
 
-  person = Person.first
-  person.name = "Alan Garner"
+   person = Person.first
+   person.name = "Alan Garner"
 
-  # Reset the changed name back to the original
-  person.reset_name!
-  person.name # "Alan Parsons"
+   # Reset the changed name back to the original
+   person.reset_name!
+   person.name # "Alan Parsons"
 
 Notes On Persistence
 ********************
@@ -632,12 +632,12 @@ calling ``Model#previous_changes``.
 
 .. code-block:: ruby
 
-  person = Person.first
-  person.name = "Alan Garner"
-  person.save # Clears out current changes.
+   person = Person.first
+   person.name = "Alan Garner"
+   person.save # Clears out current changes.
 
-  # View the previous changes.
-  person.previous_changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
+   # View the previous changes.
+   person.previous_changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
 
 Readonly Attributes
 -------------------
@@ -647,24 +647,24 @@ created with these attributes, but changes to them will be filtered out.
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-    field :origin, type: String
+   class Band
+     include Mongoid::Document
+     field :name, type: String
+     field :origin, type: String
 
-    attr_readonly :name, :origin
-  end
+     attr_readonly :name, :origin
+   end
 
-  band = Band.create(name: "Placebo")
-  band.update_attributes(name: "Tool") # Filters out the name change.
+   band = Band.create(name: "Placebo")
+   band.update_attributes(name: "Tool") # Filters out the name change.
 
 If you explicitly try to update or remove the attribute by itself, then a ``ReadonlyAttribute``
 error will be raised.
 
 .. code-block:: ruby
 
-  band.update_attribute(:name, "Tool") # Raises the error.
-  band.remove_attribute(:name) # Raises the error.
+   band.update_attribute(:name, "Tool") # Raises the error.
+   band.remove_attribute(:name) # Raises the error.
 
 Inheritance
 -----------
@@ -675,35 +675,35 @@ down into their child documents, but not vise-versa.
 
 .. code-block:: ruby
 
-  class Canvas
-    include Mongoid::Document
-    field :name, type: String
-    embeds_many :shapes
-  end
+   class Canvas
+     include Mongoid::Document
+     field :name, type: String
+     embeds_many :shapes
+   end
 
-  class Browser < Canvas
-    field :version, type: Integer
-    scope :recent, where(:version.gt => 3)
-  end
+   class Browser < Canvas
+     field :version, type: Integer
+     scope :recent, where(:version.gt => 3)
+   end
 
-  class Firefox < Browser
-  end
+   class Firefox < Browser
+   end
 
-  class Shape
-    include Mongoid::Document
-    field :x, type: Integer
-    field :y, type: Integer
-    embedded_in :canvas
-  end
+   class Shape
+     include Mongoid::Document
+     field :x, type: Integer
+     field :y, type: Integer
+     embedded_in :canvas
+   end
 
-  class Circle < Shape
-    field :radius, type: Float
-  end
+   class Circle < Shape
+     field :radius, type: Float
+   end
 
-  class Rectangle < Shape
-    field :width, type: Float
-    field :height, type: Float
-  end
+   class Rectangle < Shape
+     field :width, type: Float
+     field :height, type: Float
+   end
 
 In the above example, ``Canvas``, ``Browser`` and ``Firefox`` will all save in the canvases
 collection. An additional attribute ``_type`` is stored in order to make sure when loaded
@@ -719,10 +719,10 @@ similar to Single Table Inheritance in ActiveRecord.
 
 .. code-block:: ruby
 
-  # Returns Canvas documents and subclasses
-  Canvas.where(name: "Paper")
-  # Returns only Firefox documents
-  Firefox.where(name: "Window 1")
+   # Returns Canvas documents and subclasses
+   Canvas.where(name: "Paper")
+   # Returns only Firefox documents
+   Firefox.where(name: "Window 1")
 
 Associations
 ************
@@ -732,16 +732,16 @@ setting or through the build and create methods on the association:
 
 .. code-block:: ruby
 
-  firefox = Firefox.new
-  # Builds a Shape object
-  firefox.shapes.build({ x: 0, y: 0 })
-  # Builds a Circle object
-  firefox.shapes.build({ x: 0, y: 0 }, Circle)
-  # Creates a Rectangle object
-  firefox.shapes.create({ x: 0, y: 0 }, Rectangle)
+   firefox = Firefox.new
+   # Builds a Shape object
+   firefox.shapes.build({ x: 0, y: 0 })
+   # Builds a Circle object
+   firefox.shapes.build({ x: 0, y: 0 }, Circle)
+   # Creates a Rectangle object
+   firefox.shapes.create({ x: 0, y: 0 }, Rectangle)
 
-  rect = Rectangle.new(width: 100, height: 200)
-  firefox.shapes
+   rect = Rectangle.new(width: 100, height: 200)
+   firefox.shapes
 
 
 Timestamping
@@ -753,50 +753,50 @@ can be included to get basic behavior for ``created_at`` and
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    include Mongoid::Timestamps
-  end
+   class Person
+     include Mongoid::Document
+     include Mongoid::Timestamps
+   end
 
 You may also choose to only have specific timestamps for creation or
 modification.
 
 .. code-block:: ruby
 
-  class Person
-    include Mongoid::Document
-    include Mongoid::Timestamps::Created
-  end
+   class Person
+     include Mongoid::Document
+     include Mongoid::Timestamps::Created
+   end
 
-  class Post
-    include Mongoid::Document
-    include Mongoid::Timestamps::Updated
-  end
+   class Post
+     include Mongoid::Document
+     include Mongoid::Timestamps::Updated
+   end
 
 If you want to turn off timestamping for specific calls, use the timeless
 method:
 
 .. code-block:: ruby
 
-  person.timeless.save
-  Person.timeless.create!
+   person.timeless.save
+   Person.timeless.create!
 
 If you'd like shorter timestamp fields with aliases on them to save space,
 you can include the short versions of the modules.
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-    include Mongoid::Timestamps::Short # For c_at and u_at.
-  end
+   class Band
+     include Mongoid::Document
+     include Mongoid::Timestamps::Short # For c_at and u_at.
+   end
 
-  class Band
-    include Mongoid::Document
-    include Mongoid::Timestamps::Created::Short # For c_at only.
-  end
+   class Band
+     include Mongoid::Document
+     include Mongoid::Timestamps::Created::Short # For c_at only.
+   end
 
-  class Band
-    include Mongoid::Document
-    include Mongoid::Timestamps::Updated::Short # For u_at only.
-  end
+   class Band
+     include Mongoid::Document
+     include Mongoid::Timestamps::Updated::Short # For u_at only.
+   end
