@@ -402,17 +402,6 @@ describe Mongoid::Contextual::Mongo do
           expect(context.distinct(:name)).to eq(expected_results)
         end
       end
-
-      context 'when the collation is passed as an argument' do
-
-        let(:criteria) do
-          Band.where({})
-        end
-
-        it 'applies the collation' do
-          expect(context.distinct(:name, collation: { locale: 'en_US', strength: 2 })).to eq(expected_results)
-        end
-      end
     end
   end
 

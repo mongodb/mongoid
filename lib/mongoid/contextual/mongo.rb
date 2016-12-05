@@ -113,8 +113,8 @@ module Mongoid
       # @return [ Array<Object> ] The distinct values for the field.
       #
       # @since 3.0.0
-      def distinct(field, options = {})
-        opts = apply_collation(options)
+      def distinct(field)
+        opts = apply_collation
         view.distinct(klass.database_field_name(field), opts).map do |value|
           value.class.demongoize(value)
         end
@@ -705,7 +705,7 @@ module Mongoid
         documents.push(doc) if cacheable?
       end
 
-      def apply_collation(options)
+      def apply_collation(options = {})
         view.options[:collation] ? options.merge(collation: view.options[:collation]) : options
       end
     end
