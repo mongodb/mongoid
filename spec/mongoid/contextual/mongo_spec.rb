@@ -726,6 +726,29 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
+      context 'when a collation is specified on the criteria', if: collation_supported? do
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_update({ "$inc" => { likes: 1 }}, return_document: :after)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "returns the updated document" do
+          expect(result.likes).to eq(1)
+        end
+      end
+
       context "when removing" do
 
         let(:criteria) do
