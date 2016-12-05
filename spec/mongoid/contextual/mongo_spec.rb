@@ -167,6 +167,43 @@ describe Mongoid::Contextual::Mongo do
         expect(count).to eq(2)
       end
     end
+
+    context 'when a collation is specified', if: collation_supported? do
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context 'when the collation is specified on the criteria' do
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        let(:count) do
+          context.count
+        end
+
+        it 'applies the collation' do
+          expect(count).to eq(1)
+        end
+      end
+
+      context 'when the collation is passed as an argument' do
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE")
+        end
+
+        let(:count) do
+          context.count(collation: { locale: 'en_US', strength: 2 })
+        end
+
+        it 'applies the collation' do
+          expect(count).to eq(1)
+        end
+      end
+    end
   end
 
   [ :delete, :delete_all ].each do |method|
@@ -338,6 +375,43 @@ describe Mongoid::Contextual::Mongo do
 
       it "returns the distinct field values" do
         expect(context.distinct(:years)).to eq([ 30, 25 ])
+      end
+    end
+
+    context 'when a collation is specified', if: collation_supported? do
+
+      before do
+        Band.create(name: 'DEPECHE MODE')
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:expected_results) do
+        [ "Depeche Mode", "New Order" ]
+      end
+
+      context 'when the collation is specified on the criteria' do
+
+        let(:criteria) do
+          Band.where({}).collation(locale: 'en_US', strength: 2)
+        end
+
+        it 'applies the collation' do
+          expect(context.distinct(:name)).to eq(expected_results)
+        end
+      end
+
+      context 'when the collation is passed as an argument' do
+
+        let(:criteria) do
+          Band.where({})
+        end
+
+        it 'applies the collation' do
+          expect(context.distinct(:name, collation: { locale: 'en_US', strength: 2 })).to eq(expected_results)
+        end
       end
     end
   end

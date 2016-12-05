@@ -1702,6 +1702,19 @@ describe Mongoid::Criteria::Queryable::Optional do
     it_behaves_like "a cloning option"
   end
 
+  describe "#collation" do
+
+    let(:selection) do
+      query.collation(locale: 'fr', strength: 2)
+    end
+
+    it "adds the collation option" do
+      expect(selection.options).to eq(collation: {'locale' => 'fr', 'strength' => 2})
+    end
+
+    it_behaves_like "a cloning option"
+  end
+
   describe "#without" do
 
     context "when provided no options" do
