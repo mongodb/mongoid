@@ -749,6 +749,31 @@ describe Mongoid::Contextual::Mongo do
             depeche.reload
           }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
+
+        context 'when a collation is specified on the criteria', if: collation_supported? do
+
+          let(:criteria) do
+            Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+          end
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          let!(:result) do
+            context.find_one_and_delete
+          end
+
+          it "returns the first matching document" do
+            expect(result).to eq(depeche)
+          end
+
+          it "deletes the document from the database" do
+            expect {
+              depeche.reload
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
       end
     end
 
