@@ -618,6 +618,160 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#find_one_and_replace" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool")
+    end
+
+    context "when the selector matches" do
+
+      context "when not providing options" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace(name: 'FKA Twigs')
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "updates the document in the database" do
+          expect(depeche.reload.name).to eq('FKA Twigs')
+        end
+      end
+
+      context "when sorting" do
+
+        let(:criteria) do
+          Band.desc(:name)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace(likes: 1)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(tool)
+        end
+
+        it "updates the document in the database" do
+          expect(tool.reload.likes).to eq(1)
+          expect(tool.reload.name).to be_nil
+        end
+      end
+
+      context "when limiting fields" do
+
+        let(:criteria) do
+          Band.only(:_id)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace(name: 'FKA Twigs', likes: 1)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "limits the returned fields" do
+          expect(result.name).to be_nil
+        end
+
+        it "updates the document in the database" do
+          expect(depeche.reload.likes).to eq(1)
+        end
+      end
+
+      context "when returning new" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace({ name: 'FKA Twigs', likes: 1}, return_document: :after)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "returns the updated document" do
+          expect(result.likes).to eq(1)
+        end
+      end
+
+      context 'when a collation is specified on the criteria', if: collation_supported? do
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace({ name: 'FKA Twigs', likes: 1 }, return_document: :after)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "returns the updated document" do
+          expect(result.likes).to eq(1)
+          expect(result.name).to eq('FKA Twigs')
+        end
+      end
+    end
+
+    context "when the selector does not match" do
+
+      let(:criteria) do
+        Band.where(name: "DEPECHE MODE")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:result) do
+        context.find_one_and_replace(name: 'FKA Twigs')
+      end
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+  end
+
   describe "#find_one_and_update" do
 
     let!(:depeche) do
@@ -748,11 +902,62 @@ describe Mongoid::Contextual::Mongo do
           expect(result.likes).to eq(1)
         end
       end
+    end
 
-      context "when removing" do
+    context "when the selector does not match" do
+
+      let(:criteria) do
+        Band.where(name: "Placebo")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:result) do
+        context.find_one_and_update("$inc" => { likes: 1 })
+      end
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "#find_one_and_delete" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    let!(:result) do
+      context.find_one_and_delete
+    end
+
+    context 'when the selector matches a document' do
+
+      it "returns the first matching document" do
+        expect(result).to eq(depeche)
+      end
+
+      it "deletes the document from the database" do
+        expect {
+          depeche.reload
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+
+      context 'when a collation is specified on the criteria', if: collation_supported? do
 
         let(:criteria) do
-          Band.where(name: "Depeche Mode")
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
         end
 
         let(:context) do
@@ -772,35 +977,10 @@ describe Mongoid::Contextual::Mongo do
             depeche.reload
           }.to raise_error(Mongoid::Errors::DocumentNotFound)
         end
-
-        context 'when a collation is specified on the criteria', if: collation_supported? do
-
-          let(:criteria) do
-            Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
-          end
-
-          let(:context) do
-            described_class.new(criteria)
-          end
-
-          let!(:result) do
-            context.find_one_and_delete
-          end
-
-          it "returns the first matching document" do
-            expect(result).to eq(depeche)
-          end
-
-          it "deletes the document from the database" do
-            expect {
-              depeche.reload
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
-          end
-        end
       end
     end
 
-    context "when the selector does not match" do
+    context 'when the selector does not match a document' do
 
       let(:criteria) do
         Band.where(name: "Placebo")
@@ -811,7 +991,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:result) do
-        context.find_one_and_update("$inc" => { likes: 1 })
+        context.find_one_and_delete
       end
 
       it "returns nil" do
