@@ -18,7 +18,18 @@ module Mongoid
       # Options constant.
       #
       # @since 5.0.0
-      OPTIONS = [ :hint, :limit, :skip, :sort, :batch_size, :max_scan, :max_time_ms, :snapshot, :comment, :read ].freeze
+      OPTIONS = [ :hint,
+                  :limit,
+                  :skip,
+                  :sort,
+                  :batch_size,
+                  :max_scan,
+                  :max_time_ms,
+                  :snapshot,
+                  :comment,
+                  :read,
+                  :cursor_type
+                ].freeze
 
       # @attribute [r] view The Mongo collection view.
       attr_reader :view
@@ -567,12 +578,6 @@ module Mongoid
         end
         if criteria.options[:timeout] == false
           @view = view.no_cursor_timeout
-        end
-        if criteria.options[:cursor_type]
-          # @todo: update to use #cursor_type method on view when driver 2.3 is released.
-          # See RUBY-1080
-          @view = view.clone
-          @view.options.merge!(cursor_type: criteria.options[:cursor_type])
         end
       end
 
