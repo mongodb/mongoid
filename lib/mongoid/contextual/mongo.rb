@@ -28,7 +28,8 @@ module Mongoid
                   :snapshot,
                   :comment,
                   :read,
-                  :cursor_type
+                  :cursor_type,
+                  :collation
                 ].freeze
 
       # @attribute [r] view The Mongo collection view.
@@ -67,8 +68,7 @@ module Mongoid
       # @since 3.0.0
       def count(options = {}, &block)
         return super(&block) if block_given?
-        opts = apply_collation(options)
-        try_cache(:count) { view.count(opts) }
+        try_cache(:count) { view.count(options) }
       end
 
       # Delete all documents in the database that match the selector.
@@ -114,8 +114,7 @@ module Mongoid
       #
       # @since 3.0.0
       def distinct(field)
-        opts = apply_collation
-        view.distinct(klass.database_field_name(field), opts).map do |value|
+        view.distinct(klass.database_field_name(field)).map do |value|
           value.class.demongoize(value)
         end
       end
@@ -581,10 +580,6 @@ module Mongoid
         if criteria.options[:timeout] == false
           @view = view.no_cursor_timeout
         end
-        if criteria.options[:collation]
-          @view = view.clone
-          @view.options.merge!(collation: criteria.options[:collation])
-        end
       end
 
       # Apply an option.
@@ -703,10 +698,6 @@ module Mongoid
             document : Factory.from_db(klass, document, criteria.options[:fields])
         yield(doc)
         documents.push(doc) if cacheable?
-      end
-
-      def apply_collation(options = {})
-        view.options[:collation] ? options.merge(collation: view.options[:collation]) : options
       end
     end
   end

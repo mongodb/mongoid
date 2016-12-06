@@ -188,21 +188,6 @@ describe Mongoid::Contextual::Mongo do
           expect(count).to eq(1)
         end
       end
-
-      context 'when the collation is passed as an argument' do
-
-        let(:criteria) do
-          Band.where(name: "DEPECHE MODE")
-        end
-
-        let(:count) do
-          context.count(collation: { locale: 'en_US', strength: 2 })
-        end
-
-        it 'applies the collation' do
-          expect(count).to eq(1)
-        end
-      end
     end
   end
 

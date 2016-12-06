@@ -14,8 +14,7 @@ module Mongoid
       #
       # @since 3.0.0
       def add_to_set(adds)
-        opts = apply_collation(view.options)
-        view.update_many({ "$addToSet" => collect_operations(adds) }, opts)
+        view.update_many({ "$addToSet" => collect_operations(adds) })
       end
 
       # Perform an atomic $bit operation on the matching documents.
@@ -29,8 +28,7 @@ module Mongoid
       #
       # @since 3.0.0
       def bit(bits)
-        opts = apply_collation(view.options)
-        view.update_many({ "$bit" => collect_operations(bits) }, opts)
+        view.update_many({ "$bit" => collect_operations(bits) })
       end
 
       # Perform an atomic $inc operation on the matching documents.
@@ -44,8 +42,7 @@ module Mongoid
       #
       # @since 3.0.0
       def inc(incs)
-        opts = apply_collation(view.options)
-        view.update_many({ "$inc" => collect_operations(incs) }, opts)
+        view.update_many({ "$inc" => collect_operations(incs) })
       end
 
       # Perform an atomic $pop operation on the matching documents.
@@ -62,8 +59,7 @@ module Mongoid
       #
       # @since 3.0.0
       def pop(pops)
-        opts = apply_collation(view.options)
-        view.update_many({ "$pop" => collect_operations(pops) }, opts)
+        view.update_many({ "$pop" => collect_operations(pops) })
       end
 
       # Perform an atomic $pull operation on the matching documents.
@@ -79,8 +75,7 @@ module Mongoid
       #
       # @since 3.0.0
       def pull(pulls)
-        opts = apply_collation(view.options)
-        view.update_many({ "$pull" => collect_operations(pulls) }, opts)
+        view.update_many({ "$pull" => collect_operations(pulls) })
       end
 
       # Perform an atomic $pullAll operation on the matching documents.
@@ -94,8 +89,7 @@ module Mongoid
       #
       # @since 3.0.0
       def pull_all(pulls)
-        opts = apply_collation(view.options)
-        view.update_many({ "$pullAll" => collect_operations(pulls) }, opts)
+        view.update_many({ "$pullAll" => collect_operations(pulls) })
       end
 
       # Perform an atomic $push operation on the matching documents.
@@ -109,8 +103,7 @@ module Mongoid
       #
       # @since 3.0.0
       def push(pushes)
-        opts = apply_collation(view.options)
-        view.update_many({ "$push" => collect_operations(pushes) }, opts)
+        view.update_many({ "$push" => collect_operations(pushes) })
       end
 
       # Perform an atomic $pushAll operation on the matching documents.
@@ -124,8 +117,7 @@ module Mongoid
       #
       # @since 3.0.0
       def push_all(pushes)
-        opts = apply_collation(view.options)
-        view.update_many({ "$pushAll" => collect_operations(pushes) }, opts)
+        view.update_many({ "$pushAll" => collect_operations(pushes) })
       end
 
       # Perform an atomic $rename of fields on the matching documents.
@@ -143,8 +135,7 @@ module Mongoid
           ops[old_name] = new_name.to_s
           ops
         end
-        opts = apply_collation(view.options)
-        view.update_many({ "$rename" => collect_operations(operations) }, opts)
+        view.update_many({ "$rename" => collect_operations(operations) })
       end
 
       # Perform an atomic $set of fields on the matching documents.
@@ -158,8 +149,7 @@ module Mongoid
       #
       # @since 3.0.0
       def set(sets)
-        opts = apply_collation(view.options)
-        view.update_many({ "$set" => collect_operations(sets) }, opts)
+        view.update_many({ "$set" => collect_operations(sets) })
       end
 
       # Perform an atomic $unset of a field on the matching documents.
@@ -174,8 +164,7 @@ module Mongoid
       # @since 3.0.0
       def unset(*args)
         fields = args.__find_args__.collect { |f| [database_field_name(f), true] }
-        opts = apply_collation(view.options)
-        view.update_many({ "$unset" => Hash[fields] }, opts)
+        view.update_many({ "$unset" => Hash[fields] })
       end
 
       private
@@ -185,10 +174,6 @@ module Mongoid
           operations[database_field_name(field)] = value.mongoize
           operations
         end
-      end
-
-      def apply_collation(options = {})
-        view.options[:collation] ? options.merge(collation: view.options[:collation]) : options
       end
     end
   end
