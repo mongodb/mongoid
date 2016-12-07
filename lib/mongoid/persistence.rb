@@ -147,8 +147,10 @@ module Mongoid
     #
     # @return [ true, false ] True if succeeded, false if not.
     def update(options = {})
-      Operations.update(self, options).persist
+      Operations.update(self, options).tap { |u| @last_update = u }.persist
     end
+
+    attr_reader :last_update
 
     # Update a single attribute and persist the entire document.
     # This skips validation but fires the callbacks.
