@@ -1417,7 +1417,7 @@ describe Mongoid::Contextual::Mongo do
       context 'when db is a string' do
 
         let(:results) do
-          context.map_reduce(map, reduce).out(merge: :mr_output, db: 'another-db').to_a
+          context.map_reduce(map, reduce).out(merge: :mr_output, db: 'another-db')
         end
 
         it "returns the correct number of documents" do
