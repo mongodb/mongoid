@@ -74,6 +74,10 @@ def non_legacy_server?
   Mongoid::Clients.default.cluster.servers.first.features.write_command_enabled?
 end
 
+def testing_replica_set?
+  Mongoid::Clients.default.cluster.replica_set?
+end
+
 def testing_locally?
   !(ENV['CI'] == 'travis')
 end

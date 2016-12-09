@@ -32,12 +32,13 @@ module Mongoid
       #
       # @since 3.0.0
       def each
+        validate_out!
         if block_given?
-          documents.each do |doc|
+          @map_reduce.each do |doc|
             yield doc
           end
         else
-          to_enum
+          @map_reduce.to_enum
         end
       end
 
@@ -64,7 +65,7 @@ module Mongoid
       #
       # @since 3.0.0
       def finalize(function)
-        command[:finalize] = function
+        @map_reduce = @map_reduce.finalize(function)
         self
       end
 
@@ -79,10 +80,9 @@ module Mongoid
       #
       # @since 3.0.0
       def initialize(collection, criteria, map, reduce)
-        @collection, @criteria = collection, criteria
-        command[:mapreduce] = collection.name.to_s
-        command[:map], command[:reduce] = map, reduce
-        apply_criteria_options
+        @collection = collection
+        @criteria = criteria
+        @map_reduce = @criteria.view.map_reduce(map, reduce)
       end
 
       # Get the number of documents that were input into the map/reduce.
@@ -106,7 +106,7 @@ module Mongoid
       #
       # @since 3.0.0
       def js_mode
-        command[:jsMode] = true
+        @map_reduce = @map_reduce.js_mode(true)
         self
       end
 
@@ -134,7 +134,7 @@ module Mongoid
         normalized.update_values do |value|
           value.is_a?(::Symbol) ? value.to_s : value
         end
-        command[:out] = normalized
+        @map_reduce = @map_reduce.out(normalized)
         self
       end
 
@@ -159,8 +159,12 @@ module Mongoid
       #
       # @since 3.0.0
       def raw
-        results
+        validate_out!
+        cmd = command
+        opts = { read: cmd.delete(:read).options } if cmd[:read]
+        @map_reduce.database.command(cmd, opts || {}).first
       end
+      alias :results :raw
 
       # Execute the map/reduce, returning the raw output.
       # Useful when you don't care about map/reduce's ouptut.
@@ -196,7 +200,7 @@ module Mongoid
       #
       # @since 3.0.0
       def scope(object)
-        command[:scope] = object
+        @map_reduce = @map_reduce.scope(object)
         self
       end
 
@@ -232,113 +236,14 @@ module Mongoid
 }
       end
 
+      def command
+        @map_reduce.send(:map_reduce_spec)[:selector]
+      end
+
       private
 
-      # Apply criteria specific options - query, sort, limit.
-      #
-      # @api private
-      #
-      # @example Apply the criteria options
-      #   map_reduce.apply_criteria_options
-      #
-      # @return [ nil ] Nothing.
-      #
-      # @since 3.0.0
-      def apply_criteria_options
-        command[:query] = criteria.selector
-        if sort = criteria.options[:sort]
-          command[:sort] = sort
-        end
-        if limit = criteria.options[:limit]
-          command[:limit] = limit
-        end
-      end
-
-      # Get the result documents from the map/reduce. If the output was inline
-      # then we grab them from the results key. If the output was a temp
-      # collection then we need to execute a find on that collection.
-      #
-      # @api private
-      #
-      # @example Get the documents.
-      #   map_reduce.documents
-      #
-      # @return [ Array, Cursor ] The documents.
-      #
-      # @since 3.0.0
-      def documents
-        return results["results"] if results.has_key?("results")
-        view = output_database[output_collection].find
-        view.no_cursor_timeout if criteria.options[:timeout] == false
-        view
-      end
-
-      # Get the database that the map/reduce results were stored in.
-      #
-      # @api private
-      #
-      # @example Get the output database.
-      #   map_reduce.output_database
-      #
-      # @return [ Mongo::Database ] The output database.
-      #
-      # @since 6.0.0
-      def output_database
-        if db = command[:out].fetch(:db, command[:out]['db'])
-          client.with(database: db).database
-        else
-          client.database
-        end
-      end
-
-      # Get the collection that the map/reduce results were stored in.
-      #
-      # @api private
-      #
-      # @example Get the output collection.
-      #   map_reduce.output_collection
-      #
-      # @return [ Symbol, String ] The output collection.
-      #
-      # @since 3.0.0
-      def output_collection
-        command[:out].values.first
-      end
-
-      # Execute the map/reduce command and get the results.
-      #
-      # @api private
-      #
-      # @example Get the results.
-      #   map_reduce.results
-      #
-      # @return [ Hash ] The results of the command.
-      #
-      # @since 3.0.0
-      def results
-        raise Errors::NoMapReduceOutput.new(command) unless command[:out]
-        @results ||= __client__.command(command,__client__.options).first
-      end
-
-      # Get the client with the proper consistency.
-      #
-      # @api private
-      #
-      # @note We can use eventual if the output is set to inline.
-      #
-      # @example Get the client.
-      #   map_reduce.__client__
-      #
-      # @return [ Mongo::Client ] The client with consistency set.
-      #
-      # @since 3.0.15
-      def __client__
-        if command[:out][:inline] != 1
-          # @todo: close
-          client.with(read: { mode: :primary })
-        else
-          client
-        end
+      def validate_out!
+        raise Errors::NoMapReduceOutput.new({}) unless @map_reduce.out
       end
     end
   end
