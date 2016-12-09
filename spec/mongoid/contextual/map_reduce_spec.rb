@@ -308,7 +308,7 @@ describe Mongoid::Contextual::MapReduce do
           Band.all.read(mode: :secondary)
         end
 
-        it "passes the command to the client, using the client options", if: testing_replica_set? do
+        it "uses the read preference", if: testing_replica_set? do
 
           expect {
             replace_map_reduce.raw
