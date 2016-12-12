@@ -45,7 +45,7 @@ module Mongoid #:nodoc
       self.non_proc_defaults = []
       self.proc_defaults = []
 
-      field(:_type, :type => String)
+      field(:_type, :type => Array)
       field(:_id, :type => BSON::ObjectId)
 
       alias :id :_id

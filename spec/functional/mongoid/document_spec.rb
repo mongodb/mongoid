@@ -141,7 +141,11 @@ describe Mongoid::Document do
 
         it "sets the class type" do
           became = @obj.becomes(@to_become)
-          became._type.should == @to_become.to_s
+          if ctx == 'upcasting'
+            became._type.should == [@to_become.to_s]
+          else
+            became._type.should == [@to_become.to_s, @klass.to_s]
+          end
         end
 
         it "raises an error when inappropriate class is provided" do

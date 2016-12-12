@@ -39,7 +39,7 @@ module Mongoid #:nodoc:
       if type.blank?
         klass.instantiate(attributes)
       else
-        type.camelize.constantize.instantiate(attributes)
+        Array(type).first.camelize.constantize.instantiate(attributes)
       end
     end
   end

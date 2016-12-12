@@ -92,6 +92,16 @@ module Mongoid #:nodoc:
       #
       # @since 2.0.0.rc.7
       def process_attribute(name, value)
+        if name.to_s == '_type' && value.is_a?(String)
+          array_value = []
+          array_value << self.class.name
+          superklass = self.class.superclass
+          while superklass.include?(Mongoid::Document)
+            array_value << superklass.name
+            superklass = superklass.superclass
+          end
+          value = array_value
+        end
         if Mongoid.allow_dynamic_fields && !respond_to?("#{name}=")
           write_attribute(name, value)
         else

@@ -19,7 +19,7 @@ describe Mongoid::Identity do
       end
 
       it "sets the document type to the class name" do
-        movie._type.should == "Movie"
+        movie._type.should == ["Movie"]
       end
     end
 
@@ -34,7 +34,7 @@ describe Mongoid::Identity do
       end
 
       it "sets the document _type to the class name" do
-        canvas._type.should == "Canvas"
+        canvas._type.should == ["Canvas"]
       end
     end
 
@@ -47,7 +47,7 @@ describe Mongoid::Identity do
         let(:browser){ Browser.new }
 
         it "sets the document _type to the class name" do
-          browser._type.should == "Browser"
+          browser._type.should == ["Browser", "Canvas"]
         end
       end
 
@@ -55,7 +55,7 @@ describe Mongoid::Identity do
         let(:browser){ Browser.new :id => 1234 }
 
         it "sets the document _type to the class name" do
-          browser._type.should == "Browser"
+          browser._type.should == ["Browser", "Canvas"]
         end
       end
     end
