@@ -59,7 +59,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded?
-      @embedded ||= (cyclic ? _parent.present? : self.class.embedded?)
+      @embedded ||= (metadata && metadata.cyclic ? _parent.present? : self.class.embedded?)
     end
 
     # Determine if the document is part of an embeds_many relation.
