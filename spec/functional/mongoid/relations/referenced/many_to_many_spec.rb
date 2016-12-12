@@ -921,7 +921,6 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       end
 
       before do
-        person.preferences.count
         person.preferences << Preference.create(:name => "two")
       end
 
@@ -936,8 +935,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         person.preferences.build(:name => "settings")
       end
 
-      it "returns 0" do
-        person.preferences.count.should == 0
+      it "returns 1" do
+        person.preferences.count.should == 1
       end
     end
 
@@ -1388,8 +1387,8 @@ describe Mongoid::Relations::Referenced::ManyToMany do
         person.preferences.build
       end
 
-      it "returns false" do
-        person.preferences.exists?.should == false
+      it "returns true" do
+        person.preferences.exists?.should == true
       end
     end
   end

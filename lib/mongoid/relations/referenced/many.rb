@@ -8,8 +8,7 @@ module Mongoid #:nodoc:
       class Many < Relations::Many
         include Batch
 
-        delegate :count, :to => :criteria
-        delegate :first, :in_memory, :last, :reset, :uniq, :to => :target
+        delegate :first, :in_memory, :last, :reset, :uniq, :count, :to => :target
 
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
