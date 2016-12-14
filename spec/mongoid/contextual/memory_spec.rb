@@ -47,6 +47,21 @@ describe Mongoid::Contextual::Memory do
           expect(context.send(method)).to be true
         end
       end
+
+      context 'when there is a collation on the criteria' do
+
+        let(:criteria) do
+          Address.where(street: "hobrecht").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context.send(method)
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
+      end
     end
   end
 
@@ -74,6 +89,21 @@ describe Mongoid::Contextual::Memory do
 
       it "returns the number of matches" do
         expect(context.count).to eq(1)
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(street: "hobrecht").tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.count
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
       end
     end
 
@@ -245,6 +275,21 @@ describe Mongoid::Contextual::Memory do
           expect(deleted).to eq(1)
         end
       end
+
+      context 'when there is a collation on the criteria' do
+
+        let(:criteria) do
+          Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
+            crit.documents = [ hobrecht, friedel, pfluger ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context.send(method)
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
+      end
     end
   end
 
@@ -278,36 +323,54 @@ describe Mongoid::Contextual::Memory do
 
     describe "##{method}" do
 
-      let!(:destroyed) do
-        context.send(method)
+      context 'when there is no collation on the criteria' do
+
+        let!(:destroyed) do
+          context.send(method)
+        end
+
+        it "deletes the first matching document" do
+          expect(hobrecht).to be_destroyed
+        end
+
+        it "deletes the last matching document" do
+          expect(friedel).to be_destroyed
+        end
+
+        it "does not delete non matching docs" do
+          expect(pfluger).to_not be_destroyed
+        end
+
+        it "removes the docs from the relation" do
+          expect(person.addresses).to eq([ pfluger ])
+        end
+
+        it "removes the docs from the context" do
+          expect(context.entries).to be_empty
+        end
+
+        it "persists the changes to the database" do
+          expect(person.reload.addresses).to eq([ pfluger ])
+        end
+
+        it "returns the number of destroyed documents" do
+          expect(destroyed).to eq(2)
+        end
       end
 
-      it "deletes the first matching document" do
-        expect(hobrecht).to be_destroyed
-      end
+      context 'when there is a collation on the criteria' do
 
-      it "deletes the last matching document" do
-        expect(friedel).to be_destroyed
-      end
+        let(:criteria) do
+          Address.any_in(street: [ "hobrecht", "friedel" ]).tap do |crit|
+            crit.documents = [ hobrecht, friedel, pfluger ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
 
-      it "does not delete non matching docs" do
-        expect(pfluger).to_not be_destroyed
-      end
-
-      it "removes the docs from the relation" do
-        expect(person.addresses).to eq([ pfluger ])
-      end
-
-      it "removes the docs from the context" do
-        expect(context.entries).to be_empty
-      end
-
-      it "persists the changes to the database" do
-        expect(person.reload.addresses).to eq([ pfluger ])
-      end
-
-      it "returns the number of destroyed documents" do
-        expect(destroyed).to eq(2)
+        it "raises an exception" do
+          expect {
+            context.send(method)
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
       end
     end
   end
@@ -353,6 +416,21 @@ describe Mongoid::Contextual::Memory do
 
       it "returns the distinct field values" do
         expect(context.distinct(:street)).to eq([ "hobrecht", "friedel" ])
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(street: "hobrecht").tap do |crit|
+          crit.documents = [ hobrecht, hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.distinct(:street)
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
       end
     end
   end
@@ -441,6 +519,21 @@ describe Mongoid::Contextual::Memory do
         end
       end
     end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(street: "hobrecht").tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.each
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
   end
 
   describe "#exists?" do
@@ -486,6 +579,21 @@ describe Mongoid::Contextual::Memory do
         expect(context).to_not be_exists
       end
     end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(street: "pfluger").tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
   end
 
   [ :first, :one ].each do |method|
@@ -512,6 +620,21 @@ describe Mongoid::Contextual::Memory do
 
       it "returns the first matching document" do
         expect(context.send(method)).to eq(hobrecht)
+      end
+
+      context 'when there is a collation on the criteria' do
+
+        let(:criteria) do
+          Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context.send(method)
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
       end
     end
   end
@@ -600,6 +723,21 @@ describe Mongoid::Contextual::Memory do
         expect(context).to eq([ hobrecht ])
       end
     end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.limit(1).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
   end
 
   describe "#last" do
@@ -624,6 +762,21 @@ describe Mongoid::Contextual::Memory do
 
     it "returns the last matching document" do
       expect(context.last).to eq(friedel)
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.where(:street.in => [ "hobrecht", "friedel" ]).tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.last
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
     end
   end
 
@@ -672,6 +825,21 @@ describe Mongoid::Contextual::Memory do
           expect(context.send(method)).to eq(0)
         end
       end
+
+      context 'when there is a collation on the criteria' do
+
+        let(:criteria) do
+          Address.where(street: "hobrecht").tap do |crit|
+            crit.documents = [ hobrecht, friedel ]
+          end.collation(locale: 'en_US', strength: 2)
+        end
+
+        it "raises an exception" do
+          expect {
+            context.send(method)
+          }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+        end
+      end
     end
   end
 
@@ -699,32 +867,50 @@ describe Mongoid::Contextual::Memory do
       described_class.new(criteria)
     end
 
-    let!(:limit) do
-      context.limit(2)
-    end
+    context 'when there is no collation on the criteria' do
 
-    it "returns the context" do
-      expect(limit).to eq(context)
-    end
-
-    context "when asking for all documents" do
-
-      context "when only a limit exists" do
-
-        it "only returns the limited documents" do
-          expect(context.entries).to eq([ hobrecht, friedel ])
-        end
+      let!(:limit) do
+        context.limit(2)
       end
 
-      context "when a skip and limit exist" do
+      it "returns the context" do
+        expect(limit).to eq(context)
+      end
 
-        before do
-          limit.skip(1)
+      context "when asking for all documents" do
+
+        context "when only a limit exists" do
+
+          it "only returns the limited documents" do
+            expect(context.entries).to eq([ hobrecht, friedel ])
+          end
         end
 
-        it "applies the skip before the limit" do
-          expect(context.entries).to eq([ friedel, pfluger ])
+        context "when a skip and limit exist" do
+
+          before do
+            limit.skip(1)
+          end
+
+          it "applies the skip before the limit" do
+            expect(context.entries).to eq([ friedel, pfluger ])
+          end
         end
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel, pfluger ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.limit(2)
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
       end
     end
   end
@@ -784,6 +970,21 @@ describe Mongoid::Contextual::Memory do
         end
       end
     end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.pluck(:foo, :bar)
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
   end
 
   describe "#skip" do
@@ -810,32 +1011,50 @@ describe Mongoid::Contextual::Memory do
       described_class.new(criteria)
     end
 
-    let!(:skip) do
-      context.skip(1)
-    end
+    context 'when there is no collation on the criteria' do
 
-    it "returns the context" do
-      expect(skip).to eq(context)
-    end
-
-    context "when asking for all documents" do
-
-      context "when only a skip exists" do
-
-        it "skips the correct number" do
-          expect(context.entries).to eq([ friedel, pfluger ])
-        end
+      let!(:skip) do
+        context.skip(1)
       end
 
-      context "when a skip and limit exist" do
+      it "returns the context" do
+        expect(skip).to eq(context)
+      end
 
-        before do
-          skip.limit(1)
+      context "when asking for all documents" do
+
+        context "when only a skip exists" do
+
+          it "skips the correct number" do
+            expect(context.entries).to eq([ friedel, pfluger ])
+          end
         end
 
-        it "applies the skip before the limit" do
-          expect(context.entries).to eq([ friedel ])
+        context "when a skip and limit exist" do
+
+          before do
+            skip.limit(1)
+          end
+
+          it "applies the skip before the limit" do
+            expect(context.entries).to eq([ friedel ])
+          end
         end
+      end
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel, pfluger ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.skip(1)
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
       end
     end
   end
@@ -991,6 +1210,21 @@ describe Mongoid::Contextual::Memory do
         expect(context.entries).to eq([ friedel, hobrecht, pfluger ])
       end
     end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.tap do |crit|
+          crit.documents = [ hobrecht, friedel, pfluger ]
+        end.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.sort(state: 1)
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
   end
 
   describe "#update" do
@@ -1118,6 +1352,19 @@ describe Mongoid::Contextual::Memory do
         end
       end
     end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.update
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
+    end
   end
 
   describe "#update_all" do
@@ -1136,6 +1383,19 @@ describe Mongoid::Contextual::Memory do
 
     let(:pfluger) do
       person.addresses.create(street: "pfluger")
+    end
+
+    context 'when there is a collation on the criteria' do
+
+      let(:criteria) do
+        Address.all.collation(locale: 'en_US', strength: 2)
+      end
+
+      it "raises an exception" do
+        expect {
+          context.update_all({})
+        }.to raise_exception(Mongoid::Errors::InMemoryCollationNotSupported)
+      end
     end
 
     context "when the documents are empty" do
