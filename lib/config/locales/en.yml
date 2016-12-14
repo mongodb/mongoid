@@ -73,6 +73,9 @@ en:
           summary: "%{klass}.collection was called, and %{klass} is an embedded
             document - it resides within the collection of the root document of
             the hierarchy."
+          resolution: "For access to the collection that the embedded document is
+            in, use %{klass}#_root.collection, or do not attempt to persist an
+            embedded document without a parent set."
         in_memory_collation_not_supported:
           message: "A collation option cannot be applied when querying documents in-memory."
           summary: "The query being run against documents in memory has a collation option set.
