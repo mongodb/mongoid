@@ -2640,6 +2640,17 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       it "applies the criteria to the documents" do
         expect(preferences).to eq([ preference_one ])
       end
+
+      context 'when providing a collation' do
+
+        let(:preferences) do
+          person.preferences.where(name: "FRIST").collation(locale: 'en_US', strength: 2)
+        end
+
+        it "applies the collation option to the query" do
+          expect(preferences).to eq([ preference_one ])
+        end
+      end
     end
 
     context "when providing a criteria on id" do
