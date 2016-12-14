@@ -122,6 +122,34 @@ describe Mongoid::Indexable do
         expect(indexes.get(_type: 1)).to_not be_nil
       end
     end
+
+    context "when a collation option is specified", if: collation_supported? do
+
+      let(:klass) do
+        Class.new do
+          include Mongoid::Document
+          store_in collection: "test_db_indexes"
+          index({ name: 1 }, { collation: { locale: 'en_US', strength: 2 }})
+        end
+      end
+
+      before do
+        klass.create_indexes
+      end
+
+      after do
+        klass.remove_indexes
+      end
+
+      let(:indexes) do
+        klass.collection.indexes
+      end
+
+      it "creates the indexes" do
+        expect(indexes.get("name_1")["collation"]).to_not be_nil
+        expect(indexes.get("name_1")["collation"]["locale"]).to eq('en_US')
+      end
+    end
   end
 
   describe ".add_indexes" do
@@ -267,6 +295,21 @@ describe Mongoid::Indexable do
 
       it "sets the index with background options" do
         expect(options).to eq(background: true)
+      end
+    end
+
+    context "when providing a collation option", if: collation_supported? do
+
+      before do
+        klass.index({ name: 1 }, collation: { locale: 'en_US', strength: 2 })
+      end
+
+      let(:options) do
+        klass.index_specification(name: 1).options
+      end
+
+      it "sets the index with background options" do
+        expect(options).to eq(collation: { locale: 'en_US', strength: 2 })
       end
     end
 

@@ -140,9 +140,18 @@ en:
             \_\_min: 1\n
             \_\_max: 1\n
             \_\_bits: 26\n
+            \_\_key: 26\n
             \_\_bucket_size : 1\n
+            \_\_sphere_version : 1\n
+            \_\_text_version : 1\n
+            \_\_version : 1\n
             \_\_weights: { content: 1, title: 2 }\n
             \_\_expire_after_seconds: number_of_seconds\n
+            \_\_partial_filter_expression\n
+            \_\_storage_engine\n
+            \_\_language_override\n
+            \_\_default_language\n
+            \_\_collation\n
             Valid types are: 1, -1, '2d', '2dsphere', 'geoHaystack', 'text', 'hashed'\n\n
             Example:\n
             \_\_class Band\n
