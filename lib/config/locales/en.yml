@@ -73,9 +73,12 @@ en:
           summary: "%{klass}.collection was called, and %{klass} is an embedded
             document - it resides within the collection of the root document of
             the hierarchy."
-          resolution: "For access to the collection that the embedded document is
-            in, use %{klass}#_root.collection, or do not attempt to persist an
-            embedded document without a parent set."
+        in_memory_collation_not_supported:
+          message: "A collation option cannot be applied when querying documents in-memory."
+          summary: "The query being run against documents in memory has a collation option set.
+            A collation option is only supported if the query is executed on a MongoDB server
+            with version >= 3.4."
+          resolution: "Remove the collation option from the query."
         invalid_config_option:
           message: "Invalid configuration option: %{name}."
           summary: "A invalid configuration option was provided in your
