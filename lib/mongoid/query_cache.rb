@@ -237,7 +237,7 @@ module Mongoid
 
       def cached_cursor
         if limit
-          key = [ collection.namespace, selector, nil, skip, sort, projection ]
+          key = [ collection.namespace, selector, nil, skip, sort, projection, collation  ]
           cursor = QueryCache.cache_table[key]
           if cursor
             limited_docs = cursor.to_a[0...limit.abs]
@@ -248,7 +248,7 @@ module Mongoid
       end
 
       def cache_key
-        [ collection.namespace, selector, limit, skip, sort, projection ]
+        [ collection.namespace, selector, limit, skip, sort, projection, collation ]
       end
 
       def system_collection?
