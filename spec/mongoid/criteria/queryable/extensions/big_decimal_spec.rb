@@ -4,7 +4,7 @@ describe BigDecimal do
 
   describe ".evolve" do
 
-    context 'when serialize_big_decimal_to_decimal128 is false' do
+    context 'when map_big_decimal_to_decimal128 is false' do
 
       context "when provided a big decimal" do
 
@@ -59,14 +59,14 @@ describe BigDecimal do
       end
     end
 
-    context 'when serialize_big_decimal_to_decimal128 is true' do
+    context 'when map_big_decimal_to_decimal128 is true' do
 
       before do
-        Mongoid.serialize_big_decimal_to_decimal128 = true
+        Mongoid.map_big_decimal_to_decimal128 = true
       end
 
       after do
-        Mongoid.serialize_big_decimal_to_decimal128 = false
+        Mongoid.map_big_decimal_to_decimal128 = false
       end
 
       context "when provided a big decimal" do
