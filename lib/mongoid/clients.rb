@@ -64,8 +64,7 @@ module Mongoid
         name_as_symbol = name.to_sym
         return clients[name_as_symbol] if clients[name_as_symbol]
         CREATE_LOCK.synchronize do
-          return clients[name_as_symbol] if clients[name_as_symbol]
-          clients[name_as_symbol] = Clients::Factory.create(name)
+          clients[name_as_symbol] ||= Clients::Factory.create(name)
         end
       end
 
