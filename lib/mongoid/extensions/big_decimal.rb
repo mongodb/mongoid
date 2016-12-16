@@ -59,11 +59,7 @@ module Mongoid
         def demongoize(object)
           if object
             if object.is_a?(BSON::Decimal128)
-              if Mongoid.map_big_decimal_to_decimal128
-                object.to_big_decimal
-              else
-                raise Mongoid::Errors::UnmappedBSONType.new(object)
-              end
+              demongoize_from_decimal128(object)
             elsif object.numeric?
               ::BigDecimal.new(object.to_s)
             end
@@ -83,14 +79,28 @@ module Mongoid
         def mongoize(object)
           if object
             if Mongoid.map_big_decimal_to_decimal128
-              if object.is_a?(BigDecimal)
-                BSON::Decimal128.new(object)
-              elsif object.numeric?
-                BSON::Decimal128.new(object.to_s)
-              end
+              mongoize_to_decimal128(object)
             elsif object.numeric?
               object.to_s
             end
+          end
+        end
+
+        private
+
+        def demongoize_from_decimal128(object)
+          if Mongoid.map_big_decimal_to_decimal128
+            object.to_big_decimal
+          else
+            raise Mongoid::Errors::UnmappedBSONType.new(object)
+          end
+        end
+
+        def mongoize_to_decimal128(object)
+          if object.is_a?(BigDecimal)
+            BSON::Decimal128.new(object)
+          elsif object.numeric?
+            BSON::Decimal128.new(object.to_s)
           end
         end
       end
