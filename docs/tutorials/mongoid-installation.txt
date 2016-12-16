@@ -73,6 +73,11 @@ supported on your runtime and server.
      - Yes
      - Yes
 
+   * - JRuby 9.1.x
+     - Yes
+     - Yes
+     - Yes
+
 .. _mongoid-configuration:
 
 Configuration
