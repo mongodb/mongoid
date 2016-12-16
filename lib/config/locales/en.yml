@@ -456,7 +456,9 @@ en:
           resolution: "Verify your Mongoid configuration. If the
             database value is a BSON::Decimal128 object and the field type is
             BigDecimal, check whether you have the map_big_decimal_to_decimal128
-            option set so that the value can be mapped to a BigDecimal."
+            option set so that the value can be mapped to a BigDecimal. Keep in mind
+            that there may be a loss in precision when BSON::Decimal128 objects are
+            converted to Ruby BigDecimals."
         unknown_attribute:
           message: "Attempted to set a value for '%{name}' which is not
             allowed on the model %{klass}."
