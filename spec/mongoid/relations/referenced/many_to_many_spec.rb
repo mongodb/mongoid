@@ -2644,8 +2644,7 @@ describe Mongoid::Relations::Referenced::ManyToMany do
       context 'when providing a collation', if: collation_supported? do
 
         let(:preferences) do
-          e = person.preferences.where(name: "FIRST").collation(locale: 'en_US', strength: 2)
-          e.to_a
+          person.preferences.where(name: "FIRST").collation(locale: 'en_US', strength: 2).to_a
         end
 
         it "applies the collation option to the query" do

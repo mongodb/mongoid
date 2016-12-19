@@ -230,12 +230,12 @@ describe Mongoid::Scopable do
       context 'when a collation is defined on the criteria', if: collation_supported? do
 
         before do
-          Band.scope(:tests, ->{ Band.where(name: 'testing').collation(locale: 'en_US', strength: 2) })
-          Band.create(name: 'TESTING')
+          Band.scope(:tests, ->{ Band.where(name: 'TESTING').collation(locale: 'en_US', strength: 2) })
+          Band.create(name: 'testing')
         end
 
         it 'applies the collation' do
-          expect(Band.tests.first['name']).to eq('TESTING')
+          expect(Band.tests.first['name']).to eq('testing')
         end
       end
 

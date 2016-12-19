@@ -308,7 +308,7 @@ describe Mongoid::Indexable do
         klass.index_specification(name: 1).options
       end
 
-      it "sets the index with background options" do
+      it "sets the index with a collation option" do
         expect(options).to eq(collation: { locale: 'en_US', strength: 2 })
       end
     end

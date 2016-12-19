@@ -774,7 +774,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_one_and_replace({ name: 'FKA Twigs', likes: 1}, return_document: :after)
+          context.find_one_and_replace({ likes: 1 }, return_document: :after)
         end
 
         it "returns the first matching document" do
@@ -782,6 +782,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "returns the updated document" do
+          expect(result.name).to be_nil
           expect(result.likes).to eq(1)
         end
       end
@@ -797,7 +798,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         let!(:result) do
-          context.find_one_and_replace({ name: 'FKA Twigs', likes: 1 }, return_document: :after)
+          context.find_one_and_replace({ likes: 1 }, return_document: :after)
         end
 
         it "returns the first matching document" do
@@ -806,7 +807,7 @@ describe Mongoid::Contextual::Mongo do
 
         it "returns the updated document" do
           expect(result.likes).to eq(1)
-          expect(result.name).to eq('FKA Twigs')
+          expect(result.name).to be_nil
         end
       end
     end
