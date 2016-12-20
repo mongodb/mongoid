@@ -13,6 +13,7 @@ class Band
   field :upserted, type: Mongoid::Boolean, default: false
   field :created, type: DateTime
   field :sales, type: BigDecimal
+  field :decimal, type: BSON::Decimal128
   field :y, as: :years, type: Integer
   field :founded, type: Date
   field :deleted, type: Boolean
