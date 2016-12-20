@@ -40,6 +40,5 @@ describe Mongoid::Extensions::Decimal128 do
         expect(evolved).to eq([decimal128, other_decimal128])
       end
     end
-
   end
 end
