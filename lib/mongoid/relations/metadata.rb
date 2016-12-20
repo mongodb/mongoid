@@ -778,10 +778,10 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def validate?
-        unless self[:validate].nil?
-          self[:validate]
-        else
+        if self[:validate].nil?
           self[:validate] = relation.validation_default
+        else
+          self[:validate]
         end
       end
 
