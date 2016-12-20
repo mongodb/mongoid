@@ -3477,6 +3477,25 @@ describe Mongoid::Criteria do
         end
       end
 
+      context "when querying on a big decimal" do
+
+        let(:decimal) do
+          BSON::Decimal128.new("0.0005")
+        end
+
+        let!(:band) do
+          Band.create(name: "Boards of Canada", decimal: decimal)
+        end
+
+        let(:from_db) do
+          Band.where(decimal: decimal).first
+        end
+
+        it "finds the document by the big decimal value" do
+          expect(from_db).to eq(band)
+        end
+      end
+
       context 'when querying on a polymorphic relation' do
 
         let(:movie) do
