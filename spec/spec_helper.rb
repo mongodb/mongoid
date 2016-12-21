@@ -75,6 +75,10 @@ def testing_locally?
   !(ENV['CI'] == 'travis')
 end
 
+def testing_replica_set?
+  Mongoid::Clients.default.cluster.replica_set?
+end
+
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
