@@ -73,6 +73,29 @@ describe Mongoid::Contextual::Atomic do
         expect(smiths.reload.members).to eq([ "Dave" ])
       end
     end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let(:criteria) do
+        Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.add_to_set(members: "Dave", genres: "Electro")
+      end
+
+      it "does not add duplicates" do
+        expect(depeche_mode.reload.members).to eq([ "Dave" ])
+      end
+
+      it "adds multiple operations" do
+        expect(depeche_mode.reload.genres).to eq([ "Electro" ])
+      end
+    end
   end
 
   describe "#bit" do
@@ -112,6 +135,29 @@ describe Mongoid::Contextual::Atomic do
     end
 
     context "when chaining bitwise operations" do
+
+      before do
+        context.bit(likes: { and: 13, or: 10 })
+      end
+
+      it "performs the bitwise operation on initialized fields" do
+        expect(depeche_mode.reload.likes).to eq(14)
+      end
+    end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ], likes: 60)
+      end
+
+      let(:criteria) do
+        Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
 
       before do
         context.bit(likes: { and: 13, or: 10 })
@@ -177,6 +223,29 @@ describe Mongoid::Contextual::Atomic do
         expect(beatles.reload.y).to eq(3)
       end
     end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
+
+      let(:criteria) do
+        Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.inc(years: 1)
+      end
+
+      it "incs the value and read from alias" do
+        expect(depeche_mode.reload.years).to eq(1)
+      end
+    end
   end
 
   describe "#pop" do
@@ -226,6 +295,29 @@ describe Mongoid::Contextual::Atomic do
         expect(smiths.reload.members).to be_nil
       end
     end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
+
+      let(:criteria) do
+        Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.pop(members: 1)
+      end
+
+      it "pops the last element off the array" do
+        expect(depeche_mode.reload.members).to be_empty
+      end
+    end
   end
 
   describe "#pull" do
@@ -257,129 +349,276 @@ describe Mongoid::Contextual::Atomic do
     it "does not error on non existent fields" do
       expect(smiths.reload.members).to be_nil
     end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
+
+      let(:criteria) do
+        Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.pull(members: "DAVE")
+      end
+
+      it "pulls when the value is found" do
+        expect(depeche_mode.reload.members).to be_empty
+      end
+    end
   end
 
   describe "#pull_all" do
 
-    let!(:depeche_mode) do
-      Band.create(members: [ "Dave", "Alan", "Fletch" ])
+    context 'when the criteria does not have a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave", "Alan", "Fletch" ])
+      end
+
+      let!(:smiths) do
+        Band.create
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.pull_all(members: [ "Alan", "Dave" ])
+      end
+
+      it "pulls when the values are found" do
+        expect(depeche_mode.reload.members).to eq([ "Fletch" ])
+      end
+
+      it "does not error on non existent fields" do
+        expect(smiths.reload.members).to be_nil
+      end
     end
 
-    let!(:smiths) do
-      Band.create
-    end
+    context 'when the criteria has a collation', if: collation_supported? do
 
-    let(:criteria) do
-      Band.all
-    end
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave", "Alan", "Fletch" ])
+      end
 
-    let(:context) do
-      Mongoid::Contextual::Mongo.new(criteria)
-    end
+      let(:criteria) do
+        Band.all.collation(locale: 'en_US', strength: 2)
+      end
 
-    before do
-      context.pull_all(members: [ "Alan", "Dave" ])
-    end
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
 
-    it "pulls when the values are found" do
-      expect(depeche_mode.reload.members).to eq([ "Fletch" ])
-    end
+      before do
+        context.pull_all(members: [ "ALAN", "DAVE" ])
+      end
 
-    it "does not error on non existent fields" do
-      expect(smiths.reload.members).to be_nil
+      it "pulls when the value is found" do
+        expect(depeche_mode.reload.members).to eq([ "Fletch" ])
+      end
     end
   end
 
   describe "#push" do
 
-    let!(:depeche_mode) do
-      Band.create(members: [ "Dave" ])
+    context 'when the criteria does not have a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
+
+      let!(:smiths) do
+        Band.create
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.push(members: "Alan")
+      end
+
+      it "pushes the value to existing arrays" do
+        expect(depeche_mode.reload.members).to eq([ "Dave", "Alan" ])
+      end
+
+      it "pushes to non existent fields" do
+        expect(smiths.reload.members).to eq([ "Alan" ])
+      end
     end
 
-    let!(:smiths) do
-      Band.create
-    end
+    context 'when the criteria has a collation', if: collation_supported? do
 
-    let(:criteria) do
-      Band.all
-    end
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
 
-    let(:context) do
-      Mongoid::Contextual::Mongo.new(criteria)
-    end
+      let!(:smiths) do
+        Band.create
+      end
 
-    before do
-      context.push(members: "Alan")
-    end
+      let(:criteria) do
+        Band.where(members: ['DAVE']).collation(locale: 'en_US', strength: 2)
+      end
 
-    it "pushes the value to existing arrays" do
-      expect(depeche_mode.reload.members).to eq([ "Dave", "Alan" ])
-    end
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
 
-    it "pushes to non existent fields" do
-      expect(smiths.reload.members).to eq([ "Alan" ])
+      before do
+        context.push(members: "Alan")
+      end
+
+      it "pushes the value to existing arrays" do
+        expect(depeche_mode.reload.members).to eq([ "Dave", "Alan" ])
+      end
+
+      it "pushes to non existent fields" do
+        expect(smiths.reload.members).to be_nil
+      end
     end
   end
 
   describe "#push_all" do
 
-    let!(:depeche_mode) do
-      Band.create(members: [ "Dave" ])
+    context 'when the criteria does not have a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
+
+      let!(:smiths) do
+        Band.create
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.push_all(members: [ "Alan", "Fletch" ])
+      end
+
+      it "pushes the values to existing arrays" do
+        expect(depeche_mode.reload.members).to eq([ "Dave", "Alan", "Fletch" ])
+      end
+
+      it "pushes to non existent fields" do
+        expect(smiths.reload.members).to eq([ "Alan", "Fletch" ])
+      end
     end
 
-    let!(:smiths) do
-      Band.create
-    end
+    context 'when the criteria has a collation', if: collation_supported? do
 
-    let(:criteria) do
-      Band.all
-    end
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
 
-    let(:context) do
-      Mongoid::Contextual::Mongo.new(criteria)
-    end
+      let!(:smiths) do
+        Band.create
+      end
 
-    before do
-      context.push_all(members: [ "Alan", "Fletch" ])
-    end
+      let(:criteria) do
+        Band.where(members: ['DAVE']).collation(locale: 'en_US', strength: 2)
+      end
 
-    it "pushes the values to existing arrays" do
-      expect(depeche_mode.reload.members).to eq([ "Dave", "Alan", "Fletch" ])
-    end
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
 
-    it "pushes to non existent fields" do
-      expect(smiths.reload.members).to eq([ "Alan", "Fletch" ])
+      before do
+        context.push_all(members: [ "Alan", "Fletch" ])
+      end
+
+      it "pushes the values to existing arrays" do
+        expect(depeche_mode.reload.members).to eq([ "Dave", "Alan", "Fletch" ])
+      end
     end
   end
 
   describe "#rename" do
 
-    let!(:depeche_mode) do
-      Band.create(members: [ "Dave" ])
+    context 'when the criteria does not have a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
+
+      let!(:smiths) do
+        Band.create
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.rename(members: :artists)
+      end
+
+      it "renames existing fields" do
+        expect(depeche_mode.reload.artists).to eq([ "Dave" ])
+      end
+
+      it "does not rename non existent fields" do
+        expect(smiths.reload).to_not respond_to(:artists)
+      end
     end
 
-    let!(:smiths) do
-      Band.create
-    end
+    context 'when the criteria has a collation', if: collation_supported? do
 
-    let(:criteria) do
-      Band.all
-    end
+      let!(:depeche_mode) do
+        Band.create(members: [ "Dave" ])
+      end
 
-    let(:context) do
-      Mongoid::Contextual::Mongo.new(criteria)
-    end
+      let!(:smiths) do
+        Band.create
+      end
 
-    before do
-      context.rename(members: :artists)
-    end
+      let(:criteria) do
+        Band.where(members: ['DAVE']).collation(locale: 'en_US', strength: 2)
+      end
 
-    it "renames existing fields" do
-      expect(depeche_mode.reload.artists).to eq([ "Dave" ])
-    end
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
 
-    it "does not rename non existent fields" do
-      expect(smiths.reload).to_not respond_to(:artists)
+      before do
+        context.rename(members: :artists)
+      end
+
+      it "renames existing fields" do
+        expect(depeche_mode.reload.artists).to eq([ "Dave" ])
+      end
+
+      it "does not rename non existent fields" do
+        expect(smiths.reload).to_not respond_to(:artists)
+      end
     end
   end
 
@@ -507,6 +746,33 @@ describe Mongoid::Contextual::Atomic do
         it "unsets the aliased field" do
           expect(new_order.reload.years).to be_nil
         end
+      end
+    end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let!(:depeche_mode) do
+        Band.create(name: "Depeche Mode", years: 10)
+      end
+
+      let!(:new_order) do
+        Band.create(name: "New Order", years: 10)
+      end
+
+      let(:criteria) do
+        Band.where(name: 'DEPECHE MODE').collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.unset(:name)
+      end
+
+      it "unsets the unaliased field" do
+        expect(depeche_mode.reload.name).to be_nil
       end
     end
   end
