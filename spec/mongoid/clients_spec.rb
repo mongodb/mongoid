@@ -424,6 +424,10 @@ describe Mongoid::Clients do
         Band.store_in(client: :nonexistent)
       end
 
+      after do
+        Band.reset_storage_options!
+      end
+
       let(:band) do
         Band.new
       end
@@ -435,7 +439,7 @@ describe Mongoid::Clients do
       end
     end
 
-    context "when getting a client by name" do
+    context "when getting a client by name", if: testing_locally? do
 
       let(:file) do
         File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
