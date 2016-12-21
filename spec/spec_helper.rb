@@ -80,6 +80,11 @@ Mongoid.configure do |config|
   config.load_configuration(CONFIG)
 end
 
+def collation_supported?
+  Mongoid::Clients.default.cluster.next_primary.features.collation_enabled?
+end
+alias :decimal128_supported? :collation_supported?
+
 # Autoload every model for the test suite that sits in spec/app/models.
 Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
   name = File.basename(file, ".rb")
