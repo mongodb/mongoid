@@ -282,7 +282,7 @@ describe Mongoid::Config do
         context "when a default is provided" do
 
           before do
-            described_class.load!(file, :test_with_max_staleness)
+            described_class.load!(file)
           end
 
           let(:default) do
@@ -301,7 +301,7 @@ describe Mongoid::Config do
 
             it "sets the read option" do
               expect(options["read"]).to eq({ "mode" => :primary_preferred,
-                                              "max_staleness" => 100 })
+                                              "tag_sets" => [{ "use" => "web" }]})
             end
           end
         end
