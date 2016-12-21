@@ -167,6 +167,43 @@ describe Mongoid::Contextual::MapReduce do
         expect(results.entries).to be_empty
       end
     end
+
+    context "when there is a collation on the criteria" do
+
+      let(:map) do
+        %Q{
+         function() {
+           emit(this.name, 1);
+        }}
+      end
+
+      let(:reduce) do
+        %Q{
+         function(key, values) {
+           return Array.sum(values);
+        }}
+      end
+
+      let(:criteria) do
+        Band.where(name: 'DEPECHE MODE').collation(locale: 'en_US', strength: 2)
+      end
+
+      context 'when the server supports collations', if: collation_supported? do
+
+        it 'applies the collation' do
+          expect(map_reduce.out(inline: 1).count).to eq(1)
+        end
+      end
+
+      context 'when the server does not support collations', unless: collation_supported? do
+
+        it 'raises an exception' do
+          expect {
+            map_reduce.out(inline: 1).to_a
+          }.to raise_exception(Mongo::Error::UnsupportedCollation)
+        end
+      end
+    end
   end
 
   describe "#emitted" do
