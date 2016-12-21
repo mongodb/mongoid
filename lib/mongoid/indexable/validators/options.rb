@@ -27,7 +27,8 @@ module Mongoid
           :sphere_version,
           :text_version,
           :version,
-          :partial_filter_expression
+          :partial_filter_expression,
+          :collation
         ]
 
         VALID_TYPES = [

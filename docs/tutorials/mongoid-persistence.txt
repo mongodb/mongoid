@@ -422,3 +422,22 @@ To create a capped collection from the Mongo console:
 .. code-block:: javascript
 
   db.createCollection("name", { capped: true, size: 1024 });
+
+Set a Default Collation on a Collection
+*********************************
+
+Mongoid does not provide a mechanism for creating a collection with a default collation.
+Like capped collections, you will need to create the collection yourself one time, up-front,
+either with the driver or via the Mongo console.
+
+To create a collection with a default collation with the driver:
+
+.. code-block:: ruby
+
+  client["name", :collation => { :locale => 'fr'}].create
+
+To create a collection with a default collation from the Mongo console:
+
+.. code-block:: javascript
+
+  db.createCollection("name", { collation: { locale: 'fr' } });

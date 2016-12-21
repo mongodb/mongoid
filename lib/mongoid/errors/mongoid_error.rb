@@ -19,7 +19,7 @@ module Mongoid
       # @return [ String ] The composed message.
       #
       # @since 3.0.0
-      def compose_message(key, attributes)
+      def compose_message(key, attributes = {})
         @problem = translate_problem(key, attributes)
         @summary = translate_summary(key, attributes)
         @resolution = translate_resolution(key, attributes)

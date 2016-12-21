@@ -164,6 +164,40 @@ describe Mongoid::QueryCache do
         end
       end
 
+      context 'when the first query has a collation', if: collation_supported? do
+
+        before do
+          Band.where(name: 'DEPECHE MODE').collation(locale: 'en_US', strength: 2).to_a
+        end
+
+        context "when the next query has the same collation" do
+
+          it "uses the cache" do
+            expect_no_queries do
+              Band.where(name: 'DEPECHE MODE').collation(locale: 'en_US', strength: 2).to_a
+            end
+          end
+        end
+
+        context "when the next query does not have the same collation" do
+
+          it "queries again" do
+            expect_query(1) do
+              Band.where(name: 'DEPECHE MODE').collation(locale: 'fr', strength: 2).to_a
+            end
+          end
+        end
+
+        context "when the next query does not have a collation" do
+
+          it "queries again" do
+            expect_query(1) do
+              Band.where(name: 'DEPECHE MODE').to_a
+            end
+          end
+        end
+      end
+
       context "when the first query has no limit" do
 
         let(:game) do

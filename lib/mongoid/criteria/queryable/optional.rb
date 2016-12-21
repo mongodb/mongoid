@@ -324,6 +324,20 @@ module Mongoid
           clone.tap { |query| query.options.store(:cursor_type, type) }
         end
 
+        # Set the collation.
+        #
+        # @example Set the collation.
+        #   optional.collation(locale: 'fr', strength: 2)
+        #
+        # @param [ Hash ] collation_doc The document describing the collation to use.
+        #
+        # @return [ Optional ] The cloned optional.
+        #
+        # @since 6.1.0
+        def collation(collation_doc)
+          clone.tap { |query| query.options.store(:collation, collation_doc) }
+        end
+
         private
 
         # Add a single sort option.
