@@ -17,10 +17,6 @@ test:
       database: reports
       hosts:
         - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
-      options:
-        user: "mongoid-user"
-        password: "password"
-        auth_source: "admin"
   options:
     include_root_in_json: false
     include_type_for_serialization: false
