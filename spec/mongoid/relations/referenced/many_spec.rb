@@ -2936,6 +2936,17 @@ describe Mongoid::Relations::Referenced::Many do
       end
     end
 
+    context 'when providing a collation', if: collation_supported? do
+
+      let(:posts) do
+        person.posts.where(title: "FIRST").collation(locale: 'en_US', strength: 2)
+      end
+
+      it "applies the collation option to the query" do
+        expect(posts).to eq([ post_one ])
+      end
+    end
+
     context "when providing a criteria class method" do
 
       let(:posts) do
