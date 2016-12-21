@@ -3477,7 +3477,7 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "when querying on a BSON::Decimal128" do
+      context "when querying on a BSON::Decimal128", if: collation_supported? do
 
         let(:decimal) do
           BSON::Decimal128.new("0.0005")
