@@ -376,7 +376,7 @@ describe Mongoid::Contextual::Atomic do
 
   describe "#pull_all" do
 
-    context 'when the criteria does not have a collation', if: collation_supported? do
+    context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
         Band.create(members: [ "Dave", "Alan", "Fletch" ])
@@ -433,7 +433,7 @@ describe Mongoid::Contextual::Atomic do
 
   describe "#push" do
 
-    context 'when the criteria does not have a collation', if: collation_supported? do
+    context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
         Band.create(members: [ "Dave" ])
@@ -498,7 +498,7 @@ describe Mongoid::Contextual::Atomic do
 
   describe "#push_all" do
 
-    context 'when the criteria does not have a collation', if: collation_supported? do
+    context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
         Band.create(members: [ "Dave" ])
@@ -559,7 +559,7 @@ describe Mongoid::Contextual::Atomic do
 
   describe "#rename" do
 
-    context 'when the criteria does not have a collation', if: collation_supported? do
+    context 'when the criteria does not have a collation' do
 
       let!(:depeche_mode) do
         Band.create(members: [ "Dave" ])
