@@ -37,7 +37,7 @@ module Mongoid
       # @since 4.0.0
       def define_dynamic_reader(name)
         return unless name.valid_method_name?
-        class_eval <<-READER
+        class_eval <<-READER, __FILE__, __LINE__ + 1
           def #{name}
             attribute_will_change!(#{name.inspect})
             read_attribute(#{name.inspect})
@@ -56,7 +56,7 @@ module Mongoid
       #
       # @since 4.0.0
       def define_dynamic_before_type_cast_reader(name)
-        class_eval <<-READER
+        class_eval <<-READER, __FILE__, __LINE__ + 1
           def #{name}_before_type_cast
             attribute_will_change!(#{name.inspect})
             read_attribute_before_type_cast(#{name.inspect})
@@ -77,7 +77,7 @@ module Mongoid
       def define_dynamic_writer(name)
         return unless name.valid_method_name?
 
-        class_eval <<-WRITER
+        class_eval <<-WRITER, __FILE__, __LINE__ + 1
           def #{name}=(value)
             write_attribute(#{name.inspect}, value)
           end
