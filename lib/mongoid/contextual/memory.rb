@@ -373,6 +373,7 @@ module Mongoid
       #
       # @since 3.0.0
       def apply_options
+        raise Errors::InMemoryCollationNotSupported.new if criteria.options[:collation]
         skip(criteria.options[:skip]).limit(criteria.options[:limit])
       end
 

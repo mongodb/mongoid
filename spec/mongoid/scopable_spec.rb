@@ -227,6 +227,18 @@ describe Mongoid::Scopable do
 
     context "when provided a criteria" do
 
+      context 'when a collation is defined on the criteria', if: collation_supported? do
+
+        before do
+          Band.scope(:tests, ->{ Band.where(name: 'TESTING').collation(locale: 'en_US', strength: 2) })
+          Band.create(name: 'testing')
+        end
+
+        it 'applies the collation' do
+          expect(Band.tests.first['name']).to eq('testing')
+        end
+      end
+
       context "when the lambda includes a geo_near query" do
 
         before do
