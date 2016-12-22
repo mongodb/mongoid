@@ -160,7 +160,7 @@ module Mongoid
         #
         # @since 3.0.0
         def existence_check(name)
-          module_eval <<-END
+          module_eval <<-END, __FILE__, __LINE__ + 1
             def #{name}?
               without_autobuild { !__send__(:#{name}).blank? }
             end
