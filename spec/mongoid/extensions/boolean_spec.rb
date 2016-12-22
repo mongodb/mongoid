@@ -82,6 +82,13 @@ describe Mongoid::Boolean do
         end
       end
 
+      context "when provided on" do
+
+        it "returns true" do
+          expect(described_class.mongoize("on")).to eq(true)
+        end
+      end
+
       context "when provided false" do
 
         it "returns false" do
@@ -121,6 +128,13 @@ describe Mongoid::Boolean do
 
         it "returns false" do
           expect(described_class.mongoize("n")).to eq(false)
+        end
+      end
+
+      context "when provided off" do
+
+        it "returns true" do
+          expect(described_class.mongoize("off")).to eq(false)
         end
       end
     end
