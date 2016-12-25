@@ -167,6 +167,28 @@ describe Mongoid::Contextual::Mongo do
         expect(count).to eq(2)
       end
     end
+
+    context 'when a collation is specified', if: collation_supported? do
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      context 'when the collation is specified on the criteria' do
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        let(:count) do
+          context.count
+        end
+
+        it 'applies the collation' do
+          expect(count).to eq(1)
+        end
+      end
+    end
   end
 
   [ :delete, :delete_all ].each do |method|
@@ -205,6 +227,33 @@ describe Mongoid::Contextual::Mongo do
 
         it "returns the number of documents deleted" do
           expect(deleted).to eq(1)
+        end
+
+        context 'when the criteria has a collation', if: collation_supported? do
+
+          let(:criteria) do
+            Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+          end
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          let!(:deleted) do
+            context.send(method)
+          end
+
+          it "deletes the matching documents" do
+            expect(Band.find(new_order.id)).to eq(new_order)
+          end
+
+          it "deletes the correct number of documents" do
+            expect(Band.count).to eq(1)
+          end
+
+          it "returns the number of documents deleted" do
+            expect(deleted).to eq(1)
+          end
         end
       end
 
@@ -265,6 +314,33 @@ describe Mongoid::Contextual::Mongo do
 
         it "returns the number of documents destroyed" do
           expect(destroyed).to eq(1)
+        end
+
+        context 'when the criteria has a collation', if: collation_supported? do
+
+          let(:criteria) do
+            Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+          end
+
+          let(:context) do
+            described_class.new(criteria)
+          end
+
+          let!(:destroyed) do
+            context.send(method)
+          end
+
+          it "destroys the matching documents" do
+            expect(Band.find(new_order.id)).to eq(new_order)
+          end
+
+          it "destroys the correct number of documents" do
+            expect(Band.count).to eq(1)
+          end
+
+          it "returns the number of documents destroyed" do
+            expect(destroyed).to eq(1)
+          end
         end
       end
 
@@ -340,6 +416,29 @@ describe Mongoid::Contextual::Mongo do
         expect(context.distinct(:years)).to eq([ 30, 25 ])
       end
     end
+
+    context 'when a collation is specified', if: collation_supported? do
+
+      before do
+        Band.create(name: 'DEPECHE MODE')
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:expected_results) do
+        ["Depeche Mode", "New Order"]
+      end
+
+      let(:criteria) do
+        Band.where({}).collation(locale: 'en_US', strength: 2)
+      end
+
+      it 'applies the collation' do
+        expect(context.distinct(:name)).to eq(expected_results)
+      end
+    end
   end
 
   describe "#each" do
@@ -354,6 +453,29 @@ describe Mongoid::Contextual::Mongo do
 
     let(:context) do
       described_class.new(criteria)
+    end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let(:criteria) do
+        Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+      end
+
+      it "yields mongoid documents to the block" do
+        context.each do |doc|
+          expect(doc).to be_a(Mongoid::Document)
+        end
+      end
+
+      it "iterates over the matching documents" do
+        context.each do |doc|
+          expect(doc.name).to eq("Depeche Mode")
+        end
+      end
+
+      it "returns self" do
+        expect(context.each{}).to be(context)
+      end
     end
 
     context "when providing a block" do
@@ -555,6 +677,161 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#find_one_and_replace" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool")
+    end
+
+    context "when the selector matches" do
+
+      context "when not providing options" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace(name: 'FKA Twigs')
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "updates the document in the database" do
+          expect(depeche.reload.name).to eq('FKA Twigs')
+        end
+      end
+
+      context "when sorting" do
+
+        let(:criteria) do
+          Band.desc(:name)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace(likes: 1)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(tool)
+        end
+
+        it "updates the document in the database" do
+          expect(tool.reload.likes).to eq(1)
+          expect(tool.reload.name).to be_nil
+        end
+      end
+
+      context "when limiting fields" do
+
+        let(:criteria) do
+          Band.only(:_id)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace(name: 'FKA Twigs', likes: 1)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "limits the returned fields" do
+          expect(result.name).to be_nil
+        end
+
+        it "updates the document in the database" do
+          expect(depeche.reload.likes).to eq(1)
+        end
+      end
+
+      context "when returning new" do
+
+        let(:criteria) do
+          Band.where(name: "Depeche Mode")
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace({ likes: 1 }, return_document: :after)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "returns the updated document" do
+          expect(result.name).to be_nil
+          expect(result.likes).to eq(1)
+        end
+      end
+
+      context 'when a collation is specified on the criteria', if: collation_supported? do
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_replace({ likes: 1 }, return_document: :after)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "returns the updated document" do
+          expect(result.likes).to eq(1)
+          expect(result.name).to be_nil
+        end
+      end
+    end
+
+    context "when the selector does not match" do
+
+      let(:criteria) do
+        Band.where(name: "DEPECHE MODE")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:result) do
+        context.find_one_and_replace(name: 'FKA Twigs')
+      end
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+  end
+
   describe "#find_one_and_update" do
 
     let!(:depeche) do
@@ -663,10 +940,84 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context "when removing" do
+      context 'when a collation is specified on the criteria', if: collation_supported? do
 
         let(:criteria) do
-          Band.where(name: "Depeche Mode")
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+        end
+
+        let(:context) do
+          described_class.new(criteria)
+        end
+
+        let!(:result) do
+          context.find_one_and_update({ "$inc" => { likes: 1 }}, return_document: :after)
+        end
+
+        it "returns the first matching document" do
+          expect(result).to eq(depeche)
+        end
+
+        it "returns the updated document" do
+          expect(result.likes).to eq(1)
+        end
+      end
+    end
+
+    context "when the selector does not match" do
+
+      let(:criteria) do
+        Band.where(name: "Placebo")
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:result) do
+        context.find_one_and_update("$inc" => { likes: 1 })
+      end
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "#find_one_and_delete" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    let!(:result) do
+      context.find_one_and_delete
+    end
+
+    context 'when the selector matches a document' do
+
+      it "returns the first matching document" do
+        expect(result).to eq(depeche)
+      end
+
+      it "deletes the document from the database" do
+        expect {
+          depeche.reload
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+
+      context 'when a collation is specified on the criteria', if: collation_supported? do
+
+        let(:criteria) do
+          Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
         end
 
         let(:context) do
@@ -689,7 +1040,7 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context "when the selector does not match" do
+    context 'when the selector does not match a document' do
 
       let(:criteria) do
         Band.where(name: "Placebo")
@@ -700,7 +1051,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       let(:result) do
-        context.find_one_and_update("$inc" => { likes: 1 })
+        context.find_one_and_delete
       end
 
       it "returns nil" do
@@ -733,6 +1084,17 @@ describe Mongoid::Contextual::Mongo do
 
         it "returns the first matching document" do
           expect(context.send(method)).to eq(depeche_mode)
+        end
+
+        context 'when the criteria has a collation', if: collation_supported? do
+
+          let(:criteria) do
+            Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
+          end
+
+          it "returns the first matching document" do
+            expect(context.send(method)).to eq(depeche_mode)
+          end
         end
       end
 
