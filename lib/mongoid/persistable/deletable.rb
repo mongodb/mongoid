@@ -135,13 +135,9 @@ module Mongoid
         # @return [ Integer ] The number of documents deleted.
         #
         # @since 1.0.0
-        def delete_all(conditions = nil)
-          selector = conditions || {}
-          selector.merge!(_type: name) if hereditary?
-          coll = collection
-          deleted = coll.find(selector).count
-          coll.find(selector).delete_many
-          deleted
+        def delete_all(conditions = {})
+          selector = hereditary? ? conditions.merge(_type: name) : conditions
+          collection.find(selector).delete_many.deleted_count
         end
       end
     end

@@ -28,7 +28,8 @@ module Mongoid
                   :snapshot,
                   :comment,
                   :read,
-                  :cursor_type
+                  :cursor_type,
+                  :collation
                 ].freeze
 
       # @attribute [r] view The Mongo collection view.
@@ -79,9 +80,7 @@ module Mongoid
       #
       # @since 3.0.0
       def delete
-        self.count.tap do
-          view.delete_many
-        end
+        view.delete_many.deleted_count
       end
       alias :delete_all :delete
 
@@ -94,11 +93,10 @@ module Mongoid
       #
       # @since 3.0.0
       def destroy
-        destroyed = self.count
-        each do |doc|
+        each.inject(0) do |count, doc|
           doc.destroy
+          count += 1
         end
-        destroyed
       end
       alias :destroy_all :destroy
 

@@ -78,6 +78,11 @@ def testing_replica_set?
   Mongoid::Clients.default.cluster.replica_set?
 end
 
+def collation_supported?
+  Mongoid::Clients.default.cluster.next_primary.features.collation_enabled?
+end
+alias :decimal128_supported? :collation_supported?
+
 def testing_locally?
   !(ENV['CI'] == 'travis')
 end
