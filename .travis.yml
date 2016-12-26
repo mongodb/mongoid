@@ -5,9 +5,9 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  - 2.2.2
+  - 2.2.6
   - 2.3.3
-  - 2.3.2
+  - 2.4.0
   - jruby-9.1.5.0
 
 matrix:
@@ -31,7 +31,7 @@ env:
     - MONGODB=2.6.12
     - MONGODB=3.0.12
     - MONGODB=3.2.11
-    - MONGODB=3.4.0
+    - MONGODB=3.4.1
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
