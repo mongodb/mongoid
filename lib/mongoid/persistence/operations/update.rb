@@ -46,9 +46,11 @@ module Mongoid
             unless updates.empty?
               collection.find(selector).update(positionally(selector, updates))
               conflicts.each_pair do |key, value|
-                collection.find(selector).update(
-                  positionally(selector, { key => value })
-                )
+                value.each do |val|
+                  collection.find(selector).update(
+                    positionally(selector, { key => val })
+                  )
+                end
               end
             end
           end

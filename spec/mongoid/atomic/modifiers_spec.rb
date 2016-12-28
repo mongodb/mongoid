@@ -86,7 +86,7 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.pull(pulls)
         end
 
-        it "adds the push all modifiers" do
+        it "adds the pull modifiers" do
           modifiers.should eq(
             { "$pull" => { "addresses" => { "_id" => { "$in" => [ "one" ]}}}}
           )
@@ -111,6 +111,41 @@ describe Mongoid::Atomic::Modifiers do
         it "overwrites the previous pulls" do
           modifiers.should eq(
             { "$pull" => { "addresses" => { "_id" => { "$in" => [ "two" ]}}}}
+          )
+        end
+      end
+    end
+
+    context "when a conflicting modification exists" do
+
+      context "when the conflicting modification is a pull" do
+
+        let(:conflicting_pulls) do
+          { "addresses.0.locations" => { "_id" => { "$in" => [ "two" ]}} }
+        end
+
+        let(:pulls) do
+          { "addresses" => { "_id" => { "$in" => [ "one" ]}} }
+        end
+
+        before do
+          modifiers.pull(conflicting_pulls)
+          modifiers.pull(pulls)
+        end
+
+        it "adds the pull modifiers to the conflicts hash" do
+          modifiers.should eq(
+            { "$pull" => {
+              "addresses.0.locations" => { "_id" => { "$in" => [ "two" ]}}},
+              conflicts: { "$pull" => [
+                  {
+                    "addresses" => {
+                      "_id" => { "$in" => [ "one" ]}
+                    }
+                  }
+                ]
+              }
+            }
           )
         end
       end
@@ -270,11 +305,12 @@ describe Mongoid::Atomic::Modifiers do
         it "adds the push all modifiers to the conflicts hash" do
           modifiers.should eq(
             { "$set" => { "addresses.0.street" => "Bond" },
-              conflicts: { "$pushAll" =>
-                { "addresses" => [
-                    { "street" => "Oxford St" }
-                  ]
-                }
+              conflicts: { "$pushAll" => [
+                  { "addresses" => [
+                      { "street" => "Oxford St" }
+                    ]
+                  }
+                ]
               }
             }
           )
@@ -300,11 +336,12 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.should eq(
             { "$pullAll" => {
               "addresses" => { "street" => "Bond St" }},
-              conflicts: { "$pushAll" =>
-                { "addresses" => [
-                    { "street" => "Oxford St" }
-                  ]
-                }
+              conflicts: { "$pushAll" => [
+                  { "addresses" => [
+                      { "street" => "Oxford St" }
+                    ]
+                  }
+                ]
               }
             }
           )
@@ -330,14 +367,163 @@ describe Mongoid::Atomic::Modifiers do
           modifiers.should eq(
             { "$pushAll" => {
               "addresses.0.locations" => [{ "street" => "Bond St" }]},
-              conflicts: { "$pushAll" =>
-                { "addresses" => [
-                    { "street" => "Oxford St" }
-                  ]
-                }
+              conflicts: { "$pushAll" => [
+                  { "addresses" => [
+                      { "street" => "Oxford St" }
+                    ]
+                  }
+                ]
               }
             }
           )
+        end
+      end
+
+      context "when there is a conflicting set and push modifications" do
+
+        let(:sets) do
+          { "addresses.0.street" => "Bond" }
+        end
+
+        let(:nested) do
+          { "addresses.0.locations" => { "street" => "Bond St" } }
+        end
+
+        let(:pushes) do
+          { "addresses" => { "street" => "Oxford St" } }
+        end
+
+        before do
+          modifiers.set(sets)
+          modifiers.push(nested)
+          modifiers.push(pushes)
+        end
+
+        it "adds the push all modifiers to the conflicts hash, in a new array item" do
+          modifiers.should eq(
+            { "$set" => { "addresses.0.street" => "Bond" },
+              conflicts: { "$pushAll" =>
+                [
+                  {
+                    "addresses.0.locations" => [
+                      { "street" => "Bond St" }
+                    ],
+                  },
+                  {
+                    "addresses" => [
+                      { "street" => "Oxford St" }
+                    ]
+                  }
+                ]
+              }
+            }
+          )
+        end
+
+        context "with another nested push on the same key" do
+          let(:other_nested) do
+            { "addresses.0.locations" => { "street" => "Holmes St" } }
+          end
+
+          before do
+            modifiers.push(other_nested)
+          end
+
+          it "adds the push all modifiers to the conflicts hash, in the same array item" do
+            modifiers.should eq(
+              { "$set" => { "addresses.0.street" => "Bond" },
+                conflicts: { "$pushAll" =>
+                  [
+                    {
+                      "addresses.0.locations" => [
+                        { "street" => "Bond St" },
+                        { "street" => "Holmes St" }
+                      ],
+                    },
+                    {
+                      "addresses" => [
+                        { "street" => "Oxford St" }
+                      ]
+                    }
+                  ]
+                }
+              }
+            )
+          end
+        end
+      end
+
+      context "when there is only conflicting push modifications" do
+
+        let(:nested) do
+          { "addresses.0.locations" => { "street" => "Bond St" } }
+        end
+
+        let(:other_nested_key) do
+          { "addresses.1.locations" => { "street" => "Holmes St" } }
+        end
+
+        let(:pushes) do
+          { "addresses" => { "street" => "Oxford St" } }
+        end
+
+        before do
+          modifiers.push(nested)
+          modifiers.push(other_nested_key)
+          modifiers.push(pushes)
+        end
+
+        it "adds the push all modifiers to the conflicts hash, in a new array item" do
+          modifiers.should eq(
+            { "$pushAll" => { "addresses.0.locations" => [{ "street" => "Bond St" }] },
+              conflicts: { "$pushAll" =>
+                [
+                  {
+                    "addresses.1.locations" => [
+                      { "street" => "Holmes St" }
+                    ],
+                  },
+                  {
+                    "addresses" => [
+                      { "street" => "Oxford St" }
+                    ]
+                  }
+                ]
+              }
+            }
+          )
+        end
+
+        context "with another nested push on the same key" do
+          let(:other_nested) do
+            { "addresses.1.locations" => { "street" => "Watson St" } }
+          end
+
+          before do
+            modifiers.push(other_nested)
+          end
+
+          it "adds the push all modifiers to the conflicts hash, in the same array item" do
+            modifiers.should eq(
+              { "$pushAll" => { "addresses.0.locations" => [{ "street" => "Bond St" }] },
+                conflicts: { "$pushAll" =>
+                  [
+                    {
+                      "addresses.1.locations" => [
+                        { "street" => "Holmes St" },
+                        { "street" => "Watson St" }
+                      ],
+                    },
+                    {
+                      "addresses" => [
+                        { "street" => "Oxford St" }
+                      ]
+                    }
+                  ]
+                }
+              }
+            )
+          end
         end
       end
     end
@@ -414,7 +600,7 @@ describe Mongoid::Atomic::Modifiers do
                 ]
               },
               conflicts:
-                { "$set" => { "addresses.0.title" => "Sir" }}
+                { "$set" => [{ "addresses.0.title" => "Sir" }]}
             }
           )
         end
