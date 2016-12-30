@@ -19,7 +19,7 @@ module Mongoid
         def persist
           prepare do
             document[field] = [] unless document[field]
-            values = document.send(field)
+            values = document.send(field) || []
             Array.wrap(value).each do |val|
               values.push(val) unless values.include?(val)
             end
