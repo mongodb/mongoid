@@ -96,6 +96,8 @@ For instructions on upgrading to newer versions, visit
 * \#2944 Fixed uniqueness validation for localized fields when case insensitive
   is true. (Vladimir Zhukov)
 
+* \#2667 Fixed .cache, making it more consistent. (Arthur Neves)
+
 ## 3.1.3
 
 ### Resolved Issues
