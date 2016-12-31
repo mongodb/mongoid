@@ -92,7 +92,7 @@ module Rails
 
       models = (::Mongoid.models | models) if all_possible_models
 
-      models.compact.sort_by { |model| model.name || '' }
+      models.compact.uniq { |model| model.name }.sort_by { |model| model.name || '' }
     end
 
     # Use the application configuration to get every model and require it, so
