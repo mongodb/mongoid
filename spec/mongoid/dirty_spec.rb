@@ -401,12 +401,22 @@ describe Mongoid::Dirty do
     context "when the attribute has not changed the persisted value" do
 
       let!(:person) do
-        Person.new(title: "Grand Poobah").tap(&:move_changes)
+        Person.new(title: "Grand Poobah", map: {symbol_key: 'value', 'string_key' => 'value'}).tap(&:move_changes)
       end
 
       it "returns false" do
         person.send(:attribute_changed?, "title").should be_false
       end
+
+      it "of a map" do
+        person.send(:attribute_changed?, "map").should be_false
+      end
+
+      it "but in memory the object looks changed" do
+        person.map = {'symbol_key' => 'value', string_key: 'value'}
+        person.send(:attribute_changed?, "map").should be_false
+      end
+
     end
 
     context "when the attribute has not changed from the default value" do
@@ -498,6 +508,12 @@ describe Mongoid::Dirty do
       it "returns false" do
         person.should_not be_age_changed_from_default
       end
+
+      it "but in memory the object looks changed" do
+        person.map_with_keys = {'symbol_key' => 'value', string_key: 'value'}
+        person.send(:attribute_changed_from_default?, "map_with_keys").should be_false
+      end
+
     end
   end
 

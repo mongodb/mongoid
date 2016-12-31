@@ -16,6 +16,7 @@ class Person
   field :aliases, type: Array
   field :map, type: Hash
   field :map_with_default, type: Hash, default: {}
+  field :map_with_keys, type: Hash, default: {symbol_key: 'value', 'string_key' => 'value'}
   field :score, type: Integer
   field :blood_alcohol_content, type: Float, default: ->{ 0.0 }
   field :last_drink_taken_at, type: Date, default: ->{ 1.day.ago.in_time_zone("Alaska") }
