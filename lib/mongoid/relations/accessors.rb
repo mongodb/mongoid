@@ -113,7 +113,8 @@ module Mongoid
         else
           _building do
             _loading do
-              __build__(name, attributes[metadata.key], metadata)
+              key = (new_record? && _binding?) ? nil : attributes[metadata.key]
+              __build__(name, key, metadata)
             end
           end
         end
@@ -122,30 +123,6 @@ module Mongoid
         else
           value
         end
-      end
-
-      # @todo: Durran: Refactor before release, but this fixes the issue with
-      # the extra queries.
-      def get_relation_for_set(name, metadata, object)
-        variable = "@#{name}"
-        value = if instance_variable_defined?(variable)
-          instance_variable_get(variable)
-        else
-          _building do
-            _loading do
-              if needs_no_database_query?(object, metadata)
-                __build__(name, object, metadata)
-              else
-                __build__(name, attributes[metadata.key], metadata)
-              end
-            end
-          end
-        end
-      end
-
-      def needs_no_database_query?(object, metadata)
-        object.is_a?(Document) && !object.embedded? &&
-          object.id == attributes[metadata.key]
       end
 
       # Is the current code executing without autobuild functionality?
@@ -261,10 +238,8 @@ module Mongoid
         def setter(name, metadata)
           re_define_method("#{name}=") do |object|
             without_autobuild do
-              if metadata.many?
+              if metadata.many? || get_relation(name, metadata)
                 set_relation(name, get_relation(name, metadata).substitute(object.substitutable))
-              elsif value = get_relation_for_set(name, metadata, object)
-                set_relation(name, value.substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, metadata)
               end

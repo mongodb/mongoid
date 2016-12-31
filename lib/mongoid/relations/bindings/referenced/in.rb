@@ -29,7 +29,7 @@ module Mongoid
                   if base.referenced_many?
                     target.__send__(inverse).push(base) unless Mongoid.using_identity_map?
                   else
-                    target.do_or_do_not(metadata.inverse_setter(target), base)
+                    target.__build__(base.metadata_name, base, target.reflect_on_association(inverse))
                   end
                 end
               end
