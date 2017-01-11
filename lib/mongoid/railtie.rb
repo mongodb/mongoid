@@ -92,6 +92,15 @@ module Rails
           ::Rails::Mongoid.preload_models(app)
         end
       end
+      
+      initializer "load http errors" do |app|
+        config.after_initialize do
+          ActionDispatch::ShowExceptions.rescue_responses.update({
+            "Mongoid::Errors::DocumentNotFound" => :not_found,
+            "Mongoid::Errors::Validations" => 422
+          })
+        end
+      end
 
       # Rails runs all initializers first before getting into any generator
       # code, so we have no way in the intitializer to know if we are
