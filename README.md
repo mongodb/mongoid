@@ -26,7 +26,7 @@ Mongoid is tested against MRI 2.2, 2.3 and JRuby (9.1).
 Documentation
 -------------
 
-Please see the [MongoDB website](http://docs.mongodb.org/ecosystem/tutorial/ruby-mongoid-tutorial/#ruby-mongoid-tutorial) for up-to-date documentation on 5.0.0.
+Please see the [MongoDB website](http://docs.mongodb.org/ecosystem/tutorial/ruby-mongoid-tutorial/#ruby-mongoid-tutorial) for up-to-date documentation.
 
 License
 -------
