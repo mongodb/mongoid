@@ -23,11 +23,7 @@ In addition to Mongoid, several other mappers are available:
 
 - `MongoMapper <http://mongomapper.com/>`_ from John Nunemaker
 
-- `Mongomatic <http://mongomatic.com/>`_ from Ben Myles
-
 - `MongoODM <https://github.com/carlosparamio/mongo_odm>`_ from Carlos Paramio
-
-- `MongoModel <http://www.mongomodel.org/>`_ from Sam Pohlenz
 
 - `DriverAPILayer <http://alexeypetrushin.github.com/mongodb/driver.html>`_ from Alexey Petrushin
 
