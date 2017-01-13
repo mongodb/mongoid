@@ -101,6 +101,7 @@ module Mongoid
     #
     # @since 1.0.0
     def initialize(attrs = nil)
+      @__parent = nil
       _building do
         @new_record = true
         @attributes ||= {}
