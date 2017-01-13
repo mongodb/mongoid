@@ -131,9 +131,9 @@ Below is a list of valid types for fields.
 
 If you decide not to specify the type of field with the definition, Mongoid will treat
 it as an object and not try to typecast it when sending the values to the database.
-This can be advantageous in 2 places, since the lack of attempted conversion will yield
-a slight performance gain. However some fields are not supported if not defined as fields.
-A rule of thumb for what fields you can use are:
+This can be advantageous as the lack of attempted conversion will yield a slight
+performance gain. However some types are not supported if not defined as fields.
+You can safely omit type specifications when:
 
 - You're not using a web front end and values are already properly cast.
 - All of your fields are strings.
@@ -172,7 +172,7 @@ When a field is defined, Mongoid provides several different ways of accessing th
    person[:first_name] = "Jean"
    person.write_attribute(:first_name, "Jean")
 
-If you have defined custom getter/setter, those will be used when using the dot notation.
+You can define getters/setters that will be called when using the dot notation.
 
 .. code-block:: ruby
 
@@ -252,7 +252,7 @@ Defaults
 ********
 
 You can tell a field in Mongoid to always have a default value if nothing has been provided.
-Defaults are either static values or lambdas.
+Defaults are either static values or lambdas/procs.
 
 .. code-block:: ruby
 
@@ -264,7 +264,7 @@ Defaults are either static values or lambdas.
 
 Be wary that default values that are not defined as lambdas or procs are evaluated
 at class load time, so the following 2 definitions are not equivalent.
-(One would probably prefer the second, which is at document creation time.)
+(One would probably prefer the second, which is evaluated at document creation time.)
 
 .. code-block:: ruby
 
@@ -308,8 +308,8 @@ Custom Fields
 *************
 
 You can define custom types in Mongoid and determine how they are serialized and deserialized.
-You simply need to provide 3 methods on it for Mongoid to call to convert your object to and
-from MongoDB friendly values.
+You simply need to provide three methods on it for Mongoid to call to convert your object to
+and from MongoDB friendly values.
 
 .. code-block:: ruby
 
@@ -386,9 +386,9 @@ for use in criteria. For example we may want to write a query like so:
    point = Point.new(12, 24)
    Venue.where(location: point)
 
-Not that when accessing custom fields from the document, you will get a new instance
+Note that when accessing custom fields from the document, you will get a new instance
 of that object with each call to the getter. This is because Mongoid is generating a new
-object from the object from the raw attributes on each access.
+object from the raw attributes on each access.
 
 We need the point object in the criteria to be transformed to a Mongo friendly value when
 it is not as well, ``evolve`` is the method that takes care of this. We check if the passed
@@ -418,8 +418,8 @@ For cases when you do not want to have ``BSON::ObjectId`` ids, you can override 
 Dynamic Fields
 --------------
 
-By default Mongoid doesn't support dynamic fields. You can tell mongoid that you want
-to add dynamic fields by including ``Mongoid::Attributes::Dynamic`` in model.
+By default, Mongoid doesn't support dynamic fields. You can tell Mongoid that you want
+to add dynamic fields by including ``Mongoid::Attributes::Dynamic`` in a model.
 ``Mongoid::Attributes::Dynamic`` will allow attributes to get set and persisted on the
 document even if a field was not defined for them. There is a slight 'gotcha' however when
 dealing with dynamic attributes in that Mongoid is not completely lenient about the use of
@@ -432,7 +432,7 @@ dealing with dynamic attributes in that Mongoid is not completely lenient about 
      include Mongoid::Attributes::Dynamic
    end
 
-When dealing with dynamic attributes the following rules apply:
+When dealing with dynamic attributes, the following rules apply:
 
 If the attribute exists in the document, Mongoid will provide you with your standard
 getter and setter methods. For example, consider a person who has an attribute of
@@ -469,7 +469,7 @@ must use the other provided accessor methods:
 Localized Fields
 ----------------
 
-Mongoid now supports localized fields without the need of any external gem.
+Mongoid now supports localized fields without the need of an additional gem.
 
 .. code-block:: ruby
 
@@ -512,14 +512,14 @@ For Rails applications, set the fallbacks configuration setting to true in your 
 
    config.i18n.fallbacks = true
 
-For non-rails applications, you must include the fallbacks module straight to the I18n gem.
+For non-Rails applications, you must include the fallbacks module straight to the I18n gem.
 
 .. code-block:: ruby
 
    require "i18n/backend/fallbacks"
    I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
-Then when the fallbacks are defined, if a translation is not present Mongoid will fallback
+When the fallbacks are defined, if a translation is not present, Mongoid will fallback
 in order of the defined locales.
 
 .. code-block:: ruby
@@ -540,7 +540,7 @@ alter the criteria to match the current locale.
 
 .. code-block:: ruby
 
-   # Match all prodcucts with Marvelous as the description. Locale is en.
+   # Match all products with Marvelous as the description. Locale is en.
    Product.where(description: "Marvelous!")
    # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
 
@@ -620,7 +620,7 @@ Notes On Persistence
 ********************
 
 Mongoid uses dirty tracking as the core of its persistence operations. It looks at the
-changes on a document and atomically updates only what has changed unlike other frameworks
+changes on a document and atomically updates only what has changed, unlike other frameworks
 that write the entire document on each save. If no changes have been made, Mongoid will
 not hit the database on a call to ``Model#save``.
 
