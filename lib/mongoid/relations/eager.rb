@@ -14,9 +14,9 @@ module Mongoid
       end
 
       def eager_load(docs)
-        docs.tap do |docs|
+        docs.tap do |d|
           if eager_loadable?
-            preload(criteria.inclusions, docs)
+            preload(criteria.inclusions, d)
           end
         end
       end
