@@ -196,6 +196,8 @@ module Mongoid
     # @since 1.0.0
     def initialize(klass)
       @klass = klass
+      @embedded = nil
+      @none = nil
       klass ? super(klass.aliased_fields, klass.fields) : super({}, {})
     end
 
