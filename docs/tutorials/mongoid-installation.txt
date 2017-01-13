@@ -211,8 +211,8 @@ comments above each key.
           min_pool_size: 1
 
           # The time to wait, in seconds, in the connection pool for a connection
-          # to be checked in before timing out. (default: 5)
-          wait_queue_timeout: 5
+          # to be checked in before timing out. (default: 1)
+          wait_queue_timeout: 1
 
           # The time to wait to establish a connection before timing out, in seconds.
           # (default: 10)
