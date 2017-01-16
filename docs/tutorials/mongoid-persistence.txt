@@ -424,7 +424,7 @@ To create a capped collection from the Mongo console:
   db.createCollection("name", { capped: true, size: 1024 });
 
 Set a Default Collation on a Collection
-*********************************
+***************************************
 
 Mongoid does not provide a mechanism for creating a collection with a default collation.
 Like capped collections, you will need to create the collection yourself one time, up-front,
