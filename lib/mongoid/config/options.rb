@@ -31,7 +31,7 @@ module Mongoid
       def option(name, options = {})
         defaults[name] = settings[name] = options[:default]
 
-        class_eval <<-RUBY
+        class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def #{name}
             settings[#{name.inspect}]
           end
