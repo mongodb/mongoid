@@ -242,12 +242,14 @@ module Mongoid
         (selection.values.first == 1 && !selection_included?(name, selection, field))
     end
 
-    # Return type casted attributes.
+    # Return type-casted attributes.
     #
-    # @example Type casted attributes.
+    # @example Type-casted attributes.
     #   document.typed_attributes
     #
-    # @return [ Object ] The hash with keys and values of the type casted attributes.
+    # @return [ Object ] The hash with keys and values of the type-casted attributes.
+    #
+    # @since 6.1.0
     def typed_attributes
       attribute_names.map { |name| [name, send(name)] }.to_h
     end
