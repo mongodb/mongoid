@@ -69,7 +69,7 @@ module Mongoid
       #
       # @return [ Hash{Class => Array(Hash)}] The models and undefined indexes that were listed.
       #
-      # @since 4.0.0
+      # @since 5.2.0
       def list_undefined_indexes(models = ::Mongoid.models)
         undefined_indexes(models).each do |model, indexes|
           log_model_and_indexes(model, indexes)
@@ -83,7 +83,7 @@ module Mongoid
       #
       # @return [ Array<Class> ] The models whose indices were listed.
       #
-      # @since 4.0.0
+      # @since 5.2.0
       def list_indexes(models = ::Mongoid.models)
         models.each do |model|
           unless model.embedded?
