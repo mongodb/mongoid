@@ -261,6 +261,22 @@ describe Mongoid::Persistable::Settable do
         expect(church.reload.location).to eq({ 'city' => 'Berlin', 'street' => 'Yorckstr.'})
       end
     end
+
+    context 'when field is nested hash' do
+      it 'should not reset nested hash' do
+        church.location = { 'address' => { 'city' => 'berlin', 'street' => 'Yorckstr' } }
+        church.save
+        church.set("location.address.city" => "strausberg")
+
+        expect(church.location).to eql({ 'address' => { 'city' => 'strausberg', 'street' => 'Yorckstr' } })
+
+        church.location = { 'address' => { 'state' => { 'address' => { 'city' => 'berlin', 'street' => 'Yorckstr' } } } }
+        church.save
+        church.set("location.address.state.address.city" => "strausberg")
+
+        expect(church.location).to eql({ 'address' => { 'state' => { 'address' => { 'city' => 'strausberg', 'street' => 'Yorckstr' } } } })
+      end
+    end
   end
 
   context 'when the field is not already set locally' do
