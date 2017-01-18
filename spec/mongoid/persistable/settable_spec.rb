@@ -262,19 +262,47 @@ describe Mongoid::Persistable::Settable do
       end
     end
 
-    context 'when field is nested hash' do
-      it 'should not reset nested hash' do
-        church.location = { 'address' => { 'city' => 'berlin', 'street' => 'Yorckstr' } }
-        church.save
-        church.set("location.address.city" => "strausberg")
+    context 'when the field is a bested hash' do
 
-        expect(church.location).to eql({ 'address' => { 'city' => 'strausberg', 'street' => 'Yorckstr' } })
+      context 'when a leaf value in the nested hash is updated' do
 
-        church.location = { 'address' => { 'state' => { 'address' => { 'city' => 'berlin', 'street' => 'Yorckstr' } } } }
-        church.save
-        church.set("location.address.state.address.city" => "strausberg")
+        let(:church) do
+          Church.new.tap do |a|
+            a.location = {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}
+            a.name = 'Church1'
+            a.save
+          end
+        end
 
-        expect(church.location).to eql({ 'address' => { 'state' => { 'address' => { 'city' => 'strausberg', 'street' => 'Yorckstr' } } } })
+        before do
+          church.set('location.address.city' => 'Munich')
+        end
+
+        it 'does not reset the nested hash' do
+          expect(church.name).to eq('Church1')
+          expect(church.location).to eql({'address' => {'city' => 'Munich', 'street' => 'Yorckstr'}})
+        end
+      end
+
+
+      context 'when the nested hash is many levels deep' do
+
+        let(:church) do
+          Church.new.tap do |a|
+            a.location = {'address' => {'state' => {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}}}
+            a.name = 'Church1'
+            a.save
+          end
+        end
+
+        before do
+          church.set('location.address.state.address.city' => 'Munich')
+        end
+
+        it 'does not reset the nested hash' do
+          expect(church.name).to eq('Church1')
+          expect(church.location).to eql({'address' => {'state' => {'address' => {'city' => 'Munich', 'street' => 'Yorckstr'}}}})
+        end
       end
     end
   end
