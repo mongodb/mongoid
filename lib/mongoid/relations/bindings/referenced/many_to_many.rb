@@ -20,8 +20,9 @@ module Mongoid
             binding do
               inverse_keys = doc.you_must(metadata.inverse_foreign_key)
               if inverse_keys
-                unless inverse_keys.include?(inverse_record_id(doc))
-                  inverse_keys.push(inverse_record_id(doc))
+                record_id = inverse_record_id(doc)
+                unless inverse_keys.include?(record_id)
+                  doc.you_must(metadata.inverse_foreign_key_setter, inverse_keys.push(record_id))
                 end
                 doc.reset_relation_criteria(metadata.inverse)
               end
@@ -55,7 +56,7 @@ module Mongoid
             if inverse_metadata
               base.__send__(inverse_metadata.primary_key)
             else
-              base.id
+              base._id
             end
           end
 

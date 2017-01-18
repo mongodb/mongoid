@@ -122,15 +122,15 @@ module Mongoid
       def criterion(document, attribute, value)
         field = document.database_field_name(attribute)
 
-        if localized?(document, field)
-          conditions = value.inject([]) { |acc, (k,v)| acc << { "#{field}.#{k}" => filter(v) } }
+        if value && localized?(document, field)
+          conditions = (value || {}).inject([]) { |acc, (k,v)| acc << { "#{field}.#{k}" => filter(v) }}
           selector = { "$or" => conditions }
         else
           selector = { field => filter(value) }
         end
 
         if document.persisted? && !document.embedded?
-          selector.merge!(_id: { "$ne" => document.id })
+          selector.merge!(_id: { "$ne" => document._id })
         end
         selector
       end
@@ -164,12 +164,11 @@ module Mongoid
       # @return [ Criteria ] The scoped criteria.
       #
       # @since 2.3.0
-      def scope(criteria, document, attribute)
+      def scope(criteria, document, _attribute)
         Array.wrap(options[:scope]).each do |item|
           name = document.database_field_name(item)
           criteria = criteria.where(item => document.attributes[name])
         end
-        criteria = criteria.with(document.persistence_options)
         criteria
       end
 
@@ -227,7 +226,7 @@ module Mongoid
       def to_validate(document, attribute, value)
         metadata = document.relations[attribute.to_s]
         if metadata && metadata.stores_foreign_key?
-          [ metadata.foreign_key, value && value.id ]
+          [ metadata.foreign_key, value && value._id ]
         else
           [ attribute, value ]
         end
@@ -274,7 +273,7 @@ module Mongoid
         criteria = create_criteria(klass, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
 
-        if criteria.with(persistence_options(criteria)).exists?
+        if criteria.read(mode: :primary).exists?
           add_error(document, attribute, value)
         end
       end
@@ -294,23 +293,6 @@ module Mongoid
         document.new_record? ||
           document.send("attribute_changed?", attribute.to_s) ||
           scope_value_changed?(document)
-      end
-
-      # Get the persistence options to perform to check, merging with any
-      # existing.
-      #
-      # @api private
-      #
-      # @example Get the persistence options.
-      #   validator.persistence_options(criteria)
-      #
-      # @param [ Criteria ] criteria The criteria.
-      #
-      # @return [ Hash ] The persistence options.
-      #
-      # @since 3.0.23
-      def persistence_options(criteria)
-        (criteria.persistence_options || {}).merge!(read: :primary)
       end
 
       # Is the attribute localized?

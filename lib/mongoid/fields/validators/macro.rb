@@ -13,6 +13,7 @@ module Mongoid
           :identity,
           :label,
           :localize,
+          :fallbacks,
           :metadata,
           :pre_processed,
           :subtype,
@@ -35,6 +36,24 @@ module Mongoid
           validate_options(klass, name, options)
         end
 
+        # Validate the relation definition.
+        #
+        # @example Validate the relation definition.
+        #   Macro.validate(Model, :name)
+        #
+        # @param [ Class ] klass The model class.
+        # @param [ Symbol ] name The field name.
+        # @param [ Hash ] options The provided options.
+        #
+        # @since 6.0.0
+        def validate_relation(klass, name, options = {})
+          [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
+            if Mongoid.destructive_fields.include?(n)
+              raise Errors::InvalidRelation.new(klass, n)
+            end
+          end
+        end
+
         private
 
         # Determine if the field name is allowed, if not raise an error.
@@ -51,8 +70,10 @@ module Mongoid
         #
         # @since 3.0.0
         def validate_name(klass, name, options)
-          if Mongoid.destructive_fields.include?(name)
-            raise Errors::InvalidField.new(klass, name)
+          [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
+            if Mongoid.destructive_fields.include?(n)
+              raise Errors::InvalidField.new(klass, n)
+            end
           end
 
           if !options[:overwrite] && klass.fields.keys.include?(name.to_s)

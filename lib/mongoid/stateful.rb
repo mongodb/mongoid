@@ -55,7 +55,6 @@ module Mongoid
     def destroyed?
       @destroyed ||= false
     end
-    alias :deleted? :destroyed?
 
     # Determine if the document can be pushed.
     #
@@ -104,6 +103,12 @@ module Mongoid
     # @since 2.1.0
     def updateable?
       persisted? && changed?
+    end
+
+    private
+
+    def reset_readonly
+      self.__selected_fields = nil
     end
   end
 end

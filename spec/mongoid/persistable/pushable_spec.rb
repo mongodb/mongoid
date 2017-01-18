@@ -122,6 +122,17 @@ describe Mongoid::Persistable::Pushable do
 
         it_behaves_like "a unique pushable embedded document"
       end
+
+      context "when provided an array of objects" do
+
+        before do
+          person.add_to_set(array: [{ a: 1}, { b: 2}])
+        end
+
+        it 'persists the array of objects' do
+          expect(person.reload.array).to eq([{ 'a' => 1}, { 'b' => 2}])
+        end
+      end
     end
   end
 

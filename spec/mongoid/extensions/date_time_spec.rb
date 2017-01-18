@@ -129,12 +129,8 @@ describe Mongoid::Extensions::DateTime do
 
     context "when the string is an invalid time" do
 
-      let(:epoch) do
-        Time.utc(1970, 1, 1, 0, 0, 0, 0)
-      end
-
-      it "returns epoch" do
-        expect(DateTime.mongoize("time")).to eq(epoch)
+      it "returns nil" do
+        expect(DateTime.mongoize("time")).to eq(nil)
       end
     end
   end

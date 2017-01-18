@@ -5,6 +5,7 @@ module Mongoid
     # This is the superclass for all many to one and many to many relation
     # proxies.
     class Many < Proxy
+      include ::Enumerable
 
       delegate :avg, :max, :min, :sum, to: :criteria
       delegate :length, :size, to: :target
@@ -96,6 +97,27 @@ module Mongoid
       # @return [ Document ] An existing document or newly created one.
       def find_or_create_by(attrs = {}, type = nil, &block)
         find_or(:create, attrs, type, &block)
+      end
+
+      # Find the first document given the conditions, or creates a new document
+      # with the conditions that were supplied. This will raise an error if validation fails.
+      #
+      # @example Find or create.
+      #   person.posts.find_or_create_by!(:title => "Testing")
+      #
+      # @overload find_or_create_by!(attributes = nil, type = nil)
+      #   @param [ Hash ] attributes The attributes to search or create with.
+      #   @param [ Class ] type The optional type of document to create.
+      #
+      # @overload find_or_create_by!(attributes = nil, type = nil)
+      #   @param [ Hash ] attributes The attributes to search or create with.
+      #   @param [ Class ] type The optional type of document to create.
+      #
+      # @raise [ Errors::Validations ] If validation failed.
+      #
+      # @return [ Document ] An existing document or newly created one.
+      def find_or_create_by!(attrs = {}, type = nil, &block)
+        find_or(:create!, attrs, type, &block)
       end
 
       # Find the first +Document+ given the conditions, or instantiates a new document

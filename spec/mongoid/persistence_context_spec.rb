@@ -1,0 +1,659 @@
+require "spec_helper"
+
+describe Mongoid::PersistenceContext do
+
+  let(:persistence_context) do
+    described_class.new(object, options)
+  end
+
+  let(:object) do
+    Band
+  end
+
+  describe '.set' do
+
+    let(:options) do
+      { collection: :other }
+    end
+
+    context 'when the persistence context is set on the thread' do
+
+      let!(:persistence_context) do
+        described_class.set(object, options)
+      end
+
+      it 'sets the persistence context for the object on the current thread' do
+        expect(described_class.get(object)).to be(persistence_context)
+        expect(described_class.get(object)).not_to be(nil)
+        expect(described_class.get(object).collection.name).to eq('other')
+      end
+
+      it 'only sets persistence context for the object on the current thread' do
+         Thread.new do
+          expect(described_class.get(object)).not_to be(persistence_context)
+          expect(described_class.get(object)).to be(nil)
+        end.value
+      end
+    end
+  end
+
+
+  describe '.get' do
+
+    let(:options) do
+      { collection: :other }
+    end
+
+    context 'when there has been a persistence context set on the current thread' do
+
+      let!(:persistence_context) do
+        described_class.set(object, options)
+      end
+
+      it 'gets the persistence context for the object on the current thread' do
+        expect(described_class.get(object)).to be(persistence_context)
+        expect(described_class.get(object).collection.name).to eq('other')
+      end
+
+      it 'does not get persistence context for the object from another thread' do
+        Thread.new do
+          expect(described_class.get(object)).not_to be(persistence_context)
+          expect(described_class.get(object)).to be(nil)
+        end.value
+      end
+    end
+  end
+
+  describe '.clear' do
+
+    let(:options) do
+      { collection: :other }
+    end
+
+    context 'when there has been a persistence context set on the current thread' do
+
+      let!(:persistence_context) do
+        described_class.set(object, options)
+      end
+
+      context 'when no cluster is passed to the method' do
+
+        before do
+          described_class.clear(object)
+        end
+
+        it 'clears the persistence context for the object on the current thread' do
+          expect(described_class.get(object)).to be(nil)
+        end
+      end
+
+      context 'when a cluster is passed to the method' do
+
+        context 'when the cluster is the same as that of the persistence context on the current thread' do
+
+          let(:client) do
+            persistence_context.client
+          end
+
+          before do
+            described_class.clear(object, client.cluster)
+          end
+
+          it 'does not close the cluster' do
+            expect(client).not_to receive(:close)
+            described_class.clear(object, client.cluster.dup)
+          end
+        end
+
+        context 'when the cluster is not the same as that of the persistence context on the current thread' do
+
+          let!(:client) do
+            persistence_context.client
+          end
+
+          it 'closes the client' do
+            expect(client).to receive(:close).and_call_original
+            described_class.clear(object, client.cluster.dup)
+          end
+        end
+      end
+    end
+  end
+
+  describe '#initialize' do
+
+    let(:options) do
+      { collection: 'other' }
+    end
+
+    context 'when an object is passed' do
+
+      context 'when the object is a klass' do
+
+        it 'sets the object on the persistence context' do
+          expect(persistence_context.instance_variable_get(:@object)).to eq(object)
+        end
+      end
+
+      context 'when the object is a model instance' do
+
+        let(:object) do
+          Band.new
+        end
+
+        it 'sets the object on the persistence context' do
+          expect(persistence_context.instance_variable_get(:@object)).to eq(object)
+        end
+      end
+    end
+
+    context 'when options are passed' do
+
+      let(:options) do
+        { connect_timeout: 3 }
+      end
+
+      context 'when the options are valid client options' do
+
+        it 'sets the options on the persistence context object' do
+          expect(persistence_context.options).to eq(options)
+        end
+      end
+
+      context 'when the options are not valid client options' do
+
+        context 'when the options are valid extra options' do
+
+          let(:options) do
+            { collection: 'other' }
+          end
+
+          it 'sets the options on the persistence context object' do
+            expect(persistence_context.collection_name).to eq(options[:collection].to_sym)
+          end
+        end
+
+        context 'when the options are not valid extra options' do
+
+          let(:options) do
+            { invalid: 'option' }
+          end
+
+          it 'raises an InvalidPersistenceOption error' do
+            expect {
+              persistence_context
+            }.to raise_error(Mongoid::Errors::InvalidPersistenceOption)
+          end
+        end
+      end
+    end
+  end
+
+  describe '#collection' do
+
+    let(:persistence_context) do
+      described_class.new(object, options)
+    end
+
+    let(:options) do
+      { read: { 'mode' => :secondary } }
+    end
+
+    context 'when a parent object is passed' do
+
+      it 'uses the collection of the parent object' do
+        expect(persistence_context.collection(Person.new).name).to eq('people')
+      end
+
+      it 'does not memoize the collection' do
+        persistence_context.collection
+        expect(persistence_context.collection(Person.new).name).to eq('people')
+      end
+
+      it 'keeps the other options of the persistence context' do
+        expect(persistence_context.collection(Person.new).client.options[:read]).to eq(options[:read])
+      end
+    end
+
+    context 'when a parent object is not passed' do
+
+      it 'uses the collection of the object' do
+        expect(persistence_context.collection.name).to eq('bands')
+      end
+
+      it 'does not memoize the collection' do
+        persistence_context.collection(Person.new)
+        expect(persistence_context.collection.name).to eq('bands')
+      end
+
+      it 'keeps the other options of the persistence context' do
+        expect(persistence_context.collection.client.options[:read]).to eq(options[:read])
+      end
+    end
+  end
+
+  describe '#collection_name' do
+
+    let(:persistence_context) do
+      described_class.new(object, options)
+    end
+
+    let(:options) do
+      { collection: 'other' }
+    end
+
+    context 'when storage options are set on the object' do
+
+      context 'when there are no options passed to the Persistence Context' do
+
+        let(:options) do
+          { }
+        end
+
+        after do
+          object.reset_storage_options!
+        end
+
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in collection: :schmands
+          end
+
+          it 'uses the storage options' do
+            expect(persistence_context.collection_name).to eq(:schmands)
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in collection: ->{ :schmands }
+          end
+
+          it 'uses the storage options' do
+            expect(persistence_context.collection_name).to eq(:schmands)
+          end
+        end
+      end
+
+      context 'when there are options passed to the Persistence Context' do
+
+        let(:options) do
+          { collection: 'other' }
+        end
+
+        after do
+          object.reset_storage_options!
+        end
+
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in collection: :schmands
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.collection_name).to eq(:other)
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in collection: ->{ :schmands }
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.collection_name).to eq(:other)
+          end
+        end
+      end
+    end
+
+    context 'when storage options are not set on the object' do
+
+      context 'when there are options passed to the Persistence Context' do
+
+        let(:options) do
+          { collection: 'other' }
+        end
+
+        it 'uses the persistence context options' do
+          expect(persistence_context.collection_name).to eq(:other)
+        end
+      end
+    end
+  end
+
+  describe '#database_name' do
+
+    let(:persistence_context) do
+      described_class.new(object, options)
+    end
+
+    let(:options) do
+      { database: 'other' }
+    end
+
+    context 'when storage options are set on the object' do
+
+      context 'when there are no options passed to the Persistence Context' do
+
+        let(:options) do
+          { }
+        end
+
+        after do
+          object.reset_storage_options!
+        end
+
+        context 'when there is a database override' do
+
+          before do
+            object.store_in database: :musique
+          end
+
+          before do
+            Mongoid::Threaded.database_override = :other
+          end
+
+          after do
+            Mongoid::Threaded.database_override = nil
+          end
+
+          it 'uses the override' do
+            expect(persistence_context.database_name).to eq(:other)
+          end
+        end
+
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in database: :musique
+          end
+
+          it 'uses the storage options' do
+            expect(persistence_context.database_name).to eq(:musique)
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in database: ->{ :musique }
+          end
+          it 'uses the storage options' do
+            expect(persistence_context.database_name).to eq(:musique)
+          end
+        end
+      end
+
+      context 'when there are options passed to the Persistence Context' do
+
+        let(:options) do
+          { database: 'musique' }
+        end
+
+        context 'when there is a database override' do
+
+          before do
+            Mongoid::Threaded.database_override = :other
+          end
+
+          after do
+            Mongoid::Threaded.database_override = nil
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.database_name).to eq(:musique)
+          end
+        end
+
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in database: :sounds
+          end
+
+          after do
+            object.reset_storage_options!
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.database_name).to eq(:musique)
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in database: ->{ :sounds }
+          end
+
+          after do
+            object.reset_storage_options!
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.database_name).to eq(:musique)
+          end
+        end
+      end
+    end
+
+    context 'when storage options are not set on the object' do
+
+      context 'when there are options passed to the Persistence Context' do
+
+        let(:options) do
+          { database: 'musique' }
+        end
+
+        it 'uses the persistence context options' do
+          expect(persistence_context.database_name).to eq(:musique)
+        end
+
+        context 'when there is a database override' do
+
+          before do
+            Mongoid::Threaded.database_override = :other
+          end
+
+          after do
+            Mongoid::Threaded.database_override = nil
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.database_name).to eq(:musique)
+          end
+        end
+      end
+
+      context 'when there are no options passed to the Persistence Context' do
+
+        context 'when there is a database override' do
+
+          before do
+            Mongoid::Threaded.database_override = :other
+          end
+
+          after do
+            Mongoid::Threaded.database_override = nil
+          end
+
+          it 'uses the database override options' do
+            expect(persistence_context.database_name).to eq(Mongoid::Threaded.database_override)
+          end
+        end
+      end
+    end
+  end
+
+  describe '#client' do
+
+    let(:persistence_context) do
+      described_class.new(object, options)
+    end
+
+    let(:options) do
+      { }
+    end
+
+    before do
+      Mongoid.clients[:alternative] = { database: :mongoid_test, hosts: [ "#{HOST}:#{PORT}" ] }
+    end
+
+    after do
+      Mongoid.clients.delete(:alternative)
+    end
+
+    context 'when the client is set in the options' do
+
+      let(:options) do
+        { client: :alternative }
+      end
+
+      after do
+        persistence_context.client.close
+      end
+
+      it 'uses the client option' do
+        expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+      end
+
+      context 'when there is a client override' do
+
+        before do
+          Mongoid::Threaded.client_override = :other
+        end
+
+        after do
+          persistence_context.client.close
+          Mongoid::Threaded.client_override = nil
+        end
+
+        it 'uses the client option' do
+          expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+        end
+      end
+
+      context 'when there are storage options set' do
+
+        after do
+          object.reset_storage_options!
+        end
+
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in client: :other
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in client: ->{ :other }
+          end
+
+          it 'uses the persistence context options' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
+        end
+      end
+    end
+
+    context 'when there is no client option set' do
+
+      let(:options) do
+        { }
+      end
+
+      context 'when there is a client override' do
+
+        before do
+          Mongoid::Threaded.client_override = :alternative
+        end
+
+        after do
+          Mongoid::Threaded.client_override = nil
+        end
+
+        it 'uses the client override' do
+          expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+        end
+      end
+
+      context 'when there are storage options set' do
+
+        after do
+          object.reset_storage_options!
+        end
+
+        context 'when the storage options is static' do
+
+          before do
+            object.store_in client: :alternative
+          end
+
+          it 'uses the client storage option' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
+        end
+
+        context 'when the storage options is a block' do
+
+          before do
+            object.store_in client: ->{ :alternative }
+          end
+
+          it 'uses the client storage option' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
+        end
+
+        context 'when there is a client override' do
+
+          before do
+            Mongoid::Threaded.client_override = :alternative
+          end
+
+          after do
+            Mongoid::Threaded.client_override = nil
+          end
+
+          it 'uses the client override' do
+            expect(persistence_context.client).to eq(Mongoid::Clients.with_name(:alternative))
+          end
+        end
+      end
+    end
+
+    context 'when there are client options set' do
+
+      let(:options) do
+        { connect_timeout: 3 }
+      end
+
+      it 'applies the options to the client' do
+        expect(persistence_context.client.options[:connect_timeout]).to eq(options[:connect_timeout])
+      end
+    end
+
+    context 'when there is a database name set in the options' do
+
+      let(:options) do
+        { database: 'other' }
+      end
+
+      it 'uses the database from the options' do
+        expect(persistence_context.client.database.name).to eq(options[:database])
+      end
+    end
+  end
+end

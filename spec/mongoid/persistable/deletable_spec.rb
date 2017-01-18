@@ -30,7 +30,7 @@ describe Mongoid::Persistable::Deletable do
       it "deletes the document from the collection" do
         expect {
           Person.find(person.id)
-        }.to raise_error
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
 
       it "returns true" do

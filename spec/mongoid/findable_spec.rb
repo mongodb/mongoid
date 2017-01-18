@@ -40,18 +40,67 @@ describe Mongoid::Findable do
     end
   end
 
-  describe ".find_and_modify" do
+  describe ".find_one_and_update" do
 
     let!(:person) do
       Person.create(title: "Senior")
     end
 
     it "returns the document" do
-      expect(Person.find_and_modify(title: "Junior")).to eq(person)
+      expect(Person.find_one_and_update(title: "Junior")).to eq(person)
     end
   end
 
   describe ".find_by" do
+
+    context "when collection is a embeds_many" do
+
+      let(:person) do
+        Person.create(title: "sir")
+      end
+
+      let!(:message) do
+        person.messages.create!(body: 'foo')
+      end
+
+      context "when the document is found" do
+
+        it "returns the document" do
+          expect(person.messages.find_by(body: 'foo')).to eq(message)
+        end
+      end
+
+      context "when the document is not found" do
+
+        context "when raising a not found error" do
+
+          let!(:raise_option) { Mongoid.raise_not_found_error }
+
+          before { Mongoid.raise_not_found_error = true }
+
+          after { Mongoid.raise_not_found_error = raise_option }
+
+          it "raises an error" do
+            expect {
+              person.messages.find_by(body: 'bar')
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
+
+        context "when raising no error" do
+
+          let!(:raise_option) { Mongoid.raise_not_found_error }
+
+          before { Mongoid.raise_not_found_error = false }
+
+          after { Mongoid.raise_not_found_error = raise_option }
+
+          it "returns nil" do
+            expect(person.messages.find_by(body: 'bar')).to be_nil
+          end
+        end
+      end
+    end
 
     context "when the document is found" do
 
@@ -84,9 +133,11 @@ describe Mongoid::Findable do
 
       context "when raising a not found error" do
 
-        before do
-          Mongoid.raise_not_found_error = true
-        end
+        let!(:raise_option) { Mongoid.raise_not_found_error }
+
+        before { Mongoid.raise_not_found_error = true }
+
+        after { Mongoid.raise_not_found_error = raise_option }
 
         it "raises an error" do
           expect {
@@ -97,13 +148,11 @@ describe Mongoid::Findable do
 
       context "when raising no error" do
 
-        before do
-          Mongoid.raise_not_found_error = false
-        end
+        let!(:raise_option) { Mongoid.raise_not_found_error }
 
-        after do
-          Mongoid.raise_not_found_error = true
-        end
+        before { Mongoid.raise_not_found_error = false }
+
+        after { Mongoid.raise_not_found_error = raise_option }
 
         context "when no block is provided" do
 
@@ -124,6 +173,45 @@ describe Mongoid::Findable do
             expect(result).to be_nil
           end
         end
+      end
+    end
+  end
+
+  describe "find_by!" do
+
+    context "when the document is found" do
+
+      let!(:person) do
+        Person.create(title: "sir")
+      end
+
+      context "when no block is provided" do
+
+        it "returns the document" do
+          expect(Person.find_by!(title: "sir")).to eq(person)
+        end
+      end
+
+      context "when a block is provided" do
+
+        let(:result) do
+          Person.find_by!(title: "sir") do |peep|
+            peep.age = 50
+          end
+        end
+
+        it "yields the returned document" do
+          expect(result.age).to eq(50)
+        end
+      end
+    end
+
+    context "when the document is not found" do
+
+      it "raises an error" do
+        expect {
+          Person.find_by!(ssn: "333-22-1111")
+        }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
   end
@@ -382,13 +470,13 @@ describe Mongoid::Findable do
         Band.pluck(:follows)
       end
 
-      it "returns an empty array" do
-        expect(plucked).to be_empty
+      it "returns a array with nil values" do
+        expect(plucked).to eq([nil, nil, nil])
       end
     end
   end
 
-  Origin::Selectable.forwardables.each do |method|
+  Mongoid::Criteria::Queryable::Selectable.forwardables.each do |method|
 
     describe "##{method}" do
 
@@ -398,24 +486,48 @@ describe Mongoid::Findable do
     end
   end
 
-  describe "#text_search" do
+  context 'when Mongoid is configured to use activesupport time zone' do
 
     before do
-      Word.with(database: "admin").mongo_session.command(setParameter: 1, textSearchEnabled: true)
-      Word.create_indexes
-      Word.create!(name: "phase", origin: "latin")
+      Mongoid.use_utc = false
+      Mongoid.use_activesupport_time_zone = true
+      Time.zone = "Asia/Kolkata"
     end
 
-    after(:all) do
-      Word.remove_indexes
+    let!(:time) do
+      Time.zone.now.tap do |t|
+        User.create(last_login: t, name: 'Tom')
+      end
     end
 
-    let(:search) do
-      Word.text_search("phase")
+    it 'uses activesupport time zone' do
+      expect(User.distinct(:last_login).first.to_s).to eql(time.in_time_zone('Asia/Kolkata').to_s)
     end
 
-    it "returns all fields" do
-      expect(search.first.origin).to eq("latin")
+    it 'loads other fields accurately' do
+      expect(User.distinct(:name)).to match_array(['Tom'])
+    end
+  end
+
+  context 'when Mongoid is not configured to use activesupport time zone' do
+
+    before do
+      Mongoid.use_utc = true
+      Mongoid.use_activesupport_time_zone = false
+    end
+
+    let!(:time) do
+      Time.now.tap do |t|
+        User.create(last_login: t, name: 'Tom')
+      end
+    end
+
+    it 'uses utc' do
+      expect(User.distinct(:last_login).first.to_s).to eql(time.utc.to_s)
+    end
+
+    it 'loads other fields accurately' do
+      expect(User.distinct(:name)).to match_array(['Tom'])
     end
   end
 end

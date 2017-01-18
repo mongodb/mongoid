@@ -61,7 +61,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).with(operations).and_call_original
         end
 
         let!(:update) do
@@ -88,7 +88,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).with(operations).and_call_original
         end
 
         let!(:update) do
@@ -116,7 +116,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).with(operations).and_call_original
         end
 
         let!(:update) do
@@ -153,7 +153,7 @@ describe Mongoid::Persistable do
         end
 
         before do
-          expect_any_instance_of(Moped::Query).to receive(:update).with(operations).and_call_original
+          expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).with(operations).and_call_original
         end
 
         let!(:update) do
@@ -163,6 +163,30 @@ describe Mongoid::Persistable do
               bit(likes: { and: 13 }).
               set(name: "Placebo").
               unset(:origin)
+          end
+        end
+
+        it_behaves_like "an atomically updatable root document"
+      end
+
+      context "when nesting atomically calls" do
+
+        before do
+          class Band
+            def my_updates
+              atomically do |d|
+                d.set(name: "Placebo")
+                d.unset(:origin)
+              end
+            end
+          end
+        end
+
+        let!(:update) do
+          document.atomically do |doc|
+            doc.inc(member_count: 10)
+            doc.bit(likes: { and: 13 })
+            doc.my_updates
           end
         end
 

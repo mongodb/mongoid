@@ -131,6 +131,17 @@ describe Mongoid::Relations::Eager do
 
         context.eager_load(docs)
       end
+
+      context 'when combined with a #find_by' do
+
+        let!(:person) do
+          Person.create!(title: 'manager')
+        end
+
+        it 'executes the find_by' do
+          expect(criteria.find_by(title: 'manager')).to eq(person)
+        end
+      end
     end
 
     context "when including multiple relations" do
@@ -169,6 +180,46 @@ describe Mongoid::Relations::Eager do
       it "runs the has_and_belongs_to_many preload" do
         expect(Mongoid::Relations::Eager::HasAndBelongsToMany).to receive(:new).with([houses_metadata], docs).once.and_call_original
         context.eager_load(docs)
+      end
+
+      context 'when one of the eager loading definitions is nested' do
+
+        before do
+          class User
+            include Mongoid::Document
+          end
+
+          class Unit
+            include Mongoid::Document
+          end
+
+          class Booking
+            include Mongoid::Document
+            belongs_to :unit
+            has_many :vouchers
+          end
+
+          class Voucher
+            include Mongoid::Document
+            belongs_to :booking
+            belongs_to :created_by, class_name: 'User'
+          end
+        end
+
+        it 'successfully loads all relations' do
+          user = User.create
+          unit = Unit.create
+          booking = Booking.create(unit: unit)
+          Voucher.create(booking: booking, created_by: user)
+
+          vouchers = Voucher.includes(:created_by, booking: [:unit])
+
+          vouchers.each do |voucher|
+            expect(voucher.created_by).to eql(user)
+            expect(voucher.booking).to eql(booking)
+            expect(voucher.booking.unit).to eql(unit)
+          end
+        end
       end
     end
 

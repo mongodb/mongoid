@@ -9,36 +9,31 @@ module Mongoid
   module Relations
     module Eager
 
-      attr_accessor :eager_loaded
-
-      def with_eager_loading(document)
-        return nil unless document
-        doc = Factory.from_db(klass, document, criteria.options[:fields])
-        eager_load_one(doc)
-        doc
-      end
-
-      def eager_load_one(doc)
-        eager_load([doc])
-      end
-
-      def eager_loadable?(document = nil)
-        return false if criteria.inclusions.empty?
-        !eager_loaded
+      def eager_loadable?
+        !criteria.inclusions.empty?
       end
 
       def eager_load(docs)
-        return false unless eager_loadable?
-        preload(criteria.inclusions, docs)
-        self.eager_loaded = true
+        docs.tap do |docs|
+          if eager_loadable?
+            preload(criteria.inclusions, docs)
+          end
+        end
       end
 
       def preload(relations, docs)
-
-        relations.group_by do |metadata|
-          metadata.relation
-        end.each do |relation, associations|
-          relation.eager_load_klass.new(associations, docs).run
+        grouped_relations = relations.group_by do |metadata|
+          metadata.inverse_class_name
+        end
+        grouped_relations.keys.each do |_klass|
+          grouped_relations[_klass] = grouped_relations[_klass].group_by do |metadata|
+            metadata.relation
+          end
+        end
+        grouped_relations.each do |_klass, associations|
+          docs = associations.collect do |_relation, association|
+            _relation.eager_load_klass.new(association, docs).run
+          end.flatten
         end
       end
     end

@@ -16,7 +16,7 @@ module Mongoid
       #
       # @param [ Hash ] operations The bitwise operations.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def bit(operations)

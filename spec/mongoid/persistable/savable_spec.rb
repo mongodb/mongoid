@@ -8,6 +8,14 @@ describe Mongoid::Persistable::Savable do
       Person.create
     end
 
+    let(:contextable_item) do
+      ContextableItem.new
+    end
+
+    let(:persisted_contextable_item) do
+      ContextableItem.create(title: 'sir')
+    end
+
     context "when skipping validation" do
 
       context "when no relations are involved" do
@@ -73,6 +81,24 @@ describe Mongoid::Persistable::Savable do
                 expect(alert.errors).to be_empty
               end
             end
+          end
+        end
+
+        context 'when the embedded document is unchanged' do
+
+          let(:kangaroo) do
+            Kangaroo.new
+          end
+
+          after do
+            Kangaroo.destroy_all
+          end
+
+          it 'only makes one call to the database' do
+            allow(Kangaroo.collection).to receive(:insert).once
+            expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).never
+            kangaroo.build_baby
+            kangaroo.save
           end
         end
       end
@@ -269,20 +295,66 @@ describe Mongoid::Persistable::Savable do
       end
     end
 
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
+    context "when the changed attribute is not writable" do
 
       before do
         Person.create(title: "sir")
       end
 
+      let(:person) do
+        Person.only(:title).first
+      end
+
       it "raises an error" do
         expect {
+          person.username = 'unloaded-attribute'
           person.save
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+        }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+      end
+
+      context 'when the changed attribute is aliased' do
+
+        before do
+          Person.create(at: Time.now)
+        end
+
+        let(:person) do
+          Person.only(:at).first
+        end
+
+        it "saves the document" do
+          person.aliased_timestamp = Time.now
+          expect(person.save(validate: false)).to be true
+        end
+      end
+    end
+
+    context "when validation context isn't assigned" do
+      it "returns true" do
+        expect(contextable_item.save).to be true
+      end
+    end
+
+    context "when validation context exists" do
+      context "on new document" do
+        it "returns true" do
+          contextable_item.title = "sir"
+          expect(contextable_item.save(context: :in_context)).to be true
+        end
+        it "returns false" do
+          expect(contextable_item.save(context: :in_context)).to be false
+        end
+      end
+
+      context "on persisted document" do
+        it "returns true" do
+          persisted_contextable_item.title = "lady"
+          expect(persisted_contextable_item.save(context: :in_context)).to be true
+        end
+        it "returns false" do
+          persisted_contextable_item.title = nil
+          expect(persisted_contextable_item.save(context: :in_context)).to be false
+        end
       end
     end
   end
@@ -298,12 +370,17 @@ describe Mongoid::Persistable::Savable do
         end
 
         before do
+          Person.index({ ssn: 1 }, { unique: true })
           Person.create_indexes
           Person.create!(ssn: "555-55-9999")
         end
 
-        it "raises an error" do
-          expect { person.save! }.to raise_error
+        after do
+          Person.collection.drop
+        end
+
+        it "raises an OperationFailure" do
+          expect { person.save! }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
     end
@@ -319,12 +396,12 @@ describe Mongoid::Persistable::Savable do
       end
 
       it "raises an error with multiple save attempts" do
-        expect { subject.save! }.to raise_error
-        expect { subject.save! }.to raise_error
+        expect { service.save! }.to raise_error(Mongoid::Errors::Validations)
+        expect { service.save! }.to raise_error(Mongoid::Errors::Validations)
       end
     end
 
-    context "when a callback returns false" do
+    context "when a callback aborts the callback chain" do
 
       let(:oscar) do
         Oscar.new
@@ -358,7 +435,7 @@ describe Mongoid::Persistable::Savable do
         end
       end
 
-      it "reads for persistance as a UTC Time" do
+      it "reads for persistence as a UTC Time" do
         expect(user.changes["last_login"].last.class).to eq(Time)
       end
 
@@ -377,7 +454,7 @@ describe Mongoid::Persistable::Savable do
         end
       end
 
-      it "reads for persistance as a UTC Time" do
+      it "reads for persistence as a UTC Time" do
         expect(user.changes["account_expires"].last.class).to eq(Time)
       end
 
@@ -438,23 +515,6 @@ describe Mongoid::Persistable::Savable do
 
       it "properly sets up the entire hierarchy" do
         expect(from_db.shapes.first.canvas).to eq(firefox)
-      end
-    end
-
-    context "when the document is readonly" do
-
-      let(:person) do
-        Person.only(:title).first
-      end
-
-      before do
-        Person.create(title: "sir")
-      end
-
-      it "raises an error" do
-        expect {
-          person.save!
-        }.to raise_error(Mongoid::Errors::ReadonlyDocument)
       end
     end
   end

@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Hash ] renames The rename pairs of old name/new name.
       #
-      # @return [ true, false ] If the rename suceeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def rename(renames)

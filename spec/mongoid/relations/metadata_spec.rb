@@ -586,6 +586,22 @@ describe Mongoid::Relations::Metadata do
     end
   end
 
+  context "when the association is polymorphic" do
+
+    let(:metadata) do
+      described_class.new(
+        name: :ratable,
+        relation: Mongoid::Relations::Referenced::In,
+        polymorphic: true,
+        inverse_class_name: "Rating"
+      )
+    end
+
+    it "returns the polymorphic class name" do
+      expect(metadata.class_name).to eq("Ratable")
+    end
+  end
+
   describe "#destructive?" do
 
     context "when the relation has a destructive dependent option" do
@@ -1880,6 +1896,21 @@ describe Mongoid::Relations::Metadata do
       end
     end
 
+    context "when touch specifies additional field" do
+
+      let(:metadata) do
+        described_class.new(
+          name: :versions,
+          relation: Mongoid::Relations::Referenced::In,
+          touch: :changed_at
+        )
+      end
+
+      it "returns true" do
+        expect(metadata).to be_touchable
+      end
+    end
+
     context "when touch is nil" do
 
       let(:metadata) do
@@ -1951,5 +1982,4 @@ describe Mongoid::Relations::Metadata do
       end
     end
   end
-
 end

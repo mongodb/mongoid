@@ -24,7 +24,11 @@ module Mongoid
       #
       # @since 3.0.0
       def __mongoize_object_id__
-        update_values(&:__mongoize_object_id__)
+        if id = self['$oid']
+          BSON::ObjectId.from_string(id)
+        else
+          update_values(&:__mongoize_object_id__)
+        end
       end
 
       # Consolidate the key/values in the hash under an atomic $set.
@@ -101,6 +105,7 @@ module Mongoid
         keys = string.split(".")
         value = self
         keys.each do |key|
+          return nil if value.nil?
           nested = value[key] || value[key.to_i]
           value = nested
         end
@@ -194,7 +199,7 @@ module Mongoid
         # @since 3.0.0
         def mongoize(object)
           return if object.nil?
-          evolve(object).update_values { |value| value.mongoize }
+          evolve(object.dup).update_values { |value| value.mongoize }
         end
 
         # Can the size of this object change?

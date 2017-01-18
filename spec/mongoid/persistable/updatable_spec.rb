@@ -112,6 +112,24 @@ describe Mongoid::Persistable::Updatable do
       end
     end
 
+    context "when dynamic attributes are not enabled" do
+
+      it "raises exception for an unknown attribute " do
+        account = Account.create
+
+        expect {
+          account.update_attribute(:somethingnew, "somethingnew")
+        }.to raise_error(Mongoid::Errors::UnknownAttribute)
+      end
+
+      it "will update value of aliased field" do
+        person = Person.create
+        person.update_attribute(:t, "test_value")
+        expect(person.reload.t).to eq "test_value"
+        expect(person.test).to eq "test_value"
+      end
+    end
+
     context "when provided a symbol attribute name" do
 
       let(:post) do
@@ -168,7 +186,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             post.update_attribute(:title, "something")
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
     end
@@ -217,6 +235,7 @@ describe Mongoid::Persistable::Updatable do
       end
 
       before do
+        I18n.enforce_available_locales = false
         ::I18n.locale = :de
         product.update_attribute(:description, "Die Bombe")
       end
@@ -268,6 +287,167 @@ describe Mongoid::Persistable::Updatable do
         expect(from_db.reload.name).to eq("home")
       end
     end
+
+    context 'when the field is read-only' do
+
+      before do
+        Person.attr_readonly :species
+      end
+
+      after do
+        Person.readonly_attributes.reject! { |a| a.to_s == 'species' }
+      end
+
+      let(:person) do
+        Person.create(species: :human)
+      end
+
+      it 'raises an error when trying to set the attribute' do
+        expect {
+          person.update_attribute(:species, :reptile)
+        }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+      end
+
+      context 'when referring to the attribute with a string' do
+
+        it 'raises an error when trying to set the attribute' do
+          expect {
+            person.update_attribute('species', :reptile)
+          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        end
+      end
+
+      context 'when the field is aliased' do
+
+        before do
+          Person.attr_readonly :at
+        end
+
+        after do
+          Person.readonly_attributes.reject! { |a| a.to_s == 'at' }
+        end
+
+        it 'raises an error when trying to set the attribute using the db name' do
+          expect {
+            person.update_attribute(:at, Time.now)
+          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        end
+
+        it 'raises an error when trying to set the attribute using the aliased name' do
+          expect {
+            person.update_attribute(:aliased_timestamp, Time.now)
+          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        end
+      end
+    end
+
+    context 'when the field is loaded explicitly' do
+
+      before do
+        Person.create(title: 'Captain')
+      end
+
+      context 'when the loaded attribute is updated' do
+
+        let(:person) do
+          Person.only(:title).first.tap do |_person|
+            _person.update_attribute(:title, 'Esteemed')
+          end
+        end
+
+        it 'allows the field to be updated' do
+          expect(person.title).to eq('Esteemed')
+        end
+
+        it 'persists the updated field' do
+          expect(person.reload.title).to eq('Esteemed')
+        end
+      end
+
+      context 'when the an attribute other than the loaded one is updated' do
+
+        let(:person) do
+          Person.only(:title).first
+        end
+
+        it 'does not allow the field to be updated' do
+          expect {
+            person.update_attribute(:age, 20)
+          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        end
+
+        it 'does not persist the change' do
+          expect(person.reload.age).to eq(100)
+        end
+
+        context 'when referring to the attribute with a string' do
+
+          it 'does not allow the field to be updated' do
+            expect {
+              person.update_attribute('age', 20)
+            }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+          end
+
+          it 'does not persist the change' do
+            expect(person.reload.age).to eq(100)
+          end
+        end
+      end
+    end
+
+    context 'when fields are explicitly not loaded' do
+
+      before do
+        Person.create(title: 'Captain')
+      end
+
+      context 'when the loaded attribute is updated' do
+
+        let(:person) do
+          Person.without(:age).first.tap do |_person|
+            _person.update_attribute(:title, 'Esteemed')
+          end
+        end
+
+        it 'allows the field to be updated' do
+          expect(person.title).to eq('Esteemed')
+        end
+
+        it 'persists the updated field' do
+          expect(person.reload.title).to eq('Esteemed')
+        end
+      end
+
+      context 'when the non-loaded attribute is updated' do
+
+        let(:person) do
+          Person.without(:title).first
+        end
+
+        it 'does not allow the field to be updated' do
+          expect {
+            person.update_attribute(:title, 'Esteemed')
+          }.to raise_exception(ActiveModel::MissingAttributeError)
+        end
+
+        it 'does not persist the change' do
+          expect(person.reload.title).to eq('Captain')
+        end
+
+        context 'when referring to the attribute with a string' do
+
+          it 'does not allow the field to be updated' do
+            expect {
+              person.update_attribute('title', 'Esteemed')
+            }.to raise_exception(ActiveModel::MissingAttributeError)
+          end
+
+          it 'does not persist the change' do
+            expect(person.reload.title).to eq('Captain')
+          end
+        end
+      end
+    end
   end
 
   [:update_attributes, :update].each do |method|
@@ -283,7 +463,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             person.update_attributes(map: { "bad.key" => "value" })
-          }.to raise_error(Moped::Errors::OperationFailure)
+          }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
 
@@ -319,7 +499,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             person.send(method, map: { "bad.key" => "value" })
-          }.to raise_error(Moped::Errors::OperationFailure)
+          }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
 
@@ -359,7 +539,7 @@ describe Mongoid::Persistable::Updatable do
         it "raises an error" do
           expect {
             person.send(method, title: "something")
-          }.to raise_error
+          }.to raise_error(RuntimeError)
         end
       end
 
@@ -542,7 +722,7 @@ describe Mongoid::Persistable::Updatable do
 
   describe "#update!" do
 
-    context "when a callback returns false" do
+    context "when a callback aborts the callback chain" do
 
       let(:oscar) do
         Oscar.new

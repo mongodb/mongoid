@@ -122,6 +122,13 @@ describe Mongoid::Relations::Targets::Enumerable do
       end
     end
 
+    context "when compared to an enumerable class" do
+
+      it "returns true" do
+        expect(enumerable === described_class).to be true
+      end
+    end
+
     context "when compared to a different class" do
 
       it "returns false" do
@@ -1186,7 +1193,7 @@ describe Mongoid::Relations::Targets::Enumerable do
     context "when the enumerable is not loaded" do
 
       let(:criteria) do
-        Post.where(person_id: person.id)
+        Post.asc(:_id).where(person_id: person.id)
       end
 
       let(:enumerable) do
@@ -1272,7 +1279,7 @@ describe Mongoid::Relations::Targets::Enumerable do
         context "when accessing from a reloaded child" do
 
           it "returns the last document" do
-            expect(post_one.reload.person.posts.last).to eq(post_two)
+            expect(post_one.reload.person.posts.asc(:_id).last).to eq(post_two)
           end
         end
       end

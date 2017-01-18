@@ -259,12 +259,11 @@ module Mongoid
         send("_#{kind}_callbacks").each do |callback|
           chain.append(callback) if callback.kind == place
         end
-        class_eval <<-EOM
-          def #{name}()
-            #{chain.compile}
-          end
-          protected :#{name}
-        EOM
+        self.class.send :define_method, name do
+          runner = ActiveSupport::Callbacks::Filters::Environment.new(self, false, nil)
+          chain.compile.call(runner).value
+        end
+        self.class.send :protected, name
       end
       send(name)
     end

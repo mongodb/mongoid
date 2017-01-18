@@ -32,6 +32,11 @@ module Mongoid
       time: Time
     }.with_indifferent_access
 
+    # Constant for all names of the id field in a document.
+    #
+    # @since 5.0.0
+    IDS = [ :_id, :id, '_id', 'id' ].freeze
+
     included do
       class_attribute :aliased_fields
       class_attribute :localized_fields
@@ -93,7 +98,7 @@ module Mongoid
     #
     # @since 2.4.0
     def apply_default(name)
-      unless attributes.has_key?(name)
+      unless attributes.key?(name)
         if field = fields[name]
           default = field.eval_default(self)
           unless default.nil? || field.lazy?
@@ -358,7 +363,7 @@ module Mongoid
         field_options = field.options
 
         Fields.options.each_pair do |option_name, handler|
-          if field_options.has_key?(option_name)
+          if field_options.key?(option_name)
             handler.call(self, field, field_options[option_name])
           end
         end
@@ -475,8 +480,8 @@ module Mongoid
       def create_field_check(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}?") do
-            attr = read_attribute(name)
-            attr == true || attr.present?
+            value = read_attribute(name)
+            lookup_attribute_presence(name, value)
           end
         end
       end

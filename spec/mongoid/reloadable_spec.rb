@@ -4,6 +4,25 @@ describe Mongoid::Reloadable do
 
   describe "#reload" do
 
+    context 'when persistence options are set' do
+
+      let(:person) do
+        Person.with(collection: 'other') do |person_class|
+          person_class.create
+        end
+      end
+
+      let(:reloaded) do
+        Person.with(collection: 'other') do |person_class|
+          person_class.first
+        end
+      end
+
+      it 'applies the persistence options' do
+        expect(person).to eq(reloaded)
+      end
+    end
+
     context "when using bson ids" do
 
       let(:person) do
@@ -106,6 +125,38 @@ describe Mongoid::Reloadable do
 
       context "when embedded a single level" do
 
+        context 'when persistence options are set' do
+
+          let(:person) do
+            Person.with(collection: 'other') do |person_class|
+              person_class.create
+            end
+          end
+
+          let!(:address) do
+            person.with(collection: 'other') do |person_object|
+              person_object.addresses.create(street: "Abbey Road", number: 4)
+            end
+          end
+
+          before do
+            Person.mongo_client[:other].find(
+                { "_id" => person.id }
+            ).update_one({ "$set" => { "addresses.0.number" => 3 }})
+          end
+
+          let!(:reloaded) do
+            person.with(collection: 'other') do |person_class|
+              person.addresses.first.reload
+            end
+          end
+
+          it "reloads the embedded document attributes" do
+            expect(reloaded.number).to eq(3)
+          end
+
+        end
+
         context "when the relation is an embeds many" do
 
           let!(:address) do
@@ -115,7 +166,7 @@ describe Mongoid::Reloadable do
           before do
             Person.collection.find(
               { "_id" => person.id }
-            ).update({ "$set" => { "addresses.0.number" => 3 }})
+            ).update_one({ "$set" => { "addresses.0.number" => 3 }})
           end
 
           let!(:reloaded) do
@@ -143,7 +194,7 @@ describe Mongoid::Reloadable do
 
           before do
             Person.collection.find({ "_id" => person.id }).
-              update({ "$set" => { "name.last_name" => "Vicious" }})
+              update_one({ "$set" => { "name.last_name" => "Vicious" }})
           end
 
           let!(:reloaded) do
@@ -176,7 +227,7 @@ describe Mongoid::Reloadable do
 
         before do
           Person.collection.find({ "_id" => person.id }).
-            update({ "$set" => { "addresses.0.locations.0.name" => "work" }})
+            update_one({ "$set" => { "addresses.0.locations.0.name" => "work" }})
         end
 
         let!(:reloaded) do
@@ -209,7 +260,7 @@ describe Mongoid::Reloadable do
 
       before do
         Person.collection.find({ "_id" => person.id }).
-          update({ "$set" => { "addresses" => [] }})
+          update_one({ "$set" => { "addresses" => [] }})
         person.reload
       end
 
@@ -232,7 +283,7 @@ describe Mongoid::Reloadable do
 
         before do
           Game.collection.find({ "_id" => game.id }).
-            update({ "$set" => { "score" => 75 }})
+            update_one({ "$set" => { "score" => 75 }})
           person.reload
         end
 
@@ -251,7 +302,7 @@ describe Mongoid::Reloadable do
 
           before do
             Person.collection.find({ "_id" => person.id }).
-              update({ "$set" => { "title" => "Mam" }})
+              update_one({ "$set" => { "title" => "Mam" }})
             game.reload
           end
 
@@ -259,6 +310,44 @@ describe Mongoid::Reloadable do
             expect(game.person.title).to eq("Mam")
           end
         end
+      end
+    end
+
+    context "when overriding #id alias" do
+
+      let!(:object) do
+        IdKey.create(key: 'foo')
+      end
+
+      let!(:from_db) do
+        IdKey.find(object._id).tap do |object|
+          object.key = 'bar'
+          object.save
+        end
+      end
+
+      it "reloads the object attributes from the db" do
+        object.reload
+        expect(object.key).to eq('bar')
+      end
+
+      it "reload should return self" do
+        expect(object.reload).to eq(from_db)
+      end
+    end
+
+    context 'when the document is readonly' do
+
+      before do
+        Person.create
+      end
+
+      let(:reloaded) do
+        Person.only(:name).first.reload
+      end
+
+      it 'resets the readonly state after reloading' do
+        expect(reloaded.readonly?).to be(false)
       end
     end
   end

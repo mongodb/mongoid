@@ -1178,7 +1178,7 @@ describe Mongoid::Relations::Referenced::One do
 
       before do
         Game.collection.find({ _id: game_one.id }).
-          update({ "$set" => { name: "Diablo 2" }})
+          update_one({ "$set" => { name: "Diablo 2" }})
       end
 
       let(:reloaded) do
@@ -1210,6 +1210,30 @@ describe Mongoid::Relations::Referenced::One do
 
       it "sets a new document instance" do
         expect(reloaded).to_not equal(game_one)
+      end
+    end
+  end
+
+  context "when dependent is set to delete for child" do
+
+    context "when autobuild is true for child" do
+
+      let(:explosion) do
+        Explosion.create
+      end
+
+      let(:bomb) do
+        bomb = Bomb.create
+        bomb.explosion = explosion
+        bomb
+      end
+
+      let(:clear_child) do
+        bomb.explosion.clear
+      end
+
+      it "clearing the child raises no error" do
+        expect{ clear_child }.not_to raise_error
       end
     end
   end

@@ -36,14 +36,13 @@ class Person
   field :overridden_setter, type: String
   field :arrays, type: Array
   field :range, type: Range
+  field :species, type: Symbol
 
   index age: 1
   index addresses: 1
   index dob: 1
   index name: 1
   index title: 1
-
-  index({ ssn: 1 }, { unique: true })
 
   attr_reader :rescored
 
@@ -134,7 +133,8 @@ class Person
     self.score_without_rescoring = score
   end
 
-  alias_method_chain :score=, :rescoring
+  alias_method :score_without_rescoring=, :score=
+  alias_method :score=, :score_with_rescoring=
 
   def update_addresses
     addresses.each do |address|

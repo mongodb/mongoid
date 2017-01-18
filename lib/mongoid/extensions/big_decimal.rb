@@ -28,6 +28,18 @@ module Mongoid
         to_s
       end
 
+      # Is the BigDecimal a number?
+      #
+      # @example Is the object a number?.
+      #   object.numeric?
+      #
+      # @return [ true ] Always true.
+      #
+      # @since 6.0.0
+      def numeric?
+        true
+      end
+
       module ClassMethods
 
         # Convert the object from its mongo friendly ruby type to this type.
@@ -37,28 +49,25 @@ module Mongoid
         #
         # @param [ Object ] object The object to demongoize.
         #
-        # @return [ Object ] The object.
+        # @return [ BigDecimal, nil ] A BigDecimal derived from the object or nil.
         #
         # @since 3.0.0
         def demongoize(object)
-          if object
-            object.numeric? ? ::BigDecimal.new(object.to_s) : object
-          end
+          object && object.numeric? ? ::BigDecimal.new(object.to_s) : nil
         end
 
-        # Mongoize an object of any type to how it's stored in the db as a big
-        # decimal.
+        # Mongoize an object of any type to how it's stored in the db as a String.
         #
         # @example Mongoize the object.
         #   BigDecimal.mongoize(123)
         #
         # @param [ Object ] object The object to Mongoize
         #
-        # @return [ String ] The mongoized object.
+        # @return [ String, nil ] A String representing the object or nil.
         #
         # @since 3.0.7
         def mongoize(object)
-          object ? object.to_s : object
+          object && object.numeric? ? object.to_s : nil
         end
       end
     end

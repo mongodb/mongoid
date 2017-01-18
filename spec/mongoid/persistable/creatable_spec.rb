@@ -393,6 +393,66 @@ describe Mongoid::Persistable::Creatable do
             expect(container.vehicles.size).to eq(2)
           end
         end
+
+        context 'when searching by a Time value' do
+
+          let!(:account) do
+            Account.create!(name: 'test', period_started_at: Time.now.utc)
+          end
+
+          let!(:queried_consumption) do
+            account.consumption_periods.find_or_create_by(started_at: account.period_started_at)
+          end
+
+          before do
+            account.reload
+          end
+
+          it 'does not change the Time value' do
+            expect(queried_consumption).to eq(account.current_consumption)
+          end
+        end
+      end
+
+      context "#find_or_create_by!" do
+
+        before do
+          container.vehicles.find_or_create_by!({ driver_id: driver.id }, Car)
+        end
+
+        it "creates the given type document" do
+          expect(container.vehicles.map(&:class)).to eq([ Car ])
+        end
+
+        it "creates with the given attributes" do
+          expect(container.vehicles.map(&:driver)).to eq([ driver ])
+        end
+
+        it "creates the correct number of documents" do
+          expect(container.vehicles.size).to eq(1)
+        end
+
+        context "when executing with a found document" do
+
+          before do
+            container.vehicles.find_or_create_by!({ driver_id: driver.id }, Car)
+          end
+
+          it "does not create an additional document" do
+            expect(container.vehicles.size).to eq(1)
+          end
+        end
+
+        context "when executing with an additional new document" do
+
+          before do
+            container.vehicles.find_or_create_by!({ driver_id: driver.id }, Truck)
+          end
+
+          it "creates the new additional document" do
+            expect(container.vehicles.size).to eq(2)
+          end
+        end
       end
     end
   end
@@ -463,13 +523,18 @@ describe Mongoid::Persistable::Creatable do
       context "when a unique index exists" do
 
         before do
+          Person.index({ ssn: 1 }, { unique: true })
           Person.create_indexes
+        end
+
+        after do
+          Person.collection.drop
         end
 
         it "raises an error" do
           expect {
             4.times { Person.create!(ssn: "555-55-1029") }
-          }.to raise_error
+          }.to raise_error(Mongo::Error::OperationFailure)
         end
       end
     end
@@ -502,7 +567,7 @@ describe Mongoid::Persistable::Creatable do
       end
     end
 
-    context "when a callback returns false" do
+    context "when a callback aborts the chain" do
 
       it "raises a callback error" do
         expect { Oscar.create! }.to raise_error(Mongoid::Errors::Callback)

@@ -19,7 +19,7 @@ module Mongoid
       # @since 3.1.0
       def average_distance
         average = stats["avgDistance"]
-        average.nan? ? nil : average
+        (average.nil? || average.nan?) ? nil : average
       end
 
       # Iterates over each of the documents in the $geoNear, excluding the
@@ -90,6 +90,7 @@ module Mongoid
   near:       #{command[:near]}
   multiplier: #{command[:distanceMultiplier] || "N/A"}
   max:        #{command[:maxDistance] || "N/A"}
+  min:        #{command[:minDistance] || "N/A"}
   unique:     #{command[:unique].nil? ? true : command[:unique]}
   spherical:  #{command[:spherical] || false}>
 }
@@ -116,6 +117,21 @@ module Mongoid
         else
           stats["maxDistance"]
         end
+      end
+
+      # Specify the minimum distance to find documents for.
+      #
+      # @example Set the min distance.
+      #   geo_near.min_distance(0.5)
+      #
+      # @param [ Integer, Float ] value The minimum distance.
+      #
+      # @return [ GeoNear ] The GeoNear command.
+      #
+      # @since 3.1.0
+      def min_distance(value)
+        command[:minDistance] = value
+        self
       end
 
       # Tell the command to calculate based on spherical distances.
@@ -182,6 +198,18 @@ module Mongoid
         stats["time"]
       end
 
+      # Is this context's criteria considered empty?
+      #
+      # @example Is this context's criteria considered empty?
+      #   geo_near.empty_and_chainable?
+      #
+      # @return [ true ] Always true.
+      #
+      # @since 5.1.0
+      def empty_and_chainable?
+        true
+      end
+
       private
 
       # Apply criteria specific options - query, limit.
@@ -230,7 +258,7 @@ module Mongoid
       #
       # @since 3.0.0
       def results
-        @results ||= session.command(command)
+        @results ||= client.command(command).first
       end
     end
   end

@@ -4,6 +4,9 @@ module Mongoid
     module Time
 
       # Constant for epoch - used when passing invalid times.
+      #
+      # @deprecated No longer used as a return value from #mongoize passed
+      #   an invalid time string.
       EPOCH = ::Time.utc(1970, 1, 1, 0, 0, 0)
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -76,7 +79,7 @@ module Mongoid
               ::Time.at(time.to_i, time.usec).utc
             end
           rescue ArgumentError
-            EPOCH
+            nil
           end
         end
       end

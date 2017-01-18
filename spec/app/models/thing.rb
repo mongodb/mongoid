@@ -4,6 +4,6 @@ class Thing
   embedded_in :actor
 
   def dont_do_it
-    false
+    throw(:abort)
   end
 end

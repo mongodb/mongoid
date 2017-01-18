@@ -1,18 +1,11 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 gemspec
 
-gem "rake"
-gem "actionpack",  "~> 4.0.4"
-gem "activemodel", "~> 4.0.4"
+gem 'rake'
+gem 'actionpack', '~> 5.0.0'
+gem 'activemodel', '~> 5.0.0'
+
 
 group :test do
-  gem "rspec", "~> 3.0.0.beta2"
-
-  if ENV["CI"]
-    gem "coveralls", require: false
-  else
-    gem "guard"
-    gem "guard-rspec"
-    gem "rb-fsevent"
-  end
+  gem 'rspec', '~> 3.4.0'
 end

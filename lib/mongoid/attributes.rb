@@ -31,6 +31,8 @@ module Mongoid
     def attribute_present?(name)
       attribute = read_attribute(name)
       !attribute.blank? || attribute == false
+    rescue ActiveModel::MissingAttributeError
+      false
     end
 
     # Get the attributes that have not been cast.
@@ -56,7 +58,7 @@ module Mongoid
     #
     # @since 3.0.0
     def has_attribute?(name)
-      attributes.has_key?(name.to_s)
+      attributes.key?(name.to_s)
     end
 
     # Does the document have the provided attribute before it was assigned
@@ -72,7 +74,7 @@ module Mongoid
     #
     # @since 3.1.0
     def has_attribute_before_type_cast?(name)
-      attributes_before_type_cast.has_key?(name.to_s)
+      attributes_before_type_cast.key?(name.to_s)
     end
 
     # Read a value from the document attributes. If the value does not exist
@@ -117,7 +119,7 @@ module Mongoid
     # @since 3.1.0
     def read_attribute_before_type_cast(name)
       attr = name.to_s
-      if attributes_before_type_cast.has_key?(attr)
+      if attributes_before_type_cast.key?(attr)
         attributes_before_type_cast[attr]
       else
         read_attribute(attr)
@@ -137,14 +139,12 @@ module Mongoid
     #
     # @since 1.0.0
     def remove_attribute(name)
-      access = name.to_s
-      unless attribute_writable?(name)
-        raise Errors::ReadonlyAttribute.new(name, :nil)
-      end
-      _assigning do
-        attribute_will_change!(access)
-        delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
-        attributes.delete(access)
+      as_writable_attribute!(name) do |access|
+        _assigning do
+          attribute_will_change!(access)
+          delayed_atomic_unsets[atomic_attribute_name(access)] = [] unless new_record?
+          attributes.delete(access)
+        end
       end
     end
 
@@ -163,8 +163,7 @@ module Mongoid
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      access = database_field_name(name.to_s)
-      if attribute_writable?(access)
+      as_writable_attribute!(name) do |access|
         _assigning do
           validate_attribute_value(access, value)
           localized = fields[access].try(:localized?)
@@ -174,7 +173,8 @@ module Mongoid
             attribute_will_change!(access)
           end
           if localized
-            (attributes[access] ||= {}).merge!(typed_value)
+            attributes[access] ||= {}
+            attributes[access].merge!(typed_value)
           else
             attributes[access] = typed_value
           end
@@ -242,22 +242,26 @@ module Mongoid
         (selection.values.first == 1 && !selection_included?(name, selection, field))
     end
 
+    # Return type-casted attributes.
+    #
+    # @example Type-casted attributes.
+    #   document.typed_attributes
+    #
+    # @return [ Object ] The hash with keys and values of the type-casted attributes.
+    #
+    # @since 6.1.0
+    def typed_attributes
+      attribute_names.map { |name| [name, send(name)] }.to_h
+    end
+
     private
 
     def selection_excluded?(name, selection, field)
-      if field && field.localized?
-        selection["#{name}.#{::I18n.locale}"] == 0
-      else
-        selection[name] == 0
-      end
+      selection[name] == 0
     end
 
     def selection_included?(name, selection, field)
-      if field && field.localized?
-        selection.has_key?("#{name}.#{::I18n.locale}")
-      else
-        selection.has_key?(name)
-      end
+      selection.key?(name) || selection.keys.collect { |k| k.partition('.').first }.include?(name)
     end
 
     # Does the string contain dot syntax for accessing hashes?
@@ -271,7 +275,7 @@ module Mongoid
     #
     # @since 3.0.15
     def hash_dot_syntax?(string)
-      string.include?(".")
+      string.include?(".".freeze)
     end
 
     # Return the typecasted value for a field.
@@ -286,13 +290,13 @@ module Mongoid
     #
     # @since 1.0.0
     def typed_value_for(key, value)
-      fields.has_key?(key) ? fields[key].mongoize(value) : value.mongoize
+      fields.key?(key) ? fields[key].mongoize(value) : value.mongoize
     end
 
     module ClassMethods
 
       # Alias the provided name to the original field. This will provide an
-      # aliased getter, setter, existance check, and all dirty attribute
+      # aliased getter, setter, existence check, and all dirty attribute
       # methods.
       #
       # @example Alias the attribute.
@@ -341,6 +345,13 @@ module Mongoid
           raise Mongoid::Errors::InvalidValue.new(fields[access].type, value.class)
         end
       end
+    end
+
+    def lookup_attribute_presence(name, value)
+      if localized_fields.has_key?(name) && value
+        value = localized_fields[name].send(:lookup, value)
+      end
+      value.present?
     end
   end
 end

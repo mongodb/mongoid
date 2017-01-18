@@ -7,6 +7,24 @@ module Mongoid
       # many-to-many between documents in different collections.
       class ManyToMany < Many
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
+        VALID_OPTIONS = [
+          :after_add,
+          :after_remove,
+          :autosave,
+          :before_add,
+          :before_remove,
+          :dependent,
+          :foreign_key,
+          :index,
+          :order,
+          :primary_key
+        ].freeze
+
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
@@ -55,12 +73,12 @@ module Mongoid
             next unless doc
             append(doc)
             if persistable? || _creating?
-              ids[doc.id] = true
+              ids[doc._id] = true
               save_or_delay(doc, docs, inserts)
             else
               existing = base.send(foreign_key)
-              unless existing.include?(doc.id)
-                existing.push(doc.id) and unsynced(base, foreign_key)
+              unless existing.include?(doc._id)
+                existing.push(doc._id) and unsynced(base, foreign_key)
               end
             end
           end
@@ -90,7 +108,7 @@ module Mongoid
         # @since 2.0.0.beta.1
         def build(attributes = {}, type = nil)
           doc = Factory.build(type || klass, attributes)
-          base.send(foreign_key).push(doc.id)
+          base.send(foreign_key).push(doc._id)
           append(doc)
           doc.apply_post_processed_defaults
           unsynced(doc, inverse_foreign_key)
@@ -134,7 +152,7 @@ module Mongoid
             execute_callback :before_remove, doc
           end
           unless __metadata.forced_nil_inverse?
-            criteria.pull(inverse_foreign_key => base.id)
+            criteria.pull(inverse_foreign_key => base._id)
           end
           if persistable?
             base.set(foreign_key => base.send(foreign_key).clear)
@@ -439,18 +457,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [
-              :after_add,
-              :after_remove,
-              :autosave,
-              :before_add,
-              :before_remove,
-              :dependent,
-              :foreign_key,
-              :index,
-              :order,
-              :primary_key
-            ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

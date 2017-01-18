@@ -24,7 +24,7 @@ module Mongoid
       # @example Find multiple relation metadata by macro.
       #   person.reflect_on_all_associations(:embeds_many)
       #
-      # @param [ Array<String, Symbol> ] *macros The relation macros.
+      # @param [ Array<Symbol> ] *macros The relation macros.
       #
       # @return [ Array<Metadata> ] The matching relation metadata.
       def reflect_on_all_associations(*macros)
@@ -50,11 +50,13 @@ module Mongoid
         # @example Find multiple relation metadata by macro.
         #   Person.reflect_on_all_associations(:embeds_many)
         #
-        # @param [ Array<String, Symbol> ] *macros The relation macros.
+        # @param [ Array<Symbol> ] *macros The relation macros.
         #
         # @return [ Array<Metadata> ] The matching relation metadata.
         def reflect_on_all_associations(*macros)
-          relations.values.select { |meta| macros.include?(meta.macro) }
+          association_reflections = relations.values
+          association_reflections.select! { |reflection| macros.include?(reflection.macro) } unless macros.empty?
+          association_reflections
         end
       end
     end

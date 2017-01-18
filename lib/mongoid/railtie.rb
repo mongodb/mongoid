@@ -1,6 +1,4 @@
 # encoding: utf-8
-require "mongoid"
-require "mongoid/config"
 require "mongoid/railties/document"
 require "rails"
 require "rails/mongoid"
@@ -12,19 +10,6 @@ module Rails
     #
     # @since 2.0.0
     class Railtie < Rails::Railtie
-
-      # Determine which generator to use. app_generators was introduced after
-      # 3.0.0.
-      #
-      # @example Get the generators method.
-      #   railtie.generators
-      #
-      # @return [ Symbol ] The method name to use.
-      #
-      # @since 2.0.0.rc.4
-      def self.generator
-        config.respond_to?(:app_generators) ? :app_generators : :generators
-      end
 
       # Mapping of rescued exceptions to HTTP responses
       #
@@ -41,7 +26,7 @@ module Rails
         }
       end
 
-      config.send(generator).orm :mongoid, migration: false
+      config.app_generators.orm :mongoid, migration: false
 
       if config.action_dispatch.rescue_responses
         config.action_dispatch.rescue_responses.merge!(rescue_responses)
@@ -57,7 +42,6 @@ module Rails
       #   module MyApplication
       #     class Application < Rails::Application
       #       config.mongoid.logger = Logger.new($stdout, :warn)
-      #       config.mongoid.persist_in_safe_mode = true
       #     end
       #   end
       #
@@ -73,13 +57,13 @@ module Rails
         if config_file.file?
           begin
             ::Mongoid.load!(config_file)
-          rescue ::Mongoid::Errors::NoSessionsConfig => e
+          rescue ::Mongoid::Errors::NoClientsConfig => e
             handle_configuration_error(e)
-          rescue ::Mongoid::Errors::NoDefaultSession => e
+          rescue ::Mongoid::Errors::NoDefaultClient => e
             handle_configuration_error(e)
-          rescue ::Mongoid::Errors::NoSessionDatabase => e
+          rescue ::Mongoid::Errors::NoClientDatabase => e
             handle_configuration_error(e)
-          rescue ::Mongoid::Errors::NoSessionHosts => e
+          rescue ::Mongoid::Errors::NoClientHosts => e
             handle_configuration_error(e)
           end
         end
@@ -93,36 +77,19 @@ module Rails
         unless config.action_dispatch.rescue_responses
           ActionDispatch::ShowExceptions.rescue_responses.update(Railtie.rescue_responses)
         end
+        Mongo::Logger.logger = ::Mongoid.logger
       end
 
       # Due to all models not getting loaded and messing up inheritance queries
       # and indexing, we need to preload the models in order to address this.
       #
-      # This will happen every request in development, once in ther other
+      # This will happen for every request in development, once in other
       # environments.
       #
       # @since 2.0.0
       initializer "mongoid.preload-models" do |app|
         config.to_prepare do
           ::Rails::Mongoid.preload_models(app)
-        end
-      end
-
-      config.after_initialize do
-        # Unicorn clears the START_CTX when a worker is forked, so if we have
-        # data in START_CTX then we know we're being preloaded. Unicorn does
-        # not provide application-level hooks for executing code after the
-        # process has forked, so we reconnect lazily.
-        if defined?(Unicorn) && !Unicorn::HttpServer::START_CTX.empty?
-          ::Mongoid.default_session.disconnect if ::Mongoid.configured?
-        end
-
-        # Passenger provides the :starting_worker_process event for executing
-        # code after it has forked, so we use that and reconnect immediately.
-        if ::Mongoid::Config.running_with_passenger?
-          PhusionPassenger.on_event(:starting_worker_process) do |forked|
-            ::Mongoid.default_session.disconnect if forked
-          end
         end
       end
 

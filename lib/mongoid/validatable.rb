@@ -68,7 +68,7 @@ module Mongoid
     # @since 2.0.0.rc.1
     def read_attribute_for_validation(attr)
       attribute = database_field_name(attr)
-      if relations.has_key?(attribute)
+      if relations.key?(attribute)
         begin_validate
         relation = without_autobuild { send(attr) }
         exit_validate

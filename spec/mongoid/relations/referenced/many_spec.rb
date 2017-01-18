@@ -200,6 +200,24 @@ describe Mongoid::Relations::Referenced::Many do
             expect(person.changed).to eq([])
           end
 
+          context "when the related item has embedded relations" do
+
+            let!(:user) do
+              User.create
+            end
+
+            before do
+              p = Post.create(roles: [ Role.create ])
+              user.posts = [ p ]
+              user.save
+            end
+
+            it "add the document to the target" do
+              expect(user.posts.size).to eq(1)
+              expect(user.posts.first.roles.size).to eq(1)
+            end
+          end
+
           context "when saving another post" do
 
             before do
@@ -292,7 +310,7 @@ describe Mongoid::Relations::Referenced::Many do
           it "raises an error" do
             expect {
               person.posts.send(method, post)
-            }.to raise_error(Moped::Errors::OperationFailure)
+            }.to raise_error(Mongo::Error::OperationFailure)
           end
         end
       end
@@ -1536,7 +1554,7 @@ describe Mongoid::Relations::Referenced::Many do
               person.posts.create do |doc|
                 doc._id = existing.id
               end
-            }.to raise_error(Moped::Errors::OperationFailure)
+            }.to raise_error(Mongo::Error::OperationFailure)
           end
         end
       end
@@ -2164,30 +2182,24 @@ describe Mongoid::Relations::Referenced::Many do
 
   describe "#find" do
 
-    context "when the identity map is enabled" do
+    context "when iterating after the find" do
 
-      context "when the document is in the map" do
+      let(:person) do
+        Person.create!
+      end
 
-        let(:person) do
-          Person.create
-        end
+      let(:post_id) do
+        person.posts.first.id
+      end
 
-        before do
-          person.posts.create(title: "Test")
-        end
+      before do
+        5.times { person.posts.create! }
+      end
 
-        context "when the document does not belong to the relation" do
-
-          let!(:post) do
-            Post.create(title: "testing")
-          end
-
-          it "raises an error" do
-            expect {
-              person.posts.find(post.id)
-            }.to raise_error(Mongoid::Errors::DocumentNotFound)
-          end
-        end
+      it "does not change the in memory size" do
+        expect {
+          person.posts.find(post_id)
+        }.not_to change { person.posts.to_a.size }
       end
     end
 
@@ -2560,6 +2572,136 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#find_or_create_by!" do
+
+    context "when the relation is not polymorphic" do
+
+      let(:person) do
+        Person.create
+      end
+
+      let!(:post) do
+        person.posts.create(title: "Testing")
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          person.posts.find_or_create_by!(title: "Testing")
+        end
+
+        it "returns the document" do
+          expect(found).to eq(post)
+        end
+
+        it "keeps the document in the relation" do
+          expect(found.person).to eq(person)
+        end
+      end
+
+      context "when the document does not exist" do
+
+        context "when there is no criteria attached" do
+
+          let(:found) do
+            person.posts.find_or_create_by!(title: "Test") do |post|
+              post.content = "The Content"
+            end
+          end
+
+          it "sets the new document attributes" do
+            expect(found.title).to eq("Test")
+          end
+
+          it "returns a newly persisted document" do
+            expect(found).to be_persisted
+          end
+
+          it "calls the passed block" do
+            expect(found.content).to eq("The Content")
+          end
+
+          it "keeps the document in the relation" do
+            expect(found.person).to eq(person)
+          end
+        end
+
+        context "when a criteria is attached" do
+
+          let(:found) do
+            person.posts.recent.find_or_create_by!(title: "Test")
+          end
+
+          it "sets the new document attributes" do
+            expect(found.title).to eq("Test")
+          end
+
+          it "returns a newly persisted document" do
+            expect(found).to be_persisted
+          end
+
+          it "keeps the document in the relation" do
+            expect(found.person).to eq(person)
+          end
+        end
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:movie) do
+        Movie.create
+      end
+
+      let!(:rating) do
+        movie.ratings.create(value: 1)
+      end
+
+      context "when the document exists" do
+
+        let(:found) do
+          movie.ratings.find_or_create_by!(value: 1)
+        end
+
+        it "returns the document" do
+          expect(found).to eq(rating)
+        end
+
+        it "keeps the document in the relation" do
+          expect(found.ratable).to eq(movie)
+        end
+      end
+
+      context "when the document does not exist" do
+
+        let(:found) do
+          movie.ratings.find_or_create_by!(value: 3)
+        end
+
+        it "sets the new document attributes" do
+          expect(found.value).to eq(3)
+        end
+
+        it "returns a newly persisted document" do
+          expect(found).to be_persisted
+        end
+
+        it "keeps the document in the relation" do
+          expect(found.ratable).to eq(movie)
+        end
+
+        context "when validation fails" do
+
+          it "raises an error" do
+            expect {
+              movie.comments.find_or_create_by!(title: "")
+            }.to raise_error(Mongoid::Errors::Validations)
+          end
+        end
+      end
+    end
+  end
+
   describe "#find_or_initialize_by" do
 
     context "when the relation is not polymorphic" do
@@ -2677,6 +2819,35 @@ describe Mongoid::Relations::Referenced::Many do
     end
   end
 
+  describe "#last" do
+
+    let(:person) do
+      Person.create!
+    end
+
+    let!(:persisted_post) do
+      person.posts.create!
+    end
+
+    context "when a new document is added" do
+
+      let!(:new_post) do
+        person.posts.new
+      end
+
+      context "when the target is subsequently loaded" do
+
+        before do
+          person.posts.entries
+        end
+
+        it "returns the expected last document" do
+          expect(person.posts.last).to eq(new_post)
+        end
+      end
+    end
+  end
+
   describe ".macro" do
 
     it "returns has_many" do
@@ -2762,6 +2933,17 @@ describe Mongoid::Relations::Referenced::Many do
 
       it "applies the criteria to the documents" do
         expect(posts).to eq([ post_one ])
+      end
+
+      context 'when providing a collation', if: collation_supported? do
+
+        let(:posts) do
+          person.posts.where(title: "FIRST").collation(locale: 'en_US', strength: 2)
+        end
+
+        it "applies the collation option to the query" do
+          expect(posts).to eq([ post_one ])
+        end
       end
     end
 
@@ -3214,7 +3396,7 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         Post.collection.find({ _id: post_one.id }).
-          update({ "$set" => { title: "reloaded" }})
+          update_one({ "$set" => { title: "reloaded" }})
       end
 
       let(:reloaded) do
@@ -3322,12 +3504,10 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         expect(artist).to receive(:before_add_album).and_raise
+        begin; artist.albums << album; rescue; end
       end
 
       it "does not add the document to the relation" do
-        expect {
-          artist.albums << album
-        }.to raise_error
         expect(artist.albums).to be_empty
       end
     end
@@ -3352,13 +3532,29 @@ describe Mongoid::Relations::Referenced::Many do
 
       before do
         expect(artist).to receive(:after_add_album).and_raise
+        begin; artist.albums << album; rescue; end
       end
 
       it "adds the document to the relation" do
-        expect {
-          artist.albums << album
-        }.to raise_error
         expect(artist.albums).to eq([ album ])
+      end
+    end
+
+    context 'when the relation already exists' do
+
+      before do
+        artist.albums << album
+        album.save
+        artist.save
+        expect(artist).not_to receive(:after_add_album)
+      end
+
+      let(:reloaded_album) do
+        Album.where(artist_id: artist.id).first
+      end
+
+      it 'does not execute the callback when the relation is accessed' do
+        expect(reloaded_album.artist.after_add_referenced_called).to be(nil)
       end
     end
   end
@@ -3418,9 +3614,7 @@ describe Mongoid::Relations::Referenced::Many do
         describe "#delete" do
 
           before do
-            expect {
-              artist.albums.delete album
-            }.to raise_error
+            begin; artist.albums.delete(album); rescue; end
           end
 
           it "does not remove the document from the relation" do
@@ -3431,9 +3625,7 @@ describe Mongoid::Relations::Referenced::Many do
         describe "#clear" do
 
           before do
-            expect {
-              artist.albums.clear
-            }.to raise_error
+            begin; artist.albums.clear; rescue; end
           end
 
           it "does not clear the relation" do
@@ -3493,9 +3685,7 @@ describe Mongoid::Relations::Referenced::Many do
       describe "#delete" do
 
         before do
-          expect {
-            artist.albums.delete album
-          }.to raise_error
+          begin; artist.albums.delete(album); rescue; end
         end
 
         it "removes the documents from the relation" do
@@ -3506,9 +3696,7 @@ describe Mongoid::Relations::Referenced::Many do
       describe "#clear" do
 
         before do
-          expect {
-            artist.albums.clear
-          }.to raise_error
+          begin; artist.albums.clear; rescue; end
         end
 
         it "removes the documents from the relation" do
@@ -3553,6 +3741,54 @@ describe Mongoid::Relations::Referenced::Many do
 
     it "returns the appropriate documents" do
       expect(person.posts.open).to eq([ post ])
+    end
+  end
+
+  context "when accessing a relation named parent" do
+
+    let!(:parent) do
+      Odd.create(name: "odd parent")
+    end
+
+    let(:child) do
+      Even.create(parent_id: parent.id, name: "original even child")
+    end
+
+    it "updates the child after accessing the parent" do
+      # Access parent relation on the child to make sure it is loaded
+      child.parent
+
+      new_child_name = "updated even child"
+
+      child.name = new_child_name
+      child.save!
+
+      reloaded = Even.find(child.id)
+      expect(reloaded.name).to eq(new_child_name)
+    end
+  end
+
+  context 'when a document has referenced and embedded relations' do
+
+    let(:agent) do
+      Agent.new
+    end
+
+    let(:basic) do
+      Basic.new
+    end
+
+    let(:address) do
+      Address.new
+    end
+
+    before do
+      agent.basics << basic
+      agent.address = address
+    end
+
+    it 'saves the document correctly' do
+      expect(agent.save).to be(true)
     end
   end
 end

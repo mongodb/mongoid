@@ -264,6 +264,44 @@ describe Mongoid::Relations::Referenced::In do
 
       context "when the relation is not polymorphic" do
 
+        context 'when the child has persistence options set' do
+
+          let(:person) do
+            Person.new
+          end
+
+          let(:post) do
+            Post.new
+          end
+
+          before do
+            post.with(collection: 'other-posts') do |p|
+              person.with(collection: 'other-people') do |per|
+                p.person = person
+                per.save
+                p.save
+              end
+            end
+          end
+
+          let(:other_people_count) do
+            Person.with(collection: 'other-people') do |person_class|
+              person_class.count
+            end
+          end
+
+          let(:other_posts_count) do
+            Post.with(collection: 'other-posts') do |post_class|
+              post_class.count
+            end
+          end
+
+          it 'applies the persistence options when saving the child' do
+            expect(other_people_count).to eq(1)
+            expect(other_posts_count).to eq(1)
+          end
+        end
+
         context "when the child is a new record" do
 
           let(:person) do
@@ -1028,7 +1066,9 @@ describe Mongoid::Relations::Referenced::In do
           :index,
           :polymorphic,
           :primary_key,
-          :touch
+          :touch,
+          :optional,
+          :required
         ]
       )
     end
@@ -1240,7 +1280,7 @@ describe Mongoid::Relations::Referenced::In do
 
       before do
         Person.collection.find({ _id: person_one.id }).
-          update({ "$set" => { title: "Madam" }})
+          update_one({ "$set" => { title: "Madam" }})
       end
 
       let(:reloaded) do

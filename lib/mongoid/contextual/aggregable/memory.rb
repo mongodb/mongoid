@@ -81,7 +81,7 @@ module Mongoid
           if block_given?
             super()
           else
-            count > 0 ? super(0) { |doc| doc.send(field) } : 0
+            count > 0 ? super(0) { |doc| doc.public_send(field) } : 0
           end
         end
 
@@ -101,7 +101,7 @@ module Mongoid
         #
         # @since 3.0.0
         def aggregate_by(field, method)
-          count > 0 ? send(method) { |doc| doc.send(field) }.send(field) : nil
+          count > 0 ? send(method) { |doc| doc.public_send(field) }.public_send(field) : nil
         end
       end
     end

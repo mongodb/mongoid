@@ -20,7 +20,7 @@ module Mongoid
       # Define a configuration option with a default.
       #
       # @example Define the option.
-      #   Options.option(:persist_in_safe_mode, :default => true)
+      #   Options.option(:logger, :default => Logger.new($stdout, :warn))
       #
       # @param [ Symbol ] name The name of the configuration option.
       # @param [ Hash ] options Extras for the option.
@@ -31,7 +31,7 @@ module Mongoid
       def option(name, options = {})
         defaults[name] = settings[name] = options[:default]
 
-        class_eval <<-RUBY
+        class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def #{name}
             settings[#{name.inspect}]
           end
@@ -68,6 +68,21 @@ module Mongoid
       # @since 2.3.0
       def settings
         @settings ||= {}
+      end
+
+      # Get the log level.
+      #
+      # @example Get the log level.
+      #   config.log_level
+      #
+      # @return [ Integer ] The log level.
+      #
+      # @since 5.1.0
+      def log_level
+        if settings[:log_level]
+          level = settings[:log_level].upcase.to_s
+          "Logger::#{level}".constantize
+        end
       end
     end
   end

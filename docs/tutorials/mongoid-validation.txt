@@ -1,0 +1,17 @@
+==========
+Validation
+==========
+
+.. default-domain:: mongodb
+
+Mongoid includes ``ActiveModel::Validations`` to supply the basic
+validation plus an additional associated and uniqueness validator.
+
+See the `ActiveModel::Validations
+<http://github.com/rails/rails/blob/master/activemodel/lib/active_model/validations.rb>`_ 
+documentation for more information.
+
+Mongoid behaves slightly different to Active Record when using ``#valid?``
+on already persisted data. Active Record's ``#valid?`` will run all
+validations whereas Mongoid's ``#valid?`` will only run validations on
+documents that are in memory as an optimization.

@@ -62,7 +62,7 @@ module Mongoid
         _parent.remove_child(self) if notifying_parent?(options)
         if _parent.persisted?
           selector = _parent.atomic_selector
-          _root.collection.find(selector).update(positionally(selector, atomic_deletes))
+          _root.collection.find(selector).update_one(positionally(selector, atomic_deletes))
         end
         true
       end
@@ -78,7 +78,7 @@ module Mongoid
       #
       # @since 4.0.0
       def delete_as_root
-        collection.find(atomic_selector).remove
+        collection.find(atomic_selector).delete_one
         true
       end
 
@@ -135,13 +135,9 @@ module Mongoid
         # @return [ Integer ] The number of documents deleted.
         #
         # @since 1.0.0
-        def delete_all(conditions = nil)
-          selector = conditions || {}
-          selector.merge!(_type: name) if hereditary?
-          coll = collection
-          deleted = coll.find(selector).count
-          coll.find(selector).remove_all
-          deleted
+        def delete_all(conditions = {})
+          selector = hereditary? ? conditions.merge(_type: name) : conditions
+          collection.find(selector).delete_many.deleted_count
         end
       end
     end

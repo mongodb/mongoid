@@ -1,16 +1,55 @@
 language: ruby
+
+sudo: false
+
 bundler_args: --without development
+
 rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.1.1
-  - jruby
+  - 2.2.6
+  - 2.3.3
+  - 2.4.0
+  - ruby-head
+  - jruby-9.1.7.0
   - jruby-head
-env: JRUBY_OPTS="--server -J-Xms512m -J-Xmx1024m"
+
 matrix:
   allow_failures:
+    - rvm: 2.4.0
+    - rvm: ruby-head
     - rvm: jruby-head
-    - gemfile: gemfiles/rails41.gemfile
+    - gemfile: gemfiles/rails_master.gemfile
+  exclude:
+    - rvm: jruby-9.1.7.0
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: 2.4.0
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: ruby-head
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: jruby-head
+      gemfile: gemfiles/driver_master.gemfile
+
+gemfile:
+  - Gemfile
+  - gemfiles/rails_master.gemfile
+  - gemfiles/driver_master.gemfile
+
+env:
+  global:
+    - CI="travis"
+    - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
+  matrix:
+    - MONGODB=2.4.14
+    - MONGODB=2.6.12
+    - MONGODB=3.0.12
+    - MONGODB=3.2.11
+    - MONGODB=3.4.1
+
+before_script:
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
+  - tar -xvf /tmp/mongodb.tgz
+  - mkdir /tmp/data
+  - ${PWD}/mongodb-linux-x86_64-${MONGODB}/bin/mongod --dbpath /tmp/data --bind_ip 127.0.0.1 --auth &> /dev/null &
+
 notifications:
   email: false
   irc:
@@ -18,8 +57,3 @@ notifications:
     on_failure: always
     channels:
       - "irc.freenode.org#mongoid"
-services:
-  - mongodb
-gemfile:
-  - Gemfile
-  - gemfiles/rails41.gemfile

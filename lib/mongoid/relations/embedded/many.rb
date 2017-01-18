@@ -10,6 +10,23 @@ module Mongoid
       class Many < Relations::Many
         include Batchable
 
+        # The allowed options when defining this relation.
+        #
+        # @return [ Array<Symbol> ] The allowed options when defining this relation.
+        #
+        # @since 6.0.0
+        VALID_OPTIONS = [
+          :as,
+          :cascade_callbacks,
+          :cyclic,
+          :order,
+          :store_as,
+          :before_add,
+          :after_add,
+          :before_remove,
+          :after_remove
+         ].freeze
+
         # Appends a document or array of documents to the relation. Will set
         # the parent and update the index in the process.
         #
@@ -84,6 +101,7 @@ module Mongoid
           doc.apply_post_processed_defaults
           yield(doc) if block_given?
           doc.run_callbacks(:build) { doc }
+          base._reset_memoized_children!
           doc
         end
         alias :new :build
@@ -161,7 +179,7 @@ module Mongoid
         #
         # @example Delete the matching documents.
         #   person.addresses.delete_if do |doc|
-        #     doc.state = "GA"
+        #     doc.state == "GA"
         #   end
         #
         # @return [ Many, Enumerator ] The relation or an enumerator if no
@@ -170,7 +188,8 @@ module Mongoid
         # @since 3.1.0
         def delete_if
           if block_given?
-            target.each do |doc|
+            dup_target = target.dup
+            dup_target.each do |doc|
               delete(doc) if yield(doc)
             end
             self
@@ -616,10 +635,7 @@ module Mongoid
           #
           # @since 2.1.0
           def valid_options
-            [
-              :as, :cascade_callbacks, :cyclic, :order, :store_as,
-              :before_add, :after_add, :before_remove, :after_remove
-            ]
+            VALID_OPTIONS
           end
 
           # Get the default validation setting for the relation. Determines if

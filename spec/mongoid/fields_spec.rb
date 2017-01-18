@@ -18,6 +18,7 @@ describe Mongoid::Fields do
 
         before do
           product.description = "test"
+          I18n.enforce_available_locales = false
           ::I18n.locale = :de
           product.description = "The best"
         end
@@ -815,12 +816,14 @@ describe Mongoid::Fields do
 
     context "when the field name conflicts with mongoid's internals" do
 
-      context "when the field is named __metadata" do
+      [:__metadata, :invalid].each do |meth|
+        context "when the field is named #{meth}" do
 
-        it "raises an error" do
-          expect {
-            Person.field(:__metadata)
-          }.to raise_error(Mongoid::Errors::InvalidField)
+          it "raises an error" do
+            expect {
+              Person.field(meth)
+            }.to raise_error(Mongoid::Errors::InvalidField)
+          end
         end
       end
     end
@@ -892,7 +895,7 @@ describe Mongoid::Fields do
         (person.testing = expect("Testy")).to eq("Testy")
       end
 
-      it "adds an existance method" do
+      it "adds an existence method" do
         expect(Person.new.testing?).to be false
       end
 

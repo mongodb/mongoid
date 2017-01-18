@@ -9,7 +9,7 @@ module Mongoid
 
         # Validate a configuration option.
         #
-        # @example Validate a configuraiton option.
+        # @example Validate a configuration option.
         #
         # @param [ String ] option The name of the option.
         #

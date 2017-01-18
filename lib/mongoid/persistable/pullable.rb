@@ -17,7 +17,7 @@ module Mongoid
       #
       # @param [ Hash ] pulls The field/value pull pairs.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def pull(pulls)
@@ -37,7 +37,7 @@ module Mongoid
       #
       # @param [ Hash ] pulls The pull all operations.
       #
-      # @return [ true, false ] If the operation succeeded.
+      # @return [ Document ] The document.
       #
       # @since 4.0.0
       def pull_all(pulls)

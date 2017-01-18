@@ -97,12 +97,12 @@ module Mongoid
     #
     # @since 3.0.0
     def serialize_attribute(attrs, name, names, options)
-      if relations.has_key?(name)
+      if relations.key?(name)
         value = send(name)
         attrs[name] = value ? value.serializable_hash(options) : nil
-      elsif names.include?(name) && !fields.has_key?(name)
+      elsif names.include?(name) && !fields.key?(name)
         attrs[name] = read_attribute(name)
-      else
+      elsif !attribute_missing?(name)
         attrs[name] = send(name)
       end
     end

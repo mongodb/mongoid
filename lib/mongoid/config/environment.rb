@@ -19,7 +19,7 @@ module Mongoid
       #
       # @since 2.3.0
       def env_name
-        return Rails.env if defined?(Rails)
+        return Rails.env if defined?(Rails) && Rails.respond_to?(:env)
         return Sinatra::Base.environment.to_s if defined?(Sinatra)
         ENV["RACK_ENV"] || ENV["MONGOID_ENV"] || raise(Errors::NoEnvironment.new)
       end

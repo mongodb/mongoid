@@ -24,17 +24,11 @@ module Mongoid
       #
       # @since 2.0.0
       def update_attribute(name, value)
-        normalized = name.to_s
-        unless attribute_writable?(normalized)
-          raise Errors::ReadonlyAttribute.new(normalized, value)
+        as_writable_attribute!(name, value) do |access|
+          normalized = name.to_s
+          process_attribute(normalized, value)
+          save(validate: false)
         end
-        setter = "#{normalized}="
-        if respond_to?(setter)
-          send(setter, value)
-        else
-          write_attribute(database_field_name(normalized), value)
-        end
-        save(validate: false)
       end
 
       # Update the document attributes in the database.
@@ -110,7 +104,8 @@ module Mongoid
       #
       # @since 4.0.0
       def prepare_update(options = {})
-        return false if performing_validations?(options) && invalid?(:update)
+        return false if performing_validations?(options) &&
+          invalid?(options[:context] || :update)
         process_flagged_destroys
         result = run_callbacks(:save) do
           run_callbacks(:update) do
@@ -134,15 +129,14 @@ module Mongoid
       #
       # @since 1.0.0
       def update_document(options = {})
-        raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_update(options) do
           updates, conflicts = init_atomic_updates
           unless updates.empty?
-            coll = _root.collection
+            coll = collection(_root)
             selector = atomic_selector
-            coll.find(selector).update(positionally(selector, updates))
+            coll.find(selector).update_one(positionally(selector, updates))
             conflicts.each_pair do |key, value|
-              coll.find(selector).update(positionally(selector, { key => value }))
+              coll.find(selector).update_one(positionally(selector, { key => value }))
             end
           end
         end

@@ -9,7 +9,7 @@ module Mongoid
       # @example Mongoize the object.
       #   set.mongoize
       #
-      # @return [ Hash ] The object mongoized.
+      # @return [ Array ] The object mongoized.
       #
       # @since 3.0.0
       def mongoize
@@ -21,9 +21,9 @@ module Mongoid
         # Convert the object from its mongo friendly ruby type to this type.
         #
         # @example Demongoize the object.
-        #   Set.demongoize({ "min" => 1, "max" => 5 })
+        #   Set.demongoize([1, 2, 3])
         #
-        # @param [ Hash ] object The object to demongoize.
+        # @param [ Array ] object The object to demongoize.
         #
         # @return [ Set ] The set.
         #
@@ -36,11 +36,11 @@ module Mongoid
         # type.
         #
         # @example Mongoize the object.
-        #   Set.mongoize(1..3)
+        #   Set.mongoize(Set.new([1,2,3]))
         #
         # @param [ Set ] object The object to mongoize.
         #
-        # @return [ Hash ] The object mongoized.
+        # @return [ Array ] The object mongoized.
         #
         # @since 3.0.0
         def mongoize(object)

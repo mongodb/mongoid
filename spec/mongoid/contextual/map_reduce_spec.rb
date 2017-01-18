@@ -32,15 +32,15 @@ describe Mongoid::Contextual::MapReduce do
     Band.collection
   end
 
+  let(:criteria) do
+    Band.all
+  end
+
+  let(:map_reduce) do
+    described_class.new(collection, criteria, map, reduce)
+  end
+
   describe "#command" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     let(:base_command) do
       {
@@ -51,27 +51,25 @@ describe Mongoid::Contextual::MapReduce do
       }
     end
 
-    it "returns the db command" do
-      expect(map_reduce.command).to eq(base_command)
-    end
-
     context "with sort" do
+
       let(:criteria) do
         Band.order_by(name: -1)
       end
 
-      it "returns the db command with a sort option" do
-        expect(map_reduce.command).to eq(base_command.merge(sort: {'name' => -1}))
+      it "includes a sort option in the map reduce command" do
+        expect(map_reduce.command[:sort]).to eq('name' => -1)
       end
     end
 
     context "with limit" do
+
       let(:criteria) do
         Band.limit(10)
       end
 
       it "returns the db command with a limit option" do
-        expect(map_reduce.command).to eq(base_command.merge(limit: 10))
+        expect(map_reduce.command[:limit]).to eq(10)
       end
     end
   end
@@ -80,10 +78,6 @@ describe Mongoid::Contextual::MapReduce do
 
     let(:criteria) do
       Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
     end
 
     let(:counts) do
@@ -101,14 +95,6 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#each" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     context "when the map/reduce is inline" do
 
@@ -130,20 +116,40 @@ describe Mongoid::Contextual::MapReduce do
         map_reduce.out(replace: "mr-output")
       end
 
-      it "iterates over the results" do
-        expect(results.entries).to eq([
+      let(:expected_results) do
+        [
           { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
           { "_id" => "Tool", "value" => { "likes" => 100 }}
-        ])
+        ]
+      end
+
+      it "iterates over the results" do
+        expect(results.entries).to eq(expected_results)
+      end
+
+      it 'outputs to the collection' do
+        expect(results.entries).to eq(map_reduce.criteria.view.database["mr-output"].find.to_a)
       end
     end
 
     context "when no output is provided" do
 
-      it "raises an error" do
-        expect {
-          map_reduce.entries
-        }.to raise_error(Mongoid::Errors::NoMapReduceOutput)
+      context "when the results are iterated" do
+
+        it "raises an error" do
+          expect {
+            map_reduce.entries
+          }.to raise_error(Mongoid::Errors::NoMapReduceOutput)
+        end
+      end
+
+      context "when the statstics are requested" do
+
+        it "raises an error" do
+          expect {
+            map_reduce.counts
+          }.to raise_error(Mongoid::Errors::NoMapReduceOutput)
+        end
       end
     end
 
@@ -161,17 +167,46 @@ describe Mongoid::Contextual::MapReduce do
         expect(results.entries).to be_empty
       end
     end
+
+    context "when there is a collation on the criteria" do
+
+      let(:map) do
+        %Q{
+         function() {
+           emit(this.name, 1);
+        }}
+      end
+
+      let(:reduce) do
+        %Q{
+         function(key, values) {
+           return Array.sum(values);
+        }}
+      end
+
+      let(:criteria) do
+        Band.where(name: 'DEPECHE MODE').collation(locale: 'en_US', strength: 2)
+      end
+
+      context 'when the server supports collations', if: collation_supported? do
+
+        it 'applies the collation' do
+          expect(map_reduce.out(inline: 1).count).to eq(1)
+        end
+      end
+
+      context 'when the server does not support collations', unless: collation_supported? do
+
+        it 'raises an exception' do
+          expect {
+            map_reduce.out(inline: 1).to_a
+          }.to raise_exception(Mongo::Error::UnsupportedCollation)
+        end
+      end
+    end
   end
 
   describe "#emitted" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     let(:emitted) do
       map_reduce.out(inline: 1).emitted
@@ -184,15 +219,7 @@ describe Mongoid::Contextual::MapReduce do
 
   describe "#empty?" do
 
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
-
     context "when the map/reduce has results" do
-
-      let(:criteria) do
-        Band.all
-      end
 
       let(:results) do
         map_reduce.out(inline: 1)
@@ -221,14 +248,6 @@ describe Mongoid::Contextual::MapReduce do
 
   describe "#finalize" do
 
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
-
     let(:finalized) do
       map_reduce.finalize("testing")
     end
@@ -239,14 +258,6 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#input" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     let(:input) do
       map_reduce.out(inline: 1).input
@@ -259,14 +270,6 @@ describe Mongoid::Contextual::MapReduce do
 
   describe "#js_mode" do
 
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
-
     let(:results) do
       map_reduce.out(inline: 1).js_mode
     end
@@ -278,14 +281,6 @@ describe Mongoid::Contextual::MapReduce do
 
   describe "#out" do
 
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
-
     context "when providing inline" do
 
       let(:out) do
@@ -293,7 +288,7 @@ describe Mongoid::Contextual::MapReduce do
       end
 
       it "sets the out command" do
-        expect(out.command[:out]).to eq(inline: 1)
+        expect(out.command[:out][:inline]).to eq(1)
       end
     end
 
@@ -306,21 +301,13 @@ describe Mongoid::Contextual::MapReduce do
         end
 
         it "sets the out command value to a string" do
-          expect(out.command[:out]).to eq(replace: "test")
+          expect(out.command[:out][:replace]).to eq('test')
         end
       end
     end
   end
 
   describe "#output" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     let(:output) do
       map_reduce.out(inline: 1).output
@@ -331,15 +318,44 @@ describe Mongoid::Contextual::MapReduce do
     end
   end
 
+  describe "#raw" do
+
+    let(:client) do
+      collection.database.client
+    end
+
+    context "when not specifying an out" do
+
+      it "raises a NoMapReduceOutput error" do
+        expect {
+          map_reduce.raw
+        }.to raise_error(Mongoid::Errors::NoMapReduceOutput)
+      end
+    end
+
+    context "when providing replace" do
+
+      let(:replace_map_reduce) do
+        map_reduce.out(replace: 'output-collection')
+      end
+
+      context 'when a read preference is defined' do
+
+        let(:criteria) do
+          Band.all.read(mode: :secondary)
+        end
+
+        it "uses the read preference", if: testing_replica_set? do
+
+          expect {
+            replace_map_reduce.raw
+          }.to raise_exception(Mongo::Error::OperationFailure)
+        end
+      end
+    end
+  end
+
   describe "#reduced" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     let(:reduced) do
       map_reduce.out(inline: 1).reduced
@@ -351,14 +367,6 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#scope" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     let(:finalize) do
       %Q{
@@ -379,14 +387,6 @@ describe Mongoid::Contextual::MapReduce do
 
   describe "#time" do
 
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
-
     let(:time) do
       map_reduce.out(inline: 1).time
     end
@@ -397,14 +397,6 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#execute" do
-
-    let(:criteria) do
-      Band.all
-    end
-
-    let(:map_reduce) do
-      described_class.new(collection, criteria, map, reduce)
-    end
 
     let(:execution_results) do
       map_reduce.out(inline: 1).execute

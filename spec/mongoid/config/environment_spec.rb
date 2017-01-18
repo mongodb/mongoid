@@ -11,21 +11,24 @@ describe Mongoid::Config::Environment do
 
     context "when using rails" do
 
-      before do
-        module Rails
-          class << self
-            def env; "production"; end
+      context "when an environment exists" do
+
+        before do
+          module Rails
+            class << self
+              def env; "production"; end
+            end
           end
         end
-      end
 
-      after do
-        RailsTemp = Rails
-        Object.send(:remove_const, :Rails)
-      end
+        after do
+          RailsTemp = Rails
+          Object.send(:remove_const, :Rails)
+        end
 
-      it "returns the rails environment" do
-        expect(described_class.env_name).to eq("production")
+        it "returns the rails environment" do
+          expect(described_class.env_name).to eq("production")
+        end
       end
     end
 
