@@ -224,7 +224,7 @@ describe "db:mongoid:list_undefined_indexes", if: non_legacy_server? do
   end
 end
 
-describe "db:mongoid:list_indexes" do
+describe "db:mongoid:list_indexes", if: non_legacy_server? do
   include_context "rake task"
 
   it "receives list_indexes" do
