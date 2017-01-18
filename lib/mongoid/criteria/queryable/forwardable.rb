@@ -46,13 +46,13 @@ module Mongoid
         # @since 1.0.0
         def __forward__(name, receiver)
           if self.class == Module
-            module_eval <<-SEL
+            module_eval <<-SEL, __FILE__, __LINE__ + 1
               def #{name}(*args, &block)
                 #{receiver}.__send__(:#{name}, *args, &block)
               end
             SEL
           else
-            (class << self; self; end).class_eval <<-SEL
+            singleton_class.class_eval <<-SEL, __FILE__, __LINE__ + 1
               def #{name}(*args, &block)
                 #{receiver}.__send__(:#{name}, *args, &block)
               end

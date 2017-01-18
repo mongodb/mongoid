@@ -8,13 +8,24 @@ rvm:
   - 2.2.6
   - 2.3.3
   - 2.4.0
-  - jruby-9.1.5.0
+  - ruby-head
+  - jruby-9.1.7.0
+  - jruby-head
 
 matrix:
   allow_failures:
+    - rvm: 2.4.0
+    - rvm: ruby-head
+    - rvm: jruby-head
     - gemfile: gemfiles/rails_master.gemfile
   exclude:
-    - rvm: jruby-9.1.5.0
+    - rvm: jruby-9.1.7.0
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: 2.4.0
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: ruby-head
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: jruby-head
       gemfile: gemfiles/driver_master.gemfile
 
 gemfile:
