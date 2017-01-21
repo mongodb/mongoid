@@ -74,23 +74,23 @@ describe Mongoid::Relations::Reflections do
           expect(relations.size).to eq(1)
         end
       end
+
+      context "when no argument supplied" do
+
+        let(:relations) do
+          klass.reflect_on_all_associations
+        end
+
+        it "returns an array of all relations" do
+          expect(relations.size).to eq(3)
+        end
+      end
     end
 
     context "when no relations exist for the macros" do
 
       let(:relations) do
         klass.reflect_on_all_associations(:embeds_one)
-      end
-
-      it "returns an empty array" do
-        expect(relations).to be_empty
-      end
-    end
-
-    context "when no argument supplied" do
-
-      let(:relations) do
-        klass.reflect_on_all_associations
       end
 
       it "returns an empty array" do
