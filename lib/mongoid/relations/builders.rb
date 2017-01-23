@@ -64,7 +64,7 @@ module Mongoid
         # @since 2.0.0.rc.1
         def builder(name, metadata)
           re_define_method("build_#{name}") do |*args|
-            attributes, options = parse_args(*args)
+            attributes, _options = parse_args(*args)
             document = Factory.build(metadata.klass, attributes)
             _building do
               child = send("#{name}=", document)
@@ -89,7 +89,7 @@ module Mongoid
         # @since 2.0.0.rc.1
         def creator(name, metadata)
           re_define_method("create_#{name}") do |*args|
-            attributes, options = parse_args(*args)
+            attributes, _options = parse_args(*args)
             document = Factory.build(metadata.klass, attributes)
             doc = _assigning do
               send("#{name}=", document)
