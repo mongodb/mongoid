@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
   s.license     = "MIT"
 
-  if File.exists?('gem-private_key.pem')
+  if File.exist?('gem-private_key.pem')
     s.signing_key = 'gem-private_key.pem'
     s.cert_chain = ['gem-public_cert.pem']
   else

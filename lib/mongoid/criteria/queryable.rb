@@ -65,6 +65,7 @@ module Mongoid
         @options = Options.new(aliases, serializers)
         @selector = Selector.new(aliases, serializers)
         @pipeline = Pipeline.new(aliases)
+        @aggregating = nil
         yield(self) if block_given?
       end
 
