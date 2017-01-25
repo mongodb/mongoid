@@ -21,6 +21,17 @@ describe Mongoid::Relations::Cyclic do
       it "sets cyclic to true" do
         expect(document.cyclic).to be true
       end
+
+      context "when a query is executed" do
+
+        before do
+          document.save
+        end
+
+        it "queries the database, not memory" do
+          expect(Role.first).to be_a(Role)
+        end
+      end
     end
 
     context "when the name is not inflected easily" do
@@ -131,6 +142,17 @@ describe Mongoid::Relations::Cyclic do
 
       it "creates relation with cascading callbacks enabled" do
         expect(document.class.relations['child_mango']).to be_cascading_callbacks
+      end
+    end
+
+    context "when a query is executed" do
+
+      before do
+        document.save
+      end
+
+      it "queries the database, not memory" do
+        expect(Shelf.first).to be_a(Shelf)
       end
     end
   end
