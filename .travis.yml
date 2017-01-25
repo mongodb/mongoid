@@ -7,11 +7,13 @@ bundler_args: --without development
 rvm:
   - 1.9.3
   - 2.0
-  - 2.1
   - 2.2
   - 2.3.3
+  - 2.4.0
+  - ruby-head
   - jruby-19mode
-  - jruby-9.1.6.0
+  - jruby-9.1.7.0
+  - jruby-head
 
 gemfile:
   - Gemfile
@@ -20,10 +22,20 @@ gemfile:
   - gemfiles/driver_master.gemfile
 
 matrix:
+  allow_failures:
+    - rvm: 2.4.0
+    - rvm: ruby-head
+    - rvm: jruby-head
   exclude:
-    - rvm: jruby-9.1.6.0
+    - rvm: jruby-9.1.7.0
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: 2.4.0
       gemfile: gemfiles/driver_master.gemfile
     - rvm: jruby-19mode
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: jruby-head
+      gemfile: gemfiles/driver_master.gemfile
+    - rvm: ruby-head
       gemfile: gemfiles/driver_master.gemfile
 
 env:
@@ -32,10 +44,10 @@ env:
     - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
   matrix:
     - MONGODB=2.4.14
-    - MONGODB=2.6.11
+    - MONGODB=2.6.12
     - MONGODB=3.0.12
     - MONGODB=3.2.11
-    - MONGODB=3.4.0
+    - MONGODB=3.4.1
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
