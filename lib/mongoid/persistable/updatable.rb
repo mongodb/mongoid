@@ -26,12 +26,7 @@ module Mongoid
       def update_attribute(name, value)
         as_writable_attribute!(name, value) do |access|
           normalized = name.to_s
-          setter = "#{normalized}="
-          if respond_to?(setter)
-            send(setter, value)
-          else
-            write_attribute(access, value)
-          end
+          process_attribute(normalized, value)
           save(validate: false)
         end
       end

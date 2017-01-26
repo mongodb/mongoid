@@ -117,7 +117,7 @@ module Mongoid
       # @since 3.0.0
       def queryable
         crit = Threaded.current_scope(self) || Criteria.new(self)
-        crit.embedded = true if crit.klass.embedded?
+        crit.embedded = true if (crit.klass.embedded? && !crit.klass.cyclic?)
         crit
       end
 

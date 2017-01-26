@@ -9,7 +9,7 @@ Installation
    :backlinks: none
    :depth: 1
    :class: singlecol
-   
+
 Install the Gem
 ---------------
 
@@ -198,8 +198,8 @@ comments above each key.
           # via ismaster commands. (default: 10)
           heartbeat_frequency: 10
 
-          # The time in seconds for selecting servers for a near read preference. (default: 5)
-          local_threshold: 5
+          # The time in seconds for selecting servers for a near read preference. (default: 0.015)
+          local_threshold: 0.015
 
           # The timeout in seconds for selecting a server for an operation. (default: 30)
           server_selection_timeout: 30
@@ -211,8 +211,8 @@ comments above each key.
           min_pool_size: 1
 
           # The time to wait, in seconds, in the connection pool for a connection
-          # to be checked in before timing out. (default: 5)
-          wait_queue_timeout: 5
+          # to be checked in before timing out. (default: 1)
+          wait_queue_timeout: 1
 
           # The time to wait to establish a connection before timing out, in seconds.
           # (default: 10)
