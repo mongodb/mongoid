@@ -168,7 +168,8 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#first|last``
 
-       *Finds a single document given the provided criteria. This guarantees no order.*
+       *Finds a single document given the provided criteria. This automatically adds a sort on id.
+        Opt out of adding the id sort with the {id_sort: :none} option.*
 
      -
         .. code-block:: ruby
