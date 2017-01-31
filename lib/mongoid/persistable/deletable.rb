@@ -137,7 +137,7 @@ module Mongoid
         # @since 1.0.0
         def delete_all(conditions = {})
           selector = hereditary? ? conditions.merge(_type: name) : conditions
-          collection.find(selector).delete_many.deleted_count
+          where(selector).delete
         end
       end
     end
