@@ -121,6 +121,10 @@ development:
     # existing method. (default: false)
     # scope_overwrite_exception: false
 
+    # Raise an error when defining a field with the same name as an
+    # existing method. (default: false)
+    # duplicate_fields_exception: false
+
     # Use Active Support's time zone in conversions. (default: true)
     # use_activesupport_time_zone: true
 
@@ -131,6 +135,11 @@ development:
     # environment. The Mongoid logger will be set to the Rails logger
     # otherwise.(default: :info)
     # log_level: :info
+
+    # Control whether `belongs_to` association is required. By default
+    # `belongs_to` will trigger a validation error if the association
+    # is not present. (default: true)
+    # belongs_to_required_by_default: true
 
     # Application name that is printed to the mongodb logs upon establishing a
     # connection in server versions >= 3.4. Note that the name cannot exceed 128 bytes.
