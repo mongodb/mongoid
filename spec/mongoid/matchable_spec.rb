@@ -9,12 +9,13 @@ describe Mongoid::Matchable do
       let(:document) do
         Address.new(street: "Clarkenwell Road")
       end
+      let(:occupants){[{'name' => 'Tim'}]}
 
       before do
         document.locations << Location.new(
           name: 'No.1',
           info: { 'door' => 'Red'},
-          occupants: [{'name' => 'Tim'}]
+          occupants: occupants
         )
       end
 
@@ -68,6 +69,33 @@ describe Mongoid::Matchable do
 
           let(:selector) do
             { "info.something_else" => "Red" }
+          end
+
+          it "returns false" do
+            expect(document.locations.first.matches?(selector)).to be false
+          end
+        end
+      end
+
+      context "when matching index of an array" do
+
+        let(:occupants){["Tim","Logan"]}
+
+        context "when the contents match" do
+
+          let(:selector) do
+            { "occupants.0" => "Tim" }
+          end
+          
+          it "returns true" do
+            expect(document.locations.first.matches?(selector)).to be true
+          end
+        end
+
+        context "when the contents do not match" do
+
+          let(:selector) do
+            { "occupants.0" => "Logan" }
           end
 
           it "returns false" do
