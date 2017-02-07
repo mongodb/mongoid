@@ -211,7 +211,7 @@ module Mongoid
     #
     # @example Merge the criteria with a hash. The hash must contain a klass
     #   key and the key/value pairs correspond to method names/args.
-
+    #
     #   criteria.merge({
     #     klass: Band,
     #     where: { name: "Depeche Mode" },
