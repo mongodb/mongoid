@@ -23,11 +23,9 @@ module Mongoid
 
       def preload(relations, docs)
         grouped_relations = relations.group_by(&:inverse_class_name)
-        grouped_relations.keys.each do |klass|
-          grouped_relations[klass] = grouped_relations[klass].group_by(&:relation)
-        end
-        grouped_relations.each do |_klass, associations|
-          associations.each do |relation, association|
+        grouped_relations.values.each do |associations|
+          associations.group_by(&:relation)
+                      .each do |relation, association|
             relation.eager_load_klass.new(association, docs).run
           end
         end
