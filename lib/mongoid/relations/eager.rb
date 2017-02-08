@@ -25,14 +25,14 @@ module Mongoid
         grouped_relations = relations.group_by do |metadata|
           metadata.inverse_class_name
         end
-        grouped_relations.keys.each do |_klass|
-          grouped_relations[_klass] = grouped_relations[_klass].group_by do |metadata|
+        grouped_relations.keys.each do |klass|
+          grouped_relations[klass] = grouped_relations[klass].group_by do |metadata|
             metadata.relation
           end
         end
         grouped_relations.each do |_klass, associations|
-          associations.each do |_relation, association|
-            _relation.eager_load_klass.new(association, docs).run
+          associations.each do |relation, association|
+            relation.eager_load_klass.new(association, docs).run
           end
         end
       end
