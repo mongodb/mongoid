@@ -22,13 +22,9 @@ module Mongoid
       end
 
       def preload(relations, docs)
-        grouped_relations = relations.group_by do |metadata|
-          metadata.inverse_class_name
-        end
+        grouped_relations = relations.group_by(&:inverse_class_name)
         grouped_relations.keys.each do |klass|
-          grouped_relations[klass] = grouped_relations[klass].group_by do |metadata|
-            metadata.relation
-          end
+          grouped_relations[klass] = grouped_relations[klass].group_by(&:relation)
         end
         grouped_relations.each do |_klass, associations|
           associations.each do |relation, association|
