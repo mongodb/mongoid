@@ -31,9 +31,9 @@ module Mongoid
           end
         end
         grouped_relations.each do |_klass, associations|
-          docs = associations.collect do |_relation, association|
+          associations.each do |_relation, association|
             _relation.eager_load_klass.new(association, docs).run
-          end.flatten
+          end
         end
       end
     end
