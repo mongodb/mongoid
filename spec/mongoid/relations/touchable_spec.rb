@@ -343,6 +343,7 @@ describe Mongoid::Relations::Touchable do
         end
 
         it "does not persist other attribute changes" do
+          expect(band.name).to eq('Nocebo')
           expect(band.reload.name).not_to eq('Nocebo')
         end
       end
@@ -354,6 +355,7 @@ describe Mongoid::Relations::Touchable do
         end
 
         it "does not persist other attribute changes" do
+          expect(band.name).to eq('Nocebo')
           expect(band.reload.name).not_to eq('Nocebo')
         end
       end
