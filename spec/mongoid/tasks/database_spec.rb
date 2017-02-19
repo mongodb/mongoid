@@ -116,6 +116,45 @@ describe "Mongoid::Tasks::Database" do
     end
   end
 
+  describe ".list_indexes" do
+
+    let(:models) do
+      [ User, Account, Address, Draft, Person ]
+    end
+
+    before :each do
+      Mongoid::Tasks::Database.create_indexes(models - [Person])
+      Person.collection.indexes.create_one({age: 1}, {sparse: true, background: true})
+      Person.collection.indexes.create_one({addresses: 1})
+      Person.collection.indexes.create_one({dob: 1, title: 1})
+    end
+
+    it "prints the indexes" do
+      [ "User                                               OK",
+        "  {name: 1}",
+        "",
+        "Account                                            NONE",
+        "",
+        "Person                                             BAD",
+        "  OK",
+        "    {addresses: 1}",
+        "  CONFLICT",
+        "    {age: 1}",
+        "  MISSING",
+        "    {dob: 1}",
+        "    {name: 1}",
+        "    {title: 1}",
+        "    {preference_ids: 1}, {background: true}",
+        "  UNDEFINED",
+        "    dob_1_title_1",
+        "",
+      ].each do |line|
+        expect(Mongoid::Tasks::Database.send(:logger)).to receive(:info).with(line).ordered
+      end
+      Mongoid::Tasks::Database.list_indexes(models)
+    end
+  end
+
   describe ".remove_undefined_indexes" do
 
     let(:indexes) do

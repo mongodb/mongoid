@@ -5,6 +5,11 @@ namespace :db do
     task :load_models do
     end
 
+    desc "Lists the indexes defined on your mongoid models and in the database (does not make changes)"
+    task :list_indexes => [:environment, :load_models] do
+      ::Mongoid::Tasks::Database.list_indexes
+    end
+
     desc "Create the indexes defined on your mongoid models"
     task :create_indexes => [:environment, :load_models] do
       ::Mongoid::Tasks::Database.create_indexes
