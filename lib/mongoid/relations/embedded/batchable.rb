@@ -85,7 +85,7 @@ module Mongoid
             else
               batch_remove(target.dup)
             end
-          else
+          elsif target != docs
             base.delayed_atomic_sets.clear unless _assigning?
             docs = normalize_docs(docs).compact
             target.clear and _unscoped.clear
