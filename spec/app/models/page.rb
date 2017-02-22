@@ -3,7 +3,7 @@ class Page
   embedded_in :quiz
   embeds_many :page_questions
 
-  embedded_in :book
+  embedded_in :book, touch: true
   embeds_many :notes
   field :content, :type => String
 
