@@ -230,16 +230,14 @@ describe Mongoid::Relations::Touchable do
       context "when the parent of embedded doc has cascade callbacks" do
 
         let!(:book) do
-          Book.create
-        end
-
-        let!(:page) do
-          book.pages.create
+          Book.new
         end
 
         before do
+          book.pages.new
+          book.save
           book.unset(:updated_at)
-          page.touch
+          book.pages.first.touch
         end
 
         it "touches the parent document" do
