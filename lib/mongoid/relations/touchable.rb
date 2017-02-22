@@ -85,7 +85,7 @@ module Mongoid
             def #{method_name}
               without_autobuild do
                 relation = __send__(:#{name})
-                relation.touch(#{extra_field ? ":#{extra_field}" : 'nil' }, callbacks: [self]) if relation
+                relation.touch(#{extra_field ? ":#{extra_field}" : 'nil' }, callers: [self]) if relation
               end
             end
           TOUCH

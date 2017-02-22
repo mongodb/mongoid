@@ -124,15 +124,9 @@ module Mongoid
     #
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
-      opts = args.pop
+      opts = args.extract_options!
       cascadable_children(kind).each do |child|
-        unless opts && opts[:callbacks].include?(child)
-          # This is returning false for some destroy tests on 4.1.0.beta1,
-          # causing them to fail since 4.1.0 expects a block to be passed if the
-          # callbacks for the type are empty. If no block is passed then the nil
-          # return value gets interpreted as false and halts the chain.
-          #
-          # @see https://github.com/rails/rails/blob/master/activesupport/lib/active_support/callbacks.rb#L79
+        unless opts[:callers] && opts[:callers].include?(child)
           if child.run_callbacks(child_callback_type(kind, child), *args) == false
             return false
           end
