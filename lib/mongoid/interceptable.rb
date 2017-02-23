@@ -124,15 +124,14 @@ module Mongoid
     #
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
-      cascadable_children(kind).each do |child|
-        # This is returning false for some destroy tests on 4.1.0.beta1,
-        # causing them to fail since 4.1.0 expects a block to be passed if the
-        # callbacks for the type are empty. If no block is passed then the nil
-        # return value gets interpreted as false and halts the chain.
-        #
-        # @see https://github.com/rails/rails/blob/master/activesupport/lib/active_support/callbacks.rb#L79
-        if child.run_callbacks(child_callback_type(kind, child), *args) == false
-          return false
+      if kind == :touch && @touched_children
+        @touched_children = false
+      else
+        @touched_children = true if kind == :touch
+        cascadable_children(kind).each do |child|
+          if child.run_callbacks(child_callback_type(kind, child), *args) == false
+            return false
+          end
         end
       end
       callback_executable?(kind) ? super(kind, *args, &block) : true
@@ -191,6 +190,7 @@ module Mongoid
     #
     # @param [ Symbol ] kind The type of callback.
     # @param [ Document ] child The child document.
+    # @param [ Metadata ] metadata The metadata of the parent-to-child relationship.
     #
     # @return [ true, false ] If the child should fire the callback.
     #

@@ -227,6 +227,26 @@ describe Mongoid::Relations::Touchable do
         end
       end
 
+      context "when the parent of embedded doc has cascade callbacks" do
+
+        let(:band) do
+          Band.create(name: "The Rutles")
+        end
+
+        let!(:record) do
+          band.records.create(name: "All you need is cash")
+        end
+
+        before do
+          band.unset(:updated_at)
+          record.touch
+        end
+
+        it "touches the parent document" do
+          expect(band.updated_at).to be_within(5).of(Time.now)
+        end
+      end
+
       context "when the relation is nil" do
 
         let!(:agent) do

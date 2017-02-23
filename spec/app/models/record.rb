@@ -9,7 +9,7 @@ class Record
   field :before_validation_called, type: Mongoid::Boolean, default: false
   field :before_destroy_called, type: Mongoid::Boolean, default: false
 
-  embedded_in :band
+  embedded_in :band, touch: true
   embeds_many :tracks, cascade_callbacks: true
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
 

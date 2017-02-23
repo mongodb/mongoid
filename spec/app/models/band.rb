@@ -1,5 +1,6 @@
 class Band
   include Mongoid::Document
+  include Mongoid::Timestamps
   include Mongoid::Attributes::Dynamic
   field :name, type: String
   field :active, type: Mongoid::Boolean, default: true
