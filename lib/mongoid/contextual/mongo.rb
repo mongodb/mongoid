@@ -239,7 +239,7 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { sort: :none }.
+      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
       #   Be aware that #first/#last won't guarantee order in this case.
       #
       # @param [ Hash ] opts The options for the query returning the first document.
@@ -354,7 +354,7 @@ module Mongoid
       # @note Automatically adding a sort on _id when no other sort is
       #   defined on the criteria has the potential to cause bad performance issues.
       #   If you experience unexpected poor performance when using #first or #last
-      #   and have no sort defined on the criteria, use the option { sort: :none }.
+      #   and have no sort defined on the criteria, use the option { id_sort: :none }.
       #   Be aware that #first/#last won't guarantee order in this case.
       #
       # @param [ Hash ] opts The options for the query returning the first document.
