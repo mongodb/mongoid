@@ -428,22 +428,40 @@ describe Mongoid::Relations::Embedded::Many do
     context "when replacing an existing relation" do
 
       let(:person) do
-        Person.create(addresses: [
+        Person.create(addresses: addresses)
+      end
+
+      let(:addresses) do
+        [
           Address.new(street: "1st St"),
           Address.new(street: "2nd St")
-        ])
+        ]
       end
 
       let(:address) do
         Address.new(street: "3rd St")
       end
 
-      before do
-        person.addresses = [ address ]
+      context "when the replaced relation is different from the existing relation" do
+
+        before do
+          person.addresses = [ address ]
+        end
+
+        it "deletes the old documents" do
+          expect(person.reload.addresses).to eq([ address ])
+        end
       end
 
-      it "deletes the old documents" do
-        expect(person.reload.addresses).to eq([ address ])
+      context "when the replaced relation is identical to the existing relation" do
+
+        before do
+          person.addresses = addresses
+        end
+
+        it "does nothing" do
+          expect(person.reload.addresses).to eq(addresses)
+        end
       end
     end
 
