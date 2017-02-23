@@ -67,8 +67,7 @@ module Mongoid
     #
     # @since 6.0.0
     def collection(parent = nil)
-      name = parent ? parent.collection_name : collection_name
-      client[name.to_sym]
+      parent ? parent.collection.with(client_options) : client[collection_name.to_sym]
     end
 
     # Get the collection name for this persistence context.
