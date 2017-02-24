@@ -83,7 +83,8 @@ module Mongoid
       Validatable,
       Equality,
       ActiveModel::Model,
-      ActiveModel::Validations
+      ActiveModel::Validations,
+      PersistenceContext
     ]
 
     # These are methods names defined in included blocks that may conflict
