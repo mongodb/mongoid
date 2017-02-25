@@ -190,7 +190,7 @@ module Mongoid
     #
     # @since 2.3.0
     def cascadable_child?(kind, child, metadata)
-      return false if kind == :initialize || kind == :find
+      return false if kind == :initialize || kind == :find || kind == :touch
       return false if kind == :validate && metadata.validate?
       child.callback_executable?(kind) ? child.in_callback_state?(kind) : false
     end
