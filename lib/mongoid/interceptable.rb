@@ -124,12 +124,9 @@ module Mongoid
     #
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
-      opts = args.extract_options!
       cascadable_children(kind).each do |child|
-        unless opts[:callers] && opts[:callers].include?(child)
-          if child.run_callbacks(child_callback_type(kind, child), *args) == false
-            return false
-          end
+        if child.run_callbacks(child_callback_type(kind, child), *args) == false
+          return false
         end
       end
       callback_executable?(kind) ? super(kind, *args, &block) : true
