@@ -87,6 +87,7 @@ module Mongoid
       kinds.each do |kind|
         run_targeted_callbacks(:after, kind)
       end
+      @cascaded_children = []
     end
 
     # Run only the before callbacks for the specific event.
@@ -106,6 +107,7 @@ module Mongoid
       kinds.each do |kind|
         run_targeted_callbacks(:before, kind)
       end
+      @cascaded_children = []
     end
 
     # Run the callbacks for the document. This overrides active support's
@@ -125,12 +127,14 @@ module Mongoid
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
       opts = args.extract_options!
+      @cascaded_children ||= []
       cascadable_children(kind).each do |child|
-        unless opts[:callers] && opts[:callers].include?(child)
+        unless @cascaded_children.include?(child)
           if child.run_callbacks(child_callback_type(kind, child), *args) == false
             return false
           end
         end
+        @cascaded_children |= [child]
       end
       callback_executable?(kind) ? super(kind, *args, &block) : true
     end
