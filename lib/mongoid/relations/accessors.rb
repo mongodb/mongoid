@@ -229,7 +229,7 @@ module Mongoid
             without_autobuild do
               if value = get_relation(name, metadata, object)
                 value = __build__(name, value, metadata) unless value.respond_to?(:substitute)
-                set_relation(name, value.substitute(object.substitutable)) unless value == object.substitutable
+                set_relation(name, value.substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, metadata)
               end

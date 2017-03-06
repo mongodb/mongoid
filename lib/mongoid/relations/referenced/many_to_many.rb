@@ -189,11 +189,13 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def substitute(replacement)
-          purge
-          unless replacement.blank?
-            push(replacement.compact.uniq)
-          else
-            reset_unloaded
+          unless replacement == self
+            purge
+            if replacement.present?
+              push(replacement.compact.uniq)
+            else
+              reset_unloaded
+            end
           end
           self
         end
