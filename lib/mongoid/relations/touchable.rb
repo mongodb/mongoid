@@ -21,7 +21,7 @@ module Mongoid
       # @return [ true/false ] false if record is new_record otherwise true.
       #
       # @since 3.0.0
-      def touch(field = nil, opts = {})
+      def touch(field = nil)
         return false if _root.new_record?
         current = Time.now
         field = database_field_name(field)
@@ -33,7 +33,7 @@ module Mongoid
           selector = atomic_selector
           _root.collection.find(selector).update_one(positionally(selector, touches))
         end
-        run_callbacks(:touch, opts)
+        run_callbacks(:touch)
         true
       end
 
@@ -85,7 +85,7 @@ module Mongoid
             def #{method_name}
               without_autobuild do
                 relation = __send__(:#{name})
-                relation.touch(#{extra_field ? ":#{extra_field}" : 'nil' }, callers: [self]) if relation
+                relation.touch #{":#{extra_field}" if extra_field} if relation
               end
             end
           TOUCH
