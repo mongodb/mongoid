@@ -65,6 +65,21 @@ describe Mongoid::Contextual::None do
     end
   end
 
+  describe "#distinct" do
+
+    let!(:band) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:context) do
+      described_class.new(Band.where(name: "Depeche Mode"))
+    end
+
+    it "returns an empty array" do
+      expect(context.distinct(:id)).to eq([])
+    end
+  end
+
   describe "#pluck" do
 
     let!(:band) do
