@@ -111,11 +111,10 @@ module Mongoid
       #
       # @since 4.0.0
       def prepare_delete
-        cascade!
+        return false unless catch(:abort) { apply_delete_dependencies! }
         yield(self)
         freeze
         self.destroyed = true
-        true
       end
 
       module ClassMethods
