@@ -43,7 +43,7 @@ module Mongoid
     include Inspectable
     include Matchable
     include Persistable
-    include Relations
+    include Associations
     include Reloadable
     include Scopable
     include Selectable
@@ -70,7 +70,7 @@ module Mongoid
       Interceptable,
       Matchable,
       Persistable,
-      Relations,
+      Associations,
       Reloadable,
       Scopable,
       Serializable,

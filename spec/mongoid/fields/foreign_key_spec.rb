@@ -501,11 +501,7 @@ describe Mongoid::Fields::ForeignKey do
       context "when the array is object ids" do
 
         let(:metadata) do
-          Mongoid::Relations::Metadata.new(
-            inverse_class_name: "Game",
-            name: :person,
-            relation: Mongoid::Relations::Referenced::In
-          )
+          Game.relations["person"]
         end
 
         let(:field) do
@@ -590,11 +586,7 @@ describe Mongoid::Fields::ForeignKey do
       context "when the array is object ids" do
 
         let(:metadata) do
-          Mongoid::Relations::Metadata.new(
-            inverse_class_name: "Game",
-            name: :person,
-            relation: Mongoid::Relations::Referenced::In
-          )
+          Game.relations['person']
         end
 
         let(:field) do

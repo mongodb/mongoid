@@ -1,0 +1,7 @@
+require 'mongoid/associations/referenced/auto_save'
+require 'mongoid/associations/referenced/counter_cache'
+require 'mongoid/associations/referenced/syncable'
+require 'mongoid/associations/referenced/belongs_to'
+require 'mongoid/associations/referenced/has_many'
+require 'mongoid/associations/referenced/has_and_belongs_to_many'
+require 'mongoid/associations/referenced/has_one'

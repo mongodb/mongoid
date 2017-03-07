@@ -4,7 +4,7 @@ require "mongoid/contextual/aggregable/mongo"
 require "mongoid/contextual/command"
 require "mongoid/contextual/geo_near"
 require "mongoid/contextual/map_reduce"
-require "mongoid/relations/eager"
+require "mongoid/associations/eager_loadable"
 
 module Mongoid
   module Contextual
@@ -12,7 +12,7 @@ module Mongoid
       include Enumerable
       include Aggregable::Mongo
       include Atomic
-      include Relations::Eager
+      include Associations::EagerLoadable
       include Queryable
 
       # Options constant.

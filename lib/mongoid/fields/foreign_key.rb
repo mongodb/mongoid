@@ -63,8 +63,8 @@ module Mongoid
       # @since 3.0.0
       def evolve(object)
         if object_id_field? || object.is_a?(Document)
-          if metadata.polymorphic? && constraint
-            constraint.convert(object)
+          if metadata.polymorphic?
+            metadata.convert_to_foreign_key(object)
           else
             object.__evolve_object_id__
           end
@@ -97,7 +97,7 @@ module Mongoid
       # @since 3.0.0
       def mongoize(object)
         if type.resizable? || object_id_field?
-          type.__mongoize_fk__(constraint, object)
+          type.__mongoize_fk__(metadata, object)
         else
           related_id_field.mongoize(object)
         end

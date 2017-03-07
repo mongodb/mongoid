@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Relations do
+describe Mongoid::Associations do
 
   before(:all) do
     Person.field(
