@@ -614,7 +614,7 @@ functions.
     }
   }
 
-  Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: true)
+  Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
 
 Just like criteria, map/reduce calls are lazily evaluated. So nothing will
 hit the database until you iterate over the results, or make a call on the
