@@ -488,7 +488,7 @@ extending functionality.
     scope :active, ->{
       where(active: true) do
         def deutsch
-          tap |scope| do
+          tap do |scope|
             scope.selector.store("origin" => "Deutschland")
           end
         end
