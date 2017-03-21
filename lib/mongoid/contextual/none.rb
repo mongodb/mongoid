@@ -21,6 +21,18 @@ module Mongoid
         other.is_a?(None)
       end
 
+      # Allow distinct for null context.
+      #
+      # @example Get the distinct values.
+      #   context.distinct(:name)
+      #
+      # @param [ String, Symbol ] field the name of the field.
+      #
+      # @return [ Array ] Empty Array
+      def distinct(field)
+        []
+      end
+
       # Iterate over the null context. There are no documents to iterate over
       # in this case.
       #
