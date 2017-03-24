@@ -230,6 +230,24 @@ describe Mongoid::Persistable::Settable do
       end
     end
 
+    context 'when the field is assigned with nil' do
+
+      before do
+        church.location = nil
+        church.set('location.neighborhood' => 'Kreuzberg')
+      end
+
+      # Failed: undefined method `merge' for nil:NilClass
+      it 'updates the hash while keeping existing key and values locally' do
+        expect(church.location).to eq({'neighborhood' => 'Kreuzberg'})
+      end
+
+      # Failed: undefined method `merge' for nil:NilClass
+      it 'updates the hash in the database' do
+        expect(church.reload.location).to eq({'neighborhood' => 'Kreuzberg'})
+      end
+    end
+
     context 'when the field type is String' do
 
       before do
@@ -358,6 +376,22 @@ describe Mongoid::Persistable::Settable do
         expect(church.reload.name).to eq('Church2')
         expect(church.reload.location).to eq({ 'street' => 'Yorckstr.'})
       end
+    end
+  end
+
+  context 'hash field with auto build feature' do
+
+    let(:plane) do
+      Plane.create
+    end
+
+    before do
+      plane.plane_builder.set({'location' => {'country' => 'USA', 'city' => 'Seattle'}})
+    end
+
+    # Failed. expected: {"country"=>"USA", "city"=>"Seattle"}, got nil
+    it 'updates the attribute' do
+      expect(plane.reload.plane_builder.location).to eq({'country' => 'USA', 'city' => 'Seattle'})
     end
   end
 end
