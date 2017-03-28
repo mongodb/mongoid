@@ -230,6 +230,22 @@ describe Mongoid::Persistable::Settable do
       end
     end
 
+    context 'when the field is assigned with nil' do
+
+      before do
+        church.location = nil
+        church.set('location.neighborhood' => 'Kreuzberg')
+      end
+
+      it 'updates the hash while keeping existing key and values locally' do
+        expect(church.location).to eq({'neighborhood' => 'Kreuzberg'})
+      end
+
+      it 'updates the hash in the database' do
+        expect(church.reload.location).to eq({'neighborhood' => 'Kreuzberg'})
+      end
+    end
+
     context 'when the field type is String' do
 
       before do
