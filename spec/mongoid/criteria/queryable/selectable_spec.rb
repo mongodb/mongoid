@@ -3469,6 +3469,21 @@ describe Mongoid::Criteria::Queryable::Selectable do
             expect(selection.selector).to eq({ "user_id" => document.id })
           end
         end
+
+        context 'when the field is a String and the value is a BSON::Regexp::Raw' do
+
+          let(:raw_regexp) do
+            BSON::Regexp::Raw.new('^Em')
+          end
+
+          let(:selection) do
+            Login.where(_id: raw_regexp)
+          end
+
+          it 'does not convert the bson raw regexp object to a String' do
+            expect(selection.selector).to eq({ "_id" => raw_regexp })
+          end
+        end
       end
     end
 
