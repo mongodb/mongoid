@@ -18,7 +18,7 @@ rvm:
 gemfile:
   - Gemfile
   - gemfiles/rails41.gemfile
-  - gemfiles/rails42.gemfile
+  - gemfiles/rails40.gemfile
   - gemfiles/driver_master.gemfile
 
 matrix:
