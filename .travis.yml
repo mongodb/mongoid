@@ -19,7 +19,7 @@ matrix:
     - rvm: jruby-head
     - gemfile: gemfiles/rails_master.gemfile
   exclude:
-    - rvm: jruby-9.1.7.0
+    - rvm: jruby-9.1.8.0
       gemfile: gemfiles/driver_master.gemfile
     - rvm: 2.4.0
       gemfile: gemfiles/driver_master.gemfile
