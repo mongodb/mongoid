@@ -7,15 +7,15 @@ bundler_args: --without development
 rvm:
   - 2.2.6
   - 2.3.3
-  - 2.4.0
+  - 2.4.1
   - ruby-head
-  - jruby-9.1.7.0
+  - jruby-9.1.8.0
   - jruby-head
 
 matrix:
   allow_failures:
-    - rvm: 2.4.0
     - rvm: ruby-head
+    - rvm: jruby-9.1.8.0
     - rvm: jruby-head
     - gemfile: gemfiles/rails_master.gemfile
   exclude:
