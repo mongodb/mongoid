@@ -14,7 +14,7 @@ module Origin
         # @return [ true ] Always true.
         #
         # @since 5.2.1
-        def regexp?;
+        def regexp?
           true;
         end
 
