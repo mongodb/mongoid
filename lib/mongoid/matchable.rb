@@ -12,6 +12,7 @@ require "mongoid/matchable/ne"
 require "mongoid/matchable/nin"
 require "mongoid/matchable/or"
 require "mongoid/matchable/size"
+require "mongoid/matchable/regexp"
 
 module Mongoid
 
@@ -115,6 +116,8 @@ module Mongoid
           else
             Default.new(extract_attribute(document, key))
           end
+        elsif value.regexp?
+          Regexp.new(extract_attribute(document, key))
         else
           case key.to_s
             when "$or" then Or.new(value, document)
