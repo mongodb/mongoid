@@ -14,9 +14,7 @@ module Origin
         # @return [ true ] Always true.
         #
         # @since 5.2.1
-        def regexp?
-          true;
-        end
+        def regexp?; true; end
 
         module ClassMethods
 
