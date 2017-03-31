@@ -3314,6 +3314,17 @@ describe Mongoid::Criteria do
         end
       end
 
+      context 'when the criteria contains a BSON::Regexp::Raw' do
+
+        let(:criteria) do
+          Band.where(name: BSON::Regexp::Raw.new("^Depeche"))
+        end
+
+        it "returns the matching documents" do
+          expect(criteria).to eq([ match ])
+        end
+      end
+
       context "when the criteria is an exact fk array match" do
 
         let(:id_one) do
