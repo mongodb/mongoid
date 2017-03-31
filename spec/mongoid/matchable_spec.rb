@@ -289,6 +289,28 @@ describe Mongoid::Matchable do
           expect(document.matches?(selector)).to be false
         end
       end
+
+      context 'when a BSON::Regexp::Raw object is used' do
+
+        let(:selector) do
+          { street: BSON::Regexp::Raw.new("^Clarkenwell") }
+        end
+
+        it "returns true" do
+          expect(document.matches?(selector)).to be true
+        end
+      end
+
+      context 'when a native Regexp object is used' do
+
+        let(:selector) do
+          { street: /^Clarkenwell/ }
+        end
+
+        it "returns true" do
+          expect(document.matches?(selector)).to be true
+        end
+      end
     end
 
     context "when performing complex matching" do
