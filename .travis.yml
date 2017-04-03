@@ -24,7 +24,6 @@ gemfile:
 matrix:
   allow_failures:
     - rvm: ruby-head
-    - rvm: jruby-9.1.8.0
     - rvm: jruby-head
     - rvm: ruby-2.4.1
       gemfile: gemfiles/rails40.gemfile
