@@ -5,8 +5,8 @@ gem 'bson', github: "mongodb/bson-ruby"
 gem 'mongo', github: "mongodb/mongo-ruby-driver"
 
 gem "rake"
-gem "actionpack",  "~> 4.2.0"
-gem "activemodel", "~> 4.2.0"
+gem "actionpack",  "~> 4.2.8"
+gem "activemodel", "~> 4.2.8"
 
 group :test do
   gem "rspec", "~> 3.4.0"
