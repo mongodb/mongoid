@@ -7,7 +7,6 @@ describe Mongoid::Clients::Options do
       include Mongoid::Document
       field :name
     end
-    TestModel
   end
 
   after(:all) do
