@@ -2,12 +2,24 @@ require "spec_helper"
 
 describe Mongoid::Clients::Options do
 
+  before(:all) do
+    class TestModel
+      include Mongoid::Document
+      field :name
+    end
+    TestModel
+  end
+
+  after(:all) do
+    Object.send(:remove_const, :TestModel)
+  end
+
   describe '#with', if: non_legacy_server? do
 
     context 'when passing some options' do
 
       let(:persistence_context) do
-        Band.with(options) do |klass|
+        TestModel.with(options) do |klass|
           klass.persistence_context
         end
       end
@@ -19,13 +31,13 @@ describe Mongoid::Clients::Options do
       end
 
       it 'does not set the options on class level' do
-        expect(Band.persistence_context.client.options['database']).to eq('mongoid_test')
+        expect(TestModel.persistence_context.client.options['database']).to eq('mongoid_test')
       end
 
       context 'when the options are not valid mongo client options' do
 
         let(:persistence_context) do
-          Band.with(invalid_options) do |klass|
+          TestModel.with(invalid_options) do |klass|
             klass.persistence_context
           end
         end
@@ -40,7 +52,7 @@ describe Mongoid::Clients::Options do
 
         it 'clears the persistence context' do
           begin; persistence_context; rescue Mongoid::Errors::InvalidPersistenceOption; end
-          expect(Band.persistence_context).to eq(Mongoid::PersistenceContext.new(Band))
+          expect(TestModel.persistence_context).to eq(Mongoid::PersistenceContext.new(TestModel))
         end
       end
 
@@ -66,14 +78,14 @@ describe Mongoid::Clients::Options do
       context 'when passing a block', if: testing_locally? do
 
         let!(:connections_before) do
-          Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+          TestModel.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
         let!(:connections_and_cluster_during) do
           connections = nil
-          cluster = Band.with(options) do |klass|
+          cluster = TestModel.with(options) do |klass|
             klass.where(name: 'emily').to_a
-            connections = Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+            connections = TestModel.mongo_client.database.command(serverStatus: 1).first['connections']['current']
           end
           [ connections, cluster ]
         end
@@ -87,15 +99,15 @@ describe Mongoid::Clients::Options do
         end
 
         let(:connections_after) do
-          Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+          TestModel.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
         let!(:cluster_before) do
-          Band.persistence_context.cluster
+          TestModel.persistence_context.cluster
         end
 
         let(:cluster_after) do
-          Band.persistence_context.cluster
+          TestModel.persistence_context.cluster
         end
 
         context 'when the options create a new cluster' do
@@ -148,7 +160,7 @@ describe Mongoid::Clients::Options do
           end
 
           let(:persistence_context) do
-            Band.with(client: :secondary) do |klass|
+            TestModel.with(client: :secondary) do |klass|
               klass.persistence_context
             end
           end
@@ -179,7 +191,7 @@ describe Mongoid::Clients::Options do
 
         let(:context_and_criteria) do
           collection = nil
-          cxt = Band.with(read: :secondary) do |klass|
+          cxt = TestModel.with(read: :secondary) do |klass|
             collection = klass.all.collection
             klass.persistence_context
           end
@@ -206,11 +218,11 @@ describe Mongoid::Clients::Options do
           100.times do |i|
             threads << Thread.new do
               if i % 2 == 0
-                Band.with(collection: 'British') do |klass|
+                TestModel.with(collection: 'British') do |klass|
                   klass.create(name: 'realised')
                 end
               else
-                Band.with(collection: 'American') do |klass|
+                TestModel.with(collection: 'American') do |klass|
                   klass.create(name: 'realized')
                 end
               end
@@ -220,13 +232,13 @@ describe Mongoid::Clients::Options do
         end
 
         let(:british_count) do
-          Band.with(collection: 'British') do |klass|
+          TestModel.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
 
         let(:american_count) do
-          Band.with(collection: 'American') do |klass|
+          TestModel.with(collection: 'American') do |klass|
             klass.all.count
           end
         end
@@ -241,7 +253,7 @@ describe Mongoid::Clients::Options do
     context 'when passing a persistence context' do
 
       let(:instance) do
-        Band.new
+        TestModel.new
       end
 
       let(:persistence_context) do
@@ -253,8 +265,8 @@ describe Mongoid::Clients::Options do
       let(:options) { { database: 'other' } }
 
       it 'sets the persistence context on the object' do
-        Band.new.with(persistence_context) do |band_instance|
-          expect(band_instance.persistence_context.options).to eq(persistence_context.options)
+        TestModel.new.with(persistence_context) do |model_instance|
+          expect(model_instance.persistence_context.options).to eq(persistence_context.options)
         end
       end
     end
@@ -268,12 +280,12 @@ describe Mongoid::Clients::Options do
         { database: 'other' }
       end
 
-      let(:band) do
-        Band.create
+      let(:test_model) do
+        TestModel.create
       end
 
       let(:persistence_context) do
-        band.with(options) do |object|
+        test_model.with(options) do |object|
           object.persistence_context
         end
       end
@@ -283,13 +295,13 @@ describe Mongoid::Clients::Options do
       end
 
       it 'does not set the options on instance level' do
-        expect(band.persistence_context.client.database.name).to eq('mongoid_test')
+        expect(test_model.persistence_context.client.database.name).to eq('mongoid_test')
       end
 
       context 'when the options are not valid mongo client options' do
 
         let(:persistence_context) do
-          band.with(invalid_options) do |object|
+          test_model.with(invalid_options) do |object|
             object.persistence_context
           end
         end
@@ -304,7 +316,7 @@ describe Mongoid::Clients::Options do
 
         it 'clears the persistence context' do
           begin; persistence_context; rescue Mongoid::Errors::InvalidPersistenceOption; end
-          expect(band.persistence_context).to eq(Mongoid::PersistenceContext.new(band))
+          expect(test_model.persistence_context).to eq(Mongoid::PersistenceContext.new(test_model))
         end
       end
 
@@ -322,7 +334,7 @@ describe Mongoid::Clients::Options do
         end
 
         let(:persistence_context) do
-          band.with(client: :secondary) do |object|
+          test_model.with(client: :secondary) do |object|
             object.persistence_context
           end
         end
@@ -336,14 +348,14 @@ describe Mongoid::Clients::Options do
       context 'when passing a block', if: testing_locally? do
 
         let!(:connections_before) do
-          band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+          test_model.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
         let!(:connections_and_cluster_during) do
           connections = nil
-          cluster = band.with(options) do |b|
+          cluster = test_model.with(options) do |b|
             b.reload
-            connections = band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+            connections = test_model.mongo_client.database.command(serverStatus: 1).first['connections']['current']
             b.persistence_context.cluster
           end
           [ connections, cluster ]
@@ -358,15 +370,15 @@ describe Mongoid::Clients::Options do
         end
 
         let(:connections_after) do
-          band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+          test_model.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
         let!(:cluster_before) do
-          band.persistence_context.cluster
+          test_model.persistence_context.cluster
         end
 
         let(:cluster_after) do
-          band.persistence_context.cluster
+          test_model.persistence_context.cluster
         end
 
         context 'when the options create a new cluster' do
@@ -416,15 +428,15 @@ describe Mongoid::Clients::Options do
         before do
           threads = []
           100.times do |i|
-            band = Band.create
+            test_model = TestModel.create
             threads << Thread.new do
               if i % 2 == 0
-                band.with(collection: 'British') do |b|
+                test_model.with(collection: 'British') do |b|
                   b.name = 'realised'
                   b.upsert
                 end
               else
-                band.with(collection: 'American') do |b|
+                test_model.with(collection: 'American') do |b|
                   b.name = 'realized'
                   b.upsert
                 end
@@ -435,13 +447,13 @@ describe Mongoid::Clients::Options do
         end
 
         let(:british_count) do
-          Band.with(collection: 'British') do |klass|
+          TestModel.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
 
         let(:american_count) do
-          Band.with(collection: 'British') do |klass|
+          TestModel.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
@@ -456,7 +468,7 @@ describe Mongoid::Clients::Options do
     context 'when passing a persistence context' do
 
       let(:persistence_context) do
-        Band.with(options) do |klass|
+        TestModel.with(options) do |klass|
           klass.persistence_context
         end
       end
@@ -464,8 +476,8 @@ describe Mongoid::Clients::Options do
       let(:options) { { database: 'other' } }
 
       it 'sets the persistence context on the object' do
-        Band.with(persistence_context) do |band_class|
-          expect(band_class.persistence_context.options).to eq(persistence_context.options)
+        TestModel.with(persistence_context) do |test_model_class|
+          expect(test_model_class.persistence_context.options).to eq(persistence_context.options)
         end
       end
     end
