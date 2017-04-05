@@ -4,6 +4,10 @@ gemspec path: '..'
 gem 'bson', github: "mongodb/bson-ruby"
 gem 'mongo', github: "mongodb/mongo-ruby-driver"
 
+if RUBY_VERSION < "2.1"
+  gem "nokogiri", "~> 1.6.8"
+end
+
 gem "rake"
 gem "actionpack",  "~> 4.2.8"
 gem "activemodel", "~> 4.2.8"
