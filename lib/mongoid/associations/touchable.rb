@@ -54,8 +54,7 @@ module Mongoid
       # @since 3.0.0
       def define_touchable!(association)
         name = association.name
-        field = association[:touch].is_a?(Symbol) ? association[:touch] : nil
-        method_name = define_relation_touch_method(name, field, association)
+        method_name = define_relation_touch_method(name, association)
         association.inverse_class.tap do |klass|
           klass.after_save method_name
           klass.after_destroy method_name
@@ -80,14 +79,14 @@ module Mongoid
       # @since 3.1.0
       #
       # @return [ Symbol ] The method name.
-      def define_relation_touch_method(name, extra_field = nil, association)
+      def define_relation_touch_method(name, association)
         association.relation_class.send(:include, InstanceMethods)
         method_name = "touch_#{name}_after_create_or_destroy"
         association.inverse_class.class_eval <<-TOUCH, __FILE__, __LINE__ + 1
             def #{method_name}
               without_autobuild do
                 relation = __send__(:#{name})
-                relation.touch #{":#{extra_field}" if extra_field} if relation
+                relation.touch #{":#{association.touch_field}" if association.touch_field} if relation
               end
             end
         TOUCH
