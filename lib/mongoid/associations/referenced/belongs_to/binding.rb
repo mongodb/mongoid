@@ -24,8 +24,8 @@ module Mongoid
               check_polymorphic_inverses!(target)
               bind_foreign_key(base, record_id(target))
               bind_polymorphic_inverse_type(base, target.class.name)
-              if inverse = metadata.inverse(target)
-                if set_base_metadata
+              if inverse = association.inverse(target)
+                if set_base_association
                   if base.referenced_many?
                     target.__send__(inverse).push(base)
                   else
@@ -46,11 +46,11 @@ module Mongoid
           # @since 2.0.0.rc.1
           def unbind_one
             binding do
-              inverse = metadata.inverse(target)
+              inverse = association.inverse(target)
               bind_foreign_key(base, nil)
               bind_polymorphic_inverse_type(base, nil)
               if inverse
-                set_base_metadata
+                set_base_association
                 if base.referenced_many?
                   target.__send__(inverse).delete(base)
                 else
@@ -73,10 +73,10 @@ module Mongoid
           #
           # @since 3.0.0
           def check_polymorphic_inverses!(doc)
-            inverses = metadata.inverses(doc)
-            if inverses.count > 1 && base.send(metadata.foreign_key).nil?
+            inverses = association.inverses(doc)
+            if inverses.count > 1 && base.send(association.foreign_key).nil?
               raise Errors::InvalidSetPolymorphicRelation.new(
-                  metadata.name, base.class.name, target.class.name
+                  association.name, base.class.name, target.class.name
               )
             end
           end

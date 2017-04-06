@@ -122,12 +122,12 @@ describe Mongoid::Associations::EagerLoadable do
         Person.all.to_a
       end
 
-      let(:posts_metadata) do
+      let(:posts_association) do
         Person.reflect_on_association(:posts)
       end
 
       it "runs the has_many preload" do
-        expect(Mongoid::Associations::Referenced::HasMany::Eager).to receive(:new).with([posts_metadata], docs).once.and_call_original
+        expect(Mongoid::Associations::Referenced::HasMany::Eager).to receive(:new).with([posts_association], docs).once.and_call_original
 
         context.eager_load(docs)
       end
@@ -154,31 +154,31 @@ describe Mongoid::Associations::EagerLoadable do
         Person.all.to_a
       end
 
-      let(:posts_metadata) do
+      let(:posts_association) do
         Person.reflect_on_association(:posts)
       end
 
-      let(:houses_metadata) do
+      let(:houses_association) do
         Person.reflect_on_association(:houses)
       end
 
-      let(:cat_metadata) do
+      let(:cat_association) do
         Person.reflect_on_association(:cat)
       end
 
       it "runs the has_many preload" do
-        expect(Mongoid::Associations::Referenced::HasMany::Eager).to receive(:new).with([posts_metadata], docs).once.and_call_original
+        expect(Mongoid::Associations::Referenced::HasMany::Eager).to receive(:new).with([posts_association], docs).once.and_call_original
 
         context.eager_load(docs)
       end
 
       it "runs the has_one preload" do
-        expect(Mongoid::Associations::Referenced::HasOne::Eager).to receive(:new).with([cat_metadata], docs).once.and_call_original
+        expect(Mongoid::Associations::Referenced::HasOne::Eager).to receive(:new).with([cat_association], docs).once.and_call_original
         context.eager_load(docs)
       end
 
       it "runs the has_and_belongs_to_many preload" do
-        expect(Mongoid::Associations::Referenced::HasAndBelongsToMany::Eager).to receive(:new).with([houses_metadata], docs).once.and_call_original
+        expect(Mongoid::Associations::Referenced::HasAndBelongsToMany::Eager).to receive(:new).with([houses_association], docs).once.and_call_original
         context.eager_load(docs)
       end
 
@@ -233,16 +233,16 @@ describe Mongoid::Associations::EagerLoadable do
         Person.all.to_a
       end
 
-      let(:book_metadata) do
+      let(:book_association) do
         Person.reflect_on_association(:book)
       end
 
-      let(:cat_metadata) do
+      let(:cat_association) do
         Person.reflect_on_association(:cat)
       end
 
       it "runs the has_one preload" do
-        expect(Mongoid::Associations::Referenced::HasOne::Eager).to receive(:new).with([book_metadata, cat_metadata], docs).once.and_call_original
+        expect(Mongoid::Associations::Referenced::HasOne::Eager).to receive(:new).with([book_association, cat_association], docs).once.and_call_original
         context.eager_load(docs)
       end
     end

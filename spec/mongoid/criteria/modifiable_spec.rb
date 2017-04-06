@@ -649,7 +649,7 @@ describe Mongoid::Criteria::Modifiable do
             band = Band.create
             Mongoid::Criteria.new(Record) do |criteria|
               criteria.embedded = true
-              criteria.metadata = Band.reflect_on_association(:records)
+              criteria.association = Band.reflect_on_association(:records)
               criteria.parent_document = band
               criteria.selector = { "records" => { "producers"=>{"$in"=>["nonexistent"] } } }
             end

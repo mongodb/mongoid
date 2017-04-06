@@ -1049,13 +1049,13 @@ describe Mongoid::Associations::Referenced::HasMany::Proxy do
       double
     end
 
-    let(:metadata) do
+    let(:association) do
       double(extension?: false)
     end
 
     it "returns the embedded in builder" do
       expect(
-          described_class.builder(nil, metadata, document)
+          described_class.builder(nil, association, document)
       ).to be_a(builder_klass)
     end
   end
@@ -1843,12 +1843,12 @@ describe Mongoid::Associations::Referenced::HasMany::Proxy do
 
     context "when the relation is polymorphic" do
 
-      let(:metadata) do
+      let(:association) do
         Movie.relations["ratings"]
       end
 
       let(:criteria) do
-        described_class.criteria(metadata, id, Movie)
+        described_class.criteria(association, id, Movie)
       end
 
       it "includes the type in the criteria" do
@@ -1863,12 +1863,12 @@ describe Mongoid::Associations::Referenced::HasMany::Proxy do
 
     context "when the relation is not polymorphic" do
 
-      let(:metadata) do
+      let(:association) do
         Person.relations["posts"]
       end
 
       let(:criteria) do
-        described_class.criteria(metadata, id, Person)
+        described_class.criteria(association, id, Person)
       end
 
       it "does not include the type in the criteria" do

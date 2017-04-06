@@ -596,7 +596,7 @@ describe Mongoid::Associations::Embedded::EmbedsOne do
     end
   end
 
-  describe '#inverse_metadata' do
+  describe '#inverse_association' do
 
   end
 

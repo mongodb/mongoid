@@ -127,8 +127,8 @@ module Mongoid
       # @return [ Metadata ] The relation metadata.
       #
       # @since 2.2.0
-      def metadata
-        @metadata ||= options[:metadata]
+      def association
+        @association ||= options[:association]
       end
 
       # Is the field a BSON::ObjectId?

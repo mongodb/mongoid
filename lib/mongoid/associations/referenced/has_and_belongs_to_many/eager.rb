@@ -35,15 +35,15 @@ module Mongoid
           end
 
           def set_relation(doc, element)
-            doc.__build__(@metadata.name, element, @metadata) unless doc.blank?
+            doc.__build__(@association.name, element, @association) unless doc.blank?
           end
 
           def group_by_key
-            @metadata.foreign_key
+            @association.foreign_key
           end
 
           def key
-            @metadata.primary_key
+            @association.primary_key
           end
         end
       end

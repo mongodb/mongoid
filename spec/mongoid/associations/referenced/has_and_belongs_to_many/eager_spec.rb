@@ -16,13 +16,13 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Eager do
       House.create!
     end
 
-    let(:metadata) do
+    let(:association) do
       Person.reflect_on_association(:houses)
     end
 
     let(:eager) do
-      described_class.new([metadata], docs).tap do |b|
-        b.send(:shift_metadata)
+      described_class.new([association], docs).tap do |b|
+        b.send(:shift_association)
       end
     end
 

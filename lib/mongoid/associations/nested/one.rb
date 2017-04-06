@@ -24,14 +24,14 @@ module Mongoid
         # @since 2.0.0
         def build(parent)
           return if reject?(parent, attributes)
-          @existing = parent.send(metadata.name)
+          @existing = parent.send(association.name)
           if update?
             attributes.delete_id
             existing.assign_attributes(attributes)
           elsif replace?
-            parent.send(metadata.setter, Factory.build(@class_name, attributes))
+            parent.send(association.setter, Factory.build(@class_name, attributes))
           elsif delete?
-            parent.send(metadata.setter, nil)
+            parent.send(association.setter, nil)
           end
         end
 
@@ -39,18 +39,18 @@ module Mongoid
         # relations.
         #
         # @example Instantiate the builder.
-        #   One.new(metadata, attributes)
+        #   One.new(association, attributes)
         #
-        # @param [ Metadata ] metadata The relation metadata.
+        # @param [ Association ] association The association metadata.
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
         #
         # @since 2.0.0
-        def initialize(metadata, attributes, options)
+        def initialize(association, attributes, options)
           @attributes = attributes.with_indifferent_access
-          @metadata = metadata
+          @association = association
           @options = options
-          @class_name = options[:class_name] ? options[:class_name].constantize : metadata.klass
+          @class_name = options[:class_name] ? options[:class_name].constantize : association.klass
           @destroy = @attributes.delete(:_destroy)
         end
 

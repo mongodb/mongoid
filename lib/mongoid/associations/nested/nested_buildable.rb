@@ -3,7 +3,7 @@ module Mongoid
     module Nested
       module Buildable
 
-        attr_accessor :attributes, :existing, :metadata, :options
+        attr_accessor :attributes, :existing, :association, :options
 
         # Determines if destroys are allowed for this document.
         #

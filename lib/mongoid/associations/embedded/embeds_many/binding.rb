@@ -25,7 +25,7 @@ module Mongoid
           def bind_one(doc)
             doc.parentize(base)
             binding do
-              doc.do_or_do_not(metadata.inverse_setter(target), base)
+              doc.do_or_do_not(association.inverse_setter(target), base)
             end
           end
 
@@ -42,7 +42,7 @@ module Mongoid
           # @since 2.0.0.rc.1
           def unbind_one(doc)
             binding do
-              doc.do_or_do_not(metadata.inverse_setter(target), nil)
+              doc.do_or_do_not(association.inverse_setter(target), nil)
             end
           end
         end

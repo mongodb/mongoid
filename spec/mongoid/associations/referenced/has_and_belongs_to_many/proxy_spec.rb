@@ -1056,13 +1056,13 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Proxy do
       double
     end
 
-    let(:metadata) do
+    let(:association) do
       double(extension?: false)
     end
 
     it "returns the embedded in builder" do
       expect(
-          described_class.builder(nil, metadata, document)
+          described_class.builder(nil, association, document)
       ).to be_a(builder_klass)
     end
   end

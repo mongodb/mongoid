@@ -62,8 +62,8 @@ module Mongoid
       # @since 3.0.0
       def relation_or_fk_missing?(doc, attr, value)
         return true if value.blank? && doc.send(attr).blank?
-        metadata = doc.relations[attr.to_s]
-        metadata.stores_foreign_key? && doc.send(metadata.foreign_key).blank?
+        association = doc.relations[attr.to_s]
+        association.stores_foreign_key? && doc.send(association.foreign_key).blank?
       end
 
       # For guarding against false values.

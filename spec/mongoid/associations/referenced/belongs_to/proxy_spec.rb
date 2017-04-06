@@ -78,8 +78,8 @@ describe Mongoid::Associations::Referenced::BelongsTo::Proxy do
         expect(address.account).to eq(account)
       end
 
-      it "does not erase the metadata" do
-        expect(address.__metadata).to_not be_nil
+      it "does not erase the association metadata" do
+        expect(address.__association).to_not be_nil
       end
 
       it "allows saving of the embedded document" do

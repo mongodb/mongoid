@@ -14,7 +14,7 @@ module Mongoid
           :label,
           :localize,
           :fallbacks,
-          :metadata,
+          :association,
           :pre_processed,
           :subtype,
           :type,

@@ -78,7 +78,7 @@ module Mongoid
           #
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
-            doc = Factory.build(type || __metadata.klass, attributes)
+            doc = Factory.build(type || __association.klass, attributes)
             append(doc)
             doc.apply_post_processed_defaults
             yield(doc) if block_given?
@@ -225,15 +225,15 @@ module Mongoid
           # Instantiate a new embeds_many relation.
           #
           # @example Create the new relation.
-          #   Many.new(person, addresses, metadata)
+          #   Many.new(person, addresses, association)
           #
           # @param [ Document ] base The document this relation hangs off of.
           # @param [ Array<Document> ] target The child documents of the relation.
-          # @param [ Metadata ] metadata The relation's metadata
+          # @param [ Association ] association The association metadata
           #
           # @return [ Many ] The proxy.
-          def initialize(base, target, metadata)
-            init(base, target, metadata) do
+          def initialize(base, target, association)
+            init(base, target, association) do
               target.each_with_index do |doc, index|
                 integrate(doc)
                 doc._index = index
@@ -343,7 +343,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            Binding.new(base, target, __metadata)
+            Binding.new(base, target, __association)
           end
 
           # Returns the criteria object for the target class with its documents set
@@ -358,8 +358,8 @@ module Mongoid
             criterion.embedded = true
             criterion.documents = target
             criterion.parent_document = base
-            criterion.metadata = relation_metadata
-            Many.apply_ordering(criterion, __metadata)
+            criterion.association = __association
+            Many.apply_ordering(criterion, __association)
           end
 
           # Deletes one document from the target and unscoped.
@@ -435,7 +435,7 @@ module Mongoid
             end
           end
 
-          # Apply the metadata ordering or the default scoping to the provided
+          # Apply the association ordering or the default scoping to the provided
           # documents.
           #
           # @example Apply scoping.
@@ -447,8 +447,8 @@ module Mongoid
           #
           # @since 2.4.0
           def scope(docs)
-            return docs unless __metadata.order || __metadata.klass.default_scoping?
-            crit = __metadata.klass.order_by(__metadata.order)
+            return docs unless __association.order || __association.klass.default_scoping?
+            crit = __association.klass.order_by(__association.order)
             crit.embedded = true
             crit.documents = docs
             crit.entries
@@ -506,15 +506,15 @@ module Mongoid
             #   Embedded::Many.builder(meta, object)
             #
             # @param [ Document ] base The base document.
-            # @param [ Metadata ] meta The metadata of the relation.
+            # @param [ Association ] association The association metadata.
             # @param [ Document, Hash ] object A document or attributes to build
             #   with.
             #
             # @return [ Builder ] A newly instantiated builder object.
             #
             # @since 2.0.0.rc.1
-            def builder(base, meta, object)
-              Builder.new(base, meta, object)
+            def builder(base, association, object)
+              Builder.new(base, association, object)
             end
 
             # Returns true if the relation is an embedded one. In this case

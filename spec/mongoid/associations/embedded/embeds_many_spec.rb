@@ -612,7 +612,7 @@ describe Mongoid::Associations::Embedded::EmbedsMany do
     end
   end
 
-  describe '#inverse_metadata' do
+  describe '#inverse_association' do
 
   end
 

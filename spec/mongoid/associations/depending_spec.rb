@@ -39,7 +39,7 @@ describe Mongoid::Associations::Depending do
       Class.new.tap { |c| c.send(:include, Mongoid::Document) }
     end
 
-    context "when the metadata doesnt exist" do
+    context "when the association metadata doesnt exist" do
 
       before do
         klass.dependents.push("nothing")

@@ -12,7 +12,7 @@ describe Mongoid::Associations::Referenced::BelongsTo::Builder do
       Person.where(_id: object_id)
     end
 
-    let(:metadata) do
+    let(:association) do
       double(
           klass: Person,
           name: :person,
@@ -22,7 +22,7 @@ describe Mongoid::Associations::Referenced::BelongsTo::Builder do
     end
 
     let(:builder) do
-      described_class.new(base, metadata, object)
+      described_class.new(base, association, object)
     end
 
     context "when provided an id" do

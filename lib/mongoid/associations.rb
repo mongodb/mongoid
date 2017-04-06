@@ -31,8 +31,8 @@ module Mongoid
     include Macros
     include Reflections
 
-    attr_accessor :__metadata
-    alias :relation_metadata :__metadata
+    attr_accessor :__association
+    alias :relation_association :__association
 
     included do
       class_attribute :polymorphic
@@ -61,7 +61,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_many?
-      __metadata && __metadata.macro == :embeds_many
+      __association && __association.macro == :embeds_many
     end
 
     # Determine if the document is part of an embeds_one relation.
@@ -73,23 +73,23 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_one?
-      __metadata && __metadata.macro == :embeds_one
+      __association && __association.macro == :embeds_one
     end
 
-    # Get the metadata name for this document. If no metadata was defined
+    # Get the association name for this document. If no association was defined
     # will raise an error.
     #
-    # @example Get the metadata name.
-    #   document.metadata_name
+    # @example Get the association name.
+    #   document.association_name
     #
-    # @raise [ Errors::NoMetadata ] If no metadata is present.
+    # @raise [ Errors::NoMetadata ] If no association metadata is present.
     #
-    # @return [ Symbol ] The metadata name.
+    # @return [ Symbol ] The association name.
     #
     # @since 3.0.0
-    def metadata_name
-      raise Errors::NoMetadata.new(self.class.name) unless __metadata
-      __metadata.name
+    def association_name
+      raise Errors::NoMetadata.new(self.class.name) unless __association
+      __association.name
     end
 
     # Determine if the document is part of an references_many relation.
@@ -101,7 +101,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_many?
-      __metadata && __metadata.macro == :has_many
+      __association && __association.macro == :has_many
     end
 
     # Determine if the document is part of an references_one relation.
@@ -113,7 +113,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_one?
-      __metadata && __metadata.macro == :has_one
+      __association && __association.macro == :has_one
     end
 
     # Convenience method for iterating through the loaded relations and
@@ -122,7 +122,7 @@ module Mongoid
     # @example Reload the relations.
     #   document.reload_relations
     #
-    # @return [ Hash ] The relations metadata.
+    # @return [ Hash ] The association metadata.
     #
     # @since 2.1.6
     def reload_relations

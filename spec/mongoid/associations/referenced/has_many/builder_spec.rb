@@ -10,7 +10,7 @@ describe Mongoid::Associations::Referenced::HasMany::Builder do
     { }
   end
 
-  let(:metadata) do
+  let(:association) do
     Mongoid::Associations::Referenced::HasMany.new(Person, :posts, association_options)
   end
 
@@ -21,11 +21,11 @@ describe Mongoid::Associations::Referenced::HasMany::Builder do
     end
 
     let(:builder) do
-      described_class.new(base, metadata, object)
+      described_class.new(base, association, object)
     end
 
     before do
-      allow(metadata).to receive(:criteria).and_return(criteria)
+      allow(association).to receive(:criteria).and_return(criteria)
     end
 
     context "when provided an id" do
@@ -115,7 +115,7 @@ describe Mongoid::Associations::Referenced::HasMany::Builder do
           it "returns an empty array" do
             Person.new do |p|
               expect(p.posts).to be_empty
-              expect(p.posts.__metadata).to_not be_nil
+              expect(p.posts.__association).to_not be_nil
             end
           end
         end

@@ -12,15 +12,15 @@ module Mongoid
           # Instantiate a new embedded_in relation.
           #
           # @example Create the new relation.
-          #   Embedded::In.new(name, person, metadata)
+          #   Embedded::In.new(name, person, association)
           #
           # @param [ Document ] base The document the relation hangs off of.
           # @param [ Document ] target The target (parent) of the relation.
-          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Association ] association The association metadata.
           #
           # @return [ In ] The proxy.
-          def initialize(base, target, metadata)
-            init(base, target, metadata) do
+          def initialize(base, target, association)
+            init(base, target, association) do
               characterize_one(target)
               bind_one
             end
@@ -62,20 +62,20 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            Binding.new(base, target, __metadata)
+            Binding.new(base, target, __association)
           end
 
           # Characterize the document.
           #
-          # @example Set the base metadata.
+          # @example Set the base association.
           #   relation.characterize_one(document)
           #
-          # @param [ Document ] document The document to set the metadata on.
+          # @param [ Document ] document The document to set the association metadata on.
           #
           # @since 2.1.0
           def characterize_one(document)
-            unless base.__metadata
-              base.__metadata = __metadata.inverse_metadata(document)
+            unless base.__association
+              base.__association = __association.inverse_association(document)
             end
           end
 
@@ -100,14 +100,14 @@ module Mongoid
             #   Embedded::In.builder(meta, object, person)
             #
             # @param [ Document ] base The base document.
-            # @param [ Metadata ] meta The metadata of the relation.
+            # @param [ Association ] association The metadata of the association.
             # @param [ Document, Hash ] object A document or attributes to build with.
             #
             # @return [ Builder ] A newly instantiated builder object.
             #
             # @since 2.0.0.rc.1
-            def builder(base, meta, object)
-              Builder.new(base, meta, object)
+            def builder(base, association, object)
+              Builder.new(base, association, object)
             end
 
             # Returns true if the relation is an embedded one. In this case

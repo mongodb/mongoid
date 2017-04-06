@@ -48,15 +48,15 @@ module Mongoid
           args.each do |name|
             meth = "#{name}_attributes="
             self.nested_attributes["#{name}_attributes"] = meth
-            metadata = relations[name.to_s]
-            raise Errors::NestedAttributesMetadataNotFound.new(self, name) unless metadata
-            autosave_nested_attributes(metadata)
+            association = relations[name.to_s]
+            raise Errors::NestedAttributesMetadataNotFound.new(self, name) unless association
+            autosave_nested_attributes(association)
             re_define_method(meth) do |attrs|
               _assigning do
-                if metadata.polymorphic? and metadata.inverse_type
-                  options = options.merge!(:class_name => self.send(metadata.inverse_type))
+                if association.polymorphic? and association.inverse_type
+                  options = options.merge!(:class_name => self.send(association.inverse_type))
                 end
-                metadata.nested_builder(attrs, options).build(self)
+                association.nested_builder(attrs, options).build(self)
               end
             end
           end
@@ -74,9 +74,9 @@ module Mongoid
         # @param [ Metadata ] metadata The existing relation metadata.
         #
         # @since 3.1.4
-        def autosave_nested_attributes(metadata)
-          if metadata.autosave?
-            Associations::Referenced::AutoSave.define_autosave!(metadata)
+        def autosave_nested_attributes(association)
+          if association.autosave?
+            Associations::Referenced::AutoSave.define_autosave!(association)
           end
         end
       end

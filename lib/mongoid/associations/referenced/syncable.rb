@@ -11,15 +11,15 @@ module Mongoid
         # the key has changed and the relation bindings have not been run.
         #
         # @example Are the foreign keys syncable?
-        #   document.syncable?(metadata)
+        #   document.syncable?(association)
         #
-        # @param [ Metadata ] metadata The relation metadata.
+        # @param [ Association ] association The association metadata.
         #
         # @return [ true, false ] If we can sync.
         #
         # @since 2.1.0
-        def syncable?(metadata)
-          !synced?(metadata.foreign_key) && send(metadata.foreign_key_check)
+        def syncable?(association)
+          !synced?(association.foreign_key) && send(association.foreign_key_check)
         end
 
         # Get the synced foreign keys.
@@ -51,33 +51,33 @@ module Mongoid
         # Update the inverse keys on destroy.
         #
         # @example Update the inverse keys.
-        #   document.remove_inverse_keys(metadata)
+        #   document.remove_inverse_keys(association)
         #
-        # @param [ Metadata ] meta The document metadata.
+        # @param [ Association ] association The association.
         #
         # @return [ Object ] The updated values.
         #
         # @since 2.2.1
-        def remove_inverse_keys(meta)
-          foreign_keys = send(meta.foreign_key)
+        def remove_inverse_keys(association)
+          foreign_keys = send(association.foreign_key)
           unless foreign_keys.nil? || foreign_keys.empty?
-            meta.criteria(foreign_keys, self.class).pull(meta.inverse_foreign_key => _id)
+            association.criteria(foreign_keys, self.class).pull(association.inverse_foreign_key => _id)
           end
         end
 
         # Update the inverse keys for the relation.
         #
         # @example Update the inverse keys
-        #   document.update_inverse_keys(metadata)
+        #   document.update_inverse_keys(association)
         #
-        # @param [ Metadata ] meta The document metadata.
+        # @param [ Association ] association The document association.
         #
         # @return [ Object ] The updated values.
         #
         # @since 2.1.0
-        def update_inverse_keys(meta)
-          if changes.has_key?(meta.foreign_key)
-            old, new = changes[meta.foreign_key]
+        def update_inverse_keys(association)
+          if changes.has_key?(association.foreign_key)
+            old, new = changes[association.foreign_key]
             adds, subs = new - (old || []), (old || []) - new
 
             # If we are autosaving we don't want a duplicate to get added - the
@@ -85,17 +85,17 @@ module Mongoid
             # inverse on the autosave would cause this. We delete each id from
             # what's in memory in case a mix of id addition and object addition
             # had occurred.
-            if meta.autosave?
-              send(meta.name).in_memory.each do |doc|
+            if association.autosave?
+              send(association.name).in_memory.each do |doc|
                 adds.delete_one(doc._id)
               end
             end
 
             unless adds.empty?
-              meta.criteria(adds, self.class).without_options.add_to_set(meta.inverse_foreign_key => _id)
+              association.criteria(adds, self.class).without_options.add_to_set(association.inverse_foreign_key => _id)
             end
             unless subs.empty?
-              meta.criteria(subs, self.class).without_options.pull(meta.inverse_foreign_key => _id)
+              association.criteria(subs, self.class).without_options.pull(association.inverse_foreign_key => _id)
             end
           end
         end
@@ -105,15 +105,15 @@ module Mongoid
           # Set up the syncing of many to many foreign keys.
           #
           # @example Set up the syncing.
-          #   Person.synced(metadata)
+          #   Person.synced(association)
           #
-          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Association ] association The association metadata.
           #
           # @since 2.1.0
-          def synced(metadata)
-            unless metadata.forced_nil_inverse?
-              synced_save(metadata)
-              synced_destroy(metadata)
+          def synced(association)
+            unless association.forced_nil_inverse?
+              synced_save(association)
+              synced_destroy(association)
             end
           end
 
@@ -126,20 +126,20 @@ module Mongoid
           # array from the inverse side.
           #
           # @example Set up the save syncing.
-          #   Person.synced_save(metadata)
+          #   Person.synced_save(association)
           #
-          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Association ] association The relation association.
           #
           # @return [ Class ] The class getting set up.
           #
           # @since 2.1.0
-          def synced_save(metadata)
+          def synced_save(association)
             set_callback(
                 :save,
                 :after,
-                if: ->(doc) { doc.syncable?(metadata) }
+                if: ->(doc) { doc.syncable?(association) }
             ) do |doc|
-              doc.update_inverse_keys(metadata)
+              doc.update_inverse_keys(association)
             end
             self
           end
@@ -147,19 +147,19 @@ module Mongoid
           # Set up the sync of inverse keys that needs to happen on a destroy.
           #
           # @example Set up the destroy syncing.
-          #   Person.synced_destroy(metadata)
+          #   Person.synced_destroy(association)
           #
-          # @param [ Metadata ] metadata The relation metadata.
+          # @param [ Association ] association The association metadata.
           #
           # @return [ Class ] The class getting set up.
           #
           # @since 2.2.1
-          def synced_destroy(metadata)
+          def synced_destroy(association)
             set_callback(
                 :destroy,
                 :after
             ) do |doc|
-              doc.remove_inverse_keys(metadata)
+              doc.remove_inverse_keys(association)
             end
             self
           end

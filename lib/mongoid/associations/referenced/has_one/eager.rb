@@ -21,11 +21,11 @@ module Mongoid
           end
 
           def group_by_key
-            @metadata.primary_key
+            @association.primary_key
           end
 
           def key
-            @metadata.foreign_key
+            @association.foreign_key
           end
 
         end

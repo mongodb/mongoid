@@ -12,13 +12,13 @@ describe Mongoid::Associations::Referenced::HasMany::Eager do
       Person.create!
     end
 
-    let(:metadata) do
+    let(:association) do
       Person.reflect_on_association(:posts)
     end
 
     let(:eager) do
-      described_class.new([metadata], docs).tap do |b|
-        b.send(:shift_metadata)
+      described_class.new([association], docs).tap do |b|
+        b.send(:shift_association)
       end
     end
 
@@ -41,13 +41,13 @@ describe Mongoid::Associations::Referenced::HasMany::Eager do
       Person.create!
     end
 
-    let(:metadata) do
+    let(:association) do
       Person.reflect_on_association(:posts)
     end
 
     let(:eager) do
-      described_class.new([metadata], docs).tap do |b|
-        b.send(:shift_metadata)
+      described_class.new([association], docs).tap do |b|
+        b.send(:shift_association)
       end
     end
 
@@ -58,7 +58,7 @@ describe Mongoid::Associations::Referenced::HasMany::Eager do
 
     it "sets the relation into the parent" do
       docs.each do |doc|
-        expect(doc).to receive(:__build__).once.with(:posts, :foo, metadata)
+        expect(doc).to receive(:__build__).once.with(:posts, :foo, association)
       end
       eager.send(:set_on_parent, person.id, :foo)
     end

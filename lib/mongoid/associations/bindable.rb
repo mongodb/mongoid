@@ -6,20 +6,20 @@ module Mongoid
     module Bindable
       include Threaded::Lifecycle
 
-      attr_reader :base, :target, :metadata
+      attr_reader :base, :target, :association
 
       # Create the new binding.
       #
       # @example Initialize a binding.
-      #   Binding.new(base, target, metadata)
+      #   Binding.new(base, target, association)
       #
       # @param [ Document ] base The base of the binding.
       # @param [ Document, Array<Document> ] target The target of the binding.
-      # @param [ Metadata ] metadata The relation's metadata.
+      # @param [ Association ] association The association metadata.
       #
       # @since 2.0.0.rc.1
-      def initialize(base, target, metadata)
-        @base, @target, @metadata = base, target, metadata
+      def initialize(base, target, association)
+        @base, @target, @association = base, target, association
       end
 
       # Execute the provided block inside a binding.
@@ -55,12 +55,12 @@ module Mongoid
       #
       # @since 3.0.0
       def check_inverse!(doc)
-        unless metadata.bindable?(doc)
+        unless association.bindable?(doc)
           raise Errors::InverseNotFound.new(
               base.class,
-              metadata.name,
+              association.name,
               doc.class,
-              metadata.foreign_key
+              association.foreign_key
           )
         end
       end
@@ -79,7 +79,7 @@ module Mongoid
       # @since 3.0.0
       def bind_foreign_key(keyed, id)
         unless keyed.frozen?
-          keyed.you_must(metadata.foreign_key_setter, id)
+          keyed.you_must(association.foreign_key_setter, id)
         end
       end
 
@@ -96,8 +96,8 @@ module Mongoid
       #
       # @since 3.0.0
       def bind_polymorphic_type(typed, name)
-        if metadata.type
-          typed.you_must(metadata.type_setter, name)
+        if association.type
+          typed.you_must(association.type_setter, name)
         end
       end
 
@@ -114,8 +114,8 @@ module Mongoid
       #
       # @since 3.0.0
       def bind_polymorphic_inverse_type(typed, name)
-        if metadata.inverse_type
-          typed.you_must(metadata.inverse_type_setter, name)
+        if association.inverse_type
+          typed.you_must(association.inverse_type_setter, name)
         end
       end
 
@@ -132,8 +132,8 @@ module Mongoid
       #
       # @since 3.0.0
       def bind_inverse(doc, inverse)
-        if doc.respond_to?(metadata.inverse_setter)
-          doc.you_must(metadata.inverse_setter, inverse)
+        if doc.respond_to?(association.inverse_setter)
+          doc.you_must(association.inverse_setter, inverse)
         end
       end
 
@@ -155,25 +155,25 @@ module Mongoid
       end
 
       def record_id(base)
-        base.__send__(metadata.primary_key)
+        base.__send__(association.primary_key)
       end
 
-      # Ensure that the metadata on the base is correct, for the cases
+      # Ensure that the association on the base is correct, for the cases
       # where we have multiple belongs to definitions and were are setting
       # different parents in memory in order.
       #
       # @api private
       #
-      # @example Set the base metadata.
-      #   binding.set_base_metadata
+      # @example Set the base association.
+      #   binding.set_base_association
       #
-      # @return [ true, false ] If the metadata changed.
+      # @return [ true, false ] If the association changed.
       #
       # @since 2.4.4
-      def set_base_metadata
-        inverse_metadata = metadata.inverse_metadata(target)
-        if inverse_metadata != metadata && !inverse_metadata.nil?
-          base.__metadata = inverse_metadata
+      def set_base_association
+        inverse_association = association.inverse_association(target)
+        if inverse_association != association && !inverse_association.nil?
+          base.__association = inverse_association
         end
       end
 

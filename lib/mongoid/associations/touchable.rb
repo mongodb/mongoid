@@ -41,13 +41,13 @@ module Mongoid
 
       extend self
 
-      # Add the metadata to the touchable relations if the touch option was
+      # Add the association to the touchable relations if the touch option was
       # provided.
       #
       # @example Add the touchable.
       #   Model.touchable(meta)
       #
-      # @param [ Metadata ] metadata The relation metadata.
+      # @param [ Association ] association The association metadata.
       #
       # @return [ Class ] The model class.
       #

@@ -124,15 +124,15 @@ module Mongoid
         end
       end
 
-      # Get the inverse's metadata.
+      # Get the inverse's association metadata.
       #
       # @param [ Object ] other The other model class or model object to use when
       #   determining inverses.
       #
-      # @return [ Association ] The inverse's metadata.
+      # @return [ Association ] The inverse's association metadata.
       #
       # @since 7.0
-      def inverse_metadata(other = nil)
+      def inverse_association(other = nil)
         (other || relation_class).relations[inverse(other)]
       end
 
@@ -216,7 +216,7 @@ module Mongoid
       #
       # @since 7.0
       def foreign_key_setter
-        # note: You can't check if this metadata stores foreign key
+        # note: You can't check if this association stores foreign key
         # See HasOne and HasMany binding, they referenced foreign_key_setter
         @foreign_key_setter ||= "#{foreign_key}=" if foreign_key
       end
@@ -234,7 +234,7 @@ module Mongoid
       # polymorphic relation.
       #
       # @example Get the inverse type setter.
-      #   metadata.inverse_type_setter
+      #   association.inverse_type_setter
       #
       # @return [ String ] The name of the setter.
       #
@@ -246,7 +246,7 @@ module Mongoid
       # Get the name of the method to check if the foreign key has changed.
       #
       # @example Get the foreign key check method.
-      #   metadata.foreign_key_check
+      #   association.foreign_key_check
       #
       # @return [ String ] The foreign key check.
       #

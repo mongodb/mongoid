@@ -72,7 +72,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            BelongsTo::Binding.new(base, target, __metadata)
+            BelongsTo::Binding.new(base, target, __association)
           end
 
           # Normalize the value provided as a replacement for substitution.
@@ -89,7 +89,7 @@ module Mongoid
           # @since 3.1.5
           def normalize(replacement)
             return replacement if replacement.is_a?(Document)
-            __metadata.builder(klass, replacement).build
+            __association.builder(klass, replacement).build
           end
 
           # Are we able to persist this relation?
@@ -113,7 +113,7 @@ module Mongoid
             #   Referenced::In.builder(meta, object)
             #
             # @param [ Document ] base The base document.
-            # @param [ Association ] association The metadata of the relation.
+            # @param [ Association ] association The association metadata.
             # @param [ Document, Hash ] object A document or attributes to build
             #   with.
             #
