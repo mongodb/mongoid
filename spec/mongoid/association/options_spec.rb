@@ -1,7 +1,12 @@
 require "spec_helper"
-require "support/association"
 
 describe Mongoid::Association::Options do
+
+  STORES_FOREIGN_KEY =
+    [
+      Mongoid::Association::Referenced::HasAndBelongsToMany,
+      Mongoid::Association::Referenced::BelongsTo
+    ]
 
   [
     Mongoid::Association::Embedded::EmbeddedIn,
@@ -35,7 +40,7 @@ describe Mongoid::Association::Options do
 
       describe 'the :as option' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :as) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:as) do
 
           context 'when :as is in the options' do
 
@@ -58,7 +63,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :as) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:as) do
 
           it 'returns nil' do
             expect(association.as).to be_nil
@@ -83,7 +88,7 @@ describe Mongoid::Association::Options do
 
       describe '#autobuilding?' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :autobuild) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:autobuild) do
 
           context 'when :autobuild is in the options' do
 
@@ -135,7 +140,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :autobuild) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:autobuild) do
 
           it 'returns false' do
             expect(association.autobuilding?).to be(false)
@@ -160,7 +165,7 @@ describe Mongoid::Association::Options do
 
       describe '#autosave?' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :autosave) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:autosave) do
 
           context 'when :autosave is in the options' do
 
@@ -212,7 +217,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :autosave) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:autosave) do
 
           it 'returns false' do
             expect(association.autosave?).to be(false)
@@ -237,7 +242,7 @@ describe Mongoid::Association::Options do
 
       describe 'the :dependent option' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :dependent) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:dependent) do
 
           context 'when :dependent is in the options' do
 
@@ -260,7 +265,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :dependent) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:dependent) do
 
           it 'returns nil' do
             expect(association.dependent).to be_nil
@@ -285,7 +290,7 @@ describe Mongoid::Association::Options do
 
       describe 'the :foreign_key option' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :foreign_key) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:foreign_key) do
 
           context 'when the :foreign_key option is specified' do
 
@@ -300,8 +305,8 @@ describe Mongoid::Association::Options do
             end
           end
 
-          context 'when the association stores the foreign key', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :foreign_key) &&
-                                                                     Mongoid::Association::SpecHelpers.stores_foreign_key?(association_class) do
+          context 'when the association stores the foreign key', if: association_class::VALID_OPTIONS.include?(:foreign_key) &&
+                                                                     STORES_FOREIGN_KEY.include?(association_class) do
 
             context 'when :foreign_key option is not specified' do
 
@@ -311,8 +316,8 @@ describe Mongoid::Association::Options do
             end
           end
 
-          context 'when the association does not store the foreign key', if: !Mongoid::Association::SpecHelpers.stores_foreign_key?(association_class) &&
-                                                                              Mongoid::Association::SpecHelpers.stores_foreign_key?(association_class) do
+          context 'when the association does not store the foreign key', if: association_class::VALID_OPTIONS.include?(:foreign_key) &&
+                                                                             !STORES_FOREIGN_KEY.include?(association_class) do
 
             context 'when :foreign_key option is not specified' do
 
@@ -327,7 +332,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :foreign_key) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:foreign_key) do
 
           it 'returns nil' do
             expect(association.dependent).to be_nil
@@ -352,7 +357,7 @@ describe Mongoid::Association::Options do
 
       describe 'the :primary_key option' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :primary_key) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:primary_key) do
 
           context 'when the option is specified' do
 
@@ -375,7 +380,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :primary_key) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:primary_key) do
 
           it 'returns nil' do
             expect(association.primary_key).to be_nil
@@ -597,7 +602,7 @@ describe Mongoid::Association::Options do
 
       describe '#indexed?' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :index) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:index) do
 
           context 'when :index is in the options' do
 
@@ -649,7 +654,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :index) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:index) do
 
           it 'returns false' do
             expect(association.indexed?).to be(false)
@@ -722,7 +727,7 @@ describe Mongoid::Association::Options do
 
       describe '#polymorphic' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :polymorphic) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:polymorphic) do
 
           context 'when :polymorphic is in the options' do
 
@@ -774,7 +779,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :polymorphic) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:polymorphic) do
 
           it 'returns false' do
             expect(association.polymorphic?).to be(false)
@@ -799,7 +804,7 @@ describe Mongoid::Association::Options do
 
       describe '#cascading_callbacks?' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :cascade_callbacks) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:cascade_callbacks) do
 
           context 'when :cascade_callbacks is in the options' do
 
@@ -851,7 +856,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :cascade_callbacks) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:cascade_callbacks) do
 
           it 'returns false' do
             expect(association.cascading_callbacks?).to be(false)
@@ -876,7 +881,7 @@ describe Mongoid::Association::Options do
 
       describe '#cyclic?' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :cyclic) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:cyclic) do
 
           context 'when :cyclic is in the options' do
 
@@ -928,7 +933,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :cyclic) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:cyclic) do
 
           it 'returns false' do
             expect(association.cyclic?).to be(false)
@@ -1047,7 +1052,7 @@ describe Mongoid::Association::Options do
 
       describe '#counter_cached?' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :counter_cache) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:counter_cache) do
 
           context 'when :counter_cache is in the options' do
 
@@ -1099,7 +1104,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :counter_cache) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:counter_cache) do
 
           it 'returns false' do
             expect(association.counter_cached?).to be(false)
@@ -1238,7 +1243,7 @@ describe Mongoid::Association::Options do
 
       describe '#validate?' do
 
-        context 'when the option is supported by the association type', if: Mongoid::Association::SpecHelpers.supports_option?(association_class, :validate) do
+        context 'when the option is supported by the association type', if: association_class::VALID_OPTIONS.include?(:validate) do
 
           context 'when :validate is in the options' do
 
@@ -1290,7 +1295,7 @@ describe Mongoid::Association::Options do
           end
         end
 
-        context 'when the option is not supported by the association type', if: !Mongoid::Association::SpecHelpers.supports_option?(association_class, :validate) do
+        context 'when the option is not supported by the association type', if: !association_class::VALID_OPTIONS.include?(:validate) do
 
           it 'returns false' do
             expect(association.send(:validate?)).to be(false)
