@@ -45,21 +45,13 @@ module Mongoid
           @relation_complements ||= [ Referenced::BelongsTo ].freeze
         end
 
-        # Setup the instance methods on the class having this association type.
+        # Setup the instance methods, fields, etc. on the association owning class.
         #
         # @return [ self ]
         #
         # @since 7.0
-        def setup_instance_methods!
-          define_getter!
-          define_setter!
-          define_existence_check!
-          define_builder!
-          define_creator!
-          define_autosaver!
-          polymorph!
-          define_dependency!
-          @owner_class.validates_associated(name) if validate?
+        def setup!
+          setup_instance_methods!
           self
         end
 
@@ -203,6 +195,24 @@ module Mongoid
         end
 
         private
+
+        # Setup the instance methods on the class having this association type.
+        #
+        # @return [ self ]
+        #
+        # @since 7.0
+        def setup_instance_methods!
+          define_getter!
+          define_setter!
+          define_existence_check!
+          define_builder!
+          define_creator!
+          define_autosaver!
+          polymorph!
+          define_dependency!
+          @owner_class.validates_associated(name) if validate?
+          self
+        end
 
         def polymorphic_inverses(other)
           [ as ]

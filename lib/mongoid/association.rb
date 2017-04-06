@@ -2,18 +2,16 @@ require 'mongoid/association/accessors'
 require 'mongoid/association/builders'
 require 'mongoid/association/bindable'
 require 'mongoid/association/depending'
-require 'mongoid/association/macros'
 require 'mongoid/association/proxy'
 require 'mongoid/association/touchable'
 
 require 'mongoid/association/many'
 require 'mongoid/association/one'
-require 'mongoid/association/macros'
 require 'mongoid/association/relatable'
-
 require 'mongoid/association/nested'
 require 'mongoid/association/referenced'
 require 'mongoid/association/embedded'
+require 'mongoid/association/macros'
 
 require 'mongoid/association/reflections'
 require 'mongoid/association/eager_loadable'
@@ -30,6 +28,21 @@ module Mongoid
     include Builders
     include Macros
     include Reflections
+
+    # Map the macros to their corresponding Association classes.
+    #
+    # @return [ Hash ] The mapping from macros to their Association class.
+    #
+    # @since 7.0
+    MACRO_MAPPING = {
+        embeds_one: Association::Embedded::EmbedsOne,
+        embeds_many: Association::Embedded::EmbedsMany,
+        embedded_in: Association::Embedded::EmbeddedIn,
+        has_one: Association::Referenced::HasOne,
+        has_many: Association::Referenced::HasMany,
+        has_and_belongs_to_many: Association::Referenced::HasAndBelongsToMany,
+        belongs_to: Association::Referenced::BelongsTo,
+    }.freeze
 
     attr_accessor :__association
     alias :relation_association :__association
