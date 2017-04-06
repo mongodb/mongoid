@@ -51,7 +51,7 @@ module Mongoid
         #
         # @since 7.0
         def relation_complements
-          [ self.class ].freeze
+          @relation_complements ||= [ self.class ].freeze
         end
 
         # Setup the instance methods on the class having this association type.

@@ -10,7 +10,7 @@ module Mongoid
           include Buildable
 
           # Builds the document out of the attributes using the provided
-          # metadata on the relation. Instantiates through the factory in order
+          # association metadata on the relation. Instantiates through the factory in order
           # to make sure subclasses and allocation are used if fitting.
           #
           # @example Build the document.

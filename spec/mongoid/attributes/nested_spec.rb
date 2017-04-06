@@ -41,12 +41,12 @@ describe Mongoid::Attributes::Nested do
         Account.nested_attributes.clear
       end
 
-      let(:metadata) do
+      let(:association) do
         Account.reflect_on_association(:alerts)
       end
 
       it "keeps autosave set to false" do
-        expect(metadata).to_not be_autosave
+        expect(association).to_not be_autosave
       end
     end
   end
