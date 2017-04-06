@@ -51,11 +51,7 @@ module Mongoid
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
-          Mongoid::Association::Embedded::EmbeddedIn.new(self, name, options, &block).tap do |assoc|
-            assoc.setup_instance_methods!
-            self.embedded = true
-            self.relations = relations.merge(name.to_s => assoc)
-          end
+          define_association!(__method__, name, options, &block)
         end
 
         # Adds the relation from a parent document to its children. The name
@@ -78,12 +74,7 @@ module Mongoid
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
-          Mongoid::Association::Embedded::EmbedsMany.new(self, name, options, &block).tap do |assoc|
-            assoc.setup_instance_methods!
-            self.embedded_relations = embedded_relations.merge(name.to_s => assoc)
-            self.relations = relations.merge(name.to_s => assoc)
-            aliased_fields[name.to_s] = assoc.store_as if assoc.store_as
-          end
+          define_association!(__method__, name, options, &block)
         end
 
         # Adds the relation from a parent document to its child. The name
@@ -106,12 +97,7 @@ module Mongoid
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
-          Mongoid::Association::Embedded::EmbedsOne.new(self, name, options, &block).tap do |assoc|
-            assoc.setup_instance_methods!
-            self.embedded_relations = embedded_relations.merge(name.to_s => assoc)
-            self.relations = relations.merge(name.to_s => assoc)
-            aliased_fields[name.to_s] = assoc.store_as if assoc.store_as
-          end
+          define_association!(__method__, name, options, &block)
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -133,11 +119,7 @@ module Mongoid
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
-          Referenced::BelongsTo.new(self, name, options, &block).tap do |assoc|
-            assoc.setup_instance_methods!
-            self.relations = relations.merge(name.to_s => assoc)
-            aliased_fields[name.to_s] = assoc.foreign_key
-          end
+          define_association!(__method__, name, options, &block)
         end
 
         # Adds a relational association from a parent Document to many
@@ -159,10 +141,7 @@ module Mongoid
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def has_many(name, options = {}, &block)
-          Mongoid::Association::Referenced::HasMany.new(self, name, options, &block).tap do |assoc|
-            assoc.setup_instance_methods!
-            self.relations = relations.merge(name.to_s => assoc)
-          end
+          define_association!(__method__, name, options, &block)
         end
 
         # Adds a relational many-to-many association between many of this
@@ -186,10 +165,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def has_and_belongs_to_many(name, options = {}, &block)
-          Mongoid::Association::Referenced::HasAndBelongsToMany.new(self, name, options, &block).tap do |assoc|
-            assoc.setup_instance_methods!
-            self.relations = relations.merge(name.to_s => assoc)
-          end
+          define_association!(__method__, name, options, &block)
         end
 
         # Adds a relational association from the child Document to a Document in
@@ -211,9 +187,15 @@ module Mongoid
         # @param [ Hash ] options The relation options.
         # @param [ Proc ] block Optional block for defining extensions.
         def has_one(name, options = {}, &block)
-          Mongoid::Association::Referenced::HasOne.new(self, name, options, &block).tap do |assoc|
-            self.relations = relations.merge(name.to_s => assoc)
-            assoc.setup_instance_methods!
+          define_association!(__method__, name, options, &block)
+        end
+
+        private
+
+        def define_association!(macro_name, name, options = {}, &block)
+          Association::MACRO_MAPPING[macro_name].new(self, name, options, &block).tap do |assoc|
+            assoc.setup!
+            self.relations = self.relations.merge(name => assoc)
           end
         end
       end

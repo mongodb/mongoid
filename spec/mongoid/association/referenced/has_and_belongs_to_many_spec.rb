@@ -41,21 +41,21 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
     end
   end
 
-  describe '#setup_instance_methods!' do
+  describe '#setup!' do
 
     it 'sets up a getter for the relation' do
       expect(Mongoid::Association::Accessors).to receive(:define_getter!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     it 'sets up a setter for the relation' do
       expect(Mongoid::Association::Accessors).to receive(:define_setter!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     it 'sets up an existence check for the relation' do
       expect(Mongoid::Association::Accessors).to receive(:define_existence_check!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     context 'autosave' do
@@ -70,13 +70,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup_instance_methods! method will be called by the :has_many macro
+          # setup! method will be called by the :has_many macro
           described_class.new(has_many_left_class, name, options)
         end
 
         it 'sets up autosave' do
           expect(Mongoid::Association::Referenced::AutoSave).to receive(:define_autosave!).with(association)
-          association.setup_instance_methods!
+          association.setup!
         end
       end
 
@@ -90,7 +90,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
         it 'does not set up autosave' do
           expect(Mongoid::Association::Referenced::AutoSave).not_to receive(:define_autosave!)
-          association.setup_instance_methods!
+          association.setup!
         end
       end
 
@@ -98,13 +98,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
         let(:association) do
           # Note that it is necessary to create the association directly, otherwise the
-          # setup_instance_methods! method will be called by the :has_many macro
+          # setup! method will be called by the :has_many macro
           described_class.new(has_many_left_class, name, options)
         end
 
         it 'does not set up autosave' do
           expect(Mongoid::Association::Referenced::AutoSave).not_to receive(:define_autosave!)
-          association.setup_instance_methods!
+          association.setup!
         end
       end
     end
@@ -119,13 +119,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
       let(:association) do
         # Note that it is necessary to create the association directly, otherwise the
-        # setup_instance_methods! method will be called by the :has_and_belongs_to_many macro
+        # setup! method will be called by the :has_and_belongs_to_many macro
         described_class.new(has_many_left_class, name, options)
       end
 
       it 'sets up validation' do
         expect(has_many_left_class).to receive(:validates_associated).with(name).and_call_original
-        association.setup_instance_methods!
+        association.setup!
       end
     end
 
@@ -139,7 +139,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
       it 'does not set up validation' do
         expect(has_many_left_class).not_to receive(:validates_associated)
-        association.setup_instance_methods!
+        association.setup!
       end
     end
 
@@ -147,13 +147,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
       let(:association) do
         # Note that it is necessary to create the association directly, otherwise the
-        # setup_instance_methods! method will be called by the :has_many macro
+        # setup! method will be called by the :has_many macro
         described_class.new(has_many_left_class, name, options)
       end
 
       it 'sets up the validation because it uses the validation default (true)' do
         expect(has_many_left_class).to receive(:validates_associated).with(name).and_call_original
-        association.setup_instance_methods!
+        association.setup!
       end
     end
 
@@ -210,13 +210,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup_instance_methods! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to macro
             described_class.new(has_many_left_class, name, options)
           end
 
           it 'sets up the dependency' do
             expect(Mongoid::Association::Depending).to receive(:define_dependency!)
-            association.setup_instance_methods!
+            association.setup!
           end
         end
 
@@ -230,13 +230,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup_instance_methods! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to macro
             described_class.new(has_many_left_class, name, options)
           end
 
           it 'sets up the dependency' do
             expect(Mongoid::Association::Depending).to receive(:define_dependency!)
-            association.setup_instance_methods!
+            association.setup!
           end
         end
 
@@ -250,13 +250,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup_instance_methods! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to macro
             described_class.new(has_many_left_class, name, options)
           end
 
           it 'sets up the dependency' do
             expect(Mongoid::Association::Depending).to receive(:define_dependency!)
-            association.setup_instance_methods!
+            association.setup!
           end
         end
 
@@ -270,13 +270,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup_instance_methods! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to macro
             described_class.new(has_many_left_class, name, options)
           end
 
           it 'sets up the dependency' do
             expect(Mongoid::Association::Depending).to receive(:define_dependency!)
-            association.setup_instance_methods!
+            association.setup!
           end
         end
 
@@ -290,13 +290,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
           let(:association) do
             # Note that it is necessary to create the association directly, otherwise the
-            # setup_instance_methods! method will be called by the :belongs_to macro
+            # setup! method will be called by the :belongs_to macro
             described_class.new(has_many_left_class, name, options)
           end
 
           it 'sets up the dependency' do
             expect(Mongoid::Association::Depending).to receive(:define_dependency!)
-            association.setup_instance_methods!
+            association.setup!
           end
         end
       end
@@ -305,7 +305,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
         it 'does not set up the dependency' do
           expect(Mongoid::Association::Depending).not_to receive(:define_dependency!)
-          association.setup_instance_methods!
+          association.setup!
         end
       end
     end

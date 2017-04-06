@@ -41,31 +41,31 @@ describe Mongoid::Association::Embedded::EmbedsMany do
     end
   end
 
-  describe '#setup_instance_methods!' do
+  describe '#setup!' do
 
     it 'sets up a getter for the relation' do
       expect(Mongoid::Association::Accessors).to receive(:define_getter!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     it 'sets up a setter for the relation' do
       expect(Mongoid::Association::Accessors).to receive(:define_setter!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     it 'sets up an existence check for the relation' do
       expect(Mongoid::Association::Accessors).to receive(:define_existence_check!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     it 'sets up the builder for the relation' do
       expect(Mongoid::Association::Builders).to receive(:define_builder!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     it 'sets up the creator for the relation' do
       expect(Mongoid::Association::Builders).to receive(:define_creator!).with(association)
-      association.setup_instance_methods!
+      association.setup!
     end
 
     context 'when the :validate option is true' do
@@ -78,13 +78,13 @@ describe Mongoid::Association::Embedded::EmbedsMany do
 
       let(:association) do
         # Note that it is necessary to create the association directly, otherwise the
-        # setup_instance_methods! method will be called by the :embeds_many macro
+        # setup! method will be called by the :embeds_many macro
         described_class.new(embeds_many_class, name, options)
       end
 
       it 'sets up validation' do
         expect(embeds_many_class).to receive(:validates_associated).with(name).and_call_original
-        association.setup_instance_methods!
+        association.setup!
       end
     end
 
@@ -98,7 +98,7 @@ describe Mongoid::Association::Embedded::EmbedsMany do
 
       it 'does not set up validation' do
         expect(embeds_many_class).not_to receive(:validates_associated)
-        association.setup_instance_methods!
+        association.setup!
       end
     end
 
@@ -106,13 +106,13 @@ describe Mongoid::Association::Embedded::EmbedsMany do
 
       let(:association) do
         # Note that it is necessary to create the association directly, otherwise the
-        # setup_instance_methods! method will be called by the :embeds_many macro
+        # setup! method will be called by the :embeds_many macro
         described_class.new(embeds_many_class, name, options)
       end
 
       it 'sets up the validation because it uses the validation default (true)' do
         expect(embeds_many_class).to receive(:validates_associated).with(name).and_call_original
-        association.setup_instance_methods!
+        association.setup!
       end
     end
   end

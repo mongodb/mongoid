@@ -57,26 +57,14 @@ module Mongoid
           @relation_complements ||= [ HasMany, HasOne ].freeze
         end
 
-        # Setup the instance methods on the class having this association type.
+        # Setup the instance methods, fields, etc. on the association owning class.
         #
         # @return [ self ]
         #
         # @since 7.0
-        def setup_instance_methods!
-          define_getter!
-          define_setter!
-          define_existence_check!
-          define_builder!
-          define_creator!
-          define_autosaver!
-          define_counter_cache_callbacks!
-          polymorph!
-          define_dependency!
-          create_foreign_key_field!
-          setup_index!
-          define_touchable!
-          @owner_class.validates_associated(name) if validate?
-          @owner_class.validates(name, presence: true) if require_association?
+        def setup!
+          setup_instance_methods!
+          @owner_class.aliased_fields[name.to_s] = foreign_key
           self
         end
 
@@ -194,6 +182,23 @@ module Mongoid
         end
 
         private
+
+        def setup_instance_methods!
+          define_getter!
+          define_setter!
+          define_existence_check!
+          define_builder!
+          define_creator!
+          define_autosaver!
+          define_counter_cache_callbacks!
+          polymorph!
+          define_dependency!
+          create_foreign_key_field!
+          setup_index!
+          define_touchable!
+          @owner_class.validates_associated(name) if validate?
+          @owner_class.validates(name, presence: true) if require_association?
+        end
 
         def index_spec
           if polymorphic?

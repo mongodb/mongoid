@@ -50,6 +50,16 @@ module Mongoid
           @relation_complements ||= [ Referenced::BelongsTo ].freeze
         end
 
+        # Setup the instance methods, fields, etc. on the association owning class.
+        #
+        # @return [ self ]
+        #
+        # @since 7.0
+        def setup!
+          setup_instance_methods!
+          self
+        end
+
         # Setup the instance methods on the class having this association type.
         #
         # @return [ self ]
