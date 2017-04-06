@@ -12,13 +12,13 @@ describe Mongoid::Associations::Referenced::HasOne::Eager do
       Person.all.to_a
     end
 
-    let(:metadata) do
+    let(:association) do
       Person.reflect_on_association(:cat)
     end
 
     let(:eager) do
-      described_class.new([metadata], docs).tap do |b|
-        b.send(:shift_metadata)
+      described_class.new([association], docs).tap do |b|
+        b.send(:shift_association)
       end
     end
 
@@ -41,13 +41,13 @@ describe Mongoid::Associations::Referenced::HasOne::Eager do
       Person.all.to_a
     end
 
-    let(:metadata) do
+    let(:association) do
       Person.reflect_on_association(:cat)
     end
 
     let(:eager) do
-      described_class.new([metadata], docs).tap do |b|
-        b.send(:shift_metadata)
+      described_class.new([association], docs).tap do |b|
+        b.send(:shift_association)
       end
     end
 

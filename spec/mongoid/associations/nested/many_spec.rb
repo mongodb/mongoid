@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Associations::Nested::Many do
 
-  let(:metadata) do
+  let(:association) do
     Person.relations['addresses']
   end
 
@@ -15,7 +15,7 @@ describe Mongoid::Associations::Nested::Many do
     context "when the option is provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, allow_destroy: true)
+        described_class.new(association, {}, allow_destroy: true)
       end
 
       it "returns the option" do
@@ -26,7 +26,7 @@ describe Mongoid::Associations::Nested::Many do
     context "when the option is not provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, {})
+        described_class.new(association, {}, {})
       end
 
       it "returns false" do
@@ -48,7 +48,7 @@ describe Mongoid::Associations::Nested::Many do
     context "when attributes are over limit" do
 
       let(:builder) do
-        described_class.new(metadata, attributes, limit: 2)
+        described_class.new(association, attributes, limit: 2)
       end
 
       it "raises an error" do
@@ -62,7 +62,7 @@ describe Mongoid::Associations::Nested::Many do
 
       let(:builder) do
         described_class.new(
-          metadata,
+          association,
           attributes,
           reject_if: ->(attrs){ attrs[:city].blank? }
         )
@@ -82,7 +82,7 @@ describe Mongoid::Associations::Nested::Many do
 
       let(:builder) do
         described_class.new(
-          metadata,
+          association,
           attributes,
           reject_if: :reject_if_city_is_empty
         )
@@ -109,7 +109,7 @@ describe Mongoid::Associations::Nested::Many do
       end
 
       let(:builder) do
-        described_class.new(metadata, attributes)
+        described_class.new(association, attributes)
       end
 
       before do
@@ -128,7 +128,7 @@ describe Mongoid::Associations::Nested::Many do
       end
 
       let(:builder) do
-        described_class.new(metadata, attributes)
+        described_class.new(association, attributes)
       end
 
       before do
@@ -152,7 +152,7 @@ describe Mongoid::Associations::Nested::Many do
     end
 
     let(:builder) do
-      described_class.new(metadata, attributes, {})
+      described_class.new(association, attributes, {})
     end
 
     it "sorts the attributes" do
@@ -171,7 +171,7 @@ describe Mongoid::Associations::Nested::Many do
       context "when the proc matches" do
 
         let(:builder) do
-          described_class.new(metadata, {}, options)
+          described_class.new(association, {}, options)
         end
 
         it "returns true" do
@@ -182,7 +182,7 @@ describe Mongoid::Associations::Nested::Many do
       context "when the proc does not match" do
 
         let(:builder) do
-          described_class.new(metadata, {}, options)
+          described_class.new(association, {}, options)
         end
 
         it "returns false" do
@@ -194,7 +194,7 @@ describe Mongoid::Associations::Nested::Many do
     context "when the proc is not provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, {})
+        described_class.new(association, {}, {})
       end
 
       it "returns false" do
@@ -208,7 +208,7 @@ describe Mongoid::Associations::Nested::Many do
     context "when the option is provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, update_only: true)
+        described_class.new(association, {}, update_only: true)
       end
 
       it "returns the option" do
@@ -219,7 +219,7 @@ describe Mongoid::Associations::Nested::Many do
     context "when the option is not provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, {})
+        described_class.new(association, {}, {})
       end
 
       it "returns false" do

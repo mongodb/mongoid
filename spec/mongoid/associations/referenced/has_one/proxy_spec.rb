@@ -52,12 +52,12 @@ describe Mongoid::Associations::Referenced::HasOne::Proxy do
           Game.new
         end
 
-        let(:metadata) do
+        let(:association) do
           Game.relations["person"]
         end
 
         before do
-          expect(metadata).to receive(:criteria).never
+          expect(association).to receive(:criteria).never
           person.game = game
         end
 
@@ -869,13 +869,13 @@ describe Mongoid::Associations::Referenced::HasOne::Proxy do
       double
     end
 
-    let(:metadata) do
+    let(:association) do
       double(extension?: false)
     end
 
     it "returns the embedded in builder" do
       expect(
-          described_class.builder(nil, metadata, document)
+          described_class.builder(nil, association, document)
       ).to be_a(builder_klass)
     end
   end
@@ -1004,12 +1004,12 @@ describe Mongoid::Associations::Referenced::HasOne::Proxy do
 
     context "when the relation is polymorphic" do
 
-      let(:metadata) do
+      let(:association) do
         Book.relations["rating"]
       end
 
       let(:criteria) do
-        described_class.criteria(metadata, id, Book)
+        described_class.criteria(association, id, Book)
       end
 
       it "includes the type in the criteria" do
@@ -1024,12 +1024,12 @@ describe Mongoid::Associations::Referenced::HasOne::Proxy do
 
     context "when the relation is not polymorphic" do
 
-      let(:metadata) do
+      let(:association) do
         Person.relations["game"]
       end
 
       let(:criteria) do
-        described_class.criteria(metadata, id, Person)
+        described_class.criteria(association, id, Person)
       end
 
       it "does not include the type in the criteria" do

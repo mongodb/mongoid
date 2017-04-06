@@ -19,13 +19,13 @@ module Mongoid
           # @since 2.0.0.rc.1
           def bind_one(doc)
             binding do
-              inverse_keys = doc.you_must(metadata.inverse_foreign_key)
+              inverse_keys = doc.you_must(association.inverse_foreign_key)
               if inverse_keys
                 record_id = inverse_record_id(doc)
                 unless inverse_keys.include?(record_id)
-                  doc.you_must(metadata.inverse_foreign_key_setter, inverse_keys.push(record_id))
+                  doc.you_must(association.inverse_foreign_key_setter, inverse_keys.push(record_id))
                 end
-                doc.reset_relation_criteria(metadata.inverse)
+                doc.reset_relation_criteria(association.inverse)
               end
               base._synced[metadata.foreign_key] = true
               doc._synced[metadata.inverse_foreign_key] = true
@@ -40,11 +40,11 @@ module Mongoid
           # @since 2.0.0.rc.1
           def unbind_one(doc)
             binding do
-              base.send(metadata.foreign_key).delete_one(record_id(doc))
-              inverse_keys = doc.you_must(metadata.inverse_foreign_key)
+              base.send(association.foreign_key).delete_one(record_id(doc))
+              inverse_keys = doc.you_must(association.inverse_foreign_key)
               if inverse_keys
                 inverse_keys.delete_one(inverse_record_id(doc))
-                doc.reset_relation_criteria(metadata.inverse)
+                doc.reset_relation_criteria(association.inverse)
               end
               base._synced[metadata.foreign_key] = true
               doc._synced[metadata.inverse_foreign_key] = true
@@ -53,15 +53,15 @@ module Mongoid
 
           # Find the inverse id referenced by inverse_keys
           def inverse_record_id(doc)
-            inverse_metadata = determine_inverse_metadata(doc)
-            if inverse_metadata
-              base.__send__(inverse_metadata.primary_key)
+            inverse_association = determine_inverse_association(doc)
+            if inverse_association
+              base.__send__(inverse_association.primary_key)
             else
               base._id
             end
           end
 
-          def determine_inverse_metadata(doc)
+          def determine_inverse_association(doc)
             doc.relations[base.class.name.demodulize.underscore.pluralize]
           end
         end

@@ -19,7 +19,7 @@ module Mongoid
         #
         # @return [ Array ] The attributes.
         def build(parent, options = {})
-          @existing = parent.send(metadata.name)
+          @existing = parent.send(association.name)
           if over_limit?(attributes)
             raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
           end
@@ -36,12 +36,12 @@ module Mongoid
         # relations.
         #
         # @example Initialize the builder.
-        #   One.new(metadata, attributes, options)
+        #   One.new(association, attributes, options)
         #
-        # @param [ Metadata ] metadata The relation metadata.
+        # @param [ Association ] association The association metadata.
         # @param [ Hash ] attributes The attributes hash to attempt to set.
         # @param [ Hash ] options The options defined.
-        def initialize(metadata, attributes, options = {})
+        def initialize(association, attributes, options = {})
           if attributes.respond_to?(:with_indifferent_access)
             @attributes = attributes.with_indifferent_access.sort do |a, b|
               a[0].to_i <=> b[0].to_i
@@ -49,9 +49,9 @@ module Mongoid
           else
             @attributes = attributes
           end
-          @metadata = metadata
+          @association = association
           @options = options
-          @class_name = options[:class_name] ? options[:class_name].constantize : metadata.klass
+          @class_name = options[:class_name] ? options[:class_name].constantize : association.klass
         end
 
         private
@@ -155,7 +155,7 @@ module Mongoid
         # @since 3.0.10
         def update_document(doc, attrs)
           attrs.delete_id
-          if metadata.embedded?
+          if association.embedded?
             doc.assign_attributes(attrs)
           else
             doc.update_attributes(attrs)

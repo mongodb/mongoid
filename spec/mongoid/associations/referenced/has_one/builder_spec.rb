@@ -12,12 +12,12 @@ describe Mongoid::Associations::Referenced::HasOne::Builder do
       Post.where("person_id" => object)
     end
 
-    let(:metadata) do
+    let(:association) do
       Mongoid::Associations::Referenced::HasOne.new(Person, :post, foreign_key: "person_id")
     end
 
     let(:builder) do
-      described_class.new(base, metadata, object)
+      described_class.new(base, association, object)
     end
 
     context "when provided an id" do
@@ -36,7 +36,7 @@ describe Mongoid::Associations::Referenced::HasOne::Builder do
 
       before do
         expect(criteria).to receive(:first).and_return(post)
-        expect(metadata).to receive(:criteria).and_return(criteria)
+        expect(association).to receive(:criteria).and_return(criteria)
       end
 
       let!(:documents) do

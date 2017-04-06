@@ -18,27 +18,26 @@ module Mongoid
       include Threaded::Lifecycle
       include Marshalable
 
-      attr_accessor :base, :__metadata, :target
-      alias :relation_metadata :__metadata
+      attr_accessor :base, :__association, :target
 
       # Backwards compatibility with Mongoid beta releases.
-      delegate :foreign_key, :inverse_foreign_key, to: :__metadata
+      delegate :foreign_key, :inverse_foreign_key, to: :__association
       delegate :bind_one, :unbind_one, to: :binding
       delegate :collection_name, to: :base
 
-      # Convenience for setting the target and the metadata properties since
+      # Convenience for setting the target and the association metadata properties since
       # all proxies will need to do this.
       #
       # @example Initialize the proxy.
-      #   proxy.init(person, name, metadata)
+      #   proxy.init(person, name, association)
       #
       # @param [ Document ] base The base document on the proxy.
       # @param [ Document, Array<Document> ] target The target of the proxy.
-      # @param [ Metadata ] metadata The relation's metadata.
+      # @param [ Association ] association The association metadata.
       #
       # @since 2.0.0.rc.1
       def init(base, target, association)
-        @base, @target, @__metadata = base, target, association
+        @base, @target, @__association = base, target, association
         yield(self) if block_given?
         extend_proxies(association.extension) if association.extension
       end
@@ -48,7 +47,7 @@ module Mongoid
         extension.flatten.each {|ext| extend_proxy(ext) }
       end
 
-      # Get the class from the metadata, or return nil if no metadata present.
+      # Get the class from the association, or return nil if no association present.
       #
       # @example Get the class.
       #   proxy.klass
@@ -57,7 +56,7 @@ module Mongoid
       #
       # @since 3.0.15
       def klass
-        __metadata ? __metadata.klass : nil
+        __association ? __association.klass : nil
       end
 
       # Resets the criteria inside the relation proxy. Used by many to many
@@ -99,16 +98,16 @@ module Mongoid
         root.collection unless root.embedded?
       end
 
-      # Takes the supplied document and sets the metadata on it.
+      # Takes the supplied document and sets the association on it.
       #
-      # @example Set the metadata.
+      # @example Set the association metadata.
       #   proxt.characterize_one(name)
       #
       # @param [ Document ] document The document to set on.
       #
       # @since 2.0.0.rc.4
       def characterize_one(document)
-        document.__metadata = __metadata unless document.__metadata
+        document.__association = __association unless document.__association
       end
 
       # Default behavior of method missing should be to delegate all calls
@@ -130,7 +129,7 @@ module Mongoid
       #
       # @since 2.0.0
       def raise_mixed
-        raise Errors::MixedRelations.new(base.class, __metadata.klass)
+        raise Errors::MixedRelations.new(base.class, __association.klass)
       end
 
       # When the base is not yet saved and the user calls create or create!
@@ -157,7 +156,7 @@ module Mongoid
       #
       # @since 3.1.0
       def execute_callback(callback, doc)
-        __metadata.get_callbacks(callback).each do |c|
+        __association.get_callbacks(callback).each do |c|
           if c.is_a? Proc
             c.call(base, doc)
           else
@@ -171,16 +170,16 @@ module Mongoid
         # Apply ordering to the criteria if it was defined on the relation.
         #
         # @example Apply the ordering.
-        #   Proxy.apply_ordering(criteria, metadata)
+        #   Proxy.apply_ordering(criteria, association)
         #
         # @param [ Criteria ] criteria The criteria to modify.
-        # @param [ Metadata ] metadata The relation metadata.
+        # @param [ Association ] association The association metadata.
         #
         # @return [ Criteria ] The ordered criteria.
         #
         # @since 3.0.6
-        def apply_ordering(criteria, metadata)
-          metadata.order ? criteria.order_by(metadata.order) : criteria
+        def apply_ordering(criteria, association)
+          association.order ? criteria.order_by(association.order) : criteria
         end
       end
     end

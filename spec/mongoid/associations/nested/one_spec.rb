@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Associations::Nested::One do
 
-  let(:metadata) do
+  let(:association) do
     Person.relations['name']
   end
 
@@ -11,7 +11,7 @@ describe Mongoid::Associations::Nested::One do
     context "when the option is provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, allow_destroy: true)
+        described_class.new(association, {}, allow_destroy: true)
       end
 
       it "returns the option" do
@@ -22,7 +22,7 @@ describe Mongoid::Associations::Nested::One do
     context "when the option is not provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, {})
+        described_class.new(association, {}, {})
       end
 
       it "returns false" do
@@ -44,7 +44,7 @@ describe Mongoid::Associations::Nested::One do
       end
 
       let(:builder) do
-        described_class.new(metadata, { last_name: "Lang" }, options)
+        described_class.new(association, { last_name: "Lang" }, options)
       end
 
       before do
@@ -63,7 +63,7 @@ describe Mongoid::Associations::Nested::One do
       end
 
       let(:builder) do
-        described_class.new(metadata, { last_name: "Lang" }, options)
+        described_class.new(association, { last_name: "Lang" }, options)
       end
 
       before do
@@ -88,7 +88,7 @@ describe Mongoid::Associations::Nested::One do
       end
 
       let(:builder) do
-        described_class.new(metadata, {
+        described_class.new(association, {
           _id: name.id,
           last_name: "Lang"
         }, options)
@@ -110,7 +110,7 @@ describe Mongoid::Associations::Nested::One do
       end
 
       let(:builder) do
-        described_class.new(metadata, {
+        described_class.new(association, {
           last_name: "Lang"
         }, options)
       end
@@ -135,7 +135,7 @@ describe Mongoid::Associations::Nested::One do
       end
 
       let(:builder) do
-        described_class.new(metadata, {
+        described_class.new(association, {
           id: name.id,
           last_name: "Lang",
           _destroy: true
@@ -157,7 +157,7 @@ describe Mongoid::Associations::Nested::One do
     context "when the attribute exists" do
 
       let(:builder) do
-        described_class.new(metadata, { _destroy: true }, {})
+        described_class.new(association, { _destroy: true }, {})
       end
 
       it "returns the value" do
@@ -168,7 +168,7 @@ describe Mongoid::Associations::Nested::One do
     context "when the attribute does not exist" do
 
       let(:builder) do
-        described_class.new(metadata, {}, {})
+        described_class.new(association, {}, {})
       end
 
       it "returns nil" do
@@ -188,7 +188,7 @@ describe Mongoid::Associations::Nested::One do
       context "when the proc matches" do
 
         let(:builder) do
-          described_class.new(metadata, {}, options)
+          described_class.new(association, {}, options)
         end
 
         it "returns true" do
@@ -199,7 +199,7 @@ describe Mongoid::Associations::Nested::One do
       context "when the proc does not match" do
 
         let(:builder) do
-          described_class.new(metadata, {}, options)
+          described_class.new(association, {}, options)
         end
 
         it "returns false" do
@@ -211,7 +211,7 @@ describe Mongoid::Associations::Nested::One do
     context "when the proc is not provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, {})
+        described_class.new(association, {}, {})
       end
 
       it "returns false" do
@@ -225,7 +225,7 @@ describe Mongoid::Associations::Nested::One do
     context "when the option is provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, update_only: true)
+        described_class.new(association, {}, update_only: true)
       end
 
       it "returns the option" do
@@ -236,7 +236,7 @@ describe Mongoid::Associations::Nested::One do
     context "when the option is not provided" do
 
       let(:builder) do
-        described_class.new(metadata, {}, {})
+        described_class.new(association, {}, {})
       end
 
       it "returns false" do

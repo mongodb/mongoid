@@ -12,7 +12,7 @@ module Mongoid
           # object or an array of documents, where it will just return them.
           #
           # @example Build the documents.
-          #   Builder.new(meta, attrs).build
+          #   Builder.new(association, attrs).build
           #
           # @param [ String ] type The type of document to query for.
           #
@@ -20,7 +20,7 @@ module Mongoid
           def build(type = nil)
             return object.try(:dup) unless query?
             ids = object || []
-            metadata.criteria(ids, base.class)
+            association.criteria(ids, base.class)
           end
 
           # Do we need to perform a database query? It will be so if the object we

@@ -12,9 +12,9 @@ module Mongoid
           # Instantiate the eager load class.
           #
           # @example Create the new belongs to eager load preloader.
-          #   BelongsTo.new(relations_metadata, parent_docs)
+          #   BelongsTo.new(association, parent_docs)
           #
-          # @param [ Array<Metadata> ] Relations to eager load
+          # @param [ Array<Association> ] Associations to eager load
           # @param [ Array<Document> ] Documents to preload the relations
           #
           # @return [ Base ] The eager load preloader
@@ -36,9 +36,9 @@ module Mongoid
           # @since 4.0.0
           def run
             @loaded = []
-            while shift_metadata
+            while shift_association
               preload
-              @loaded << @docs.collect { |d| d.send(@metadata.name) if d.respond_to?(@metadata.name) }
+              @loaded << @docs.collect { |d| d.send(@association.name) if d.respond_to?(@association.name) }
             end
             @loaded.flatten
           end
@@ -64,8 +64,8 @@ module Mongoid
           #
           # @since 4.0.0
           def each_loaded_document
-            criteria = @metadata.klass.any_in(key => keys_from_docs)
-            criteria.inclusions = criteria.inclusions - [@metadata]
+            criteria = @association.klass.any_in(key => keys_from_docs)
+            criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc
             end
@@ -95,7 +95,7 @@ module Mongoid
           #
           # @since 4.0.0
           def grouped_docs
-            @grouped_docs[@metadata.name] ||= @docs.group_by do |doc|
+            @grouped_docs[@association.name] ||= @docs.group_by do |doc|
               doc.send(group_by_key) if doc.respond_to?(group_by_key)
             end
           end
@@ -136,21 +136,21 @@ module Mongoid
           #
           # @since 4.0.0
           def set_relation(doc, element)
-            doc.set_relation(@metadata.name, element) unless doc.blank?
+            doc.set_relation(@association.name, element) unless doc.blank?
           end
 
           private
 
-          # Shift the current relation metadata
+          # Shift the current association metadata
           #
-          # @example Shift the current metadata.
-          #   loader.shift_metadata
+          # @example Shift the current association.
+          #   loader.shift_association
           #
-          # @return [ Object ] The relation metadata object.
+          # @return [ Association ] The association object.
           #
           # @since 4.0.0
-          def shift_metadata
-            @metadata = @associations.shift
+          def shift_association
+            @association = @associations.shift
           end
         end
       end

@@ -14,14 +14,14 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Binding do
     Mongoid::Associations::Referenced::HasMany::Targets::Enumerable.new([ preference ])
   end
 
-  let(:metadata) do
+  let(:association) do
     Person.relations["preferences"]
   end
 
   describe "#bind_one" do
 
     let(:binding) do
-      described_class.new(person, target, metadata)
+      described_class.new(person, target, association)
     end
 
     context "when the document is bindable" do
@@ -77,7 +77,7 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Binding do
   describe "#unbind_one" do
 
     let(:binding) do
-      described_class.new(person, target, metadata)
+      described_class.new(person, target, association)
     end
 
     context "when the documents are unbindable" do

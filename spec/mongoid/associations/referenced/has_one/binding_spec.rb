@@ -10,14 +10,14 @@ describe Mongoid::Associations::Referenced::HasOne::Binding do
     Game.new
   end
 
-  let(:metadata) do
+  let(:association) do
     Person.relations["game"]
   end
 
   describe "#bind_one" do
 
     let(:binding) do
-      described_class.new(person, game, metadata)
+      described_class.new(person, game, association)
     end
 
     context "when the document is bindable" do
@@ -53,7 +53,7 @@ describe Mongoid::Associations::Referenced::HasOne::Binding do
   describe "#unbind_one" do
 
     let(:binding) do
-      described_class.new(person, game, metadata)
+      described_class.new(person, game, association)
     end
 
     context "when the document is unbindable" do

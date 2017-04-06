@@ -12,13 +12,13 @@ module Mongoid
           # and the base on the inverse object.
           #
           # @example Create the new relation.
-          #   Referenced::One.new(base, target, metadata)
+          #   Referenced::One.new(base, target, association)
           #
           # @param [ Document ] base The document this relation hangs off of.
           # @param [ Document ] target The target (child) of the relation.
-          # @param [ Metadata ] metadata The relation's metadata.
-          def initialize(base, target, metadata)
-            init(base, target, metadata) do
+          # @param [ Association ] association The association metadata.
+          def initialize(base, target, association)
+            init(base, target, association) do
               raise_mixed if klass.embedded? && !klass.cyclic?
               characterize_one(target)
               bind_one
@@ -54,13 +54,13 @@ module Mongoid
           def substitute(replacement)
             unbind_one
             if persistable?
-              if __metadata.destructive?
-                send(__metadata.dependent)
+              if __association.destructive?
+                send(__association.dependent)
               else
                 save if persisted?
               end
             end
-            HasOne::Proxy.new(base, replacement, __metadata) if replacement
+            HasOne::Proxy.new(base, replacement, __association) if replacement
           end
 
           private
@@ -74,7 +74,7 @@ module Mongoid
           #
           # @return [ Binding ] The binding object.
           def binding
-            HasOne::Binding.new(base, target, __metadata)
+            HasOne::Binding.new(base, target, __association)
           end
 
           # Are we able to persist this relation?
@@ -98,7 +98,7 @@ module Mongoid
             #   Referenced::One.builder(meta, object)
             #
             # @param [ Document ] base The base document.
-            # @param [ Metadata ] meta The metadata of the relation.
+            # @param [ Association ] association The association metadata.
             # @param [ Document, Hash ] object A document or attributes to build
             #   with.
             #
@@ -114,20 +114,16 @@ module Mongoid
             # @example Get the criteria.
             #   Proxy.criteria(meta, id, Model)
             #
-            # @param [ Metadata ] metadata The metadata.
+            # @param [ Association ] association The association metadata.
             # @param [ Object ] object The value of the foreign key.
             # @param [ Class ] type The optional type.
             #
             # @return [ Criteria ] The criteria.
             #
             # @since 2.1.0
-            def criteria(metadata, object, type = nil)
-              crit = metadata.klass.where(metadata.foreign_key => object)
-              metadata.add_polymorphic_criterion(crit, type)
-              # if metadata.polymorphic?
-              #   crit = crit.where(metadata.type => type.name)
-              # end
-              # crit
+            def criteria(association, object, type = nil)
+              crit = association.klass.where(association.foreign_key => object)
+              association.add_polymorphic_criterion(crit, type)
             end
 
             def eager_loader(association, docs)

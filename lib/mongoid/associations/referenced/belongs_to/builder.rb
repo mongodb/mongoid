@@ -21,8 +21,8 @@ module Mongoid
           # @since 7.0
           def build(type = nil)
             return object unless query?
-            model = type ? type.constantize : metadata.klass
-            metadata.criteria(object, model).first
+            model = type ? type.constantize : association.klass
+            association.criteria(object, model).first
           end
         end
       end

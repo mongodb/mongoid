@@ -224,9 +224,9 @@ module Mongoid
       #
       # @since 2.4.4
       def to_validate(document, attribute, value)
-        metadata = document.relations[attribute.to_s]
-        if metadata && metadata.stores_foreign_key?
-          [ metadata.foreign_key, value && value._id ]
+        association = document.relations[attribute.to_s]
+        if association && association.stores_foreign_key?
+          [ association.foreign_key, value && value._id ]
         else
           [ attribute, value ]
         end
@@ -246,7 +246,7 @@ module Mongoid
       # @since 2.4.10
       def validate_embedded(document, attribute, value)
         return if skip_validation?(document)
-        relation = document._parent.send(document.metadata_name)
+        relation = document._parent.send(document.association_name)
         criteria = create_criteria(relation, document, attribute, value)
         criteria = criteria.merge(options[:conditions].call) if options[:conditions]
         add_error(document, attribute, value) if criteria.count > 1

@@ -12,12 +12,12 @@ describe Mongoid::Associations::Embedded::EmbedsOne::Proxy do
       Name.new
     end
 
-    let(:metadata) do
+    let(:association) do
       Person.relations["name"]
     end
 
     let(:relation) do
-      described_class.new(base, target, metadata)
+      described_class.new(base, target, association)
     end
 
     context "when the proxied document is same class" do

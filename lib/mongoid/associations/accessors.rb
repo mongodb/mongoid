@@ -12,36 +12,36 @@ module Mongoid
       # document is nil, then sets the relation on this document.
       #
       # @example Build the relation.
-      #   person.__build__(:addresses, { :_id => 1 }, metadata)
+      #   person.__build__(:addresses, { :_id => 1 }, association)
       #
       # @param [ String, Symbol ] name The name of the relation.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
-      # @param [ Metadata ] metadata The relation's metadata.
+      # @param [ Association ] association The association metadata.
       # @param [ true, false ] building If we are in a build operation.
       #
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def __build__(name, object, metadata)
-        relation = create_relation(object, metadata)
+      def __build__(name, object, association)
+        relation = create_relation(object, association)
         set_relation(name, relation)
       end
 
-      # Create a relation from an object and metadata.
+      # Create a relation from an object and association.
       #
       # @example Create the relation.
-      #   person.create_relation(document, metadata)
+      #   person.create_relation(document, association)
       #
       # @param [ Document, Array<Document ] object The relation target.
-      # @param [ Metadata ] metadata The relation metadata.
+      # @param [ Association ] association The association metadata.
       #
       # @return [ Proxy ] The relation.
       #
       # @since 2.0.0.rc.1
-      def create_relation(object, metadata)
-        type = @attributes[metadata.inverse_type]
-        target = metadata.builder(self, object).build(type)
-        target ? metadata.create_relation(self, target) : nil
+      def create_relation(object, association)
+        type = @attributes[association.inverse_type]
+        target = association.builder(self, object).build(type)
+        target ? association.create_relation(self, target) : nil
       end
 
       # Resets the criteria inside the relation proxy. Used by many to many
@@ -83,34 +83,34 @@ module Mongoid
       # @api private
       #
       # @example Get the relation.
-      #   document.get_relation(:name, metadata)
+      #   document.get_relation(:name, association)
       #
       # @param [ Symbol ] name The name of the relation.
-      # @param [ Metadata ] metadata The relation metadata.
+      # @param [ Association ] association The association metadata.
       # @param [ true, false ] reload If the relation is to be reloaded.
       #
       # @return [ Proxy ] The relation.
       #
       # @since 3.0.16
-      def get_relation(name, metadata, object, reload = false)
+      def get_relation(name, association, object, reload = false)
         if !reload && (value = ivar(name)) != false
           value
         else
           _building do
             _loading do
-              if object && needs_no_database_query?(object, metadata)
-                __build__(name, object, metadata)
+              if object && needs_no_database_query?(object, association)
+                __build__(name, object, association)
               else
-                __build__(name, attributes[metadata.key], metadata)
+                __build__(name, attributes[association.key], association)
               end
             end
           end
         end
       end
 
-      def needs_no_database_query?(object, metadata)
+      def needs_no_database_query?(object, association)
         object.is_a?(Document) && !object.embedded? &&
-            object._id == attributes[metadata.key]
+            object._id == attributes[association.key]
       end
 
       # Is the current code executing without autobuild functionality?
@@ -160,7 +160,7 @@ module Mongoid
       # Adds the existence check for relations.
       #
       # @example Add the existence check.
-      #   Person.existence_check(:name, meta)
+      #   Person.existence_check(:name, association)
       #
       # @example Check if a relation exists.
       #   person = Person.new
@@ -189,10 +189,10 @@ module Mongoid
       # the thing.
       #
       # @example Set up the getter for the relation.
-      #   Person.getter("addresses", metadata)
+      #   Person.define_getter!(association)
       #
       # @param [ String, Symbol ] name The name of the relation.
-      # @param [ Metadata ] metadata The metadata for the relation.
+      # @param [ Association ] association The association for the relation.
       #
       # @return [ Class ] The class being set up.
       #
@@ -214,7 +214,7 @@ module Mongoid
       # be specify only for referenced many relations.
       #
       # @example Set up the ids getter for the relation.
-      #   Person.ids_getter("addresses", metadata)
+      #   Person.define_ids_getter!(association)
       #
       # @param [ String, Symbol ] name The name of the relation.
       #
@@ -234,10 +234,10 @@ module Mongoid
       # created with the supplied target.
       #
       # @example Set up the setter for the relation.
-      #   Person.setter("addresses", metadata)
+      #   Person.define_setter!(association)
       #
       # @param [ String, Symbol ] name The name of the relation.
-      # @param [ Metadata ] metadata The metadata for the relation.
+      # @param [ Association ] association The association for the relation.
       #
       # @return [ Class ] The class being set up.
       #
@@ -269,10 +269,10 @@ module Mongoid
       # referenced many relations.
       #
       # @example Set up the id_setter for the relation.
-      #   Person.ids_setter("addesses", metadata)
+      #   Person.define_ids_setter!(association)
       #
       #  @param [ String, Symbol ] name The name of the relation.
-      #  @param [ Metadata ] metadata The metadata for the relation.
+      #  @param [ Association ] association The association for the relation.
       #
       #  @return [ Class ] The class being set up.
       def self.define_ids_setter!(association)
@@ -288,7 +288,7 @@ module Mongoid
       # defined as #build_name.
       #
       # @example
-      #   Person.builder("name")
+      #   Person.define_builder!(association)
       #
       # @param [ String, Symbol ] name The name of the relation.
       #
@@ -315,7 +315,7 @@ module Mongoid
       # immediately save.
       #
       # @example
-      #   Person.creator("name")
+      #   Person.define_creator!(association)
       #
       # @param [ String, Symbol ] name The name of the relation.
       #
@@ -327,12 +327,12 @@ module Mongoid
         association.inverse_class.tap do |klass|
           klass.re_define_method("create_#{name}") do |*args|
             attributes, _options = parse_args(*args)
-            document = Factory.build(metadata.klass, attributes)
+            document = Factory.build(association.klass, attributes)
             doc = _assigning do
               send("#{name}=", document)
             end
             doc.save
-            save if new_record? && metadata.stores_foreign_key?
+            save if new_record? && association.stores_foreign_key?
             doc
           end
         end

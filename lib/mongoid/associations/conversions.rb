@@ -9,10 +9,10 @@ module Mongoid
       # return the provided object.
       #
       # @example Flag the object.
-      #   Conversions.flag(metadata, 15)
+      #   Conversions.flag(15)
       #
       # @param [ Object ] object The object to flag.
-      # @param [ Metadata ] The relation metadata.
+      # @param [ Association ] The association metadata.
       #
       # @return [ Object ] The provided object.
       #

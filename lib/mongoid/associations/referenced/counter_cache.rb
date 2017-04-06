@@ -37,8 +37,8 @@ module Mongoid
           def reset_counters(id, *counters)
             document = id.is_a?(Document) ? id : find(id)
             counters.each do |name|
-              relation_metadata = relations[name]
-              counter_name = relation_metadata.inverse_metadata.counter_cache_column_name
+              relation_association = relations[name]
+              counter_name = relation_association.inverse_association.counter_cache_column_name
               document.update_attribute(counter_name, document.send(name).count)
             end
           end

@@ -180,7 +180,7 @@ module Mongoid
         end
         if embedded?
           attributes[:_parent] = parent_document
-          attributes[:__metadata] = metadata
+          attributes[:__association] = association
         end
         klass.__send__(method, attributes, &block)
       end

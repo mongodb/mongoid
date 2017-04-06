@@ -16,7 +16,7 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Builder do
       double(klass: Preference, selector: { "_id" => { "$in" => [] }})
     end
 
-    let(:metadata) do
+    let(:association) do
       double(
           klass: Preference,
           name: :preferences,
@@ -26,7 +26,7 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Builder do
     end
 
     let(:builder) do
-      described_class.new(base, metadata, object)
+      described_class.new(base, association, object)
     end
 
     context "when provided ids" do
@@ -54,7 +54,7 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Builder do
 
     context "when order specified" do
 
-      let(:metadata) do
+      let(:association) do
         double(
             klass: Post,
             name: :preferences,
@@ -109,7 +109,7 @@ describe Mongoid::Associations::Referenced::HasAndBelongsToMany::Builder do
 
       context "when the object is nil" do
 
-        let(:metadata) do
+        let(:association) do
           double(
               klass: Post,
               name: :preferences,

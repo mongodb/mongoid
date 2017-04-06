@@ -208,15 +208,15 @@ module Mongoid
           # and the base on the inverse object.
           #
           # @example Create the new relation.
-          #   Referenced::Many.new(base, target, metadata)
+          #   Referenced::Many.new(base, target, association)
           #
           # @param [ Document ] base The document this relation hangs off of.
           # @param [ Array<Document> ] target The target of the relation.
-          # @param [ Metadata ] metadata The relation's metadata.
+          # @param [ Association ] association The association metadata.
           #
           # @since 2.0.0.beta.1
-          def initialize(base, target, metadata)
-            init(base, HasMany::Targets::Enumerable.new(target), metadata) do
+          def initialize(base, target, association)
+            init(base, HasMany::Targets::Enumerable.new(target), association) do
               raise_mixed if klass.embedded? && !klass.cyclic?
             end
           end
@@ -249,7 +249,7 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def purge
-            unless __metadata.destructive?
+            unless __association.destructive?
               nullify
             else
               after_remove_error = nil
@@ -309,7 +309,7 @@ module Mongoid
           # @since 2.4.0
           def unscoped
             klass.unscoped.where(
-                foreign_key => __metadata.flag(base._id)
+                foreign_key => __association.flag(base._id)
             )
           end
 
@@ -362,9 +362,9 @@ module Mongoid
           # @since 5.1.0
           def already_related?(document)
             document.persisted? &&
-                document.__metadata &&
-                document.respond_to?(document.__metadata.foreign_key) &&
-                document.__send__(document.__metadata.foreign_key) == base.id
+                document.__association &&
+                document.respond_to?(document.__association.foreign_key) &&
+                document.__send__(document.__association.foreign_key) == base.id
           end
 
           # Instantiate the binding associated with this relation.
@@ -378,7 +378,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            HasMany::Binding.new(base, target, __metadata)
+            HasMany::Binding.new(base, target, __association)
           end
 
           # Get the collection of the relation in question.
@@ -404,8 +404,8 @@ module Mongoid
           # @since 2.0.0.beta.1
           def criteria
             Proxy.criteria(
-                __metadata,
-                __metadata.flag(base.send(__metadata.primary_key)),
+                __association,
+                __association.flag(base.send(__association.primary_key)),
                 base.class
             )
           end
@@ -418,12 +418,12 @@ module Mongoid
           #
           # @param [ Document ] document The document to cascade on.
           #
-          # @return [ true, false ] If the metadata is destructive.
+          # @return [ true, false ] If the association is destructive.
           #
           # @since 2.1.0
           def cascade!(document)
             if persistable?
-              case __metadata.dependent
+              case __association.dependent
               when :delete_all
                 document.delete
               when :destroy
@@ -527,7 +527,7 @@ module Mongoid
           # @since 2.4.0
           def remove_not_in(ids)
             removed = criteria.not_in(_id: ids)
-            if __metadata.destructive?
+            if __association.destructive?
               removed.delete_all
             else
               removed.update_all(foreign_key => nil)
@@ -536,7 +536,7 @@ module Mongoid
               if !ids.include?(doc._id)
                 unbind_one(doc)
                 target.delete(doc)
-                if __metadata.destructive?
+                if __association.destructive?
                   doc.destroyed = true
                 end
               end
@@ -590,23 +590,23 @@ module Mongoid
             # @example Get the criteria.
             #   Proxy.criteria(meta, id, Model)
             #
-            # @param [ Metadata ] metadata The metadata.
+            # @param [ Association ] association The association metadata.
             # @param [ Object ] object The value of the foreign key.
             # @param [ Class ] type The optional type.
             #
             # @return [ Criteria ] The criteria.
             #
             # @since 2.1.0
-            def criteria(metadata, object, type = nil)
+            def criteria(association, object, type = nil)
               apply_ordering(
                   with_inverse_field_criterion(
                       with_polymorphic_criterion(
-                          metadata.klass.where(metadata.foreign_key => object),
-                          metadata,
+                          association.klass.where(association.foreign_key => object),
+                          association,
                           type
                       ),
-                      metadata
-                  ), metadata
+                      association
+                  ), association
               )
             end
 
@@ -672,22 +672,17 @@ module Mongoid
             # @api private
             #
             # @example Get the criteria with polymorphic criterion.
-            #   Proxy.with_polymorphic_criterion(criteria, metadata)
+            #   Proxy.with_polymorphic_criterion(criteria, association)
             #
             # @param [ Criteria ] criteria The criteria to decorate.
-            # @param [ Metadata ] metadata The metadata.
+            # @param [ Association ] association The association.
             # @param [ Class ] type The optional type.
             #
             # @return [ Criteria ] The criteria.
             #
             # @since 3.0.0
-            def with_polymorphic_criterion(criteria, metadata, type = nil)
-              metadata.add_polymorphic_criterion(criteria, type)
-              # if metadata.polymorphic?
-              #   criteria.where(metadata.type => type.name)
-              # else
-              #   criteria
-              # end
+            def with_polymorphic_criterion(criteria, association, type = nil)
+              association.add_polymorphic_criterion(criteria, type)
             end
 
             # Decorate the criteria with inverse field criteria, if applicable.
@@ -698,15 +693,15 @@ module Mongoid
             #   Proxy.with_inverse_field_criterion(criteria, metadata)
             #
             # @param [ Criteria ] criteria The criteria to decorate.
-            # @param [ Metadata ] metadata The metadata.
+            # @param [ Association ] association The association metadata.
             #
             # @return [ Criteria ] The criteria.
             #
             # @since 3.0.0
-            def with_inverse_field_criterion(criteria, metadata)
-              inverse_metadata = metadata.inverse_metadata(metadata.klass)
-              if inverse_metadata.try(:inverse_of)
-                criteria.any_in(inverse_metadata.inverse_of => [metadata.name, nil])
+            def with_inverse_field_criterion(criteria, association)
+              inverse_association = association.inverse_association(association.klass)
+              if inverse_association.try(:inverse_of)
+                criteria.any_in(inverse_association.inverse_of => [association.name, nil])
               else
                 criteria
               end

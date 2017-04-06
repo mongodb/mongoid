@@ -14,11 +14,11 @@ describe Mongoid::Associations::Referenced::BelongsTo::Binding do
     Post.new
   end
 
-  let(:game_metadata) do
+  let(:game_association) do
     Game.relations["person"]
   end
 
-  let(:post_metadata) do
+  let(:post_association) do
     Post.relations["person"]
   end
 
@@ -27,7 +27,7 @@ describe Mongoid::Associations::Referenced::BelongsTo::Binding do
     context "when the child of an references one" do
 
       let(:binding) do
-        described_class.new(game, person, game_metadata)
+        described_class.new(game, person, game_association)
       end
 
       context "when the document is bindable with default pk" do
@@ -90,7 +90,7 @@ describe Mongoid::Associations::Referenced::BelongsTo::Binding do
     context "when the child of an references many" do
 
       let(:binding) do
-        described_class.new(post, person, post_metadata)
+        described_class.new(post, person, post_association)
       end
 
       context "when the document is bindable" do
@@ -129,7 +129,7 @@ describe Mongoid::Associations::Referenced::BelongsTo::Binding do
     context "when the child of an references one" do
 
       let(:binding) do
-        described_class.new(game, person, game_metadata)
+        described_class.new(game, person, game_association)
       end
 
       context "when the document is unbindable" do
@@ -162,7 +162,7 @@ describe Mongoid::Associations::Referenced::BelongsTo::Binding do
     context "when the child of an references many" do
 
       let(:binding) do
-        described_class.new(post, person, post_metadata)
+        described_class.new(post, person, post_association)
       end
 
       context "when the document is unbindable" do

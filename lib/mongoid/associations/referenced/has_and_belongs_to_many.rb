@@ -250,7 +250,7 @@ module Mongoid
               type: FOREIGN_KEY_FIELD_TYPE,
               identity: true,
               overwrite: true,
-              metadata: self,
+              association: self,
               default: nil
           )
         end

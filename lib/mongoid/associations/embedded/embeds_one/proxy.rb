@@ -21,13 +21,13 @@ module Mongoid
           # Instantiate a new embeds_one relation.
           #
           # @example Create the new proxy.
-          #   One.new(person, name, metadata)
+          #   One.new(person, name, association)
           #
           # @param [ Document ] base The document this relation hangs off of.
           # @param [ Document ] target The child document in the relation.
-          # @param [ Metadata ] metadata The relation's metadata
-          def initialize(base, target, metadata)
-            init(base, target, metadata) do
+          # @param [ Association ] association The association metadata.
+          def initialize(base, target, association)
+            init(base, target, association) do
               characterize_one(target)
               bind_one
               characterize_one(target)
@@ -78,7 +78,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            Binding.new(base, target, __metadata)
+            Binding.new(base, target, __association)
           end
 
           # Are we able to persist this relation?
@@ -102,14 +102,14 @@ module Mongoid
             #   Embedded::One.builder(meta, object, person)
             #
             # @param [ Document ] base The base document.
-            # @param [ Metadata ] meta The metadata of the relation.
+            # @param [ Association ] association The association metadata.
             # @param [ Document, Hash ] object A document or attributes to build with.
             #
             # @return [ Builder ] A newly instantiated builder object.
             #
             # @since 2.0.0.rc.1
-            def builder(base, meta, object)
-              Builder.new(base, meta, object)
+            def builder(base, association, object)
+              Builder.new(base, association, object)
             end
 
             # Returns true if the relation is an embedded one. In this case

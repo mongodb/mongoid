@@ -10,7 +10,7 @@ module Mongoid
           private
 
           def preload
-            raise Errors::EagerLoad.new(@metadata.name) if @metadata.polymorphic?
+            raise Errors::EagerLoad.new(@association.name) if @association.polymorphic?
 
             @docs.each do |d|
               set_relation(d, nil)
@@ -23,11 +23,11 @@ module Mongoid
           end
 
           def group_by_key
-            @metadata.foreign_key
+            @association.foreign_key
           end
 
           def key
-            @metadata.primary_key
+            @association.primary_key
           end
         end
       end

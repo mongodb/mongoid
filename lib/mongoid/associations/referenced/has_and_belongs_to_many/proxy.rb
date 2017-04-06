@@ -30,7 +30,7 @@ module Mongoid
             return concat(docs) if docs.size > 1
             if doc = docs.first
               append(doc)
-              base.add_to_set(foreign_key => doc.send(__metadata.primary_key))
+              base.add_to_set(foreign_key => doc.send(__association.primary_key))
               if child_persistable?(doc)
                 doc.save
               end
@@ -117,7 +117,7 @@ module Mongoid
           def delete(document)
             doc = super
             if doc && persistable?
-              base.pull(foreign_key => doc.send(__metadata.primary_key))
+              base.pull(foreign_key => doc.send(__association.primary_key))
               target._unloaded = criteria
               unsynced(base, foreign_key)
             end
@@ -136,7 +136,7 @@ module Mongoid
             target.each do |doc|
               execute_callback :before_remove, doc
             end
-            unless __metadata.forced_nil_inverse?
+            unless __association.forced_nil_inverse?
               criteria.pull(inverse_foreign_key => base._id)
             end
             if persistable?
@@ -145,7 +145,7 @@ module Mongoid
             after_remove_error = nil
             many_to_many = target.clear do |doc|
               unbind_one(doc)
-              unless __metadata.forced_nil_inverse?
+              unless __association.forced_nil_inverse?
                 doc.changed_attributes.delete(inverse_foreign_key)
               end
               begin
@@ -225,7 +225,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            HasAndBelongsToMany::Binding.new(base, target, __metadata)
+            HasAndBelongsToMany::Binding.new(base, target, __association)
           end
 
           # Determine if the child document should be persisted.
@@ -242,7 +242,7 @@ module Mongoid
           # @since 3.0.20
           def child_persistable?(doc)
             (persistable? || _creating?) &&
-                !(doc.persisted? && __metadata.forced_nil_inverse?)
+                !(doc.persisted? && __association.forced_nil_inverse?)
           end
 
           # Returns the criteria object for the target class with its documents set
@@ -253,7 +253,7 @@ module Mongoid
           #
           # @return [ Criteria ] A new criteria.
           def criteria
-            Proxy.criteria(__metadata, base.send(foreign_key))
+            Proxy.criteria(__association, base.send(foreign_key))
           end
 
           # Flag the base as unsynced with respect to the foreign key.
@@ -283,7 +283,7 @@ module Mongoid
             #   Referenced::ManyToMany.builder(meta, object)
             #
             # @param [ Document ] base The base document.
-            # @param [ Association ] association The association metadata of the relation.
+            # @param [ Association ] association The association metadata.
             # @param [ Document, Hash ] object A document or attributes to build
             #   with.
             #
