@@ -47,7 +47,7 @@ module Mongoid
         #
         # @since 7.0
         def relation_complements
-          [ Referenced::BelongsTo ].freeze
+          @relation_complements ||= [ Referenced::BelongsTo ].freeze
         end
 
         # Setup the instance methods on the class having this association type.

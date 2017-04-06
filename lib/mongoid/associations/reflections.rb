@@ -52,7 +52,7 @@ module Mongoid
         #
         # @param [ Array<Symbol> ] *macros The relation macros.
         #
-        # @return [ Array<association> ] The matching association metadata.
+        # @return [ Array<Association> ] The matching association metadata.
         def reflect_on_all_associations(*macros)
           association_reflections = relations.values
           association_reflections.select! { |reflection| macros.include?(reflection.macro) } unless macros.empty?

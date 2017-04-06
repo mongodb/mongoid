@@ -127,9 +127,9 @@ module Mongoid
       # was not provided or set to true.
       #
       # @example Set up validation.
-      #   Person.validates_relation(metadata)
+      #   Person.validates_relation(association)
       #
-      # @param [ Metadata ] metadata The relation metadata.
+      # @param [ Association ] association The association metadata.
       #
       # @since 2.0.0.rc.1
       def validates_relation(association)
