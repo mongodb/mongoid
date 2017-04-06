@@ -4,17 +4,26 @@ require 'mongoid/associations/options'
 
 module Mongoid
   module Associations
+
+    # This module provides behaviors shared between Association types.
+    #
+    # @since 7.0
     module Relatable
       include Constrainable
       include Conversions
       include Options
 
+      # The options shared between all association types.
+      #
+      # @return [ Array<Symbol> ] The shared options.
+      #
+      # @since 7.0
       SHARED_OPTIONS = [
-          :class_name,
-          :inverse_of,
-          :validate,
-          :extend
-      ].freeze
+                         :class_name,
+                         :inverse_of,
+                         :validate,
+                         :extend
+                       ].freeze
 
       # The primary key default.
       #
@@ -42,6 +51,7 @@ module Mongoid
       # @param [ Class ] _class The class of the model who owns this relation.
       # @param [ Symbol ] name The name of the association.
       # @param [ Hash ] options The relation options.
+      # @param [ Block ] block The optional block.
       #
       # @since 7.0
       def initialize(_class, name, opts = {}, &block)
@@ -53,6 +63,11 @@ module Mongoid
         validate!
       end
 
+      # Compare this association to another.
+      #
+      # @return [ Object ] The object to compare to this association.
+      #
+      # @since 7.0
       def ==(other)
         relation_class_name == other.relation_class_name &&
           inverse_class_name == other.inverse_class_name &&
@@ -60,28 +75,46 @@ module Mongoid
               options == other.options
       end
 
-      # todo: remove
-      def merge!(options)
-        @options.merge!(options)
-        self
+      # Get the callbacks for a given type.
+      #
+      # @param [ Symbol ] callback_type The type of callback type.
+      #
+      # @return [ Array<Proc, Symbol> ] A list of the callbacks, either method
+      #   names or Procs.
+      #
+      # @since 7.0
+      def get_callbacks(callback_type)
+        Array(options[callback_type])
       end
 
-      # todo: remove
-      def [](key)
-        @options[key]
-      end
-
+      # Get the type setter.
+      # @note Only relevant for polymorphic relations that take the :as option.
+      #
+      # @return [ String ] The type setter method.
+      #
+      # @since 7.0
       def type_setter
         @type_setter ||= type.__setter__
       end
 
-      # def foreign_key_match?(relation)
+      # Whether trying to bind an object using this association should raise
+      # an error.
       #
-      #   !relation.stores_foreign_key? || (relation.foreign_key == foreign_key)
-      # end
-
+      # @params [ Document ] doc The document to be bound.
+      #
+      # @return [ true, false ] Whether the document can be bound.
+      #
+      # @since 7.0
       def bindable?(doc); false; end
 
+      # Get the inverse names.
+      #
+      # @param [ Object ] other The other model class or model object to use when
+      #   determining inverses.
+      #
+      # @return [ Array<Symbol> ] The list of inverse names.
+      #
+      # @since 7.0
       def inverses(other = nil)
         return [ inverse_of ] if inverse_of
         if polymorphic?
@@ -91,21 +124,24 @@ module Mongoid
         end
       end
 
-      # Returns the name of a single inverse relation.
-      def inverse(other = nil)
-        # todo this is a hack, change it
-        other.first if other.is_a?(Array)
-        candidates = inverses(other)
-        # note: you want to find the first item that is not nil
-        # this line is here so that I can determine scenario under which candidates is nil
-        #binding.pry if candidates && candidates.first.nil?
-        candidates.detect { |c| c } if candidates
-      end
-
+      # Get the inverse's metadata.
+      #
+      # @param [ Object ] other The other model class or model object to use when
+      #   determining inverses.
+      #
+      # @return [ Association ] The inverse's metadata.
+      #
+      # @since 7.0
       def inverse_metadata(other = nil)
         (other || relation_class).relations[inverse(other)]
       end
 
+      # Get the inverse type.
+      #
+      # @return [ nil ] Default is nil for an association.
+      #
+      # @since 7.0
+      def inverse_type; end
 
       # The class name of the relation object(s).
       #
@@ -145,7 +181,6 @@ module Mongoid
         @owner_class
       end
       alias :inverse_klass :inverse_class
-
 
       # The foreign key field if this relations stores a foreign key.
       # Otherwise, the primary key.
@@ -222,7 +257,7 @@ module Mongoid
 
       # Create a relation proxy object using the owner and target.
       #
-      # @param [ Document ] base The document this relation hangs off of.
+      # @param [ Document ] owner The document this relation hangs off of.
       # @param [ Document, Array<Document> ] target The target (parent) of the
       #   relation.
       #
@@ -242,16 +277,34 @@ module Mongoid
         @destructive ||= !!(dependent && (dependent == :delete_all || dependent == :destroy))
       end
 
-      def inverse_type; end
-
+      # Get the counter cache column name.
+      #
+      # @return [ String ] The counter cache column name.
+      #
+      # @since 7.0
       def counter_cache_column_name
         @counter_cache_column_name ||= (@options[:counter_cache].is_a?(String) ||
             @options[:counter_cache].is_a?(Symbol)) ?
             @options[:counter_cache] : "#{inverse || inverse_class_name.demodulize.underscore.pluralize}_count"
       end
 
+      # Get the extension.
+      #
+      # @return [ Module ] The extension module, if one have been defined.
+      #
+      # @since 7.0
       def extension
         @extension ||= @options[:extend]
+      end
+
+      # Get the inverse name.
+      #
+      # @return [ Symbol ] The inverse name.
+      #
+      # @since 7.0
+      def inverse(other = nil)
+        candidates = inverses(other)
+        candidates.detect { |c| c } if candidates
       end
 
       private
@@ -346,11 +399,6 @@ module Mongoid
         @default_inverse ||= klass.relations[inverse_klass.name.underscore]
       end
 
-      # If set to true, then the associated object(s) will be validated when the owning object is saved.
-      #
-      # @return [ true, false ] Whether to validate the associated objects.
-      #
-      # @since 7.0
       def validate?
         @validate ||= if @options[:validate].nil?
                         validation_default

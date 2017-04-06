@@ -75,8 +75,8 @@ module Mongoid
         #
         # @since 3.1.4
         def autosave_nested_attributes(metadata)
-          unless metadata.autosave == false
-            Associations::Referenced::AutoSave.define_autosave!(metadata.merge!(autosave: true))
+          if metadata.autosave?
+            Associations::Referenced::AutoSave.define_autosave!(metadata)
           end
         end
       end

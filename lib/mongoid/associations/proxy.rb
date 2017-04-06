@@ -148,29 +148,6 @@ module Mongoid
         raise Errors::UnsavedDocument.new(base, doc)
       end
 
-      # Return the name of defined callback method
-      #
-      # @example returns the before_add callback method name
-      #   callback_method(:before_add)
-      #
-      # @param [ Symbol ] which callback
-      #
-      # @return [ Array ] with callback methods to be executed, the array may have symbols and Procs
-      #
-      # @since 3.1.0
-      def callback_method(callback_name)
-        methods = []
-        metadata = __metadata[callback_name]
-        if metadata
-          if metadata.is_a?(Array)
-            methods.concat(metadata)
-          else
-            methods << metadata
-          end
-        end
-        methods
-      end
-
       # Executes a callback method
       #
       # @example execute the before add callback
@@ -180,14 +157,11 @@ module Mongoid
       #
       # @since 3.1.0
       def execute_callback(callback, doc)
-        callback_method = callback_method(callback)
-        if callback_method
-          callback_method.each do |c|
-            if c.is_a? Proc
-              c.call(base, doc)
-            else
-              base.send c, doc
-            end
+        __metadata.get_callbacks(callback).each do |c|
+          if c.is_a? Proc
+            c.call(base, doc)
+          else
+            base.send c, doc
           end
         end
       end

@@ -410,15 +410,15 @@ describe Mongoid::Associations::Options do
               }
             end
 
-            it 'retrieves the after_add method name from the association via []' do
-              expect(association[:after_add]).to eq(options[:after_add])
+            it 'retrieves the after_add method name from the association' do
+              expect(association.get_callbacks(:after_add)).to eq(Array(options[:after_add]))
             end
           end
 
           context 'when the :after_add option is not specified' do
 
             it 'returns nil' do
-              expect(association[:after_add]).to be_nil
+              expect(association.get_callbacks(:after_add)).to be_empty
             end
           end
         end
@@ -427,7 +427,7 @@ describe Mongoid::Associations::Options do
 
 
           it 'returns nil' do
-            expect(association[:after_add]).to be_nil
+            expect(association.get_callbacks(:after_add)).to be_empty
           end
 
           context 'when the option is provided' do
@@ -459,15 +459,15 @@ describe Mongoid::Associations::Options do
               }
             end
 
-            it 'retrieves the after_remove method name from the association via []' do
-              expect(association[:after_remove]).to eq(options[:after_remove])
+            it 'retrieves the after_remove method name from the association' do
+              expect(association.get_callbacks(:after_remove)).to eq(Array(options[:after_remove]))
             end
           end
 
           context 'when the :after_remove option is not specified' do
 
             it 'returns nil' do
-              expect(association[:after_remove]).to be_nil
+              expect(association.get_callbacks(:after_remove)).to be_empty
             end
           end
         end
@@ -476,7 +476,7 @@ describe Mongoid::Associations::Options do
 
 
           it 'returns nil' do
-            expect(association[:after_remove]).to be_nil
+            expect(association.get_callbacks(:after_remove)).to be_empty
           end
 
           context 'when the option is provided' do
@@ -508,15 +508,15 @@ describe Mongoid::Associations::Options do
               }
             end
 
-            it 'retrieves the before_add method name from the association via []' do
-              expect(association[:before_add]).to eq(options[:before_add])
+            it 'retrieves the before_add method name from the association' do
+              expect(association.get_callbacks(:before_add)).to eq(Array(options[:before_add]))
             end
           end
 
           context 'when the :before_add option is not specified' do
 
             it 'returns nil' do
-              expect(association[:before_add]).to be_nil
+              expect(association.get_callbacks(:before_add)).to be_empty
             end
           end
         end
@@ -525,7 +525,7 @@ describe Mongoid::Associations::Options do
 
 
           it 'returns nil' do
-            expect(association[:before_add]).to be_nil
+            expect(association.get_callbacks(:before_add)).to be_empty
           end
 
           context 'when the option is provided' do
@@ -557,15 +557,15 @@ describe Mongoid::Associations::Options do
               }
             end
 
-            it 'retrieves the before_remove method name from the association via []' do
-              expect(association[:before_remove]).to eq(options[:before_remove])
+            it 'retrieves the before_remove method name from the association' do
+              expect(association.get_callbacks(:before_remove)).to eq(Array(options[:before_remove]))
             end
           end
 
           context 'when the :before_remove option is not specified' do
 
             it 'returns nil' do
-              expect(association[:before_remove]).to be_nil
+              expect(association.get_callbacks(:before_remove)).to be_empty
             end
           end
         end
@@ -574,7 +574,7 @@ describe Mongoid::Associations::Options do
 
 
           it 'returns nil' do
-            expect(association[:before_remove]).to be_nil
+            expect(association.get_callbacks(:before_remove)).to be_empty
           end
 
           context 'when the option is provided' do
