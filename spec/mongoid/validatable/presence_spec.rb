@@ -259,7 +259,7 @@ describe Mongoid::Validatable::PresenceValidator do
       end
 
       it "does not change autosave on the relation" do
-        expect(Person.relations["game"][:autosave]).to be false
+        expect(Person.relations["game"].autosave?).to be false
       end
 
       context "when the relation is new" do
