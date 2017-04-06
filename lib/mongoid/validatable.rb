@@ -156,7 +156,7 @@ module Mongoid
           args.last[:attributes].each do |name|
             association = relations[name.to_s]
             if association && association.autosave?
-              Associations::Referenced::AutoSave.define_autosave!(association)
+              Association::Referenced::AutoSave.define_autosave!(association)
             end
           end
         end

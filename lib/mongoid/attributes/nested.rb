@@ -76,7 +76,7 @@ module Mongoid
         # @since 3.1.4
         def autosave_nested_attributes(association)
           if association.autosave?
-            Associations::Referenced::AutoSave.define_autosave!(association)
+            Association::Referenced::AutoSave.define_autosave!(association)
           end
         end
       end
