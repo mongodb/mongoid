@@ -13,7 +13,7 @@ require "mongoid/criteria"
 require "mongoid/factory"
 require "mongoid/fields"
 require "mongoid/timestamps"
-require "mongoid/associations"
+require "mongoid/association"
 require "mongoid/composable"
 
 module Mongoid

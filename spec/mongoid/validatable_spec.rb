@@ -34,7 +34,7 @@ describe Mongoid::Validatable do
       end
 
       let(:documents) do
-        Mongoid::Associations::Referenced::HasMany::Targets::Enumerable.new([ address ])
+        Mongoid::Association::Referenced::HasMany::Targets::Enumerable.new([ address ])
       end
 
       before do
