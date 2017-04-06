@@ -133,6 +133,15 @@ module Mongoid
       # @since 7.0
       def type; end
 
+      # The field for saving the associated object's type.
+      #
+      # @return [ nil ] Default is nil.
+      #
+      # @since 7.0
+      def touch_field
+        @touch_field ||= options[:touch] if (options[:touch].is_a?(String) || options[:touch].is_a?(Symbol))
+      end
+
       private
 
       def touchable?
