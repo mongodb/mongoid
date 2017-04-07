@@ -2424,6 +2424,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
     before do
       Person.validates_uniqueness_of(:username)
+      Person.index({ ssn: 1 }, { unique: true })
       Person.create_indexes
     end
 
@@ -2433,6 +2434,7 @@ describe Mongoid::Validatable::UniquenessValidator do
 
     after do
       Person.reset_callbacks(:validate)
+      Person.collection.drop
     end
 
     it "transfers the options to the cloned client" do

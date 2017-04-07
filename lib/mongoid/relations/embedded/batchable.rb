@@ -279,7 +279,7 @@ module Mongoid
                 self.inserts_valid = false
               end
             end
-            doc.as_document
+            doc.send(:as_attributes)
           end
         end
 
@@ -308,7 +308,7 @@ module Mongoid
             _unscoped.delete_one(doc)
             unbind_one(doc)
             execute_callback :after_remove, doc
-            doc.as_document
+            doc.send(:as_attributes)
           end
         end
 

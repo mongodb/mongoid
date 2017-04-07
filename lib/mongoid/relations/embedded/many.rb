@@ -57,11 +57,7 @@ module Mongoid
         #
         # @since 2.0.0.rc.1
         def as_document
-          attributes = []
-          _unscoped.each do |doc|
-            attributes.push(doc.as_document)
-          end
-          attributes
+          as_attributes.collect { |attrs| BSON::Document.new(attrs) }
         end
 
         # Appends an array of documents to the relation. Performs a batch
@@ -512,6 +508,14 @@ module Mongoid
         # @since 2.4.0
         def _unscoped=(docs)
           @_unscoped = docs
+        end
+
+        def as_attributes
+          attributes = []
+          _unscoped.each do |doc|
+            attributes.push(doc.as_document)
+          end
+          attributes
         end
 
         class << self

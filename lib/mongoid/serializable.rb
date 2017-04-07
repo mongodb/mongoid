@@ -66,7 +66,7 @@ module Mongoid
     #
     # @since 3.0.0
     def field_names(options)
-      names = (as_document.keys + attribute_names).uniq.sort
+      names = (as_attributes.keys + attribute_names).uniq.sort
 
       only = Array.wrap(options[:only]).map(&:to_s)
       except = Array.wrap(options[:except]).map(&:to_s)

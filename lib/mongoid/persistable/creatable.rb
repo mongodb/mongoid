@@ -42,7 +42,7 @@ module Mongoid
       #
       # @since 2.1.0
       def atomic_inserts
-        { atomic_insert_modifier => { atomic_position => as_document }}
+        { atomic_insert_modifier => { atomic_position => as_attributes }}
       end
 
       # Insert the embedded document.
@@ -76,7 +76,7 @@ module Mongoid
       #
       # @since 4.0.0
       def insert_as_root
-        collection.insert_one(as_document)
+        collection.insert_one(as_attributes)
       end
 
       # Post process an insert, which sets the new record attribute to false

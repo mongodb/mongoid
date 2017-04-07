@@ -51,7 +51,7 @@ module Mongoid
     #
     # @since 3.0.22
     def clone_document
-      attrs = as_document.__deep_copy__
+      attrs = as_attributes.__deep_copy__
       process_localized_attributes(self, attrs)
       attrs
     end

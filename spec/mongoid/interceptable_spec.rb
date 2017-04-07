@@ -1152,6 +1152,25 @@ describe Mongoid::Interceptable do
               expect(band.reload.records.first.before_validation_called).to be true
             end
           end
+
+          context 'when the parent is updated' do
+
+            let(:band) do
+              Band.create(name: "Moderat")
+            end
+
+            before do
+              band.update(records: [ { name: 'Black on Both Sides' }])
+            end
+
+            it 'executes the callback' do
+              expect(band.records.first.before_validation_called).to be true
+            end
+
+            it 'persists the change' do
+              expect(band.reload.records.first.before_validation_called).to be true
+            end
+          end
         end
 
         context "when the child is persisted" do
