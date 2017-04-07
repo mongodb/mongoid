@@ -101,15 +101,6 @@ module Mongoid
           HasOne::Proxy
         end
 
-        # Get the macro for this association type.
-        #
-        # @return [ Symbol ] The macro.
-        #
-        # @since 7.0
-        def macro
-          :has_one
-        end
-
         # The criteria used for querying this relation.
         #
         # @return [ Mongoid::Criteria ] The criteria used for querying this relation.

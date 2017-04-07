@@ -437,13 +437,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
     end
   end
 
-  describe '#macro' do
-
-    it 'returns :has_and_belongs_to_many' do
-      expect(association.macro).to be(:has_and_belongs_to_many)
-    end
-  end
-
   describe '#validation_default' do
 
     it 'returns true' do

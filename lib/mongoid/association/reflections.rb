@@ -54,9 +54,13 @@ module Mongoid
         #
         # @return [ Array<Association> ] The matching association metadata.
         def reflect_on_all_associations(*macros)
-          association_reflections = relations.values
-          association_reflections.select! { |reflection| macros.include?(reflection.macro) } unless macros.empty?
-          association_reflections
+          all_associations = relations.values
+          unless macros.empty?
+            all_associations.select! do |reflection|
+              macros.include?(Association::MACRO_MAPPING.key(reflection.class))
+            end
+          end
+          all_associations
         end
       end
     end

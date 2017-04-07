@@ -986,13 +986,6 @@ describe Mongoid::Association::Referenced::BelongsTo do
     end
   end
 
-  describe '#macro' do
-
-    it 'returns :embedded_in' do
-      expect(association.macro).to be(:belongs_to)
-    end
-  end
-
   describe '#validation_default' do
 
     it 'returns false' do

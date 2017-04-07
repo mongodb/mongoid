@@ -76,7 +76,7 @@ module Mongoid
       klass.embedded_relations.each do |_, association|
         next unless attrs.present? && attrs[association.key].present?
 
-        if association.macro == :embeds_many
+        if association.is_a?(Association::Embedded::EmbedsMany)
           attrs[association.key].each do |attr|
             process_localized_attributes(association.klass, attr)
           end

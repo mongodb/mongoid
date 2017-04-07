@@ -445,13 +445,6 @@ describe Mongoid::Association::Referenced::HasOne do
     end
   end
 
-  describe '#macro' do
-
-    it 'returns :has_one' do
-      expect(association.macro).to be(:has_one)
-    end
-  end
-
   describe '#validation_default' do
 
     it 'returns true' do

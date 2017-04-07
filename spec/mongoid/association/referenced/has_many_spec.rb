@@ -438,13 +438,6 @@ describe Mongoid::Association::Referenced::HasMany do
     end
   end
 
-  describe '#macro' do
-
-    it 'returns :has_many' do
-      expect(association.macro).to be(:has_many)
-    end
-  end
-
   describe '#validation_default' do
 
     it 'returns true' do

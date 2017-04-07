@@ -119,15 +119,6 @@ module Mongoid
           Proxy
         end
 
-        # Get the macro for this association type.
-        #
-        # @return [ Symbol ] The macro.
-        #
-        # @since 7.0
-        def macro
-          :embeds_many
-        end
-
         # Is this association polymorphic?
         #
         # @return [ true, false ] Whether this association is polymorphic.

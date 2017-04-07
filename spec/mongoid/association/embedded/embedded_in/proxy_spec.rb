@@ -391,13 +391,6 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
     end
   end
 
-  describe ".macro" do
-
-    it "returns embeds_one" do
-      expect(described_class.macro).to eq(:embedded_in)
-    end
-  end
-
   describe "#respond_to?" do
 
     let(:person) do

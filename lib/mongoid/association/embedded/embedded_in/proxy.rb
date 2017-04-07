@@ -135,19 +135,6 @@ module Mongoid
               nil
             end
 
-            # Returns the macro for this relation. Used mostly as a helper in
-            # reflection.
-            #
-            # @example Get the macro.
-            #   Mongoid::Relations::Embedded::In.macro
-            #
-            # @return [ Symbol ] :embedded_in.
-            #
-            # @since 2.0.0.rc.1
-            def macro
-              :embedded_in
-            end
-
             # Get the path calculator for the supplied document.
             #
             # @example Get the path calculator.
