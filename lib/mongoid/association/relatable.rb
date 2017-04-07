@@ -1,5 +1,4 @@
 require 'mongoid/association/constrainable'
-require 'mongoid/association/conversions'
 require 'mongoid/association/options'
 
 module Mongoid
@@ -10,7 +9,6 @@ module Mongoid
     # @since 7.0
     module Relatable
       include Constrainable
-      include Conversions
       include Options
 
       # The options shared between all association types.

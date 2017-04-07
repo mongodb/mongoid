@@ -308,9 +308,7 @@ module Mongoid
           #
           # @since 2.4.0
           def unscoped
-            klass.unscoped.where(
-                foreign_key => __association.flag(base._id)
-            )
+            klass.unscoped.where(foreign_key => base._id)
           end
 
           private
@@ -405,7 +403,7 @@ module Mongoid
           def criteria
             Proxy.criteria(
                 __association,
-                __association.flag(base.send(__association.primary_key)),
+                base.send(__association.primary_key),
                 base.class
             )
           end
