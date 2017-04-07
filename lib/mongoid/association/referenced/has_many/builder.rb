@@ -20,7 +20,7 @@ module Mongoid
           def build(type = nil)
             return object unless query?
             return [] if object.is_a?(Array)
-            association.criteria(association.flag(object), base.class)
+            association.criteria(object, base.class)
           end
         end
       end

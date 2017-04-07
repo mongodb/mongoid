@@ -22,7 +22,7 @@ module Mongoid
           def build(type = nil)
             return object unless query?
             return nil if base.new_record?
-            association.criteria(association.flag(object), base.class).first
+            association.criteria(object, base.class).first
           end
         end
       end
