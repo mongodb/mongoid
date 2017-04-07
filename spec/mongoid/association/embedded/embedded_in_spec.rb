@@ -110,13 +110,6 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
     end
   end
 
-  describe '#macro' do
-
-    it 'returns :embedded_in' do
-      expect(association.macro).to be(:embedded_in)
-    end
-  end
-
   describe '#validation_default' do
 
     it 'returns false' do

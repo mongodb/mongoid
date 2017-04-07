@@ -89,15 +89,6 @@ module Mongoid
         # @since 7.0
         def stores_foreign_key?; true; end
 
-        # Get the macro for this association type.
-        #
-        # @return [ Symbol ] The macro.
-        #
-        # @since 7.0
-        def macro
-          :has_and_belongs_to_many
-        end
-
         # Get a builder object for creating a relationship of this type between two objects.
         #
         # @params [ Object ] The base.

@@ -215,13 +215,6 @@ describe Mongoid::Association::Embedded::EmbedsOne do
     end
   end
 
-  describe '#macro' do
-
-    it 'returns :embeds_one' do
-      expect(association.macro).to be(:embeds_one)
-    end
-  end
-
   describe '#validation_default' do
 
     it 'returns true' do

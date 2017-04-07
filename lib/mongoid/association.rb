@@ -74,7 +74,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_many?
-      __association && __association.macro == :embeds_many
+      __association && __association.is_a?(Association::Embedded::EmbedsMany)
     end
 
     # Determine if the document is part of an embeds_one relation.
@@ -86,7 +86,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_one?
-      __association && __association.macro == :embeds_one
+      __association && __association.is_a?(Association::Embedded::EmbedsOne)
     end
 
     # Get the association name for this document. If no association was defined
@@ -114,7 +114,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_many?
-      __association && __association.macro == :has_many
+      __association && __association.is_a?(Association::Referenced::HasMany)
     end
 
     # Determine if the document is part of an references_one relation.
@@ -126,7 +126,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_one?
-      __association && __association.macro == :has_one
+      __association && __association.is_a?(Association::Referenced::HasOne)
     end
 
     # Convenience method for iterating through the loaded relations and

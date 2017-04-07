@@ -20,17 +20,6 @@ describe Mongoid::Association::Reflections do
       klass.embeds_many(:addresses)
     end
 
-    context "when the name exists" do
-
-      let(:relation) do
-        klass.reflect_on_association(:addresses)
-      end
-
-      it "returns the association metadata" do
-        expect(relation.macro).to eq(:embeds_many)
-      end
-    end
-
     context "when the name does not exist" do
 
       let(:relation) do

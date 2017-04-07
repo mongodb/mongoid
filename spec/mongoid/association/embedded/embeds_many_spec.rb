@@ -215,13 +215,6 @@ describe Mongoid::Association::Embedded::EmbedsMany do
     end
   end
 
-  describe '#macro' do
-
-    it 'returns :embeds_many' do
-      expect(association.macro).to be(:embeds_many)
-    end
-  end
-
   describe '#validation_default' do
 
     it 'returns true' do
