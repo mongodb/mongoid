@@ -35,22 +35,26 @@ describe Mongoid::Relations::Synchronization do
       end
     end
 
+    after(:all) do
+      Object.send(:remove_const, :TestModel)
+    end
+
     it 'prohibits the use of :_sycned as an attribute' do
       expect {
         model_synced
-      }.to raise_exception
+      }.to raise_exception(Mongoid::Errors::InvalidField)
     end
 
     it 'prohibits the use of :_synced? as an attribute' do
       expect {
         model_synced?
-      }.to raise_exception
+      }.to raise_exception(Mongoid::Errors::InvalidField)
     end
 
     it 'prohibits the use of :_syncable? as an attribute' do
       expect {
         model_syncable?
-      }.to raise_exception
+      }.to raise_exception(Mongoid::Errors::InvalidField)
     end
   end
 
