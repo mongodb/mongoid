@@ -270,7 +270,7 @@ module Mongoid
           #
           # @since 3.0.0
           def unsynced(doc, key)
-            doc.synced[key] = false
+            doc._synced[key] = false
             true
           end
 
