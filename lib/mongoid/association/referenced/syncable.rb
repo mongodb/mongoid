@@ -11,41 +11,41 @@ module Mongoid
         # the key has changed and the relation bindings have not been run.
         #
         # @example Are the foreign keys syncable?
-        #   document.syncable?(association)
+        #   document._syncable?(association)
         #
         # @param [ Association ] association The association metadata.
         #
         # @return [ true, false ] If we can sync.
         #
         # @since 2.1.0
-        def syncable?(association)
-          !synced?(association.foreign_key) && send(association.foreign_key_check)
+        def _syncable?(association)
+          !_synced?(association.foreign_key) && send(association.foreign_key_check)
         end
 
         # Get the synced foreign keys.
         #
         # @example Get the synced foreign keys.
-        #   document.synced
+        #   document._synced
         #
         # @return [ Hash ] The synced foreign keys.
         #
         # @since 2.1.0
-        def synced
-          @synced ||= {}
+        def _synced
+          @_synced ||= {}
         end
 
         # Has the document been synced for the foreign key?
         #
         # @example Has the document been synced?
-        #   document.synced?
+        #   document._synced?
         #
         # @param [ String ] foreign_key The foreign key.
         #
         # @return [ true, false ] If we can sync.
         #
         # @since 2.1.0
-        def synced?(foreign_key)
-          !!synced[foreign_key]
+        def _synced?(foreign_key)
+          !!_synced[foreign_key]
         end
 
         # Update the inverse keys on destroy.
@@ -105,12 +105,12 @@ module Mongoid
           # Set up the syncing of many to many foreign keys.
           #
           # @example Set up the syncing.
-          #   Person.synced(association)
+          #   Person._synced(association)
           #
           # @param [ Association ] association The association metadata.
           #
           # @since 2.1.0
-          def synced(association)
+          def _synced(association)
             unless association.forced_nil_inverse?
               synced_save(association)
               synced_destroy(association)
@@ -137,7 +137,7 @@ module Mongoid
             set_callback(
                 :save,
                 :after,
-                if: ->(doc) { doc.syncable?(association) }
+                if: ->(doc) { doc._syncable?(association) }
             ) do |doc|
               doc.update_inverse_keys(association)
             end

@@ -29,7 +29,7 @@ describe "Syncable Association" do
         field :_synced?
       end
     end
-    
+
     let(:model_syncable?) do
       class TestModel
         include Mongoid::Document
