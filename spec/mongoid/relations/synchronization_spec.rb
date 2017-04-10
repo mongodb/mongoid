@@ -4,12 +4,54 @@ describe Mongoid::Relations::Synchronization do
 
   before(:all) do
     Mongoid.raise_not_found_error = true
-    Person.synced(Person.relations["preferences"])
+    Person._synced(Person.relations["preferences"])
   end
 
   after(:all) do
     Person.reset_callbacks(:save)
     Person.reset_callbacks(:destroy)
+  end
+
+  describe 'Model loading' do
+
+    let(:model_synced) do
+      class TestModel
+        include Mongoid::Document
+        field :_synced
+      end
+    end
+
+    let(:model_synced?) do
+      class TestModel
+        include Mongoid::Document
+        field :_synced?
+      end
+    end
+    
+    let(:model_syncable?) do
+      class TestModel
+        include Mongoid::Document
+        field :_syncable?
+      end
+    end
+
+    it 'prohibits the use of :_sycned as an attribute' do
+      expect {
+        model_synced
+      }.to raise_exception
+    end
+
+    it 'prohibits the use of :_synced? as an attribute' do
+      expect {
+        model_synced?
+      }.to raise_exception
+    end
+
+    it 'prohibits the use of :_syncable? as an attribute' do
+      expect {
+        model_syncable?
+      }.to raise_exception
+    end
   end
 
   describe ".update_inverse_keys" do
@@ -119,7 +161,7 @@ describe Mongoid::Relations::Synchronization do
     end
 
     it "resets the synced flag" do
-      expect(person.synced["preference_ids"]).to be false
+      expect(person._synced["preference_ids"]).to be false
     end
 
     context "when subsequently setting with keys" do

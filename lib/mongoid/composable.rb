@@ -82,6 +82,7 @@ module Mongoid
       Traversable,
       Validatable,
       Equality,
+      Relations::Synchronization,
       ActiveModel::Model,
       ActiveModel::Validations,
       PersistenceContext
