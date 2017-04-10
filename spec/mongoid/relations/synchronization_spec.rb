@@ -35,7 +35,7 @@ describe Mongoid::Relations::Synchronization do
       end
     end
 
-    after(:all) do
+    after do
       Object.send(:remove_const, :TestModel)
     end
 
