@@ -198,7 +198,7 @@ module Mongoid
           reference(meta, Array)
           autosave(meta)
           validates_relation(meta)
-          synced(meta)
+          _synced(meta)
           meta
         end
 

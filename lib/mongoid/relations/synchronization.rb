@@ -11,41 +11,41 @@ module Mongoid
       # the key has changed and the relation bindings have not been run.
       #
       # @example Are the foreign keys syncable?
-      #   document.syncable?(metadata)
+      #   document._syncable??(metadata)
       #
       # @param [ Metadata ] metadata The relation metadata.
       #
       # @return [ true, false ] If we can sync.
       #
       # @since 2.1.0
-      def syncable?(metadata)
-        !synced?(metadata.foreign_key) && send(metadata.foreign_key_check)
+      def _syncable?(metadata)
+        !_synced?(metadata.foreign_key) && send(metadata.foreign_key_check)
       end
 
       # Get the synced foreign keys.
       #
       # @example Get the synced foreign keys.
-      #   document.synced
+      #   document._synced
       #
       # @return [ Hash ] The synced foreign keys.
       #
       # @since 2.1.0
-      def synced
-        @synced ||= {}
+      def _synced
+        @_synced ||= {}
       end
 
       # Has the document been synced for the foreign key?
       #
       # @example Has the document been synced?
-      #   document.synced?
+      #   document._synced??
       #
       # @param [ String ] foreign_key The foreign key.
       #
       # @return [ true, false ] If we can sync.
       #
       # @since 2.1.0
-      def synced?(foreign_key)
-        !!synced[foreign_key]
+      def _synced?(foreign_key)
+        !!_synced[foreign_key]
       end
 
       # Update the inverse keys on destroy.
@@ -110,7 +110,7 @@ module Mongoid
         # @param [ Metadata ] metadata The relation metadata.
         #
         # @since 2.1.0
-        def synced(metadata)
+        def _synced(metadata)
           unless metadata.forced_nil_inverse?
             synced_save(metadata)
             synced_destroy(metadata)
@@ -137,7 +137,7 @@ module Mongoid
           set_callback(
             :save,
             :after,
-            if: ->(doc){ doc.syncable?(metadata) }
+            if: ->(doc){ doc._syncable?(metadata) }
           ) do |doc|
             doc.update_inverse_keys(metadata)
           end
