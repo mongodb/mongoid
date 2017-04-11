@@ -43,11 +43,11 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "syncs the base" do
-        expect(person).to be_synced("preference_ids")
+        expect(person._synced?("preference_ids")).to be(true)
       end
 
       it "syncs the inverse" do
-        expect(preference_two).to be_synced("person_ids")
+        expect(preference_two._synced?("person_ids")).to be(true)
       end
     end
 
@@ -98,11 +98,11 @@ describe Mongoid::Relations::Bindings::Referenced::ManyToMany do
       end
 
       it "syncs the base" do
-        expect(person).to be_synced("preference_ids")
+        expect(person._synced?("preference_ids")).to be(true)
       end
 
       it "syncs the inverse" do
-        expect(preference).to be_synced("person_ids")
+        expect(preference._synced?("person_ids")).to be(true)
       end
     end
 
