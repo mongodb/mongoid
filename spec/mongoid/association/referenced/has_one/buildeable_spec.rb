@@ -8,43 +8,30 @@ describe Mongoid::Association::Referenced::HasOne::Builder do
 
   describe "#build" do
 
-    let(:criteria) do
-      Post.where("person_id" => object)
+    let(:document) do
+      association.build(base, object)
     end
 
     let(:association) do
-      Mongoid::Association::Referenced::HasOne.new(Person, :post, foreign_key: "person_id")
-    end
-
-    let(:builder) do
-      described_class.new(base, association, object)
+      Mongoid::Association::Referenced::HasOne.new(Person, :post)
     end
 
     context "when provided an id" do
 
-      let(:object_id) do
-        BSON::ObjectId.new
+      let!(:post) do
+        Post.create(person_id: object)
       end
 
       let(:object) do
-        object_id
-      end
-
-      let(:post) do
-        double
+        BSON::ObjectId.new
       end
 
       before do
-        expect(criteria).to receive(:first).and_return(post)
-        expect(association).to receive(:criteria).and_return(criteria)
-      end
-
-      let!(:documents) do
-        builder.build
+        expect(Post).to receive(:where).with(association.foreign_key => object).and_call_original
       end
 
       it "sets the document" do
-        expect(documents).to eq(post)
+        expect(document).to eq(post)
       end
     end
 
@@ -54,30 +41,27 @@ describe Mongoid::Association::Referenced::HasOne::Builder do
         Post.new
       end
 
-      let(:document) do
-        builder.build
-      end
-
       it "returns the object" do
         expect(document).to eq(object)
       end
     end
-  end
-
-  describe "#build" do
-
-    let(:person) do
-      Person.new
-    end
 
     context "when the document is not found" do
 
+      let(:object) do
+        BSON::ObjectId.new
+      end
+
       it "returns nil" do
-        expect(person.game).to be_nil
+        expect(document).to be_nil
       end
     end
 
     context "when the document is persisted" do
+
+      let(:person) do
+        Person.create
+      end
 
       let!(:game) do
         Game.create(person: person)
@@ -90,8 +74,8 @@ describe Mongoid::Association::Referenced::HasOne::Builder do
 
     context "when the document have a non standard pk" do
 
-      before do
-        person.save
+      let(:person) do
+        Person.create
       end
 
       let!(:cat) do
