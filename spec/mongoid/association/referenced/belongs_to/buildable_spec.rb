@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::BelongsTo::Builder do
+describe Mongoid::Association::Referenced::BelongsTo::Buildable do
 
   let(:base) do
     double
@@ -8,45 +8,28 @@ describe Mongoid::Association::Referenced::BelongsTo::Builder do
 
   describe "#build" do
 
-    let(:criteria) do
-      Person.where(_id: object_id)
+    let(:document) do
+      association.build(double, object)
     end
 
     let(:association) do
-      double(
-          klass: Person,
-          name: :person,
-          foreign_key: "person_id",
-          criteria: criteria
-      )
-    end
-
-    let(:builder) do
-      described_class.new(base, association, object)
+      Post.relations['person']
     end
 
     context "when provided an id" do
 
       context "when the object is an object id" do
 
-        let(:object_id) do
-          BSON::ObjectId.new
+        let!(:person) do
+          Person.create(_id: object)
         end
 
         let(:object) do
-          object_id
-        end
-
-        let(:person) do
-          double
+          BSON::ObjectId.new
         end
 
         before do
-          expect(criteria).to receive(:first).and_return(person)
-        end
-
-        let!(:document) do
-          builder.build
+          expect(Person).to receive(:where).with(association.primary_key => object).and_call_original
         end
 
         it "sets the document" do
@@ -54,40 +37,52 @@ describe Mongoid::Association::Referenced::BelongsTo::Builder do
         end
       end
 
-      context "when the object is an integer" do
+      context 'when the id is nil' do
+
+        let(:object) do
+          nil
+        end
 
         before do
-          Person.field :_id, overwrite: true, type: Integer
+          expect(Person).not_to receive(:where)
         end
 
-        after do
-          Person.field(
-              :_id,
-              overwrite: true,
-              type: BSON::ObjectId,
-              pre_processed: true,
-              default: ->{ BSON::ObjectId.new }
-          )
+        it 'returns nil' do
+          expect(document).to be_nil
         end
+      end
 
-        let(:object_id) do
-          666
+      context "when the id does not correspond to a document in the database" do
+
+        let!(:person) do
+          Person.create
         end
 
         let(:object) do
-          object_id
-        end
-
-        let(:person) do
-          double
+          BSON::ObjectId.new
         end
 
         before do
-          expect(criteria).to receive(:first).and_return(person)
+          expect(Person).to receive(:where).with(association.primary_key => object).and_call_original
         end
 
-        let!(:document) do
-          builder.build
+        it 'returns nil' do
+          expect(document).to be_nil
+        end
+      end
+
+      context "when the object is an integer" do
+
+        let!(:person) do
+          Person.create(_id: object)
+        end
+
+        let(:object) do
+          666
+        end
+
+        before do
+          expect(Person).to receive(:where).with(association.primary_key => object).and_call_original
         end
 
         it "sets the document" do
@@ -98,48 +93,20 @@ describe Mongoid::Association::Referenced::BelongsTo::Builder do
 
     context "when provided a object" do
 
+      let!(:person) do
+        Person.create
+      end
+
       let(:object) do
         Person.new
       end
 
-      let(:builder) do
-        described_class.new(base, nil, object)
-      end
-
-      let(:document) do
-        builder.build
+      before do
+        expect(Person).not_to receive(:where)
       end
 
       it "returns the object" do
         expect(document).to eq(object)
-      end
-    end
-  end
-
-  describe "#build" do
-
-    let(:game) do
-      Game.new
-    end
-
-    context "when no document found in the database" do
-
-      context "when the id is nil" do
-
-        it "returns nil" do
-          expect(game.person).to be_nil
-        end
-      end
-
-      context "when the id is incorrect" do
-
-        before do
-          game.person_id = BSON::ObjectId.new
-        end
-
-        it "returns nil" do
-          expect(game.person).to be_nil
-        end
       end
     end
 

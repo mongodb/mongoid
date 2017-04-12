@@ -251,21 +251,7 @@ module Mongoid
         association.inverse_class.tap do |klass|
           klass.re_define_method("#{name}=") do |object|
             without_autobuild do
-
-              # name is :child
-              # value is send(:child)
-              # object is Child object
-              # child object already has parent
-              #current_value = get_relation(name, association, object)
-
-              # current value is set
-
-              # current value is not set
-
-
               if value = get_relation(name, association, object)
-
-                # is the object a proxy
                 if value.respond_to?(:substitute)
                   set_relation(name, value.substitute(object.substitutable))
                 else
@@ -273,9 +259,6 @@ module Mongoid
                   set_relation(name, value.substitute(object.substitutable))
                 end
               else
-                # if object && association.inverse && (related = object.send(association.inverse))
-                #   related.substitute(nil)
-                # end
                 __build__(name, object.substitutable, association)
               end
             end

@@ -1,5 +1,5 @@
 require 'mongoid/association/referenced/belongs_to/binding'
-require 'mongoid/association/referenced/belongs_to/builder'
+require 'mongoid/association/referenced/belongs_to/buildable'
 require 'mongoid/association/referenced/belongs_to/proxy'
 require 'mongoid/association/referenced/belongs_to/eager'
 
@@ -12,6 +12,7 @@ module Mongoid
       # @since 7.0
       class BelongsTo
         include Relatable
+        include Buildable
 
         # The options available for this type of association, in addition to the
         # common ones.

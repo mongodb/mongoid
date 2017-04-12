@@ -1,5 +1,5 @@
 require 'mongoid/association/referenced/has_many/binding'
-require 'mongoid/association/referenced/has_many/builder'
+require 'mongoid/association/referenced/has_many/buildable'
 require 'mongoid/association/referenced/has_many/proxy'
 require 'mongoid/association/referenced/has_many/enumerable'
 require 'mongoid/association/referenced/has_many/eager'
@@ -13,6 +13,7 @@ module Mongoid
       # @since 7.0
       class HasMany
         include Relatable
+        include Buildable
 
         # The options available for this type of association, in addition to the
         # common ones.
