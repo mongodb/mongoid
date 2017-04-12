@@ -7,27 +7,36 @@ module Mongoid
         module Buildable
 
           # This builder either takes an _id or an object and queries for the
-          # inverse side using the id or sets the object.
-          #
-          # @example Build the document.
-          #   Builder.new(meta, attrs).build
-          #
-          # @param [ String ] type The type of document to query for.
+          # inverse side using the id or sets the object after clearing the
+          # associated object.
           #
           # @return [ Document ] A single document.
           def build(base, object, type = nil)
-            return object unless query?(object)
-            unless base.new_record?
-              execute_query(object, base)
+            if query?(object)
+              if !base.new_record?
+                execute_query(object, base)
+              end
+            else
+              clear_associated(object)
+              object
             end
           end
 
           private
 
-          def execute_query(object, base)
+          def clear_associated(object)
+            if associated = object.send(inverse)
+              associated.substitute(nil)
+            end
+          end
+
+          def query_criteria(object, base)
             crit = klass.where(foreign_key => object)
-            crit = add_polymorphic_criterion(crit, base)
-            crit.limit(-1).first(id_sort: :none)
+            with_polymorphic_criterion(crit, base)
+          end
+
+          def execute_query(object, base)
+            query_criteria(object, base).limit(-1).first(id_sort: :none)
           end
 
           # Add polymorphic query criteria to a Criteria object, if this association is
@@ -39,7 +48,7 @@ module Mongoid
           # @return [ Mongoid::Criteria ] The criteria object.
           #
           # @since 7.0
-          def add_polymorphic_criterion(criteria, base)
+          def with_polymorphic_criterion(criteria, base)
             if polymorphic?
               binding.pry
               criteria.where(type => base.class.name)
