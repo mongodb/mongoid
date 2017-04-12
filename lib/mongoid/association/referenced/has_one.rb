@@ -1,5 +1,6 @@
 require 'mongoid/association/referenced/has_one/binding'
 require 'mongoid/association/referenced/has_one/builder'
+require 'mongoid/association/referenced/has_one/buildable'
 require 'mongoid/association/referenced/has_one/proxy'
 require 'mongoid/association/referenced/has_one/eager'
 
@@ -12,6 +13,7 @@ module Mongoid
       # @since 7.0
       class HasOne
         include Relatable
+        include Buildable
 
         # The options available for this type of association, in addition to the
         # common ones.
@@ -120,23 +122,6 @@ module Mongoid
         # @since 7.0
         def nested_builder(attributes, options)
           Nested::One.new(self, attributes, options)
-        end
-
-        # Add polymorphic query criteria to a Criteria object, if this association is
-        #  polymorphic.
-        #
-        # @params [ Mongoid::Criteria ] criteria The criteria object to add to.
-        # @params [ Class ] object_class The object class.
-        #
-        # @return [ Mongoid::Criteria ] The criteria object.
-        #
-        # @since 7.0
-        def add_polymorphic_criterion(criteria, object_class)
-          if polymorphic?
-            criteria.where(type => object_class.name)
-          else
-            criteria
-          end
         end
 
         # Is this association polymorphic?
