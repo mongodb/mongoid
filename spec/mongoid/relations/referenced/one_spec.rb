@@ -1237,4 +1237,37 @@ describe Mongoid::Relations::Referenced::One do
       end
     end
   end
+
+  context 'when the relation fails validations' do
+
+    let(:petal) do
+      petal = Petal.new
+      petal.flower = Flower.new
+      petal.save
+      petal
+    end
+
+    before do
+      class Flower
+        include Mongoid::Document
+
+        has_one :petal
+        field :type
+        validates :type, presence: true
+      end
+      class Petal
+        include Mongoid::Document
+        belongs_to :flower
+      end
+    end
+
+    after do
+      Object.send(:remove_const, :Flower)
+      Object.send(:remove_const, :Petal)
+    end
+
+    it 'does not save the foreign key of the unsaved object' do
+      expect(petal.reload.flower).to be_nil
+    end
+  end
 end
