@@ -64,7 +64,11 @@ module Mongoid
       # @since 1.0.0
       def determine(value, operator)
         attribute.__array__.any? {|attr|
-          attr ? attr.send(operator, first(value)) : false
+          begin
+            attr ? attr.send(operator, first(value)) : false
+          rescue ArgumentError
+            false
+          end
         }
       end
     end
