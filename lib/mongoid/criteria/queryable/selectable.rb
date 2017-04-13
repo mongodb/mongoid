@@ -629,13 +629,14 @@ module Mongoid
         # @example Convert all the values to arrays.
         #   selectable.with_array_values({ key: 1...4 })
         #
-        # @param [ Hash ] criterion The criterion.
+        # @param [ Hash, Array ] criterion The criterion or array of ids.
         #
         # @return [ Hash ] The $in friendly criterion (array values).
         #
         # @since 1.0.0
         def with_array_values(criterion)
           return nil unless criterion
+          criterion = { _id: criterion } if criterion.is_a?(Array)
           criterion.each_pair do |key, value|
             criterion[key] = value.__array__
           end
