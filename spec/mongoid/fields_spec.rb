@@ -47,7 +47,7 @@ describe Mongoid::Fields do
         context "when no default is provided" do
 
           it "returns an empty hash" do
-            expect(product.description_translations).to be_empty
+            expect(product.website_translations).to be_empty
           end
         end
 

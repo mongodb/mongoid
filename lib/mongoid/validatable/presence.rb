@@ -28,12 +28,16 @@ module Mongoid
       def validate_each(document, attribute, value)
         field = document.fields[document.database_field_name(attribute)]
         if field.try(:localized?) && !value.blank?
-          value.each_pair do |_locale, _value|
-            document.errors.add(
-              attribute,
-              :blank_in_locale,
-              options.merge(location: _locale)
-            ) if not_present?(_value)
+          if options[:default_locale] == true
+            document.errors.add(attribute, :blank, options) if not_present?(value[I18n.default_locale.to_s])
+          else
+            value.each_pair do |_locale, _value|
+              document.errors.add(
+                attribute,
+                :blank_in_locale,
+                options.merge(location: _locale)
+              ) if not_present?(_value)
+            end
           end
         elsif document.relations.has_key?(attribute.to_s)
           if relation_or_fk_missing?(document, attribute, value)

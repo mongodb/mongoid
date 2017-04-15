@@ -448,6 +448,23 @@ describe Mongoid::Validatable::PresenceValidator do
 
       before do
         product.name_translations = { "en" => "test" }
+        product.description_translations = { "en" => "desc test" }
+      end
+
+      it "is a valid document" do
+        expect(product).to be_valid
+      end
+    end
+
+    context "when only the default locale is present" do
+
+      let(:product) do
+        Product.new
+      end
+
+      before do
+        product.name_translations = { "en" => "test" }
+        product.description_translations = { "en" => "desc test", "fr" => "" }
       end
 
       it "is a valid document" do
