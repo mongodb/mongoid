@@ -43,7 +43,11 @@ module Mongoid
       #
       # @since 2.3.0
       def mongoize(object)
-        { ::I18n.locale.to_s => type.mongoize(object) }
+        if object.is_a?(Hash)
+          object
+        else
+          { ::I18n.locale.to_s => type.mongoize(object) }
+        end
       end
 
       private
