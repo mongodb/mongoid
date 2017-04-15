@@ -165,7 +165,7 @@ describe Mongoid::Contextual::Aggregable::Mongo do
         end
 
         it "returns a sum" do
-          expect(aggregates["sum"]).to be_nil
+          expect(aggregates["sum"]).to eq(0)
         end
       end
 
