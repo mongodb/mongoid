@@ -130,9 +130,11 @@ module Mongoid
         #
         # @example Create a new document.
         #   Person.create(:title => "Mr")
+        #   Person.create({ :title => "Mr" })
         #
         # @example Create multiple new documents.
         #   Person.create({ title: "Mr" }, { title: "Mrs" })
+        #   Person.create([{ title: "Mr" }, { title: "Mrs" }])
         #
         # @param [ Hash, Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
@@ -140,15 +142,19 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create(attributes = nil, &block)
+        def create(*attributes, &block)
           _creating do
-            if attributes.is_a?(::Array)
-              attributes.map { |attrs| create(attrs, &block) }
-            else
-              doc = new(attributes, &block)
-              doc.save
-              doc
-            end
+            attributes << nil if attributes.empty?
+            documents = attributes.map do |attrs|
+              case attrs
+              when ::Array then create(*attrs, &block)
+              when ::Hash, ::NilClass
+                doc = new(attrs, &block)
+                doc.save
+                doc
+              end
+            end.compact
+            documents.one? ? documents.first : documents
           end
         end
 
@@ -159,9 +165,11 @@ module Mongoid
         #
         # @example Create a new document.
         #   Person.create!(:title => "Mr")
+        #   Person.create!({ :title => "Mr" })
         #
         # @example Create multiple new documents.
         #   Person.create!({ title: "Mr" }, { title: "Mrs" })
+        #   Person.create!([{ title: "Mr" }, { title: "Mrs" }])
         #
         # @param [ Hash, Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
@@ -171,16 +179,20 @@ module Mongoid
         # @return [ Document, Array<Document> ] The newly created document(s).
         #
         # @since 1.0.0
-        def create!(attributes = nil, &block)
+        def create!(*attributes, &block)
           _creating do
-            if attributes.is_a?(::Array)
-              attributes.map { |attrs| create!(attrs, &block) }
-            else
-              doc = new(attributes, &block)
-              doc.fail_due_to_validation! unless doc.insert.errors.empty?
-              doc.fail_due_to_callback!(:create!) if doc.new_record?
-              doc
-            end
+            attributes << nil if attributes.empty?
+            documents = attributes.map do |attrs|
+              case attrs
+              when ::Array then create!(*attrs, &block)
+              when ::Hash, ::NilClass
+                doc = new(attrs, &block)
+                doc.fail_due_to_validation! unless doc.insert.errors.empty?
+                doc.fail_due_to_callback!(:create!) if doc.new_record?
+                doc
+              end
+            end.compact
+            documents.one? ? documents.first : documents
           end
         end
       end
