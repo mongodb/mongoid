@@ -64,7 +64,7 @@ module Mongoid
           #
           # @return [ true, false ] If the relation can potentially be deleted.
           def destroyable?(attributes)
-            destroy = attributes.delete(:_destroy)
+            destroy = attributes.delete(:_destroy) || attributes.delete("_destroy")
             [ 1, "1", true, "true" ].include?(destroy) && allow_destroy?
           end
 
