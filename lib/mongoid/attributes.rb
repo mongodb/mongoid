@@ -93,7 +93,7 @@ module Mongoid
     # @since 1.0.0
     def read_attribute(name)
       normalized = database_field_name(name.to_s)
-      if attribute_missing?(normalized)
+      if attribute_missing?(normalized) && Mongoid.raise_missing_attribute_error
         raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
       end
       if hash_dot_syntax?(normalized)

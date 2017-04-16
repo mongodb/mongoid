@@ -278,6 +278,10 @@ describe Mongoid::Config do
         expect(described_class.raise_not_found_error).to be true
       end
 
+      it "sets the raise missing attribute error option" do
+        expect(described_class.raise_missing_attribute_error).to be true
+      end
+
       it "sets the use activesupport time zone option" do
         expect(described_class.use_activesupport_time_zone).to be true
       end
