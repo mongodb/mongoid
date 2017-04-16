@@ -6,7 +6,7 @@ module Mongoid
     # will contain the full error messages from the +Document+ in question.
     #
     # @example Create the error.
-    #   Validations.new(person.errors)
+    #   Validations.new(person)
     class Validations < MongoidError
       attr_reader :document
       alias :record :document
