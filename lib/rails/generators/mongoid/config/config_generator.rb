@@ -13,7 +13,9 @@ module Mongoid
       end
 
       def app_name
-        Rails::Application.subclasses.first.parent.to_s.underscore
+        subclasses = Rails::Application.subclasses
+        subclasses = Rails::Engine.subclasses if subclasses.empty?
+        subclasses.first.parent.to_s.underscore
       end
 
       def create_config_file
