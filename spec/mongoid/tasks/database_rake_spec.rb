@@ -198,6 +198,58 @@ describe "db:mongoid:create_indexes", if: non_legacy_server? do
   end
 end
 
+describe "db:mongoid:list_undefined_indexes", if: non_legacy_server? do
+  include_context "rake task"
+
+  it "receives list_undefined_indexes" do
+    expect(Mongoid::Tasks::Database).to receive(:list_undefined_indexes)
+    task.invoke
+  end
+
+  it "calls environment" do
+    expect(task.prerequisites).to include("environment")
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    before do
+      expect(Rails).to receive(:application).and_return(application)
+    end
+
+    it "receives list_undefined_indexes" do
+      expect(Mongoid::Tasks::Database).to receive(:list_undefined_indexes)
+      task.invoke
+    end
+  end
+end
+
+describe "db:mongoid:list_indexes", if: non_legacy_server? do
+  include_context "rake task"
+
+  it "receives list_indexes" do
+    expect(Mongoid::Tasks::Database).to receive(:list_indexes)
+    task.invoke
+  end
+
+  it "calls environment" do
+    expect(task.prerequisites).to include("environment")
+  end
+
+  context "when using rails task" do
+    include_context "rails rake task"
+
+    before do
+      expect(Rails).to receive(:application).and_return(application)
+    end
+
+    it "receives list_indexes" do
+      expect(Mongoid::Tasks::Database).to receive(:list_indexes)
+      task.invoke
+    end
+  end
+end
+
 describe "db:mongoid:remove_undefined_indexes", if: non_legacy_server? do
   include_context "rake task"
 

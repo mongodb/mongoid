@@ -113,6 +113,44 @@ describe "Mongoid::Tasks::Database" do
     end
   end
 
+  describe ".list_undefined_indexes" do
+
+    let(:indexes) do
+      User.collection.indexes
+    end
+
+    before :each do
+      Mongoid::Tasks::Database.create_indexes(models)
+      indexes.create(account_expires: 1)
+    end
+
+    it "prints the undefined indexes" do
+      [ "User",
+        "  account_expires_1" ].each do |line|
+        expect(Mongoid::Tasks::Database.send(:logger)).to receive(:info).with(line)
+      end
+      Mongoid::Tasks::Database.list_undefined_indexes(models)
+    end
+  end
+
+  describe ".list_indexes" do
+
+    before :each do
+      Mongoid::Tasks::Database.create_indexes(models)
+    end
+
+    it "prints the indexes" do
+      [ "User",
+        "  _id_",
+        "  name_1",
+        "Account",
+        "  (none)" ].each do |line|
+        expect(Mongoid::Tasks::Database.send(:logger)).to receive(:info).with(line)
+      end
+      Mongoid::Tasks::Database.list_indexes(models)
+    end
+  end
+
   describe ".remove_undefined_indexes" do
 
     let(:indexes) do

@@ -62,6 +62,36 @@ module Mongoid
         undefined_by_model
       end
 
+      # Prints a list of undefined indexes to the logger.
+      #
+      # @example Print list of undefined indexes.
+      #   Mongoid::Tasks::Database.list_undefined_indexes
+      #
+      # @return [ Hash{Class => Array(Hash)}] The models and undefined indexes that were listed.
+      #
+      # @since 5.2.0
+      def list_undefined_indexes(models = ::Mongoid.models)
+        undefined_indexes(models).each do |model, indexes|
+          log_model_and_indexes(model, indexes)
+        end
+      end
+
+      # Prints a list of indexes to the logger.
+      #
+      # @example Print list of indexes.
+      #   Mongoid::Tasks::Database.list_indexes
+      #
+      # @return [ Array<Class> ] The models whose indices were listed.
+      #
+      # @since 5.2.0
+      def list_indexes(models = ::Mongoid.models)
+        models.each do |model|
+          unless model.embedded?
+            log_model_and_indexes(model, model.collection.indexes.to_a)
+          end
+        end
+      end
+
       # Remove indexes that exist in the database but aren't specified on the
       # models.
       #
@@ -108,6 +138,12 @@ module Mongoid
       private
       def logger
         Mongoid.logger
+      end
+
+      def log_model_and_indexes(model, indexes)
+        logger.info "#{model}"
+        logger.info "  (none)" if indexes.empty?
+        indexes.each{ |index| logger.info "  #{index['name']}" }
       end
     end
   end
