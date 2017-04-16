@@ -16,14 +16,11 @@ module Mongoid
       # @param [ Hash ] attrs The attributes to set.
       #
       # @since 2.0.0.rc.7
-      def process_attributes(attrs = nil)
-        attrs ||= {}
-        if !attrs.empty?
-          attrs = sanitize_for_mass_assignment(attrs)
-          attrs.each_pair do |key, value|
-            next if pending_attribute?(key, value)
-            process_attribute(key, value)
-          end
+      def process_attributes(attrs = {})
+        sanitize_for_mass_assignment(Hash(attrs)).reject do |name, value|
+          pending_attribute?(name, value)
+        end.each do |name, value|
+          process_attribute(name, value)
         end
         yield self if block_given?
         process_pending
