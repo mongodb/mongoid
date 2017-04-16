@@ -117,7 +117,7 @@ module Mongoid
       #
       # @since 2.2.0
       def add_operation(mods, field, value)
-        if mods.has_key?(field)
+        if mods.has_key?(field) && mods[field].kind_of?(Array)
           value.each do |val|
             mods[field].push(val)
           end
