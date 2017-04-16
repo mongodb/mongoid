@@ -349,6 +349,132 @@ describe Mongoid::Relations::Cascading do
             end
           end
         end
+
+        context "when dependent is restrict_with_error" do
+
+          context "when restricting a references many" do
+
+            before do
+              Person.has_many :drugs, dependent: :restrict_with_error
+            end
+
+            after do
+              Person.cascades.delete("drugs")
+              Person.has_many :drugs, validate: false
+            end
+
+            context "when the relation is empty" do
+
+              let(:person) do
+                Person.new drugs: []
+              end
+
+              it "deletes the parent" do
+                person.send(method)
+                expect(person).to be_destroyed
+              end
+            end
+
+            context "when the relation is not empty" do
+
+              let(:person) do
+                Person.new drugs: [ Drug.new ]
+              end
+
+              it "add the error message" do
+                person.send(method)
+                expect(person.errors[:base]).to include('Cannot delete record because dependent drugs exist')
+              end
+
+              it "does not deletes the parent" do
+                person.send(method)
+                expect(person).to_not be_destroyed
+              end
+            end
+          end
+
+          context "when restricting a references one" do
+
+            before do
+              Person.has_one :account, dependent: :restrict_with_error
+            end
+
+            after do
+              Person.cascades.delete("account")
+              Person.has_one :account, validate: false
+            end
+
+            context "when the relation is empty" do
+
+              let(:person) do
+                Person.new account: nil
+              end
+
+              it "deletes the parent" do
+                person.send(method)
+                expect(person).to be_destroyed
+              end
+            end
+
+            context "when the relation is not empty" do
+
+              let(:person) do
+                Person.new account: Account.new(name: 'test')
+              end
+
+              it "add the error message" do
+                person.send(method)
+                expect(person.errors[:base]).to include('Cannot delete record because a dependent account exists')
+              end
+
+              it "does not deletes the parent" do
+                person.send(method)
+                expect(person).to_not be_destroyed
+              end
+            end
+          end
+
+          context "when restricting a many to many" do
+
+            before do
+              Person.has_and_belongs_to_many :houses, dependent: :restrict_with_error
+            end
+
+            after do
+              Person.cascades.delete("houses")
+              Person.has_and_belongs_to_many :houses, validate: false
+            end
+
+            context "when the relation is empty" do
+
+              let(:person) do
+                Person.new houses: []
+              end
+
+              it "deletes the parent" do
+                person.send(method)
+                expect(person).to be_destroyed
+              end
+            end
+
+            context "when the relation is not empty" do
+
+              let(:person) do
+                Person.new houses: [House.new]
+              end
+
+              it "add the error message" do
+                person.send(method)
+                expect(person.errors[:base]).to include('Cannot delete record because dependent houses exist')
+              end
+
+              it "does not deletes the parent" do
+                person.send(method)
+                expect(person).to_not be_destroyed
+              end
+            end
+          end
+        end
       end
     end
   end

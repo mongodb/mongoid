@@ -1,8 +1,10 @@
 # encoding: utf-8
+require "mongoid/relations/cascading/base"
 require "mongoid/relations/cascading/delete"
 require "mongoid/relations/cascading/destroy"
 require "mongoid/relations/cascading/nullify"
 require "mongoid/relations/cascading/restrict"
+require "mongoid/relations/cascading/restrict_with_error"
 
 module Mongoid
   module Relations
