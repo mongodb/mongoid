@@ -168,7 +168,7 @@ describe Mongoid::Relations::Embedded::One do
             expect(name).to be_persisted
           end
 
-          context "when replacing an exising document" do
+          context "when replacing an existing document" do
 
             let(:pet_owner) do
               PetOwner.create
@@ -197,6 +197,41 @@ describe Mongoid::Relations::Embedded::One do
 
             it "saves the new name" do
               expect(pet_owner.pet.name).to eq("tiksy")
+            end
+          end
+
+          context 'when there are multiple embedded documents of the same class' do
+
+            let(:parent) do
+              ParentTestClass.new
+            end
+
+            let(:childA) do
+              ChildTestClass.new(value: "A")
+            end
+
+            let(:childB) do
+              ChildTestClass.new(value: "B")
+            end
+
+            let(:childC) do
+              ChildTestClass.new(value: "C")
+            end
+
+            before do
+              parent.child_test_one = childA
+              parent.child_test_two = childB
+              parent.save!
+              parent.child_test_one = childC
+              parent.save!
+            end
+
+            it 'sets the first embedded document correctly' do
+              expect(parent.reload.child_test_one).to be(childC)
+            end
+
+            it 'sets the second embedded document correctly' do
+              expect(parent.reload.child_test_two).to be(childB)
             end
           end
         end
