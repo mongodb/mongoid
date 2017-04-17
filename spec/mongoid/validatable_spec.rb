@@ -218,6 +218,46 @@ describe Mongoid::Validatable do
     end
   end
 
+  describe "#associated_validatable?" do
+    context "when associated is not validatable" do
+
+      let(:person) do
+        Person.new(username: "test")
+      end
+
+      let(:phone) do
+        Phone.new(number: "test")
+      end
+
+      before do
+        person.phones << phone
+      end
+
+      it "returns false" do
+        expect(phone.associated_validatable?).to eql false
+      end
+    end
+
+    context "when associated is validatable" do
+
+      let(:person) do
+        Person.new(username: "test")
+      end
+
+      let(:pet) do
+        Pet.new(name: "test")
+      end
+
+      before do
+        person.pet = pet
+      end
+
+      it "returns true" do
+        expect(pet.associated_validatable?).to eql true
+      end
+    end
+  end
+
   describe ".validates_associated" do
 
     let(:klass) do
