@@ -605,6 +605,11 @@ describe Mongoid::Relations::Referenced::ManyToMany do
             person.preferences = [ from_db ]
             expect(from_db.person_ids).to eq([ person.id ])
           end
+
+          it "persists the inverse keys" do
+            person.preferences = [ from_db ]
+            expect(from_db.reload.person_ids).to eq([ person.id ])
+          end
         end
       end
     end
