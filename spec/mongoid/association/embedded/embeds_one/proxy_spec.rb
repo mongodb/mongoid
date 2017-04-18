@@ -644,29 +644,6 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
     end
   end
 
-  describe ".builder" do
-
-    let(:base) do
-      Person.new
-    end
-
-    let(:target) do
-      Name.new
-    end
-
-    let(:association) do
-      Person.relations["name"]
-    end
-
-    let(:builder_klass) do
-      Mongoid::Association::Embedded::EmbedsOne::Builder
-    end
-
-    it "returns the embedded one builder" do
-      expect(described_class.builder(base, association, target)).to be_a(builder_klass)
-    end
-  end
-
   describe "#create_#\{name}" do
 
     context "when the parent is a new record" do

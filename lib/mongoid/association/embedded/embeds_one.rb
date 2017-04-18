@@ -1,6 +1,6 @@
-require 'mongoid/association/embedded/embeds_many/binding'
-require 'mongoid/association/embedded/embeds_many/builder'
-require 'mongoid/association/embedded/embeds_many/proxy'
+require 'mongoid/association/embedded/embeds_one/binding'
+require 'mongoid/association/embedded/embeds_one/buildable'
+require 'mongoid/association/embedded/embeds_one/proxy'
 
 module Mongoid
   module Association
@@ -11,6 +11,7 @@ module Mongoid
       # @since 7.0
       class EmbedsOne
         include Relatable
+        include Buildable
 
         # The options available for this type of association, in addition to the
         # common ones.
@@ -93,18 +94,6 @@ module Mongoid
         #
         # @return [ nil ] Not relevant for this relation
         def primary_key; end
-
-        # Get a builder object for creating a relationship of this type between two objects.
-        #
-        # @params [ Object ] The base.
-        # @params [ Object ] The object to relate.
-        #
-        # @return [ Association::Embedded::EmbedsOne::Builder ] The builder object.
-        #
-        # @since 7.0
-        def builder(base, object)
-          Builder.new(base, self, object)
-        end
 
         # Get the relation proxy class for this association type.
         #

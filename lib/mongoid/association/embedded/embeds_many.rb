@@ -1,6 +1,6 @@
-require 'mongoid/association/embedded/embeds_one/binding'
-require 'mongoid/association/embedded/embeds_one/builder'
-require 'mongoid/association/embedded/embeds_one/proxy'
+require 'mongoid/association/embedded/embeds_many/binding'
+require 'mongoid/association/embedded/embeds_many/builder'
+require 'mongoid/association/embedded/embeds_many/proxy'
 
 module Mongoid
   module Association

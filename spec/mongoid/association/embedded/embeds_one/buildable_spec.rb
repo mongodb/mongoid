@@ -1,29 +1,29 @@
 require "spec_helper"
 
-describe Mongoid::Association::Embedded::EmbedsOne::Builder do
+describe Mongoid::Association::Embedded::EmbedsOne::Buildable do
 
   let(:base) do
     double
   end
 
-  let(:builder) do
-    described_class.new(base, association, object)
+  let(:options) do
+    { }
   end
 
   describe "#build" do
 
+    let(:document) do
+      association.build(double, object)
+    end
+
+    let(:association) do
+      Mongoid::Association::Embedded::EmbedsOne.new(Person, :name, options)
+    end
+
     context "when provided nil" do
 
-      let(:association) do
-        double(klass: Name, name: :name)
-      end
-
-      let(:builder) do
-        described_class.new(nil, association, nil)
-      end
-
-      let(:document) do
-        builder.build
+      let(:object) do
+        nil
       end
 
       it "returns nil" do
@@ -33,16 +33,8 @@ describe Mongoid::Association::Embedded::EmbedsOne::Builder do
 
     context "when provided a document" do
 
-      let(:association) do
-        double(klass: Name, name: :name)
-      end
-
       let(:object) do
         Name.new
-      end
-
-      let(:document) do
-        builder.build
       end
 
       it "returns the document" do
@@ -52,16 +44,8 @@ describe Mongoid::Association::Embedded::EmbedsOne::Builder do
 
     context "when no type is in the object" do
 
-      let(:association) do
-        double(klass: Name, name: :name)
-      end
-
       let(:object) do
         { "first_name" => "Corbin" }
-      end
-
-      let(:document) do
-        builder.build
       end
 
       it "creates the correct type of document" do
@@ -76,15 +60,11 @@ describe Mongoid::Association::Embedded::EmbedsOne::Builder do
     context "when a type is in the object" do
 
       let(:association) do
-        double(klass: Writer, name: :writer)
+        Mongoid::Association::Embedded::EmbedsOne.new(Writer, :writer, options)
       end
 
       let(:object) do
         { "_type" => PdfWriter.name, "speed" => 100 }
-      end
-
-      let(:document) do
-        builder.build
       end
 
       it "creates the correct type of document" do
