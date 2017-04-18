@@ -201,13 +201,6 @@ describe Mongoid::Association::Embedded::EmbedsOne do
     end
   end
 
-  describe '#builder' do
-
-    it 'returns an instance of Mongoid::Association::Embedded::EmbedsOne::Builder' do
-      expect(association.builder(double, double)).to be_a(Mongoid::Association::Embedded::EmbedsOne::Builder)
-    end
-  end
-
   describe '#relation' do
 
     it 'returns Mongoid::Association::Embedded::EmbedsOne::Proxy' do
