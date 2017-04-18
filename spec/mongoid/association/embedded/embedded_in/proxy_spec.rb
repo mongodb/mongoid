@@ -354,29 +354,6 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
     end
   end
 
-  describe ".builder" do
-
-    let(:builder_class) do
-      Mongoid::Association::Embedded::EmbeddedIn::Builder
-    end
-
-    let(:base) do
-      Name.new
-    end
-
-    let(:target) do
-      Person.new
-    end
-
-    let(:association) do
-      Name.relations["namable"]
-    end
-
-    it "returns the embedded one builder" do
-      expect(described_class.builder(base, association, target)).to be_a(builder_class)
-    end
-  end
-
   describe ".embedded?" do
 
     it "returns true" do

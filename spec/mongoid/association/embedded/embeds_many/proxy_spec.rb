@@ -1116,35 +1116,6 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
-  describe ".builder" do
-
-    let(:base) do
-      Person.new
-    end
-
-    let(:target) do
-      [ address ]
-    end
-
-    let(:association) do
-      Person.relations["addresses"]
-    end
-
-    let(:relation) do
-      described_class.new(base, target, association)
-    end
-
-    let(:document) do
-      Address.new
-    end
-
-    it "returns the many builder" do
-      expect(
-          described_class.builder(base, association, document)
-      ).to be_a(Mongoid::Association::Embedded::EmbedsMany::Builder)
-    end
-  end
-
   describe "#clear" do
 
     context "when the parent has been persisted" do

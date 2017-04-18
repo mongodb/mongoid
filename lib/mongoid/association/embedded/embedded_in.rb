@@ -1,5 +1,5 @@
 require 'mongoid/association/embedded/embedded_in/binding'
-require 'mongoid/association/embedded/embedded_in/builder'
+require 'mongoid/association/embedded/embedded_in/buildable'
 require 'mongoid/association/embedded/embedded_in/proxy'
 
 module Mongoid
@@ -11,6 +11,7 @@ module Mongoid
       # @since 7.0
       class EmbeddedIn
         include Relatable
+        include Buildable
 
         # The options available for this type of association, in addition to the
         # common ones.
@@ -77,18 +78,6 @@ module Mongoid
         # @since 7.0
         def key
           @key ||= name.to_s
-        end
-
-        # Get a builder object for creating a relationship of this type between two objects.
-        #
-        # @params [ Object ] The base.
-        # @params [ Object ] The object to relate.
-        #
-        # @return [ Association::Embedded::EmbeddedIn::Builder ] The builder object.
-        #
-        # @since 7.0
-        def builder(base, object)
-          Builder.new(base, self, object)
         end
 
         # Get the relation proxy class for this association type.
