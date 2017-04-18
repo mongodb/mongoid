@@ -25,7 +25,7 @@ module Mongoid
           private
 
           def clear_associated(object)
-            if associated = object.send(inverse)
+            if object && (associated = object.send(inverse))
               associated.substitute(nil)
             end
           end
@@ -50,7 +50,6 @@ module Mongoid
           # @since 7.0
           def with_polymorphic_criterion(criteria, base)
             if polymorphic?
-              binding.pry
               criteria.where(type => base.class.name)
             else
               criteria

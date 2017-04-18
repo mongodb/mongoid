@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::HasOne::Builder do
+describe Mongoid::Association::Referenced::HasOne::Buildable do
 
   let(:base) do
     double(new_record?: false)
@@ -13,13 +13,13 @@ describe Mongoid::Association::Referenced::HasOne::Builder do
     end
 
     let(:association) do
-      Mongoid::Association::Referenced::HasOne.new(Person, :post)
+      Mongoid::Association::Referenced::HasOne.new(Person, :account)
     end
 
     context "when provided an id" do
 
-      let!(:post) do
-        Post.create(person_id: object)
+      let!(:account) do
+        Account.create!(person_id: object, name: 'banking')
       end
 
       let(:object) do
@@ -27,22 +27,45 @@ describe Mongoid::Association::Referenced::HasOne::Builder do
       end
 
       before do
-        expect(Post).to receive(:where).with(association.foreign_key => object).and_call_original
+        expect(Account).to receive(:where).with(association.foreign_key => object).and_call_original
       end
 
       it "sets the document" do
-        expect(document).to eq(post)
+        expect(document).to eq(account)
       end
     end
 
     context "when provided a object" do
 
       let(:object) do
-        Post.new
+        Account.new
       end
 
       it "returns the object" do
         expect(document).to eq(object)
+      end
+
+      context 'when the object is already related to another object' do
+
+        let(:original_person) do
+          Person.new
+        end
+
+        let(:object) do
+          Account.new(person: original_person)
+        end
+
+        let!(:document) do
+          association.build(Person.new, object)
+        end
+
+        it 'clears the object of its previous relation' do
+          expect(original_person.account).to be_nil
+        end
+
+        it 'returns the object' do
+          expect(document).to eq(object)
+        end
       end
     end
 
