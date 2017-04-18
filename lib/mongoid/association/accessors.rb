@@ -40,11 +40,7 @@ module Mongoid
       # @since 2.0.0.rc.1
       def create_relation(object, association)
         type = @attributes[association.inverse_type]
-        if association.respond_to?(:build)
-          target = association.build(self, object, type)
-        else
-          target = association.builder(self, object).build(type)
-        end
+        target = association.build(self, object, type)
         target ? association.create_relation(self, target) : nil
       end
 
