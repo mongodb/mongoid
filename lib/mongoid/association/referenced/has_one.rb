@@ -81,17 +81,17 @@ module Mongoid
         # @since 7.0
         def validation_default; true; end
 
-        # Get a builder object for creating a relationship of this type between two objects.
-        #
-        # @params [ Object ] The base.
-        # @params [ Object ] The object to relate.
-        #
-        # @return [ Association::HasOne::Builder ] The builder object.
-        #
-        # @since 7.0
-        def builder(base, object)
-          Builder.new(base, self, object)
-        end
+        # # Get a builder object for creating a relationship of this type between two objects.
+        # #
+        # # @params [ Object ] The base.
+        # # @params [ Object ] The object to relate.
+        # #
+        # # @return [ Association::HasOne::Builder ] The builder object.
+        # #
+        # # @since 7.0
+        # def builder(base, object)
+        #   Builder.new(base, self, object)
+        # end
 
         # Get the relation proxy class for this association type.
         #

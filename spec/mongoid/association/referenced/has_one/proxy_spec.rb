@@ -859,27 +859,6 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     end
   end
 
-  describe ".builder" do
-
-    let(:builder_klass) do
-      Mongoid::Association::Referenced::HasOne::Builder
-    end
-
-    let(:document) do
-      double
-    end
-
-    let(:association) do
-      double(extension?: false)
-    end
-
-    it "returns the embedded in builder" do
-      expect(
-          described_class.builder(nil, association, document)
-      ).to be_a(builder_klass)
-    end
-  end
-
   describe "#create_#\{name}" do
 
     context "when the relationship is an illegal embedded reference" do
@@ -992,48 +971,6 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
 
       it "saves the document" do
         expect(rating).to be_persisted
-      end
-    end
-  end
-
-  describe ".criteria" do
-
-    let(:id) do
-      BSON::ObjectId.new
-    end
-
-    context "when the relation is polymorphic" do
-
-      let(:association) do
-        Book.relations["rating"]
-      end
-
-      let(:criteria) do
-        described_class.criteria(association, id, Book)
-      end
-
-      it "includes the type in the criteria" do
-        expect(criteria.selector).to eq(
-                                         {
-                                             "ratable_id"    => id,
-                                             "ratable_type"  => "Book"
-                                         }
-                                     )
-      end
-    end
-
-    context "when the relation is not polymorphic" do
-
-      let(:association) do
-        Person.relations["game"]
-      end
-
-      let(:criteria) do
-        described_class.criteria(association, id, Person)
-      end
-
-      it "does not include the type in the criteria" do
-        expect(criteria.selector).to eq({ "person_id" => id })
       end
     end
   end

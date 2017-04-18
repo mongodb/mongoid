@@ -431,13 +431,6 @@ describe Mongoid::Association::Referenced::HasOne do
     end
   end
 
-  describe '#builder' do
-
-    it 'returns an instance of Mongoid::Association::Referenced::HasOne::Builder' do
-      expect(association.builder(double, double)).to be_a(Mongoid::Association::Referenced::HasOne::Builder)
-    end
-  end
-
   describe '#relation' do
 
     it 'returns Mongoid::Association::Referenced::HasOne::Proxy' do
@@ -1126,13 +1119,6 @@ describe Mongoid::Association::Referenced::HasOne do
 
     it 'returns the foreign key followed by "="' do
       expect(association.foreign_key_setter).to eq("#{association.foreign_key}=")
-    end
-  end
-
-  describe '#criteria' do
-
-    it 'returns a criteria object' do
-      expect(association.criteria(BSON::ObjectId.new, OwnerObject)).to be_a(Mongoid::Criteria)
     end
   end
 

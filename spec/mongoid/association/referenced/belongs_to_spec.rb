@@ -972,13 +972,6 @@ describe Mongoid::Association::Referenced::BelongsTo do
     end
   end
 
-  describe '#builder' do
-
-    it 'returns an instance of Mongoid::Association::Referenced::BelongsTo::Builder' do
-      expect(association.builder(double, double)).to be_a(Mongoid::Association::Referenced::BelongsTo::Builder)
-    end
-  end
-
   describe '#relation' do
 
     it 'returns Mongoid::Association::Referenced::BelongsTo::Proxy' do
