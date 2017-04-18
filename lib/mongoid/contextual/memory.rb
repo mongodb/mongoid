@@ -44,7 +44,7 @@ module Mongoid
         deleted = count
         removed = map do |doc|
           prepare_remove(doc)
-          doc.as_document
+          doc.send(:as_attributes)
         end
         unless removed.empty?
           collection.find(selector).update_one(

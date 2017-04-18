@@ -569,7 +569,7 @@ module Mongoid
           if doc.new_record? && doc.valid?(:create)
             doc.run_before_callbacks(:save, :create)
             docs.push(doc)
-            inserts.push(doc.as_document)
+            inserts.push(doc.send(:as_attributes))
           else
             doc.save
           end

@@ -222,7 +222,7 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_pushes
-      pushable? ? { atomic_position => as_document } : {}
+      pushable? ? { atomic_position => as_attributes } : {}
     end
 
     # Get all the attributes that need to be set.
@@ -234,7 +234,7 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_sets
-      updateable? ? setters : settable? ? { atomic_path => as_document } : {}
+      updateable? ? setters : settable? ? { atomic_path => as_attributes } : {}
     end
 
     # Get all the attributes that need to be unset.
