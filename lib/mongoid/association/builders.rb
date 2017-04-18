@@ -1,5 +1,4 @@
 # encoding: utf-8
-require 'mongoid/association/buildable'
 
 module Mongoid
   module Association
