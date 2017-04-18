@@ -135,10 +135,17 @@ RSpec.configure do |config|
       client.database.users.create(MONGOID_ROOT_USER)
     rescue Exception => e
     end
+    Mongoid.purge!
   end
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
+    Mongoid.default_client.collections.each do |coll|
+      coll.delete_many
+    end
+  end
+
+  config.after(:suite) do
     Mongoid.purge!
   end
 end
