@@ -1,29 +1,29 @@
 require "spec_helper"
 
-describe Mongoid::Association::Embedded::EmbeddedIn::Builder do
+describe Mongoid::Association::Embedded::EmbeddedIn::Buildable do
 
   describe "#build" do
-
-    let(:object) do
-      double
-    end
 
     let(:base) do
       double
     end
 
+    let(:options) do
+      { }
+    end
+
     let(:association) do
-      double(klass: Person, name: :person)
+      Mongoid::Association::Embedded::EmbeddedIn.new(Person, :addresses, options)
     end
 
     context "when a document is provided" do
 
-      let(:builder) do
-        described_class.new(base, association, object)
+      let(:object) do
+        double
       end
 
       let(:document) do
-        builder.build
+        association.build(base, object)
       end
 
       it "returns the document" do

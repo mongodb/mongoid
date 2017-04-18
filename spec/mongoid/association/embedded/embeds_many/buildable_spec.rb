@@ -1,29 +1,29 @@
 require "spec_helper"
 
-describe Mongoid::Association::Embedded::EmbedsMany::Builder do
+describe Mongoid::Association::Embedded::EmbedsMany::Buildable do
 
   let(:base) do
     double
   end
 
-  let(:builder) do
-    described_class.new(base, association, object)
+  let(:options) do
+    { }
   end
 
   describe "#build" do
 
-    context "when passed an array of documents" do
+    let(:documents) do
+      association.build(base, object)
+    end
 
-      let(:association) do
-        double(klass: Address, name: :addresses)
-      end
+    let(:association) do
+      Mongoid::Association::Embedded::EmbedsMany.new(Person, :addresses, options)
+    end
+
+    context "when passed an array of documents" do
 
       let(:object) do
         [ Address.new(city: "London") ]
-      end
-
-      let(:documents) do
-        builder.build
       end
 
       it "returns an array of documents" do
@@ -33,16 +33,8 @@ describe Mongoid::Association::Embedded::EmbedsMany::Builder do
 
     context "when the array is empty" do
 
-      let(:association) do
-        double(klass: Address, name: :addresses)
-      end
-
       let(:object) do
         []
-      end
-
-      let(:documents) do
-        builder.build
       end
 
       it "returns an empty array" do
@@ -52,16 +44,8 @@ describe Mongoid::Association::Embedded::EmbedsMany::Builder do
 
     context "when passed nil" do
 
-      let(:association) do
-        double(klass: Address, name: :addresses)
-      end
-
-      let(:builder) do
-        described_class.new(nil, association, nil)
-      end
-
-      let(:documents) do
-        builder.build
+      let(:object) do
+        nil
       end
 
       it "returns an empty array" do
@@ -71,16 +55,8 @@ describe Mongoid::Association::Embedded::EmbedsMany::Builder do
 
     context "when no type is in the object" do
 
-      let(:association) do
-        double(klass: Address, name: :addresses)
-      end
-
       let(:object) do
         [ { "city" => "London" }, { "city" => "Shanghai" } ]
-      end
-
-      let(:documents) do
-        builder.build
       end
 
       it "returns an array of documents" do
@@ -100,7 +76,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Builder do
     context "when a type is in the object" do
 
       let(:association) do
-        double(klass: Shape, name: :shapes)
+        Mongoid::Association::Embedded::EmbedsMany.new(Person, :shapes)
       end
 
       let(:object) do
@@ -108,10 +84,6 @@ describe Mongoid::Association::Embedded::EmbedsMany::Builder do
             { "_type" => "Circle", "radius" => 100 },
             { "_type" => "Square", "width" => 50 }
         ]
-      end
-
-      let(:documents) do
-        builder.build
       end
 
       it "returns an array of documents" do

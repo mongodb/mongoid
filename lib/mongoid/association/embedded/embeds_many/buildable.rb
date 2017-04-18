@@ -6,8 +6,8 @@ module Mongoid
         # Builder class for embeds_many associations.
         #
         # @since 7.0
-        class Builder
-          include Buildable
+        module Buildable
+          include Threaded::Lifecycle
 
           # Builds the document out of the attributes using the provided
           # association metadata. Instantiates through the factory in order
@@ -20,7 +20,7 @@ module Mongoid
           # @param [ String ] type Not used in this context.
           #
           # @return [ Array<Document ] The documents.
-          def build(type = nil)
+          def build(base, object, type = nil)
             return [] if object.blank?
             return object if object.first.is_a?(Document)
             docs = []

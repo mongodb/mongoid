@@ -13,7 +13,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Buildable do
   describe "#build" do
 
     let(:document) do
-      association.build(double, object)
+      association.build(base, object)
     end
 
     let(:association) do
@@ -60,7 +60,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Buildable do
     context "when a type is in the object" do
 
       let(:association) do
-        Mongoid::Association::Embedded::EmbedsOne.new(Writer, :writer, options)
+        Mongoid::Association::Embedded::EmbedsOne.new(Person, :writer, options)
       end
 
       let(:object) do

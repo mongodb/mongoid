@@ -96,13 +96,6 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
     end
   end
 
-  describe '#builder' do
-
-    it 'returns an instance of Mongoid::Association::Embedded::EmbeddedIn::Builder' do
-      expect(association.builder(double, double)).to be_a(Mongoid::Association::Embedded::EmbeddedIn::Builder)
-    end
-  end
-
   describe '#relation' do
 
     it 'returns Mongoid::Association::Embedded::EmbeddedIn::Proxy' do
