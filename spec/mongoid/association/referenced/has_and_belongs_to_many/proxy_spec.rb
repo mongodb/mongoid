@@ -1046,27 +1046,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
   end
 
-  describe ".builder" do
-
-    let(:builder_klass) do
-      Mongoid::Association::Referenced::HasAndBelongsToMany::Builder
-    end
-
-    let(:document) do
-      double
-    end
-
-    let(:association) do
-      double(extension?: false)
-    end
-
-    it "returns the embedded in builder" do
-      expect(
-          described_class.builder(nil, association, document)
-      ).to be_a(builder_klass)
-    end
-  end
-
   describe "#clear" do
 
     context "when the relation is not polymorphic" do

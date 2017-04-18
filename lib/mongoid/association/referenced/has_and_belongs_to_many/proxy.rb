@@ -276,24 +276,6 @@ module Mongoid
 
           class << self
 
-            # Return the builder that is responsible for generating the documents
-            # that will be used by this relation.
-            #
-            # @example Get the builder.
-            #   Referenced::ManyToMany.builder(meta, object)
-            #
-            # @param [ Document ] base The base document.
-            # @param [ Association ] association The association metadata.
-            # @param [ Document, Hash ] object A document or attributes to build
-            #   with.
-            #
-            # @return [ Builder ] A new builder object.
-            #
-            # @since 2.0.0.rc.1
-            def builder(base, meta, object)
-              Builder.new(base, meta, object)
-            end
-
             # Create the standard criteria for this relation given the supplied
             # association metadata and object.
             #

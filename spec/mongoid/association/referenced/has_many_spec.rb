@@ -424,13 +424,6 @@ describe Mongoid::Association::Referenced::HasMany do
     end
   end
 
-  describe '#builder' do
-
-    it 'returns an instance of Mongoid::Association::Referenced::HasMany::Builder' do
-      expect(association.builder(double, double)).to be_a(Mongoid::Association::Referenced::HasMany::Builder)
-    end
-  end
-
   describe '#relation' do
 
     it 'returns Mongoid::Association::Referenced::HasMany::Proxy' do

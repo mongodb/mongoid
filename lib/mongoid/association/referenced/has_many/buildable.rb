@@ -16,7 +16,7 @@ module Mongoid
           #
           # @return [ Document ] A single document.
           def build(base, object, type = nil)
-            return object unless query?(object)
+            return (object || []) unless query?(object)
             return [] if object.is_a?(Array)
             query_criteria(object, base)
           end
