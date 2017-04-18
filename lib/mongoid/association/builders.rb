@@ -1,6 +1,5 @@
 # encoding: utf-8
 require 'mongoid/association/buildable'
-#require "mongoid/association/nested_builder"
 
 module Mongoid
   module Association
