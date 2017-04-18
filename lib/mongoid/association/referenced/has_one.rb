@@ -1,5 +1,4 @@
 require 'mongoid/association/referenced/has_one/binding'
-require 'mongoid/association/referenced/has_one/builder'
 require 'mongoid/association/referenced/has_one/buildable'
 require 'mongoid/association/referenced/has_one/proxy'
 require 'mongoid/association/referenced/has_one/eager'

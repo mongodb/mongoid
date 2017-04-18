@@ -9,7 +9,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
   describe "#build" do
 
     let(:documents) do
-      association.build(double, object)
+      association.build(base, object)
     end
 
     let(:options) do
@@ -35,7 +35,7 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
       end
     end
 
-    context "when order specified" do
+    context "when order is specified" do
 
       let(:options) do
         {
@@ -52,6 +52,31 @@ describe Mongoid::Association::Referenced::HasMany::Buildable do
       end
 
       it "adds the ordering to the criteria" do
+        expect(documents).to eq(criteria)
+      end
+    end
+
+    context "when the relation is polymorphic" do
+
+      let(:options) do
+        {
+          as: :ratable
+        }
+      end
+
+      let(:object) do
+        BSON::ObjectId.new
+      end
+
+      let(:base) do
+        Rating.new
+      end
+
+      let(:criteria) do
+        Post.where(association.foreign_key => object, 'ratable_type' => 'Rating')
+      end
+
+      it "adds the type to the criteria" do
         expect(documents).to eq(criteria)
       end
     end
