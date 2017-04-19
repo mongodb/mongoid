@@ -138,7 +138,7 @@ module Mongoid
             end
             unless __association.forced_nil_inverse?
               if replacement
-                criteria(base.send(foreign_key) - replacement.collect(&:_id)).pull(inverse_foreign_key => base._id)
+                criteria(base.send(foreign_key) - replacement.collect(&:id)).pull(inverse_foreign_key => base._id)
               else
                 criteria(base.send(foreign_key)).pull(inverse_foreign_key => base._id)
               end
