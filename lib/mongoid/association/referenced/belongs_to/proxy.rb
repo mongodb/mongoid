@@ -53,10 +53,11 @@ module Mongoid
           # @since 2.0.0.rc.1
           def substitute(replacement)
             unbind_one
-            return nil unless replacement
-            self.target = normalize(replacement)
-            bind_one
-            self
+            if replacement
+              self.target = normalize(replacement)
+              bind_one
+              self
+            end
           end
 
           private
@@ -90,7 +91,6 @@ module Mongoid
           def normalize(replacement)
             return replacement if replacement.is_a?(Document)
             __association.build(klass, replacement)
-            #__association.builder(klass, replacement).build
           end
 
           # Are we able to persist this relation?
@@ -106,22 +106,6 @@ module Mongoid
           end
 
           class << self
-
-            # Get the standard criteria used for querying this relation.
-            #
-            # @example Get the criteria.
-            #   Proxy.criteria(meta, id, Model)
-            #
-            # @param [ Association ] association The association metadata.
-            # @param [ Object ] object The value of the foreign key.
-            # @param [ Class ] type The optional type.
-            #
-            # @return [ Criteria ] The criteria.
-            #
-            # @since 2.1.0
-            def criteria(association, object, type = nil)
-              type.where(association.primary_key => object)
-            end
 
             # Get the Eager object for this type of association.
             #
@@ -146,44 +130,6 @@ module Mongoid
             # @since 2.0.0.rc.1
             def embedded?
               false
-            end
-
-            # Get the foreign key for the provided name.
-            #
-            # @example Get the foreign key.
-            #   Association::BelongsTo::Proxy.foreign_key(:person)
-            #
-            # @param [ Symbol ] name The name.
-            #
-            # @return [ String ] The foreign key.
-            #
-            # @since 3.0.0
-            def foreign_key(name)
-              "#{name}#{foreign_key_suffix}"
-            end
-
-            # Get the default value for the foreign key.
-            #
-            # @example Get the default.
-            #   Association::BelongsTo::Proxy.foreign_key_default
-            #
-            # @return [ nil ] Always nil.
-            #
-            # @since 2.0.0.rc.1
-            def foreign_key_default
-              nil
-            end
-
-            # Returns the suffix of the foreign key field, either "_id" or "_ids".
-            #
-            # @example Get the suffix for the foreign key.
-            #   Association::BelongsTo::Proxy.foreign_key_suffix
-            #
-            # @return [ String ] "_id"
-            #
-            # @since 2.0.0.rc.1
-            def foreign_key_suffix
-              "_id"
             end
           end
         end

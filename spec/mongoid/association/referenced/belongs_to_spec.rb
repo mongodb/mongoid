@@ -1842,13 +1842,6 @@ describe Mongoid::Association::Referenced::BelongsTo do
     end
   end
 
-  describe '#criteria' do
-
-    it 'returns a criteria object' do
-      expect(association.criteria(BSON::ObjectId.new, OwnerObject)).to be_a(Mongoid::Criteria)
-    end
-  end
-
   describe '#destructive?' do
 
     context 'when the dependent option is provided' do
