@@ -49,6 +49,13 @@ module Mongoid
         # @since 7.0
         FOREIGN_KEY_FIELD_TYPE = Object
 
+        # The default foriegn key suffic.
+        #
+        # @return [ String ] '_id'
+        #
+        # @since 7.0
+        FOREIGN_KEY_SUFFIX = '_id'.freeze
+
         # The list of association complements.
         #
         # @return [ Array<Association> ] The association complements.
@@ -96,7 +103,7 @@ module Mongoid
         #
         # @since 7.0
         def foreign_key
-          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s : relation.foreign_key(name)
+          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s : default_foreign_key_field
         end
 
         # Get the relation proxy class for this association type.
@@ -106,15 +113,6 @@ module Mongoid
         # @since 7.0
         def relation
           Proxy
-        end
-
-        # The criteria used for querying this relation.
-        #
-        # @return [ Mongoid::Criteria ] The criteria used for querying this relation.
-        #
-        # @since 7.0
-        def criteria(object, type)
-          relation.criteria(self, object, type)
         end
 
         # Is this association polymorphic?
@@ -190,6 +188,10 @@ module Mongoid
 
         def default_primary_key
           PRIMARY_KEY_DEFAULT
+        end
+
+        def default_foreign_key_field
+          @default_foreign_key_field ||= "#{name}#{FOREIGN_KEY_SUFFIX}"
         end
 
         def polymorph!
