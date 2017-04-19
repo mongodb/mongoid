@@ -49,7 +49,7 @@ module Mongoid
         # @since 7.0
         FOREIGN_KEY_FIELD_TYPE = Object
 
-        # The default foriegn key suffic.
+        # The default foreign key suffix.
         #
         # @return [ String ] '_id'
         #
@@ -103,7 +103,8 @@ module Mongoid
         #
         # @since 7.0
         def foreign_key
-          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s : default_foreign_key_field
+          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
+                             default_foreign_key_field
         end
 
         # Get the relation proxy class for this association type.
