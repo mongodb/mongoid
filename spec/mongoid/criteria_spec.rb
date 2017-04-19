@@ -3770,4 +3770,53 @@ describe Mongoid::Criteria do
       end
     end
   end
+
+  describe "#nested eager loading" do
+    before do
+      class User 
+        include Mongoid::Document
+
+        field :name
+      end
+
+      class Unit
+        include Mongoid::Document
+
+        field :number
+      end
+
+      class Booking
+        include Mongoid::Document
+
+        field :number
+
+        belongs_to :unit
+        has_many :vouchers
+      end
+
+      class Voucher
+        include Mongoid::Document
+
+        field :number
+
+        belongs_to :booking
+        belongs_to :created_by, class_name: 'User'
+      end
+    end
+
+    it 'should load all nested models' do
+      user = User.create(name: 'John')
+      unit = Unit.create(number: 1)
+      booking = Booking.create(number: 1, unit: unit)
+      voucher = Voucher.create(number: 123, booking: booking, created_by: user)
+
+      vouchers = Voucher.includes(:created_by, booking: [:unit])
+
+      vouchers.each do |voucher|
+        expect(voucher.created_by).to eql(user)
+        expect(voucher.booking).to eql(booking)
+        expect(voucher.booking.unit).to eql(unit)
+      end
+    end
+  end
 end
