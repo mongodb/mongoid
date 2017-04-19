@@ -43,7 +43,7 @@ module Mongoid
     include Inspectable
     include Matchable
     include Persistable
-    include Relations
+    include Association
     include Reloadable
     include Scopable
     include Selectable
@@ -70,7 +70,7 @@ module Mongoid
       Interceptable,
       Matchable,
       Persistable,
-      Relations,
+      Association,
       Reloadable,
       Scopable,
       Serializable,
@@ -82,7 +82,7 @@ module Mongoid
       Traversable,
       Validatable,
       Equality,
-      Relations::Synchronization,
+      Association::Referenced::Syncable,
       ActiveModel::Model,
       ActiveModel::Validations,
       PersistenceContext

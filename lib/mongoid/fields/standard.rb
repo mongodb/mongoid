@@ -26,17 +26,17 @@ module Mongoid
         mods[key] = new
       end
 
-      # Get the constraint from the metadata once.
-      #
-      # @example Get the constraint.
-      #   field.constraint
-      #
-      # @return [ Constraint ] The relation's contraint.
-      #
-      # @since 2.1.0
-      def constraint
-        @constraint ||= metadata.constraint
-      end
+      # # Get the constraint from the metadata once.
+      # #
+      # # @example Get the constraint.
+      # #   field.constraint
+      # #
+      # # @return [ Constraint ] The relation's contraint.
+      # #
+      # # @since 2.1.0
+      # def constraint
+      #   @constraint ||= metadata.constraint
+      # end
 
       # Evaluate the default value and return it. Will handle the
       # serialization, proc calls, and duplication if necessary.
@@ -127,8 +127,8 @@ module Mongoid
       # @return [ Metadata ] The relation metadata.
       #
       # @since 2.2.0
-      def metadata
-        @metadata ||= options[:metadata]
+      def association
+        @association ||= options[:association]
       end
 
       # Is the field a BSON::ObjectId?

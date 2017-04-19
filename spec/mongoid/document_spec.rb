@@ -87,11 +87,11 @@ describe Mongoid::Document do
     context "when the document is not subclassed" do
 
       let(:types) do
-        Address._types
+        Kangaroo._types
       end
 
       it "returns the document" do
-        expect(types).to eq([ "Address" ])
+        expect(types).to eq([ "Kangaroo" ])
       end
     end
 

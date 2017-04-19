@@ -70,23 +70,23 @@ module Mongoid
       # @raise [ Errors::InvalidIncludes ] If no relation is found.
       #
       # @since 5.1.0
-      def add_inclusion(_klass, metadata)
-        inclusions.push(metadata) unless inclusions.include?(metadata)
+      def add_inclusion(_klass, association)
+        inclusions.push(association) unless inclusions.include?(association)
       end
 
       def extract_includes_list(_parent_class, *relations_list)
         relations_list.flatten.each do |relation_object|
           if relation_object.is_a?(Hash)
             relation_object.each do |relation, _includes|
-              metadata = _parent_class.reflect_on_association(relation)
-              raise Errors::InvalidIncludes.new(_klass, [ relation ]) unless metadata
-              add_inclusion(_parent_class, metadata)
-              extract_includes_list(metadata.klass, _includes)
+              association = _parent_class.reflect_on_association(relation)
+              raise Errors::InvalidIncludes.new(_klass, [ relation ]) unless association
+              add_inclusion(_parent_class, association)
+              extract_includes_list(association.klass, _includes)
             end
           else
-            metadata = _parent_class.reflect_on_association(relation_object)
-            raise Errors::InvalidIncludes.new(_parent_class, [ relation_object ]) unless metadata
-            add_inclusion(_parent_class, metadata)
+            association = _parent_class.reflect_on_association(relation_object)
+            raise Errors::InvalidIncludes.new(_parent_class, [ relation_object ]) unless association
+            add_inclusion(_parent_class, association)
           end
         end
       end

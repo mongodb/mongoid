@@ -204,12 +204,8 @@ describe Mongoid::Extensions::Array do
 
     context "when the related model uses object ids" do
 
-      let(:metadata) do
+      let(:association) do
         Person.relations["preferences"]
-      end
-
-      let(:constraint) do
-        metadata.constraint
       end
 
       context "when provided an object id" do
@@ -219,7 +215,7 @@ describe Mongoid::Extensions::Array do
         end
 
         let(:fk) do
-          Array.__mongoize_fk__(constraint, object_id)
+          Array.__mongoize_fk__(association, object_id)
         end
 
         it "returns the object id as an array" do
@@ -234,7 +230,7 @@ describe Mongoid::Extensions::Array do
         end
 
         let(:fk) do
-          Array.__mongoize_fk__(constraint, [ object_id ])
+          Array.__mongoize_fk__(association, [ object_id ])
         end
 
         it "returns the object ids" do
@@ -251,7 +247,7 @@ describe Mongoid::Extensions::Array do
           end
 
           let(:fk) do
-            Array.__mongoize_fk__(constraint, object_id.to_s)
+            Array.__mongoize_fk__(association, object_id.to_s)
           end
 
           it "returns the object id in an array" do
@@ -266,7 +262,7 @@ describe Mongoid::Extensions::Array do
           end
 
           let(:fk) do
-            Array.__mongoize_fk__(constraint, string)
+            Array.__mongoize_fk__(association, string)
           end
 
           it "returns the string in an array" do
@@ -277,7 +273,7 @@ describe Mongoid::Extensions::Array do
         context "when the string is blank" do
 
           let(:fk) do
-            Array.__mongoize_fk__(constraint, "")
+            Array.__mongoize_fk__(association, "")
           end
 
           it "returns an empty array" do
@@ -289,7 +285,7 @@ describe Mongoid::Extensions::Array do
       context "when provided nil" do
 
         let(:fk) do
-          Array.__mongoize_fk__(constraint, nil)
+          Array.__mongoize_fk__(association, nil)
         end
 
         it "returns an empty array" do
@@ -306,7 +302,7 @@ describe Mongoid::Extensions::Array do
           end
 
           let(:fk) do
-            Array.__mongoize_fk__(constraint, [ object_id.to_s ])
+            Array.__mongoize_fk__(association, [ object_id.to_s ])
           end
 
           it "returns the object id in an array" do
@@ -321,7 +317,7 @@ describe Mongoid::Extensions::Array do
           end
 
           let(:fk) do
-            Array.__mongoize_fk__(constraint, [ string ])
+            Array.__mongoize_fk__(association, [ string ])
           end
 
           it "returns the string in an array" do
@@ -332,7 +328,7 @@ describe Mongoid::Extensions::Array do
         context "when the strings are blank" do
 
           let(:fk) do
-            Array.__mongoize_fk__(constraint, [ "", "" ])
+            Array.__mongoize_fk__(association, [ "", "" ])
           end
 
           it "returns an empty array" do
@@ -344,7 +340,7 @@ describe Mongoid::Extensions::Array do
       context "when provided nils" do
 
         let(:fk) do
-          Array.__mongoize_fk__(constraint, [ nil, nil, nil ])
+          Array.__mongoize_fk__(association, [ nil, nil, nil ])
         end
 
         it "returns an empty array" do

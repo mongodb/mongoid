@@ -63,8 +63,8 @@ module Mongoid
       # @since 3.0.0
       def evolve(object)
         if object_id_field? || object.is_a?(Document)
-          if metadata.polymorphic? && constraint
-            constraint.convert(object)
+          if association.polymorphic?
+            association.convert_to_foreign_key(object)
           else
             object.__evolve_object_id__
           end
@@ -97,7 +97,7 @@ module Mongoid
       # @since 3.0.0
       def mongoize(object)
         if type.resizable? || object_id_field?
-          type.__mongoize_fk__(constraint, object)
+          type.__mongoize_fk__(association, object)
         else
           related_id_field.mongoize(object)
         end
@@ -113,7 +113,7 @@ module Mongoid
       # @since 2.2.0
       def object_id_field?
         @object_id_field ||=
-          metadata.polymorphic? ? true : metadata.klass.using_object_ids?
+            association.polymorphic? ? true : association.klass.using_object_ids?
       end
 
       # Returns true if an array, false if not.
@@ -156,7 +156,7 @@ module Mongoid
       #
       # @since 3.0.0
       def related_id_field
-        @related_id_field ||= metadata.klass.fields["_id"]
+        @related_id_field ||= association.klass.fields["_id"]
       end
 
       # This is used when default values need to be serialized. Most of the

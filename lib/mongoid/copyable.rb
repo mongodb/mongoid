@@ -73,15 +73,15 @@ module Mongoid
           attrs["#{name}_translations"] = value
         end
       end
-      klass.embedded_relations.each do |_, metadata|
-        next unless attrs.present? && attrs[metadata.key].present?
+      klass.embedded_relations.each do |_, association|
+        next unless attrs.present? && attrs[association.key].present?
 
-        if metadata.macro == :embeds_many
-          attrs[metadata.key].each do |attr|
-            process_localized_attributes(metadata.klass, attr)
+        if association.is_a?(Association::Embedded::EmbedsMany)
+          attrs[association.key].each do |attr|
+            process_localized_attributes(association.klass, attr)
           end
         else
-          process_localized_attributes(metadata.klass, attrs[metadata.key])
+          process_localized_attributes(association.klass, attrs[association.key])
         end
       end
     end

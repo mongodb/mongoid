@@ -553,12 +553,12 @@ describe Mongoid::Contextual::Mongo do
 
     context "when no documents are returned" do
 
-      let(:game_metadata) do
+      let(:game_association) do
         Person.reflect_on_association(:game)
       end
 
       it "does not make any additional database queries" do
-        expect(game_metadata).to receive(:eager_load).never
+        expect(game_association).to receive(:eager_load).never
         context.send(:eager_load, [])
       end
     end

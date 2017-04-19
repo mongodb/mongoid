@@ -1,13 +1,13 @@
 # encoding: utf-8
 require "mongoid/contextual/aggregable/memory"
-require "mongoid/relations/eager"
+require "mongoid/association/eager_loadable"
 
 module Mongoid
   module Contextual
     class Memory
       include Enumerable
       include Aggregable::Memory
-      include Relations::Eager
+      include Association::EagerLoadable
       include Queryable
       include Positional
 
