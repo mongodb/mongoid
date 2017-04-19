@@ -132,12 +132,16 @@ module Mongoid
           #   person.preferences.nullify
           #
           # @since 2.0.0.rc.1
-          def nullify
+          def nullify(replacement = [])
             target.each do |doc|
               execute_callback :before_remove, doc
             end
             unless __association.forced_nil_inverse?
-              criteria.pull(inverse_foreign_key => base._id)
+              if replacement
+                criteria(base.send(foreign_key) - replacement.collect(&:_id)).pull(inverse_foreign_key => base._id)
+              else
+                criteria(base.send(foreign_key)).pull(inverse_foreign_key => base._id)
+              end
             end
             if persistable?
               base.set(foreign_key => base.send(foreign_key).clear)
@@ -175,7 +179,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def substitute(replacement)
-            purge
+            purge(replacement)
             unless replacement.blank?
               push(replacement.compact.uniq)
             else
@@ -252,8 +256,8 @@ module Mongoid
           #   relation.criteria
           #
           # @return [ Criteria ] A new criteria.
-          def criteria
-            Proxy.criteria(__association, base.send(foreign_key))
+          def criteria(id_list = nil)
+            Proxy.criteria(__association, id_list || base.send(foreign_key) || [])
           end
 
           # Flag the base as unsynced with respect to the foreign key.
