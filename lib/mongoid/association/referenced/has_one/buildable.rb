@@ -39,15 +39,6 @@ module Mongoid
             query_criteria(object, base).limit(-1).first(id_sort: :none)
           end
 
-          # Add polymorphic query criteria to a Criteria object, if this association is
-          #  polymorphic.
-          #
-          # @params [ Mongoid::Criteria ] criteria The criteria object to add to.
-          # @params [ Class ] object_class The object class.
-          #
-          # @return [ Mongoid::Criteria ] The criteria object.
-          #
-          # @since 7.0
           def with_polymorphic_criterion(criteria, base)
             if polymorphic?
               criteria.where(type => base.class.name)

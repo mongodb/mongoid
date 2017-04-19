@@ -982,13 +982,6 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
     end
   end
 
-  describe ".foreign_key_suffix" do
-
-    it "returns _id" do
-      expect(described_class.foreign_key_suffix).to eq("_id")
-    end
-  end
-
   describe "#nullify" do
 
     let(:person) do

@@ -37,6 +37,13 @@ module Mongoid
         # @since 7.0
         VALID_OPTIONS = (ASSOCIATION_OPTIONS + SHARED_OPTIONS).freeze
 
+        # The default foreign key suffix.
+        #
+        # @return [ String ] '_id'
+        #
+        # @since 7.0
+        FOREIGN_KEY_SUFFIX = '_id'.freeze
+
         # The list of association complements.
         #
         # @return [ Array<Association> ] The association complements.
@@ -64,7 +71,7 @@ module Mongoid
         # @since 7.0
         def foreign_key
           @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
-                             "#{inverse}#{relation.foreign_key_suffix}"
+                             default_foreign_key_field
         end
 
         # Is this association type embedded?
@@ -87,16 +94,7 @@ module Mongoid
         #
         # @since 7.0
         def relation
-          HasOne::Proxy
-        end
-
-        # The criteria used for querying this relation.
-        #
-        # @return [ Mongoid::Criteria ] The criteria used for querying this relation.
-        #
-        # @since 7.0
-        def criteria(object, type)
-          relation.criteria(self, object, type)
+          Proxy
         end
 
         # The nested builder object.
@@ -175,6 +173,10 @@ module Mongoid
           define_dependency!
           @owner_class.validates_associated(name) if validate?
           self
+        end
+
+        def default_foreign_key_field
+          @default_foreign_key_field ||= "#{inverse}#{FOREIGN_KEY_SUFFIX}"
         end
 
         def polymorphic_inverses(other)
