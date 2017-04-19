@@ -146,7 +146,7 @@ module Mongoid
       # @since 2.2.1
       def extract_attribute(document, key)
         if (key_string = key.to_s) =~ /.+\..+/
-          key_string.split('.').inject(document.as_document) do |_attribs, _key|
+          key_string.split('.').inject(document.send(:as_attributes)) do |_attribs, _key|
             if _attribs.is_a?(::Array)
               if _key =~ /\A\d+\z/ && _attribs.none? {|doc| doc.is_a?(Hash)}
                 _attribs.try(:[], _key.to_i)
