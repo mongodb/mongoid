@@ -6,8 +6,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     original_raise_not_found_error = Mongoid.raise_not_found_error
     original_preferences_association = Person.relations["preferences"]
     Mongoid.raise_not_found_error = true
-    Person.autosave(Person.relations["preferences"].merge!(autosave: true))
-    Person._synced(Person.relations["preferences"])
+    Person.has_and_belongs_to_many :preferences, autosave: true
     example.run
     Mongoid.raise_not_found_error = original_raise_not_found_error
     Person.relations["preferences"] = original_preferences_association

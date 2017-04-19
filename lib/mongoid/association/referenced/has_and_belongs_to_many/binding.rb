@@ -27,8 +27,8 @@ module Mongoid
                 end
                 doc.reset_relation_criteria(association.inverse)
               end
-              base._synced[metadata.foreign_key] = true
-              doc._synced[metadata.inverse_foreign_key] = true
+              base._synced[association.foreign_key] = true
+              doc._synced[association.inverse_foreign_key] = true
             end
           end
 
@@ -46,8 +46,8 @@ module Mongoid
                 inverse_keys.delete_one(inverse_record_id(doc))
                 doc.reset_relation_criteria(association.inverse)
               end
-              base._synced[metadata.foreign_key] = true
-              doc._synced[metadata.inverse_foreign_key] = true
+              base._synced[association.foreign_key] = true
+              doc._synced[association.inverse_foreign_key] = true
             end
           end
 
