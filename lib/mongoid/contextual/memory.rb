@@ -129,7 +129,7 @@ module Mongoid
       # @return [ Document ] The first document.
       #
       # @since 3.0.0
-      def first
+      def first(*args)
         eager_load([documents.first]).first
       end
       alias :one :first
