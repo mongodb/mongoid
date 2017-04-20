@@ -108,6 +108,7 @@ module Mongoid
             target.delete(document) do |doc|
               if doc
                 unbind_one(doc)
+                doc.remove_ivar(__association.name)
                 cascade!(doc) if !_assigning?
               end
               execute_callback :after_remove, doc
@@ -216,7 +217,7 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def initialize(base, target, association)
-            init(base, HasMany::Targets::Enumerable.new(target), association) do
+            init(base, HasMany::Targets::Enumerable.new(target, base, association), association) do
               raise_mixed if klass.embedded? && !klass.cyclic?
             end
           end

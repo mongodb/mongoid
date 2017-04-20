@@ -55,7 +55,7 @@ module Mongoid
       # @since 3.0.14
       def reset_relation_criteria(name)
         if instance_variable_defined?("@_#{name}")
-          send(name).reset_unloaded
+          send(name).reset_unloaded if send(name).is_a?(Criteria)
         end
       end
 
