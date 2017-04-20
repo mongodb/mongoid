@@ -361,13 +361,6 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
     end
   end
 
-  describe ".foreign_key_suffix" do
-
-    it "returns nil" do
-      expect(described_class.foreign_key_suffix).to be_nil
-    end
-  end
-
   describe "#respond_to?" do
 
     let(:person) do
@@ -390,13 +383,6 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
           expect(document.respond_to?(method)).to be true
         end
       end
-    end
-  end
-
-  describe ".validation_default" do
-
-    it "returns false" do
-      expect(described_class.validation_default).to be false
     end
   end
 

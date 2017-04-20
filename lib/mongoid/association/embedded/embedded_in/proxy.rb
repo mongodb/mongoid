@@ -106,18 +106,6 @@ module Mongoid
               true
             end
 
-            # Returns the suffix of the foreign key field, either "_id" or "_ids".
-            #
-            # @example Get the suffix for the foreign key.
-            #   Referenced::Many.foreign_key_suffix
-            #
-            # @return [ nil ] nil.
-            #
-            # @since 3.0.0
-            def foreign_key_suffix
-              nil
-            end
-
             # Get the path calculator for the supplied document.
             #
             # @example Get the path calculator.
@@ -130,44 +118,6 @@ module Mongoid
             # @since 2.1.0
             def path(document)
               Mongoid::Atomic::Paths::Root.new(document)
-            end
-
-            # Tells the caller if this relation is one that stores the foreign
-            # key on its own objects.
-            #
-            # @example Does this relation store a foreign key?
-            #   Embedded::In.stores_foreign_key?
-            #
-            # @return [ false ] false.
-            #
-            # @since 2.0.0.rc.1
-            def stores_foreign_key?
-              false
-            end
-
-            # Get the valid options allowed with this relation.
-            #
-            # @example Get the valid options.
-            #   Relation.valid_options
-            #
-            # @return [ Array<Symbol> ] The valid options.
-            #
-            # @since 2.1.0
-            def valid_options
-              VALID_OPTIONS
-            end
-
-            # Get the default validation setting for the relation. Determines if
-            # by default a validates associated will occur.
-            #
-            # @example Get the validation default.
-            #   Proxy.validation_default
-            #
-            # @return [ true, false ] The validation default.
-            #
-            # @since 2.1.9
-            def validation_default
-              false
             end
           end
         end

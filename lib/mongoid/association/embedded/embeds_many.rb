@@ -155,13 +155,21 @@ module Mongoid
           Mongoid::Atomic::Paths::Embedded::Many.new(document)
         end
 
+        def criteria(base, target)
+          criterion = klass.scoped
+          criterion.embedded = true
+          criterion.documents = target
+          criterion.parent_document = base
+          criterion.association = self
+          apply_ordering(criterion)
+        end
+
         private
 
-        # Setup the instance methods on the class having this association type.
-        #
-        # @return [ self ]
-        #
-        # @since 7.0
+        def apply_ordering(criteria)
+          order ? criteria.order_by(order) : criteria
+        end
+
         def setup_instance_methods!
           define_getter!
           define_setter!

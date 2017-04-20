@@ -138,8 +138,8 @@ module Mongoid
             end
             unless __association.forced_nil_inverse?
               if replacement
-                id_list = base.send(foreign_key) - replacement.collect(&:id)
-                criteria(id_list).pull(inverse_foreign_key => base._id)
+                objects_to_clear = base.send(foreign_key) - replacement.collect(&:id)
+                criteria(objects_to_clear).pull(inverse_foreign_key => base._id)
               else
                 criteria.pull(inverse_foreign_key => base._id)
               end

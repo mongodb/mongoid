@@ -342,7 +342,7 @@ module Mongoid
             Binding.new(base, target, __association)
           end
 
-          # Returns the criteria object for the target class with its documents set
+          # Returns the "#{criteria}"# object for the target class with its documents set
           # to target.
           #
           # @example Get a criteria for the relation.
@@ -350,12 +350,7 @@ module Mongoid
           #
           # @return [ Criteria ] A new criteria.
           def criteria
-            criterion = klass.scoped
-            criterion.embedded = true
-            criterion.documents = target
-            criterion.parent_document = base
-            criterion.association = __association
-            Many.apply_ordering(criterion, __association)
+            @criteria ||= __association.criteria(base, target)
           end
 
           # Deletes one document from the target and unscoped.
