@@ -794,15 +794,6 @@ describe Mongoid::Association::Embedded::EmbedsMany do
     end
   end
 
-  describe '#criteria' do
-
-    it 'does not respond to the method' do
-      expect {
-        association.criteria
-      }.to raise_exception(NoMethodError)
-    end
-  end
-
   describe '#destructive?' do
 
     it 'returns false' do

@@ -790,13 +790,6 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
     end
   end
 
-  describe ".foreign_key_suffix" do
-
-    it "returns nil" do
-      expect(described_class.foreign_key_suffix).to be_nil
-    end
-  end
-
   describe "#respond_to?" do
 
     let(:person) do

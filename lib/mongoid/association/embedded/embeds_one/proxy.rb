@@ -108,18 +108,6 @@ module Mongoid
               true
             end
 
-            # Returns the suffix of the foreign key field, either "_id" or "_ids".
-            #
-            # @example Get the suffix for the foreign key.
-            #   Referenced::Many.foreign_key_suffix
-            #
-            # @return [ nil ] nil.
-            #
-            # @since 3.0.0
-            def foreign_key_suffix
-              nil
-            end
-
             # Get the path calculator for the supplied document.
             #
             # @example Get the path calculator.

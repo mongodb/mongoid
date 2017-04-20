@@ -1957,13 +1957,6 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
-  describe ".foreign_key_suffix" do
-
-    it "returns nil" do
-      expect(described_class.foreign_key_suffix).to be_nil
-    end
-  end
-
   describe "#exists?" do
 
     let!(:person) do
