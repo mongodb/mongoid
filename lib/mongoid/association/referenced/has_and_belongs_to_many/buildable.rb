@@ -26,21 +26,8 @@ module Mongoid
 
           private
 
-          def query_criteria(id_list)
-            crit = relation_class.all_of(primary_key => {"$in" => id_list || []})
-            with_ordering(crit)
-          end
-
           def query?(object)
             object.nil? || Array(object).all? { |d| !d.is_a?(Mongoid::Document) }
-          end
-
-          def with_ordering(criteria)
-            if order
-              criteria.order_by(order)
-            else
-              criteria
-            end
           end
         end
       end

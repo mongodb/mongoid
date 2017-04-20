@@ -311,7 +311,7 @@ describe Mongoid::Association::Options do
             context 'when :foreign_key option is not specified' do
 
               it 'returns the name followed by the foreign_key_suffix' do
-                expect(association.foreign_key).to eq("name#{association.relation.foreign_key_suffix}")
+                expect(association.foreign_key).to eq("name#{association.class::FOREIGN_KEY_SUFFIX}")
               end
             end
           end
@@ -326,7 +326,7 @@ describe Mongoid::Association::Options do
               end
 
               it 'returns the inverse name followed by the foreign_key_suffix' do
-                expect(association.foreign_key).to eq("other#{association.relation.foreign_key_suffix}")
+                expect(association.foreign_key).to eq("other#{association.class::FOREIGN_KEY_SUFFIX}")
               end
             end
           end

@@ -1099,7 +1099,7 @@ describe Mongoid::Association::Referenced::HasMany do
   describe '#criteria' do
 
     it 'returns a criteria object' do
-      expect(association.criteria(BSON::ObjectId.new, OwnerObject)).to be_a(Mongoid::Criteria)
+      expect(association.criteria(OwnerObject.new)).to be_a(Mongoid::Criteria)
     end
   end
 

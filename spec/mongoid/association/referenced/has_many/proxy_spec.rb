@@ -1814,10 +1814,10 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
   end
 
-  describe ".criteria" do
+  describe "#criteria" do
 
-    let(:id) do
-      BSON::ObjectId.new
+    let(:base) do
+      Movie.new
     end
 
     context "when the relation is polymorphic" do
@@ -1827,13 +1827,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       let(:criteria) do
-        described_class.criteria(association, id, Movie)
+        association.criteria(base)
       end
 
       it "includes the type in the criteria" do
         expect(criteria.selector).to eq(
                                          {
-                                             "ratable_id"    => id,
+                                             "ratable_id"    => base.id,
                                              "ratable_type"  => "Movie"
                                          }
                                      )
@@ -1846,12 +1846,16 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         Person.relations["posts"]
       end
 
+      let(:base) do
+        Person.new
+      end
+
       let(:criteria) do
-        described_class.criteria(association, id, Person)
+        association.criteria(base)
       end
 
       it "does not include the type in the criteria" do
-        expect(criteria.selector).to eq({ "person_id" => id })
+        expect(criteria.selector).to eq({ "person_id" => base.id })
       end
     end
   end
@@ -2761,13 +2765,6 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(found).to_not be_persisted
         end
       end
-    end
-  end
-
-  describe ".foreign_key_suffix" do
-
-    it "returns _id" do
-      expect(described_class.foreign_key_suffix).to eq("_id")
     end
   end
 

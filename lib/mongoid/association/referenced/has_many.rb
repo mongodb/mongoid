@@ -42,6 +42,13 @@ module Mongoid
         # @since 7.0
         VALID_OPTIONS = (ASSOCIATION_OPTIONS + SHARED_OPTIONS).freeze
 
+        # The default foreign key suffix.
+        #
+        # @return [ String ] '_id'
+        #
+        # @since 7.0
+        FOREIGN_KEY_SUFFIX = '_id'.freeze
+
         # The list of association complements.
         #
         # @return [ Array<Association> ] The association complements.
@@ -88,7 +95,7 @@ module Mongoid
         # @since 7.0
         def foreign_key
           @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
-                             "#{inverse}#{relation.foreign_key_suffix}"
+                             default_foreign_key_field
         end
 
         # Is this association type embedded?
@@ -126,8 +133,8 @@ module Mongoid
         # @return [ Mongoid::Criteria ] The criteria used for querying this relation.
         #
         # @since 7.0
-        def criteria(object, type)
-          relation.criteria(self, object, type)
+        def criteria(base)
+          query_criteria(base.send(primary_key), base)
         end
 
         # The type of this association if it's polymorphic.
@@ -205,6 +212,10 @@ module Mongoid
 
         private
 
+        def default_foreign_key_field
+          @default_foreign_key_field ||= "#{inverse}#{FOREIGN_KEY_SUFFIX}"
+        end
+
         def polymorphic_inverses(other)
           [ as ]
         end
@@ -224,6 +235,38 @@ module Mongoid
 
         def default_primary_key
           PRIMARY_KEY_DEFAULT
+        end
+
+        def query_criteria(object, base)
+          crit = klass.where(foreign_key => object)
+          crit = with_polymorphic_criterion(crit, base)
+          crit = with_ordering(crit)
+          with_inverse_field_criterion(crit)
+        end
+
+        def with_polymorphic_criterion(criteria, base)
+          if polymorphic?
+            criteria.where(type => base.class.name)
+          else
+            criteria
+          end
+        end
+
+        def with_ordering(criteria)
+          if order
+            criteria.order_by(order)
+          else
+            criteria
+          end
+        end
+
+        def with_inverse_field_criterion(criteria)
+          inverse_association = inverse_association(klass)
+          if inverse_association.try(:inverse_of)
+            criteria.any_in(inverse_association.inverse_of => [name, nil])
+          else
+            criteria
+          end
         end
       end
     end
