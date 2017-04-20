@@ -61,7 +61,7 @@ module Mongoid
         def remove_inverse_keys(association)
           foreign_keys = send(association.foreign_key)
           unless foreign_keys.nil? || foreign_keys.empty?
-            association.criteria(foreign_keys, self.class).pull(association.inverse_foreign_key => _id)
+            association.criteria(self, foreign_keys).pull(association.inverse_foreign_key => _id)
           end
         end
 
@@ -92,10 +92,10 @@ module Mongoid
             end
 
             unless adds.empty?
-              association.criteria(adds, self.class).without_options.add_to_set(association.inverse_foreign_key => _id)
+              association.criteria(self, adds).without_options.add_to_set(association.inverse_foreign_key => _id)
             end
             unless subs.empty?
-              association.criteria(subs, self.class).without_options.pull(association.inverse_foreign_key => _id)
+              association.criteria(self, subs).without_options.pull(association.inverse_foreign_key => _id)
             end
           end
         end

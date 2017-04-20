@@ -2602,13 +2602,6 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
   end
 
-  describe ".foreign_key_suffix" do
-
-    it "returns _ids" do
-      expect(described_class.foreign_key_suffix).to eq("_ids")
-    end
-  end
-
   describe "#max" do
 
     let(:person) do

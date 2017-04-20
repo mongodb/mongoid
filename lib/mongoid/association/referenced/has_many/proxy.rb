@@ -401,11 +401,7 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def criteria
-            Proxy.criteria(
-                __association,
-                base.send(__association.primary_key),
-                base.class
-            )
+            @criteria ||= __association.criteria(base)
           end
 
           # Perform the necessary cascade operations for documents that just got
@@ -565,31 +561,6 @@ module Mongoid
 
           class << self
 
-            # Get the standard criteria used for querying this relation.
-            #
-            # @example Get the criteria.
-            #   Proxy.criteria(meta, id, Model)
-            #
-            # @param [ Association ] association The association metadata.
-            # @param [ Object ] object The value of the foreign key.
-            # @param [ Class ] type The optional type.
-            #
-            # @return [ Criteria ] The criteria.
-            #
-            # @since 2.1.0
-            def criteria(association, object, type = nil)
-              apply_ordering(
-                  with_inverse_field_criterion(
-                      with_polymorphic_criterion(
-                          association.klass.where(association.foreign_key => object),
-                          association,
-                          type
-                      ),
-                      association
-                  ), association
-              )
-            end
-
             def eager_loader(association, docs)
               Eager.new(association, docs)
             end
@@ -605,86 +576,6 @@ module Mongoid
             # @since 2.0.0.rc.1
             def embedded?
               false
-            end
-
-            # Get the foreign key for the provided name.
-            #
-            # @example Get the foreign key.
-            #   Referenced::Many.foreign_key(:person)
-            #
-            # @param [ Symbol ] name The name.
-            #
-            # @return [ String ] The foreign key.
-            #
-            # @since 3.0.0
-            def foreign_key(name)
-              "#{name}#{foreign_key_suffix}"
-            end
-
-            # Get the default value for the foreign key.
-            #
-            # @example Get the default.
-            #   Referenced::Many.foreign_key_default
-            #
-            # @return [ nil ] Always nil.
-            #
-            # @since 2.0.0.rc.1
-            def foreign_key_default
-              nil
-            end
-
-            # Returns the suffix of the foreign key field, either "_id" or "_ids".
-            #
-            # @example Get the suffix for the foreign key.
-            #   Referenced::Many.foreign_key_suffix
-            #
-            # @return [ String ] "_id"
-            #
-            # @since 2.0.0.rc.1
-            def foreign_key_suffix
-              "_id"
-            end
-
-            private
-
-            # Decorate the criteria with polymorphic criteria, if applicable.
-            #
-            # @api private
-            #
-            # @example Get the criteria with polymorphic criterion.
-            #   Proxy.with_polymorphic_criterion(criteria, association)
-            #
-            # @param [ Criteria ] criteria The criteria to decorate.
-            # @param [ Association ] association The association.
-            # @param [ Class ] type The optional type.
-            #
-            # @return [ Criteria ] The criteria.
-            #
-            # @since 3.0.0
-            def with_polymorphic_criterion(criteria, association, type = nil)
-              association.add_polymorphic_criterion(criteria, type)
-            end
-
-            # Decorate the criteria with inverse field criteria, if applicable.
-            #
-            # @api private
-            #
-            # @example Get the criteria with polymorphic criterion.
-            #   Proxy.with_inverse_field_criterion(criteria, metadata)
-            #
-            # @param [ Criteria ] criteria The criteria to decorate.
-            # @param [ Association ] association The association metadata.
-            #
-            # @return [ Criteria ] The criteria.
-            #
-            # @since 3.0.0
-            def with_inverse_field_criterion(criteria, association)
-              inverse_association = association.inverse_association(association.klass)
-              if inverse_association.try(:inverse_of)
-                criteria.any_in(inverse_association.inverse_of => [association.name, nil])
-              else
-                criteria
-              end
             end
           end
         end

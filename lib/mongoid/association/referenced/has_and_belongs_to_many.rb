@@ -46,6 +46,13 @@ module Mongoid
         # @since 7.0
         FOREIGN_KEY_FIELD_TYPE = Array
 
+        # The default foreign key suffix.
+        #
+        # @return [ String ] '_ids'
+        #
+        # @since 7.0
+        FOREIGN_KEY_SUFFIX = '_ids'.freeze
+
         # The list of association complements.
         #
         # @return [ Array<Association> ] The association complements.
@@ -105,7 +112,8 @@ module Mongoid
         #
         # @since 7.0
         def foreign_key
-          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s : relation.foreign_key(name)
+          @foreign_key ||= @options[:foreign_key] ? @options[:foreign_key].to_s :
+                             default_foreign_key_field
         end
 
         # The criteria used for querying this relation.
@@ -113,8 +121,8 @@ module Mongoid
         # @return [ Mongoid::Criteria ] The criteria used for querying this relation.
         #
         # @since 7.0
-        def criteria(object, type)
-          relation.criteria(self, object, type)
+        def criteria(base, id_list = nil)
+          query_criteria(id_list || base.send(foreign_key))
         end
 
         # Get the foreign key field on the inverse.
@@ -125,9 +133,9 @@ module Mongoid
         # @since 7.0
         def inverse_foreign_key
           if @options.key?(:inverse_of)
-            inverse_of ? "#{inverse_of.to_s.singularize}#{relation.foreign_key_suffix}" : nil
+            inverse_of ? "#{inverse_of.to_s.singularize}#{FOREIGN_KEY_SUFFIX}" : nil
           else
-            "#{inverse_class_name.demodulize.underscore}#{relation.foreign_key_suffix}"
+            "#{inverse_class_name.demodulize.underscore}#{FOREIGN_KEY_SUFFIX}"
           end
         end
 
@@ -201,6 +209,10 @@ module Mongoid
           PRIMARY_KEY_DEFAULT
         end
 
+        def default_foreign_key_field
+          @default_foreign_key_field ||= "#{name.to_s.singularize}#{FOREIGN_KEY_SUFFIX}"
+        end
+
         def setup_syncing!
           unless forced_nil_inverse?
             synced_save
@@ -250,6 +262,19 @@ module Mongoid
             raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)
           end
           matches.collect { |m| m.name } unless matches.blank?
+        end
+
+        def with_ordering(criteria)
+          if order
+            criteria.order_by(order)
+          else
+            criteria
+          end
+        end
+
+        def query_criteria(id_list)
+          crit = relation_class.all_of(primary_key => {"$in" => id_list || []})
+          with_ordering(crit)
         end
       end
     end

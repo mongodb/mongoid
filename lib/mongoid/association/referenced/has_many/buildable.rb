@@ -23,47 +23,6 @@ module Mongoid
 
           private
 
-          def query_criteria(object, base)
-            crit = klass.where(foreign_key => object)
-            crit = with_polymorphic_criterion(crit, base)
-            crit = with_ordering(crit)
-            with_inverse_field_criterion(crit)
-          end
-
-          # Add polymorphic query criteria to a Criteria object, if this association is
-          #  polymorphic.
-          #
-          # @params [ Mongoid::Criteria ] criteria The criteria object to add to.
-          # @params [ Class ] object_class The object class.
-          #
-          # @return [ Mongoid::Criteria ] The criteria object.
-          #
-          # @since 7.0
-          def with_polymorphic_criterion(criteria, base)
-            if polymorphic?
-              criteria.where(type => base.class.name)
-            else
-              criteria
-            end
-          end
-
-          def with_ordering(criteria)
-            if order
-              criteria.order_by(order)
-            else
-              criteria
-            end
-          end
-
-          def with_inverse_field_criterion(criteria)
-            inverse_association = inverse_association(klass)
-            if inverse_association.try(:inverse_of)
-              criteria.any_in(inverse_association.inverse_of => [name, nil])
-            else
-              criteria
-            end
-          end
-
           def query?(object)
             object && Array(object).all? { |d| !d.is_a?(Mongoid::Document) }
           end

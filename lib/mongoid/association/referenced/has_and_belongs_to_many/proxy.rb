@@ -138,9 +138,10 @@ module Mongoid
             end
             unless __association.forced_nil_inverse?
               if replacement
-                criteria(base.send(foreign_key) - replacement.collect(&:id)).pull(inverse_foreign_key => base._id)
+                id_list = base.send(foreign_key) - replacement.collect(&:id)
+                criteria(id_list).pull(inverse_foreign_key => base._id)
               else
-                criteria(base.send(foreign_key)).pull(inverse_foreign_key => base._id)
+                criteria.pull(inverse_foreign_key => base._id)
               end
             end
             if persistable?
@@ -257,7 +258,7 @@ module Mongoid
           #
           # @return [ Criteria ] A new criteria.
           def criteria(id_list = nil)
-            Proxy.criteria(__association, id_list || base.send(foreign_key) || [])
+            __association.criteria(base, id_list)
           end
 
           # Flag the base as unsynced with respect to the foreign key.
@@ -279,27 +280,6 @@ module Mongoid
           end
 
           class << self
-
-            # Create the standard criteria for this relation given the supplied
-            # association metadata and object.
-            #
-            # @example Get the criteria.
-            #   Proxy.criteria(meta, object)
-            #
-            # @param [ Association ] association The association metadata.
-            # @param [ Object ] object The object for the criteria.
-            # @param [ Class ] type The criteria class.
-            #
-            # @return [ Criteria ] The criteria.
-            #
-            # @since 2.1.0
-            def criteria(association, object, type = nil)
-              apply_ordering(
-                  association.klass.all_of(
-                      association.primary_key => {"$in" => object || []}
-                  ), association
-              )
-            end
 
             # Get the Eager object for this type of association.
             #
@@ -324,44 +304,6 @@ module Mongoid
             # @since 2.0.0.rc.1
             def embedded?
               false
-            end
-
-            # Get the foreign key for the provided name.
-            #
-            # @example Get the foreign key.
-            #   Referenced::ManyToMany.foreign_key(:person)
-            #
-            # @param [ Symbol ] name The name.
-            #
-            # @return [ String ] The foreign key.
-            #
-            # @since 3.0.0
-            def foreign_key(name)
-              "#{name.to_s.singularize}#{foreign_key_suffix}"
-            end
-
-            # Get the default value for the foreign key.
-            #
-            # @example Get the default.
-            #   Referenced::ManyToMany.foreign_key_default
-            #
-            # @return [ Array ] Always an empty array.
-            #
-            # @since 2.0.0.rc.1
-            def foreign_key_default
-              []
-            end
-
-            # Returns the suffix of the foreign key field, either "_id" or "_ids".
-            #
-            # @example Get the suffix for the foreign key.
-            #   Referenced::ManyToMany.foreign_key_suffix
-            #
-            # @return [ String ] "_ids"
-            #
-            # @since 2.0.0.rc.1
-            def foreign_key_suffix
-              "_ids"
             end
           end
         end
