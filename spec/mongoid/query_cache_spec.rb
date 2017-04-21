@@ -37,8 +37,8 @@ describe Mongoid::QueryCache do
           Mongoid::QueryCache.enabled = false
         end
 
-        it 'queries for each access to the base' do
-          expect(server).to receive(:with_connection).exactly(relations.size).times.and_call_original
+        it 'does not query for access to the base' do
+          expect(server).to receive(:context).exactly(0).times.and_call_original
           relations.each do |object|
             object.person
           end
@@ -51,8 +51,8 @@ describe Mongoid::QueryCache do
           Mongoid::QueryCache.enabled = true
         end
 
-        it 'queries only once for the base' do
-          expect(server).to receive(:with_connection).exactly(1).times.and_call_original
+        it 'does not query for access to the base' do
+          expect(server).to receive(:context).exactly(0).times.and_call_original
           relations.each do |object|
             object.person
           end
