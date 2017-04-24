@@ -52,6 +52,21 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           expect(added).to eq(person.addresses)
         end
 
+        context 'when the child is already related to the parent' do
+
+          let(:message) do
+            Message.new(person: person)
+          end
+
+          before do
+            person.messages << message
+          end
+
+          it "appends only once to the target" do
+            expect(person.messages).to eq([ message ])
+          end
+        end
+
         context "with a limiting default scope" do
 
           context "when the document matches the scope" do
