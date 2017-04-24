@@ -21,6 +21,63 @@ module Mongoid
     module Builders
       extend ActiveSupport::Concern
 
+
+      # Defines a builder method for an embeds_one relation. This is
+      # defined as #build_name.
+      #
+      # @example
+      #   Builders.define_builder!(association)
+      #
+      # @param [ String, Symbol ] name The name of the relation.
+      #
+      # @return [ Class ] The class being set up.
+      #
+      # @since 2.0.0.rc.1
+      def self.define_builder!(association)
+        name = association.name
+        association.inverse_class.tap do |klass|
+          klass.re_define_method("build_#{name}") do |*args|
+            attributes, _class = parse_args(*args)
+            klass = _class.is_a?(Class) ? _class : association.relation_class
+            document = Factory.build(klass, attributes)
+            _building do
+              child = send("#{name}=", document)
+              child.run_callbacks(:build)
+              child
+            end
+          end
+        end
+      end
+
+      # Defines a creator method for an embeds_one relation. This is
+      # defined as #create_name. After the object is built it will
+      # immediately save.
+      #
+      # @example
+      #   Builders.define_creator!(association)
+      #
+      # @param [ String, Symbol ] name The name of the relation.
+      #
+      # @return [ Class ] The class being set up.
+      #
+      # @since 2.0.0.rc.1
+      def self.define_creator!(association)
+        name = association.name
+        association.inverse_class.tap do |klass|
+          klass.re_define_method("create_#{name}") do |*args|
+            attributes, _class = parse_args(*args)
+            klass = _class.is_a?(Class) ? _class : association.relation_class
+            document = Factory.build(klass, attributes)
+            doc = _assigning do
+              send("#{name}=", document)
+            end
+            doc.save
+            save if new_record? && association.stores_foreign_key?
+            doc
+          end
+        end
+      end
+
       private
 
       # Parse out the attributes and the options from the args passed to a
@@ -36,59 +93,6 @@ module Mongoid
       # @since 2.3.4
       def parse_args(*args)
         [ args.first || {}, args.size > 1 ? args[1] : {} ]
-      end
-
-
-      # Defines a builder method for an embeds_one relation. This is
-      # defined as #build_name.
-      #
-      # @example
-      #   Person.builder("name")
-      #
-      # @param [ String, Symbol ] name The name of the relation.
-      #
-      # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
-      def self.define_builder!(association)
-        association.inverse_class.tap do |klass|
-          klass.re_define_method("build_#{association.name}") do |*args|
-            attributes, _options = parse_args(*args)
-            document = Factory.build(association.relation_class, attributes)
-            _building do
-              child = send("#{association.name}=", document)
-              child.run_callbacks(:build)
-              child
-            end
-          end
-        end
-      end
-
-      # Defines a creator method for an embeds_one relation. This is
-      # defined as #create_name. After the object is built it will
-      # immediately save.
-      #
-      # @example
-      #   Person.creator("name")
-      #
-      # @param [ String, Symbol ] name The name of the relation.
-      #
-      # @return [ Class ] The class being set up.
-      #
-      # @since 2.0.0.rc.1
-      def self.define_creator!(association)
-        association.inverse_class.tap do |klass|
-          klass.re_define_method("create_#{association.name}") do |*args|
-            attributes, _options = parse_args(*args)
-            document = Factory.build(association.relation_class, attributes)
-            doc = _assigning do
-              send("#{association.name}=", document)
-            end
-            doc.save
-            save if new_record? && association.stores_foreign_key?
-            doc
-          end
-        end
       end
     end
   end

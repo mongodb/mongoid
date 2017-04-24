@@ -32,6 +32,23 @@ describe Mongoid::Association::Builders do
         end
       end
 
+      context 'when a subclass is passed to the method' do
+
+        around do |example|
+          class Kitten < Cat; end
+          example.run
+          Object.send(:remove_const, :Kitten)
+        end
+
+        let(:kitten) do
+          person.build_cat({}, Kitten)
+        end
+
+        it 'builds the object of the subclass type' do
+          expect(kitten).to be_a(Kitten)
+        end
+      end
+
       context "when the relation is a belongs to" do
 
         context "when the inverse is a has many" do
@@ -110,6 +127,23 @@ describe Mongoid::Association::Builders do
 
         it "does not set a binding attribute" do
           expect(game[:binding]).to be_nil
+        end
+      end
+
+      context 'when a subclass is passed to the method' do
+
+        around do |example|
+          class Kitten < Cat; end
+          example.run
+          Object.send(:remove_const, :Kitten)
+        end
+
+        let(:kitten) do
+          person.create_cat({}, Kitten)
+        end
+
+        it 'builds the object of the subclass type' do
+          expect(kitten).to be_a(Kitten)
         end
       end
 
