@@ -310,6 +310,10 @@ module Mongoid
 
           private
 
+          def object_already_related?(document)
+            target.any? { |existing| existing === document }
+          end
+
           # Appends the document to the target array, updating the index on the
           # document at the same time.
           #
@@ -321,7 +325,9 @@ module Mongoid
           # @since 2.0.0.rc.1
           def append(document)
             execute_callback :before_add, document
-            target.push(*scope([document]))
+            unless object_already_related?(document)
+              target.push(*scope([document]))
+            end
             _unscoped.push(document)
             integrate(document)
             document._index = _unscoped.size - 1
