@@ -324,11 +324,11 @@ module Mongoid
       end
 
       def define_builder!
-        Association::Builders.define_builder!(self)
+        Association::Accessors.define_builder!(self)
       end
 
       def define_creator!
-        Association::Builders.define_creator!(self)
+        Association::Accessors.define_creator!(self)
       end
 
       def define_getter!

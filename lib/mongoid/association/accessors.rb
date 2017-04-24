@@ -299,8 +299,9 @@ module Mongoid
         name = association.name
         association.inverse_class.tap do |klass|
           klass.re_define_method("build_#{name}") do |*args|
-            attributes, _options = parse_args(*args)
-            document = Factory.build(association.relation_class, attributes)
+            attributes, _class = parse_args(*args)
+            klass = _class.is_a?(Class) ? _class : association.relation_class
+            document = Factory.build(klass, attributes)
             _building do
               child = send("#{name}=", document)
               child.run_callbacks(:build)
@@ -326,8 +327,9 @@ module Mongoid
         name = association.name
         association.inverse_class.tap do |klass|
           klass.re_define_method("create_#{name}") do |*args|
-            attributes, _options = parse_args(*args)
-            document = Factory.build(association.klass, attributes)
+            attributes, _class = parse_args(*args)
+            klass = _class.is_a?(Class) ? _class : association.relation_class
+            document = Factory.build(klass, attributes)
             doc = _assigning do
               send("#{name}=", document)
             end
