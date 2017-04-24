@@ -483,6 +483,13 @@ en:
             attributes hash, and is raised instead of getting a NoMethodError."
           resolution: "You can include Mongoid::Attributes::Dynamic if you
             expect to be writing values for undefined fields often."
+        unknown_model:
+          message: "Attempted to instantiate an object of the unknown Model '%{klass}'."
+          summary: "A document with the value '%{value}' at the key '_type' was used to
+            instantiate a model object but Mongoid cannot find this Class."
+          resolution: "The _type field is a reserved one used by Mongoid to determine the
+            class for instantiating an object. Please don't save data in this field or ensure
+            that any values in this field correspond to valid Models."
         unsaved_document:
           message: "Attempted to save %{document} before the parent %{base}."
           summary: "You cannot call create or create! through the

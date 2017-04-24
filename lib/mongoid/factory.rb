@@ -43,7 +43,9 @@ module Mongoid
       if type.blank?
         klass.instantiate(attributes, selected_fields)
       else
-        type.camelize.constantize.instantiate(attributes, selected_fields)
+        camelized = type.camelize
+        raise Errors::UnknownModel.new(camelized, type) unless Object.const_defined?(camelized)
+        camelized.constantize.instantiate(attributes, selected_fields)
       end
     end
   end
