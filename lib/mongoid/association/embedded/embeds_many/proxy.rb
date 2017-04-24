@@ -311,7 +311,7 @@ module Mongoid
           private
 
           def object_already_related?(document)
-            target.any? { |existing| existing === document }
+            target.any? { |existing| existing.id && existing === document }
           end
 
           # Appends the document to the target array, updating the index on the
