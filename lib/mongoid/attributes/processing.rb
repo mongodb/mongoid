@@ -97,6 +97,9 @@ module Mongoid
         end
         responds = respond_to?("#{name}=", true)
         raise Errors::UnknownAttribute.new(self.class, name) unless responds
+        if name.to_s == "_type" && self.class._types.exclude?(value)
+          raise Errors::InvalidSubclassType.new(self.class, value)
+        end
         send("#{name}=", value)
       end
 

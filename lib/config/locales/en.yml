@@ -267,6 +267,10 @@ en:
             from the child side which relation to go in."
           resolution: "Set the values from the parent, or redefine the relation
             with only a single definition in the parent."
+        invalid_subclass_type:
+          message: "Invalid subclass type '%{type}' for %{klass}."
+          summary: "Only the type of subclass of %{klass} can be assigned to _type field."
+          resolution: "Verify if the value to be a subclass name of %{klass}."
         invalid_value:
           message: "Value of type %{value_class} cannot be written to a field of type %{field_class}"
           summary: "Tried to set a value of type %{value_class} to a field of type %{field_class}"
