@@ -693,6 +693,7 @@ module Mongoid
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
             document : Factory.from_db(klass, document, criteria.options[:fields])
+        criteria.send(:set_parent_relation, doc)
         yield(doc)
         documents.push(doc) if cacheable?
       end
