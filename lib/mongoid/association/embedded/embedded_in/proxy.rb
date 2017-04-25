@@ -39,14 +39,16 @@ module Mongoid
           # @since 2.0.0.rc.1
           def substitute(replacement)
             unbind_one
-            unless replacement
+            if replacement
+              self.target = replacement
+              bind_one
+              base.new_record = true
+              self
+            else
               base.delete if persistable?
-              return nil
+              base.new_record = true
+              nil
             end
-            base.new_record = true
-            self.target = replacement
-            bind_one
-            self
           end
 
           private
