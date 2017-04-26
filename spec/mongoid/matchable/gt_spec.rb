@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Matchable::Gt do
 
-  describe "#matches?" do
+  describe "#_matches?" do
 
     context "when the value is larger" do
 
@@ -11,7 +11,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns true" do
-        expect(matcher.matches?("$gt" => 3)).to be true
+        expect(matcher._matches?("$gt" => 3)).to be true
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 3)).to be false
+        expect(matcher._matches?("$gt" => 3)).to be false
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 10)).to be false
+        expect(matcher._matches?("$gt" => 10)).to be false
       end
     end
 
@@ -44,7 +44,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => 5)).to be false
+        expect(matcher._matches?("$gt" => 5)).to be false
       end
     end
 
@@ -56,7 +56,7 @@ describe Mongoid::Matchable::Gt do
         end
 
         it "returns false" do
-          expect(matcher.matches?("$gt" => 5)).to be true
+          expect(matcher._matches?("$gt" => 5)).to be true
         end
       end
 
@@ -67,7 +67,7 @@ describe Mongoid::Matchable::Gt do
         end
 
         it "returns false" do
-          expect(matcher.matches?("$gt" => 5)).to be false
+          expect(matcher._matches?("$gt" => 5)).to be false
         end
       end
     end
@@ -79,7 +79,7 @@ describe Mongoid::Matchable::Gt do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$gt" => '4.9')).to be false
+        expect(matcher._matches?("$gt" => '4.9')).to be false
       end
     end
   end

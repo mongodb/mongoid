@@ -8,12 +8,12 @@ module Mongoid
       # Return true if the attribute and first value in the hash are equal.
       #
       # @example Do the values match?
-      #   matcher.matches?({ :key => 10 })
+      #   matcher._matches?({ :key => 10 })
       #
       # @param [ Hash ] value The values to check.
       #
       # @return [ true, false ] If the values match.
-      def matches?(value)
+      def _matches?(value)
         first = first(value)
         return false if first.is_a?(Array) && first.empty?
 

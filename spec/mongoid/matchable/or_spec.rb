@@ -10,14 +10,14 @@ describe Mongoid::Matchable::Or do
     described_class.new("value", person)
   end
 
-  describe "#matches?" do
+  describe "#_matches?" do
 
     context "when provided a simple expression" do
 
       context "when any of the values are equal" do
 
         let(:matches) do
-          matcher.matches?(
+          matcher._matches?(
             [ { title: "Sir" }, { title: "King" } ]
           )
         end
@@ -34,14 +34,14 @@ describe Mongoid::Matchable::Or do
       context "when none of the values are equal" do
 
         it "returns false" do
-          expect(matcher.matches?([])).to be false
+          expect(matcher._matches?([])).to be false
         end
       end
 
       context "when the expression is a $not" do
 
         let(:matches) do
-          matcher.matches?([ { title: {:$not => /Foobar/ } }])
+          matcher._matches?([ { title: {:$not => /Foobar/ } }])
         end
 
         context "when the value matches" do
@@ -69,7 +69,7 @@ describe Mongoid::Matchable::Or do
       context "when any of the values are equal" do
 
         let(:matches) do
-          matcher.matches?(
+          matcher._matches?(
             [
               { title: { "$in" => [ "Sir", "Madam" ] } },
               { title: "King" }
@@ -89,7 +89,7 @@ describe Mongoid::Matchable::Or do
       context "when none of the values are equal" do
 
         let(:matches) do
-          matcher.matches?(
+          matcher._matches?(
             [
               { title: { "$in" => [ "Prince", "Madam" ] } },
               { title: "King" }
@@ -109,7 +109,7 @@ describe Mongoid::Matchable::Or do
       context "when expression contain multiple fields" do
 
         let(:matches) do
-          matcher.matches?(
+          matcher._matches?(
             [
               { title: "Sir", age: 23 },
               { title: "King", age: 100 }
