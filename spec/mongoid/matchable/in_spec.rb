@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Matchable::In do
 
-  describe "#matches?" do
+  describe "#_matches\?" do
 
     context 'when the attribute is not nil' do
 
@@ -13,14 +13,14 @@ describe Mongoid::Matchable::In do
       context "when the values include the attribute" do
 
         it "returns true" do
-          expect(matcher.matches?("$in" => [/\Afir.*\z/, "second"])).to be true
+          expect(matcher._matches?("$in" => [/\Afir.*\z/, "second"])).to be true
         end
       end
 
       context "when the values don't include the attribute" do
 
         it "returns false" do
-          expect(matcher.matches?("$in" => ["third"])).to be false
+          expect(matcher._matches?("$in" => ["third"])).to be false
         end
       end
     end
@@ -34,14 +34,14 @@ describe Mongoid::Matchable::In do
       context "when the values include the attribute" do
 
         it "returns true" do
-          expect(matcher.matches?("$in" => [/\Afir.*\z/, nil])).to be true
+          expect(matcher._matches?("$in" => [/\Afir.*\z/, nil])).to be true
         end
       end
 
       context "when the values don't include the attribute" do
 
         it "returns false" do
-          expect(matcher.matches?("$in" => ["third"])).to be false
+          expect(matcher._matches?("$in" => ["third"])).to be false
         end
       end
     end

@@ -148,7 +148,7 @@ module Mongoid
         @documents = criteria.documents.select do |doc|
           @root ||= doc._root
           @collection ||= root.collection
-          doc.matches?(criteria.selector)
+          doc._matches?(criteria.selector)
         end
         apply_sorting
         apply_options

@@ -10,12 +10,12 @@ module Mongoid
       # non-existence.
       #
       # @example Does anything exist?
-      #   matcher.matches?({ :key => 10 })
+      #   matcher._matches?({ :key => 10 })
       #
       # @param [ Hash ] value The values to check.
       #
       # @return [ true, false ] If a value exists.
-      def matches?(value)
+      def _matches?(value)
         @attribute.nil? != value.values.first
       end
     end

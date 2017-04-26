@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Matchable::Exists do
 
-  describe "#matches?" do
+  describe "#_matches?" do
 
     context "when checking for existence" do
 
@@ -13,7 +13,7 @@ describe Mongoid::Matchable::Exists do
         end
 
         it "returns true" do
-          expect(matcher.matches?("$exists" => true)).to be true
+          expect(matcher._matches?("$exists" => true)).to be true
         end
       end
 
@@ -24,7 +24,7 @@ describe Mongoid::Matchable::Exists do
         end
 
         it "returns false" do
-          expect(matcher.matches?("$exists" => true)).to be false
+          expect(matcher._matches?("$exists" => true)).to be false
         end
       end
     end
@@ -38,7 +38,7 @@ describe Mongoid::Matchable::Exists do
         end
 
         it "returns false" do
-          expect(matcher.matches?("$exists" => false)).to be false
+          expect(matcher._matches?("$exists" => false)).to be false
         end
       end
 
@@ -49,7 +49,7 @@ describe Mongoid::Matchable::Exists do
         end
 
         it "returns true" do
-          expect(matcher.matches?("$exists" => false)).to be true
+          expect(matcher._matches?("$exists" => false)).to be true
         end
       end
     end

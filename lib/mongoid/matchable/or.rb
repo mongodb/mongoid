@@ -8,20 +8,20 @@ module Mongoid
       # Does the supplied query match the attribute?
       #
       # @example Does this match?
-      #   matcher.matches?("$or" => [ { field => value } ])
+      #   matcher._matches?("$or" => [ { field => value } ])
       #
       # @param [ Array ] conditions The or expression.
       #
       # @return [ true, false ] True if matches, false if not.
       #
       # @since 2.0.0.rc.7
-      def matches?(conditions)
+      def _matches?(conditions)
         conditions.each do |condition|
           res = true
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            res &&= document.matches?(key => value)
+            res &&= document._matches?(key => value)
             break unless res
           end
           return res if res

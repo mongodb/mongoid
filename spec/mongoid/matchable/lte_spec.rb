@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Mongoid::Matchable::Lte do
 
-  describe "#matches?" do
+  describe "#_matches\?" do
 
     context "when the value is larger" do
 
@@ -11,7 +11,7 @@ describe Mongoid::Matchable::Lte do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$lte" => 3)).to be false
+        expect(matcher._matches?("$lte" => 3)).to be false
       end
     end
 
@@ -22,7 +22,7 @@ describe Mongoid::Matchable::Lte do
       end
 
       it "returns true" do
-        expect(matcher.matches?("$lte" => 10)).to be true
+        expect(matcher._matches?("$lte" => 10)).to be true
       end
     end
 
@@ -33,7 +33,7 @@ describe Mongoid::Matchable::Lte do
       end
 
       it "returns true" do
-        expect(matcher.matches?("$lte" => 5)).to be true
+        expect(matcher._matches?("$lte" => 5)).to be true
       end
     end
 
@@ -44,7 +44,7 @@ describe Mongoid::Matchable::Lte do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$lte" => 5)).to be false
+        expect(matcher._matches?("$lte" => 5)).to be false
       end
     end
 
@@ -56,7 +56,7 @@ describe Mongoid::Matchable::Lte do
         end
 
         it "returns true" do
-          expect(matcher.matches?("$lte" => 5)).to be true
+          expect(matcher._matches?("$lte" => 5)).to be true
         end
       end
 
@@ -66,7 +66,7 @@ describe Mongoid::Matchable::Lte do
         end
 
         it "returns false" do
-          expect(matcher.matches?("$lte" => 5)).to be false
+          expect(matcher._matches?("$lte" => 5)).to be false
         end
       end
     end
@@ -78,7 +78,7 @@ describe Mongoid::Matchable::Lte do
       end
 
       it "returns false" do
-        expect(matcher.matches?("$lte" => '5.1')).to be false
+        expect(matcher._matches?("$lte" => '5.1')).to be false
       end
     end
   end

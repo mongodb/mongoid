@@ -10,7 +10,7 @@ describe Mongoid::Matchable::Regexp do
     'Emily'
   end
 
-  describe '#matches?' do
+  describe '#_matches?' do
 
     context 'when a BSON::Regexp::Raw object is passed' do
 
@@ -19,7 +19,7 @@ describe Mongoid::Matchable::Regexp do
       end
 
       it 'compiles the regexp object to a native regexp for the matching' do
-        expect(matcher.matches?(regexp)).to be(true)
+        expect(matcher._matches?(regexp)).to be(true)
       end
 
       context 'when the value does not match the attribute' do
@@ -29,7 +29,7 @@ describe Mongoid::Matchable::Regexp do
         end
 
         it 'compiles the regexp object to a native regexp for the matching' do
-          expect(matcher.matches?(regexp)).to be(false)
+          expect(matcher._matches?(regexp)).to be(false)
         end
       end
     end
@@ -41,7 +41,7 @@ describe Mongoid::Matchable::Regexp do
       end
 
       it 'calls super with the native regexp' do
-        expect(matcher.matches?(regexp)).to be(true)
+        expect(matcher._matches?(regexp)).to be(true)
       end
 
       context 'when the value does not match the attribute' do
@@ -51,7 +51,7 @@ describe Mongoid::Matchable::Regexp do
         end
 
         it 'compiles the regexp object to a native regexp for the matching' do
-          expect(matcher.matches?(regexp)).to be(false)
+          expect(matcher._matches?(regexp)).to be(false)
         end
       end
     end
