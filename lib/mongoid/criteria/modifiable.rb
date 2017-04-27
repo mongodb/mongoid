@@ -182,7 +182,11 @@ module Mongoid
           attributes[:_parent] = parent_document
           attributes[:__association] = association
         end
-        klass.__send__(method, attributes, &block)
+        if polymorphic?
+          klass.__send__(method, attributes.merge(@criterion), &block)
+        else
+          klass.__send__(method, attributes, &block)
+        end
       end
 
       # Find the first object or create/initialize it.
