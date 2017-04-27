@@ -62,10 +62,8 @@ module Mongoid
                 __autosaving__ do
                   if relation = ivar(association.name)
                     Array(relation).each do |doc|
-                      if changed_for_autosave?(doc)
-                        doc.with(persistence_context) do |d|
-                          d.save
-                        end
+                      doc.with(persistence_context) do |d|
+                        d.save
                       end
                     end
                   end
