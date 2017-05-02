@@ -24,14 +24,14 @@ module Mongoid
       # if the value is included.
       #
       # @example Does this value match?
-      #   default.matches?("value")
+      #   default._matches?("value")
       #
       # @param [ Object ] value The value to check if it matches.
       #
       # @return [ true, false ] True if matches, false if not.
       #
       # @since 1.0.0
-      def matches?(value)
+      def _matches?(value)
         attribute.is_a?(Array) && !value.is_a?(Array) ? attribute.any? { |_attribute| value === _attribute } : value === attribute
       end
 

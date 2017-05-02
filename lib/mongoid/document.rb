@@ -282,7 +282,7 @@ module Mongoid
           relation, stored = send(name), meta.store_as
           if attributes.key?(stored) || !relation.blank?
             if relation
-              attributes[stored] = relation.as_document
+              attributes[stored] = relation.send(:as_attributes)
             else
               attributes.delete(stored)
             end

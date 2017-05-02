@@ -44,7 +44,7 @@ module Mongoid
         deleted = count
         removed = map do |doc|
           prepare_remove(doc)
-          doc.as_document
+          doc.send(:as_attributes)
         end
         unless removed.empty?
           collection.find(selector).update_one(
@@ -148,7 +148,7 @@ module Mongoid
         @documents = criteria.documents.select do |doc|
           @root ||= doc._root
           @collection ||= root.collection
-          doc.matches?(criteria.selector)
+          doc._matches?(criteria.selector)
         end
         apply_sorting
         apply_options

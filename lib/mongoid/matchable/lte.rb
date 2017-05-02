@@ -8,12 +8,12 @@ module Mongoid
       # Return true if the attribute is less than or equal to the value.
       #
       # @example Do the values match?
-      #   matcher.matches?({ :key => 10 })
+      #   matcher._matches?({ :key => 10 })
       #
       # @param [ Hash ] value The values to check.
       #
       # @return [ true, false ] If a value exists.
-      def matches?(value)
+      def _matches?(value)
         determine(value, :<=)
       rescue ArgumentError
         false

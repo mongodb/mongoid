@@ -519,7 +519,7 @@ module Mongoid
           selector = conditions || {}
           removed = klass.send(method, selector.merge!(criteria.selector))
           target.delete_if do |doc|
-            if doc.matches?(selector)
+            if doc._matches?(selector)
               unbind_one(doc) and true
             end
           end
@@ -569,7 +569,7 @@ module Mongoid
           if doc.new_record? && doc.valid?(:create)
             doc.run_before_callbacks(:save, :create)
             docs.push(doc)
-            inserts.push(doc.as_document)
+            inserts.push(doc.send(:as_attributes))
           else
             doc.save
           end
