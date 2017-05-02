@@ -10,7 +10,7 @@ describe Mongoid::Matchable::And do
     described_class.new("value", person)
   end
 
-  describe "#matches?" do
+  describe "#_matches?" do
 
     context "when provided a simple expression" do
 
@@ -19,7 +19,7 @@ describe Mongoid::Matchable::And do
         context "when the value matches" do
 
           let(:matches) do
-            matcher.matches?([ { title: "Sir" } ])
+            matcher._matches?([ { title: "Sir" } ])
           end
 
           before do
@@ -34,7 +34,7 @@ describe Mongoid::Matchable::And do
         context "when the expression is a $not" do
 
           let(:matches) do
-            matcher.matches?([ { title: {:$not => /Foobar/ } }])
+            matcher._matches?([ { title: {:$not => /Foobar/ } }])
           end
 
           context "when the value matches" do
@@ -59,7 +59,7 @@ describe Mongoid::Matchable::And do
         context "when the value does not match" do
 
           let(:matches) do
-            matcher.matches?([ { title: "Sir" } ])
+            matcher._matches?([ { title: "Sir" } ])
           end
 
           it "returns false" do
@@ -73,7 +73,7 @@ describe Mongoid::Matchable::And do
         context "when all of the values are equal" do
 
           let(:matches) do
-            matcher.matches?(
+            matcher._matches?(
               [ { title: "Sir" }, { _id: person.id } ]
             )
           end
@@ -90,7 +90,7 @@ describe Mongoid::Matchable::And do
         context "when one of the values does not match" do
 
           let(:matches) do
-            matcher.matches?(
+            matcher._matches?(
               [ { title: "Sir" }, { _id: BSON::ObjectId.new } ]
             )
           end
@@ -107,7 +107,7 @@ describe Mongoid::Matchable::And do
         context "when provided no expressions" do
 
           let(:matches) do
-            matcher.matches?([])
+            matcher._matches?([])
           end
 
           it "returns true" do
@@ -122,7 +122,7 @@ describe Mongoid::Matchable::And do
       context "when all of the values are equal" do
 
         let(:matches) do
-          matcher.matches?(
+          matcher._matches?(
             [
               { title: { "$in" => [ "Sir", "Madam" ] } },
               { _id: person.id }
@@ -142,7 +142,7 @@ describe Mongoid::Matchable::And do
       context "when one of the values does not match" do
 
         let(:matches) do
-          matcher.matches?(
+          matcher._matches?(
             [
               { title: { "$in" => [ "Prince", "Madam" ] } },
               { _id: BSON::ObjectId.new }
@@ -164,7 +164,7 @@ describe Mongoid::Matchable::And do
         context "when all the expressions match" do
 
           let(:matches) do
-            matcher.matches?(
+            matcher._matches?(
               [
                 { title: "Sir", age: 23 },
                 { _id: person.id }

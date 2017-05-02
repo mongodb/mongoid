@@ -6,19 +6,19 @@ describe Mongoid::Matchable::Ne do
     described_class.new("first")
   end
 
-  describe "#matches?" do
+  describe "#_matches?" do
 
     context "when the values are not equal" do
 
       it "returns true" do
-        expect(matcher.matches?("$ne" => "second")).to be true
+        expect(matcher._matches?("$ne" => "second")).to be true
       end
     end
 
     context "when the values are equal" do
 
       it "returns false" do
-        expect(matcher.matches?("$ne" => "first")).to be false
+        expect(matcher._matches?("$ne" => "first")).to be false
       end
     end
 
@@ -31,14 +31,14 @@ describe Mongoid::Matchable::Ne do
       context "when the value is in the array" do
 
         it "returns false" do
-          expect(array_matcher.matches?("$ne" => "first")).to be false
+          expect(array_matcher._matches?("$ne" => "first")).to be false
         end
       end
 
       context "when the value is not in the array" do
 
         it "returns true" do
-          expect(array_matcher.matches?("$ne" => "second")).to be true
+          expect(array_matcher._matches?("$ne" => "second")).to be true
         end
       end
     end

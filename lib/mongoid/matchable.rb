@@ -47,26 +47,26 @@ module Mongoid
     # MongoDB selector. Used for matching on embedded associations.
     #
     # @example Does the document match?
-    #   document.matches?(:title => { "$in" => [ "test" ] })
+    #   document._matches?(:title => { "$in" => [ "test" ] })
     #
     # @param [ Hash ] selector The MongoDB selector.
     #
     # @return [ true, false ] True if matches, false if not.
     #
     # @since 1.0.0
-    def matches?(selector)
+    def _matches?(selector)
       selector.each_pair do |key, value|
         if value.is_a?(Hash)
           value.each do |item|
             if item[0].to_s == "$not".freeze
               item = item[1]
-              return false if matcher(self, key, item).matches?(item)
+              return false if matcher(self, key, item)._matches?(item)
             else
-              return false unless matcher(self, key, Hash[*item]).matches?(Hash[*item])
+              return false unless matcher(self, key, Hash[*item])._matches?(Hash[*item])
             end
           end
         else
-          return false unless matcher(self, key, value).matches?(value)
+          return false unless matcher(self, key, value)._matches?(value)
         end
       end
       true

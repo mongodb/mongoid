@@ -6,25 +6,25 @@ describe Mongoid::Matchable::All do
     described_class.new(["first", "second", "third"])
   end
 
-  describe "#matches?" do
+  describe "#_matches?" do
 
     context "when the attribute includes all of the values" do
 
       it "returns true" do
-        expect(matcher.matches?("$all" => ["first", /\Asec.*\z/])).to be true
+        expect(matcher._matches?("$all" => ["first", /\Asec.*\z/])).to be true
       end
     end
 
     context "when the attributes doesn't include all of the values" do
 
       it "returns false" do
-        expect(matcher.matches?("$all" => ["second", "third", "fourth"])).to be false
+        expect(matcher._matches?("$all" => ["second", "third", "fourth"])).to be false
       end
     end
 
     context "when the value is empty" do
       it "returns false" do
-        expect(matcher.matches?("$all" => [])).to be false
+        expect(matcher._matches?("$all" => [])).to be false
       end
     end
   end
