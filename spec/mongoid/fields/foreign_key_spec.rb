@@ -464,7 +464,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "does not change the foreign key" do
-        expect(evolved).to be(value)
+        expect(evolved).to eq(BSON::ObjectId.from_string(value))
       end
     end
   end
