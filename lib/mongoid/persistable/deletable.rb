@@ -21,10 +21,12 @@ module Mongoid
       def delete(options = {})
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         prepare_delete do
-          if embedded?
-            delete_as_embedded(options)
-          else
-            delete_as_root
+          unless options[:persist] == false
+            if embedded?
+              delete_as_embedded(options)
+            else
+              delete_as_root
+            end
           end
         end
       end

@@ -168,7 +168,7 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
             expect(name).to be_persisted
           end
 
-          context "when replacing an exising document" do
+          context "when replacing an existing document" do
 
             let(:pet_owner) do
               PetOwner.create
@@ -198,6 +198,29 @@ describe Mongoid::Association::Embedded::EmbedsOne::Proxy do
             it "saves the new name" do
               expect(pet_owner.pet.name).to eq("tiksy")
             end
+          end
+        end
+        
+        context 'when the original document does not need to be unset because it will be replaced by the $set' do
+
+          let!(:pet_owner) do
+            PetOwner.create(pet: pet_one)
+          end
+
+          let(:pet_one) do
+            Pet.new(name: 'kika')
+          end
+
+          let(:pet_two) do
+            Pet.new(name: 'tiksy')
+          end
+
+          before do
+            expect(Mongo::Logger.logger).to receive(:debug?).exactly(2).times
+          end
+
+          it 'does not execute an unnecessary unset for the relation' do
+            pet_owner.pet = pet_two
           end
         end
 
