@@ -485,10 +485,10 @@ axes:
         display_name: ruby-2.4.1
         variables:
            RVM_RUBY: "ruby-2.4.1"
-      - id: "jruby-9.1"
-        display_name: jruby-9.1
-        variables:
-           RVM_RUBY: "jruby-9.1"
+#      - id: "jruby-9.1"
+#        display_name: jruby-9.1
+#        variables:
+#           RVM_RUBY: "jruby-9.1"
   - id: "os"
     display_name: OS
     values:
