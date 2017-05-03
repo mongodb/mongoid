@@ -14,7 +14,6 @@ export CI=evergreen
 export JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
 
 source ~/.rvm/scripts/rvm
-rvm install $RVM_RUBY
 rvm use $RVM_RUBY
 gem install bundler
 
