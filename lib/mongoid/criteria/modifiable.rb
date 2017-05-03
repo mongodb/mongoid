@@ -182,7 +182,7 @@ module Mongoid
           attributes[:_parent] = parent_document
           attributes[:__association] = association
         end
-        if polymorphic?
+        if polymorphic? && @criterion
           klass.__send__(method, attributes.merge(@criterion), &block)
         else
           klass.__send__(method, attributes, &block)
