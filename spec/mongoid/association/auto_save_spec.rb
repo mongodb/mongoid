@@ -306,6 +306,57 @@ describe Mongoid::Association::Referenced::AutoSave do
           end
         end
       end
+
+      context 'when the autosave should be cascaded' do
+
+        before do
+          class King
+            include Mongoid::Document
+            has_one :peasant, autosave: true
+          end
+
+          class Peasant
+            include Mongoid::Document
+            belongs_to :king
+            has_one :harvest, autosave: true
+          end
+
+          class Harvest
+            include Mongoid::Document
+            field :season, type: String
+            belongs_to :peasant
+          end
+        end
+
+        after do
+          Object.send(:remove_const, :King)
+          Object.send(:remove_const, :Peasant)
+          Object.send(:remove_const, :Harvest)
+        end
+
+        let(:king) do
+          King.create
+        end
+
+        let(:peasant) do
+          Peasant.create
+        end
+
+        let(:harvest) do
+          Harvest.create(season: 'Summer')
+        end
+
+        before do
+          peasant.harvest = harvest
+          king.peasant = peasant
+          harvest.season = 'Fall'
+          king.save
+        end
+
+        it 'cascades the save' do
+          expect(harvest.reload.season).to eq('Fall')
+        end
+      end
     end
   end
 end
