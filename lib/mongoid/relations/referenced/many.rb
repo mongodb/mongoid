@@ -180,7 +180,9 @@ module Mongoid
         # @since 2.1.0
         def each
           if block_given?
-            target.each { |doc| yield(doc) }
+            target.each do |doc|
+              yield(doc)
+            end
           else
             to_enum
           end
@@ -231,7 +233,7 @@ module Mongoid
         #
         # @since 2.0.0.beta.1
         def initialize(base, target, metadata)
-          init(base, Targets::Enumerable.new(target), metadata) do
+          init(base, Targets::Enumerable.new(target, base, metadata), metadata) do
             raise_mixed if klass.embedded? && !klass.cyclic?
           end
         end

@@ -59,6 +59,7 @@ module Mongoid
         #
         # @since 2.1.0
         def <<(document)
+          set_base(document)
           _added[document._id] = document
           self
         end
@@ -113,6 +114,7 @@ module Mongoid
           doc = (_loaded.delete(document._id) || _added.delete(document._id))
           unless doc
             if _unloaded && _unloaded.where(_id: document._id).exists?
+              set_base(document)
               yield(document) if block_given?
               return document
             end
@@ -121,7 +123,7 @@ module Mongoid
           doc
         end
 
-        # Deletes every document in the enumerable for where the block returns
+        # Deletes every document in the enumerable for which the block returns
         # true.
         #
         # @note This operation loads all documents from the database.
@@ -181,6 +183,7 @@ module Mongoid
           else
             unloaded_documents.each do |doc|
               document = _added.delete(doc._id) || _loaded.delete(doc._id) || doc
+              set_base(document)
               _loaded[document._id] = document
               yield(document)
             end
@@ -218,10 +221,10 @@ module Mongoid
         #
         # @since 2.1.0
         def first
-          _loaded.try(:values).try(:first) ||
+          set_base(_loaded.try(:values).try(:first) ||
             _added[(ul = _unloaded.try(:first)).try(:id)] ||
             ul ||
-            _added.values.try(:first)
+            _added.values.try(:first))
         end
 
         # Initialize the new enumerable either with a criteria or an array.
@@ -235,12 +238,15 @@ module Mongoid
         # @param [ Criteria, Array<Document> ] target The wrapped object.
         #
         # @since 2.1.0
-        def initialize(target)
+        def initialize(target, base = nil, metadata = nil)
+          @base = base
+          @metadata = metadata
           if target.is_a?(Criteria)
             @_added, @executed, @_loaded, @_unloaded = {}, false, {}, target
           else
             @_added, @executed = {}, true
             @_loaded = target.inject({}) do |_target, doc|
+              set_base(doc)
               _target[doc._id] = doc if doc
               _target
             end
@@ -302,10 +308,10 @@ module Mongoid
         #
         # @since 2.1.0
         def last
-          _added.values.try(:last) ||
+          set_base(_added.values.try(:last) ||
             _loaded.try(:values).try(:last) ||
             _added[(ul = _unloaded.try(:last)).try(:id)] ||
-            ul
+            ul)
         end
 
         # Loads all the documents in the enumerable from the database.
@@ -466,6 +472,27 @@ module Mongoid
 
         def unloaded_documents
           _unloaded.selector.values.any?(&:blank_criteria?) ? [] : _unloaded
+        end
+
+        def set_base(doc)
+          if doc && @base
+            doc.set_relation(@metadata.inverse_of, @base) if base_can_be_set?
+            doc
+          end
+        end
+
+        # The base can only be set for a Referenced::Many type, as the base is already
+        # loaded from the database.
+        # It cannot be set for Reference::ManyToMany because it's not guaranteed that all
+        # related objects are loaded.
+        #
+        # @api private
+        #
+        # @since 6.0.0
+        def base_can_be_set?
+          @metadata &&
+              @metadata.relation == Mongoid::Relations::Referenced::Many &&
+              @metadata.inverse_of
         end
       end
     end
