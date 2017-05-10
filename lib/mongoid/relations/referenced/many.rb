@@ -782,7 +782,7 @@ module Mongoid
           # @since 3.0.0
           def with_polymorphic_criterion(criteria, metadata, type = nil)
             if metadata.polymorphic?
-              criteria.where(metadata.type => type.name)
+              criteria.where(metadata.type => metadata.inverse_class_name)
             else
               criteria
             end
