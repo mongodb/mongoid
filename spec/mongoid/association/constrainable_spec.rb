@@ -77,12 +77,26 @@ describe Mongoid::Association::Constrainable do
 
       context 'when a string is passed' do
 
-        let(:object) do
-          BSON::ObjectId.new.to_s
+        context 'when the string represents an ObjectId' do
+
+          let(:object) do
+            BSON::ObjectId.new.to_s
+          end
+
+          it 'returns the object id' do
+            expect(result).to eq(BSON::ObjectId.from_string(object))
+          end
         end
 
-        it 'returns the object id' do
-          expect(result).to eq(BSON::ObjectId.from_string(object))
+        context 'when the string does not represent an ObjectId' do
+
+          let(:object) do
+            'some-other-string'
+          end
+
+          it 'returns the object' do
+            expect(result).to eq(object)
+          end
         end
       end
 
