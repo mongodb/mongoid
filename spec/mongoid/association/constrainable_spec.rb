@@ -53,5 +53,63 @@ describe Mongoid::Association::Constrainable do
         expect(constrainable.convert_to_foreign_key("testing")).to eq("testing")
       end
     end
+
+    context 'when the association is polymorphic' do
+
+      let(:constrainable) do
+        Post.relations['posteable']
+      end
+
+      let(:result) do
+        constrainable.convert_to_foreign_key(object)
+      end
+
+      context 'when a BSON::ObjectId is passed' do
+
+        let(:object) do
+          BSON::ObjectId.new
+        end
+
+        it 'returns the object id' do
+          expect(result).to eq(object)
+        end
+      end
+
+      context 'when a string is passed' do
+
+        context 'when the string represents an ObjectId' do
+
+          let(:object) do
+            BSON::ObjectId.new.to_s
+          end
+
+          it 'returns the object id' do
+            expect(result).to eq(BSON::ObjectId.from_string(object))
+          end
+        end
+
+        context 'when the string does not represent an ObjectId' do
+
+          let(:object) do
+            'some-other-string'
+          end
+
+          it 'returns the object' do
+            expect(result).to eq(object)
+          end
+        end
+      end
+
+      context 'when a model object is passed' do
+
+        let(:object) do
+          Post.new
+        end
+
+        it 'returns the id' do
+          expect(result).to eq(object.id)
+        end
+      end
+    end
   end
 end

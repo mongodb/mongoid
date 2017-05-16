@@ -35,7 +35,11 @@ module Mongoid
       private
       
       def convert_polymorphic(object)
-        object.respond_to?(:id) ? object.id : object
+        if object.is_a?(Mongoid::Document)
+          object.id
+        else
+          BSON::ObjectId.mongoize(object)
+        end
       end
     end
   end
