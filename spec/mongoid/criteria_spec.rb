@@ -433,7 +433,7 @@ describe Mongoid::Criteria do
       end
 
       it "contains equal options" do
-        expect(clone.options).to eq({ sort: { "name" => 1 }})
+        expect(clone.options).to eq({ sort: { "name" => 1 }, :read=>{:mode=>:secondary}})
       end
 
       it "clones the options" do
