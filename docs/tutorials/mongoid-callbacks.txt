@@ -13,7 +13,7 @@ Callbacks
 Document Callbacks
 ------------------
 
-Mongoid supports the following callbacks for :ref:`documents <mongoid-documents-6.0.0>`:
+Mongoid supports the following callbacks for :doc:`documents </tutorials/mongoid-documents>`:
 
 -  ``after_initialize``
 -  ``after_build``
