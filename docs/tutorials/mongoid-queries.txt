@@ -163,13 +163,13 @@ Mongoid also has some helpful methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.find_or_initialize_by(name: "Photek")
-          Band.where(:likes.gt => 10).find_or_initialize_by(name: "Photek")
+           Band.find_or_initialize_by(name: "Photek")
+           Band.where(:likes.gt => 10).find_or_initialize_by(name: "Photek")
 
    * - ``Criteria#first|last``
 
        *Finds a single document given the provided criteria. This automatically adds a sort on id.
-        Opt out of adding the id sort with the {id_sort: :none} option.*
+       Opt out of adding the id sort with the {id_sort: :none} option.*
 
      -
         .. code-block:: ruby

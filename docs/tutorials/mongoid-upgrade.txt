@@ -6,7 +6,7 @@ Upgrade Mongoid
 
 Upgrade to 6.x Series
 `````````````````````
-Mongoid 6.0 is compatible with Rails 5 and thus requires >= Ruby 2.2.2.
+Mongoid 6.x is compatible with Rails 5 and thus requires >= Ruby 2.2.2.
 
 Please see the list of behavior changes for version `6.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.beta>`_
 and version `6.0.0.rc0 <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.rc0>`_ for specific changes that might be
