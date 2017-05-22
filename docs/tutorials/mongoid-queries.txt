@@ -32,12 +32,12 @@ on an ``Origin::Queryable`` exists on a ``Mongoid::Criteria``
 
 .. code-block:: ruby
 
-  Band.where(name: "Depeche Mode")
-  Band.
-    where(:founded.gte => "1980-1-1").
-    in(name: [ "Tool", "Deftones" ]).
-    union.
-    in(name: [ "Melvins" ])
+   Band.where(name: "Depeche Mode")
+   Band.
+     where(:founded.gte => "1980-1-1").
+     in(name: [ "Tool", "Deftones" ]).
+     union.
+     in(name: [ "Melvins" ])
 
 With each chained method on a criteria, a newly cloned criteria
 is returned with the new query added. This is so that with scoping
@@ -65,8 +65,8 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.count
-          Band.where(name: "Photek").count
+           Band.count
+           Band.where(name: "Photek").count
 
    * - ``Criteria#distinct``
 
@@ -76,9 +76,9 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.distinct(:name)
-          Band.where(:fans.gt => 100000).
-            distinct(:name)
+           Band.distinct(:name)
+           Band.where(:fans.gt => 100000).
+             distinct(:name)
 
    * - ``Criteria#each``
 
@@ -87,9 +87,9 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.where(members: 1).each do |band|
-            p band.name
-          end
+           Band.where(members: 1).each do |band|
+             p band.name
+           end
 
    * - ``Criteria#exists?``
 
@@ -99,8 +99,8 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.exists?
-          Band.where(name: "Photek").exists?
+           Band.exists?
+           Band.where(name: "Photek").exists?
 
    * - ``Criteria#find``
 
@@ -110,14 +110,14 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.find("4baa56f1230048567300485c")
-          Band.find(
-            "4baa56f1230048567300485c",
-            "4baa56f1230048567300485d"
-          )
-          Band.where(name: "Photek").find(
-            "4baa56f1230048567300485c"
-          )
+           Band.find("4baa56f1230048567300485c")
+           Band.find(
+             "4baa56f1230048567300485c",
+             "4baa56f1230048567300485d"
+           )
+           Band.where(name: "Photek").find(
+             "4baa56f1230048567300485c"
+           )
 
    * - ``Criteria#find_by``
 
@@ -128,11 +128,11 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.find_by(name: "Photek")
+           Band.find_by(name: "Photek")
 
-          Band.find_by(name: "Tool") do |band|
-            band.impressions += 1
-          end
+           Band.find_by(name: "Tool") do |band|
+             band.impressions += 1
+           end
 
    * - ``Criteria#find_or_create_by``
 
@@ -142,8 +142,8 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.find_or_create_by(name: "Photek")
-          Band.where(:likes.gt => 10).find_or_create_by(name: "Photek")
+           Band.find_or_create_by(name: "Photek")
+           Band.where(:likes.gt => 10).find_or_create_by(name: "Photek")
 
    * - ``Criteria#find_or_initialize_by``
 
@@ -153,8 +153,8 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.find_or_initialize_by(name: "Photek")
-          Band.where(:likes.gt => 10).find_or_initialize_by(name: "Photek")
+           Band.find_or_initialize_by(name: "Photek")
+           Band.where(:likes.gt => 10).find_or_initialize_by(name: "Photek")
 
    * - ``Criteria#first|last``
 
@@ -163,9 +163,9 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.first
-          Band.where(:members.with_size => 3).first
-          Band.where(:members.with_size => 3).last
+           Band.first
+           Band.where(:members.with_size => 3).first
+           Band.where(:members.with_size => 3).last
 
    * - ``Criteria#first_or_create``
 
@@ -175,7 +175,7 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").first_or_create
+           Band.where(name: "Photek").first_or_create
 
    * - ``Criteria#first_or_create!``
 
@@ -185,7 +185,7 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").first_or_create!
+           Band.where(name: "Photek").first_or_create!
 
    * - ``Criteria#first_or_initialize``
 
@@ -195,7 +195,7 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").first_or_initialize
+           Band.where(name: "Photek").first_or_initialize
 
    * - ``Criteria#for_js``
 
@@ -206,7 +206,7 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.for_js("this.name = param", param: "Tool")
+           Band.for_js("this.name = param", param: "Tool")
 
    * - ``Criteria#length|size``
 
@@ -215,8 +215,8 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.length
-          Band.where(name: "FKA Twigs").size
+           Band.length
+           Band.where(name: "FKA Twigs").size
 
    * - ``Criteria#pluck``
 
@@ -226,7 +226,7 @@ methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.all.pluck(:name)
+           Band.all.pluck(:name)
 
 
 Eager Loading
@@ -240,19 +240,19 @@ associations.
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-    has_many :albums
-  end
+   class Band
+     include Mongoid::Document
+     has_many :albums
+   end
 
-  class Album
-    include Mongoid::Document
-    belongs_to :band
-  end
+   class Album
+     include Mongoid::Document
+     belongs_to :band
+   end
 
-  Band.includes(:albums).each do |band|
-    p band.albums.first.name # Does not hit the database again.
-  end
+   Band.includes(:albums).each do |band|
+     p band.albums.first.name # Does not hit the database again.
+   end
 
 
 Queries + Persistence
@@ -276,7 +276,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").create
+           Band.where(name: "Photek").create
 
    * - ``Criteria#create!``
 
@@ -285,7 +285,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").create!
+           Band.where(name: "Photek").create!
 
    * - ``Criteria#build|new``
 
@@ -294,8 +294,8 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").build
-          Band.where(name: "Photek").new
+           Band.where(name: "Photek").build
+           Band.where(name: "Photek").new
 
    * - ``Criteria#update``
 
@@ -304,7 +304,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").update(label: "Mute")
+           Band.where(name: "Photek").update(label: "Mute")
 
    * - ``Criteria#update_all``
 
@@ -313,7 +313,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(members: 2).update_all(label: "Mute")
+           Band.where(members: 2).update_all(label: "Mute")
 
    * - ``Criteria#add_to_set``
 
@@ -322,7 +322,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").add_to_set(label: "Mute")
+           Band.where(name: "Photek").add_to_set(label: "Mute")
 
    * - ``Criteria#bit``
 
@@ -331,7 +331,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
+           Band.where(name: "Photek").bit(likes: { and: 14, or: 4 })
 
    * - ``Criteria#inc``
 
@@ -340,7 +340,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").inc(likes: 123)
+           Band.where(name: "Photek").inc(likes: 123)
 
    * - ``Criteria#pop``
 
@@ -349,8 +349,8 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Photek").pop(members: -1)
-          Band.where(name: "Photek").pop(members: 1)
+           Band.where(name: "Photek").pop(members: -1)
+           Band.where(name: "Photek").pop(members: 1)
 
    * - ``Criteria#pull``
 
@@ -359,7 +359,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Tool").pull(members: "Maynard")
+           Band.where(name: "Tool").pull(members: "Maynard")
 
    * - ``Criteria#pull_all``
 
@@ -368,8 +368,8 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Tool").
-            pull_all(:members, [ "Maynard", "Danny" ])
+           Band.where(name: "Tool").
+             pull_all(:members, [ "Maynard", "Danny" ])
 
    * - ``Criteria#push``
 
@@ -378,7 +378,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Tool").push(members: "Maynard")
+           Band.where(name: "Tool").push(members: "Maynard")
 
    * - ``Criteria#push_all``
 
@@ -387,8 +387,8 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Tool").
-            push_all(members: [ "Maynard", "Danny" ])
+           Band.where(name: "Tool").
+             push_all(members: [ "Maynard", "Danny" ])
 
    * - ``Criteria#rename``
 
@@ -397,7 +397,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Tool").rename(name: :title)
+           Band.where(name: "Tool").rename(name: :title)
 
    * - ``Criteria#set``
 
@@ -406,7 +406,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Tool").set(likes: 10000)
+           Band.where(name: "Tool").set(likes: 10000)
 
    * - ``Criteria#unset``
 
@@ -415,7 +415,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(name: "Tool").unset(:likes)
+           Band.where(name: "Tool").unset(:likes)
 
    * - ``Criteria#delete``
 
@@ -424,7 +424,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(label: "Mute").delete
+           Band.where(label: "Mute").delete
 
    * - ``Criteria#destroy``
 
@@ -434,7 +434,7 @@ document inserts, updates, and deletion.
      -
         .. code-block:: ruby
 
-          Band.where(label: "Mute").destroy
+           Band.where(label: "Mute").destroy
 
 Scoping
 -------

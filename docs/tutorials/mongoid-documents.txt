@@ -96,7 +96,7 @@ in a ``Mongoid::Document``.
 Keep in mind that the field definitions determine how Mongoid behaves when writing and reading
 fields from the database. Changing the Model definition in the Model file does not change existing
 data. If you'd like to update a field type or options of existing data, you must write a script to do so.
- You will get errors otherwise.
+You will get errors otherwise.
 
 Consider a simple class for modeling a person in an application. A person may have a first name,
 last name, and middle name. We can define these attributes on a person by using the fields macro.
