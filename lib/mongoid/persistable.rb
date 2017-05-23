@@ -123,7 +123,10 @@ module Mongoid
     #
     # @since 4.0.0
     def post_process_persist(result, options = {})
-      post_persist unless result == false
+      unless result == false
+        reset_persisted_children
+        move_changes
+      end
       errors.clear unless performing_validations?(options)
       true
     end

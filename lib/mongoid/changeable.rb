@@ -89,17 +89,6 @@ module Mongoid
       changed_attributes.clear
     end
 
-    # Things that need to execute after a document has been persisted.
-    #
-    # @example Handle post persistence.
-    #   document.post_persist
-    #
-    # @since 3.0.0
-    def post_persist
-      reset_persisted_children
-      move_changes
-    end
-
     # Get the previous changes on the document.
     #
     # @example Get the previous changes.

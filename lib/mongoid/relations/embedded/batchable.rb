@@ -327,8 +327,6 @@ module Mongoid
         def post_process_batch_insert(docs)
           docs.each do |doc|
             doc.new_record = false
-            doc.run_after_callbacks(:create, :save)
-            doc.post_persist
           end
         end
 
@@ -347,7 +345,6 @@ module Mongoid
         # @since 3.0.0
         def post_process_batch_remove(docs, method)
           docs.each do |doc|
-            doc.run_after_callbacks(:destroy) if method == :destroy
             doc.freeze
             doc.destroyed = true
           end
