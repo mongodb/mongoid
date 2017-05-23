@@ -814,6 +814,82 @@ describe Mongoid::Relations::Referenced::ManyToMany do
     end
   end
 
+  describe "when self-referencing" do
+    let!(:parent) do
+      Vertex.create
+    end
+
+    let!(:child) do
+      Vertex.create(parents: [parent])
+    end
+
+    before do
+      parent.reload
+      child.reload
+    end
+
+    it "sets the parent" do
+      expect(child.parents).to include(parent)
+    end
+
+    it "sets the parent id" do
+      expect(child.parent_ids).to include(parent.id)
+    end
+
+    it "sets the child" do
+      expect(parent.children).to include(child)
+    end
+
+    it "sets the child id" do
+      expect(parent.child_ids).to include(child.id)
+    end
+
+    describe "#update" do
+      before do
+        child.update(parents: [parent])
+      end
+
+      it "sets the parent" do
+        expect(child.parents).to include(parent)
+      end
+
+      it "sets the parent id" do
+        expect(child.parent_ids).to include(parent.id)
+      end
+
+      it "sets the child" do
+        expect(parent.children).to include(child)
+      end
+
+      it "sets the child id" do
+        expect(parent.child_ids).to include(child.id)
+      end
+
+      describe "when reloading" do
+        before do
+          parent.reload
+          child.reload
+        end
+
+        it "sets the parent" do
+          expect(child.parents).to include(parent)
+        end
+
+        it "sets the parent id" do
+          expect(child.parent_ids).to include(parent.id)
+        end
+
+        it "sets the child" do
+          expect(parent.children).to include(child)
+        end
+
+        it "sets the child id" do
+          expect(parent.child_ids).to include(child.id)
+        end
+      end
+    end
+  end
+
   [ nil, [] ].each do |value|
 
     describe "#= #{value}" do
