@@ -3407,6 +3407,18 @@ describe Mongoid::Criteria do
       Band.create(name: "Tool")
     end
 
+    context "when provided an array" do
+      it "returns the matching documents" do
+        account = Account.create!(name: "savings", balance: "100")
+        agent = account.agents.create!
+        agent_ids = [agent.id]
+        old_agent_ids = agent_ids.clone
+        criteria = Account.where(agent_ids: agent_ids).to_a
+        criteria.should == [account]
+        agent_ids.should == old_agent_ids
+      end
+    end
+
     context "when provided a string" do
 
       context "when the criteria is embedded" do
