@@ -145,7 +145,7 @@ module Mongoid
     #
     # @return [ Document ] The first matching document.
     def first
-      with_default_scope.first
+      with_default_scope.to_a.first
     end
     alias :one :first
 
@@ -156,7 +156,7 @@ module Mongoid
     #
     # @return [ Document ] The last matching document.
     def last
-      with_default_scope.last
+      with_default_scope.to_a.last
     end
   end
 end
