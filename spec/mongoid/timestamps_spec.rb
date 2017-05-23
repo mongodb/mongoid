@@ -98,7 +98,7 @@ describe Mongoid::Timestamps do
 
     before do
       address.number = 1
-      document.save
+      address.save
     end
 
     it "updates the root document updated at" do
