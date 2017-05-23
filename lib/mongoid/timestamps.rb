@@ -3,6 +3,7 @@ require "mongoid/timestamps/timeless"
 require "mongoid/timestamps/created"
 require "mongoid/timestamps/updated"
 require "mongoid/timestamps/short"
+require "mongoid/timestamps/serverside"
 
 module Mongoid
 
