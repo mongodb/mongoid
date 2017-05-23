@@ -156,7 +156,7 @@ module Mongoid
     #
     # @return [ Document ] The last matching document.
     def last
-      with_default_scope.last
+      with_default_scope.order([[:_id, 1]]).last
     end
   end
 end

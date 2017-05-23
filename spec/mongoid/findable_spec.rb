@@ -476,6 +476,42 @@ describe Mongoid::Findable do
     end
   end
 
+  describe ".first" do
+
+    before do
+      Band.create(name: "Tool")
+      Band.create(name: "Photek")
+    end
+
+    it "returns first record" do
+      expect(Band.first.name).to eq("Tool")
+    end
+
+    it "returns first record if an order is specified" do
+      expect(Band.order([[:name, 1]]).first.name).to eq("Photek")
+    end
+  end
+
+  describe ".last" do
+
+    before do
+      Band.create(name: "Tool")
+      Band.create(name: "Photek")
+    end
+
+    it "returns last record" do
+      expect(Band.last.name).to eq("Photek")
+    end
+
+    it "returns last record if an order is specified" do
+      expect(Band.order([[:name, 1]]).last.name).to eq("Tool")
+    end
+
+    it "returns last record if an id order is specified" do
+      expect(Band.order([[:_id, -1]]).last.name).to eq("Tool")
+    end
+  end
+
   Mongoid::Criteria::Queryable::Selectable.forwardables.each do |method|
 
     describe "##{method}" do
