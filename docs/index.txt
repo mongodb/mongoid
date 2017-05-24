@@ -12,9 +12,20 @@ framework for MongoDB in Ruby.
 .. toctree::
    :titlesonly:
 
-   /mongoid-tutorials-6.0
-   /mongoid-tutorials-5.1
-   Mongoid 3 and 4 <http://mongoid.github.io>
+   /tutorials/mongoid-installation
+   /tutorials/mongoid-documents
+   /tutorials/mongoid-persistence
+   /tutorials/mongoid-queries
+   /tutorials/mongoid-relations
+   /tutorials/mongoid-nested-attributes
+   /tutorials/mongoid-callbacks
+   /tutorials/mongoid-validation
+   /tutorials/mongoid-indexes
+   /tutorials/mongoid-rails
+   /tutorials/mongoid-upgrade
+
+
+For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
 
 Additional Mappers
 ------------------
