@@ -14,7 +14,7 @@ module Mongoid
             # @example Evolve the value to a boolean.
             #   Boolean.evolve(true)
             #
-            # @param [ Object ] The object to evolve.
+            # @param [ Object ] object The object to evolve.
             #
             # @return [ true, false ] The boolean value.
             #

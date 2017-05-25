@@ -26,7 +26,7 @@ module Mongoid
           # @example Merge the object into the array.
           #   4.__add_from_array__([ 1, 2 ])
           #
-          # @param [ Array ] value The array to add to.
+          # @param [ Array ] array The array to add to.
           #
           # @return [ Array ] The merged object.
           #
@@ -54,7 +54,7 @@ module Mongoid
           # @example Merge the object into the array.
           #   4.__intersect_from_array__([ 1, 2 ])
           #
-          # @param [ Array ] value The array to intersect to.
+          # @param [ Array ] array The array to intersect to.
           #
           # @return [ Array ] The merged object.
           #
@@ -68,7 +68,7 @@ module Mongoid
           # @example Merge the object into the array.
           #   4.__intersect_from_object__([ 1, 2 ])
           #
-          # @param [ Object ] value The value to intersect to.
+          # @param [ Object ] object The value to intersect to.
           #
           # @return [ Array ] The merged object.
           #
@@ -96,7 +96,7 @@ module Mongoid
           # @example Merge the object into the array.
           #   4.__union_from_object__([ 1, 2 ])
           #
-          # @param [ Object ] value The value to union to.
+          # @param [ Object ] object The value to union to.
           #
           # @return [ Array ] The merged object.
           #

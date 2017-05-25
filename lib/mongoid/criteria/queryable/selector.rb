@@ -83,7 +83,7 @@ module Mongoid
         # @example Evolve the multi-selection.
         #   selector.evolve_multi([{ field: "value" }])
         #
-        # @param [ Array<Hash> ] The multi-selection.
+        # @param [ Array<Hash> ] value The multi-selection.
         #
         # @return [ Array<Hash> ] The serialized values.
         #

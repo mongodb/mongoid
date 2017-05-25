@@ -162,7 +162,7 @@ module Mongoid
             # @example Evolve the object.
             #   Array.evolve(1)
             #
-            # @param [ Object ] The object to evolve.
+            # @param [ Object ] object The object to evolve.
             #
             # @return [ Object ] The evolved object.
             #
