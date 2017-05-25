@@ -11,7 +11,7 @@ module Mongoid
       # @example Reset the given counter cache
       #   post.reset_counters(:comments)
       #
-      # @param [ Symbol, Array ] One or more counter caches to reset
+      # @param [ Symbol, Array ] counters One or more counter caches to reset
       #
       # @since 4.0.0
       def reset_counters(*counters)
@@ -27,8 +27,8 @@ module Mongoid
         # @example Reset the given counter cache
         #   Post.reset_counters('50e0edd97c71c17ea9000001', :comments)
         #
-        # @param [ String ] The id of the object that will be reset.
-        # @param [ Symbol, Array ] One or more counter caches to reset
+        # @param [ String ] id The id of the object that will be reset.
+        # @param [ Symbol, Array ] counters One or more counter caches to reset
         #
         # @since 3.1.0
         def reset_counters(id, *counters)
@@ -49,8 +49,8 @@ module Mongoid
         #   Post.update_counters('50e0edd97c71c17ea9000001',
         #              :comments_count => 5, :likes_count => -2)
         #
-        # @param [ String ] The id of the object to update.
-        # @param [ Hash ] Key = counter_cache and Value = factor.
+        # @param [ String ] id The id of the object to update.
+        # @param [ Hash ] counters
         #
         # @since 3.1.0
         def update_counters(id, counters)
@@ -64,8 +64,8 @@ module Mongoid
         # @example Increment comments counter
         #   Post.increment_counter(:comments_count, '50e0edd97c71c17ea9000001')
         #
-        # @param [ Symbol ] Counter cache name
-        # @param [ String ] The id of the object that will have its counter incremented.
+        # @param [ Symbol ] counter_name Counter cache name
+        # @param [ String ] id The id of the object that will have its counter incremented.
         #
         # @since 3.1.0
         def increment_counter(counter_name, id)
@@ -79,8 +79,8 @@ module Mongoid
         # @example Decrement comments counter
         #   Post.decrement_counter(:comments_count, '50e0edd97c71c17ea9000001')
         #
-        # @param [ Symbol ] Counter cache name
-        # @param [ String ] The id of the object that will have its counter decremented.
+        # @param [ Symbol ] counter_name Counter cache name
+        # @param [ String ] id The id of the object that will have its counter decremented.
         #
         # @since 3.1.0
         def decrement_counter(counter_name, id)
@@ -96,7 +96,7 @@ module Mongoid
         # @example Add the touchable.
         #   Person.add_counter_cache_callbacks(meta)
         #
-        # @param [ Metadata ] metadata The metadata for the relation.
+        # @param [ Metadata ] meta The metadata for the relation.
         #
         # @since 3.1.0
         def add_counter_cache_callbacks(meta)

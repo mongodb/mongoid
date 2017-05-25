@@ -165,8 +165,6 @@ module Mongoid
         #
         # @param [ Hash, Array ] attributes The attributes to create with, or an
         #   Array of multiple attributes for multiple documents.
-        # @param [ Hash ] options A mass-assignment protection options. Supports
-        #   :as and :without_protection
         #
         # @return [ Document, Array<Document> ] The newly created document(s).
         #

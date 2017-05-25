@@ -14,8 +14,8 @@ module Mongoid
       # @param [ String ] name The name of the field.
       # @param [ String ] key The atomic location of the field.
       # @param [ Hash ] mods The current modifications.
-      # @param [ Array ] new The new elements to add.
-      # @param [ Array ] old The old elements getting removed.
+      # @param [ Array ] new_elements The new elements to add.
+      # @param [ Array ] old_elements The old elements getting removed.
       #
       # @since 2.4.0
       def add_atomic_changes(document, name, key, mods, new_elements, old_elements)

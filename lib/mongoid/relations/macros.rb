@@ -326,7 +326,8 @@ module Mongoid
         #   Model.reference_one_to_one(:name, meta)
         #
         # @param [ Symbol ] name The name of the relation.
-        # @param [ Metadata ] meta The relation metadata.
+        # @param [ Symbol ] options The association options.
+        # @param [ Metadata ] relation The relation.
         #
         # @return [ Class ] The model class.
         #

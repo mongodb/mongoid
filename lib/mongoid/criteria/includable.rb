@@ -48,7 +48,7 @@ module Mongoid
       # @example Set the inclusions.
       #   criteria.inclusions = [ meta ]
       #
-      # @param [ Array<Metadata> ] The inclusions.
+      # @param [ Array<Metadata> ] value The inclusions.
       #
       # @return [ Array<Metadata> ] The new inclusions.
       #
@@ -65,7 +65,7 @@ module Mongoid
       #   criteria.add_inclusion(Person, :posts)
       #
       # @param [ Class, String, Symbol ] _klass The class or string/symbol of the class name.
-      # @param [ Symbol ] relation The relation.
+      # @param [ Symbol ] metadata The relation.
       #
       # @raise [ Errors::InvalidIncludes ] If no relation is found.
       #

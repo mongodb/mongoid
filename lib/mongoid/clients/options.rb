@@ -135,7 +135,7 @@ module Mongoid
         #   Threaded.set_options(Band, { write: { w: 3 }})
         #
         # @param [ Class ] klass The model class.
-        # @param [ Mongo::Client ] client The client with options.
+        # @param [ Mongo::Client ] options The options.
         #
         # @return [ Mongo::Client, nil ] The client or nil if the cluster does not change.
         #

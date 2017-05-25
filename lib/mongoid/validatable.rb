@@ -144,7 +144,7 @@ module Mongoid
       # @example Validate with a specific validator.
       #   validates_with MyValidator, on: :create
       #
-      # @param [ Class<Array>, Hash ] *args The validator classes and options.
+      # @param [ Class<Array>, Hash ] args The validator classes and options.
       #
       # @note See ActiveModel::Validations::With for full options. This is
       #   overridden to add autosave functionality when presence validation is

@@ -157,7 +157,7 @@ module Mongoid
       # @example Unset the field on the matches.
       #   context.unset(:name)
       #
-      # @param [ String, Symbol, Array ] fields The name of the fields.
+      # @param [ String, Symbol, Array ] args The name of the fields.
       #
       # @return [ nil ] Nil.
       #

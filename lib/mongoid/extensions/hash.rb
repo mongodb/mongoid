@@ -161,10 +161,11 @@ module Mongoid
       # @api private
       #
       # @example Mongoize for the klass, field and value.
-      #   {}.mongoize_for(Band, "name", "test")
+      #   {}.mongoize_for("$push", Band, "name", "test")
       #
+      # @param [ String ] operator The operator.
       # @param [ Class ] klass The model class.
-      # @param [ String, Symbol ] The field key.
+      # @param [ String, Symbol ] key The field key.
       # @param [ Object ] value The value to mongoize.
       #
       # @return [ Object ] The mongoized value.

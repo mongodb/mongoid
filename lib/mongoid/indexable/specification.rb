@@ -99,7 +99,7 @@ module Mongoid
       # @example Normalize the index options.
       #   specification.normalize_options(drop_dups: true)
       #
-      # @param [ Hash ] options The index options.
+      # @param [ Hash ] opts The index options.
       #
       # @return [ Hash ] The normalized options.
       #

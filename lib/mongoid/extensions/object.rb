@@ -94,7 +94,7 @@ module Mongoid
       #   object.do_or_do_not(:use, "The Force")
       #
       # @param [ String, Symbol ] name The method name.
-      # @param [ Array ] *args The arguments.
+      # @param [ Array ] args The arguments.
       #
       # @return [ Object, nil ] The result of the method call or nil if the
       #   method does not exist.
@@ -209,7 +209,7 @@ module Mongoid
       #   object.you_must(:use, "The Force")
       #
       # @param [ String, Symbol ] name The method name.
-      # @param [ Array ] *args The arguments.
+      # @param [ Array ] args The arguments.
       #
       # @return [ Object, nil ] The result of the method call or nil if the
       #   method does not exist. Nil if the object is frozen.

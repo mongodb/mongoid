@@ -218,7 +218,6 @@ module Mongoid
     #   person.attributes = { :title => "Mr." }
     #
     # @param [ Hash ] attrs The new attributes to set.
-    # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
     #
     # @since 1.0.0
     def write_attributes(attrs = nil)
@@ -332,7 +331,7 @@ module Mongoid
     # the value is valid for given a field.
     # For now, only Hash and Array fields are validated.
     #
-    # @param [ String, Symbol ] name The name of the attribute to validate.
+    # @param [ String, Symbol ] access The name of the attribute to validate.
     # @param [ Object ] value The to be validated.
     #
     # @since 3.0.10

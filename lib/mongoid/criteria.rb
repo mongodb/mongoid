@@ -386,7 +386,7 @@ module Mongoid
     # @example Add a javascript selection.
     #   criteria.where("this.name == 'syd'")
     #
-    # @param [ String, Hash ] criterion The javascript or standard selection.
+    # @param [ String, Hash ] expression The javascript or standard selection.
     #
     # @raise [ UnsupportedJavascript ] If provided a string and the criteria
     #   is embedded.

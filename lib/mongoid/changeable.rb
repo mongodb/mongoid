@@ -265,7 +265,7 @@ module Mongoid
       #   Model.create_dirty_methods("name", "name")
       #
       # @param [ String ] name The name of the field.
-      # @param [ String ] name The name of the accessor.
+      # @param [ String ] meth The name of the accessor.
       #
       # @return [ Module ] The fields module.
       #

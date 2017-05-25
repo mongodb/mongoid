@@ -44,8 +44,7 @@ module Mongoid
         # @example Substitute the relation.
         #   name.substitute(new_name)
         #
-        # @param [ Document, Array<Document> ] new_target The replacement.
-        # @param [ true, false ] building Are we in build mode?
+        # @param [ Document, Array<Document> ] replacement The replacement.
         #
         # @return [ In, nil ] The relation or nil.
         #
@@ -64,8 +63,6 @@ module Mongoid
         #
         # @example Get the binding object.
         #   binding([ address ])
-        #
-        # @param [ Document, Array<Document> ] new_target The replacement.
         #
         # @return [ Binding ] The binding object.
         #

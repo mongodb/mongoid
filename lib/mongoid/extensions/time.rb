@@ -27,7 +27,7 @@ module Mongoid
         # @example Get the configured time.
         #   ::Time.configured
         #
-        # @retun [ Time ] The configured time.
+        # @return [ Time ] The configured time.
         #
         # @since 3.0.0
         def configured

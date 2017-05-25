@@ -19,7 +19,7 @@ module Mongoid
         # @example Concat with other documents.
         #   person.posts.concat([ post_one, post_two ])
         #
-        # @param [ Document, Array<Document> ] *args Any number of documents.
+        # @param [ Document, Array<Document> ] args Any number of documents.
         #
         # @return [ Array<Document> ] The loaded docs.
         #

@@ -31,7 +31,7 @@ module Mongoid
         # @example Substitute the new document.
         #   person.name.substitute(new_name)
         #
-        # @param [ Document ] other A document to replace the target.
+        # @param [ Document ] replacement A document to replace the target.
         #
         # @return [ Document, nil ] The relation or nil.
         #
@@ -60,8 +60,6 @@ module Mongoid
         #
         # @example Get the binding.
         #   relation.binding([ address ])
-        #
-        # @param [ Document ] new_target The new document to bind with.
         #
         # @return [ Binding ] The relation's binding.
         #

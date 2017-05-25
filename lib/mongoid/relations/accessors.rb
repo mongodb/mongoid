@@ -17,7 +17,6 @@ module Mongoid
       # @param [ String, Symbol ] name The name of the relation.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
       # @param [ Metadata ] metadata The relation's metadata.
-      # @param [ true, false ] building If we are in a build operation.
       #
       # @return [ Proxy ] The relation.
       #
@@ -32,7 +31,7 @@ module Mongoid
       # @example Create the relation.
       #   person.create_relation(document, metadata)
       #
-      # @param [ Document, Array<Document ] object The relation target.
+      # @param [ Document, Array<Document> ] object The relation target.
       # @param [ Metadata ] metadata The relation metadata.
       #
       # @return [ Proxy ] The relation.

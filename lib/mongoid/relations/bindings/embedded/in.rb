@@ -17,8 +17,6 @@ module Mongoid
           #   name.person.bind(:continue => true)
           #   name.person = Person.new
           #
-          # @param [ Hash ] options The binding options.
-          #
           # @option options [ true, false ] :continue Continue binding the inverse.
           # @option options [ true, false ] :binding Are we in build mode?
           #
@@ -41,8 +39,6 @@ module Mongoid
           # @example Unbind the document.
           #   name.person.unbind(:continue => true)
           #   name.person = nil
-          #
-          # @param [ Hash ] options The options to pass through.
           #
           # @option options [ true, false ] :continue Do we continue unbinding?
           #

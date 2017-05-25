@@ -57,7 +57,7 @@ module Mongoid
       # @example Allow pluck for null context.
       #   context.pluck(:name)
       #
-      # @param [ String, Symbol, Array ] field or fields to pluck.
+      # @param [ String, Symbol, Array ] args Field or fields to pluck.
       #
       # @return [ Array ] Emtpy Array
       def pluck(*args)
@@ -69,7 +69,7 @@ module Mongoid
       # @example Create the new context.
       #   Null.new(criteria)
       #
-      # @param [ Criteria ] The criteria.
+      # @param [ Criteria ] criteria The criteria.
       #
       # @since 4.0.0
       def initialize(criteria)

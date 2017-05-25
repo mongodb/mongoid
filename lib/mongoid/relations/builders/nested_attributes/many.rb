@@ -60,7 +60,7 @@ module Mongoid
           # @example Is the document destroyable?
           #   destroyable?({ :_destroy => "1" })
           #
-          # @parma [ Hash ] attributes The attributes to pull the flag from.
+          # @param [ Hash ] attributes The attributes to pull the flag from.
           #
           # @return [ true, false ] If the relation can potentially be deleted.
           def destroyable?(attributes)
