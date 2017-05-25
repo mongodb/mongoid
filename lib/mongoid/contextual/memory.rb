@@ -140,7 +140,7 @@ module Mongoid
       # @example Create the new context.
       #   Memory.new(criteria)
       #
-      # @param [ Criteria ] The criteria.
+      # @param [ Criteria ] criteria The criteria.
       #
       # @since 3.0.0
       def initialize(criteria)

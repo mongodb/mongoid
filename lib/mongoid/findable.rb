@@ -71,7 +71,7 @@ module Mongoid
     # @example Do any documents exist for the conditions?
     #   Person.exists?
     #
-    # @param [ Array ] args The conditions.
+    # @return [ true, false ] If any documents exist for the conditions.
     def exists?
       with_default_scope.exists?
     end

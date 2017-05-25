@@ -40,7 +40,7 @@ module Mongoid
         # @example Concat with other documents.
         #   person.posts.concat([ post_one, post_two ])
         #
-        # @param [ Document, Array<Document> ] *args Any number of documents.
+        # @param [ Document, Array<Document> ] args Any number of documents.
         #
         # @return [ Array<Document> ] The loaded docs.
         #
@@ -208,7 +208,7 @@ module Mongoid
         # @note This will keep matching documents in memory for iteration
         #   later.
         #
-        # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] arg The ids.
+        # @param [ BSON::ObjectId, Array<BSON::ObjectId> ] args The ids.
         #
         # @return [ Document, Criteria ] The matching document(s).
         #
@@ -385,8 +385,6 @@ module Mongoid
         # @example Get the binding.
         #   relation.binding([ address ])
         #
-        # @param [ Array<Document> ] new_target The new documents to bind with.
-        #
         # @return [ Binding ] The binding.
         #
         # @since 2.0.0.rc.1
@@ -510,7 +508,7 @@ module Mongoid
         #   person.posts.delete_all({ :title => "Testing" })
         #
         # @param [ Hash ] conditions Optional conditions to delete with.
-        # @param [ Symbol ] The deletion method to call.
+        # @param [ Symbol ] method The deletion method to call.
         #
         # @return [ Integer ] The number of documents deleted.
         #

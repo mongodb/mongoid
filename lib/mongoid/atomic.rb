@@ -31,7 +31,7 @@ module Mongoid
     # @example Add the atomic pull.
     #   person.add_atomic_pull(address)
     #
-    # @param [ Document ] The embedded document to pull.
+    # @param [ Document ] document The embedded document to pull.
     #
     # @since 2.2.0
     def add_atomic_pull(document)

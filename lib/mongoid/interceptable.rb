@@ -46,7 +46,7 @@ module Mongoid
     # @example Is the callback executable?
     #   document.callback_executable?(:save)
     #
-    # @param [ Symbol ] kin The type of callback.
+    # @param [ Symbol ] kind The type of callback.
     #
     # @return [ true, false ] If the callback can be executed.
     #
@@ -118,7 +118,7 @@ module Mongoid
     #   end
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array ] *args Any options.
+    # @param [ Array ] args Any options.
     #
     # @return [ Document ] The document
     #

@@ -13,7 +13,8 @@ module Mongoid
       # @example Does this object respond to the method?
       #   person.respond_to?(:title)
       #
-      # @param [ Array ] *args The name of the method.
+      # @param [ Array ] name The name of the method.
+      # @param [ true, false ] include_private
       #
       # @return [ true, false ] True if it does, false if not.
       #
@@ -126,7 +127,7 @@ module Mongoid
       #   document.method_missing(:test)
       #
       # @param [ String, Symbol ] name The name of the method.
-      # @param [ Array ] *args The arguments to the method.
+      # @param [ Array ] args The arguments to the method.
       #
       # @return [ Object ] The result of the method call.
       #

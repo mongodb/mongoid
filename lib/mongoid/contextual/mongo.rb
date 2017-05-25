@@ -200,7 +200,7 @@ module Mongoid
       # @example Execute the command.
       #   context.find_one_and_update({ likes: 1 })
       #
-      # @param [ Hash ] update The updates.
+      # @param [ Hash ] replacement The replacement.
       # @param [ Hash ] options The command options.
       #
       # @option options [ :before, :after ] :return_document Return the updated document
@@ -313,7 +313,7 @@ module Mongoid
       # @example Map by some field.
       #   context.map(:field1)
       #
-      # @exmaple Map with block.
+      # @example Map with block.
       #   context.map(&:field1)
       #
       # @param [ Symbol ] field The field name.
@@ -425,7 +425,7 @@ module Mongoid
       # @note This method will return the raw db values - it performs no custom
       #   serialization.
       #
-      # @param [ String, Symbol, Array ] field Fields to pluck.
+      # @param [ String, Symbol, Array ] fields Fields to pluck.
       #
       # @return [ Array<Object, Array> ] The plucked values.
       #

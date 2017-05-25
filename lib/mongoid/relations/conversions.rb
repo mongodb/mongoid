@@ -13,7 +13,7 @@ module Mongoid
       #   Conversions.flag(metadata, 15)
       #
       # @param [ Object ] object The object to flag.
-      # @param [ Metadata ] The relation metadata.
+      # @param [ Metadata ] metadata The relation metadata.
       #
       # @return [ Object ] The provided object.
       #

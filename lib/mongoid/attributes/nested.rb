@@ -34,7 +34,7 @@ module Mongoid
         #     accepts_nested_attributes_for :addresses, :game, :posts
         #   end
         #
-        # @param [ Array<Symbol>, Hash ] *args A list of relation names, followed
+        # @param [ Array<Symbol>, Hash ] args A list of relation names, followed
         #   by a hash of options.
         #
         # @option *args [ true, false ] :allow_destroy Can deletion occur?

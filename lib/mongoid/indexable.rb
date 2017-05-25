@@ -92,7 +92,7 @@ module Mongoid
       #     index({ name: 1 }, { background: true })
       #   end
       #
-      # @param [ Symbol ] name The name of the field.
+      # @param [ Symbol ] spec The index spec.
       # @param [ Hash ] options The index options.
       #
       # @return [ Hash ] The index options.
@@ -110,7 +110,8 @@ module Mongoid
       # @example Get the index specification.
       #   Model.index_specification(name: 1)
       #
-      # @param [ Hash ] key The index key/direction pair.
+      # @param [ Hash ] index_hash The index key/direction pair.
+      # @param [ String ] index_name The index name.
       #
       # @return [ Specification ] The found specification.
       #

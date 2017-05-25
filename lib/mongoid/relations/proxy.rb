@@ -115,7 +115,8 @@ module Mongoid
       # to the target of the proxy. This can be overridden in special cases.
       #
       # @param [ String, Symbol ] name The name of the method.
-      # @param [ Array ] *args The arguments passed to the method.
+      # @param [ Array ] args The arguments passed to the method.
+      #
       def method_missing(name, *args, &block)
         target.send(name, *args, &block)
       end
@@ -153,7 +154,7 @@ module Mongoid
       # @example returns the before_add callback method name
       #   callback_method(:before_add)
       #
-      # @param [ Symbol ] which callback
+      # @param [ Symbol ] callback_name Which callback
       #
       # @return [ Array ] with callback methods to be executed, the array may have symbols and Procs
       #

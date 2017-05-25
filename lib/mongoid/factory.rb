@@ -14,7 +14,6 @@ module Mongoid
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
-    # @param [ Hash ] options The mass assignment scoping options.
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)

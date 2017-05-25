@@ -920,7 +920,7 @@ module Mongoid
       # @example Find the module from the parts.
       #   metadata.find_from_parts([ "Namespace", "Module" ])
       #
-      # @param [ Array<String> ] The modules.
+      # @param [ Array<String> ] modules The modules.
       #
       # @return [ String ] The matching module.
       #
@@ -1127,7 +1127,7 @@ module Mongoid
       # @example Find the inverses.
       #   metadata.lookup_inverses(other)
       #
-      # @param [ Document ] : The inverse document.
+      # @param [ Document ] other The inverse document.
       #
       # @return [ Array<String> ] The inverse names.
       def lookup_inverses(other)
@@ -1150,7 +1150,7 @@ module Mongoid
       # @example Find the inverse.
       #   metadata.lookup_inverse(other)
       #
-      # @param [ Document ] : The inverse document.
+      # @param [ Document ] other The inverse document.
       #
       # @return [ String ] The inverse name.
       #

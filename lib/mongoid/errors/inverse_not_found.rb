@@ -12,7 +12,7 @@ module Mongoid
       #
       # @param [ Class ] base The base class.
       # @param [ Symbol ] name The name of the relation.
-      # @param [ Class ] The child class.
+      # @param [ Class ] klass The child class.
       # @param [ Symbol ] inverse The attempted inverse key.
       #
       # @since 3.0.0

@@ -13,8 +13,6 @@ module Mongoid
           # @example Bind one document.
           #   person.posts.bind_one(post)
           #
-          # @param [ Document ] doc The single document to bind.
-          #
           # @since 2.0.0.rc.1
           def bind_one(doc)
             binding do
@@ -26,8 +24,6 @@ module Mongoid
           #
           # @example Unbind the document.
           #   person.posts.unbind_one(document)
-          #
-          # @param [ Document ] document The document to unbind.
           #
           # @since 2.0.0.rc.1
           def unbind_one(doc)
