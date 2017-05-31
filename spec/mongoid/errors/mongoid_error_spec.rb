@@ -13,7 +13,7 @@ describe Mongoid::Errors::MongoidError do
 
     ["message", "summary", "resolution"].each do |name|
       expect(::I18n).to receive(:translate).
-        with("mongoid.errors.messages.#{key}.#{name}", {}).
+        with("mongoid.errors.messages.#{key}.#{name}", { locale: :en }).
       and_return(name)
     end
 
