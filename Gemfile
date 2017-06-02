@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'actionpack', '~> 5.0.0'
-gem 'activemodel', '~> 5.0.0'
+gem 'actionpack', '~> 5.1'
+gem 'activemodel', '~> 5.1'
 
 
 group :test do
