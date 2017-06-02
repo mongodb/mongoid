@@ -227,12 +227,8 @@ module Mongoid
           re_define_method("#{name}=") do |object|
             without_autobuild do
               if value = get_relation(name, metadata, object)
-                if value.respond_to?(:substitute)
-                  set_relation(name, value.substitute(object.substitutable))
-                else
-                  value = __build__(name, value, metadata)
-                  set_relation(name, value.substitute(object.substitutable))
-                end
+                value = __build__(name, value, metadata) unless value.respond_to?(:substitute)
+                set_relation(name, value.substitute(object.substitutable))
               else
                 __build__(name, object.substitutable, metadata)
               end
