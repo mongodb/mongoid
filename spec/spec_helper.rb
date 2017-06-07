@@ -57,7 +57,7 @@ CONFIG = {
       hosts: [ "#{HOST}:#{PORT}" ],
       options: {
         server_selection_timeout: 0.5,
-        max_pool_size: 1,
+        max_pool_size: 5,
         heartbeat_frequency: 180,
         user: MONGOID_ROOT_USER.name,
         password: MONGOID_ROOT_USER.password,
