@@ -1242,6 +1242,16 @@ describe Mongoid::Relations::Referenced::Many do
         it "adds the document to the target" do
           expect(person.posts.size).to eq(1)
         end
+
+        context "when the parent is saved" do
+          before do
+            person.save!
+          end
+
+          it "does save the target" do
+            post.should be_persisted
+          end
+        end
       end
 
       context "when appending in a parent create block" do

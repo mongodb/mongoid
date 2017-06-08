@@ -1267,6 +1267,16 @@ describe Mongoid::Relations::Embedded::Many do
       it "sets the index on the child" do
         expect(address._index).to eq(0)
       end
+
+      context "when the parent is saved" do
+        before do
+          person.save!
+        end
+
+        it "does saves the new document" do
+          address.should be_persisted
+        end
+      end
     end
 
     context "when the parent is not a new record" do
