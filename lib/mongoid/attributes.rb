@@ -173,6 +173,9 @@ module Mongoid
             attribute_will_change!(access)
           end
           if localized
+            if attributes[access].is_a?(String)
+              attributes[access] = { ::I18n.locale.to_s => attributes[access] }
+            end 
             attributes[access] ||= {}
             attributes[access].merge!(typed_value)
           else
