@@ -305,6 +305,20 @@ module Mongoid
         candidates.detect { |c| c } if candidates
       end
 
+      # Whether the associated object(s) should be validated.
+      #
+      # @return [ true, false ] If the associated object(s)
+      #   should be validated.
+      #
+      # @since 7.0
+      def validate?
+        @validate ||= if @options[:validate].nil?
+                        validation_default
+                      else
+                        !!@options[:validate]
+                      end
+      end
+
       private
 
       def setup_index!
@@ -395,14 +409,6 @@ module Mongoid
 
       def default_inverse
         @default_inverse ||= klass.relations[inverse_klass.name.underscore]
-      end
-
-      def validate?
-        @validate ||= if @options[:validate].nil?
-                        validation_default
-                      else
-                        !!@options[:validate]
-                      end
       end
     end
   end
