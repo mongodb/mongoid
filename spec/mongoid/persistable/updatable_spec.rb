@@ -611,6 +611,27 @@ describe Mongoid::Persistable::Updatable do
           end
         end
 
+        context "when providing an embedded child with before validation" do
+
+          let!(:book) do
+            Book.create
+          end
+
+          before do
+            book.send(method, pages: [{content: "text"}])
+          end
+
+          # passed
+          it "updates the embedded document with changes from before validation callback" do
+            expect(book.pages.first.page_number).to eq(1)
+          end
+
+          # failed. expected 1, got nil
+          it "persistes the changes from before validation callback" do
+            expect(book.reload.pages.first.page_number).to eq(1)
+          end
+        end
+
         context "when providing a parent to a referenced in" do
 
           let!(:person) do
