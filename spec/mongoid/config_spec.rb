@@ -171,6 +171,52 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when the map_big_decimal_to_decimal128 option is set in the config' do
+
+
+    before do
+      Mongoid.configure do |config|
+        config.load_configuration(conf)
+      end
+    end
+
+    context 'when the value is false' do
+
+      let(:conf) do
+        CONFIG.merge(options: { map_big_decimal_to_decimal128: false })
+      end
+
+      it 'sets the Mongoid.map_big_decimal_to_decimal128 option to the provided value' do
+        expect(Mongoid.map_big_decimal_to_decimal128).to be(false)
+      end
+    end
+
+    context 'when the value is true' do
+
+      let(:conf) do
+        CONFIG.merge(options: { map_big_decimal_to_decimal128: true })
+      end
+
+      it 'sets the Mongoid.map_big_decimal_to_decimal128 option to the provided value' do
+        expect(Mongoid.map_big_decimal_to_decimal128).to be(true)
+      end
+    end
+  end
+
+  context 'when the map_big_decimal_to_decimal128 option is not set in the config' do
+
+    before do
+      Mongoid::Config.reset
+      Mongoid.configure do |config|
+        config.load_configuration(CONFIG)
+      end
+    end
+
+    it 'does not set the Mongoid.app_name option' do
+      expect(Mongoid.map_big_decimal_to_decimal128).to be(false)
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do

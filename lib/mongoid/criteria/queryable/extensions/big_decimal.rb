@@ -24,7 +24,15 @@ module Mongoid
             # @since 1.0.0
             def evolve(object)
               __evolve__(object) do |obj|
-                obj ? obj.to_s : obj
+                if obj
+                  if obj.is_a?(::BigDecimal) && Mongoid.map_big_decimal_to_decimal128
+                    BSON::Decimal128.new(obj)
+                  elsif obj.is_a?(BSON::Decimal128) && Mongoid.map_big_decimal_to_decimal128
+                    obj
+                  else
+                    obj.to_s
+                  end
+                end
               end
             end
           end
