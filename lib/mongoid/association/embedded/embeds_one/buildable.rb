@@ -16,7 +16,7 @@ module Mongoid
           # @example Build the document.
           #   Builder.new(meta, attrs).build
           #
-          # @param [ String ] type Not used in this context.
+          # @param [ String ] _type Not used in this context.
           #
           # @return [ Document ] A single document.
           def build(base, object, _type = nil)

@@ -8,7 +8,8 @@ module Mongoid
       # @example Execute or raise
       #   criteria.execute_or_raise(id)
       #
-      # @param [ Object ] args The arguments passed.
+      # @param [ Object ] ids The arguments passed.
+      # @param [ true, false ] multi Whether there arguments were a list.
       #
       # @raise [ Errors::DocumentNotFound ] If nothing returned.
       #
@@ -66,7 +67,7 @@ module Mongoid
       # @example Get the documents from the map or criteria.
       #   criteria.multiple_from_map_or_db(ids)
       #
-      # @param [ ids ] The searched ids.
+      # @param [ Array<Object> ] ids The searched ids.
       #
       # @return [ Array<Document> ] The found documents.
       def multiple_from_db(ids)

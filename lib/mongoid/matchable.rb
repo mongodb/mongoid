@@ -84,7 +84,7 @@ module Mongoid
     #
     # @param [ Document ] document The document to check.
     # @param [ Symbol, String ] key The field name.
-    # @param [ Object, Hash ] The value or selector.
+    # @param [ Object, Hash ] value The value or selector.
     #
     # @return [ Matcher ] The matcher.
     #
@@ -105,7 +105,7 @@ module Mongoid
       #
       # @param [ Document ] document The document to check.
       # @param [ Symbol, String ] key The field name.
-      # @param [ Object, Hash ] The value or selector.
+      # @param [ Object, Hash ] value The value or selector.
       #
       # @return [ Matcher ] The matcher.
       #

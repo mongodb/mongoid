@@ -44,7 +44,7 @@ module Mongoid
     # @example Create a new persistence context.
     #   PersistenceContext.new(model, collection: 'other')
     #
-    # @param [ Object ] parent The class or model instance for which a persistence context
+    # @param [ Object ] object The class or model instance for which a persistence context
     #   should be created.
     # @param [ Hash ] opts The persistence context options.
     #
