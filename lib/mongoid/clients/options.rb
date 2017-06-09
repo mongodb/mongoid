@@ -252,8 +252,9 @@ module Mongoid
         def with(options)
           if block_given?
             set_options(self, options)
-            yield self
+            result = yield self
             unset_options(self)
+            result
           else
             Proxy.new(self, (persistence_options || {}).merge(options))
           end
