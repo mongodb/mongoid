@@ -72,16 +72,26 @@ module Mongoid
         #
         # @example Add the unwind.
         #   pipeline.unwind(:field)
+        #   pipeline.unwind(document)
+        #
+        # @see https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/
         #
         # @param [ String, Symbol ] field The name of the field.
+        # @param [ Hash ]           document.
         #
         # @return [ Pipeline ] The pipeline.
         #
         # @since 2.0.0
         def unwind(field)
-          normalized = field.to_s
-          name = aliases[normalized] || normalized
-          push("$unwind" => name.__mongo_expression__)
+          unless field.respond_to? :keys
+            normalized = field.to_s
+            name = aliases[normalized] || normalized
+            push("$unwind" => name.__mongo_expression__)
+          else
+            permit_keys = ['path', 'includeArrayIndex', 'preserveNullAndEmptyArrays'].freeze
+            normalized = BSON::Document.new(field.select { |k| permit_keys.include?(k.to_s) })
+            push("$unwind" => normalized)
+          end
         end
 
         private
