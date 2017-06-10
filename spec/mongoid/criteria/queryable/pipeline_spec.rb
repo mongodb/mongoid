@@ -197,17 +197,15 @@ describe Mongoid::Criteria::Queryable::Pipeline do
       end
     end
 
-    context "when provided a hash value" do
-      context "unnecessary keys should be removed" do
-        before do
-          pipeline.unwind(path: "$foo", "includeArrayIndex" => "index", preserveNullAndEmptyArrays: true, foo: "bar")
-        end
+    context "when provided a hash" do
+      before do
+        pipeline.unwind(path: "$author", "includeArrayIndex" => "author_index", preserveNullAndEmptyArrays: true)
+      end
 
-        it "only reserve permit keys" do
-          expect(pipeline).to eq([
-            { "$unwind" => { "path" => "$foo", "includeArrayIndex" => "index", "preserveNullAndEmptyArrays" => true } }
-          ])
-        end
+      it "sets the hash" do
+        expect(pipeline).to eq([
+          { "$unwind" => { path: "$author", "includeArrayIndex" => "author_index", preserveNullAndEmptyArrays: true } }
+        ])
       end
     end
   end

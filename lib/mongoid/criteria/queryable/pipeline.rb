@@ -82,15 +82,13 @@ module Mongoid
         # @return [ Pipeline ] The pipeline.
         #
         # @since 2.0.0
-        def unwind(field)
-          unless field.respond_to? :keys
-            normalized = field.to_s
+        def unwind(field_or_doc)
+          unless field_or_doc.respond_to? :keys
+            normalized = field_or_doc.to_s
             name = aliases[normalized] || normalized
             push("$unwind" => name.__mongo_expression__)
           else
-            permit_keys = ['path', 'includeArrayIndex', 'preserveNullAndEmptyArrays'].freeze
-            normalized = BSON::Document.new(field.select { |k| permit_keys.include?(k.to_s) })
-            push("$unwind" => normalized)
+            push("$unwind" => field_or_doc)
           end
         end
 
