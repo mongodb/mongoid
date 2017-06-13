@@ -34,6 +34,15 @@ describe Mongoid::Clients::Options do
           Band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
+        it "can return results" do
+          Band.create(name: 'emily')
+          result = Band.with(:read => {:mode => :secondary_preferred}) do |klass|
+            klass.where(name: 'emily').to_a
+          end
+          expect(result.length).to eq(1)
+          expect(result.first.name).to eq('emily')
+        end
+
         before do
           Band.with(options) do |klass|
             klass.where(name: 'emily').to_a
