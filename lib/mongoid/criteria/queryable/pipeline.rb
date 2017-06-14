@@ -74,10 +74,7 @@ module Mongoid
         #   pipeline.unwind(:field)
         #   pipeline.unwind(document)
         #
-        # @see https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/
-        #
-        # @param [ String, Symbol ] field The name of the field.
-        # @param [ Hash ]           document.
+        # @param [ String, Symbol, Hash ] field_or_doc The name of the field or a document.
         #
         # @return [ Pipeline ] The pipeline.
         #
