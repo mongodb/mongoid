@@ -3,6 +3,7 @@ require "mongoid"
 require "./perf/models"
 
 Mongoid.connect_to("mongoid_perf_test")
+Mongo::Logger.logger.level = ::Logger::FATAL
 
 Mongoid.purge!
 
