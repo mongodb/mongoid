@@ -72,16 +72,21 @@ module Mongoid
         #
         # @example Add the unwind.
         #   pipeline.unwind(:field)
+        #   pipeline.unwind(document)
         #
-        # @param [ String, Symbol ] field The name of the field.
+        # @param [ String, Symbol, Hash ] field_or_doc The name of the field or a document.
         #
         # @return [ Pipeline ] The pipeline.
         #
         # @since 2.0.0
-        def unwind(field)
-          normalized = field.to_s
-          name = aliases[normalized] || normalized
-          push("$unwind" => name.__mongo_expression__)
+        def unwind(field_or_doc)
+          unless field_or_doc.respond_to? :keys
+            normalized = field_or_doc.to_s
+            name = aliases[normalized] || normalized
+            push("$unwind" => name.__mongo_expression__)
+          else
+            push("$unwind" => field_or_doc)
+          end
         end
 
         private

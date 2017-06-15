@@ -196,5 +196,17 @@ describe Mongoid::Criteria::Queryable::Pipeline do
         end
       end
     end
+
+    context "when provided a hash" do
+      before do
+        pipeline.unwind(path: "$author", "includeArrayIndex" => "author_index", preserveNullAndEmptyArrays: true)
+      end
+
+      it "sets the hash" do
+        expect(pipeline).to eq([
+          { "$unwind" => { path: "$author", "includeArrayIndex" => "author_index", preserveNullAndEmptyArrays: true } }
+        ])
+      end
+    end
   end
 end
