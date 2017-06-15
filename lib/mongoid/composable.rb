@@ -75,6 +75,7 @@ module Mongoid
       Scopable,
       Serializable,
       Clients,
+      Clients::Options,
       Shardable,
       Stateful,
       Cacheable,
@@ -84,8 +85,7 @@ module Mongoid
       Equality,
       Association::Referenced::Syncable,
       ActiveModel::Model,
-      ActiveModel::Validations,
-      PersistenceContext
+      ActiveModel::Validations
     ]
 
     # These are methods names defined in included blocks that may conflict
