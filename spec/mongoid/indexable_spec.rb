@@ -89,8 +89,9 @@ describe Mongoid::Indexable do
         klass.create_indexes
       end
 
-      it "creates the indexes" do
-        expect(klass.collection.indexes.get(_type: 1)).to_not be_nil
+      it "creates the indexes by using specified background option" do
+        index = klass.collection.indexes.get(_type: 1)
+        expect(index[:background]).to eq(true)
       end
     end
 
@@ -104,12 +105,9 @@ describe Mongoid::Indexable do
         end
       end
 
-      before do
-        klass.create_indexes
-      end
-
       after do
         klass.remove_indexes
+        Mongoid::Config.background_indexing = false
       end
 
       let(:indexes) do
@@ -118,8 +116,20 @@ describe Mongoid::Indexable do
         end
       end
 
-      it "creates the indexes" do
-        expect(indexes.get(_type: 1)).to_not be_nil
+      it "creates the indexes by using default background_indexing option" do
+        klass.create_indexes
+
+        index = indexes.get(_type: 1)
+        expect(index[:background]).to eq(Mongoid::Config.background_indexing)
+      end
+
+      it "creates the indexes by using specified background_indexing option" do
+        Mongoid::Config.background_indexing = true
+
+        klass.create_indexes
+
+        index = indexes.get(_type: 1)
+        expect(index[:background]).to eq(true)
       end
     end
 

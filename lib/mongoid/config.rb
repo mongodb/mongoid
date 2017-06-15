@@ -27,6 +27,7 @@ module Mongoid
     option :log_level, default: :info
     option :belongs_to_required_by_default, default: true
     option :app_name, default: nil
+    option :background_indexing, default: false
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
