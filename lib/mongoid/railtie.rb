@@ -1,5 +1,4 @@
 # encoding: utf-8
-require "mongoid/railties/document"
 require "rails"
 require "rails/mongoid"
 
