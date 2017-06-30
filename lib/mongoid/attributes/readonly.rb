@@ -68,8 +68,11 @@ module Mongoid
         #
         # @since 3.0.0
         def attr_readonly(*names)
+          foreign_keys = relations.values.collect(&:foreign_key).compact.collect(&:to_sym)
           names.each do |name|
-            readonly_attributes << database_field_name(name)
+            unless foreign_keys.include?(name.to_sym)
+              readonly_attributes << database_field_name(name)
+            end
           end
         end
       end

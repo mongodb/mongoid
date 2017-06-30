@@ -309,6 +309,17 @@ describe Mongoid::Attributes::Readonly do
           }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
         end
       end
+
+      context "belongs_to field is readonly" do
+        it do
+          mother = Person.create
+          Person.create(mother: mother)
+          child = Person.find_by(mother: mother)
+          expect {
+            child.mother
+          }.not_to raise_error
+        end
+      end
     end
   end
 end
