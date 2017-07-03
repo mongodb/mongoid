@@ -230,4 +230,50 @@ describe Mongoid::Relations::Builders::NestedAttributes::Many do
       end
     end
   end
+  
+  describe "process_attributes" do
+    context "child's _type should be set to either passed or parent's class value" do
+      before(:all) do
+        class Column
+          include Mongoid::Document
+          embeds_many :contents
+          accepts_nested_attributes_for :contents, allow_destroy: true
+        end
+        class Content
+          include Mongoid::Document
+          include Mongoid::Attributes::Dynamic
+          field :description
+          embedded_in :column
+        end
+        class Attachment < Content
+          field :src, type: String
+        end
+        class Map < Content      
+          field :latitude, type: String
+          field :longitude, type: String
+        end
+      end
+
+      it "should associated child to proper class" do
+        column = Column.create
+        column.update_attributes({'contents_attributes' => [
+          {_type: 'Attachment', description: 'image description', src: 'path/to/image'}, 
+          {_type: 'Map', description: 'map description', latitude: '25.3321', longitude: '35.32423'}
+        ]})
+        expect(column.persisted?).to be true
+        expect(column.contents.first.class).to eq Attachment
+        expect(column.contents.last.class).to eq Map
+      end
+      it "should create only parent documents" do
+        column = Column.create
+        column.update_attributes({'contents_attributes' => [
+          {description: 'image description', src: 'path/to/image'}, 
+          {description: 'map description', latitude: '25.3321', longitude: '35.32423'}
+        ]})
+        expect(column.persisted?).to be true
+        expect(column.contents.first.class).to eq Content
+        expect(column.contents.last.class).to eq Content
+      end
+    end
+  end
 end

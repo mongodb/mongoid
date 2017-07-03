@@ -99,7 +99,8 @@ module Mongoid
             if id = attrs.extract_id
               update_nested_relation(parent, id, attrs)
             else
-              existing.push(Factory.build(metadata.klass, attrs)) unless destroyable?(attrs)
+              klass = attrs[:_type].try(:constantize) || metadata.klass
+              existing.push(Factory.build(klass, attrs)) unless destroyable?(attrs)
             end
           end
 
