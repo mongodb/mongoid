@@ -32,43 +32,34 @@ Compatibility
 -------------
 
 Note the following compatibility matrix to determine if Mongoid is
-supported on your runtime and server.
+supported on your runtime and server. Note that Mongoid 6.x is compatible with
+Rails 5 and thus requires >= Ruby 2.2.2.
 
 .. list-table::
    :header-rows: 1
    :widths: 28 30 30 30
 
    * - Ruby Version
-     - 2.4.x
-     - 2.6.x
-     - 3.0.x
-
-   * - MRI 1.8.x
-     - No
-     - No
-     - No
-
-   * - MRI 1.9.x
-     - Yes
-     - Yes
-     - Yes
-
-   * - MRI 2.0.x
-     - Yes
-     - Yes
-     - Yes
+     - MongoDB 3.0.x
+     - MongoDB 3.2.x
+     - MongoDB 3.4.x
 
    * - MRI 2.1.x
+     - No
+     - No
+     - No
+
+   * - MRI 2.2.2
      - Yes
      - Yes
      - Yes
 
-   * - MRI 2.2.x
+   * - MRI 2.3.x
      - Yes
      - Yes
      - Yes
 
-   * - JRuby 1.7.x
+   * - MRI 2.4.1
      - Yes
      - Yes
      - Yes
