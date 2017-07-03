@@ -408,10 +408,6 @@ axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
-      - id: "latest"
-        display_name: "MongoDB latest"
-        variables:
-           VERSION: "latest"
       - id: "3.4"
         display_name: "MongoDB 3.4"
         variables:
@@ -424,14 +420,14 @@ axes:
         display_name: "MongoDB 3.0"
         variables:
            VERSION: "3.0"
-      - id: "2.6"
-        display_name: "MongoDB 2.6"
-        variables:
-           VERSION: "2.6"
-      - id: "2.4"
-        display_name: "MongoDB 2.4"
-        variables:
-           VERSION: "2.4"
+#      - id: "2.6"
+#        display_name: "MongoDB 2.6"
+#        variables:
+#           VERSION: "2.6"
+#      - id: "2.4"
+#        display_name: "MongoDB 2.4"
+#        variables:
+#           VERSION: "2.4"
 
   - id: "topology"
     display_name: Topology
@@ -528,7 +524,7 @@ axes:
 
 buildvariants:
 - matrix_name: "rhel70-all-standalone"
-  matrix_spec: { driver: "*", ruby: "*", mongodb-version: "3.4", topology: "standalone", rails: "*" }
+  matrix_spec: { driver: "*", ruby: "*", mongodb-version: "*", topology: "standalone", rails: "*" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${rails}"
   run_on:
     - rhel70-small
