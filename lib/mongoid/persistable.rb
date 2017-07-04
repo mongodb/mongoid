@@ -162,10 +162,9 @@ module Mongoid
     # @since 4.0.0
     def process_atomic_operations(operations)
       operations.each do |field, value|
-        as_writable_attribute!(field, value) do |access|
-          yield(access, value)
-          remove_change(access)
-        end
+        access = database_field_name(field)
+        yield(access, value)
+        remove_change(access)
       end
     end
 

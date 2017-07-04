@@ -163,7 +163,8 @@ module Mongoid
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      as_writable_attribute!(name) do |access|
+      access = database_field_name(name)
+      if attribute_writable?(access)
         _assigning do
           validate_attribute_value(access, value)
           localized = fields[access].try(:localized?)

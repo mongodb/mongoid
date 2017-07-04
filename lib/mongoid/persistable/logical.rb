@@ -30,7 +30,7 @@ module Mongoid
             attributes[field] = value
             ops[atomic_attribute_name(field)] = values
           end
-          { "$bit" => ops }
+          { "$bit" => ops } unless ops.empty?
         end
       end
     end
