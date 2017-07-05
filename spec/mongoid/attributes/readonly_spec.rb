@@ -232,5 +232,40 @@ describe Mongoid::Attributes::Readonly do
         end
       end
     end
+
+    context 'when a foreign_key is defined as readonly' do
+
+      let(:attributes) do
+        :mother_id
+      end
+
+      context 'when the relation exists' do
+
+        let(:mother) do
+          Person.create
+        end
+
+        let(:child) do
+          Person.create(mother: mother)
+          Person.find_by(mother: mother)
+        end
+
+        it 'the relation can still be accessed' do
+          expect(child.mother).to eq(mother)
+        end
+      end
+
+      context 'when the relation does not exist' do
+
+        let(:child) do
+          Person.create
+        end
+
+        it 'the relation is nil' do
+          expect(child.mother).to be_nil
+        end
+      end
+
+    end
   end
 end

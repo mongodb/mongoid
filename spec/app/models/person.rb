@@ -114,6 +114,9 @@ class Person
     dependent:  :nullify,
     validate: false
 
+  belongs_to :mother, class_name: 'Person'
+  has_many :children, class_name: 'Person'
+
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :name, update_only: true
   accepts_nested_attributes_for :pet, allow_destroy: true
