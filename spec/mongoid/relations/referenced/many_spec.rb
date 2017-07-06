@@ -3791,4 +3791,26 @@ describe Mongoid::Relations::Referenced::Many do
       expect(agent.save).to be(true)
     end
   end
+
+  context 'when the two models use the same name to refer to the relation' do
+
+    let(:agent) do
+      Agent.new
+    end
+
+    let(:band) do
+      Band.new
+    end
+
+    before do
+      agent.same_name = band
+      agent.save
+      band.save
+      band.reload
+    end
+
+    it 'constructs the correct criteria' do
+      expect(band.same_name).to eq([agent])
+    end
+  end
 end
