@@ -569,5 +569,12 @@ module Mongoid
     def selector_with_type_selection
       type_selectable? ? selector.merge(type_selection) : selector
     end
+
+    def set_parent_relation(document)
+      if association && parent_document
+        document.set_relation(association.inverse, parent_document)
+      end
+      document
+    end
   end
 end

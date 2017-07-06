@@ -67,7 +67,7 @@ module Mongoid
       #
       # @since 3.0.14
       def reset_unloaded
-        target.reset_unloaded(criteria)
+        target.reset_unloaded(criteria) if _unloaded.is_a?(Criteria)
       end
 
       # The default substitutable object for a relation proxy is the clone of

@@ -622,6 +622,22 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       it "becomes loaded" do
         expect(enumerable).to be__loaded
       end
+
+      context 'when the base relation is accessed from each document' do
+
+        let(:persons) do
+          described_class.new(criteria).collect(&:person)
+        end
+
+        before do
+          Post.create(person_id: person.id)
+          Post.create(person_id: person.id)
+        end
+
+        it 'sets the base relation from the criteria' do
+          expect(persons.uniq.size).to eq(1)
+        end
+      end
     end
 
     context "when only an array target exists" do

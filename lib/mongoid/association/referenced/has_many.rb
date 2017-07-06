@@ -239,9 +239,11 @@ module Mongoid
 
         def query_criteria(object, base)
           crit = klass.where(foreign_key => object)
+          crit.association = self
           crit = with_polymorphic_criterion(crit, base)
+          crit = with_inverse_field_criterion(crit)
           crit = with_ordering(crit)
-          with_inverse_field_criterion(crit)
+          with_base(crit, base)
         end
 
         def with_polymorphic_criterion(criteria, base)
@@ -267,6 +269,11 @@ module Mongoid
           else
             criteria
           end
+        end
+
+        def with_base(criteria, base)
+          criteria.parent_document = base
+          criteria
         end
       end
     end
