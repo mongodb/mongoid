@@ -240,8 +240,7 @@ module Mongoid
         def query_criteria(object, base)
           crit = klass.where(foreign_key => object)
           crit = with_polymorphic_criterion(crit, base)
-          crit = with_ordering(crit)
-          with_inverse_field_criterion(crit)
+          with_ordering(crit)
         end
 
         def with_polymorphic_criterion(criteria, base)

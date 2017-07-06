@@ -22,6 +22,8 @@ class Band
   embeds_many :notes, as: :noteable, cascade_callbacks: true, validate: false
   embeds_one :label, cascade_callbacks: true
 
+  has_many :same_name, class_name: 'Agent', inverse_of: :same_name
+
   after_upsert do |doc|
     doc.upserted = true
   end
