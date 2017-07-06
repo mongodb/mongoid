@@ -144,9 +144,7 @@ describe Mongoid::Attributes::Readonly do
         context 'with multiple fields operation' do
 
           it "udpates the attribute" do
-            person.bit(
-              age: {and: 13}, score: {or: 13}, inte: {and: 13, or: 10}
-            )
+            person.bit(age: {and: 13}, score: {or: 13})
             person.save
             expect(person.reload.score).to eq(13)
             expect(person.reload.age).to eq(4)
