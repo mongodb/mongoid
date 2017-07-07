@@ -41,7 +41,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         it "sets the association metadata on the child" do
-          expect(address.__association).to_not be_nil
+          expect(address._association).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -80,7 +80,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
             end
 
             it "appends to the target" do
-              expect(person.appointments.target).to eq([ active ])
+              expect(person.appointments._target).to eq([ active ])
             end
 
             it "appends to the _unscoped" do
@@ -99,7 +99,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
             end
 
             it "doesn't append to the target" do
-              expect(person.appointments.target).to_not eq([ inactive ])
+              expect(person.appointments._target).to_not eq([ inactive ])
             end
 
             it "appends to the _unscoped" do
@@ -196,7 +196,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           end
 
           it "sets the association metadata on the child" do
-            expect(child_role.__association).to_not be_nil
+            expect(child_role._association).to_not be_nil
           end
 
           it "sets the index on the child" do
@@ -298,7 +298,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
 
       it "sets the association metadata on the child" do
-        expect(address.__association).to_not be_nil
+        expect(address._association).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -667,7 +667,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         it "sets the association metadata on the child" do
-          expect(child_role.__association).to_not be_nil
+          expect(child_role._association).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1044,7 +1044,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         it "sets the association metadata on the child" do
-          expect(address.__association).to_not be_nil
+          expect(address._association).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1087,7 +1087,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         it "sets the association metadata on the child" do
-          expect(child_role.__association).to_not be_nil
+          expect(child_role._association).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1247,7 +1247,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
 
       it "sets the association metadata on the child" do
-        expect(address.__association).to_not be_nil
+        expect(address._association).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -1354,7 +1354,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
         end
 
         it "sets the association metadata on the child" do
-          expect(child_role.__association).to_not be_nil
+          expect(child_role._association).to_not be_nil
         end
 
         it "sets the index on the child" do
@@ -1461,7 +1461,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
 
       it "sets the association metadata on the child" do
-        expect(address.__association).to_not be_nil
+        expect(address._association).to_not be_nil
       end
 
       it "sets the index on the child" do
@@ -1560,7 +1560,7 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       end
 
       it "sets the association metadata on the child" do
-        expect(address.__association).to_not be_nil
+        expect(address._association).to_not be_nil
       end
 
       it "sets the index on the child" do

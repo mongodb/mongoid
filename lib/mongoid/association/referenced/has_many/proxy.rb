@@ -9,7 +9,7 @@ module Mongoid
         class Proxy < Association::Many
 
           delegate :count, to: :criteria
-          delegate :first, :in_memory, :last, :reset, :uniq, to: :target
+          delegate :first, :in_memory, :last, :reset, :uniq, to: :_target
 
           # Appends a document or array of documents to the relation. Will set
           # the parent and update the index in the process.
@@ -105,7 +105,7 @@ module Mongoid
           # @since 2.1.0
           def delete(document)
             execute_callback :before_remove, document
-            target.delete(document) do |doc|
+            _target.delete(document) do |doc|
               if doc
                 unbind_one(doc)
                 cascade!(doc) if !_assigning?
@@ -165,7 +165,7 @@ module Mongoid
           # @since 2.1.0
           def each
             if block_given?
-              target.each { |doc| yield(doc) }
+              _target.each { |doc| yield(doc) }
             else
               to_enum
             end
@@ -200,7 +200,7 @@ module Mongoid
           # @since 2.0.0.beta.1
           def find(*args)
             matching = criteria.find(*args)
-            Array(matching).each { |doc| target.push(doc) }
+            Array(matching).each { |doc| _target.push(doc) }
             matching
           end
 
@@ -231,7 +231,7 @@ module Mongoid
           # @since 2.0.0.rc.1
           def nullify
             criteria.update_all(foreign_key => nil)
-            target.clear do |doc|
+            _target.clear do |doc|
               unbind_one(doc)
               doc.changed_attributes.delete(foreign_key)
             end
@@ -249,12 +249,12 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def purge
-            unless __association.destructive?
+            unless _association.destructive?
               nullify
             else
               after_remove_error = nil
               criteria.delete_all
-              many = target.clear do |doc|
+              many = _target.clear do |doc|
                 execute_callback :before_remove, doc
                 unbind_one(doc)
                 doc.destroyed = true
@@ -289,7 +289,7 @@ module Mongoid
               new_ids = new_docs.map { |doc| doc._id }
               remove_not_in(new_ids)
               new_docs.each do |doc|
-                docs.push(doc) if doc.send(foreign_key) != base._id
+                docs.push(doc) if doc.send(foreign_key) != _base._id
               end
               concat(docs)
             else
@@ -308,7 +308,7 @@ module Mongoid
           #
           # @since 2.4.0
           def unscoped
-            klass.unscoped.where(foreign_key => base._id)
+            klass.unscoped.where(foreign_key => _base._id)
           end
 
           private
@@ -324,7 +324,7 @@ module Mongoid
           # @since 2.0.0.rc.1
           def append(document)
             with_add_callbacks(document, already_related?(document)) do
-              target.push(document)
+              _target.push(document)
               characterize_one(document)
               bind_one(document)
             end
@@ -360,9 +360,9 @@ module Mongoid
           # @since 5.1.0
           def already_related?(document)
             document.persisted? &&
-                document.__association &&
-                document.respond_to?(document.__association.foreign_key) &&
-                document.__send__(document.__association.foreign_key) == base.id
+                document._association &&
+                document.respond_to?(document._association.foreign_key) &&
+                document.__send__(document._association.foreign_key) == _base.id
           end
 
           # Instantiate the binding associated with this relation.
@@ -376,7 +376,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            HasMany::Binding.new(base, target, __association)
+            HasMany::Binding.new(_base, _target, _association)
           end
 
           # Get the collection of the relation in question.
@@ -401,7 +401,7 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def criteria
-            @criteria ||= __association.criteria(base)
+            @criteria ||= _association.criteria(_base)
           end
 
           # Perform the necessary cascade operations for documents that just got
@@ -417,7 +417,7 @@ module Mongoid
           # @since 2.1.0
           def cascade!(document)
             if persistable?
-              case __association.dependent
+              case _association.dependent
               when :delete_all
                 document.delete
               when :destroy
@@ -441,8 +441,8 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def method_missing(name, *args, &block)
-            if target.respond_to?(name)
-              target.send(name, *args, &block)
+            if _target.respond_to?(name)
+              _target.send(name, *args, &block)
             else
               klass.send(:with_scope, criteria) do
                 criteria.public_send(name, *args, &block)
@@ -481,7 +481,7 @@ module Mongoid
           #
           # @since 2.1.0
           def persistable?
-            !_binding? && (_creating? || base.persisted? && !_building?)
+            !_binding? && (_creating? || _base.persisted? && !_building?)
           end
 
           # Deletes all related documents from the database given the supplied
@@ -502,7 +502,7 @@ module Mongoid
           def remove_all(conditions = nil, method = :delete_all)
             selector = conditions || {}
             removed = klass.send(method, selector.merge!(criteria.selector))
-            target.delete_if do |doc|
+            _target.delete_if do |doc|
               if doc._matches?(selector)
                 unbind_one(doc) and true
               end
@@ -521,7 +521,7 @@ module Mongoid
           # @since 2.4.0
           def remove_not_in(ids)
             removed = criteria.not_in(_id: ids)
-            if __association.destructive?
+            if _association.destructive?
               removed.delete_all
             else
               removed.update_all(foreign_key => nil)
@@ -529,8 +529,8 @@ module Mongoid
             in_memory.each do |doc|
               if !ids.include?(doc._id)
                 unbind_one(doc)
-                target.delete(doc)
-                if __association.destructive?
+                _target.delete(doc)
+                if _association.destructive?
                   doc.destroyed = true
                 end
               end

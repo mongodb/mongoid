@@ -15,7 +15,7 @@ module Mongoid
       #
       # @since 3.0.0
       def clear
-        target.delete
+        _target.delete
       end
 
       # Get all the documents in the relation that are loaded into memory.
@@ -27,7 +27,7 @@ module Mongoid
       #
       # @since 2.1.0
       def in_memory
-        [ target ]
+        [ _target ]
       end
 
       # Since method_missing is overridden we should override this as well.
@@ -41,7 +41,7 @@ module Mongoid
       #
       # @since 2.1.8
       def respond_to?(name, include_private = false)
-        target.respond_to?(name, include_private) || super
+        _target.respond_to?(name, include_private) || super
       end
 
       # Evolve the proxy document into an object id.
@@ -53,7 +53,7 @@ module Mongoid
       #
       # @since 4.0.0
       def __evolve_object_id__
-        target._id
+        _target._id
       end
     end
   end

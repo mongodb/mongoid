@@ -816,7 +816,7 @@ describe Mongoid::Fields do
 
     context "when the field name conflicts with mongoid's internals" do
 
-      [:__association, :invalid].each do |meth|
+      [:_association, :invalid].each do |meth|
         context "when the field is named #{meth}" do
 
           it "raises an error" do

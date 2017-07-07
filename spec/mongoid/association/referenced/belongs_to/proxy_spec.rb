@@ -79,7 +79,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
       end
 
       it "does not erase the association metadata" do
-        expect(address.__association).to_not be_nil
+        expect(address._association).to_not be_nil
       end
 
       it "allows saving of the embedded document" do
@@ -106,7 +106,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it "sets the target of the relation" do
-            expect(game.person.target).to eq(person)
+            expect(game.person._target).to eq(person)
           end
 
           it "sets the foreign key on the relation" do
@@ -141,7 +141,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it "sets the target of the relation" do
-            expect(game.person.target).to eq(person)
+            expect(game.person._target).to eq(person)
           end
 
           it "sets the foreign key of the relation" do
@@ -203,7 +203,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it "sets the target of the relation" do
-            expect(rating.ratable.target).to eq(bar)
+            expect(rating.ratable._target).to eq(bar)
           end
 
           it "sets the foreign key on the relation" do
@@ -238,7 +238,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it "sets the target of the relation" do
-            expect(rating.ratable.target).to eq(bar)
+            expect(rating.ratable._target).to eq(bar)
           end
 
           it "sets the foreign key of the relation" do
@@ -317,7 +317,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it "sets the target of the relation" do
-            expect(post.person.target).to eq(person)
+            expect(post.person._target).to eq(person)
           end
 
           it "sets the foreign key on the relation" do
@@ -344,7 +344,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           end
 
           it "sets the target of the relation" do
-            expect(post.person.target).to eq(person)
+            expect(post.person._target).to eq(person)
           end
 
           it "sets the foreign key of the relation" do
@@ -388,7 +388,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
           it "should assign as expected" do
             eye.suspended_in = eye_bowl
-            expect(eye.suspended_in.target).to eq(eye_bowl)
+            expect(eye.suspended_in._target).to eq(eye_bowl)
           end
         end
 
@@ -409,7 +409,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
             end
 
             it "sets the target of the relation" do
-              expect(rating.ratable.target).to eq(movie)
+              expect(rating.ratable._target).to eq(movie)
             end
 
             it "sets the foreign key on the relation" do
@@ -436,7 +436,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
             end
 
             it "sets the target of the relation" do
-              expect(rating.ratable.target).to eq(movie)
+              expect(rating.ratable._target).to eq(movie)
             end
 
             it "sets the foreign key of the relation" do

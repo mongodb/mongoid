@@ -8,7 +8,7 @@ module Mongoid
       include ::Enumerable
 
       delegate :avg, :max, :min, :sum, to: :criteria
-      delegate :length, :size, to: :target
+      delegate :length, :size, to: :_target
 
       # Is the relation empty?
       #
@@ -45,7 +45,7 @@ module Mongoid
           attributes.map { |attrs| create(attrs, type, &block) }
         else
           doc = build(attributes, type, &block)
-          base.persisted? ? doc.save : raise_unsaved(doc)
+          _base.persisted? ? doc.save : raise_unsaved(doc)
           doc
         end
       end
@@ -75,7 +75,7 @@ module Mongoid
           attributes.map { |attrs| create!(attrs, type, &block) }
         else
           doc = build(attributes, type, &block)
-          base.persisted? ? doc.save! : raise_unsaved(doc)
+          _base.persisted? ? doc.save! : raise_unsaved(doc)
           doc
         end
       end
@@ -195,7 +195,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.6
       def serializable_hash(options = {})
-        target.map { |document| document.serializable_hash(options) }
+        _target.map { |document| document.serializable_hash(options) }
       end
 
       # Get a criteria for the embedded documents without the default scoping

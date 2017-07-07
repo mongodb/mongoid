@@ -401,7 +401,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(person.posts.target).to eq([ post ])
+          expect(person.posts._target).to eq([ post ])
         end
 
         it "sets the foreign key on the relation" do
@@ -432,7 +432,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(person.posts.target).to eq([ post ])
+          expect(person.posts._target).to eq([ post ])
         end
 
         it "sets the foreign key of the relation" do
@@ -593,7 +593,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(movie.ratings.target).to eq([ rating ])
+          expect(movie.ratings._target).to eq([ rating ])
         end
 
         it "sets the foreign key on the relation" do
@@ -624,7 +624,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(movie.ratings.target).to eq([ rating ])
+          expect(movie.ratings._target).to eq([ rating ])
         end
 
         it "sets the foreign key of the relation" do

@@ -78,17 +78,17 @@ module Mongoid
         def batch_replace(docs)
           if docs.blank?
             if _assigning? && !empty?
-              base.add_atomic_unset(first)
-              target_duplicate = target.dup
+              _base.add_atomic_unset(first)
+              target_duplicate = _target.dup
               pre_process_batch_remove(target_duplicate, :delete)
               post_process_batch_remove(target_duplicate, :delete)
             else
-              batch_remove(target.dup)
+              batch_remove(_target.dup)
             end
-          elsif target != docs
-            base.delayed_atomic_sets.clear unless _assigning?
+          elsif _target != docs
+            _base.delayed_atomic_sets.clear unless _assigning?
             docs = normalize_docs(docs).compact
-            target.clear and _unscoped.clear
+            _target.clear and _unscoped.clear
             inserts = execute_batch_insert(docs, "$set")
             add_atomic_sets(inserts)
           end
@@ -108,11 +108,11 @@ module Mongoid
         # @since 3.0.0
         def add_atomic_sets(sets)
           if _assigning?
-            base.delayed_atomic_sets[path].try(:clear)
-            base.collect_children.each do |child|
+            _base.delayed_atomic_sets[path].try(:clear)
+            _base.collect_children.each do |child|
               child.delayed_atomic_sets.clear
             end
-            base.delayed_atomic_sets[path] = sets
+            _base.delayed_atomic_sets[path] = sets
           end
         end
 
@@ -202,7 +202,7 @@ module Mongoid
         def normalize_docs(docs)
           if docs.first.is_a?(::Hash)
             docs.map do |doc|
-              attributes = { __association: __association, _parent: base }
+              attributes = { _association: _association, _parent: _base }
               attributes.merge!(doc)
               Factory.build(klass, attributes)
             end
@@ -252,7 +252,7 @@ module Mongoid
         #
         # @since 3.0.0
         def selector
-          @selector ||= base.atomic_selector
+          @selector ||= _base.atomic_selector
         end
 
         # Pre processes the batch insert for the provided documents.
@@ -304,7 +304,7 @@ module Mongoid
               doc.apply_delete_dependencies!
               doc.run_before_callbacks(:destroy) if method == :destroy
             end
-            target.delete_one(doc)
+            _target.delete_one(doc)
             _unscoped.delete_one(doc)
             unbind_one(doc)
             execute_callback :after_remove, doc

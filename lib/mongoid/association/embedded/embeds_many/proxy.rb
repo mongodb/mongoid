@@ -74,12 +74,12 @@ module Mongoid
           #
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
-            doc = Factory.build(type || __association.klass, attributes)
+            doc = Factory.build(type || _association.klass, attributes)
             append(doc)
             doc.apply_post_processed_defaults
             yield(doc) if block_given?
             doc.run_callbacks(:build) { doc }
-            base._reset_memoized_children!
+            _base._reset_memoized_children!
             doc
           end
 
@@ -93,7 +93,7 @@ module Mongoid
           #
           # @return [ Many ] The empty relation.
           def clear
-            batch_clear(target.dup)
+            batch_clear(_target.dup)
             self
           end
 
@@ -108,7 +108,7 @@ module Mongoid
           # @return [ Integer ] The total number of persisted embedded docs, as
           #   flagged by the #persisted? method.
           def count
-            target.select { |doc| doc.persisted? }.size
+            _target.select { |doc| doc.persisted? }.size
           end
 
           # Delete the supplied document from the target. This method is proxied
@@ -124,11 +124,11 @@ module Mongoid
           # @since 2.0.0.rc.1
           def delete(document)
             execute_callback :before_remove, document
-            doc = target.delete_one(document)
+            doc = _target.delete_one(document)
             if doc && !_binding?
               _unscoped.delete_one(doc)
               if _assigning?
-                base.add_atomic_pull(doc)
+                _base.add_atomic_pull(doc)
               else
                 doc.delete(suppress: true)
                 unbind_one(doc)
@@ -167,7 +167,7 @@ module Mongoid
           # @since 3.1.0
           def delete_if
             if block_given?
-              dup_target = target.dup
+              dup_target = _target.dup
               dup_target.each do |doc|
                 delete(doc) if yield(doc)
               end
@@ -230,12 +230,12 @@ module Mongoid
           # @return [ Many ] The proxy.
           def initialize(base, target, association)
             init(base, target, association) do
-              target.each_with_index do |doc, index|
+              _target.each_with_index do |doc, index|
                 integrate(doc)
                 doc._index = index
               end
-              @_unscoped = target.dup
-              @target = scope(target)
+              @_unscoped = _target.dup
+              @_target = scope(_target)
             end
           end
 
@@ -248,7 +248,7 @@ module Mongoid
           #
           # @since 2.1.0
           def in_memory
-            target
+            _target
           end
 
           # Pop documents off the relation. This can be a single document or
@@ -268,11 +268,11 @@ module Mongoid
           # @since 3.0.0
           def pop(count = nil)
             if count
-              if docs = target[target.size - count, target.size]
+              if docs = _target[_target.size - count, _target.size]
                 docs.each { |doc| delete(doc) }
               end
             else
-              delete(target[-1])
+              delete(_target[-1])
             end
           end
 
@@ -311,7 +311,7 @@ module Mongoid
           private
 
           def object_already_related?(document)
-            target.any? { |existing| existing.id && existing === document }
+            _target.any? { |existing| existing.id && existing === document }
           end
 
           # Appends the document to the target array, updating the index on the
@@ -326,7 +326,7 @@ module Mongoid
           def append(document)
             execute_callback :before_add, document
             unless object_already_related?(document)
-              target.push(*scope([document]))
+              _target.push(*scope([document]))
             end
             _unscoped.push(document)
             integrate(document)
@@ -345,7 +345,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            Binding.new(base, target, __association)
+            Binding.new(_base, _target, _association)
           end
 
           # Returns the "#{criteria}"# object for the target class with its documents set
@@ -356,7 +356,7 @@ module Mongoid
           #
           # @return [ Criteria ] A new criteria.
           def criteria
-            @criteria ||= __association.criteria(base, target)
+            @criteria ||= _association.criteria(_base, _target)
           end
 
           # Deletes one document from the target and unscoped.
@@ -370,7 +370,7 @@ module Mongoid
           #
           # @since 2.4.7
           def delete_one(document)
-            target.delete_one(document)
+            _target.delete_one(document)
             _unscoped.delete_one(document)
             reindex
           end
@@ -400,7 +400,7 @@ module Mongoid
           #
           # @return [ Criteria, Object ] A Criteria or return value from the target.
           def method_missing(name, *args, &block)
-            return super if target.respond_to?(name)
+            return super if _target.respond_to?(name)
             klass.send(:with_scope, criteria) do
               criteria.public_send(name, *args, &block)
             end
@@ -415,7 +415,7 @@ module Mongoid
           #
           # @since 2.1.0
           def persistable?
-            base.persisted? && !_binding?
+            _base.persisted? && !_binding?
           end
 
           # Reindex all the target elements. This is useful when performing
@@ -444,8 +444,8 @@ module Mongoid
           #
           # @since 2.4.0
           def scope(docs)
-            return docs unless __association.order || __association.klass.default_scoping?
-            crit = __association.klass.order_by(__association.order)
+            return docs unless _association.order || _association.klass.default_scoping?
+            crit = _association.klass.order_by(_association.order)
             crit.embedded = true
             crit.documents = docs
             crit.entries

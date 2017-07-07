@@ -21,7 +21,7 @@ module Mongoid
           # @return [ In ] The proxy.
           def initialize(base, target, association)
             init(base, target, association) do
-              characterize_one(target)
+              characterize_one(_target)
               bind_one
             end
           end
@@ -40,11 +40,11 @@ module Mongoid
           def substitute(replacement)
             unbind_one
             unless replacement
-              base.delete if persistable?
+              _base.delete if persistable?
               return nil
             end
-            base.new_record = true
-            self.target = replacement
+            _base.new_record = true
+            self._target = replacement
             bind_one
             self
           end
@@ -62,7 +62,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            Binding.new(base, target, __association)
+            Binding.new(_base, _target, _association)
           end
 
           # Characterize the document.
@@ -74,8 +74,8 @@ module Mongoid
           #
           # @since 2.1.0
           def characterize_one(document)
-            unless base.__association
-              base.__association = __association.inverse_association(document)
+            unless _base._association
+              _base._association = _association.inverse_association(document)
             end
           end
 
@@ -88,7 +88,7 @@ module Mongoid
           #
           # @since 2.1.0
           def persistable?
-            target.persisted? && !_binding? && !_building?
+            _target.persisted? && !_binding? && !_building?
           end
 
           class << self

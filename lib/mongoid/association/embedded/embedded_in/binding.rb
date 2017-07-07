@@ -28,16 +28,16 @@ module Mongoid
             # base.__metadata is the inverse_metadata
             # If the base already has __metadata, that avoids an exception being raised
             # when the inverse_metadata is attempted to be fetched.
-            base.__association = association.inverse_association(target) unless base.__association
-            base.parentize(target)
+            _base._association = _association.inverse_association(_target) unless _base._association
+            _base.parentize(_target)
             binding do
               # is determined by checking base.__metadata
               # better to use the target to check if push or a setter should be used
               # for the relation
-              if base.embedded_many?
-                target.do_or_do_not(association.inverse(target)).push(base)
+              if _base.embedded_many?
+                _target.do_or_do_not(_association.inverse(_target)).push(_base)
               else
-                target.do_or_do_not(association.inverse_setter(target), base)
+                _target.do_or_do_not(_association.inverse_setter(_target), _base)
               end
             end
           end
@@ -54,10 +54,10 @@ module Mongoid
           # @since 2.0.0.rc.1
           def unbind_one
             binding do
-              if base.embedded_many?
-                target.do_or_do_not(association.inverse(target)).delete(base)
+              if _base.embedded_many?
+                _target.do_or_do_not(_association.inverse(_target)).delete(_base)
               else
-                target.do_or_do_not(association.inverse_setter(target), nil)
+                _target.do_or_do_not(_association.inverse_setter(_target), nil)
               end
             end
           end
