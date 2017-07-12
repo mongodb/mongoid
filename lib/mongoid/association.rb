@@ -45,7 +45,6 @@ module Mongoid
     }.freeze
 
     attr_accessor :_association
-    alias :relation_association :_association
 
     included do
       class_attribute :polymorphic
