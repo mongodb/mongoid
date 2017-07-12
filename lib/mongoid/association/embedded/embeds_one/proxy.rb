@@ -28,11 +28,11 @@ module Mongoid
           # @param [ Association ] association The association metadata.
           def initialize(base, target, association)
             init(base, target, association) do
-              characterize_one(target)
+              characterize_one(_target)
               bind_one
-              characterize_one(target)
-              base._reset_memoized_children!
-              target.save if persistable?
+              characterize_one(_target)
+              _base._reset_memoized_children!
+              _target.save if persistable?
             end
           end
 
@@ -50,19 +50,19 @@ module Mongoid
           def substitute(replacement)
             if replacement != self
               if _assigning?
-                base.add_atomic_unset(target) unless replacement
+                _base.add_atomic_unset(_target) unless replacement
               else
                 # The associated object will be replaced by the below update, so only
                 # run the callbacks and state-changing code by passing persist: false.
-                target.destroy(persist: false) if persistable?
+                _target.destroy(persist: false) if persistable?
               end
               unbind_one
               return nil unless replacement
               replacement = Factory.build(klass, replacement) if replacement.is_a?(::Hash)
-              self.target = replacement
+              self._target = replacement
               bind_one
-              characterize_one(target)
-              target.save if persistable?
+              characterize_one(_target)
+              _target.save if persistable?
             end
             self
           end
@@ -80,7 +80,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            Binding.new(base, target, __association)
+            Binding.new(_base, _target, _association)
           end
 
           # Are we able to persist this relation?
@@ -92,7 +92,7 @@ module Mongoid
           #
           # @since 2.1.0
           def persistable?
-            base.persisted? && !_binding? && !_building? && !_assigning?
+            _base.persisted? && !_binding? && !_building? && !_assigning?
           end
 
           class << self

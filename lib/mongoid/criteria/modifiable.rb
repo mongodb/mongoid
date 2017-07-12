@@ -180,7 +180,7 @@ module Mongoid
         end
         if embedded?
           attributes[:_parent] = parent_document
-          attributes[:__association] = association
+          attributes[:_association] = association
         end
         if polymorphic? && @criterion
           klass.__send__(method, attributes.merge(@criterion), &block)

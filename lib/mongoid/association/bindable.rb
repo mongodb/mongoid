@@ -6,7 +6,7 @@ module Mongoid
     module Bindable
       include Threaded::Lifecycle
 
-      attr_reader :base, :target, :association
+      attr_reader :_base, :_target, :_association
 
       # Create the new binding.
       #
@@ -19,7 +19,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def initialize(base, target, association)
-        @base, @target, @association = base, target, association
+        @_base, @_target, @_association = base, target, association
       end
 
       # Execute the provided block inside a binding.
@@ -55,12 +55,12 @@ module Mongoid
       #
       # @since 3.0.0
       def check_inverse!(doc)
-        unless association.bindable?(doc)
+        unless _association.bindable?(doc)
           raise Errors::InverseNotFound.new(
-              base.class,
-              association.name,
+              _base.class,
+              _association.name,
               doc.class,
-              association.foreign_key
+              _association.foreign_key
           )
         end
       end
@@ -79,7 +79,7 @@ module Mongoid
       # @since 3.0.0
       def bind_foreign_key(keyed, id)
         unless keyed.frozen?
-          keyed.you_must(association.foreign_key_setter, id)
+          keyed.you_must(_association.foreign_key_setter, id)
         end
       end
 
@@ -96,8 +96,8 @@ module Mongoid
       #
       # @since 3.0.0
       def bind_polymorphic_type(typed, name)
-        if association.type
-          typed.you_must(association.type_setter, name)
+        if _association.type
+          typed.you_must(_association.type_setter, name)
         end
       end
 
@@ -114,8 +114,8 @@ module Mongoid
       #
       # @since 3.0.0
       def bind_polymorphic_inverse_type(typed, name)
-        if association.inverse_type
-          typed.you_must(association.inverse_type_setter, name)
+        if _association.inverse_type
+          typed.you_must(_association.inverse_type_setter, name)
         end
       end
 
@@ -132,8 +132,8 @@ module Mongoid
       #
       # @since 3.0.0
       def bind_inverse(doc, inverse)
-        if doc.respond_to?(association.inverse_setter)
-          doc.you_must(association.inverse_setter, inverse)
+        if doc.respond_to?(_association.inverse_setter)
+          doc.you_must(_association.inverse_setter, inverse)
         end
       end
 
@@ -149,13 +149,13 @@ module Mongoid
       # @since 3.0.0
       def bind_from_relational_parent(doc)
         check_inverse!(doc)
-        bind_foreign_key(doc, record_id(base))
-        bind_polymorphic_type(doc, base.class.name)
-        bind_inverse(doc, base)
+        bind_foreign_key(doc, record_id(_base))
+        bind_polymorphic_type(doc, _base.class.name)
+        bind_inverse(doc, _base)
       end
 
-      def record_id(base)
-        base.__send__(association.primary_key)
+      def record_id(_base)
+        _base.__send__(_association.primary_key)
       end
 
       # Ensure that the association on the base is correct, for the cases
@@ -171,9 +171,9 @@ module Mongoid
       #
       # @since 2.4.4
       def set_base_association
-        inverse_association = association.inverse_association(target)
-        if inverse_association != association && !inverse_association.nil?
-          base.__association = inverse_association
+        inverse_association = _association.inverse_association(_target)
+        if inverse_association != _association && !inverse_association.nil?
+          _base._association = inverse_association
         end
       end
 

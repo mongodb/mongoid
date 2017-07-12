@@ -20,9 +20,9 @@ module Mongoid
           def initialize(base, target, association)
             init(base, target, association) do
               raise_mixed if klass.embedded? && !klass.cyclic?
-              characterize_one(target)
+              characterize_one(_target)
               bind_one
-              target.save if persistable?
+              _target.save if persistable?
             end
           end
 
@@ -36,7 +36,7 @@ module Mongoid
           # @since 2.0.0.rc.1
           def nullify
             unbind_one
-            target.save
+            _target.save
           end
 
           # Substitutes the supplied target document for the existing document
@@ -54,13 +54,13 @@ module Mongoid
           def substitute(replacement)
             unbind_one
             if persistable?
-              if __association.destructive?
-                send(__association.dependent)
+              if _association.destructive?
+                send(_association.dependent)
               else
                 save if persisted?
               end
             end
-            HasOne::Proxy.new(base, replacement, __association) if replacement
+            HasOne::Proxy.new(_base, replacement, _association) if replacement
           end
 
           private
@@ -74,7 +74,7 @@ module Mongoid
           #
           # @return [ Binding ] The binding object.
           def binding
-            HasOne::Binding.new(base, target, __association)
+            HasOne::Binding.new(_base, _target, _association)
           end
 
           # Are we able to persist this relation?
@@ -86,7 +86,7 @@ module Mongoid
           #
           # @since 2.1.0
           def persistable?
-            base.persisted? && !_binding? && !_building?
+            _base.persisted? && !_binding? && !_building?
           end
 
           class << self

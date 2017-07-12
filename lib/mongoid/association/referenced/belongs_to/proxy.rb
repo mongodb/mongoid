@@ -22,7 +22,7 @@ module Mongoid
           # @param [ Association ] association The association object.
           def initialize(base, target, association)
             init(base, target, association) do
-              characterize_one(target)
+              characterize_one(_target)
               bind_one
             end
           end
@@ -36,7 +36,7 @@ module Mongoid
           #
           def nullify
             unbind_one
-            target.save
+            _target.save
           end
 
           # Substitutes the supplied target documents for the existing document
@@ -54,7 +54,7 @@ module Mongoid
           def substitute(replacement)
             unbind_one
             if replacement
-              self.target = normalize(replacement)
+              self._target = normalize(replacement)
               bind_one
               self
             end
@@ -73,7 +73,7 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def binding
-            BelongsTo::Binding.new(base, target, __association)
+            BelongsTo::Binding.new(_base, _target, _association)
           end
 
           # Normalize the value provided as a replacement for substitution.
@@ -90,7 +90,7 @@ module Mongoid
           # @since 3.1.5
           def normalize(replacement)
             return replacement if replacement.is_a?(Document)
-            __association.build(klass, replacement)
+            _association.build(klass, replacement)
           end
 
           # Are we able to persist this relation?
@@ -102,7 +102,7 @@ module Mongoid
           #
           # @since 2.1.0
           def persistable?
-            target.persisted? && !_binding? && !_building?
+            _target.persisted? && !_binding? && !_building?
           end
 
           class << self

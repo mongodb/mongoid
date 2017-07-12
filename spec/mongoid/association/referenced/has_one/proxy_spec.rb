@@ -62,7 +62,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(person.game.target).to eq(game)
+          expect(person.game._target).to eq(game)
         end
 
         it "sets the foreign key on the relation" do
@@ -97,7 +97,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(person.game.target).to eq(game)
+          expect(person.game._target).to eq(game)
         end
 
         it "sets the foreign key of the relation" do
@@ -152,7 +152,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(person.cat.target).to eq(cat)
+          expect(person.cat._target).to eq(cat)
         end
 
         it "sets the foreign key of the relation" do
@@ -190,7 +190,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(bar.rating.target).to eq(rating)
+          expect(bar.rating._target).to eq(rating)
         end
 
         it "sets the foreign key on the relation" do
@@ -225,7 +225,7 @@ describe Mongoid::Association::Referenced::HasOne::Proxy do
         end
 
         it "sets the target of the relation" do
-          expect(bar.rating.target).to eq(rating)
+          expect(bar.rating._target).to eq(rating)
         end
 
         it "sets the foreign key of the relation" do

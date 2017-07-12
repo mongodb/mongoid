@@ -44,8 +44,7 @@ module Mongoid
         belongs_to: Association::Referenced::BelongsTo,
     }.freeze
 
-    attr_accessor :__association
-    alias :relation_association :__association
+    attr_accessor :_association
 
     included do
       class_attribute :polymorphic
@@ -74,7 +73,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_many?
-      __association && __association.is_a?(Association::Embedded::EmbedsMany)
+      _association && _association.is_a?(Association::Embedded::EmbedsMany)
     end
 
     # Determine if the document is part of an embeds_one relation.
@@ -86,7 +85,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def embedded_one?
-      __association && __association.is_a?(Association::Embedded::EmbedsOne)
+      _association && _association.is_a?(Association::Embedded::EmbedsOne)
     end
 
     # Get the association name for this document. If no association was defined
@@ -101,8 +100,8 @@ module Mongoid
     #
     # @since 3.0.0
     def association_name
-      raise Errors::NoMetadata.new(self.class.name) unless __association
-      __association.name
+      raise Errors::NoMetadata.new(self.class.name) unless _association
+      _association.name
     end
 
     # Determine if the document is part of an references_many relation.
@@ -114,7 +113,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_many?
-      __association && __association.is_a?(Association::Referenced::HasMany)
+      _association && _association.is_a?(Association::Referenced::HasMany)
     end
 
     # Determine if the document is part of an references_one relation.
@@ -126,7 +125,7 @@ module Mongoid
     #
     # @since 2.0.0.rc.1
     def referenced_one?
-      __association && __association.is_a?(Association::Referenced::HasOne)
+      _association && _association.is_a?(Association::Referenced::HasOne)
     end
 
     # Convenience method for iterating through the loaded relations and

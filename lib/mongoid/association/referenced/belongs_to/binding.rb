@@ -21,15 +21,15 @@ module Mongoid
           # @since 2.0.0.rc.1
           def bind_one
             binding do
-              check_polymorphic_inverses!(target)
-              bind_foreign_key(base, record_id(target))
-              bind_polymorphic_inverse_type(base, target.class.name)
-              if inverse = association.inverse(target)
+              check_polymorphic_inverses!(_target)
+              bind_foreign_key(_base, record_id(_target))
+              bind_polymorphic_inverse_type(_base, _target.class.name)
+              if inverse = _association.inverse(_target)
                 if set_base_association
-                  if base.referenced_many?
-                    target.__send__(inverse).push(base)
+                  if _base.referenced_many?
+                    _target.__send__(inverse).push(_base)
                   else
-                    target.set_relation(inverse, base)
+                    _target.set_relation(inverse, _base)
                   end
                 end
               end
@@ -46,15 +46,15 @@ module Mongoid
           # @since 2.0.0.rc.1
           def unbind_one
             binding do
-              inverse = association.inverse(target)
-              bind_foreign_key(base, nil)
-              bind_polymorphic_inverse_type(base, nil)
+              inverse = _association.inverse(_target)
+              bind_foreign_key(_base, nil)
+              bind_polymorphic_inverse_type(_base, nil)
               if inverse
                 set_base_association
-                if base.referenced_many?
-                  target.__send__(inverse).delete(base)
+                if _base.referenced_many?
+                  _target.__send__(inverse).delete(_base)
                 else
-                  target.set_relation(inverse, nil)
+                  _target.set_relation(inverse, nil)
                 end
               end
             end
@@ -73,10 +73,10 @@ module Mongoid
           #
           # @since 3.0.0
           def check_polymorphic_inverses!(doc)
-            inverses = association.inverses(doc)
-            if inverses.count > 1 && base.send(association.foreign_key).nil?
+            inverses = _association.inverses(doc)
+            if inverses.count > 1 && _base.send(_association.foreign_key).nil?
               raise Errors::InvalidSetPolymorphicRelation.new(
-                  association.name, base.class.name, target.class.name
+                  _association.name, _base.class.name, _target.class.name
               )
             end
           end

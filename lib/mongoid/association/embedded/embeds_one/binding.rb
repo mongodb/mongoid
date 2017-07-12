@@ -21,9 +21,9 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def bind_one
-            target.parentize(base)
+            _target.parentize(_base)
             binding do
-              target.do_or_do_not(association.inverse_setter(target), base)
+              _target.do_or_do_not(_association.inverse_setter(_target), _base)
             end
           end
 
@@ -37,7 +37,7 @@ module Mongoid
           # @since 2.0.0.rc.1
           def unbind_one
             binding do
-              target.do_or_do_not(association.inverse_setter(target), nil)
+              _target.do_or_do_not(_association.inverse_setter(_target), nil)
             end
           end
         end

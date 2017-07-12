@@ -88,11 +88,11 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Binding do
         context "when the base has an association" do
 
           before do
-            address.__association = person_association
+            address._association = person_association
           end
 
           it "does not overwrite the existing association" do
-            expect(address).to receive(:__association=).never
+            expect(address).to receive(:_association=).never
             binding.bind_one
           end
         end

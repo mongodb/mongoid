@@ -18,12 +18,12 @@ module Mongoid
       include Threaded::Lifecycle
       include Marshalable
 
-      attr_accessor :base, :__association, :target
+      attr_accessor :_base, :_association, :_target
 
       # Backwards compatibility with Mongoid beta releases.
-      delegate :foreign_key, :inverse_foreign_key, to: :__association
+      delegate :foreign_key, :inverse_foreign_key, to: :_association
       delegate :bind_one, :unbind_one, to: :binding
-      delegate :collection_name, to: :base
+      delegate :collection_name, to: :_base
 
       # Convenience for setting the target and the association metadata properties since
       # all proxies will need to do this.
@@ -37,7 +37,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def init(base, target, association)
-        @base, @target, @__association = base, target, association
+        @_base, @_target, @_association = base, target, association
         yield(self) if block_given?
         extend_proxies(association.extension) if association.extension
       end
@@ -56,7 +56,7 @@ module Mongoid
       #
       # @since 3.0.15
       def klass
-        __association ? __association.klass : nil
+        _association ? _association.klass : nil
       end
 
       # Resets the criteria inside the relation proxy. Used by many to many
@@ -67,7 +67,7 @@ module Mongoid
       #
       # @since 3.0.14
       def reset_unloaded
-        target.reset_unloaded(criteria)
+        _target.reset_unloaded(criteria)
       end
 
       # The default substitutable object for a relation proxy is the clone of
@@ -80,7 +80,7 @@ module Mongoid
       #
       # @since 2.1.6
       def substitutable
-        target
+        _target
       end
 
       protected
@@ -94,7 +94,7 @@ module Mongoid
       #
       # @since 2.0.0
       def collection
-        root = base._root
+        root = _base._root
         root.collection unless root.embedded?
       end
 
@@ -107,7 +107,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.4
       def characterize_one(document)
-        document.__association = __association unless document.__association
+        document._association = _association unless document._association
       end
 
       # Default behavior of method missing should be to delegate all calls
@@ -117,7 +117,7 @@ module Mongoid
       # @param [ Array ] args The arguments passed to the method.
       #
       def method_missing(name, *args, &block)
-        target.send(name, *args, &block)
+        _target.send(name, *args, &block)
       end
 
       # When the base document illegally references an embedded document this
@@ -130,7 +130,7 @@ module Mongoid
       #
       # @since 2.0.0
       def raise_mixed
-        raise Errors::MixedRelations.new(base.class, __association.klass)
+        raise Errors::MixedRelations.new(_base.class, _association.klass)
       end
 
       # When the base is not yet saved and the user calls create or create!
@@ -145,7 +145,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.6
       def raise_unsaved(doc)
-        raise Errors::UnsavedDocument.new(base, doc)
+        raise Errors::UnsavedDocument.new(_base, doc)
       end
 
       # Executes a callback method
@@ -157,11 +157,11 @@ module Mongoid
       #
       # @since 3.1.0
       def execute_callback(callback, doc)
-        __association.get_callbacks(callback).each do |c|
+        _association.get_callbacks(callback).each do |c|
           if c.is_a? Proc
-            c.call(base, doc)
+            c.call(_base, doc)
           else
-            base.send c, doc
+            _base.send c, doc
           end
         end
       end
