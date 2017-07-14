@@ -605,7 +605,7 @@ but the child document contains a "foreign key" reference to the parent.
   # A child member document.
   {
     "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
-    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
+    "band_id" : [ ObjectId("4d3ed089fb60ab534684b7e9") ]
   }
 
 Has And Belongs To Many
