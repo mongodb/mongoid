@@ -64,7 +64,7 @@ module Mongoid
         # @since 7.0
         def stores_foreign_key?; false; end
 
-        # The default for validation the association object.
+        # The default for validating the association object.
         #
         # @return [ false ] Always false.
         #
@@ -122,7 +122,6 @@ module Mongoid
           define_touchable!
         end
 
-
         def relation_complements
           @relation_complements ||= [ Embedded::EmbedsMany,
                                       Embedded::EmbedsOne ].freeze
@@ -143,7 +142,6 @@ module Mongoid
           matches = (other || relation_class).relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
                 rel.relation_class_name == inverse_class_name
-
           end
           if matches.size > 1
             raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)

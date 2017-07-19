@@ -4,9 +4,12 @@ module Mongoid
     module Referenced
       class HasOne
 
+        # The Builder behavior for has_one associations.
+        #
+        # @since 7.0
         module Buildable
 
-          # This builder either takes an _id or an object and queries for the
+          # This method either takes an _id or an object and queries for the
           # inverse side using the id or sets the object after clearing the
           # associated object.
           #

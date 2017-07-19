@@ -79,13 +79,8 @@ module Mongoid
           # @example Build a new document on the relation.
           #   person.posts.build(:title => "A new post")
           #
-          # @overload build(attributes = {}, type = nil)
-          #   @param [ Hash ] attributes The attributes of the new document.
-          #   @param [ Class ] type The optional subclass to build.
-          #
-          # @overload build(attributes = {}, type = nil)
-          #   @param [ Hash ] attributes The attributes of the new document.
-          #   @param [ Class ] type The optional subclass to build.
+          # @param [ Hash ] attributes The attributes of the new document.
+          # @param [ Class ] type The optional subclass to build.
           #
           # @return [ Document ] The new document.
           #
@@ -130,6 +125,8 @@ module Mongoid
           #
           # @example Nullify the relation.
           #   person.preferences.nullify
+          #
+          # @param [ Array<Document> ] The replacement documents.
           #
           # @since 2.0.0.rc.1
           def nullify(replacement = [])

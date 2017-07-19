@@ -11,6 +11,7 @@ module Mongoid
       #   InvalidRelationOption.new(Person, invalid_option: 'make_me_a_sandwich')
       #
       # @param [ Class ] klass The model class.
+      # @param [ String, Symbol ] name The relation name.
       # @param [ Symbol ] option The invalid option.
       # @param [ Array<Symbol> ] valid_options The valid option.
       #

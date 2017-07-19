@@ -68,14 +68,8 @@ module Mongoid
           # @example Build a new document on the relation.
           #   person.posts.build(:title => "A new post")
           #
-          # @overload build(attributes = {}, options = {}, type = nil)
-          #   @param [ Hash ] attributes The attributes of the new document.
-          #   @param [ Hash ] options The scoped assignment options.
-          #   @param [ Class ] type The optional subclass to build.
-          #
-          # @overload build(attributes = {}, type = nil)
-          #   @param [ Hash ] attributes The attributes of the new document.
-          #   @param [ Class ] type The optional subclass to build.
+          # @param [ Hash ] attributes The attributes of the new document.
+          # @param [ Class ] type The optional subclass to build.
           #
           # @return [ Document ] The new document.
           #

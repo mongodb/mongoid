@@ -17,6 +17,8 @@ module Mongoid
           # @example Build the documents.
           #   Builder.new(meta, attrs).build
           #
+          # @param [ Object ] base The base object.
+          # @param [ Object ] object The object to use to build the relation.
           # @param [ String ] type Not used in this context.
           #
           # @return [ Array<Document ] The documents.

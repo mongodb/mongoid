@@ -180,7 +180,7 @@ module Mongoid
       end
       alias :inverse_klass :inverse_class
 
-      # The foreign key field if this relations stores a foreign key.
+      # The foreign key field if this relation stores a foreign key.
       # Otherwise, the primary key.
       #
       # @return [ Symbol, String ] The primary key.
@@ -268,7 +268,7 @@ module Mongoid
 
       # Whether the dependent method is destructive.
       #
-      # @return [ false ] If the dependent method is destructive.
+      # @return [ true, false ] If the dependent method is destructive.
       #
       # @since 7.0
       def destructive?
@@ -288,7 +288,7 @@ module Mongoid
 
       # Get the extension.
       #
-      # @return [ Module ] The extension module, if one have been defined.
+      # @return [ Module ] The extension module, if one has been defined.
       #
       # @since 7.0
       def extension

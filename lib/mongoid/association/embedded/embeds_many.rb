@@ -82,7 +82,7 @@ module Mongoid
         # @example Get the validation default.
         #   Proxy.validation_default
         #
-        # @return [ true, false ] The validation default.
+        # @return [ true ] Always true.
         #
         # @since 2.1.9
         def validation_default; true; end
@@ -155,6 +155,12 @@ module Mongoid
           Mongoid::Atomic::Paths::Embedded::Many.new(document)
         end
 
+        # Get a criteria object for searching given a parent and children documents.
+        #
+        # @param [ Document ] base The base document.
+        # @param [ Document ] target The children documents.
+        #
+        # @sicne 7.0
         def criteria(base, target)
           criterion = klass.scoped
           criterion.embedded = true
@@ -192,7 +198,6 @@ module Mongoid
           matches = relation_class.relations.values.select do |rel|
             relation_complements.include?(rel.class) &&
                 rel.relation_class_name == inverse_class_name
-
           end
           if matches.size > 1
             raise Errors::AmbiguousRelationship.new(relation_class, @owner_class, name, matches)

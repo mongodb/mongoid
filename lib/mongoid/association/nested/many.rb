@@ -16,6 +16,7 @@ module Mongoid
         #   many.build(person)
         #
         # @param [ Document ] parent The parent document of the relation.
+        # @param [ Hash ] options The options.
         #
         # @return [ Array ] The attributes.
         def build(parent, options = {})
@@ -36,7 +37,7 @@ module Mongoid
         # relations.
         #
         # @example Initialize the builder.
-        #   One.new(association, attributes, options)
+        #   Many.new(association, attributes, options)
         #
         # @param [ Association ] association The association metadata.
         # @param [ Hash ] attributes The attributes hash to attempt to set.
@@ -66,7 +67,7 @@ module Mongoid
         # @return [ true, false ] If the relation can potentially be deleted.
         def destroyable?(attributes)
           destroy = attributes.delete(:_destroy)
-          [1, "1", true, "true"].include?(destroy) && allow_destroy?
+          Nested::DESTROY_FLAGS.include?(destroy) && allow_destroy?
         end
 
         # Are the supplied attributes of greater number than the supplied

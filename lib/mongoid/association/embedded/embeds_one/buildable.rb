@@ -16,6 +16,8 @@ module Mongoid
           # @example Build the document.
           #   Builder.new(meta, attrs).build
           #
+          # @param [ Document ] base The document this relation hangs off of.
+          # @param [ Document ] object The related document.
           # @param [ String ] _type Not used in this context.
           #
           # @return [ Document ] A single document.

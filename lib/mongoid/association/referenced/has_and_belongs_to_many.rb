@@ -7,6 +7,9 @@ module Mongoid
   module Association
     module Referenced
 
+      # The HasAndBelongsToMany type association.
+      #
+      # @since 7.0
       class HasAndBelongsToMany
         include Relatable
         include Buildable
@@ -86,6 +89,11 @@ module Mongoid
         # @since 7.0
         def validation_default; true; end
 
+        # Are ids only saved on this side of the relation?
+        #
+        # @return [ true, false ] Whether this association has a forced nil inverse.
+        #
+        # @since 7.0
         def forced_nil_inverse?
           @forced_nil_inverse ||= @options.key?(:inverse_of) && !@options[:inverse_of]
         end

@@ -64,13 +64,8 @@ module Mongoid
           # @example Build a new document on the relation.
           #   person.people.build(:name => "Bozo")
           #
-          # @overload build(attributes = {}, options = {}, type = nil)
-          #   @param [ Hash ] attributes The attributes to build the document with.
-          #   @param [ Class ] type Optional class to build the document with.
-          #
-          # @overload build(attributes = {}, type = nil)
-          #   @param [ Hash ] attributes The attributes to build the document with.
-          #   @param [ Class ] type Optional class to build the document with.
+          # @param [ Hash ] attributes The attributes to build the document with.
+          # @param [ Class ] type Optional class to build the document with.
           #
           # @return [ Document ] The new document.
           def build(attributes = {}, type = nil)
@@ -91,7 +86,7 @@ module Mongoid
           # @example Clear the relation.
           #   person.addresses.clear
           #
-          # @return [ Many ] The empty relation.
+          # @return [ self ] The empty relation.
           def clear
             batch_clear(_target.dup)
             self
@@ -508,7 +503,7 @@ module Mongoid
             # always true.
             #
             # @example Is the relation embedded?
-            #   Embedded::Many.embedded?
+            #   Association::Embedded::EmbedsMany.embedded?
             #
             # @return [ true ] true.
             #
@@ -520,7 +515,7 @@ module Mongoid
             # Returns the suffix of the foreign key field, either "_id" or "_ids".
             #
             # @example Get the suffix for the foreign key.
-            #   Referenced::Many.foreign_key_suffix
+            #   Association::Embedded::EmbedsMany.foreign_key_suffix
             #
             # @return [ nil ] nil.
             #

@@ -38,14 +38,12 @@ module Mongoid
         [ args.first || {}, args.size > 1 ? args[1] : {} ]
       end
 
-
-      # Defines a builder method for an embeds_one relation. This is
-      # defined as #build_name.
+      # Defines a builder method. This is defined as #build_name.
       #
       # @example
-      #   Person.builder("name")
+      #   Person.define_builder!(association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
+      # @param [ Association ] association The association metadata for the relation.
       #
       # @return [ Class ] The class being set up.
       #
@@ -64,14 +62,13 @@ module Mongoid
         end
       end
 
-      # Defines a creator method for an embeds_one relation. This is
-      # defined as #create_name. After the object is built it will
-      # immediately save.
+      # Defines a creator method. This is defined as #create_name.
+      # After the object is built it will immediately save.
       #
       # @example
-      #   Person.creator("name")
+      #   Person.define_creator!(association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
+      # @param [ Association ] association The association metadata for the relation.
       #
       # @return [ Class ] The class being set up.
       #

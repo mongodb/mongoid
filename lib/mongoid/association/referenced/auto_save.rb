@@ -20,7 +20,7 @@ module Mongoid
         # Begin the associated autosave.
         #
         # @example Begin autosave.
-        #   document.__autosaving__s
+        #   document.__autosaving__
         #
         # @since 3.1.3
         def __autosaving__

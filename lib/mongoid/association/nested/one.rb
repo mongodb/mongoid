@@ -7,6 +7,7 @@ module Mongoid
 
         attr_accessor :destroy
 
+
         # Builds the relation depending on the attributes and the options
         # passed to the macro.
         #
@@ -94,7 +95,7 @@ module Mongoid
         #
         # @since 2.0.0
         def destroyable?
-          [1, "1", true, "true"].include?(destroy) && allow_destroy?
+          Nested::DESTROY_FLAGS.include?(destroy) && allow_destroy?
         end
 
         # Is the document to be replaced?

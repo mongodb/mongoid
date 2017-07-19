@@ -17,7 +17,6 @@ module Mongoid
       # @param [ String, Symbol ] name The name of the relation.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
       # @param [ Association ] association The association metadata.
-      # @param [ true, false ] building If we are in a build operation.
       #
       # @return [ Proxy ] The relation.
       #
@@ -32,7 +31,7 @@ module Mongoid
       # @example Create the relation.
       #   person.create_relation(document, association)
       #
-      # @param [ Document, Array<Document ] object The relation target.
+      # @param [ Document, Array<Document> ] object The relation target.
       # @param [ Association ] association The association metadata.
       #
       # @return [ Proxy ] The relation.
@@ -44,7 +43,7 @@ module Mongoid
         target ? association.create_relation(self, target) : nil
       end
 
-      # Resets the criteria inside the relation proxy. Used by many to many
+      # Resets the criteria inside the relation proxy. Used by many-to-many
       # relations to keep the underlying ids array in sync.
       #
       # @example Reset the relation criteria.
@@ -87,6 +86,7 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the relation.
       # @param [ Association ] association The association metadata.
+      # @param [ Object ] object The object used to build the relation.
       # @param [ true, false ] reload If the relation is to be reloaded.
       #
       # @return [ Proxy ] The relation.
@@ -160,14 +160,14 @@ module Mongoid
       # Adds the existence check for relations.
       #
       # @example Add the existence check.
-      #   Person.existence_check(:name, association)
+      #   Person.define_existence_check!(association)
       #
       # @example Check if a relation exists.
       #   person = Person.new
       #   person.has_game?
       #   person.game?
       #
-      # @param [ String, Symbol ] name The name of the relation.
+      # @param [ Association ] association The association.
       #
       # @return [ Class ] The model being set up.
       #
@@ -191,8 +191,7 @@ module Mongoid
       # @example Set up the getter for the relation.
       #   Person.define_getter!(association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
-      # @param [ Association ] association The association for the relation.
+      # @param [ Association ] association The association metadata for the relation.
       #
       # @return [ Class ] The class being set up.
       #
@@ -216,7 +215,7 @@ module Mongoid
       # @example Set up the ids getter for the relation.
       #   Person.define_ids_getter!(association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
+      # @param [ Association ] association The association metadata for the relation.
       #
       # @return [ Class ] The class being set up.
       def self.define_ids_getter!(association)
@@ -236,8 +235,7 @@ module Mongoid
       # @example Set up the setter for the relation.
       #   Person.define_setter!(association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
-      # @param [ Association ] association The association for the relation.
+      # @param [ Association ] association The association metadata for the relation.
       #
       # @return [ Class ] The class being set up.
       #
@@ -271,7 +269,6 @@ module Mongoid
       # @example Set up the id_setter for the relation.
       #   Person.define_ids_setter!(association)
       #
-      #  @param [ String, Symbol ] name The name of the relation.
       #  @param [ Association ] association The association for the relation.
       #
       #  @return [ Class ] The class being set up.
@@ -290,7 +287,7 @@ module Mongoid
       # @example
       #   Person.define_builder!(association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
+      # @param [ Association ] association The association for the relation.
       #
       # @return [ Class ] The class being set up.
       #
@@ -317,7 +314,7 @@ module Mongoid
       # @example
       #   Person.define_creator!(association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
+      # @param [ Association ] association The association for the relation.
       #
       # @return [ Class ] The class being set up.
       #

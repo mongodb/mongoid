@@ -11,6 +11,9 @@ module Mongoid
         self.dependents = []
       end
 
+      # The valid dependent strategies.
+      #
+      # @since 7.0
       STRATEGIES = [
           :delete_all,
           :destroy,
@@ -19,13 +22,44 @@ module Mongoid
           :restrict_with_error
       ]
 
-      RESTRICT_ERROR_MSG = 'Cannot delete record because dependent members exist.'.freeze
+      # The error message when a strategy cannot delete objects because there are associated objects.
+      #
+      # @since 7.0
+      RESTRICT_ERROR_MSG = 'Cannot delete record because associated objects exist.'.freeze
+
+      # Attempt to add the cascading information for the document to know how
+      # to handle associated documents on a removal.
+      #
+      # @example Set up cascading information
+      #   Mongoid::Association::Depending.define_dependency!(association)
+      #
+      # @param [ Association ] association The association metadata.
+      #
+      # @return [ Class ] The class of the document.
+      #
+      # @since 2.0.0.rc.1
+      def self.define_dependency!(association)
+        validate!(association)
+        association.inverse_class.tap do |klass|
+          if association.dependent && !klass.dependents.include?(association)
+            klass.dependents.push(association)
+          end
+        end
+      end
+
+      def self.validate!(association)
+        unless STRATEGIES.include?(association.dependent)
+          raise Errors::InvalidDependentStrategy.new(association,
+                                                     association.dependent,
+                                                     STRATEGIES)
+        end
+      end
 
       # Perform all cascading deletes, destroys, or nullifies. Will delegate to
       # the appropriate strategy to perform the operation.
       #
       # @example Execute cascades.
-      #   document.cascade!
+      #   document.apply_delete_dependencies!
       #
       # @since 2.0.0.rc.1
       def apply_delete_dependencies!
@@ -75,36 +109,6 @@ module Mongoid
         if (relation = send(association.name)) && !relation.blank?
           errors.add(association.name, RESTRICT_ERROR_MSG)
           throw(:abort, false)
-        end
-      end
-
-      # Attempt to add the cascading information for the document to know how
-      # to handle associated documents on a removal.
-      #
-      # @example Set up cascading information
-      #   Mongoid::Association::Depending.define_dependency!(association)
-      #
-      # @param [ Association ] association The association metadata.
-      #
-      # @return [ Class ] The class of the document.
-      #
-      # @since 2.0.0.rc.1
-      def self.define_dependency!(association)
-        validate!(association)
-        association.inverse_class.tap do |klass|
-          if association.dependent && !klass.dependents.include?(association)
-            klass.dependents.push(association)
-          end
-        end
-      end
-
-      private
-
-      def self.validate!(association)
-        unless STRATEGIES.include?(association.dependent)
-          raise Errors::InvalidDependentStrategy.new(association,
-                                                     association.dependent,
-                                                     STRATEGIES)
         end
       end
     end

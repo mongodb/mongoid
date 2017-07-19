@@ -20,6 +20,8 @@ module Mongoid
       # @example Load the proxy.
       #   Marshal.load(proxy)
       #
+      # @param [ Array<Object> ] The data to set on the proxy.
+      #
       # @return [ Array<Object> ] The loaded data.
       #
       # @since 3.0.15

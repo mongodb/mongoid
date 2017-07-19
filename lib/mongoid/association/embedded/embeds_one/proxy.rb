@@ -5,11 +5,11 @@ module Mongoid
 
         class Proxy < Association::One
 
-          # The allowed options when defining this relation.
+          # The valid options when defining this relation.
           #
           # @return [ Array<Symbol> ] The allowed options when defining this relation.
           #
-          # @since 6.0.0
+          # @since 7.0
           VALID_OPTIONS = [
               :autobuild,
               :as,
@@ -101,7 +101,7 @@ module Mongoid
             # always true.
             #
             # @example Is this relation embedded?
-            #   Embedded::One.embedded?
+            #   Association::Embedded::EmbedsOne.embedded?
             #
             # @return [ true ] true.
             #

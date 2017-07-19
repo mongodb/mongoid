@@ -45,7 +45,7 @@ module Mongoid
       # provided.
       #
       # @example Add the touchable.
-      #   Model.touchable(meta)
+      #   Model.define_touchable!(assoc)
       #
       # @param [ Association ] association The association metadata.
       #

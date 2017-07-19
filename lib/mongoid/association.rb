@@ -89,7 +89,7 @@ module Mongoid
     end
 
     # Get the association name for this document. If no association was defined
-    # will raise an error.
+    #   an error will be raised.
     #
     # @example Get the association name.
     #   document.association_name

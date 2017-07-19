@@ -5,8 +5,6 @@ module Mongoid
     # Used for converting foreign key values to the correct type based on the
     # types of ids that the document stores.
     #
-    # @note Durran: The name of this class is this way to match the metadata
-    #   getter, and foreign_key was already taken there.
     module Constrainable
 
       # Convert the supplied object to the appropriate type to set as the

@@ -3,16 +3,12 @@ module Mongoid
     module Embedded
       class EmbeddedIn
 
-        # This class handles all behaviour for relations that are either
-        # one-to-many or one-to-one, where the foreign key is store on this side
-        # of the relation and the reference is to document(s) in another
-        # collection.
         class Proxy < Association::One
 
           # Instantiate a new embedded_in relation.
           #
           # @example Create the new relation.
-          #   Embedded::In.new(name, person, association)
+          #   Association::Embedded::EmbeddedIn.new(person, address, association)
           #
           # @param [ Document ] base The document the relation hangs off of.
           # @param [ Document ] target The target (parent) of the relation.
@@ -32,7 +28,7 @@ module Mongoid
           # @example Substitute the new document.
           #   person.name.substitute(new_name)
           #
-          # @param [ Document ] other A document to replace the target.
+          # @param [ Document ] replacement A document to replace the target.
           #
           # @return [ Document, nil ] The relation or nil.
           #
@@ -56,8 +52,6 @@ module Mongoid
           # @example Get the binding.
           #   binding([ address ])
           #
-          # @param [ Proxy ] new_target The new documents to bind with.
-          #
           # @return [ Binding ] A binding object.
           #
           # @since 2.0.0.rc.1
@@ -68,7 +62,7 @@ module Mongoid
           # Characterize the document.
           #
           # @example Set the base association.
-          #   relation.characterize_one(document)
+          #   object.characterize_one(document)
           #
           # @param [ Document ] document The document to set the association metadata on.
           #
@@ -97,7 +91,7 @@ module Mongoid
             # always true.
             #
             # @example Is this relation embedded?
-            #   Embedded::In.embedded?
+            #   Association::Embedded::EmbeddedIn.embedded?
             #
             # @return [ true ] true.
             #

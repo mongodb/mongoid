@@ -4,16 +4,20 @@ module Mongoid
     module Referenced
       class HasAndBelongsToMany
 
-        # Builder class for has_and_belongs_to_many associations.
+        # The Builder behavior for has_and_belongs_to_many associations.
+        #
+        # @since 7.0
         module Buildable
 
           # This builder either takes a hash and queries for the
           # object or an array of documents, where it will just return them.
           #
           # @example Build the documents.
-          #   Builder.new(association, attrs).build
+          #   relation.build(association, attrs)
           #
-          # @param [ String ] type The type of document to query for.
+          # @param [ Object ] base The base object.
+          # @param [ Object ] object The object to use to build the relation.
+          # @param [ String ] type Not used in this context.
           #
           # @return [ Array<Document> ] The documents.
           def build(base, object, type = nil)

@@ -3,7 +3,7 @@ module Mongoid
     module Embedded
       class EmbeddedIn
 
-        # The Builder object for embedded_in associations.
+        # The Builder behavior for embedded_in associations.
         #
         # @since 7.0
         module Buildable
@@ -15,6 +15,8 @@ module Mongoid
           # @example Build the document.
           #   Builder.new(meta, attrs).build
           #
+          # @param [ Object ] base The object.
+          # @param [ Object ] object The parent hash or document.
           # @param [ String ] type Not used in this context.
           #
           # @return [ Document ] A single document.
