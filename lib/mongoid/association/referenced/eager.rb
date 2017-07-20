@@ -14,8 +14,8 @@ module Mongoid
           # @example Create the new belongs to eager load preloader.
           #   BelongsTo.new(association, parent_docs)
           #
-          # @param [ Array<Association> ] Associations to eager load
-          # @param [ Array<Document> ] Documents to preload the relations
+          # @param [ Array<Association> ] associations Associations to eager load
+          # @param [ Array<Document> ] docs Documents to preload the relations
           #
           # @return [ Base ] The eager load preloader
           #
@@ -76,7 +76,7 @@ module Mongoid
           # @example Set docs into parent with pk = "foo"
           #   loader.set_on_parent("foo", docs)
           #
-          # @param [ ObjectId ] parent`s id
+          # @param [ ObjectId ] id parent`s id
           # @param [ Document, Array ] element to push into the parent
           #
           # @since 4.0.0
@@ -131,7 +131,7 @@ module Mongoid
           # @example Set docs into parent using the current relation name.
           #   loader.set_relation(doc, docs)
           #
-          # @param [ Document ] document
+          # @param [ Document ] doc The object to set the relation on
           # @param [ Document, Array ] element to set into the parent
           #
           # @since 4.0.0

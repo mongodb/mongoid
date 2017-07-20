@@ -74,7 +74,7 @@ module Mongoid
       #   Model.define_relation_touch_method(:band, :band_updated_at)
       #
       # @param [ Symbol ] name The name of the relation.
-      # @param [ Symbol ] extra_field Additional timestamp field to update.
+      # @param [ Association ] association The association metadata.
       #
       # @since 3.1.0
       #

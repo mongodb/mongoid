@@ -70,8 +70,6 @@ module Mongoid
           # @example Get the binding.
           #   relation.binding([ address ])
           #
-          # @param [ Document ] new_target The new target of the relation.
-          #
           # @return [ Binding ] The binding object.
           def binding
             HasOne::Binding.new(_base, _target, _association)

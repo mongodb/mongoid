@@ -17,7 +17,7 @@ module Mongoid
           # @example Push a document.
           #   person.addresses.push(address)
           #
-          # @param [ Document, Array<Document> ] *args Any number of documents.
+          # @param [ Document, Array<Document> ] args Any number of documents.
           def <<(*args)
             docs = args.flatten
             return concat(docs) if docs.size > 1
@@ -334,8 +334,6 @@ module Mongoid
           # @example Create the binding.
           #   relation.binding([ address ])
           #
-          # @param [ Array<Document> ] new_target The new documents to bind with.
-          #
           # @return [ Binding ] The many binding.
           #
           # @since 2.0.0.rc.1
@@ -453,7 +451,7 @@ module Mongoid
           #   relation.remove_all({ :num => 1 }, true)
           #
           # @param [ Hash ] conditions Conditions to filter by.
-          # @param [ true, false ] destroy If true then destroy, else delete.
+          # @param [ true, false ] method :delete or :destroy.
           #
           # @return [ Integer ] The number of documents removed.
           def remove_all(conditions = {}, method = :delete)

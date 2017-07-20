@@ -151,8 +151,8 @@ module Mongoid
         # Add polymorphic query criteria to a Criteria object, if this association is
         #  polymorphic.
         #
-        # @params [ Mongoid::Criteria ] criteria The criteria object to add to.
-        # @params [ Class ] object_class The object class.
+        # @param [ Mongoid::Criteria ] criteria The criteria object to add to.
+        # @param [ Class ] object_class The object class.
         #
         # @return [ Mongoid::Criteria ] The criteria object.
         #
@@ -177,7 +177,7 @@ module Mongoid
         # Whether trying to bind an object using this association should raise
         # an error.
         #
-        # @params [ Document ] The document to be bound.
+        # @param [ Document ] doc The document to be bound.
         #
         # @return [ true, false ] Whether the document can be bound.
         def bindable?(doc)
@@ -186,8 +186,8 @@ module Mongoid
 
         # The nested builder object.
         #
-        # @params [ Hash ] The attributes to use to build the association object.
-        # @params [ Hash ] The options for the association.
+        # @param [ Hash ] attributes The attributes to use to build the association object.
+        # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::Many ] The Nested Builder object.
         #

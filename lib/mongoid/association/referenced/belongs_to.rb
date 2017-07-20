@@ -136,8 +136,8 @@ module Mongoid
 
         # The nested builder object.
         #
-        # @params [ Hash ] The attributes to use to build the association object.
-        # @params [ Hash ] The options for the association.
+        # @param [ Hash ] attributes The attributes to use to build the association object.
+        # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::One ] The Nested Builder object.
         #

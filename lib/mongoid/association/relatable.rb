@@ -48,7 +48,7 @@ module Mongoid
       #
       # @param [ Class ] _class The class of the model who owns this relation.
       # @param [ Symbol ] name The name of the association.
-      # @param [ Hash ] options The relation options.
+      # @param [ Hash ] opts The relation options.
       # @param [ Block ] block The optional block.
       #
       # @since 7.0
@@ -98,7 +98,7 @@ module Mongoid
       # Whether trying to bind an object using this association should raise
       # an error.
       #
-      # @params [ Document ] doc The document to be bound.
+      # @param [ Document ] doc The document to be bound.
       #
       # @return [ true, false ] Whether the document can be bound.
       #

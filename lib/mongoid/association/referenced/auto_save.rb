@@ -47,7 +47,7 @@ module Mongoid
         # @example Define the autosave method:
         #   Association::Referenced::Autosave.define_autosave!(association)
         #
-        # @params [ Association ] The association for which autosaving is enabled.
+        # @param [ Association ] association The association for which autosaving is enabled.
         #
         # @return [ Class ] The association's owner class.
         #

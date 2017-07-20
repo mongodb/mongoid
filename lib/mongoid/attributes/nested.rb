@@ -71,7 +71,7 @@ module Mongoid
         # @example Add the autosave if appropriate.
         #   Person.autosave_nested_attributes(metadata)
         #
-        # @param [ Metadata ] metadata The existing relation metadata.
+        # @param [ Association ] association The existing association metadata.
         #
         # @since 3.1.4
         def autosave_nested_attributes(association)

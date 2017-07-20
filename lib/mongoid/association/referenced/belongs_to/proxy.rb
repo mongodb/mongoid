@@ -45,10 +45,9 @@ module Mongoid
           # @example Substitute the relation.
           #   name.substitute(new_name)
           #
-          # @param [ Document, Array<Document> ] new_target The replacement.
-          # @param [ true, false ] building Are we in build mode?
+          # @param [ Document, Array<Document> ] replacement The replacement.
           #
-          # @return [ In, nil ] The relation or nil.
+          # @return [ self, nil ] The relation or nil.
           #
           # @since 2.0.0.rc.1
           def substitute(replacement)
@@ -66,8 +65,6 @@ module Mongoid
           #
           # @example Get the binding object.
           #   binding([ address ])
-          #
-          # @param [ Document, Array<Document> ] new_target The replacement.
           #
           # @return [ Binding ] The binding object.
           #
@@ -111,8 +108,8 @@ module Mongoid
             #
             # @example Get the eager loader object
             #
-            # @param [ Association ] The association object.
-            # @param [ Array<Document> ] The array of documents.
+            # @param [ Association ] association The association object.
+            # @param [ Array<Document> ] docs The array of documents.
             #
             # @since 7.0
             def eager_loader(association, docs)

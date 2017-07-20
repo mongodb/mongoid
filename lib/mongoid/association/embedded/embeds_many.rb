@@ -130,8 +130,8 @@ module Mongoid
 
         # The nested builder object.
         #
-        # @params [ Hash ] The attributes to use to build the association object.
-        # @params [ Hash ] The options for the association.
+        # @param [ Hash ] attributes The attributes to use to build the association object.
+        # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::Many ] The Nested Builder object.
         #
@@ -160,7 +160,7 @@ module Mongoid
         # @param [ Document ] base The base document.
         # @param [ Document ] target The children documents.
         #
-        # @sicne 7.0
+        # @since 7.0
         def criteria(base, target)
           criterion = klass.scoped
           criterion.embedded = true

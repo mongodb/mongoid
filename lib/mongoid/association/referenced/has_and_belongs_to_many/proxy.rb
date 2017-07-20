@@ -20,7 +20,7 @@ module Mongoid
           # @example Concat with other documents.
           #   person.posts.concat([ post_one, post_two ])
           #
-          # @param [ Document, Array<Document> ] *args Any number of documents.
+          # @param [ Document, Array<Document> ] args Any number of documents.
           #
           # @return [ Array<Document> ] The loaded docs.
           #
@@ -126,7 +126,7 @@ module Mongoid
           # @example Nullify the relation.
           #   person.preferences.nullify
           #
-          # @param [ Array<Document> ] The replacement documents.
+          # @param [ Array<Document> ] replacement The replacement documents.
           #
           # @since 2.0.0.rc.1
           def nullify(replacement = [])
@@ -282,8 +282,8 @@ module Mongoid
             #
             # @example Get the eager loader object
             #
-            # @param [ Association ] The association object.
-            # @param [ Array<Document> ] The array of documents.
+            # @param [ Association ] association The association object.
+            # @param [ Array<Document> ] docs The array of documents.
             #
             # @since 7.0
             def eager_loader(association, docs)

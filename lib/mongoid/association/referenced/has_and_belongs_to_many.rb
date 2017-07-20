@@ -150,7 +150,7 @@ module Mongoid
         # Whether trying to bind an object using this association should raise
         # an error.
         #
-        # @params [ Document ] The document to be bound.
+        # @param [ Document ] doc The document to be bound.
         #
         # @return [ true, false ] Whether the document can be bound.
         def bindable?(doc)
@@ -169,8 +169,8 @@ module Mongoid
 
         # The nested builder object.
         #
-        # @params [ Hash ] The attributes to use to build the association object.
-        # @params [ Hash ] The options for the association.
+        # @param [ Hash ] attributes The attributes to use to build the association object.
+        # @param [ Hash ] options The options for the association.
         #
         # @return [ Association::Nested::One ] The Nested Builder object.
         #

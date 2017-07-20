@@ -36,7 +36,7 @@ module Mongoid
       # @example Get the eager loading inclusions.
       #   Person.includes(:game).inclusions
       #
-      # @return [ Array<Metadata> ] The inclusions.
+      # @return [ Array<Association> ] The inclusions.
       #
       # @since 2.2.0
       def inclusions
@@ -46,11 +46,11 @@ module Mongoid
       # Set the inclusions for the criteria.
       #
       # @example Set the inclusions.
-      #   criteria.inclusions = [ meta ]
+      #   criteria.inclusions = [ association ]
       #
-      # @param [ Array<Metadata> ] value The inclusions.
+      # @param [ Array<Association> ] value The inclusions.
       #
-      # @return [ Array<Metadata> ] The new inclusions.
+      # @return [ Array<Association> ] The new inclusions.
       #
       # @since 3.0.0
       def inclusions=(value)
@@ -65,7 +65,7 @@ module Mongoid
       #   criteria.add_inclusion(Person, :posts)
       #
       # @param [ Class, String, Symbol ] _klass The class or string/symbol of the class name.
-      # @param [ Symbol ] metadata The relation.
+      # @param [ Symbol ] association The relation.
       #
       # @raise [ Errors::InvalidIncludes ] If no relation is found.
       #
