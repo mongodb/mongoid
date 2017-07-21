@@ -171,7 +171,7 @@ describe Mongoid::Validatable::AssociatedValidator do
         end
       end
 
-      context "when the assocation has all valid documents" do
+      context "when the association has all valid documents" do
 
         let(:associated) do
           double(valid?: true, flagged_for_destroy?: false)

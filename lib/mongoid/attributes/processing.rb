@@ -133,9 +133,9 @@ module Mongoid
       # @since 2.0.0.rc.7
       def process_relations
         pending_relations.each_pair do |name, value|
-          metadata = relations[name]
+          association = relations[name]
           if value.is_a?(Hash)
-            metadata.nested_builder(value, {}).build(self)
+            association.nested_builder(value, {}).build(self)
           else
             send("#{name}=", value)
           end

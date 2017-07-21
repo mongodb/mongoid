@@ -28,8 +28,11 @@ module Mongoid
       # @since 1.0.0
       def create_indexes
         return unless index_specifications
+
+        default_options = {background: Config.background_indexing}
+
         index_specifications.each do |spec|
-          key, options = spec.key, spec.options
+          key, options = spec.key, default_options.merge(spec.options)
           if database = options[:database]
             with(database: database) do |klass|
               klass.collection.indexes.create_one(key, options.except(:database))

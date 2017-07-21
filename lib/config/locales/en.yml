@@ -91,6 +91,11 @@ en:
             expecting the option to be there, please consult the following page
             with repect to Mongoid's configuration:\n\n
             \_\_http://mongoid.org/en/mongoid/docs/installation.html"
+        invalid_dependent_strategy:
+          message: "Invalid dependent strategy: %{invalid_strategy}."
+          summary: "An invalid dependent strategy was defined for the association:
+            %{association}. The valid strategies are: %{valid_strategies}."
+          resolution: "Change the dependent strategy to one of the valid types."
         invalid_field:
           message: "Defining a field named '%{name}' is not allowed."
           summary: "Defining this field would override the method '%{name}',
@@ -196,6 +201,11 @@ en:
             allowed, and don't use these names. These include names that also
             conflict with core Ruby methods on Object, Module, Enumerable, or
             included gems that inject methods into these or Mongoid internals."
+        invalid_relation_option:
+          message: "Invalid relation option :%{option} for relation '%{name}' on class
+            %{klass}."
+          summary: "An invalid option was provided for a relation."
+          resolution: "Valid options are: %{valid_options}, make sure you use only those."
         invalid_scope:
           message: "Defining a scope of value %{value} on %{klass} is not
             allowed."
@@ -473,6 +483,13 @@ en:
             attributes hash, and is raised instead of getting a NoMethodError."
           resolution: "You can include Mongoid::Attributes::Dynamic if you
             expect to be writing values for undefined fields often."
+        unknown_model:
+          message: "Attempted to instantiate an object of the unknown Model '%{klass}'."
+          summary: "A document with the value '%{value}' at the key '_type' was used to
+            instantiate a model object but Mongoid cannot find this Class."
+          resolution: "The _type field is a reserved one used by Mongoid to determine the
+            class for instantiating an object. Please don't save data in this field or ensure
+            that any values in this field correspond to valid Models."
         unsaved_document:
           message: "Attempted to save %{document} before the parent %{base}."
           summary: "You cannot call create or create! through the

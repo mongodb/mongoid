@@ -9,7 +9,8 @@ class Animal
   field :tags, type: Array
 
   embedded_in :person
-  embedded_in :circus
+  embedded_in :circus, class_name: 'Circus' # class_name is necessary because ActiveRecord think the singular of Circus
+                                            # is Circu
 
   validates_format_of :name, without: /\$\$\$/
 

@@ -461,7 +461,7 @@ module Mongoid
           re_define_method("#{meth}=") do |value|
             val = write_attribute(name, value)
             if field.foreign_key?
-              remove_ivar(field.metadata.name)
+              remove_ivar(field.association.name)
             end
             val
           end

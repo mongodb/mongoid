@@ -145,6 +145,9 @@ development:
     # Application name that is printed to the mongodb logs upon establishing a
     # connection in server versions >= 3.4. Note that the name cannot exceed 128 bytes.
     # app_name: MyApplicationName
+
+    # Use background indexes by default if `background` option not specified. (default: false)
+    # background_indexing: false
 test:
   clients:
     default:

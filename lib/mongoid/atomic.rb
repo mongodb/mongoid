@@ -36,7 +36,7 @@ module Mongoid
     # @since 2.2.0
     def add_atomic_pull(document)
       document.flagged_for_destroy = true
-      (delayed_atomic_pulls[document.metadata_name.to_s] ||= []).push(document)
+      (delayed_atomic_pulls[document.association_name.to_s] ||= []).push(document)
     end
 
     # Add an atomic unset for the document.
@@ -51,7 +51,7 @@ module Mongoid
     # @since 3.0.0
     def add_atomic_unset(document)
       document.flagged_for_destroy = true
-      (delayed_atomic_unsets[document.metadata_name.to_s] ||= []).push(document)
+      (delayed_atomic_unsets[document.association_name.to_s] ||= []).push(document)
     end
 
     # Returns path of the attribute for modification
@@ -189,7 +189,7 @@ module Mongoid
     #
     # @since 2.1.0
     def atomic_paths
-      @atomic_paths ||= __metadata ? __metadata.path(self) : Atomic::Paths::Root.new(self)
+      @atomic_paths ||= _association ? _association.path(self) : Atomic::Paths::Root.new(self)
     end
 
     # Get all the attributes that need to be pulled.

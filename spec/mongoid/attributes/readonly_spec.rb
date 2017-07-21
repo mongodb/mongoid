@@ -96,30 +96,14 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via the setter" do
 
         it "does not update the first field" do
-          expect {
-            person.title = 'mr'
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.title).to eq("sir")
-        end
-
-        it "does not update the second field" do
-          expect {
-            person.aliased_timestamp = Time.at(43)
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.aliased_timestamp).to eq(Time.at(42))
-        end
-
-        it "does not persist the first field" do
-          expect {
-            person.title = 'mr'
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+          person.title = 'mr'
+          person.save
           expect(person.reload.title).to eq("sir")
         end
 
-        it "does not persist the second field" do
-          expect {
-            person.aliased_timestamp = Time.at(43)
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        it "does not update the second field" do
+          person.aliased_timestamp = Time.at(43)
+          person.save
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -128,19 +112,20 @@ describe Mongoid::Attributes::Readonly do
 
         context 'with single field operation' do
 
-          it "raises an error " do
-            expect {
-              person.inc(score: 1)
-            }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+          it "updates the field" do
+            person.inc(score: 1)
+            person.save
+            expect(person.reload.score).to eq(2)
           end
         end
 
         context 'with multiple fields operation' do
 
-          it "raises an error " do
-            expect {
-              person.inc(score: 1, age: 1)
-            }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+          it "updates the fields" do
+            person.inc(score: 1, age: 1)
+            person.save
+            expect(person.reload.score).to eq(2)
+            expect(person.reload.age).to eq(101)
           end
         end
       end
@@ -149,21 +134,20 @@ describe Mongoid::Attributes::Readonly do
 
         context 'with single field operation' do
 
-          it "raises an error " do
-            expect {
-              person.bit(score: { or: 13 })
-            }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+          it "does the update" do
+            person.bit(score: { or: 13 })
+            person.save
+            expect(person.reload.score).to eq(13)
           end
         end
 
         context 'with multiple fields operation' do
 
-          it "raises an error " do
-            expect {
-              person.bit(
-                age: { and: 13 }, score: { or: 13 }, inte: { and: 13, or: 10 }
-              )
-            }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+          it "udpates the attribute" do
+            person.bit(age: {and: 13}, score: {or: 13})
+            person.save
+            expect(person.reload.score).to eq(13)
+            expect(person.reload.age).to eq(4)
           end
         end
       end
@@ -171,30 +155,14 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via []=" do
 
         it "does not update the first field" do
-          expect {
-            person[:title] = "mr"
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.title).to eq("sir")
-        end
-
-        it "does not update the second field" do
-          expect {
-            person[:aliased_timestamp] = Time.at(43)
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.aliased_timestamp).to eq(Time.at(42))
-        end
-
-        it "does not persist the first field" do
-          expect {
-            person[:title] = "mr"
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+          person[:title] = "mr"
+          person.save
           expect(person.reload.title).to eq("sir")
         end
 
-        it "does not persist the second field" do
-          expect {
-            person[:aliased_timestamp] = Time.at(43)
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        it "does not update the second field" do
+          person[:aliased_timestamp] = Time.at(43)
+          person.save
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -202,30 +170,14 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via write_attribute" do
 
         it "does not update the first field" do
-          expect {
-            person.write_attribute(:title, "mr")
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.title).to eq("sir")
-        end
-
-        it "does not update the second field" do
-          expect {
-            person.write_attribute(:aliased_timestamp, Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.aliased_timestamp).to eq(Time.at(42))
-        end
-
-        it "does not persist the first field" do
-          expect {
-            person.write_attribute(:title, "mr")
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+          person.write_attribute(:title, "mr")
+          person.save
           expect(person.reload.title).to eq("sir")
         end
 
-        it "does not persist the second field" do
-          expect {
-            person.write_attribute(:aliased_timestamp, Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        it "does not update the second field" do
+          person.write_attribute(:aliased_timestamp, Time.at(43))
+          person.save
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -233,30 +185,14 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via update_attributes" do
 
         it "does not update the first field" do
-          expect {
-            person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.title).to eq("sir")
-        end
-
-        it "does not update the second field" do
-          expect {
-            person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.aliased_timestamp).to eq(Time.at(42))
-        end
-
-        it "does not persist the first field" do
-          expect {
-            person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+          person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
+          person.save
           expect(person.reload.title).to eq("sir")
         end
 
-        it "does not persist the second field" do
-          expect {
-            person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        it "does not update the second field" do
+          person.update_attributes(title: "mr", aliased_timestamp: Time.at(43))
+          person.save
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -264,30 +200,14 @@ describe Mongoid::Attributes::Readonly do
       context "when updating via update_attributes!" do
 
         it "does not update the first field" do
-          expect {
-            person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.title).to eq("sir")
-        end
-
-        it "does not update the second field" do
-          expect {
-            person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
-          expect(person.aliased_timestamp).to eq(Time.at(42))
-        end
-
-        it "does not persist the first field" do
-          expect {
-            person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+          person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
+          person.save
           expect(person.reload.title).to eq("sir")
         end
 
-        it "does not persist the second field" do
-          expect {
-            person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
-          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
+        it "does not update the second field" do
+          person.update_attributes!(title: "mr", aliased_timestamp: Time.at(43))
+          person.save
           expect(person.reload.aliased_timestamp).to eq(Time.at(42))
         end
       end
@@ -297,7 +217,7 @@ describe Mongoid::Attributes::Readonly do
         it "raises an error" do
           expect {
             person.update_attribute(:title, "mr")
-          }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
         end
       end
 
@@ -306,9 +226,44 @@ describe Mongoid::Attributes::Readonly do
         it "raises an error" do
           expect {
             person.remove_attribute(:title)
-          }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+          }.to raise_exception(Mongoid::Errors::ReadonlyAttribute)
         end
       end
+    end
+
+    context 'when a foreign_key is defined as readonly' do
+
+      let(:attributes) do
+        :mother_id
+      end
+
+      context 'when the relation exists' do
+
+        let(:mother) do
+          Person.create
+        end
+
+        let(:child) do
+          Person.create(mother: mother)
+          Person.find_by(mother: mother)
+        end
+
+        it 'the relation can still be accessed' do
+          expect(child.mother).to eq(mother)
+        end
+      end
+
+      context 'when the relation does not exist' do
+
+        let(:child) do
+          Person.create
+        end
+
+        it 'the relation is nil' do
+          expect(child.mother).to be_nil
+        end
+      end
+
     end
   end
 end

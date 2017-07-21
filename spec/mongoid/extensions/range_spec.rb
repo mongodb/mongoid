@@ -139,6 +139,13 @@ describe Mongoid::Extensions::Range do
         expect(("a".."z").mongoize).to eq({ "min" => "a", "max" => "z" })
       end
     end
+
+    context 'when the value is a string' do
+
+      it 'returns a string' do
+        expect(Range.mongoize('3')).to eq('3')
+      end
+    end
   end
 
   describe "#resizable?" do

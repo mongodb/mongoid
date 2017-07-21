@@ -127,14 +127,14 @@ module Mongoid
       # was not provided or set to true.
       #
       # @example Set up validation.
-      #   Person.validates_relation(metadata)
+      #   Person.validates_relation(association)
       #
-      # @param [ Metadata ] metadata The relation metadata.
+      # @param [ Association ] association The association metadata.
       #
       # @since 2.0.0.rc.1
-      def validates_relation(metadata)
-        if metadata.validate?
-          validates_associated(metadata.name)
+      def validates_relation(association)
+        if association.validate?
+          validates_associated(association.name)
         end
       end
 
@@ -154,9 +154,9 @@ module Mongoid
       def validates_with(*args, &block)
         if args.first == PresenceValidator
           args.last[:attributes].each do |name|
-            metadata = relations[name.to_s]
-            if metadata && metadata[:autosave] != false
-              autosave(metadata.merge!(autosave: true))
+            association = relations[name.to_s]
+            if association && association.autosave?
+              Association::Referenced::AutoSave.define_autosave!(association)
             end
           end
         end

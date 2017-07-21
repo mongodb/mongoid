@@ -4,7 +4,6 @@ require "mongoid/evolvable"
 require "mongoid/extensions"
 require "mongoid/errors"
 require "mongoid/threaded"
-require "mongoid/relations"
 require "mongoid/atomic"
 require "mongoid/attributes"
 require "mongoid/contextual"
@@ -14,6 +13,7 @@ require "mongoid/criteria"
 require "mongoid/factory"
 require "mongoid/fields"
 require "mongoid/timestamps"
+require "mongoid/association"
 require "mongoid/composable"
 
 module Mongoid
@@ -281,7 +281,7 @@ module Mongoid
         without_autobuild do
           relation, stored = send(name), meta.store_as
           if attributes.key?(stored) || !relation.blank?
-            if relation
+            if !relation.nil?
               attributes[stored] = relation.send(:as_attributes)
             else
               attributes.delete(stored)

@@ -41,12 +41,12 @@ describe Mongoid::Attributes::Nested do
         Account.nested_attributes.clear
       end
 
-      let(:metadata) do
+      let(:association) do
         Account.reflect_on_association(:alerts)
       end
 
       it "keeps autosave set to false" do
-        expect(metadata).to_not be_autosave
+        expect(association).to_not be_autosave
       end
     end
   end
@@ -4377,12 +4377,11 @@ describe Mongoid::Attributes::Nested do
 
     context "when nesting multiple levels and parent is timestamped" do
 
-      before do
-        class Address
-          after_save do
-            addressable.touch
-          end
-        end
+      around do |example|
+        original_relations = Location.relations
+        Location.embedded_in :address, touch: true
+        example.run
+        Location.relations = original_relations
       end
 
       after do
@@ -4760,6 +4759,13 @@ describe Mongoid::Attributes::Nested do
 
         before do
           user.update_attributes(params)
+        end
+
+        around do |example|
+          original_relations = User.relations
+          User.has_many :posts, foreign_key: :author_id, validate: false, autosave: true
+          example.run
+          user.relations = original_relations
         end
 
         let(:post) do

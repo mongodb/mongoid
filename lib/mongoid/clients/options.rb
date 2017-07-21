@@ -38,7 +38,7 @@ module Mongoid
       def mongo_client
         persistence_context.client
       end
-      
+
       def persistence_context
         PersistenceContext.get(self) ||
             PersistenceContext.get(self.class) ||
