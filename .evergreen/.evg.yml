@@ -320,7 +320,7 @@ functions:
         working_dir: "src"
         script: |
           ${PREPARE_SHELL}
-          MONGODB_URI="${MONGODB_URI}" TOPOLOGY=${TOPOLOGY} RVM_RUBY="${RVM_RUBY}" .evergreen/run-tests.sh
+          MONGODB_URI="${MONGODB_URI}" TOPOLOGY=${TOPOLOGY} RVM_RUBY="${RVM_RUBY}" RAILS="${RAILS}" DRIVER="${DRIVER}" .evergreen/run-tests.sh
 
   "cleanup":
     - command: shell.exec
