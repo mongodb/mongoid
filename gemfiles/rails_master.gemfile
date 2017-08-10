@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-gemspec path: '..'
 
 gem 'bson', git: 'https://github.com/mongodb/bson-ruby'
 gem 'mongo', git: 'https://github.com/mongodb/mongo-ruby-driver'
@@ -11,3 +10,5 @@ gem 'activemodel', git: 'https://github.com/rails/rails'
 group :test do
   gem 'rspec', '~> 3.4.0'
 end
+
+gemspec path: '..'
