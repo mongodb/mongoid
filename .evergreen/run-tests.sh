@@ -30,9 +30,9 @@ EOH
 
 gem install bundler
 
-if [ "$DRIVER" == "master" ]; then
+if [ $DRIVER == "master" ]; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
-elif [ "$RAILS" == "master" ]; then
+elif [ $RAILS == "master" ]; then
     bundle install --gemfile=gemfiles/rails_master.gemfile
 else
   bundle install
