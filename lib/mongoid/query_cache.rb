@@ -236,7 +236,7 @@ module Mongoid
       private
 
       def read_or_server_selector
-        respond_to?(:server_selector) ? server_selector : read
+        respond_to?(:server_selector, true) ? server_selector : read
       end
 
       def cached_cursor
