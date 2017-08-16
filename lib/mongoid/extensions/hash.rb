@@ -106,8 +106,11 @@ module Mongoid
         value = self
         keys.each do |key|
           return nil if value.nil?
-          nested = value[key] || value[key.to_i]
-          value = nested
+          value_for_key = value[key]
+          if value_for_key.nil? && key.to_i.to_s == key
+            value_for_key = value[key.to_i]
+          end
+          value = value_for_key
         end
         value
       end
