@@ -103,6 +103,18 @@ module Rails
         puts "There is a configuration error with the current mongoid.yml."
         puts e.message
       end
+
+      initializer 'mongoid.runtime-metric' do
+        require 'mongoid/railties/controller_runtime'
+
+        ActiveSupport.on_load :action_controller do
+          include ::Mongoid::Railties::ControllerRuntime::ControllerExtension
+        end
+
+        Mongo::Monitoring::Global.subscribe Mongo::Monitoring::COMMAND,
+            ::Mongoid::Railties::ControllerRuntime::Instrument.new
+      end
+
     end
   end
 end
