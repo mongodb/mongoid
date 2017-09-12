@@ -144,6 +144,45 @@ describe Mongoid::Copyable do
         end
       end
 
+      context "when cloning a document with polymorphic embedded documents with multiple language field" do
+
+        let!(:address_customized) do
+          person.addresses.build({ street: "Bond", name: "Bond" }, AddressCustomized)
+        end
+
+        before do
+          I18n.enforce_available_locales = false
+          I18n.locale = 'pt_BR'
+          person.addresses.each { |address| address.name = "descrição" }
+          person.addresses.type(AddressCustomized).first.alternative_name = "alternativa"
+          person.save
+        end
+
+        after do
+          I18n.locale = :en
+        end
+
+        let!(:from_db) do
+          Person.find(person.id)
+        end
+
+        let(:copy) do
+          from_db.send(method)
+        end
+
+        it 'sets embedded translations' do
+          I18n.locale = 'pt_BR'
+          copy.addresses.each do |address|
+            expect(address.name).to eq("descrição")
+          end
+
+          copy.addresses.type(AddressCustomized).each do |address|
+            expect(address.alternative_name).to eq("alternativa")
+          end
+        end
+
+      end
+
       context "when cloning a loaded document" do
 
         before do
