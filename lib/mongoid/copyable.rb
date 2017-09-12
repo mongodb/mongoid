@@ -74,8 +74,8 @@ module Mongoid
 
         if metadata.macro == :embeds_many
           attrs[metadata.key].each do |attr|
-            klass = attr.fetch('_type', metadata.class_name).constantize
-            process_localized_attributes(klass, attr)
+            embedded_klass = attr.fetch('_type', metadata.class_name).constantize
+            process_localized_attributes(embedded_klass, attr)
           end
         else
           process_localized_attributes(metadata.klass, attrs[metadata.key])
