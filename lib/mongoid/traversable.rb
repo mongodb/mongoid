@@ -8,7 +8,7 @@ module Mongoid
     extend ActiveSupport::Concern
 
     def _parent
-      @__parent
+      @__parent ||= nil
     end
 
     def _parent=(p)
