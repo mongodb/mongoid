@@ -928,6 +928,60 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         end
       end
     end
+
+    context 'when the id_sort option is none' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'does not use the sort on id' do
+        expect(enumerable.first(id_sort: :none)).to eq(first_post)
+      end
+    end
+
+    context 'when the id_sort option is not provided' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'uses the sort on id' do
+        expect(enumerable.first).to eq(first_post)
+      end
+    end
   end
 
   describe "#include?" do
@@ -1342,6 +1396,60 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         it "returns nil" do
           expect(last).to be_nil
         end
+      end
+    end
+
+    context 'when the id_sort option is none' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'does not use the sort on id' do
+        expect(enumerable.last(id_sort: :none)).to eq(first_post)
+      end
+    end
+
+    context 'when the id_sort option is not provided' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'uses the sort on id' do
+        expect(enumerable.last).to eq(second_post)
       end
     end
   end
