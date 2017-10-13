@@ -5,9 +5,9 @@ class BSON::ObjectId
   end
 end
 
-class Symbol
-  remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
-end
+# class Symbol
+#   remove_method :size if instance_methods.include? :size # temporal fix for ruby 1.9
+# end
 
 class BSON::Document
   # We need to override this as ActiveSupport creates a new Object, instead of a new Hash
