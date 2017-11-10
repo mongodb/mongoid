@@ -49,23 +49,24 @@ describe Mongoid::Shardable do
     end
   end
 
-  describe "#shard_key_selector" do
+  describe '#shard_key_selector' do
+    subject { instance.shard_key_selector }
+    let(:klass) { Band }
+    let(:instance) { klass.new(name: name) }
+    let(:name) { 'Jo' }
 
-    let(:klass) do
-      Band
-    end
+    before { klass.shard_key(:name) }
 
-    let(:object) do
-      klass.new
-    end
+    it { is_expected.to eq({ 'name' => name }) }
 
-    before do
-      klass.shard_key(:name)
-      object.name = "Jo"
-    end
+    context 'changing shard_key value on persisted record' do
+      let(:instance) { klass.create(name: name) }
 
-    it "returns a hash of shard key names and values" do
-      expect(object.shard_key_selector).to eq({ "name" => "Jo" })
+      before do
+        instance.name = 'Izi4'
+      end
+
+      it { is_expected.to eq({ 'name' => name }) }
     end
   end
 end

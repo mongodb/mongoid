@@ -37,7 +37,7 @@ module Mongoid
     def shard_key_selector
       selector = {}
       shard_key_fields.each do |field|
-        selector[field.to_s] = send(field)
+        selector[field.to_s] = attribute_was(field) || send(field)
       end
       selector
     end
