@@ -208,6 +208,7 @@ module Mongoid
         if context = get(object)
           context.client.close unless (context.cluster.equal?(cluster) || cluster.nil?)
         end
+      ensure  
         Thread.current["[mongoid][#{object.object_id}]:context"] = nil
       end
     end
