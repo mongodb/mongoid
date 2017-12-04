@@ -4,7 +4,7 @@ require "./perf/models"
 require './perf/gc_suite'
 
 Mongoid.connect_to("mongoid_perf_test")
-
+Mongo::Logger.logger.level = ::Logger::FATAL
 Mongoid.purge!
 
 puts "Creating indexes..."
