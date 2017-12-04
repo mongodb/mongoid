@@ -7,5 +7,6 @@ gem 'activemodel', '~> 5.1'
 
 
 group :test do
+  gem 'benchmark-ips'
   gem 'rspec', '~> 3.4.0'
 end
