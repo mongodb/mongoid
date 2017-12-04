@@ -19,7 +19,11 @@ module Mongoid
 
         return @attribute.any? do |sub_document|
           value["$elemMatch"].all? do |k, v|
-            Matchable.matcher(sub_document, k, v)._matches?(v)
+            if v.try(:first).try(:[],0) == "$not".freeze
+              !Matchable.matcher(sub_document, k, v.first[1])._matches?(v.first[1])
+            else
+              Matchable.matcher(sub_document, k, v)._matches?(v)
+            end
           end
         end
       end

@@ -53,6 +53,13 @@ describe Mongoid::Matchable::ElemMatch do
           expect(matcher._matches?("$elemMatch" => {"a" => {"$in" => [1]}, "b" => {"$gt" => 1}})).to be true
         end
       end
+
+      context "when using a $not operator that matches" do
+
+        it "returns true" do
+          expect(matcher._matches?("$elemMatch" => {"a" => {"$not" => 4}})).to be true
+        end
+      end
     end
 
     context "when there is not a sub document that matches the criteria" do
@@ -72,6 +79,13 @@ describe Mongoid::Matchable::ElemMatch do
 
         it "returns true" do
           expect(matcher._matches?("$elemMatch" => {"a" => {"$in" => [1]}, "b" => {"$gt" => 10}})).to be false
+        end
+      end
+
+      context "when using a $not operator that does not match" do
+
+        it "returns true" do
+          expect(matcher._matches?("$elemMatch" => {"a" => {"$not" => 1}})).to be true
         end
       end
     end
