@@ -146,14 +146,14 @@ describe Mongoid::Copyable do
 
       context "when cloning a document with polymorphic embedded documents with multiple language field" do
 
-        let!(:favorite_localized) do
-          person.favorites.build({ title: "Title" }, FavoriteLocalized)
+        let!(:shipment_address) do
+          person.addresses.build({ shipping_name: "Title" }, ShipmentAddress)
         end
 
         before do
           I18n.enforce_available_locales = false
           I18n.locale = 'pt_BR'
-          person.favorites.each { |favorite| favorite.title = "Título" }
+          person.addresses.type(ShipmentAddress).each { |address| address.shipping_name = "Título" }
           person.save
         end
 
@@ -171,8 +171,8 @@ describe Mongoid::Copyable do
 
         it 'sets embedded translations' do
           I18n.locale = 'pt_BR'
-          copy.favorites.each do |favorite|
-            expect(favorite.title).to eq("Título")
+          copy.addresses.type(ShipmentAddress).each do |address|
+            expect(address.shipping_name).to eq("Título")
           end
         end
 
