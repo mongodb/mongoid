@@ -72,9 +72,9 @@ module Mongoid
       klass.embedded_relations.each do |_, association|
         next unless attrs.present? && attrs[association.key].present?
 
-        if metadata.macro == :embeds_many
-          attrs[metadata.key].each do |attr|
-            embedded_klass = attr.fetch('_type', metadata.class_name).constantize
+        if association.is_a?(Association::Embedded::EmbedsMany)
+          attrs[association.name.to_s].each do |attr|
+            embedded_klass = attr.fetch('_type', association.class_name).constantize
             process_localized_attributes(embedded_klass, attr)
           end
         else
