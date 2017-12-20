@@ -62,6 +62,12 @@ describe Mongoid::Matchable::ElemMatch do
       end
     end
 
+    context "when using symbols and a :$not operator that matches" do
+      it "returns true" do
+        expect(matcher._matches?(:$elemMatch => {"a" => {:$not => 4}})).to be true
+      end
+    end
+
     context "when there is not a sub document that matches the criteria" do
 
       it "returns false" do
