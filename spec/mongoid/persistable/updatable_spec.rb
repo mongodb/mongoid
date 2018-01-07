@@ -454,16 +454,23 @@ describe Mongoid::Persistable::Updatable do
 
     describe "##{method}" do
 
-      context "when saving with a hash field with invalid keys" do
+      context "when saving with a hash field with dot keys" do
 
         let(:person) do
           Person.create
         end
 
-        it "raises an error" do
-          expect {
-            person.update_attributes(map: { "bad.key" => "value" })
-          }.to raise_error(Mongo::Error::OperationFailure)
+        if mongodb_version_gte?('3.6')
+          it "sets the key" do
+            person.send(method, map: { "bad.key" => "value" })
+            expect(person.map["bad.key"]).to eq "value"
+          end
+        else
+          it "raises an error" do
+            expect {
+              person.send(method, map: { "bad.key" => "value" })
+            }.to raise_error(Mongo::Error::OperationFailure)
+          end
         end
       end
 
@@ -496,10 +503,14 @@ describe Mongoid::Persistable::Updatable do
           Person.create
         end
 
+        let!(:destroyed) do
+          person.destroy
+        end
+
         it "raises an error" do
           expect {
-            person.send(method, map: { "bad.key" => "value" })
-          }.to raise_error(Mongo::Error::OperationFailure)
+            person.send(method, pets: false)
+          }.to raise_error(RuntimeError)
         end
       end
 

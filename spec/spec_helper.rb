@@ -88,6 +88,13 @@ def testing_locally?
   !(ENV['CI'] == 'travis')
 end
 
+def mongodb_version_gte?(version)
+  db_version = Mongoid.default_client.command(buildInfo: 1).first[:version].split('.').map(&:to_i)
+  version = version.split('.').map(&:to_i) if version.is_a?(String)
+  version = version.fill(0, version.size...3) if version.size < 3
+  (db_version <=> version) >= 0
+end
+
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
