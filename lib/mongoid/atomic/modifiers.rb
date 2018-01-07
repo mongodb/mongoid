@@ -68,7 +68,7 @@ module Mongoid
         modifications.each_pair do |field, value|
           push_fields[field] = field
           mods = push_conflict?(field) ? conflicting_pushes : pushes
-          add_each_operation(mods, field, Array.wrap(value))
+          add_each_operation(mods, field, value)
         end
       end
 
@@ -138,6 +138,7 @@ module Mongoid
       #
       # @since 7.0.0
       def add_each_operation(mods, field, value)
+        value = Array.wrap(value)
         if mods.has_key?(field)
           value.each do |val|
             mods[field]["$each"].push(val)
