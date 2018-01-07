@@ -30,11 +30,11 @@ env:
     - CI="travis"
     - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
   matrix:
-    - MONGODB=2.4.14
     - MONGODB=2.6.12
-    - MONGODB=3.0.14
-    - MONGODB=3.2.12
-    - MONGODB=3.4.3
+    - MONGODB=3.0.15
+    - MONGODB=3.2.18
+    - MONGODB=3.4.10
+    - MONGODB=3.6.1
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
