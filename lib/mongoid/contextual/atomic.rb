@@ -117,7 +117,7 @@ module Mongoid
       #
       # @since 3.0.0
       def push_all(pushes)
-        view.update_many("$push" => collect_operations(pushes, true))
+        view.update_many("$push" => collect_each_operations(pushes))
       end
 
       # Perform an atomic $rename of fields on the matching documents.
@@ -169,10 +169,15 @@ module Mongoid
 
       private
 
-      def collect_operations(ops, use_each = false)
-        ops.inject({}) do |operations, (field, value)|
-          operations[database_field_name(field)] = use_each ? { '$each' => value.mongoize } : value.mongoize
-          operations
+      def collect_operations(ops)
+        ops.each_with_object({}) do |(field, value), operations|
+          operations[database_field_name(field)] = value.mongoize
+        end
+      end
+
+      def collect_each_operations(ops)
+        ops.each_with_object({}) do |(field, value), operations|
+          operations[database_field_name(field)] = { "$each" => Array.wrap(value).mongoize }
         end
       end
     end
