@@ -205,8 +205,8 @@ module Mongoid
 
       # Get the conflicting push modifications.
       #
-      # @example Get the conflicting pushs.
-      #   modifiers.conflicting_pushs
+      # @example Get the conflicting pushes.
+      #   modifiers.conflicting_pushes
       #
       # @return [ Hash ] The conflicting push operations.
       #
