@@ -17,6 +17,21 @@ module Mongoid
         view.update_many("$addToSet" => collect_operations(adds))
       end
 
+      # Execute an atomic $addToSet on the matching documents with
+      # the $each specifier
+      #
+      # @example Add the value to the set.
+      #   context.add_to_set(members: "Dave", genres: "Electro")
+      #
+      # @param [ Hash ] adds The operations.
+      #
+      # @return [ nil ] Nil.
+      #
+      # @since 7.0.0
+      def add_each_to_set(adds)
+        view.update_many("$addToSet" => collect_each_operations(adds))
+      end
+
       # Perform an atomic $bit operation on the matching documents.
       #
       # @example Perform the bitwise op.
@@ -106,7 +121,7 @@ module Mongoid
         view.update_many("$push" => collect_operations(pushes))
       end
 
-      # Perform an atomic $pushAll operation on the matching documents.
+      # Perform an atomic $push with $each operation on the matching documents.
       #
       # @example Push the values to the matching docs.
       #   context.push(members: [ "Alan", "Fletch" ])
@@ -116,9 +131,10 @@ module Mongoid
       # @return [ nil ] Nil.
       #
       # @since 3.0.0
-      def push_all(pushes)
-        view.update_many("$pushAll" => collect_operations(pushes))
+      def push_each(pushes)
+        view.update_many("$push" => collect_each_operations(pushes))
       end
+      alias push_all push_each
 
       # Perform an atomic $rename of fields on the matching documents.
       #
@@ -170,9 +186,14 @@ module Mongoid
       private
 
       def collect_operations(ops)
-        ops.inject({}) do |operations, (field, value)|
+        ops.each_with_object({}) do |(field, value), operations|
           operations[database_field_name(field)] = value.mongoize
-          operations
+        end
+      end
+
+      def collect_each_operations(ops)
+        ops.each_with_object({}) do |(field, value), operations|
+          operations[database_field_name(field)] = { "$each" => Array.wrap(value).mongoize }
         end
       end
     end

@@ -8,7 +8,7 @@ module Mongoid
       module Batchable
         include Positional
 
-        # Insert new documents as a batch push ($pushAll). This ensures that
+        # Insert new documents as a batch push ($push + $each). This ensures that
         # all callbacks are run at the appropriate time and only 1 request is
         # made to the database.
         #
@@ -21,7 +21,7 @@ module Mongoid
         #
         # @since 3.0.0
         def batch_insert(docs)
-          execute_batch_insert(docs, "$pushAll")
+          execute_batch_insert(docs, "$push", true)
         end
 
         # Clear all of the docs out of the relation in a single swipe.
@@ -126,16 +126,17 @@ module Mongoid
         #
         # @param [ Array<Document> ] docs The docs to persist.
         # @param [ String ] operation The atomic operation.
+        # @param [ Boolean ] use_each Indicates whether to wrap the insert args with `$each`.
         #
         # @return [ Array<Hash> ] The inserts.
         #
         # @since 3.0.0
-        def execute_batch_insert(docs, operation)
+        def execute_batch_insert(docs, operation, use_each = false)
           self.inserts_valid = true
           inserts = pre_process_batch_insert(docs)
           if insertable?
             collection.find(selector).update_one(
-                positionally(selector, operation => { path => inserts })
+                positionally(selector, operation => { path => use_each ? { '$each' => inserts } : inserts })
             )
             post_process_batch_insert(docs)
           end
