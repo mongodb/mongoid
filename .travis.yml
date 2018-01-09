@@ -11,6 +11,7 @@ rvm:
   - jruby-9.1.12.0
 
 matrix:
+  fast_finish: true
   allow_failures:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_master.gemfile
