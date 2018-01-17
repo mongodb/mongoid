@@ -508,6 +508,24 @@ module Mongoid
         update_documents(attributes, :update_many)
       end
 
+      # Update all the matching documents atomically.
+      #
+      # @example Update all the matching documents.
+      #   context.nested_update({ name: "Smith" , verified: true}, "households.$[i].family.children.$[]", [ {"i.number" => 67} ])
+      #
+      # @param [ Hash ] attributes The new attributes for each document.
+      # @param [ String ] nested_string Mongo syntax for updating nested documents.
+      # @param [ Array ] array_filters Array filters for the identifiers specified in nesting.
+      # @param [ Boolean ] multi To update firs or all occurrences.
+      #
+      # @return [ nil, false ] False if no attributes were provided.
+      #
+      # @since 7.0.0
+      def nested_update(attributes = nil, nested_string = nil, array_filters = [], multi: false)
+        method = multi ? :update_many : :update_one
+        update_nested_documents(attributes, nested_string, array_filters, method)
+      end
+
       private
 
       # yield the block given or return the cached value
@@ -545,6 +563,27 @@ module Mongoid
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
         view.send(method, attributes.__consolidate__(klass))
+      end
+
+      # Update the embedded documents for the provided method with filters
+      #
+      # @api private
+      #
+      # @example Update the documents.
+      #   context.update_embedded_documents(attrs, nested, array_filters)
+      #
+      # @param [ Hash ] attributes The updates.
+      # @param [ String ] nested_string Mongo syntax for updating nested documents.
+      # @param [ Array ] array_filters Array filters for the identifiers specified in nesting.
+      # @param [ Symbol ] method The method to use.
+      #
+      # @return [ true, false ] If the update succeeded.
+      #
+      # @since 7.0.0
+      def update_nested_documents(attributes, nested_string, array_filters, method = :update_one)
+        return false unless attributes && nested_string
+        attributes = Hash[attributes.map { |k, v| ["#{nested_string}.#{klass.database_field_name(k.to_s)}", v] }]
+        view.send(method, attributes.__consolidate__(klass), { array_filters: array_filters })
       end
 
       # Apply the field limitations.

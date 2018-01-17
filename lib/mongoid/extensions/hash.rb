@@ -42,7 +42,7 @@ module Mongoid
       def __consolidate__(klass)
         consolidated = {}
         each_pair do |key, value|
-          if key =~ /\$/
+          if key.to_s.starts_with?('$')
             value.each_pair do |_key, _value|
               value[_key] = (key == "$rename") ? _value.to_s : mongoize_for(key, klass, _key, _value)
             end
