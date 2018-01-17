@@ -490,8 +490,11 @@ module Mongoid
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update(attributes = nil)
-        update_documents(attributes)
+      def update(attributes = nil, nested_string = nil, array_filters = [])
+        binding.pry
+        nested_string.present? ?
+            update_embedded_documents(attributes, nested_string, array_filters) :
+            update_documents(attributes)
       end
 
       # Update all the matching documents atomically.
@@ -504,8 +507,11 @@ module Mongoid
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update_all(attributes = nil)
-        update_documents(attributes, :update_many)
+      def update_all(attributes = nil, nested_string = nil, array_filters = [])
+        binding.pry
+        nested_string.present? ?
+            update_embedded_documents(attributes, nested_string, array_filters) :
+            update_documents(attributes, :update_many)
       end
 
       private
@@ -545,6 +551,36 @@ module Mongoid
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
         view.send(method, attributes.__consolidate__(klass))
+      end
+
+      # Update the embedded documents for the provided method with filters
+      #
+      # @api private
+      #
+      # @example Update the documents.
+      #   context.update_embedded_documents(attrs, nested, array_filters)
+      #
+      # @param [ Hash ] attributes The updates.
+      # @param [ Symbol ] method The method to use.
+      # @param [ String ] nesting Mongo syntax for updating nested documents.
+      #
+      # @example nesting param.
+      #  "legs.$[].sport_event.competitors.$[i]"
+      #
+      # @param [ Array ] array_filters Array filters for the identifiers specified in nesting.
+      #
+      # @example array_filters params
+      #  [{ "i.name" => "Manchester United"}]
+      #
+      # @param [ Symbol ] method The method to use.
+      #
+      # @return [ true, false ] If the update succeeded.
+      #
+      # @since 3.0.4
+      def update_embedded_documents(attributes, nesting_string, array_filters, method = :update_one)
+        return false unless attributes && nesting_string && array_filters
+        attributes = Hash[attributes.map { |k, v| ["#{nesting_string}. #{klass.database_field_name(k.to_s)}", v] }]
+        view.send(method, attributes.__consolidate__(klass), { array_filters: array_filters })
       end
 
       # Apply the field limitations.
