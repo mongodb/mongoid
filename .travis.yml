@@ -31,7 +31,6 @@ env:
     - CI="travis"
     - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
   matrix:
-    - MONGODB=2.4.14
     - MONGODB=2.6.12
     - MONGODB=3.0.14
     - MONGODB=3.2.12
