@@ -54,7 +54,7 @@ module Mongoid
           #
           # @since 2.4.0
           def concat(docs)
-            batch_insert(docs) unless docs.empty?
+            batch_push(docs) unless docs.empty?
             self
           end
 
