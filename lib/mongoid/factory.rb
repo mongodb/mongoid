@@ -17,7 +17,8 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      type = (attributes || {})[TYPE]
+      attributes ||= {}
+      type = attributes[TYPE] || attributes[TYPE.to_sym]
       if type && klass._types.include?(type)
         type.constantize.new(attributes)
       else
