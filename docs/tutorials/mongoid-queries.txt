@@ -393,7 +393,7 @@ document inserts, updates, and deletion.
 
    * - ``Criteria#push_all``
 
-       *Perform a $pushAll on all matching documents.*
+       *Perform a $push with $each on all matching documents.*
 
      -
         .. code-block:: ruby
