@@ -408,6 +408,10 @@ axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
+      - id: "3.6"
+        display_name: "MongoDB 3.6"
+        variables:
+           VERSION: "3.6"
       - id: "3.4"
         display_name: "MongoDB 3.4"
         variables:
