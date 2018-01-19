@@ -5,7 +5,6 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  - 2.2.9
   - 2.4.3
   - ruby-head
   - jruby-9.1.15.0
