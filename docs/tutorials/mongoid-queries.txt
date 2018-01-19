@@ -553,7 +553,7 @@ that would affect its visibility within the scoped relation.
     include Mongoid::Document
     field :active, default: true
     embedded_in :label
-    default_scoped ->{ where(active: true) }
+    default_scope ->{ where(active: true) }
   end
 
   label.bands.push(band)
