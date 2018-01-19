@@ -15,6 +15,14 @@ export JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
 
 source ~/.rvm/scripts/rvm
 
+# Necessary for jruby
+export JAVACMD=/opt/java/jdk8/bin/java
+export PATH=$PATH:/opt/java/jdk8/bin
+
+if [ "$RVM_RUBY" == "ruby-head" ]; then
+  rvm reinstall $RVM_RUBY
+fi
+
 # Don't errexit because this may call scripts which error
 set +o errexit
 rvm use $RVM_RUBY
@@ -29,6 +37,7 @@ assert(version in "`ruby --version`")
 EOH
 
 gem install bundler
+
 
 if [ $DRIVER == "master" ]; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
