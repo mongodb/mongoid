@@ -339,7 +339,7 @@ describe Mongoid::Atomic do
             address.locations.build(name: "Home")
           end
 
-          it "returns the proper $sets and $pushAlls for all levels" do
+          it "returns the proper $sets and $pushes for all levels" do
             expect(person.atomic_updates).to eq(
               {
                 "$set" => {
