@@ -391,7 +391,7 @@ document inserts, updates, and deletion.
 
           Band.where(name: "Tool").push(members: "Maynard")
 
-   * - ``Criteria#push_each``
+   * - ``Criteria#push_all``
 
        *Perform a $push with $each on all matching documents.*
 
@@ -399,7 +399,7 @@ document inserts, updates, and deletion.
         .. code-block:: ruby
 
           Band.where(name: "Tool").
-            push_each(members: [ "Maynard", "Danny" ])
+            push_all(members: [ "Maynard", "Danny" ])
 
    * - ``Criteria#rename``
 

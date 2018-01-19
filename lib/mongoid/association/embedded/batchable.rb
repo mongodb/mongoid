@@ -12,15 +12,15 @@ module Mongoid
         # all callbacks are run at the appropriate time and only 1 request is
         # made to the database.
         #
-        # @example Execute the batch push.
-        #   batchable.batch_push([ doc_one, doc_two ])
+        # @example Execute the batch insert.
+        #   batchable.batch_insert([ doc_one, doc_two ])
         #
         # @param [ Array<Document> ] docs The docs to add.
         #
         # @return [ Array<Hash> ] The inserts.
         #
-        # @since 7.0.0
-        def batch_push(docs)
+        # @since 3.0.0
+        def batch_insert(docs)
           execute_batch_push(docs)
         end
 
@@ -124,7 +124,6 @@ module Mongoid
         #   batchable.execute_batch_set(docs)
         #
         # @param [ Array<Document> ] docs The docs to persist.
-        # @param [ String ] operation The atomic operation.
         #
         # @return [ Array<Hash> ] The inserts.
         #
@@ -148,7 +147,6 @@ module Mongoid
         #   batchable.execute_batch_push(docs)
         #
         # @param [ Array<Document> ] docs The docs to persist.
-        # @param [ String ] operation The atomic operation.
         #
         # @return [ Array<Hash> ] The inserts.
         #
