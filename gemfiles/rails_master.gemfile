@@ -1,14 +1,11 @@
 source 'https://rubygems.org'
 
-gem 'bson', git: 'https://github.com/mongodb/bson-ruby'
-gem 'mongo', git: 'https://github.com/mongodb/mongo-ruby-driver'
-
 gem 'rake'
 gem 'actionpack', git: 'https://github.com/rails/rails'
 gem 'activemodel', git: 'https://github.com/rails/rails'
 
 group :test do
-  gem 'rspec', '~> 3.4.0'
+  gem 'rspec', '~> 3.7.0'
 end
 
 gemspec path: '..'
