@@ -109,7 +109,7 @@ module Mongoid
       # Perform an atomic $push/$each operation on the matching documents.
       #
       # @example Push the values to the matching docs.
-      #   context.push_each(members: [ "Alan", "Fletch" ])
+      #   context.push_all(members: [ "Alan", "Fletch" ])
       #
       # @param [ Hash ] pushes The operations.
       #

@@ -12,7 +12,7 @@ module Mongoid
         # all callbacks are run at the appropriate time and only 1 request is
         # made to the database.
         #
-        # @example Execute the batch insert.
+        # @example Execute the batch push.
         #   batchable.batch_insert([ doc_one, doc_two ])
         #
         # @param [ Array<Document> ] docs The docs to add.
