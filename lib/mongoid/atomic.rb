@@ -110,10 +110,10 @@ module Mongoid
     #   performed in a single operation. Conflicting modifications are
     #   detected by the 'haveConflictingMod' function in MongoDB.
     #   Examination of the code suggests that two modifications (a $set
-    #   and a $pushAll, for example) conflict if:
+    #   and a $push with $each, for example) conflict if:
     #     (1) the key paths being modified are equal.
     #     (2) one key path is a prefix of the other.
-    #   So a $set of 'addresses.0.street' will conflict with a $pushAll
+    #   So a $set of 'addresses.0.street' will conflict with a $push and $each
     #   to 'addresses', and we will need to split our update into two
     #   pieces. We do not, however, attempt to match MongoDB's logic
     #   exactly. Instead, we assume that two updates conflict if the
@@ -218,7 +218,7 @@ module Mongoid
     # @example Get the pushes.
     #   person.atomic_pushes
     #
-    # @return [ Hash ] The $pushAll operations.
+    # @return [ Hash ] The The $push and $each operations.
     #
     # @since 2.1.0
     def atomic_pushes
