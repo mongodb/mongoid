@@ -5,18 +5,17 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  - 2.2.7
-  - 2.3.4
-  - 2.4.1
+  - 2.2.9
+  - 2.4.3
   - ruby-head
-  - jruby-9.1.10.0
+  - jruby-9.1.15.0
 
 matrix:
   allow_failures:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_master.gemfile
   exclude:
-    - rvm: jruby-9.1.10.0
+    - rvm: jruby-9.1.15.0
       gemfile: gemfiles/driver_master.gemfile
     - rvm: ruby-head
       gemfile: gemfiles/driver_master.gemfile
