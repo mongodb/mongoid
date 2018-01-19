@@ -154,6 +154,22 @@ module Mongoid
         apply_options
       end
 
+      # Increment a value on all documents.
+      #
+      # @example Perform the increment.
+      #   context.inc(likes: 10)
+      #
+      # @param [ Hash ] incs The operations.
+      #
+      # @return [ Enumerator ] The enumerator.
+      #
+      # @since 7.0.0
+      def inc(*args)
+        each do |document|
+          document.inc *args
+        end
+      end
+
       # Get the last document in the database for the criteria's selector.
       #
       # @example Get the last document.
