@@ -84,6 +84,7 @@ module Mongoid
       Validatable,
       Equality,
       Relations::Synchronization,
+      Relations::Macros,
       ActiveModel::Model,
       ActiveModel::Validations
     ]
