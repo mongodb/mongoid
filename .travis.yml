@@ -15,13 +15,15 @@ matrix:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_master.gemfile
   exclude:
-    - rvm: jruby-9.1.15.0
-      gemfile: gemfiles/driver_master.gemfile
-      gemfile: gemfiles/rails_master.gemfile
     - rvm: ruby-head
       gemfile: gemfiles/rails_master.gemfile
+    - rvm: jruby-9.1.15.0
+      gemfile: gemfiles/rails_master.gemfile
+    - rvm: jruby-9.1.15.0
+      gemfile: gemfiles/driver_master.gemfile
     - rvm: jruby-head
       gemfile: gemfiles/driver_master.gemfile
+    - rvm: jruby-head
       gemfile: gemfiles/rails_master.gemfile
 
 gemfile:
