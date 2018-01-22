@@ -20,6 +20,26 @@ describe Mongoid::Association::Macros do
     klass.validators.clear
   end
 
+  describe 'Model loading' do
+
+    let(:model_associations) do
+      class TestModel
+        include Mongoid::Document
+        field :associations
+      end
+    end
+
+    after do
+      Object.send(:remove_const, :TestModel)
+    end
+
+    it 'prohibits the use of :associations as an attribute' do
+      expect {
+        model_associations
+      }.to raise_exception(Mongoid::Errors::InvalidField)
+    end
+  end
+
   describe ".embedded_in" do
 
     it "defines the macro" do
