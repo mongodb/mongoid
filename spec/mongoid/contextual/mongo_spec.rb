@@ -275,6 +275,23 @@ describe Mongoid::Contextual::Mongo do
           expect(Band.count).to eq(0)
         end
       end
+
+      context 'when the write concern is unacknowledged' do
+
+        let(:criteria) do
+          Band.all
+        end
+
+        let!(:deleted) do
+          criteria.with(write: { w: 0 }) do |crit|
+            crit.send(method)
+          end
+        end
+
+        it 'returns 0' do
+          expect(deleted).to eq(0)
+        end
+      end
     end
   end
 
@@ -361,6 +378,27 @@ describe Mongoid::Contextual::Mongo do
         it "destroys all the documents" do
           expect(Band.count).to eq(0)
         end
+      end
+    end
+
+    context 'when the write concern is unacknowledged' do
+
+      before do
+        2.times { Band.create }
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let!(:deleted) do
+        criteria.with(write: { w: 0 }) do |crit|
+          crit.send(method)
+        end
+      end
+
+      it 'returns 0' do
+        expect(deleted).to eq(0)
       end
     end
   end
