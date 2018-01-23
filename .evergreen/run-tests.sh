@@ -15,6 +15,14 @@ export JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
 
 source ~/.rvm/scripts/rvm
 
+# Necessary for jruby
+export JAVACMD=/opt/java/jdk8/bin/java
+export PATH=$PATH:/opt/java/jdk8/bin
+
+if [ "$RVM_RUBY" == "ruby-head" ]; then
+  rvm reinstall $RVM_RUBY
+fi
+
 # Don't errexit because this may call scripts which error
 set +o errexit
 rvm use $RVM_RUBY
@@ -30,12 +38,14 @@ EOH
 
 gem install bundler
 
+
 if [ $DRIVER == "master" ]; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
+  BUNDLE_GEMFILE=gemfiles/driver_master.gemfile bundle exec rake spec
 elif [ $RAILS == "master" ]; then
-    bundle install --gemfile=gemfiles/rails_master.gemfile
+  bundle install --gemfile=gemfiles/rails_master.gemfile
+  BUNDLE_GEMFILE=gemfiles/rails_master.gemfile bundle exec rake spec
 else
   bundle install
+  bundle exec rake spec
 fi
-
-bundle exec rake spec
