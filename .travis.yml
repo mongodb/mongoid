@@ -5,9 +5,13 @@ sudo: false
 bundler_args: --without development
 
 rvm:
-  - 2.4.3
+  - 2.5
   - ruby-head
   - jruby-9.1.15.0
+
+before_install:
+  - gem update --system
+  - gem update bundler
 
 matrix:
   allow_failures:
