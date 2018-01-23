@@ -41,11 +41,10 @@ gem install bundler
 
 if [ $DRIVER == "master" ]; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
-    export BUNDLE_GEMFILE=gemfiles/driver_master.gemfile
-    BUNDLE_GEMFILE=gemfiles/driver_master.gemfile bundle exec rake spec
+  BUNDLE_GEMFILE=gemfiles/driver_master.gemfile bundle exec rake spec
 elif [ $RAILS == "master" ]; then
-    bundle install --gemfile=gemfiles/rails_master.gemfile
-    BUNDLE_GEMFILE=gemfiles/rails_master.gemfile bundle exec rake spec
+  bundle install --gemfile=gemfiles/rails_master.gemfile
+  BUNDLE_GEMFILE=gemfiles/rails_master.gemfile bundle exec rake spec
 else
   bundle install
   bundle exec rake spec
