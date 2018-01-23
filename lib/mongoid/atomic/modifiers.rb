@@ -130,6 +130,27 @@ module Mongoid
         end
       end
 
+      # Adds or appends an array operation with the $each specifier used
+      # in conjuction with $push.
+      #
+      # @example Add the operation.
+      #   modifications.add_operation(mods, field, value)
+      #
+      # @param [ Hash ] mods The modifications.
+      # @param [ String ] field The field.
+      # @param [ Hash ] value The atomic op.
+      #
+      # @since 7.0.0
+      def add_each_operation(mods, field, value)
+        if mods.has_key?(field)
+          value.each do |val|
+            mods[field]["$each"].push(val)
+          end
+        else
+          mods[field] = { "$each" => value }
+        end
+      end
+
       # Get the $addToSet operations or intialize a new one.
       #
       # @example Get the $addToSet operations.

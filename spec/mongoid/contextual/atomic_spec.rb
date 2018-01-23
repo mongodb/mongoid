@@ -98,6 +98,102 @@ describe Mongoid::Contextual::Atomic do
     end
   end
 
+  describe "#add_each_to_set" do
+
+    let!(:depeche_mode) do
+      Band.create(members: [ "Dave" ])
+    end
+
+    let!(:new_order) do
+      Band.create(members: [ "Peter" ])
+    end
+
+    let!(:smiths) do
+      Band.create
+    end
+
+    context "when the criteria has no sorting" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.add_each_to_set(members: [ "Dave", "Joe" ])
+      end
+
+      it "does not add duplicates" do
+        expect(depeche_mode.reload.members).to eq([ "Dave", "Joe" ])
+      end
+
+      it "adds unique values" do
+        expect(new_order.reload.members).to eq([ "Peter", "Dave", "Joe" ])
+      end
+
+      it "adds to non initialized fields" do
+        expect(smiths.reload.members).to eq([ "Dave", "Joe" ])
+      end
+    end
+
+    context "when the criteria has sorting" do
+
+      let(:criteria) do
+        Band.asc(:name)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.add_each_to_set(members: [ "Dave", "Joe" ], genres: "Electro")
+      end
+
+      it "does not add duplicates" do
+        expect(depeche_mode.reload.members).to eq([ "Dave", "Joe" ])
+      end
+
+      it "adds multiple operations" do
+        expect(depeche_mode.reload.genres).to eq([ "Electro" ])
+      end
+
+      it "adds unique values" do
+        expect(new_order.reload.members).to eq([ "Peter", "Dave", "Joe" ])
+      end
+
+      it "adds to non initialized fields" do
+        expect(smiths.reload.members).to eq([ "Dave", "Joe" ])
+      end
+    end
+
+    context 'when the criteria has a collation', if: collation_supported? do
+
+      let(:criteria) do
+        Band.where(members: [ "DAVE" ]).collation(locale: 'en_US', strength: 2)
+      end
+
+      let(:context) do
+        Mongoid::Contextual::Mongo.new(criteria)
+      end
+
+      before do
+        context.add_each_to_set(members: [ "Dave", "Joe" ], genres: "Electro")
+      end
+
+      it "does not add duplicates" do
+        expect(depeche_mode.reload.members).to eq([ "Dave", "Joe" ])
+      end
+
+      it "adds multiple operations" do
+        expect(depeche_mode.reload.genres).to eq([ "Electro" ])
+      end
+    end
+  end
+
   describe "#bit" do
 
     let!(:depeche_mode) do
