@@ -87,6 +87,10 @@ def testing_locally?
   !(ENV['CI'] == 'travis')
 end
 
+def array_filters_supported?
+  Mongoid::Clients.default.cluster.next_primary.features.array_filters_enabled?
+end
+
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)
