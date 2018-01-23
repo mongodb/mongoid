@@ -486,12 +486,16 @@ module Mongoid
       #   context.update({ "$set" => { name: "Smiths" }})
       #
       # @param [ Hash ] attributes The new attributes for the document.
+      # @param [ Hash ] opts The update operation options.
+      #
+      # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
+      #   an update should apply.
       #
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update(attributes = nil)
-        update_documents(attributes)
+      def update(attributes = nil, opts = {})
+        update_documents(attributes, :update_one, opts)
       end
 
       # Update all the matching documents atomically.
@@ -500,12 +504,16 @@ module Mongoid
       #   context.update_all({ "$set" => { name: "Smiths" }})
       #
       # @param [ Hash ] attributes The new attributes for each document.
+      # @param [ Hash ] opts The update operation options.
+      #
+      # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
+      #   an update should apply.
       #
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update_all(attributes = nil)
-        update_documents(attributes, :update_many)
+      def update_all(attributes = nil, opts = {})
+        update_documents(attributes, :update_many, opts)
       end
 
       private
@@ -541,10 +549,10 @@ module Mongoid
       # @return [ true, false ] If the update succeeded.
       #
       # @since 3.0.4
-      def update_documents(attributes, method = :update_one)
+      def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        view.send(method, attributes.__consolidate__(klass))
+        view.send(method, attributes.__consolidate__(klass), opts)
       end
 
       # Apply the field limitations.

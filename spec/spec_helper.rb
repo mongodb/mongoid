@@ -84,6 +84,10 @@ def collation_supported?
 end
 alias :decimal128_supported? :collation_supported?
 
+def array_filters_supported?
+  Mongoid::Clients.default.cluster.next_primary.features.array_filters_enabled?
+end
+
 def testing_locally?
   !(ENV['CI'] == 'travis')
 end
