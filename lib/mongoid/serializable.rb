@@ -101,7 +101,7 @@ module Mongoid
         value = send(name)
         attrs[name] = value ? value.serializable_hash(options) : nil
       elsif names.include?(name) && !fields.key?(name)
-        attrs[name] = read_attribute(name)
+        attrs[name] = read_raw_attribute(name)
       elsif !attribute_missing?(name)
         attrs[name] = send(name)
       end

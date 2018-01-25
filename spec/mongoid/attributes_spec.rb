@@ -42,7 +42,7 @@ describe Mongoid::Attributes do
             context "accessing via []" do
 
               it "does not raise an error" do
-                expect(from_db["desc"]).to eq("en" => "test")
+                expect(from_db["desc"]).to eq("test")
               end
             end
 
@@ -165,7 +165,7 @@ describe Mongoid::Attributes do
         context "when passing just the name" do
 
           it "returns the full value" do
-            expect(person[:desc]).to eq("en" => "testing")
+            expect(person[:desc]).to eq("testing")
           end
         end
 
