@@ -150,6 +150,17 @@ describe Mongoid::Attributes do
 
   describe "#[]" do
 
+    context 'when the document has a custom attribute type' do
+
+      let(:bar) do
+        Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+      end
+
+      it 'returns the demongoized version of the attribute' do
+        expect(bar.reload[:lat_lng]).to be_a(LatLng)
+      end
+    end
+
     context "when the document is a new record" do
 
       let(:person) do
@@ -267,6 +278,20 @@ describe Mongoid::Attributes do
   end
 
   describe "#[]=" do
+
+    context 'when the document has a custom attribute type' do
+
+      let(:bar) do
+        Bar.new.tap do |b|
+          b[:lat_lng] = LatLng.new(52.30, 13.25)
+          b.save
+        end
+      end
+
+      it 'sets the demongoized version of the attribute' do
+        expect(bar.reload.lat_lng).to be_a(LatLng)
+      end
+    end
 
     let(:person) do
       Person.new
@@ -767,6 +792,17 @@ describe Mongoid::Attributes do
   end
 
   describe "#read_attribute" do
+
+    context 'when the document has a custom attribute type' do
+
+      let(:bar) do
+        Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+      end
+
+      it 'returns the demongoized version of the attribute' do
+        expect(bar.reload.read_attribute(:lat_lng)).to be_a(LatLng)
+      end
+    end
 
     context "when the document is a new record" do
 
