@@ -191,7 +191,7 @@ module Mongoid
 
       def collect_each_operations(ops)
         ops.each_with_object({}) do |(field, value), operations|
-          operations[database_field_name(field)] = { "$each" => value.mongoize }
+          operations[database_field_name(field)] = { "$each" => Array.wrap(value).mongoize }
         end
       end
     end
