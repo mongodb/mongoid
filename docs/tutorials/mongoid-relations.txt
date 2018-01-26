@@ -608,6 +608,52 @@ but the child document contains a "foreign key" reference to the parent.
     "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
   }
 
+Belongs To
+----------
+
+A ``belongs_to`` macro is used when a document is the child in a ``has_one`` or ``has_many`` association.
+By default, a child document cannot be saved unless it's associated with a parent. To override this requirement,
+you can use the option, ``optional: false``.
+
+Defining
+********
+
+The child document of the relation uses the ``belongs_to`` macro to indicate it is associated with a parent.
+The document on the ``belongs_to`` side stores the reference to the parent.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_one :studio
+  end
+
+  class Studio
+    include Mongoid::Document
+    field :name, type: String
+    belongs_to :band
+  end
+
+Definitions are required on both sides to the relation in order for it to work properly, unless
+one of the models is embedded.
+
+Storage
+*******
+
+When defining a relation of this nature, each document is stored in its respective collection,
+but the child document contains a "foreign key" reference to the parent.
+
+.. code-block:: ruby
+
+  # The parent band document.
+  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+
+  # The child studio document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
+    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
+  }
+
 Has And Belongs To Many
 -----------------------
 
