@@ -16,8 +16,8 @@ Common Behaviour
 Attributes
 **********
 
-All relations contain a ``target``, which is the proxied document or documents, a ``base``
-which is the document the relation hangs off, and ``metadata`` which provides information
+All relations contain a ``_target``, which is the proxied document or documents, a ``_base``
+which is the document the relation hangs off, and ``_association`` which provides information
 about the relation.
 
 .. code-block:: ruby
@@ -28,9 +28,9 @@ about the relation.
    end
    
    person.addresses = [ address ]
-   person.addresses.target # returns [ address ]
-   person.addresses.base # returns person
-   person.addresses.metadata # returns the metadata
+   person.addresses._target # returns [ address ]
+   person.addresses._base # returns person
+   person.addresses._association # returns the association metadata
 
 Extensions
 **********
@@ -291,31 +291,28 @@ when the base document calls ``#touch``.
    band = Band.first
    band.touch # Calls touch on the parent label.
 
-Metadata
---------
+Association metadata
+--------------------
 
 All relations in Mongoid contain metadata that holds information about the relation in
 question, and is a valuable tool for third party developers to use to extend Mongoid.
 
-You can access the metadata of the relation in a few different ways.
+You can access the association metadata of the relation in a few different ways.
 
 .. code-block:: ruby
 
-   # Get the metadata for a named relation from the class or document.
+   # Get the metadata for a named association from the class or document.
    Model.reflect_on_association(:relation_name)
    model.reflect_on_association(:relation_name)
  
-   # Get the metadata that the current object has in its relation.
-   model.metadata
- 
    # Get the metadata with a specific relation itself on a specific
    # document.
-   person.addresses.metadata
+   model.associations[:relation_name]
 
-The Metadata Object
-*******************
+The Association Object
+**********************
 
-The metadata object itself contains more information than one might know what to do
+The association object itself contains more information than one might know what to do
 with, and is useful for developers of extensions to Mongoid.
 
 
@@ -325,87 +322,79 @@ with, and is useful for developers of extensions to Mongoid.
 
    * - Method
      - Description
-   * - ``Metadata#as``
+   * - ``Association#as``
      - Returns the name of the parent to a polymorphic child.
-   * - ``Metadata#as?``
+   * - ``Association#as?``
      - Returns whether or not an as option exists.
-   * - ``Metadata#autobuilding?``
+   * - ``Association#autobuilding?``
      - Returns whether or not the relation is autobuilding.
-   * - ``Metadata#autosaving?``
+   * - ``Association#autosaving?``
      - Returns whether or not the relation is autosaving.
-   * - ``Metadata#cascading_callbacks?``
+   * - ``Association#cascading_callbacks?``
      - Returns whether the relation has callbacks cascaded down from the parent.
-   * - ``Metadata#class_name``
+   * - ``Association#class_name``
      - Returns the class name of the proxied document.
-   * - ``Metadata#cyclic?``
+   * - ``Association#cyclic?``
      - Returns whether the relation is a cyclic relation.
-   * - ``Metadata#dependent``
+   * - ``Association#dependent``
      - Returns the relation's dependent option.
-   * - ``Metadata#dependent?``
-     - Returns whether the relation is a dependent relation.
-   * - ``Metadata#destructive?``
+   * - ``Association#destructive?``
      - Returns true if the relation has a dependent delete or destroy.
-   * - ``Metadata#embedded?``
+   * - ``Association#embedded?``
      - Returns whether the relation is embedded in another document.
-   * - ``Metadata#forced_nil_inverse?``
+   * - ``Association#forced_nil_inverse?``
      - Returns whether the relation has a nil inverse defined.
-   * - ``Metadata#foreign_key``
+   * - ``Association#foreign_key``
      - Returns the name of the foreign key field.
-   * - ``Metadata#foreign_key_check``
+   * - ``Association#foreign_key_check``
      - Returns the name of the foreign key field dirty check method.
-   * - ``Metadata#foreign_key_setter``
+   * - ``Association#foreign_key_setter``
      - Returns the name of the foreign key field setter.
-   * - ``Metadata#indexed?``
+   * - ``Association#indexed?``
      - Returns whether the foreign key is auto indexed.
-   * - ``Metadata#inverses``
+   * - ``Association#inverses``
      - Returns the names of all inverse relation.
-   * - ``Metadata#inverse``
+   * - ``Association#inverse``
      - Returns the name of a single inverse relation.
-   * - ``Metadata#inverse_class_name``
+   * - ``Association#inverse_class_name``
      - Returns the class name of the relation on the inverse side.
-   * - ``Metadata#inverse_foreign_key``
+   * - ``Association#inverse_foreign_key``
      - Returns the name of the foreign key field on the inverse side.
-   * - ``Metadata#inverse_klass``
+   * - ``Association#inverse_klass``
      - Returns the class of the relation on the inverse side.
-   * - ``Metadata#inverse_metadata``
-     - Returns the metadata of the relation on the inverse side.
-   * - ``Metadata#inverse_of``
+   * - ``Association#inverse_association``
+     - Returns the metadata of the association on the inverse side.
+   * - ``Association#inverse_of``
      - Returns the explicitly defined name of the inverse relation.
-   * - ``Metadata#inverse_of?``
-     - Returns whether an inverse_of option is defined.
-   * - ``Metadata#inverse_setter``
+   * - ``Association#inverse_setter``
      - Returns the name of the method used to set the inverse.
-   * - ``Metadata#inverse_type``
+   * - ``Association#inverse_type``
      - Returns the name for the polymorphic type field of the inverse.
-   * - ``Metadata#inverse_type_setter``
+   * - ``Association#inverse_type_setter``
      - Returns the name for the polymorphic type field setter of the inverse.
-   * - ``Metadata#key``
+   * - ``Association#key``
      - Returns the name of the field in the attributes hash to use to get the relation.
-   * - ``Metadata#klass``
+   * - ``Association#klass``
      - Returns the class of the proxied documents in the relation.
-   * - ``Metadata#macro``
-     - Returns the relation's macro.
-   * - ``Metadata#name``
+   * - ``Association#name``
      - Returns the relation name.
-   * - ``Metadata#options``
+   * - ``Association#options``
      - Returns self, for API compatibility with Active Record.
-   * - ``Metadata#order``
+   * - ``Association#order``
      - Returns the custom sorting options on the relation.
-   * - ``Metadata#order?``
-     - Returns whether custom sorting options are set.
-   * - ``Metadata#polymorphic?``
+   * - ``Association#polymorphic?``
      - Returns whether the relation is polymorphic.
-   * - ``Metadata#setter``
+   * - ``Association#setter``
      - Returns the name of the field to set the relation.
-   * - ``Metadata#store_as``
+   * - ``Association#store_as``
      - Returns the name of the attribute to store an embedded relation in.
-   * - ``Metadata#touchable?``
+   * - ``Association#touchable?``
      - Returns whether or not the relation has a touch option.
-   * - ``Metadata#type``
+   * - ``Association#type``
      - Returns the name of the field to get the polymorphic type.
-   * - ``Metadata#type_setter``
+   * - ``Association#type_setter``
      - Returns the name of the field to set the polymorphic type.
-   * - ``Metadata#validate?``
+   * - ``Association#validate?``
      - Returns whether the relation has an associated validation.
 
 Embeds One
