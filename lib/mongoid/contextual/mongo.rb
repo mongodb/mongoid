@@ -95,7 +95,8 @@ module Mongoid
       def destroy
         each.inject(0) do |count, doc|
           doc.destroy
-          count += 1
+          count += 1 if collection.write_concern.nil? || collection.write_concern.acknowledged?
+          count
         end
       end
       alias :destroy_all :destroy
