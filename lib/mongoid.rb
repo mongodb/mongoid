@@ -42,7 +42,7 @@ module Mongoid
   PLATFORM_DETAILS = "mongoid-#{VERSION}".freeze
 
   # The minimum MongoDB version supported.
-  MONGODB_VERSION = "2.4.0"
+  MONGODB_VERSION = "2.6.0"
 
   # Sets the Mongoid configuration options. Best used by passing a block.
   #
