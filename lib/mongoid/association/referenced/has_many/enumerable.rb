@@ -185,6 +185,7 @@ module Mongoid
                 unloaded_documents.each do |doc|
                   document = _added.delete(doc._id) || _loaded.delete(doc._id) || doc
                   _loaded[document._id] = document
+                  set_base(document)
                   yield(document)
                 end
               end
@@ -248,7 +249,9 @@ module Mongoid
             # @param [ Criteria, Array<Document> ] target The wrapped object.
             #
             # @since 2.1.0
-            def initialize(target)
+            def initialize(target, base = nil, association = nil)
+              @base = base
+              @association = association
               if target.is_a?(Criteria)
                 @_added, @executed, @_loaded, @_unloaded = {}, false, {}, target
               else
@@ -483,6 +486,10 @@ module Mongoid
             end
 
             private
+
+            def set_base(document)
+              document.set_relation(@association.inverse, @base) if @association
+            end
 
             def method_missing(name, *args, &block)
               entries.send(name, *args, &block)

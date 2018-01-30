@@ -74,6 +74,8 @@ module Mongoid
         instance_variable_set("@_#{name}", relation)
       end
 
+      def reset_unloaded; end
+
       private
 
       # Get the relation. Extracted out from the getter method to avoid

@@ -31,7 +31,7 @@ describe Mongoid::QueryCache do
         :posts
       end
 
-      context 'when query cache is disabled' do
+      context 'does not query for the relation and instead sets the base' do
 
         before do
           Mongoid::QueryCache.enabled = false
@@ -39,20 +39,6 @@ describe Mongoid::QueryCache do
 
         it 'queries for each access to the base' do
           expect(server).to receive(:with_connection).exactly(relations.size).times.and_call_original
-          relations.each do |object|
-            object.person
-          end
-        end
-      end
-
-      context 'when query cache is enabled' do
-
-        before do
-          Mongoid::QueryCache.enabled = true
-        end
-
-        it 'queries only once for the base' do
-          expect(server).to receive(:with_connection).exactly(1).times.and_call_original
           relations.each do |object|
             object.person
           end
