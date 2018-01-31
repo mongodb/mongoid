@@ -42,7 +42,7 @@ describe Mongoid::Attributes do
             context "accessing via []" do
 
               it "does not raise an error" do
-                expect(from_db["desc"]).to eq("en" => "test")
+                expect(from_db["desc"]).to eq("test")
               end
             end
 
@@ -150,6 +150,17 @@ describe Mongoid::Attributes do
 
   describe "#[]" do
 
+    context 'when the document has a custom attribute type' do
+
+      let(:bar) do
+        Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+      end
+
+      it 'returns the demongoized version of the attribute' do
+        expect(bar.reload[:lat_lng]).to be_a(LatLng)
+      end
+    end
+
     context "when the document is a new record" do
 
       let(:person) do
@@ -165,7 +176,7 @@ describe Mongoid::Attributes do
         context "when passing just the name" do
 
           it "returns the full value" do
-            expect(person[:desc]).to eq("en" => "testing")
+            expect(person[:desc]).to eq("testing")
           end
         end
 
@@ -267,6 +278,20 @@ describe Mongoid::Attributes do
   end
 
   describe "#[]=" do
+
+    context 'when the document has a custom attribute type' do
+
+      let(:bar) do
+        Bar.new.tap do |b|
+          b[:lat_lng] = LatLng.new(52.30, 13.25)
+          b.save
+        end
+      end
+
+      it 'sets the demongoized version of the attribute' do
+        expect(bar.reload.lat_lng).to be_a(LatLng)
+      end
+    end
 
     let(:person) do
       Person.new
@@ -767,6 +792,17 @@ describe Mongoid::Attributes do
   end
 
   describe "#read_attribute" do
+
+    context 'when the document has a custom attribute type' do
+
+      let(:bar) do
+        Bar.create(lat_lng: LatLng.new(52.30, 13.25))
+      end
+
+      it 'returns the demongoized version of the attribute' do
+        expect(bar.reload.read_attribute(:lat_lng)).to be_a(LatLng)
+      end
+    end
 
     context "when the document is a new record" do
 
