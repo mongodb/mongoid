@@ -1838,4 +1838,121 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       expect(enumerable).to be__loaded
     end
   end
+
+  describe 'setting the same parent object on enumerated children objects' do
+
+    let(:person) do
+      Person.create
+    end
+
+    context 'when a single child is fetched' do
+
+      let!(:post) do
+        person.posts << Post.new
+        person.posts.first
+      end
+
+      let(:server) do
+        Person.mongo_client.cluster.next_primary
+      end
+
+      it 'does not query the database to access the parent' do
+        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
+        expect(post.person).to eq(person)
+      end
+    end
+
+    context 'when a single child is fetched with a scope' do
+
+      let!(:post) do
+        person.posts << Post.new(title: 'open')
+        person.posts.open.first
+      end
+
+      let(:server) do
+        Person.mongo_client.cluster.next_primary
+      end
+
+      it 'does not query the database to access the parent' do
+        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
+        expect(post.person).to eq(person)
+      end
+    end
+
+    context 'when multiple children are fetched' do
+
+      let!(:posts) do
+        person.posts << Post.new
+        person.posts << Post.new
+        person.posts << Post.new
+        person.posts.to_a
+      end
+
+      let(:server) do
+        Person.mongo_client.cluster.next_primary
+      end
+
+      it 'does not query the database to access the parent' do
+        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
+        expect(posts.all? { |post| post.person == person }).to be(true)
+      end
+    end
+
+    context 'when multiple children are fetched with query criteria' do
+
+      let!(:posts) do
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'not-a-test')
+        person.posts.where(title: 'open').to_a
+      end
+
+      let(:server) do
+        Person.mongo_client.cluster.next_primary
+      end
+
+      it 'does not query the database to access the parent' do
+        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
+        expect(posts.all? { |post| post.person == person }).to be(true)
+      end
+    end
+
+    context 'when multiple children are fetched with a scope' do
+
+      let!(:posts) do
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'not-a-test')
+        person.posts.open.to_a
+      end
+
+      let(:server) do
+        Person.mongo_client.cluster.next_primary
+      end
+
+      it 'does not query the database to access the parent' do
+        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
+        expect(posts.all? { |post| post.person == person }).to be(true)
+      end
+    end
+
+    context 'when the parent is updated in memory' do
+
+      let!(:posts) do
+        person.posts << Post.new
+        person.posts << Post.new
+        person.username = 'emily'
+        person.posts.to_a
+      end
+
+      let(:server) do
+        Person.mongo_client.cluster.next_primary
+      end
+
+      it 'does not query the database to access the parent' do
+        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
+        expect(posts.all? { |post| post.person.username == 'emily' }).to be(true)
+      end
+    end
+  end
 end
