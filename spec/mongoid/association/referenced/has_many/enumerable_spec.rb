@@ -1858,13 +1858,10 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         person.posts.first
       end
 
-      let(:server) do
-        Person.mongo_client.cluster.next_primary
-      end
-
       it 'does not query the database to access the parent' do
-        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
-        expect(post.person).to eq(person)
+        expect_query(0) do
+          expect(post.person).to eq(person)
+        end
       end
     end
 
@@ -1875,13 +1872,10 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         person.posts.open.first
       end
 
-      let(:server) do
-        Person.mongo_client.cluster.next_primary
-      end
-
       it 'does not query the database to access the parent' do
-        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
-        expect(post.person).to eq(person)
+        expect_query(0) do
+          expect(post.person).to eq(person)
+        end
       end
     end
 
@@ -1894,13 +1888,10 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         person.posts.to_a
       end
 
-      let(:server) do
-        Person.mongo_client.cluster.next_primary
-      end
-
       it 'does not query the database to access the parent' do
-        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
-        expect(posts.all? { |post| post.person == person }).to be(true)
+        expect_query(0) do
+          expect(posts.all? { |post| post.person == person }).to be(true)
+        end
       end
     end
 
@@ -1913,13 +1904,10 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         person.posts.where(title: 'open').to_a
       end
 
-      let(:server) do
-        Person.mongo_client.cluster.next_primary
-      end
-
       it 'does not query the database to access the parent' do
-        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
-        expect(posts.all? { |post| post.person == person }).to be(true)
+        expect_query(0) do
+          expect(posts.all? { |post| post.person == person }).to be(true)
+        end
       end
     end
 
@@ -1932,13 +1920,10 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         person.posts.open.to_a
       end
 
-      let(:server) do
-        Person.mongo_client.cluster.next_primary
-      end
-
       it 'does not query the database to access the parent' do
-        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
-        expect(posts.all? { |post| post.person == person }).to be(true)
+        expect_query(0) do
+          expect(posts.all? { |post| post.person == person }).to be(true)
+        end
       end
     end
 
@@ -1951,13 +1936,10 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         person.posts.to_a
       end
 
-      let(:server) do
-        Person.mongo_client.cluster.next_primary
-      end
-
       it 'does not query the database to access the parent' do
-        expect(server).to receive(:with_connection).exactly(0).times.and_call_original
-        expect(posts.all? { |post| post.person.username == 'emily' }).to be(true)
+        expect_query(0) do
+          expect(posts.all? { |post| post.person.username == 'emily' }).to be(true)
+        end
       end
     end
   end
