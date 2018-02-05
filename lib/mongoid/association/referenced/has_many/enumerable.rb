@@ -179,6 +179,7 @@ module Mongoid
               if _loaded?
                 _loaded.each_pair do |id, doc|
                   document = _added.delete(doc._id) || doc
+                  set_base(document)
                   yield(document)
                 end
               else
@@ -250,8 +251,8 @@ module Mongoid
             #
             # @since 2.1.0
             def initialize(target, base = nil, association = nil)
-              @base = base
-              @association = association
+              @_base = base
+              @_association = association
               if target.is_a?(Criteria)
                 @_added, @executed, @_loaded, @_unloaded = {}, false, {}, target
               else
@@ -304,8 +305,9 @@ module Mongoid
             # @since 2.1.0
             def in_memory
               docs = (_loaded.values + _added.values)
-              docs.each { |doc| yield(doc) } if block_given?
-              docs
+              docs.each do |doc|
+                yield(doc) if block_given?
+              end
             end
 
             # Get the last document in the enumerable. Will check the new
@@ -488,7 +490,9 @@ module Mongoid
             private
 
             def set_base(document)
-              document.set_relation(@association.inverse, @base) if @association
+              if @_association.is_a?(Referenced::HasMany)
+                document.set_relation(@_association.inverse, @_base) if @_association
+              end
             end
 
             def method_missing(name, *args, &block)

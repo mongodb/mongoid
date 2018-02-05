@@ -189,6 +189,12 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       it "returns the added documents" do
         expect(added).to eq([ post ])
       end
+
+      it "sets the base on the new document" do
+        expect_query(0) do
+          added.collect(&:person)
+        end
+      end
     end
   end
 
