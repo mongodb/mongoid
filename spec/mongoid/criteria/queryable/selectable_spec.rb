@@ -1449,7 +1449,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when the stretegy is the default (intersection)" do
+        context "when the strategy is the default (intersection)" do
 
           let(:selection) do
             query.in(first: [ 1, 2 ].freeze).in(first: [ 2, 3 ])
@@ -1459,6 +1459,35 @@ describe Mongoid::Criteria::Queryable::Selectable do
             expect(selection.selector).to eq({
               "first" =>  { "$in" => [ 2 ] }
             })
+          end
+
+          it "returns a cloned query" do
+            expect(selection).to_not equal(query)
+          end
+        end
+
+        context 'when the field is aliased' do
+
+          before(:all) do
+            class TestModel
+              include Mongoid::Document
+            end
+          end
+
+          after(:all) do
+            Object.send(:remove_const, :TestModel)
+          end
+
+          let(:bson_object_id) do
+            BSON::ObjectId.new
+          end
+
+          let(:selection) do
+            TestModel.in(id: [bson_object_id.to_s]).in(id: [bson_object_id.to_s])
+          end
+
+          it "intersects the $in selectors" do
+            expect(selection.selector).to eq("_id" =>  { "$in" => [ bson_object_id ] })
           end
 
           it "returns a cloned query" do
@@ -1483,7 +1512,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when the stretegy is override" do
+        context "when the strategy is override" do
 
           let(:selection) do
             query.in(first: [ 1, 2 ]).override.in(first: [ 3, 4 ])
@@ -1500,7 +1529,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        context "when the stretegy is union" do
+        context "when the strategy is union" do
 
           let(:selection) do
             query.in(first: [ 1, 2 ]).union.in(first: [ 3, 4 ])
