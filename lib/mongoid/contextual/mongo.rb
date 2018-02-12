@@ -256,12 +256,12 @@ module Mongoid
         try_cache(:first) do
           if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
             if raw_doc = view.sort(sort).limit(-1).first
-              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
           else
             if raw_doc = view.limit(-1).first
-              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
           end
@@ -277,7 +277,7 @@ module Mongoid
       def find_first
         return documents.first if cached? && cache_loaded?
         if raw_doc = view.first
-          doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+          doc = Factory.from_db(klass, raw_doc, criteria)
           eager_load([doc]).first
         end
       end
@@ -368,7 +368,7 @@ module Mongoid
         try_cache(:last) do
           with_inverse_sorting(opts) do
             if raw_doc = view.limit(-1).first
-              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
           end
@@ -683,7 +683,7 @@ module Mongoid
       def documents_for_iteration
         return documents if cached? && !documents.empty?
         return view unless eager_loadable?
-        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
+        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
         eager_load(docs)
       end
 
@@ -701,7 +701,7 @@ module Mongoid
       # @since 3.0.0
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
-            document : Factory.from_db(klass, document, criteria.options[:fields])
+            document : Factory.from_db(klass, document, criteria)
         yield(doc)
         documents.push(doc) if cacheable?
       end

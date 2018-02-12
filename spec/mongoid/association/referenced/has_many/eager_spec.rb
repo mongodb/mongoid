@@ -91,6 +91,15 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
           end
         end
       end
+
+      it "does not query when accessing the base on each document" do
+        persons = Person.all.includes(:drugs).to_a
+        expect_query(0) do
+          persons.each do |person|
+            person.drugs.collect(&:person)
+          end
+        end
+      end
     end
 
     context "when the relation is not polymorphic" do
@@ -118,6 +127,12 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
         it "does not query when updating the association" do
           expect_query(0) do
             eager.posts.first.title = "New title"
+          end
+        end
+
+        it "does not query when accessing the base on each document" do
+          expect_query(0) do
+            eager.posts.collect(&:person)
           end
         end
       end

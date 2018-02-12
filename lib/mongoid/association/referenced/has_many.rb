@@ -240,6 +240,8 @@ module Mongoid
         def query_criteria(object, base)
           crit = klass.where(foreign_key => object)
           crit = with_polymorphic_criterion(crit, base)
+          crit.association = self
+          crit.parent_document = base
           with_ordering(crit)
         end
 

@@ -577,6 +577,31 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context 'when the criteria has a parent document' do
+
+      before do
+        Post.create(person: person)
+        Post.create(person: person)
+        Post.create(person: person)
+      end
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:criteria) do
+        person.posts.all
+      end
+
+      let(:persons) do
+        criteria.collect(&:person)
+      end
+
+      it 'sets the same parent object on each related object' do
+        expect(persons.uniq.size).to eq(1)
+      end
+    end
   end
 
   describe "#eager_load" do
