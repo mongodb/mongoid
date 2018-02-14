@@ -35,10 +35,10 @@ module Mongoid
           key, options = spec.key, default_options.merge(spec.options)
           if database = options[:database]
             with(database: database) do |klass|
-              klass.collection.indexes.create_one(key, options.except(:database))
+              klass.collection.indexes(session: session).create_one(key, options.except(:database))
             end
           else
-            collection.indexes.create_one(key, options)
+            collection.indexes(session: session).create_one(key, options)
           end
         end and true
       end
@@ -58,7 +58,7 @@ module Mongoid
             begin
               klass.collection.indexes.each do |spec|
                 unless spec["name"] == "_id_"
-                  klass.collection.indexes.drop_one(spec["key"])
+                  klass.collection.indexes(session: session).drop_one(spec["key"])
                   logger.info(
                     "MONGOID: Removed index '#{spec["name"]}' on collection " +
                     "'#{klass.collection.name}' in database '#{database}'."

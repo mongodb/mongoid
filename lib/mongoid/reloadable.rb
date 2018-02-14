@@ -58,7 +58,7 @@ module Mongoid
     #
     # @since 2.3.2
     def reload_root_document
-      {}.merge(collection.find(_id: _id).read(mode: :primary).first || {})
+      {}.merge(collection.find(_id: _id, session: session).read(mode: :primary).first || {})
     end
 
     # Reload the embedded document.

@@ -341,7 +341,7 @@ module Mongoid
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
-        @view = collection.find(criteria.selector)
+        @view = collection.find(criteria.selector, session: session)
         apply_options
       end
 
@@ -704,6 +704,12 @@ module Mongoid
             document : Factory.from_db(klass, document, criteria)
         yield(doc)
         documents.push(doc) if cacheable?
+      end
+
+      private
+
+      def session
+        @criteria.send(:session)
       end
     end
   end
