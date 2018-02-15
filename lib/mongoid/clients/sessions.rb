@@ -8,6 +8,8 @@ module Mongoid
     # @since 6.4.0
     module Sessions
 
+      NOT_SUPPORTED = 'not supported'
+
       # Execute a block within the context of a session.
       #
       # @example Execute some operations in the context of a session.
@@ -40,7 +42,10 @@ module Mongoid
         session = persistence_context.client.start_session(options)
         Threaded.set_session(session)
         yield
-      rescue Mongo::Error::InvalidSession
+      rescue Mongo::Error::InvalidSession => ex
+        if ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
+          raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
+        end
         raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
       ensure
         Threaded.clear_session
@@ -82,7 +87,10 @@ module Mongoid
           session = persistence_context.client.start_session(options)
           Threaded.set_session(session)
           yield
-        rescue Mongo::Error::InvalidSession
+        rescue Mongo::Error::InvalidSession => ex
+          if ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
+            raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
+          end
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
         ensure
           Threaded.clear_session
