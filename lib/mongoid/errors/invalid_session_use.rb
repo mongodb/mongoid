@@ -3,7 +3,7 @@ module Mongoid
   module Errors
 
     # This error is raised when a session is attempted to be used with a model whose client cannot use it or if
-    #   sessions are attempted to be nested.
+    #   sessions are nested.
     #
     # @since 6.4.0
     class InvalidSessionUse < MongoidError

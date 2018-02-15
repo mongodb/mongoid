@@ -397,8 +397,6 @@ module Mongoid
             @criteria ||= _association.criteria(_base)
           end
 
-
-
           # Perform the necessary cascade operations for documents that just got
           # deleted or nullified.
           #

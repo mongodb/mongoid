@@ -228,7 +228,7 @@ en:
             client specified in its 'store_in' options.\n\n"
         invalid_session_nesting:
           message: "A session was started while another session was being used."
-          summary: "Sessions also cannot be nested. Only one session can be used in a thread at once."
+          summary: "Sessions cannot be nested. Only one session can be used in a thread at once."
           resolution: "Only use one session at a time; sessions cannot be nested."
         invalid_storage_options:
           message: "Invalid options passed to %{klass}.store_in: %{options}."
