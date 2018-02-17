@@ -49,7 +49,7 @@ module Mongoid
         obj
       else
         camelized = type.camelize
-        class_existing? = if Rails.env.development?
+        class_existing? = if defined?(Rails) && Rails.env.development?
           camelized.constantize rescue false
         else
           Object.const_defined? camelized
