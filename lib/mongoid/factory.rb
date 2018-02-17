@@ -49,7 +49,12 @@ module Mongoid
         obj
       else
         camelized = type.camelize
-        raise Errors::UnknownModel.new(camelized, type) unless camelized.constantize rescue false
+        class_existing? = if Rails.env.development?
+          camelized.constantize rescue false
+        else
+          Object.const_defined? camelized
+        end
+        raise Errors::UnknownModel.new(camelized, type) unless class_existing?
         camelized.constantize.instantiate(attributes, selected_fields)
       end
     end
