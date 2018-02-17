@@ -118,8 +118,6 @@ module Mongoid
       # @example Process the pending items.
       #   document.process_pending
       #
-      # @param [ Hash ] options The mass assignment options.
-      #
       # @since 2.0.0.rc.7
       def process_pending
         process_nested and process_relations
@@ -132,14 +130,12 @@ module Mongoid
       # @example Process the relations.
       #   document.process_relations
       #
-      # @param [ Hash ] options The mass assignment options.
-      #
       # @since 2.0.0.rc.7
       def process_relations
         pending_relations.each_pair do |name, value|
-          metadata = relations[name]
+          association = relations[name]
           if value.is_a?(Hash)
-            metadata.nested_builder(value, {}).build(self)
+            association.nested_builder(value, {}).build(self)
           else
             send("#{name}=", value)
           end

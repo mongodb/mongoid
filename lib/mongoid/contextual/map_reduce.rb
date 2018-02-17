@@ -111,6 +111,7 @@ module Mongoid
       end
 
       # Specifies where the map/reduce output is to be stored.
+      # Please see MongoDB documentation for supported map reduce options.
       #
       # @example Store output in memory.
       #   map_reduce.out(inline: 1)
@@ -123,6 +124,9 @@ module Mongoid
       #
       # @example Store output in a collection, reducing existing documents.
       #   map_reduce.out(reduce: "collection_name")
+      #
+      # @example Return results from map reduce.
+      #   map_reduce.out(inline: 1)
       #
       # @param [ Hash ] location The place to store the results.
       #

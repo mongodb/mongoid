@@ -9,6 +9,8 @@ class Agent
   belongs_to :game
   belongs_to :agency, touch: true, autobuild: true
 
+  belongs_to :same_name, class_name: 'Band', inverse_of: :same_name
+
   has_and_belongs_to_many :accounts
   has_and_belongs_to_many :basics
 end

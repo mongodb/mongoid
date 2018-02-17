@@ -43,7 +43,7 @@ module Mongoid
     include Inspectable
     include Matchable
     include Persistable
-    include Relations
+    include Association
     include Reloadable
     include Scopable
     include Selectable
@@ -70,11 +70,12 @@ module Mongoid
       Interceptable,
       Matchable,
       Persistable,
-      Relations,
+      Association,
       Reloadable,
       Scopable,
       Serializable,
       Clients,
+      Clients::Options,
       Shardable,
       Stateful,
       Cacheable,
@@ -82,10 +83,10 @@ module Mongoid
       Traversable,
       Validatable,
       Equality,
-      Relations::Synchronization,
+      Association::Referenced::Syncable,
+      Association::Macros,
       ActiveModel::Model,
-      ActiveModel::Validations,
-      PersistenceContext
+      ActiveModel::Validations
     ]
 
     # These are methods names defined in included blocks that may conflict

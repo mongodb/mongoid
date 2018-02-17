@@ -535,6 +535,9 @@ module Mongoid
         #
         # @since 1.0.0
         def where(criterion = nil)
+          # We need to save the criterion in an instance variable so Modifiable methods
+          # know how to create a polymorphic object.
+          @criterion = criterion
           criterion.is_a?(String) ? js_query(criterion) : expr_query(criterion)
         end
 

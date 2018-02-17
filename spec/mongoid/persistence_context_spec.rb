@@ -70,6 +70,20 @@ describe Mongoid::PersistenceContext do
       { collection: :other }
     end
 
+    context 'when the method throws an error' do
+
+      let!(:persistence_context) do
+        described_class.set(object, options).tap do |cxt|
+          allow(cxt).to receive(:client).and_raise(Mongoid::Errors::NoClientConfig.new('default'))
+        end
+      end
+
+      it 'clears the context anyway' do
+        begin; described_class.clear(object); rescue; end
+        expect(described_class.get(object)).to be(nil)
+      end
+    end
+
     context 'when there has been a persistence context set on the current thread' do
 
       let!(:persistence_context) do

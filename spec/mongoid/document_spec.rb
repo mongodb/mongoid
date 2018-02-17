@@ -10,10 +10,17 @@ describe Mongoid::Document do
     Person.new
   end
 
-  it "does not respond to _destroy" do
-    expect(person).to_not respond_to(:_destroy)
+  it "defines a _destroy method" do
+    expect(Person.new).to respond_to(:_destroy)
   end
 
+  describe "#_destroy" do
+  
+    it "default to false" do
+      expect(Person.new._destroy).to be false
+    end
+  end
+  
   describe ".included" do
 
     let(:models) do
@@ -87,11 +94,11 @@ describe Mongoid::Document do
     context "when the document is not subclassed" do
 
       let(:types) do
-        Address._types
+        Kangaroo._types
       end
 
       it "returns the document" do
-        expect(types).to eq([ "Address" ])
+        expect(types).to eq([ "Kangaroo" ])
       end
     end
 

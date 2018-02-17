@@ -46,7 +46,7 @@ module Mongoid
     # @example Is the callback executable?
     #   document.callback_executable?(:save)
     #
-    # @param [ Symbol ] kin The type of callback.
+    # @param [ Symbol ] kind The type of callback.
     #
     # @return [ true, false ] If the callback can be executed.
     #
@@ -118,7 +118,7 @@ module Mongoid
     #   end
     #
     # @param [ Symbol ] kind The type of callback to execute.
-    # @param [ Array ] *args Any options.
+    # @param [ Array ] args Any options.
     #
     # @return [ Document ] The document
     #
@@ -160,8 +160,8 @@ module Mongoid
     #
     # @since 2.3.0
     def cascadable_children(kind, children = Set.new)
-      embedded_relations.each_pair do |name, metadata|
-        next unless metadata.cascading_callbacks?
+      embedded_relations.each_pair do |name, association|
+        next unless association.cascading_callbacks?
         without_autobuild do
           delayed_pulls = delayed_atomic_pulls[name]
           delayed_unsets = delayed_atomic_unsets[name]
@@ -170,7 +170,7 @@ module Mongoid
           relation = send(name)
           Array.wrap(relation).each do |child|
             next if children.include?(child)
-            children.add(child) if cascadable_child?(kind, child, metadata)
+            children.add(child) if cascadable_child?(kind, child, association)
             child.send(:cascadable_children, kind, children)
           end
         end
@@ -189,9 +189,9 @@ module Mongoid
     # @return [ true, false ] If the child should fire the callback.
     #
     # @since 2.3.0
-    def cascadable_child?(kind, child, metadata)
+    def cascadable_child?(kind, child, association)
       return false if kind == :initialize || kind == :find || kind == :touch
-      return false if kind == :validate && metadata.validate?
+      return false if kind == :validate && association.validate?
       child.callback_executable?(kind) ? child.in_callback_state?(kind) : false
     end
 
@@ -254,6 +254,7 @@ module Mongoid
           chain.append(callback) if callback.kind == place
         end
         self.class.send :define_method, name do
+<<<<<<< HEAD
           runner = chain.compile
           env = ActiveSupport::Callbacks::Filters::Environment.new(self, false, nil)
           if runner.respond_to?(:call)
@@ -261,6 +262,14 @@ module Mongoid
           else
             runner.send "invoke_#{place}", env
           end
+=======
+          env = ActiveSupport::Callbacks::Filters::Environment.new(self, false, nil)
+          sequence = chain.compile
+          sequence.invoke_before(env)
+          env.value = !env.halted
+          sequence.invoke_after(env)
+          env.value
+>>>>>>> b3a5918e504f4ac9ae4e750701bb02db78000960
         end
         self.class.send :protected, name
       end

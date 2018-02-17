@@ -189,8 +189,8 @@ describe Mongoid::Persistable::Savable do
               "title" => "King",
               "name.first_name" => "Ryan"
             },
-            "$pushAll"=> {
-              "addresses" => [ { "_id" => address.id, "street" => "Bond St" } ]
+            "$push"=> {
+              "addresses" => { '$each' => [ { "_id" => address.id, "street" => "Bond St" } ] }
             }
           })
         end
@@ -309,7 +309,7 @@ describe Mongoid::Persistable::Savable do
         expect {
           person.username = 'unloaded-attribute'
           person.save
-        }.to raise_error(Mongoid::Errors::ReadonlyAttribute)
+        }.to raise_error(ActiveModel::MissingAttributeError)
       end
 
       context 'when the changed attribute is aliased' do

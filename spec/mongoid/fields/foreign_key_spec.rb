@@ -7,7 +7,7 @@ describe Mongoid::Fields::ForeignKey do
     let(:field) do
       described_class.new(
         :vals,
-        metadata: Person.relations["preferences"],
+        association: Person.relations["preferences"],
         type: Array,
         default: [],
         identity: true
@@ -68,7 +68,7 @@ describe Mongoid::Fields::ForeignKey do
     let(:field) do
       described_class.new(
         :vals,
-        metadata: Person.relations["posts"],
+        association: Person.relations["posts"],
         type: Array,
         default: default,
         identity: true
@@ -89,7 +89,7 @@ describe Mongoid::Fields::ForeignKey do
     let(:field) do
       described_class.new(
         :vals,
-        metadata: Person.relations["posts"],
+        association: Person.relations["posts"],
         type: Array,
         default: [],
         identity: true
@@ -103,14 +103,14 @@ describe Mongoid::Fields::ForeignKey do
 
   describe "#evolve" do
 
-    let(:metadata) do
+    let(:association) do
       Person.reflect_on_association(:preferences)
     end
 
     context "when provided a document" do
 
       let(:field) do
-        described_class.new(:person_id, type: Object, metadata: metadata)
+        described_class.new(:person_id, type: Object, association: association)
       end
 
       let(:game) do
@@ -129,7 +129,7 @@ describe Mongoid::Fields::ForeignKey do
     context "when the type is an array" do
 
       let(:field) do
-        described_class.new(:preference_ids, type: Array, default: [], metadata: metadata)
+        described_class.new(:preference_ids, type: Array, default: [], association: association)
       end
 
       context "when providing a single value" do
@@ -197,12 +197,12 @@ describe Mongoid::Fields::ForeignKey do
 
           context "when the relation stores ids as strings" do
 
-            let!(:metadata) do
+            let!(:association) do
               Agent.reflect_on_association(:accounts)
             end
 
             let!(:field) do
-              described_class.new(:account_ids, type: Array, default: [], metadata: metadata)
+              described_class.new(:account_ids, type: Array, default: [], association: association)
             end
 
             let(:id_one) do
@@ -260,12 +260,12 @@ describe Mongoid::Fields::ForeignKey do
 
     context "when the type is an object" do
 
-      let(:metadata) do
+      let(:association) do
         Game.reflect_on_association(:person)
       end
 
       let(:field) do
-        described_class.new(:person_id, type: Object, metadata: metadata)
+        described_class.new(:person_id, type: Object, association: association)
       end
 
       context "when providing a single value" do
@@ -312,12 +312,12 @@ describe Mongoid::Fields::ForeignKey do
 
         context "when the relation stores string ids" do
 
-          let(:metadata) do
+          let(:association) do
             Comment.reflect_on_association(:account)
           end
 
           let(:field) do
-            described_class.new(:person_id, type: Object, metadata: metadata)
+            described_class.new(:person_id, type: Object, association: association)
           end
 
           context "when the value is an id string" do
@@ -384,12 +384,12 @@ describe Mongoid::Fields::ForeignKey do
 
           context "when the relation stores ids as strings" do
 
-            let(:metadata) do
+            let(:association) do
               Comment.reflect_on_association(:account)
             end
 
             let(:field) do
-              described_class.new(:person_id, type: Object, metadata: metadata)
+              described_class.new(:person_id, type: Object, association: association)
             end
 
             let(:id_one) do
@@ -445,14 +445,14 @@ describe Mongoid::Fields::ForeignKey do
       end
     end
 
-    context "when the metadata is polymoprhic" do
+    context "when the association is polymoprhic" do
 
-      let(:metadata) do
+      let(:association) do
         Agent.reflect_on_association(:names)
       end
 
       let(:field) do
-        described_class.new(:nameable_id, type: Object, metadata: metadata)
+        described_class.new(:nameable_id, type: Object, association: association)
       end
 
       let(:value) do
@@ -464,7 +464,7 @@ describe Mongoid::Fields::ForeignKey do
       end
 
       it "does not change the foreign key" do
-        expect(evolved).to be(value)
+        expect(evolved).to eq(BSON::ObjectId.from_string(value))
       end
     end
   end
@@ -500,12 +500,8 @@ describe Mongoid::Fields::ForeignKey do
 
       context "when the array is object ids" do
 
-        let(:metadata) do
-          Mongoid::Relations::Metadata.new(
-            inverse_class_name: "Game",
-            name: :person,
-            relation: Mongoid::Relations::Referenced::In
-          )
+        let(:association) do
+          Game.relations["person"]
         end
 
         let(:field) do
@@ -514,7 +510,7 @@ describe Mongoid::Fields::ForeignKey do
             type: Array,
             default: [],
             identity: true,
-            metadata: metadata,
+            association: association,
             overwrite: true
           )
         end
@@ -589,12 +585,8 @@ describe Mongoid::Fields::ForeignKey do
 
       context "when the array is object ids" do
 
-        let(:metadata) do
-          Mongoid::Relations::Metadata.new(
-            inverse_class_name: "Game",
-            name: :person,
-            relation: Mongoid::Relations::Referenced::In
-          )
+        let(:association) do
+          Game.relations['person']
         end
 
         let(:field) do
@@ -603,7 +595,7 @@ describe Mongoid::Fields::ForeignKey do
             type: Object,
             default: nil,
             identity: true,
-            metadata: metadata,
+            association: association,
             overwrite: true
           )
         end

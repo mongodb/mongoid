@@ -28,7 +28,7 @@ module Mongoid
             attributes[field] = (current || 0) + increment
             ops[atomic_attribute_name(field)] = increment
           end
-          { "$inc" => ops }
+          { "$inc" => ops } unless ops.empty?
         end
       end
     end

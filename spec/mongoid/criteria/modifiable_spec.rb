@@ -49,6 +49,29 @@ describe Mongoid::Criteria::Modifiable do
         end
       end
     end
+
+    context 'when the object is polymorphic' do
+
+      let(:movie) do
+        Movie.new
+      end
+
+      let(:criteria) do
+        Rating.where(ratable: movie)
+      end
+
+      let(:document) do
+        criteria.create
+      end
+
+      it 'sets the polymorphic id' do
+        expect(document.ratable_id).to eq(movie.id)
+      end
+
+      it 'sets the type field' do
+        expect(document.ratable_type).to eq('Movie')
+      end
+    end
   end
 
   describe "#create!" do
@@ -63,6 +86,29 @@ describe Mongoid::Criteria::Modifiable do
         expect {
           criteria.create!
         }.to raise_error(Mongoid::Errors::Validations)
+      end
+    end
+
+    context 'when the object is polymorphic' do
+
+      let(:movie) do
+        Movie.new
+      end
+
+      let(:criteria) do
+        Rating.where(ratable: movie)
+      end
+
+      let(:document) do
+        criteria.create!
+      end
+
+      it 'sets the polymorphic id' do
+        expect(document.ratable_id).to eq(movie.id)
+      end
+
+      it 'sets the type field' do
+        expect(document.ratable_type).to eq('Movie')
       end
     end
   end
@@ -295,6 +341,25 @@ describe Mongoid::Criteria::Modifiable do
           expect(person.pets).to be true
         end
       end
+
+      context 'when the object is polymorphic' do
+
+        let(:movie) do
+          Movie.new
+        end
+
+        let(:document) do
+          Rating.find_or_create_by(ratable: movie)
+        end
+
+        it 'sets the polymorphic id' do
+          expect(document.ratable_id).to eq(movie.id)
+        end
+
+        it 'sets the type field' do
+          expect(document.ratable_type).to eq('Movie')
+        end
+      end
     end
   end
 
@@ -447,6 +512,25 @@ describe Mongoid::Criteria::Modifiable do
         end
       end
     end
+
+    context 'when the object is polymorphic' do
+
+      let(:movie) do
+        Movie.new
+      end
+
+      let(:document) do
+        Rating.find_or_create_by!(ratable: movie)
+      end
+
+      it 'sets the polymorphic id' do
+        expect(document.ratable_id).to eq(movie.id)
+      end
+
+      it 'sets the type field' do
+        expect(document.ratable_type).to eq('Movie')
+      end
+    end
   end
 
   describe ".find_or_initialize_by" do
@@ -498,6 +582,25 @@ describe Mongoid::Criteria::Modifiable do
         it "calls the block" do
           expect(person.pets).to be true
         end
+      end
+    end
+
+    context 'when the object is polymorphic' do
+
+      let(:movie) do
+        Movie.new
+      end
+
+      let(:document) do
+        Rating.find_or_initialize_by(ratable: movie)
+      end
+
+      it 'sets the polymorphic id' do
+        expect(document.ratable_id).to eq(movie.id)
+      end
+
+      it 'sets the type field' do
+        expect(document.ratable_type).to eq('Movie')
       end
     end
   end
@@ -649,7 +752,7 @@ describe Mongoid::Criteria::Modifiable do
             band = Band.create
             Mongoid::Criteria.new(Record) do |criteria|
               criteria.embedded = true
-              criteria.metadata = Band.reflect_on_association(:records)
+              criteria.association = Band.reflect_on_association(:records)
               criteria.parent_document = band
               criteria.selector = { "records" => { "producers"=>{"$in"=>["nonexistent"] } } }
             end
@@ -700,6 +803,29 @@ describe Mongoid::Criteria::Modifiable do
 
         it "returns a persisted document" do
           expect(document).to be_persisted
+        end
+      end
+
+      context 'when the object is polymorphic' do
+
+        let(:movie) do
+          Movie.new
+        end
+
+        let(:criteria) do
+          Rating.where(ratable: movie)
+        end
+
+        let(:document) do
+          criteria.first_or_create
+        end
+
+        it 'sets the polymorphic id' do
+          expect(document.ratable_id).to eq(movie.id)
+        end
+
+        it 'sets the type field' do
+          expect(document.ratable_type).to eq('Movie')
         end
       end
 
@@ -919,6 +1045,29 @@ describe Mongoid::Criteria::Modifiable do
         end
       end
     end
+
+    context 'when the object is polymorphic' do
+
+      let(:movie) do
+        Movie.new
+      end
+
+      let(:criteria) do
+        Rating.where(ratable: movie)
+      end
+
+      let(:document) do
+        criteria.first_or_create!
+      end
+
+      it 'sets the polymorphic id' do
+        expect(document.ratable_id).to eq(movie.id)
+      end
+
+      it 'sets the type field' do
+        expect(document.ratable_type).to eq('Movie')
+      end
+    end
   end
 
   describe "first_or_initialize" do
@@ -935,6 +1084,29 @@ describe Mongoid::Criteria::Modifiable do
 
       it "returns the document" do
         expect(found).to eq(band)
+      end
+    end
+
+    context 'when the object is polymorphic' do
+
+      let(:movie) do
+        Movie.new
+      end
+
+      let(:criteria) do
+        Rating.where(ratable: movie)
+      end
+
+      let(:document) do
+        criteria.first_or_initialize
+      end
+
+      it 'sets the polymorphic id' do
+        expect(document.ratable_id).to eq(movie.id)
+      end
+
+      it 'sets the type field' do
+        expect(document.ratable_type).to eq('Movie')
       end
     end
 

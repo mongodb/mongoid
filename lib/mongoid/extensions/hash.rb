@@ -106,8 +106,11 @@ module Mongoid
         value = self
         keys.each do |key|
           return nil if value.nil?
-          nested = value[key] || value[key.to_i]
-          value = nested
+          value_for_key = value[key]
+          if value_for_key.nil? && key.to_i.to_s == key
+            value_for_key = value[key.to_i]
+          end
+          value = value_for_key
         end
         value
       end
@@ -162,10 +165,11 @@ module Mongoid
       # @api private
       #
       # @example Mongoize for the klass, field and value.
-      #   {}.mongoize_for(Band, "name", "test")
+      #   {}.mongoize_for("$push", Band, "name", "test")
       #
+      # @param [ String ] operator The operator.
       # @param [ Class ] klass The model class.
-      # @param [ String, Symbol ] The field key.
+      # @param [ String, Symbol ] key The field key.
       # @param [ Object ] value The value to mongoize.
       #
       # @return [ Object ] The mongoized value.

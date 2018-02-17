@@ -88,6 +88,17 @@ describe Mongoid::Factory do
         expect(person.title).to eq("Sir")
       end
     end
+
+    context "when the type is a symbol" do
+
+      let(:person) do
+        described_class.build(Person, { :_type => "Doctor" })
+      end
+
+      it "instantiates the subclass" do
+        expect(person.class).to eq(Doctor)
+      end
+    end
   end
 
   describe ".from_db" do
@@ -180,6 +191,24 @@ describe Mongoid::Factory do
       it "sets the attributes" do
         expect(document.title).to eq("Sir")
       end
+    end
+
+    context 'when type does not correspond to a Class name' do
+
+      let(:attributes) do
+        { "title" => "Sir", "_type" => "invalid_class_name" }
+      end
+
+      let(:person) do
+        described_class.from_db(Person, attributes)
+      end
+
+      it 'raises a exception' do
+        expect {
+          person
+        }.to raise_exception(Mongoid::Errors::UnknownModel)
+      end
+
     end
   end
 end

@@ -222,9 +222,11 @@ module Mongoid
           super
         else
           unless cursor = cached_cursor
-            server = read.select_server(cluster)
-            cursor = CachedCursor.new(view, send_initial_query(server), server)
-            QueryCache.cache_table[cache_key] = cursor
+            read_with_retry do
+              server = server_selector.select_server(cluster)
+              cursor = CachedCursor.new(view, send_initial_query(server), server)
+              QueryCache.cache_table[cache_key] = cursor
+            end
           end
           cursor.each do |doc|
             yield doc

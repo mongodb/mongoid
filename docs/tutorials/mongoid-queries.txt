@@ -163,13 +163,13 @@ Mongoid also has some helpful methods on criteria.
      -
         .. code-block:: ruby
 
-          Band.find_or_initialize_by(name: "Photek")
-          Band.where(:likes.gt => 10).find_or_initialize_by(name: "Photek")
+           Band.find_or_initialize_by(name: "Photek")
+           Band.where(:likes.gt => 10).find_or_initialize_by(name: "Photek")
 
    * - ``Criteria#first|last``
 
        *Finds a single document given the provided criteria. This automatically adds a sort on id.
-        Opt out of adding the id sort with the {id_sort: :none} option.*
+       Opt out of adding the id sort with the {id_sort: :none} option.*
 
      -
         .. code-block:: ruby
@@ -393,7 +393,7 @@ document inserts, updates, and deletion.
 
    * - ``Criteria#push_all``
 
-       *Perform a $pushAll on all matching documents.*
+       *Perform a $push with $each on all matching documents.*
 
      -
         .. code-block:: ruby
@@ -553,7 +553,7 @@ that would affect its visibility within the scoped relation.
     include Mongoid::Document
     field :active, default: true
     embedded_in :label
-    default_scoped ->{ where(active: true) }
+    default_scope ->{ where(active: true) }
   end
 
   label.bands.push(band)

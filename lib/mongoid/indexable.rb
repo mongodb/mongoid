@@ -28,8 +28,11 @@ module Mongoid
       # @since 1.0.0
       def create_indexes
         return unless index_specifications
+
+        default_options = {background: Config.background_indexing}
+
         index_specifications.each do |spec|
-          key, options = spec.key, spec.options
+          key, options = spec.key, default_options.merge(spec.options)
           if database = options[:database]
             with(database: database) do |klass|
               klass.collection.indexes.create_one(key, options.except(:database))
@@ -92,7 +95,7 @@ module Mongoid
       #     index({ name: 1 }, { background: true })
       #   end
       #
-      # @param [ Symbol ] name The name of the field.
+      # @param [ Symbol ] spec The index spec.
       # @param [ Hash ] options The index options.
       #
       # @return [ Hash ] The index options.
@@ -110,7 +113,8 @@ module Mongoid
       # @example Get the index specification.
       #   Model.index_specification(name: 1)
       #
-      # @param [ Hash ] key The index key/direction pair.
+      # @param [ Hash ] index_hash The index key/direction pair.
+      # @param [ String ] index_name The index name.
       #
       # @return [ Specification ] The found specification.
       #

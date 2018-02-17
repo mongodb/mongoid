@@ -26,7 +26,7 @@ module Mongoid
           # @example Merge the hash into the array.
           #   { field: value }.__add_from_array__([ 1, 2 ])
           #
-          # @param [ Array ] value The array to add to.
+          # @param [ Array ] array The array to add to.
           #
           # @return [ Hash ] The merged hash.
           #
@@ -54,7 +54,7 @@ module Mongoid
           # @example Merge the hash into the array.
           #   { field: value }.__intersect_from_array__([ 1, 2 ])
           #
-          # @param [ Array ] value The array to intersect to.
+          # @param [ Array ] array The array to intersect to.
           #
           # @return [ Hash ] The merged hash.
           #
@@ -68,7 +68,7 @@ module Mongoid
           # @example Merge the hash into the object.
           #   { field: value }.__intersect_from_object__([ 1, 2 ])
           #
-          # @param [ Object ] value The object to intersect to.
+          # @param [ Object ] object The object to intersect to.
           #
           # @return [ Hash ] The merged hash.
           #
@@ -96,7 +96,7 @@ module Mongoid
           # @example Merge the hash into the object.
           #   { field: value }.__union_from_object__([ 1, 2 ])
           #
-          # @param [ Object ] value The object to union to.
+          # @param [ Object ] object The object to union to.
           #
           # @return [ Hash ] The merged hash.
           #

@@ -122,22 +122,22 @@ module Mongoid
 
       module ClassMethods
 
-        # Convert the provided object to a propery array of foreign keys.
+        # Convert the provided object to a proper array of foreign keys.
         #
         # @example Mongoize the object.
         #   Array.__mongoize_fk__(constraint, object)
         #
-        # @param [ Constraint ] constraint The metadata constraint.
+        # @param [ Association ] association The association metadata.
         # @param [ Object ] object The object to convert.
         #
         # @return [ Array ] The array of ids.
         #
         # @since 3.0.0
-        def __mongoize_fk__(constraint, object)
+        def __mongoize_fk__(association, object)
           if object.resizable?
-            object.blank? ? object : constraint.convert(object)
+            object.blank? ? object : association.convert_to_foreign_key(object)
           else
-            object.blank? ? [] : constraint.convert(Array(object))
+            object.blank? ? [] : association.convert_to_foreign_key(Array(object))
           end
         end
 

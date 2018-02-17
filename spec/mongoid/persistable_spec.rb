@@ -200,6 +200,21 @@ describe Mongoid::Persistable do
         expect(document.atomically).to be true
       end
     end
+
+    context "when the block has no operations" do
+        before do
+          expect_any_instance_of(Mongo::Collection::View).to_not receive(:update_one)
+        end
+
+        let!(:update) do
+          document.atomically do
+          end
+        end
+
+        it "doesn't update the document" do
+          expect(document.reload.origin).to eq("London")
+        end
+    end
   end
 
   describe "#fail_due_to_valiation!" do

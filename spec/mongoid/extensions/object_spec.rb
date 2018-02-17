@@ -39,12 +39,8 @@ describe Mongoid::Extensions::Object do
 
     context "when the related model uses object ids" do
 
-      let(:metadata) do
+      let(:association) do
         Game.relations["person"]
-      end
-
-      let(:constraint) do
-        metadata.constraint
       end
 
       context "when provided an object id" do
@@ -54,7 +50,7 @@ describe Mongoid::Extensions::Object do
         end
 
         let(:fk) do
-          Object.__mongoize_fk__(constraint, object_id)
+          Object.__mongoize_fk__(association, object_id)
         end
 
         it "returns the object id" do
@@ -71,7 +67,7 @@ describe Mongoid::Extensions::Object do
           end
 
           let(:fk) do
-            Object.__mongoize_fk__(constraint, object_id.to_s)
+            Object.__mongoize_fk__(association, object_id.to_s)
           end
 
           it "returns the object id" do
@@ -86,7 +82,7 @@ describe Mongoid::Extensions::Object do
           end
 
           let(:fk) do
-            Object.__mongoize_fk__(constraint, string)
+            Object.__mongoize_fk__(association, string)
           end
 
           it "returns the string" do
@@ -97,7 +93,7 @@ describe Mongoid::Extensions::Object do
         context "when the string is blank" do
 
           let(:fk) do
-            Object.__mongoize_fk__(constraint, "")
+            Object.__mongoize_fk__(association, "")
           end
 
           it "returns nil" do
@@ -109,7 +105,7 @@ describe Mongoid::Extensions::Object do
       context "when provided nil" do
 
         let(:fk) do
-          Object.__mongoize_fk__(constraint, nil)
+          Object.__mongoize_fk__(association, nil)
         end
 
         it "returns nil" do
@@ -120,7 +116,7 @@ describe Mongoid::Extensions::Object do
       context "when provided an empty array" do
 
         let(:fk) do
-          Object.__mongoize_fk__(constraint, [])
+          Object.__mongoize_fk__(association, [])
         end
 
         it "returns an empty array" do

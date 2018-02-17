@@ -88,6 +88,22 @@ module Mongoid
           pipeline
         end
 
+        # Perform a deep copy of the options.
+        #
+        # @example Perform a deep copy.
+        #   options.__deep_copy__
+        #
+        # @return [ Options ] The copied options.
+        #
+        # @since 6.1.1
+        def __deep_copy__
+          self.class.new(aliases, serializers) do |copy|
+            each_pair do |key, value|
+              copy.merge!(key => value.__deep_copy__)
+            end
+          end
+        end
+
         private
 
         # Evolve a single key selection with various types of values.

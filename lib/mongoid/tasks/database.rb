@@ -36,7 +36,8 @@ module Mongoid
       # @example Return the list of unused indexes.
       #   Mongoid::Tasks::Database.undefined_indexes
       #
-      # @return Hash{Class => Array(Hash)} The list of undefined indexes by model.
+      # @return [ Array<Hash> ] The list of undefined indexes by model.
+      #
       def undefined_indexes(models = ::Mongoid.models)
         undefined_by_model = {}
 

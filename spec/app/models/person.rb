@@ -85,7 +85,7 @@ class Person
 
   has_many \
     :posts,
-    dependent: :delete,
+    dependent: :delete_all,
     validate: false do
     def extension
       "Testing"
@@ -105,7 +105,7 @@ class Person
   has_one :account, validate: false
   has_one :cat, dependent: :nullify, validate: false, primary_key: :username
   has_one :book, autobuild: true, validate: false
-  has_one :home, dependent: :delete, validate: false
+  has_one :home, dependent: :delete_all, validate: false
 
   has_and_belongs_to_many \
     :administrated_events,
@@ -113,6 +113,9 @@ class Person
     inverse_of: :administrators,
     dependent:  :nullify,
     validate: false
+
+  belongs_to :mother, class_name: 'Person'
+  has_many :children, class_name: 'Person'
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :name, update_only: true

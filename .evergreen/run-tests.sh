@@ -14,16 +14,38 @@ export CI=evergreen
 export JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
 
 source ~/.rvm/scripts/rvm
-rvm install $RVM_RUBY
-rvm use $RVM_RUBY
-gem install bundler
 
-if [ "$DRIVER" == "master" ]; then
-  bundle install --gemfile=gemfiles/driver_master.gemfile
-elif [ "$RAILS" == "master" ]; then
-    bundle install --gemfile=gemfiles/rails_master.gemfile
-else
-  bundle install
+# Necessary for jruby
+export JAVACMD=/opt/java/jdk8/bin/java
+export PATH=$PATH:/opt/java/jdk8/bin
+
+if [ "$RVM_RUBY" == "ruby-head" ]; then
+  rvm reinstall $RVM_RUBY
 fi
 
-bundle exec rake spec
+# Don't errexit because this may call scripts which error
+set +o errexit
+rvm use $RVM_RUBY
+set -o errexit
+
+# Ensure we're using the right ruby
+python - <<EOH
+ruby = "${RVM_RUBY}".split("-")[0]
+version = "${RVM_RUBY}".split("-")[1]
+assert(ruby in "`ruby --version`")
+assert(version in "`ruby --version`")
+EOH
+
+gem install bundler
+
+
+if [ $DRIVER == "master" ]; then
+  bundle install --gemfile=gemfiles/driver_master.gemfile
+  BUNDLE_GEMFILE=gemfiles/driver_master.gemfile bundle exec rake spec
+elif [ $RAILS == "master" ]; then
+  bundle install --gemfile=gemfiles/rails_master.gemfile
+  BUNDLE_GEMFILE=gemfiles/rails_master.gemfile bundle exec rake spec
+else
+  bundle install
+  bundle exec rake spec
+fi

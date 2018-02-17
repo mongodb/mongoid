@@ -14,8 +14,6 @@ module Mongoid
     # @example Clone the document.
     #   document.clone
     #
-    # @param [ Document ] other The document getting cloned.
-    #
     # @return [ Document ] The new document.
     def clone
       # @note This next line is here to address #2704, even though having an
@@ -47,8 +45,6 @@ module Mongoid
     # @example clone document
     #   model.clone_document
     #
-    # @param [ Hash ] dcoument The document with hash format
-    #
     # @since 3.0.22
     def clone_document
       attrs = as_attributes.__deep_copy__
@@ -73,15 +69,15 @@ module Mongoid
           attrs["#{name}_translations"] = value
         end
       end
-      klass.embedded_relations.each do |_, metadata|
-        next unless attrs.present? && attrs[metadata.key].present?
+      klass.embedded_relations.each do |_, association|
+        next unless attrs.present? && attrs[association.key].present?
 
-        if metadata.macro == :embeds_many
-          attrs[metadata.key].each do |attr|
-            process_localized_attributes(metadata.klass, attr)
+        if association.is_a?(Association::Embedded::EmbedsMany)
+          attrs[association.name.to_s].each_with_index do |attr, index|
+            process_localized_attributes(send(association.name)[index].class, attr)
           end
         else
-          process_localized_attributes(metadata.klass, attrs[metadata.key])
+          process_localized_attributes(association.klass, attrs[association.key])
         end
       end
     end

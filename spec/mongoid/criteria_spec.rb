@@ -412,7 +412,7 @@ describe Mongoid::Criteria do
       end
 
       let(:criteria) do
-        Band.where(name: "Depeche Mode").asc(:name).includes(:records)
+        Band.where(name: "Depeche Mode").asc(:name).includes(:records).read(mode: :secondary)
       end
 
       before do
@@ -433,7 +433,7 @@ describe Mongoid::Criteria do
       end
 
       it "contains equal options" do
-        expect(clone.options).to eq({ sort: { "name" => 1 }})
+        expect(clone.options).to eq({ sort: { "name" => 1 }, read: { mode: :secondary } })
       end
 
       it "clones the options" do
@@ -466,6 +466,10 @@ describe Mongoid::Criteria do
 
       it "sets the context to nil" do
         expect(clone.instance_variable_get(:@context)).to be_nil
+      end
+
+      it 'does not convert the option keys to string from symbols' do
+        expect(clone.options[:read][:mode]).to eq(:secondary)
       end
     end
   end
@@ -1440,18 +1444,18 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when including the same metadata multiple times" do
+    context "when including the same association multiple times" do
 
       let(:criteria) do
         Person.all.includes(:posts, :posts).includes(:posts)
       end
 
-      let(:metadata) do
+      let(:association) do
         Person.reflect_on_association(:posts)
       end
 
-      it "does not duplicate the metadata in the inclusions" do
-        expect(criteria.inclusions).to eq([ metadata ])
+      it "does not duplicate the association in the inclusions" do
+        expect(criteria.inclusions).to eq([ association ])
       end
     end
 
@@ -2213,12 +2217,12 @@ describe Mongoid::Criteria do
       Band.includes(:records)
     end
 
-    let(:metadata) do
+    let(:association) do
       Band.relations["records"]
     end
 
     it "returns the inclusions" do
-      expect(criteria.inclusions).to eq([ metadata ])
+      expect(criteria.inclusions).to eq([ association ])
     end
   end
 
@@ -2228,16 +2232,16 @@ describe Mongoid::Criteria do
       Band.all
     end
 
-    let(:metadata) do
+    let(:association) do
       Band.relations["records"]
     end
 
     before do
-      criteria.inclusions = [ metadata ]
+      criteria.inclusions = [ association ]
     end
 
     it "sets the inclusions" do
-      expect(criteria.inclusions).to eq([ metadata ])
+      expect(criteria.inclusions).to eq([ association ])
     end
   end
 
@@ -2405,7 +2409,7 @@ describe Mongoid::Criteria do
         end
       end
 
-      let(:metadata) do
+      let(:association) do
         Band.relations["records"]
       end
 
@@ -2430,7 +2434,7 @@ describe Mongoid::Criteria do
       end
 
       it "merges the inclusions" do
-        expect(merged.inclusions).to eq([ metadata ])
+        expect(merged.inclusions).to eq([ association ])
       end
 
       it "returns a new criteria" do
@@ -2444,7 +2448,7 @@ describe Mongoid::Criteria do
         { klass: Band, includes: [ :records ] }
       end
 
-      let(:metadata) do
+      let(:association) do
         Band.relations["records"]
       end
 
@@ -2465,7 +2469,7 @@ describe Mongoid::Criteria do
       end
 
       it "merges the inclusions" do
-        expect(merged.inclusions).to eq([ metadata ])
+        expect(merged.inclusions).to eq([ association ])
       end
 
       it "returns a new criteria" do
@@ -2490,7 +2494,7 @@ describe Mongoid::Criteria do
       end
     end
 
-    let(:metadata) do
+    let(:association) do
       Band.relations["records"]
     end
 
@@ -2515,7 +2519,7 @@ describe Mongoid::Criteria do
     end
 
     it "merges the inclusions" do
-      expect(merged.inclusions).to eq([ metadata ])
+      expect(merged.inclusions).to eq([ association ])
     end
 
     it "returns the same criteria" do

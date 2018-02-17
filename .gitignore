@@ -25,3 +25,4 @@ yard-docs
 .idea
 gem-private_key.pem
 examples
+.byebug_history

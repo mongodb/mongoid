@@ -60,7 +60,7 @@ module Mongoid
         # @example Add a projection to the pipeline.
         #   aggregable.project(author: 1, name: 0)
         #
-        # @param [ Hash ] criterion The projection to make.
+        # @param [ Hash ] operation The projection to make.
         #
         # @return [ Aggregable ] The aggregable.
         #

@@ -94,7 +94,7 @@ module Mongoid
       #   object.do_or_do_not(:use, "The Force")
       #
       # @param [ String, Symbol ] name The method name.
-      # @param [ Array ] *args The arguments.
+      # @param [ Array ] args The arguments.
       #
       # @return [ Object, nil ] The result of the method call or nil if the
       #   method does not exist.
@@ -209,7 +209,7 @@ module Mongoid
       #   object.you_must(:use, "The Force")
       #
       # @param [ String, Symbol ] name The method name.
-      # @param [ Array ] *args The arguments.
+      # @param [ Array ] args The arguments.
       #
       # @return [ Object, nil ] The result of the method call or nil if the
       #   method does not exist. Nil if the object is frozen.
@@ -225,17 +225,17 @@ module Mongoid
         # contstraint.
         #
         # @example Convert the object to a fk.
-        #   Object.__mongoize_fk__(constraint, object)
+        #   Object.__mongoize_fk__(association, object)
         #
-        # @param [ Constraint ] constraint The constraint.
+        # @param [ Association ] association The association metadata.
         # @param [ Object ] object The object to convert.
         #
         # @return [ Object ] The converted object.
         #
         # @since 3.0.0
-        def __mongoize_fk__(constraint, object)
+        def __mongoize_fk__(association, object)
           return nil if !object || object == ""
-          constraint.convert(object)
+          association.convert_to_foreign_key(object)
         end
 
         # Convert the object from its mongo friendly ruby type to this type.

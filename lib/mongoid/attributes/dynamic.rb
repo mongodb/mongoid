@@ -13,7 +13,8 @@ module Mongoid
       # @example Does this object respond to the method?
       #   person.respond_to?(:title)
       #
-      # @param [ Array ] *args The name of the method.
+      # @param [ Array ] name The name of the method.
+      # @param [ true, false ] include_private
       #
       # @return [ true, false ] True if it does, false if not.
       #
@@ -40,7 +41,7 @@ module Mongoid
         class_eval <<-READER, __FILE__, __LINE__ + 1
           def #{name}
             attribute_will_change!(#{name.inspect})
-            read_attribute(#{name.inspect})
+            read_raw_attribute(#{name.inspect})
           end
         READER
       end
@@ -126,7 +127,7 @@ module Mongoid
       #   document.method_missing(:test)
       #
       # @param [ String, Symbol ] name The name of the method.
-      # @param [ Array ] *args The arguments to the method.
+      # @param [ Array ] args The arguments to the method.
       #
       # @return [ Object ] The result of the method call.
       #
@@ -146,7 +147,7 @@ module Mongoid
           getter = attr.reader
           define_dynamic_reader(getter)
           attribute_will_change!(attr.reader)
-          read_attribute(getter)
+          read_raw_attribute(getter)
         end
       end
     end

@@ -63,9 +63,10 @@ module Mongoid
       # @example Initialize the new map/reduce.
       #   MapReduce.new(criteria, map, reduce)
       #
+      # @param [ Mongo::Collection ] collection The collection to run the
+      #   operation on.
       # @param [ Criteria ] criteria The Mongoid criteria.
-      # @param [ String ] map The map js function.
-      # @param [ String ] reduce The reduce js function.
+      # @param [ String ] near
       #
       # @since 3.0.0
       def initialize(collection, criteria, near)
@@ -241,7 +242,7 @@ module Mongoid
       # @since 3.0.0
       def documents
         results["results"].map do |attributes|
-          doc = Factory.from_db(criteria.klass, attributes["obj"], criteria.options[:fields])
+          doc = Factory.from_db(criteria.klass, attributes["obj"], criteria)
           doc.attributes["geo_near_distance"] = attributes["dis"]
           doc
         end

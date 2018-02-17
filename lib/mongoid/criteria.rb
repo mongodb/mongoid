@@ -35,7 +35,7 @@ module Mongoid
     # @since 4.0.0
     CHECK = []
 
-    attr_accessor :embedded, :klass, :parent_document, :metadata
+    attr_accessor :embedded, :klass, :parent_document, :association
 
     # Returns true if the supplied +Enumerable+ or +Criteria+ is equal to the results
     # of this +Criteria+ or the criteria itself.
@@ -389,7 +389,7 @@ module Mongoid
     # @example Add a javascript selection.
     #   criteria.where("this.name == 'syd'")
     #
-    # @param [ String, Hash ] criterion The javascript or standard selection.
+    # @param [ String, Hash ] expression The javascript or standard selection.
     #
     # @raise [ UnsupportedJavascript ] If provided a string and the criteria
     #   is embedded.

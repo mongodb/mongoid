@@ -227,7 +227,7 @@ module Mongoid
     # @since 2.3.0
     def attribute_will_change!(attr)
       unless changed_attributes.key?(attr)
-        changed_attributes[attr] = read_attribute(attr).__deep_copy__
+        changed_attributes[attr] = read_raw_attribute(attr).__deep_copy__
       end
     end
 
@@ -265,7 +265,7 @@ module Mongoid
       #   Model.create_dirty_methods("name", "name")
       #
       # @param [ String ] name The name of the field.
-      # @param [ String ] name The name of the accessor.
+      # @param [ String ] meth The name of the accessor.
       #
       # @return [ Module ] The fields module.
       #

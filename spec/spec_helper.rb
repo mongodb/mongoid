@@ -57,7 +57,8 @@ CONFIG = {
       hosts: [ "#{HOST}:#{PORT}" ],
       options: {
         server_selection_timeout: 0.5,
-        max_pool_size: 1,
+        wait_queue_timeout: 5,
+        max_pool_size: 5,
         heartbeat_frequency: 180,
         user: MONGOID_ROOT_USER.name,
         password: MONGOID_ROOT_USER.password,
@@ -82,6 +83,10 @@ def collation_supported?
   Mongoid::Clients.default.cluster.next_primary.features.collation_enabled?
 end
 alias :decimal128_supported? :collation_supported?
+
+def array_filters_supported?
+  Mongoid::Clients.default.cluster.next_primary.features.array_filters_enabled?
+end
 
 def testing_locally?
   !(ENV['CI'] == 'travis')
@@ -134,10 +139,17 @@ RSpec.configure do |config|
       client.database.users.create(MONGOID_ROOT_USER)
     rescue Exception => e
     end
+    Mongoid.purge!
   end
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
+    Mongoid.default_client.collections.each do |coll|
+      coll.delete_many
+    end
+  end
+
+  config.after(:suite) do
     Mongoid.purge!
   end
 end

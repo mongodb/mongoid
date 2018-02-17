@@ -29,7 +29,7 @@ module Mongoid
     #
     # @since 1.0.0
     def attribute_present?(name)
-      attribute = read_attribute(name)
+      attribute = read_raw_attribute(name)
       !attribute.blank? || attribute == false
     rescue ActiveModel::MissingAttributeError
       false
@@ -92,21 +92,15 @@ module Mongoid
     #
     # @since 1.0.0
     def read_attribute(name)
-      normalized = database_field_name(name.to_s)
-      if attribute_missing?(normalized)
-        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
-      end
-      if hash_dot_syntax?(normalized)
-        attributes.__nested__(normalized)
-      else
-        attributes[normalized]
-      end
+      field = fields[name.to_s]
+      raw = read_raw_attribute(name)
+      field ? field.demongoize(raw) : raw
     end
     alias :[] :read_attribute
 
     # Read a value from the attributes before type cast. If the value has not
     # yet been assigned then this will return the attribute's existing value
-    # using read_attribute.
+    # using read_raw_attribute.
     #
     # @example Read an attribute before type cast.
     #   person.read_attribute_before_type_cast(:price)
@@ -122,7 +116,7 @@ module Mongoid
       if attributes_before_type_cast.key?(attr)
         attributes_before_type_cast[attr]
       else
-        read_attribute(attr)
+        read_raw_attribute(attr)
       end
     end
 
@@ -163,7 +157,8 @@ module Mongoid
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      as_writable_attribute!(name) do |access|
+      access = database_field_name(name)
+      if attribute_writable?(access)
         _assigning do
           validate_attribute_value(access, value)
           localized = fields[access].try(:localized?)
@@ -215,7 +210,6 @@ module Mongoid
     #   person.attributes = { :title => "Mr." }
     #
     # @param [ Hash ] attrs The new attributes to set.
-    # @param [ Boolean ] guard_protected_attributes False to skip mass assignment protection.
     #
     # @since 1.0.0
     def write_attributes(attrs = nil)
@@ -293,6 +287,20 @@ module Mongoid
       fields.key?(key) ? fields[key].mongoize(value) : value.mongoize
     end
 
+    private
+
+    def read_raw_attribute(name)
+      normalized = database_field_name(name.to_s)
+      if attribute_missing?(normalized)
+        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
+      end
+      if hash_dot_syntax?(normalized)
+        attributes.__nested__(normalized)
+      else
+        attributes[normalized]
+      end
+    end
+
     module ClassMethods
 
       # Alias the provided name to the original field. This will provide an
@@ -333,7 +341,7 @@ module Mongoid
     # the value is valid for given a field.
     # For now, only Hash and Array fields are validated.
     #
-    # @param [ String, Symbol ] name The name of the attribute to validate.
+    # @param [ String, Symbol ] access The name of the attribute to validate.
     # @param [ Object ] value The to be validated.
     #
     # @since 3.0.10

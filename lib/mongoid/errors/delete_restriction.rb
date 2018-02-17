@@ -11,8 +11,8 @@ module Mongoid
       # @example Create the new callbacks error.
       #   Callbacks.new(Post, :create!)
       #
-      # @param [ Class ] klass The class of the document.
-      # @param [ Symbol ] method The name of the method.
+      # @param [ Class ] document
+      # @param [ Symbol ] relation
       #
       # @since 3.0.0
       def initialize(document, relation)

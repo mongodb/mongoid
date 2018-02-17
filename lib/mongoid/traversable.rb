@@ -8,7 +8,7 @@ module Mongoid
     extend ActiveSupport::Concern
 
     def _parent
-      @__parent
+      @__parent ||= nil
     end
 
     def _parent=(p)
@@ -40,7 +40,7 @@ module Mongoid
     # @since 2.4.0
     def collect_children
       children = []
-      embedded_relations.each_pair do |name, metadata|
+      embedded_relations.each_pair do |name, association|
         without_autobuild do
           child = send(name)
           Array.wrap(child).each do |doc|
@@ -101,7 +101,7 @@ module Mongoid
     #
     # @since 2.0.0.beta.1
     def remove_child(child)
-      name = child.metadata_name
+      name = child.association_name
       if child.embedded_one?
         remove_ivar(name)
       else

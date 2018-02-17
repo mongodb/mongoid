@@ -180,9 +180,13 @@ module Mongoid
         end
         if embedded?
           attributes[:_parent] = parent_document
-          attributes[:__metadata] = metadata
+          attributes[:_association] = association
         end
-        klass.__send__(method, attributes, &block)
+        if polymorphic? && @criterion
+          klass.__send__(method, attributes.merge(@criterion), &block)
+        else
+          klass.__send__(method, attributes, &block)
+        end
       end
 
       # Find the first object or create/initialize it.

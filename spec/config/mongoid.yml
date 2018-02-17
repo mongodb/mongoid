@@ -32,6 +32,7 @@ test:
     log_level: :warn
     belongs_to_required_by_default: false
     app_name: 'testing'
+    background_indexing: false
 test_with_max_staleness:
   clients:
     default:
