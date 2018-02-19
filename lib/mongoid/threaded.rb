@@ -335,7 +335,7 @@ module Mongoid
     #
     # @since 6.4.0
     def set_session(session)
-      Thread.current['session'] = session
+      Thread.current[:session] = session
     end
 
     # Get the cached session for this thread.
@@ -347,7 +347,7 @@ module Mongoid
     #
     # @since 6.4.0
     def get_session
-      Thread.current['session']
+      Thread.current[:session]
     end
 
     # Clear the cached session for this thread.
@@ -361,7 +361,7 @@ module Mongoid
     def clear_session
       session = get_session
       session.end_session if session
-      Thread.current['session'] = nil
+      Thread.current[:session] = nil
     end
   end
 end

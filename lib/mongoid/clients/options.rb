@@ -47,11 +47,6 @@ module Mongoid
 
       private
 
-
-      def session
-        Threaded.get_session
-      end
-
       def set_persistence_context(options_or_context)
         PersistenceContext.set(self, options_or_context)
       end
@@ -106,12 +101,6 @@ module Mongoid
 
         def persistence_context
           PersistenceContext.get(self) || PersistenceContext.new(self)
-        end
-
-        private
-
-        def session
-          Threaded.get_session
         end
       end
     end

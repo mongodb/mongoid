@@ -53,6 +53,10 @@ module Mongoid
 
       private
 
+      def session
+        Threaded.get_session
+      end
+
       module ClassMethods
 
         # Execute a block within the context of a session.
@@ -94,6 +98,12 @@ module Mongoid
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
         ensure
           Threaded.clear_session
+        end
+
+        private
+
+        def session
+          Threaded.get_session
         end
       end
     end
