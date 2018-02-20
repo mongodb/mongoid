@@ -9,6 +9,11 @@ rvm:
   - ruby-head
   - jruby-9.1.15.0
 
+branches:
+  only:
+  - master
+  - 6.4.0-stable
+
 before_install:
   - gem update --system
   - gem update bundler
