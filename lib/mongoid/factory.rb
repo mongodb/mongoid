@@ -49,8 +49,11 @@ module Mongoid
         obj
       else
         camelized = type.camelize
-        raise Errors::UnknownModel.new(camelized, type) unless Object.const_defined?(camelized)
-        camelized.constantize.instantiate(attributes, selected_fields)
+        begin
+          camelized.constantize.instantiate(attributes, selected_fields)
+        rescue NameError
+          raise Errors::UnknownModel.new(camelized, type)
+        end
       end
     end
   end
