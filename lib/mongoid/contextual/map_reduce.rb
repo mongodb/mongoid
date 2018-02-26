@@ -166,7 +166,7 @@ module Mongoid
         validate_out!
         cmd = command
         opts = { read: cmd.delete(:read).options } if cmd[:read]
-        @map_reduce.database.command(cmd, opts || {}).first
+        @map_reduce.database.command(cmd, opts.merge(session: session)).first
       end
       alias :results :raw
 

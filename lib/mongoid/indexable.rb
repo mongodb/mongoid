@@ -56,7 +56,7 @@ module Mongoid
         indexed_database_names.each do |database|
           with(database: database) do |klass|
             begin
-              klass.collection.indexes.each do |spec|
+              klass.collection.indexes(session: session).each do |spec|
                 unless spec["name"] == "_id_"
                   klass.collection.indexes(session: session).drop_one(spec["key"])
                   logger.info(
