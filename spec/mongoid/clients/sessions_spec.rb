@@ -42,6 +42,28 @@ describe Mongoid::Clients::Sessions do
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
       end
 
+      context 'when another thread is started' do
+
+        let!(:last_use_diff) do
+          Person.with_session do |session|
+            Person.create
+            Person.create
+            last_use = session.instance_variable_get(:@server_session).last_use
+            Thread.new { Person.create }.value
+            session.instance_variable_get(:@server_session).last_use - last_use
+          end
+        end
+
+        it 'does not use the session for that thread' do
+          expect(Person.count).to be(2)
+          expect(Person.with(client: :default) { Person.count }).to be(1)
+          lsids_sent = insert_events.collect { |event| event.command['lsid'] }
+          expect(lsids_sent.size).to eq(2)
+          expect(lsids_sent.uniq.size).to eq(1)
+          expect(last_use_diff).to eq(0)
+        end
+      end
+
       context 'when the operations in the session block are all on the class' do
 
         before do
@@ -51,14 +73,11 @@ describe Mongoid::Clients::Sessions do
           end
         end
 
-        let(:insert_events) do
-          subscriber.started_events.select { |event| event.command['insert'] }
-        end
-
         it 'uses a single session id for all operations on the class' do
           expect(Person.count).to be(2)
-          expect(insert_events).not_to be_empty
-          expect(insert_events.collect { |event| event.command['lsid'] }.uniq.size).to eq(1)
+          lsids_sent = insert_events.collect { |event| event.command['lsid'] }
+          expect(lsids_sent.size).to eq(2)
+          expect(lsids_sent.uniq.size).to eq(1)
         end
       end
 
@@ -77,9 +96,10 @@ describe Mongoid::Clients::Sessions do
           end
 
           it 'uses a single session id for all operations on the class' do
-            expect(insert_events).not_to be_empty
             expect(Post.with(client: :other) { |klass| klass.count }).to be(1)
-            expect(insert_events.collect { |event| event.command['lsid'] }.uniq.size).to eq(1)
+            lsids_sent = insert_events.collect { |event| event.command['lsid'] }
+            expect(lsids_sent.size).to eq(3)
+            expect(lsids_sent.uniq.size).to eq(1)
           end
         end
 
@@ -105,8 +125,9 @@ describe Mongoid::Clients::Sessions do
 
           it 'uses a single session id for all operations on the class' do
             expect(Person.count).to be(2)
-            expect(insert_events).not_to be_empty
-            expect(insert_events.collect { |event| event.command['lsid'] }.uniq.size).to eq(1)
+            lsids_sent = insert_events.collect { |event| event.command['lsid'] }
+            expect(lsids_sent.size).to eq(2)
+            expect(lsids_sent.uniq.size).to eq(1)
           end
         end
 
@@ -160,7 +181,7 @@ describe Mongoid::Clients::Sessions do
 
   context 'when a session is used on a model instance' do
 
-    let(:person) do
+    let!(:person) do
       Person.with(client: :other) do |klass|
         klass.create
       end
@@ -177,7 +198,7 @@ describe Mongoid::Clients::Sessions do
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
       end
 
-      context 'when the operations in the session block are all on the class' do
+      context 'when the operations in the session block are all on the instance' do
 
         before do
           person.with_session do
@@ -191,8 +212,9 @@ describe Mongoid::Clients::Sessions do
         it 'uses a single session id for all operations on the class' do
           expect(person.reload.username).to eq('Emily')
           expect(person.reload.age).to eq(80)
-          expect(update_events).not_to be_empty
-          expect(update_events.collect { |event| event.command['lsid'] }.uniq.size).to eq(1)
+          lsids_sent = update_events.collect { |event| event.command['lsid'] }
+          expect(lsids_sent.size).to eq(2)
+          expect(lsids_sent.uniq.size).to eq(1)
         end
       end
 
@@ -213,8 +235,13 @@ describe Mongoid::Clients::Sessions do
           it 'uses a single session id for all operations on the class' do
             expect(person.reload.username).to eq('Emily')
             expect(Post.with(client: :other) { Post.count }).to be(1)
-            expect(update_events).not_to be_empty
-            expect(update_events.collect { |event| event.command['lsid'] }.uniq.size).to eq(1)
+            update_lsids_sent = update_events.collect { |event| event.command['lsid'] }
+            expect(update_lsids_sent.size).to eq(3) # person update, counter cache, post assignment
+            expect(update_lsids_sent.uniq.size).to eq(1) # person update, counter cache, post assignment
+            insert_lsids_sent = insert_events.collect { |event| event.command['lsid'] }
+            expect(insert_lsids_sent.size).to eq(2)
+            expect(insert_lsids_sent.uniq.size).to eq(1)
+            expect(update_lsids_sent.uniq).to eq(insert_lsids_sent.uniq)
           end
         end
 
@@ -241,7 +268,8 @@ describe Mongoid::Clients::Sessions do
           it 'uses a single session id for all operations on the class' do
             expect(person.reload.username).to eq('Emily')
             expect(Post.count).to be(0)
-            expect(update_events.collect { |event| event.command['lsid'] }.uniq.size).to eq(1)
+            update_lsids_sent = update_events.collect { |event| event.command['lsid'] }
+            expect(update_lsids_sent.size).to eq(1)
           end
         end
 

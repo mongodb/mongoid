@@ -41,7 +41,7 @@ module Mongoid
         raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting) if Threaded.get_session
         session = persistence_context.client.start_session(options)
         Threaded.set_session(session)
-        yield
+        yield(session)
       rescue Mongo::Error::InvalidSession => ex
         if ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
           raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
@@ -90,7 +90,7 @@ module Mongoid
           raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting) if Threaded.get_session
           session = persistence_context.client.start_session(options)
           Threaded.set_session(session)
-          yield
+          yield(session)
         rescue Mongo::Error::InvalidSession => ex
           if ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
             raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
