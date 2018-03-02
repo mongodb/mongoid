@@ -134,9 +134,9 @@ module Mongoid
           unless updates.empty?
             coll = collection(_root)
             selector = atomic_selector
-            coll.find(selector).update_one(positionally(selector, updates))
+            coll.find(selector).update_one(positionally(selector, updates), session: session)
             conflicts.each_pair do |key, value|
-              coll.find(selector).update_one(positionally(selector, { key => value }))
+              coll.find(selector).update_one(positionally(selector, { key => value }), session: session)
             end
           end
         end
