@@ -27,6 +27,7 @@ module Mongoid
     include Modifiable
     include Scopable
     include Clients::Options
+    include Clients::Sessions
     include Options
 
     # Static array used to check with method missing - we only need to ever

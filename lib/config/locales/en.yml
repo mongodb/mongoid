@@ -216,6 +216,20 @@ en:
             \_\_\_\_include Mongoid::Document\n
             \_\_\_\_scope :inactive, ->{ where(active: false) }\n
             \_\_end\n\n"
+        invalid_session_use:
+          message: "A session was attempted to be used with a model whose client cannot use
+            that session."
+          summary: "Sessions are started via driver clients (Model#mongo_client) and, in most cases, driver
+            clients are shared across models. When different models have their own clients, a session cannot
+            be obtained via one model and used for operations on another model."
+          resolution: "Only execute operations on the model class or instances of the model through which
+            the session was created. Otherwise, ensure that all models on which operations are executed
+            in the session block share the same driver client. For example, a model may have a different
+            client specified in its 'store_in' options.\n\n"
+        invalid_session_nesting:
+          message: "A session was started while another session was being used."
+          summary: "Sessions cannot be nested. Only one session can be used in a thread at once."
+          resolution: "Only use one session at a time; sessions cannot be nested."
         invalid_storage_options:
           message: "Invalid options passed to %{klass}.store_in: %{options}."
           summary: "The :store_in macro takes only a hash of parameters with
@@ -462,6 +476,13 @@ en:
             with the already defined method %{model_name}, or set the
             configuration option Mongoid.scope_overwrite_exception to false,
             which is its default. In this case a warning will be logged."
+        sessions_not_supported:
+          message: "Sessions are not supported by the connected server(s)."
+          summary: "A session was attempted to be used with a MongoDB server version
+            that doesn't support sessions. Sessions are supported in MongoDB
+            server versions 3.6 and higher."
+          resolution: "Verify that all servers in your deployment are at least
+            version 3.6 or don't attempt to use sessions with older server versions."
         taken:
           "is already taken"
         too_many_nested_attribute_records:
