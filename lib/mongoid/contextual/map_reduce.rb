@@ -166,12 +166,12 @@ module Mongoid
         validate_out!
         cmd = command
         opts = { read: cmd.delete(:read).options } if cmd[:read]
-        @map_reduce.database.command(cmd, opts.merge(session: session)).first
+        @map_reduce.database.command(cmd, (opts || {}).merge(session: session)).first
       end
       alias :results :raw
 
       # Execute the map/reduce, returning the raw output.
-      # Useful when you don't care about map/reduce's ouptut.
+      # Useful when you don't care about map/reduce's output.
       #
       # @example Run the map reduce
       #   map_reduce.execute
@@ -248,6 +248,10 @@ module Mongoid
 
       def validate_out!
         raise Errors::NoMapReduceOutput.new({}) unless @map_reduce.out
+      end
+
+      def session
+        criteria.send(:session)
       end
     end
   end

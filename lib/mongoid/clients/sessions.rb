@@ -8,8 +8,6 @@ module Mongoid
     # @since 6.4.0
     module Sessions
 
-      NOT_SUPPORTED = 'not supported'
-
       # Execute a block within the context of a session.
       #
       # @example Execute some operations in the context of a session.
@@ -28,13 +26,15 @@ module Mongoid
       #   in the context of the implicit session and operations on any models using
       #   another client will fail. For example, if you set a client using store_in on a
       #   particular model and execute an operation on it in the session context block,
-      #   that operation won't use the block's session.
+      #   that operation can't use the block's session and an error will be raised.
       #   An error will also be raised if sessions are nested.
       #
       # @raise [ Errors::InvalidSessionUse ] If an operation is attempted on a model using another
       #   client from which the session was started or if sessions are nested.
       #
       # @return [ Object ] The result of calling the block.
+      #
+      # @yieldparam [ Mongo::Session ] The session being used for the block.
       #
       # @since 6.4.0
       def with_session(options = {})
@@ -77,13 +77,15 @@ module Mongoid
         #   in the context of the implicit session and operations on any models using
         #   another client will fail. For example, if you set a client using store_in on a
         #   particular model and execute an operation on it in the session context block,
-        #   that operation won't use the block's session.
+        #   that operation can't use the block's session and an error will be raised.
         #   You also cannot nest sessions.
         #
         # @raise [ Errors::InvalidSessionUse ] If an operation is attempted on a model using another
         #   client from which the session was started or if sessions are nested.
         #
         # @return [ Object ] The result of calling the block.
+        #
+        # @yieldparam [ Mongo::Session ] The session being used for the block.
         #
         # @since 6.4.0
         def with_session(options = {})
