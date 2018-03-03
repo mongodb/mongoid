@@ -16,7 +16,7 @@ module Mongoid
           #
           # @since 1.0.0
           def __evolve_date__
-            time = ::Time.parse(self)
+            time = __evolve_time__.utc
             ::Time.utc(time.year, time.month, time.day, 0, 0, 0, 0)
           end
 
@@ -29,7 +29,7 @@ module Mongoid
           #
           # @since 1.0.0
           def __evolve_time__
-            ::Time.parse(self).utc
+            __mongoize_time__.utc
           end
 
           # Get the string as a mongo expression, adding $ to the front.
