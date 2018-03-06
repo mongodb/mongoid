@@ -3,12 +3,14 @@ require "mongoid/clients/factory"
 require "mongoid/clients/validators"
 require "mongoid/clients/storage_options"
 require "mongoid/clients/options"
+require "mongoid/clients/sessions"
 
 module Mongoid
   module Clients
     extend ActiveSupport::Concern
     include StorageOptions
     include Options
+    include Sessions
 
     class << self
 

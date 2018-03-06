@@ -205,6 +205,10 @@ describe Mongoid::Attributes::Nested do
         Post.accepts_nested_attributes_for :person
       end
 
+      after do
+        Post.reset_callbacks(:save)
+      end
+
       let(:post) do
         Post.new(person_attributes: { title: "Sir" })
       end
