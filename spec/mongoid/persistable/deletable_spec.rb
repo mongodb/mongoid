@@ -228,6 +228,25 @@ describe Mongoid::Persistable::Deletable do
           expect(removed).to eq(1)
         end
       end
+
+      context 'when the write concern is unacknowledged' do
+
+        before do
+          Person.create(title: 'miss')
+        end
+
+        let!(:deleted) do
+          Person.with(write: { w: 0 }) { |klass| klass.delete_all(title: "sir") }
+        end
+
+        it "removes the matching documents" do
+          expect(Person.where(title: 'miss').count).to eq(1)
+        end
+
+        it "returns 0" do
+          expect(deleted).to eq(0)
+        end
+      end
     end
   end
 end

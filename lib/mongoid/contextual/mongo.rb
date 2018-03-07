@@ -95,7 +95,7 @@ module Mongoid
       def destroy
         each.inject(0) do |count, doc|
           doc.destroy
-          count += 1 if collection.write_concern.nil? || collection.write_concern.acknowledged?
+          count += 1 if acknowledged_write?
           count
         end
       end
@@ -710,6 +710,10 @@ module Mongoid
 
       def session
         @criteria.send(:session)
+      end
+
+      def acknowledged_write?
+        collection.write_concern.nil? || collection.write_concern.acknowledged?
       end
     end
   end
