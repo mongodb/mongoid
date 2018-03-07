@@ -222,6 +222,25 @@ describe Mongoid::Persistable::Destroyable do
       end
     end
 
+    context 'when the write concern is unacknowledged' do
+
+      before do
+        Person.create(title: 'miss')
+      end
+
+      let!(:removed) do
+        Person.with(write: { w: 0 }) { |klass| klass.destroy_all(title: "sir") }
+      end
+
+      it "removes the matching documents" do
+        expect(Person.where(title: 'miss').count).to eq(1)
+      end
+
+      it "returns 0" do
+        expect(removed).to eq(0)
+      end
+    end
+
     context 'when removing a list of embedded documents' do
 
       context 'when the embedded documents list is reversed in memory' do
