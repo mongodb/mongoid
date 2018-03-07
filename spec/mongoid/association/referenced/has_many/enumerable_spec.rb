@@ -189,6 +189,12 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       it "returns the added documents" do
         expect(added).to eq([ post ])
       end
+
+      it "sets the base on the new document" do
+        expect_query(0) do
+          added.collect(&:person)
+        end
+      end
     end
   end
 
@@ -622,6 +628,22 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       it "becomes loaded" do
         expect(enumerable).to be__loaded
       end
+
+      context 'when the base relation is accessed from each document' do
+
+        let(:persons) do
+          described_class.new(criteria).collect(&:person)
+        end
+
+        before do
+          Post.create(person_id: person.id)
+          Post.create(person_id: person.id)
+        end
+
+        it 'sets the base relation from the criteria' do
+          expect(persons.uniq.size).to eq(1)
+        end
+      end
     end
 
     context "when only an array target exists" do
@@ -926,6 +948,60 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         it "returns nil" do
           expect(first).to be_nil
         end
+      end
+    end
+
+    context 'when the id_sort option is none' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'does not use the sort on id' do
+        expect(enumerable.first(id_sort: :none)).to eq(first_post)
+      end
+    end
+
+    context 'when the id_sort option is not provided' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'uses the sort on id' do
+        expect(enumerable.first).to eq(first_post)
       end
     end
   end
@@ -1344,6 +1420,60 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         end
       end
     end
+
+    context 'when the id_sort option is none' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'does not use the sort on id' do
+        expect(enumerable.last(id_sort: :none)).to eq(first_post)
+      end
+    end
+
+    context 'when the id_sort option is not provided' do
+
+      let(:person) do
+        Person.create
+      end
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      let!(:first_post) do
+        person.posts.create(title: "One")
+      end
+
+      let!(:second_post) do
+        person.posts.create(title: "Two")
+      end
+
+      it 'uses the sort on id' do
+        expect(enumerable.last).to eq(second_post)
+      end
+    end
   end
 
   describe "#kind_of?" do
@@ -1712,6 +1842,105 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
 
     it "sets loaded to true" do
       expect(enumerable).to be__loaded
+    end
+  end
+
+  describe 'setting the same parent object on enumerated children objects' do
+
+    let(:person) do
+      Person.create
+    end
+
+    context 'when a single child is fetched' do
+
+      let!(:post) do
+        person.posts << Post.new
+        person.posts.first
+      end
+
+      it 'does not query the database to access the parent' do
+        expect_query(0) do
+          expect(post.person).to eq(person)
+        end
+      end
+    end
+
+    context 'when a single child is fetched with a scope' do
+
+      let!(:post) do
+        person.posts << Post.new(title: 'open')
+        person.posts.open.first
+      end
+
+      it 'does not query the database to access the parent' do
+        expect_query(0) do
+          expect(post.person).to eq(person)
+        end
+      end
+    end
+
+    context 'when multiple children are fetched' do
+
+      let!(:posts) do
+        person.posts << Post.new
+        person.posts << Post.new
+        person.posts << Post.new
+        person.posts.to_a
+      end
+
+      it 'does not query the database to access the parent' do
+        expect_query(0) do
+          expect(posts.all? { |post| post.person == person }).to be(true)
+        end
+      end
+    end
+
+    context 'when multiple children are fetched with query criteria' do
+
+      let!(:posts) do
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'not-a-test')
+        person.posts.where(title: 'open').to_a
+      end
+
+      it 'does not query the database to access the parent' do
+        expect_query(0) do
+          expect(posts.all? { |post| post.person == person }).to be(true)
+        end
+      end
+    end
+
+    context 'when multiple children are fetched with a scope' do
+
+      let!(:posts) do
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'open')
+        person.posts << Post.new(title: 'not-a-test')
+        person.posts.open.to_a
+      end
+
+      it 'does not query the database to access the parent' do
+        expect_query(0) do
+          expect(posts.all? { |post| post.person == person }).to be(true)
+        end
+      end
+    end
+
+    context 'when the parent is updated in memory' do
+
+      let!(:posts) do
+        person.posts << Post.new
+        person.posts << Post.new
+        person.username = 'emily'
+        person.posts.to_a
+      end
+
+      it 'does not query the database to access the parent' do
+        expect_query(0) do
+          expect(posts.all? { |post| post.person.username == 'emily' }).to be(true)
+        end
+      end
     end
   end
 end

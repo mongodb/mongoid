@@ -17,7 +17,8 @@ module Mongoid
     #
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
-      type = (attributes || {})[TYPE]
+      attributes ||= {}
+      type = attributes[TYPE] || attributes[TYPE.to_sym]
       if type && klass._types.include?(type)
         type.constantize.new(attributes)
       else
@@ -37,10 +38,15 @@ module Mongoid
     #   #only we give the document a list of the selected fields.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = nil, selected_fields = nil)
+    def from_db(klass, attributes = nil, criteria = nil)
+      selected_fields = criteria.options[:fields] if criteria
       type = (attributes || {})[TYPE]
       if type.blank?
-        klass.instantiate(attributes, selected_fields)
+        obj = klass.instantiate(attributes, selected_fields)
+        if criteria && criteria.association && criteria.parent_document
+          obj.set_relation(criteria.association.inverse, criteria.parent_document)
+        end
+        obj
       else
         camelized = type.camelize
         raise Errors::UnknownModel.new(camelized, type) unless Object.const_defined?(camelized)

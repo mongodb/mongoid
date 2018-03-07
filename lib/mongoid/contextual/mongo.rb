@@ -95,7 +95,8 @@ module Mongoid
       def destroy
         each.inject(0) do |count, doc|
           doc.destroy
-          count += 1
+          count += 1 if acknowledged_write?
+          count
         end
       end
       alias :destroy_all :destroy
@@ -255,12 +256,12 @@ module Mongoid
         try_cache(:first) do
           if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
             if raw_doc = view.sort(sort).limit(-1).first
-              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
           else
             if raw_doc = view.limit(-1).first
-              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
           end
@@ -276,7 +277,7 @@ module Mongoid
       def find_first
         return documents.first if cached? && cache_loaded?
         if raw_doc = view.first
-          doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+          doc = Factory.from_db(klass, raw_doc, criteria)
           eager_load([doc]).first
         end
       end
@@ -340,7 +341,7 @@ module Mongoid
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
-        @view = collection.find(criteria.selector)
+        @view = collection.find(criteria.selector, session: session)
         apply_options
       end
 
@@ -367,7 +368,7 @@ module Mongoid
         try_cache(:last) do
           with_inverse_sorting(opts) do
             if raw_doc = view.limit(-1).first
-              doc = Factory.from_db(klass, raw_doc, criteria.options[:fields])
+              doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
           end
@@ -486,12 +487,16 @@ module Mongoid
       #   context.update({ "$set" => { name: "Smiths" }})
       #
       # @param [ Hash ] attributes The new attributes for the document.
+      # @param [ Hash ] opts The update operation options.
+      #
+      # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
+      #   an update should apply.
       #
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update(attributes = nil)
-        update_documents(attributes)
+      def update(attributes = nil, opts = {})
+        update_documents(attributes, :update_one, opts)
       end
 
       # Update all the matching documents atomically.
@@ -500,12 +505,16 @@ module Mongoid
       #   context.update_all({ "$set" => { name: "Smiths" }})
       #
       # @param [ Hash ] attributes The new attributes for each document.
+      # @param [ Hash ] opts The update operation options.
+      #
+      # @option opts [ Array ] :array_filters A set of filters specifying to which array elements
+      #   an update should apply.
       #
       # @return [ nil, false ] False if no attributes were provided.
       #
       # @since 3.0.0
-      def update_all(attributes = nil)
-        update_documents(attributes, :update_many)
+      def update_all(attributes = nil, opts = {})
+        update_documents(attributes, :update_many, opts)
       end
 
       private
@@ -541,10 +550,10 @@ module Mongoid
       # @return [ true, false ] If the update succeeded.
       #
       # @since 3.0.4
-      def update_documents(attributes, method = :update_one)
+      def update_documents(attributes, method = :update_one, opts = {})
         return false unless attributes
         attributes = Hash[attributes.map { |k, v| [klass.database_field_name(k.to_s), v] }]
-        view.send(method, attributes.__consolidate__(klass))
+        view.send(method, attributes.__consolidate__(klass), opts)
       end
 
       # Apply the field limitations.
@@ -674,7 +683,7 @@ module Mongoid
       def documents_for_iteration
         return documents if cached? && !documents.empty?
         return view unless eager_loadable?
-        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria.options[:fields]) }
+        docs = view.map{ |doc| Factory.from_db(klass, doc, criteria) }
         eager_load(docs)
       end
 
@@ -692,9 +701,19 @@ module Mongoid
       # @since 3.0.0
       def yield_document(document, &block)
         doc = document.respond_to?(:_id) ?
-            document : Factory.from_db(klass, document, criteria.options[:fields])
+            document : Factory.from_db(klass, document, criteria)
         yield(doc)
         documents.push(doc) if cacheable?
+      end
+
+      private
+
+      def session
+        @criteria.send(:session)
+      end
+
+      def acknowledged_write?
+        collection.write_concern.nil? || collection.write_concern.acknowledged?
       end
     end
   end

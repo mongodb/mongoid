@@ -66,6 +66,49 @@ describe String do
         expect(evolved).to eq(Time.new(2010, 1, 1, 11, 0, 0, 0).utc)
       end
     end
+
+    context "when the string without timezone" do
+
+      context "when using active support's time zone" do
+
+        before do
+          Mongoid.use_activesupport_time_zone = true
+          ::Time.zone = "Tokyo"
+        end
+
+        let(:date) do
+          "2010-01-01 5:00:00"
+        end
+
+        let(:evolved) do
+          date.__evolve_time__
+        end
+
+        it "parses string using active support's time zone" do
+          expect(evolved).to eq(Time.zone.parse(date).utc)
+        end
+      end
+
+      context "when not using active support's time zone" do
+
+        before do
+          Mongoid.use_activesupport_time_zone = false
+          ::Time.zone = nil
+        end
+
+        let(:date) do
+          "2010-01-01 5:00:00"
+        end
+
+        let(:evolved) do
+          date.__evolve_time__
+        end
+
+        it "parses string using system time zone" do
+          expect(evolved).to eq(Time.parse(date).utc)
+        end
+      end
+    end
   end
 
   describe "#__sort_option__" do

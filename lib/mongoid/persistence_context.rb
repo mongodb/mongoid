@@ -195,10 +195,10 @@ module Mongoid
         Thread.current["[mongoid][#{object.object_id}]:context"]
       end
 
-      # Get the persistence context for a particular class or model instance.
+      # Clear the persistence context for a particular class or model instance.
       #
-      # @example Get the persistence context for a class or model instance.
-      #  PersistenceContext.get(model)
+      # @example Clear the persistence context for a class or model instance.
+      #  PersistenceContext.clear(model)
       #
       # @param [ Class, Object ] object The class or model instance.
       # @param [ Mongo::Cluster ] cluster The original cluster before this context was used.
@@ -208,6 +208,7 @@ module Mongoid
         if context = get(object)
           context.client.close unless (context.cluster.equal?(cluster) || cluster.nil?)
         end
+      ensure  
         Thread.current["[mongoid][#{object.object_id}]:context"] = nil
       end
     end

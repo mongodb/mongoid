@@ -179,12 +179,14 @@ module Mongoid
               if _loaded?
                 _loaded.each_pair do |id, doc|
                   document = _added.delete(doc._id) || doc
+                  set_base(document)
                   yield(document)
                 end
               else
                 unloaded_documents.each do |doc|
                   document = _added.delete(doc._id) || _loaded.delete(doc._id) || doc
                   _loaded[document._id] = document
+                  set_base(document)
                   yield(document)
                 end
               end
@@ -217,12 +219,22 @@ module Mongoid
             # @example Get the first document.
             #   enumerable.first
             #
+            # @note Automatically adding a sort on _id when no other sort is
+            #   defined on the criteria has the potential to cause bad performance issues.
+            #   If you experience unexpected poor performance when using #first or #last,
+            #   use the option { id_sort: :none }.
+            #   Be aware that #first/#last won't guarantee order in this case.
+            #
+            # @param [ Hash ] opts The options for the query returning the first document.
+            #
+            # @option opts [ :none ] :id_sort Don't apply a sort on _id.
+            #
             # @return [ Document ] The first document found.
             #
             # @since 2.1.0
-            def first
+            def first(opts = {})
               _loaded.try(:values).try(:first) ||
-                  _added[(ul = _unloaded.try(:first)).try(:id)] ||
+                  _added[(ul = _unloaded.try(:first, opts)).try(:id)] ||
                   ul ||
                   _added.values.try(:first)
             end
@@ -238,7 +250,9 @@ module Mongoid
             # @param [ Criteria, Array<Document> ] target The wrapped object.
             #
             # @since 2.1.0
-            def initialize(target)
+            def initialize(target, base = nil, association = nil)
+              @_base = base
+              @_association = association
               if target.is_a?(Criteria)
                 @_added, @executed, @_loaded, @_unloaded = {}, false, {}, target
               else
@@ -291,8 +305,9 @@ module Mongoid
             # @since 2.1.0
             def in_memory
               docs = (_loaded.values + _added.values)
-              docs.each { |doc| yield(doc) } if block_given?
-              docs
+              docs.each do |doc|
+                yield(doc) if block_given?
+              end
             end
 
             # Get the last document in the enumerable. Will check the new
@@ -301,13 +316,23 @@ module Mongoid
             # @example Get the last document.
             #   enumerable.last
             #
+            # @note Automatically adding a sort on _id when no other sort is
+            #   defined on the criteria has the potential to cause bad performance issues.
+            #   If you experience unexpected poor performance when using #first or #last,
+            #   use the option { id_sort: :none }.
+            #   Be aware that #first/#last won't guarantee order in this case.
+            #
+            # @param [ Hash ] opts The options for the query returning the first document.
+            #
+            # @option opts [ :none ] :id_sort Don't apply a sort on _id.
+            #
             # @return [ Document ] The last document found.
             #
             # @since 2.1.0
-            def last
+            def last(opts = {})
               _added.values.try(:last) ||
                   _loaded.try(:values).try(:last) ||
-                  _added[(ul = _unloaded.try(:last)).try(:id)] ||
+                  _added[(ul = _unloaded.try(:last, opts)).try(:id)] ||
                   ul
             end
 
@@ -463,6 +488,12 @@ module Mongoid
             end
 
             private
+
+            def set_base(document)
+              if @_association.is_a?(Referenced::HasMany)
+                document.set_relation(@_association.inverse, @_base) if @_association
+              end
+            end
 
             def method_missing(name, *args, &block)
               entries.send(name, *args, &block)

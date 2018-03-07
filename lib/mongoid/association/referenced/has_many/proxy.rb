@@ -210,7 +210,8 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def initialize(base, target, association)
-            init(base, HasMany::Targets::Enumerable.new(target), association) do
+            enum = HasMany::Targets::Enumerable.new(target, base, association)
+            init(base, enum, association) do
               raise_mixed if klass.embedded? && !klass.cyclic?
             end
           end
@@ -455,7 +456,7 @@ module Mongoid
           # @since 3.0.0
           def persist_delayed(docs, inserts)
             unless docs.empty?
-              collection.insert_many(inserts)
+              collection.insert_many(inserts, session: session)
               docs.each do |doc|
                 doc.new_record = false
                 doc.run_after_callbacks(:create, :save)

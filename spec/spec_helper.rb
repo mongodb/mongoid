@@ -84,6 +84,11 @@ def collation_supported?
 end
 alias :decimal128_supported? :collation_supported?
 
+def array_filters_supported?
+  Mongoid::Clients.default.cluster.next_primary.features.array_filters_enabled?
+end
+alias :sessions_supported? :array_filters_supported?
+
 def testing_locally?
   !(ENV['CI'] == 'travis')
 end
@@ -147,5 +152,74 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     Mongoid.purge!
+  end
+end
+
+# A subscriber to be used with the Ruby driver for testing.
+#
+# @since 6.4.0
+class EventSubscriber
+
+  # The started events.
+  #
+  # @since 6.4.0
+  attr_reader :started_events
+
+  # The succeeded events.
+  #
+  # @since 6.4.0
+  attr_reader :succeeded_events
+
+  # The failed events.
+  #
+  # @since 6.4.0
+  attr_reader :failed_events
+
+  # Create the test event subscriber.
+  #
+  # @example Create the subscriber
+  #   EventSubscriber.new
+  #
+  # @since 6.4.0
+  def initialize
+    @started_events = []
+    @succeeded_events = []
+    @failed_events = []
+  end
+
+  # Cache the succeeded event.
+  #
+  # @param [ Event ] event The event.
+  #
+  # @since 6.4.0
+  def succeeded(event)
+    @succeeded_events.push(event)
+  end
+
+  # Cache the started event.
+  #
+  # @param [ Event ] event The event.
+  #
+  # @since 6.4.0
+  def started(event)
+    @started_events.push(event)
+  end
+
+  # Cache the failed event.
+  #
+  # @param [ Event ] event The event.
+  #
+  # @since 6.4.0
+  def failed(event)
+    @failed_events.push(event)
+  end
+
+  # Clear all cached events.
+  #
+  # @since 6.4.0
+  def clear_events!
+    @started_events = []
+    @succeeded_events = []
+    @failed_events = []
   end
 end

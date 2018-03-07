@@ -26,8 +26,8 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "mongoid"
 
-  s.add_dependency("activemodel", ["~> 5.1"])
-  s.add_dependency("mongo", ['>=2.4.1', '<3.0.0'])
+  s.add_dependency("activemodel", [">= 5.1", "<6.0.0"])
+  s.add_dependency("mongo", ['>=2.5.1', '<3.0.0'])
 
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.test_files   = Dir.glob("spec/**/*")

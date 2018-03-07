@@ -48,7 +48,8 @@ module Mongoid
         end
         unless removed.empty?
           collection.find(selector).update_one(
-            positionally(selector, "$pullAll" => { path => removed })
+            positionally(selector, "$pullAll" => { path => removed }),
+            session: session
           )
         end
         deleted
@@ -152,6 +153,22 @@ module Mongoid
         end
         apply_sorting
         apply_options
+      end
+
+      # Increment a value on all documents.
+      #
+      # @example Perform the increment.
+      #   context.inc(likes: 10)
+      #
+      # @param [ Hash ] incs The operations.
+      #
+      # @return [ Enumerator ] The enumerator.
+      #
+      # @since 7.0.0
+      def inc(*args)
+        each do |document|
+          document.inc *args
+        end
       end
 
       # Get the last document in the database for the criteria's selector.
@@ -303,7 +320,7 @@ module Mongoid
           updates["$set"].merge!(doc.atomic_updates["$set"] || {})
           doc.move_changes
         end
-        collection.find(selector).update_one(updates) unless updates["$set"].empty?
+        collection.find(selector).update_one(updates, session: session) unless updates["$set"].empty?
       end
 
       # Get the limiting value.
@@ -443,6 +460,12 @@ module Mongoid
         documents.delete_one(doc)
         doc._parent.remove_child(doc)
         doc.destroyed = true
+      end
+
+      private
+
+      def session
+        @criteria.send(:session)
       end
     end
   end

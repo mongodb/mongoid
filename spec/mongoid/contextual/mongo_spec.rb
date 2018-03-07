@@ -275,6 +275,23 @@ describe Mongoid::Contextual::Mongo do
           expect(Band.count).to eq(0)
         end
       end
+
+      context 'when the write concern is unacknowledged' do
+
+        let(:criteria) do
+          Band.all
+        end
+
+        let!(:deleted) do
+          criteria.with(write: { w: 0 }) do |crit|
+            crit.send(method)
+          end
+        end
+
+        it 'returns 0' do
+          expect(deleted).to eq(0)
+        end
+      end
     end
   end
 
@@ -361,6 +378,27 @@ describe Mongoid::Contextual::Mongo do
         it "destroys all the documents" do
           expect(Band.count).to eq(0)
         end
+      end
+    end
+
+    context 'when the write concern is unacknowledged' do
+
+      before do
+        2.times { Band.create }
+      end
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let!(:deleted) do
+        criteria.with(write: { w: 0 }) do |crit|
+          crit.send(method)
+        end
+      end
+
+      it 'returns 0' do
+        expect(deleted).to eq(0)
       end
     end
   end
@@ -537,6 +575,31 @@ describe Mongoid::Contextual::Mongo do
             enum.next
           end
         end
+      end
+    end
+
+    context 'when the criteria has a parent document' do
+
+      before do
+        Post.create(person: person)
+        Post.create(person: person)
+        Post.create(person: person)
+      end
+
+      let(:person) do
+        Person.new
+      end
+
+      let(:criteria) do
+        person.posts.all
+      end
+
+      let(:persons) do
+        criteria.collect(&:person)
+      end
+
+      it 'sets the same parent object on each related object' do
+        expect(persons.uniq.size).to eq(1)
       end
     end
   end
@@ -2094,6 +2157,41 @@ describe Mongoid::Contextual::Mongo do
         expect(context.update).to be false
       end
     end
+
+    context 'when provided array filters', if: array_filters_supported? do
+
+      before do
+        Band.delete_all
+        b = Band.new(name: 'Depeche Mode')
+        b.labels << Label.new(name: 'Warner')
+        b.labels << Label.new(name: 'Sony')
+        b.labels << Label.new(name: 'Cbs')
+        b.save
+
+        b = Band.new(name: 'FKA Twigs')
+        b.labels << Label.new(name: 'Warner')
+        b.labels << Label.new(name: 'Cbs')
+        b.save
+      end
+
+
+      let(:criteria) do
+        Band.where(name: 'Depeche Mode')
+      end
+
+      let!(:update) do
+        context.update({ '$set' => { 'labels.$[i].name' => 'Sony' } },
+                       array_filters: [{ 'i.name' => 'Cbs' }])
+      end
+
+      it 'applies the array filters' do
+        expect(Band.where(name: 'Depeche Mode').first.labels.collect(&:name)).to match_array(['Warner', 'Sony', 'Sony'])
+      end
+
+      it 'does not affect other documents' do
+        expect(Band.where(name: 'FKA Twigs').first.labels.collect(&:name)).to match_array(['Warner', 'Cbs'])
+      end
+    end
   end
 
   describe "#update_all" do
@@ -2229,6 +2327,41 @@ describe Mongoid::Contextual::Mongo do
 
       it "returns false" do
         expect(context.update_all).to be false
+      end
+    end
+
+    context 'when provided array filters', if: array_filters_supported? do
+
+      before do
+        Band.delete_all
+        b = Band.new(name: 'Depeche Mode')
+        b.labels << Label.new(name: 'Warner')
+        b.labels << Label.new(name: 'Sony')
+        b.labels << Label.new(name: 'Cbs')
+        b.save
+
+        b = Band.new(name: 'FKA Twigs')
+        b.labels << Label.new(name: 'Warner')
+        b.labels << Label.new(name: 'Cbs')
+        b.save
+      end
+
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let!(:update) do
+        context.update_all({ '$set' => { 'labels.$[i].name' => 'Sony' } },
+                       array_filters: [{ 'i.name' => 'Cbs' }])
+      end
+
+      it 'applies the array filters' do
+        expect(Band.where(name: 'Depeche Mode').first.labels.collect(&:name)).to match_array(['Warner', 'Sony', 'Sony'])
+      end
+
+      it 'updates all documents' do
+        expect(Band.where(name: 'FKA Twigs').first.labels.collect(&:name)).to match_array(['Warner', 'Sony'])
       end
     end
   end

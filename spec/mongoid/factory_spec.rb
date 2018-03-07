@@ -88,6 +88,17 @@ describe Mongoid::Factory do
         expect(person.title).to eq("Sir")
       end
     end
+
+    context "when the type is a symbol" do
+
+      let(:person) do
+        described_class.build(Person, { :_type => "Doctor" })
+      end
+
+      it "instantiates the subclass" do
+        expect(person.class).to eq(Doctor)
+      end
+    end
   end
 
   describe ".from_db" do

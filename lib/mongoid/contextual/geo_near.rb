@@ -242,7 +242,7 @@ module Mongoid
       # @since 3.0.0
       def documents
         results["results"].map do |attributes|
-          doc = Factory.from_db(criteria.klass, attributes["obj"], criteria.options[:fields])
+          doc = Factory.from_db(criteria.klass, attributes["obj"], criteria)
           doc.attributes["geo_near_distance"] = attributes["dis"]
           doc
         end

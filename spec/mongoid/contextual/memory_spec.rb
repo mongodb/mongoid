@@ -987,6 +987,25 @@ describe Mongoid::Contextual::Memory do
     end
   end
 
+  describe '#inc' do
+
+    let(:criteria) do
+      Address.all.tap do |crit|
+        crit.documents = [ Address.new(number: 1),
+                           Address.new(number: 2),
+                           Address.new(number: 3) ]
+      end
+    end
+
+    let(:context) do
+      described_class.new(criteria)
+    end
+
+    it 'increases each member' do
+      expect(context.inc(number: 10).collect(&:number)).to eql([11, 12, 13])
+    end
+  end
+
   describe "#skip" do
 
     let(:hobrecht) do

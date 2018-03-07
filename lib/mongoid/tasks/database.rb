@@ -44,7 +44,7 @@ module Mongoid
         models.each do |model|
           unless model.embedded?
             begin
-              model.collection.indexes.each do |index|
+              model.collection.indexes(session: model.send(:session)).each do |index|
                 # ignore default index
                 unless index['name'] == '_id_'
                   key = index['key'].symbolize_keys
@@ -77,7 +77,7 @@ module Mongoid
           indexes.each do |index|
             key = index['key'].symbolize_keys
             collection = model.collection
-            collection.indexes.drop_one(key)
+            collection.indexes(session: model.send(:session)).drop_one(key)
             logger.info(
               "MONGOID: Removed index '#{index['name']}' on collection " +
               "'#{collection.name}' in database '#{collection.database.name}'."
@@ -107,6 +107,7 @@ module Mongoid
       end
 
       private
+
       def logger
         Mongoid.logger
       end

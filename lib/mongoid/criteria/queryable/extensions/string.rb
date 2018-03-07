@@ -29,7 +29,7 @@ module Mongoid
           #
           # @since 1.0.0
           def __evolve_time__
-            ::Time.parse(self).utc
+            __mongoize_time__.utc
           end
 
           # Get the string as a mongo expression, adding $ to the front.

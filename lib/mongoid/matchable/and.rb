@@ -2,7 +2,7 @@
 module Mongoid
   module Matchable
 
-    # Defines behavior for handling $or expressions in embedded documents.
+    # Defines behavior for handling $and expressions in embedded documents.
     class And < Default
 
       # Does the supplied query match the attribute?

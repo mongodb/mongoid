@@ -201,9 +201,9 @@ module Mongoid
     #
     # @since 4.0.0
     def persist_atomic_operations(operations)
-      if persisted? && operations
+      if persisted? && operations && !operations.empty?
         selector = atomic_selector
-        _root.collection.find(selector).update_one(positionally(selector, operations))
+        _root.collection.find(selector).update_one(positionally(selector, operations), session: session)
       end
     end
   end

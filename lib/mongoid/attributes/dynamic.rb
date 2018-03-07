@@ -41,7 +41,7 @@ module Mongoid
         class_eval <<-READER, __FILE__, __LINE__ + 1
           def #{name}
             attribute_will_change!(#{name.inspect})
-            read_attribute(#{name.inspect})
+            read_raw_attribute(#{name.inspect})
           end
         READER
       end
@@ -147,7 +147,7 @@ module Mongoid
           getter = attr.reader
           define_dynamic_reader(getter)
           attribute_will_change!(attr.reader)
-          read_attribute(getter)
+          read_raw_attribute(getter)
         end
       end
     end

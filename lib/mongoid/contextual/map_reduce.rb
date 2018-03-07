@@ -111,6 +111,7 @@ module Mongoid
       end
 
       # Specifies where the map/reduce output is to be stored.
+      # Please see MongoDB documentation for supported map reduce options.
       #
       # @example Store output in memory.
       #   map_reduce.out(inline: 1)
@@ -123,6 +124,9 @@ module Mongoid
       #
       # @example Store output in a collection, reducing existing documents.
       #   map_reduce.out(reduce: "collection_name")
+      #
+      # @example Return results from map reduce.
+      #   map_reduce.out(inline: 1)
       #
       # @param [ Hash ] location The place to store the results.
       #
@@ -162,12 +166,12 @@ module Mongoid
         validate_out!
         cmd = command
         opts = { read: cmd.delete(:read).options } if cmd[:read]
-        @map_reduce.database.command(cmd, opts || {}).first
+        @map_reduce.database.command(cmd, (opts || {}).merge(session: session)).first
       end
       alias :results :raw
 
       # Execute the map/reduce, returning the raw output.
-      # Useful when you don't care about map/reduce's ouptut.
+      # Useful when you don't care about map/reduce's output.
       #
       # @example Run the map reduce
       #   map_reduce.execute
@@ -244,6 +248,10 @@ module Mongoid
 
       def validate_out!
         raise Errors::NoMapReduceOutput.new({}) unless @map_reduce.out
+      end
+
+      def session
+        criteria.send(:session)
       end
     end
   end

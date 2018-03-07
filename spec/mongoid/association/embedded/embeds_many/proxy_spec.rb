@@ -254,6 +254,62 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
           end
         end
       end
+
+      context 'when the child was associated with anther parent' do
+
+        let(:person_one) do
+          Person.create
+        end
+
+        let(:address) do
+          Address.new
+        end
+
+        let(:person_two) do
+          Person.create
+        end
+
+        before do
+          person_one.addresses << address
+        end
+
+        let!(:added) do
+          address.addressable = nil
+          person_two.addresses.send(method, address)
+        end
+
+        it "appends to the target" do
+          expect(person_two.addresses).to eq([ address ])
+        end
+
+        it "sets the base on the inverse relation" do
+          expect(address.addressable).to eq(person_two)
+        end
+
+        it "sets the same instance on the inverse relation" do
+          expect(address.addressable).to eql(person_two)
+        end
+
+        it "does not save the new document" do
+          expect(address).to_not be_persisted
+        end
+
+        it "sets the parent on the child" do
+          expect(address._parent).to eq(person_two)
+        end
+
+        it "sets the association metadata on the child" do
+          expect(address._association).to_not be_nil
+        end
+
+        it "sets the index on the child" do
+          expect(address._index).to eq(0)
+        end
+
+        it "returns the relation" do
+          expect(added).to eq(person_two.addresses)
+        end
+      end
     end
   end
 
