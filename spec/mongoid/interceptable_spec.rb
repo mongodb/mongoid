@@ -526,7 +526,7 @@ describe Mongoid::Interceptable do
           end
 
           after(:all) do
-            Band.reset_callbacks(:rearrange)
+            begin; Band.reset_callbacks(:rearrange); rescue; end
           end
 
           let(:attributes) do
