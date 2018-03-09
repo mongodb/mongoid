@@ -271,6 +271,29 @@ module Mongoid
             end
           end
 
+          # Shift documents off the relation. This can be a single document or
+          # multiples, and will automatically persist the changes.
+          #
+          # @example Shift a single document.
+          #   relation.shift
+          #
+          # @example Shift multiple documents.
+          #   relation.shift(3)
+          #
+          # @param [ Integer ] count The number of documents to shift, or 1 if not
+          #   provided.
+          #
+          # @return [ Document, Array<Document> ] The shifted document(s).
+          def shift(count = nil)
+            if count
+              if _target.size > 0 && docs = _target[0, count]
+                docs.each { |doc| delete(doc) }
+              end
+            else
+              delete(_target[0])
+            end
+          end
+
           # Substitutes the supplied target documents for the existing documents
           # in the relation.
           #
