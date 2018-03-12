@@ -309,11 +309,11 @@ module Mongoid
         # @return [ Document, Array<Document> ] The shifted document(s).
         def shift(count = nil)
           if count
-            if _target.size > 0 && docs = _target[0, count]
+            if target.size > 0 && docs = target[0, count]
               docs.each { |doc| delete(doc) }
             end
           else
-            delete(_target[0])
+            delete(target[0])
           end
         end
 

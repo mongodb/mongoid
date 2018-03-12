@@ -2583,6 +2583,25 @@ describe Mongoid::Relations::Embedded::Many do
         person.addresses.create(street: "hermannstr")
       end
 
+      context "when the number is zero" do
+
+        let!(:popped) do
+          person.addresses.pop(0)
+        end
+
+        it "returns an empty array" do
+          expect(popped).to eq([])
+        end
+
+        it "does not remove the document from the relation" do
+          expect(person.addresses).to eq([ address_one, address_two ])
+        end
+
+        it "does not persist the pop" do
+          expect(person.reload.addresses).to eq([ address_one, address_two ])
+        end
+      end
+
       context "when the number is not larger than the relation" do
 
         let!(:popped) do
@@ -2683,11 +2702,28 @@ describe Mongoid::Relations::Embedded::Many do
         person.addresses.create(street: "hermannstr")
       end
 
+      context "when the number is zero" do
+
+        let!(:shifted) do
+          person.addresses.shift(0)
+        end
+
+        it "returns an empty array" do
+          expect(shifted).to eq([])
+        end
+
+        it "does not remove the document from the relation" do
+          expect(person.addresses).to eq([ address_one, address_two ])
+        end
+
+        it "does not persist the shift" do
+          expect(person.reload.addresses).to eq([ address_one, address_two ])
+        end
+      end
+
       context "when the number is not larger than the relation" do
 
         let!(:shifted) do
-          # person.addresses.create(street: "kos")
-          # binding.pry
           person.addresses.shift(2)
         end
 
