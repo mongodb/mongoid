@@ -4,19 +4,17 @@ sudo: false
 
 bundler_args: --without development
 
-rvm:
-  - 2.5
-  - ruby-head
-  - jruby-9.1.15.0
+branches:
+  only:
+  - master
+  - 6.4.0-stable
 
 before_install:
   - gem update --system
   - gem update bundler
 
 matrix:
-  allow_failures:
-    - rvm: ruby-head
-    - gemfile: gemfiles/rails_master.gemfile
+  fast_finish: true
   exclude:
     - rvm: ruby-head
       gemfile: gemfiles/rails_master.gemfile
@@ -24,10 +22,18 @@ matrix:
       gemfile: gemfiles/rails_master.gemfile
     - rvm: jruby-9.1.15.0
       gemfile: gemfiles/driver_master.gemfile
-    - rvm: jruby-head
-      gemfile: gemfiles/driver_master.gemfile
-    - rvm: jruby-head
-      gemfile: gemfiles/rails_master.gemfile
+    - rvm: jruby-9.1.15.0
+      env: MONGODB=2.6.12
+    - rvm: jruby-9.1.15.0
+      env: MONGODB=3.4.10
+  allow_failures:
+    - rvm: ruby-head
+    - gemfile: gemfiles/rails_master.gemfile
+
+rvm:
+  - 2.5
+  - ruby-head
+  - jruby-9.1.15.0
 
 gemfile:
   - Gemfile
