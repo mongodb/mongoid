@@ -108,13 +108,25 @@ examples.
 
    * - ``Model#update_attributes``
 
-       *Update the provided attributes (and any other dirty fields).*
+       *Update the document attributes in the database. Will return true if validation passed,
+       false if not.*
+     -
+        .. code-block:: ruby
+
+          person.update_attributes(
+            first_name: "Jean",
+            last_name: "Zorg"
+          )
+
+   * - ``Model#update_attributes!``
+
+       *Update the document attributes in the database and raise an error if validation failed.*
      -
         .. code-block:: ruby
 
           person.update_attributes!(
-            first_name: "Jean",
-            last_name: "Zorg"
+            first_name: "Leo",
+            last_name: "Tolstoy"
           )
 
    * - ``Model#update_attribute``
