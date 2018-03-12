@@ -1,4 +1,4 @@
 # encoding: utf-8
 module Mongoid
-  VERSION = "7.0.0.beta"
+  VERSION = "7.0.0"
 end
