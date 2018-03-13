@@ -278,7 +278,22 @@ describe Mongoid::Persistable::Settable do
       end
     end
 
-    context 'when the field is a bested hash' do
+    context 'when the field is a nested hash' do
+
+      context 'when the field is reset to an empty hash' do
+
+        before do
+          church.set('location' => {})
+        end
+
+        it 'updates the field locally' do
+          expect(church.location).to eq({})
+        end
+
+        it 'updates the field in the database' do
+          expect(church.reload.location).to eq({})
+        end
+      end
 
       context 'when a leaf value in the nested hash is updated' do
 
