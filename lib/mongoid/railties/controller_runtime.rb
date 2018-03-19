@@ -2,31 +2,45 @@ module Mongoid
   module Railties
     module ControllerRuntime
 
+      # This extension mimics the Rails' internal method to
+      # measure ActiveRecord runtime during request processing.
+      # It appends MongoDB runtime value (`mongoid_runtime`) into payload
+      # of instrumentation event `process_action.action_controller`.
       module ControllerExtension
         extend ActiveSupport::Concern
 
         protected
 
-        attr_internal :mongo_runtime
+        attr_internal :mongoid_runtime
 
+        # reset the runtime before each action
+        def process_action *_
+          Collector.reset_runtime
+          super
+        end
+
+        # override to collect the measurements
         def cleanup_view_runtime
-          mongo_rt_before_render = Instrument.reset_runtime
+          mongo_rt_before_render = Collector.reset_runtime
           runtime = super
-          mongo_rt_after_render = Instrument.reset_runtime
-          self.mongo_runtime = mongo_rt_before_render + mongo_rt_after_render
+          mongo_rt_after_render = Collector.reset_runtime
+          self.mongoid_runtime = mongo_rt_before_render + mongo_rt_after_render
           runtime - mongo_rt_after_render
         end
 
+        # add the measurement to a instrumentation event payload
         def append_info_to_payload payload
           super
-          payload[:mongo_runtime] = (mongo_runtime || 0) + Instrument.reset_runtime
+          payload[:mongoid_runtime] = (mongoid_runtime || 0) + Collector.reset_runtime
         end
 
         module ClassMethods
 
+          # append MongoDB runtime information to action log message
           def log_process_action payload
-            messages, mongo_runtime = super, payload[:mongo_runtime]
-            messages << ("MongoDB: %.1fms" % mongo_runtime.to_f) if mongo_runtime
+            messages = super
+            mongoid_runtime = payload[:mongoid_runtime]
+            messages << ("MongoDB: %.1fms" % mongoid_runtime.to_f) if mongoid_runtime
             messages
           end
 
@@ -34,17 +48,19 @@ module Mongoid
 
       end
 
-      class Instrument
+      # The Collector of MongoDB runtime metric, that subscribes to Mongo internal monitoring.
+      # Stores the value within Thread variable to leverage multithreaded servers.
+      class Collector
 
-        VARIABLE_NAME = 'Mongoid.controller_runtime'.freeze
+        VARIABLE_NAME = "Mongoid.controller_runtime".freeze
 
         def started _; end
 
-        def completed e
-          Instrument.runtime += e.duration
+        def _completed e
+          Collector.runtime += e.duration
         end
-        alias :succeeded :completed
-        alias :failed :completed
+        alias :succeeded :_completed
+        alias :failed :_completed
 
         def self.runtime
           Thread.current[VARIABLE_NAME] ||= 0
@@ -55,9 +71,9 @@ module Mongoid
         end
 
         def self.reset_runtime
-          _runtime = runtime
+          to_now = runtime
           self.runtime = 0
-          _runtime
+          to_now
         end
 
       end

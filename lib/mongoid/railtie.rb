@@ -104,8 +104,13 @@ module Rails
         puts e.message
       end
 
-      initializer 'mongoid.runtime-metric' do
-        require 'mongoid/railties/controller_runtime'
+      # Include Controller extension that measures Mongoid runtime
+      # during request processing. The value then appears in Rails'
+      # instrumentation event `process_action.action_controller`.
+      #
+      # The measurement is made via internal Mongo monitoring subscription
+      initializer "mongoid.runtime-metric" do
+        require "mongoid/railties/controller_runtime"
 
         ActiveSupport.on_load :action_controller do
           include ::Mongoid::Railties::ControllerRuntime::ControllerExtension
