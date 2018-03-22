@@ -17,6 +17,20 @@ module Mongoid
         view.update_many("$addToSet" => collect_operations(adds))
       end
 
+      # Perform an atomic $addToSet/$each on the matching documents.
+      #
+      # @example Add the value to the set.
+      #   context.add_each_to_set(members: ["Dave", "Bill"], genres: ["Electro", "Disco"])
+      #
+      # @param [ Hash ] adds The operations.
+      #
+      # @return [ nil ] Nil.
+      #
+      # @since 7.0.0
+      def add_each_to_set(adds)
+        view.update_many("$addToSet" => collect_each_operations(adds))
+      end
+
       # Perform an atomic $bit operation on the matching documents.
       #
       # @example Perform the bitwise op.
@@ -117,10 +131,7 @@ module Mongoid
       #
       # @since 3.0.0
       def push_all(pushes)
-        push_each_updates = collect_operations(pushes).each.inject({}) do |ops, (field, elements)|
-          ops.merge!(field => { '$each' => elements })
-        end
-        view.update_many("$push" => push_each_updates)
+        view.update_many("$push" => collect_each_operations(pushes))
       end
 
       # Perform an atomic $rename of fields on the matching documents.
@@ -173,9 +184,14 @@ module Mongoid
       private
 
       def collect_operations(ops)
-        ops.inject({}) do |operations, (field, value)|
+        ops.each_with_object({}) do |(field, value), operations|
           operations[database_field_name(field)] = value.mongoize
-          operations
+        end
+      end
+
+      def collect_each_operations(ops)
+        ops.each_with_object({}) do |(field, value), operations|
+          operations[database_field_name(field)] = { "$each" => Array.wrap(value).mongoize }
         end
       end
     end
