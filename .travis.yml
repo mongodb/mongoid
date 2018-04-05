@@ -18,22 +18,22 @@ matrix:
   exclude:
     - rvm: ruby-head
       gemfile: gemfiles/rails_master.gemfile
-    - rvm: jruby-9.1.15.0
+    - rvm: jruby-9.1.16.0
       gemfile: gemfiles/rails_master.gemfile
-    - rvm: jruby-9.1.15.0
+    - rvm: jruby-9.1.16.0
       gemfile: gemfiles/driver_master.gemfile
-    - rvm: jruby-9.1.15.0
+    - rvm: jruby-9.1.16.0
       env: MONGODB=2.6.12
-    - rvm: jruby-9.1.15.0
+    - rvm: jruby-9.1.16.0
       env: MONGODB=3.4.10
   allow_failures:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_master.gemfile
 
 rvm:
-  - 2.5
+  - 2.5.1
   - ruby-head
-  - jruby-9.1.15.0
+  - jruby-9.1.16.0
 
 gemfile:
   - Gemfile
