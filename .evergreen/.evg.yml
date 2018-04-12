@@ -522,7 +522,7 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "rhel70-rails-master-all-ruby-standalone"
-  matrix_spec: { driver: "latest", ruby: "ruby-2.4.2", mongodb-version: "3.6", topology: "standalone", rails: 'master' }
+  matrix_spec: { driver: "latest", ruby: "ruby-2.5.0", mongodb-version: "3.6", topology: "standalone", rails: 'master' }
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
