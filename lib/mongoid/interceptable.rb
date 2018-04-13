@@ -126,11 +126,21 @@ module Mongoid
     # @since 2.3.0
     def run_callbacks(kind, *args, &block)
       cascadable_children(kind).each do |child|
-        if child.run_callbacks(child_callback_type(kind, child), *args) == false
+        if child.run_before_callbacks(child_callback_type(kind, child), *args) == false
           return false
         end
       end
-      callback_executable?(kind) ? super(kind, *args, &block) : true
+
+      ret_value = callback_executable?(kind) ? super(kind, *args, &block) : true
+      return false if ret_value == false
+
+      cascadable_children(kind).each do |child|
+        if child.run_after_callbacks(child_callback_type(kind, child), *args) == false
+          return false
+        end
+      end
+
+      ret_value
     end
 
     private
