@@ -111,7 +111,7 @@ module Mongoid
             end
 
             if option == :type && options[option] == Symbol
-              Mongoid.logger.warn FIELD_TYPE_IS_SYMBOL
+              Mongoid.logger.warn(FIELD_TYPE_IS_SYMBOL)
             end
           end
         end

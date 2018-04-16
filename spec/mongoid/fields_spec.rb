@@ -431,6 +431,10 @@ describe Mongoid::Fields do
         expect(Mongoid.logger).to receive(:warn)
       end
 
+      after do
+        Band.fields.delete("should_warn")
+      end
+
       it "warns that the BSON symbol type is deprecated" do
         Band.field :should_warn, type: Symbol
       end
