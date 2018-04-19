@@ -420,7 +420,7 @@ A Note about the BSON Symbol type
 
 Because the BSON specification deprecated the BSON symbol type, the `bson` gem will serialize Ruby
 symbols into BSON strings when used on its own. However, in order to maintain backwards
-compatibility with older datasets, `mongo` gem overrides this behavior to serialize Ruby symbols as
+compatibility with older datasets, the `mongo` gem overrides this behavior to serialize Ruby symbols as
 BSON symbols. This is necessary to be able to specify queries for documents which contain BSON
 symbols as fields.
 
