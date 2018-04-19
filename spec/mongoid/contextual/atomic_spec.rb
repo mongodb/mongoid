@@ -496,7 +496,7 @@ describe Mongoid::Contextual::Atomic do
     end
   end
 
-  describe "#push_all" do
+  describe "#push_each" do
 
     context 'when the criteria does not have a collation' do
 
@@ -517,7 +517,7 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.push_all(members: [ "Alan", "Fletch" ])
+        context.push_each(members: [ "Alan", "Fletch" ])
       end
 
       it "pushes the values to existing arrays" do
@@ -548,7 +548,7 @@ describe Mongoid::Contextual::Atomic do
       end
 
       before do
-        context.push_all(members: [ "Alan", "Fletch" ])
+        context.push_each(members: [ "Alan", "Fletch" ])
       end
 
       it "pushes the values to existing arrays" do
