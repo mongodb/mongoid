@@ -19,7 +19,7 @@ module Mongoid
         #
         # @return [ Array<Hash> ] The inserts.
         #
-        # @since 5.2.2
+        # @since 5.4.0
         def batch_push(docs)
           execute_batch_push(docs)
         end
@@ -129,7 +129,7 @@ module Mongoid
         #
         # @return [ Array<Hash> ] The inserts.
         #
-        # @since 5.2.2
+        # @since 5.4.0
         def execute_batch_set(docs)
           self.inserts_valid = true
           inserts = pre_process_batch_insert(docs)
@@ -154,7 +154,7 @@ module Mongoid
         #
         # @return [ Array<Hash> ] The inserts.
         #
-        # @since 5.2.2
+        # @since 5.4.0
         def execute_batch_push(docs)
           self.inserts_valid = true
           pushes = pre_process_batch_insert(docs)

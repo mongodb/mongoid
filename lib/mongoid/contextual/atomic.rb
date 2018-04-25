@@ -115,7 +115,7 @@ module Mongoid
       #
       # @return [ nil ] Nil.
       #
-      # @since 5.2.2
+      # @since 5.4.0
       def push_each(pushes)
         push_each_updates = collect_operations(pushes).each.inject({}) do |ops, (field, elements)|
           ops.merge!(field => { '$each' => elements })
