@@ -211,10 +211,10 @@ describe Mongoid::Atomic::Modifiers do
 
         it "adds the push all modifiers" do
           expect(modifiers).to eq(
-            { "$pushAll" =>
-              { "addresses" => [
+            { "$push" =>
+              { "addresses" => { '$each' => [
                   { "street" => "Oxford St" }
-                ]
+                ] }
               }
             }
           )
@@ -238,11 +238,11 @@ describe Mongoid::Atomic::Modifiers do
 
         it "adds the push all modifiers" do
           expect(modifiers).to eq(
-            { "$pushAll" =>
-              { "addresses" => [
+            { "$push" =>
+              { "addresses" => { '$each' => [
                   { "street" => "Hobrechtstr." },
                   { "street" => "Pflugerstr." }
-                ]
+                ] }
               }
             }
           )
@@ -270,10 +270,10 @@ describe Mongoid::Atomic::Modifiers do
         it "adds the push all modifiers to the conflicts hash" do
           expect(modifiers).to eq(
             { "$set" => { "addresses.0.street" => "Bond" },
-              conflicts: { "$pushAll" =>
-                { "addresses" => [
+              conflicts: { "$push" =>
+                { "addresses" => { '$each' => [
                     { "street" => "Oxford St" }
-                  ]
+                  ] }
                 }
               }
             }
@@ -300,10 +300,10 @@ describe Mongoid::Atomic::Modifiers do
           expect(modifiers).to eq(
             { "$pullAll" => {
               "addresses" => { "street" => "Bond St" }},
-              conflicts: { "$pushAll" =>
-                { "addresses" => [
+              conflicts: { "$push" => 
+                { "addresses" => { '$each' => [
                     { "street" => "Oxford St" }
-                  ]
+                  ] }
                 }
               }
             }
@@ -328,12 +328,12 @@ describe Mongoid::Atomic::Modifiers do
 
         it "adds the push all modifiers to the conflicts hash" do
           expect(modifiers).to eq(
-            { "$pushAll" => {
-              "addresses.0.locations" => [{ "street" => "Bond St" }]},
-              conflicts: { "$pushAll" =>
-                { "addresses" => [
+            { "$push" => {
+              "addresses.0.locations" => {'$each' => [{ "street" => "Bond St" }]}},
+              conflicts: { "$push" =>
+                { "addresses" => { '$each' => [
                     { "street" => "Oxford St" }
-                  ]
+                  ] }
                 }
               }
             }
