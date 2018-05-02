@@ -32,7 +32,7 @@ module Mongoid
           touches = touch_atomic_updates(field)
           unless touches["$set"].blank?
             selector = atomic_selector
-            _root.collection.find(selector).update_one(positionally(selector, touches), session: session)
+            _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
           end
           run_callbacks(:touch)
           true
