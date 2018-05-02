@@ -341,7 +341,7 @@ module Mongoid
         @criteria, @klass, @cache = criteria, criteria.klass, criteria.options[:cache]
         @collection = @klass.collection
         criteria.send(:merge_type_selection)
-        @view = collection.find(criteria.selector, session: session)
+        @view = collection.find(criteria.selector, session: _session)
         apply_options
       end
 
@@ -706,8 +706,8 @@ module Mongoid
         documents.push(doc) if cacheable?
       end
 
-      def session
-        @criteria.send(:session)
+      def _session
+        @criteria.send(:_session)
       end
 
       def acknowledged_write?

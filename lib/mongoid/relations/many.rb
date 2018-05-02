@@ -213,8 +213,8 @@ module Mongoid
 
       private
 
-      def session
-        base.send(:session)
+      def _session
+        base.send(:_session)
       end
 
       # Find the first object given the supplied attributes or create/initialize it.

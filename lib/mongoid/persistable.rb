@@ -204,7 +204,7 @@ module Mongoid
     def persist_atomic_operations(operations)
       if persisted? && operations
         selector = atomic_selector
-        _root.collection.find(selector).update_one(positionally(selector, operations), session: session)
+        _root.collection.find(selector).update_one(positionally(selector, operations), session: _session)
       end
     end
   end

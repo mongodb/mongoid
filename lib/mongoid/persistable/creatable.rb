@@ -63,7 +63,7 @@ module Mongoid
           selector = _parent.atomic_selector
           _root.collection.find(selector).update_one(
               positionally(selector, atomic_inserts),
-              session: session)
+              session: _session)
         end
       end
 
@@ -78,7 +78,7 @@ module Mongoid
       #
       # @since 4.0.0
       def insert_as_root
-        collection.insert_one(as_attributes, session: session)
+        collection.insert_one(as_attributes, session: _session)
       end
 
       # Post process an insert, which sets the new record attribute to false
