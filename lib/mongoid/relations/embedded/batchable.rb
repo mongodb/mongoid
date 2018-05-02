@@ -13,15 +13,15 @@ module Mongoid
         # made to the database.
         #
         # @example Execute the batch push.
-        #   batchable.batch_insert([ doc_one, doc_two ])
+        #   batchable.batch_push([ doc_one, doc_two ])
         #
         # @param [ Array<Document> ] docs The docs to add.
         #
         # @return [ Array<Hash> ] The inserts.
         #
-        # @since 3.0.0
-        def batch_insert(docs)
-          execute_batch_insert(docs, "$pushAll")
+        # @since 5.4.0
+        def batch_push(docs)
+          execute_batch_push(docs)
         end
 
         # Clear all of the docs out of the relation in a single swipe.
@@ -89,7 +89,7 @@ module Mongoid
             base.delayed_atomic_sets.clear unless _assigning?
             docs = normalize_docs(docs).compact
             target.clear and _unscoped.clear
-            inserts = execute_batch_insert(docs, "$set")
+            inserts = execute_batch_set(docs)
             add_atomic_sets(inserts)
           end
         end
@@ -122,24 +122,48 @@ module Mongoid
         # @api private
         #
         # @example Perform a batch operation.
-        #   batchable.execute_batch(docs, "$set")
+        #   batchable.execute_batch_set(docs)
         #
         # @param [ Array<Document> ] docs The docs to persist.
         # @param [ String ] operation The atomic operation.
         #
         # @return [ Array<Hash> ] The inserts.
         #
-        # @since 3.0.0
-        def execute_batch_insert(docs, operation)
+        # @since 5.4.0
+        def execute_batch_set(docs)
           self.inserts_valid = true
           inserts = pre_process_batch_insert(docs)
           if insertable?
             collection.find(selector).update_one(
-              positionally(selector, operation => { path => inserts })
+              positionally(selector, '$set' => { path => inserts })
             )
             post_process_batch_insert(docs)
           end
           inserts
+        end
+
+        # Perform a batch persist of the provided documents with $push and $each.
+        #
+        # @api private
+        #
+        # @example Perform a batch push.
+        #   batchable.execute_batch_push(docs)
+        #
+        # @param [ Array<Document> ] docs The docs to persist.
+        # @param [ String ] operation The atomic operation.
+        #
+        # @return [ Array<Hash> ] The inserts.
+        #
+        # @since 5.4.0
+        def execute_batch_push(docs)
+          self.inserts_valid = true
+          pushes = pre_process_batch_insert(docs)
+          if insertable?
+            collection.find(selector).update_one(
+                positionally(selector, '$push' => { path => { '$each' => pushes } }))
+            post_process_batch_insert(docs)
+          end
+          pushes
         end
 
         # Are we in a state to be able to batch insert?
