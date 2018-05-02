@@ -53,7 +53,7 @@ module Mongoid
 
       private
 
-      def session
+      def _session
         Threaded.get_session
       end
 
@@ -104,7 +104,7 @@ module Mongoid
 
         private
 
-        def session
+        def _session
           Threaded.get_session
         end
       end
