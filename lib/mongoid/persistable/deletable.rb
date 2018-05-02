@@ -64,7 +64,7 @@ module Mongoid
           selector = _parent.atomic_selector
           _root.collection.find(selector).update_one(
               positionally(selector, atomic_deletes),
-              session: session)
+              session: _session)
         end
         true
       end
@@ -80,7 +80,7 @@ module Mongoid
       #
       # @since 4.0.0
       def delete_as_root
-        collection.find(atomic_selector).delete_one(session: session)
+        collection.find(atomic_selector).delete_one(session: _session)
         true
       end
 

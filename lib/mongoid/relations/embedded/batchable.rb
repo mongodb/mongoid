@@ -39,7 +39,7 @@ module Mongoid
           unless docs.empty?
             collection.find(selector).update_one(
               positionally(selector, "$unset" => { path => true }),
-              session: session
+              session: _session
             )
             post_process_batch_remove(docs, :delete)
           end
@@ -60,7 +60,7 @@ module Mongoid
           if !docs.empty?
             collection.find(selector).update_one(
               positionally(selector, "$pullAll" => { path => removals }),
-              session: session
+              session: _session
             )
             post_process_batch_remove(docs, method)
           end
@@ -136,7 +136,7 @@ module Mongoid
           if insertable?
             collection.find(selector).update_one(
                 positionally(selector, '$set' => { path => inserts }),
-                session: session
+                session: _session
             )
             post_process_batch_insert(docs)
           end
@@ -161,7 +161,7 @@ module Mongoid
           if insertable?
             collection.find(selector).update_one(
                 positionally(selector, '$push' => { path => { '$each' => pushes } }),
-                session: session
+                session: _session
             )
             post_process_batch_insert(docs)
           end

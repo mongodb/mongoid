@@ -49,7 +49,7 @@ module Mongoid
         unless removed.empty?
           collection.find(selector).update_one(
             positionally(selector, "$pullAll" => { path => removed }),
-            session: session
+            session: _session
           )
         end
         deleted
@@ -304,7 +304,7 @@ module Mongoid
           updates["$set"].merge!(doc.atomic_updates["$set"] || {})
           doc.move_changes
         end
-        collection.find(selector).update_one(updates, session: session) unless updates["$set"].empty?
+        collection.find(selector).update_one(updates, session: _session) unless updates["$set"].empty?
       end
 
       # Get the limiting value.
@@ -446,8 +446,8 @@ module Mongoid
         doc.destroyed = true
       end
 
-      def session
-        @criteria.send(:session)
+      def _session
+        @criteria.send(:_session)
       end
     end
   end
