@@ -4,38 +4,25 @@ sudo: false
 
 bundler_args: --without development
 
+before_install:
+  - gem update --system
+  - gem update bundler
+
 rvm:
-  - 1.9.3
-  - 2.0
-  - 2.2
-  - 2.3.3
-  - 2.4.1
+  - 2.5.1
   - ruby-head
-  - jruby-19mode
-  - jruby-9.1.8.0
-  - jruby-head
+  - jruby-9.1.16.0
 
 gemfile:
   - Gemfile
-  - gemfiles/rails41.gemfile
-  - gemfiles/rails40.gemfile
   - gemfiles/driver_master.gemfile
 
 matrix:
+  fast_finish: true
   allow_failures:
-    - rvm: 1.9.3
     - rvm: ruby-head
-    - rvm: jruby-head
   exclude:
-    - rvm: jruby-9.1.8.0
-      gemfile: gemfiles/driver_master.gemfile
-    - rvm: 2.4.1
-      gemfile: gemfiles/rails40.gemfile
-    - rvm: 2.4.1
-      gemfile: gemfiles/rails41.gemfile
-    - rvm: jruby-19mode
-      gemfile: gemfiles/driver_master.gemfile
-    - rvm: jruby-head
+    - rvm: jruby-9.1.16.0
       gemfile: gemfiles/driver_master.gemfile
 
 env:
@@ -44,9 +31,8 @@ env:
     - JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
   matrix:
     - MONGODB=2.6.12
-    - MONGODB=3.0.12
-    - MONGODB=3.2.11
-    - MONGODB=3.4.1
+    - MONGODB=3.4.10
+    - MONGODB=3.6.2
 
 before_script:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB}.tgz -O /tmp/mongodb.tgz
