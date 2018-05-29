@@ -13,7 +13,7 @@ Issues are now in the [Mongoid Jira project](https://jira.mongodb.org/browse/MON
 Project Tracking
 ----------------
 
-* [Mongoid Website and Documentation](http://mongoid.org)
+* [Mongoid Website and Documentation](http://www.mongoid.org)
 * [Mongoid Google Group](http://groups.google.com/group/mongoid)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/mongoid)
 * [#mongoid](http://webchat.freenode.net/?channels=mongoid) on freenode IRC
