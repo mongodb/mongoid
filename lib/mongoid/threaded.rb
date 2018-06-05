@@ -164,6 +164,30 @@ module Mongoid
       validations_for(document.class).delete_one(document._id)
     end
 
+    # Begin suppressing default scopes for given model on the current thread.
+    #
+    # @example Begin without default scope stack.
+    #   Threaded.begin_without_default_scope(klass)
+    #
+    # @param [ Class ] klass The model to suppress default scoping on.
+    #
+    # @since VERSION
+    def begin_without_default_scope(klass)
+      stack(:without_default_scope).push(klass)
+    end
+
+    # Exit suppressing default scopes for given model on the current thread.
+    #
+    # @example Exit without default scope stack.
+    #   Threaded.exit_without_default_scope(klass)
+    #
+    # @param [ Class ] klass The model to unsuppress default scoping on.
+    #
+    # @since VERSION
+    def exit_without_default_scope(klass)
+      stack(:without_default_scope).delete(klass)
+    end
+
     # Get the global client override.
     #
     # @example Get the global client override.
@@ -246,6 +270,18 @@ module Mongoid
         Thread.current[CURRENT_SCOPE_KEY] ||= {}
         Thread.current[CURRENT_SCOPE_KEY][klass] = scope
       end
+    end
+
+    # Is the given klass' default scope suppressed on the current thread?
+    #
+    # @example Is the given klass' default scope suppressed?
+    #   Threaded.without_default_scope?(klass)
+    #
+    # @param [ Class ] klass The model to check for default scope suppression.
+    #
+    # @since VERSION
+    def without_default_scope?(klass)
+      stack(:without_default_scope).include?(klass)
     end
 
     # Is the document autosaved on the current thread?
