@@ -28,18 +28,3 @@ framework for MongoDB in Ruby.
 
 
 For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
-
-Additional Mappers
-------------------
-
-In addition to Mongoid, several other mappers are available:
-
-- `MongoMapper <http://mongomapper.com/>`_ from John Nunemaker
-
-- `MongoODM <https://github.com/carlosparamio/mongo_odm>`_ from Carlos Paramio
-
-- `DriverAPILayer <http://alexeypetrushin.github.com/mongodb/driver.html>`_ from Alexey Petrushin
-
-All the mappers build on top of the basic Ruby driver and so some
-knowledge of that is useful, especially if you work with a custom
-MongoDB configuration.
