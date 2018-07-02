@@ -1,12 +1,9 @@
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+require 'lite_spec_helper'
 
 MODELS = File.join(File.dirname(__FILE__), "app/models")
 $LOAD_PATH.unshift(MODELS)
 
 require "action_controller"
-require "mongoid"
-require "rspec"
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.
