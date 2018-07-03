@@ -26,14 +26,15 @@ To install the gem with bundler, include the following in your Gemfile:
 
 .. code-block:: ruby
 
-   gem 'mongoid', '~> 6.1.0'
+   gem 'mongoid', '~> 7.0'
 
 Compatibility
 -------------
 
 Note the following compatibility matrix to determine if Mongoid is
-supported on your runtime and server. Note that Mongoid 6.x is compatible with
-Rails 5 and thus requires >= Ruby 2.2.2.
+compatible your Ruby version and MongoDB server. Note that Mongoid
+is currently compatible with Rails 5 and depends on ActiveModel 5.1 or higher,
+and thus requires Ruby 2.2.2 or higher.
 
 .. list-table::
    :header-rows: 1
@@ -43,8 +44,12 @@ Rails 5 and thus requires >= Ruby 2.2.2.
      - MongoDB 3.0.x
      - MongoDB 3.2.x
      - MongoDB 3.4.x
+     - MongoDB 3.6.x
+     - MongoDB 4.0.x
 
    * - MRI 2.1.x
+     - No
+     - No
      - No
      - No
      - No
@@ -53,8 +58,12 @@ Rails 5 and thus requires >= Ruby 2.2.2.
      - Yes
      - Yes
      - Yes
+     - Yes
+     - Yes
 
    * - MRI 2.3.x
+     - Yes
+     - Yes
      - Yes
      - Yes
      - Yes
@@ -63,8 +72,12 @@ Rails 5 and thus requires >= Ruby 2.2.2.
      - Yes
      - Yes
      - Yes
+     - Yes
+     - Yes
 
    * - JRuby 9.1.x
+     - Yes
+     - Yes
      - Yes
      - Yes
      - Yes
@@ -74,9 +87,10 @@ Rails 5 and thus requires >= Ruby 2.2.2.
 Configuration
 -------------
 
-Mongoid configuration can be done through a ``mongoid.yml`` that specifies your
+Mongoid is customarily configured through a ``mongoid.yml`` file that specifies
 options and clients. The simplest configuration is as follows, which sets the default
-client to "localhost:27017" and provides a single database in that client named "mongoid".
+client to talk to a MongoDB server at "localhost:27017" using
+a database named "mongoid".
 
 .. code-block:: yaml
 
@@ -87,34 +101,45 @@ client to "localhost:27017" and provides a single database in that client named 
         hosts:
           - localhost:27017
 
+The top level key in the configuration file, ``development`` in the above
+example, refers to the environment name which the application is executing in,
+i.e. ``development``, ``test`` or ``production``. The third level key,
+``default`` in the above example, refers to the Mongoid client name.
+Most applications will use a single client named ``default``.
+
 Rails Applications
 ******************
 
-You can generate a config file by executing the generator and then editing
-``myapp/config/mongoid.yml`` to your heart's desire. Mongoid will then handle
-everything else from there.
+If you are using Rails, you can have Mongoid generate a default configuration
+file for you by running the following command:
 
 .. code-block:: bash
 
   $ rails g mongoid:config
 
-When Mongoid loads its configuration, it chooses the environment to use based
-on the following order:
+The configuration file will be placed in ``config/mongoid.yml``.
+
+Environment Determination
+*************************
+
+When Mongoid loads its configuration, it chooses the environment to use
+in the following order:
 
 - ``Rails.env`` if using Rails.
 - ``Sinatra::Base.environment`` if using Sinatra.
 - ``RACK_ENV`` environment variable.
 - ``MONGOID_ENV`` environment variable.
 
-If you are not using any rack based application and want to override the
-environment programatically, you can pass a second paramter to ``load!`` and
-Mongoid will use that.
+If you are not building a Rack based application and want to override the
+environment programatically, you can pass a second parameter to ``load!``
+as follows:
 
 .. code-block:: ruby
 
   Mongoid.load!("path/to/your/mongoid.yml", :production)
 
-Depending on your version of Rails, you may also need to configure the orm to be Mongoid in application.rb.
+Depending on your version of Rails, you may also need to configure the ORM
+to be Mongoid in application.rb like so:
 
 .. code-block:: ruby
 
@@ -126,8 +151,8 @@ Anatomy of a Mongoid Config
 ***************************
 
 Let's have a look at a full-blown ``mongoid.yml`` and explain the full power
-of what Mongoid can do. The following configuration has its explanation in the
-comments above each key.
+of what Mongoid can do. The following configuration has explanation of the
+various options in the comments above each key:
 
 .. code-block:: yaml
 
@@ -138,7 +163,8 @@ comments above each key.
       default:
         # A uri may be defined for a client:
         # uri: 'mongodb://user:password@myhost1.mydomain.com:27017/my_db'
-        # Please see driver documentation for details. Alternatively, you can define the following:
+        # Please see driver documentation for details. Alternatively, you can
+        # define the following:
         #
         # Define the name of the default database that Mongoid can connect to.
         # (required).
