@@ -88,9 +88,9 @@ Configuration
 -------------
 
 Mongoid is customarily configured through a ``mongoid.yml`` file that specifies
-options and clients. The simplest configuration is as follows, which sets the default
-client to talk to a MongoDB server at "localhost:27017" using
-a database named "mongoid".
+options and clients. The simplest configuration is as follows, which configures
+Mongoid to talk to a MongoDB server at "localhost:27017" and use the database
+named "mongoid".
 
 .. code-block:: yaml
 
@@ -104,7 +104,7 @@ a database named "mongoid".
 The top level key in the configuration file, ``development`` in the above
 example, refers to the environment name which the application is executing in,
 i.e. ``development``, ``test`` or ``production``. The third level key,
-``default`` in the above example, refers to the Mongoid client name.
+``default`` in the above example, refers to the Mongo client name.
 Most applications will use a single client named ``default``.
 
 Rails Applications
@@ -293,13 +293,51 @@ various options in the comments above each key:
       # Set the Mongoid and Ruby driver log levels. (default: :info)
       log_level: :info
 
-Logging
-*******
+Inline Configuration
+********************
 
-Changing logging options is done simply by telling Mongoid or the driver's logger to have
-a different level. Logging level is ``DEBUG`` by default.
+It is also possible to configure Mongoid directly in Ruby, without using
+a configuration file. This configuration mechanism does not support defining
+multiple environments, however it does support defining multiple clients.
 
 .. code-block:: ruby
 
+  Mongoid.configure do |config|
+    config.clients.default = {
+      hosts: ['localhost:27017'],
+      database: 'my_db',
+    }
+    
+    config.log_level = :warn
+  end
+
+Logging
+*******
+
+Mongoid and the MongoDB Ruby driver have separate loggers and log levels.
+
+If Mongoid is loaded in the context of a Rails application, it will
+use Rails' configured logger by default. Otherwise Mongoid will configure
+itself to log to ``STDOUT`` with the default log level of ``INFO``.
+
+The Ruby driver's default log level is ``DEBUG``, and changing Mongoid's
+log level does not affect the Ruby driver's log level.
+However, if Mongoid is configured with a configuration file, the
+log level specified in the configuration file will be applied to both
+the Mongoid and the Ruby driver loggers.
+
+To change the log levels:
+
+.. code-block:: ruby
+
+  # Mongoid
   Mongoid.logger.level = Logger::DEBUG
-  Mongo::Logger.logger.level = Logger::DEBUG
+  # Ruby driver
+  Mongo::Logger.logger.level = Logger::INFO
+
+*Note:* The Mongo client is a Ruby driver client instance, therefore
+the logger of a Mongo client is the Ruby driver logger, not the Mongoid
+logger. In other words:
+
+  # Ruby driver logger, not Mongoid logger
+  Mongoid.client(:default).logger == Mongo::Logger.logger
