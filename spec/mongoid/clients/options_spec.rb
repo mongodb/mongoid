@@ -177,25 +177,40 @@ describe Mongoid::Clients::Options do
 
       context 'when returning a criteria' do
 
-        let(:context_and_criteria) do
-          collection = nil
-          cxt = Band.with(read: :secondary) do |klass|
-            collection = klass.all.collection
-            klass.persistence_context
+        shared_context 'applies secondary read preference' do
+
+          let(:context_and_criteria) do
+            collection = nil
+            cxt = Band.with(read_secondary_option) do |klass|
+              collection = klass.all.collection
+              klass.persistence_context
+            end
+            [ cxt, collection ]
           end
-          [ cxt, collection ]
+
+          let(:persistence_context) do
+            context_and_criteria[0]
+          end
+
+          let(:client) do
+            context_and_criteria[1].client
+          end
+
+          it 'applies the options to the criteria client' do
+            expect(client.options['read']).to eq('mode' => :secondary)
+          end
         end
 
-        let(:persistence_context) do
-          context_and_criteria[0]
+        context 'read: :secondary shorthand' do
+          let(:read_secondary_option) { {read: :secondary} }
+
+          it_behaves_like 'applies secondary read preference'
         end
 
-        let(:client) do
-          context_and_criteria[1].client
-        end
+        context 'read: {mode: :secondary}' do
+          let(:read_secondary_option) { {read: {mode: :secondary}} }
 
-        it 'applies the options to the criteria client' do
-          expect(client.options['read']).to eq(:secondary)
+          it_behaves_like 'applies secondary read preference'
         end
       end
 
