@@ -107,10 +107,6 @@ module Mongoid
     #
     # @since 6.0.0
     def client
-      client_options = send(:client_options)
-      if client_options[:read].is_a?(Symbol)
-        client_options = client_options.merge(read: {mode: client_options[:read]})
-      end
       @client ||= (client = Clients.with_name(client_name)
                     client = client.use(database_name) if database_name_option
                     client.with(client_options))
@@ -154,9 +150,15 @@ module Mongoid
     end
 
     def client_options
-      @client_options ||= options.select do |k, v|
-                            Mongo::Client::VALID_OPTIONS.include?(k.to_sym)
-                          end
+      @client_options ||= begin
+        opts = options.select do |k, v|
+                              Mongo::Client::VALID_OPTIONS.include?(k.to_sym)
+                            end
+        if opts[:read].is_a?(Symbol)
+          opts[:read] = {mode: opts[:read]}
+        end
+        opts
+      end
     end
 
     def database_name_option
