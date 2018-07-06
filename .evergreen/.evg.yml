@@ -476,6 +476,10 @@ axes:
         display_name: ruby-2.3
         variables:
            RVM_RUBY: "ruby-2.3"
+      - id: "ruby-2.4"
+        display_name: ruby-2.4
+        variables:
+           RVM_RUBY: "ruby-2.4"
       - id: "ruby-2.5.0"
         display_name: ruby-2.5.0
         variables:
