@@ -150,9 +150,15 @@ module Mongoid
     end
 
     def client_options
-      @client_options ||= options.select do |k, v|
-                            Mongo::Client::VALID_OPTIONS.include?(k.to_sym)
-                          end
+      @client_options ||= begin
+        opts = options.select do |k, v|
+                              Mongo::Client::VALID_OPTIONS.include?(k.to_sym)
+                            end
+        if opts[:read].is_a?(Symbol)
+          opts[:read] = {mode: opts[:read]}
+        end
+        opts
+      end
     end
 
     def database_name_option
@@ -208,7 +214,7 @@ module Mongoid
         if context = get(object)
           context.client.close unless (context.cluster.equal?(cluster) || cluster.nil?)
         end
-      ensure  
+      ensure
         Thread.current["[mongoid][#{object.object_id}]:context"] = nil
       end
     end

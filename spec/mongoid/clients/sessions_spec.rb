@@ -16,17 +16,17 @@ describe Mongoid::Clients::Sessions do
   end
 
   let(:subscriber) do
-    Mongoid::Clients.with_name(:other).instance_variable_get(:@monitoring).subscribers['Command'].find do |s|
+    Mongoid::Clients.with_name(:other).send(:monitoring).subscribers['Command'].find do |s|
       s.is_a?(EventSubscriber)
     end
   end
 
   let(:insert_events) do
-    subscriber.started_events.select { |event| event.command_name == :insert }
+    subscriber.started_events.select { |event| event.command_name == 'insert' }
   end
 
   let(:update_events) do
-    subscriber.started_events.select { |event| event.command_name == :update }
+    subscriber.started_events.select { |event| event.command_name == 'update' }
   end
 
   context 'when a session is used on a model class' do
