@@ -4,6 +4,10 @@ MODELS = File.join(File.dirname(__FILE__), "app/models")
 $LOAD_PATH.unshift(MODELS)
 
 require "action_controller"
+begin
+  require 'byebug'
+rescue LoadError
+end
 
 # These environment variables can be set if wanting to test against a database
 # that is not on the local machine.
