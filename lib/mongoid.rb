@@ -49,6 +49,11 @@ module Mongoid
   # @example Set up configuration options.
   #   Mongoid.configure do |config|
   #     config.connect_to("mongoid_test")
+  #
+  #     config.clients.default = {
+  #       hosts: ["localhost:27017"],
+  #       database: "mongoid_test",
+  #     }
   #   end
   #
   # @return [ Config ] The configuration object.
