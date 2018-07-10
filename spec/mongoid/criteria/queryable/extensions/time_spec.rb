@@ -1,4 +1,4 @@
-require "spec_helper"
+require "lite_spec_helper"
 
 describe Time do
 
@@ -8,20 +8,25 @@ describe Time do
 
       context "when the time is not in utc" do
 
-        let(:date) do
-          Time.new(2010, 1, 1, 12, 0, 0)
+        let(:time) do
+          Time.new(2010, 1, 1, 14, 0, 0, '+02:00')
         end
 
         let(:evolved) do
-          described_class.evolve(date)
+          described_class.evolve(time)
         end
 
         let(:expected) do
-          Time.new(2010, 1, 1, 12, 0, 0).utc
+          Time.new(2010, 1, 1, 12, 0, 0, '+00:00')
         end
 
         it "returns the same time" do
           expect(evolved).to eq(expected)
+        end
+
+        it 'does not mutate original time' do
+          described_class.evolve(time)
+          expect(time.utc_offset).to eq(7200)
         end
 
         it "returns the time in utc" do
@@ -31,12 +36,12 @@ describe Time do
 
       context "when the time is already utc" do
 
-        let(:date) do
+        let(:time) do
           Time.new(2010, 1, 1, 12, 0, 0).utc
         end
 
         let(:evolved) do
-          described_class.evolve(date)
+          described_class.evolve(time)
         end
 
         let(:expected) do
@@ -57,12 +62,12 @@ describe Time do
 
       context "when the array is composed of times" do
 
-        let(:date) do
+        let(:time) do
           Time.new(2010, 1, 1, 12, 0, 0)
         end
 
         let(:evolved) do
-          described_class.evolve([ date ])
+          described_class.evolve([ time ])
         end
 
         let(:expected) do
@@ -80,16 +85,16 @@ describe Time do
 
       context "when the array is composed of strings" do
 
-        let(:date) do
+        let(:time) do
           Time.parse("1st Jan 2010 12:00:00+01:00")
         end
 
         let(:evolved) do
-          described_class.evolve([ date.to_s ])
+          described_class.evolve([ time.to_s ])
         end
 
         it "returns the strings as a times" do
-          expect(evolved).to eq([ date.to_time ])
+          expect(evolved).to eq([ time.to_time ])
         end
 
         it "returns the times in utc" do
@@ -146,7 +151,7 @@ describe Time do
 
     context "when provided a range" do
 
-      context "when the range are dates" do
+      context "when the range are times" do
 
         let(:min) do
           Time.new(2010, 1, 1, 12, 0, 0)
@@ -273,16 +278,16 @@ describe Time do
 
     context "when provided a string" do
 
-      let(:date) do
+      let(:time) do
         Time.parse("1st Jan 2010 12:00:00+01:00")
       end
 
       let(:evolved) do
-        described_class.evolve(date.to_s)
+        described_class.evolve(time.to_s)
       end
 
       it "returns the string as a time" do
-        expect(evolved).to eq(date.to_time)
+        expect(evolved).to eq(time.to_time)
       end
 
       it "returns the time in utc" do

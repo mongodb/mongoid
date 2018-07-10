@@ -28,7 +28,7 @@ module Mongoid
           #
           # @since 1.0.0
           def __evolve_time__
-            utc
+            getutc
           end
 
           module ClassMethods
