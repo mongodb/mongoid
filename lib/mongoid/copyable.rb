@@ -73,8 +73,9 @@ module Mongoid
         next unless attrs.present? && attrs[association.key].present?
 
         if association.is_a?(Association::Embedded::EmbedsMany)
-          attrs[association.name.to_s].each_with_index do |attr, index|
-            process_localized_attributes(send(association.name)[index].class, attr)
+          attrs[association.name.to_s].each do |attr|
+            embedded_klass = attr.fetch('_type', association.class_name).constantize
+            process_localized_attributes(embedded_klass, attr)
           end
         else
           process_localized_attributes(association.klass, attrs[association.key])
