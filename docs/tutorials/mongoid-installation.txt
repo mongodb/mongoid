@@ -38,7 +38,6 @@ and thus requires Ruby 2.2.2 or higher.
 
 .. list-table::
    :header-rows: 1
-   :widths: 28 30 30 30
 
    * - Ruby Version
      - MongoDB 3.0.x
