@@ -315,6 +315,25 @@ describe Mongoid::Persistable::Settable do
         end
       end
 
+      context 'when a leaf value in the nested hash is updated to a number' do
+
+        let(:church) do
+          Church.new.tap do |a|
+            a.location = {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}
+            a.name = 'Church1'
+            a.save
+          end
+        end
+
+        before do
+          church.set('location.address.city' => 12345)
+        end
+
+        it 'does not reset the nested hash' do
+          expect(church.name).to eq('Church1')
+          expect(church.location).to eql({'address' => {'city' => 12345, 'street' => 'Yorckstr'}})
+        end
+      end
 
       context 'when the nested hash is many levels deep' do
 
