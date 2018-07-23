@@ -339,5 +339,7 @@ To change the log levels:
 the logger of a Mongo client is the Ruby driver logger, not the Mongoid
 logger. In other words:
 
+.. code-block:: ruby
+
   # Ruby driver logger, not Mongoid logger
   Mongoid.client(:default).logger == Mongo::Logger.logger
