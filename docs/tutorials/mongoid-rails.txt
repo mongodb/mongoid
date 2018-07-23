@@ -11,8 +11,73 @@ Rails Considerations
    :class: singlecol
 
 Mongoid was built and targeted towards Rails applications, even though it will
-work in any environment. However if you are using Rails consult the next sections
-on how Mongoid hooks into a Rails application.
+work in any Ruby application. This document explains how
+to use Mongoid with a Rails application.
+
+.. _rails-compatibility:
+
+Rails Version Compatibility
+---------------------------
+
+Refer to the following compatibility matrix to determine which version
+of Mongoid to use with your Rails application.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Mongoid Version
+     - Rails 5.2
+     - Rails 5.1
+     - Rails 5.0
+     - Rails 4.2
+
+   * - Mongoid 7.0
+     - Yes
+     - Yes
+     - No
+     - No
+
+   * - Mongoid 6.4
+     - Yes
+     - Yes
+     - No
+     - No
+
+   * - Mongoid 6.3
+     - Yes
+     - Yes
+     - No
+     - No
+
+   * - Mongoid 6.2
+     - Yes
+     - Yes
+     - No
+     - No
+
+   * - Mongoid 6.1
+     - No
+     - No
+     - Yes
+     - No
+
+   * - Mongoid 6.0
+     - No
+     - No
+     - Yes
+     - No
+
+   * - Mongoid 5.4
+     - No
+     - No
+     - No
+     - Yes
+
+   * - Mongoid 5.2
+     - No
+     - No
+     - No
+     - Yes
 
 
 Using Mongoid with a new Rails application

@@ -88,6 +88,9 @@ and thus requires Ruby 2.2.2 or higher.
      - Yes
      - Yes
 
+Refer to :ref:`Rails considerations <rails-compatibility>`
+for the Ruby on Rails compatibility matrix.
+
 .. _mongoid-configuration:
 
 Configuration
