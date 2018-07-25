@@ -329,7 +329,7 @@ describe Mongoid::Persistable::Settable do
           church.set('location.address.city' => 12345)
         end
 
-        it 'does not reset the nested hash' do
+        it 'updates the nested value to the correct value' do
           expect(church.name).to eq('Church1')
           expect(church.location).to eql({'address' => {'city' => 12345, 'street' => 'Yorckstr'}})
         end
