@@ -10,20 +10,21 @@ Persistence Methods
    :depth: 1
    :class: singlecol
 
-Mongoid supports all expected CRUD operations for those familiar with other Ruby mappers
-like Active Record or Data Mapper. What distinguishes Mongoid from other mappers for MongoDB
-is that the general persistence operations perform atomic updates on only the fields that have
-changed instead of writing the entire document to the database each time.
+Mongoid supports all expected CRUD operations for those familiar with other
+Ruby mappers like Active Record or Data Mapper. What distinguishes Mongoid
+from other mappers for MongoDB is that the general persistence operations
+perform atomic updates on only the fields that have changed instead of
+writing the entire document to the database each time.
 
-The persistence sections will provide examples on what database operation is performed
-when executing the documented command.
+The persistence sections will provide examples on what database operation is
+performed when executing the documented command.
 
 Standard
 --------
 
-Mongoid's standard persistence methods come in the form of common methods you would find
-in other mapping frameworks. The following table shows all standard operations with
-examples.
+Mongoid's standard persistence methods come in the form of common methods you
+would find in other mapping frameworks. The following table shows all standard
+operations with examples.
 
 .. list-table::
    :header-rows: 1
