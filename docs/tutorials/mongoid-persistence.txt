@@ -32,46 +32,100 @@ examples.
    * - Operation
      - Example
 
-   * - ``Model.create``
-
-       *Insert a document or multiple documents into the database.*
-     -
-        .. code-block:: ruby
-
-          Person.create(
-            first_name: "Heinrich",
-            last_name: "Heine"
-          )
-
-          Person.create([
-            { first_name: "Heinrich", last_name: "Heine" },
-            { first_name: "Willy", last_name: "Brandt" }
-          ])
-
-          Person.create(first_name: "Heinrich") do |doc|
-            doc.last_name = "Heine"
-          end
-
    * - ``Model.create!``
 
-       *Insert a document or multiple documents into the database, raising an error
-       if a validation error occurs.*
+       *Insert a document or multiple documents into the database, raising an
+       error if a validation or server error occurs.*
+       
+       *Pass a hash of attributes to create one document with the specified
+       attributes, or an array of hashes to create multiple documents.
+       If a singe hash is passed, the corresponding document is returned.
+       If an array of hashes is passed, an array of documents corresponding
+       to the hashes is returned.*
+       
+       *If a block is given to* ``create!`` *, it will be invoked with each
+       document as the argument in turn prior to attempting to save that
+       document.*
+       
+       *If there is a problem saving any of the documents, such as
+       a validation error or a server error, an exception is raised
+       and, consequently, none of the documents are returned.
+       However, if an array of hashes was passed and previous documents were
+       successfully saved, those documents will remain in the database.*
      -
         .. code-block:: ruby
 
           Person.create!(
             first_name: "Heinrich",
             last_name: "Heine"
-          )
+          ) # => Person instance
 
           Person.create!([
             { first_name: "Heinrich", last_name: "Heine" },
             { first_name: "Willy", last_name: "Brandt" }
-          ])
+          ]) # => Array of two Person instances
 
           Person.create!(first_name: "Heinrich") do |doc|
             doc.last_name = "Heine"
+          end # => Person instance
+
+   * - ``Model.create``
+
+       *Instantiate a document or multiple documents and, if validations pass,
+       insert them into the database.*
+       
+       ``create`` *is similar to* ``create!`` *but does not raise
+       exceptions on validation errors. It still raises errors on server
+       errors, such as trying to insert a document with an* ``_id`` *that
+       already exists in the collection.*
+       
+       *If any validation errors are encountered, the respective document
+       is not inserted but is returned along with documents that were inserted.
+       Use* ``persisted?`` *,* ``new_record?`` *or* ``errors`` *methods
+       to check which of the returned documents were inserted into the
+       database.*
+     -
+        .. code-block:: ruby
+
+          Person.create(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          ) # => Person instance
+
+          Person.create([
+            { first_name: "Heinrich", last_name: "Heine" },
+            { first_name: "Willy", last_name: "Brandt" }
+          ]) # => Array of two Person instances
+
+          Person.create(first_name: "Heinrich") do |doc|
+            doc.last_name = "Heine"
+          end # => Person instance
+          
+          class Post
+            include Mongoid::Document
+            
+            validates_uniqueness_of :title
           end
+          
+          posts = Post.create([{title: "test"}, {title: "test"}])
+          # => array of two Post instances
+          posts.map { |post| post.persisted? } # => [true, false]
+
+   * - ``Model#save!``
+
+       *Saves the changed attributes to the database atomically, or insert the document if
+       new. Will raise an error of validations fail.*
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.save!
+
+          person.first_name = "Christian Johan"
+          person.save!
 
    * - ``Model#save``
 
@@ -89,22 +143,6 @@ examples.
 
           person.first_name = "Christian Johan"
           person.save
-
-   * - ``Model#save!``
-
-       *Saves the changed attributes to the database atomically, or insert the document if
-       new. Will raise an error of validations fail.*
-     -
-        .. code-block:: ruby
-
-          person = Person.new(
-            first_name: "Heinrich",
-            last_name: "Heine"
-          )
-          person.save!
-
-          person.first_name = "Christian Johan"
-          person.save!
 
    * - ``Model#update_attributes``
 
