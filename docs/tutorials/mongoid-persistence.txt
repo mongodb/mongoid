@@ -113,8 +113,10 @@ examples.
 
    * - ``Model#save!``
 
-       *Saves the changed attributes to the database atomically, or insert the document if
-       new. Will raise an error of validations fail.*
+       *Save the changed attributes to the database atomically, or insert the document if
+       new. Raises an exception if validations fail or there is a server error.*
+       
+       *Returns true if the changed attributes were saved, raises an exception otherwise.*
      -
         .. code-block:: ruby
 
@@ -129,8 +131,15 @@ examples.
 
    * - ``Model#save``
 
-       *Saves the changed attributes to the database atomically, or insert the document
-       if flagged as a new record via* ``Model#new_record?`` *. Can bypass validations if wanted.*
+       *Save the changed attributes to the database atomically, or insert the document
+       if new.*
+       
+       *Returns true if the changed attributes were saved. Returns false
+       if there were any validation errors. Raises an exception if
+       the document passed validation but there was a server error during
+       the save.*
+       
+       *Pass* ``validate: false`` *option to bypass validations.*
      -
         .. code-block:: ruby
 
