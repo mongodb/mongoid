@@ -366,11 +366,66 @@ no callbacks will ever get run, nor will any validations.
 
    * - ``Model#set``
 
-       *Performs an atomic $set on the field.*
+       *Updates an attribute on the model instance and, if the instance
+       is already persisted, performs an atomic $set on the field, bypassing
+       validations.*
+       
+       ``set`` *can also deeply set values on Hash fields.*
+       
+       ``set`` *can also deeply set values on* ``embeds_one`` *associations.
+       If such an association's document is nil, one will be created prior
+       to the update.*
+
+       ``set`` *should not be used with* ``has_one`` *associations, as it
+       does not correctly work in such cases.*
+
      -
         .. code-block:: ruby
 
-          person.set(name: "Tyler Durden")
+          person = Person.create!(name: "Ricky Bobby")
+          person.set(name: "Tyler Durden") # updates name in the database
+
+
+    	  person = Person.new
+          person.set(name: "Tyler Durden") # does not write to database
+    	  person.name # => "Tyler Durden"
+    	  person.persisted? # => true
+
+
+    	  class Post
+    	    include Mongoid::Document
+    	    
+    	    field :metadata, type: Hash
+    	  end
+    	  
+          post = Post.create!
+          post.set('metadata.published_at' => Time.now)
+          post.metadata['published_at'] # => Time instance
+          
+          post.set('metadata.approved.today' => true)
+          post.metadata['approved'] # => {'today' => true}
+
+
+          class Flight
+            include Mongoid::Document
+
+            embeds_one :plan
+          end
+
+          class Plan
+            include Mongoid::Document
+
+            embedded_in :flight
+
+            field :route, type: String
+          end
+          
+          flight = Flight.create!
+          flight.plan # => nil
+          flight.set('plan.route', 'test route')
+          flight.plan # => Plan instance
+          flight.plan.route # => "test route"
+
 
    * - ``Model#unset``
 
