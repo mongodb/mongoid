@@ -243,6 +243,48 @@ examples.
 
           Person.destroy_all
 
+Mongoid provides the following persistence-related attributes:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Attribute
+     - Example
+
+
+   * - ``Model#new_record?``
+
+       *Returns* ``true`` *if the model instance has not yet been saved
+       to the database. Opposite of* ``persisted?``
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.new_record? # => true
+          person.save!
+          person.new_record? # => false
+
+   * - ``Model#persisted?``
+
+       *Returns* ``true`` *if the model instance has been saved
+       to the database. Opposite of* ``new_record?``
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.persisted? # => false
+          person.save!
+          person.persisted? # => true
+
+
+
 Atomic
 ------
 
