@@ -7,8 +7,10 @@ Validation
 Mongoid includes ``ActiveModel::Validations`` to supply the basic
 validation plus an additional associated and uniqueness validator.
 
-See the `ActiveModel::Validations
-<http://github.com/rails/rails/blob/master/activemodel/lib/active_model/validations.rb>`_ 
+See the `Active Record Validations
+<https://guides.rubyonrails.org/active_record_validations.html>`_
+Rails guide and `ActiveModel::Validations
+<https://api.rubyonrails.org/classes/ActiveModel/Validations.html>`_ 
 documentation for more information.
 
 Mongoid behaves slightly different to Active Record when using ``#valid?``
