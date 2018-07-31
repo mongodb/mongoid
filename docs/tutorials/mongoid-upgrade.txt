@@ -1,19 +1,33 @@
-===============
-Upgrade Mongoid
-===============
+=================
+Upgrading Mongoid
+=================
 
 .. default-domain:: mongodb
 
-Upgrade to 6.x Series
-`````````````````````
+Upgrading to 7.x Series
+```````````````````````
+
+This major version of Mongoid has a number of significant refactors, bug fixes
+and behavior corrections.
+
+Please see the list of behavior changes for version
+`7.0.0 <https://github.com/mongodb/mongoid/releases/tag/v7.0.0>`_
+and version
+`7.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v7.0.0.beta>`_
+for specific changes that might be required in your code.
+
+Upgrading to 6.x Series
+```````````````````````
 Mongoid 6.x is compatible with Rails 5 and requires Ruby 2.2.2 or higher.
 
-Please see the list of behavior changes for version `6.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.beta>`_
-and version `6.0.0.rc0 <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.rc0>`_ for specific changes that might be
-required in your code.
+Please see the list of behavior changes for version
+`6.0.0.rc0 <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.rc0>`_
+and version
+`6.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.beta>`_
+for specific changes that might be required in your code.
 
-Upgrade to 5.x Series
-`````````````````````
+Upgrading to 5.x Series
+```````````````````````
 
 The underlying driver has changed from Moped to the official MongoDB Ruby driver.
 For all users dropping down to the driver level for operations, please see the driver

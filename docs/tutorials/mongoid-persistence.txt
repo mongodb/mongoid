@@ -32,51 +32,114 @@ examples.
    * - Operation
      - Example
 
-   * - ``Model.create``
-
-       *Insert a document or multiple documents into the database.*
-     -
-        .. code-block:: ruby
-
-          Person.create(
-            first_name: "Heinrich",
-            last_name: "Heine"
-          )
-
-          Person.create([
-            { first_name: "Heinrich", last_name: "Heine" },
-            { first_name: "Willy", last_name: "Brandt" }
-          ])
-
-          Person.create(first_name: "Heinrich") do |doc|
-            doc.last_name = "Heine"
-          end
-
    * - ``Model.create!``
 
-       *Insert a document or multiple documents into the database, raising an error
-       if a validation error occurs.*
+       *Insert a document or multiple documents into the database, raising an
+       error if a validation or server error occurs.*
+       
+       *Pass a hash of attributes to create one document with the specified
+       attributes, or an array of hashes to create multiple documents.
+       If a single hash is passed, the corresponding document is returned.
+       If an array of hashes is passed, an array of documents corresponding
+       to the hashes is returned.*
+       
+       *If a block is given to* ``create!`` *, it will be invoked with each
+       document as the argument in turn prior to attempting to save that
+       document.*
+       
+       *If there is a problem saving any of the documents, such as
+       a validation error or a server error, an exception is raised
+       and, consequently, none of the documents are returned.
+       However, if an array of hashes was passed and previous documents were
+       successfully saved, those documents will remain in the database.*
      -
         .. code-block:: ruby
 
           Person.create!(
             first_name: "Heinrich",
             last_name: "Heine"
-          )
+          ) # => Person instance
 
           Person.create!([
             { first_name: "Heinrich", last_name: "Heine" },
             { first_name: "Willy", last_name: "Brandt" }
-          ])
+          ]) # => Array of two Person instances
 
           Person.create!(first_name: "Heinrich") do |doc|
             doc.last_name = "Heine"
+          end # => Person instance
+
+   * - ``Model.create``
+
+       *Instantiate a document or multiple documents and, if validations pass,
+       insert them into the database.*
+       
+       ``create`` *is similar to* ``create!`` *but does not raise
+       exceptions on validation errors. It still raises errors on server
+       errors, such as trying to insert a document with an* ``_id`` *that
+       already exists in the collection.*
+       
+       *If any validation errors are encountered, the respective document
+       is not inserted but is returned along with documents that were inserted.
+       Use* ``persisted?`` *,* ``new_record?`` *or* ``errors`` *methods
+       to check which of the returned documents were inserted into the
+       database.*
+     -
+        .. code-block:: ruby
+
+          Person.create(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          ) # => Person instance
+
+          Person.create([
+            { first_name: "Heinrich", last_name: "Heine" },
+            { first_name: "Willy", last_name: "Brandt" }
+          ]) # => Array of two Person instances
+
+          Person.create(first_name: "Heinrich") do |doc|
+            doc.last_name = "Heine"
+          end # => Person instance
+          
+          class Post
+            include Mongoid::Document
+            
+            validates_uniqueness_of :title
           end
+          
+          posts = Post.create([{title: "test"}, {title: "test"}])
+          # => array of two Post instances
+          posts.map { |post| post.persisted? } # => [true, false]
+
+   * - ``Model#save!``
+
+       *Save the changed attributes to the database atomically, or insert the document if
+       new. Raises an exception if validations fail or there is a server error.*
+       
+       *Returns true if the changed attributes were saved, raises an exception otherwise.*
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.save!
+
+          person.first_name = "Christian Johan"
+          person.save!
 
    * - ``Model#save``
 
-       *Saves the changed attributes to the database atomically, or insert the document
-       if flagged as a new record via* ``Model#new_record?`` *. Can bypass validations if wanted.*
+       *Save the changed attributes to the database atomically, or insert the document
+       if new.*
+       
+       *Returns true if the changed attributes were saved. Returns false
+       if there were any validation errors. Raises an exception if
+       the document passed validation but there was a server error during
+       the save.*
+       
+       *Pass* ``validate: false`` *option to bypass validations.*
      -
         .. code-block:: ruby
 
@@ -89,22 +152,6 @@ examples.
 
           person.first_name = "Christian Johan"
           person.save
-
-   * - ``Model#save!``
-
-       *Saves the changed attributes to the database atomically, or insert the document if
-       new. Will raise an error of validations fail.*
-     -
-        .. code-block:: ruby
-
-          person = Person.new(
-            first_name: "Heinrich",
-            last_name: "Heine"
-          )
-          person.save!
-
-          person.first_name = "Christian Johan"
-          person.save!
 
    * - ``Model#update_attributes``
 
@@ -196,6 +243,48 @@ examples.
 
           Person.destroy_all
 
+Mongoid provides the following persistence-related attributes:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Attribute
+     - Example
+
+
+   * - ``Model#new_record?``
+
+       *Returns* ``true`` *if the model instance has not yet been saved
+       to the database. Opposite of* ``persisted?``
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.new_record? # => true
+          person.save!
+          person.new_record? # => false
+
+   * - ``Model#persisted?``
+
+       *Returns* ``true`` *if the model instance has been saved
+       to the database. Opposite of* ``new_record?``
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.persisted? # => false
+          person.save!
+          person.persisted? # => true
+
+
+
 Atomic
 ------
 
@@ -277,11 +366,66 @@ no callbacks will ever get run, nor will any validations.
 
    * - ``Model#set``
 
-       *Performs an atomic $set on the field.*
+       *Updates an attribute on the model instance and, if the instance
+       is already persisted, performs an atomic $set on the field, bypassing
+       validations.*
+       
+       ``set`` *can also deeply set values on Hash fields.*
+       
+       ``set`` *can also deeply set values on* ``embeds_one`` *associations.
+       If such an association's document is nil, one will be created prior
+       to the update.*
+
+       ``set`` *should not be used with* ``has_one`` *associations, as it
+       does not correctly work in such cases.*
+
      -
         .. code-block:: ruby
 
-          person.set(name: "Tyler Durden")
+          person = Person.create!(name: "Ricky Bobby")
+          person.set(name: "Tyler Durden") # updates name in the database
+
+
+    	  person = Person.new
+          person.set(name: "Tyler Durden") # does not write to database
+    	  person.name # => "Tyler Durden"
+    	  person.persisted? # => true
+
+
+    	  class Post
+    	    include Mongoid::Document
+    	    
+    	    field :metadata, type: Hash
+    	  end
+    	  
+          post = Post.create!
+          post.set('metadata.published_at' => Time.now)
+          post.metadata['published_at'] # => Time instance
+          
+          post.set('metadata.approved.today' => true)
+          post.metadata['approved'] # => {'today' => true}
+
+
+          class Flight
+            include Mongoid::Document
+
+            embeds_one :plan
+          end
+
+          class Plan
+            include Mongoid::Document
+
+            embedded_in :flight
+
+            field :route, type: String
+          end
+          
+          flight = Flight.create!
+          flight.plan # => nil
+          flight.set('plan.route', 'test route')
+          flight.plan # => Plan instance
+          flight.plan.route # => "test route"
+
 
    * - ``Model#unset``
 
