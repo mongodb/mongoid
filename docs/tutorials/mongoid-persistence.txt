@@ -39,7 +39,7 @@ examples.
        
        *Pass a hash of attributes to create one document with the specified
        attributes, or an array of hashes to create multiple documents.
-       If a singe hash is passed, the corresponding document is returned.
+       If a single hash is passed, the corresponding document is returned.
        If an array of hashes is passed, an array of documents corresponding
        to the hashes is returned.*
        
