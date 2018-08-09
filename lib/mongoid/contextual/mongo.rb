@@ -300,6 +300,8 @@ module Mongoid
       #
       # @return [ GeoNear ] The GeoNear command.
       #
+      # @deprecated
+      #
       # @since 3.1.0
       def geo_near(coordinates)
         GeoNear.new(collection, criteria, coordinates)

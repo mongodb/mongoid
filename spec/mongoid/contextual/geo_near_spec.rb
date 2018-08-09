@@ -2,6 +2,10 @@ require "spec_helper"
 
 describe Mongoid::Contextual::GeoNear do
 
+  before do
+    skip unless testing_geo_near?
+  end
+
   describe "#average_distance" do
 
     let!(:collection) do
