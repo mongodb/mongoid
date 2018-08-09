@@ -1,6 +1,6 @@
-=========
+============
 Transactions
-=========
+============
 
 .. default-domain:: mongodb
 
@@ -13,7 +13,7 @@ Transactions
 Version 4.0 of the MongoDB server introduces
 `multi-document transactions <https://docs.mongodb.com/manual/core/transactions/>`_.
 (Updates to multiple fields within a single document are atomic in all
-versions of MongoDB). Mongoid version 7.1.0 adds support for transactions.
+versions of MongoDB). Mongoid versions 6.4 and higher support transactions.
 
 Using Transactions
 ------------------
@@ -93,9 +93,9 @@ that the session was initiated on. By default, all operations will be done on th
 
   Person.with_session do |s|
     s.start_transaction
-    Person.create
-    Person.create
-    Post.create
+    Person.create!
+    Person.create!
+    Post.create!
     s.commit_transaction
   end
 
@@ -106,9 +106,9 @@ To explicitly use a different client, use the ``with`` method:
     Person.with(client: :other) do
       Person.with_session do |s|
         s.start_transaction
-        Person.create
-        Person.create
-        Post.create
+        Person.create!
+        Person.create!
+        Post.create!
         s.commit_transaction
       end
     end
