@@ -13,7 +13,8 @@ Transactions
 Version 4.0 of the MongoDB server introduces
 `multi-document transactions <https://docs.mongodb.com/manual/core/transactions/>`_.
 (Updates to multiple fields within a single document are atomic in all
-versions of MongoDB). Mongoid versions 6.4 and higher support transactions.
+versions of MongoDB). Transactions require Mongoid version 6.4 or higher and Ruby driver version
+2.6 or higher.
 
 Using Transactions
 ------------------
