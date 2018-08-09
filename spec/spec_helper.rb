@@ -90,6 +90,7 @@ def testing_geo_near?
   $geo_near_enabled ||= (Mongoid::Clients.default
                              .command(serverStatus: 1)
                              .first['version'] < '4.1')
+end
 
 def transactions_supported?
   Mongoid::Clients.default.cluster.next_primary.features.transactions_enabled?
