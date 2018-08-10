@@ -353,7 +353,7 @@ describe Mongoid::Persistable::Settable do
             expect(church.location).to eql({'address' => {'state' => {'address' => {'city' => 'Munich', 'street' => 'Yorckstr'}}}})
           end
 
-          it 'removes lowel level attributes of the nested hash' do
+          it 'removes lower level attributes of the nested hash' do
             church.set('location.address.state.address' => 'hello')
 
             expect(church.name).to eq('Church1')
@@ -369,7 +369,7 @@ describe Mongoid::Persistable::Settable do
             expect(church.location).to eql({'address' => {'state' => {'address' => {'city' => {'hello' => 'world'}, 'street' => 'Yorckstr'}}}})
           end
 
-          it 'removes lowel level attributes of the nested hash' do
+          it 'removes lower level attributes of the nested hash' do
             church.set('location.address.state.address' => {'hello' => 'world'})
 
             expect(church.name).to eq('Church1')
