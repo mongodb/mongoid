@@ -388,6 +388,24 @@ describe Mongoid::Persistable::Settable do
         end
       end
     end
+
+    context 'when nested field is not an array' do
+      let(:church) do
+        Church.create!(
+          location: {'address' => 5}
+        )
+      end
+
+      context 'setting to an array' do
+        it 'sets values to the array' do
+          church.set('location.address' => ['three'])
+
+          expect(church.location).to eq('address' => ['three'])
+          church.reload
+          expect(church.location).to eq('address' => ['three'])
+        end
+      end
+    end
   end
 
   context 'when the field is not already set locally' do
