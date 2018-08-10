@@ -4,17 +4,11 @@ MODELS = File.join(File.dirname(__FILE__), "app/models")
 $LOAD_PATH.unshift(MODELS)
 
 require "action_controller"
+require 'support/spec_config'
 
-# These environment variables can be set if wanting to test against a database
-# that is not on the local machine.
-ENV["MONGOID_SPEC_HOST"] ||= "127.0.0.1"
-ENV["MONGOID_SPEC_PORT"] ||= "27017"
-
-# These are used when creating any connection in the test suite.
-HOST = ENV["MONGOID_SPEC_HOST"]
-PORT = ENV["MONGOID_SPEC_PORT"].to_i
-
-Mongo::Logger.logger.level = Logger::INFO
+unless SpecConfig.instance.client_debug?
+  Mongo::Logger.logger.level = Logger::INFO
+end
 # Mongoid.logger.level = Logger::DEBUG
 
 # When testing locally we use the database named mongoid_test. However when
@@ -35,7 +29,7 @@ require 'support/expectations'
 # Give MongoDB time to start up on the travis ci environment.
 if (ENV['CI'] == 'travis' || ENV['CI'] == 'evergreen')
   starting = true
-  client = Mongo::Client.new(['127.0.0.1:27017'])
+  client = Mongo::Client.new(SpecConfig.instance.addresses)
   while starting
     begin
       client.command(Mongo::Server::Monitor::Connection::ISMASTER)
@@ -51,7 +45,7 @@ CONFIG = {
   clients: {
     default: {
       database: database_id,
-      hosts: [ "#{HOST}:#{PORT}" ],
+      hosts: SpecConfig.instance.addresses,
       options: {
         server_selection_timeout: 0.5,
         wait_queue_timeout: 5,
@@ -129,7 +123,7 @@ RSpec.configure do |config|
   config.include(Mongoid::Expectations)
 
   config.before(:suite) do
-    client = Mongo::Client.new(["#{HOST}:#{PORT}"])
+    client = Mongo::Client.new(SpecConfig.instance.addresses)
     begin
       # Create the root user administrator as the first user to be added to the
       # database. This user will need to be authenticated in order to add any
