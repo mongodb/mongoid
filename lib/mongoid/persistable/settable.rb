@@ -51,16 +51,38 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(setters) do |field, value|
 
-            field_and_value_hash = hasherizer(field.split('.'), value)
-            field = field_and_value_hash.keys.first.to_s
-            value = field_and_value_hash[field]
+            field_seq = field.to_s.split('.')
+            field = field_seq.shift
+            if field_seq.length > 0
+              # nested hash path
+              old_value = attributes[field]
 
-            if fields[field] && fields[field].type == Hash && attributes.key?(field) && Hash === value && !value.empty?
-              merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
-              value = (attributes[field] || {}).merge(value, &merger)
+              # if the old value is not a hash, clobber it
+              unless Hash === old_value
+                old_value = {}
+              end
+
+              # descend into the hash, creating intermediate keys as needed
+              cur_value = old_value
+              while field_seq.length > 1
+                cur_key = field_seq.shift
+                # clobber on each level if type is not a hash
+                unless Hash === cur_value[cur_key]
+                  cur_value[cur_key] = {}
+                end
+                cur_value = cur_value[cur_key]
+              end
+
+              # now we are on the leaf level, perform the set
+              # and overwrite whatever was on this level before
+              cur_value[field_seq.shift] = value
+
+              # and set value to the value of the top level field
+              # because this is what we pass to $set
+              value = old_value
             end
 
-            process_attribute(field.to_s, value)
+            process_attribute(field, value)
 
             unless relations.include?(field.to_s)
               ops[atomic_attribute_name(field)] = attributes[field]
