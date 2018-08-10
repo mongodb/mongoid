@@ -37,6 +37,11 @@ module Mongoid
       #   document.set('author.title' => 'Sir')
       #   # => document.author == {'title' => 'Sir'}
       #
+      # Note that unlike MongoDB's $set, Mongoid's set writes out the entire
+      # field even when setting a subset of the field via the nested hash
+      # semantics. This means performing a $set with nested hash semantics
+      # can overwrite other hash keys within the top level field in the database.
+      #
       # @param [ Hash ] setters The field/value pairs to set.
       #
       # @return [ Document ] The document.
