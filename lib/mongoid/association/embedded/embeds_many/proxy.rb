@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mongoid/association/embedded/batchable'
 
 module Mongoid

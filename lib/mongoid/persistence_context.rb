@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mongoid
 
   # Object encapsulating logic for setting/getting a collection and database name

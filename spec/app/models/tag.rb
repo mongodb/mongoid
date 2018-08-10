@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Tag
   include Mongoid::Document
   field :text, type: String

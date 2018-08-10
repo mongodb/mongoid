@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Definition
   include Mongoid::Document
   field :description, type: String

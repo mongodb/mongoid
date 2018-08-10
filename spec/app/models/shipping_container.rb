@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShippingContainer
   include Mongoid::Document
   has_many :vehicles

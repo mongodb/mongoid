@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GCSuite
   def warming(*)
     run_gc

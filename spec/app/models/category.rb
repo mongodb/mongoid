@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Category
   include Mongoid::Document
   embedded_in :root_category

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Shape
   include Mongoid::Document
   field :x, type: Integer, default: 0

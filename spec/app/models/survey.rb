@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Survey
   include Mongoid::Document
   embeds_many :questions

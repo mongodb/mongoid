@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Set up a root user so we can set up authentication on a database level.
 MONGOID_ROOT_USER = Mongo::Auth::User.new(
   database: Mongo::Database::ADMIN,

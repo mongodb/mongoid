@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Driver
   include Mongoid::Document
   has_one :vehicle

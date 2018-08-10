@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "benchmark"
 require "mongoid"
 require "./perf/models"

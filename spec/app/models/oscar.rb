@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Oscar
   include Mongoid::Document
   field :title, type: String

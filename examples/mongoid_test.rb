@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mongoid'
 require 'mongoid/support/query_counter'
 require 'minitest/autorun'

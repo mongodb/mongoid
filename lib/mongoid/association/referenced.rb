@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mongoid/association/referenced/auto_save'
 require 'mongoid/association/referenced/counter_cache'
 require 'mongoid/association/referenced/syncable'

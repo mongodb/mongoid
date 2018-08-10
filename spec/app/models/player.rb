@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Player
   include Mongoid::Document
   field :active, type: Mongoid::Boolean

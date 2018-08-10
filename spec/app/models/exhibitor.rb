@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Exhibitor
   include Mongoid::Document
   field :status, type: String

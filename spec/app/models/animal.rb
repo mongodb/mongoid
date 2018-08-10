@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Animal
   include Mongoid::Document
 

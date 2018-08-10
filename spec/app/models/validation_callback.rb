@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ValidationCallback
   include Mongoid::Document
   field :history, type: Array, default: []

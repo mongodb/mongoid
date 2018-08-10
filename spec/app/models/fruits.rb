@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Fruits
   class Apple
     include Mongoid::Document

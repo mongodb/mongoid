@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ParentDoc
   include Mongoid::Document
   field :statistic
