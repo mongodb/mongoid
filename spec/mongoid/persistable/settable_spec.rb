@@ -360,6 +360,34 @@ describe Mongoid::Persistable::Settable do
         end
       end
     end
+
+    context 'when nested field is an array' do
+      let(:church) do
+        Church.create!(
+          location: {'address' => ['one', 'two']}
+        )
+      end
+
+      context 'setting to a different array' do
+        it 'sets values to new array discarding old values' do
+          church.set('location.address' => ['three'])
+
+          expect(church.location).to eq('address' => ['three'])
+          church.reload
+          expect(church.location).to eq('address' => ['three'])
+        end
+      end
+
+      context 'changing from an array to a number' do
+        it 'sets value to the number' do
+          church.set('location.address' => 5)
+
+          expect(church.location).to eq('address' => 5)
+          church.reload
+          expect(church.location).to eq('address' => 5)
+        end
+      end
+    end
   end
 
   context 'when the field is not already set locally' do
