@@ -424,6 +424,22 @@ describe Mongoid::Persistable::Settable do
         end
       end
     end
+
+    context 'when nesting into a field that is not a hash' do
+      let(:church) do
+        Church.create!(
+          location: {'address' => 5}
+        )
+      end
+
+      it 'sets field to new hash value discarding original value' do
+        church.set('location.address.a' => 'test')
+
+        expect(church.location).to eq('address' => {'a' => 'test'})
+        church.reload
+        expect(church.location).to eq('address' => {'a' => 'test'})
+      end
+    end
   end
 
   context 'when the field is not already set locally' do
