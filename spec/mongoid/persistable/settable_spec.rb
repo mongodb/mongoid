@@ -211,7 +211,7 @@ describe Mongoid::Persistable::Settable do
       Church.new.tap do |a|
         a.location = { 'city' => 'Berlin' }
         a.name = 'Church1'
-        a.save
+        a.save!
       end
     end
 
@@ -280,7 +280,7 @@ describe Mongoid::Persistable::Settable do
 
     context 'when the field is a nested hash' do
 
-      context 'when the field is reset to an empty hash' do
+      context 'when the field is set to an empty hash' do
 
         before do
           church.set('location' => {})
@@ -301,7 +301,7 @@ describe Mongoid::Persistable::Settable do
           Church.new.tap do |a|
             a.location = {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}
             a.name = 'Church1'
-            a.save
+            a.save!
           end
         end
 
@@ -321,7 +321,7 @@ describe Mongoid::Persistable::Settable do
           Church.new.tap do |a|
             a.location = {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}
             a.name = 'Church1'
-            a.save
+            a.save!
           end
         end
 
@@ -341,17 +341,22 @@ describe Mongoid::Persistable::Settable do
           Church.new.tap do |a|
             a.location = {'address' => {'state' => {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}}}
             a.name = 'Church1'
-            a.save
+            a.save!
           end
         end
 
-        before do
+        it 'keeps peer attributes of the nested hash' do
           church.set('location.address.state.address.city' => 'Munich')
-        end
 
-        it 'does not reset the nested hash' do
           expect(church.name).to eq('Church1')
           expect(church.location).to eql({'address' => {'state' => {'address' => {'city' => 'Munich', 'street' => 'Yorckstr'}}}})
+        end
+
+        it 'removes lowel level attributes of the nested hash' do
+          church.set('location.address.state.address' => 'hello')
+
+          expect(church.name).to eq('Church1')
+          expect(church.location).to eql({'address' => {'state' => {'address' => 'hello'}}})
         end
       end
     end
