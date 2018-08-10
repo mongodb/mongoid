@@ -14,6 +14,29 @@ module Mongoid
       # @example Set the values.
       #   document.set(title: "sir", dob: Date.new(1970, 1, 1))
       #
+      # The key can be a dotted sequence of keys, in which case the
+      # top level field is treated as a nested hash and any missing keys
+      # are created automatically:
+      #
+      # @example Set the values using nested hash semantics.
+      #   document.set('author.title' => 'Sir')
+      #   # => document.author == {'title' => 'Sir'}
+      #
+      # Performing a nested set like this merges values of intermediate keys:
+      #
+      # @example Nested hash value merging.
+      #   document.set('author.title' => 'Sir')
+      #   document.set('author.name' => 'Linus Torvalds')
+      #   # => document.author == {'title' => 'Sir', 'name' => 'Linus Torvalds'}
+      #
+      # If the top level field was not a hash, its original value is discarded
+      # and the field is replaced with a hash.
+      #
+      # @example Nested hash overwriting a non-hash value.
+      #   document.set('author' => 'John Doe')
+      #   document.set('author.title' => 'Sir')
+      #   # => document.author == {'title' => 'Sir'}
+      #
       # @param [ Hash ] setters The field/value pairs to set.
       #
       # @return [ Document ] The document.
