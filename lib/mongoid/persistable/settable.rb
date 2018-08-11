@@ -92,10 +92,5 @@ module Mongoid
         end
       end
     end
-
-    def hasherizer(keys, value)
-      return value if keys.empty?
-      {}.tap { |hash| hash[keys.shift] = hasherizer(keys, value) }
-    end
   end
 end
