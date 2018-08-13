@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mongoid/association/embedded/embeds_many/binding'
 require 'mongoid/association/embedded/embeds_many/buildable'
 require 'mongoid/association/embedded/embeds_many/proxy'

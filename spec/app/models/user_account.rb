@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserAccount
   include Mongoid::Document
   field :username, type: String

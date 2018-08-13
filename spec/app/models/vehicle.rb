@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Vehicle
   include Mongoid::Document
   belongs_to :shipping_container

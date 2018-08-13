@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Audio
   include Mongoid::Document
   field :likes, type: Integer

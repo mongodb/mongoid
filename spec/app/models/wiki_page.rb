@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WikiPage
   include Mongoid::Document
   include Mongoid::Timestamps

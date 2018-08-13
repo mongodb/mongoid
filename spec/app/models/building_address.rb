@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BuildingAddress
   include Mongoid::Document
   field :city, type: String

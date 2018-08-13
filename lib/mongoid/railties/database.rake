@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 load 'mongoid/tasks/database.rake'
 
 namespace :db do

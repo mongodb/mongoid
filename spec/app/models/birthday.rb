@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Birthday
   include Mongoid::Document
   field :title

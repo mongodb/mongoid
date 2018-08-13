@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Tool
   include Mongoid::Document
   embedded_in :palette

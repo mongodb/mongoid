@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Even
   include Mongoid::Document
   field :name

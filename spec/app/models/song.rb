@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Song
   include Mongoid::Document
   field :title

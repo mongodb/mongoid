@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FireHydrant
   include Mongoid::Document
   field :location, type: String

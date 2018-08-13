@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Odd
   include Mongoid::Document
   field :name

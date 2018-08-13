@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Princess
   include Mongoid::Document
   field :primary_color

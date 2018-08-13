@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PetOwner
   include Mongoid::Document
   field :title

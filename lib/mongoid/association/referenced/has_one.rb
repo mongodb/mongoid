@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mongoid/association/referenced/has_one/binding'
 require 'mongoid/association/referenced/has_one/buildable'
 require 'mongoid/association/referenced/has_one/proxy'

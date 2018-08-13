@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Language
   include Mongoid::Document
   field :name, type: String

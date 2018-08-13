@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # encoding: utf-8
 require "mongoid/errors/mongoid_error"
 require "mongoid/errors/ambiguous_relationship"

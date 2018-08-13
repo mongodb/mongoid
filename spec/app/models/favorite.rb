@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Favorite
   include Mongoid::Document
   field :title

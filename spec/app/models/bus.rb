@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Bus
   include Mongoid::Document
   field :saturday, type: Mongoid::Boolean, default: false

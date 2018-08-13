@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Item
   include Mongoid::Document
   field :title, type: String

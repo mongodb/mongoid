@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Page
   include Mongoid::Document
   embedded_in :quiz

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Product
   include Mongoid::Document
   field :description, localize: true

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Acolyte
   include Mongoid::Document
   include Mongoid::Attributes::Dynamic

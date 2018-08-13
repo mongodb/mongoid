@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Owner
   include Mongoid::Document
   field :name

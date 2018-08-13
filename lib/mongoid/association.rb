@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'mongoid/association/accessors'
 require 'mongoid/association/builders'
 require 'mongoid/association/bindable'

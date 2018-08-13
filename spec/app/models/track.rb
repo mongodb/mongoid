@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Track
   include Mongoid::Document
   field :name, type: String

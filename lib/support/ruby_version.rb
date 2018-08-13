@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Go ahead and fail if not using Ruby 1.9.3, no since in letting people
 # squarm for answers
 def raise_version_error(message)

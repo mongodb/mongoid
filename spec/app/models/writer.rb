@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Writer
   include Mongoid::Document
   field :speed, type: Integer, default: 0

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'lite_spec_helper'
 
 MODELS = File.join(File.dirname(__FILE__), "app/models")

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Actor
   include Mongoid::Document
   field :name
