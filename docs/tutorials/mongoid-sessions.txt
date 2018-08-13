@@ -1,3 +1,5 @@
+.. _sessions:
+
 =========
 Sessions
 =========
@@ -35,7 +37,7 @@ of a session.
 .. code-block:: ruby
 
    Person.with_session(causal_consistency: true) do
-     Person.create
+     Person.create!
      person = Person.first
      person.name = "Emily"
      person.save
@@ -53,5 +55,5 @@ of a session.
    person.with_session(causal_consistency: true) do
      person.username = 'Emily'
      person.save
-     person.posts << Post.create
+     person.posts << Post.create!
    end
