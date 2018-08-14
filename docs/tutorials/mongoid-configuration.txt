@@ -1,0 +1,304 @@
+=============
+Configuration
+=============
+
+.. _mongoid-configuration:
+
+Mongoid is customarily configured through a ``mongoid.yml`` file that specifies
+options and clients. The simplest configuration is as follows, which configures
+Mongoid to talk to a MongoDB server at "localhost:27017" and use the database
+named "mongoid".
+
+.. code-block:: yaml
+
+  development:
+    clients:
+      default:
+        database: mongoid
+        hosts:
+          - localhost:27017
+
+The top level key in the configuration file, ``development`` in the above
+example, refers to the environment name which the application is executing in,
+i.e. ``development``, ``test`` or ``production``. The third level key,
+``default`` in the above example, refers to the Mongo client name.
+Most applications will use a single client named ``default``.
+
+Rails Applications
+******************
+
+If you are using Rails, you can have Mongoid generate a default configuration
+file for you by running the following command:
+
+.. code-block:: bash
+
+  $ rails g mongoid:config
+
+The configuration file will be placed in ``config/mongoid.yml``.
+
+Environment Determination
+*************************
+
+When Mongoid loads its configuration, it chooses the environment to use
+in the following order:
+
+- ``Rails.env`` if using Rails.
+- ``Sinatra::Base.environment`` if using Sinatra.
+- ``RACK_ENV`` environment variable.
+- ``MONGOID_ENV`` environment variable.
+
+If you are not building a Rack based application and want to override the
+environment programatically, you can pass a second parameter to ``load!``
+as follows:
+
+.. code-block:: ruby
+
+  Mongoid.load!("path/to/your/mongoid.yml", :production)
+
+Depending on your version of Rails, you may also need to configure the ORM
+to be Mongoid in application.rb like so:
+
+.. code-block:: ruby
+
+  config.generators do |g|
+    g.orm :mongoid
+  end
+
+Anatomy of a Mongoid Config
+***************************
+
+Let's have a look at a full-blown ``mongoid.yml`` and explain the full power
+of what Mongoid can do. The following configuration has explanation of the
+various options in the comments above each key:
+
+.. code-block:: yaml
+
+  development:
+    # Configure available database clients. (required)
+    clients:
+      # Define the default client. (required)
+      default:
+        # A uri may be defined for a client:
+        # uri: 'mongodb://user:password@myhost1.mydomain.com:27017/my_db'
+        # Please see driver documentation for details. Alternatively, you can
+        # define the following:
+        #
+        # Define the name of the default database that Mongoid can connect to.
+        # (required).
+        database: my_db
+        # Provide the hosts the default client can connect to. Must be an array
+        # of host:port pairs. (required)
+        hosts:
+          - myhost1.mydomain.com:27017
+          - myhost2.mydomain.com:27017
+          - myhost3.mydomain.com:27017
+        options:
+          # Change the default write concern. (default = { w: 1 })
+          write:
+            w: 1
+
+          # Change the default read preference. Valid options for mode are: :secondary,
+          # :secondary_preferred, :primary, :primary_preferred, :nearest
+          # (default: primary)
+          read:
+            mode: :secondary_preferred
+            tag_sets:
+              - use: web
+
+          # The name of the user for authentication.
+          user: 'user'
+
+          # The password of the user for authentication.
+          password: 'password'
+
+          # The user's database roles.
+          roles:
+            - 'dbOwner'
+
+          # Change the default authentication mechanism. Valid options are: :scram,
+          # :mongodb_cr, :mongodb_x509, and :plain. (default on 3.0 is :scram, default
+          # on 2.4 and 2.6 is :plain)
+          auth_mech: :scram
+
+          # The database or source to authenticate the user against. (default: admin)
+          auth_source: admin
+
+          # Force the driver to connect in a specific way instead of auto-
+          # discovering. Can be one of: :direct, :replica_set, :sharded. Set to :direct
+          # when connecting to hidden members of a replica set.
+          connect: :direct
+
+          # Change the default time in seconds the server monitors refresh their status
+          # via ismaster commands. (default: 10)
+          heartbeat_frequency: 10
+
+          # The time in seconds for selecting servers for a near read preference. (default: 0.015)
+          local_threshold: 0.015
+
+          # The timeout in seconds for selecting a server for an operation. (default: 30)
+          server_selection_timeout: 30
+
+          # The maximum number of connections in the connection pool. (default: 5)
+          max_pool_size: 5
+
+          # The minimum number of connections in the connection pool. (default: 1)
+          min_pool_size: 1
+
+          # The time to wait, in seconds, in the connection pool for a connection
+          # to be checked in before timing out. (default: 1)
+          wait_queue_timeout: 1
+
+          # The time to wait to establish a connection before timing out, in seconds.
+          # (default: 10)
+          connect_timeout: 10
+
+          # The timeout to wait to execute operations on a socket before raising an error.
+          # (default: 5)
+          socket_timeout: 5
+
+          # The name of the replica set to connect to. Servers provided as seeds that do
+          # not belong to this replica set will be ignored.
+          replica_set: my_replica_set
+
+          # Whether to connect to the servers via ssl. (default: false)
+          ssl: true
+
+          # The certificate file used to identify the connection against MongoDB.
+          ssl_cert: /path/to/my.cert
+
+          # The private keyfile used to identify the connection against MongoDB.
+          # Note that even if the key is stored in the same file as the certificate,
+          # both need to be explicitly specified.
+          ssl_key: /path/to/my.key
+
+          # A passphrase for the private key.
+          ssl_key_pass_phrase: password
+
+          # Whether or not to do peer certification validation. (default: true)
+          ssl_verify: true
+
+          # The file containing a set of concatenated certification authority certifications
+          # used to validate certs passed from the other end of the connection.
+          ssl_ca_cert: /path/to/ca.cert
+
+    # Configure Mongoid specific options. (optional)
+    options:
+      # Include the root model name in json serialization. (default: false)
+      include_root_in_json: false
+
+      # Include the _type field in serialization. (default: false)
+      include_type_for_serialization: false
+
+      # Preload all models in development, needed when models use
+      # inheritance. (default: false)
+      preload_models: false
+
+      # Raise an error when performing a #find and the document is not found.
+      # (default: true)
+      raise_not_found_error: true
+
+      # Raise an error when defining a scope with the same name as an
+      # existing method. (default: false)
+      scope_overwrite_exception: false
+
+      # Use Active Support's time zone in conversions. (default: true)
+      use_activesupport_time_zone: true
+
+      # Ensure all times are UTC in the app side. (default: false)
+      use_utc: false
+
+      # Set the Mongoid and Ruby driver log levels. (default: :info)
+      log_level: :info
+
+Inline Configuration
+********************
+
+It is also possible to configure Mongoid directly in Ruby, without using
+a configuration file. This configuration mechanism does not support defining
+multiple environments, however it does support defining multiple clients.
+
+.. code-block:: ruby
+
+  Mongoid.configure do |config|
+    config.clients.default = {
+      hosts: ['localhost:27017'],
+      database: 'my_db',
+    }
+    
+    config.log_level = :warn
+  end
+
+Logging
+*******
+
+Mongoid and the MongoDB Ruby driver have separate loggers and log levels.
+
+If Mongoid is loaded in the context of a Rails application, it will
+use Rails' configured logger by default. Otherwise Mongoid will configure
+itself to log to ``STDOUT`` with the default log level of ``INFO``.
+
+The Ruby driver's default log level is ``DEBUG``, and changing Mongoid's
+log level does not affect the Ruby driver's log level.
+However, if Mongoid is configured with a configuration file, the
+log level specified in the configuration file will be applied to both
+the Mongoid and the Ruby driver loggers.
+
+To change the log levels:
+
+.. code-block:: ruby
+
+  # Mongoid
+  Mongoid.logger.level = Logger::DEBUG
+  # Ruby driver
+  Mongo::Logger.logger.level = Logger::INFO
+
+*Note:* The Mongo client is a Ruby driver client instance, therefore
+the logger of a Mongo client is the Ruby driver logger, not the Mongoid
+logger. In other words:
+
+.. code-block:: ruby
+
+  # Ruby driver logger, not Mongoid logger
+  Mongoid.client(:default).logger == Mongo::Logger.logger
+
+Usage with Forking Servers
+**************************
+
+When using Mongoid with a forking web server such as Unicorn, worker processes
+need to recreate driver client instances to ensure that background threads
+monitoring the MongoDB cluster are recreated as they are not transfered into
+child processes through forks, and file descriptors and synchronization
+primitives are not shared between workers.
+
+It is recommended to not perform any operations on Mongoid models in the
+parent process prior to the fork. If the parent process needs to perform
+operations on the MongoDB database, reset all clients in an ``after_fork``
+handler which is defined in ``unicorn.rb``:
+
+.. code-block:: ruby
+
+    after_fork do |server, worker|
+      Mongoid.clients.each do |name, client|
+        client.close
+        client.reconnect
+      end
+    end
+
+If the parent process does not need to perform operations on the MongoDB
+cluster after child processes are forked, close the client in the parent:
+
+.. code-block:: ruby
+
+    before_fork do |server, worker|
+      Mongoid.clients.each do |name, client|
+        client.close
+      end
+    end
+
+*Note:* This pattern should be used with Ruby driver version 2.6.2 or higher.
+Previous driver versions did not recreate monitoring threads when reconnecting.
+
+*Note:* If the parent process performs operations on the Mongo client and
+does not close it, the parent process will continue consuming a connection slot
+in the cluster and will continue monitoring the cluster for as long as the
+parent remains alive.
