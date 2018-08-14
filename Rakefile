@@ -35,3 +35,15 @@ RSpec::Core::RakeTask.new('spec:progress') do |spec|
 end
 
 task :default => :spec
+
+desc "Generate all documentation"
+task :docs => 'docs:yard'
+
+namespace :docs do
+  desc "Generate yard documention"
+  task :yard do
+    out = File.join('yard-docs', Mongoid::VERSION)
+    FileUtils.rm_rf(out)
+    system "yardoc -o #{out} --title mongoid-#{Mongoid::VERSION}"
+  end
+end
