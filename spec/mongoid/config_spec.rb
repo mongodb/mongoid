@@ -370,7 +370,7 @@ describe Mongoid::Config do
           end
 
           it "sets the default hosts" do
-            expect(default[:hosts]).to eq(["127.0.0.1:27017"])
+            expect(default[:hosts]).to eq(["#{HOST}:#{PORT}"])
           end
 
           context "when the default has options" do

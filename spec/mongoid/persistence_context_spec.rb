@@ -536,7 +536,7 @@ describe Mongoid::PersistenceContext do
     end
 
     before do
-      Mongoid.clients[:alternative] = { database: :mongoid_test, hosts: SpecConfig.instance.addresses }
+      Mongoid.clients[:alternative] = { database: :mongoid_test, hosts: [ "#{HOST}:#{PORT}" ] }
     end
 
     after do

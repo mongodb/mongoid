@@ -427,7 +427,7 @@ describe Mongoid::Clients do
       let(:client_name) { :alternative }
 
       before do
-        Mongoid.clients[client_name] = { database: database_id_alt, hosts: SpecConfig.instance.addresses }
+        Mongoid.clients[client_name] = { database: database_id_alt, hosts: [ "#{HOST}:#{PORT}" ] }
       end
 
       after do
