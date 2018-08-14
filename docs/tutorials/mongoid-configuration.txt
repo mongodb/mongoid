@@ -260,3 +260,42 @@ logger. In other words:
 
   # Ruby driver logger, not Mongoid logger
   Mongoid.client(:default).logger == Mongo::Logger.logger
+
+Usage with Forking Servers
+**************************
+
+When using Mongoid with a forking web server such as Unicorn, worker processes
+need to recreate driver client instances to ensure that background threads
+monitoring the MongoDB cluster are recreated as they are not transfered into
+child processes through forks, and file descriptors and synchronization
+primitives are not shared between workers.
+
+It is recommended to not perform any operations on Mongoid models in the
+parent process prior to the fork. If the parent process needs to perform
+operations on the MongoDB database, reset all clients in an ``after_fork``
+handler which is defined in ``unicorn.rb``:
+
+.. code-block:: ruby
+
+    after_fork do |server, worker|
+      Mongoid::Clients.clients.each do |name, client|
+        client.close
+        client.reconnect
+      end
+    end
+
+If the parent process does not need to perform operations on the MongoDB
+cluster after child processes are forked, close the client in the parent:
+
+.. code-block:: ruby
+
+    before_fork do |server, worker|
+      Mongoid::Clients.clients.each do |name, client|
+        client.close
+      end
+    end
+
+*Note:* If the parent process performs operations on the Mongo client and
+does not close it, the parent process will continue consuming a connection slot
+in the cluster and will continue monitoring the cluster for as long as the
+parent remains alive.
