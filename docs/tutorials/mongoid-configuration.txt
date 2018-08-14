@@ -278,7 +278,7 @@ handler which is defined in ``unicorn.rb``:
 .. code-block:: ruby
 
     after_fork do |server, worker|
-      Mongoid::Clients.clients.each do |name, client|
+      Mongoid.clients.each do |name, client|
         client.close
         client.reconnect
       end
@@ -290,7 +290,7 @@ cluster after child processes are forked, close the client in the parent:
 .. code-block:: ruby
 
     before_fork do |server, worker|
-      Mongoid::Clients.clients.each do |name, client|
+      Mongoid.clients.each do |name, client|
         client.close
       end
     end
