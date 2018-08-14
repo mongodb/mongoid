@@ -24,7 +24,7 @@ framework for MongoDB in Ruby.
    /tutorials/mongoid-indexes
    /tutorials/mongoid-rails
    /tutorials/mongoid-upgrade
-   API <https://docs.mongodb.com/mongoid/6.3/api>
+   API <https://docs.mongodb.com/mongoid/6.4/api/>
 
 
 For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
