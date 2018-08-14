@@ -213,7 +213,7 @@ describe Mongoid::Persistable::Settable do
       Church.new.tap do |a|
         a.location = { 'city' => 'Berlin' }
         a.name = 'Church1'
-        a.save
+        a.save!
       end
     end
 
@@ -280,7 +280,22 @@ describe Mongoid::Persistable::Settable do
       end
     end
 
-    context 'when the field is a bested hash' do
+    context 'when the field is a nested hash' do
+
+      context 'when the field is set to an empty hash' do
+
+        before do
+          church.set('location' => {})
+        end
+
+        it 'updates the field locally' do
+          expect(church.location).to eq({})
+        end
+
+        it 'updates the field in the database' do
+          expect(church.reload.location).to eq({})
+        end
+      end
 
       context 'when a leaf value in the nested hash is updated' do
 
@@ -288,7 +303,7 @@ describe Mongoid::Persistable::Settable do
           Church.new.tap do |a|
             a.location = {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}
             a.name = 'Church1'
-            a.save
+            a.save!
           end
         end
 
@@ -302,6 +317,25 @@ describe Mongoid::Persistable::Settable do
         end
       end
 
+      context 'when a leaf value in the nested hash is updated to a number' do
+
+        let(:church) do
+          Church.new.tap do |a|
+            a.location = {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}
+            a.name = 'Church1'
+            a.save!
+          end
+        end
+
+        before do
+          church.set('location.address.city' => 12345)
+        end
+
+        it 'updates the nested value to the correct value' do
+          expect(church.name).to eq('Church1')
+          expect(church.location).to eql({'address' => {'city' => 12345, 'street' => 'Yorckstr'}})
+        end
+      end
 
       context 'when the nested hash is many levels deep' do
 
@@ -309,18 +343,103 @@ describe Mongoid::Persistable::Settable do
           Church.new.tap do |a|
             a.location = {'address' => {'state' => {'address' => {'city' => 'Berlin', 'street' => 'Yorckstr'}}}}
             a.name = 'Church1'
-            a.save
+            a.save!
           end
         end
 
-        before do
-          church.set('location.address.state.address.city' => 'Munich')
+        context 'setting value to a string' do
+          it 'keeps peer attributes of the nested hash' do
+            church.set('location.address.state.address.city' => 'Munich')
+
+            expect(church.name).to eq('Church1')
+            expect(church.location).to eql({'address' => {'state' => {'address' => {'city' => 'Munich', 'street' => 'Yorckstr'}}}})
+          end
+
+          it 'removes lower level attributes of the nested hash' do
+            church.set('location.address.state.address' => 'hello')
+
+            expect(church.name).to eq('Church1')
+            expect(church.location).to eql({'address' => {'state' => {'address' => 'hello'}}})
+          end
         end
 
-        it 'does not reset the nested hash' do
-          expect(church.name).to eq('Church1')
-          expect(church.location).to eql({'address' => {'state' => {'address' => {'city' => 'Munich', 'street' => 'Yorckstr'}}}})
+        context 'setting value to a hash' do
+          it 'keeps peer attributes of the nested hash' do
+            church.set('location.address.state.address.city' => {'hello' => 'world'})
+
+            expect(church.name).to eq('Church1')
+            expect(church.location).to eql({'address' => {'state' => {'address' => {'city' => {'hello' => 'world'}, 'street' => 'Yorckstr'}}}})
+          end
+
+          it 'removes lower level attributes of the nested hash' do
+            church.set('location.address.state.address' => {'hello' => 'world'})
+
+            expect(church.name).to eq('Church1')
+            expect(church.location).to eql({'address' => {'state' => {'address' => {'hello' => 'world'}}}})
+          end
         end
+      end
+    end
+
+    context 'when nested field is an array' do
+      let(:church) do
+        Church.create!(
+          location: {'address' => ['one', 'two']}
+        )
+      end
+
+      context 'setting to a different array' do
+        it 'sets values to new array discarding old values' do
+          church.set('location.address' => ['three'])
+
+          expect(church.location).to eq('address' => ['three'])
+          church.reload
+          expect(church.location).to eq('address' => ['three'])
+        end
+      end
+
+      context 'changing from an array to a number' do
+        it 'sets value to the number' do
+          church.set('location.address' => 5)
+
+          expect(church.location).to eq('address' => 5)
+          church.reload
+          expect(church.location).to eq('address' => 5)
+        end
+      end
+    end
+
+    context 'when nested field is not an array' do
+      let(:church) do
+        Church.create!(
+          location: {'address' => 5}
+        )
+      end
+
+      context 'setting to an array' do
+        it 'sets values to the array' do
+          church.set('location.address' => ['three'])
+
+          expect(church.location).to eq('address' => ['three'])
+          church.reload
+          expect(church.location).to eq('address' => ['three'])
+        end
+      end
+    end
+
+    context 'when nesting into a field that is not a hash' do
+      let(:church) do
+        Church.create!(
+          location: {'address' => 5}
+        )
+      end
+
+      it 'sets field to new hash value discarding original value' do
+        church.set('location.address.a' => 'test')
+
+        expect(church.location).to eq('address' => {'a' => 'test'})
+        church.reload
+        expect(church.location).to eq('address' => {'a' => 'test'})
       end
     end
   end
