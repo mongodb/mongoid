@@ -295,6 +295,9 @@ cluster after child processes are forked, close the client in the parent:
       end
     end
 
+*Note:* This pattern should be used with Ruby driver version 2.6.2 or higher.
+Previous driver versions did not recreate monitoring threads when reconnecting.
+
 *Note:* If the parent process performs operations on the Mongo client and
 does not close it, the parent process will continue consuming a connection slot
 in the cluster and will continue monitoring the cluster for as long as the
