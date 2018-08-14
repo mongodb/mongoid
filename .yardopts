@@ -1,2 +1,3 @@
 - CHANGELOG*
 -o yard-docs
+--exclude spec
