@@ -451,7 +451,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
         end
 
         it 'sets up touch' do
-          expect(Mongoid:: Association::Touchable).to receive(:define_touchable!).with(association)
+          expect(Mongoid::Touchable).to receive(:define_touchable!).with(association)
           association.setup!
         end
       end
@@ -465,7 +465,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
         end
 
         it 'does not set up touch' do
-          expect(Mongoid:: Association::Touchable).not_to receive(:define_touchable!).with(association)
+          expect(Mongoid::Touchable).not_to receive(:define_touchable!).with(association)
           association.setup!
         end
       end
@@ -479,7 +479,7 @@ describe Mongoid::Association::Referenced::BelongsTo do
         end
 
         it 'does not set up touch' do
-          expect(Mongoid:: Association::Touchable).not_to receive(:define_touchable!).with(association)
+          expect(Mongoid::Touchable).not_to receive(:define_touchable!).with(association)
           association.setup!
         end
       end
