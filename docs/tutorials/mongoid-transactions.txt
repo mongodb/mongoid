@@ -55,6 +55,7 @@ when starting a transaction:
  ``commit_transaction`` and ``abort_transaction``, again on the session instance:
 
 .. code-block:: ruby
+
   Person.with_session do |session|
     session.commit_transaction
   end
@@ -70,6 +71,7 @@ The transaction commit `can be retried <https://docs.mongodb.com/manual/core/tra
 if it fails. Here is the Ruby code to do so:
 
 .. code-block:: ruby
+
   begin
     session.commit_transaction
   rescue Mongo::Error => e
@@ -84,6 +86,7 @@ Note that in order to perform operations within the transaction, operations must
 that the session was initiated on. By default, all operations will be done on the default client:
 
 .. code-block:: ruby
+
   class Person
     include Mongoid::Document
   end
@@ -103,6 +106,7 @@ that the session was initiated on. By default, all operations will be done on th
 To explicitly use a different client, use the ``with`` method:
 
 .. code-block:: ruby
+
   Post.with(client: :other) do
     Person.with(client: :other) do
       Person.with_session do |s|
