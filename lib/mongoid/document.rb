@@ -15,6 +15,7 @@ require "mongoid/fields"
 require "mongoid/timestamps"
 require "mongoid/association"
 require "mongoid/composable"
+require "mongoid/touchable"
 
 module Mongoid
 
@@ -23,6 +24,7 @@ module Mongoid
   module Document
     extend ActiveSupport::Concern
     include Composable
+    include Mongoid::Touchable::InstanceMethods
 
     attr_accessor :__selected_fields
     attr_reader :new_record
