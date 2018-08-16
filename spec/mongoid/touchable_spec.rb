@@ -2,14 +2,35 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Touchable do
+describe Mongoid::Touchable do
 
   describe "#touch" do
+
+    context "when the document has no associations" do
+      let(:updatable) do
+        Updatable.create
+      end
+
+      it "responds to #touch" do
+        expect(updatable).to respond_to(:touch)
+      end
+
+      it "updates the timestamp when called" do
+        expect(updatable.updated_at).to be_nil
+
+        updatable.touch
+        updated_at = updatable.updated_at
+        expect(updated_at).not_to be_nil
+
+        updatable.touch
+        expect(updatable.updated_at).to be > updated_at
+      end
+    end
 
     context "when the document is embedded" do
 
       before do
-        Label.send(:include, Mongoid::Association::Touchable::InstanceMethods)
+        Label.send(:include, Mongoid::Touchable::InstanceMethods)
       end
 
       let(:band) do
@@ -36,8 +57,8 @@ describe Mongoid::Association::Touchable do
     context "when no relations have touch options" do
 
       before do
-        Person.send(:include, Mongoid::Association::Touchable::InstanceMethods)
-        Agent.send(:include, Mongoid::Association::Touchable::InstanceMethods)
+        Person.send(:include, Mongoid::Touchable::InstanceMethods)
+        Agent.send(:include, Mongoid::Touchable::InstanceMethods)
       end
 
       context "when no updated at is defined" do
@@ -221,8 +242,8 @@ describe Mongoid::Association::Touchable do
       context "when the relation is a parent of an embedded doc" do
 
         before do
-          Page.send(:include, Mongoid::Association::Touchable::InstanceMethods)
-          Edit.send(:include, Mongoid::Association::Touchable::InstanceMethods)
+          Page.send(:include, Mongoid::Touchable::InstanceMethods)
+          Edit.send(:include, Mongoid::Touchable::InstanceMethods)
         end
 
         let(:page) do
@@ -246,7 +267,7 @@ describe Mongoid::Association::Touchable do
       context "when the parent of embedded doc has cascade callbacks" do
 
         before do
-          Band.send(:include, Mongoid::Association::Touchable::InstanceMethods)
+          Band.send(:include, Mongoid::Touchable::InstanceMethods)
         end
 
         let!(:book) do
