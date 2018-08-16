@@ -11,3 +11,7 @@ group :test do
   gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
   gem 'fuubar'
 end
+
+group :development do
+  gem 'yard'
+end
