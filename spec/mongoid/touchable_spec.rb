@@ -6,7 +6,7 @@ describe Mongoid::Touchable do
 
   describe "#touch" do
 
-    context "when the document has no relations" do
+    context "when the document has no associations" do
       let(:updatable) do
         Updatable.create
       end
