@@ -11,6 +11,10 @@ describe Mongoid::Touchable do
         Updatable.create
       end
 
+      it "responds to #touch" do
+        expect(updatable).to respond_to(:touch)
+      end
+
       it "updates the timestamp when called" do
         expect(updatable.updated_at).to be_nil
 
