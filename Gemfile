@@ -12,6 +12,7 @@ group :test do
 end
 
 group :development, :testing do
+  gem 'yard'
   platforms :mri do
     if RUBY_VERSION >= '2.0.0'
       gem 'byebug'
