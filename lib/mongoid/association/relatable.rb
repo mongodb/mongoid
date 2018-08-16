@@ -327,7 +327,7 @@ module Mongoid
 
       def define_touchable!
         if touchable?
-          Association::Touchable.define_touchable!(self)
+          Touchable.define_touchable!(self)
         end
       end
 
