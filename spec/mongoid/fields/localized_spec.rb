@@ -158,6 +158,29 @@ describe Mongoid::Fields::Localized do
                   expect(value).to be_nil
                 end
               end
+
+              context "when the current locale is nil" do
+
+                let(:value) do
+                  field.demongoize({ "de" => nil, "es" => "pruebas" })
+                end
+
+                it "returns nil" do
+                  expect(value).to eq("pruebas")
+                end
+              end
+
+              context "when the current locale is an empty string" do
+
+                let(:value) do
+                  field.demongoize({ "de" => "", "es" => "pruebas" })
+                end
+
+                it "returns nil" do
+                  # expect("".present?).to eq(false)
+                  expect(value).to eq("pruebas")
+                end
+              end
             end
 
             context "when no fallbacks are defined" do
