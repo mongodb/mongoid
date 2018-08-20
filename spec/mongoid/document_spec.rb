@@ -12,6 +12,10 @@ describe Mongoid::Document do
     Person.new
   end
 
+  it "is touchable" do
+    expect(person).to respond_to(:touch)
+  end
+
   it "defines a _destroy method" do
     expect(Person.new).to respond_to(:_destroy)
   end
