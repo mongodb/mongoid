@@ -438,11 +438,7 @@ module Mongoid
       def create_field_getter_before_type_cast(name, meth)
         generated_methods.module_eval do
           re_define_method("#{meth}_before_type_cast") do
-            if has_attribute_before_type_cast?(name)
-              read_attribute_before_type_cast(name)
-            else
-              send meth
-            end
+            read_attribute_before_type_cast(name)
           end
         end
       end
