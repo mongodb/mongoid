@@ -3,7 +3,9 @@ test:
     default:
       database: mongoid_test
       hosts:
-        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+        <% SpecConfig.instance.addresses.each do |address| %>
+          - <%= address %>
+        <% end %>
       options:
         user: "mongoid-user"
         password: "password"
@@ -16,7 +18,9 @@ test:
     reports:
       database: reports
       hosts:
-        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+        <% SpecConfig.instance.addresses.each do |address| %>
+          - <%= address %>
+        <% end %>
       options:
         user: "mongoid-user"
         password: "password"
@@ -38,7 +42,9 @@ test_with_max_staleness:
     default:
       database: mongoid_test
       hosts:
-        - <%=ENV["MONGOID_SPEC_HOST"]%>:<%=ENV["MONGOID_SPEC_PORT"]%>
+        <% SpecConfig.instance.addresses.each do |address| %>
+          - <%= address %>
+        <% end %>
       options:
         read:
           mode: :primary_preferred
