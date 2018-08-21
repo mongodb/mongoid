@@ -33,8 +33,8 @@ describe Mongoid::Matchable::Nor do
 
       context "when none of the values are not equal" do
 
-        it "returns false" do
-          expect(matcher._matches?([])).to be false
+        it "returns true" do
+          expect(matcher._matches?([])).to be true
         end
       end
 
@@ -122,8 +122,8 @@ describe Mongoid::Matchable::Nor do
           person.age = 100
         end
 
-        it "returns true" do
-          expect(matches).to be true
+        it "returns false" do
+          expect(matches).to be false
         end
       end
     end

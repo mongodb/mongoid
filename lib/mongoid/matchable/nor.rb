@@ -17,16 +17,16 @@ module Mongoid
       # @since 2.0.0.rc.7
       def _matches?(conditions)
         conditions.each do |condition|
-          res = true
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            res &&= !document._matches?(key => value)
-            break unless res
+            # $nor returns true if all conditions in the array fail, so if one matches, then we failed
+            if document._matches?(key => value)
+              return false
+            end
           end
-          return res if res
         end
-        return false
+        return true
       end
     end
   end

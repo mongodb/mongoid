@@ -127,6 +127,7 @@ module Mongoid
           case key.to_s
             when "$or" then Or.new(value, document)
             when "$and" then And.new(value, document)
+            when "$nor" then Nor.new(value, document)
             else Default.new(extract_attribute(document, key))
           end
         end
