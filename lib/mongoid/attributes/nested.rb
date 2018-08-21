@@ -45,13 +45,16 @@ module Mongoid
         # @option *args [ true, false ] :update_only Only update existing docs.
         def accepts_nested_attributes_for(*args)
           options = args.extract_options!
+          options[:autosave] = true if options[:autosave].nil?
+
           options[:reject_if] = REJECT_ALL_BLANK_PROC if options[:reject_if] == :all_blank
           args.each do |name|
             meth = "#{name}_attributes="
             self.nested_attributes["#{name}_attributes"] = meth
             association = relations[name.to_s]
             raise Errors::NestedAttributesMetadataNotFound.new(self, name) unless association
-            autosave_nested_attributes(association)
+            autosave_nested_attributes(association) unless !options[:autosave]
+
             re_define_method(meth) do |attrs|
               _assigning do
                 if association.polymorphic? and association.inverse_type
@@ -76,7 +79,8 @@ module Mongoid
         #
         # @since 3.1.4
         def autosave_nested_attributes(association)
-          if association.autosave?
+          if association.autosave? || (association.options[:autosave].nil? && !association.embedded?)
+            association.options[:autosave] = true
             Association::Referenced::AutoSave.define_autosave!(association)
           end
         end
