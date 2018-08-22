@@ -13,6 +13,8 @@ MONGODB_URI=${MONGODB_URI:-}
 export CI=evergreen
 export JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
 
+ls -l /opt
+
 # Necessary for jruby
 # Use toolchain java if it exists
 if [ -f /opt/java/jdk8/bin/java ]; then
@@ -36,10 +38,25 @@ if [ "$RVM_RUBY" == "ruby-head" ]; then
   
   #rvm reinstall $RVM_RUBY
 else
-  toolchain_url=https://s3.amazonaws.com//mciuploads/mongo-ruby-toolchain/rhel70/07f2c6cf44624721cfc614547de3b2db8fb29919/mongo_ruby_driver_toolchain_rhel70_07f2c6cf44624721cfc614547de3b2db8fb29919_18_07_27_19_35_52.tar.gz
-  curl -fL $toolchain_url |tar zxf -
+  # For testing toolchains:
+  #toolchain_url=https://s3.amazonaws.com//mciuploads/mongo-ruby-toolchain/rhel70/07f2c6cf44624721cfc614547de3b2db8fb29919/mongo_ruby_driver_toolchain_rhel70_07f2c6cf44624721cfc614547de3b2db8fb29919_18_07_27_19_35_52.tar.gz
+  #curl -fL $toolchain_url |tar zxf -
+  #export PATH=`pwd`/rubies/$RVM_RUBY/bin:$PATH
   
-  export PATH=`pwd`/rubies/$RVM_RUBY/bin:$PATH
+  # Normal operation
+  if ! test -d $HOME/.rubies/$RVM_RUBY/bin; then
+    echo "Ruby directory does not exist: $HOME/.rubies/$RVM_RUBY/bin" 1>&2
+    echo "Contents of /opt:" 1>&2
+    ls -l /opt 1>&2 || true
+    echo ".rubies symlink:" 1>&2
+    ls -ld $HOME/.rubies 1>&2 || true
+    echo "Our rubies:" 1>&2
+    ls -l $HOME/.rubies 1>&2 || true
+    exit 2
+  fi
+  export PATH=$HOME/.rubies/$RVM_RUBY/bin:$PATH
+  
+  ruby --version
 
   # Ensure we're using the right ruby
   python - <<EOH
@@ -49,9 +66,12 @@ assert(ruby in "`ruby --version`")
 assert(version in "`ruby --version`")
 EOH
 
-  echo 'updating rubygems'
-  gem update --system
+  # We shouldn't need to update rubygems, and there is value in
+  # testing on whatever rubygems came with each supported ruby version
+  #echo 'updating rubygems'
+  #gem update --system
 
+  # Only install bundler when not using ruby-head.
   # ruby-head comes with bundler and gem complains
   # because installing bundler would overwrite the bundler binary
   gem install bundler
