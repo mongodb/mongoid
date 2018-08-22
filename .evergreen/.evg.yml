@@ -549,17 +549,17 @@ axes:
            RAILS: "master"
 
 buildvariants:
-- matrix_name: "rhel70-all-driver-all-ruby-standalone"
+- matrix_name: "all"
   matrix_spec: { driver: "*", ruby: "*", mongodb-version: "*", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-test
   tasks:
      - name: "test"
-- matrix_name: "rhel70-rails-master-all-ruby-standalone"
+- matrix_name: "rails-master"
   matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-test
   tasks:
      - name: "test"
