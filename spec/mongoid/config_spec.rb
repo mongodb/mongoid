@@ -370,7 +370,9 @@ describe Mongoid::Config do
           end
 
           it "sets the default hosts" do
-            expect(default[:hosts]).to eq(["#{HOST}:#{PORT}"])
+            expect(default[:hosts]).to eq(SpecConfig.instance.addresses)
+            # and make sure the value is not empty
+            expect(default[:hosts].first).to include(':')
           end
 
           context "when the default has options" do
