@@ -32,4 +32,8 @@ class SpecConfig
   def client_debug?
     %w(1 true yes).include?((ENV['CLIENT_DEBUG'] || '').downcase)
   end
+
+  def ci?
+    !!ENV['CI']
+  end
 end

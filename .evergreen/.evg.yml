@@ -296,10 +296,23 @@ functions:
         content_type: ${content_type|application/x-gzip}
         display_name: "drivers-dir.tar.gz"
 
+  "upload test results to s3":
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.xml
+        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/artifacts/${task_id}-${execution}-rspec.xml
+        content_type: application/xml
+        permissions: public-read
+        bucket: mciuploads
+
   "upload test results":
     - command: attach.xunit_results
       params:
-        file: ./src/*/build/test-results/TEST-*.xml
+        file: ./src/tmp/rspec.xml
 
   "bootstrap mongo-orchestration":
     - command: shell.exec
@@ -396,6 +409,7 @@ post:
   # - func: "upload working dir"
   - func: "upload mo artifacts"
   - func: "upload test results"
+  - func: "upload test results to s3"
   - func: "cleanup"
 
 tasks:

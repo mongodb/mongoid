@@ -10,3 +10,10 @@ begin
   require 'byebug'
 rescue LoadError
 end
+
+RSpec.configure do |config|
+  if SpecConfig.instance.ci?
+    require 'rspec_junit_formatter'
+    config.add_formatter('RSpecJUnitFormatter', File.join(File.dirname(__FILE__), '../tmp/rspec.xml'))
+  end
+end

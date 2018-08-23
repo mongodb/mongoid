@@ -13,6 +13,7 @@ end
 
 group :development, :testing do
   gem 'yard'
+  gem 'rspec_junit_formatter'
   platforms :mri do
     if RUBY_VERSION >= '2.0.0'
       gem 'byebug'
