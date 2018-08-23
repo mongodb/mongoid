@@ -6,7 +6,15 @@ gem 'activemodel', git: 'https://github.com/rails/rails'
 
 group :test do
   gem 'benchmark-ips'
-  gem 'rspec', '~> 3.7.0'
+  gem 'rspec', '~> 3.7'
+end
+
+group :development, :testing do
+  gem 'yard'
+  gem 'rspec_junit_formatter'
+  platforms :mri do
+    gem 'byebug'
+  end
 end
 
 gemspec path: '..'

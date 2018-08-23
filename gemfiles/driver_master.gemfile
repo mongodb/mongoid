@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
-gem 'bson', github: "mongodb/bson-ruby"
-gem 'mongo', github: "mongodb/mongo-ruby-driver"
+gem 'bson', git: "https://github.com/mongodb/bson-ruby"
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver"
 
 gem 'rake'
 gem 'actionpack', '~> 5.1'
@@ -9,7 +9,15 @@ gem 'activemodel', '~> 5.1'
 
 group :test do
   gem 'benchmark-ips'
-  gem 'rspec', '~> 3.7.0'
+  gem 'rspec', '~> 3.7'
+end
+
+group :development, :testing do
+  gem 'yard'
+  gem 'rspec_junit_formatter'
+  platforms :mri do
+    gem 'byebug'
+  end
 end
 
 gemspec path: '..'
