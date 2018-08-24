@@ -503,6 +503,9 @@ axes:
         display_name: ruby-2.5
         variables:
            RVM_RUBY: "ruby-2.5"
+  - id: "jruby"
+    display_name: JRuby Version
+    values:
       - id: "jruby-9.1"
         display_name: jruby-9.1
         variables:
@@ -551,6 +554,20 @@ axes:
 buildvariants:
 - matrix_name: "all"
   matrix_spec: { driver: "*", ruby: "*", mongodb-version: "*", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "jruby-new"
+  matrix_spec: { driver: "*", jruby: "jruby-9.2", mongodb-version: "4.0", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "jruby-old"
+  matrix_spec: { driver: "*", jruby: "jruby-9.1", mongodb-version: "3.0", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}"
   run_on:
     - ubuntu1404-test
