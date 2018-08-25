@@ -560,14 +560,14 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "jruby-new"
-  matrix_spec: { driver: "*", jruby: "jruby-9.2", mongodb-version: "4.0", topology: "standalone" }
+  matrix_spec: { driver: "latest", jruby: "jruby-9.2", mongodb-version: "4.0", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}"
   run_on:
     - ubuntu1404-test
   tasks:
      - name: "test"
 - matrix_name: "jruby-old"
-  matrix_spec: { driver: "*", jruby: "jruby-9.1", mongodb-version: "3.0", topology: "standalone" }
+  matrix_spec: { driver: "latest", jruby: "jruby-9.1", mongodb-version: "3.0", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}"
   run_on:
     - ubuntu1404-test
