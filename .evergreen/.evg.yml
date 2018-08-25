@@ -304,6 +304,7 @@ functions:
         # src is the relative path to repo checkout,
         # This is specified in this yaml file earlier.
         local_file: ./src/tmp/rspec.xml
+        display_name: rspec.xml
         remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/artifacts/${task_id}-${execution}-rspec.xml
         content_type: application/xml
         permissions: public-read
