@@ -163,10 +163,6 @@ RSpec.configure do |config|
       coll.delete_many
     end
   end
-
-  config.after(:suite) do
-    Mongoid.purge!
-  end
 end
 
 # A subscriber to be used with the Ruby driver for testing.
