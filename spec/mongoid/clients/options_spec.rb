@@ -2,15 +2,13 @@ require "spec_helper"
 
 describe Mongoid::Clients::Options do
 
-  before(:all) do
-    class TestModel
-      include Mongoid::Document
-      field :name
-    end
-  end
-
-  after(:all) do
-    Object.send(:remove_const, :TestModel)
+  before do
+    # This test asserts on numbers of open connections,
+    # to make these assertions work in jruby we cannot have connections
+    # bleeding from one test to another and this includes background SDAM
+    # threads in the driver
+    Mongoid.disconnect_clients
+    Mongoid::Clients.clients.clear
   end
 
   describe '#with', if: non_legacy_server? do
@@ -18,7 +16,7 @@ describe Mongoid::Clients::Options do
     context 'when passing some options' do
 
       let(:persistence_context) do
-        TestModel.with(options) do |klass|
+        Minim.with(options) do |klass|
           klass.persistence_context
         end
       end
@@ -30,13 +28,13 @@ describe Mongoid::Clients::Options do
       end
 
       it 'does not set the options on class level' do
-        expect(TestModel.persistence_context.client.options['database']).to eq('mongoid_test')
+        expect(Minim.persistence_context.client.options['database']).to eq('mongoid_test')
       end
 
       context 'when the options are not valid mongo client options' do
 
         let(:persistence_context) do
-          TestModel.with(invalid_options) do |klass|
+          Minim.with(invalid_options) do |klass|
             klass.persistence_context
           end
         end
@@ -51,7 +49,7 @@ describe Mongoid::Clients::Options do
 
         it 'clears the persistence context' do
           begin; persistence_context; rescue Mongoid::Errors::InvalidPersistenceOption; end
-          expect(TestModel.persistence_context).to eq(Mongoid::PersistenceContext.new(TestModel))
+          expect(Minim.persistence_context).to eq(Mongoid::PersistenceContext.new(Minim))
         end
       end
 
@@ -77,14 +75,14 @@ describe Mongoid::Clients::Options do
       context 'when passing a block', if: testing_locally? do
 
         let!(:connections_before) do
-          TestModel.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+          Minim.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
         let!(:connections_and_cluster_during) do
           connections = nil
-          cluster = TestModel.with(options) do |klass|
+          cluster = Minim.with(options) do |klass|
             klass.where(name: 'emily').to_a
-            connections = TestModel.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+            connections = Minim.mongo_client.database.command(serverStatus: 1).first['connections']['current']
           end
           [ connections, cluster ]
         end
@@ -98,15 +96,15 @@ describe Mongoid::Clients::Options do
         end
 
         let(:connections_after) do
-          TestModel.mongo_client.database.command(serverStatus: 1).first['connections']['current']
+          Minim.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
         let!(:cluster_before) do
-          TestModel.persistence_context.cluster
+          Minim.persistence_context.cluster
         end
 
         let(:cluster_after) do
-          TestModel.persistence_context.cluster
+          Minim.persistence_context.cluster
         end
 
         context 'when the options create a new cluster' do
@@ -159,7 +157,7 @@ describe Mongoid::Clients::Options do
           end
 
           let(:persistence_context) do
-            TestModel.with(client: :secondary) do |klass|
+            Minim.with(client: :secondary) do |klass|
               klass.persistence_context
             end
           end
@@ -192,7 +190,7 @@ describe Mongoid::Clients::Options do
 
           let(:context_and_criteria) do
             collection = nil
-            cxt = TestModel.with(read_secondary_option) do |klass|
+            cxt = Minim.with(read_secondary_option) do |klass|
               collection = klass.all.collection
               klass.persistence_context
             end
@@ -232,11 +230,11 @@ describe Mongoid::Clients::Options do
           100.times do |i|
             threads << Thread.new do
               if i % 2 == 0
-                TestModel.with(collection: 'British') do |klass|
+                Minim.with(collection: 'British') do |klass|
                   klass.create(name: 'realised')
                 end
               else
-                TestModel.with(collection: 'American') do |klass|
+                Minim.with(collection: 'American') do |klass|
                   klass.create(name: 'realized')
                 end
               end
@@ -246,13 +244,13 @@ describe Mongoid::Clients::Options do
         end
 
         let(:british_count) do
-          TestModel.with(collection: 'British') do |klass|
+          Minim.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
 
         let(:american_count) do
-          TestModel.with(collection: 'American') do |klass|
+          Minim.with(collection: 'American') do |klass|
             klass.all.count
           end
         end
@@ -267,7 +265,7 @@ describe Mongoid::Clients::Options do
     context 'when passing a persistence context' do
 
       let(:instance) do
-        TestModel.new
+        Minim.new
       end
 
       let(:persistence_context) do
@@ -279,7 +277,7 @@ describe Mongoid::Clients::Options do
       let(:options) { { database: 'other' } }
 
       it 'sets the persistence context on the object' do
-        TestModel.new.with(persistence_context) do |model_instance|
+        Minim.new.with(persistence_context) do |model_instance|
           expect(model_instance.persistence_context.options).to eq(persistence_context.options)
         end
       end
@@ -295,7 +293,7 @@ describe Mongoid::Clients::Options do
       end
 
       let(:test_model) do
-        TestModel.create
+        Minim.create
       end
 
       let(:persistence_context) do
@@ -447,7 +445,7 @@ describe Mongoid::Clients::Options do
         before do
           threads = []
           100.times do |i|
-            test_model = TestModel.create
+            test_model = Minim.create
             threads << Thread.new do
               if i % 2 == 0
                 test_model.with(collection: 'British') do |b|
@@ -466,13 +464,13 @@ describe Mongoid::Clients::Options do
         end
 
         let(:british_count) do
-          TestModel.with(collection: 'British') do |klass|
+          Minim.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
 
         let(:american_count) do
-          TestModel.with(collection: 'British') do |klass|
+          Minim.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
@@ -487,7 +485,7 @@ describe Mongoid::Clients::Options do
     context 'when passing a persistence context' do
 
       let(:persistence_context) do
-        TestModel.with(options) do |klass|
+        Minim.with(options) do |klass|
           klass.persistence_context
         end
       end
@@ -495,7 +493,7 @@ describe Mongoid::Clients::Options do
       let(:options) { { database: 'other' } }
 
       it 'sets the persistence context on the object' do
-        TestModel.with(persistence_context) do |test_model_class|
+        Minim.with(persistence_context) do |test_model_class|
           expect(test_model_class.persistence_context.options).to eq(persistence_context.options)
         end
       end
