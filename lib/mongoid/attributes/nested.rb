@@ -44,7 +44,8 @@ module Mongoid
         # @option *args [ Integer ] :limit The max number to create.
         # @option *args [ true, false ] :update_only Only update existing docs.
         # @options *args [ true, false ] :autosave Whether autosave should be enabled on the
-        #   association.
+        #   association. Note that since the default is true, setting autosave to nil will still
+        #   enable it.
         def accepts_nested_attributes_for(*args)
           options = args.extract_options!.dup
           options[:autosave] = true if options[:autosave].nil?
