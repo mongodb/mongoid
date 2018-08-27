@@ -6,7 +6,6 @@ MODELS = File.join(File.dirname(__FILE__), "app/models")
 $LOAD_PATH.unshift(MODELS)
 
 require "action_controller"
-require 'support/spec_config'
 
 unless SpecConfig.instance.client_debug?
   Mongo::Logger.logger.level = Logger::INFO

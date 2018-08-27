@@ -41,6 +41,7 @@ gem update --system
 
 gem install bundler
 
+echo "We are in `pwd`"
 
 if [ $DRIVER == "master" ]; then
   bundle install --gemfile=gemfiles/driver_master.gemfile

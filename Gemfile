@@ -13,9 +13,8 @@ end
 
 group :development, :testing do
   gem 'yard'
+  gem 'rspec_junit_formatter', git: 'https://github.com/p-mongo/rspec_junit_formatter', branch: 'mongodb'
   platforms :mri do
-    if RUBY_VERSION >= '2.0.0'
-      gem 'byebug'
-    end
+    gem 'byebug'
   end
 end
