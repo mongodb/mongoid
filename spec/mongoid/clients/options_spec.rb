@@ -232,11 +232,11 @@ describe Mongoid::Clients::Options do
           100.times do |i|
             threads << Thread.new do
               if i % 2 == 0
-                Minim.with(collection: 'British') do |klass|
+                NameOnly.with(collection: 'British') do |klass|
                   klass.create(name: 'realised')
                 end
               else
-                Minim.with(collection: 'American') do |klass|
+                NameOnly.with(collection: 'American') do |klass|
                   klass.create(name: 'realized')
                 end
               end
@@ -246,13 +246,13 @@ describe Mongoid::Clients::Options do
         end
 
         let(:british_count) do
-          Minim.with(collection: 'British') do |klass|
+          NameOnly.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
 
         let(:american_count) do
-          Minim.with(collection: 'American') do |klass|
+          NameOnly.with(collection: 'American') do |klass|
             klass.all.count
           end
         end
@@ -447,7 +447,7 @@ describe Mongoid::Clients::Options do
         before do
           threads = []
           100.times do |i|
-            test_model = Minim.create
+            test_model = NameOnly.create
             threads << Thread.new do
               if i % 2 == 0
                 test_model.with(collection: 'British') do |b|
@@ -466,13 +466,13 @@ describe Mongoid::Clients::Options do
         end
 
         let(:british_count) do
-          Minim.with(collection: 'British') do |klass|
+          NameOnly.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
 
         let(:american_count) do
-          Minim.with(collection: 'British') do |klass|
+          NameOnly.with(collection: 'British') do |klass|
             klass.all.count
           end
         end
