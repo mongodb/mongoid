@@ -12,10 +12,12 @@ describe Mongoid::Attributes::Nested do
 
       before do
         Person.accepts_nested_attributes_for :favorites
+        Person.accepts_nested_attributes_for :children
       end
 
       after do
         Person.send(:undef_method, :favorites_attributes=)
+        Person.send(:undef_method, :children_attributes=)
         Person.nested_attributes.clear
       end
 
@@ -23,9 +25,18 @@ describe Mongoid::Attributes::Nested do
         expect(person).to respond_to(:favorites_attributes=)
       end
 
+      it "does not autosave if the association is embedded" do
+        expect(person).not_to respond_to(:autosave_documents_for_favorites)
+      end
+
+      it "autosaves if the association is not embedded" do
+        expect(person).to respond_to(:autosave_documents_for_children)
+      end
+
       it "adds the method name to the nested attributes list" do
         expect(Person.nested_attributes).to eq({
-          "favorites_attributes" => "favorites_attributes="
+          "favorites_attributes" => "favorites_attributes=",
+          "children_attributes" => "children_attributes="
         })
       end
     end
@@ -202,7 +213,12 @@ describe Mongoid::Attributes::Nested do
     context "when the relation is a referenced in" do
 
       before do
-        Post.accepts_nested_attributes_for :person
+        Post.accepts_nested_attributes_for :person, autosave: false
+      end
+
+      after do
+        Post.send(:undef_method, :person_attributes=)
+        Post.nested_attributes.clear
       end
 
       let(:post) do

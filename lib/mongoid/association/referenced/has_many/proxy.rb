@@ -459,7 +459,7 @@ module Mongoid
               collection.insert_many(inserts, session: _session)
               docs.each do |doc|
                 doc.new_record = false
-                doc.run_after_callbacks(:create, :save)
+                doc.run_after_callbacks(:create, :save) unless _association.autosave?
                 doc.post_persist
               end
             end
