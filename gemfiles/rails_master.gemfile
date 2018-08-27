@@ -7,6 +7,9 @@ gem 'activemodel', git: 'https://github.com/rails/rails'
 group :test do
   gem 'benchmark-ips'
   gem 'rspec', '~> 3.7'
+  platforms :mri do
+    gem 'timeout-interrupt'
+  end
 end
 
 group :development, :testing do
