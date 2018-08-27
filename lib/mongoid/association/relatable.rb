@@ -323,6 +323,12 @@ module Mongoid
 
       private
 
+      # Gets the model classes with inverse associations of this model. This is used to determine
+      # the classes on the other end of polymorphic relations with models.
+      def inverse_association_classes
+        Mongoid::Config.models.map { |m| inverse_association(m) }.compact.map(&:inverse_class)
+      end
+
       def setup_index!
         @owner_class.index(index_spec, background: true) if indexed?
       end
