@@ -43,6 +43,8 @@ module Mongoid
         #   to a class method to reject documents with.
         # @option *args [ Integer ] :limit The max number to create.
         # @option *args [ true, false ] :update_only Only update existing docs.
+        # @options *args [ true, false ] :autosave Whether autosave should be enabled on the
+        #   association.
         def accepts_nested_attributes_for(*args)
           options = args.extract_options!.dup
           options[:autosave] = true if options[:autosave].nil?
