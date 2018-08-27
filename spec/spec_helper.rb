@@ -7,10 +7,13 @@ $LOAD_PATH.unshift(MODELS)
 
 require "action_controller"
 
-unless SpecConfig.instance.client_debug?
+if SpecConfig.instance.client_debug?
+  Mongoid.logger.level = Logger::DEBUG
+  Mongo::Logger.logger.level = Logger::DEBUG
+else
+  Mongoid.logger.level = Logger::INFO
   Mongo::Logger.logger.level = Logger::INFO
 end
-# Mongoid.logger.level = Logger::DEBUG
 
 # When testing locally we use the database named mongoid_test. However when
 # tests are running in parallel on Travis we need to use different database
@@ -59,7 +62,12 @@ CONFIG = {
     }
   },
   options: {
-    belongs_to_required_by_default: false
+    belongs_to_required_by_default: false,
+    log_level: if SpecConfig.instance.client_debug?
+      :debug
+    else
+      :info
+    end,
   }
 }
 
