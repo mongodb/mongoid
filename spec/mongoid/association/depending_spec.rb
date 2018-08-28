@@ -4,6 +4,66 @@ require "spec_helper"
 
 describe Mongoid::Association::Depending do
 
+  describe '#self.included' do
+
+    context 'when a destroy dependent is defined' do
+
+      context 'when the model is a subclass' do
+
+        let(:define_classes) do
+          class DependentReportCard
+            include Mongoid::Document
+
+            belongs_to :dependent_student
+          end
+
+          class DependentUser
+            include Mongoid::Document
+          end
+
+          class DependentStudent < DependentUser
+            has_many :dependent_report_cards, dependent: :destroy
+          end
+
+          class DependentCollegeUser < DependentUser; end
+        end
+
+        it 'adds the dependent' do
+          define_classes
+          expect(DependentStudent.dependents.length).to be(1)
+          expect(DependentStudent.dependents.first.name).to be(:dependent_report_cards)
+
+          s = DependentStudent.create!
+          expect(s.dependents.length).to be(1)
+          expect(s.dependents.first.name).to be(:dependent_report_cards)
+        end
+
+        it 'facilitates proper destroying of the object' do
+          define_classes
+          s = DependentStudent.create!
+          r = DependentReportCard.create!(dependent_student: s)
+          s.destroy!
+
+          expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+
+        it "doesn't add the dependent to sibling classes" do
+          define_classes
+          expect(DependentCollegeUser.dependents).to be_empty
+
+          c = DependentCollegeUser.create!
+          expect(c.dependents).to be_empty
+        end
+
+        it 'does not impede destroying the sibling class' do
+          define_classes
+          c = DependentCollegeUser.create!
+          expect { c.destroy! }.not_to raise_error
+        end
+      end
+    end
+  end
+
   around(:each) do |example|
     relations_before = Person.relations
     example.run

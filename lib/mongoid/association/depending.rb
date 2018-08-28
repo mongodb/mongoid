@@ -9,8 +9,17 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :dependents
-        self.dependents = []
+        def self.dependents
+          @dependents ||= []
+        end
+
+        def self.dependents=(deps)
+          @dependents = deps
+        end
+
+        def dependents
+          self.class.dependents
+        end
       end
 
       # The valid dependent strategies.
