@@ -51,7 +51,12 @@ CONFIG = {
       database: database_id,
       hosts: SpecConfig.instance.addresses,
       options: {
-        server_selection_timeout: 0.5,
+        server_selection_timeout:
+          if SpecConfig.instance.jruby?
+            1
+          else
+            0.5
+          end,
         wait_queue_timeout: 5,
         max_pool_size: 5,
         heartbeat_frequency: 180,
