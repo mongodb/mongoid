@@ -15,7 +15,6 @@ require 'support/spec_config'
 
 RSpec.configure do |config|
   if SpecConfig.instance.ci?
-    require 'rspec_junit_formatter'
-    config.add_formatter('RSpecJUnitFormatter', File.join(File.dirname(__FILE__), '../tmp/rspec.xml'))
+    config.add_formatter(RSpec::Core::Formatters::JsonFormatter, File.join(File.dirname(__FILE__), '../tmp/rspec.json'))
   end
 end
