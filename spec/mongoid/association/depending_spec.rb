@@ -10,55 +10,151 @@ describe Mongoid::Association::Depending do
 
       context 'when the model is a subclass' do
 
-        let(:define_classes) do
-          class DependentReportCard
-            include Mongoid::Document
+        context 'when transitive dependents are defined' do
 
-            belongs_to :dependent_student
+          let(:define_classes) do
+            class DependentReportCard
+              include Mongoid::Document
+
+              belongs_to :dependent_student
+            end
+
+            class DependentUser
+              include Mongoid::Document
+            end
+
+            class DependentStudent < DependentUser
+              belongs_to :dependent_teacher
+              has_many :dependent_report_cards, dependent: :destroy
+            end
+
+            class DependentTeacher
+              include Mongoid::Document
+
+              has_many :dependent_students, dependent: :destroy
+            end
+
+            class DependentCollegeUser < DependentUser; end
           end
 
-          class DependentUser
-            include Mongoid::Document
+          it 'adds the dependent' do
+            define_classes
+
+            expect(DependentStudent.dependents.length).to be(1)
+            expect(DependentStudent.dependents.first.name).to be(:dependent_report_cards)
+
+            s = DependentStudent.create!
+            expect(s.dependents.length).to be(1)
+            expect(s.dependents.first.name).to be(:dependent_report_cards)
           end
 
-          class DependentStudent < DependentUser
-            has_many :dependent_report_cards, dependent: :destroy
+          it 'facilitates proper destroying of the object' do
+            define_classes
+
+            s = DependentStudent.create!
+            r = DependentReportCard.create!(dependent_student: s)
+            s.destroy!
+
+            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
 
-          class DependentCollegeUser < DependentUser; end
+          it 'facilitates proper transitive destroying of the object' do
+            define_classes
+
+            t = DependentTeacher.create!
+            s = DependentStudent.create!(dependent_teacher: t)
+            r = DependentReportCard.create!(dependent_student: s)
+            s.destroy!
+
+            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+
+          it "doesn't add the dependent to sibling classes" do
+            define_classes
+
+            expect(DependentCollegeUser.dependents).to be_empty
+
+            c = DependentCollegeUser.create!
+            expect(c.dependents).to be_empty
+          end
+
+          it 'does not impede destroying the sibling class' do
+            define_classes
+            c = DependentCollegeUser.create!
+            expect { c.destroy! }.not_to raise_error
+          end
         end
 
-        it 'adds the dependent' do
-          define_classes
-          expect(DependentStudent.dependents.length).to be(1)
-          expect(DependentStudent.dependents.first.name).to be(:dependent_report_cards)
 
-          s = DependentStudent.create!
-          expect(s.dependents.length).to be(1)
-          expect(s.dependents.first.name).to be(:dependent_report_cards)
-        end
+        context 'when a separate subclass overrides the destroy dependent' do
+          let(:define_classes) do
+            class Dep
+              include Mongoid::Document
 
-        it 'facilitates proper destroying of the object' do
-          define_classes
-          s = DependentStudent.create!
-          r = DependentReportCard.create!(dependent_student: s)
-          s.destroy!
+              belongs_to :double_assoc
+            end
 
-          expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
-        end
+            class DoubleAssoc
+              include Mongoid::Document
 
-        it "doesn't add the dependent to sibling classes" do
-          define_classes
-          expect(DependentCollegeUser.dependents).to be_empty
+              has_many :deps, dependent: :destroy
+            end
 
-          c = DependentCollegeUser.create!
-          expect(c.dependents).to be_empty
-        end
+            class DoubleAssocOne < DoubleAssoc
+              has_many :deps, dependent: :nullify, inverse_of: :double_assoc
+            end
 
-        it 'does not impede destroying the sibling class' do
-          define_classes
-          c = DependentCollegeUser.create!
-          expect { c.destroy! }.not_to raise_error
+            class DoubleAssocTwo < DoubleAssocOne
+              has_many :deps, dependent: :destroy, inverse_of: :double_assoc
+            end
+          end
+
+          it 'adds the non-destroy dependent correctly to the subclass with the override' do
+            define_classes
+
+            expect(DoubleAssocOne.dependents.length).to be(1)
+            expect(DoubleAssocOne.dependents.first.name).to be(:deps)
+            expect(DoubleAssocOne.dependents.first.options[:dependent]).to be(:nullify)
+
+            one = DoubleAssocOne.create!
+            expect(one.dependents.length).to be(1)
+            expect(one.dependents.first.name).to be(:deps)
+            expect(one.dependents.first.options[:dependent]).to be(:nullify)
+          end
+
+          it 'does not cause the destruction of the non-destroy dependent' do
+            define_classes
+
+            one = DoubleAssocOne.create!
+            dep = Dep.create!(double_assoc: one)
+            one.destroy!
+
+            expect { Dep.find(dep.id) }.not_to raise_error
+            expect(dep.double_assoc).to be_nil
+          end
+
+          it 'adds the destroy dependent correctly to the subclass without the override' do
+            define_classes
+
+            expect(DoubleAssocTwo.dependents.length).to be(1)
+            expect(DoubleAssocTwo.dependents.first.name).to be(:deps)
+            expect(DoubleAssocTwo.dependents.first.options[:dependent]).to be(:destroy)
+
+            two = DoubleAssocTwo.create!
+            expect(two.dependents.length).to be(1)
+            expect(two.dependents.first.name).to be(:deps)
+            expect(two.dependents.first.options[:dependent]).to be(:destroy)
+          end
+
+          it 'causes the destruction of the destroy dependent' do
+            define_classes
+
+            two = DoubleAssocTwo.create!
+            dep = Dep.create!(double_assoc: two)
+            two.destroy!
+
+            expect { Dep.find(dep.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
         end
       end
     end
