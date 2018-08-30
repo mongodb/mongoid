@@ -6,6 +6,7 @@ MODELS = File.join(File.dirname(__FILE__), "app/models")
 $LOAD_PATH.unshift(MODELS)
 
 require "action_controller"
+require 'rspec/retry'
 
 if SpecConfig.instance.client_debug?
   Mongoid.logger.level = Logger::DEBUG

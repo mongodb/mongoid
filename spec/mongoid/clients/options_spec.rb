@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Clients::Options do
+describe Mongoid::Clients::Options, retry: 3 do
 
   before do
     # This test asserts on numbers of open connections,

@@ -5,6 +5,7 @@ gem 'actionpack', git: 'https://github.com/rails/rails'
 gem 'activemodel', git: 'https://github.com/rails/rails'
 
 group :test do
+  gem 'rspec-retry'
   gem 'benchmark-ips'
   gem 'rspec', '~> 3.7'
   platforms :mri do

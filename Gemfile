@@ -7,6 +7,7 @@ gem 'activemodel', '~> 5.1'
 
 
 group :test do
+  gem 'rspec-retry'
   gem 'benchmark-ips'
   gem 'rspec', '~> 3.7'
   platforms :mri do
