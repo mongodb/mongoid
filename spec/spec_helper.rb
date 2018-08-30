@@ -53,7 +53,7 @@ CONFIG = {
       options: {
         server_selection_timeout:
           if SpecConfig.instance.jruby?
-            1
+            3
           else
             0.5
           end,
