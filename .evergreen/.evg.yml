@@ -306,7 +306,7 @@ functions:
         local_file: ./src/tmp/rspec.json
         display_name: rspec.json
         remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/artifacts/${task_id}-${execution}-rspec.json
-        content_type: application/xml
+        content_type: application/json
         permissions: public-read
         bucket: mciuploads
 
