@@ -54,9 +54,9 @@ module Mongoid
               if _assigning?
                 _base.add_atomic_unset(_target) unless replacement
               else
-                # The associated object will be replaced by the below update, so only
-                # run the callbacks and state-changing code by passing persist: false.
-                _target.destroy(persist: false) if persistable?
+                # The associated object will be replaced by the below update if non-nil, so only
+                # run the callbacks and state-changing code by passing persist: false in that case.
+                _target.destroy(persist: !replacement) if persistable?
               end
               unbind_one
               return nil unless replacement
