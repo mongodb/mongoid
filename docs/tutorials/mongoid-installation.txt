@@ -81,6 +81,13 @@ and thus requires Ruby 2.2.2 or higher.
      - No
      - No
 
+   * - JRuby 9.2.x
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+     - Yes
+
    * - JRuby 9.1.x
      - Yes
      - Yes
