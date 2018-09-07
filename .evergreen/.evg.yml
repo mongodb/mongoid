@@ -439,14 +439,14 @@ axes:
         display_name: "MongoDB 3.2"
         variables:
            VERSION: "3.2"
-#      - id: "3.0"
-#        display_name: "MongoDB 3.0"
-#        variables:
-#           VERSION: "3.0"
-#      - id: "2.6"
-#        display_name: "MongoDB 2.6"
-#        variables:
-#           VERSION: "2.6"
+      - id: "3.0"
+        display_name: "MongoDB 3.0"
+        variables:
+           VERSION: "3.0"
+      - id: "2.6"
+        display_name: "MongoDB 2.6"
+        variables:
+           VERSION: "2.6"
   - id: "topology"
     display_name: Topology
     values:
@@ -487,6 +487,10 @@ axes:
   - id: "ruby"
     display_name: Ruby Version
     values:
+      - id: "ruby-2.2"
+        display_name: ruby-2.2
+        variables:
+           RVM_RUBY: "ruby-2.2"
       - id: "ruby-2.3"
         display_name: ruby-2.3
         variables:
@@ -495,10 +499,21 @@ axes:
         display_name: ruby-2.4
         variables:
            RVM_RUBY: "ruby-2.4"
-      - id: "ruby-2.5.0"
-        display_name: ruby-2.5.0
+      - id: "ruby-2.5"
+        display_name: ruby-2.5
         variables:
-           RVM_RUBY: "ruby-2.5.0"
+           RVM_RUBY: "ruby-2.5"
+  - id: "jruby"
+    display_name: JRuby Version
+    values:
+      - id: "jruby-9.1"
+        display_name: jruby-9.1
+        variables:
+           RVM_RUBY: "jruby-9.1"
+      - id: "jruby-9.2"
+        display_name: jruby-9.2
+        variables:
+           RVM_RUBY: "jruby-9.2"
   - id: "os"
     display_name: OS
     values:
@@ -537,17 +552,59 @@ axes:
            RAILS: "master"
 
 buildvariants:
-- matrix_name: "rhel70-all-driver-all-ruby-standalone"
-  matrix_spec: { driver: "*", ruby: "*", mongodb-version: "*", topology: "standalone" }
+- matrix_name: "rubies"
+  matrix_spec: { driver: "latest", ruby: "*", mongodb-version: "4.0", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-test
   tasks:
      - name: "test"
-- matrix_name: "rhel70-rails-master-all-ruby-standalone"
-  matrix_spec: { driver: "latest", ruby: "ruby-2.5.0", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
+- matrix_name: "mongodb"
+  matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: ["3.6","3.4","3.2"], topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "mongodb-old"
+  matrix_spec: { driver: "latest", ruby: "ruby-2.2", mongodb-version: ["3.0","2.6"], topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "jruby-new"
+  matrix_spec: { driver: "latest", jruby: "jruby-9.2", mongodb-version: "4.0", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "jruby-old"
+  matrix_spec: { driver: "latest", jruby: "jruby-9.1", mongodb-version: "3.0", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "driver-master-new"
+  matrix_spec: { driver: "master", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "driver-master-old"
+  matrix_spec: { driver: "master", ruby: "ruby-2.2", mongodb-version: "2.6", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "rails-master"
+  matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-test
   tasks:
      - name: "test"
