@@ -890,6 +890,33 @@ describe Mongoid::Association::Referenced::HasOne do
 
   describe '#relation_class_name' do
 
+    context 'when the classes are defined in a module' do
+
+      let(:define_classes) do
+        module HasOneAssociationClassName
+          class OwnedClass
+            include Mongoid::Document
+
+            belongs_to :owner_class
+          end
+
+          class OwnerClass
+            include Mongoid::Document
+
+            has_one :owned_class
+          end
+        end
+      end
+
+      it 'returns the proper namespaced class name' do
+        define_classes
+
+        expect(
+            HasOneAssociationClassName::OwnedClass.relations['owner_class'].relation_class_name
+        ).to eq('HasOneAssociationClassName::OwnerClass')
+      end
+    end
+
     context 'when the :class_name option is specified' do
 
       let(:options) do
@@ -1197,6 +1224,38 @@ describe Mongoid::Association::Referenced::HasOne do
       it 'returns false' do
         expect(association.destructive?).to be(false)
       end
+    end
+  end
+
+  context 'when the classes are defined in a module' do
+
+    let(:define_classes) do
+      module HasOneAssociationModuleDefinitions
+        class OwnedClass
+          include Mongoid::Document
+
+          belongs_to :owner_class
+        end
+
+        class OwnerClass
+          include Mongoid::Document
+
+          has_one :owned_class
+        end
+      end
+    end
+
+    let(:owner) do
+      HasOneAssociationModuleDefinitions::OwnerClass.create!
+    end
+
+    let(:owned) do
+      define_classes
+      HasOneAssociationModuleDefinitions::OwnedClass.create!(owner_class: owner)
+    end
+
+    it 'successfully creates the owned document' do
+      expect { owned }.not_to raise_error
     end
   end
 
