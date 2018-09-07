@@ -45,8 +45,10 @@ and thus requires Ruby 2.2.2 or higher.
      - MongoDB 3.4.x
      - MongoDB 3.2.x
      - MongoDB 3.0.x
+     - MongoDB 2.6.x
 
    * - MRI 2.5.0+
+     - Yes
      - Yes
      - Yes
      - Yes
@@ -59,8 +61,10 @@ and thus requires Ruby 2.2.2 or higher.
      - Yes
      - Yes
      - Yes
+     - Yes
 
    * - MRI 2.3.x
+     - Yes
      - Yes
      - Yes
      - Yes
@@ -73,8 +77,10 @@ and thus requires Ruby 2.2.2 or higher.
      - Yes
      - Yes
      - Yes
+     - Yes
 
    * - MRI 2.1.x
+     - No
      - No
      - No
      - No
@@ -87,8 +93,10 @@ and thus requires Ruby 2.2.2 or higher.
      - Yes
      - Yes
      - Yes
+     - Yes
 
    * - JRuby 9.1.x
+     - Yes
      - Yes
      - Yes
      - Yes
