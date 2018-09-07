@@ -60,8 +60,9 @@ Indexes can be run in the background in cases where they may take some time:
      index({ ssn: 1 }, { unique: true, background: true })
    end
 
-For unique indexes that are defined for a column that might already have duplicate
-values, you can drop the duplicate entries:
+*Deprecated:* When using MongoDB 2.6, you can drop the duplicate entries
+for unique indexes that are defined for a column that might
+already have duplicate values by specifying the ``drop_dups`` option:
 
 .. code-block:: ruby
 
@@ -70,6 +71,8 @@ values, you can drop the duplicate entries:
      field :ssn
      index({ ssn: 1 }, { unique: true, drop_dups: true })
    end
+
+The ``drop_dups`` option has been `removed as of MongoDB 3.0 <https://docs.mongodb.com/manual/release-notes/3.0-compatibility/#remove-dropdups-option>`_.
 
 For geospatial indexes, make sure the field you are indexing is an Array.
 
