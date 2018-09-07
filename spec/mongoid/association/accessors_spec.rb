@@ -687,6 +687,45 @@ describe Mongoid::Association::Accessors do
     end
   end
 
+  context 'when setting associations to nil values' do
+    context 'when the document embeds one' do
+      let(:definitions) do
+        class AccessorEmbedding
+          include Mongoid::Document
+
+          embeds_one :accessor_embedded
+        end
+
+        class AccessorEmbedded
+          include Mongoid::Document
+
+          embedded_in :accessor_embedding
+        end
+
+        define_embedded
+      end
+
+      let(:embedding) do
+        AccessorEmbedding.create!
+      end
+
+      let(:define_embedded) do
+        AccessorEmbedded.create!(accessor_embedding: embedding)
+      end
+
+      it 'successfully removes the embedded document' do
+        definitions
+
+        expect(embedding.accessor_embedded).not_to be_nil
+
+        embedding.accessor_embedded = nil
+        embedding.save!
+
+        expect(embedding.reload.accessor_embedded).to be_nil
+      end
+    end
+  end
+
   context "when setting association foreign keys" do
 
     let(:game) do
