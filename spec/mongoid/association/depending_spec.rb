@@ -28,6 +28,8 @@ describe Mongoid::Association::Depending do
               has_many :dependent_report_cards, dependent: :destroy
             end
 
+            class DependentDerivedStudent < DependentStudent; end
+
             class DependentTeacher
               include Mongoid::Document
 
@@ -35,6 +37,22 @@ describe Mongoid::Association::Depending do
             end
 
             class DependentCollegeUser < DependentUser; end
+          end
+
+          it "does not add the dependent to superclass" do
+            define_classes
+
+            expect(DependentUser.dependents).to be_empty
+
+            u = DependentUser.create!
+            expect(u.dependents).to be_empty
+          end
+
+          it 'does not impede destroying the superclass' do
+            define_classes
+
+            u = DependentUser.create!
+            expect { u.destroy! }.not_to raise_error
           end
 
           it 'adds the dependent' do
@@ -69,6 +87,27 @@ describe Mongoid::Association::Depending do
             expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
           end
 
+          it 'adds the dependent to subclasses' do
+            define_classes
+
+            expect(DependentDerivedStudent.dependents.length).to be(1)
+            expect(DependentDerivedStudent.dependents.first.name).to be(:dependent_report_cards)
+
+            s = DependentDerivedStudent.create!
+            expect(s.dependents.length).to be(1)
+            expect(s.dependents.first.name).to be(:dependent_report_cards)
+          end
+
+          it 'facilitates proper destroying of the object from subclasses' do
+            define_classes
+
+            s = DependentDerivedStudent.create!
+            r = DependentReportCard.create!(dependent_student: s)
+            s.destroy!
+
+            expect { DependentReportCard.find(r.id) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+
           it "doesn't add the dependent to sibling classes" do
             define_classes
 
@@ -80,6 +119,7 @@ describe Mongoid::Association::Depending do
 
           it 'does not impede destroying the sibling class' do
             define_classes
+
             c = DependentCollegeUser.create!
             expect { c.destroy! }.not_to raise_error
           end
