@@ -11,6 +11,11 @@ module Mongoid
       included do
         def self.dependents
           @dependents ||= superclass.method_defined?(:dependents) ? superclass.dependents.dup : []
+          @dependents = @dependents.reduce([]) do |deps, dep|
+            deps.reject! { |d| d.class_name == dep.class_name }
+            deps << dep
+          end
+          @dependents
         end
 
         def self.dependents=(deps)
@@ -53,8 +58,6 @@ module Mongoid
         validate!(association)
         association.inverse_class.tap do |klass|
           if association.dependent && !klass.dependents.include?(association)
-            # Override existing dependents defined for the same association class.
-            klass.dependents.reject! { |assoc| assoc.class_name == association.class_name }
             klass.dependents.push(association)
           end
         end
