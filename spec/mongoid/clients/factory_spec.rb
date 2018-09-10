@@ -134,8 +134,8 @@ describe Mongoid::Clients::Factory do
 
             let(:config) do
               {
-                default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
-                secondary: { uri: "mongodb://127.0.0.1:27017,127.0.0.1:27018/mongoid_test" }
+                default: { hosts: [ "127.0.0.1:1234" ], database: database_id },
+                secondary: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/mongoid_test" }
               }
             end
 
@@ -164,7 +164,7 @@ describe Mongoid::Clients::Factory do
             end
 
             it "sets the cluster's seeds" do
-              expect(seeds).to eq([ "127.0.0.1:27017", "127.0.0.1:27018" ])
+              expect(seeds).to eq([ "127.0.0.1:1234", "127.0.0.1:5678" ])
             end
           end
         end
