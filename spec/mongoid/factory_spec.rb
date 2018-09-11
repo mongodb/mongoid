@@ -213,8 +213,8 @@ describe Mongoid::Factory do
 
     context 'when type is correct but the instantiation throws a NoMethodError' do
       class BadPerson < Person
-        def instantiate
-          call_some_no_existant_method()
+        def self.instantiate(*args)
+          call_some_no_existant_method(*args)
           super
         end
       end
@@ -224,7 +224,7 @@ describe Mongoid::Factory do
       end
 
       let(:person) do
-        described_class.from_db(Person, attributes)
+        described_class.from_db(BadPerson, attributes)
       end
 
       it 'raises a exception' do
