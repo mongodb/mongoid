@@ -125,6 +125,61 @@ describe Mongoid::Association::Depending do
           end
         end
 
+        context 'when a superclass is reopened and a new dependent is added' do
+          let(:define_classes) do
+            class DependentOwnedOne
+              include Mongoid::Document
+
+              belongs_to :dependent_superclass
+            end
+
+            class DependentOwnedTwo
+              include Mongoid::Document
+
+              belongs_to :dependent_superclass
+            end
+
+            class DependentSuperclass
+              include Mongoid::Document
+              has_one :dependent_owned_one
+              has_one :dependent_owned_two
+            end
+
+            class DependentSubclass < DependentSuperclass
+              has_one :dependent_owned_two, dependent: :nullify
+            end
+
+            class DependentSuperclass
+              has_one :dependent_owned_one, dependent: :destroy
+            end
+          end
+
+          it 'defines the dependent from the reopened superclass on the subclass' do
+            define_classes
+
+            DependentSubclass.create!.destroy!
+
+            expect(DependentSubclass.dependents.length).to be(1)
+            expect(DependentSubclass.dependents.last.name).to be(:dependent_owned_two)
+            expect(DependentSubclass.dependents.last.options[:dependent]).to be(:nullify)
+
+            subclass = DependentSubclass.create!
+            expect(subclass.dependents.last.name).to be(:dependent_owned_two)
+            expect(subclass.dependents.last.options[:dependent]).to be(:nullify)
+          end
+
+          it 'causes the destruction of the inherited destroy dependent' do
+            define_classes
+
+            subclass = DependentSubclass.create!
+            owned = DependentOwnedOne.create!(dependent_superclass: subclass)
+            subclass.destroy!
+
+            expect {
+              DependentOwnedOne.find(owned.id)
+            }.to raise_error(Mongoid::Errors::DocumentNotFound)
+          end
+        end
 
         context 'when a separate subclass overrides the destroy dependent' do
           let(:define_classes) do
@@ -147,6 +202,8 @@ describe Mongoid::Association::Depending do
             class DoubleAssocTwo < DoubleAssocOne
               has_many :deps, dependent: :destroy, inverse_of: :double_assoc
             end
+
+            class DoubleAssocThree < DoubleAssoc; end
           end
 
           it 'adds the non-destroy dependent correctly to the subclass with the override' do

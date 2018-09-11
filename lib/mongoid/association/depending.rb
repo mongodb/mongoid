@@ -9,21 +9,15 @@ module Mongoid
       extend ActiveSupport::Concern
 
       included do
-        def self.dependents
-          @dependents ||= superclass.method_defined?(:dependents) ? superclass.dependents.dup : []
-          @dependents = @dependents.reduce([]) do |deps, dep|
-            deps.reject! { |d| d.class_name == dep.class_name }
-            deps << dep
-          end
-          @dependents
-        end
+        class_attribute :dependents
+        class_attribute :dependents_owner
+        self.dependents = []
+        self.dependents_owner = self
+      end
 
-        def self.dependents=(deps)
-          @dependents = deps
-        end
-
-        def dependents
-          self.class.dependents
+      class_methods do
+        def _all_dependents
+          dependents + (superclass.respond_to?(:_all_dependents) ? superclass._all_dependents : [])
         end
       end
 
@@ -57,6 +51,11 @@ module Mongoid
       def self.define_dependency!(association)
         validate!(association)
         association.inverse_class.tap do |klass|
+          if klass.dependents_owner != klass
+            klass.dependents = []
+            klass.dependents_owner = klass
+          end
+
           if association.dependent && !klass.dependents.include?(association)
             klass.dependents.push(association)
           end
@@ -79,7 +78,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def apply_delete_dependencies!
-        dependents.each do |association|
+        self.class._all_dependents.each do |association|
           if association.try(:dependent)
             send("_dependent_#{association.dependent}!", association)
           end
