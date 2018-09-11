@@ -107,6 +107,10 @@ module Mongoid
     #
     # @since 6.0.0
     def client
+      client_options = send(:client_options)
+      if client_options[:read].is_a?(Symbol)
+        client_options = client_options.merge(read: {mode: client_options[:read]})
+      end
       @client ||= (client = Clients.with_name(client_name)
                     client = client.use(database_name) if database_name_option
                     client.with(client_options))
