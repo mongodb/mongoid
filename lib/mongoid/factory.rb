@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 # encoding: utf-8
 module Mongoid
 
@@ -50,11 +49,20 @@ module Mongoid
         obj
       else
         camelized = type.camelize
+
+        # Check if the class exists
         begin
-          camelized.constantize.instantiate(attributes, selected_fields)
+          constantized = camelized.constantize
         rescue NameError
           raise Errors::UnknownModel.new(camelized, type)
         end
+
+        # Check if the class is a Document class
+        if !constantized.respond_to?(:instantiate)
+          raise Errors::UnknownModel.new(camelized, type)
+        end
+
+        constantized.instantiate(attributes, selected_fields)
       end
     end
   end

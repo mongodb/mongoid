@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require "spec_helper"
 
 describe Mongoid::Factory do
@@ -209,6 +207,30 @@ describe Mongoid::Factory do
         expect {
           person
         }.to raise_exception(Mongoid::Errors::UnknownModel)
+      end
+
+    end
+
+    context 'when type is correct but the instantiation throws a NoMethodError' do
+      class BadPerson < Person
+        def instantiate
+          call_some_no_existant_method()
+          super
+        end
+      end
+
+      let(:attributes) do
+        { "title" => "Sir", "_type" => "BadPerson" }
+      end
+
+      let(:person) do
+        described_class.from_db(Person, attributes)
+      end
+
+      it 'raises a exception' do
+        expect {
+          person
+        }.to raise_exception(NoMethodError)
       end
 
     end
