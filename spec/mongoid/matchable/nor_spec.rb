@@ -24,8 +24,8 @@ describe Mongoid::Matchable::Nor do
           )
         end
 
-        before do
-          person.title = "Queen"
+        let(:person) do
+          Person.new(title: 'Queen')
         end
 
         it "returns true" do
@@ -33,7 +33,23 @@ describe Mongoid::Matchable::Nor do
         end
       end
 
-      context "when none of the values are not equal" do
+      context "when all of the values are equal" do
+        let(:matches) do
+          matcher._matches?(
+            [ { title: "Sir" }, { title: "King" } ]
+          )
+        end
+
+        let(:person) do
+          Person.new(title: 'King')
+        end
+
+        it "returns false" do
+          expect(matches).to be false
+        end
+      end
+
+      context "when there are no values" do
 
         it "returns true" do
           expect(matcher._matches?([])).to be true
