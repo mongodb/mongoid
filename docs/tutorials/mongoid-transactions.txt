@@ -1,0 +1,120 @@
+============
+Transactions
+============
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Version 4.0 of the MongoDB server introduces
+`multi-document transactions <https://docs.mongodb.com/manual/core/transactions/>`_.
+(Updates to multiple fields within a single document are atomic in all
+versions of MongoDB). Transactions require Mongoid version 6.4 or higher and Ruby driver version
+2.6 or higher.
+
+Using Transactions
+------------------
+
+In order to start a transaction, the application must have a :ref:`session <sessions>`.
+
+A transaction can be started by calling the ``start_transaction`` method on a session, which can be
+obtained by calling the ``with_session`` method on either a model class or instance:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+  end
+
+  Person.with_session do |session|
+    session.start_transaction
+  end
+
+  person = Person.new
+  person.with_session do |session|
+    session.start_transaction
+  end
+
+It is also possible to specify read concern, write concern and read preference
+when starting a transaction:
+
+.. code-block:: ruby
+
+  Person.with_session do |session|
+    session.start_transaction(
+      read_concern: {level: :majority},
+      write_concern: {w: 3},
+      read: {mode: :primary})
+  end
+
+ A transaction may be committed or aborted. The corresponding methods to do so are
+ ``commit_transaction`` and ``abort_transaction``, again on the session instance:
+
+.. code-block:: ruby
+
+  Person.with_session do |session|
+    session.commit_transaction
+  end
+
+  Person.with_session do |session|
+    session.abort_transaction
+  end
+
+If a session ends with an open transaction,
+`the transaction is aborted <https://docs.mongodb.com/manual/core/transactions/#transactions-and-sessions>`_.
+
+The transaction commit `can be retried <https://docs.mongodb.com/manual/core/transactions/#retry-commit-operation>`_
+if it fails. Here is the Ruby code to do so:
+
+.. code-block:: ruby
+
+  begin
+    session.commit_transaction
+  rescue Mongo::Error => e
+    if e.label?(Mongo::Error::UNKNOWN_TRANSACTION_COMMIT_RESULT_LABEL)
+      retry
+    else
+      raise
+    end
+  end
+
+Note that in order to perform operations within the transaction, operations must use the same client
+that the session was initiated on. By default, all operations will be done on the default client:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+  end
+
+  class Post
+    include Mongoid::Document
+  end
+
+  Person.with_session do |s|
+    s.start_transaction
+    Person.create!
+    Person.create!
+    Post.create!
+    s.commit_transaction
+  end
+
+To explicitly use a different client, use the ``with`` method:
+
+.. code-block:: ruby
+
+  Post.with(client: :other) do
+    Person.with(client: :other) do
+      Person.with_session do |s|
+        s.start_transaction
+        Person.create!
+        Person.create!
+        Post.create!
+        s.commit_transaction
+      end
+    end
+  end

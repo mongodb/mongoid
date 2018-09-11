@@ -1,82 +1,13 @@
-============
-Installation
-============
-
-.. default-domain:: mongodb
-
-.. contents:: On this page
-   :local:
-   :backlinks: none
-   :depth: 1
-   :class: singlecol
-
-Install the Gem
----------------
-
-Mongoid is bundled as a gem, and is hosted on `Rubygems <http://rubygems.org>`_.
-It can be installed manually or with bundler.
-
-To install the gem manually:
-
-.. code-block:: sh
-
-    gem install mongoid
-
-To install the gem with bundler, include the following in your Gemfile:
-
-.. code-block:: ruby
-
-   gem 'mongoid', '~> 6.1.0'
-
-Compatibility
--------------
-
-Note the following compatibility matrix to determine if Mongoid is
-supported on your runtime and server. Note that Mongoid 6.x is compatible with
-Rails 5 and thus requires >= Ruby 2.2.2.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 28 30 30 30
-
-   * - Ruby Version
-     - MongoDB 3.0.x
-     - MongoDB 3.2.x
-     - MongoDB 3.4.x
-
-   * - MRI 2.1.x
-     - No
-     - No
-     - No
-
-   * - MRI 2.2.2
-     - Yes
-     - Yes
-     - Yes
-
-   * - MRI 2.3.x
-     - Yes
-     - Yes
-     - Yes
-
-   * - MRI 2.4.1
-     - Yes
-     - Yes
-     - Yes
-
-   * - JRuby 9.1.x
-     - Yes
-     - Yes
-     - Yes
+=============
+Configuration
+=============
 
 .. _mongoid-configuration:
 
-Configuration
--------------
-
-Mongoid configuration can be done through a ``mongoid.yml`` that specifies your
-options and clients. The simplest configuration is as follows, which sets the default
-client to "localhost:27017" and provides a single database in that client named "mongoid".
+Mongoid is customarily configured through a ``mongoid.yml`` file that specifies
+options and clients. The simplest configuration is as follows, which configures
+Mongoid to talk to a MongoDB server at "localhost:27017" and use the database
+named "mongoid".
 
 .. code-block:: yaml
 
@@ -87,34 +18,45 @@ client to "localhost:27017" and provides a single database in that client named 
         hosts:
           - localhost:27017
 
+The top level key in the configuration file, ``development`` in the above
+example, refers to the environment name which the application is executing in,
+i.e. ``development``, ``test`` or ``production``. The third level key,
+``default`` in the above example, refers to the Mongo client name.
+Most applications will use a single client named ``default``.
+
 Rails Applications
 ******************
 
-You can generate a config file by executing the generator and then editing
-``myapp/config/mongoid.yml`` to your heart's desire. Mongoid will then handle
-everything else from there.
+If you are using Rails, you can have Mongoid generate a default configuration
+file for you by running the following command:
 
 .. code-block:: bash
 
   $ rails g mongoid:config
 
-When Mongoid loads its configuration, it chooses the environment to use based
-on the following order:
+The configuration file will be placed in ``config/mongoid.yml``.
+
+Environment Determination
+*************************
+
+When Mongoid loads its configuration, it chooses the environment to use
+in the following order:
 
 - ``Rails.env`` if using Rails.
 - ``Sinatra::Base.environment`` if using Sinatra.
 - ``RACK_ENV`` environment variable.
 - ``MONGOID_ENV`` environment variable.
 
-If you are not using any rack based application and want to override the
-environment programatically, you can pass a second paramter to ``load!`` and
-Mongoid will use that.
+If you are not building a Rack based application and want to override the
+environment programatically, you can pass a second parameter to ``load!``
+as follows:
 
 .. code-block:: ruby
 
   Mongoid.load!("path/to/your/mongoid.yml", :production)
 
-Depending on your version of Rails, you may also need to configure the orm to be Mongoid in application.rb.
+Depending on your version of Rails, you may also need to configure the ORM
+to be Mongoid in application.rb like so:
 
 .. code-block:: ruby
 
@@ -126,8 +68,8 @@ Anatomy of a Mongoid Config
 ***************************
 
 Let's have a look at a full-blown ``mongoid.yml`` and explain the full power
-of what Mongoid can do. The following configuration has its explanation in the
-comments above each key.
+of what Mongoid can do. The following configuration has explanation of the
+various options in the comments above each key:
 
 .. code-block:: yaml
 
@@ -138,7 +80,8 @@ comments above each key.
       default:
         # A uri may be defined for a client:
         # uri: 'mongodb://user:password@myhost1.mydomain.com:27017/my_db'
-        # Please see driver documentation for details. Alternatively, you can define the following:
+        # Please see driver documentation for details. Alternatively, you can
+        # define the following:
         #
         # Define the name of the default database that Mongoid can connect to.
         # (required).
@@ -267,16 +210,95 @@ comments above each key.
       # Set the Mongoid and Ruby driver log levels. (default: :info)
       log_level: :info
 
-Logging
-*******
+Inline Configuration
+********************
 
-Changing logging options is done simply by telling Mongoid or the driver's logger to have
-a different level. Logging level is ``DEBUG`` by default.
+It is also possible to configure Mongoid directly in Ruby, without using
+a configuration file. This configuration mechanism does not support defining
+multiple environments, however it does support defining multiple clients.
 
 .. code-block:: ruby
 
-  Mongoid.logger.level = Logger::DEBUG
-  Mongo::Logger.logger.level = Logger::DEBUG
+  Mongoid.configure do |config|
+    config.clients.default = {
+      hosts: ['localhost:27017'],
+      database: 'my_db',
+    }
+    
+    config.log_level = :warn
+  end
 
-Refer to :ref:`Rails considerations <rails-compatibility>`
-for the Ruby on Rails compatibility matrix.
+Logging
+*******
+
+Mongoid and the MongoDB Ruby driver have separate loggers and log levels.
+
+If Mongoid is loaded in the context of a Rails application, it will
+use Rails' configured logger by default. Otherwise Mongoid will configure
+itself to log to ``STDOUT`` with the default log level of ``INFO``.
+
+The Ruby driver's default log level is ``DEBUG``, and changing Mongoid's
+log level does not affect the Ruby driver's log level.
+However, if Mongoid is configured with a configuration file, the
+log level specified in the configuration file will be applied to both
+the Mongoid and the Ruby driver loggers.
+
+To change the log levels:
+
+.. code-block:: ruby
+
+  # Mongoid
+  Mongoid.logger.level = Logger::DEBUG
+  # Ruby driver
+  Mongo::Logger.logger.level = Logger::INFO
+
+*Note:* The Mongo client is a Ruby driver client instance, therefore
+the logger of a Mongo client is the Ruby driver logger, not the Mongoid
+logger. In other words:
+
+.. code-block:: ruby
+
+  # Ruby driver logger, not Mongoid logger
+  Mongoid.client(:default).logger == Mongo::Logger.logger
+
+Usage with Forking Servers
+**************************
+
+When using Mongoid with a forking web server such as Unicorn, worker processes
+need to recreate driver client instances to ensure that background threads
+monitoring the MongoDB cluster are recreated as they are not transfered into
+child processes through forks, and file descriptors and synchronization
+primitives are not shared between workers.
+
+It is recommended to not perform any operations on Mongoid models in the
+parent process prior to the fork. If the parent process needs to perform
+operations on the MongoDB database, reset all clients in an ``after_fork``
+handler which is defined in ``unicorn.rb``:
+
+.. code-block:: ruby
+
+    after_fork do |server, worker|
+      Mongoid.clients.each do |name, client|
+        client.close
+        client.reconnect
+      end
+    end
+
+If the parent process does not need to perform operations on the MongoDB
+cluster after child processes are forked, close the client in the parent:
+
+.. code-block:: ruby
+
+    before_fork do |server, worker|
+      Mongoid.clients.each do |name, client|
+        client.close
+      end
+    end
+
+*Note:* This pattern should be used with Ruby driver version 2.6.2 or higher.
+Previous driver versions did not recreate monitoring threads when reconnecting.
+
+*Note:* If the parent process performs operations on the Mongo client and
+does not close it, the parent process will continue consuming a connection slot
+in the cluster and will continue monitoring the cluster for as long as the
+parent remains alive.

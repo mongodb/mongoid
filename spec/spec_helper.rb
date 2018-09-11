@@ -89,6 +89,14 @@ def array_filters_supported?
 end
 alias :sessions_supported? :array_filters_supported?
 
+def transactions_supported?
+  Mongoid::Clients.default.cluster.next_primary.features.transactions_enabled?
+end
+
+def testing_transactions?
+  transactions_supported? && testing_replica_set?
+end
+
 def testing_locally?
   !(ENV['CI'] == 'travis')
 end

@@ -13,10 +13,12 @@ framework for MongoDB in Ruby.
    :titlesonly:
 
    /tutorials/mongoid-installation
+   /tutorials/mongoid-configuration
    /tutorials/mongoid-documents
    /tutorials/mongoid-persistence
    /tutorials/mongoid-queries
    /tutorials/mongoid-sessions
+   /tutorials/mongoid-transactions
    /tutorials/mongoid-relations
    /tutorials/mongoid-nested-attributes
    /tutorials/mongoid-callbacks
