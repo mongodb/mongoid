@@ -10,14 +10,22 @@ module Mongoid
 
       included do
         class_attribute :dependents
+
+        # @api private
         class_attribute :dependents_owner
+
         self.dependents = []
         self.dependents_owner = self
       end
 
       class_methods do
+        # @api private
         def _all_dependents
-          dependents + (superclass.respond_to?(:_all_dependents) ? superclass._all_dependents : [])
+          superclass_dependents = superclass.respond_to?(:_all_dependents) ? superclass._all_dependents : []
+          dependents + superclass_dependents.reject do |new_dep|
+            dependents.any? do |old_dep| old_dep.name == new_dep.name
+            end
+          end
         end
       end
 
