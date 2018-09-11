@@ -15,13 +15,12 @@ module Mongoid
       #
       # @return [ true, false ] True if matches, false if not.
       #
-      # @since 2.0.0.rc.7
+      # @since 7.1.0
       def _matches?(conditions)
         conditions.each do |condition|
-          condition.keys.each do |k|
-            key = k
-            value = condition[k]
-            # $nor returns true if all conditions in the array fail, so if one matches, then we failed
+          condition.each do |key, value|
+            # $nor returns true if all conditions in the array fail,
+            # so if one matches, then we failed
             if document._matches?(key => value)
               return false
             end
