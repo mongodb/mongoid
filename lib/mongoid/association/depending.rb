@@ -10,7 +10,23 @@ module Mongoid
 
       included do
         class_attribute :dependents
+
+        # @api private
+        class_attribute :dependents_owner
+
         self.dependents = []
+        self.dependents_owner = self
+      end
+
+      class_methods do
+        # @api private
+        def _all_dependents
+          superclass_dependents = superclass.respond_to?(:_all_dependents) ? superclass._all_dependents : []
+          dependents + superclass_dependents.reject do |new_dep|
+            dependents.any? do |old_dep| old_dep.name == new_dep.name
+            end
+          end
+        end
       end
 
       # The valid dependent strategies.
@@ -43,6 +59,11 @@ module Mongoid
       def self.define_dependency!(association)
         validate!(association)
         association.inverse_class.tap do |klass|
+          if klass.dependents_owner != klass
+            klass.dependents = []
+            klass.dependents_owner = klass
+          end
+
           if association.dependent && !klass.dependents.include?(association)
             klass.dependents.push(association)
           end
@@ -65,7 +86,7 @@ module Mongoid
       #
       # @since 2.0.0.rc.1
       def apply_delete_dependencies!
-        dependents.each do |association|
+        self.class._all_dependents.each do |association|
           if association.try(:dependent)
             send("_dependent_#{association.dependent}!", association)
           end
