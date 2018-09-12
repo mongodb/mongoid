@@ -213,7 +213,7 @@ describe Mongoid::Factory do
 
     end
 
-    context 'when type is correct but the instantiation throws a NoMethodError' do
+    context 'when type is correct but the instantiation raises a NoMethodError' do
       class BadPerson < Person
         def self.instantiate(*args)
           call_some_nonexistent_method(*args)
