@@ -191,6 +191,32 @@ describe Mongoid::Fields::Localized do
                 expect(value).to eq('testen')
               end
             end
+
+            context 'when default locale is provided' do
+              before do
+                ::I18n.locale = :sv
+              end
+
+              after do
+                ::I18n.locale = :en
+                ::I18n.default_locale = :en
+              end
+
+              let(:value) do
+                field.demongoize({ 'de' => 'world'})
+              end
+
+              it 'returns default translation' do
+                ::I18n.default_locale = :de
+                expect(value).to eq('world')
+              end
+
+              it 'returns nil if all locales are missing' do
+                ::I18n.default_locale = :ru
+                expect(value).to be_nil
+              end
+
+            end
           end
         end
       end
