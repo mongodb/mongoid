@@ -212,5 +212,29 @@ describe Mongoid::Factory do
       end
 
     end
+
+    context 'when type is correct but the instantiation raises a NoMethodError' do
+      class BadPerson < Person
+        def self.instantiate(*args)
+          call_some_nonexistent_method(*args)
+          super
+        end
+      end
+
+      let(:attributes) do
+        { "title" => "Sir", "_type" => "BadPerson" }
+      end
+
+      let(:person) do
+        described_class.from_db(BadPerson, attributes)
+      end
+
+      it 'raises a exception' do
+        expect {
+          person
+        }.to raise_exception(NoMethodError)
+      end
+
+    end
   end
 end
