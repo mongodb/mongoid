@@ -189,6 +189,16 @@ describe Mongoid::Matchable::Nor do
             Person.new(title: 'Queen', age: 23)
           end
 
+          it "returns true" do
+            expect(matches).to be true
+          end
+        end
+
+        context 'and model has identical values in all of the fields' do
+          let(:target) do
+            Person.new(title: 'Sir', age: 23)
+          end
+
           it "returns false" do
             expect(matches).to be false
           end

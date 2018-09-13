@@ -26,16 +26,11 @@ module Mongoid
           # prohibits
           return false
         end
-        conditions.each do |condition|
-          condition.each do |key, value|
-            # $nor returns true if all conditions in the array fail,
-            # so if one matches, then we failed
-            if document._matches?(key => value)
-              return false
-            end
+        conditions.none? do |condition|
+          condition.all? do |key, value|
+            document._matches?(key => value)
           end
         end
-        return true
       end
     end
   end
