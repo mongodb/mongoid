@@ -86,7 +86,7 @@ describe Mongoid::Matchable do
           let(:selector) do
             { "occupants.0" => "Tim" }
           end
-          
+
           it "returns true" do
             expect(document.locations.first._matches?(selector)).to be true
           end
@@ -766,6 +766,31 @@ describe Mongoid::Matchable do
 
           let(:selector) do
             { "$or" => [ { number: 10 }, { number: { "$lt" => 99 } } ] }
+          end
+
+          it "returns false" do
+            expect(document._matches?(selector)).to be false
+          end
+        end
+      end
+
+      context "with an $nor selector" do
+
+        context "when the attributes match" do
+
+          let(:selector) do
+            { "$nor" => [ { number: 10 }, { number: { "$gt" => 199 } } ] }
+          end
+
+          it "returns true" do
+            expect(document._matches?(selector)).to be true
+          end
+        end
+
+        context "when the attributes do not match" do
+
+          let(:selector) do
+            { "$nor" => [ { number: 10 }, { number: { "$gt" => 99 } } ] }
           end
 
           it "returns false" do
