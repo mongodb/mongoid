@@ -18,7 +18,7 @@ module Mongoid
       #
       # @return [ true, false ] True if matches, false if not.
       #
-      # @since 7.1.0
+      # @since 6.4.2/7.0.2/7.1.0
       def _matches?(conditions)
         if conditions.length == 0
           # MongoDB does not allow $nor array to be empty, but
