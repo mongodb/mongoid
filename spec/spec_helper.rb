@@ -146,6 +146,7 @@ ActiveSupport::Inflector.inflections do |inflect|
 end
 
 I18n.config.enforce_available_locales = false
+puts "I18n version: #{I18n::VERSION}"
 
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
