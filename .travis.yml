@@ -22,10 +22,10 @@ gemfile:
 matrix:
   include:
   - name: I18n 1.0 >
-    before_script: gem install i18n -v 1.0.0
+    before_install: gem install i18n -v 1.0.0
     env: I18N_VERSION=1.0.0
   - name: I18n 1.1.0 <
-    before_script: gem install i18n -v 1.1.0
+    before_install: gem install i18n -v 1.1.0
     env: I18N_VERSION=1.1.0
 
 env:
