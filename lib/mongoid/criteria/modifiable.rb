@@ -5,6 +5,7 @@ module Mongoid
     module Modifiable
 
       # @attribute [r] create_attrs Additional attributes to add to the Document upon creation.
+      # @api private
       attr_reader :create_attrs
 
       # Build a document given the selector and return it.
@@ -60,6 +61,9 @@ module Mongoid
       end
 
       # Define attributes with which new documents will be created.
+      #
+      # Note that if `find_or_create_by` is called after this in a method chain, the attributes in
+      # the query will override those from this method.
       #
       # @example Define attributes to be used when a new document is created.
       #   Person.create_with(job: 'Engineer').find_or_create_by(employer: 'MongoDB')
