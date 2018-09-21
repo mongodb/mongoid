@@ -1677,6 +1677,25 @@ describe Mongoid::Criteria::Modifiable do
             expect(new_person.age).to eq(50)
           end
 
+          context 'when a matching document is already in the collection' do
+            let(:query) do
+              { 'username' => 'foo', 'age' => 12 }
+            end
+
+            let(:person) do
+              Person.create!(query)
+            end
+
+            let(:found_person) do
+              Person.create_with(attrs).find_or_create_by(query)
+            end
+
+            it 'finds the matching document' do
+              person
+              expect(found_person.id).to eq(person.id)
+            end
+          end
+
           context 'when the attributes are shared with the write method args' do
 
             let(:query) do
@@ -1765,6 +1784,25 @@ describe Mongoid::Criteria::Modifiable do
           it 'gives the find method arg precedence' do
             expect(new_person.username).to eq('Beet')
             expect(new_person.age).to be(50)
+          end
+
+          context 'when a matching document is already in the collection' do
+            let(:query) do
+              { 'username' => 'foo', 'age' => 12 }
+            end
+
+            let(:person) do
+              Person.create!(query)
+            end
+
+            let(:found_person) do
+              criteria.create_with(attrs).find_or_create_by(query)
+            end
+
+            it 'finds the matching document' do
+              person
+              expect(found_person.id).to eq(person.id)
+            end
           end
         end
       end
