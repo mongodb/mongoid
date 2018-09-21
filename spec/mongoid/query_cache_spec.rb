@@ -413,7 +413,7 @@ describe Mongoid::QueryCache do
     end
   end
 
-  context "when querying a very large collection" do
+  context "when querying collection smaller than the batch size" do
 
     before do
       99.times { Band.create! }
