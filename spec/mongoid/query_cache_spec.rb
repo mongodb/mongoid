@@ -464,6 +464,16 @@ describe Mongoid::QueryCache do
     it 'does not cache the result' do
       expect(Band.all.map(&:id).size).to eq(10)
     end
+
+    context 'when a batch size smaller than the result set is specified' do
+      let(:batch_size) do
+        4
+      end
+
+      it 'does not cache the result' do
+        expect(Band.batch_size(batch_size).all.map(&:id).size).to eq(10)
+      end
+    end
   end
 end
 
