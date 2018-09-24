@@ -1645,11 +1645,15 @@ describe Mongoid::Criteria::Modifiable do
         { 'username' => 'Turnip' }
       end
 
-      it 'returns a criteria with the defined attributes' do
-        expect(Person.create_with(attrs).selector).to eq(attrs)
+      it 'does not modify the selector' do
+        expect(Person.create_with(attrs).selector[:username]).to be_nil
       end
 
-      context 'when a method is chained' do
+      it 'create_attrs is modified' do
+        expect(Person.create_with(attrs).create_attrs).to eq(attrs)
+      end
+
+      context 'when a create is chained' do
 
         context 'when a write method is chained' do
 
@@ -1673,6 +1677,25 @@ describe Mongoid::Criteria::Modifiable do
             expect(new_person.age).to eq(50)
           end
 
+          context 'when a matching document is already in the collection' do
+            let(:query) do
+              { 'username' => 'foo', 'age' => 12 }
+            end
+
+            let(:person) do
+              Person.create!(query)
+            end
+
+            let(:found_person) do
+              Person.create_with(attrs).find_or_create_by(query)
+            end
+
+            it 'finds the matching document' do
+              person
+              expect(found_person.id).to eq(person.id)
+            end
+          end
+
           context 'when the attributes are shared with the write method args' do
 
             let(:query) do
@@ -1683,7 +1706,7 @@ describe Mongoid::Criteria::Modifiable do
               Person.create_with(attrs).find_or_create_by(query)
             end
 
-            it 'gives the write method args precedence' do
+            it 'gives the find method args precedence' do
               expect(new_person.username).to eq('Beet')
               expect(new_person.age).to eq(50)
             end
@@ -1710,8 +1733,12 @@ describe Mongoid::Criteria::Modifiable do
             { 'username' => 'Beet', 'age' => 50 }
           end
 
+          it 'does not modify the selector' do
+            expect(criteria.create_with(attrs).selector).to eq(criteria_selector)
+          end
+
           it 'overwrites all the original attributes' do
-            expect(criteria.create_with(attrs).selector).to eq(attrs)
+            expect(criteria.create_with(attrs).create_attrs).to eq(attrs)
           end
         end
       end
@@ -1722,8 +1749,12 @@ describe Mongoid::Criteria::Modifiable do
           { 'username' => 'Beet' }
         end
 
+        it 'does not modify the selector' do
+          expect(criteria.create_with(attrs).selector).to eq(criteria_selector)
+        end
+
         it 'only overwrites the shared attributes' do
-          expect(criteria.create_with(attrs).selector).to eq(criteria_selector.merge!(attrs))
+          expect(criteria.create_with(attrs).create_attrs).to eq(attrs)
         end
       end
 
@@ -1732,12 +1763,11 @@ describe Mongoid::Criteria::Modifiable do
         let(:attrs) do
           { 'username' => 'Turnip' }
         end
-
         let(:query) do
           { 'username' => 'Beet', 'age' => 50 }
         end
 
-        context 'when a write method is chained' do
+        context 'when a create method is chained' do
 
           it 'executes the method' do
             expect(criteria.create_with(attrs).new.username).to eq('Turnip')
@@ -1751,9 +1781,28 @@ describe Mongoid::Criteria::Modifiable do
             criteria.create_with(attrs).find_or_create_by(query)
           end
 
-          it 'executes the query' do
+          it 'gives the find method arg precedence' do
             expect(new_person.username).to eq('Beet')
-            expect(new_person.age).to eq(50)
+            expect(new_person.age).to be(50)
+          end
+
+          context 'when a matching document is already in the collection' do
+            let(:query) do
+              { 'username' => 'foo', 'age' => 12 }
+            end
+
+            let(:person) do
+              Person.create!(query)
+            end
+
+            let(:found_person) do
+              criteria.create_with(attrs).find_or_create_by(query)
+            end
+
+            it 'finds the matching document' do
+              person
+              expect(found_person.id).to eq(person.id)
+            end
           end
         end
       end
