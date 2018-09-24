@@ -45,8 +45,10 @@ and remain reusable.
 Query Cache
 ***********
 
-If Mongoid's QueryCache is enabled, it will cache queries and avoid sending requests
-to the database for identical queries.
+If Mongoid's QueryCache is enabled, it will cache queries that the server returns in a single batch
+and avoids sending requests to the database for identical queries. Note that if the number of
+results is too large to be returned in a single batch, the QueryCache will *not* be used, even if
+Mongoid::QueryCache.enabled is true.
 
 To enable the QueryCache:
 
