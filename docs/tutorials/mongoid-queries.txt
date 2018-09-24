@@ -149,7 +149,8 @@ Mongoid also has some helpful methods on criteria.
    * - ``Criteria#find_or_create_by``
 
        *Find a document by the provided attributes, and if not found
-       create and return a newly persisted one.*
+       create and return a newly persisted one. Note that attributes provided in the arguments to
+       this method will override any set in ``create_with``*
 
      -
         .. code-block:: ruby

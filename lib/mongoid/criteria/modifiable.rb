@@ -3,6 +3,10 @@ module Mongoid
   class Criteria
     module Modifiable
 
+      # @attribute [r] create_attrs Additional attributes to add to the Document upon creation.
+      # @api private
+      attr_reader :create_attrs
+
       # Build a document given the selector and return it.
       # Complex criteria, such as $in and $or operations will get ignored.
       #
@@ -57,6 +61,9 @@ module Mongoid
 
       # Define attributes with which new documents will be created.
       #
+      # Note that if `find_or_create_by` is called after this in a method chain, the attributes in
+      # the query will override those from this method.
+      #
       # @example Define attributes to be used when a new document is created.
       #   Person.create_with(job: 'Engineer').find_or_create_by(employer: 'MongoDB')
       #
@@ -64,7 +71,9 @@ module Mongoid
       #
       # @since 5.1.0
       def create_with(attrs = {})
-        where(selector.merge(attrs))
+        tap do
+          (@create_attrs ||= {}).merge!(attrs)
+        end
       end
 
       # Find the first +Document+ given the conditions, or creates a new document
@@ -172,7 +181,8 @@ module Mongoid
       #
       # @since 3.0.0
       def create_document(method, attrs = nil, &block)
-        attributes = selector.reduce(attrs ? attrs.dup : {}) do |hash, (key, value)|
+        attrs = (create_attrs || {}).merge(attrs || {})
+        attributes = selector.reduce(attrs) do |hash, (key, value)|
           unless invalid_key?(hash, key) || invalid_embedded_doc?(value)
             hash[key] = value
           end
