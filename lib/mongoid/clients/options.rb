@@ -21,6 +21,12 @@ module Mongoid
       #
       # @since 6.0.0
       def with(options_or_context, &block)
+        # Only changing the collection name does not require the overhead of an entire new persistence context.
+        if options_or_context.is_a?(Hash) && (options_or_context.size == 1) && options_or_context.key?(:collection)
+          self.collection_name = options_or_context[:collection]
+          return block_given? ? yield(self) : self
+        end
+
         original_cluster = persistence_context.cluster
         set_persistence_context(options_or_context)
         yield self
@@ -29,11 +35,15 @@ module Mongoid
       end
 
       def collection(parent = nil)
-        persistence_context.collection(parent)
+        @collection_name ? mongo_client[@collection_name] : persistence_context.collection(parent)
       end
 
       def collection_name
-        persistence_context.collection_name
+        @collection_name || persistence_context.collection_name
+      end
+
+      def collection_name=(collection_name)
+        @collection_name = collection_name.nil? ? nil : collection_name.to_sym
       end
 
       def mongo_client
@@ -93,11 +103,18 @@ module Mongoid
         #
         # @since 6.0.0
         def with(options, &block)
-          original_cluster = persistence_context.cluster
-          PersistenceContext.set(self, options)
-          yield self
-        ensure
-          PersistenceContext.clear(self, original_cluster)
+          # Support changing just the collection name, when not used with a block
+          if !block_given? && options.is_a?(Hash) && (options.size == 1) && options.key?(:collection)
+            return all.with(options, &block)
+          end
+
+          begin
+            original_cluster = persistence_context.cluster
+            PersistenceContext.set(self, options)
+            yield self
+          ensure
+            PersistenceContext.clear(self, original_cluster)
+          end
         end
 
         def persistence_context

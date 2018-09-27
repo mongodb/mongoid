@@ -1363,6 +1363,20 @@ describe Mongoid::Contextual::Mongo do
     it "sets the view selector" do
       expect(context.view.selector).to eq({ "name" => "Depeche Mode" })
     end
+
+    it "sets the collection" do
+      expect(context.collection).to eq(Band.collection)
+    end
+
+    context "with a different collection name" do
+      let(:criteria) do
+        Band.with(collection: 'other').where(name: "Depeche Mode").no_timeout
+      end
+
+      it "sets the collection" do
+        expect(context.collection.name).to eq("other")
+      end
+    end
   end
 
   [ :length, :size ].each do |method|

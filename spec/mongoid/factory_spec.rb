@@ -236,5 +236,32 @@ describe Mongoid::Factory do
       end
 
     end
+
+    context "when built from within the context of a criteria" do
+
+      let(:criteria) do
+        Person.with(collection: 'other').where(title: "Sir")
+      end
+
+      let(:attributes) do
+        { "_type" => "Person", "title" => "Sir" }
+      end
+
+      let(:document) do
+        described_class.from_db(Person, attributes, criteria)
+      end
+
+      it "generates based on the type" do
+        expect(document).to be_a(Person)
+      end
+
+      it "sets the attributes" do
+        expect(document.title).to eq("Sir")
+      end
+
+      it "retains the collection name" do
+        expect(document.collection_name).to eq(:other)
+      end
+    end
   end
 end

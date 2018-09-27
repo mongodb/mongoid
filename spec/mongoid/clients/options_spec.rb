@@ -74,6 +74,32 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
       end
 
+      context 'when not passing a block' do
+
+        let(:collection_name) do
+          Minim.with(options).collection_name
+        end
+
+        let(:persistence_context) do
+          Minim.with(options).persistence_context
+        end
+
+        let(:options) { { collection: 'another-collection' } }
+
+        it 'uses the collection' do
+          expect(collection_name).to eq(options[:collection].to_sym)
+        end
+
+        it 'does not change the context' do
+          expect(Minim.persistence_context).to eq(persistence_context)
+        end
+
+        it 'does not include the collection option in the client options' do
+          expect(persistence_context.client.options[:collection]).to be_nil
+          expect(persistence_context.client.options['collection']).to be_nil
+        end
+      end
+
       context 'when passing a block', if: testing_locally? do
 
         let!(:connections_before) do
@@ -183,6 +209,10 @@ describe Mongoid::Clients::Options, retry: 3 do
 
         it 'uses that collection' do
           expect(persistence_context.collection.name).to eq(options[:collection])
+        end
+
+        it 'uses that collection when no block is supplied' do
+          expect(Minim.with(options).collection_name).to eq(options[:collection].to_sym)
         end
       end
 
@@ -437,8 +467,14 @@ describe Mongoid::Clients::Options, retry: 3 do
           { collection: 'other' }
         end
 
+        let(:collection_name) do
+          test_model.with(options) do |object|
+            object.collection_name
+          end
+        end
+
         it 'uses that collection' do
-          expect(persistence_context.collection.name).to eq(options[:collection])
+          expect(collection_name).to eq(options[:collection].to_sym)
         end
       end
 

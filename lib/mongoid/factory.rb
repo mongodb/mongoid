@@ -47,6 +47,9 @@ module Mongoid
         if criteria && criteria.association && criteria.parent_document
           obj.set_relation(criteria.association.inverse, criteria.parent_document)
         end
+        # Use the collection name from the criteria so that any changes to this model
+        # are saved back to the collection from which it was retrieved.
+        obj.collection_name = criteria.collection_name if criteria
         obj
       else
         camelized = type.camelize
@@ -63,7 +66,9 @@ module Mongoid
           raise Errors::UnknownModel.new(camelized, type)
         end
 
-        constantized.instantiate(attributes, selected_fields)
+        obj = constantized.instantiate(attributes, selected_fields)
+        obj.collection_name = criteria.collection_name if criteria
+        obj
       end
     end
   end
