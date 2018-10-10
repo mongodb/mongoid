@@ -1,6 +1,6 @@
-=========
-Relations
-=========
+============
+Associations
+============
 
 .. default-domain:: mongodb
 
@@ -10,15 +10,15 @@ Relations
    :depth: 1
    :class: singlecol
 
-Common Behaviour
-----------------
+Common Behavior
+---------------
 
 Attributes
 **********
 
-All relations contain a ``_target``, which is the proxied document or documents, a ``_base``
-which is the document the relation hangs off, and ``_association`` which provides information
-about the relation.
+All associations contain a ``_target``, which is the proxied document or documents, a ``_base``
+which is the document the association hangs off, and ``_association`` which provides information
+about the association.
 
 .. code-block:: ruby
 
@@ -35,8 +35,8 @@ about the relation.
 Extensions
 **********
 
-All relations can have extensions, which provides a way to add application specific
-functionality to the relation. They are defined by providing a block to the relation definition.
+All associations can have extensions, which provides a way to add application specific
+functionality to the association. They are defined by providing a block to the association definition.
 
 .. code-block:: ruby
 
@@ -55,10 +55,10 @@ functionality to the relation. They are defined by providing a block to the rela
    person.addresses.find_by_country("Mongolia") # returns address
    person.addresses.chinese # returns [ address ]
 
-Custom Relation Names
-*********************
+Custom Association Names
+************************
 
-You can name your relations whatever you like, but if the class cannot be inferred by
+You can name your associations whatever you like, but if the class cannot be inferred by
 Mongoid from the name, and neither can the opposite side you'll want to provide the
 macro with some additional options to tell Mongoid how to hook them up.
 
@@ -78,7 +78,7 @@ Validations
 ***********
 
 It is important to note that by default, Mongoid will validate the children of any
-relation that are loaded into memory via a ``validates_associated``. The relations that
+association that are loaded into memory via a ``validates_associated``. The associations that
 this applies to are:
 
 - ``embeds_many``
@@ -87,7 +87,7 @@ this applies to are:
 - ``has_one``
 - ``has_and_belongs_to_many``
 
-If you do not want this behavior, you may turn it off when defining the relation.
+If you do not want this behavior, you may turn it off when defining the association.
 
 .. code-block:: ruby
 
@@ -105,7 +105,7 @@ When a child embedded document can belong to more than one type of parent docume
 tell Mongoid to support this by adding the ``as`` option to the definition on the parents,
 and the ``polymorphic`` option on the child. On the child object, an additional field will
 be stored that indicates the type of the parent. Polymorphic behavior is allowed on all
-relations with the exception of ``has_and_belongs_to_many``.
+associations with the exception of ``has_and_belongs_to_many``.
 
 .. code-block:: ruby
 
@@ -129,7 +129,7 @@ Cascading Callbacks
 *******************
 
 If you want the embedded document callbacks to fire when calling a persistence operation on
-its parent, you will need to provide the cascade callbacks option to the relation.
+its parent, you will need to provide the cascade callbacks option to the association.
 
 .. code-block:: ruby
 
@@ -145,7 +145,7 @@ Dependent Behaviour
 *******************
 
 You can provide dependent options to referenced associations to instruct Mongoid
-how to handle situations where one side of the relation is deleted, or is attempted
+how to handle situations where one side of the association is deleted, or is attempted
 to be deleted. The options are as follows:
 
 - ``:delete``: Delete the child document without running any of the model callbacks.
@@ -183,15 +183,15 @@ Autosaving
 **********
 
 One core difference between Mongoid and Active Record from a behavior standpoint
-is that Mongoid does not automatically save child relations for relational associations.
-This is for performance reasons.
+is that Mongoid does not automatically save associated documents for
+non-embedded associations. This is for performance reasons.
 
-To enable an autosave on a relational association (embedded associations do not need
+To enable an autosave on a non-embedded association (embedded associations do not need
 this since they are actually part of the parent in the database) add the autosave
-option to the relation.
+option to the association.
 
-Note that autosave functionality will automatically be added to a relation when using
-``accepts_nested_attributes_for`` or validating presence of the relation.
+Note that autosave functionality will automatically be added to an association when using
+``accepts_nested_attributes_for`` or validating presence of the association.
 
 .. code-block:: ruby
 
@@ -240,8 +240,8 @@ which provides accessors for the parent and children via ``parent_`` and ``child
 Existence Predicates
 ********************
 
-All relations have existence predicates on them in the form of ``name?`` and ``has_name?``
-to check if the relation is blank.
+All associations have existence predicates on them in the form of ``name?`` and ``has_name?``
+to check if the association is blank.
 
 .. code-block:: ruby
 
@@ -259,8 +259,8 @@ to check if the relation is blank.
 Autobuilding
 ************
 
-One to one relations (``embeds_one``, ``has_one``) have an autobuild option which tells
-Mongoid to instantiate a new document when the relation is accessed and it is ``nil``.
+One to one associations (``embeds_one``, ``has_one``) have an autobuild option which tells
+Mongoid to instantiate a new document when the association is accessed and it is ``nil``.
 
 .. code-block:: ruby
 
@@ -277,8 +277,8 @@ Mongoid to instantiate a new document when the relation is accessed and it is ``
 Touching
 ********
 
-Any ``belongs_to`` relation, no matter where it hangs off from, can take an optional ``:touch``
-option which will call the touch method on it and any parent relations with the option defined
+Any ``belongs_to`` association, no matter where it hangs off from, can take an optional ``:touch``
+option which will call the touch method on it and any parent associations with the option defined
 when the base document calls ``#touch``.
 
 .. code-block:: ruby
@@ -294,20 +294,20 @@ when the base document calls ``#touch``.
 Association metadata
 --------------------
 
-All relations in Mongoid contain metadata that holds information about the relation in
+All associations in Mongoid contain metadata that holds information about the association in
 question, and is a valuable tool for third party developers to use to extend Mongoid.
 
-You can access the association metadata of the relation in a few different ways.
+You can access the association metadata of the association in a few different ways.
 
 .. code-block:: ruby
 
    # Get the metadata for a named association from the class or document.
-   Model.reflect_on_association(:relation_name)
-   model.reflect_on_association(:relation_name)
+   Model.reflect_on_association(:association_name)
+   model.reflect_on_association(:association_name)
  
-   # Get the metadata with a specific relation itself on a specific
+   # Get the metadata with a specific association itself on a specific
    # document.
-   model.associations[:relation_name]
+   model.associations[:association_name]
 
 The Association Object
 **********************
@@ -327,23 +327,23 @@ with, and is useful for developers of extensions to Mongoid.
    * - ``Association#as?``
      - Returns whether or not an as option exists.
    * - ``Association#autobuilding?``
-     - Returns whether or not the relation is autobuilding.
+     - Returns whether or not the association is autobuilding.
    * - ``Association#autosaving?``
-     - Returns whether or not the relation is autosaving.
+     - Returns whether or not the association is autosaving.
    * - ``Association#cascading_callbacks?``
-     - Returns whether the relation has callbacks cascaded down from the parent.
+     - Returns whether the association has callbacks cascaded down from the parent.
    * - ``Association#class_name``
      - Returns the class name of the proxied document.
    * - ``Association#cyclic?``
-     - Returns whether the relation is a cyclic relation.
+     - Returns whether the association is a cyclic association.
    * - ``Association#dependent``
-     - Returns the relation's dependent option.
+     - Returns the association's dependent option.
    * - ``Association#destructive?``
-     - Returns true if the relation has a dependent delete or destroy.
+     - Returns true if the association has a dependent delete or destroy.
    * - ``Association#embedded?``
-     - Returns whether the relation is embedded in another document.
+     - Returns whether the association is embedded in another document.
    * - ``Association#forced_nil_inverse?``
-     - Returns whether the relation has a nil inverse defined.
+     - Returns whether the association has a nil inverse defined.
    * - ``Association#foreign_key``
      - Returns the name of the foreign key field.
    * - ``Association#foreign_key_check``
@@ -353,19 +353,19 @@ with, and is useful for developers of extensions to Mongoid.
    * - ``Association#indexed?``
      - Returns whether the foreign key is auto indexed.
    * - ``Association#inverses``
-     - Returns the names of all inverse relation.
+     - Returns the names of all inverse association.
    * - ``Association#inverse``
-     - Returns the name of a single inverse relation.
+     - Returns the name of a single inverse association.
    * - ``Association#inverse_class_name``
-     - Returns the class name of the relation on the inverse side.
+     - Returns the class name of the association on the inverse side.
    * - ``Association#inverse_foreign_key``
      - Returns the name of the foreign key field on the inverse side.
    * - ``Association#inverse_klass``
-     - Returns the class of the relation on the inverse side.
+     - Returns the class of the association on the inverse side.
    * - ``Association#inverse_association``
      - Returns the metadata of the association on the inverse side.
    * - ``Association#inverse_of``
-     - Returns the explicitly defined name of the inverse relation.
+     - Returns the explicitly defined name of the inverse association.
    * - ``Association#inverse_setter``
      - Returns the name of the method used to set the inverse.
    * - ``Association#inverse_type``
@@ -373,29 +373,29 @@ with, and is useful for developers of extensions to Mongoid.
    * - ``Association#inverse_type_setter``
      - Returns the name for the polymorphic type field setter of the inverse.
    * - ``Association#key``
-     - Returns the name of the field in the attributes hash to use to get the relation.
+     - Returns the name of the field in the attributes hash to use to get the association.
    * - ``Association#klass``
-     - Returns the class of the proxied documents in the relation.
+     - Returns the class of the proxied documents in the association.
    * - ``Association#name``
-     - Returns the relation name.
+     - Returns the association name.
    * - ``Association#options``
      - Returns self, for API compatibility with Active Record.
    * - ``Association#order``
-     - Returns the custom sorting options on the relation.
+     - Returns the custom sorting options on the association.
    * - ``Association#polymorphic?``
-     - Returns whether the relation is polymorphic.
+     - Returns whether the association is polymorphic.
    * - ``Association#setter``
-     - Returns the name of the field to set the relation.
+     - Returns the name of the field to set the association.
    * - ``Association#store_as``
-     - Returns the name of the attribute to store an embedded relation in.
+     - Returns the name of the attribute to store an embedded association in.
    * - ``Association#touchable?``
-     - Returns whether or not the relation has a touch option.
+     - Returns whether or not the association has a touch option.
    * - ``Association#type``
      - Returns the name of the field to get the polymorphic type.
    * - ``Association#type_setter``
      - Returns the name of the field to set the polymorphic type.
    * - ``Association#validate?``
-     - Returns whether the relation has an associated validation.
+     - Returns whether the association has an associated validation.
 
 Embeds One
 ----------
@@ -406,9 +406,9 @@ using Mongoid's ``embeds_one`` and ``embedded_in`` macros.
 Defining
 ********
 
-The parent document of the relation should use the ``embeds_one`` macro to indicate is has 1
+The parent document of the association should use the ``embeds_one`` macro to indicate is has 1
 embedded child, where the document that is embedded uses ``embedded_in``. Definitions are required
-on both sides to the relation in order for it to work properly.
+on both sides to the association in order for it to work properly.
 
 .. code-block:: ruby
 
@@ -459,9 +459,9 @@ using Mongoid's ``embeds_many`` and ``embedded_in`` macros.
 Defining
 ********
 
-The parent document of the relation should use the ``embeds_many`` macro to indicate it has n
+The parent document of the association should use the ``embeds_many`` macro to indicate it has n
 number of embedded children, where the document that is embedded uses ``embedded_in``. Definitions
-are required on both sides to the relation in order for it to work properly.
+are required on both sides to the association in order for it to work properly.
 
 .. code-block:: ruby
 
@@ -514,7 +514,7 @@ using Mongoid's ``has_one`` and ``belongs_to`` macros.
 Defining
 ********
 
-The parent document of the relation should use the ``has_one`` macro to indicate is has 1 referenced
+The parent document of the association should use the ``has_one`` macro to indicate is has 1 referenced
 child, where the document that is referenced in it uses ``belongs_to``.
 
 .. code-block:: ruby
@@ -530,13 +530,13 @@ child, where the document that is referenced in it uses ``belongs_to``.
     belongs_to :band
   end
 
-Definitions are required on both sides to the relation in order for it to work properly, unless
+Definitions are required on both sides to the association in order for it to work properly, unless
 one of the models is embedded.
 
 Storage
 *******
 
-When defining a relation of this nature, each document is stored in its respective collection,
+When defining an association of this nature, each document is stored in its respective collection,
 but the child document contains a "foreign key" reference to the parent.
 
 .. code-block:: ruby
@@ -561,7 +561,7 @@ behavior to Active Record.
 Defining
 ********
 
-The parent document of the relation should use the ``has_many`` macro to indicate is has n number
+The parent document of the association should use the ``has_many`` macro to indicate is has n number
 of referenced children, where the document that is referenced uses ``belongs_to``.
 
 .. code-block:: ruby
@@ -577,13 +577,13 @@ of referenced children, where the document that is referenced uses ``belongs_to`
     belongs_to :band
   end
 
-Definitions are required on both sides to the relation in order for it to work properly,
+Definitions are required on both sides to the association in order for it to work properly,
 unless one of the models is embedded.
 
 Storage
 *******
 
-When defining a relation of this nature, each document is stored in its respective collection,
+When defining an association of this nature, each document is stored in its respective collection,
 but the child document contains a "foreign key" reference to the parent.
 
 .. code-block:: ruby
@@ -607,7 +607,7 @@ you can use the option, ``optional: false``.
 Defining
 ********
 
-The child document of the relation uses the ``belongs_to`` macro to indicate it is associated with a parent.
+The child document of the association uses the ``belongs_to`` macro to indicate it is associated with a parent.
 The document on the ``belongs_to`` side stores the reference to the parent.
 
 .. code-block:: ruby
@@ -623,13 +623,13 @@ The document on the ``belongs_to`` side stores the reference to the parent.
     belongs_to :band
   end
 
-Definitions are required on both sides to the relation in order for it to work properly, unless
+Definitions are required on both sides to the association in order for it to work properly, unless
 one of the models is embedded.
 
 Storage
 *******
 
-When defining a relation of this nature, each document is stored in its respective collection,
+When defining an association of this nature, each document is stored in its respective collection,
 but the child document contains a "foreign key" reference to the parent.
 
 .. code-block:: ruby
@@ -649,12 +649,12 @@ Has And Belongs To Many
 Many to many relationships where the inverse documents are stored in a separate collection
 from the base document are defined using Mongoid's ``has_and_belongs_to_many`` macro. This
 exhibits similar behavior to Active Record with the exception that no join collection is needed,
-the foreign key ids are stored as arrays on either side of the relation.
+the foreign key ids are stored as arrays on either side of the association.
 
 Defining
 ********
 
-Both sides of the relation use the same macro.
+Both sides of the association use the same macro.
 
 .. code-block:: ruby
 
@@ -687,7 +687,7 @@ as an array on the parent.
 Storage
 *******
 
-When defining a relation of this nature, each document is stored in its respective collection,
+When defining an association of this nature, each document is stored in its respective collection,
 and each document contains a "foreign key" reference to the other in the form of an array.
 
 .. code-block:: ruby
@@ -707,7 +707,7 @@ and each document contains a "foreign key" reference to the other in the form of
 The counter_cache option
 ------------------------
 
-As with ActiveRecord, the :counter_cache option can be used on a relation to make finding the
+As with ActiveRecord, the :counter_cache option can be used on an association to make finding the
 number of belonging objects more efficient. Also similar to ActiveRecord, you must take into
 account that there will be an extra attribute on the associated model. This means that with Mongoid,
 you need to include ``Mongoid::Attributes::Dynamic`` on the associated model.
