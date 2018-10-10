@@ -207,13 +207,15 @@ Note that autosave functionality will automatically be added to an association w
 Recursive Embedding
 *******************
 
-A document can recursively embed itself using ``recursively_embeds_one`` or ``recursively_embeds_many``,
-which provides accessors for the parent and children via ``parent_`` and ``child_`` methods.
+A document can recursively embed itself using ``recursively_embeds_one`` or
+``recursively_embeds_many``, which provides accessors for the parent and
+children via ``parent_`` and ``child_`` methods.
 
 .. code-block:: ruby
 
    class Tag
      include Mongoid::Document
+     field :name, type: String
      recursively_embeds_many
    end
   
@@ -234,7 +236,7 @@ which provides accessors for the parent and children via ``parent_`` and ``child
    child = Node.new
    root.child_node = child
   
-   root.child # child
+   root.child_node # child
    child.parent_node # root
 
 Existence Predicates
