@@ -42,6 +42,78 @@ is returned with the new query added. This is so that with scoping
 or exposures, for example, the original queries are unmodified
 and remain reusable.
 
+elem_match
+``````````
+
+This matcher finds documents with array fields where one of the array values
+matches all of the conditions. For example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :tours, type: Array
+  end
+
+  aerosmith = Band.create!(name: 'Aerosmith', tours: [
+    {city: 'London', year: 1995},
+    {city: 'New York', year: 1999},
+  ])
+
+  Band.elem_match(tours: {city: 'London'}).to_a # => [aerosmith]
+
+``elem_match`` also works with embedded associations:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    embeds_many :tours
+  end
+
+  class Tour
+    include Mongoid::Document
+    field :city, type: String
+    field :year, type: Integer
+    embedded_in :band
+  end
+
+  dm = Band.create!(name: 'Depeche Mode')
+  aerosmith = Band.create!(name: 'Aerosmith')
+  Tour.create!(band: aerosmith, city: 'London', year: 1995)
+  Tour.create!(band: aerosmith, city: 'New York', year: 1999)
+
+  Band.elem_match(tours: {city: 'London'}).to_a # => [aerosmith]
+
+``elem_match`` does not work with non-embedded associations because MongoDB
+does not have joins - the conditions would be added to the collection
+that is the source of a non-embedded association rather than the collection
+of the association's target.
+
+``elem_match`` can also be used with recursively embedded associations,
+as the following example shows:
+
+.. code-block:: ruby
+
+  class Tag
+    include Mongoid::Document
+    field :name, type: String
+    recursively_embeds_many
+  end
+
+  root = Tag.create!(name: 'root')
+  sub1 = Tag.new(name: 'sub1', child_tags: [Tag.new(name: 'subsub1')])
+  root.child_tags << sub1
+  root.child_tags << Tag.new(name: 'sub2')
+  root.save!
+
+  Tag.elem_match(child_tags: {name: 'sub1'}).to_a # => [root]
+
+  root.child_tags.elem_match(child_tags: {name: 'subsub1'}).to_a # => [sub1]
+
+
 Query Cache
 ***********
 
