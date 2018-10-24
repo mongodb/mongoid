@@ -146,7 +146,7 @@ describe Mongoid::Clients::Options, retry: 3 do
           let(:config) do
             {
                 default: { hosts: SpecConfig.instance.addresses, database: database_id },
-                secondary: { uri: "mongodb://127.0.0.1:27017/secondary-db?connectTimeoutMS=3000" }
+                secondary: { uri: "mongodb://#{SpecConfig.instance.addresses.first}/secondary-db?connectTimeoutMS=3000" }
             }
           end
 
@@ -340,7 +340,7 @@ describe Mongoid::Clients::Options, retry: 3 do
           {
               default: { hosts: SpecConfig.instance.addresses, database: database_id },
               secondary: {
-                uri: "mongodb://127.0.0.1:27017/secondary-db",
+                uri: "mongodb://#{SpecConfig.instance.addresses.first}/secondary-db",
                 options: {
                   server_selection_timeout: 0.5,
                 },

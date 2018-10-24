@@ -14,8 +14,8 @@ describe Mongoid::Clients::Factory do
 
           let(:config) do
             {
-              default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
-              secondary: { hosts: [ "127.0.0.1:27017" ], database: database_id }
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              secondary: { hosts: SpecConfig.instance.addresses, database: database_id }
             }
           end
 
@@ -40,7 +40,7 @@ describe Mongoid::Clients::Factory do
           end
 
           it "sets the cluster's seeds" do
-            expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
+            expect(cluster.addresses.first.to_s).to eq(SpecConfig.instance.addresses.first)
           end
 
           it "sets the platform to Mongoid's platform constant" do
@@ -82,11 +82,11 @@ describe Mongoid::Clients::Factory do
           end
 
           it "sets the cluster's seed ports to 27017" do
-            expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
+            expect(%w(127.0.0.1:27017 localhost:27017)).to include(cluster.addresses.first.to_s)
           end
 
           it "sets ips with no ports to 27017" do
-            expect(default.cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
+            expect(%w(127.0.0.1:27017 localhost:27017)).to include(cluster.addresses.first.to_s)
           end
         end
 
@@ -122,7 +122,7 @@ describe Mongoid::Clients::Factory do
             end
 
             it "sets the cluster's seeds" do
-              expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
+              expect(%w(127.0.0.1:27017 localhost:27017)).to include(cluster.addresses.first.to_s)
             end
 
             it "sets the database" do
@@ -183,7 +183,7 @@ describe Mongoid::Clients::Factory do
     context "when no name is provided" do
 
       let(:config) do
-        { default: { hosts: ["127.0.0.1:27017"], database: database_id }}
+        { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
       end
 
       before do
@@ -202,7 +202,7 @@ describe Mongoid::Clients::Factory do
         client.cluster
       end
 
-      let(:seeds) do
+      let(:cluster_addresses) do
         cluster.addresses.map{ |address| address.to_s }
       end
 
@@ -210,8 +210,10 @@ describe Mongoid::Clients::Factory do
         expect(client).to be_a(Mongo::Client)
       end
 
-      it "sets the cluster's seeds" do
-        expect(seeds).to eq([ "127.0.0.1:27017" ])
+      it "sets the cluster's addresses" do
+        SpecConfig.instance.addresses.each do |address|
+          expect(cluster_addresses).to include(address)
+        end
       end
     end
 
@@ -232,7 +234,7 @@ describe Mongoid::Clients::Factory do
   describe ".default" do
 
     let(:config) do
-      { default: { hosts: ["127.0.0.1:27017"], database: database_id }}
+      { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
     end
 
     before do
@@ -251,7 +253,7 @@ describe Mongoid::Clients::Factory do
       client.cluster
     end
 
-    let(:seeds) do
+    let(:cluster_addresses) do
       cluster.addresses.map{ |address| address.to_s }
     end
 
@@ -259,8 +261,10 @@ describe Mongoid::Clients::Factory do
       expect(client).to be_a(Mongo::Client)
     end
 
-    it "sets the cluster's seeds" do
-      expect(seeds).to eq([ "127.0.0.1:27017" ])
+    it "sets the cluster's addresses" do
+      SpecConfig.instance.addresses.each do |address|
+        expect(cluster_addresses).to include(address)
+      end
     end
   end
 
@@ -269,7 +273,7 @@ describe Mongoid::Clients::Factory do
     let(:config) do
       {
         default: {
-          hosts: [ "127.0.0.1:27017" ],
+          hosts: SpecConfig.instance.addresses,
           database: database_id,
           options: {
             "server_selection_timeout" => 10,
@@ -295,7 +299,7 @@ describe Mongoid::Clients::Factory do
       client.cluster
     end
 
-    let(:seeds) do
+    let(:cluster_addresses) do
       cluster.addresses.map{ |address| address.to_s }
     end
 
@@ -303,8 +307,10 @@ describe Mongoid::Clients::Factory do
       expect(client).to be_a(Mongo::Client)
     end
 
-    it "sets the cluster's seeds" do
-      expect(seeds).to eq([ "127.0.0.1:27017" ])
+    it "sets the cluster's addresses" do
+      SpecConfig.instance.addresses.each do |address|
+        expect(cluster_addresses).to include(address)
+      end
     end
 
     it "sets the server selection timeout" do
