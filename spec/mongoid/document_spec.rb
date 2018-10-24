@@ -17,12 +17,12 @@ describe Mongoid::Document do
   end
 
   describe "#_destroy" do
-  
+
     it "default to false" do
       expect(Person.new._destroy).to be false
     end
   end
-  
+
   describe ".included" do
 
     let(:models) do
@@ -385,6 +385,27 @@ describe Mongoid::Document do
 
     let!(:person) do
       Person.new(title: "Sir")
+    end
+
+    describe 'id' do
+      context 'rails < 6' do
+        max_rails_version '5.2'
+
+        it 'is a BSON::ObjectId' do
+          id = person.as_json['_id']
+          expect(id).to be_a(BSON::ObjectId)
+        end
+      end
+
+      context 'rails >= 6' do
+        min_rails_version '6.0'
+
+        it 'is a hash with $oid' do
+          id = person.as_json['_id']
+          expect(id).to be_a(Hash)
+          expect(id['$oid']).to be_a(String)
+        end
+      end
     end
 
     context "when no options are provided" do
