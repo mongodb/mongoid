@@ -13,6 +13,7 @@ group :test do
   platforms :mri do
     gem 'timeout-interrupt'
   end
+  gem 'fuubar'
 end
 
 group :development, :testing do
