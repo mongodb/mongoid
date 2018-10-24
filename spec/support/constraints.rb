@@ -1,4 +1,30 @@
 module Constraints
+  RAILS_VERSION = ActiveSupport.version.to_s.split('.')[0..1].join('.').freeze
+
+  def min_rails_version(version)
+    unless version =~ /^\d+\.\d+$/
+      raise ArgumentError, "Version can only be major.minor: #{version}"
+    end
+
+    before do
+      if version > RAILS_VERSION
+        skip "Rails version #{version} or higher required, we have #{RAILS_VERSION}"
+      end
+    end
+  end
+
+  def max_rails_version(version)
+    unless version =~ /^\d+\.\d+$/
+      raise ArgumentError, "Version can only be major.minor: #{version}"
+    end
+
+    before do
+      if version < RAILS_VERSION
+        skip "Rails version #{version} or lower required, we have #{RAILS_VERSION}"
+      end
+    end
+  end
+
   def min_server_version(version)
     unless version =~ /^\d+\.\d+$/
       raise ArgumentError, "Version can only be major.minor: #{version}"
