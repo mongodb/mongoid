@@ -451,7 +451,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "returns the distinct field values" do
-        expect(context.distinct(:years)).to eq([ 30, 25 ])
+        expect(context.distinct(:years).sort).to eq([ 25, 30 ])
       end
     end
 
@@ -1718,6 +1718,9 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when limiting is provided" do
+      # map/reduce with limit is not supported on sharded clusters:
+      # https://jira.mongodb.org/browse/SERVER-2099
+      require_topology :single, :replica_set
 
       let(:criteria) do
         Band.limit(1)
