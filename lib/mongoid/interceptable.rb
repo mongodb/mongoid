@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 # encoding: utf-8
 module Mongoid
 
@@ -132,7 +131,7 @@ module Mongoid
       end
 
       ret_value = callback_executable?(kind) ? super(kind, *args, &block) : true
-      return false if ret_value == false
+      # return false if ret_value == false
 
       cascadable_children(kind).each do |child|
         if child.run_after_callbacks(child_callback_type(kind, child), *args) == false
@@ -258,6 +257,7 @@ module Mongoid
     #
     # @since 3.0.0
     def run_targeted_callbacks(place, kind)
+      return unless respond_to?("_#{kind}_callbacks")
       name = "_run__#{place}__#{kind}__callbacks"
       unless respond_to?(name)
         chain = ActiveSupport::Callbacks::CallbackChain.new(name, {})

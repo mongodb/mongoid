@@ -573,7 +573,7 @@ describe Mongoid::Interceptable do
         context "when saving the root" do
 
           it "only executes the callbacks once for each embed" do
-            expect(note).to receive(:update_saved).twice
+            expect(note).to receive(:update_saved).once
             band.save
           end
         end
@@ -939,6 +939,19 @@ describe Mongoid::Interceptable do
 
           it "does not execute the callback" do
             expect(record.before_create_called).to be false
+          end
+        end
+      end
+
+      describe "#after_create" do
+        context "when the child is new" do
+          context "when the parent is new" do
+            it "record must be persisted in after_create" do
+              band = Band.new(name: "Moderat")
+              record = band.records.build(name: "Moderat")
+              band.save
+              expect(record.persisted_in_after_create).to be true
+            end
           end
         end
       end

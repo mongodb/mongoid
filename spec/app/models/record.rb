@@ -2,6 +2,8 @@
 
 class Record
   include Mongoid::Document
+  attr_accessor :persisted_in_after_create
+
   field :name, type: String
   field :producers, type: Array
 
@@ -22,6 +24,11 @@ class Record
   before_destroy :before_destroy_stub
 
   after_destroy :access_band
+  after_create :after_create_stub
+
+  def after_create_stub
+    self.persisted_in_after_create = self.persisted?
+  end
 
   def before_create_stub
     self.before_create_called = true
