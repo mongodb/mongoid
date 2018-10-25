@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional nil behaviour.
+        # This module contains additional nil behavior.
         module NilClass
 
           # Add this object to nil.

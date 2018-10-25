@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for $rename operations.
+    # Defines behavior for $rename operations.
     #
     # @since 4.0.0
     module Renamable

@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for persistence operations that create new documents.
+    # Defines behavior for persistence operations that create new documents.
     #
     # @since 4.0.0
     module Creatable

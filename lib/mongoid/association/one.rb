@@ -4,7 +4,7 @@ module Mongoid
   module Association
 
     # This is the superclass for one to one relations and defines the common
-    # behaviour or those proxies.
+    # behavior or those proxies.
     class One < Association::Proxy
 
       # Clear this relation - same as calling #delete on the document.

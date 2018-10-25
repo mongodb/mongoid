@@ -73,7 +73,7 @@ module Mongoid
 
     # Run only the after callbacks for the specific event.
     #
-    # @note ActiveSupport does not allow this type of behaviour by default, so
+    # @note ActiveSupport does not allow this type of behavior by default, so
     #   Mongoid has to get around it and implement itself.
     #
     # @example Run only the after save callbacks.
@@ -92,7 +92,7 @@ module Mongoid
 
     # Run only the before callbacks for the specific event.
     #
-    # @note ActiveSupport does not allow this type of behaviour by default, so
+    # @note ActiveSupport does not allow this type of behavior by default, so
     #   Mongoid has to get around it and implement itself.
     #
     # @example Run only the before save callbacks.

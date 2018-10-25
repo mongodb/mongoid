@@ -55,7 +55,7 @@ module Mongoid
       options[:validate].nil? ? true : options[:validate]
     end
 
-    # Overrides the default ActiveModel behaviour since we need to handle
+    # Overrides the default ActiveModel behavior since we need to handle
     # validations of relations slightly different than just calling the
     # getter.
     #

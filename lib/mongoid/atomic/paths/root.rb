@@ -4,7 +4,7 @@ module Mongoid
   module Atomic
     module Paths
 
-      # This class encapsulates behaviour for locating and updating root
+      # This class encapsulates behavior for locating and updating root
       # documents atomically.
       class Root
 

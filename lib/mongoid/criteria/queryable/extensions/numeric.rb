@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional numeric behaviour.
+        # This module contains additional numeric behavior.
         module Numeric
 
           # Evolve the numeric value into a mongo friendly date, aka UTC time at

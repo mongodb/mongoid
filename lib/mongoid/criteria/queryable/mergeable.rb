@@ -4,7 +4,7 @@ module Mongoid
   class Criteria
     module Queryable
 
-      # Contains behaviour for merging existing selection with new selection.
+      # Contains behavior for merging existing selection with new selection.
       module Mergeable
 
         # @attribute [rw] strategy The name of the current strategy.

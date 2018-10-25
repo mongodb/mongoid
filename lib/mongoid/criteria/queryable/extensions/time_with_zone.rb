@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional time with zone behaviour.
+        # This module contains additional time with zone behavior.
         module TimeWithZone
 
           # Evolve the time into a utc time.

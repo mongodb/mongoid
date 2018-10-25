@@ -7,7 +7,7 @@ require "mongoid/timestamps/short"
 
 module Mongoid
 
-  # This module handles the behaviour for setting up document created at and
+  # This module handles the behavior for setting up document created at and
   # updated at timestamps.
   module Timestamps
     extend ActiveSupport::Concern

@@ -547,7 +547,7 @@ child elements.
 
 * \#3432 Fixed mongoization of DateTime losing precision.
 
-* \#3397 Fixed $ne matcher for embedded documents to match server behaviour.
+* \#3397 Fixed $ne matcher for embedded documents to match server behavior.
 
 * \#3352 Allow named scopes named "open" to work through 1-n relations.
 
@@ -1305,8 +1305,8 @@ child elements.
   validation fails. Instead, they get flagged for destruction and then the
   removal occurs upon the parent passing validation and going to persist.
 
-  Note this is a behaviour change, but since the API does not change and
-  the previous behaviour was incorrect and did not match AR this was able
+  Note this is a behavior change, but since the API does not change and
+  the previous behavior was incorrect and did not match AR this was able
   to go into a point release.
 
 ## 3.0.9
@@ -2345,7 +2345,7 @@ child elements.
 
 * \#463 `Document#upsert` is no longer aliased to `Document#save` and now
   actually performs a proper MongoDB upsert command when called. If you
-  were using this method before and want the same behaviour, please switch
+  were using this method before and want the same behavior, please switch
   to `save`.
 
         band = Band.new(name: "Tool")
@@ -2401,7 +2401,7 @@ child elements.
 * \#1972 `added`, `loaded`, and `unloaded` can now be valid scope names on a
   document that is part of a 1-n relation.
 
-* \#1952/#1950 `#all_in` behaviour on embedded documents now properly matches
+* \#1952/#1950 `#all_in` behavior on embedded documents now properly matches
   root documents when passing an empty array. (Hans Hasselberg)
 
 * \#1941/#1939 `Model.find_by` now returns nil if raise not found error is
@@ -3201,7 +3201,7 @@ child elements.
 * \#1273 Mongoid.preload_models now checks if preload configuration option is set,
   where Mongoid.load_models always loads everything. (Ryan McGeary)
 
-* \#1244 Has one relations now adhere to default dependant behaviour.
+* \#1244 Has one relations now adhere to default dependant behavior.
 
 * \#1225 Fixed delayed persistence of embedded documents via $set.
 
@@ -3352,7 +3352,7 @@ validations error from before.
 
 * \#1173 has_many relations no longer delete all documents on a set of the relation
  (= [ doc_one, doc_two ]) but look to the dependent option to determine what
- behaviour should occur. :delete and :destroy will behave as before, :nullify and
+ behavior should occur. :delete and :destroy will behave as before, :nullify and
  no option specified will both nullify the old documents without deleting.
 
 * \#1142, \#767 Embedded relations no longer immediately persist atomically

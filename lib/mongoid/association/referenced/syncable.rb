@@ -4,7 +4,7 @@ module Mongoid
   module Association
     module Referenced
 
-      # This module handles the behaviour for synchronizing foreign keys between
+      # This module handles the behavior for synchronizing foreign keys between
       # both sides of a many to many relations.
       module Syncable
 

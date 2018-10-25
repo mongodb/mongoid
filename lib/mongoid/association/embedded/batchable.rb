@@ -4,7 +4,7 @@ module Mongoid
   module Association
     module Embedded
 
-      # Contains behaviour for executing operations in batch on embedded
+      # Contains behavior for executing operations in batch on embedded
       # documents.
       module Batchable
         include Positional

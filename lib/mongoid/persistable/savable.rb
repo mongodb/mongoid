@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for persistence operations that save documents.
+    # Defines behavior for persistence operations that save documents.
     #
     # @since 4.0.0
     module Savable

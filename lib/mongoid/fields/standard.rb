@@ -4,7 +4,7 @@ module Mongoid
   module Fields
     class Standard
 
-      # Defines the behaviour for defined fields in the document.
+      # Defines the behavior for defined fields in the document.
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :name, :options
 

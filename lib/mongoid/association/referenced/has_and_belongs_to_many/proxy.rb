@@ -5,7 +5,7 @@ module Mongoid
     module Referenced
       class HasAndBelongsToMany
 
-        # This class defines the behaviour for all relations that are a
+        # This class defines the behavior for all relations that are a
         # many-to-many between documents in different collections.
         class Proxy < Referenced::HasMany::Proxy
 

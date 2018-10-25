@@ -112,7 +112,7 @@ en:
         invalid_field_option:
           message: "Invalid option :%{option} provided for field :%{name}."
           summary: "Mongoid requires that you only provide valid options on each
-            field definition in order to prevent unexpected behaviour later on."
+            field definition in order to prevent unexpected behavior later on."
           resolution: "When defining the field :%{name} on '%{klass}', please provide
             valid options for the field. These are currently: %{valid}. If you
             meant to define a custom field option, please do so first like so:\n\n

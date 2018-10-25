@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # This module contains the behaviour of Mongoid's clone/dup of documents.
+  # This module contains the behavior of Mongoid's clone/dup of documents.
   module Equality
 
     # Default comparison is via the string version of the id.

@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # Contains behaviour specific to evolving for queryable queries.
+  # Contains behavior specific to evolving for queryable queries.
   module Evolvable
 
     # Evolve the document into an object id.

@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional object behaviour.
+        # This module contains additional object behavior.
         module String
 
           # Evolve the string into a mongodb friendly date.

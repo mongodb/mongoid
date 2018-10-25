@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # Contains the bahviour around inspecting documents via inspect.
+  # Contains the bahvior around inspecting documents via inspect.
   #
   # @since 4.0.0
   module Inspectable

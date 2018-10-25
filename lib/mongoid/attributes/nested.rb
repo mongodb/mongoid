@@ -3,7 +3,7 @@
 module Mongoid
   module Attributes
 
-    # Defines behaviour around that lovel Rails feature nested attributes.
+    # Defines behavior around that lovel Rails feature nested attributes.
     #
     # @since 1.0.0
     module Nested

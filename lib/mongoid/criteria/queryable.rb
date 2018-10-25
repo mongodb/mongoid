@@ -51,7 +51,7 @@ module Mongoid
       end
 
       # Initialize the new queryable. Will yield itself to the block if a block
-      # is provided for objects that need additional behaviour.
+      # is provided for objects that need additional behavior.
       #
       # @example Initialize the queryable.
       #   Queryable.new

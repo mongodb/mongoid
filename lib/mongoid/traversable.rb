@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # Provides behaviour around traversing the document graph.
+  # Provides behavior around traversing the document graph.
   #
   # @since 4.0.0
   module Traversable
@@ -182,7 +182,7 @@ module Mongoid
       end
 
       # When inheriting, we want to copy the fields from the parent class and
-      # set the on the child to start, mimicking the behaviour of the old
+      # set the on the child to start, mimicking the behavior of the old
       # class_inheritable_accessor that was deprecated in Rails edge.
       #
       # @example Inherit from this class.

@@ -6,7 +6,7 @@ module Mongoid
   module Association
 
     # This class is the superclass for all relation proxy objects, and contains
-    # common behaviour for all of them.
+    # common behavior for all of them.
     class Proxy
       alias :extend_proxy :extend
 

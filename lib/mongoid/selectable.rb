@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # Provides behaviour for generating the selector for a specific document.
+  # Provides behavior for generating the selector for a specific document.
   #
   # @since 4.0.0
   module Selectable

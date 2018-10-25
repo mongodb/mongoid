@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # Defines behaviour for dirty tracking.
+  # Defines behavior for dirty tracking.
   #
   # @since 4.0.0
   module Changeable

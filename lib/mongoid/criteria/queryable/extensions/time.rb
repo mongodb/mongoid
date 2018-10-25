@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional time behaviour.
+        # This module contains additional time behavior.
         module Time
 
           # Evolve the time as a date, UTC midnight.

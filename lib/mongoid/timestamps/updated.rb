@@ -4,7 +4,7 @@ require "mongoid/timestamps/updated/short"
 
 module Mongoid
   module Timestamps
-    # This module handles the behaviour for setting up document updated at
+    # This module handles the behavior for setting up document updated at
     # timestamp.
     module Updated
       extend ActiveSupport::Concern

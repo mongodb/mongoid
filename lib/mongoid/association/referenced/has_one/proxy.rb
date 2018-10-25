@@ -5,7 +5,7 @@ module Mongoid
     module Referenced
       class HasOne
 
-        # This class defines the behaviour for all relations that are a
+        # This class defines the behavior for all relations that are a
         # one-to-one between documents in different collections.
         class Proxy < Association::One
 
