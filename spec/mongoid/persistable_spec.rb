@@ -184,15 +184,22 @@ describe Mongoid::Persistable do
           end
         end
 
-        let!(:update) do
+        let(:run_update) do
           document.atomically do |doc|
+            doc.my_updates
             doc.inc(member_count: 10)
             doc.bit(likes: { and: 13 })
-            doc.my_updates
           end
         end
 
-        it_behaves_like "an atomically updatable root document"
+        it_behaves_like "an atomically updatable root document" do
+          let!(:update) { run_update }
+        end
+
+        it "performs an update_one exactly once" do
+          expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).exactly(:once).and_call_original
+          run_update
+        end
       end
     end
 
