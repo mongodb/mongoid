@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for persistence operations that update existing
+    # Defines behavior for persistence operations that update existing
     # documents.
     #
     # @since 4.0.0

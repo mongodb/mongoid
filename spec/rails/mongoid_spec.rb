@@ -78,7 +78,7 @@ describe "Rails::Mongoid" do
       context "when models exist in subdirectories" do
 
         let(:files) do
-          [ "/rails/root/app/models/mongoid/behaviour.rb" ]
+          [ "/rails/root/app/models/mongoid/behavior.rb" ]
         end
 
         before do
@@ -86,7 +86,7 @@ describe "Rails::Mongoid" do
         end
 
         it "requires the models by subdirectory and basename" do
-          expect(Rails::Mongoid).to receive(:load_model).with("mongoid/behaviour")
+          expect(Rails::Mongoid).to receive(:load_model).with("mongoid/behavior")
           Rails::Mongoid.preload_models(app)
         end
       end

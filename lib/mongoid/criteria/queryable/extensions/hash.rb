@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional hash behaviour.
+        # This module contains additional hash behavior.
         module Hash
 
           # Add an object to a hash using the merge strategies.

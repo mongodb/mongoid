@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional datetime behaviour.
+        # This module contains additional datetime behavior.
         module DateTime
 
           # Evolve the date time into a mongo friendly UTC time.

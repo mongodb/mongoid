@@ -3,7 +3,7 @@
 module Mongoid
   module Contextual
     module Aggregable
-      # Contains behaviour for aggregating values in Mongo.
+      # Contains behavior for aggregating values in Mongo.
       module Mongo
 
         # Get all the aggregate values for the provided field.

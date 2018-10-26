@@ -41,7 +41,7 @@ module Rails
     # method as a convenience.
     #
     # @example Load the model.
-    #   Mongoid.load_model("/mongoid/behaviour")
+    #   Mongoid.load_model("/mongoid/behavior")
     #
     # @param [ String ] file The base filename.
     #

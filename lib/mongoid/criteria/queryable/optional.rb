@@ -4,7 +4,7 @@ module Mongoid
   class Criteria
     module Queryable
 
-      # The optional module includes all behaviour that has to do with extra
+      # The optional module includes all behavior that has to do with extra
       # options surrounding queries, like skip, limit, sorting, etc.
       module Optional
         extend Macroable

@@ -141,8 +141,8 @@ its parent, you will need to provide the cascade callbacks option to the associa
 
   band.save # Fires all save callbacks on the band, albums, and label.
 
-Dependent Behaviour
-*******************
+Dependent Behavior
+******************
 
 You can provide dependent options to referenced associations to instruct Mongoid
 how to handle situations where one side of the association is deleted, or is attempted

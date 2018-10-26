@@ -19,7 +19,7 @@ require "mongoid/validatable"
 
 module Mongoid
 
-  # This module provides inclusions of all behaviour in a Mongoid document.
+  # This module provides inclusions of all behavior in a Mongoid document.
   #
   # @since 4.0.0
   module Composable

@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for $set operations.
+    # Defines behavior for $set operations.
     #
     # @since 4.0.0
     module Settable

@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional regex behaviour.
+        # This module contains additional regex behavior.
         module Regexp
 
           # Is the object a regexp?

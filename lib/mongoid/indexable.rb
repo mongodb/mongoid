@@ -6,7 +6,7 @@ require "ostruct"
 
 module Mongoid
 
-  # Encapsulates behaviour around defining indexes.
+  # Encapsulates behavior around defining indexes.
   #
   # @since 4.0.0
   module Indexable

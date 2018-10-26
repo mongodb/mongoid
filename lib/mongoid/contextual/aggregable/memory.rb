@@ -3,7 +3,7 @@
 module Mongoid
   module Contextual
     module Aggregable
-      # Contains behaviour for aggregating values in memory.
+      # Contains behavior for aggregating values in memory.
       module Memory
 
         # Get the average value of the provided field.

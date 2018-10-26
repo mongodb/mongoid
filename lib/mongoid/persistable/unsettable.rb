@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for $unset operations.
+    # Defines behavior for $unset operations.
     #
     # @since 4.0.0
     module Unsettable

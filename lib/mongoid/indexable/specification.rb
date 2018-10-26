@@ -3,7 +3,7 @@
 module Mongoid
   module Indexable
 
-    # Encapsulates behaviour around an index specification.
+    # Encapsulates behavior around an index specification.
     #
     # @since 4.0.0
     class Specification

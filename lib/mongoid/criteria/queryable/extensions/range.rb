@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional range behaviour.
+        # This module contains additional range behavior.
         module Range
 
           # Get the range as an array.

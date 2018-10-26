@@ -5,7 +5,7 @@ module Mongoid
     module Referenced
       class BelongsTo
 
-        # This class handles all behaviour for relations that are either
+        # This class handles all behavior for relations that are either
         # one-to-many or one-to-one, where the foreign key is stored on this side
         # of the relation and the reference is to document(s) in another
         # collection.

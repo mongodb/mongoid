@@ -7,7 +7,7 @@ require "mongoid/fields/validators"
 
 module Mongoid
 
-  # This module defines behaviour for fields.
+  # This module defines behavior for fields.
   module Fields
     extend ActiveSupport::Concern
 

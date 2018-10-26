@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for $pull and $pullAll operations.
+    # Defines behavior for $pull and $pullAll operations.
     #
     # @since 4.0.0
     module Pullable

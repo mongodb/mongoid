@@ -3,7 +3,7 @@
 module Mongoid
   module Association
 
-    # This module contains all the behaviour related to accessing relations
+    # This module contains all the behavior related to accessing relations
     # through the getters and setters, and how to delegate to builders to
     # create new ones.
     module Accessors

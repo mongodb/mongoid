@@ -3,7 +3,7 @@
 module Mongoid
   module Timestamps
 
-    # This module adds behaviour for turning off timestamping in single or
+    # This module adds behavior for turning off timestamping in single or
     # multiple calls.
     module Timeless
       extend ActiveSupport::Concern

@@ -7,7 +7,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # The big decimal module adds custom behaviour for Origin onto the
+        # The big decimal module adds custom behavior for Origin onto the
         # BigDecimal class.
         module BigDecimal
           module ClassMethods

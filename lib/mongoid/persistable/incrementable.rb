@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for $inc operations.
+    # Defines behavior for $inc operations.
     #
     # @since 4.0.0
     module Incrementable

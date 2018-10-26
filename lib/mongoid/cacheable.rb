@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # Encapsulates behaviour around caching.
+  # Encapsulates behavior around caching.
   #
   # @since 6.0.0
   module Cacheable

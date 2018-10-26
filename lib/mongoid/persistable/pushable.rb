@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for $push and $addToSet operations.
+    # Defines behavior for $push and $addToSet operations.
     #
     # @since 4.0.0
     module Pushable

@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # This module handles reloading behaviour of documents.
+  # This module handles reloading behavior of documents.
   #
   # @since 4.0.0
   module Reloadable
@@ -38,7 +38,7 @@ module Mongoid
     private
 
     # Reload the document, determining if it's embedded or not and what
-    # behaviour to use.
+    # behavior to use.
     #
     # @example Reload the document.
     #   document._reload

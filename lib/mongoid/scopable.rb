@@ -3,7 +3,7 @@
 
 module Mongoid
 
-  # This module contains behaviour for all Mongoid scoping - named scopes,
+  # This module contains behavior for all Mongoid scoping - named scopes,
   # default scopes, and criteria accessors via scoped and unscoped.
   #
   # @since 4.0.0

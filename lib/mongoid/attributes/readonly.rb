@@ -3,7 +3,7 @@
 module Mongoid
   module Attributes
 
-    # This module defines behaviour for readonly attributes.
+    # This module defines behavior for readonly attributes.
     module Readonly
       extend ActiveSupport::Concern
 

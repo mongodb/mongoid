@@ -5,7 +5,7 @@ module Mongoid
     module Paths
       module Embedded
 
-        # This class encapsulates behaviour for locating and updating
+        # This class encapsulates behavior for locating and updating
         # documents that are defined as an embedded 1-n.
         class Many
           include Embedded

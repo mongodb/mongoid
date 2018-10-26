@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for logical bitwise operations.
+    # Defines behavior for logical bitwise operations.
     #
     # @since 4.0.0
     module Logical

@@ -3,7 +3,7 @@
 module Mongoid
   module Association
 
-    # This module defines the behaviour for setting up cascading deletes and
+    # This module defines the behavior for setting up cascading deletes and
     # nullifies for relations, and how to delegate to the appropriate strategy.
     module Depending
       extend ActiveSupport::Concern

@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # This module provides the extra behaviour for including relations in JSON
+  # This module provides the extra behavior for including relations in JSON
   # and XML serialization.
   #
   # @since 4.0.0

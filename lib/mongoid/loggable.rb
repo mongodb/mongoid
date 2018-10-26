@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # Contains logging behaviour.
+  # Contains logging behavior.
   module Loggable
 
     # Get the logger.

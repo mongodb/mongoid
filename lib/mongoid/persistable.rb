@@ -17,7 +17,7 @@ require "mongoid/persistable/unsettable"
 
 module Mongoid
 
-  # Contains general behaviour for persistence operations.
+  # Contains general behavior for persistence operations.
   #
   # @since 2.0.0
   module Persistable
@@ -145,7 +145,7 @@ module Mongoid
       self
     end
 
-    # Process the atomic operations - this handles the common behaviour of
+    # Process the atomic operations - this handles the common behavior of
     # iterating through each op, getting the aliased field name, and removing
     # appropriate dirty changes.
     #

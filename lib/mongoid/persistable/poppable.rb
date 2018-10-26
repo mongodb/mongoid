@@ -3,7 +3,7 @@
 module Mongoid
   module Persistable
 
-    # Defines behaviour for $pop operations.
+    # Defines behavior for $pop operations.
     #
     # @since 4.0.0
     module Poppable

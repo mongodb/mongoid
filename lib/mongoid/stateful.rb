@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # This module contains the behaviour for getting the various states a
+  # This module contains the behavior for getting the various states a
   # document can transition through.
   module Stateful
 

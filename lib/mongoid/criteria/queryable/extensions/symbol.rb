@@ -5,7 +5,7 @@ module Mongoid
     module Queryable
       module Extensions
 
-        # This module contains additional symbol behaviour.
+        # This module contains additional symbol behavior.
         module Symbol
 
           # Get the symbol as a specification.

@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # This module contains behaviour for adding shard key fields to updates.
+  # This module contains behavior for adding shard key fields to updates.
   #
   # @since 4.0.0
   module Shardable

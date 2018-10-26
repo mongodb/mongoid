@@ -170,7 +170,7 @@ module Mongoid
       end
     end
 
-    # Included to add behaviour for clearing out the query cache on certain
+    # Included to add behavior for clearing out the query cache on certain
     # operations.
     #
     # @since 4.0.0
@@ -260,7 +260,7 @@ module Mongoid
       end
     end
 
-    # Adds behaviour to the query cache for collections.
+    # Adds behavior to the query cache for collections.
     #
     # @since 5.0.0
     module Collection
