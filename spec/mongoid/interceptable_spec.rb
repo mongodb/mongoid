@@ -573,7 +573,7 @@ describe Mongoid::Interceptable do
         context "when saving the root" do
 
           it "only executes the callbacks once for each embed" do
-            expect(note).to receive(:update_saved).once
+            expect(note).to receive(:update_saved).twice
             band.save
           end
         end
