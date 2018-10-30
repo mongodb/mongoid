@@ -55,23 +55,21 @@ module Mongoid
     #
     # @since 4.0.0
     def atomically
-      begin
-        call_depth = @atomically_depth ||= 0
-        @atomic_updates_to_execute = @atomic_updates_to_execute || {}
+      call_depth = @atomically_depth ||= 0
+      @atomic_updates_to_execute = @atomic_updates_to_execute || {}
 
-        if block_given?
-          @atomically_depth += 1
-          yield(self)
-          @atomically_depth -= 1
-        end
+      if block_given?
+        @atomically_depth += 1
+        yield(self)
+        @atomically_depth -= 1
+      end
 
-        persist_atomic_operations(@atomic_updates_to_execute) if call_depth.zero?
-        true
-      ensure
-        if call_depth.zero?
-          @atomically_depth = nil
-          @atomic_updates_to_execute = nil
-        end
+      persist_atomic_operations(@atomic_updates_to_execute) if call_depth.zero?
+      true
+    ensure
+      if call_depth.zero?
+        @atomically_depth = nil
+        @atomic_updates_to_execute = nil
       end
     end
 
