@@ -175,8 +175,8 @@ describe Mongoid::Persistable do
 
         before do
           class Band
-            def my_updates
-              atomically do |d|
+            def my_updates(*args)
+              atomically(*args) do |d|
                 d.set(name: "Placebo")
                 d.unset(:origin)
               end
@@ -184,21 +184,86 @@ describe Mongoid::Persistable do
           end
         end
 
-        let(:run_update) do
-          document.atomically do |doc|
-            doc.my_updates
-            doc.inc(member_count: 10)
-            doc.bit(likes: { and: 13 })
+        context "when given join_context: false" do
+
+          let(:run_update) do
+            document.atomically do |doc|
+              doc.set origin: "Paris"
+              doc.atomically(join_context: false) do |doc2|
+                doc2.inc(member_count: 10)
+              end
+              doc.inc likes: 1
+              raise "oops"
+            end
+          end
+
+          it_behaves_like "an atomically updatable root document" do
+            let!(:update) do
+              document.atomically do |doc|
+                doc.inc(member_count: 10)
+                doc.my_updates join_context: false
+                doc.bit(likes: { and: 13 })
+              end
+            end
+          end
+
+          it "independently persists the non-joining block's operations" do
+            begin run_update; rescue RuntimeError; end
+
+            document.reload
+
+            expect(document.origin).to eq "London"
+            expect(document.likes).to eq 60
+            expect(document.member_count).to eq 10
+          end
+
+          it "resets in-memory changes that did not successfully persist" do
+            begin run_update; rescue RuntimeError; end
+
+            expect(document.origin).to eq "London"
+            expect(document.likes).to eq 60
+            expect(document.member_count).to eq 10
           end
         end
 
-        it_behaves_like "an atomically updatable root document" do
-          let!(:update) { run_update }
-        end
+        context "when given join_context: true" do
 
-        it "performs an update_one exactly once" do
-          expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).exactly(:once).and_call_original
-          run_update
+          let(:run_update) do
+            document.atomically do |doc|
+              doc.inc(member_count: 10)
+              doc.my_updates join_context: true
+              doc.bit(likes: { and: 13 })
+            end
+          end
+
+          it_behaves_like "an atomically updatable root document" do
+            let!(:update) { run_update }
+          end
+
+          it "performs an update_one exactly once" do
+            expect_any_instance_of(Mongo::Collection::View).to receive(:update_one).exactly(:once).and_call_original
+            run_update
+          end
+
+          it "resets in-memory changes that did not successfully persist" do
+            begin
+              document.atomically do |doc|
+                doc.set origin: "Paris"
+                doc.atomically(join_context: true) do |doc2|
+                  doc2.inc(member_count: 10)
+                end
+                doc.atomically(join_context: true) do |doc3|
+                  doc.inc likes: 1
+                end
+                raise "oops"
+              end
+            rescue RuntimeError
+            end
+
+            expect(document.origin).to eq "London"
+            expect(document.likes).to eq 60
+            expect(document.member_count).to eq 0
+          end
         end
       end
     end
