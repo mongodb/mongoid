@@ -113,6 +113,20 @@ describe Mongoid::Persistable::Pullable do
         it_behaves_like "a pullable embedded document"
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(test_array: [ 1, 1, 2, 3 ])
+      end
+
+      it "marks a dirty change for the pulled fields" do
+        person.atomically do
+          person.pull test_array: 1
+          expect(person.changes).to eq({"test_array" => [[ 1, 1, 2, 3 ], [ 2, 3 ]]})
+        end
+      end
+    end
   end
 
   describe "#pull_all" do
@@ -224,6 +238,20 @@ describe Mongoid::Persistable::Pullable do
         end
 
         it_behaves_like "a multi-pullable embedded document"
+      end
+    end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(test_array: [ 1, 1, 2, 3, 4 ])
+      end
+
+      it "marks a dirty change for the pulled fields" do
+        person.atomically do
+          person.pull_all test_array: [ 1, 2 ]
+          expect(person.changes).to eq({"test_array" => [[ 1, 1, 2, 3, 4 ], [ 3, 4 ]]})
+        end
       end
     end
   end

@@ -136,6 +136,20 @@ describe Mongoid::Persistable::Pushable do
         end
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(test_array: [ 1, 2, 3 ])
+      end
+
+      it "marks a dirty change for the modified fields" do
+        person.atomically do
+          person.add_to_set test_array: [ 1, 4 ]
+          expect(person.changes).to eq({"test_array" => [[ 1, 2, 3 ], [ 1, 2, 3, 4 ]]})
+        end
+      end
+    end
   end
 
   describe "#push" do
@@ -265,6 +279,20 @@ describe Mongoid::Persistable::Pushable do
         end
 
         it_behaves_like "a pushable embedded document"
+      end
+    end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(test_array: [ 1, 2, 3 ])
+      end
+
+      it "marks a dirty change for the pushed fields" do
+        person.atomically do
+          person.push test_array: [ 1, 4 ]
+          expect(person.changes).to eq({"test_array" => [[ 1, 2, 3 ], [ 1, 2, 3, 1, 4 ]]})
+        end
       end
     end
   end

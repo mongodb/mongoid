@@ -166,6 +166,20 @@ describe Mongoid::Persistable::Settable do
         end
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(title: "sir", age: 30)
+      end
+
+      it "marks a dirty change for the set fields" do
+        person.atomically do
+          person.set title: "miss", age: 21
+          expect(person.changes).to eq({"title" => ["sir", "miss"], "age" => [30, 21]})
+        end
+      end
+    end
   end
 
   context "when dynamic attributes are not enabled" do

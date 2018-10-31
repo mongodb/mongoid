@@ -113,5 +113,19 @@ describe Mongoid::Persistable::Poppable do
         it_behaves_like "a poppable embedded document"
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(test_array: [1, 2, 3])
+      end
+
+      it "marks a dirty change for the popped fields" do
+        person.atomically do
+          person.pop test_array: 1
+          expect(person.changes).to eq({"test_array" => [[1, 2, 3], [1, 2]]})
+        end
+      end
+    end
   end
 end

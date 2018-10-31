@@ -25,7 +25,12 @@ module Mongoid
         prepare_atomic_operation do |ops|
           process_atomic_operations(renames) do |old_field, new_field|
             new_name = new_field.to_s
-            attributes[new_name] = attributes.delete(old_field)
+            if executing_atomically?
+              process_attribute new_name, attributes[old_field]
+              process_attribute old_field, nil
+            else
+              attributes[new_name] = attributes.delete(old_field)
+            end
             ops[atomic_attribute_name(old_field)] = atomic_attribute_name(new_name)
           end
           { "$rename" => ops }
