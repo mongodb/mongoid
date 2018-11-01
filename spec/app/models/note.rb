@@ -6,7 +6,7 @@ class Note
   field :saved, type: Mongoid::Boolean, default: false
   embedded_in :noteable, polymorphic: true
 
-  after_save :update_saved
+  before_save :update_saved
 
   scope :permanent, ->{ where(saved: true) }
 
