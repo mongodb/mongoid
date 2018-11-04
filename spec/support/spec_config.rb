@@ -13,7 +13,7 @@ class SpecConfig
     if @mongodb_uri
       @mongodb_uri.servers
     else
-      ['127.0.0.1:27017']
+      ['127.0.0.1']
     end
   end
 
