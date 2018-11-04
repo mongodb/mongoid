@@ -24,7 +24,6 @@ module Mongoid
       # @since 3.0.0
       def touch(field = nil)
         return false if _root.new_record?
-        return false if _root.destroyed?
         current = Time.now
         field = database_field_name(field)
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
