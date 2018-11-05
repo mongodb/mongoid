@@ -311,8 +311,8 @@ describe Mongoid::Config do
         expect(described_class.use_utc).to be false
       end
 
-      it "sets the atomically join_context default option" do
-        expect(described_class.atomically_join_context_default).to be false
+      it "sets the join_contexts default option" do
+        expect(described_class.join_contexts).to be false
       end
     end
 
@@ -361,8 +361,8 @@ describe Mongoid::Config do
           expect(described_class.use_utc).to be false
         end
 
-        it "sets the atomically join_context default option" do
-          expect(described_class.atomically_join_context_default).to be false
+        it "sets the join_contexts default option" do
+          expect(described_class.join_contexts).to be false
         end
       end
 

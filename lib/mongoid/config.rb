@@ -25,7 +25,7 @@ module Mongoid
     option :duplicate_fields_exception, default: false
     option :use_activesupport_time_zone, default: true
     option :use_utc, default: false
-    option :atomically_join_context_default, default: false
+    option :join_contexts, default: false
 
     # The log level.
     #
