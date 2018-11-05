@@ -188,13 +188,13 @@ describe Mongoid::Touchable do
 
       context "when record is new" do
 
-        let(:agent) do
+        let!(:agent) do
           Agent.new(updated_at: 2.days.ago)
         end
 
         context "when no attribute is provided" do
 
-          let!(:touched) do
+          let(:touched) do
             agent.touch
           end
 
@@ -205,12 +205,55 @@ describe Mongoid::Touchable do
 
         context "when an attribute is provided" do
 
-          let!(:touched) do
+          let(:touched) do
             agent.touch(:dob)
           end
 
           it "returns false" do
             expect(touched).to be false
+          end
+        end
+      end
+
+      context "when record is destroyed" do
+
+        let!(:agent) do
+          Agent.create!(updated_at: 2.days.ago).tap do |agent|
+            agent.destroy
+          end
+        end
+
+        let(:frozen_error_cls) do
+          if RUBY_VERSION >= '2.5'
+            FrozenError
+          else
+            RuntimeError
+          end
+        end
+
+        context "when no attribute is provided" do
+
+          let(:touched) do
+            agent.touch
+          end
+
+          it "raises FrozenError" do
+            expect do
+              touched
+            end.to raise_error(frozen_error_cls)
+          end
+        end
+
+        context "when an attribute is provided" do
+
+          let(:touched) do
+            agent.touch(:dob)
+          end
+
+          it "raises FrozenError" do
+            expect do
+              touched
+            end.to raise_error(frozen_error_cls)
           end
         end
       end
