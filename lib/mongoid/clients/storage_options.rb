@@ -140,7 +140,7 @@ module Mongoid
           if db = client[:database]
             db
           elsif uri = client[:uri]
-            client[:database] = Mongo::URI.new(uri).database
+            client[:database] = Mongo::URI.get(uri).database
           else
             nil
           end
