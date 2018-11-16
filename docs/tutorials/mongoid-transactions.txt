@@ -51,8 +51,8 @@ when starting a transaction:
       read: {mode: :primary})
   end
 
- A transaction may be committed or aborted. The corresponding methods to do so are
- ``commit_transaction`` and ``abort_transaction``, again on the session instance:
+A transaction may be committed or aborted. The corresponding methods to do so are
+``commit_transaction`` and ``abort_transaction``, again on the session instance:
 
 .. code-block:: ruby
 
