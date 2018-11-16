@@ -289,10 +289,11 @@ Mongoid provides the following persistence-related attributes:
 Atomic
 ------
 
-Although Mongoid performs atomic operations under the covers by default, there may be cases
-where you want to do this explicitly without persisting other fields. Mongoid provides support
-for all of these operations as well. When executing atomic operations via these methods,
-no callbacks will ever get run, nor will any validations.
+Although Mongoid performs atomic operations under the covers by default,
+there may be cases where you want to do this explicitly without persisting
+other fields. Mongoid provides support for all of these operations as well.
+When executing atomic operations via these methods, callbacks and validations
+are not invoked.
 
 .. list-table::
    :header-rows: 1
@@ -436,6 +437,57 @@ no callbacks will ever get run, nor will any validations.
 
           person.unset(:name)
 
+Atomic Operation Grouping
+`````````````````````````
+
+Atomic operations may be grouped together using the ``#atomically`` method
+on a document. All operations inside the block given to ``#atomically``
+are sent to the cluster in a single atomic command. For example:
+
+.. code-block:: ruby
+
+  person.atomically do
+    person.inc(age: 1)
+    person.set(name: 'Jake')
+  end
+
+``#atomically`` blocks may be nested. The default behavior is to write
+changes performed by each block as soon as the block ends:
+
+.. code-block:: ruby
+
+  person.atomically do
+    person.atomically do
+      person.inc(age: 1)
+      person.set(name: 'Jake')
+    end
+    raise 'An exception'
+    # name and age changes are still persisted
+  end
+
+This behavior can be changed by specifying the ``join_context: true`` option
+to ``#atomically``. When using this option, nested ``#atomically`` blocks
+are joined with the outer blocks, and only the outermost block (or the
+first block where ``join_contexts`` is false) actually writes changes to
+the cluster. For example:
+
+.. code-block:: ruby
+
+  person.atomically do
+    person.atomically(join_context: true) do
+      person.inc(age: 1)
+      person.set(name: 'Jake')
+    end
+    raise 'An exception'
+    # name and age changes are not persisted
+  end
+
+Atomic operations described in this section apply to one document at a time,
+therefore nesting ``#atomically`` blocks invoked on multiple documents does
+not make changes to the different documents be persisted atomically together.
+However, MongoDB offers `multi-document transactions <transactions>`_
+as of server version 4.0 which provide atomic persistence across multiple
+documents.
 
 Custom
 ------
