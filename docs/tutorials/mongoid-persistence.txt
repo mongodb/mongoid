@@ -493,7 +493,7 @@ Mongoid models are reverted. For example:
 
 .. code-block:: ruby
 
-  person = Person.new(name: 'Tom)
+  person = Person.new(name: 'Tom')
   begin
     person.atomically do
       person.inc(age: 1)
