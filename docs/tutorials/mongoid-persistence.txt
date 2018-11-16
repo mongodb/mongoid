@@ -487,6 +487,24 @@ The context joining behavior can be enabled globally by default by setting
 ``join_context: false`` on an ``#atomically`` block can be used to
 obtain the independent persistence context behavior.
 
+If an exception is raised in an ``#atomically`` block which has not yet
+persisted its changes to the cluster, any pending attribute changes on
+Mongoid models are reverted. For example:
+
+.. code-block:: ruby
+
+  person = Person.new(name: 'Tom)
+  begin
+    person.atomically do
+      person.inc(age: 1)
+      person.set(name: 'Jake')
+      person.name # => 'Jake'
+      raise 'An exception'
+    end
+  rescue Exception
+    person.name # => 'Tom'
+  end
+
 Atomic operations described in this section apply to one document at a time,
 therefore nesting ``#atomically`` blocks invoked on multiple documents does
 not make changes to the different documents be persisted atomically together.
