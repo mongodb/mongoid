@@ -97,7 +97,7 @@ module Mongoid
       call_depth = @atomic_depth ||= 0
       has_own_context = call_depth.zero? || !join_context
       @atomic_updates_to_execute_stack ||= []
-      push_atomic_context if has_own_context
+      _mongoid_push_atomic_context if has_own_context
 
       if block_given?
         @atomic_depth += 1
@@ -107,15 +107,15 @@ module Mongoid
 
       if has_own_context
         persist_atomic_operations @atomic_context
-        remove_atomic_context_changes
+        _mongoid_remove_atomic_context_changes
       end
 
       true
     rescue Exception => e
-      reset_atomic_context_changes! if has_own_context
+      _mongoid_reset_atomic_context_changes! if has_own_context
       raise e
     ensure
-      pop_atomic_context if has_own_context
+      _mongoid_pop_atomic_context if has_own_context
 
       if call_depth.zero?
         @atomic_depth = nil
@@ -233,12 +233,12 @@ module Mongoid
     # @api private
     #
     # @example Remove the current atomic context's dirty changes.
-    #   document.remove_atomic_context_changes
+    #   document._mongoid_remove_atomic_context_changes
     #
     # @since VERSION
-    def remove_atomic_context_changes
+    def _mongoid_remove_atomic_context_changes
       return unless executing_atomically?
-      atomic_context_changed_fields.each { |f| remove_change f }
+      _mongoid_atomic_context_changed_fields.each { |f| remove_change f }
     end
 
     # Reset the attributes for all fields changed in the current atomic
@@ -247,12 +247,12 @@ module Mongoid
     # @api private
     #
     # @example Reset the current atomic context's changed attributes.
-    #   document.reset_atomic_context_changes!
+    #   document._mongoid_reset_atomic_context_changes!
     #
     # @since VERSION
-    def reset_atomic_context_changes!
+    def _mongoid_reset_atomic_context_changes!
       return unless executing_atomically?
-      atomic_context_changed_fields.each { |f| reset_attribute! f }
+      _mongoid_atomic_context_changed_fields.each { |f| reset_attribute! f }
     end
 
     # Push a new atomic context onto the stack.
@@ -260,10 +260,10 @@ module Mongoid
     # @api private
     #
     # @example Push a new atomic context onto the stack.
-    #   document.push_atomic_context
+    #   document._mongoid_push_atomic_context
     #
     # @since VERSION
-    def push_atomic_context
+    def _mongoid_push_atomic_context
       return unless executing_atomically?
       @atomic_context = {}
       @atomic_updates_to_execute_stack << @atomic_context
@@ -274,10 +274,10 @@ module Mongoid
     # @api private
     #
     # @example Pop an atomic context off the stack.
-    #   document.pop_atomic_context
+    #   document._mongoid_pop_atomic_context
     #
     # @since VERSION
-    def pop_atomic_context
+    def _mongoid_pop_atomic_context
       return unless executing_atomically?
       @atomic_updates_to_execute_stack.pop
       @atomic_context = @atomic_updates_to_execute_stack.last
@@ -288,12 +288,12 @@ module Mongoid
     # @api private
     #
     # @example Return the current atomic context's changed fields.
-    #   document.atomic_context_changed_fields
+    #   document._mongoid_atomic_context_changed_fields
     #
     # @return [ Array ] The changed fields.
     #
     # @since VERSION
-    def atomic_context_changed_fields
+    def _mongoid_atomic_context_changed_fields
       @atomic_context.values.flat_map(&:keys)
     end
 
