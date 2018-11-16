@@ -153,7 +153,7 @@ various options in the comments above each key:
           connect_timeout: 10
 
           # The timeout to wait to execute operations on a socket before raising an error.
-          # (default: 5)
+          # (default: nil)
           socket_timeout: 5
 
           # The name of the replica set to connect to. Servers provided as seeds that do
