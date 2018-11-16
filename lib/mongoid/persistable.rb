@@ -50,9 +50,10 @@ module Mongoid
     #
     # An option join_context can be given which, when true, will merge the
     # operations declared by the given block with the atomically block wrapping
-    # the current invocation, if one exists. If this block or any other block
-    # sharing the same context raises before persisting, then all the operations
-    # of that context will not be persisted, and will also be reset in-memory.
+    # the current invocation for the same document, if one exists. If this
+    # block or any other block sharing the same context raises before
+    # persisting, then all the operations of that context will not be
+    # persisted, and will also be reset in memory.
     #
     # When join_context is false, the given block of operations will be
     # persisted independently of other contexts. Failures in other contexts will
@@ -85,8 +86,8 @@ module Mongoid
     # @param [ Hash ] options The options to pass to atomically.
     #
     # @option options [ true, false ] :join_context Join the context (i.e. merge
-    #   declared atomic operations) of the atomically block wrapping this one,
-    #   if one exists.
+    #   declared atomic operations) of the atomically block wrapping this one
+    #   for the same document, if one exists.
     #
     # @return [ true, false ] If the operation succeeded.
     #
