@@ -482,6 +482,11 @@ the cluster. For example:
     # name and age changes are not persisted
   end
 
+The context joining behavior can be enabled globally by default by setting
+``join_context`` option in Mongoid configuration. In this case specifying
+``join_context: false`` on an ``#atomically`` block can be used to
+obtain the independent persistence context behavior.
+
 Atomic operations described in this section apply to one document at a time,
 therefore nesting ``#atomically`` blocks invoked on multiple documents does
 not make changes to the different documents be persisted atomically together.

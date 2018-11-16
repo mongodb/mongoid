@@ -209,6 +209,10 @@ various options in the comments above each key:
 
       # Set the Mongoid and Ruby driver log levels. (default: :info)
       log_level: :info
+      
+      # Whether to join nested persistence contexts for atomic operations
+      # to parent contexts by default. (default: false)
+      join_contexts: false
 
 Inline Configuration
 ********************
