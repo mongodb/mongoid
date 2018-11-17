@@ -171,7 +171,7 @@ module Mongoid
     #
     # @param [ Class ] klass The model to suppress default scoping on.
     #
-    # @since VERSION
+    # @api private
     def begin_without_default_scope(klass)
       stack(:without_default_scope).push(klass)
     end
@@ -183,7 +183,7 @@ module Mongoid
     #
     # @param [ Class ] klass The model to unsuppress default scoping on.
     #
-    # @since VERSION
+    # @api private
     def exit_without_default_scope(klass)
       stack(:without_default_scope).delete(klass)
     end
@@ -279,7 +279,7 @@ module Mongoid
     #
     # @param [ Class ] klass The model to check for default scope suppression.
     #
-    # @since VERSION
+    # @api private
     def without_default_scope?(klass)
       stack(:without_default_scope).include?(klass)
     end
