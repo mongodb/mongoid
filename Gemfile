@@ -10,10 +10,11 @@ group :test do
   gem 'rspec-retry'
   gem 'benchmark-ips'
   gem 'rspec', '~> 3.7'
+  gem 'fuubar'
+  gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
   end
-  gem 'fuubar'
 end
 
 group :development, :testing do
