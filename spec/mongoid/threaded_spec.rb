@@ -233,4 +233,72 @@ describe Mongoid::Threaded do
       end
     end
   end
+
+  describe "#begin_without_default_scope" do
+
+    let(:klass) do
+      Appointment
+    end
+
+    after do
+      described_class.exit_without_default_scope(klass)
+    end
+
+    it "adds the given class to the without_default_scope stack" do
+      described_class.begin_without_default_scope(klass)
+
+      expect(described_class.stack(:without_default_scope)).to include(klass)
+    end
+  end
+
+  describe "#exit_without_default_scope" do
+
+    let(:klass) do
+      Appointment
+    end
+
+    before do
+      described_class.begin_without_default_scope(klass)
+    end
+
+    it "removes the given class from the without_default_scope stack" do
+      described_class.exit_without_default_scope(klass)
+
+      expect(described_class.stack(:without_default_scope)).not_to include(klass)
+    end
+  end
+
+  describe "#without_default_scope?" do
+
+    let(:klass) do
+      Appointment
+    end
+
+    context "when klass has begun without_default_scope" do
+
+      before do
+        described_class.begin_without_default_scope(klass)
+      end
+
+      after do
+        described_class.exit_without_default_scope(klass)
+      end
+
+      it "returns true" do
+        expect(described_class.without_default_scope?(klass)).to be(true)
+      end
+    end
+
+    context "when klass has exited without_default_scope" do
+
+      before do
+        described_class.begin_without_default_scope(klass)
+        described_class.exit_without_default_scope(klass)
+      end
+
+      it "returns false" do
+        expect(described_class.without_default_scope?(klass)).to be(false)
+      end
+    end
+  end
 end
