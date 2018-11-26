@@ -6,12 +6,21 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require "mongoid"
 require "rspec"
 
-begin
-  require 'byebug'
-rescue LoadError
-end
-
 require 'support/spec_config'
+
+unless SpecConfig.instance.ci?
+  begin
+    require 'byebug'
+  rescue LoadError
+    # jruby - try pry
+    begin
+      require 'pry'
+    # jruby likes to raise random error classes, in this case
+    # NameError in addition to LoadError
+    rescue Exception
+    end
+  end
+end
 
 if SpecConfig.instance.mri?
   require 'timeout_interrupt'
