@@ -223,5 +223,19 @@ describe Mongoid::Persistable::Incrementable do
         it_behaves_like "an incrementable embedded document in another embedded document"
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(age: 10, score: 100)
+      end
+
+      it "marks a dirty change for the incremented fields" do
+        person.atomically do
+          person.inc age: 15, score: 2
+          expect(person.changes).to eq({"age" => [10, 25], "score" => [100, 102]})
+        end
+      end
+    end
   end
 end

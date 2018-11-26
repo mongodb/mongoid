@@ -37,6 +37,7 @@ test:
     belongs_to_required_by_default: false
     app_name: 'testing'
     background_indexing: false
+    join_contexts: false
 test_with_max_staleness:
   clients:
     default:

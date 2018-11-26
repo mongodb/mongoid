@@ -310,6 +310,10 @@ describe Mongoid::Config do
       it "sets the use utc option" do
         expect(described_class.use_utc).to be false
       end
+
+      it "sets the join_contexts default option" do
+        expect(described_class.join_contexts).to be false
+      end
     end
 
     context "when the rack environment is set" do
@@ -355,6 +359,10 @@ describe Mongoid::Config do
 
         it "sets the use utc option" do
           expect(described_class.use_utc).to be false
+        end
+
+        it "sets the join_contexts default option" do
+          expect(described_class.join_contexts).to be false
         end
       end
 

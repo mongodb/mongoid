@@ -133,5 +133,19 @@ describe Mongoid::Persistable::Renamable do
         it_behaves_like "a renamable embedded document"
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(title: "sir")
+      end
+
+      it "marks a dirty change for the renamed fields" do
+        person.atomically do
+          person.rename title: :salutation
+          expect(person.changes).to eq({"title" => ["sir", nil], "salutation" => [nil, "sir"]})
+        end
+      end
+    end
   end
 end

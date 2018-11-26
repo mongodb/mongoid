@@ -141,5 +141,19 @@ describe Mongoid::Persistable::Logical do
         it_behaves_like "a logical embedded document"
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(age: 10, score: 100)
+      end
+
+      it "marks a dirty change for the modified fields" do
+        person.atomically do
+          person.bit age: { and: 6 }, score: { or: 122 }
+          expect(person.changes).to eq({"age" => [10, 2], "score" => [100, 126]})
+        end
+      end
+    end
   end
 end

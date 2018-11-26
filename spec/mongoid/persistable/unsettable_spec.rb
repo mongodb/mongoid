@@ -153,5 +153,19 @@ describe Mongoid::Persistable::Unsettable do
         it_behaves_like "an unsettable embedded document"
       end
     end
+
+    context "when executing atomically" do
+
+      let(:person) do
+        Person.create(title: "sir", age: 30)
+      end
+
+      it "marks a dirty change for the unset fields" do
+        person.atomically do
+          person.unset :title
+          expect(person.changes).to eq({"title" => ["sir", nil]})
+        end
+      end
+    end
   end
 end

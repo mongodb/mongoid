@@ -28,6 +28,7 @@ module Mongoid
               value = value & val if op.to_s == "and"
               value = value | val if op.to_s == "or"
             end
+            process_attribute field, value if executing_atomically?
             attributes[field] = value
             ops[atomic_attribute_name(field)] = values
           end
