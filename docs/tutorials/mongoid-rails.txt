@@ -136,12 +136,13 @@ Similar to Active Record, Mongoid tells raise to return specific http codes when
   Mongoid::Errors::DocumentNotFound : 404
   Mongoid::Errors::Validations : 422
 
-Controller runtime instrumentation
+Controller Runtime Instrumentation
 **********************************
 
-Mongoid provides it's own runtime metric to Rails' internal instrumentation
-event `process_action.action_controller`. It is accessible in the payload by `mongoid_runtime` key.
-The measurement is made via internal Mongo monitoring subscription.
+Mongoid provides its runtime metric to Rails' internal instrumentation
+event `process_action.action_controller`. It is accessible in the payload via
+`mongoid_runtime` key. The measurement is made via an internal Mongo driver
+monitoring subscription.
 
 Rake Tasks
 ----------
