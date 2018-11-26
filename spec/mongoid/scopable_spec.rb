@@ -1130,6 +1130,19 @@ describe Mongoid::Scopable do
     it "sets the threading options" do
       Band.without_default_scope do
         expect(Mongoid::Threaded).to be_executing(:without_default_scope)
+        expect(Mongoid::Threaded.without_default_scope?(Band)).to be(true)
+      end
+    end
+
+    it "suppresses default scope on the given model within the given block" do
+      Appointment.without_default_scope do
+        expect(Appointment.all.selector).to be_empty
+      end
+    end
+
+    it "does not affect other models' default scopes within the given block" do
+      Appointment.without_default_scope do
+        expect(Audio.all.selector).not_to be_empty
       end
     end
   end

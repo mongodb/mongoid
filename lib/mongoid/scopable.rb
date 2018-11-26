@@ -102,7 +102,7 @@ module Mongoid
       #
       # @since 3.0.0
       def default_scopable?
-        default_scoping? && !Threaded.executing?(:without_default_scope)
+        default_scoping? && !Threaded.without_default_scope?(self)
       end
 
       # Get a queryable, either the last one on the scope stack or a fresh one.
@@ -244,10 +244,10 @@ module Mongoid
       #
       # @since 3.0.0
       def without_default_scope
-        Threaded.begin_execution("without_default_scope")
+        Threaded.begin_without_default_scope(self)
         yield
       ensure
-        Threaded.exit_execution("without_default_scope")
+        Threaded.exit_without_default_scope(self)
       end
 
       private
