@@ -117,7 +117,7 @@ module Rails
         end
 
         Mongo::Monitoring::Global.subscribe Mongo::Monitoring::COMMAND,
-            ::Mongoid::Railties::ControllerRuntime::Instrument.new
+            ::Mongoid::Railties::ControllerRuntime::Collector.new
       end
 
     end

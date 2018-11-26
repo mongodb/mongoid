@@ -13,13 +13,13 @@ module Mongoid
 
         attr_internal :mongoid_runtime
 
-        # reset the runtime before each action
-        def process_action *_
+        # Reset the runtime before each action.
+        def process_action(action, *args)
           Collector.reset_runtime
           super
         end
 
-        # override to collect the measurements
+        # Override to collect the measurements.
         def cleanup_view_runtime
           mongo_rt_before_render = Collector.reset_runtime
           runtime = super
@@ -28,16 +28,17 @@ module Mongoid
           runtime - mongo_rt_after_render
         end
 
-        # add the measurement to a instrumentation event payload
-        def append_info_to_payload payload
+        # Add the measurement to the instrumentation event payload.
+        def append_info_to_payload(payload)
           super
           payload[:mongoid_runtime] = (mongoid_runtime || 0) + Collector.reset_runtime
         end
 
         module ClassMethods
 
-          # append MongoDB runtime information to action log message
-          def log_process_action payload
+          # Append MongoDB runtime information to ActionController runtime
+          # log message.
+          def log_process_action(payload)
             messages = super
             mongoid_runtime = payload[:mongoid_runtime]
             messages << ("MongoDB: %.1fms" % mongoid_runtime.to_f) if mongoid_runtime
@@ -48,8 +49,10 @@ module Mongoid
 
       end
 
-      # The Collector of MongoDB runtime metric, that subscribes to Mongo internal monitoring.
-      # Stores the value within Thread variable to leverage multithreaded servers.
+      # The Collector of MongoDB runtime metric, that subscribes to Mongo
+      # driver command monitoring. Stores the value within a thread-local
+      # variable to provide correct accounting when an application issues
+      # MongoDB operations from background threads.
       class Collector
 
         VARIABLE_NAME = "Mongoid.controller_runtime".freeze

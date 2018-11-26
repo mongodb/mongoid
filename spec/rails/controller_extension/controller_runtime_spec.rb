@@ -71,7 +71,7 @@ describe "Mongoid::Railties::ControllerRuntime" do
 
   it "resets the metric before each action" do
     set_metric 42
-    controller.send :process_action
+    controller.send(:process_action, 'foo')
     expect(collector.runtime).to be(0)
     expect(controller.instance_variable_get "@process_action").to be(true)
   end
