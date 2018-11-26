@@ -1,12 +1,12 @@
-source 'https://rubygems.org'
-gemspec
+source "https://rubygems.org"
+gemspec path: '..'
 
 gem 'rake'
 gem 'actionpack', '~> 5.1'
 gem 'activemodel', '~> 5.1'
 
 # https://jira.mongodb.org/browse/MONGOID-4614
-gem 'i18n', '~> 1.0', '>= 1.1'
+gem 'i18n', '~> 1.0.0'
 
 group :test do
   gem 'rspec-retry'

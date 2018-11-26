@@ -28,7 +28,7 @@ if test -z "$JAVACMD" && [ -f /usr/lib/jvm/java-1.8.0/bin/java ]; then
   export PATH=$PATH:/usr/lib/jvm/java-1.8.0/bin
 fi
 
-if [ "$RVM_RUBY" == "ruby-head" ]; then
+if test "$RVM_RUBY" = "ruby-head"; then
   # 12.04, 14.04 and 16.04 are good
   wget -O ruby-head.tar.bz2 http://rubies.travis-ci.org/ubuntu/`lsb_release -rs`/x86_64/ruby-head.tar.bz2
   tar xf ruby-head.tar.bz2
@@ -85,12 +85,15 @@ fi
 
 echo "We are in `pwd`"
 
-if [ $DRIVER == "master" ]; then
+if test "$DRIVER" = "master"; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_master.gemfile bundle exec rake spec
-elif [ $RAILS == "master" ]; then
+elif test "$RAILS" = "master"; then
   bundle install --gemfile=gemfiles/rails_master.gemfile
   BUNDLE_GEMFILE=gemfiles/rails_master.gemfile bundle exec rake spec
+elif test "$I18N" = "1.0"; then
+  bundle install --gemfile=gemfiles/i18n-1.0.gemfile
+  BUNDLE_GEMFILE=gemfiles/i18n-1.0.gemfile bundle exec rake spec
 else
   bundle install
   bundle exec rake spec
