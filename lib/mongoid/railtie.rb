@@ -102,6 +102,23 @@ module Rails
         puts "There is a configuration error with the current mongoid.yml."
         puts e.message
       end
+
+      # Include Controller extension that measures Mongoid runtime
+      # during request processing. The value then appears in Rails'
+      # instrumentation event `process_action.action_controller`.
+      #
+      # The measurement is made via internal Mongo monitoring subscription
+      initializer "mongoid.runtime-metric" do
+        require "mongoid/railties/controller_runtime"
+
+        ActiveSupport.on_load :action_controller do
+          include ::Mongoid::Railties::ControllerRuntime::ControllerExtension
+        end
+
+        Mongo::Monitoring::Global.subscribe Mongo::Monitoring::COMMAND,
+            ::Mongoid::Railties::ControllerRuntime::Collector.new
+      end
+
     end
   end
 end

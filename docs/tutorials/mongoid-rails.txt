@@ -136,6 +136,26 @@ Similar to Active Record, Mongoid tells raise to return specific http codes when
   Mongoid::Errors::DocumentNotFound : 404
   Mongoid::Errors::Validations : 422
 
+Controller Runtime Instrumentation
+**********************************
+
+Mongoid provides time spent executing MongoDB commands (obtained via a
+driver command monitoring subscription) to Rails' instrumentation event
+`process_action.action_controller`. This time is logged together with view
+time like so:
+
+.. code-block:: none
+
+  Completed 200 OK in 2739ms (Views: 12.6ms | MongoDB: 0.2ms)
+
+This logging is set up automatically.
+
+Note: the time indicated is the time taken by MongoDB cluster to execute
+MongoDB operations, plus the time taken to send commands and receive
+results from MongoDB over the network. It does not include time taken by
+the driver and Mongoid to generate the queries or type cast and otherwise
+process the results.
+
 Rake Tasks
 ----------
 
