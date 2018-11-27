@@ -4,7 +4,7 @@ module Mongoid
   module Extensions
     module String
 
-      # @attribute [rw] unconvertable_to_bson If the document is unconvetable.
+      # @attribute [rw] unconvertable_to_bson If the document is unconvertable.
       attr_accessor :unconvertable_to_bson
 
       # Evolve the string into an object id if possible.
