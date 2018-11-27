@@ -334,7 +334,7 @@ functions:
         working_dir: "src"
         script: |
           ${PREPARE_SHELL}
-          MONGODB_URI="${MONGODB_URI}" TOPOLOGY=${TOPOLOGY} RVM_RUBY="${RVM_RUBY}" RAILS="${RAILS}" DRIVER="${DRIVER}" .evergreen/run-tests.sh
+          MONGODB_URI="${MONGODB_URI}" TOPOLOGY=${TOPOLOGY} RVM_RUBY="${RVM_RUBY}" RAILS="${RAILS}" DRIVER="${DRIVER}" I18N="${I18N}" .evergreen/run-tests.sh
 
   "cleanup":
     - command: shell.exec
@@ -554,6 +554,13 @@ axes:
         display_name: "Rails-master"
         variables:
            RAILS: "master"
+  - id: "i18n"
+    display_name: I18n version
+    values:
+      - id: 1.0
+        display_name: "i18n-1.0"
+        variables:
+           I18N: "1.0"
 
 buildvariants:
 - matrix_name: "topologies"
@@ -615,6 +622,13 @@ buildvariants:
 - matrix_name: "rails-master"
   matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
   display_name: "${rails}, ${driver}, ${mongodb-version}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "i18n-1.0"
+  matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone", i18n: '1.0' }
+  display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - ubuntu1404-test
   tasks:
