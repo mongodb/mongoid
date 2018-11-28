@@ -49,7 +49,7 @@ module Mongoid
         #
         # @since 3.0.0
         def demongoize(object)
-          return nil if object.blank?
+          return nil if object.nil?
           object = object.getlocal unless Mongoid::Config.use_utc?
           if Mongoid::Config.use_activesupport_time_zone?
             object = object.in_time_zone(Mongoid.time_zone)
@@ -69,7 +69,7 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
-          return nil if object.blank?
+          return nil if object.nil?
           begin
             time = object.__mongoize_time__
             if object.respond_to?(:sec_fraction)
