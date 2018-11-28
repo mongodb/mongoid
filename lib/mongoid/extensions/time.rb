@@ -4,6 +4,18 @@ module Mongoid
   module Extensions
     module Time
 
+      # Mongoizes a Time into a time.
+      #
+      # Time always mongoize into Time instances
+      # (which are themselves).
+      #
+      # @return [ Time ] self.
+      #
+      # @since 3.0.0
+      def __mongoize_time__
+        self
+      end
+
       # Constant for epoch - used when passing invalid times.
       #
       # @deprecated No longer used as a return value from #mongoize passed

@@ -4,7 +4,7 @@ module Mongoid
   module Extensions
     module Float
 
-      # Convert the float into a time.
+      # Converts the float into a time as the number of seconds since the epoch.
       #
       # @example Convert the float into a time.
       #   1335532685.117847.__mongoize_time__

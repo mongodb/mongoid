@@ -4,6 +4,18 @@ module Mongoid
   module Extensions
     module TimeWithZone
 
+      # Mongoizes an ActiveSupport::TimeWithZone into a time.
+      #
+      # TimeWithZone always mongoize into TimeWithZone instances
+      # (which are themselves).
+      #
+      # @return [ ActiveSupport::TimeWithZone ] self.
+      #
+      # @since 3.0.0
+      def __mongoize_time__
+        self
+      end
+
       # Turn the object from the ruby type we deal with to a Mongo friendly
       # type.
       #

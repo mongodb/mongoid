@@ -354,56 +354,36 @@ describe Mongoid::Extensions::Array do
 
   describe "#__mongoize_time__" do
 
+    let(:array) do
+      [ 2010, 11, 19, 00, 24, 49.123457 ]
+    end
+
+    let(:mongoized) do
+      array.__mongoize_time__
+    end
+
     context "when using active support's time zone" do
+      include_context 'using AS time zone'
 
-      before do
-        Mongoid.use_activesupport_time_zone = true
-        ::Time.zone = "Tokyo"
-      end
-
-      after do
-        ::Time.zone = "Berlin"
-      end
-
-      let(:array) do
-        [ 2010, 11, 19, 00, 24, 49 ]
-      end
-
-      let(:time) do
-        array.__mongoize_time__
-      end
-
-      it "converts to a time" do
-        expect(time).to eq(::Time.zone.local(*array))
-      end
+      # In AS time zone (could be different from Ruby time zone)
+      let(:expected_time) { ::Time.zone.local(*array).in_time_zone }
 
       it "converts to the as time zone" do
-        expect(time.zone).to eq("JST")
+        expect(mongoized.zone).to eq("JST")
       end
+
+      it_behaves_like 'mongoizes to AS::TimeWithZone'
+      it_behaves_like 'maintains precision when mongoized'
     end
 
     context "when not using active support's time zone" do
+      include_context 'not using AS time zone'
 
-      before do
-        Mongoid.use_activesupport_time_zone = false
-      end
+      # In Ruby time zone (could be different from AS time zone)
+      let(:expected_time) { ::Time.local(*array).in_time_zone }
 
-      after do
-        Mongoid.use_activesupport_time_zone = true
-        Time.zone = nil
-      end
-
-      let(:array) do
-        [ 2010, 11, 19, 00, 24, 49 ]
-      end
-
-      let(:time) do
-        array.__mongoize_time__
-      end
-
-      it "converts to a time" do
-        expect(time).to eq(Time.local(*array))
-      end
+      it_behaves_like 'mongoizes to Time'
+      it_behaves_like 'maintains precision when mongoized'
     end
   end
 

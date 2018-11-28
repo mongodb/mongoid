@@ -45,3 +45,6 @@ RSpec.configure do |config|
     end
   end
 end
+
+# require all shared examples
+Dir['./spec/support/shared/*.rb'].sort.each { |file| require file }

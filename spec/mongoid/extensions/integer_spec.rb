@@ -18,8 +18,18 @@ describe Mongoid::Extensions::Integer do
       integer.__mongoize_time__
     end
 
-    it "returns the float as a time" do
-      expect(mongoized).to eq(Time.at(integer))
+    let(:expected_time) { Time.at(integer).in_time_zone }
+
+    context "when using active support's time zone" do
+      include_context 'using AS time zone'
+
+      it_behaves_like 'mongoizes to Time'
+    end
+
+    context "when not using active support's time zone" do
+      include_context 'not using AS time zone'
+
+      it_behaves_like 'mongoizes to Time'
     end
   end
 

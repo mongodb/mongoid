@@ -9,13 +9,12 @@ module Mongoid
       # @example Mongoize the date time.
       #   date_time.__mongoize_time__
       #
-      # @return [ Time ] The mongoized time.
+      # @return [ Time | ActiveSupport::TimeWithZone ] The mongoized time.
       #
       # @since 3.0.0
       def __mongoize_time__
-        return to_time if utc? && Mongoid.use_utc?
         if Mongoid.use_activesupport_time_zone?
-          in_time_zone(::Time.zone).to_time
+          in_time_zone(::Time.zone)
         else
           time = to_time
           time.respond_to?(:getlocal) ? time.getlocal : time

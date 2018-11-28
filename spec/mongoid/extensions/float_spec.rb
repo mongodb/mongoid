@@ -11,15 +11,27 @@ describe Mongoid::Extensions::Float do
   describe "#__mongoize_time__" do
 
     let(:float) do
-      1335532685.117847
+      1335532685.123457
     end
 
     let(:mongoized) do
       float.__mongoize_time__
     end
 
-    it "returns the float as a time" do
-      expect(mongoized).to eq(Time.at(float))
+    let(:expected_time) { Time.at(float).in_time_zone }
+
+    context "when using active support's time zone" do
+      include_context 'using AS time zone'
+
+      it_behaves_like 'mongoizes to Time'
+      it_behaves_like 'maintains precision when mongoized'
+    end
+
+    context "when not using active support's time zone" do
+      include_context 'not using AS time zone'
+
+      it_behaves_like 'mongoizes to Time'
+      it_behaves_like 'maintains precision when mongoized'
     end
   end
 

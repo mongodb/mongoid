@@ -33,20 +33,27 @@ module Mongoid
 
       # Mongoize the string for storage.
       #
+      # @note Returns a local time in the default time zone.
+      #
       # @example Mongoize the string.
       #   "2012-01-01".__mongoize_time__
+      #   # => 2012-01-01 00:00:00 -0500
       #
-      # @note The extra parse from Time is because ActiveSupport::TimeZone
-      #   either returns nil or Time.now if the string is empty or invalid,
-      #   which is a regression from pre-3.0 and also does not agree with
-      #   the core Time API.
-      #
-      # @return [ Time ] The time.
+      # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
+      #   configured default time zone corresponding to this string.
       #
       # @since 3.0.0
       def __mongoize_time__
-        ::Time.parse(self)
-        ::Time.configured.parse(self)
+        # This extra parse from Time is because ActiveSupport::TimeZone
+        # either returns nil or Time.now if the string is empty or invalid,
+        # which is a regression from pre-3.0 and also does not agree with
+        # the core Time API.
+        parsed = ::Time.parse(self)
+        if ::Time == ::Time.configured
+          parsed
+        else
+          ::Time.configured.parse(self)
+        end
       end
 
       # Convert the string to a collection friendly name.

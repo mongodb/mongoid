@@ -13,9 +13,12 @@ module Mongoid
       # Convert the date into a time.
       #
       # @example Convert the date to a time.
-      #   date.__mongoize_time__
+      #   Date.new(2018, 11, 1).__mongoize_time__
+      #   # => Thu, 01 Nov 2018 00:00:00 EDT -04:00
       #
-      # @return [ Time ] The converted time.
+      # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
+      #   configured default time zone corresponding to local midnight of
+      #   this date.
       #
       # @since 3.0.0
       def __mongoize_time__
