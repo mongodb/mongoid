@@ -248,6 +248,29 @@ or else the values will not store properly.
      end
    end
 
+Date Fields
+***********
+
+Mongoid allows assignment of values of several types to ``Date`` fields:
+
+- ``Date`` - the provided date is stored as is.
+- ``Time``, ``DateTime``, ``ActiveSupport::TimeWithZone`` - the date component
+  of the value is taken in the value's time zone.
+- ``String`` - the date specified in the string is used.
+- ``Integer``, ''Float`` - the value is taken to be a UTC timestamp which is
+  converted to the :ref:`configured time zone <time-zones>` (note that
+  ``Mongoid.use_utc`` has no effect on this conversion), then the date is
+  taken from the resulting time.
+
+In other words, if a date is specified in the value, that date is used without
+first converting the value to the configured time zone.
+
+As a date & time to date conversion is lossy (it discards the time component),
+especially if an application operates with times in different time zones it is
+recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
+objects to ``Date`` objects before assigning the values to fields of type
+``Date``.
+
 Defaults
 ********
 

@@ -23,7 +23,7 @@ describe Mongoid::Extensions::Integer do
     context "when using active support's time zone" do
       include_context 'using AS time zone'
 
-      it_behaves_like 'mongoizes to Time'
+      it_behaves_like 'mongoizes to AS::TimeWithZone'
     end
 
     context "when not using active support's time zone" do
