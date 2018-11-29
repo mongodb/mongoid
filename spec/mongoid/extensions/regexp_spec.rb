@@ -35,6 +35,29 @@ describe Mongoid::Extensions::Regexp do
       it "returns the provided value as a regex" do
         expect(value).to eq(/[^abc]/)
       end
+
+
+      context "when the string is empty" do
+
+        let(:value) do
+          Regexp.mongoize("")
+        end
+
+        it "returns an empty regex" do
+          expect(value).to eq(//)
+        end
+      end
+    end
+
+    context "when the value is nil" do
+
+      let(:value) do
+        Regexp.mongoize(nil)
+      end
+
+      it "returns the nil" do
+        expect(value).to be_nil
+      end
     end
   end
 
