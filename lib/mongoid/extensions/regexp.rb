@@ -18,6 +18,7 @@ module Mongoid
         #
         # @since 3.0.0
         def mongoize(object)
+          return nil if object.nil?
           ::Regexp.new(object)
         end
       end
