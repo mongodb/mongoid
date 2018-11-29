@@ -4,7 +4,7 @@ module Mongoid
   module Extensions
     module Integer
 
-      # Returns the integer as a time.
+      # Converts the integer into a time as the number of seconds since the epoch.
       #
       # @example Convert the integer to a time.
       #   1335532685.__mongoize_time__

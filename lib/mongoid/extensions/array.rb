@@ -44,10 +44,15 @@ module Mongoid
 
       # Converts the array for storing as a time.
       #
+      # @note Returns a local time in the default time zone.
+      #
       # @example Convert the array to a time.
       #   [ 2010, 1, 1 ].__mongoize_time__
+      #   # => 2010-01-01 00:00:00 -0500
       #
-      # @return [ Time ] The time.
+      # @return [ Time | ActiveSupport::TimeWithZone ] Local time in the
+      #   configured default time zone corresponding to date/time components
+      #   in this array.
       #
       # @since 3.0.0
       def __mongoize_time__

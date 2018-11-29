@@ -462,4 +462,31 @@ describe Mongoid::Extensions::Time do
       expect(eom_time_mongoized.subsec.to_f.round(3)).to eq(eom_time.utc.subsec.to_f.round(3))
     end
   end
+
+  describe "__mongoize_time__" do
+
+    let(:time) do
+      Time.at(1543331265.123457)
+    end
+
+    let(:mongoized) do
+      time.__mongoize_time__
+    end
+
+    let(:expected_time) { time.in_time_zone }
+
+    context "when using active support's time zone" do
+      include_context 'using AS time zone'
+
+      it_behaves_like 'mongoizes to Time'
+      it_behaves_like 'maintains precision when mongoized'
+    end
+
+    context "when not using active support's time zone" do
+      include_context 'not using AS time zone'
+
+      it_behaves_like 'mongoizes to Time'
+      it_behaves_like 'maintains precision when mongoized'
+    end
+  end
 end

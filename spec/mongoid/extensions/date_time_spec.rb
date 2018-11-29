@@ -6,75 +6,30 @@ describe Mongoid::Extensions::DateTime do
 
   describe "__mongoize_time__" do
 
-    context "when the date time has more than seconds precision" do
-
-      let(:date_time) do
-        DateTime.parse("2012-06-17 18:42:15.123Z")
-      end
-
-      let(:mongoized) do
-        date_time.__mongoize_time__
-      end
-
-      it "does not drop the precision" do
-        expect(mongoized.to_f.to_s).to match(/\.123/)
-      end
+    let(:date_time) do
+      # DateTime has time zone information, even if a time zone is not provided
+      # when parsing a string
+      DateTime.parse("2012-06-17 18:42:15.123457")
     end
 
+    let(:mongoized) do
+      date_time.__mongoize_time__
+    end
+
+    let(:expected_time) { date_time.to_time.in_time_zone }
+
     context "when using active support's time zone" do
+      include_context 'using AS time zone'
 
-      before do
-        Mongoid.use_activesupport_time_zone = true
-        Time.zone = "Tokyo"
-      end
-
-      after do
-        Time.zone = nil
-      end
-
-      let(:date_time) do
-        DateTime.new(2010, 1, 1)
-      end
-
-      let(:expected) do
-        Time.zone.local(2010, 1, 1, 9, 0, 0, 0)
-      end
-
-      let(:mongoized) do
-        date_time.__mongoize_time__
-      end
-
-      it "returns the date as a local time" do
-        expect(mongoized).to eq(expected)
-      end
+      it_behaves_like 'mongoizes to AS::TimeWithZone'
+      it_behaves_like 'maintains precision when mongoized'
     end
 
     context "when not using active support's time zone" do
+      include_context 'not using AS time zone'
 
-      before do
-        Mongoid.use_activesupport_time_zone = false
-      end
-
-      after do
-        Mongoid.use_activesupport_time_zone = true
-        Time.zone = nil
-      end
-
-      let(:date_time) do
-        DateTime.new(2010, 1, 1)
-      end
-
-      let(:expected) do
-        Time.utc(2010, 1, 1, 0, 0, 0, 0).getlocal
-      end
-
-      let(:mongoized) do
-        date_time.__mongoize_time__
-      end
-
-      it "returns the date as a utc time" do
-        expect(mongoized).to eq(expected)
-      end
+      it_behaves_like 'mongoizes to Time'
+      it_behaves_like 'maintains precision when mongoized'
     end
   end
 
