@@ -487,4 +487,33 @@ describe Mongoid::Config do
       end
     end
   end
+
+  describe '.log_level=' do
+    around do |example|
+      saved_log_level = Mongoid::Config.log_level
+      begin
+        example.run
+      ensure
+        Mongoid::Config.log_level = saved_log_level
+      end
+    end
+
+    it 'accepts a string' do
+      Mongoid::Config.log_level = 'info'
+      expect(Mongoid::Config.log_level).to eq(1)
+
+      # set twice to ensure value changes from default, whatever the default is
+      Mongoid::Config.log_level = 'warn'
+      expect(Mongoid::Config.log_level).to eq(2)
+    end
+
+    it 'accepts an integer' do
+      Mongoid::Config.log_level = 1
+      expect(Mongoid::Config.log_level).to eq(1)
+
+      # set twice to ensure value changes from default, whatever the default is
+      Mongoid::Config.log_level = 2
+      expect(Mongoid::Config.log_level).to eq(2)
+    end
+  end
 end

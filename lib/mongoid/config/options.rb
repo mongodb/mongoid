@@ -80,9 +80,12 @@ module Mongoid
       #
       # @since 5.1.0
       def log_level
-        if settings[:log_level]
-          level = settings[:log_level].upcase.to_s
-          "Logger::#{level}".constantize
+        if level = settings[:log_level]
+          unless level.is_a?(Integer)
+            level = level.upcase.to_s
+            level = "Logger::#{level}".constantize
+          end
+          level
         end
       end
     end
