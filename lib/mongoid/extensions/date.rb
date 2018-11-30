@@ -68,7 +68,12 @@ module Mongoid
         def mongoize(object)
           unless object.blank?
             begin
-              time = object.__mongoize_time__
+              if object.is_a?(String)
+                # https://jira.mongodb.org/browse/MONGOID-4460
+                time = ::Time.parse(object)
+              else
+                time = object.__mongoize_time__
+              end
               ::Time.utc(time.year, time.month, time.day)
             rescue ArgumentError
               nil

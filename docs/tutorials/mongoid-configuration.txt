@@ -275,6 +275,8 @@ logger. In other words:
   # Ruby driver logger, not Mongoid logger
   Mongoid.client(:default).logger == Mongo::Logger.logger
 
+.. _time-zones:
+
 Time Zones
 **********
 
