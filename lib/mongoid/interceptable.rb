@@ -131,7 +131,11 @@ module Mongoid
           return false
         end
       end
-      callback_executable?(kind) ? super(kind, *args, &block) : true
+      if callback_executable?(kind)
+        super(kind, *args, &block)
+      else
+        true
+      end
     end
 
     private

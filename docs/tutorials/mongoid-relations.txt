@@ -699,8 +699,9 @@ that a bundle may contain other bundles or products:
 Cascading Callbacks
 *******************
 
-If you want the embedded document callbacks to fire when calling a persistence operation on
-its parent, you will need to provide the cascade callbacks option to the association.
+If you want the embedded document callbacks to fire when calling a persistence
+operation on its parent, you will need to provide the cascade callbacks option
+to the association.
 
 .. code-block:: ruby
 
