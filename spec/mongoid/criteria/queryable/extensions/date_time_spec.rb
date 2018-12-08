@@ -17,7 +17,7 @@ describe DateTime do
       end
 
       let(:expected) do
-        Time.new(2010, 1, 1, 12, 0, 0).utc
+        Time.utc(2010, 1, 1, 11, 0, 0)
       end
 
       it "returns the time" do
@@ -84,7 +84,7 @@ describe DateTime do
       end
 
       let(:expected) do
-        Time.new(2010, 1, 1, 12, 0, 0).utc
+        Time.utc(2010, 1, 1, 11, 0, 0)
       end
 
       it "returns the time" do
@@ -127,7 +127,7 @@ describe DateTime do
         end
 
         let(:expected) do
-          Time.new(2010, 1, 1, 12, 0, 0).utc
+          Time.utc(2010, 1, 1, 11, 0, 0)
         end
 
         it "returns the array with evolved times" do
@@ -222,11 +222,11 @@ describe DateTime do
         end
 
         let(:expected_min) do
-          Time.new(2010, 1, 1, 12, 0, 0)
+          Time.utc(2010, 1, 1, 11, 0, 0)
         end
 
         let(:expected_max) do
-          Time.new(2010, 1, 3, 12, 0, 0)
+          Time.utc(2010, 1, 3, 11, 0, 0)
         end
 
         it "returns a selection of times" do
