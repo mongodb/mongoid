@@ -286,6 +286,72 @@ recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
 
+DateTime Fields
+***************
+
+MongoDB stores all times as UTC timestamps. When assigning a value to a
+``DateTime`` field, or when querying a ``DateTime`` field, Mongoid
+converts the passed in value to a UTC ``Time`` before sending it to the
+MongoDB server.
+
+``Time``, ``ActiveSupport::TimeWithZone`` and ``DateTime`` objects embed
+time zone information, and the value persisted is the specified moment in
+time, in UTC. When the value is retrieved, the time zone in which it is
+returned is defined by the :ref:`configured time zone settings <time-zones>`.
+
+.. code-block:: ruby
+
+   class Ticket
+     include Mongoid::Document
+     field :opened_at, type: DateTime
+   end
+   
+   Mongoid.use_activesupport_time_zone = true
+   Time.zone = 'Berlin'
+   
+   ticket = Ticket.create!(opened_at: '2018-02-18 07:00:08 -0500')
+
+    ticket.opened_at
+    # => Sun, 18 Feb 2018 13:00:08 +0100
+    ticket
+    => #<Ticket _id: 5c13d4b9026d7c4e7870bb2f, opened_at: 2018-02-18 12:00:08 UTC>
+
+    Time.zone = 'America/New_York'
+    ticket.opened_at
+    # => Sun, 18 Feb 2018 07:00:08 -0500
+    
+    Mongoid.use_utc = true
+    ticket.opened_at
+    # => Sun, 18 Feb 2018 12:00:08 +0000
+
+Mongoid also supports casting integers and floats to ``DateTime``. When
+doing so, the integers/floats are assumed to be Unix timestamps (in UTC):
+
+.. code-block:: ruby
+
+    ticket.opened_at = 1544803974
+    ticket.opened_at
+    # => Fri, 14 Dec 2018 16:12:54 +0000
+
+If a string is used as a ``DateTime`` field value, the behavior depends on
+whether the string includes a time zone. If no time zone is specified,
+the :ref:`default Mongoid time zone <time-zones>` is used:
+
+.. code-block:: ruby
+
+    Time.zone = 'America/New_York'
+    ticket.opened_at = 'Mar 4, 2018 10:00:00'
+    ticket.opened_at
+    # => Sun, 04 Mar 2018 15:00:00 +0000
+
+If a time zone is specfied, it is respected:
+
+.. code-block:: ruby
+
+    ticket.opened_at = 'Mar 4, 2018 10:00:00 +01:00'
+    ticket.opened_at
+    # => Sun, 04 Mar 2018 09:00:00 +0000
+
 Defaults
 ********
 
