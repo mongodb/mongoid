@@ -141,16 +141,20 @@ describe DateTime do
 
       context "when the array is composed of strings" do
 
-        let(:date) do
-          DateTime.parse("1st Jan 2010 12:00:00+01:00")
+        let(:date_str) do
+          "1st Jan 2010 12:00:00+01:00"
         end
 
         let(:evolved) do
-          described_class.evolve([ date.to_s ])
+          described_class.evolve([ date_str ])
+        end
+
+        let(:expected) do
+          Time.utc(2010, 1, 1, 11, 0, 0)
         end
 
         it "returns the strings as a times" do
-          expect(evolved).to eq([ date.to_time ])
+          expect(evolved).to eq([ expected ])
         end
 
         it "returns the times in utc" do
@@ -243,20 +247,28 @@ describe DateTime do
       context "when the range are strings" do
 
         let(:min) do
-          DateTime.new(2010, 1, 1, 12, 0, 0)
+          "1st Jan 2010 12:00:00+01:00"
         end
 
         let(:max) do
-          DateTime.new(2010, 1, 3, 12, 0, 0)
+          "3rd Jan 2010 12:00:00+01:00"
+        end
+
+        let(:expected_min) do
+          Time.utc(2010, 1, 1, 11, 0, 0)
+        end
+
+        let(:expected_max) do
+          Time.utc(2010, 1, 3, 11, 0, 0)
         end
 
         let(:evolved) do
-          described_class.evolve(min.to_s..max.to_s)
+          described_class.evolve(min..max)
         end
 
         it "returns a selection of times" do
           expect(evolved).to eq(
-            { "$gte" => min.to_time, "$lte" => max.to_time }
+            { "$gte" => expected_min, "$lte" => expected_max }
           )
         end
 
@@ -334,16 +346,20 @@ describe DateTime do
 
     context "when provided a string" do
 
-      let(:date) do
-        DateTime.parse("1st Jan 2010 12:00:00+01:00")
+      let(:date_str) do
+        "1st Jan 2010 12:00:00+01:00"
       end
 
       let(:evolved) do
-        described_class.evolve(date.to_s)
+        described_class.evolve(date_str)
+      end
+
+      let(:expected) do
+        Time.utc(2010, 1, 1, 11, 0, 0)
       end
 
       it "returns the string as a time" do
-        expect(evolved).to eq(date.to_time)
+        expect(evolved).to eq(expected)
       end
 
       it "returns the time in utc" do
