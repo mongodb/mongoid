@@ -99,7 +99,7 @@ specified type.
 type, permitting richer data manipulation within MongoDB or by other
 tools.
 3. When querying documents, query parameters are converted to the specified
-type before being sent to MongoDb.
+type before being sent to MongoDB.
 4. When retrieving documents from the database, field values are converted
 to the specified type.
 
