@@ -88,18 +88,33 @@ and have a structure like so:
 Fields
 ------
 
-Even though MongoDB is a schemaless database, most uses will be with web applications where
-form parameters always come to the server as strings. Mongoid provides an easy mechanism for
-transforming these strings into their appropriate types through the definition of fields
-in a ``Mongoid::Document``.
+Even though MongoDB is a schemaless database and allows data to be stored
+as strings, Mongoid permits the application to declare the type of data
+stored in the various fields of a document. Field type declarations affect
+the following:
 
-Keep in mind that the field definitions determine how Mongoid behaves when writing and reading
-fields from the database. Changing the Model definition in the Model file does not change existing
-data. If you'd like to update a field type or options of existing data, you must write a script to do so.
-You will get errors otherwise.
+1. When assigning values to fields, the values are converted to the
+specified type.
+2. When persisting data to MongoDB, the data is sent in an appropriate
+type, permitting richer data manipulation within MongoDB or by other
+tools.
+3. When querying documents, query parameters are converted to the specified
+type before being sent to MongoDb.
+4. When retrieving documents from the database, field values are converted
+to the specified type.
 
-Consider a simple class for modeling a person in an application. A person may have a first name,
-last name, and middle name. We can define these attributes on a person by using the fields macro.
+Field type definitions determine how Mongoid behaves when constructing the
+queries, retrieving and writing fields from the database. Changing the field
+definitions in a model class does not alter data already stored in
+MongoDB. To update type or contents of fields of existing documents,
+the field must be re-saved to the database. Note that, due to Mongoid
+tracking which attributes on a model change and only saving the changed ones,
+it may be necessary to explicitly write a field value when changing the
+type of an existing field without changing the stored values.
+
+Consider a simple class for modeling a person in an application. A person may
+have a first name, last name, and middle name. We can define these attributes
+on a person by using the ``field`` macro.
 
 .. code-block:: ruby
 
