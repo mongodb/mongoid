@@ -18,11 +18,8 @@ module Mongoid
           # @since 1.0.0
           def __evolve_time__
             usec = strftime("%6N").to_f
-            if utc?
-              ::Time.utc(year, month, day, hour, min, sec, usec)
-            else
-              ::Time.local(year, month, day, hour, min, sec, usec).utc
-            end
+            u = utc
+            ::Time.utc(u.year, u.month, u.day, u.hour, u.min, u.sec, usec)
           end
 
           module ClassMethods

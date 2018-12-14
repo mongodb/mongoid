@@ -88,18 +88,33 @@ and have a structure like so:
 Fields
 ------
 
-Even though MongoDB is a schemaless database, most uses will be with web applications where
-form parameters always come to the server as strings. Mongoid provides an easy mechanism for
-transforming these strings into their appropriate types through the definition of fields
-in a ``Mongoid::Document``.
+Even though MongoDB is a schemaless database and allows data to be stored
+as strings, Mongoid permits the application to declare the type of data
+stored in the various fields of a document. Field type declarations affect
+the following:
 
-Keep in mind that the field definitions determine how Mongoid behaves when writing and reading
-fields from the database. Changing the Model definition in the Model file does not change existing
-data. If you'd like to update a field type or options of existing data, you must write a script to do so.
-You will get errors otherwise.
+1. When assigning values to fields, the values are converted to the
+specified type.
+2. When persisting data to MongoDB, the data is sent in an appropriate
+type, permitting richer data manipulation within MongoDB or by other
+tools.
+3. When querying documents, query parameters are converted to the specified
+type before being sent to MongoDB.
+4. When retrieving documents from the database, field values are converted
+to the specified type.
 
-Consider a simple class for modeling a person in an application. A person may have a first name,
-last name, and middle name. We can define these attributes on a person by using the fields macro.
+Field type definitions determine how Mongoid behaves when constructing the
+queries, retrieving and writing fields from the database. Changing the field
+definitions in a model class does not alter data already stored in
+MongoDB. To update type or contents of fields of existing documents,
+the field must be re-saved to the database. Note that, due to Mongoid
+tracking which attributes on a model change and only saving the changed ones,
+it may be necessary to explicitly write a field value when changing the
+type of an existing field without changing the stored values.
+
+Consider a simple class for modeling a person in an application. A person may
+have a first name, last name, and middle name. We can define these attributes
+on a person by using the ``field`` macro.
 
 .. code-block:: ruby
 
@@ -270,6 +285,72 @@ especially if an application operates with times in different time zones it is
 recommended to explicitly convert ``String``, ``Time`` and ``DateTime``
 objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
+
+DateTime Fields
+***************
+
+MongoDB stores all times as UTC timestamps. When assigning a value to a
+``DateTime`` field, or when querying a ``DateTime`` field, Mongoid
+converts the passed in value to a UTC ``Time`` before sending it to the
+MongoDB server.
+
+``Time``, ``ActiveSupport::TimeWithZone`` and ``DateTime`` objects embed
+time zone information, and the value persisted is the specified moment in
+time, in UTC. When the value is retrieved, the time zone in which it is
+returned is defined by the :ref:`configured time zone settings <time-zones>`.
+
+.. code-block:: ruby
+
+   class Ticket
+     include Mongoid::Document
+     field :opened_at, type: DateTime
+   end
+   
+   Mongoid.use_activesupport_time_zone = true
+   Time.zone = 'Berlin'
+   
+   ticket = Ticket.create!(opened_at: '2018-02-18 07:00:08 -0500')
+
+    ticket.opened_at
+    # => Sun, 18 Feb 2018 13:00:08 +0100
+    ticket
+    => #<Ticket _id: 5c13d4b9026d7c4e7870bb2f, opened_at: 2018-02-18 12:00:08 UTC>
+
+    Time.zone = 'America/New_York'
+    ticket.opened_at
+    # => Sun, 18 Feb 2018 07:00:08 -0500
+    
+    Mongoid.use_utc = true
+    ticket.opened_at
+    # => Sun, 18 Feb 2018 12:00:08 +0000
+
+Mongoid also supports casting integers and floats to ``DateTime``. When
+doing so, the integers/floats are assumed to be Unix timestamps (in UTC):
+
+.. code-block:: ruby
+
+    ticket.opened_at = 1544803974
+    ticket.opened_at
+    # => Fri, 14 Dec 2018 16:12:54 +0000
+
+If a string is used as a ``DateTime`` field value, the behavior depends on
+whether the string includes a time zone. If no time zone is specified,
+the :ref:`default Mongoid time zone <time-zones>` is used:
+
+.. code-block:: ruby
+
+    Time.zone = 'America/New_York'
+    ticket.opened_at = 'Mar 4, 2018 10:00:00'
+    ticket.opened_at
+    # => Sun, 04 Mar 2018 15:00:00 +0000
+
+If a time zone is specfied, it is respected:
+
+.. code-block:: ruby
+
+    ticket.opened_at = 'Mar 4, 2018 10:00:00 +01:00'
+    ticket.opened_at
+    # => Sun, 04 Mar 2018 09:00:00 +0000
 
 Defaults
 ********
