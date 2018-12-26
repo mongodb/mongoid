@@ -17,13 +17,13 @@ framework for MongoDB in Ruby.
    /tutorials/mongoid-documents
    /tutorials/mongoid-persistence
    /tutorials/mongoid-queries
-   /tutorials/mongoid-sessions
-   /tutorials/mongoid-transactions
    /tutorials/mongoid-relations
    /tutorials/mongoid-nested-attributes
    /tutorials/mongoid-callbacks
    /tutorials/mongoid-validation
    /tutorials/mongoid-indexes
+   /tutorials/mongoid-sessions
+   /tutorials/mongoid-transactions
    /tutorials/mongoid-rails
    /tutorials/mongoid-upgrade
    API <https://docs.mongodb.com/mongoid/7.0/api/>
