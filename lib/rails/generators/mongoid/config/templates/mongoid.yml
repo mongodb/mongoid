@@ -3,6 +3,11 @@ development:
   clients:
     # Defines the default client. (required)
     default:
+      # A uri may be defined for a client:
+      # uri: 'mongodb://user:password@myhost1.mydomain.com:27017/my_db'
+
+      # Otherwise define the parameters separately
+      
       # Defines the name of the default database that Mongoid can connect to.
       # (required).
       database: <%= database_name || app_name %>_development
