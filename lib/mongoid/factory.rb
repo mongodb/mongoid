@@ -30,13 +30,20 @@ module Mongoid
     # Builds a new +Document+ from the supplied attributes loaded from the
     # database.
     #
+    # If a criteria object is given, it is used in two ways:
+    # 1. If the criteria has a list of fields specified via #only,
+    #    only those fields are populated in the returned document.
+    # 2. If the criteria has a referencing association (i.e., this document
+    #    is being instantiated as an association of another document),
+    #    the other document is also populated in the returned document's
+    #    reverse association, if one exists.
+    #
     # @example Build the document.
     #   Mongoid::Factory.from_db(Person, { "name" => "Durran" })
     #
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
-    # @param [ Array ] selected_fields If instantiated from a criteria using
-    #   #only we give the document a list of the selected fields.
+    # @param [ Criteria ] criteria Optional criteria object.
     #
     # @return [ Document ] The instantiated document.
     def from_db(klass, attributes = nil, criteria = nil)
