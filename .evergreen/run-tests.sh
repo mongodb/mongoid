@@ -80,7 +80,7 @@ EOH
   # Only install bundler when not using ruby-head.
   # ruby-head comes with bundler and gem complains
   # because installing bundler would overwrite the bundler binary
-  gem install bundler
+  gem install bundler -v '<2'
 fi
 
 echo "We are in `pwd`"
