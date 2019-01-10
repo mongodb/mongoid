@@ -166,9 +166,9 @@ module Mongoid
       # @return [ Enumerator ] The enumerator.
       #
       # @since 7.0.0
-      def inc(*args)
+      def inc(incs)
         each do |document|
-          document.inc *args
+          document.inc(incs)
         end
       end
 
