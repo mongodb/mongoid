@@ -38,10 +38,10 @@ if test "$RVM_RUBY" = "ruby-head"; then
   
   #rvm reinstall $RVM_RUBY
 else
-  if test "$RVM_RUBY" = ruby-2.2; then
+  if true; then
   
   # For testing toolchains:
-  toolchain_url=https://s3.amazonaws.com//mciuploads/mongo-ruby-toolchain/ubuntu1404/8cd47ac2cf636710740a6d79167f055e4c0a0154/mongo_ruby_driver_toolchain_ubuntu1404_8cd47ac2cf636710740a6d79167f055e4c0a0154_18_08_24_03_45_11.tar.gz
+  toolchain_url=https://s3.amazonaws.com//mciuploads/mongo-ruby-toolchain/ubuntu1404/8cd47ac2cf636710740a6d79167f055e4c0a0154/mongo_ruby_driver_toolchain_ubuntu1404_patch_8cd47ac2cf636710740a6d79167f055e4c0a0154_5c452b76e3c3312273591db4_19_01_21_02_16_23.tar.gz
   curl -fL $toolchain_url |tar zxf -
   export PATH=`pwd`/rubies/$RVM_RUBY/bin:$PATH
   

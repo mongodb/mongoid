@@ -503,6 +503,10 @@ axes:
         display_name: ruby-2.5
         variables:
            RVM_RUBY: "ruby-2.5"
+      - id: "ruby-2.6"
+        display_name: ruby-2.6
+        variables:
+           RVM_RUBY: "ruby-2.6"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -564,7 +568,7 @@ axes:
 
 buildvariants:
 - matrix_name: "topologies"
-  matrix_spec: { driver: "*", ruby: "ruby-2.5", mongodb-version: "4.0", topology: ["replica-set"] }
+  matrix_spec: { driver: "*", ruby: "ruby-2.6", mongodb-version: "4.0", topology: ["replica-set"] }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1404-test
@@ -578,7 +582,7 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "mongodb"
-  matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: ["3.6","3.4","3.2"], topology: "standalone" }
+  matrix_spec: { driver: "latest", ruby: "ruby-2.6", mongodb-version: ["3.6","3.4","3.2"], topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1404-test
@@ -606,7 +610,7 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "driver-master-new"
-  matrix_spec: { driver: "master", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone" }
+  matrix_spec: { driver: "master", ruby: "ruby-2.6", mongodb-version: "4.0", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1404-test
@@ -620,7 +624,7 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "rails-master"
-  matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
+  matrix_spec: { driver: "latest", ruby: "ruby-2.6", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - ubuntu1404-test
