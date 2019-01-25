@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 require "spec_helper"
 
+require_relative './copyable_spec_models'
+
 describe Mongoid::Copyable do
 
   [ :clone, :dup ].each do |method|
@@ -104,6 +106,7 @@ describe Mongoid::Copyable do
 
           context 'embeds_many' do
 
+
             it "clones" do
               t = StoreAsDupTest3.new(:name => "hi")
               t.store_as_dup_test4s << StoreAsDupTest4.new
@@ -114,6 +117,20 @@ describe Mongoid::Copyable do
               expect(copy.store_as_dup_test4s.first.object_id).not_to eq(t.store_as_dup_test4s.first.object_id)
             end
           end
+        end
+      end
+
+      context 'nested embeds_many' do
+        it 'works' do
+          a = CopyableSpec::A.new
+          a.locations << CopyableSpec::Location.new
+          a.locations.first.buildings << CopyableSpec::Building.new
+          a.save!
+
+          new_a = a.send(method)
+
+          expect(new_a.locations.length).to be 1
+          expect(new_a.locations.first.buildings.length).to be 1
         end
       end
 
