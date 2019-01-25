@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 # -*- coding: utf-8 -*-
 require "spec_helper"
 
@@ -92,12 +91,29 @@ describe Mongoid::Copyable do
 
         context "and dynamic attributes are not set" do
 
-          it "clones" do
-            t = StoreAsDupTest1.new(:name => "hi")
-            t.build_store_as_dup_test2(:name => "there")
-            t.save
-            copy = t.send(method)
-            expect(copy.store_as_dup_test2.name).to eq(t.store_as_dup_test2.name)
+          context 'embeds_one' do
+
+            it "clones" do
+              t = StoreAsDupTest1.new(:name => "hi")
+              t.build_store_as_dup_test2(:name => "there")
+              t.save
+              copy = t.send(method)
+              expect(copy.object_id).not_to eq(t.object_id)
+              expect(copy.store_as_dup_test2.name).to eq(t.store_as_dup_test2.name)
+            end
+          end
+
+          context 'embeds_many' do
+
+            it "clones" do
+              t = StoreAsDupTest3.new(:name => "hi")
+              t.store_as_dup_test4s << StoreAsDupTest4.new
+              t.save
+              copy = t.send(method)
+              expect(copy.object_id).not_to eq(t.object_id)
+              expect(copy.store_as_dup_test4s).not_to be_empty
+              expect(copy.store_as_dup_test4s.first.object_id).not_to eq(t.store_as_dup_test4s.first.object_id)
+            end
           end
         end
       end
