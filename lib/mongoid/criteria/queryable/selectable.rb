@@ -501,6 +501,11 @@ module Mongoid
         # @example Construct a text search selector with options.
         #   selectable.text_search("testing", :$language => "fr")
         #
+        # @note Per https://docs.mongodb.com/manual/reference/operator/query/text/
+        #   it is not currently possible to supply multiple text search
+        #   conditions in a query. Mongoid will build such a query but the
+        #   server will return an error when trying to execute it.
+        #
         # @param [ String, Symbol ] terms A string of terms that MongoDB parses
         #   and uses to query the text index.
         # @param [ Hash ] opts Text search options. See MongoDB documentation
@@ -512,9 +517,19 @@ module Mongoid
         def text_search(terms, opts = nil)
           clone.tap do |query|
             if terms
-              criterion = { :$text => { :$search => terms } }
-              criterion[:$text].merge!(opts) if opts
-              query.selector = criterion
+              criterion = {'$text' => { '$search' => terms }}
+              criterion['$text'].merge!(opts) if opts
+              if query.selector['$text']
+                # Per https://docs.mongodb.com/manual/reference/operator/query/text/
+                # multiple $text expressions are not currently supported by
+                # MongoDB server, but build the query correctly instead of
+                # overwriting previous text search condition with the currently
+                # given one.
+                Mongoid.logger.warn('Multiple $text expressions per query are not currently supported by the server')
+                query.selector = {'$and' => [query.selector]}.merge(criterion)
+              else
+                query.selector = query.selector.merge(criterion)
+              end
             end
           end
         end
