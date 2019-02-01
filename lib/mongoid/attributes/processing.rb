@@ -32,7 +32,7 @@ module Mongoid
 
       private
 
-      # If the key provided is the name of a relation or a nested attribute, we
+      # If the key provided is the name of an association or a nested attribute, we
       # need to wait until all other attributes are set before processing
       # these.
       #
@@ -58,12 +58,12 @@ module Mongoid
         return false
       end
 
-      # Get all the pending relations that need to be set.
+      # Get all the pending associations that need to be set.
       #
-      # @example Get the pending relations.
+      # @example Get the pending associations.
       #   document.pending_relations
       #
-      # @return [ Hash ] The pending relations in key/value pairs.
+      # @return [ Hash ] The pending associations in key/value pairs.
       #
       # @since 2.0.0.rc.7
       def pending_relations
@@ -125,10 +125,10 @@ module Mongoid
         pending_nested.clear and pending_relations.clear
       end
 
-      # Process all the pending relations that needed to wait until ids were set
+      # Process all the pending associations that needed to wait until ids were set
       # to fire off.
       #
-      # @example Process the relations.
+      # @example Process the associations.
       #   document.process_relations
       #
       # @since 2.0.0.rc.7

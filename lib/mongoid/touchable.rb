@@ -7,7 +7,7 @@ module Mongoid
 
       # Touch the document, in effect updating its updated_at timestamp and
       # optionally the provided field to the current time. If any belongs_to
-      # relations exist with a touch option, they will be updated as well.
+      # associations exist with a touch option, they will be updated as well.
       #
       # @example Update the updated_at timestamp.
       #   document.touch
@@ -15,7 +15,7 @@ module Mongoid
       # @example Update the updated_at and provided timestamps.
       #   document.touch(:audited)
       #
-      # @note This will not autobuild relations if those options are set.
+      # @note This will not autobuild associations if those options are set.
       #
       # @param [ Symbol ] field The name of an additional field to update.
       #
@@ -41,7 +41,7 @@ module Mongoid
 
     extend self
 
-    # Add the association to the touchable relations if the touch option was
+    # Add the association to the touchable associations if the touch option was
     # provided.
     #
     # @example Add the touchable.
@@ -65,15 +65,15 @@ module Mongoid
     private
 
     # Define the method that will get called for touching belongs_to
-    # relations.
+    # associations.
     #
     # @api private
     #
-    # @example Define the touch relation.
+    # @example Define the touch association.
     #   Model.define_relation_touch_method(:band)
     #   Model.define_relation_touch_method(:band, :band_updated_at)
     #
-    # @param [ Symbol ] name The name of the relation.
+    # @param [ Symbol ] name The name of the association.
     # @param [ Association ] association The association metadata.
     #
     # @since 3.1.0

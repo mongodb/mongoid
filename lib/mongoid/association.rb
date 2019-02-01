@@ -65,7 +65,7 @@ module Mongoid
       @embedded ||= (cyclic ? _parent.present? : self.class.embedded?)
     end
 
-    # Determine if the document is part of an embeds_many relation.
+    # Determine if the document is part of an embeds_many association.
     #
     # @example Is the document in an embeds many?
     #   address.embedded_many?
@@ -77,7 +77,7 @@ module Mongoid
       _association && _association.is_a?(Association::Embedded::EmbedsMany)
     end
 
-    # Determine if the document is part of an embeds_one relation.
+    # Determine if the document is part of an embeds_one association.
     #
     # @example Is the document in an embeds one?
     #   address.embedded_one?
@@ -105,7 +105,7 @@ module Mongoid
       _association.name
     end
 
-    # Determine if the document is part of an references_many relation.
+    # Determine if the document is part of an references_many association.
     #
     # @example Is the document in a references many?
     #   post.referenced_many?
@@ -117,7 +117,7 @@ module Mongoid
       _association && _association.is_a?(Association::Referenced::HasMany)
     end
 
-    # Determine if the document is part of an references_one relation.
+    # Determine if the document is part of an references_one association.
     #
     # @example Is the document in a references one?
     #   address.referenced_one?
@@ -129,10 +129,10 @@ module Mongoid
       _association && _association.is_a?(Association::Referenced::HasOne)
     end
 
-    # Convenience method for iterating through the loaded relations and
+    # Convenience method for iterating through the loaded associations and
     # reloading them.
     #
-    # @example Reload the relations.
+    # @example Reload the associations.
     #   document.reload_relations
     #
     # @return [ Hash ] The association metadata.

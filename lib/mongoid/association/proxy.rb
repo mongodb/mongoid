@@ -5,7 +5,7 @@ require "mongoid/association/marshalable"
 module Mongoid
   module Association
 
-    # This class is the superclass for all relation proxy objects, and contains
+    # This class is the superclass for all association proxy objects, and contains
     # common behavior for all of them.
     class Proxy
       alias :extend_proxy :extend
@@ -53,17 +53,17 @@ module Mongoid
       # @example Get the class.
       #   proxy.klass
       #
-      # @return [ Class ] The relation class.
+      # @return [ Class ] The association class.
       #
       # @since 3.0.15
       def klass
         _association ? _association.klass : nil
       end
 
-      # Resets the criteria inside the relation proxy. Used by many to many
-      # relations to keep the underlying ids array in sync.
+      # Resets the criteria inside the association proxy. Used by many to many
+      # associations to keep the underlying ids array in sync.
       #
-      # @example Reset the relation criteria.
+      # @example Reset the association criteria.
       #   person.preferences.reset_relation_criteria
       #
       # @since 3.0.14
@@ -71,7 +71,7 @@ module Mongoid
         _target.reset_unloaded(criteria)
       end
 
-      # The default substitutable object for a relation proxy is the clone of
+      # The default substitutable object for an association proxy is the clone of
       # the target.
       #
       # @example Get the substitutable.
@@ -135,7 +135,7 @@ module Mongoid
       end
 
       # When the base is not yet saved and the user calls create or create!
-      # on the relation, this error will get raised.
+      # on the association, this error will get raised.
       #
       # @example Raise the error.
       #   relation.raise_unsaved(post)
@@ -169,7 +169,7 @@ module Mongoid
 
       class << self
 
-        # Apply ordering to the criteria if it was defined on the relation.
+        # Apply ordering to the criteria if it was defined on the association.
         #
         # @example Apply the ordering.
         #   Proxy.apply_ordering(criteria, association)

@@ -90,7 +90,7 @@ module Mongoid
         # @since 7.0
         def validation_default; true; end
 
-        # Get the relation proxy class for this association type.
+        # Get the association proxy class for this association type.
         #
         # @return [ Association::HasOne::Proxy ] The proxy class.
         #
@@ -122,7 +122,7 @@ module Mongoid
 
         # The type of this association if it's polymorphic.
         #
-        # @note Only relevant for polymorphic relations.
+        # @note Only relevant for polymorphic associations.
         #
         # @return [ String, nil ] The type field.
         #

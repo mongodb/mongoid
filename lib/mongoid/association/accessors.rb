@@ -3,23 +3,23 @@
 module Mongoid
   module Association
 
-    # This module contains all the behavior related to accessing relations
+    # This module contains all the behavior related to accessing associations
     # through the getters and setters, and how to delegate to builders to
     # create new ones.
     module Accessors
       extend ActiveSupport::Concern
 
-      # Builds the related document and creates the relation unless the
-      # document is nil, then sets the relation on this document.
+      # Builds the related document and creates the association unless the
+      # document is nil, then sets the association on this document.
       #
-      # @example Build the relation.
+      # @example Build the association.
       #   person.__build__(:addresses, { :_id => 1 }, association)
       #
-      # @param [ String, Symbol ] name The name of the relation.
+      # @param [ String, Symbol ] name The name of the association.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
       # @param [ Association ] association The association metadata.
       #
-      # @return [ Proxy ] The relation.
+      # @return [ Proxy ] The association.
       #
       # @since 2.0.0.rc.1
       def __build__(name, object, association)
@@ -27,15 +27,15 @@ module Mongoid
         set_relation(name, relation)
       end
 
-      # Create a relation from an object and association.
+      # Create an association from an object and association metadata.
       #
-      # @example Create the relation.
+      # @example Create the association.
       #   person.create_relation(document, association)
       #
-      # @param [ Document, Array<Document> ] object The relation target.
+      # @param [ Document, Array<Document> ] object The association target.
       # @param [ Association ] association The association metadata.
       #
-      # @return [ Proxy ] The relation.
+      # @return [ Proxy ] The association.
       #
       # @since 2.0.0.rc.1
       def create_relation(object, association)
@@ -44,13 +44,13 @@ module Mongoid
         target ? association.create_relation(self, target) : nil
       end
 
-      # Resets the criteria inside the relation proxy. Used by many-to-many
-      # relations to keep the underlying ids array in sync.
+      # Resets the criteria inside the association proxy. Used by many-to-many
+      # associations to keep the underlying ids array in sync.
       #
-      # @example Reset the relation criteria.
+      # @example Reset the association criteria.
       #   person.reset_relation_criteria(:preferences)
       #
-      # @param [ Symbol ] name The name of the relation.
+      # @param [ Symbol ] name The name of the association.
       #
       # @since 3.0.14
       def reset_relation_criteria(name)
@@ -59,16 +59,16 @@ module Mongoid
         end
       end
 
-      # Set the supplied relation to an instance variable on the class with the
+      # Set the supplied association to an instance variable on the class with the
       # provided name. Used as a helper just for code cleanliness.
       #
       # @example Set the proxy on the document.
       #   person.set(:addresses, addresses)
       #
-      # @param [ String, Symbol ] name The name of the relation.
-      # @param [ Proxy ] relation The relation to set.
+      # @param [ String, Symbol ] name The name of the association.
+      # @param [ Proxy ] relation The association to set.
       #
-      # @return [ Proxy ] The relation.
+      # @return [ Proxy ] The association.
       #
       # @since 2.0.0.rc.1
       def set_relation(name, relation)
@@ -77,20 +77,20 @@ module Mongoid
 
       private
 
-      # Get the relation. Extracted out from the getter method to avoid
+      # Get the association. Extracted out from the getter method to avoid
       # infinite recursion when overriding the getter.
       #
       # @api private
       #
-      # @example Get the relation.
+      # @example Get the association.
       #   document.get_relation(:name, association)
       #
-      # @param [ Symbol ] name The name of the relation.
+      # @param [ Symbol ] name The name of the association.
       # @param [ Association ] association The association metadata.
-      # @param [ Object ] object The object used to build the relation.
-      # @param [ true, false ] reload If the relation is to be reloaded.
+      # @param [ Object ] object The object used to build the association.
+      # @param [ true, false ] reload If the association is to be reloaded.
       #
-      # @return [ Proxy ] The relation.
+      # @return [ Proxy ] The association.
       #
       # @since 3.0.16
       def get_relation(name, association, object, reload = false)
@@ -158,12 +158,12 @@ module Mongoid
         [args.first || {}, args.size > 1 ? args[1] : {}]
       end
 
-      # Adds the existence check for relations.
+      # Adds the existence check for associations.
       #
       # @example Add the existence check.
       #   Person.define_existence_check!(association)
       #
-      # @example Check if a relation exists.
+      # @example Check if an association exists.
       #   person = Person.new
       #   person.has_game?
       #   person.game?
@@ -185,14 +185,14 @@ module Mongoid
         end
       end
 
-      # Defines the getter for the relation. Nothing too special here: just
-      # return the instance variable for the relation if it exists or build
+      # Defines the getter for the association. Nothing too special here: just
+      # return the instance variable for the association if it exists or build
       # the thing.
       #
-      # @example Set up the getter for the relation.
+      # @example Set up the getter for the association.
       #   Person.define_getter!(association)
       #
-      # @param [ Association ] association The association metadata for the relation.
+      # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       #
@@ -210,13 +210,13 @@ module Mongoid
         end
       end
 
-      # Defines the getter for the ids of documents in the relation. Should
-      # be specify only for referenced many relations.
+      # Defines the getter for the ids of documents in the association. Should
+      # be specify only for referenced many associations.
       #
-      # @example Set up the ids getter for the relation.
+      # @example Set up the ids getter for the association.
       #   Person.define_ids_getter!(association)
       #
-      # @param [ Association ] association The association metadata for the relation.
+      # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       def self.define_ids_getter!(association)
@@ -228,15 +228,15 @@ module Mongoid
         end
       end
 
-      # Defines the setter for the relation. This does a few things based on
+      # Defines the setter for the association. This does a few things based on
       # some conditions. If there is an existing association, a target
-      # substitution will take place, otherwise a new relation will be
+      # substitution will take place, otherwise a new association will be
       # created with the supplied target.
       #
-      # @example Set up the setter for the relation.
+      # @example Set up the setter for the association.
       #   Person.define_setter!(association)
       #
-      # @param [ Association ] association The association metadata for the relation.
+      # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       #
@@ -262,15 +262,15 @@ module Mongoid
       end
 
       # Defines the setter method that allows you to set documents
-      # in this relation by their ids. The defined setter, finds
-      # documents with given ids and invokes regular relation setter
+      # in this association by their ids. The defined setter, finds
+      # documents with given ids and invokes regular association setter
       # with found documents. Ids setters should be defined only for
-      # referenced many relations.
+      # referenced many associations.
       #
-      # @example Set up the id_setter for the relation.
+      # @example Set up the id_setter for the association.
       #   Person.define_ids_setter!(association)
       #
-      #  @param [ Association ] association The association for the relation.
+      #  @param [ Association ] association The association for the association.
       #
       #  @return [ Class ] The class being set up.
       def self.define_ids_setter!(association)
@@ -282,13 +282,13 @@ module Mongoid
         end
       end
 
-      # Defines a builder method for an embeds_one relation. This is
+      # Defines a builder method for an embeds_one association. This is
       # defined as #build_name.
       #
       # @example
       #   Person.define_builder!(association)
       #
-      # @param [ Association ] association The association for the relation.
+      # @param [ Association ] association The association for the association.
       #
       # @return [ Class ] The class being set up.
       #
@@ -308,14 +308,14 @@ module Mongoid
         end
       end
 
-      # Defines a creator method for an embeds_one relation. This is
+      # Defines a creator method for an embeds_one association. This is
       # defined as #create_name. After the object is built it will
       # immediately save.
       #
       # @example
       #   Person.define_creator!(association)
       #
-      # @param [ Association ] association The association for the relation.
+      # @param [ Association ] association The association for the association.
       #
       # @return [ Class ] The class being set up.
       #

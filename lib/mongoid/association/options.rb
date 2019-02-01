@@ -23,7 +23,7 @@ module Mongoid
         @options[:dependent]
       end
 
-      # The custom sorting options on the relation.
+      # The custom sorting options on the association.
       #
       # @return [ Criteria::Queryable::Key ] The custom sorting options.
       #
@@ -50,16 +50,16 @@ module Mongoid
         !!@options[:autobuild]
       end
 
-      # Is the relation cyclic.
+      # Is the association cyclic.
       #
-      # @return [ true, false ] Whether the relation is cyclic.
+      # @return [ true, false ] Whether the association is cyclic.
       #
       # @since 7.0
       def cyclic?
         !!@options[:cyclic]
       end
 
-      # The name the owning object uses to refer to this relation.
+      # The name the owning object uses to refer to this association.
       #
       # @return [ String ] The inverse_of option.
       #
@@ -105,7 +105,7 @@ module Mongoid
       # @since 7.0
       def polymorphic?; false; end
 
-      # Whether the relation has callbacks cascaded down from the parent.
+      # Whether the association has callbacks cascaded down from the parent.
       #
       # @return [ true, false ] Whether callbacks are cascaded.
       #

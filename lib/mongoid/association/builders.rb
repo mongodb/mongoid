@@ -5,7 +5,7 @@ module Mongoid
   module Association
 
     # This module is responsible for defining the build and create methods used
-    # in one to one relations.
+    # in one to one associations.
     #
     # @example Methods that get created.
     #
@@ -44,7 +44,7 @@ module Mongoid
       # @example
       #   Person.define_builder!(association)
       #
-      # @param [ Association ] association The association metadata for the relation.
+      # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       #
@@ -69,7 +69,7 @@ module Mongoid
       # @example
       #   Person.define_creator!(association)
       #
-      # @param [ Association ] association The association metadata for the relation.
+      # @param [ Association ] association The association metadata for the association.
       #
       # @return [ Class ] The class being set up.
       #

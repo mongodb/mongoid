@@ -9,7 +9,7 @@ module Mongoid
         class Binding
           include Bindable
 
-          # Binds a single document with the inverse relation. Used
+          # Binds a single document with the inverse association. Used
           # specifically when appending to the proxy.
           #
           # @example Bind one document.

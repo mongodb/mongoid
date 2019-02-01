@@ -6,17 +6,17 @@ module Mongoid
       class Many
         include Buildable
 
-        # Builds the relation depending on the attributes and the options
+        # Builds the association depending on the attributes and the options
         # passed to the macro.
         #
         # This attempts to perform 3 operations, either one of an update of
-        # the existing relation, a replacement of the relation with a new
-        # document, or a removal of the relation.
+        # the existing association, a replacement of the association with a new
+        # document, or a removal of the association.
         #
         # @example Build the nested attrs.
         #   many.build(person)
         #
-        # @param [ Document ] parent The parent document of the relation.
+        # @param [ Document ] parent The parent document of the association.
         # @param [ Hash ] options The options.
         #
         # @return [ Array ] The attributes.
@@ -35,7 +35,7 @@ module Mongoid
         end
 
         # Create the new builder for nested attributes on one-to-many
-        # relations.
+        # associations.
         #
         # @example Initialize the builder.
         #   Many.new(association, attributes, options)
@@ -58,14 +58,14 @@ module Mongoid
 
         private
 
-        # Can the existing relation potentially be deleted?
+        # Can the existing association potentially be deleted?
         #
         # @example Is the document destroyable?
         #   destroyable?({ :_destroy => "1" })
         #
         # @param [ Hash ] attributes The attributes to pull the flag from.
         #
-        # @return [ true, false ] If the relation can potentially be deleted.
+        # @return [ true, false ] If the association can potentially be deleted.
         def destroyable?(attributes)
           destroy = attributes.delete(:_destroy)
           Nested::DESTROY_FLAGS.include?(destroy) && allow_destroy?
@@ -107,7 +107,7 @@ module Mongoid
         end
 
         # Destroy the child document, needs to do some checking for embedded
-        # relations and delay the destroy in case parent validation fails.
+        # associations and delay the destroy in case parent validation fails.
         #
         # @api private
         #
@@ -115,7 +115,7 @@ module Mongoid
         #   builder.destroy(parent, relation, doc)
         #
         # @param [ Document ] parent The parent document.
-        # @param [ Proxy ] relation The relation proxy.
+        # @param [ Proxy ] relation The association proxy.
         # @param [ Document ] doc The doc to destroy.
         #
         # @since 3.0.10
@@ -135,7 +135,7 @@ module Mongoid
         # @example Destroy the document.
         #   builder.destroy_document(relation, doc)
         #
-        # @param [ Proxy ] relation The relation proxy.
+        # @param [ Proxy ] relation The association proxy.
         # @param [ Document ] doc The document to delete.
         #
         # @since 3.0.10
@@ -164,11 +164,11 @@ module Mongoid
           end
         end
 
-        # Update nested relation.
+        # Update nested association.
         #
         # @api private
         #
-        # @example Update nested relation.
+        # @example Update nested association.
         #   builder.update_nested_relation(parent, id, attrs)
         #
         # @param [ Document ] parent The parent document.
@@ -181,7 +181,7 @@ module Mongoid
           converted = first ? convert_id(first.class, id) : id
 
           if existing.where(id: converted).exists?
-            # document exists in relation
+            # document exists in association
             doc = existing.find(converted)
             if destroyable?(attrs)
               destroy(parent, existing, doc)
@@ -189,7 +189,7 @@ module Mongoid
               update_document(doc, attrs)
             end
           else
-            # push existing document to relation
+            # push existing document to association
             doc = existing.unscoped.find(converted)
             update_document(doc, attrs)
             existing.push(doc) unless destroyable?(attrs)

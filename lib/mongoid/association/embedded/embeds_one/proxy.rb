@@ -7,9 +7,9 @@ module Mongoid
 
         class Proxy < Association::One
 
-          # The valid options when defining this relation.
+          # The valid options when defining this association.
           #
-          # @return [ Array<Symbol> ] The allowed options when defining this relation.
+          # @return [ Array<Symbol> ] The allowed options when defining this association.
           #
           # @since 7.0
           VALID_OPTIONS = [
@@ -20,13 +20,13 @@ module Mongoid
               :store_as
           ].freeze
 
-          # Instantiate a new embeds_one relation.
+          # Instantiate a new embeds_one association.
           #
           # @example Create the new proxy.
           #   One.new(person, name, association)
           #
-          # @param [ Document ] base The document this relation hangs off of.
-          # @param [ Document ] target The child document in the relation.
+          # @param [ Document ] base The document this association hangs off of.
+          # @param [ Document ] target The child document in the association.
           # @param [ Association ] association The association metadata.
           def initialize(base, target, association)
             init(base, target, association) do
@@ -39,14 +39,14 @@ module Mongoid
           end
 
           # Substitutes the supplied target documents for the existing document
-          # in the relation.
+          # in the association.
           #
           # @example Substitute the new document.
           #   person.name.substitute(new_name)
           #
           # @param [ Document ] replacement A document to replace the target.
           #
-          # @return [ Document, nil ] The relation or nil.
+          # @return [ Document, nil ] The association or nil.
           #
           # @since 2.0.0.rc.1
           def substitute(replacement)
@@ -71,24 +71,24 @@ module Mongoid
 
           private
 
-          # Instantiate the binding associated with this relation.
+          # Instantiate the binding associated with this association.
           #
           # @example Get the binding.
           #   relation.binding([ address ])
           #
-          # @return [ Binding ] The relation's binding.
+          # @return [ Binding ] The association's binding.
           #
           # @since 2.0.0.rc.1
           def binding
             Binding.new(_base, _target, _association)
           end
 
-          # Are we able to persist this relation?
+          # Are we able to persist this association?
           #
-          # @example Can we persist the relation?
+          # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the relation is persistable.
+          # @return [ true, false ] If the association is persistable.
           #
           # @since 2.1.0
           def persistable?
@@ -97,10 +97,10 @@ module Mongoid
 
           class << self
 
-            # Returns true if the relation is an embedded one. In this case
+            # Returns true if the association is an embedded one. In this case
             # always true.
             #
-            # @example Is this relation embedded?
+            # @example Is this association embedded?
             #   Association::Embedded::EmbedsOne.embedded?
             #
             # @return [ true ] true.

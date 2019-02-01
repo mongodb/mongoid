@@ -20,8 +20,8 @@ module Mongoid
           attributes.all? { |key, value| key == '_destroy' || value.blank? }
         }
 
-        # Used when needing to update related models from a parent relation. Can
-        # be used on embedded or referenced relations.
+        # Used when needing to update related models from a parent association. Can
+        # be used on embedded or referenced associations.
         #
         # @example Defining nested attributes.
         #
@@ -35,7 +35,7 @@ module Mongoid
         #     accepts_nested_attributes_for :addresses, :game, :posts
         #   end
         #
-        # @param [ Array<Symbol>, Hash ] args A list of relation names, followed
+        # @param [ Array<Symbol>, Hash ] args A list of association names, followed
         #   by a hash of options.
         #
         # @option *args [ true, false ] :allow_destroy Can deletion occur?
@@ -71,7 +71,7 @@ module Mongoid
 
         private
 
-        # Add the autosave information for the nested relation.
+        # Add the autosave information for the nested association.
         #
         # @api private
         #

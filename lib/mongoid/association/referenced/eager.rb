@@ -16,7 +16,7 @@ module Mongoid
           #   BelongsTo.new(association, parent_docs)
           #
           # @param [ Array<Association> ] associations Associations to eager load
-          # @param [ Array<Document> ] docs Documents to preload the relations
+          # @param [ Array<Document> ] docs Documents to preload the associations
           #
           # @return [ Base ] The eager load preloader
           #
@@ -29,7 +29,7 @@ module Mongoid
 
           # Run the preloader.
           #
-          # @example Preload the relations into the documents.
+          # @example Preload the associations into the documents.
           #   loader.run
           #
           # @return [ Array ] The list of documents given.
@@ -46,11 +46,11 @@ module Mongoid
 
           protected
 
-          # Preload the current relation.
+          # Preload the current association.
           #
           # This method should be implemented in the subclass
           #
-          # @example Preload the current relation into the documents.
+          # @example Preload the current association into the documents.
           #   loader.preload
           #
           # @since 4.0.0
@@ -60,7 +60,7 @@ module Mongoid
 
           # Run the preloader.
           #
-          # @example Iterate over the documents loaded for the current relation
+          # @example Iterate over the documents loaded for the current association
           #   loader.each_loaded_document { |doc| }
           #
           # @since 4.0.0
@@ -129,10 +129,10 @@ module Mongoid
 
           # Set the pre-loaded document into its parent.
           #
-          # @example Set docs into parent using the current relation name.
+          # @example Set docs into parent using the current association name.
           #   loader.set_relation(doc, docs)
           #
-          # @param [ Document ] doc The object to set the relation on
+          # @param [ Document ] doc The object to set the association on
           # @param [ Document, Array ] element to set into the parent
           #
           # @since 4.0.0

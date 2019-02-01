@@ -109,7 +109,7 @@ module Mongoid
                              default_foreign_key_field
         end
 
-        # Get the relation proxy class for this association type.
+        # Get the association proxy class for this association type.
         #
         # @return [ Association::BelongsTo::Proxy ] The proxy class.
         #
@@ -127,9 +127,9 @@ module Mongoid
           @polymorphic ||= !!@options[:polymorphic]
         end
 
-        # The name of the field used to store the type of polymorphic relation.
+        # The name of the field used to store the type of polymorphic association.
         #
-        # @return [ String ] The field used to store the type of polymorphic relation.
+        # @return [ String ] The field used to store the type of polymorphic association.
         #
         # @since 7.0
         def inverse_type

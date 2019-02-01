@@ -9,15 +9,15 @@ module Mongoid
         attr_accessor :destroy
 
 
-        # Builds the relation depending on the attributes and the options
+        # Builds the association depending on the attributes and the options
         # passed to the macro.
         #
         # @example Build a 1-1 nested document.
         #   one.build(person, as: :admin)
         #
         # @note This attempts to perform 3 operations, either one of an update of
-        #   the existing relation, a replacement of the relation with a new
-        #   document, or a removal of the relation.
+        #   the existing association, a replacement of the association with a new
+        #   document, or a removal of the association.
         #
         # @param [ Document ] parent The parent document.
         #
@@ -38,7 +38,7 @@ module Mongoid
         end
 
         # Create the new builder for nested attributes on one-to-one
-        # relations.
+        # associations.
         #
         # @example Instantiate the builder.
         #   One.new(association, attributes)
@@ -59,7 +59,7 @@ module Mongoid
         private
 
         # Is the id in the attribtues acceptable for allowing an update to
-        # the existing relation?
+        # the existing association?
         #
         # @api private
         #
@@ -74,24 +74,24 @@ module Mongoid
           existing._id == id || id.nil? || (existing._id != id && update_only?)
         end
 
-        # Can the existing relation be deleted?
+        # Can the existing association be deleted?
         #
         # @example Can the existing object be deleted?
         #   one.delete?
         #
-        # @return [ true, false ] If the relation should be deleted.
+        # @return [ true, false ] If the association should be deleted.
         #
         # @since 2.0.0
         def delete?
           destroyable? && !attributes[:id].nil?
         end
 
-        # Can the existing relation potentially be destroyed?
+        # Can the existing association potentially be destroyed?
         #
         # @example Is the object destroyable?
         #   one.destroyable?({ :_destroy => "1" })
         #
-        # @return [ true, false ] If the relation can potentially be
+        # @return [ true, false ] If the association can potentially be
         #   destroyed.
         #
         # @since 2.0.0

@@ -6,11 +6,11 @@ module Mongoid
     # Module providing functionality for parsing (nested) inclusion definitions.
     module Includable
 
-      # Eager loads all the provided relations. Will load all the documents
+      # Eager loads all the provided associations. Will load all the documents
       # into the identity map whose ids match based on the extra query for the
       # ids.
       #
-      # @note This will work for embedded relations that reference another
+      # @note This will work for embedded associations that reference another
       #   collection via belongs_to as well.
       #
       # @note Eager loading brings all the documents into memory, so there is a
@@ -18,10 +18,10 @@ module Mongoid
       #   eager loading becomes slower around 100k documents, but this will
       #   naturally depend on the specific application.
       #
-      # @example Eager load the provided relations.
+      # @example Eager load the provided associations.
       #   Person.includes(:posts, :game)
       #
-      # @param [ Array<Symbol>, Array<Hash> ] relations The names of the relations to eager
+      # @param [ Array<Symbol>, Array<Hash> ] relations The names of the associations to eager
       #   load.
       #
       # @return [ Criteria ] The cloned criteria.
@@ -66,9 +66,9 @@ module Mongoid
       #   criteria.add_inclusion(Person, :posts)
       #
       # @param [ Class, String, Symbol ] _klass The class or string/symbol of the class name.
-      # @param [ Symbol ] association The relation.
+      # @param [ Symbol ] association The association.
       #
-      # @raise [ Errors::InvalidIncludes ] If no relation is found.
+      # @raise [ Errors::InvalidIncludes ] If no association is found.
       #
       # @since 5.1.0
       def add_inclusion(_klass, association)

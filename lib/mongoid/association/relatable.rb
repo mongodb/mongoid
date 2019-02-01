@@ -34,7 +34,7 @@ module Mongoid
 
       # The name of the association.
       #
-      # @return [ Symbol ] The name of the relation.
+      # @return [ Symbol ] The name of the association.
       #
       # @since 7.0
       attr_reader :name
@@ -48,9 +48,9 @@ module Mongoid
 
       # Initialize the Association.
       #
-      # @param [ Class ] _class The class of the model who owns this relation.
+      # @param [ Class ] _class The class of the model who owns this association.
       # @param [ Symbol ] name The name of the association.
-      # @param [ Hash ] opts The relation options.
+      # @param [ Hash ] opts The association options.
       # @param [ Block ] block The optional block.
       #
       # @since 7.0
@@ -92,7 +92,7 @@ module Mongoid
       end
 
       # Get the type setter.
-      # @note Only relevant for polymorphic relations that take the :as option.
+      # @note Only relevant for polymorphic associations that take the :as option.
       #
       # @return [ String ] The type setter method.
       #
@@ -147,9 +147,9 @@ module Mongoid
       # @since 7.0
       def inverse_type; end
 
-      # The class name of the relation object(s).
+      # The class name of the association object(s).
       #
-      # @return [ String ] The relation objects' class name.
+      # @return [ String ] The association objects' class name.
       #
       # @since 7.0
       def relation_class_name
@@ -157,9 +157,9 @@ module Mongoid
       end
       alias :class_name :relation_class_name
 
-      # The class of the relation object(s).
+      # The class of the association object(s).
       #
-      # @return [ String ] The relation objects' class.
+      # @return [ String ] The association objects' class.
       #
       # @since 7.0
       def klass
@@ -167,7 +167,7 @@ module Mongoid
       end
       alias :relation_class :klass
 
-      # The class name of the object owning this relation.
+      # The class name of the object owning this association.
       #
       # @return [ String ] The owning objects' class name.
       #
@@ -176,7 +176,7 @@ module Mongoid
         @inverse_class_name ||= @owner_class.name
       end
 
-      # The class of the object owning this relation.
+      # The class of the object owning this association.
       #
       # @return [ String ] The owning objects' class.
       #
@@ -186,7 +186,7 @@ module Mongoid
       end
       alias :inverse_klass :inverse_class
 
-      # The foreign key field if this relation stores a foreign key.
+      # The foreign key field if this association stores a foreign key.
       # Otherwise, the primary key.
       #
       # @return [ Symbol, String ] The primary key.
@@ -225,7 +225,7 @@ module Mongoid
         @foreign_key_setter ||= "#{foreign_key}=" if foreign_key
       end
 
-      # The atomic path for this relation.
+      # The atomic path for this association.
       #
       # @return [  Mongoid::Atomic::Paths::Root ] The atomic path object.
       #
@@ -235,7 +235,7 @@ module Mongoid
       end
 
       # Gets the setter for the field that sets the type of document on a
-      # polymorphic relation.
+      # polymorphic association.
       #
       # @example Get the inverse type setter.
       #   association.inverse_type_setter
@@ -259,11 +259,11 @@ module Mongoid
         @foreign_key_check ||= "#{foreign_key}_changed?" if (stores_foreign_key? && foreign_key)
       end
 
-      # Create a relation proxy object using the owner and target.
+      # Create an association proxy object using the owner and target.
       #
-      # @param [ Document ] owner The document this relation hangs off of.
+      # @param [ Document ] owner The document this association hangs off of.
       # @param [ Document, Array<Document> ] target The target (parent) of the
-      #   relation.
+      #   association.
       #
       # @return [ Proxy ]
       #
@@ -332,7 +332,7 @@ module Mongoid
       end
 
       # Gets the model classes with inverse associations of this model. This is used to determine
-      # the classes on the other end of polymorphic relations with models.
+      # the classes on the other end of polymorphic associations with models.
       def inverse_association_classes
         Mongoid::Config.models.map { |m| inverse_association(m) }.compact.map(&:inverse_class)
       end

@@ -3,7 +3,7 @@
 module Mongoid
   module Errors
 
-    # This error is raised when trying to create a relation that conflicts with
+    # This error is raised when trying to create an association that conflicts with
     # an already defined method.
     #
     # @since 6.0.0
@@ -47,7 +47,7 @@ module Mongoid
         klass.instance_method(name).owner
       end
 
-      # Get the location of the relation definition.
+      # Get the location of the association definition.
       #
       # @example Get the location of the method on the filesystem.
       #   error.location(Person, :crazy_method_name)

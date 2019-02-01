@@ -20,7 +20,7 @@ module Mongoid
           #   Builder.new(meta, attrs).build
           #
           # @param [ Object ] base The base object.
-          # @param [ Object ] object The object to use to build the relation.
+          # @param [ Object ] object The object to use to build the association.
           # @param [ String ] type Not used in this context.
           #
           # @return [ Array<Document ] The documents.

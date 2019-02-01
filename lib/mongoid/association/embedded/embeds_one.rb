@@ -60,7 +60,7 @@ module Mongoid
 
         # The key that is used to get the attributes for the associated object.
         #
-        # @return [ String ] The name of the field used to store the relation.
+        # @return [ String ] The name of the field used to store the association.
         #
         # @since 7.0
         def key
@@ -74,7 +74,7 @@ module Mongoid
         # @since 7.0
         def embedded?; true; end
 
-        # Get the default validation setting for the relation. Determines if
+        # Get the default validation setting for the association. Determines if
         # by default a validates associated will occur.
         #
         # @example Get the validation default.
@@ -94,10 +94,10 @@ module Mongoid
 
         # The primary key
         #
-        # @return [ nil ] Not relevant for this relation
+        # @return [ nil ] Not relevant for this association
         def primary_key; end
 
-        # Get the relation proxy class for this association type.
+        # Get the association proxy class for this association type.
         #
         # @return [ Association::Embedded::EmbedsMany::Proxy ] The proxy class.
         #

@@ -3,7 +3,7 @@
 module Mongoid
   module Errors
 
-    # Raised when an option provided for a relation is invalid.
+    # Raised when an option provided for an association is invalid.
     class InvalidRelationOption < MongoidError
 
       # Create the new error.
@@ -12,7 +12,7 @@ module Mongoid
       #   InvalidRelationOption.new(Person, invalid_option: 'make_me_a_sandwich')
       #
       # @param [ Class ] klass The model class.
-      # @param [ String, Symbol ] name The relation name.
+      # @param [ String, Symbol ] name The association name.
       # @param [ Symbol ] option The invalid option.
       # @param [ Array<Symbol> ] valid_options The valid option.
       #

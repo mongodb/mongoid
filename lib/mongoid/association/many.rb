@@ -3,7 +3,7 @@
 module Mongoid
   module Association
 
-    # This is the superclass for all many to one and many to many relation
+    # This is the superclass for all many to one and many to many association
     # proxies.
     class Many < Association::Proxy
       include ::Enumerable
@@ -11,19 +11,19 @@ module Mongoid
       delegate :avg, :max, :min, :sum, to: :criteria
       delegate :length, :size, to: :_target
 
-      # Is the relation empty?
+      # Is the association empty?
       #
-      # @example Is the relation empty??
+      # @example Is the association empty??
       #   person.addresses.blank?
       #
-      # @return [ true, false ] If the relation is empty or not.
+      # @return [ true, false ] If the association is empty or not.
       #
       # @since 2.1.0
       def blank?
         size == 0
       end
 
-      # Creates a new document on the references many relation. This will
+      # Creates a new document on the references many association. This will
       # save the document if the parent has been persisted.
       #
       # @example Create and save the new document.
@@ -46,7 +46,7 @@ module Mongoid
         end
       end
 
-      # Creates a new document on the references many relation. This will
+      # Creates a new document on the references many association. This will
       # save the document if the parent has been persisted and will raise an
       # error if validation fails.
       #
@@ -143,9 +143,9 @@ module Mongoid
           klass.respond_to?(name, include_private) || super
       end
 
-      # This is public access to the relation's criteria.
+      # This is public access to the association's criteria.
       #
-      # @example Get the scoped relation.
+      # @example Get the scoped association.
       #   relation.scoped
       #
       # @return [ Criteria ] The scoped criteria.
@@ -164,7 +164,7 @@ module Mongoid
       #
       # @param [ Hash ] options The options to pass.
       #
-      # @option options [ Symbol ] :include What relations to include
+      # @option options [ Symbol ] :include What associations to include
       # @option options [ Symbol ] :only Limit the fields to only these.
       # @option options [ Symbol ] :except Dont include these fields.
       #

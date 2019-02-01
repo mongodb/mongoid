@@ -47,11 +47,11 @@ module Mongoid
 
       private
 
-      # Returns true if the relation is blank or the foreign key is blank.
+      # Returns true if the association is blank or the foreign key is blank.
       #
       # @api private
       #
-      # @example Check is the relation or fk is blank.
+      # @example Check is the association or fk is blank.
       #   validator.relation_or_fk_mising(doc, :name, "")
       #
       # @param [ Document ] doc The document.

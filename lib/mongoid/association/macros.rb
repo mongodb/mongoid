@@ -3,8 +3,8 @@
 module Mongoid
   module Association
 
-    # This module contains the core macros for defining relations between
-    # documents. They can be either embedded or referenced (relational).
+    # This module contains the core macros for defining associations between
+    # documents. They can be either embedded or referenced.
     module Macros
       extend ActiveSupport::Concern
 
@@ -22,7 +22,7 @@ module Mongoid
       # @example Get the associations.
       #   person.associations
       #
-      # @return [ Hash ] The relations.
+      # @return [ Hash ] The associations.
       #
       # @since 2.3.1
       def associations
@@ -31,12 +31,12 @@ module Mongoid
 
       module ClassMethods
 
-        # Adds the relation back to the parent document. This macro is
+        # Adds the association back to the parent document. This macro is
         # necessary to set the references from the child back to the parent
-        # document. If a child does not define this relation calling
+        # document. If a child does not define this association calling
         # persistence methods on the child object will cause a save to fail.
         #
-        # @example Define the relation.
+        # @example Define the association.
         #
         #   class Person
         #     include Mongoid::Document
@@ -48,18 +48,18 @@ module Mongoid
         #     embedded_in :person
         #   end
         #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
+        # @param [ Symbol ] name The name of the association.
+        # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embedded_in(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
 
-        # Adds the relation from a parent document to its children. The name
-        # of the relation needs to be a pluralized form of the child class
+        # Adds the association from a parent document to its children. The name
+        # of the association needs to be a pluralized form of the child class
         # name.
         #
-        # @example Define the relation.
+        # @example Define the association.
         #
         #   class Person
         #     include Mongoid::Document
@@ -71,18 +71,18 @@ module Mongoid
         #     embedded_in :person
         #   end
         #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
+        # @param [ Symbol ] name The name of the association.
+        # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
 
-        # Adds the relation from a parent document to its child. The name
-        # of the relation needs to be a singular form of the child class
+        # Adds the association from a parent document to its child. The name
+        # of the association needs to be a singular form of the child class
         # name.
         #
-        # @example Define the relation.
+        # @example Define the association.
         #
         #   class Person
         #     include Mongoid::Document
@@ -94,17 +94,17 @@ module Mongoid
         #     embedded_in :person
         #   end
         #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
+        # @param [ Symbol ] name The name of the association.
+        # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
         def embeds_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
 
-        # Adds a relational association from the child Document to a Document in
-        # another database or collection.
+        # Adds a referenced association from the child Document to a Document
+        # in another database or collection.
         #
-        # @example Define the relation.
+        # @example Define the association.
         #
         #   class Game
         #     include Mongoid::Document
@@ -116,17 +116,17 @@ module Mongoid
         #     has_one :game
         #   end
         #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
+        # @param [ Symbol ] name The name of the association.
+        # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
         def belongs_to(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
 
-        # Adds a relational association from a parent Document to many
+        # Adds a referenced association from a parent Document to many
         # Documents in another database or collection.
         #
-        # @example Define the relation.
+        # @example Define the association.
         #
         #   class Person
         #     include Mongoid::Document
@@ -138,17 +138,17 @@ module Mongoid
         #     belongs_to :person
         #   end
         #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
+        # @param [ Symbol ] name The name of the association.
+        # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
         def has_many(name, options = {}, &block)
           define_association!(__method__, name, options, &block)
         end
 
-        # Adds a relational many-to-many association between many of this
+        # Adds a referenced many-to-many association between many of this
         # Document and many of another Document.
         #
-        # @example Define the relation.
+        # @example Define the association.
         #
         #   class Person
         #     include Mongoid::Document
@@ -160,8 +160,8 @@ module Mongoid
         #     has_and_belongs_to_many :people
         #   end
         #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
+        # @param [ Symbol ] name The name of the association.
+        # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
         #
         # @since 2.0.0.rc.1
@@ -169,10 +169,10 @@ module Mongoid
           define_association!(__method__, name, options, &block)
         end
 
-        # Adds a relational association from the child Document to a Document in
-        # another database or collection.
+        # Adds a referenced association from the child Document to a Document
+        # in another database or collection.
         #
-        # @example Define the relation.
+        # @example Define the association.
         #
         #   class Game
         #     include Mongoid::Document
@@ -184,8 +184,8 @@ module Mongoid
         #     has_one :game
         #   end
         #
-        # @param [ Symbol ] name The name of the relation.
-        # @param [ Hash ] options The relation options.
+        # @param [ Symbol ] name The name of the association.
+        # @param [ Hash ] options The association options.
         # @param [ Proc ] block Optional block for defining extensions.
         def has_one(name, options = {}, &block)
           define_association!(__method__, name, options, &block)

@@ -10,10 +10,10 @@ module Mongoid
 
       # Returns the association metadata for the supplied name.
       #
-      # @example Find relation association by name.
+      # @example Find association metadata by name.
       #   person.reflect_on_association(:addresses)
       #
-      # @param [ String, Symbol ] name The name of the relation to find.
+      # @param [ String, Symbol ] name The name of the association to find.
       #
       # @return [ Association ] The matching association metadata.
       def reflect_on_association(name)
@@ -25,7 +25,7 @@ module Mongoid
       # @example Find multiple association metadata by macro.
       #   person.reflect_on_all_associations(:embeds_many)
       #
-      # @param [ Array<Symbol> ] macros The relation macros.
+      # @param [ Array<Symbol> ] macros The association macros.
       #
       # @return [ Array<Association> ] The matching association metadata.
       def reflect_on_all_association(*macros)
@@ -39,7 +39,7 @@ module Mongoid
         # @example Find association metadata by name.
         #   Person.reflect_on_association(:addresses)
         #
-        # @param [ String, Symbol ] name The name of the relation to find.
+        # @param [ String, Symbol ] name The name of the association to find.
         #
         # @return [ Association ] The matching association metadata.
         def reflect_on_association(name)
@@ -51,7 +51,7 @@ module Mongoid
         # @example Find multiple association metadata by macro.
         #   Person.reflect_on_all_associations(:embeds_many)
         #
-        # @param [ Array<Symbol> ] macros The relation macros.
+        # @param [ Array<Symbol> ] macros The association macros.
         #
         # @return [ Array<Association> ] The matching association metadata.
         def reflect_on_all_associations(*macros)

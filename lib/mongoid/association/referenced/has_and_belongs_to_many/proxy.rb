@@ -5,11 +5,11 @@ module Mongoid
     module Referenced
       class HasAndBelongsToMany
 
-        # This class defines the behavior for all relations that are a
+        # This class defines the behavior for all associations that are a
         # many-to-many between documents in different collections.
         class Proxy < Referenced::HasMany::Proxy
 
-          # Appends a document or array of documents to the relation. Will set
+          # Appends a document or array of documents to the association. Will set
           # the parent and update the index in the process.
           #
           # @example Append a document.
@@ -41,7 +41,7 @@ module Mongoid
 
           alias :push :<<
 
-          # Appends an array of documents to the relation. Performs a batch
+          # Appends an array of documents to the association. Performs a batch
           # insert of the documents instead of persisting one at a time.
           #
           # @example Concat with other documents.
@@ -75,9 +75,9 @@ module Mongoid
           end
 
           # Build a new document from the attributes and append it to this
-          # relation without saving.
+          # association without saving.
           #
-          # @example Build a new document on the relation.
+          # @example Build a new document on the association.
           #   person.posts.build(:title => "A new post")
           #
           # @param [ Hash ] attributes The attributes of the new document.
@@ -98,8 +98,8 @@ module Mongoid
 
           alias :new :build
 
-          # Delete the document from the relation. This will set the foreign key
-          # on the document to nil. If the dependent options on the relation are
+          # Delete the document from the association. This will set the foreign key
+          # on the document to nil. If the dependent options on the association are
           # :delete or :destroy the appropriate removal will occur.
           #
           # @example Delete the document.
@@ -124,7 +124,7 @@ module Mongoid
           # documents by deleting the foreign keys and the references, orphaning
           # the target documents in the process.
           #
-          # @example Nullify the relation.
+          # @example Nullify the association.
           #   person.preferences.nullify
           #
           # @param [ Array<Document> ] replacement The replacement documents.
@@ -166,15 +166,15 @@ module Mongoid
           alias :purge :nullify
 
           # Substitutes the supplied target documents for the existing documents
-          # in the relation. If the new target is nil, perform the necessary
+          # in the association. If the new target is nil, perform the necessary
           # deletion.
           #
-          # @example Replace the relation.
+          # @example Replace the association.
           # person.preferences.substitute([ new_post ])
           #
           # @param [ Array<Document> ] replacement The replacement target.
           #
-          # @return [ Many ] The relation.
+          # @return [ Many ] The association.
           #
           # @since 2.0.0.rc.1
           def substitute(replacement)
@@ -205,7 +205,7 @@ module Mongoid
           # Appends the document to the target array, updating the index on the
           # document at the same time.
           #
-          # @example Append the document to the relation.
+          # @example Append the document to the association.
           #   relation.append(document)
           #
           # @param [ Document ] document The document to append to the target.
@@ -219,7 +219,7 @@ module Mongoid
             execute_callback :after_add, document
           end
 
-          # Instantiate the binding associated with this relation.
+          # Instantiate the binding associated with this association.
           #
           # @example Get the binding.
           #   relation.binding([ address ])
@@ -251,7 +251,7 @@ module Mongoid
           # Returns the criteria object for the target class with its documents set
           # to target.
           #
-          # @example Get a criteria for the relation.
+          # @example Get a criteria for the association.
           #   relation.criteria
           #
           # @return [ Criteria ] A new criteria.
@@ -291,10 +291,10 @@ module Mongoid
               Eager.new(association, docs)
             end
 
-            # Returns true if the relation is an embedded one. In this case
+            # Returns true if the association is an embedded one. In this case
             # always false.
             #
-            # @example Is this relation embedded?
+            # @example Is this association embedded?
             #   Referenced::ManyToMany.embedded?
             #
             # @return [ false ] Always false.

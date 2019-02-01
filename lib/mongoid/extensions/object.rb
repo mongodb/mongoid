@@ -83,7 +83,7 @@ module Mongoid
         self
       end
 
-      # Check if the object is part of a blank relation criteria.
+      # Check if the object is part of a blank association criteria.
       #
       # @example Is the object blank criteria?
       #   "".blank_criteria?

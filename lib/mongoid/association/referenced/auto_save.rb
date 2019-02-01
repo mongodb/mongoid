@@ -35,7 +35,7 @@ module Mongoid
         # Check if there is changes for auto-saving
         #
         # @example Return true if there is changes on self or in
-        #           autosaved relations.
+        #           autosaved associations.
         #   document.changed_for_autosave?
         #
         # @since 3.1.3

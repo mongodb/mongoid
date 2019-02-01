@@ -9,7 +9,7 @@ module Mongoid
     module Constrainable
 
       # Convert the supplied object to the appropriate type to set as the
-      # foreign key for a relation.
+      # foreign key for an association.
       #
       # @example Convert the object.
       #   constraint.convert("12345")
@@ -32,7 +32,7 @@ module Mongoid
       end
 
       private
-      
+
       def convert_polymorphic(object)
         if object.is_a?(Mongoid::Document)
           object.id

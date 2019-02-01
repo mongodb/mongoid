@@ -4,7 +4,7 @@ module Mongoid
   module Errors
 
     # This error is raised when attempting to eager load a many to many
-    # relation.
+    # association.
     class EagerLoad < MongoidError
 
       # Create the new eager load error.
@@ -12,7 +12,7 @@ module Mongoid
       # @example Create the new eager load error.
       #   EagerLoad.new(:preferences)
       #
-      # @param [ Symbol ] name The name of the relation.
+      # @param [ Symbol ] name The name of the association.
       #
       # @since 2.2.0
       def initialize(name)

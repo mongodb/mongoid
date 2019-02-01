@@ -3,7 +3,7 @@
 module Mongoid
   module Errors
 
-    # Raised when invalid options are passed to a relation macro.
+    # Raised when invalid options are passed to an association macro.
     class InvalidOptions < MongoidError
 
       # Instantiate the options error.
@@ -11,7 +11,7 @@ module Mongoid
       # @example Create the error.
       #   InvalidOptions.new(:name, :polymorphic, [ :as ])
       #
-      # @param [ Symbol ] name The name of the relation.
+      # @param [ Symbol ] name The name of the association.
       # @param [ Symbol ] invalid The invalid option.
       # @param [ Array<Symbol> ] valid The allowed options.
       #
