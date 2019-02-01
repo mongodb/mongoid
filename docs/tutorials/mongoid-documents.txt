@@ -124,6 +124,7 @@ Below is a list of valid types for fields.
 - ``BSON::Binary``
 - ``Range``
 - ``Regexp``
+- ``Set``
 - ``String``
 - ``Symbol``
 - ``Time``
@@ -153,6 +154,60 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 - ``Date``
 - ``DateTime``
 - ``Range``
+
+
+Updating Container Fields
+*************************
+
+Be aware that, until
+`MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_
+is resolved, all fields including container ones must be assigned to for
+their values to be persisted to the database.
+
+For example, adding to a set like this does not work:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :tours, type: Set
+  end
+  
+  band = Band.new
+  band.tours
+  # => #<Set: {}>
+
+  band.tours << 'London'
+  # => #<Set: {"London"}>
+  band.tours
+  # => #<Set: {}>
+
+Instead, the field value must be modified outside of the model and assigned
+back to the model as follows:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :tours, type: Set
+  end
+  
+  band = Band.new
+  
+  tours = band.tours
+  # => #<Set: {}>
+
+  tours << 'London'
+  # => #<Set: {"London"}>
+  
+  band.tours = tours
+  # => #<Set: {"London"}>
+  
+  band.tours
+  # => #<Set: {"London"}>
+
 
 Accessing Field Values
 **********************
