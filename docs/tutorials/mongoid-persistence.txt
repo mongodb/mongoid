@@ -204,7 +204,7 @@ operations with examples.
 
        *Update the document's updated_at timestamp, optionally with one extra
        provided time field. This will cascade the touch to all*
-       ``belongs_to`` *relations of the document with the option set.
+       ``belongs_to`` *associations of the document with the option set.
        This operation skips validations and callbacks.*
        
        *Attempting to touch a destroyed document will raise* ``FrozenError``

@@ -5,15 +5,16 @@ Nested Attributes
 .. default-domain:: mongodb
 
 Nested attributes provide a mechanism for updating documents and their
-relations in a single operation by nesting attributes in a single
+associations in a single operation by nesting attributes in a single
 parameters hash. This is useful when wanting to edit multiple documents
 within a single web form.
 
 Behavior
 --------
 
-Nested attributes can be enabled for any relation, embedded or referenced. To enable this
-for the relation, simply provide the relation name to the ``accepts_nested_attributes_for`` macro.
+Nested attributes can be enabled for any association, embedded or referenced.
+To enable this for an association, simply provide the association name to the
+``accepts_nested_attributes_for`` macro.
 
 .. code-block:: ruby
 
@@ -24,13 +25,14 @@ for the relation, simply provide the relation name to the ``accepts_nested_attri
      accepts_nested_attributes_for :albums, :producer
    end
 
-Note that when you add nested attributes functionality to a referenced relation, Mongoid
-will automatically enable autosave for that relation.
+Note that when you add nested attributes functionality to a referenced
+association, Mongoid will automatically enable autosave for that association.
 
-When a relation gains nested attributes behavior, an additional method is added to the base
-model, which should be used to update the attributes with the new functionality. This method
-is the relation name plus ``_attributes=``. You can use this method directly, or more commonly
-the name of the method can be an attribute in the updates for the base class, in which case
+When an association gains nested attributes behavior, an additional method is
+added to the base model, which should be used to update the attributes with
+the new functionality. This method is the association name plus ``_attributes=``.
+You can use this method directly, or more commonly the name of the method can
+be an attribute in the updates for the base class, in which case
 Mongoid will call the appropriate setter under the covers.
 
 .. code-block:: ruby

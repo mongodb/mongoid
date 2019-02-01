@@ -95,7 +95,8 @@ Indexes can be scoped to a specific database.
      index({ ssn: 1 }, { database: "users", unique: true, background: true })
    end
 
-You can have Mongoid define indexes for you on "foreign key" fields for relational associations. This only works on the relation macro that the foreign key is stored on.
+Mongoid can define indexes on "foreign key" fields for associations.
+This only works on the association macro that the foreign key is stored on.
 
 .. code-block:: ruby
 
