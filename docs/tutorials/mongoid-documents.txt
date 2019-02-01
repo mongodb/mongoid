@@ -600,7 +600,7 @@ must use the other provided accessor methods:
 Localized Fields
 ----------------
 
-Mongoid now supports localized fields without the need of an additional gem.
+Mongoid supports localized fields via `i18n <https://github.com/ruby-i18n/i18n>`_.
 
 .. code-block:: ruby
 
