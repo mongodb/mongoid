@@ -412,3 +412,28 @@ Previous driver versions did not recreate monitoring threads when reconnecting.
 does not close it, the parent process will continue consuming a connection slot
 in the cluster and will continue monitoring the cluster for as long as the
 parent remains alive.
+
+Development Configuration
+*************************
+
+Driver's default configuration is suitable for production deployment.
+In development, some settings can be adjusted to provide a better developer
+experience.
+
+- ``:server_selection_timeout``: set this to a low value (e.g., ``1``)
+if your MongoDB server is running locally and you start it manually. A low
+server selection timeout will cause the driver to fail quickly when there is
+no server running.
+
+Sample recomended development configuration:
+
+.. code-block:: yaml
+
+  development:
+    clients:
+      default:
+        database: mongoid
+        hosts:
+          - localhost:27017
+        options:
+          server_selection_timeout: 1
