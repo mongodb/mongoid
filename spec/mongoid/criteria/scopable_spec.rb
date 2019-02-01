@@ -388,4 +388,85 @@ describe Mongoid::Criteria::Scopable do
       end
     end
   end
+
+  describe 'scope and where' do
+    class ScopeWhereModel
+      include Mongoid::Document
+
+      scope :foo, -> { where(foo: true) }
+    end
+
+    shared_examples_for 'restricts to both' do
+      it 'restricts to both' do
+        expect(result.selector['foo']).to eq(true)
+        expect(result.selector['hello']).to eq('world')
+      end
+    end
+
+    context 'scope is given first' do
+      let(:result) { ScopeWhereModel.foo.where(hello: 'world') }
+
+      it_behaves_like 'restricts to both'
+    end
+
+    context 'where is given first' do
+      let(:result) { ScopeWhereModel.where(hello: 'world').foo }
+
+      it_behaves_like 'restricts to both'
+    end
+  end
+
+  describe 'scope with argument and where' do
+    class ArgumentScopeWhereModel
+      include Mongoid::Document
+
+      scope :my_text_search, ->(search) { where('$text' => {'$search' => search}) }
+    end
+
+    shared_examples_for 'restricts to both' do
+      it 'restricts to both' do
+        expect(result.selector['$text']).to eq({'$search' => 'bar'})
+        expect(result.selector['hello']).to eq('world')
+      end
+    end
+
+    context 'scope is given first' do
+      let(:result) { ArgumentScopeWhereModel.my_text_search('bar').where(hello: 'world') }
+
+      it_behaves_like 'restricts to both'
+    end
+
+    context 'where is given first' do
+      let(:result) { ArgumentScopeWhereModel.where(hello: 'world').my_text_search('bar') }
+
+      it_behaves_like 'restricts to both'
+    end
+  end
+
+  describe 'built in text search scope and where' do
+    class TextSearchScopeWhereModel
+      include Mongoid::Document
+
+      # using the default text_search scope
+    end
+
+    shared_examples_for 'restricts to both' do
+      it 'restricts to both' do
+        expect(result.selector['$text']).to eq({'$search' => 'bar'})
+        expect(result.selector['hello']).to eq('world')
+      end
+    end
+
+    context 'scope is given first' do
+      let(:result) { TextSearchScopeWhereModel.text_search('bar').where(hello: 'world') }
+
+      it_behaves_like 'restricts to both'
+    end
+
+    context 'where is given first' do
+      let(:result) { TextSearchScopeWhereModel.where(hello: 'world').text_search('bar') }
+
+      it_behaves_like 'restricts to both'
+    end
+  end
 end
