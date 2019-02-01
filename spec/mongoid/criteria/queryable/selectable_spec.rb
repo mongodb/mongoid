@@ -3371,7 +3371,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
 
       it "constructs a text search document" do
-        expect(selection.selector).to eq({ :$text => { :$search => "testing" }})
+        expect(selection.selector).to eq({ '$text' => { '$search' => "testing" }})
       end
 
       it "returns the cloned selectable" do
@@ -3385,14 +3385,33 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it "constructs a text search document" do
-          expect(selection.selector[:$text][:$search]).to eq("essais")
+          expect(selection.selector['$text']['$search']).to eq("essais")
         end
 
         it "add the options to the text search document" do
-          expect(selection.selector[:$text][:$language]).to eq("fr")
+          expect(selection.selector['$text'][:$language]).to eq("fr")
         end
 
         it_behaves_like "a cloning selection"
+      end
+    end
+
+    context 'when given more than once' do
+      let(:selection) do
+        query.text_search("one").text_search('two')
+      end
+
+      # MongoDB server can only handle one text expression at a time,
+      # per https://docs.mongodb.com/manual/reference/operator/query/text/.
+      # Nonetheless we test that the query is built correctly when
+      # a user supplies more than one text condition.
+      it 'merges conditions' do
+        expect(Mongoid.logger).to receive(:warn)
+        expect(selection.selector).to eq('$and' => [
+            {'$text' => {'$search' => 'one'}}
+          ],
+          '$text' => {'$search' => 'two'},
+        )
       end
     end
   end
