@@ -117,6 +117,10 @@ Mongoid also provides a rake task to delete all secondary indexes.
 
    $ rake db:mongoid:remove_indexes
 
+Note: the output of these rake tasks goes to the default logger configured
+by Rails. This is usually a file like ``log/development.log`` and not standard
+output.
+
 These create/remove indexes commands also works for just one model by running
 
 .. code-block:: ruby
