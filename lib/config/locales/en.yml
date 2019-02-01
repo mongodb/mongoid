@@ -8,15 +8,15 @@ en:
         summary_title: "summary"
         resolution_title: "resolution"
         ambiguous_relationship:
-          message: "Ambiguous relations %{candidates} defined on %{klass}."
+          message: "Ambiguous associations %{candidates} defined on %{klass}."
           summary:
-            "When Mongoid attempts to set an inverse document of a relation
-            in memory, it needs to know which relation it belongs to. When
+            "When Mongoid attempts to set an inverse document of an association
+            in memory, it needs to know which association it belongs to. When
             setting %{name}, Mongoid looked on the class %{inverse}
-            for a matching relation, but multiples were found that could
+            for a matching association, but multiples were found that could
             potentially match: %{candidates}."
-          resolution: "On the %{name} relation on %{inverse} you must add an
-            :inverse_of option to specify the exact relationship on %{klass}
+          resolution: "On the %{name} association on %{inverse} you must add an
+            :inverse_of option to specify the exact association on %{klass}
             that is the opposite of %{name}."
         callbacks:
           message: "Calling %{method} on %{klass} resulted in a false return
@@ -62,9 +62,9 @@ en:
             which will cause a nil to be returned instead of raising this error."
         eager_load:
           message: "Eager loading :%{name} is not supported since it is a
-            polymorphic belongs_to relation."
+            polymorphic belongs_to association."
           summary: "Mongoid cannot currently determine the classes it needs to
-            eager load when the relation is polymorphic. The parents reside in
+            eager load when the association is polymorphic. The parents reside in
             different collections so a simple id lookup is not sufficient enough."
           resolution: "Don't attempt to perform this action and have patience,
             maybe this will be supported in the future."
@@ -126,9 +126,9 @@ en:
         invalid_includes:
           message: "Invalid includes directive: %{klass}.includes(%{args})"
           summary: "Eager loading in Mongoid only supports providing arguments
-            to %{klass}.includes that are the names of relations on the %{klass}."
+            to %{klass}.includes that are the names of associations on the %{klass}."
           resolution: "Ensure that each parameter passed to %{klass}.includes is
-            a valid name of a relation on the %{klass} model. These are: %{relations}."
+            a valid name of an association on the %{klass} model. These are: %{relations}."
         invalid_index:
           message: "Invalid index specification on %{klass}: %{spec}, %{options}"
           summary: "Indexes in Mongoid are defined as a hash of field name and
@@ -165,8 +165,8 @@ en:
             \_\_\_\_index({ location: '2d' }, { background: true })\n
             \_\_end\n\n"
         invalid_options:
-          message: "Invalid option :%{invalid} provided to relation :%{name}."
-          summary: "Mongoid checks the options that are passed to the relation
+          message: "Invalid option :%{invalid} provided to association :%{name}."
+          summary: "Mongoid checks the options that are passed to the association
             macros to ensure that no ill side effects occur by letting something
             slip by."
           resolution: "Valid options are: %{valid}, make sure these are the ones
@@ -179,7 +179,7 @@ en:
             root path assigned."
           resolution: "Most likely your embedded model, %{klass} is also
             referenced via a has_many from a root document in another
-            collection. Double check the relation definitions and fix any
+            collection. Double check the association definitions and fix any
             instances where embedded documents are improperly referenced
             from other collections."
         invalid_persistence_option:
@@ -189,8 +189,8 @@ en:
           resolution: "Valid options are: %{valid}, make sure these are the ones
              you are using."
         invalid_relation:
-          message: "Defining a relation named '%{name}' is not allowed."
-          summary: "Defining this relation would override the method '%{name}',
+          message: "Defining an association named '%{name}' is not allowed."
+          summary: "Defining this association would override the method '%{name}',
             which would cause issues with expectations around the original
             method and cause extremely hard to debug issues. The original
             method was defined in:\n
@@ -202,9 +202,9 @@ en:
             conflict with core Ruby methods on Object, Module, Enumerable, or
             included gems that inject methods into these or Mongoid internals."
         invalid_relation_option:
-          message: "Invalid relation option :%{option} for relation '%{name}' on class
+          message: "Invalid association option :%{option} for association '%{name}' on class
             %{klass}."
-          summary: "An invalid option was provided for a relation."
+          summary: "An invalid option was provided for an association."
           resolution: "Valid options are: %{valid_options}, make sure you use only those."
         invalid_scope:
           message: "Defining a scope of value %{value} on %{klass} is not
@@ -261,16 +261,16 @@ en:
           message: "When adding a(n) %{klass} to %{base}#%{name}, Mongoid could
             not determine the inverse foreign key to set. The attempted key was
             '%{inverse}'."
-          summary: "When adding a document to a relation, Mongoid attempts
-            to link the newly added document to the base of the relation in
+          summary: "When adding a document to an association, Mongoid attempts
+            to link the newly added document to the base of the association in
             memory, as well as set the foreign key to link them on the
             database side. In this case Mongoid could not determine what the
             inverse foreign key was."
           resolution: "If an inverse is not required, like a belongs_to or
             has_and_belongs_to_many, ensure that :inverse_of => nil is set
-            on the relation. If the inverse is needed, most likely the
-            inverse cannot be figured out from the names of the relations and
-            you will need to explicitly tell Mongoid on the relation what
+            on the association. If the inverse is needed, most likely the
+            inverse cannot be figured out from the names of the associations and
+            you will need to explicitly tell Mongoid on the association what
             the inverse is.\n\n
             Example:\n
             \_\_class Lush\n
@@ -283,13 +283,13 @@ en:
             \_\_end"
         invalid_set_polymorphic_relation:
           message: "The %{name} attribute can't be set to an instance of
-            %{other_klass} as %{other_klass} has multiple relations referencing
+            %{other_klass} as %{other_klass} has multiple associations referencing
             %{klass} as %{name}."
-          summary: "If the parent class of a polymorphic relation has multiple
-            definitions for the same relation, the values must be set from the
+          summary: "If the parent class of a polymorphic association has multiple
+            definitions for the same association, the values must be set from the
             parent side and not the child side since Mongoid cannot determine
-            from the child side which relation to go in."
-          resolution: "Set the values from the parent, or redefine the relation
+            from the child side which association to go in."
+          resolution: "Set the values from the parent, or redefine the association
             with only a single definition in the parent."
         invalid_value:
           message: "Value of type %{value_class} cannot be written to a field of type %{field_class}"
@@ -297,7 +297,7 @@ en:
           resolution: "Verify if the value to be set correspond to field definition"
         mixed_relations:
           message: "Referencing a(n) %{embedded} document from the %{root}
-            document via a relational association is not allowed since the
+            document via a non-embedded association is not allowed since the
             %{embedded} is embedded."
           summary: "In order to properly access a(n) %{embedded} from %{root}
             the reference would need to go through the root document of
@@ -317,15 +317,15 @@ en:
           resolution: "Provide either only a uri as configuration or only
             standard options."
         nested_attributes_metadata_not_found:
-          message: "Could not find metadata for relation '%{name}' on model:
+          message: "Could not find metadata for association '%{name}' on model:
             %{klass}."
-          summary: "When defining nested attributes for a relation, Mongoid
-            needs to access the metadata for the relation '%{name}' in order
+          summary: "When defining nested attributes for an association, Mongoid
+            needs to access the metadata for the association '%{name}' in order
             if add autosave functionality to it, if applicable. Either no
-            relation named '%{name}' could be found, or the relation had not
+            association named '%{name}' could be found, or the association had not
             been defined yet."
-          resolution: "Make sure that there is a relation defined named
-            '%{name}' on %{klass} or that the relation definition comes before
+          resolution: "Make sure that there is an association defined named
+            '%{name}' on %{klass} or that the association definition comes before
             the accepts_nested_attributes_for macro in the model - order
             matters so that Mongoid has access to the metadata.\n\n
             Example:\n
@@ -373,16 +373,16 @@ en:
             \_\_reduce:  'collection-name'\n\n"
         no_metadata:
           message: "Metadata not found for document of type %{klass}."
-          summary: "Mongoid sets the metadata of a relation on the document
-            when it is either loaded from within the relation, or added to
+          summary: "Mongoid sets the metadata of an association on the document
+            when it is either loaded from within the association, or added to
             one. The presence of the metadata is required in order to
-            provide various functionality around relations. Most likely you
+            provide various functionality around associations. Most likely you
             are getting this error because the document is embedded and was
             attempted to be persisted without being associated with a parent,
-            or the relation was not properly defined."
-          resolution: "Ensure that your relations on the %{klass} model
-            are all properly defined, and that the inverse relations
-            are also properly defined. Embedded relations must have both the
+            or the association was not properly defined."
+          resolution: "Ensure that your associations on the %{klass} model
+            are all properly defined, and that the inverse associations
+            are also properly defined. Embedded associations must have both the
             parent (embeds_one/embeds_many) and the inverse (embedded_in)
             present in order to work properly."
         no_parent:
@@ -393,9 +393,9 @@ en:
             most likely caused by either calling %{klass}.create or
             %{klass}.create! without setting the parent document as an
             attribute."
-          resolution: "Ensure that you've set the parent relation if
+          resolution: "Ensure that you've set the parent association if
             instantiating the embedded document directly, or always create new
-            embedded documents via the parent relation."
+            embedded documents via the parent association."
         no_client_config:
           message: "No configuration could be found for a client named
             '%{name}'."
@@ -514,7 +514,7 @@ en:
         unsaved_document:
           message: "Attempted to save %{document} before the parent %{base}."
           summary: "You cannot call create or create! through the
-            relation (%{document}) whose parent (%{base}) is
+            association (%{document}) whose parent (%{base}) is
             not already saved. This would cause the database to be out of sync
             since the child could potentially reference a nonexistent parent."
           resolution: "Make sure to only use create or create! when the parent
@@ -526,7 +526,7 @@ en:
             #where criterion on embedded documents. Since %{klass} is embedded,
             the expression %{javascript} is not allowed."
           resolution: "Please provide a standard hash to #where when the criteria
-            is for an embedded relation."
+            is for an embedded association."
         validations:
           message: "Validation of %{document} failed."
           summary: "The following errors were found: %{errors}"
@@ -538,4 +538,4 @@ en:
             Mongoid will raise an error when attempting to delete the
             %{document} when the child '%{relation}' still has documents in it."
           resolution: "Don't attempt to delete the parent %{document} when
-            it has children, or change the dependent option on the relation."
+            it has children, or change the dependent option on the association."
