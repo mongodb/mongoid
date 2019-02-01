@@ -93,6 +93,9 @@ various options in the comments above each key:
           - myhost2.mydomain.com:27017
           - myhost3.mydomain.com:27017
         options:
+          # These options are Ruby driver options, documented in
+          # https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/
+
           # Change the default write concern. (default = { w: 1 })
           write:
             w: 1
@@ -180,6 +183,9 @@ various options in the comments above each key:
           # The file containing a set of concatenated certification authority certifications
           # used to validate certs passed from the other end of the connection.
           ssl_ca_cert: /path/to/ca.cert
+          
+          # Compressors to use. (default is to not use compression)
+          compressors: [zlib]
 
     # Configure Mongoid specific options. (optional)
     options:
@@ -209,6 +215,9 @@ various options in the comments above each key:
 
       # Set the Mongoid and Ruby driver log levels. (default: :info)
       log_level: :info
+
+The Ruby driver options may be found in 
+`the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
 
 Inline Configuration
 ********************
