@@ -3406,6 +3406,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       # Nonetheless we test that the query is built correctly when
       # a user supplies more than one text condition.
       it 'merges conditions' do
+        expect(Mongoid.logger).to receive(:warn)
         expect(selection.selector).to eq('$and' => [
             {'$text' => {'$search' => 'one'}}
           ],
