@@ -12,19 +12,19 @@ describe Mongoid::Errors::NestedAttributesMetadataNotFound do
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "Could not find metadata for relation 'posts' on model: Person."
+        "Could not find metadata for association 'posts' on model: Person."
       )
     end
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "When defining nested attributes for a relation, Mongoid needs"
+        "When defining nested attributes for an association, Mongoid needs"
       )
     end
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "Make sure that there is a relation defined named 'posts' on Person"
+        "Make sure that there is an association defined named 'posts' on Person"
       )
     end
   end
