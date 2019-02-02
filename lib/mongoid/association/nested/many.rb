@@ -190,7 +190,7 @@ module Mongoid
             end
           else
             # push existing document to association
-            doc = existing.unscoped.find(converted)
+            doc = association.klass.unscoped.find(converted)
             update_document(doc, attrs)
             existing.push(doc) unless destroyable?(attrs)
           end

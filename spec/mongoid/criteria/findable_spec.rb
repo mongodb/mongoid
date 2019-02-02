@@ -37,6 +37,42 @@ describe Mongoid::Criteria::Findable do
           expect(found).to eq(band)
         end
       end
+
+      context 'when criteria has additional conditions' do
+        let(:band) do
+          Band.create(name: "Tool")
+        end
+
+        let(:found) do
+          Band.where(name: 'Blah').find(band.id)
+        end
+
+        it 'respects conditions' do
+          expect do
+            found
+          end.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+      end
+
+      context 'when criteria has additional conditions on id' do
+        let(:band) do
+          Band.create(name: "Tool")
+        end
+
+        let(:other) do
+          Band.create(name: "Other")
+        end
+
+        let(:found) do
+          Band.where(id: other.id).find(band.id)
+        end
+
+        it 'respects both conditions' do
+          expect do
+            found
+          end.to raise_error(Mongoid::Errors::DocumentNotFound)
+        end
+      end
     end
 
     context "when using object ids" do
@@ -1195,6 +1231,25 @@ describe Mongoid::Criteria::Findable do
 
       it "returns the correct document" do
         expect(from_db.first).to eq(band)
+      end
+    end
+  end
+
+  describe '#from_database_selector' do
+    let(:criteria) { Mongoid::Criteria.new(Band) }
+    let(:result) { criteria.send(:from_database_selector, [1]) }
+
+    context 'when criteria is empty' do
+      it 'adds id' do
+        expect(result.selector).to eq('_id' => 1)
+      end
+    end
+
+    context 'when criteria is restricted by id' do
+      let(:criteria) { Mongoid::Criteria.new(Band).where(id: 2) }
+
+      it 'adds id' do
+        expect(result.selector).to eq('$and' => [{'_id' => 2}], '_id' => 1)
       end
     end
   end

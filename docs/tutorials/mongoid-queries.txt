@@ -222,13 +222,25 @@ Mongoid also has some helpful methods on criteria.
 
        *Find a document by the provided attributes, and if not found
        create and return a newly persisted one. Note that attributes provided in the arguments to
-       this method will override any set in ``create_with``*
+       this method will override any set in ``create_with``*.
 
      -
         .. code-block:: ruby
 
           Band.find_or_create_by(name: "Photek")
           Band.where(:likes.gt => 10).find_or_create_by(name: "Photek")
+       
+        ``find_or_create_by`` can be used on any scope, but in this case
+        the criteria given by the scope and by ``find_or_create_by`` are
+        combined. The following creates three bands:
+        
+        .. code-block:: ruby
+
+          Band.find_or_create_by(name: "Photek")
+          Band.where(name: "Photek").find_or_create_by(name: "Aerosmith")
+          # creates Aerosmith again because there is no band whose name
+          # is Photek and Aerosmith at the same time
+          Band.where(name: "Photek").find_or_create_by(name: "Aerosmith")
 
    * - ``Criteria#find_or_initialize_by``
 

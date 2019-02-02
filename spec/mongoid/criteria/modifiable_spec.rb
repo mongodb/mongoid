@@ -1775,7 +1775,7 @@ describe Mongoid::Criteria::Modifiable do
           end
         end
 
-        context 'when a write method is chained' do
+        context 'when a write method is chained producing conflicting criteria' do
 
           let(:new_person) do
             criteria.create_with(attrs).find_or_create_by(query)
@@ -1799,9 +1799,10 @@ describe Mongoid::Criteria::Modifiable do
               criteria.create_with(attrs).find_or_create_by(query)
             end
 
-            it 'finds the matching document' do
+            it 'creates a new document' do
               person
-              expect(found_person.id).to eq(person.id)
+              expect(found_person.id).not_to eq(person.id)
+              expect(found_person.id > person.id).to be true
             end
           end
         end
