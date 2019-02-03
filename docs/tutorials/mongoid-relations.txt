@@ -122,6 +122,42 @@ association:
   # looks up emails where emails.c_ref == company.c
   company.emails
 
+With a has_and_belongs_to_many association, primary key is the field on
+the remote model that contains the value by which the remote model is
+looked up, and foreign key is the field on the local model which stores
+these values. For example:
+
+.. code-block:: ruby
+
+  class Company
+    include Mongoid::Document
+    
+    field :c_id, type: Integer
+    field :e_ids, type: Array
+    
+    has_and_belongs_to_many :employees, primary_key: :e_id, foreign_key: :e_ids
+  end
+  
+  class Employee
+    include Mongoid::Document
+    
+    field :e_id, type: Integer
+    field :c_ids, type: Array
+    
+    has_and_belongs_to_many :companies, primary_key: :c_id, foreign_key: :c_ids
+  end
+  
+  company = Company.create!(c_id: 123)
+  # => #<Company _id: 5c565ece026d7c461d8a9d4e, c_id: 123, e_ids: nil>
+  
+  employee = Employee.create!(e_id: 456)
+  # => #<Employee _id: 5c565ee8026d7c461d8a9d4f, e_id: 456, c_ids: nil>
+
+  company.employees << employee
+  
+  company
+  # => #<Company _id: 5c565ece026d7c461d8a9d4e, c_id: 123, e_ids: [456]>
+
 Note that just like with the default ``#{association_name}_id`` field,
 Mongoid automatically adds a field for the custom foreign key ``c_ref`` to
 the model. However, since Mongoid doesn't know what type of data should be
