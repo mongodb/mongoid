@@ -5,11 +5,11 @@ module Mongoid
     module Referenced
       class HasAndBelongsToMany
 
-        # Binding class for all has_and_belongs_to_many relations.
+        # Binding class for all has_and_belongs_to_many associations.
         class Binding
           include Bindable
 
-          # Binds a single document with the inverse relation. Used
+          # Binds a single document with the inverse association. Used
           # specifically when appending to the proxy.
           #
           # @example Bind one document.

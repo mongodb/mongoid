@@ -17,8 +17,8 @@ module Mongoid
           #   relation.build(meta, attrs)
           #
           # @param [ Object ] base The base object.
-          # @param [ Object ] object The object to use to build the relation.
-          # @param [ String ] type The type of the relation.
+          # @param [ Object ] object The object to use to build the association.
+          # @param [ String ] type The type of the association.
           #
           # @return [ Document ] A single document.
           def build(base, object, type = nil)

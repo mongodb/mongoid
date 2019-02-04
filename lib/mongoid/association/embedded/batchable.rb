@@ -25,7 +25,7 @@ module Mongoid
           execute_batch_push(docs)
         end
 
-        # Clear all of the docs out of the relation in a single swipe.
+        # Clear all of the docs out of the association in a single swipe.
         #
         # @example Clear all docs.
         #   batchable.batch_clear(docs)

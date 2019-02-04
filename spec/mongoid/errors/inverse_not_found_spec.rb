@@ -18,7 +18,7 @@ describe Mongoid::Errors::InverseNotFound do
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "hen adding a document to a relation, Mongoid attempts to link"
+        "hen adding a document to an association, Mongoid attempts to link"
       )
     end
 

@@ -5,9 +5,9 @@ module Mongoid
     module Referenced
       class BelongsTo
 
-        # This class handles all behavior for relations that are either
+        # This class handles all behavior for associations that are either
         # one-to-many or one-to-one, where the foreign key is stored on this side
-        # of the relation and the reference is to document(s) in another
+        # of the association and the reference is to document(s) in another
         # collection.
         class Proxy < Association::One
           include Evolvable
@@ -17,9 +17,9 @@ module Mongoid
           # @example Create the new proxy.
           #   Association::BelongsTo::Proxy.new(game, person, association)
           #
-          # @param [ Document ] base The document this relation hangs off of.
+          # @param [ Document ] base The document this association hangs off of.
           # @param [ Document, Array<Document> ] target The target (parent) of the
-          #   relation.
+          #   association.
           # @param [ Association ] association The association object.
           def initialize(base, target, association)
             init(base, target, association) do
@@ -32,7 +32,7 @@ module Mongoid
           # document by deleting the foreign key and the reference, orphaning
           # the target document in the process.
           #
-          # @example Nullify the relation.
+          # @example Nullify the association.
           #   person.game.nullify
           #
           def nullify
@@ -41,14 +41,14 @@ module Mongoid
           end
 
           # Substitutes the supplied target documents for the existing document
-          # in the relation.
+          # in the association.
           #
-          # @example Substitute the relation.
+          # @example Substitute the association.
           #   name.substitute(new_name)
           #
           # @param [ Document, Array<Document> ] replacement The replacement.
           #
-          # @return [ self, nil ] The relation or nil.
+          # @return [ self, nil ] The association or nil.
           #
           # @since 2.0.0.rc.1
           def substitute(replacement)
@@ -62,7 +62,7 @@ module Mongoid
 
           private
 
-          # Instantiate the binding associated with this relation.
+          # Instantiate the binding associated with this association.
           #
           # @example Get the binding object.
           #   binding([ address ])
@@ -91,12 +91,12 @@ module Mongoid
             _association.build(klass, replacement)
           end
 
-          # Are we able to persist this relation?
+          # Are we able to persist this association?
           #
-          # @example Can we persist the relation?
+          # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the relation is persistable.
+          # @return [ true, false ] If the association is persistable.
           #
           # @since 2.1.0
           def persistable?
@@ -117,10 +117,10 @@ module Mongoid
               Eager.new(association, docs)
             end
 
-            # Returns true if the relation is an embedded one. In this case
+            # Returns true if the association is an embedded one. In this case
             # always false.
             #
-            # @example Is this relation embedded?
+            # @example Is this association embedded?
             #   Association::BelongsTo::Proxy.embedded?
             #
             # @return [ false ] Always false.

@@ -319,9 +319,9 @@ Eager Loading
 *************
 
 Mongoid provides a facility to eager load documents
-from relations to prevent the n+1 issue when
-iterating over documents with relation access. Eager loaded is supported on
-all relations with the exception of polymorphic ``belongs_to``
+from associations to prevent the n+1 issue when
+iterating over documents with association access. Eager loading is supported on
+all associations with the exception of polymorphic ``belongs_to``
 associations.
 
 .. code-block:: ruby
@@ -676,10 +676,10 @@ again later to always ensure it's there.
 
   Band.unscoped.where(name: "Depeche Mode").scoped
 
-If you are using a default scope on a model that is part of a relation,
-you must reload the relation to have scoping reapplied.
-This is important to note if you change a value of a document in the relation
-that would affect its visibility within the scoped relation.
+If you are using a default scope on a model that is part of an association,
+you must reload the association to have scoping reapplied.
+This is important to note if you change a value of a document in the association
+that would affect its visibility within the scoped association.
 
 .. code-block:: ruby
 

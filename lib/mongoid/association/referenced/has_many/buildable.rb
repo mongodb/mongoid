@@ -17,7 +17,7 @@ module Mongoid
           #   relation.build(meta, attrs)
           #
           # @param [ Object ] base The base object.
-          # @param [ Object ] object The object to use to build the relation.
+          # @param [ Object ] object The object to use to build the association.
           # @param [ String ] type The type of document to query for.
           #
           # @return [ Document ] A single document.

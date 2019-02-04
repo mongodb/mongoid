@@ -10,7 +10,7 @@ module Mongoid
         class Proxy < Association::Many
           include Batchable
 
-          # Appends a document or array of documents to the relation. Will set
+          # Appends a document or array of documents to the association. Will set
           # the parent and update the index in the process.
           #
           # @example Append a document.
@@ -32,19 +32,19 @@ module Mongoid
 
           alias :push :<<
 
-          # Get this relation as as its representation in the database.
+          # Get this association as as its representation in the database.
           #
-          # @example Convert the relation to an attributes hash.
+          # @example Convert the association to an attributes hash.
           #   person.addresses.as_document
           #
-          # @return [ Array<Hash> ] The relation as stored in the db.
+          # @return [ Array<Hash> ] The association as stored in the db.
           #
           # @since 2.0.0.rc.1
           def as_document
             as_attributes.collect { |attrs| BSON::Document.new(attrs) }
           end
 
-          # Appends an array of documents to the relation. Performs a batch
+          # Appends an array of documents to the association. Performs a batch
           # insert of the documents instead of persisting one at a time.
           #
           # @example Concat with other documents.
@@ -60,10 +60,10 @@ module Mongoid
             self
           end
 
-          # Builds a new document in the relation and appends it to the target.
+          # Builds a new document in the association and appends it to the target.
           # Takes an optional type if you want to specify a subclass.
           #
-          # @example Build a new document on the relation.
+          # @example Build a new document on the association.
           #   person.people.build(:name => "Bozo")
           #
           # @param [ Hash ] attributes The attributes to build the document with.
@@ -82,13 +82,13 @@ module Mongoid
 
           alias :new :build
 
-          # Clear the relation. Will delete the documents from the db if they are
+          # Clear the association. Will delete the documents from the db if they are
           # already persisted.
           #
-          # @example Clear the relation.
+          # @example Clear the association.
           #   person.addresses.clear
           #
-          # @return [ self ] The empty relation.
+          # @return [ self ] The empty association.
           def clear
             batch_clear(_target.dup)
             self
@@ -111,7 +111,7 @@ module Mongoid
           # Delete the supplied document from the target. This method is proxied
           # in order to reindex the array after the operation occurs.
           #
-          # @example Delete the document from the relation.
+          # @example Delete the document from the association.
           #   person.addresses.delete(address)
           #
           # @param [ Document ] document The document to be deleted.
@@ -138,10 +138,10 @@ module Mongoid
 
           # Delete all the documents in the association without running callbacks.
           #
-          # @example Delete all documents from the relation.
+          # @example Delete all documents from the association.
           #   person.addresses.delete_all
           #
-          # @example Conditionally delete documents from the relation.
+          # @example Conditionally delete documents from the association.
           #   person.addresses.delete_all({ :street => "Bond" })
           #
           # @param [ Hash ] conditions Conditions on which documents to delete.
@@ -158,7 +158,7 @@ module Mongoid
           #     doc.state == "GA"
           #   end
           #
-          # @return [ Many, Enumerator ] The relation or an enumerator if no
+          # @return [ Many, Enumerator ] The association or an enumerator if no
           #   block was provided.
           #
           # @since 3.1.0
@@ -176,10 +176,10 @@ module Mongoid
 
           # Destroy all the documents in the association whilst running callbacks.
           #
-          # @example Destroy all documents from the relation.
+          # @example Destroy all documents from the association.
           #   person.addresses.destroy_all
           #
-          # @example Conditionally destroy documents from the relation.
+          # @example Conditionally destroy documents from the association.
           #   person.addresses.destroy_all({ :street => "Bond" })
           #
           # @param [ Hash ] conditions Conditions on which documents to destroy.
@@ -189,7 +189,7 @@ module Mongoid
             remove_all(conditions, :destroy)
           end
 
-          # Determine if any documents in this relation exist in the database.
+          # Determine if any documents in this association exist in the database.
           #
           # @example Are there persisted documents?
           #   person.posts.exists?
@@ -215,13 +215,13 @@ module Mongoid
             criteria.find(*args)
           end
 
-          # Instantiate a new embeds_many relation.
+          # Instantiate a new embeds_many association.
           #
-          # @example Create the new relation.
+          # @example Create the new association.
           #   Many.new(person, addresses, association)
           #
-          # @param [ Document ] base The document this relation hangs off of.
-          # @param [ Array<Document> ] target The child documents of the relation.
+          # @param [ Document ] base The document this association hangs off of.
+          # @param [ Array<Document> ] target The child documents of the association.
           # @param [ Association ] association The association metadata
           #
           # @return [ Many ] The proxy.
@@ -236,7 +236,7 @@ module Mongoid
             end
           end
 
-          # Get all the documents in the relation that are loaded into memory.
+          # Get all the documents in the association that are loaded into memory.
           #
           # @example Get the in memory documents.
           #   relation.in_memory
@@ -248,7 +248,7 @@ module Mongoid
             _target
           end
 
-          # Pop documents off the relation. This can be a single document or
+          # Pop documents off the association. This can be a single document or
           # multiples, and will automatically persist the changes.
           #
           # @example Pop a single document.
@@ -273,7 +273,7 @@ module Mongoid
             end
           end
 
-          # Shift documents off the relation. This can be a single document or
+          # Shift documents off the association. This can be a single document or
           # multiples, and will automatically persist the changes.
           #
           # @example Shift a single document.
@@ -299,12 +299,12 @@ module Mongoid
           # Substitutes the supplied target documents for the existing documents
           # in the relation.
           #
-          # @example Substitute the relation's target.
+          # @example Substitute the association's target.
           #   person.addresses.substitute([ address ])
           #
           # @param [ Array<Document> ] docs The replacement docs.
           #
-          # @return [ Many ] The proxied relation.
+          # @return [ Many ] The proxied association.
           #
           # @since 2.0.0.rc.1
           def substitute(docs)
@@ -312,13 +312,13 @@ module Mongoid
             self
           end
 
-          # Return the relation with all previous scoping removed. This is the
+          # Return the association with all previous scoping removed. This is the
           # exact representation of the docs in the database.
           #
           # @example Get the unscoped documents.
           #   person.addresses.unscoped
           #
-          # @return [ Criteria ] The unscoped relation.
+          # @return [ Criteria ] The unscoped association.
           #
           # @since 2.4.0
           def unscoped
@@ -354,7 +354,7 @@ module Mongoid
             execute_callback :after_add, document
           end
 
-          # Instantiate the binding associated with this relation.
+          # Instantiate the binding associated with this association.
           #
           # @example Create the binding.
           #   relation.binding([ address ])
@@ -369,7 +369,7 @@ module Mongoid
           # Returns the "#{criteria}"# object for the target class with its documents set
           # to target.
           #
-          # @example Get a criteria for the relation.
+          # @example Get a criteria for the association.
           #   relation.criteria
           #
           # @return [ Criteria ] A new criteria.
@@ -393,7 +393,7 @@ module Mongoid
             reindex
           end
 
-          # Integrate the document into the relation. will set its metadata and
+          # Integrate the document into the association. will set its metadata and
           # attempt to bind the inverse.
           #
           # @example Integrate the document.
@@ -424,12 +424,12 @@ module Mongoid
             end
           end
 
-          # Are we able to persist this relation?
+          # Are we able to persist this association?
           #
-          # @example Can we persist the relation?
+          # @example Can we persist the association?
           #   relation.persistable?
           #
-          # @return [ true, false ] If the relation is persistable.
+          # @return [ true, false ] If the association is persistable.
           #
           # @since 2.1.0
           def persistable?
@@ -440,7 +440,7 @@ module Mongoid
           # operations on the proxied target directly and the indices need to
           # match that on the database side.
           #
-          # @example Reindex the relation.
+          # @example Reindex the association.
           #   person.addresses.reindex
           #
           # @since 2.0.0.rc.1
@@ -469,10 +469,10 @@ module Mongoid
             crit.entries
           end
 
-          # Remove all documents from the relation, either with a delete or a
+          # Remove all documents from the association, either with a delete or a
           # destroy depending on what this was called through.
           #
-          # @example Destroy documents from the relation.
+          # @example Destroy documents from the association.
           #   relation.remove_all({ :num => 1 }, true)
           #
           # @param [ Hash ] conditions Conditions to filter by.
@@ -522,10 +522,10 @@ module Mongoid
 
           class << self
 
-            # Returns true if the relation is an embedded one. In this case
+            # Returns true if the association is an embedded one. In this case
             # always true.
             #
-            # @example Is the relation embedded?
+            # @example Is the association embedded?
             #   Association::Embedded::EmbedsMany.embedded?
             #
             # @return [ true ] true.

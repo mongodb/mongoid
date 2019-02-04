@@ -56,15 +56,15 @@ module Mongoid
     end
 
     # Overrides the default ActiveModel behavior since we need to handle
-    # validations of relations slightly different than just calling the
+    # validations of associations slightly different than just calling the
     # getter.
     #
     # @example Read the value.
     #   person.read_attribute_for_validation(:addresses)
     #
-    # @param [ Symbol ] attr The name of the field or relation.
+    # @param [ Symbol ] attr The name of the field or association.
     #
-    # @return [ Object ] The value of the field or the relation.
+    # @return [ Object ] The value of the field or the association.
     #
     # @since 2.0.0.rc.1
     def read_attribute_for_validation(attr)
@@ -124,7 +124,7 @@ module Mongoid
 
     module ClassMethods
 
-      # Adds an associated validator for the relation if the validate option
+      # Adds an associated validator for the association if the validate option
       # was not provided or set to true.
       #
       # @example Set up validation.

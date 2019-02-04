@@ -2,7 +2,7 @@
 # encoding: utf-8
 module Mongoid
 
-  # This module provides the extra behavior for including relations in JSON
+  # This module provides the extra behavior for including associations in JSON
   # and XML serialization.
   #
   # @since 4.0.0
@@ -27,7 +27,7 @@ module Mongoid
     #
     # @param [ Hash ] options The options to pass.
     #
-    # @option options [ Symbol ] :include What relations to include.
+    # @option options [ Symbol ] :include What associations to include.
     # @option options [ Symbol ] :only Limit the fields to only these.
     # @option options [ Symbol ] :except Dont include these fields.
     # @option options [ Symbol ] :methods What methods to include.
@@ -81,7 +81,7 @@ module Mongoid
       names
     end
 
-    # Serialize a single attribute. Handles relations, fields, and dynamic
+    # Serialize a single attribute. Handles associations, fields, and dynamic
     # attributes.
     #
     # @api private
@@ -108,16 +108,16 @@ module Mongoid
       end
     end
 
-    # For each of the provided include options, get the relation needed and
+    # For each of the provided include options, get the association needed and
     # provide it in the hash.
     #
-    # @example Serialize the included relations.
+    # @example Serialize the included associations.
     #   document.serialize_relations({}, :include => :addresses)
     #
     # @param [ Hash ] attributes The attributes to serialize.
     # @param [ Hash ] options The serialization options.
     #
-    # @option options [ Symbol ] :include What relations to include
+    # @option options [ Symbol ] :include What associations to include
     # @option options [ Symbol ] :only Limit the fields to only these.
     # @option options [ Symbol ] :except Dont include these fields.
     #
@@ -136,12 +136,12 @@ module Mongoid
     # Since the inclusions can be a hash, symbol, or array of symbols, this is
     # provided as a convenience to parse out the names.
     #
-    # @example Get the relation names.
+    # @example Get the association names.
     #   document.relation_names(:include => [ :addresses ])
     #
     # @param [ Hash, Symbol, Array<Symbol> ] inclusions The inclusions.
     #
-    # @return [ Array<Symbol> ] The names of the included relations.
+    # @return [ Array<Symbol> ] The names of the included associations.
     #
     # @since 2.0.0.rc.6
     def relation_names(inclusions)
@@ -151,14 +151,14 @@ module Mongoid
     # Since the inclusions can be a hash, symbol, or array of symbols, this is
     # provided as a convenience to parse out the options.
     #
-    # @example Get the relation options.
+    # @example Get the association options.
     #   document.relation_names(:include => [ :addresses ])
     #
     # @param [ Hash, Symbol, Array<Symbol> ] inclusions The inclusions.
     # @param [ Hash ] options The options.
-    # @param [ Symbol ] name The name of the relation.
+    # @param [ Symbol ] name The name of the association.
     #
-    # @return [ Hash ] The options for the relation.
+    # @return [ Hash ] The options for the association.
     #
     # @since 2.0.0.rc.6
     def relation_options(inclusions, options, name)

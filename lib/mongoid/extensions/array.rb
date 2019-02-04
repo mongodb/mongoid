@@ -59,7 +59,7 @@ module Mongoid
         ::Time.configured.local(*self)
       end
 
-      # Check if the array is part of a blank relation criteria.
+      # Check if the array is part of a blank association criteria.
       #
       # @example Is the array blank criteria?
       #   [].blank_criteria?

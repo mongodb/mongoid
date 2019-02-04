@@ -5,7 +5,7 @@ module Mongoid
     module Embedded
 
       # This module provides convenience macros for using cyclic embedded
-      # relations.
+      # associations.
       module Cyclic
         extend ActiveSupport::Concern
 
@@ -15,7 +15,7 @@ module Mongoid
 
         module ClassMethods
 
-          # Create a cyclic embedded relation that creates a tree hierarchy for
+          # Create a cyclic embedded association that creates a tree hierarchy for
           # the document and many embedded child documents.
           #
           # @example Set up a recursive embeds many.
@@ -45,7 +45,7 @@ module Mongoid
             embedded_in cyclic_parent_name, class_name: self.name, cyclic: true
           end
 
-          # Create a cyclic embedded relation that creates a single self
+          # Create a cyclic embedded association that creates a single self
           # referencing relationship for a parent and a single child.
           #
           # @example Set up a recursive embeds one.
@@ -94,7 +94,7 @@ module Mongoid
           # @example Determine the child name.
           #   Role.cyclic_child_name
           #
-          # @param [ true, false ] many Is the a many relation?
+          # @param [ true, false ] many Is the a many association?
           #
           # @return [ String ] "child_" plus the class name underscored in
           #   singular or plural form.

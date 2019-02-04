@@ -12,13 +12,13 @@ module Mongoid
           include Threaded::Lifecycle
 
           # Builds the document out of the attributes using the provided
-          # association metadata on the relation. Instantiates through the factory in order
+          # association metadata on the association. Instantiates through the factory in order
           # to make sure subclasses and allocation are used if fitting.
           #
           # @example Build the document.
           #   Builder.new(meta, attrs).build
           #
-          # @param [ Document ] base The document this relation hangs off of.
+          # @param [ Document ] base The document this association hangs off of.
           # @param [ Document ] object The related document.
           # @param [ String ] _type Not used in this context.
           #

@@ -24,7 +24,7 @@ module Mongoid
           end
 
           # Get the position of the document in the hierarchy. This will
-          # include indexes of 1-n embedded relations that may sit above the
+          # include indexes of 1-n embedded associations that may sit above the
           # embedded one.
           #
           # @example Get the position.

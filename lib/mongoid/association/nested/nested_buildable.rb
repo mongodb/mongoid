@@ -24,7 +24,7 @@ module Mongoid
         # @example Is there a reject proc?
         #   builder.reject?
         #
-        # @param [ Document ] document The parent document of the relation
+        # @param [ Document ] document The parent document of the association
         # @param [ Hash ] attrs The attributes to check for rejection.
         #
         # @return [ true, false ] True and call proc or method if rejectable, false if not.
@@ -42,7 +42,7 @@ module Mongoid
         end
 
         # Determines if only updates can occur. Only valid for one-to-one
-        # relations.
+        # associations.
         #
         # @example Is this update only?
         #   builder.update_only?

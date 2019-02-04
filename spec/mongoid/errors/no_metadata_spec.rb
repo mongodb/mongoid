@@ -15,11 +15,11 @@ describe Mongoid::Errors::NoMetadata do
     end
 
     it "contains the summary in the message" do
-      expect(error.message).to include("Mongoid sets the metadata of a relation on the")
+      expect(error.message).to include("Mongoid sets the metadata of an association on the")
     end
 
     it "contains the resolution in the message" do
-      expect(error.message).to include("Ensure that your relations on the Address model")
+      expect(error.message).to include("Ensure that your associations on the Address model")
     end
   end
 end

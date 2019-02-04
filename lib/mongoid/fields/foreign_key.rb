@@ -146,7 +146,7 @@ module Mongoid
         serialize_default(default_val[])
       end
 
-      # Get the id field of the relation.
+      # Get the id field of the association.
       #
       # @api private
       #

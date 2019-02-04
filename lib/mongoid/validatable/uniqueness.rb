@@ -208,8 +208,8 @@ module Mongoid
       end
 
       # Get the name of the field and the value to validate. This is for the
-      # case when we validate a relation via the relation name and not the key,
-      # we need to send the key name and value to the db, not the relation
+      # case when we validate an association via the association name and not the key,
+      # we need to send the key name and value to the db, not the association
       # object.
       #
       # @api private

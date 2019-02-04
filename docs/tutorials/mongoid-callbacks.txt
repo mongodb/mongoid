@@ -82,22 +82,24 @@ syntax as well:
      end
    end
 
-Relation Callbacks
-------------------
+Association Callbacks
+---------------------
 
-Mongoid has a set of callbacks that are specific to collection based relations - these are:
+Mongoid has a set of callbacks that are specific to collection based
+associations - these are:
 
 - ``after_add``
 - ``after_remove``
 - ``before_add``
 - ``before_remove``
 
-Each time a document is added or removed from any of the following relations,
-the respective callbacks are fired: ``embeds_many``,
+Each time a document is added or removed from any of the following associations,
+the respective callbacks are invoked: ``embeds_many``,
 ``has_many``, and ``has_and_belongs_to_many``.
 
-Relation Callbacks are specified as an option on the relation. The element added/removed
-is the parameter to the method you call via the callback. Example:
+Association callbacks are specified as options on the respective association.
+The document added/removed will be passed as the parameter to the specified
+callback. Example:
 
 .. code-block:: ruby
 

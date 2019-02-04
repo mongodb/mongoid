@@ -5,13 +5,13 @@ module Mongoid
     module Embedded
       class EmbedsOne
 
-        # Binding class for all embeds_one relations.
+        # Binding class for all embeds_one associations.
         #
         # @since 7.0
         class Binding
           include Bindable
 
-          # Binds the base object to the inverse of the relation. This is so we
+          # Binds the base object to the inverse of the association. This is so we
           # are referenced to the actual objects themselves on both sides.
           #
           # This case sets the association metadata on the inverse object as well as the

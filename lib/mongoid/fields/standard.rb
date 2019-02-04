@@ -113,7 +113,7 @@ module Mongoid
       # @example Get the metadata.
       #   field.metadata
       #
-      # @return [ Metadata ] The relation metadata.
+      # @return [ Metadata ] The association metadata.
       #
       # @since 2.2.0
       def association

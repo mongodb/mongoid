@@ -4,7 +4,7 @@ module Mongoid
   module Association
     module Marshalable
 
-      # Provides the data needed to Marshal.dump a relation proxy.
+      # Provides the data needed to Marshal.dump an association proxy.
       #
       # @example Dump the proxy.
       #   Marshal.dump(proxy)

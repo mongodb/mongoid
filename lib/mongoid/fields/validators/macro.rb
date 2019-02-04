@@ -42,9 +42,9 @@ module Mongoid
           validate_options(klass, name, options)
         end
 
-        # Validate the relation definition.
+        # Validate the association definition.
         #
-        # @example Validate the relation definition.
+        # @example Validate the association definition.
         #   Macro.validate(Model, :name)
         #
         # @param [ Class ] klass The model class.

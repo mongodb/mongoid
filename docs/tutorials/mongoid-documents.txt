@@ -855,9 +855,9 @@ error will be raised.
 Inheritance
 -----------
 
-Mongoid supports inheritance in both root and embedded documents. In scenarios where
-documents are inherited from their fields, relations, validations and scopes get copied
-down into their child documents, but not vise-versa.
+Mongoid supports inheritance in both top level and embedded documents. When
+a child document inherits from a parent document, the parent document's
+fields, associations, validations and scopes are copied to the child document.
 
 .. code-block:: ruby
 

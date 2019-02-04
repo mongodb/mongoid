@@ -91,7 +91,7 @@ module Mongoid
         # @since 7.0
         def validation_default; true; end
 
-        # Are ids only saved on this side of the relation?
+        # Are ids only saved on this side of the association?
         #
         # @return [ true, false ] Whether this association has a forced nil inverse.
         #
@@ -107,7 +107,7 @@ module Mongoid
         # @since 7.0
         def stores_foreign_key?; true; end
 
-        # Get the relation proxy class for this association type.
+        # Get the association proxy class for this association type.
         #
         # @return [ Association::HasAndBelongsToMany::Proxy ] The proxy class.
         #
@@ -126,9 +126,9 @@ module Mongoid
                              default_foreign_key_field
         end
 
-        # The criteria used for querying this relation.
+        # The criteria used for querying this association.
         #
-        # @return [ Mongoid::Criteria ] The criteria used for querying this relation.
+        # @return [ Mongoid::Criteria ] The criteria used for querying this association.
         #
         # @since 7.0
         def criteria(base, id_list = nil)

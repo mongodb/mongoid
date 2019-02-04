@@ -14,7 +14,7 @@ module Mongoid
       # @example Rename the fields.
       #   document.rename(title: "salutation", name: "nombre")
       #
-      # @note This does not work for fields in embeds many relations.
+      # @note This does not work for fields in embeds many associations.
       #
       # @param [ Hash ] renames The rename pairs of old name/new name.
       #
