@@ -285,7 +285,7 @@ module Mongoid
               new_ids = new_docs.map { |doc| doc._id }
               remove_not_in(new_ids)
               new_docs.each do |doc|
-                docs.push(doc) if doc.send(foreign_key) != _base._id
+                docs.push(doc) if doc.send(foreign_key) != _base.send(_association.primary_key)
               end
               concat(docs)
             else
@@ -304,7 +304,7 @@ module Mongoid
           #
           # @since 2.4.0
           def unscoped
-            klass.unscoped.where(foreign_key => _base._id)
+            klass.unscoped.where(foreign_key => _base.send(_association.primary_key))
           end
 
           private
