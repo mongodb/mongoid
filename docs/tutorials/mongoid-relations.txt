@@ -122,10 +122,20 @@ association:
   # looks up emails where emails.c_ref == company.c
   company.emails
 
-With a has_and_belongs_to_many association, primary key is the field on
-the remote model that contains the value by which the remote model is
-looked up, and foreign key is the field on the local model which stores
-these values. For example:
+With a has_and_belongs_to_many association, since the data is stored on both
+sides of the association, there are 4 fields configurable when the association
+is defined:
+
+- ``:primary_key`` is the field on the remote model that contains the value
+by which the remote model is looked up.
+- ``:foreign_key`` is the field on the local model which stores the
+``:primary_key`` values.
+- ``:inverse_primary_key`` is the field on the local model that the remote
+model uses to look up the local model docuemnts.
+- ``:inverse_foreign_key`` is the field on the remote model storing the
+values in ``:inverse_primary_key``.
+
+An example might make this more clear:
 
 .. code-block:: ruby
 
@@ -135,7 +145,9 @@ these values. For example:
     field :c_id, type: Integer
     field :e_ids, type: Array
     
-    has_and_belongs_to_many :employees, primary_key: :e_id, foreign_key: :e_ids
+    has_and_belongs_to_many :employees,
+      primary_key: :e_id, foreign_key: :e_ids,
+      inverse_primary_key: :c_id, inverse_foreign_key: :c_ids
   end
   
   class Employee
@@ -144,7 +156,9 @@ these values. For example:
     field :e_id, type: Integer
     field :c_ids, type: Array
     
-    has_and_belongs_to_many :companies, primary_key: :c_id, foreign_key: :c_ids
+    has_and_belongs_to_many :companies,
+      primary_key: :c_id, foreign_key: :c_ids,
+      inverse_primary_key: :e_id, inverse_foreign_key: :e_ids
   end
   
   company = Company.create!(c_id: 123)
@@ -157,6 +171,9 @@ these values. For example:
   
   company
   # => #<Company _id: 5c565ece026d7c461d8a9d4e, c_id: 123, e_ids: [456]>
+  
+  employee
+  # => #<Employee _id: 5c5883ce026d7c4b9e244c0c, e_id: 456, c_ids: [123]>
 
 Note that just like with the default ``#{association_name}_id`` field,
 Mongoid automatically adds a field for the custom foreign key ``c_ref`` to

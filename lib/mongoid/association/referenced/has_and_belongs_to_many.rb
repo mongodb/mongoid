@@ -33,7 +33,9 @@ module Mongoid
             :foreign_key,
             :index,
             :order,
-            :primary_key
+            :primary_key,
+            :inverse_primary_key,
+            :inverse_foreign_key,
         ].freeze
 
         # The complete list of valid options for this association, including
@@ -142,7 +144,9 @@ module Mongoid
         #
         # @since 7.0
         def inverse_foreign_key
-          if @options.key?(:inverse_of)
+          if @options.key?(:inverse_foreign_key)
+            @options[:inverse_foreign_key]
+          elsif @options.key?(:inverse_of)
             inverse_of ? "#{inverse_of.to_s.singularize}#{FOREIGN_KEY_SUFFIX}" : nil
           else
             "#{inverse_class_name.demodulize.underscore}#{FOREIGN_KEY_SUFFIX}"
