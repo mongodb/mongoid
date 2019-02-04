@@ -4199,8 +4199,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
           query.where(field: 5).where(field: 10)
         end
 
-        it "overrides the previous field" do
-          expect(selection.selector).to eq({ "field" => 10 })
+        it "combines conditions" do
+          expect(selection.selector).to eq('$and' => [{'field' => 5}], "field" => 10 )
         end
       end
     end

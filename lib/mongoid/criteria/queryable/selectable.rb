@@ -573,7 +573,19 @@ module Mongoid
         # @since 1.0.0
         def expr_query(criterion)
           selection(criterion) do |selector, field, value|
-            selector.merge!(field.__expr_part__(value.__expand_complex__, negating?))
+            kv = field.__expr_part__(value.__expand_complex__, negating?)
+            if selector[field]
+              # We already have a restriction by the field we are trying
+              # to restrict, combine the restrictions
+              selector.replace('$and' => [Hash[selector.to_a]])
+            end
+            # This merge does additional processing on kv, kv isn't written
+            # into the selector as it is.
+            # This is also why we $and only the previous value of the selector,
+            # because we need to pass the new value through serialization logic
+            # otherwise document instances get stored as document instances
+            # and not their ids.
+            selector.merge!(kv)
           end
         end
 

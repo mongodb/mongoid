@@ -106,7 +106,15 @@ module Mongoid
       #
       # @since 3.0.0
       def from_database(ids)
-        (ids.size > 1 ? any_in(id: ids) : where(id: ids.first)).entries
+        from_database_selector(ids).entries
+      end
+
+      private def from_database_selector(ids)
+        if ids.size > 1
+          any_in(_id: ids)
+        else
+          where(_id: ids.first)
+        end
       end
 
       # Convert all the ids to their proper types.
