@@ -30,6 +30,7 @@ end
 
 require 'support/authorization'
 require 'support/expectations'
+require 'support/macros'
 require 'support/constraints'
 
 # Give MongoDB time to start up on the travis ci environment.
@@ -53,13 +54,8 @@ CONFIG = {
       database: database_id,
       hosts: SpecConfig.instance.addresses,
       options: {
-        server_selection_timeout:
-          if SpecConfig.instance.jruby?
-            3
-          else
-            0.5
-          end,
-        wait_queue_timeout: 5,
+        server_selection_timeout: 3.42,
+        wait_queue_timeout: 1,
         max_pool_size: 5,
         heartbeat_frequency: 180,
         user: MONGOID_ROOT_USER.name,
@@ -152,9 +148,10 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.include(Mongoid::Expectations)
   config.extend(Constraints)
+  config.extend(Mongoid::Macros)
 
   config.before(:suite) do
-    client = Mongo::Client.new(SpecConfig.instance.addresses)
+    client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
     begin
       # Create the root user administrator as the first user to be added to the
       # database. This user will need to be authenticated in order to add any
@@ -167,6 +164,9 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
+    unless Mongoid.default_client.cluster.connected?
+      Mongoid.default_client.reconnect
+    end
     Mongoid.default_client.collections.each do |coll|
       coll.delete_many
     end
