@@ -135,13 +135,18 @@ module Mongoid
               execute_callback :before_remove, doc
             end
             unless _association.forced_nil_inverse?
+              if field = _association.options[:inverse_primary_key]
+                ipk = _base.send(field)
+              else
+                ipk = _base._id
+              end
               if replacement
                 objects_to_clear = _base.send(foreign_key) - replacement.collect do |object|
                   object.send(_association.primary_key)
                 end
-                criteria(objects_to_clear).pull(inverse_foreign_key => _base._id)
+                criteria(objects_to_clear).pull(inverse_foreign_key => ipk)
               else
-                criteria.pull(inverse_foreign_key => _base._id)
+                criteria.pull(inverse_foreign_key => ipk)
               end
             end
             if persistable?

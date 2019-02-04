@@ -1015,14 +1015,35 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
 
   describe '#inverse_foreign_key' do
 
-    it 'returns nil' do
+    it 'returns generated key' do
       expect(association.inverse_foreign_key).to eq('has_many_left_object_ids')
+    end
+
+    context 'with inverse given' do
+      let(:options) do
+        { inverse_of: 'foo' }
+      end
+
+      it 'returns configured key' do
+        expect(association.inverse_foreign_key).to eq('foo_ids')
+      end
+    end
+
+    context 'with primary_key and foreign_key given' do
+      let(:options) do
+        { primary_key: 'foo', foreign_key: 'foo_ref',
+          inverse_primary_key: 'bar', inverse_foreign_key: 'bar_ref' }
+      end
+
+      it 'returns configured key' do
+        expect(association.inverse_foreign_key).to eq('bar_ref')
+      end
     end
   end
 
   describe '#inverse_foreign_key_setter' do
 
-    it 'returns nil' do
+    it 'returns generated method name' do
       expect(association.inverse_foreign_key_setter).to eq('has_many_left_object_ids=')
     end
   end
