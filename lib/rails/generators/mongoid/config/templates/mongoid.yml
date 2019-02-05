@@ -77,8 +77,8 @@ development:
         # wait_queue_timeout: 5
 
         # The time to wait to establish a connection before timing out, in seconds.
-        # (default: 5)
-        # connect_timeout: 5
+        # (default: 10)
+        # connect_timeout: 10
 
         # The timeout to wait to execute operations on a socket before raising an error.
         # (default: 5)
