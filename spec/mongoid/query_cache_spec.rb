@@ -125,6 +125,36 @@ describe Mongoid::QueryCache do
     end
   end
 
+  context 'querying all documents after a single document' do
+    before do
+      3.times do
+        Person.create
+      end
+    end
+
+    it 'returns all documents' do
+      expect(Person.all.to_a.count).to eq(3)
+      Person.first
+      expect(Person.all.to_a.count).to eq(3)
+    end
+
+    context 'with conditions specified' do
+      it 'returns all documents' do
+        expect(Person.gt(age: 0).to_a.count).to eq(3)
+        Person.gt(age: 0).first
+        expect(Person.gt(age: 0).to_a.count).to eq(3)
+      end
+    end
+
+    context 'with order specified' do
+      it 'returns all documents' do
+        expect(Person.order_by(name: 1).to_a.count).to eq(3)
+        Person.order_by(name: 1).first
+        expect(Person.order_by(name: 1).to_a.count).to eq(3)
+      end
+    end
+  end
+
   context "when querying in the same collection" do
 
     before do
