@@ -252,6 +252,30 @@ describe Mongoid::Clients do
 
         it_behaves_like "an overridden collection name at the class level"
       end
+
+      context 'restores outer context in outer block' do
+        use_spec_mongoid_config
+
+        let(:instance_collection_name) do
+          Band.with(collection: "artists") do |klass|
+            Band.with(collection: "scratch") do |klass|
+              # nothing
+            end
+            klass.new.collection_name
+          end
+        end
+
+        let(:class_collection_name) do
+          Band.with(collection: "artists") do |klass|
+            Band.with(collection: "scratch") do |klass|
+              # nothing
+            end
+            klass.collection_name
+          end
+        end
+
+        it_behaves_like "an overridden collection name at the class level"
+      end
     end
 
     context "when overriding store_in and persistence options" do

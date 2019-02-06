@@ -223,14 +223,16 @@ module Mongoid
       #
       # @param [ Class, Object ] object The class or model instance.
       # @param [ Mongo::Cluster ] cluster The original cluster before this context was used.
+      # @param [ Mongoid::PersistenceContext ] original_context The original persistence
+      #   context that was set before this context was used.
       #
       # @since 6.0.0
-      def clear(object, cluster = nil)
+      def clear(object, cluster = nil, original_context = nil)
         if context = get(object)
           context.client.close unless (context.cluster.equal?(cluster) || cluster.nil?)
         end
       ensure
-        Thread.current["[mongoid][#{object.object_id}]:context"] = nil
+        Thread.current["[mongoid][#{object.object_id}]:context"] = original_context
       end
     end
   end
