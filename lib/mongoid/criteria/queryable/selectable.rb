@@ -141,7 +141,12 @@ module Mongoid
         # @note The only valid geometry shapes for a $geoIntersects are:
         #   :intersects_line, :intersects_point, and :intersects_polygon.
         #
-        # @note The only valid geometry shape for a $geoWithin is :within_polygon
+        # @note The only valid options for a $geoWithin query are the geometry shape :within_polygon and the operator :within_box
+        #
+        # @note The :within_box operator for the $geoWithin query expects the lower left (south west) coordinate pair as the first
+        #   argument and the upper right (north east) as the second argument.
+        #   Important: When latitude and longitude are passed, longitude is expected as the first element of the coordinate pair.
+        #   Source: https://docs.mongodb.com/manual/reference/operator/query/box/
         #
         # @example Add a geo intersect criterion for a line.
         #   query.geo_spacial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
@@ -154,6 +159,9 @@ module Mongoid
         #
         # @example Add a geo within criterion for a polygon.
         #   query.geo_spacial(:location.within_polygon => [[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]])
+        #
+        # @example Add a geo within criterion for a box.
+        #   query.geo_spacial(:location.within_box => [[ 1, 10 ], [ 2, 10 ])
         #
         # @param [ Hash ] criterion The criterion.
         #
