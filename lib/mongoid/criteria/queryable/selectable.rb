@@ -175,6 +175,7 @@ module Mongoid
         key :within_polygon, :override, "$geoWithin", "$geometry" do |value|
           { "type" => POLYGON, "coordinates" => value }
         end
+        key :within_box, :override, "$geoWithin", "$box"
 
         # Add the $gt criterion to the selector.
         #
