@@ -210,6 +210,72 @@ describe Mongoid::Clients do
       end
 
       it_behaves_like "an overridden collection name at the class level"
+
+      context 'when nesting #with calls' do
+        let(:instance_collection_name) do
+          Band.with(collection: "ignore") do |klass|
+            Band.with(collection: "artists") do |klass|
+              klass.new.collection_name
+            end
+          end
+        end
+
+        let(:class_collection_name) do
+          Band.with(collection: "ignore") do |klass|
+            Band.with(collection: "artists") do |klass|
+              klass.collection_name
+            end
+          end
+        end
+
+        it_behaves_like "an overridden collection name at the class level"
+      end
+
+      context 'when outer #with call specifies the collection' do
+        use_spec_mongoid_config
+
+        let(:instance_collection_name) do
+          Band.with(collection: "artists") do |klass|
+            Band.with(client: :reports) do |klass|
+              klass.new.collection_name
+            end
+          end
+        end
+
+        let(:class_collection_name) do
+          Band.with(collection: "artists") do |klass|
+            Band.with(client: :reports) do |klass|
+              klass.collection_name
+            end
+          end
+        end
+
+        it_behaves_like "an overridden collection name at the class level"
+      end
+
+      context 'restores outer context in outer block' do
+        use_spec_mongoid_config
+
+        let(:instance_collection_name) do
+          Band.with(collection: "artists") do |klass|
+            Band.with(collection: "scratch") do |klass|
+              # nothing
+            end
+            klass.new.collection_name
+          end
+        end
+
+        let(:class_collection_name) do
+          Band.with(collection: "artists") do |klass|
+            Band.with(collection: "scratch") do |klass|
+              # nothing
+            end
+            klass.collection_name
+          end
+        end
+
+        it_behaves_like "an overridden collection name at the class level"
+      end
     end
 
     context "when overriding store_in and persistence options" do
@@ -554,20 +620,14 @@ describe Mongoid::Clients do
     end
 
     context "when getting a client by name" do
-
-      let(:file) do
-        File.join(File.dirname(__FILE__), "..", "config", "mongoid.yml")
-      end
+      use_spec_mongoid_config
 
       before do
-        described_class.clear
-        Mongoid.load!(file, :test)
         Band.store_in(client: :reports)
       end
 
       after do
         mongo_client.close
-        Mongoid::Config.reset
         Band.reset_storage_options!
       end
 
