@@ -13,6 +13,7 @@ test:
           tag_sets:
             - use: web
         max_pool_size: 1
+        server_selection_timeout: 3.14
     reports:
       database: reports
       hosts:
@@ -21,6 +22,7 @@ test:
         user: "mongoid-user"
         password: "password"
         auth_source: "admin"
+        server_selection_timeout: 3.14
   options:
     include_root_in_json: false
     include_type_for_serialization: false
@@ -43,3 +45,4 @@ test_with_max_staleness:
         read:
           mode: :primary_preferred
           max_staleness: 100
+        server_selection_timeout: 3.14

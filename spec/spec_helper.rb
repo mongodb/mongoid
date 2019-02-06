@@ -34,6 +34,7 @@ end
 
 require 'support/authorization'
 require 'support/expectations'
+require 'support/macros'
 
 # Give MongoDB time to start up on the travis ci environment.
 if (ENV['CI'] == 'travis' || ENV['CI'] == 'evergreen')
@@ -56,8 +57,8 @@ CONFIG = {
       database: database_id,
       hosts: [ "#{HOST}:#{PORT}" ],
       options: {
-        server_selection_timeout: 0.5,
-        wait_queue_timeout: 5,
+        server_selection_timeout: 3.42,
+        wait_queue_timeout: 1,
         max_pool_size: 5,
         heartbeat_frequency: 180,
         user: MONGOID_ROOT_USER.name,
@@ -138,9 +139,10 @@ I18n.config.enforce_available_locales = false
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.include(Mongoid::Expectations)
+  config.extend(Mongoid::Macros)
 
   config.before(:suite) do
-    client = Mongo::Client.new(["#{HOST}:#{PORT}"])
+    client = Mongo::Client.new(["#{HOST}:#{PORT}"], server_selection_timeout: 3.03)
     begin
       # Create the root user administrator as the first user to be added to the
       # database. This user will need to be authenticated in order to add any
@@ -153,6 +155,9 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
+    unless Mongoid.default_client.cluster.connected?
+      Mongoid.default_client.reconnect
+    end
     Mongoid.default_client.collections.each do |coll|
       coll.delete_many
     end

@@ -20,11 +20,12 @@ module Mongoid
       #
       # @since 6.0.0
       def with(options_or_context, &block)
+        original_context = PersistenceContext.get(self)
         original_cluster = persistence_context.cluster
         set_persistence_context(options_or_context)
         yield self
       ensure
-        clear_persistence_context(original_cluster)
+        clear_persistence_context(original_cluster, original_context)
       end
 
       def collection(parent = nil)
@@ -51,8 +52,8 @@ module Mongoid
         PersistenceContext.set(self, options_or_context)
       end
 
-      def clear_persistence_context(original_cluster = nil)
-        PersistenceContext.clear(self, original_cluster)
+      def clear_persistence_context(original_cluster = nil, context = nil)
+        PersistenceContext.clear(self, original_cluster, context)
       end
 
       module ClassMethods
@@ -92,11 +93,12 @@ module Mongoid
         #
         # @since 6.0.0
         def with(options, &block)
+          original_context = PersistenceContext.get(self)
           original_cluster = persistence_context.cluster
           PersistenceContext.set(self, options)
           yield self
         ensure
-          PersistenceContext.clear(self, original_cluster)
+          PersistenceContext.clear(self, original_cluster, original_context)
         end
 
         def persistence_context
