@@ -135,17 +135,20 @@ module Mongoid
           ::Boolean.evolve(value)
         end
 
-        # Add a $geoIntersects or $geoWithin selection. Symbol operators must be used as shown in
-        # the examples to expand the criteria.
+        # Add a $geoIntersects or $geoWithin selection. Symbol operators must
+        # be used as shown in the examples to expand the criteria.
         #
         # @note The only valid geometry shapes for a $geoIntersects are:
         #   :intersects_line, :intersects_point, and :intersects_polygon.
         #
-        # @note The only valid options for a $geoWithin query are the geometry shape :within_polygon and the operator :within_box
+        # @note The only valid options for a $geoWithin query are the geometry
+        #   shape :within_polygon and the operator :within_box.
         #
-        # @note The :within_box operator for the $geoWithin query expects the lower left (south west) coordinate pair as the first
-        #   argument and the upper right (north east) as the second argument.
-        #   Important: When latitude and longitude are passed, longitude is expected as the first element of the coordinate pair.
+        # @note The :within_box operator for the $geoWithin query expects the
+        #   lower left (south west) coordinate pair as the first argument and
+        #   the upper right (north east) as the second argument.
+        #   Important: When latitude and longitude are passed, longitude is
+        #   expected as the first element of the coordinate pair.
         #   Source: https://docs.mongodb.com/manual/reference/operator/query/box/
         #
         # @example Add a geo intersect criterion for a line.
