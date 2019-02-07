@@ -19,9 +19,13 @@ module Mongoid
           # @param [ Object ] base The base object.
           # @param [ Object ] object The object to use to build the association.
           # @param [ String ] type Not used in this context.
+          # @param [ nil ] selected_fields Must be nil.
           #
           # @return [ Array<Document> ] The documents.
-          def build(base, object, type = nil)
+          def build(base, object, type = nil, selected_fields = nil)
+            if selected_fields
+              raise NotImplementedError, 'Referenced associations do not support selected fields restrictions'
+            end
             if query?(object)
               query_criteria(object)
             else

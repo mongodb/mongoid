@@ -44,10 +44,15 @@ module Mongoid
     # @param [ Class ] klass The class to instantiate from if _type is not present.
     # @param [ Hash ] attributes The document attributes.
     # @param [ Criteria ] criteria Optional criteria object.
+    # @param [ Hash ] selected_fields Fields which were retrieved via
+    #   #only. If selected_fields are specified, fields not listed in it
+    #   will not be accessible in the returned document.
     #
     # @return [ Document ] The instantiated document.
-    def from_db(klass, attributes = nil, criteria = nil)
-      selected_fields = criteria.options[:fields] if criteria
+    def from_db(klass, attributes = nil, criteria = nil, selected_fields = nil)
+      if criteria
+        selected_fields ||= criteria.options[:fields]
+      end
       type = (attributes || {})[TYPE]
       if type.blank?
         obj = klass.instantiate(attributes, selected_fields)

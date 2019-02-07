@@ -53,6 +53,7 @@ matches all of the conditions. For example:
   class Band
     include Mongoid::Document
     field :name, type: String
+    field :label, type: String
     field :tours, type: Array
   end
 
@@ -112,6 +113,38 @@ as the following example shows:
   Tag.elem_match(child_tags: {name: 'sub1'}).to_a # => [root]
 
   root.child_tags.elem_match(child_tags: {name: 'subsub1'}).to_a # => [sub1]
+
+only
+````
+
+This method retrieves only the specified fields from the database.
+
+.. code-block:: ruby
+
+  band = Band.only(:name).first
+
+``only`` can also be used with embedded associations:
+
+.. code-block:: ruby
+
+  band = Band.only(:name, 'tours.year').last
+  # => #<Band _id: 5c59afb1026d7c034dba46ac, name: "Aerosmith">
+
+  band.tours.first
+  # => #<Tour _id: 5c59afdf026d7c034dba46af, city: nil, year: 1995>
+
+Attempting to reference attributes which have not been loaded results in
+``ActiveModel::MissingAttributeError``.
+
+.. code-block:: ruby
+
+  band.label
+  # ActiveModel::MissingAttributeError (Missing attribute: 'label'.)
+
+Even though Mongoid currently allows writing to attributes that have not
+been loaded, such writes will not be persisted
+(`MONGOID-4701 <https://jira.mongodb.org/browse/MONGOID-4701>`_) and
+should therefore be avoided.
 
 
 Query Cache
