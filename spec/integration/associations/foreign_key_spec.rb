@@ -40,7 +40,7 @@ describe 'Association foreign key configuration' do
 
       context 'unscoped' do
         it 'looks up child' do
-          skip 'Broken per https://jira.mongodb.org/browse/MONGOID-4626'
+          pending 'Broken per https://jira.mongodb.org/browse/MONGOID-4626'
 
           company = ForeignKeySpec::ScopedCompany.create!(c: 'test')
           on_email = ForeignKeySpec::ScopedEmail.create!(company: company, s: 'on')
