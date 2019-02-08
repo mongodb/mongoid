@@ -1073,6 +1073,26 @@ describe Mongoid::Criteria::Queryable::Selectable do
           })
         end
 
+        context "when used with the $box operator ($geoWithin query) " do
+          let(:selection) do
+            query.geo_spacial(
+              :location.within_box => [[ 1, 10 ], [ 2, 10 ]]
+            )
+          end
+  
+          it "adds the $geoIntersects expression" do
+            expect(selection.selector).to eq({
+              "location" => {
+                "$geoWithin" => {
+                  "$box" => [
+                    [ 1, 10 ], [ 2, 10 ]
+                  ]
+                }
+              }
+            })
+          end
+        end
+
         it_behaves_like "a cloning selection"
       end
     end
