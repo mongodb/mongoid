@@ -23,9 +23,6 @@ module Mongoid
           #
           # @return [ Document ] A single document.
           def build(base, object, type = nil, selected_fields = nil)
-            if selected_fields
-              raise NotImplementedError, 'Referenced associations do not support selected fields restrictions'
-            end
             return (object || []) unless query?(object)
             return [] if object.is_a?(Array)
             query_criteria(object, base)

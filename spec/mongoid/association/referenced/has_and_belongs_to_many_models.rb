@@ -18,3 +18,20 @@ class HabtmmEmployee
     primary_key: :c_id, foreign_key: :c_ids,
     inverse_primary_key: :e_id, inverse_foreign_key: :e_ids
 end
+
+class HabtmmContract
+  include Mongoid::Document
+
+  has_and_belongs_to_many :signatures, class_name: 'HabtmmSignature'
+
+  field :item, type: String
+end
+
+class HabtmmSignature
+  include Mongoid::Document
+
+  has_and_belongs_to_many :contracts, class_name: 'HabtmmContract'
+
+  field :name, type: String
+  field :year, type: Integer
+end

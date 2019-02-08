@@ -23,7 +23,7 @@ describe Mongoid::Document do
     end
 
     it 'allows writing omitted fields' do
-      skip 'https://jira.mongodb.org/browse/MONGOID-4701'
+      pending 'https://jira.mongodb.org/browse/MONGOID-4701'
 
       expect do
         person.age
