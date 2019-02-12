@@ -14,8 +14,13 @@ module Mongoid
           # inverse side using the id or sets the object after clearing the
           # associated object.
           #
+          # @param [ Object ] base The base object.
+          # @param [ Object ] object The object to use to build the association.
+          # @param [ String ] type The type of the association.
+          # @param [ nil ] selected_fields Must be nil.
+          #
           # @return [ Document ] A single document.
-          def build(base, object, type = nil)
+          def build(base, object, type = nil, selected_fields = nil)
             if query?(object)
               if !base.new_record?
                 execute_query(object, base)

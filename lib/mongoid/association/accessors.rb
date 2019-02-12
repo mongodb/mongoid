@@ -18,12 +18,15 @@ module Mongoid
       # @param [ String, Symbol ] name The name of the association.
       # @param [ Hash, BSON::ObjectId ] object The id or attributes to use.
       # @param [ Association ] association The association metadata.
+      # @param [ Hash ] selected_fields Fields which were retrieved via #only.
+      #   If selected_fields is specified, fields not listed in it will not be
+      #   accessible in the built document.
       #
       # @return [ Proxy ] The association.
       #
       # @since 2.0.0.rc.1
-      def __build__(name, object, association)
-        relation = create_relation(object, association)
+      def __build__(name, object, association, selected_fields = nil)
+        relation = create_relation(object, association, selected_fields)
         set_relation(name, relation)
       end
 
@@ -34,13 +37,16 @@ module Mongoid
       #
       # @param [ Document, Array<Document> ] object The association target.
       # @param [ Association ] association The association metadata.
+      # @param [ Hash ] selected_fields Fields which were retrieved via #only.
+      #   If selected_fields is specified, fields not listed in it will not be
+      #   accessible in the created association document.
       #
       # @return [ Proxy ] The association.
       #
       # @since 2.0.0.rc.1
-      def create_relation(object, association)
+      def create_relation(object, association, selected_fields = nil)
         type = @attributes[association.inverse_type]
-        target = association.build(self, object, type)
+        target = association.build(self, object, type, selected_fields)
         target ? association.create_relation(self, target) : nil
       end
 
@@ -102,11 +108,32 @@ module Mongoid
               if object && needs_no_database_query?(object, association)
                 __build__(name, object, association)
               else
-                __build__(name, attributes[association.key], association)
+                selected_fields = _mongoid_filter_selected_fields(association.key)
+                __build__(name, attributes[association.key], association, selected_fields)
               end
             end
           end
         end
+      end
+
+      # Returns a subset of __selected_fields attribute applicable to the
+      # (embedded) association with the given key.
+      #
+      # For example, if __selected_fields is {'a' => 1, 'b.c' => 2, 'b.c.f' => 3},
+      # and assoc_key is 'b', return value would be {'c' => 2, 'c.f' => 3}.
+      #
+      # @api private
+      def _mongoid_filter_selected_fields(assoc_key)
+        return nil unless __selected_fields
+        filtered = {}
+        __selected_fields.each do |k, v|
+          bits = k.split('.')
+          if bits.first == assoc_key
+            bits.shift
+            filtered[bits.join('.')] = v
+          end
+        end
+        filtered
       end
 
       def needs_no_database_query?(object, association)
