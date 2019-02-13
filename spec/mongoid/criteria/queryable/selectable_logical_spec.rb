@@ -8,6 +8,22 @@ describe Mongoid::Criteria::Queryable::Selectable do
     Mongoid::Query.new("id" => "_id")
   end
 
+  shared_examples_for 'logical combination' do
+    context 'when argument is a Criteria' do
+      let(:query) do
+        Mongoid::Query.new.where(hello: 'world')
+      end
+
+      let(:other) do
+        Mongoid::Query.new.where(foo: 'bar')
+      end
+
+      it 'combines' do
+        expect(result.selector).to eq('hello' => 'world', expected_operator => [{'foo' => 'bar'}])
+      end
+    end
+  end
+
   describe "#and" do
 
     context "when provided no criterion" do
@@ -185,6 +201,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
           expect(selection).to_not equal(query)
         end
       end
+    end
+
+    context 'when argument is a Criteria' do
+      let(:result) { query.and(other) }
+      let(:expected_operator) { '$and' }
+
+      it_behaves_like 'logical combination'
     end
   end
 

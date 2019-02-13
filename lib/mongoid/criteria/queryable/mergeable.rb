@@ -152,6 +152,9 @@ module Mongoid
             criterion.flatten.each do |expr|
               next unless expr
               criteria = sel[operator] || []
+              if expr.is_a?(Queryable)
+                expr = expr.selector
+              end
               normalized = expr.inject({}) do |hash, (field, value)|
                 hash.merge!(field.__expr_part__(value.__expand_complex__))
                 hash
