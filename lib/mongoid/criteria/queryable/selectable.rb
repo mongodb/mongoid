@@ -437,7 +437,9 @@ module Mongoid
           if criterion.empty?
             tap { |query| query.negating = true }
           else
-            __override__(criterion.first, "$not")
+            criterion.inject(self) do |c, new_c|
+              c.send(:__override__, new_c, "$not")
+            end
           end
         end
         key :not, :override, "$not"
