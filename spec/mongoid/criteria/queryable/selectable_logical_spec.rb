@@ -752,6 +752,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
 
       it "combines the conditions" do
+        pending 'MONGOID-4697'
+
         expect(selection.selector).to eq({
           "field" => 'foo',
           '$nor' => [{ "field" => 'bar' }],
