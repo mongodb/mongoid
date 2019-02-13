@@ -18,8 +18,38 @@ describe Mongoid::Criteria::Queryable::Selectable do
         Mongoid::Query.new.where(foo: 'bar')
       end
 
+      let(:result) { query.send(tested_method, other) }
+
       it 'combines' do
         expect(result.selector).to eq('hello' => 'world', expected_operator => [{'foo' => 'bar'}])
+      end
+    end
+
+    context 'when argument is a mix of Criteria and hashes' do
+      let(:query) do
+        Mongoid::Query.new.where(hello: 'world')
+      end
+
+      let(:other1) do
+        Mongoid::Query.new.where(foo: 'bar')
+      end
+
+      let(:other2) do
+        {bar: 42}
+      end
+
+      let(:other3) do
+        Mongoid::Query.new.where(a: 2)
+      end
+
+      let(:result) { query.send(tested_method, other1, other2, other3) }
+
+      it 'combines' do
+        expect(result.selector).to eq('hello' => 'world', expected_operator => [
+          {'foo' => 'bar'},
+          {'bar' => 42},
+          {'a' => 2},
+        ])
       end
     end
   end
@@ -204,7 +234,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
 
     context 'when argument is a Criteria' do
-      let(:result) { query.and(other) }
+      let(:tested_method) { :and }
       let(:expected_operator) { '$and' }
 
       it_behaves_like 'logical combination'
@@ -410,6 +440,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
     end
+
+    context 'when argument is a Criteria' do
+      let(:tested_method) { :or }
+      let(:expected_operator) { '$or' }
+
+      it_behaves_like 'logical combination'
+    end
   end
 
   describe "#nor" do
@@ -553,6 +590,13 @@ describe Mongoid::Criteria::Queryable::Selectable do
           expect(selection).to_not equal(query)
         end
       end
+    end
+
+    context 'when argument is a Criteria' do
+      let(:tested_method) { :nor }
+      let(:expected_operator) { '$nor' }
+
+      it_behaves_like 'logical combination'
     end
   end
 

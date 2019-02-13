@@ -152,7 +152,7 @@ module Mongoid
             criterion.flatten.each do |expr|
               next unless expr
               criteria = sel[operator] || []
-              if expr.is_a?(Queryable)
+              if expr.is_a?(Selectable)
                 expr = expr.selector
               end
               normalized = expr.inject({}) do |hash, (field, value)|
