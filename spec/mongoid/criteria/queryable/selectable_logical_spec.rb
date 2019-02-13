@@ -82,9 +82,9 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when provided multiple criterion" do
+    context "when provided multiple criteria" do
 
-      context "when the criterion is already included" do
+      context "when the criteria is already included" do
 
         let(:selection) do
           query.and({ first: [ 1, 2 ] }).and({ first: [ 1, 2 ] })
@@ -103,7 +103,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when the criterion are for different fields" do
+      context "when the criteria is for different fields" do
 
         let(:selection) do
           query.and({ first: [ 1, 2 ] }, { second: [ 3, 4 ] })
@@ -123,7 +123,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when the criterion are on the same field" do
+      context "when the criteria are on the same field" do
 
         let(:selection) do
           query.and({ first: [ 1, 2 ] }, { first: [ 3, 4 ] })
@@ -144,9 +144,9 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when chaining the criterion" do
+    context "when chaining the criteria" do
 
-      context "when the criterion are for different fields" do
+      context "when the criteria are for different fields" do
 
         let(:selection) do
           query.and(first: [ 1, 2 ]).and(second: [ 3, 4 ])
@@ -166,7 +166,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when the criterion are on the same field" do
+      context "when the criteria are on the same field" do
 
         let(:selection) do
           query.and(first: [ 1, 2 ]).and(first: [ 3, 4 ])
@@ -245,9 +245,9 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when provided multiple criterion" do
+    context "when provided multiple criteria" do
 
-      context "when the criterion are for different fields" do
+      context "when the criteria are for different fields" do
 
         let(:selection) do
           query.or({ first: [ 1, 2 ] }, { second: [ 3, 4 ] })
@@ -267,7 +267,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when a criterion has a selectable key" do
+      context "when the criteria has a selectable key" do
 
         let(:selection) do
           query.or({ first: [ 1, 2 ] }, { :second.gt => 3 })
@@ -287,7 +287,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when the criterion has an aliased field" do
+      context "when a criterion has an aliased field" do
 
         let(:selection) do
           query.or({ id: 1 })
@@ -324,7 +324,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when the criterion are on the same field" do
+      context "when the criteria are on the same field" do
 
         let(:selection) do
           query.or({ first: [ 1, 2 ] }, { first: [ 3, 4 ] })
