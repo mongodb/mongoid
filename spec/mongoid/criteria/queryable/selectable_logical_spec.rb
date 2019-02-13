@@ -742,12 +742,51 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when provided multiple criterion" do
+    context "when negating a field in the original selector" do
+      let(:query) do
+        Mongoid::Query.new("id" => "_id").where(field: 'foo')
+      end
 
-      context "when the criterion are for different fields" do
+      let(:selection) do
+        query.not(field: 'bar')
+      end
+
+      it "combines the conditions" do
+        expect(selection.selector).to eq({
+          "field" => 'foo',
+          '$nor' => [{ "field" => 'bar' }],
+        })
+      end
+
+      it "returns a cloned query" do
+        expect(selection).to_not equal(query)
+      end
+    end
+
+    context "when provided multiple criteria" do
+
+      context "when the criteria are for different fields" do
 
         let(:selection) do
           query.not(first: /1/, second: /2/)
+        end
+
+        it "adds the $not selectors" do
+          expect(selection.selector).to eq({
+            "first" => { "$not" => /1/ },
+            "second" => { "$not" => /2/ }
+          })
+        end
+
+        it "returns a cloned query" do
+          expect(selection).to_not equal(query)
+        end
+      end
+
+      context "when the criteria are given in separate arguments" do
+
+        let(:selection) do
+          query.not({first: /1/}, {second: /2/})
         end
 
         it "adds the $not selectors" do
