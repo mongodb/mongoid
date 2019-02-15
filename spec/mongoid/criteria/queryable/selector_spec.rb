@@ -372,11 +372,11 @@ describe Mongoid::Criteria::Queryable::Selector do
         context "when providing an array" do
 
           let(:big_one) do
-            BigDecimal.new("1.2321")
+            BigDecimal("1.2321")
           end
 
           let(:big_two) do
-            BigDecimal.new("4.2222")
+            BigDecimal("4.2222")
           end
 
           let(:array) do
