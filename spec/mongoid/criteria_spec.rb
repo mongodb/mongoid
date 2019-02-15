@@ -3465,7 +3465,7 @@ describe Mongoid::Criteria do
       context "when querying on a big decimal" do
 
         let(:sales) do
-          BigDecimal.new('0.1')
+          BigDecimal('0.1')
         end
 
         let!(:band) do

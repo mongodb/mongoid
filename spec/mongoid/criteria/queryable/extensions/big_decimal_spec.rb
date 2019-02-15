@@ -7,7 +7,7 @@ describe BigDecimal do
     context "when provided a big decimal" do
 
       let(:big_decimal) do
-        BigDecimal.new("123456.789")
+        BigDecimal("123456.789")
       end
 
       it "returns the decimal as a string" do
@@ -25,11 +25,11 @@ describe BigDecimal do
     context "when provided an array of big decimals" do
 
       let(:bd_one) do
-        BigDecimal.new("123456.789")
+        BigDecimal("123456.789")
       end
 
       let(:bd_two) do
-        BigDecimal.new("123333.789")
+        BigDecimal("123333.789")
       end
 
       let(:array) do
