@@ -31,7 +31,7 @@ Please see the [MongoDB website](http://docs.mongodb.org/ecosystem/tutorial/ruby
 License
 -------
 
-Copyright (c) 2009-2017 Durran Jordan
+Copyright (c) 2009-2019 Durran Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
