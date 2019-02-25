@@ -88,6 +88,9 @@ echo "We are in `pwd`"
 if test "$DRIVER" = "master"; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_master.gemfile bundle exec rake spec
+elif test "$DRIVER" = "stable"; then
+  bundle install --gemfile=gemfiles/driver_stable.gemfile
+  BUNDLE_GEMFILE=gemfiles/driver_stable.gemfile bundle exec rake spec
 elif test "$RAILS" = "master"; then
   bundle install --gemfile=gemfiles/rails_master.gemfile
   BUNDLE_GEMFILE=gemfiles/rails_master.gemfile bundle exec rake spec

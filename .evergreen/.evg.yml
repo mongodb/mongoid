@@ -547,6 +547,10 @@ axes:
         display_name: "Driver-master"
         variables:
            DRIVER: "master"
+      - id: stable
+        display_name: "Driver-stable"
+        variables:
+           DRIVER: "stable"
   - id: "rails"
     display_name: Rails Version
     values:
@@ -618,6 +622,20 @@ buildvariants:
      - name: "test"
 - matrix_name: "driver-master-old"
   matrix_spec: { driver: "master", ruby: "ruby-2.2", mongodb-version: "2.6", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "driver-stable-new"
+  matrix_spec: { driver: "stable", ruby: "ruby-2.6", mongodb-version: "4.0", topology: "standalone" }
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "driver-stable-old"
+  matrix_spec: { driver: "stable", ruby: "ruby-2.2", mongodb-version: "2.6", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1404-test
