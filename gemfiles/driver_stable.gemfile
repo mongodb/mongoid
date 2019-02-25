@@ -7,6 +7,13 @@ gem 'rake'
 gem 'actionpack', '~> 5.1'
 gem 'activemodel', '~> 5.1'
 
+if RUBY_VERSION < '2.3'
+  gem 'i18n', '~> 1.0', '< 1.5'
+  gem 'nokogiri', '<1.10'
+else
+  gem 'i18n', '~> 1.0'
+end
+
 group :test do
   gem 'rspec-retry'
   gem 'benchmark-ips'
