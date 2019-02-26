@@ -580,7 +580,7 @@ axes:
 
 buildvariants:
 - matrix_name: "topologies"
-  matrix_spec: { driver: "*", ruby: "ruby-2.6", mongodb-version: "4.0", topology: ["replica-set"] }
+  matrix_spec: { driver: [latest, master, stable], ruby: "ruby-2.6", mongodb-version: "4.0", topology: ["replica-set"] }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1404-test
