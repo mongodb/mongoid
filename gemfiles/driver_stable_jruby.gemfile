@@ -1,0 +1,36 @@
+source "https://rubygems.org"
+
+# Due to https://github.com/jruby/jruby/issues/5292 /
+# https://github.com/bundler/bundler/issues/6678 we cannot test unreleased
+# bson with JRuby, just test the driver then
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.7-stable'
+
+gem 'rake'
+gem 'actionpack', '~> 5.1'
+gem 'activemodel', '~> 5.1'
+
+if RUBY_VERSION < '2.3'
+  gem 'i18n', '~> 1.0', '< 1.5'
+else
+  gem 'i18n', '~> 1.0'
+end
+
+group :test do
+  gem 'rspec-retry'
+  gem 'benchmark-ips'
+  gem 'rspec', '~> 3.7'
+  gem 'fuubar'
+  gem 'rfc'
+  platforms :mri do
+    gem 'timeout-interrupt'
+  end
+end
+
+group :development, :testing do
+  gem 'yard'
+  platforms :mri do
+    gem 'byebug'
+  end
+end
+
+gemspec path: '..'

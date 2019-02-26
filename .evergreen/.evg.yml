@@ -540,17 +540,25 @@ axes:
     display_name: Driver Version
     values:
       - id: latest
-        display_name: "Driver-stable"
+        display_name: "Driver-latest"
         variables:
-           DRIVER: "latest"
+          DRIVER: "latest"
       - id: master
         display_name: "Driver-master"
         variables:
-           DRIVER: "master"
+          DRIVER: "master"
+      - id: master-jruby
+        display_name: "Driver-master (JRuby)"
+        variables:
+          DRIVER: "master-jruby"
       - id: stable
         display_name: "Driver-stable"
         variables:
-           DRIVER: "stable"
+          DRIVER: "stable"
+      - id: stable-jruby
+        display_name: "Driver-stable (JRuby)"
+        variables:
+          DRIVER: "stable-jruby"
   - id: "rails"
     display_name: Rails Version
     values:
@@ -608,6 +616,20 @@ buildvariants:
      - name: "test"
 - matrix_name: "jruby-old"
   matrix_spec: { driver: "latest", jruby: "jruby-9.1", mongodb-version: "3.0", topology: "standalone" }
+  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "jruby-driver-stable"
+  matrix_spec: { driver: "stable-jruby", jruby: "jruby-9.2", mongodb-version: "4.0", topology: "standalone" }
+  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1404-test
+  tasks:
+     - name: "test"
+- matrix_name: "jruby-driver-master"
+  matrix_spec: { driver: "master-jruby", jruby: "jruby-9.2", mongodb-version: "4.0", topology: "standalone" }
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1404-test
