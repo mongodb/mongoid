@@ -1,8 +1,11 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
+
+gem 'bson', git: "https://github.com/mongodb/bson-ruby"
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.7-stable'
 
 gem 'rake'
-gem 'actionpack', git: 'https://github.com/rails/rails'
-gem 'activemodel', git: 'https://github.com/rails/rails'
+gem 'actionpack', '~> 5.1'
+gem 'activemodel', '~> 5.1'
 
 if RUBY_VERSION < '2.3'
   gem 'i18n', '~> 1.0', '< 1.5'
