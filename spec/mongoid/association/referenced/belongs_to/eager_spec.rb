@@ -161,5 +161,26 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         expect(game.person_id).to eql(id)
       end
     end
+
+    context "when all the values for the belongs_to relation are nil" do
+
+      before do
+        class Ticket
+          include Mongoid::Document
+
+          belongs_to :person
+        end
+
+        2.times { |i| Ticket.create!(person: nil) }
+      end
+
+      it "only queries once for the parent documents" do
+        expect_query(1) do
+          Ticket.all.includes(:person).each do |ticket|
+            expect(ticket.person).to eq nil
+          end
+        end
+      end
+    end
   end
 end

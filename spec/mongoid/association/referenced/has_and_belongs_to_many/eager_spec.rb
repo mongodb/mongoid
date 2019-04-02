@@ -131,5 +131,26 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
         end
       end
     end
+
+    context "when all the values for the has_and_belongs_to_many relation are empty" do
+
+      before do
+        class Ticket
+          include Mongoid::Document
+        end
+
+        Person.has_and_belongs_to_many :tickets
+
+        2.times { |i| Person.create! }
+      end
+
+      it "only queries once for the parent documents" do
+        expect_query(1) do
+          Person.all.includes(:tickets).each do |person|
+            expect(person.tickets).to eq []
+          end
+        end
+      end
+    end
   end
 end
