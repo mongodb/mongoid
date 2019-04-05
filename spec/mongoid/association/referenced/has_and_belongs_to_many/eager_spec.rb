@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../has_and_belongs_to_many_models'
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
 
@@ -135,19 +136,13 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
     context "when all the values for the has_and_belongs_to_many association are empty" do
 
       before do
-        class Ticket
-          include Mongoid::Document
-        end
-
-        Person.has_and_belongs_to_many :tickets
-
-        2.times { |i| Person.create! }
+        2.times { |i| HabtmmPerson.create! }
       end
 
       it "only queries once for the parent documents" do
         found_person = false
         expect_query(1) do
-          Person.all.includes(:tickets).each do |person|
+          HabtmmPerson.all.includes(:tickets).each do |person|
             expect(person.tickets).to eq []
             found_person = true
           end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative '../has_many_models'
 
 describe Mongoid::Association::Referenced::BelongsTo::Eager do
 
@@ -165,19 +166,13 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
     context "when all the values for the belongs_to association are nil" do
 
       before do
-        class Ticket
-          include Mongoid::Document
-
-          belongs_to :person
-        end
-
-        2.times { |i| Ticket.create!(person: nil) }
+        2.times { |i| HmmTicket.create!(person: nil) }
       end
 
       it "only queries once for the parent documents" do
         found_ticket = false
         expect_query(1) do
-          Ticket.all.includes(:person).each do |ticket|
+          HmmTicket.all.includes(:person).each do |ticket|
             expect(ticket.person).to eq nil
             found_ticket = true
           end
