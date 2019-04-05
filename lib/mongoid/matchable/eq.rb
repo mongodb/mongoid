@@ -3,7 +3,7 @@
 module Mongoid
   module Matchable
 
-    # Performs non-equivalency checks.
+    # Performs equivalency checks.
     class Eq < Default
 
       # Return true if the attribute and first value are equal.
@@ -13,7 +13,7 @@ module Mongoid
       #
       # @param [ Hash ] value The values to check.
       #
-      # @return [ true, false ] If a value exists.
+      # @return [ true, false ] True if matches, false if not.
       def _matches?(value)
         super(value.values.first)
       end

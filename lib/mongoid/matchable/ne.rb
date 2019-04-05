@@ -13,7 +13,7 @@ module Mongoid
       #
       # @param [ Hash ] value The values to check.
       #
-      # @return [ true, false ] If a value exists.
+      # @return [ true, false ] True if matches, false if not.
       def _matches?(value)
         !super(value.values.first)
       end
