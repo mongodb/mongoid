@@ -43,7 +43,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       Person.create!(houses: 3.times.map { House.create! })
     end
 
-    context "when including the has_and_belongs_to_many relation" do
+    context "when including the has_and_belongs_to_many association" do
 
       it "queries twice" do
         expect_query(2) do
@@ -62,7 +62,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:eager) do
         Person.asc(:_id).includes(:preferences).last
@@ -132,7 +132,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       end
     end
 
-    context "when all the values for the has_and_belongs_to_many relation are empty" do
+    context "when all the values for the has_and_belongs_to_many association are empty" do
 
       before do
         class Ticket
