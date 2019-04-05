@@ -145,11 +145,14 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       end
 
       it "only queries once for the parent documents" do
+        found_person = false
         expect_query(1) do
           Person.all.includes(:tickets).each do |person|
             expect(person.tickets).to eq []
+            found_person = true
           end
         end
+        expect(found_person).to be true
       end
     end
   end
