@@ -2,6 +2,7 @@
 require "mongoid/matchable/default"
 require "mongoid/matchable/all"
 require "mongoid/matchable/and"
+require "mongoid/matchable/eq"
 require "mongoid/matchable/exists"
 require "mongoid/matchable/gt"
 require "mongoid/matchable/gte"
@@ -32,6 +33,7 @@ module Mongoid
       "$all" => All,
       "$elemMatch" => ElemMatch,
       "$and" => And,
+      "$eq" => Eq,
       "$exists" => Exists,
       "$gt" => Gt,
       "$gte" => Gte,
@@ -42,7 +44,7 @@ module Mongoid
       "$nin" => Nin,
       "$or" => Or,
       "$nor" => Nor,
-      "$size" => Size
+      "$size" => Size,
     }.with_indifferent_access.freeze
 
     # Determines if this document has the attributes to match the supplied
