@@ -29,3 +29,9 @@ class HmmStudent
   field :name, type: String
   field :grade, type: Integer, default: 3
 end
+
+class HmmTicket
+  include Mongoid::Document
+
+  belongs_to :person
+end
