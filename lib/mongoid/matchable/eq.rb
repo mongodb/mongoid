@@ -3,10 +3,10 @@
 module Mongoid
   module Matchable
 
-    # Performs non-equivalency checks.
-    class Ne < Default
+    # Performs equivalency checks.
+    class Eq < Default
 
-      # Return true if the attribute and first value are not equal.
+      # Return true if the attribute and first value are equal.
       #
       # @example Do the values match?
       #   matcher._matches?({ :key => 10 })
@@ -15,7 +15,7 @@ module Mongoid
       #
       # @return [ true, false ] True if matches, false if not.
       def _matches?(value)
-        !super(value.values.first)
+        super(value.values.first)
       end
     end
   end
