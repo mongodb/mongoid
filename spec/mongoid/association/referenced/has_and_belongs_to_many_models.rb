@@ -14,3 +14,13 @@ class HabtmmEmployee
   field :habtmm_company_ids, type: Array
   has_and_belongs_to_many :companies, primary_key: :c_id, foreign_key: :c_ids, class_name: 'HabtmmCompany'
 end
+
+class HabtmmTicket
+  include Mongoid::Document
+end
+
+class HabtmmPerson
+  include Mongoid::Document
+
+  has_and_belongs_to_many :tickets, class_name: 'HabtmmTicket'
+end

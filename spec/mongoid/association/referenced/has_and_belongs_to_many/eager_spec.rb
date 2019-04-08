@@ -1,4 +1,5 @@
 require "spec_helper"
+require_relative '../has_and_belongs_to_many_models'
 
 describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
 
@@ -41,7 +42,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       Person.create!(houses: 3.times.map { House.create! })
     end
 
-    context "when including the has_and_belongs_to_many relation" do
+    context "when including the has_and_belongs_to_many association" do
 
       it "queries twice" do
         expect_query(2) do
@@ -60,7 +61,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:eager) do
         Person.asc(:_id).includes(:preferences).last
@@ -127,6 +128,24 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
             expect(person.houses.length).to be(2)
           end
         end
+      end
+    end
+
+    context "when all the values for the has_and_belongs_to_many association are empty" do
+
+      before do
+        2.times { |i| HabtmmPerson.create! }
+      end
+
+      it "only queries once for the parent documents" do
+        found_person = false
+        expect_query(1) do
+          HabtmmPerson.all.includes(:tickets).each do |person|
+            expect(person.tickets).to eq []
+            found_person = true
+          end
+        end
+        expect(found_person).to be true
       end
     end
   end

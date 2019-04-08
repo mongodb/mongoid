@@ -1,4 +1,5 @@
 require "spec_helper"
+require_relative '../has_many_models'
 
 describe Mongoid::Association::Referenced::BelongsTo::Eager do
 
@@ -55,7 +56,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       Post.create!(person: person)
     end
 
-    it "sets the relation into the parent" do
+    it "sets the association into the parent" do
       docs.each do |doc|
         expect(doc).to receive(:set_relation).with(:person, :foo)
       end
@@ -73,7 +74,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       3.times { |i| Account.create!(person: person, name: "savings#{i}") }
     end
 
-    context "when including the belongs_to relation" do
+    context "when including the belongs_to association" do
 
       it "queries twice" do
 
@@ -85,7 +86,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:eager) do
         Post.includes(:person).last
@@ -128,13 +129,13 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
           expect(eager.ivar(:person)).to be nil
         end
 
-        it "has a nil relation" do
+        it "has a nil association" do
           expect(eager.person).to be nil
         end
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       let!(:movie) do
         Movie.create(name: "Bladerunner")
@@ -157,6 +158,24 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         id = BSON::ObjectId.new
         game = Game.new(:person_id => id)
         expect(game.person_id).to eql(id)
+      end
+    end
+
+    context "when all the values for the belongs_to association are nil" do
+
+      before do
+        2.times { |i| HmmTicket.create!(person: nil) }
+      end
+
+      it "only queries once for the parent documents" do
+        found_ticket = false
+        expect_query(1) do
+          HmmTicket.all.includes(:person).each do |ticket|
+            expect(ticket.person).to eq nil
+            found_ticket = true
+          end
+        end
+        expect(found_ticket).to be true
       end
     end
   end
