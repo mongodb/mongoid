@@ -4,61 +4,65 @@ Indexes
 
 .. default-domain:: mongodb
 
+Specifying Indexes
+------------------
+
 You can define indexes on documents using the index macro. Provide the key for
-the index along with a direction. For additional options, supply them in a second
-options hash parameter.
+the index along with a direction. Aadditional options can be supplied in the
+second options hash parameter:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :ssn
+    class Person
+      include Mongoid::Document
+      field :ssn
    
-     index({ ssn: 1 }, { unique: true, name: "ssn_index" })
-   end
+      index({ ssn: 1 }, { unique: true, name: "ssn_index" })
+    end
 
-You can define indexes on embedded document fields as well.
-
-.. code-block:: ruby
-
-   class Person
-     include Mongoid::Document
-     embeds_many :addresses
-     index "addresses.street" => 1
-   end
-
-You can index on multiple fields and provide direction.
+You can define indexes on embedded document fields as well:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :first_name
-     field :last_name
+    class Person
+      include Mongoid::Document
+      embeds_many :addresses
+      index "addresses.street" => 1
+    end
+
+You can index on multiple fields and provide direction:
+
+.. code-block:: ruby
+
+    class Person
+      include Mongoid::Document
+      field :first_name
+      field :last_name
   
-     index({ first_name: 1, last_name: 1 }, { unique: true })
-   end
+      index({ first_name: 1, last_name: 1 }, { unique: true })
+    end
 
 Indexes can be sparse:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :ssn
+    class Person
+      include Mongoid::Document
+      field :ssn
   
-     index({ ssn: -1 }, { sparse: true })
-   end
+      index({ ssn: -1 }, { sparse: true })
+    end
 
-Indexes can be run in the background in cases where they may take some time:
+Indexes can be specified to be created in the background in cases where
+the collection is large and index creation may take a long time:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :ssn
-     index({ ssn: 1 }, { unique: true, background: true })
-   end
+    class Person
+      include Mongoid::Document
+      field :ssn
+      index({ ssn: 1 }, { unique: true, background: true })
+    end
 
 *Deprecated:* When using MongoDB 2.6, you can drop the duplicate entries
 for unique indexes that are defined for a column that might
@@ -66,70 +70,74 @@ already have duplicate values by specifying the ``drop_dups`` option:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :ssn
-     index({ ssn: 1 }, { unique: true, drop_dups: true })
-   end
+    class Person
+      include Mongoid::Document
+      field :ssn
+      index({ ssn: 1 }, { unique: true, drop_dups: true })
+    end
 
-The ``drop_dups`` option has been `removed as of MongoDB 3.0 <https://docs.mongodb.com/manual/release-notes/3.0-compatibility/#remove-dropdups-option>`_.
+The ``drop_dups`` option has been `removed as of MongoDB 3.0
+<https://docs.mongodb.com/manual/release-notes/3.0-compatibility/#remove-dropdups-option>`_.
 
-For geospatial indexes, make sure the field you are indexing is an Array.
+For geospatial indexes, make sure the field being indexed is of type Array:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :location, type: Array
+    class Person
+      include Mongoid::Document
+      field :location, type: Array
  
-     index({ location: "2d" }, { min: -200, max: 200 })
-   end
+      index({ location: "2d" }, { min: -200, max: 200 })
+    end
 
-Indexes can be scoped to a specific database.
+Indexes can be scoped to a specific database:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :ssn
-     index({ ssn: 1 }, { database: "users", unique: true, background: true })
-   end
+    class Person
+      include Mongoid::Document
+      field :ssn
+      index({ ssn: 1 }, { database: "users", unique: true, background: true })
+    end
 
 Mongoid can define indexes on "foreign key" fields for associations.
-This only works on the association macro that the foreign key is stored on.
+This only works on the association macro that the foreign key is stored on:
 
 .. code-block:: ruby
 
-   class Comment
-     include Mongoid::Document
-     belongs_to :post, index: true
-     has_and_belongs_to_many :preferences, index: true
-   end
+    class Comment
+      include Mongoid::Document
+      belongs_to :post, index: true
+      has_and_belongs_to_many :preferences, index: true
+    end
 
-When you want to create the indexes in the database, use the provided rake task.
+Index Management Rake Tasks
+---------------------------
 
-.. code-block:: bash
-
-   $ rake db:mongoid:create_indexes
-
-Mongoid also provides a rake task to delete all secondary indexes.
+When you want to create the indexes in the database, use the provided
+``db:mongoid::create_indexes`` Rake task:
 
 .. code-block:: bash
 
-   $ rake db:mongoid:remove_indexes
+    $ rake db:mongoid:create_indexes
 
-Note: the output of these rake tasks goes to the default logger configured
+Mongoid also provides a Rake task to delete all secondary indexes.
+
+.. code-block:: bash
+
+    $ rake db:mongoid:remove_indexes
+
+Note: the output of these Rake tasks goes to the default logger configured
 by Rails. This is usually a file like ``log/development.log`` and not standard
 output.
 
 These create/remove indexes commands also works for just one model by running
+in Rails console:
 
 .. code-block:: ruby
 
-   Model.create_indexes
+    # Create indexes for Model
+    Model.create_indexes
    
-or 
-
-.. code-block:: ruby
-
-   Model.remove_indexes
+    # Remove indexes for Model
+    Model.remove_indexes
