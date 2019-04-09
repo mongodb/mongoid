@@ -141,3 +141,36 @@ in Rails console:
    
     # Remove indexes for Model
     Model.remove_indexes
+
+Using Rake Tasks With Non-Rails Applications
+--------------------------------------------
+
+Mongoid's Rake tasks are automatically loaded in Rails applications using
+Mongoid. When using Mongoid with a non-Rails application, these tasks must
+be loaded manually. This can be achieved by loading them in the Rakefile and
+providing an ``:environment`` task to load your application's models:
+
+.. code-block:: ruby
+
+    # Rakefile
+    
+    require 'mongoid'
+    load 'mongoid/tasks/database.rake'
+    
+    task :environment do
+      # Require/load your application's models here
+    end
+
+If your application uses Bundler, you can require ``bundler/setup`` instead of
+explicitly requiring ``mongoid``:
+
+.. code-block:: ruby
+
+    # Rakefile
+    
+    require 'bundler/setup'
+    load 'mongoid/tasks/database.rake'
+    
+    task :environment do
+      # Require/load your application's models here
+    end
