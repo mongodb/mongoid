@@ -8,7 +8,7 @@ Specifying Indexes
 ------------------
 
 You can define indexes on documents using the index macro. Provide the key for
-the index along with a direction. Aadditional options can be supplied in the
+the index along with a direction. Additional options can be supplied in the
 second options hash parameter:
 
 .. code-block:: ruby
