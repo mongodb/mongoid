@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'actionpack', '~> 5.1'
-gem 'activemodel', '~> 5.1'
+gem 'actionpack', '~> 6.0.0.rc1'
+gem 'activemodel', '~> 6.0.0.rc1'
 
 # https://jira.mongodb.org/browse/MONGOID-4614
 if RUBY_VERSION < '2.3'
