@@ -29,9 +29,6 @@ end
 
 group :development, :testing do
   gem 'yard'
-  platforms :mri do
-    gem 'byebug'
-  end
 end
 
 gemspec path: '..'

@@ -23,6 +23,10 @@ end
 group :development, :testing do
   gem 'yard'
   platforms :mri do
-    gem 'byebug'
+    if RUBY_VERSION < '2.3'
+      gem 'byebug', '~> 10.0'
+    else
+      gem 'byebug'
+    end
   end
 end

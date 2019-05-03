@@ -570,6 +570,10 @@ axes:
         display_name: "Rails-master"
         variables:
            RAILS: "master"
+      - id: "60"
+        display_name: "Rails 6.0"
+        variables:
+           RAILS: "60"
   - id: "i18n"
     display_name: I18n version
     values:
@@ -663,13 +667,20 @@ buildvariants:
     - ubuntu1404-test
   tasks:
      - name: "test"
-- matrix_name: "rails-master"
-  matrix_spec: { driver: "latest", ruby: "ruby-2.6", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
+- matrix_name: "rails-60"
+  matrix_spec: { driver: "latest", ruby: "ruby-2.6", mongodb-version: "4.0", topology: "standalone", rails: '60' }
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - ubuntu1404-test
   tasks:
      - name: "test"
+#- matrix_name: "rails-master"
+#  matrix_spec: { driver: "latest", ruby: "ruby-2.6", mongodb-version: "4.0", topology: "standalone", rails: 'master' }
+#  display_name: "${rails}, ${driver}, ${mongodb-version}"
+#  run_on:
+#    - ubuntu1404-test
+#  tasks:
+#     - name: "test"
 - matrix_name: "i18n-1.0"
   matrix_spec: { driver: "latest", ruby: "ruby-2.5", mongodb-version: "4.0", topology: "standalone", i18n: '1.0' }
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
