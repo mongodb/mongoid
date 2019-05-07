@@ -94,12 +94,12 @@ elif test "$DRIVER" = "stable"; then
 elif test "$DRIVER" = "stable-jruby"; then
   bundle install --gemfile=gemfiles/driver_stable_jruby.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_stable_jruby.gemfile bundle exec rake spec
-elif test "$RAILS" = "master"; then
-  bundle install --gemfile=gemfiles/rails_master.gemfile
-  BUNDLE_GEMFILE=gemfiles/rails_master.gemfile bundle exec rake spec
-elif test "$RAILS" = "master"; then
+elif test "$RAILS" = "master-jruby"; then
   bundle install --gemfile=gemfiles/rails_master_jruby.gemfile
   BUNDLE_GEMFILE=gemfiles/rails_master_jruby.gemfile bundle exec rake spec
+elif test -n "$RAILS"; then
+  bundle install --gemfile=gemfiles/rails_"$RAILS".gemfile
+  BUNDLE_GEMFILE=gemfiles/rails_"$RAILS".gemfile bundle exec rake spec
 elif test "$I18N" = "1.0"; then
   bundle install --gemfile=gemfiles/i18n-1.0.gemfile
   BUNDLE_GEMFILE=gemfiles/i18n-1.0.gemfile bundle exec rake spec
