@@ -95,11 +95,14 @@ the following:
 
 1. When assigning values to fields, the values are converted to the
 specified type.
+
 2. When persisting data to MongoDB, the data is sent in an appropriate
 type, permitting richer data manipulation within MongoDB or by other
 tools.
+
 3. When querying documents, query parameters are converted to the specified
 type before being sent to MongoDB.
+
 4. When retrieving documents from the database, field values are converted
 to the specified type.
 
@@ -369,7 +372,7 @@ returned is defined by the :ref:`configured time zone settings <time-zones>`.
     ticket.opened_at
     # => Sun, 18 Feb 2018 13:00:08 +0100
     ticket
-    => #<Ticket _id: 5c13d4b9026d7c4e7870bb2f, opened_at: 2018-02-18 12:00:08 UTC>
+    # => #<Ticket _id: 5c13d4b9026d7c4e7870bb2f, opened_at: 2018-02-18 12:00:08 UTC>
 
     Time.zone = 'America/New_York'
     ticket.opened_at
