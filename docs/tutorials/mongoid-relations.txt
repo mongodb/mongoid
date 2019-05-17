@@ -205,32 +205,98 @@ If you do not want this behavior, you may turn it off when defining the associat
      has_many :posts, validate: false
    end
 
+
 Polymorphism
 ************
 
-When a child embedded document can belong to more than one type of parent document, you can
-tell Mongoid to support this by adding the ``as`` option to the definition on the parents,
-and the ``polymorphic`` option on the child. On the child object, an additional field will
-be stored that indicates the type of the parent. Polymorphic behavior is allowed on all
-associations with the exception of ``has_and_belongs_to_many``.
+One to one and one to many associations support polymorphism, which is
+having a single association potentially contain objects of different classes.
+For example, we could model an organization in which departments and teams
+have managers as follows:
 
 .. code-block:: ruby
 
-   class Band
-     include Mongoid::Document
-     embeds_many :photos, as: :photographic
-     has_one :address, as: :addressable
-   end
+  class Department
+    include Mongoid::Document
+    
+    has_one :manager, as: :unit
+  end
+  
+  class Team
+    include Mongoid::Document
+    
+    has_one :manager, as: :unit
+  end
    
-   class Photo
-     include Mongoid::Document
-     embedded_in :photographic, polymorphic: true
-   end
-   
-   class Address
-     include Mongoid::Document
-     belongs_to :addressable, polymorphic: true
-   end
+  class Manager
+    include Mongoid::Document
+    
+    belongs_to :unit, polymorphic: true
+  end
+  
+  dept = Department.create!
+  team = Team.create!
+  
+  alice = Manager.create!(unit: dept)
+  alice.unit == dept
+  # => true
+  dept.manager == alice
+  # => true
+
+To provide another example, suppose we want to track price history for
+products and bundles. This can be achieved via an embedded one to many
+polymorphic association:
+
+.. code-block:: ruby
+
+  class Product
+    include Mongoid::Document
+    
+    field :name, type: String
+    has_and_belongs_to_many :bundles
+    
+    embeds_many :prices, as: :item
+  end
+  
+  class Bundle
+    include Mongoid::Document
+
+    field :name, type: String
+    has_and_belongs_to_many :products
+
+    embeds_many :prices, as: :item
+  end
+  
+  class Price
+    include Mongoid::Document
+    
+    embedded_in :item, polymorphic: true
+  end
+  
+  pants = Product.create!(name: 'Pants',
+    prices: [Price.new, Price.new])
+  costume = Bundle.create!(name: 'Costume', products: [pants],
+    prices: [Price.new, Price.new])
+
+To define a polymorphic association, specify the ``polymorphic: true`` option
+on the child association and add the ``as: :association_name`` option to the
+parent association.
+
+Note that Mongoid currently supports polymorphism only in one direction - from
+the child to the parent. For example, polymorphism cannot be used to specify
+that a bundle may contain other bundles or products:
+  
+.. code-block:: ruby
+
+  class Bundle
+    include Mongoid::Document
+
+    # Does not work:
+    has_many :items, polymorphic: true
+  end
+
+``has_and_belongs_to_many`` associations do not support polymorphism.
+
 
 Cascading Callbacks
 *******************

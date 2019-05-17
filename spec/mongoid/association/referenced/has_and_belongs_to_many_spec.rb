@@ -656,7 +656,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
     end
   end
 
-  describe '#klass' do
+  describe '#relation_class' do
 
     context 'when the :class_name option is specified' do
 
@@ -670,14 +670,14 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany do
       end
 
       it 'returns the class name option' do
-        expect(association.klass).to eq(_class)
+        expect(association.relation_class).to eq(_class)
       end
     end
 
     context 'when the class_name option is not specified' do
 
       it 'uses the name of the relation to deduce the class name' do
-        expect(association.klass).to eq(HasManyRightObject)
+        expect(association.relation_class).to eq(HasManyRightObject)
       end
     end
   end
