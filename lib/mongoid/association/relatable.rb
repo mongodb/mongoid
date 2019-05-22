@@ -464,6 +464,10 @@ module Mongoid
         @default_inverse ||= klass.relations[inverse_klass.name.underscore]
       end
 
+      # Returns an array of classes/modules forming the namespace hierarchy
+      # where symbols referenced in the provided class/module would be looked
+      # up by Ruby. For example, if mod is Foo::Bar, this method would return
+      # [Foo::Bar, Foo, Object].
       def namespace_hierarchy(mod)
         parent = Object
         hier = [parent]
