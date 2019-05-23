@@ -4,9 +4,34 @@ gem 'rake'
 gem 'actionpack', git: 'https://github.com/rails/rails'
 gem 'activemodel', git: 'https://github.com/rails/rails'
 
+if RUBY_VERSION < '2.3'
+  gem 'i18n', '~> 1.0', '< 1.5'
+  gem 'nokogiri', '<1.10'
+else
+  gem 'i18n', '~> 1.0'
+end
+
 group :test do
+  gem 'rspec-retry'
   gem 'benchmark-ips'
-  gem 'rspec', '~> 3.7.0'
+  gem 'rspec', '~> 3.7'
+  gem 'rspec-expectations', '~> 3.7', '<= 3.8.2'
+  gem 'fuubar'
+  gem 'rfc'
+  platforms :mri do
+    gem 'timeout-interrupt'
+  end
+end
+
+group :development, :testing do
+  gem 'yard'
+  platforms :mri do
+    if RUBY_VERSION < '2.3'
+      gem 'byebug', '~> 10.0'
+    else
+      gem 'byebug'
+    end
+  end
 end
 
 gemspec path: '..'
