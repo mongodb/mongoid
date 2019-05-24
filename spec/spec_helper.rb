@@ -32,6 +32,7 @@ def database_id_alt
   "mongoid_test_alt"
 end
 
+require 'support/spec_config'
 require 'support/authorization'
 require 'support/expectations'
 require 'support/macros'
