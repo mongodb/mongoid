@@ -11,7 +11,7 @@ module Mongoid
 
       check_class_collision
 
-      class_option :no_timestamps, type: :boolean
+      class_option :timestamps, type: :boolean, default: true
       class_option :parent,     type: :string, desc: "The parent class for the generated model"
       class_option :collection, type: :string, desc: "The collection for storing model's documents"
 
