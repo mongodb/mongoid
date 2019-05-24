@@ -435,10 +435,6 @@ describe Mongoid::Document do
     end
 
     context ':compact option' do
-      # Since rails 6 differs in how it treats id fields,
-      # run this test on one version of rails. Currently rails 6 is in beta,
-      # when it is released this version should be changed to 6.
-      max_rails_version '5.2'
 
       before do
         # These tests require a specific set of defined attributes
