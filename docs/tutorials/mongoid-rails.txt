@@ -32,52 +32,52 @@ of Mongoid to use with your Rails application.
      - Rails 4.2
 
    * - Mongoid 7.0
-     - Yes
-     - Yes
-     - No
-     - No
+     - |checkmark|
+     - |checkmark|
+     -
+     -
 
    * - Mongoid 6.4
-     - Yes
-     - Yes
-     - No
-     - No
+     - |checkmark|
+     - |checkmark|
+     -
+     -
 
    * - Mongoid 6.3
-     - Yes
-     - Yes
-     - No
-     - No
+     - |checkmark|
+     - |checkmark|
+     -
+     -
 
    * - Mongoid 6.2
-     - Yes
-     - Yes
-     - No
-     - No
+     - |checkmark|
+     - |checkmark|
+     -
+     -
 
    * - Mongoid 6.1
-     - No
-     - No
-     - Yes
-     - No
+     -
+     -
+     - |checkmark|
+     -
 
    * - Mongoid 6.0
-     - No
-     - No
-     - Yes
-     - No
+     -
+     -
+     - |checkmark|
+     -
 
    * - Mongoid 5.4
-     - No
-     - No
-     - No
-     - Yes
+     -
+     -
+     -
+     - |checkmark|
 
    * - Mongoid 5.2
-     - No
-     - No
-     - No
-     - Yes
+     -
+     -
+     -
+     - |checkmark|
 
 
 Using Mongoid with a new Rails application
@@ -171,3 +171,5 @@ Mongoid provides the following rake tasks when used in a Rails 3 environment:
 - ``db:seed``: Seeds the database from db/seeds.rb
 - ``db:setup``: Creates indexes and seeds the database.
 - ``db:test:prepare``: Exists only for framework dependency purposes, does not actually do anything.
+
+.. include:: /includes/unicode-checkmark.rst
