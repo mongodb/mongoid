@@ -1,5 +1,4 @@
 # Mongoid
-[![Build Status](https://travis-ci.org/mongodb/mongoid.svg?branch=master)](https://travis-ci.org/mongodb/mongoid)
 [![Code Climate](https://codeclimate.com/github/mongodb/mongoid.svg)](https://codeclimate.com/github/mongodb/mongoid)
 [![Dependency Status](https://www.versioneye.com/ruby/mongoid/badge.svg)](https://www.versioneye.com/ruby/mongoid)
 

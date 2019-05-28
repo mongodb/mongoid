@@ -17,9 +17,9 @@ else
 end
 
 # When testing locally we use the database named mongoid_test. However when
-# tests are running in parallel on Travis we need to use different database
-# names for each process running since we do not have transactions and want a
-# clean slate before each spec run.
+# tests are running in parallel in a CI environment we need to use different
+# database names for each process running since we do not have transactions
+# and want a clean slate before each spec run.
 def database_id
   "mongoid_test"
 end
@@ -33,8 +33,8 @@ require 'support/expectations'
 require 'support/macros'
 require 'support/constraints'
 
-# Give MongoDB time to start up on the travis ci environment.
-if (ENV['CI'] == 'travis' || ENV['CI'] == 'evergreen')
+# Give MongoDB servers time to start up in CI environments
+if SpecConfig.instance.ci?
   starting = true
   client = Mongo::Client.new(SpecConfig.instance.addresses)
   while starting
@@ -104,10 +104,6 @@ end
 
 def testing_transactions?
   transactions_supported? && testing_replica_set?
-end
-
-def testing_locally?
-  !(ENV['CI'] == 'travis')
 end
 
 # Set the database that the spec suite connects to.
