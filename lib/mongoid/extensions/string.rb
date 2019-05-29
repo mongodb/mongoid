@@ -82,7 +82,9 @@ module Mongoid
       #
       # @since 3.0.0
       def numeric?
-        true if Float(self) rescue (self =~ /^NaN|\-?Infinity$/)
+        !!Float(self)
+      rescue ArgumentError
+        (self =~ /^NaN|\-?Infinity$/) == 0
       end
 
       # Get the string as a getter string.
