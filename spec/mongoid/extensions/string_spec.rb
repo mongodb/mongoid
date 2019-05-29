@@ -342,10 +342,38 @@ describe Mongoid::Extensions::String do
       end
     end
 
+    context "when the string is NaN and junk in front" do
+
+      it "returns false" do
+        expect("a\nNaN".numeric?).to eq(false)
+      end
+    end
+
+    context "when the string is NaN and whitespace at end" do
+
+      it "returns false" do
+        expect("NaN\n".numeric?).to eq(false)
+      end
+    end
+
     context "when the string is Infinity" do
 
       it "returns true" do
         expect("Infinity".numeric?).to eq(true)
+      end
+    end
+
+    context "when the string contains Infinity and junk in front" do
+
+      it "returns false" do
+        expect("a\nInfinity".numeric?).to eq(false)
+      end
+    end
+
+    context "when the string contains Infinity and whitespace at end" do
+
+      it "returns false" do
+        expect("Infinity\n".numeric?).to eq(false)
       end
     end
 
