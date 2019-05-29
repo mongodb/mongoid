@@ -1660,6 +1660,22 @@ describe Mongoid::Association::Referenced::BelongsTo do
       end
     end
 
+    context 'when the :class_name option is scoped with ::' do
+
+      let!(:_class) do
+        class OtherOwnerObject; end
+        OtherOwnerObject
+      end
+
+      let(:options) do
+        { class_name: '::OtherOwnerObject' }
+      end
+
+      it 'returns the class name option' do
+        expect(association.relation_class).to eq(_class)
+      end
+    end
+
     context 'when the class_name option is not specified' do
 
       it 'uses the name of the relation to deduce the class name' do
