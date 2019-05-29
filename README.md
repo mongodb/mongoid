@@ -1,31 +1,38 @@
 # Mongoid
 [![Code Climate](https://codeclimate.com/github/mongodb/mongoid.svg)](https://codeclimate.com/github/mongodb/mongoid)
-[![Dependency Status](https://www.versioneye.com/ruby/mongoid/badge.svg)](https://www.versioneye.com/ruby/mongoid)
 
-Mongoid is an ODM (Object-Document-Mapper) framework for MongoDB in Ruby.
-
-Issues
-------
-
-Issues are now in the [Mongoid Jira project](https://jira.mongodb.org/browse/MONGOID/).
-
-Project Tracking
-----------------
-
-* [Mongoid Website and Documentation](http://www.mongoid.org)
-* [Mongoid Google Group](http://groups.google.com/group/mongoid)
-* [Stackoverflow](http://stackoverflow.com/questions/tagged/mongoid)
-* [#mongoid](http://webchat.freenode.net/?channels=mongoid) on freenode IRC
-
-Compatibility
--------------
-
-Mongoid is tested against MRI 2.2-2.6 and JRuby 9.1-9.2.
+Mongoid is an ODM (Object-Document Mapper) framework for MongoDB in Ruby.
 
 Documentation
 -------------
 
-Please see the [MongoDB website](http://docs.mongodb.org/ecosystem/tutorial/ruby-mongoid-tutorial/#ruby-mongoid-tutorial) for up-to-date documentation.
+Mongoid has [extensive user documentation](https://docs.mongodb.com/mongoid/current/).
+[API documentation](http://api.mongodb.com/mongoid/current/) is also available.
+
+Mongoid is built on top of the MongoDB Ruby driver which has
+[its own user documentation](https://docs.mongodb.com/ruby-driver/current/).
+
+Compatibility
+-------------
+
+Mongoid supports and is tested against:
+
+- MRI 2.2-2.6
+- JRuby 9.1-9.2
+- MongoDB server 2.6-4.0
+
+Issues
+------
+
+Please use the [MONGOID project](https://jira.mongodb.org/browse/MONGOID/)
+in MongoDB JIRA to report issues with Mongoid.
+
+Support
+-------
+
+* [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoid)
+* [Mongoid Google Group](http://groups.google.com/group/mongoid)
+* [#mongoid](http://webchat.freenode.net/?channels=mongoid) on Freenode IRC
 
 License
 -------
