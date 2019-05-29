@@ -310,49 +310,49 @@ describe Mongoid::Extensions::String do
     context "when the string is an integer" do
 
       it "returns true" do
-        expect("1234").to be_numeric
+        expect("1234".numeric?).to eq(true)
       end
     end
 
     context "when string is a float" do
 
       it "returns true" do
-        expect("1234.123").to be_numeric
+        expect("1234.123".numeric?).to eq(true)
       end
     end
 
     context "when the string is has exponents" do
 
       it "returns true" do
-        expect("1234.123123E4").to be_numeric
+        expect("1234.123123E4".numeric?).to eq(true)
       end
     end
 
     context "when the string is non numeric" do
 
       it "returns false" do
-        expect("blah").to_not be_numeric
+        expect("blah".numeric?).to eq(false)
       end
     end
 
     context "when the string is NaN" do
 
       it "returns true" do
-        expect("NaN").to be_numeric
+        expect("NaN".numeric?).to eq(true)
       end
     end
 
     context "when the string is Infinity" do
 
       it "returns true" do
-        expect("Infinity").to be_numeric
+        expect("Infinity".numeric?).to eq(true)
       end
     end
 
     context "when the string is -Infinity" do
 
       it "returns true" do
-        expect("-Infinity").to be_numeric
+        expect("-Infinity".numeric?).to eq(true)
       end
     end
   end
