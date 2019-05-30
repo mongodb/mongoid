@@ -172,15 +172,7 @@ module Mongoid
       #
       # @since 7.0
       def relation_class_name
-        @class_name ||= @options[:class_name] || begin
-          cls_name = ActiveSupport::Inflector.classify(name)
-          begin
-            cls_name = resolve_name(inverse_class, cls_name).name
-          rescue NameError
-            # ignore
-          end
-          cls_name
-        end
+        @class_name ||= @options[:class_name] || ActiveSupport::Inflector.classify(name)
       end
       alias :class_name :relation_class_name
 
