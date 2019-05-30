@@ -84,7 +84,7 @@ module Mongoid
       def numeric?
         !!Float(self)
       rescue ArgumentError
-        (self =~ /^NaN|\-?Infinity$/) == 0
+        (self =~ /\A(?:NaN|-?Infinity)\z/) == 0
       end
 
       # Get the string as a getter string.
