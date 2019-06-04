@@ -1,0 +1,2 @@
+class OtherOwnerObject
+end
