@@ -483,7 +483,13 @@ module Mongoid
       def resolve_name(mod, name)
         cls = exc = nil
         parts = name.to_s.split('::')
-        namespace_hierarchy(mod).each do |ns|
+        if parts.first == ''
+          parts.shift
+          hierarchy = [Object]
+        else
+          hierarchy = namespace_hierarchy(mod)
+        end
+        hierarchy.each do |ns|
           begin
             parts.each do |part|
               # Simple const_get sometimes pulls names out of weird scopes,
