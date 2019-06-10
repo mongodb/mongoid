@@ -909,12 +909,12 @@ describe Mongoid::Association::Referenced::HasOne do
         end
       end
 
-      it 'returns the proper namespaced class name' do
+      it 'returns the inferred unqualified class name' do
         define_classes
 
         expect(
             HasOneAssociationClassName::OwnedClass.relations['owner_class'].relation_class_name
-        ).to eq('HasOneAssociationClassName::OwnerClass')
+        ).to eq('OwnerClass')
       end
     end
 
@@ -943,6 +943,16 @@ describe Mongoid::Association::Referenced::HasOne do
 
       it 'uses the name of the relation to deduce the class name' do
         expect(association.relation_class_name).to eq('BelongingObject')
+      end
+    end
+
+    context "when the class is not defined" do
+      let(:name) do
+        :undefined_class
+      end
+
+      it 'does not trigger autoloading' do
+        expect(association.relation_class_name).to eq('UndefinedClass')
       end
     end
   end
