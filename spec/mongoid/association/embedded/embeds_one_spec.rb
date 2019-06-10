@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './embeds_one_models'
 
 describe Mongoid::Association::Embedded::EmbedsOne do
 
@@ -446,6 +447,32 @@ describe Mongoid::Association::Embedded::EmbedsOne do
           it 'returns the :as attribute' do
             expect(association.inverses).to eq([ :containable ])
           end
+
+          context 'when class_name is given and is a :: prefixed string' do
+
+            let(:association) do
+              EomCcParent.relations['child']
+            end
+
+            it 'returns the inverse in an array' do
+              pending 'MONGOID-4751'
+
+              inverses = association.inverses
+              expect(inverses).to eq([:parent])
+            end
+
+            context 'when other associations referencing unloaded classes exist' do
+              let(:association) do
+                EomDnlParent.relations['child']
+              end
+
+              it 'does not load other classes' do
+                inverses = association.inverses
+                expect(inverses).to eq([:parent])
+                expect(Object.const_defined?(:EoDnlMarker)).to be false
+              end
+            end
+          end
         end
       end
     end
@@ -606,12 +633,33 @@ describe Mongoid::Association::Embedded::EmbedsOne do
       it 'returns the class name option' do
         expect(association.relation_class_name).to eq('OtherEmbeddedObject')
       end
+
+      context ':class_name is a :: prefixed string' do
+        let(:association) do
+          EomCcParent.relations['child']
+        end
+
+        it 'returns the :: prefixed string' do
+          expect(association.relation_class_name).to eq('::EomCcChild')
+        end
+      end
     end
 
     context 'when the class_name option is not specified' do
 
       it 'uses the name of the relation to deduce the class name' do
         expect(association.relation_class_name).to eq('EmbeddedObject')
+      end
+    end
+
+    context 'when another association in the model is referencing a third model class' do
+      let(:association) do
+        EomDnlParent.relations['child']
+      end
+
+      it 'does not attempt to load the third class' do
+        expect(association.relation_class_name).to eq('EomDnlChild')
+        expect(Object.const_defined?(:EoDnlMarker)).to be false
       end
     end
   end

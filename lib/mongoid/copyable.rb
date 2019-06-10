@@ -75,7 +75,11 @@ module Mongoid
 
         if association.is_a?(Association::Embedded::EmbedsMany)
           attrs[association.key].each do |attr|
-            embedded_klass = attr.fetch('_type', association.relation_class_name).constantize
+            embedded_klass = if type = attr['_type']
+              type.constantize
+            else
+              association.relation_class
+            end
             process_localized_attributes(embedded_klass, attr)
           end
         else
