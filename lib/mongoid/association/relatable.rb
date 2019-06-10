@@ -147,20 +147,19 @@ module Mongoid
       # @since 7.0
       def inverse_type; end
 
-      # The class name of the association object(s).
+      # The class name, possibly unqualified or :: prefixed, of the association
+      # object(s).
       #
-      # The class name may be fully qualified or may be specified relative
-      # to the class on which the association is defined (this class is
-      # accessible as inverse_class). If :class_name option is given in the
-      # association, the exact value of that option is returned here for
-      # backwards compatibility reasons. If :class_name option is not given,
-      # the name of the class computed by Mongoid to be the association target
-      # is returned, and it will be fully qualified.
+      # This method returns the class name as it is used in the association
+      # definition. If :class_name option is given in the association, the
+      # exact value of that option is returned here. If :class_name option is
+      # not given, the name of the class is calculated from association name
+      # but is not resolved to the actual class.
       #
       # The class name returned by this method may not correspond to a defined
-      # class. The return value of the method is the class name that Mongoid
-      # would reference, relative to the host document class, when it needs to
-      # perform operations on the association target.
+      # class, either because the corresponding class has not been loaded yet,
+      # or because the association references a non-existent class altogether.
+      # To obtain the association class, use +relation_class+ method.
       #
       # @note The return value of this method should not be used to determine
       #   whether two associations have the same target class, because the
@@ -472,6 +471,11 @@ module Mongoid
 
       # Resolves the given class/module name in the context of the specified
       # module, as Ruby would when a constant is referenced in the source.
+      #
+      # @note This method can swallow exceptions produced during class loading,
+      #   because it rescues NameError internally. Since this method attempts
+      #   to load classes, failure during the loading process may also lead to
+      #   there being incomplete class definitions.
       def resolve_name(mod, name)
         cls = exc = nil
         parts = name.to_s.split('::')
