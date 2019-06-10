@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative './embeds_one_models'
 
 describe Mongoid::Association::Embedded::EmbeddedIn do
 
@@ -315,6 +316,42 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
           it 'returns nil' do
             expect(association.inverses).to eq(nil)
           end
+
+          context 'when class_name is given and is a plain string' do
+            let(:association) do
+              EomParent.relations['child']
+            end
+
+            it 'returns the inverse in an array' do
+              inverses = association.inverses
+              expect(inverses).to eq([:parent])
+            end
+          end
+
+          context 'when class_name is given and is a :: prefixed string' do
+            let(:association) do
+              EomCcChild.relations['parent']
+            end
+
+            it 'returns the inverse in an array' do
+              pending 'MONGOID-4751'
+
+              inverses = association.inverses
+              expect(inverses).to eq([:child])
+            end
+
+            context 'when other associations referencing unloaded classes exist' do
+              let(:association) do
+                EomDnlChild.relations['parent']
+              end
+
+              it 'does not load other classes' do
+                inverses = association.inverses
+                expect(inverses).to eq([:child])
+                expect(Object.const_defined?(:EoDnlMarker)).to be false
+              end
+            end
+          end
         end
       end
     end
@@ -551,12 +588,33 @@ describe Mongoid::Association::Embedded::EmbeddedIn do
       it 'returns the class name option' do
         expect(association.relation_class_name).to eq('OtherContainer')
       end
+
+      context ':class_name is a :: prefixed string' do
+        let(:association) do
+          EomCcChild.relations['parent']
+        end
+
+        it 'returns the :: prefixed string' do
+          expect(association.relation_class_name).to eq('::EomCcParent')
+        end
+      end
     end
 
     context 'when the class_name option is not specified' do
 
       it 'uses the name of the relation to deduce the class name' do
         expect(association.relation_class_name).to eq('Container')
+      end
+    end
+
+    context 'when another association in the model is referencing a third model class' do
+      let(:association) do
+        EomDnlChild.relations['parent']
+      end
+
+      it 'does not attempt to load the third class' do
+        expect(association.relation_class_name).to eq('EomDnlParent')
+        expect(Object.const_defined?(:EoDnlMarker)).to be false
       end
     end
   end
