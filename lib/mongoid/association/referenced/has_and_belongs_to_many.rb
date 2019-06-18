@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'mongoid/association/referenced/has_and_belongs_to_many/binding'
 require 'mongoid/association/referenced/has_and_belongs_to_many/buildable'

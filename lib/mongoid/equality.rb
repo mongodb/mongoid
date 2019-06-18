@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 module Mongoid
 
   # This module contains the behavior of Mongoid's clone/dup of documents.
@@ -64,4 +65,3 @@ module Mongoid
     end
   end
 end
-

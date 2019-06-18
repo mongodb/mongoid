@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 require "mongoid/clients/factory"
 require "mongoid/clients/validators"
 require "mongoid/clients/storage_options"

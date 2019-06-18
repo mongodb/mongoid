@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'mongoid/association/embedded/embeds_many/binding'
 require 'mongoid/association/embedded/embeds_many/buildable'

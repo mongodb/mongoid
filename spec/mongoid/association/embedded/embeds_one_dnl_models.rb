@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+# encoding: utf-8
+
 # This file is added as an autoload target, but should never be actually
 # processed.
 
