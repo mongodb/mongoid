@@ -179,7 +179,7 @@ module Mongoid
         #
         # @since 1.0.0
         def multi_selection?(key)
-          key =~ /\$and|\$or|\$nor/
+          %w($and $or $nor).include?(key)
         end
 
         # Determines if the selection operator takes a list. Returns true for $in and $nin.
@@ -195,17 +195,17 @@ module Mongoid
         #
         # @since 2.1.1
         def multi_value?(key)
-          key =~ /\$nin|\$in/
+          %w($in $nin).include?(key)
         end
 
         private
 
         def in?(key)
-          key =~ /\$in/
+          key == '$in'
         end
 
         def nin?(key)
-          key =~ /\$nin/
+          key == '$nin'
         end
       end
     end
