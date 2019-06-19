@@ -259,7 +259,7 @@ module Mongoid
       end
 
       def system_collection?
-        collection.namespace =~ /^system./
+        collection.namespace =~ /\Asystem./
       end
     end
 
