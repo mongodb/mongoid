@@ -182,7 +182,8 @@ module Mongoid
           %w($and $or $nor).include?(key)
         end
 
-        # Determines if the selection operator takes a list. Returns true for $in and $nin.
+        # Determines if the selection operator takes a list. Returns true for
+        # $in and $nin.
         #
         # @api private
         #
