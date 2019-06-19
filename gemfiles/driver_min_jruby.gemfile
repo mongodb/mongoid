@@ -3,7 +3,7 @@ source "https://rubygems.org"
 # Due to https://github.com/jruby/jruby/issues/5292 /
 # https://github.com/bundler/bundler/issues/6678 we cannot test unreleased
 # bson with JRuby, just test the driver then
-gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.10-stable'
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.5-stable'
 
 gem 'rake'
 gem 'actionpack', '~> 5.1'
