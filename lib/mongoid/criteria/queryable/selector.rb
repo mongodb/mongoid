@@ -22,9 +22,10 @@ module Mongoid
           other.each_pair do |key, value|
             if value.is_a?(Hash) && self[key.to_s].is_a?(Hash)
               value = self[key.to_s].merge(value) do |_key, old_val, new_val|
-                if in?(_key)
+                case _key
+                when '$in'
                   new_val & old_val
-                elsif nin?(_key)
+                when '$nin'
                   (old_val + new_val).uniq
                 else
                   new_val
@@ -197,16 +198,6 @@ module Mongoid
         # @since 2.1.1
         def multi_value?(key)
           %w($in $nin).include?(key)
-        end
-
-        private
-
-        def in?(key)
-          key == '$in'
-        end
-
-        def nin?(key)
-          key == '$nin'
         end
       end
     end
