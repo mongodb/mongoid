@@ -20,7 +20,7 @@ module Mongoid
         #
         # @since 2.1.0
         def path
-          @path ||= position.sub(/\.\d+$/, "")
+          @path ||= position.sub(/\.\d+\z/, "")
         end
       end
     end

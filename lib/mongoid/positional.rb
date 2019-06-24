@@ -64,7 +64,7 @@ module Mongoid
       matches = position.scan(/\.\d+\./)
       if matches.size == 1
         keys.each do |kk|
-          if position =~ /^#{kk}\.\d+\.(.*)/
+          if position =~ /\A#{kk}\.\d+\.(.*)\z/
             return "#{kk}.$.#{$1}"
           end
         end

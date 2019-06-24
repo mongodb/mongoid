@@ -48,7 +48,7 @@ module Mongoid
       #     include Mongoid::Document
       #     field :title
       #
-      #     validates_format_of :title, with: /^[a-z0-9 \-_]*$/i
+      #     validates_format_of :title, with: /\A[a-z0-9 \-_]*\z/i
       #   end
       #
       # @param [ Array ] args The names of the fields to validate.

@@ -69,7 +69,7 @@ module Mongoid
       #
       # @since 2.3.1
       def mongoid_id?
-        self =~ /\A(|_)id$/
+        self =~ /\A(|_)id\z/
       end
 
       # Is the string a number? The literals "NaN", "Infinity", and "-Infinity"
@@ -96,7 +96,7 @@ module Mongoid
       #
       # @since 1.0.0
       def reader
-        delete("=").sub(/\_before\_type\_cast$/, '')
+        delete("=").sub(/\_before\_type\_cast\z/, '')
       end
 
       # Is this string a writer?
