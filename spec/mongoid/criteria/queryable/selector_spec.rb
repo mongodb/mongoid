@@ -845,37 +845,6 @@ describe Mongoid::Criteria::Queryable::Selector do
     end
   end
 
-  describe '#multi_value?' do
-
-    let(:selector) do
-      described_class.new
-    end
-
-    context 'when key is $in' do
-      it 'returns true' do
-        expect(selector.send(:multi_value?, '$in')).to be true
-      end
-    end
-
-    context 'when key is $nin' do
-      it 'returns true' do
-        expect(selector.send(:multi_value?, '$nin')).to be true
-      end
-    end
-
-    context 'when key includes $in but is not $in' do
-      it 'returns false' do
-        expect(selector.send(:multi_value?, '$inc')).to be false
-      end
-    end
-
-    context 'when key is some other ey' do
-      it 'returns false' do
-        expect(selector.send(:multi_value?, 'foo')).to be false
-      end
-    end
-  end
-
   describe '#multi_selection?' do
 
     let(:selector) do
