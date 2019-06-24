@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 module Mongoid
 
   # Provides behavior for generating the selector for a specific document.

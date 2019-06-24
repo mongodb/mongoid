@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'mongoid/association/referenced/has_one/binding'
 require 'mongoid/association/referenced/has_one/buildable'

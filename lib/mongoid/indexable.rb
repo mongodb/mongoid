@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 require "mongoid/indexable/specification"
 require "mongoid/indexable/validators/options"
 require "ostruct"

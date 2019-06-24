@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 require "mongoid/timestamps/timeless"
 require "mongoid/timestamps/created"
 require "mongoid/timestamps/updated"

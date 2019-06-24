@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 require 'mongoid/association/referenced/auto_save'
 require 'mongoid/association/referenced/counter_cache'

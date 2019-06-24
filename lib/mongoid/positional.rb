@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 module Mongoid
 
   # This module is responsible for taking update selectors and switching out

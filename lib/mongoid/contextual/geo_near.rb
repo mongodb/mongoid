@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 module Mongoid
   module Contextual
     class GeoNear
@@ -265,4 +266,3 @@ module Mongoid
     end
   end
 end
-

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# encoding: utf-8
 
 # Go ahead and fail if not using Ruby 1.9.3, no since in letting people
 # squarm for answers

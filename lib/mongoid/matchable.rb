@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 require "mongoid/matchable/default"
 require "mongoid/matchable/all"
 require "mongoid/matchable/and"

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 require "mongoid/persistable/creatable"
 require "mongoid/persistable/deletable"
 require "mongoid/persistable/destroyable"

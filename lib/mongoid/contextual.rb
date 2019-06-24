@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
+
 require "mongoid/contextual/queryable"
 require "mongoid/contextual/mongo"
 require "mongoid/contextual/memory"
