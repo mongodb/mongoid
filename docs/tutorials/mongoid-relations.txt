@@ -127,13 +127,13 @@ sides of the association, there are 4 fields configurable when the association
 is defined:
 
 - ``:primary_key`` is the field on the remote model that contains the value
-by which the remote model is looked up.
+  by which the remote model is looked up.
 - ``:foreign_key`` is the field on the local model which stores the
-``:primary_key`` values.
+  ``:primary_key`` values.
 - ``:inverse_primary_key`` is the field on the local model that the remote
-model uses to look up the local model docuemnts.
+  model uses to look up the local model docuemnts.
 - ``:inverse_foreign_key`` is the field on the remote model storing the
-values in ``:inverse_primary_key``.
+  values in ``:inverse_primary_key``.
 
 An example might make this more clear:
 
