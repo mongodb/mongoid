@@ -7,7 +7,7 @@ Persistence Methods
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Mongoid supports all expected CRUD operations for those familiar with other
@@ -444,7 +444,7 @@ are not invoked.
           person.unset(:name)
 
 Atomic Operation Grouping
-`````````````````````````
+*************************
 
 Atomic operations may be grouped together using the ``#atomically`` method
 on a document. All operations inside the block given to ``#atomically``
@@ -614,6 +614,15 @@ In the above example, all persistence operations would be stored in the alternat
 database for all remaining operations on this thread. This is why the after request
 set the override back to nil - it ensures subsequent requests with no local params
 use the default option.
+
+Persistence context applies to both read and write operations. For example,
+secondary reads can be performed as follows:
+
+.. code-block:: ruby
+
+  Band.with(read: {mode: :secondary}) do
+    Band.count
+  end
 
 Client and Collection Access
 ****************************
