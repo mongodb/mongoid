@@ -431,6 +431,29 @@ when the base document calls ``#touch``.
    band = Band.first
    band.touch # Calls touch on the parent label.
 
+The counter_cache Option
+************************
+
+As with ActiveRecord, the ``:counter_cache`` option can be used on an association
+to make finding the number of belonging objects more efficient. Also similar
+to ActiveRecord, you must take into account that there will be an extra
+attribute on the associated model. This means that with Mongoid,
+you need to include ``Mongoid::Attributes::Dynamic`` on the associated model.
+For example:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+    belongs_to :customer, counter_cache: true
+  end
+
+  class Customer
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+    has_many :orders
+  end
+
 Association metadata
 --------------------
 
@@ -906,25 +929,3 @@ children via ``parent_`` and ``child_`` methods.
   
    root.child_node # child
    child.parent_node # root
-
-The counter_cache Option
-------------------------
-
-As with ActiveRecord, the :counter_cache option can be used on an association to make finding the
-number of belonging objects more efficient. Also similar to ActiveRecord, you must take into
-account that there will be an extra attribute on the associated model. This means that with Mongoid,
-you need to include ``Mongoid::Attributes::Dynamic`` on the associated model.
-For example:
-
-.. code-block:: ruby
-
-  class Order
-    include Mongoid::Document
-    belongs_to :customer, counter_cache: true
-  end
-
-  class Customer
-    include Mongoid::Document
-    include Mongoid::Attributes::Dynamic
-    has_many :orders
-  end
