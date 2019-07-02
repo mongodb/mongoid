@@ -380,6 +380,53 @@ children via ``parent_`` and ``child_`` methods.
    root.child_node # child
    child.parent_node # root
 
+Referencing Vs Embedding
+************************
+
+While a complete discussion of referencing vs embedding is beyond the scope
+of this tutorial, here are some high level considerations for choosing
+one over the other.
+
+When an association is embedded, both parent and child documents are stored
+in the same collection. This permits efficient persistence and retrieval
+when both are used/needed. For example, if the navigation bar on a web site
+shows attributes of a user that are stored in documents themselves, it is
+often a good idea to use embedded associations.
+
+Using embedded associations allows using MongoDB tools like the
+`aggregation pipeline
+<https://docs.mongodb.com/manual/core/aggregation-pipeline/>`_ to query
+these documents in a powerful way.
+
+Because embedded documents are stored as part of their parent top-level
+documents, it is not possible to persist an embedded document by itself,
+nor is it possible to retrieve embedded documents directly. However,
+embedded documents can still be efficiently queried and retrieved with the
+help of MongoDB projection operation:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :started_on, type: Date
+    embeds_one :label
+  end
+  
+  class Label
+    include Mongoid::Document
+    field :name, type: String
+    embedded_in :band
+  end
+
+  # Retrieve labels for bands started in the last year.
+  #
+  # Sends a find query like this:
+  # {"find"=>"bands",
+  #  "filter"=>{"started_on"=>{"$gt"=>2018-07-01 00:00:00 UTC}},
+  #  "projection"=>{"_id"=>1, "label"=>1}}
+  Band.where(started_on: {'$gt' => Time.now - 1.year}).only(:label).map(&:label).compact.uniq
+
+
 Common Behavior
 ---------------
 
