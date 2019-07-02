@@ -7,30 +7,428 @@ Associations
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
-Common Behavior
----------------
+Referenced Associations
+-----------------------
 
-Attributes
-**********
+Mongoid supports the ``has_one``, ``has_many``, ``belongs_to`` and
+``has_and_belongs_to_many`` associations familiar to ActiveRecord users.
 
-All associations contain a ``_target``, which is the proxied document or documents, a ``_base``
-which is the document the association hangs off, and ``_association`` which provides information
-about the association.
+
+Has One
+*******
+
+One to one associations where documents are stored in separate collections
+are defined using ``has_one`` and ``belongs_to`` macros.
+
+Defining
+~~~~~~~~
+
+The parent document of the association should use the ``has_one`` macro to
+indicate is has one referenced child, and the document that is referenced
+should use ``belongs_to``.
 
 .. code-block:: ruby
 
-   class Person
+  class Band
+    include Mongoid::Document
+    has_one :studio
+  end
+
+  class Studio
+    include Mongoid::Document
+    field :name, type: String
+    belongs_to :band
+  end
+
+Definitions are required on both sides to the association in order for it to
+work properly.
+
+Storage
+~~~~~~~
+
+When defining an association of this nature, each document is stored in its
+respective collection, and the child document contains a "foreign key"
+reference to the parent:
+
+.. code-block:: ruby
+
+  # The parent band document.
+  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+
+  # The child studio document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
+    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
+  }
+
+
+Has Many
+********
+
+One to many associations where the children are stored in a separate
+collection from the parent document are defined using Mongoid's ``has_many``
+and ``belongs_to`` macros.
+
+Defining
+~~~~~~~~
+
+The parent document of the association should use the ``has_many`` macro to
+indicate is has n number of referenced children, where the document that is
+referenced uses ``belongs_to``.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_many :members
+  end
+
+  class Member
+    include Mongoid::Document
+    field :name, type: String
+    belongs_to :band
+  end
+
+Definitions are required on both sides to the association in order for it
+to work properly.
+
+Storage
+~~~~~~~
+
+When defining an association of this nature, each document is stored in its
+respective collection, and the child document contains a "foreign key"
+reference to the parent.
+
+.. code-block:: ruby
+
+  # The parent band document.
+  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+
+  # A child member document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
+    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
+  }
+
+Belongs To
+**********
+
+A ``belongs_to`` macro is used when a document is the child in a ``has_one``
+or ``has_many`` association. By default, in order for a document to
+be saved, each of its ``belongs_to`` associations must be provided a value.
+To override this requirement, you can use the option ``optional: false``
+on the ``belong_to`` association.
+
+Defining
+~~~~~~~~
+
+The child document of the association uses the ``belongs_to`` macro to indicate
+it is associated with a parent. The document on the ``belongs_to`` side
+stores the reference to the parent.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_one :studio
+  end
+
+  class Studio
+    include Mongoid::Document
+    field :name, type: String
+    belongs_to :band
+  end
+
+Definitions are required on both sides to the association in order for it to
+work properly.
+
+Storage
+~~~~~~~
+
+When defining an association of this nature, each document is stored in its respective collection,
+but the child document contains a "foreign key" reference to the parent.
+
+.. code-block:: ruby
+
+  # The parent band document.
+  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+
+  # The child studio document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
+    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
+  }
+
+Has And Belongs To Many
+***********************
+
+Many to many associations in Mongoid are defined using the
+``has_and_belongs_to_many`` macro. Unlike ActiveRecord's
+``has_and_belongs_to_many``, in Mongoid there is no "join collection" -
+the foreign key ids are stored as arrays on both sides of the association.
+
+``has_and_belongs_to_many`` association has no embedded equivalent.
+
+Defining
+~~~~~~~~
+
+Both sides of the association use the same macro.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_and_belongs_to_many :tags
+  end
+
+  class Tag
+    include Mongoid::Document
+    field :name, type: String
+    has_and_belongs_to_many :bands
+  end
+
+You can create a one sided many to many if you want to mimic a has_many
+that stores the keys as an array on the parent.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_and_belongs_to_many :tags, inverse_of: nil
+  end
+
+  class Tag
+    include Mongoid::Document
+    field :name, type: String
+  end
+
+Storage
+~~~~~~~
+
+When defining an association of this nature, each document is stored in its
+respective collection, and each document contains a "foreign key" reference
+to the other in the form of an array.
+
+.. code-block:: ruby
+
+  # The band document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
+    "tag_ids" : [ ObjectId("4d3ed089fb60ab534684b7f2") ]
+  }
+
+  # The tag document.
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7f2"),
+    "band_ids" : [ ObjectId("4d3ed089fb60ab534684b7e9") ]
+  }
+
+Embedded Associations
+---------------------
+
+Thanks to MongoDB's document model, Mongoid also offers embedded associations
+which allow documents of different types to be stored hierarchically
+in the same collection. Embedded associations are defined using
+``embeds_one``, ``embeds_many`` and ``embedded_in`` macros, plus
+``recursively_embeds_one`` and ``recursively_embeds_many``for recursive
+embedding.
+
+Embeds One
+**********
+
+One to one associations where the children are embedded in the parent
+document are defined using Mongoid's ``embeds_one`` and ``embedded_in`` macros.
+
+Defining
+~~~~~~~~
+
+The parent document of the association should use the ``embeds_one`` macro to
+indicate is has one embedded child, where the document that is embedded uses
+``embedded_in``. Definitions are required on both sides to the association
+in order for it to work properly.
+
+.. code-block:: ruby
+
+   class Band
      include Mongoid::Document
-     embeds_many :addresses
+     embeds_one :label
    end
-   
-   person.addresses = [ address ]
-   person.addresses._target # returns [ address ]
-   person.addresses._base # returns person
-   person.addresses._association # returns the association metadata
+  
+   class Label
+     include Mongoid::Document
+     field :name, type: String
+     embedded_in :band
+   end
+
+Storage
+~~~~~~~
+
+Documents that are embedded using the ``embeds_one`` macro are stored as a
+hash inside the parent in the parent's database collection.
+
+.. code-block:: ruby
+
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
+    "label" : {
+      "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
+      "name" : "Mute",
+    }
+  }
+
+You can optionally tell Mongoid to store the embedded document in a different
+attribute other than the name, by providing the ``:store_as`` option.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_one :label, store_as: "lab"
+  end
+
+
+Embeds Many
+***********
+
+One to many relationships where the children are embedded in the parent
+document are defined using Mongoid's ``embeds_many`` and ``embedded_in`` macros.
+
+Defining
+~~~~~~~~
+
+The parent document of the association should use the ``embeds_many`` macro
+to indicate it has many embedded children, where the document that is
+embedded uses ``embedded_in``. Definitions are required on both sides of
+the association in order for it to work properly.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :albums
+  end
+
+  class Album
+    include Mongoid::Document
+    field :name, type: String
+    embedded_in :band
+  end
+
+Storage
+~~~~~~~
+
+Documents that are embedded using the ``embeds_many`` macro are stored as
+an array of hashes inside the parent in the parent's database collection.
+
+.. code-block:: ruby
+
+  {
+    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
+    "albums" : [
+      {
+        "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
+        "name" : "Violator",
+      }
+    ]
+  }
+
+You can optionally tell Mongoid to store the embedded document in a different
+attribute other than the name, by providing the ``:store_as`` option.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :albums, store_as: "albs"
+  end
+
+Recursive Embedding
+*******************
+
+A document can recursively embed itself using ``recursively_embeds_one`` or
+``recursively_embeds_many``, which provides accessors for the parent and
+children via ``parent_`` and ``child_`` methods.
+
+.. code-block:: ruby
+
+   class Tag
+     include Mongoid::Document
+     field :name, type: String
+     recursively_embeds_many
+   end
+  
+   root = Tag.new(name: "programming")
+   child_one = root.child_tags.build
+   child_two = root.child_tags.build
+  
+   root.child_tags # [ child_one, child_two ]
+   child_one.parent_tag # [ root ]
+   child_two.parent_tag # [ root ]
+  
+   class Node
+     include Mongoid::Document
+     recursively_embeds_one
+   end
+  
+   root = Node.new
+   child = Node.new
+   root.child_node = child
+  
+   root.child_node # child
+   child.parent_node # root
+
+Referencing Vs Embedding
+************************
+
+While a complete discussion of referencing vs embedding is beyond the scope
+of this tutorial, here are some high level considerations for choosing
+one over the other.
+
+When an association is embedded, both parent and child documents are stored
+in the same collection. This permits efficient persistence and retrieval
+when both are used/needed. For example, if the navigation bar on a web site
+shows attributes of a user that are stored in documents themselves, it is
+often a good idea to use embedded associations.
+
+Using embedded associations allows using MongoDB tools like the
+`aggregation pipeline
+<https://docs.mongodb.com/manual/core/aggregation-pipeline/>`_ to query
+these documents in a powerful way.
+
+Because embedded documents are stored as part of their parent top-level
+documents, it is not possible to persist an embedded document by itself,
+nor is it possible to retrieve embedded documents directly. However,
+embedded documents can still be efficiently queried and retrieved with the
+help of MongoDB projection operation:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :started_on, type: Date
+    embeds_one :label
+  end
+  
+  class Label
+    include Mongoid::Document
+    field :name, type: String
+    embedded_in :band
+  end
+
+  # Retrieve labels for bands started in the last year.
+  #
+  # Sends a find query like this:
+  # {"find"=>"bands",
+  #  "filter"=>{"started_on"=>{"$gt"=>2018-07-01 00:00:00 UTC}},
+  #  "projection"=>{"_id"=>1, "label"=>1}}
+  Band.where(started_on: {'$gt' => Time.now - 1.year}).only(:label).map(&:label).compact.uniq
+
+
+Common Behavior
+---------------
 
 Extensions
 **********
@@ -127,13 +525,13 @@ sides of the association, there are 4 fields configurable when the association
 is defined:
 
 - ``:primary_key`` is the field on the remote model that contains the value
-by which the remote model is looked up.
+  by which the remote model is looked up.
 - ``:foreign_key`` is the field on the local model which stores the
-``:primary_key`` values.
+  ``:primary_key`` values.
 - ``:inverse_primary_key`` is the field on the local model that the remote
-model uses to look up the local model docuemnts.
+  model uses to look up the local model docuemnts.
 - ``:inverse_foreign_key`` is the field on the remote model storing the
-values in ``:inverse_primary_key``.
+  values in ``:inverse_primary_key``.
 
 An example might make this more clear:
 
@@ -377,41 +775,6 @@ Note that autosave functionality will automatically be added to an association w
    band.albums.build(name: "101")
    band.save # Will save the album as well.
 
-Recursive Embedding
-*******************
-
-A document can recursively embed itself using ``recursively_embeds_one`` or
-``recursively_embeds_many``, which provides accessors for the parent and
-children via ``parent_`` and ``child_`` methods.
-
-.. code-block:: ruby
-
-   class Tag
-     include Mongoid::Document
-     field :name, type: String
-     recursively_embeds_many
-   end
-  
-   root = Tag.new(name: "programming")
-   child_one = root.child_tags.build
-   child_two = root.child_tags.build
-  
-   root.child_tags # [ child_one, child_two ]
-   child_one.parent_tag # [ root ]
-   child_two.parent_tag # [ root ]
-  
-   class Node
-     include Mongoid::Document
-     recursively_embeds_one
-   end
-  
-   root = Node.new
-   child = Node.new
-   root.child_node = child
-  
-   root.child_node # child
-   child.parent_node # root
-
 Existence Predicates
 ********************
 
@@ -466,6 +829,29 @@ when the base document calls ``#touch``.
    band = Band.first
    band.touch # Calls touch on the parent label.
 
+The counter_cache Option
+************************
+
+As with ActiveRecord, the ``:counter_cache`` option can be used on an association
+to make finding the number of belonging objects more efficient. Also similar
+to ActiveRecord, you must take into account that there will be an extra
+attribute on the associated model. This means that with Mongoid,
+you need to include ``Mongoid::Attributes::Dynamic`` on the associated model.
+For example:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+    belongs_to :customer, counter_cache: true
+  end
+
+  class Customer
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+    has_many :orders
+  end
+
 Association metadata
 --------------------
 
@@ -483,6 +869,25 @@ You can access the association metadata of the association in a few different wa
    # Get the metadata with a specific association itself on a specific
    # document.
    model.associations[:association_name]
+
+Attributes
+**********
+
+All associations contain a ``_target``, which is the proxied document or documents, a ``_base``
+which is the document the association hangs off, and ``_association`` which provides information
+about the association.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     embeds_many :addresses
+   end
+   
+   person.addresses = [ address ]
+   person.addresses._target # returns [ address ]
+   person.addresses._base # returns person
+   person.addresses._association # returns the association metadata
 
 The Association Object
 **********************
@@ -571,332 +976,3 @@ with, and is useful for developers of extensions to Mongoid.
      - Returns the name of the field to set the polymorphic type.
    * - ``Association#validate?``
      - Returns whether the association has an associated validation.
-
-Embeds One
-----------
-
-One to one relationships where the children are embedded in the parent document are defined
-using Mongoid's ``embeds_one`` and ``embedded_in`` macros.
-
-Defining
-********
-
-The parent document of the association should use the ``embeds_one`` macro to indicate is has 1
-embedded child, where the document that is embedded uses ``embedded_in``. Definitions are required
-on both sides to the association in order for it to work properly.
-
-.. code-block:: ruby
-
-   class Band
-     include Mongoid::Document
-     embeds_one :label
-   end
-  
-   class Label
-     include Mongoid::Document
-     field :name, type: String
-     embedded_in :band
-   end
-
-Storage
-*******
-
-Documents that are embedded using the ``embeds_one`` macro are stored as a hash inside the
-parent in the parent's database collection.
-
-.. code-block:: ruby
-
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
-    "label" : {
-      "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
-      "name" : "Mute",
-    }
-  }
-
-You can optionally tell Mongoid to store the embedded document in a different attribute other
-than the name, by providing a ``:store_as`` option.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    embeds_one :label, store_as: "lab"
-  end
-
-
-Embeds Many
------------
-
-One to many relationships where the children are embedded in the parent document are defined
-using Mongoid's ``embeds_many`` and ``embedded_in`` macros.
-
-Defining
-********
-
-The parent document of the association should use the ``embeds_many`` macro to indicate it has n
-number of embedded children, where the document that is embedded uses ``embedded_in``. Definitions
-are required on both sides to the association in order for it to work properly.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    embeds_many :albums
-  end
-
-  class Album
-    include Mongoid::Document
-    field :name, type: String
-    embedded_in :band
-  end
-
-Storage
-*******
-
-Documents that are embedded using the ``embeds_many`` macro are stored as an array of hashes
-inside the parent in the parent's database collection.
-
-.. code-block:: ruby
-
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
-    "albums" : [
-      {
-        "_id" : ObjectId("4d3ed089fb60ab534684b7e0"),
-        "name" : "Violator",
-      }
-    ]
-  }
-
-You can optionally tell Mongoid to store the embedded document in a different attribute other
-than the name, by providing a ``:store_as`` option.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    embeds_many :albums, store_as: "albs"
-  end
-
-
-Has One
--------
-
-One to one relationships where the children are referenced in the parent document are defined
-using Mongoid's ``has_one`` and ``belongs_to`` macros.
-
-Defining
-********
-
-The parent document of the association should use the ``has_one`` macro to indicate is has 1 referenced
-child, where the document that is referenced in it uses ``belongs_to``.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    has_one :studio
-  end
-
-  class Studio
-    include Mongoid::Document
-    field :name, type: String
-    belongs_to :band
-  end
-
-Definitions are required on both sides to the association in order for it to work properly, unless
-one of the models is embedded.
-
-Storage
-*******
-
-When defining an association of this nature, each document is stored in its respective collection,
-but the child document contains a "foreign key" reference to the parent.
-
-.. code-block:: ruby
-
-  # The parent band document.
-  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
-
-  # The child studio document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
-    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
-  }
-
-
-Has Many
---------
-
-One to many relationships where the children are stored in a separate collection from the parent
-document are defined using Mongoid's ``has_many`` and ``belongs_to`` macros. This exhibits similar
-behavior to Active Record.
-
-Defining
-********
-
-The parent document of the association should use the ``has_many`` macro to indicate is has n number
-of referenced children, where the document that is referenced uses ``belongs_to``.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    has_many :members
-  end
-
-  class Member
-    include Mongoid::Document
-    field :name, type: String
-    belongs_to :band
-  end
-
-Definitions are required on both sides to the association in order for it to work properly,
-unless one of the models is embedded.
-
-Storage
-*******
-
-When defining an association of this nature, each document is stored in its respective collection,
-but the child document contains a "foreign key" reference to the parent.
-
-.. code-block:: ruby
-
-  # The parent band document.
-  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
-
-  # A child member document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
-    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
-  }
-
-Belongs To
-----------
-
-A ``belongs_to`` macro is used when a document is the child in a ``has_one`` or ``has_many`` association.
-By default, a child document cannot be saved unless it's associated with a parent. To override this requirement,
-you can use the option, ``optional: false``.
-
-Defining
-********
-
-The child document of the association uses the ``belongs_to`` macro to indicate it is associated with a parent.
-The document on the ``belongs_to`` side stores the reference to the parent.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    has_one :studio
-  end
-
-  class Studio
-    include Mongoid::Document
-    field :name, type: String
-    belongs_to :band
-  end
-
-Definitions are required on both sides to the association in order for it to work properly, unless
-one of the models is embedded.
-
-Storage
-*******
-
-When defining an association of this nature, each document is stored in its respective collection,
-but the child document contains a "foreign key" reference to the parent.
-
-.. code-block:: ruby
-
-  # The parent band document.
-  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
-
-  # The child studio document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
-    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
-  }
-
-Has And Belongs To Many
------------------------
-
-Many to many relationships where the inverse documents are stored in a separate collection
-from the base document are defined using Mongoid's ``has_and_belongs_to_many`` macro. This
-exhibits similar behavior to Active Record with the exception that no join collection is needed,
-the foreign key ids are stored as arrays on either side of the association.
-
-Defining
-********
-
-Both sides of the association use the same macro.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    has_and_belongs_to_many :tags
-  end
-
-  class Tag
-    include Mongoid::Document
-    field :name, type: String
-    has_and_belongs_to_many :bands
-  end
-
-You can create a one sided many to many if you want to mimic a has_many that stores the keys
-as an array on the parent.
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    has_and_belongs_to_many :tags, inverse_of: nil
-  end
-
-  class Tag
-    include Mongoid::Document
-    field :name, type: String
-  end
-
-Storage
-*******
-
-When defining an association of this nature, each document is stored in its respective collection,
-and each document contains a "foreign key" reference to the other in the form of an array.
-
-.. code-block:: ruby
-
-  # The band document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
-    "tag_ids" : [ ObjectId("4d3ed089fb60ab534684b7f2") ]
-  }
-
-  # The tag document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f2"),
-    "band_ids" : [ ObjectId("4d3ed089fb60ab534684b7e9") ]
-  }
-
-The counter_cache option
-------------------------
-
-As with ActiveRecord, the :counter_cache option can be used on an association to make finding the
-number of belonging objects more efficient. Also similar to ActiveRecord, you must take into
-account that there will be an extra attribute on the associated model. This means that with Mongoid,
-you need to include ``Mongoid::Attributes::Dynamic`` on the associated model.
-For example:
-
-.. code-block:: ruby
-
-  class Order
-    include Mongoid::Document
-    belongs_to :customer, counter_cache: true
-  end
-
-  class Customer
-    include Mongoid::Document
-    include Mongoid::Attributes::Dynamic
-    has_many :orders
-  end
