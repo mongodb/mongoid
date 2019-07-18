@@ -4,6 +4,12 @@ Indexes
 
 .. default-domain:: mongodb
 
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
 You can define indexes on documents using the index macro. Provide the key for
 the index along with a direction. For additional options, supply them in a second
 options hash parameter.

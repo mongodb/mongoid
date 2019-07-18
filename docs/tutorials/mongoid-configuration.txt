@@ -1,8 +1,14 @@
+.. _mongoid-configuration:
+
 =============
 Configuration
 =============
 
-.. _mongoid-configuration:
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
 
 Mongoid is customarily configured through a ``mongoid.yml`` file that specifies
 options and clients. The simplest configuration is as follows, which configures

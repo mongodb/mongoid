@@ -4,6 +4,12 @@ Upgrade Mongoid
 
 .. default-domain:: mongodb
 
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
 Upgrade to 6.x Series
 `````````````````````
 Mongoid 6.x is compatible with Rails 5 and requires Ruby 2.2.2 or higher.

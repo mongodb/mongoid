@@ -4,6 +4,12 @@ Nested Attributes
 
 .. default-domain:: mongodb
 
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
 Nested attributes provide a mechanism for updating documents and their
 relations in a single operation by nesting attributes in a single
 parameters hash. This is useful when wanting to edit multiple documents
