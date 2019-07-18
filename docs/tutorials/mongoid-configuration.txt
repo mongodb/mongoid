@@ -287,7 +287,7 @@ handler which is defined in ``unicorn.rb``:
 .. code-block:: ruby
 
     after_fork do |server, worker|
-      Mongoid.clients.each do |name, client|
+      Mongoid::Clients.clients.each do |name, client|
         client.close
         client.reconnect
       end
@@ -299,9 +299,7 @@ cluster after child processes are forked, close the client in the parent:
 .. code-block:: ruby
 
     before_fork do |server, worker|
-      Mongoid.clients.each do |name, client|
-        client.close
-      end
+      Mongoid.disconnect_clients
     end
 
 *Note:* This pattern should be used with Ruby driver version 2.6.2 or higher.
