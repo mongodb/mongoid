@@ -432,7 +432,7 @@ if your MongoDB server is running locally and you start it manually. A low
 server selection timeout will cause the driver to fail quickly when there is
 no server running.
 
-Sample recomended development configuration:
+Sample recommended development configuration:
 
 .. code-block:: yaml
 
