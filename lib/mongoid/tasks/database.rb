@@ -108,6 +108,26 @@ module Mongoid
         end.compact
       end
 
+      # Shared collection for each model given the provided globs and the class is
+      # not embedded..
+      #
+      # @example Shard all collections
+      # Mongoid::Tasks::Database.shard_collections
+      #
+      # @return [ Array<Class> ] The sharded models
+      def shard_collections(models = ::Mongoid.models)
+        models.each do |model|
+          next unless !model.embedded? || model.cyclic?
+          next unless model.collection.cluster.sharded?
+          next if model.shard_key_fields.blank?
+
+          admin_db = model.collection.client.list_mongo_databases(name: :admin).first
+          admin_db.command(enableSharding: model.collection.database.name)
+          admin_db.command(shardCollection: model.collection.namespace, key: model.shard_key_fields)
+          logger.info("MONGOID: Shard for #{model.collection.namespace}")
+        end.compact
+      end
+
       private
 
       def logger

@@ -67,6 +67,10 @@ namespace :db do
     task :remove_indexes => "mongoid:remove_indexes"
   end
 
+  unless Rake::Task.task_defined?("db:shard_collections")
+    task :shard_collections => "mongoid:shard_collections"
+  end
+
   namespace :mongoid do
     task :load_models do
       ::Rails.application.eager_load! if defined?(::Rails)
