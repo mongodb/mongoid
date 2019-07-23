@@ -20,6 +20,11 @@ namespace :db do
       ::Mongoid::Tasks::Database.remove_indexes
     end
 
+    desc "Shard the collections with shard_key defined on your mongoid models"
+    task :shard_collections => [:environment, :load_models] do
+      ::Mongoid::Tasks::Database.shard_collections
+    end
+
     desc "Drops the default client database"
     task :drop => :environment do
       ::Mongoid::Clients.default.database.drop

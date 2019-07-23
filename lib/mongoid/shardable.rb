@@ -11,7 +11,7 @@ module Mongoid
 
     included do
       cattr_accessor :shard_key_fields
-      self.shard_key_fields = []
+      self.shard_key_fields = {}
     end
 
     # Get the shard key fields.
@@ -21,7 +21,7 @@ module Mongoid
     # @example Get the shard key fields.
     #   model.shard_key_fields
     #
-    # @return [ Array<String> ] The shard key field names.
+    # @return [ Hash ] The shard key field names.
     #
     # @since 1.0.0
     def shard_key_fields
@@ -38,7 +38,7 @@ module Mongoid
     # @since 2.0.0
     def shard_key_selector
       selector = {}
-      shard_key_fields.each do |field|
+      shard_key_fields.keys.each do |field|
         selector[field.to_s] = new_record? ? send(field) : attribute_was(field)
       end
       selector
@@ -55,13 +55,13 @@ module Mongoid
       #     field :first_name, :type => String
       #     field :last_name, :type => String
       #
-      #     shard_key :first_name, :last_name
+      #     shard_key :first_name => 1, :last_name => 1
       #   end
       #
       # @since 2.0.0
-      def shard_key(*names)
-        names.each do |name|
-          self.shard_key_fields << self.database_field_name(name).to_sym
+      def shard_key(**shard_configs)
+        shard_configs.each do |key, value|
+          self.shard_key_fields[self.database_field_name(key).to_sym] = value
         end
       end
     end

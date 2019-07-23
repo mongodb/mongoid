@@ -17,7 +17,7 @@ describe Mongoid::Shardable do
       expect(klass).to respond_to(:shard_key_fields)
     end
 
-    it "defaults shard_key_fields to an empty array" do
+    it "defaults shard_key_fields to an empty hash" do
       expect(klass.shard_key_fields).to be_empty
     end
   end
@@ -29,11 +29,11 @@ describe Mongoid::Shardable do
     end
 
     before do
-      Band.shard_key(:name)
+      Band.shard_key(name: 1)
     end
 
     it "specifies a shard key on the collection" do
-      expect(klass.shard_key_fields).to eq([:name])
+      expect(klass.shard_key_fields).to eq({name: 1})
     end
 
     context 'when a relation is used as the shard key' do
@@ -43,11 +43,11 @@ describe Mongoid::Shardable do
       end
 
       before do
-        Game.shard_key(:person)
+        Game.shard_key(person: 1)
       end
 
       it "converts the shard key to the foreign key field" do
-        expect(klass.shard_key_fields).to eq([:person_id])
+        expect(klass.shard_key_fields).to eq({person_id: 1})
       end
     end
   end
@@ -57,7 +57,7 @@ describe Mongoid::Shardable do
     let(:klass) { Band }
     let(:value) { 'a-brand-name' }
 
-    before { klass.shard_key(:name) }
+    before { klass.shard_key(name: 1) }
 
     context 'when record is new' do
       let(:instance) { klass.new(name: value) }
