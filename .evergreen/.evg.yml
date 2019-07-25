@@ -47,7 +47,7 @@ functions:
            export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
 
            # Python has cygwin path problems on Windows. Detect prospective mongo-orchestration home directory
-           if [ "Windows_NT" == "$OS" ]; then # Magic variable in cygwin
+           if [ "Windows_NT" = "$OS" ]; then # Magic variable in cygwin
               export DRIVERS_TOOLS=$(cygpath -m $DRIVERS_TOOLS)
            fi
 
