@@ -1,0 +1,44 @@
+=======
+Sharding
+=======
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 1
+   :class: singlecol
+
+Specifying Sharding Keys
+------------------------
+
+You can define shard keys on documents using the shard_key macro.
+
+.. code-block:: ruby
+    class Person
+      include Mongoid::Document
+      field :ssn
+
+      shard_key ssn: 1
+      index ssn: 1 # the collection must have an index that starts with the shard key
+    end
+
+You can define Hashed shard key as well:
+
+.. code-block:: ruby
+    class Person
+      include Mongoid::Document
+      field :ssn
+
+      shard_key ssn: "hashed"
+      index ssn: 1
+    end
+
+Sharding Management Rake Tasks
+------------------------------
+
+When you want to sharding the collections in the database, use the provided ``db:mongoid:shard_collections`` Rake task:
+
+.. code-block:: bash
+
+    $ rake db:mongoid:create_indexes # need create indexes before sharding
+    $ rake db:mongoid:shard_collections
