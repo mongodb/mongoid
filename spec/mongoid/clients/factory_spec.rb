@@ -135,8 +135,8 @@ describe Mongoid::Clients::Factory do
 
             let(:config) do
               {
-                default: { hosts: [ "127.0.0.1:1234" ], database: database_id },
-                secondary: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/mongoid_test" }
+                default: { hosts: [ "127.0.0.1:1234" ], database: database_id, server_selection_timeout: 1 },
+                secondary: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/mongoid_test?serverSelectionTimeoutMS=1000" }
               }
             end
 
