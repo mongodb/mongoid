@@ -610,7 +610,7 @@ buildvariants:
   matrix_spec: { driver: "current", ruby: "*", mongodb-version: "4.0", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1604-test
   tasks:
      - name: "test"
 - matrix_name: "mongodb"
