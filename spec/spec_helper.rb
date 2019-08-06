@@ -100,7 +100,8 @@ def testing_geo_near?
 end
 
 def transactions_supported?
-  Mongoid::Clients.default.cluster.next_primary.features.transactions_enabled?
+  features = Mongoid::Clients.default.cluster.next_primary.features
+  features.respond_to?(:transactions_enabled?) && features.transactions_enabled?
 end
 
 def testing_transactions?
@@ -161,7 +162,9 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
-    unless Mongoid.default_client.cluster.connected?
+    cluster = Mongoid.default_client.cluster
+    # Older drivers do not have a #connected? method
+    if cluster.respond_to?(:connected?) && !cluster.connected?
       Mongoid.default_client.reconnect
     end
     Mongoid.default_client.collections.each do |coll|
