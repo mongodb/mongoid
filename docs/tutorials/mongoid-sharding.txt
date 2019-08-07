@@ -1,6 +1,6 @@
-=======
+==========
 Sharding
-=======
+==========
 
 .. contents:: On this page
    :local:
