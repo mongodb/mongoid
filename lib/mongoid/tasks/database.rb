@@ -123,7 +123,7 @@ module Mongoid
 
           admin_db = model.collection.client.list_mongo_databases(name: :admin).first
           admin_db.command(enableSharding: model.collection.database.name)
-          admin_db.command(shardCollection: model.collection.namespace, key: model.shard_key_fields)
+          admin_db.command(shardCollection: model.collection.namespace, **model.shard_config)
           logger.info("MONGOID: Shard for #{model.collection.namespace}")
         end.compact
       end

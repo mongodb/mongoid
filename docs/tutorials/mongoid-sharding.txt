@@ -33,6 +33,17 @@ You can define Hashed shard key as well:
       index ssn: 1
     end
 
+You can pass other args in `mongo doc <https://docs.mongodb.com/manual/reference/method/sh.shardCollection/#sh.shardCollection>`_ as well:
+
+.. code block:: ruby
+    class Person
+      include Mongoid::Document
+      field :ssn
+
+      shard_key({ssn: "hashed"}, unique: true)
+      index ssn: 1
+    end
+
 Sharding Management Rake Tasks
 ------------------------------
 
