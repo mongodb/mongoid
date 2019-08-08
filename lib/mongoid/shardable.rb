@@ -10,8 +10,9 @@ module Mongoid
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :shard_key_fields
-      self.shard_key_fields = {}
+      cattr_accessor :shard_key_fields, :shard_config
+      self.shard_key_fields = []
+      self.shard_config = {}
     end
 
     # Get the shard key fields.
@@ -21,7 +22,7 @@ module Mongoid
     # @example Get the shard key fields.
     #   model.shard_key_fields
     #
-    # @return [ Hash ] The shard key field names.
+    # @return [ Array ] The shard key field names.
     #
     # @since 1.0.0
     def shard_key_fields
@@ -38,7 +39,7 @@ module Mongoid
     # @since 2.0.0
     def shard_key_selector
       selector = {}
-      shard_key_fields.keys.each do |field|
+      shard_key_fields.each do |field|
         selector[field.to_s] = new_record? ? send(field) : attribute_was(field)
       end
       selector
@@ -59,10 +60,14 @@ module Mongoid
       #   end
       #
       # @since 2.0.0
-      def shard_key(**shard_configs)
-        shard_configs.each do |key, value|
-          self.shard_key_fields[self.database_field_name(key).to_sym] = value
-        end
+      def shard_key(key, unique: false, options: {})
+        key = Hash[key.map { |k, v| [self.database_field_name(k).to_sym, v] }]
+        self.shard_key_fields = key.keys
+        self.shard_config = {
+          key: key,
+          unique: unique,
+          options: options,
+        }
       end
     end
   end
