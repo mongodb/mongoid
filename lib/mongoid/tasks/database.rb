@@ -119,7 +119,7 @@ module Mongoid
         models.each do |model|
           next unless !model.embedded? || model.cyclic?
           next unless model.collection.cluster.sharded?
-          next if model.shard_key_fields.blank?
+          next if model.shard_config.blank?
 
           admin_db = model.collection.client.list_mongo_databases(name: :admin).first
           admin_db.command(enableSharding: model.collection.database.name)

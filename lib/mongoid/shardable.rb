@@ -22,7 +22,7 @@ module Mongoid
     # @example Get the shard key fields.
     #   model.shard_key_fields
     #
-    # @return [ Array ] The shard key field names.
+    # @return [ Array<String> ] The shard key field names.
     #
     # @since 1.0.0
     def shard_key_fields
