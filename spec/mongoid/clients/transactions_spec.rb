@@ -4,18 +4,27 @@
 require "spec_helper"
 
 describe Mongoid::Clients::Sessions do
+  before(:all) do
+    unless Mongo::VERSION >= '2.6'
+      skip 'Driver does not support transactions'
+    end
+  end
 
   before(:all) do
-    CONFIG[:clients][:other] = CONFIG[:clients][:default].dup
-    CONFIG[:clients][:other][:database] = 'other'
-    Mongoid::Clients.clients.values.each(&:close)
-    Mongoid::Config.send(:clients=, CONFIG[:clients])
-    Mongoid::Clients.with_name(:other).subscribe(Mongo::Monitoring::COMMAND, EventSubscriber.new)
+    if Mongo::VERSION >= '2.6'
+      CONFIG[:clients][:other] = CONFIG[:clients][:default].dup
+      CONFIG[:clients][:other][:database] = 'other'
+      Mongoid::Clients.clients.values.each(&:close)
+      Mongoid::Config.send(:clients=, CONFIG[:clients])
+      Mongoid::Clients.with_name(:other).subscribe(Mongo::Monitoring::COMMAND, EventSubscriber.new)
+    end
   end
 
   after(:all) do
-    Mongoid::Clients.with_name(:other).close
-    Mongoid::Clients.clients.delete(:other)
+    if Mongo::VERSION >= '2.6'
+      Mongoid::Clients.with_name(:other).close
+      Mongoid::Clients.clients.delete(:other)
+    end
   end
 
   let(:subscriber) do
