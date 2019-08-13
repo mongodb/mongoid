@@ -181,23 +181,6 @@ module Mongoid
         def multi_selection?(key)
           %w($and $or $nor).include?(key)
         end
-
-        # Determines if the selection operator takes a list. Returns true for
-        # $in and $nin.
-        #
-        # @api private
-        #
-        # @example Does the selection operator take multiple values?
-        #   selector.multi_value?("$nin")
-        #
-        # @param [ String ] key The key to check.
-        #
-        # @return [ true, false ] If the key is $in or $nin.
-        #
-        # @since 2.1.1
-        def multi_value?(key)
-          %w($in $nin).include?(key)
-        end
       end
     end
   end
