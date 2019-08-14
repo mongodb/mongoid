@@ -15,4 +15,4 @@ Run the test suite in a separate terminal:
 
 ## Caveats
 ### "Too many open files" error
-On MacOS, you may encounter a "Too many open files" error when running the tests. If this happens, run the command `ulimit -n 10000` and then re-run the tests.
+On MacOS, you may encounter a "Too many open files" error when running the tests. If this happens, run the command `ulimit -n 10000` to increase the number of files that can be opened and then re-run the tests.
