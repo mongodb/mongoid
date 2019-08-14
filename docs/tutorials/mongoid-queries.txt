@@ -872,3 +872,65 @@ Valid options to ``#out`` are:
   provided name, and merge the results with the existing documents.
 - ``reduce: "name"``: Store in a collection with the
   provided name, and reduce all existing results in that collection.
+
+
+Full Text Search
+----------------
+
+To perform full text search with Mongoid, follow these steps:
+
+1. Define a full text search index on a model.
+2. Create the full text search index on the server.
+3. Build a full text search query.
+
+
+Defining Full Text Search Index
+*******************************
+
+Index definition through Mongoid is described in detail on the `indexes
+<mongoid-indexes>`_ page. Full text search indexes are described in detail on
+under `text indexes <https://docs.mongodb.com/manual/core/index-text/>`_
+in the MongoDB manual. Below is an example definition of a Band model with
+a full text search index specified on the description field:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :description, type: String
+    
+    index description: 'text'
+  end
+
+Note that the index type (``text``) must be given as a string, not as a symbol.
+
+
+Creating Full Text Search Index
+*******************************
+
+To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
+
+.. code-block:: ruby
+
+  bundle exec rake db:mongoid:create_indexes
+
+
+Querying Using Full Text Search Index
+*************************************
+
+To find bands whose description contains "ounces" or its variations, use the
+`$text operator <https://docs.mongodb.com/manual/reference/operator/query/text/#op._S_text>`_:
+
+.. code-block:: ruby
+
+  Band.where('$text' => {'$search' => 'ounces'}).to_a
+  # => [#<Band _id: 5d5341b3ce4ef35d5016746d, name: "foo", description: "ounce">]
+
+Note that the description contains the word "ounce" even though the search
+query was "ounces".
+
+Note also that when performing a full text search, the name of the field is
+not explicitly specified - ``$text`` operator searches all fields indexed with
+full text search indexes.
