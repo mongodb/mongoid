@@ -3,8 +3,10 @@ host_arch() {
   arch=
   if test -f /etc/debian_version; then
     # Debian or Ubuntu
-    if lsb_release -i |grep -q Debian; then
-      release=`lsb_release -r |awk '{print $2}'`
+    if test "`uname -m`" = aarch64; then
+      arch=ubuntu1604-arm
+    elif lsb_release -i |grep -q Debian; then
+      release=`lsb_release -r |awk '{print $2}' |tr -d .`
       arch="debian$release"
     elif lsb_release -i |grep -q Ubuntu; then
       release=`lsb_release -r |awk '{print $2}' |tr -d .`
@@ -15,7 +17,11 @@ host_arch() {
     fi
   elif test -f /etc/redhat-release; then
     # RHEL or CentOS
-    if lsb_release -i |grep -q RedHat; then
+    if test "`uname -m`" = s390x; then
+      arch=rhel72-s390x
+    elif test "`uname -m`" = ppc64le; then
+      arch=rhel71-ppc
+    elif lsb_release -i |grep -q RedHat; then
       release=`lsb_release -r |awk '{print $2}' |tr -d .`
       arch="rhel$release"
     else
@@ -86,10 +92,10 @@ setup_ruby() {
     
     #rvm reinstall $RVM_RUBY
   else
-    if ! test "$RVM_RUBY" = ruby-1.9; then
+    if true; then
     
     # For testing toolchains:
-    toolchain_url=https://s3.amazonaws.com//mciuploads/mongo-ruby-toolchain/`host_arch`/741a9eba5788e6d5254a09319d7d237b40a9f4d6/mongo_ruby_driver_toolchain_`host_arch`_patch_741a9eba5788e6d5254a09319d7d237b40a9f4d6_5cfa8ad0d6d80a02bbb45be7_19_06_07_16_03_30.tar.gz
+    toolchain_url=https://s3.amazonaws.com//mciuploads/mongo-ruby-toolchain/`host_arch`/ce62fbb005213564a3da1041854da54df6615b2a/mongo_ruby_driver_toolchain_`host_arch |tr - _`_patch_ce62fbb005213564a3da1041854da54df6615b2a_5cfacdc857e85a3ef6647ad9_19_06_07_20_49_15.tar.gz
     curl -fL $toolchain_url |tar zxf -
     export PATH=`pwd`/rubies/$RVM_RUBY/bin:$PATH
     
