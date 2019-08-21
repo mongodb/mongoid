@@ -22,7 +22,18 @@ You can define shard keys on documents using the shard_key macro.
       index ssn: 1 # the collection must have an index that starts with the shard key
     end
 
-You can define Hashed shard key as well:
+You cloud define shard_key with old syntax.
+
+.. code-block:: ruby
+    class Person
+      include Mongoid::Document
+      field :ssn
+
+      shard_key :ssn # same with shard_key ssn: 1
+      index ssn: 1 # the collection must have an index that starts with the shard key
+    end
+
+You can define Hashed shard key as well.
 
 .. code-block:: ruby
     class Person
@@ -33,7 +44,7 @@ You can define Hashed shard key as well:
       index ssn: 1
     end
 
-You can pass other args in `mongo doc <https://docs.mongodb.com/manual/reference/method/sh.shardCollection/#sh.shardCollection>`_ as well:
+You can pass other args in `mongo doc <https://docs.mongodb.com/manual/reference/method/sh.shardCollection/#sh.shardCollection>`_ as well.
 
 .. code block:: ruby
     class Person

@@ -56,11 +56,16 @@ module Mongoid
       #     field :first_name, :type => String
       #     field :last_name, :type => String
       #
-      #     shard_key :first_name => 1, :last_name => 1
+      #     shard_key first_name: 1, last_name: 1
       #   end
       #
       # @since 2.0.0
-      def shard_key(key, unique: false, options: {})
+      def shard_key(name_or_key, *names, unique: false, options: {})
+        key = if name_or_key.is_a?(Hash)
+                name_or_key
+              else
+                Hash[([name_or_key] + names).flatten.map { |f| [f, 1] }]
+              end
         key = Hash[key.map { |k, v| [self.database_field_name(k).to_sym, v] }]
         self.shard_key_fields = key.keys
         self.shard_config = {

@@ -29,7 +29,37 @@ describe Mongoid::Shardable do
     end
 
     before do
-      Band.shard_key(name: 1)
+      Band.shard_key(:name)
+    end
+
+    it "specifies a shard key on the collection" do
+      expect(klass.shard_key_fields).to eq([:name])
+    end
+
+    context 'when a relation is used as the shard key' do
+
+      let(:klass) do
+        Game
+      end
+
+      before do
+        Game.shard_key(:person)
+      end
+
+      it "converts the shard key to the foreign key field" do
+        expect(klass.shard_key_fields).to eq([:person_id])
+      end
+    end
+  end
+
+  describe ".shard_key new syntax" do
+
+    let(:klass) do
+      Band
+    end
+
+    before do
+      Band.shard_key({ name: 1 }, unique: true)
     end
 
     it "specifies a shard key on the collection" do
@@ -57,7 +87,7 @@ describe Mongoid::Shardable do
     let(:klass) { Band }
     let(:value) { 'a-brand-name' }
 
-    before { klass.shard_key(name: 1) }
+    before { klass.shard_key(:name) }
 
     context 'when record is new' do
       let(:instance) { klass.new(name: value) }
