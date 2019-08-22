@@ -621,7 +621,7 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "mongodb-old"
-  matrix_spec: { driver: "current", ruby: "ruby-2.2", mongodb-version: ["3.0","2.6"], topology: "standalone" }
+  matrix_spec: { driver: "current", ruby: "ruby-2.3", mongodb-version: ["3.0","2.6"], topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
@@ -663,7 +663,7 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "driver-master-old"
-  matrix_spec: { driver: "master", ruby: "ruby-2.2", mongodb-version: "2.6", topology: "standalone" }
+  matrix_spec: { driver: "master", ruby: "ruby-2.3", mongodb-version: "2.6", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
@@ -677,7 +677,7 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "driver-stable-old"
-  matrix_spec: { driver: "stable", ruby: "ruby-2.2", mongodb-version: "2.6", topology: "standalone" }
+  matrix_spec: { driver: "stable", ruby: "ruby-2.3", mongodb-version: "2.6", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
@@ -698,7 +698,9 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "driver-min"
-  matrix_spec: { driver: "min", ruby: "ruby-2.3", mongodb-version: "3.6", topology: "standalone" }
+  # Since driver 2.11+ requires Ruby 2.3+, but Mongoid still supports
+  # Ruby 2.2, this is the only configuration which we test on Ruby 2.2
+  matrix_spec: { driver: "min", ruby: "ruby-2.2", mongodb-version: "3.6", topology: "standalone" }
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
