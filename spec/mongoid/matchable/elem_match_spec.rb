@@ -105,5 +105,199 @@ describe Mongoid::Matchable::ElemMatch do
         expect(matcher._matches?("$elemMatch" => {"a" => 3, "b" => 2})).to be false
       end
     end
+
+    context "when nesting queries" do
+      context "and using nested and" do
+        it "returns true for nested eq" do
+          query = {
+            :$elemMatch => {
+              :$and => [
+                {:a => {:$eq => 1}},
+                {:b => {:$eq => 2}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns true for raw value" do
+          query = {
+            :$elemMatch => {
+              :$and => [
+                {:a => 1},
+                {:b => 2}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns false when partially false" do
+          query = {
+            :$elemMatch => {
+              :$and => [
+                {:a => {:$eq => 1}},
+                {:b => {:$eq => 20}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+
+        it "returns false when partially false on raw values" do
+          query = {
+            :$elemMatch => {
+              :$and => [
+                {:a => 1},
+                {:b => 20}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+
+        it "returns false when fully false" do
+          query = {
+            :$elemMatch => {
+              :$and => [
+                {:a => {:$eq => 10}},
+                {:b => {:$eq => 20}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+
+        it "returns false when fully false on raw values" do
+          query = {
+            :$elemMatch => {
+              :$and => [
+                {:a => 10},
+                {:b => 20}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+      end
+
+      context "and using nested or" do
+        it "returns true" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {:a => {:$eq => 1}},
+                {:b => {:$eq => 1}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns true on raw values" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {:a => 1},
+                {:b => 1}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns false" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {:a => {:$eq => 10}},
+                {:b => {:$eq => 10}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+
+        it "returns false on raw values" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {:a => 10},
+                {:b => 10}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+      end
+
+      context "and using nested nor" do
+        it "returns true" do
+          query = {
+            :$elemMatch => {
+              :$nor => [
+                {:a => {:$eq => 1}},
+                {:b => {:$eq => 2}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns true on raw values" do
+          query = {
+            :$elemMatch => {
+              :$nor => [
+                {:a => 1},
+                {:b => 2}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns false" do
+          query = {
+            :$elemMatch => {
+              :$nor => [
+                {:a => {:$lt => 10}},
+                {:b => {:$lt => 10}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+      end
+
+      context "and using multiple nested statements" do
+        let(:attribute) {[{"a" => 1, "b" => 1}, {"a" => 1, "b" => 1}, {"a" => 3, "b" => 3}]}
+
+        it "returns true" do
+          query = {
+            :$elemMatch => {
+              :b => 3,
+              :$or => [
+                {:a => {:$ne => 1}},
+                {:b => {:$ne => 1}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns false" do
+          query = {
+            :$elemMatch => {
+              :b => 1,
+              :$or => [
+                {:a => {:$gt => 5}},
+                {:b => {:$lt => 1}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+      end
+    end
   end
 end

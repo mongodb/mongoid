@@ -29,7 +29,7 @@ module Mongoid
         end
         conditions.none? do |condition|
           condition.all? do |key, value|
-            document._matches?(key => value)
+            safe_matches?(document, key, value)
           end
         end
       end

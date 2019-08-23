@@ -22,7 +22,7 @@ module Mongoid
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            return false unless document._matches?(key => value)
+            return false unless safe_matches?(document, key, value)
           end
         end
         true
