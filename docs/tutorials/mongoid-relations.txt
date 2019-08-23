@@ -976,3 +976,162 @@ with, and is useful for developers of extensions to Mongoid.
      - Returns the name of the field to set the polymorphic type.
    * - ``Association#validate?``
      - Returns whether the association has an associated validation.
+
+
+Querying Associations
+---------------------
+
+Mongoid supports several forms of efficient querying of documents based on
+associations.
+
+
+Embedded Associations
+*********************
+
+Given the following models:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :tours
+    embeds_many :awards
+    field :name, type: String
+  end
+  
+  class Tour
+    include Mongoid::Document
+    embedded_in :band
+    field :year, type: Integer
+  end
+  
+  class Award
+    include Mongoid::Document
+    embedded_in :band
+    field :name, type: String
+  end
+
+Mongoid allows retrieving bands whose tours have certain attributes via the
+dot notation, as follows:
+
+.. code-block:: ruby
+
+  # Get all bands that have toured since 2000
+  Band.where('tours.year' => {'$gte' => 2000})
+
+Mongoid also can retrieve embedded documents only, without retrieving top-level
+documents, using projection:
+
+.. code-block:: ruby
+
+  # Get awards for bands that have toured since 2000
+  Band.where('tours.year' => {'$gte' => 2000}).pluck(:awards)
+
+
+Referenced Associations
+***********************
+
+If the associations are referenced rather than embedded, performing queries
+through them takes a bit more work. Given the following models modified from
+the previous example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_many :tours
+    has_many :awards
+    field :name, type: String
+  end
+  
+  class Tour
+    include Mongoid::Document
+    belongs_to :band
+    field :year, type: Integer
+  end
+  
+  class Award
+    include Mongoid::Document
+    belongs_to :band
+    field :name, type: String
+  end
+
+One could retrieve all bands that have toured since 2000 as follows:
+
+.. code-block:: ruby
+
+  band_ids = Tour.where(year: {'$gte' => 2000}).pluck(:band_id)
+  bands = Band.find(band_ids)
+
+The conditions on ``Tour`` can be arbitrarily complex, but they must all
+be on the same ``Tour`` document (or documents embedded in ``Tour``).
+
+To find awards for bands that have toured since 2000:
+
+.. code-block:: ruby
+
+  band_ids = Tour.where(year: {'$gte' => 2000}).pluck(:band_id)
+  awards = Award.where(band_id: {'$in' => band_ids})
+
+
+Aggregation Pipeline
+********************
+
+Mongoid exposes MongoDB's aggregation pipeline for queries involving multiple
+referenced associations at the same time. Given the same setup as before with
+referenced associations:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    has_many :tours
+    has_many :awards
+    field :name, type: String
+  end
+  
+  class Tour
+    include Mongoid::Document
+    belongs_to :band
+    field :year, type: Integer
+  end
+  
+  class Award
+    include Mongoid::Document
+    belongs_to :band
+    field :name, type: String
+  end
+
+To retrieve bands that toured since 2000 and have at least one award, one
+could do the following:
+
+.. code-block:: ruby
+
+  band_ids = Band.collection.aggregate([
+    {'$lookup' => {
+      from: 'tours',
+      localField: '_id',
+      foreignField: 'band_id',
+      as: 'tours',
+    }},
+    {'$lookup' => {
+      from: 'awards',
+      localField: '_id',
+      foreignField: 'band_id',
+      as: 'awards',
+    }},
+    {'$match' => {
+      'tours.year' => {'$gte' => 2000},
+      'awards._id' => {'$exists' => true},
+    }},
+    {'$project' => {_id: 1}},
+  ])
+  bands = Band.find(band_ids)
+
+Note that the aggregation pipeline, since it is implemented by the Ruby driver
+for MongoDB and not Mongoid, returns raw ``BSON::Document`` objects rather than
+``Mongoid::Document`` model instances. The above example projects only
+the ``_id`` field which is then used to load full models. An alternative is
+to not perform such a projection and work with raw fields, which would eliminate
+having to send the list of document ids to Mongoid in the second query
+(which could be large).
