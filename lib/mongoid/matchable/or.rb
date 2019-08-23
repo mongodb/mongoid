@@ -23,7 +23,7 @@ module Mongoid
           condition.keys.each do |k|
             key = k
             value = condition[k]
-            res &&= document._matches?(key => value)
+            res &&= safe_matches?(document, key, value)
             break unless res
           end
           return res if res
