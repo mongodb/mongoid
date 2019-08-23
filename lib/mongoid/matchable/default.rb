@@ -84,7 +84,7 @@ module Mongoid
       #
       # @since 7.0.4
       def safe_matches?(document, key, value)
-        if value.is_a?(Document)
+        if document.is_a?(Document)
           document._matches?(key => value)
         else
           # If not a Document, then assume it's a Hash
