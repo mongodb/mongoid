@@ -120,8 +120,8 @@ module Mongoid
       # Convenience method for checking _matches? on a Document or a Hash.
       #
       # @example Does the document of type Document or Hash match?
-      #   safe_matches?(default, "a", 1)
-      #   safe_matches?(:a => 1, "b", 2)
+      #   recursive_matches?(default, "a", 1)
+      #   recursive_matches?(:a => 1, "b", 2)
       #
       # @param [ Document, Hash ] document The object of type Document or Hash to call _matches? on
       # @param [ String ] key The key
@@ -130,16 +130,11 @@ module Mongoid
       # @return [ true, false ] True if matches, false if not.
       #
       # @since 7.0.4
-      def safe_matches?(document, key, value)
+      def recursive_matches?(document, key, value)
         if document.is_a?(Document)
           document._matches?(key => value)
         else
-          # If not a Document, then assume it's a Hash
-          if value.try(:first).try(:[],0) == "$not".freeze || value.try(:first).try(:[],0) == :$not
-            !Matchable.matcher(document, key, value.first[1])._matches?(value.first[1])
-          else
-            Matchable.matcher(document, key, value)._matches?(value)
-          end
+          Matchable.matcher(document, key, value)._matches?(value)
         end
       end
     end
