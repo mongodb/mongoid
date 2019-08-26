@@ -53,10 +53,13 @@ module Mongoid
         def store(key, value)
           name, serializer = storage_pair(key)
           if multi_selection?(name)
-            super(name, evolve_multi(value))
+            store_name = name
+            store_value = evolve_multi(value)
           else
-            super(localized_key(name, serializer), evolve(serializer, value))
+            store_name = localized_key(name, serializer)
+            store_value = evolve(serializer, value)
           end
+          super(store_name, store_value)
         end
         alias :[]= :store
 
