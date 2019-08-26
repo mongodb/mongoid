@@ -607,7 +607,7 @@ buildvariants:
   matrix_spec:
     driver: [current, master, stable]
     ruby: "ruby-2.6"
-    mongodb-version: "4.0"
+    mongodb-version: "4.2"
     topology: ["replica-set"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -617,7 +617,7 @@ buildvariants:
 - matrix_name: "rubies"
   matrix_spec:
     driver: "current"
-    ruby: "*"
+    ruby: ["ruby-2.5", "ruby-2.4", "ruby-2.3"]
     mongodb-version: "4.0"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -629,7 +629,7 @@ buildvariants:
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.6"
-    mongodb-version: ["3.6","3.4","3.2"]
+    mongodb-version: ["3.6", "3.4", "3.2"]
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -651,7 +651,7 @@ buildvariants:
   matrix_spec:
     driver: "current"
     jruby: "jruby-9.2"
-    mongodb-version: "4.0"
+    mongodb-version: "4.2"
     topology: ["standalone", "replica-set"]
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -684,7 +684,7 @@ buildvariants:
   matrix_spec:
     driver: "master-jruby"
     jruby: "jruby-9.2"
-    mongodb-version: "4.0"
+    mongodb-version: "4.2"
     topology: "standalone"
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -695,7 +695,7 @@ buildvariants:
   matrix_spec:
     driver: "master"
     ruby: "ruby-2.6"
-    mongodb-version: "4.0"
+    mongodb-version: "4.2"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -774,7 +774,7 @@ buildvariants:
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.6"
-    mongodb-version: "4.0"
+    mongodb-version: "4.2"
     topology: "standalone"
     rails: '60'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
@@ -791,9 +791,9 @@ buildvariants:
 #     - name: "test"
 - matrix_name: "i18n-1.0"
   matrix_spec:
-    driver: "current",
+    driver: "current"
     ruby: "ruby-2.5"
-    mongodb-version: "4.0"
+    mongodb-version: "4.2"
     topology: "standalone"
     i18n: '1.0'
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
