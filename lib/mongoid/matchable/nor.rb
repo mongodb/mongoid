@@ -21,7 +21,7 @@ module Mongoid
       #
       # @since 7.1.0
       def _matches?(conditions)
-        if conditions.length == 0
+        if conditions.blank?
           # MongoDB does not allow $nor array to be empty, but
           # Mongoid accepts an empty array for $or which MongoDB also
           # prohibits
@@ -29,7 +29,7 @@ module Mongoid
         end
         conditions.none? do |condition|
           condition.all? do |key, value|
-            safe_matches?(document, key, value)
+            recursive_matches?(document, key, value)
           end
         end
       end

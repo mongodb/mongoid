@@ -269,6 +269,47 @@ describe Mongoid::Matchable::ElemMatch do
         end
       end
 
+      context "and using nested not" do
+        it "returns true" do
+          query = {
+            :$elemMatch => {
+              :not => {
+                :$nor => [
+                  {:a => {:$lt => 10}},
+                  {:b => {:$lt => 10}}
+                ]
+              }
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns false" do
+          query = {
+            :$elemMatch => {
+              :$not => {
+                :$or => [
+                  {:a => {:$lt => 10}},
+                  {:b => {:$lt => 10}}
+                ]
+              }
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+
+        it "returns false for a non nested value" do
+          query = {
+            :$elemMatch => {
+              :$not => {
+                :a => {:$lt => 10},
+              }
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+      end
+
       context "and using multiple nested statements" do
         let(:attribute) {[{"a" => 1, "b" => 1}, {"a" => 1, "b" => 1}, {"a" => 3, "b" => 3}]}
 
@@ -292,6 +333,104 @@ describe Mongoid::Matchable::ElemMatch do
               :$or => [
                 {:a => {:$gt => 5}},
                 {:b => {:$lt => 1}}
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be false
+        end
+
+        it "returns true on two level deep nesting with not" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {
+                  :$not => {:a => {:$lt => 10}}
+                },
+                {
+                  :$and => [
+                    {:a => {:$eq => 3}},
+                    {:b => {:$eq => 3}}
+                  ]
+                }
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns true on two level deep nesting with not as the matching statement" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {
+                  :$not => {:a => {:$gt => 10}}
+                },
+                {
+                  :$and => [
+                    {:a => {:$eq => 10}},
+                    {:b => {:$eq => 10}}
+                  ]
+                }
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns true on multiple level deep nesting with not as the matching statement" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {
+                  :$not => {
+                    :$not => {
+                      :$not => {
+                        :$not => {
+                          :$or => [
+                            {:a => {:$eq => 1}},
+                            {:b => {:$eq => 1}}
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  :b => {:$eq => 10}
+                }
+              ]
+            }
+          }
+          expect(matcher._matches?(query)).to be true
+        end
+
+        it "returns false on multiple level deep nesting with not as the matching statement" do
+          query = {
+            :$elemMatch => {
+              :$or => [
+                {
+                  :$not => {
+                    :$not => {
+                      :$not => {
+                        :$not => {
+                          :$not => {
+                            :$not => {
+                              :$not => {
+                                :$or => [
+                                  {:a => {:$lt => 10}},
+                                  {:b => {:$lt => 10}}
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  :b => {:$eq => 10}
+                }
               ]
             }
           }

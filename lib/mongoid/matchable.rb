@@ -18,6 +18,7 @@ require "mongoid/matchable/nor"
 require "mongoid/matchable/size"
 require "mongoid/matchable/elem_match"
 require "mongoid/matchable/regexp"
+require "mongoid/matchable/not"
 
 module Mongoid
 
@@ -47,6 +48,7 @@ module Mongoid
       "$or" => Or,
       "$nor" => Nor,
       "$size" => Size,
+      "$not" => Not
     }.with_indifferent_access.freeze
 
     # Determines if this document has the attributes to match the supplied
@@ -118,6 +120,9 @@ module Mongoid
       # @since 2.0.0.rc.7
       def matcher(document, key, value)
         if value.is_a?(Hash)
+          if key == :$not || value.keys.first == :$not
+            return Not.new(value, document)
+          end
           matcher = MATCHERS[value.keys.first]
           if matcher
             matcher.new(extract_attribute(document, key))
