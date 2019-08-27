@@ -124,7 +124,7 @@ class ClusterConfig
     # test runtime for the suite overall because all commands are sent on the
     # same connection rather than each command connecting to the cluster by
     # itself.
-    client = ClientRegistry.instance.global_client('root_authorized')
+    client = Mongoid::Clients.default
 
     primary = client.cluster.next_primary
     @primary_address = primary.address
