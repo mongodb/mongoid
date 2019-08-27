@@ -140,7 +140,7 @@ class ClusterConfig
       topology.to_sym
     end
 
-    @single_server = client.cluster.servers_list.length == 1
+    @single_server = client.cluster.send(:servers_list).length == 1
 
     @server_version = client.database.command(buildInfo: 1).first['version']
 
