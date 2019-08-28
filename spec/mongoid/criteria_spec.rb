@@ -990,6 +990,7 @@ describe Mongoid::Criteria do
   end
 
   describe "#geo_near" do
+    max_server_version '4.0'
 
     before do
       Bar.create_indexes
@@ -3336,6 +3337,8 @@ describe Mongoid::Criteria do
   end
 
   describe "#max_scan" do
+    max_server_version '4.0'
+
     let!(:band) do
       Band.create(name: "Depeche Mode")
     end
