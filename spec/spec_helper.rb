@@ -32,6 +32,7 @@ end
 require 'support/authorization'
 require 'support/expectations'
 require 'support/macros'
+require 'support/cluster_config'
 require 'support/constraints'
 
 # Give MongoDB servers time to start up in CI environments
