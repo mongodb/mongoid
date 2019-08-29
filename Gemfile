@@ -20,8 +20,7 @@ group :test do
   gem 'rspec-retry'
   gem 'benchmark-ips'
   gem 'rspec', '~> 3.7'
-  gem 'rspec-expectations', '~> 3.7', '<= 3.8.2'
-  #gem 'rspec-expectations', git: 'https://github.com/p-mongo/rspec-expectations', ref: 'pr-1112-3.8'
+  gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
   gem 'fuubar'
   gem 'rfc'
   platforms :mri do
