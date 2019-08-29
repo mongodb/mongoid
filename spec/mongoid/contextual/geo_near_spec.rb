@@ -1,6 +1,7 @@
 require "spec_helper"
 
 describe Mongoid::Contextual::GeoNear do
+  max_server_version '4.0'
 
   describe "#average_distance" do
 
