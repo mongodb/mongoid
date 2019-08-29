@@ -25,13 +25,11 @@ module Mongoid
           elem_match.all? do |k, v|
             if v.try(:first).try(:[],0) == "$not".freeze || v.try(:first).try(:[],0) == :$not
               !Matchable.matcher(sub_document, k, v.first[1])._matches?(v.first[1])
+            elsif k == :$not
+              # If the key is :$not, then the value must be an operator query
+              !Matchable.matcher(sub_document, v.first[0], v.first[1])._matches?(v.first[1])
             else
-              if k == :$not
-                # If the key is :$not, then the value must be an operator query
-                !Matchable.matcher(sub_document, v.first[0], v.first[1])._matches?(v.first[1])
-              else
-                Matchable.matcher(sub_document, k, v)._matches?(v)
-              end
+              Matchable.matcher(sub_document, k, v)._matches?(v)
             end
           end
         end
