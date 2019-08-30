@@ -82,7 +82,7 @@ module Mongoid
       #
       # @return [ true, false ] True if matches, false if not.
       #
-      # @since 7.0.4
+      # @since 7.0.5
       def recursive_matches?(document, key, value)
         if document.is_a?(Document)
           document._matches?(key => value)
