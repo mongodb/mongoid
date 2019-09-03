@@ -41,7 +41,11 @@ describe Mongoid::Clients::Factory do
           end
 
           it "sets the cluster's seeds" do
-            expect(cluster.addresses.first.to_s).to eq(SpecConfig.instance.addresses.first)
+            address = SpecConfig.instance.addresses.first
+            unless address.include?(':')
+              address = "#{address}:27017"
+            end
+            expect(cluster.addresses.first.to_s).to eq(address)
           end
 
           it "sets the platform to Mongoid's platform constant" do
@@ -213,6 +217,9 @@ describe Mongoid::Clients::Factory do
 
       it "sets the cluster's addresses" do
         SpecConfig.instance.addresses.each do |address|
+          unless address.include?(':')
+            address = "#{address}:27017"
+          end
           expect(cluster_addresses).to include(address)
         end
       end
@@ -264,6 +271,9 @@ describe Mongoid::Clients::Factory do
 
     it "sets the cluster's addresses" do
       SpecConfig.instance.addresses.each do |address|
+        unless address.include?(':')
+          address = "#{address}:27017"
+        end
         expect(cluster_addresses).to include(address)
       end
     end
@@ -310,6 +320,9 @@ describe Mongoid::Clients::Factory do
 
     it "sets the cluster's addresses" do
       SpecConfig.instance.addresses.each do |address|
+        unless address.include?(':')
+          address = "#{address}:27017"
+        end
         expect(cluster_addresses).to include(address)
       end
     end
