@@ -121,6 +121,9 @@ module Mongoid
           next unless model.collection.cluster.sharded?
           next if model.shard_config.blank?
 
+          stats = model.collection.database.command(collStats: model.collection.name)
+          next if stats.first[:sharded]
+
           admin_db = model.collection.client.list_mongo_databases(name: :admin).first
           admin_db.command(enableSharding: model.collection.database.name)
           admin_db.command(shardCollection: model.collection.namespace, **model.shard_config)
