@@ -118,10 +118,15 @@ module Mongoid
       end
 
       # Returns a subset of __selected_fields attribute applicable to the
-      # (embedded) association with the given key.
+      # (embedded) association with the given key, or nil if no projection
+      # is to be performed.
       #
       # For example, if __selected_fields is {'a' => 1, 'b.c' => 2, 'b.c.f' => 3},
       # and assoc_key is 'b', return value would be {'c' => 2, 'c.f' => 3}.
+      #
+      # @param [ String ] assoc_key
+      #
+      # @return [ Hash | nil ]
       #
       # @api private
       def _mongoid_filter_selected_fields(assoc_key)
@@ -134,6 +139,15 @@ module Mongoid
             filtered[bits.join('.')] = v
           end
         end
+
+        # Positional projection is specified as "foo.$". In this case the
+        # document that the $ is referring to should be retrieved with all
+        # fields. See https://docs.mongodb.com/manual/reference/operator/projection/positional/
+        # and https://jira.mongodb.org/browse/MONGOID-4769.
+        if filtered.keys == %w($)
+          filtered = nil
+        end
+
         filtered
       end
 
