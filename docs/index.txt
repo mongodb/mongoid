@@ -6,12 +6,13 @@ Mongoid
 
 .. default-domain:: mongodb
 
-Mongoid is the officially supported ODM (Object-Document-Mapper)
-framework for MongoDB in Ruby. 
+Mongoid is the officially supported object-document mapper (ODM)
+for MongoDB in Ruby. 
 
 .. toctree::
    :titlesonly:
 
+   /tutorials/getting-started-sinatra
    /tutorials/mongoid-installation
    /tutorials/mongoid-configuration
    /tutorials/mongoid-documents
