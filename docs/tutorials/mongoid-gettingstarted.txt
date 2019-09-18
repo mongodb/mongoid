@@ -151,8 +151,8 @@ between our *Post* and subsequent *Comments*:
     end
 
 .. code-block:: ruby
-   :name: app/models/post.rb
-   :caption: app/models/post.rb
+   :name: app/models/comment.rb
+   :caption: app/models/comment.rb
 
     class Comment
         include Mongoid::Document
