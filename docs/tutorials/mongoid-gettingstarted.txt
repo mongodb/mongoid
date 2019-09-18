@@ -1,0 +1,119 @@
+===============
+Getting Started
+===============
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+Creating a Blog Application with Mongoid and Ruby on Rails
+----------------------------------------------------------
+
+For this tutorial we will be creating a similar blog as to that described in the `Ruby on Rails Getting Started <https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application>`_ guide, however using Mongoid instead of ActiveRecord as the database adapter.
+
+Generating a new Rails Application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: sh
+
+    rails new blog --skip-bundle --skip-active-record --skip-test --skip-system-test
+
+Using the standard `Rails generator <https://guides.rubyonrails.org/generators.html>`_ with some additional parameters we can initialize our blog without an ActiveRecord backend.
+
+``--skip-bundle``
+
+We don't want to run ``bundle install`` as part of the new project generator as we will be modifying the ``Gemfile`` in the next section, after which we will install the bundle.
+
+``--skip-activerecord``
+
+`ActiveRecord <https://guides.rubyonrails.org/active_record_basics.html>`_ will not be used as we are using Mongoid as our ODM for this project.
+
+``--skip-test``
+(optional)
+
+``--skip-system-test``
+(optional)
+
+Initializing the Application with Mongoid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Modify the ``Gemfile`` to include a reference to the `mongoid <https://rubygems.org/gems/mongoid/> gem`_:
+
+.. code-block:: ruby
+
+    gem 'mongoid'
+
+.. note::
+
+    at the time of writing the latest version of the mongoid gem (7.0.4) does not support Rails
+    6+. Support for this is in the ``master`` branch and can be accessed by updating the ``Gemfile``
+    as follows:
+
+    .. code-block:: ruby
+
+        gem 'mongoid', github: 'mongodb/mongoid', branch: 'master'
+
+2. Install the ``Gemfile``
+
+.. code-block:: sh
+
+    bundle install
+
+3. Generate the Mongoid configuration
+
+.. code-block:: sh
+
+    rails g mongoid:config
+
+This generator will create the `config/mongoid.yml` configuration file, which we will use to
+configure our connection to the cluster. Note that as we are not using ActiveRecord we do not have
+a ``database.yml`` file.
+
+.. note:: the mongoid 7.0.5+ gem is required to use the generator with Rails 6.0+
+
+Configuring Mongoid
+~~~~~~~~~~~~~~~~~~~
+
+Before `configuring Mongoid <https://docs.mongodb.com/mongoid/current/tutorials/mongoid-configuration/>`_
+we will first need a running cluster. If one is not currently avaiable please consider creating a
+`free Atlas cluster <https://docs.mongodb.com/manual/tutorial/atlas-free-tier-setup/>`_ to get up
+and running quickly.
+
+If using an Atlas cluster the _Ruby 2.5 or later_ connetion string format will provide a
+`connection string URI <https://docs.mongodb.com/manual/reference/connection-string>`_ in
+a `MONGODB+SRV <https://www.mongodb.com/blog/post/mongodb-3-6-here-to-SRV-you-with-easier-replica-set-connections>`_
+format which can be used in the ``mongoid.yml`` as follows`:
+
+.. code-block:: yaml
+
+    development:
+      clients:
+        default:
+          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog?retryWrites=true&w=majority
+
+
+Creating the Post model, controller and views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: sh
+
+    rails g scaffold Post title:string text:text
+
+Using the standard Rails scaffolding, Mongoid can generate the necessary backing files for our blog
+so that we can quickly begin creating blog posts.
+
+.. note::
+
+    If using Rails 6.0+, as `Webpacker <https://github.com/rails/webpacker#installation>`_ is
+    enabled by default, some additional steps are require prior to starting the application server.
+
+.. code-block:: sh
+
+    bundle exec rails s
+
+After starting our Rails server, we can navigate to http://localhost:3000/posts to see any posts
+that have already been created, or to create new ones.
