@@ -26,30 +26,35 @@ of Mongoid to use with your Rails application.
    :header-rows: 1
 
    * - Mongoid Version
+     - Rails 6.0
      - Rails 5.2
      - Rails 5.1
      - Rails 5.0
      - Rails 4.2
 
    * - Mongoid 7.0
+     - |checkmark| [#rails-6]_
      - |checkmark|
      - |checkmark|
      -
      -
 
    * - Mongoid 6.4
+     -
      - |checkmark|
      - |checkmark|
      -
      -
 
    * - Mongoid 6.3
+     -
      - |checkmark|
      - |checkmark|
      -
      -
 
    * - Mongoid 6.2
+     -
      - |checkmark|
      - |checkmark|
      -
@@ -58,10 +63,12 @@ of Mongoid to use with your Rails application.
    * - Mongoid 6.1
      -
      -
+     -
      - |checkmark|
      -
 
    * - Mongoid 6.0
+     -
      -
      -
      - |checkmark|
@@ -71,13 +78,17 @@ of Mongoid to use with your Rails application.
      -
      -
      -
+     -
      - |checkmark|
 
    * - Mongoid 5.2
      -
      -
      -
+     -
      - |checkmark|
+
+.. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
 
 
 Using Mongoid with a new Rails application
