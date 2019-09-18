@@ -41,7 +41,8 @@ We don't want to run ``bundle install`` as part of the new project generator as 
 Initializing the Application with Mongoid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Modify the ``Gemfile`` to include a reference to the `mongoid <https://rubygems.org/gems/mongoid/> `_ gem:
+1. Modify the ``Gemfile`` to include a reference to the
+`mongoid <https://rubygems.org/gems/mongoid/>`_ gem:
 
 .. code-block:: ruby
 
@@ -55,7 +56,7 @@ Initializing the Application with Mongoid
 
     .. code-block:: ruby
 
-        gem 'mongoid', github: 'mongodb/mongoid', branch: 'master'
+        gem 'mongoid', '~> 7.0.5'
 
 2. Install the ``Gemfile``
 
@@ -73,7 +74,7 @@ This generator will create the `config/mongoid.yml` configuration file, which we
 configure our connection to the cluster. Note that as we are not using ActiveRecord we do not have
 a ``database.yml`` file.
 
-.. note:: the mongoid 7.0.5+ gem is required to use the generator with Rails 6.0+
+.. note:: the ``mongoid`` 7.0.5+ gem is required to use the generator with Rails 6.0+
 
 Configuring Mongoid
 ~~~~~~~~~~~~~~~~~~~
