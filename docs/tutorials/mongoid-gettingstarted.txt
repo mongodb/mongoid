@@ -68,7 +68,7 @@ Initializing the Application with Mongoid
 
 .. code-block:: sh
 
-    rails g mongoid:config
+    bin/rails g mongoid:config
 
 This generator will create the `config/mongoid.yml` configuration file, which we will use to
 configure our connection to the cluster. Note that as we are not using ActiveRecord we do not have
@@ -103,7 +103,7 @@ Creating the Post model, controller and views
 
 .. code-block:: sh
 
-    rails g scaffold Post title:string body:text
+    bin/rails g scaffold Post title:string body:text
 
 Using the standard Rails scaffolding, Mongoid can generate the necessary backing files for our blog
 so that we can quickly begin creating blog posts.
@@ -115,7 +115,7 @@ so that we can quickly begin creating blog posts.
 
 .. code-block:: sh
 
-    bundle exec rails s
+    bin/rails s
 
 After starting our Rails server, we can navigate to http://localhost:3000/posts to see any posts
 that have already been created, or to create new ones.
@@ -131,7 +131,7 @@ comments to our posts.
 
 .. code-block:: sh
 
-    rails g scaffold Comment name:string message:string post:belongs_to
+    bin/rails g scaffold Comment name:string message:string post:belongs_to
 
 Once the scaffolding has been created we need to modify the output slightly as we want to ensure we
 are maintaining a `one-to-many relationship <https://docs.mongodb.com/manual/tutorial/model-embedded-one-to-many-relationships-between-documents/>`_
