@@ -33,10 +33,10 @@ We don't want to run ``bundle install`` as part of the new project generator as 
 `ActiveRecord <https://guides.rubyonrails.org/active_record_basics.html>`_ will not be used as we are using Mongoid as our ODM for this project.
 
 ``--skip-test``
-(optional)
+(optional) Skip the generation of test unit files for the new project.
 
 ``--skip-system-test``
-(optional)
+(optional) Skip generation of the system test files for the new project.
 
 Initializing the Application with Mongoid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,7 +140,6 @@ between our *Post* and subsequent *Comments*:
 .. code-block:: ruby
    :name: app/models/post.rb
    :caption: app/models/post.rb
-
 
     class Post
         include Mongoid::Document
