@@ -13,7 +13,7 @@ for MongoDB in Ruby.
    :titlesonly:
 
    /tutorials/getting-started-sinatra
-   /tutorials/mongoid-gettingstarted
+   /tutorials/getting-started-rails
    /tutorials/mongoid-installation
    /tutorials/mongoid-configuration
    /tutorials/mongoid-documents
