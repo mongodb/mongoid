@@ -41,7 +41,7 @@ We don't want to run ``bundle install`` as part of the new project generator as 
 Initializing the Application with Mongoid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Modify the ``Gemfile`` to include a reference to the `mongoid <https://rubygems.org/gems/mongoid/> gem`_:
+1. Modify the ``Gemfile`` to include a reference to the `mongoid <https://rubygems.org/gems/mongoid/> `_ gem:
 
 .. code-block:: ruby
 
@@ -83,7 +83,8 @@ we will first need a running cluster. If one is not currently avaiable please co
 `free Atlas cluster <https://docs.mongodb.com/manual/tutorial/atlas-free-tier-setup/>`_ to get up
 and running quickly.
 
-If using an Atlas cluster the _Ruby 2.5 or later_ connetion string format will provide a
+If using an Atlas cluster, we recommend selecting the Ruby driver *2.5 or later* connection
+string format, which will provide a
 `connection string URI <https://docs.mongodb.com/manual/reference/connection-string>`_ in
 a `MONGODB+SRV <https://www.mongodb.com/blog/post/mongodb-3-6-here-to-SRV-you-with-easier-replica-set-connections>`_
 format which can be used in the ``mongoid.yml`` as follows`:
@@ -101,7 +102,7 @@ Creating the Post model, controller and views
 
 .. code-block:: sh
 
-    rails g scaffold Post title:string text:text
+    rails g scaffold Post title:string body:text
 
 Using the standard Rails scaffolding, Mongoid can generate the necessary backing files for our blog
 so that we can quickly begin creating blog posts.
@@ -117,3 +118,6 @@ so that we can quickly begin creating blog posts.
 
 After starting our Rails server, we can navigate to http://localhost:3000/posts to see any posts
 that have already been created, or to create new ones.
+
+.. image:: rails-new-blog.png
+  :alt: Screenshot of the new blog
