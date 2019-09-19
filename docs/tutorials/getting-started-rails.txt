@@ -153,33 +153,44 @@ The uncommented contents of ``config/mongoid.yml`` should look like this:
             server_selection_timeout: 5
 
 
-Creating the Post model, controller and views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Run Application
+***************
+
+You can now start the application server by running:
+
+.. code-block:: sh
+
+    rails s
+
+Access the application by navigating to `localhost:3000
+<http://localhost:3000>`_.
+
+
+Add Posts
+*********
+
+Using the standard Rails scaffolding, Mongoid can generate the necessary
+model, controller and view files for our blog so that we can quickly begin
+creating blog posts:
 
 .. code-block:: sh
 
     bin/rails g scaffold Post title:string body:text
-
-Using the standard Rails scaffolding, Mongoid can generate the necessary backing files for our blog
-so that we can quickly begin creating blog posts.
 
 .. note::
 
     If using Rails 6.0+, as `Webpacker <https://github.com/rails/webpacker#installation>`_ is
     enabled by default, some additional steps are require prior to starting the application server.
 
-.. code-block:: sh
-
-    bin/rails s
-
-After starting our Rails server, we can navigate to http://localhost:3000/posts to see any posts
-that have already been created, or to create new ones.
+Navigate to `localhost:3000/posts <http://localhost:3000/posts>`_
+to create posts and see the posts that have already been created.
 
 .. image:: rails-new-blog.png
   :alt: Screenshot of the new blog
 
-Adding Comments to our Posts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Adding Comments
+***************
 
 Now that our blog application is up and running, we want to introduce the ability for users to add
 comments to our posts.
