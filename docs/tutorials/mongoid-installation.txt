@@ -13,7 +13,8 @@ Installation
 Install the Gem
 ---------------
 
-Mongoid is bundled as a gem, and is hosted on `Rubygems <http://rubygems.org>`_.
+Mongoid is bundled as a gem, and is `hosted on Rubygems
+<https://rubygems.org/gems/mongoid>`_.
 It can be installed manually or with bundler.
 
 To install the gem manually:
@@ -22,298 +23,230 @@ To install the gem manually:
 
     gem install mongoid
 
-To install the gem with bundler, include the following in your Gemfile:
+To install the gem with bundler, include the following in your ``Gemfile``:
 
 .. code-block:: ruby
 
    gem 'mongoid', '~> 7.0.5'
 
-Compatibility
--------------
+Using Mongoid with a New Rails Application
+------------------------------------------
 
-Note the following compatibility matrix to determine if Mongoid is
-compatible with your Ruby version and MongoDB server. Note that Mongoid
-is currently compatible with Rails 5 and depends on ActiveModel 5.1 or higher,
-and thus requires Ruby 2.2.2 or higher.
+When creating a new Rails application and wish to use Mongoid for
+data access, give the ``--skip-active-record`` flag to the ``rails new``
+command to avoid depending on and configuring ActiveRecord..
+
+Using Mongoid with an Existing Rails Application
+------------------------------------------------
+
+When converting an existing Rails application to use Mongoid for data access,
+the ``config/application.rb`` file needs to be updated to remove the
+``require 'rails/all'`` line and explicitly include the required frameworks
+(which could be all of the frameworks provided by Rails with the exception of
+ActiveRecord). Any references to ActiveRecord in files in the ``config``
+directory and in the models also need to be removed.
+
+Ruby MongoDB Driver Compatibility
+---------------------------------
+
+The following compatibility table specifies the versions of `Ruby driver for
+MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
+(the ``mongo`` gem) supported by Mongoid.
 
 .. list-table::
    :header-rows: 1
-
-   * - Ruby Version
-     - MongoDB 4.0.x
-     - MongoDB 3.6.x
-     - MongoDB 3.4.x
-     - MongoDB 3.2.x
-     - MongoDB 3.0.x
-     - MongoDB 2.6.x
-
-   * - MRI 2.5.0+
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-
-   * - MRI 2.4.1+
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-
-   * - MRI 2.3.x
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-
-   * - MRI 2.2.2+
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - YES
-
-   * - MRI 2.1.x
-     - No
-     - No
-     - No
-     - No
-     - No
-     - No
-
-   * - JRuby 9.2.x
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-
-   * - JRuby 9.1.x
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-     - Yes
-
-Refer to :ref:`Rails considerations <rails-compatibility>`
-for the Ruby on Rails compatibility matrix.
-
-.. _mongoid-configuration:
-
-Configuration
--------------
-
-Mongoid configuration can be done through a ``mongoid.yml`` that specifies your
-options and clients. The simplest configuration is as follows, which sets the default
-client to "localhost:27017" and provides a single database in that client named "mongoid".
-
-.. code-block:: yaml
-
-  development:
-    clients:
-      default:
-        database: mongoid
-        hosts:
-          - localhost:27017
-
-Rails Applications
-******************
-
-You can generate a config file by executing the generator and then editing
-``myapp/config/mongoid.yml`` to your heart's desire. Mongoid will then handle
-everything else from there.
-
-.. code-block:: bash
-
-  $ rails g mongoid:config
-
-When Mongoid loads its configuration, it chooses the environment to use based
-on the following order:
-
-- ``Rails.env`` if using Rails.
-- ``Sinatra::Base.environment`` if using Sinatra.
-- ``RACK_ENV`` environment variable.
-- ``MONGOID_ENV`` environment variable.
-
-If you are not using any rack based application and want to override the
-environment programatically, you can pass a second paramter to ``load!`` and
-Mongoid will use that.
-
-.. code-block:: ruby
-
-  Mongoid.load!("path/to/your/mongoid.yml", :production)
-
-Depending on your version of Rails, you may also need to configure the orm to be Mongoid in application.rb.
-
-.. code-block:: ruby
-
-  config.generators do |g|
-    g.orm :mongoid
-  end
-
-Anatomy of a Mongoid Config
-***************************
-
-Let's have a look at a full-blown ``mongoid.yml`` and explain the full power
-of what Mongoid can do. The following configuration has its explanation in the
-comments above each key.
-
-.. code-block:: yaml
-
-  development:
-    # Configure available database clients. (required)
-    clients:
-      # Define the default client. (required)
-      default:
-        # A uri may be defined for a client:
-        # uri: 'mongodb://user:password@myhost1.mydomain.com:27017/my_db'
-        # Please see driver documentation for details. Alternatively, you can define the following:
-        #
-        # Define the name of the default database that Mongoid can connect to.
-        # (required).
-        database: my_db
-        # Provide the hosts the default client can connect to. Must be an array
-        # of host:port pairs. (required)
-        hosts:
-          - myhost1.mydomain.com:27017
-          - myhost2.mydomain.com:27017
-          - myhost3.mydomain.com:27017
-        options:
-          # Change the default write concern. (default = { w: 1 })
-          write:
-            w: 1
-
-          # Change the default read preference. Valid options for mode are: :secondary,
-          # :secondary_preferred, :primary, :primary_preferred, :nearest
-          # (default: primary)
-          read:
-            mode: :secondary_preferred
-            tag_sets:
-              - use: web
-
-          # The name of the user for authentication.
-          user: 'user'
-
-          # The password of the user for authentication.
-          password: 'password'
-
-          # The user's database roles.
-          roles:
-            - 'dbOwner'
-
-          # Change the default authentication mechanism. Valid options are: :scram,
-          # :mongodb_cr, :mongodb_x509, and :plain. (default on 3.0 is :scram, default
-          # on 2.4 and 2.6 is :plain)
-          auth_mech: :scram
-
-          # The database or source to authenticate the user against. (default: admin)
-          auth_source: admin
-
-          # Force the driver to connect in a specific way instead of auto-
-          # discovering. Can be one of: :direct, :replica_set, :sharded. Set to :direct
-          # when connecting to hidden members of a replica set.
-          connect: :direct
-
-          # Change the default time in seconds the server monitors refresh their status
-          # via ismaster commands. (default: 10)
-          heartbeat_frequency: 10
-
-          # The time in seconds for selecting servers for a near read preference. (default: 0.015)
-          local_threshold: 0.015
-
-          # The timeout in seconds for selecting a server for an operation. (default: 30)
-          server_selection_timeout: 30
-
-          # The maximum number of connections in the connection pool. (default: 5)
-          max_pool_size: 5
-
-          # The minimum number of connections in the connection pool. (default: 1)
-          min_pool_size: 1
-
-          # The time to wait, in seconds, in the connection pool for a connection
-          # to be checked in before timing out. (default: 1)
-          wait_queue_timeout: 1
-
-          # The time to wait to establish a connection before timing out, in seconds.
-          # (default: 10)
-          connect_timeout: 10
-
-          # The timeout to wait to execute operations on a socket before raising an error.
-          # (default: 5)
-          socket_timeout: 5
-
-          # The name of the replica set to connect to. Servers provided as seeds that do
-          # not belong to this replica set will be ignored.
-          replica_set: my_replica_set
-
-          # Whether to connect to the servers via ssl. (default: false)
-          ssl: true
-
-          # The certificate file used to identify the connection against MongoDB.
-          ssl_cert: /path/to/my.cert
-
-          # The private keyfile used to identify the connection against MongoDB.
-          # Note that even if the key is stored in the same file as the certificate,
-          # both need to be explicitly specified.
-          ssl_key: /path/to/my.key
-
-          # A passphrase for the private key.
-          ssl_key_pass_phrase: password
-
-          # Whether or not to do peer certification validation. (default: true)
-          ssl_verify: true
-
-          # The file containing a set of concatenated certification authority certifications
-          # used to validate certs passed from the other end of the connection.
-          ssl_ca_cert: /path/to/ca.cert
-
-    # Configure Mongoid specific options. (optional)
-    options:
-      # Include the root model name in json serialization. (default: false)
-      include_root_in_json: false
-
-      # Include the _type field in serialization. (default: false)
-      include_type_for_serialization: false
-
-      # Preload all models in development, needed when models use
-      # inheritance. (default: false)
-      preload_models: false
-
-      # Raise an error when performing a #find and the document is not found.
-      # (default: true)
-      raise_not_found_error: true
-
-      # Raise an error when defining a scope with the same name as an
-      # existing method. (default: false)
-      scope_overwrite_exception: false
-
-      # Use Active Support's time zone in conversions. (default: true)
-      use_activesupport_time_zone: true
-
-      # Ensure all times are UTC in the app side. (default: false)
-      use_utc: false
-
-      # Set the Mongoid and Ruby driver log levels. (default: :info)
-      log_level: :info
-
-Logging
-*******
-
-Changing logging options is done simply by telling Mongoid or the driver's logger to have
-a different level. Logging level is ``DEBUG`` by default.
-
-.. code-block:: ruby
-
-  Mongoid.logger.level = Logger::DEBUG
-  Mongo::Logger.logger.level = Logger::DEBUG
-
-Refer to :ref:`Rails considerations <rails-compatibility>`
-for the Ruby on Rails compatibility matrix.
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - Driver 2.10
+     - Driver 2.9
+     - Driver 2.8
+     - Driver 2.7
+     - Driver 2.6
+     - Driver 2.5
+
+   * - 7.0
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#driver-2.5]_
+
+   * - 6.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#driver-2.5]_
+
+.. [#driver-2.5] Driver version 2.5.1 or higher is required.
+
+Ruby Compatibility
+------------------
+
+The following compatibility table specifies the versions of Ruby interpreters
+supported by Mongoid.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - Ruby 2.6
+     - Ruby 2.5
+     - Ruby 2.4
+     - Ruby 2.3
+     - Ruby 2.2
+     - JRuby 9.2
+     - JRuby 9.1
+
+   * - 7.0
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#ruby-2.4]_
+     - |checkmark|
+     - |checkmark| [#ruby-2.2]_
+     - |checkmark|
+     - |checkmark|
+
+   * - 6.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#ruby-2.4]_
+     - |checkmark|
+     - |checkmark| [#ruby-2.2]_
+     - |checkmark|
+     - |checkmark|
+
+.. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
+
+.. [#ruby-2.2] Ruby version 2.2.2 or higher is required.
+
+MongoDB Compatibility
+---------------------
+
+The following compatibility table specifies the recommended
+version(s) of Mongoid for use with a specific version of MongoDB.
+
+Note that in order to use features of a particular MongoDB server version,
+both the driver and Mongoid must support that server version.
+Please refer to `the driver compatibility page
+<https://docs.mongodb.com/ruby-driver/current/reference/driver-compatibility/>`_
+for driver compatibility matrices.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - MongoDB 4.2
+     - MongoDB 4.0
+     - MongoDB 3.6
+     - MongoDB 3.4
+     - MongoDB 3.2
+     - MongoDB 3.0
+     - MongoDB 2.6
+
+   * - 7.0
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
+   * - 6.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
+
+.. _rails-compatibility:
+
+Rails Compatibility
+-------------------
+
+The following compatibility table specifies which versions of Rails are
+supported by Mongoid.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - Rails 6.0
+     - Rails 5.2
+     - Rails 5.1
+     - Rails 5.0
+     - Rails 4.2
+
+   * - 7.0
+     - |checkmark| [#rails-6]_
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.4
+     -
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.3
+     -
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.2
+     -
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.1
+     -
+     -
+     -
+     - |checkmark|
+     -
+
+   * - 6.0
+     -
+     -
+     -
+     - |checkmark|
+     -
+
+   * - 5.4
+     -
+     -
+     -
+     -
+     - |checkmark|
+
+   * - 5.2
+     -
+     -
+     -
+     -
+     - |checkmark|
+
+.. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
+
+.. include:: /includes/unicode-checkmark.rst
