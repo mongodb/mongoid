@@ -28,9 +28,7 @@ In order to do so, he first step is to install the ``rails`` gem:
 
 .. code-block:: sh
 
-    gem install rails
-
-Verify that the installed version is 6.x.
+    gem install rails -v '~> 6.0.0'
 
 
 Create New Application
