@@ -102,6 +102,31 @@ Note that as we are not using ActiveRecord we will not have a ``database.yml``
 file.
 
 
+Run MongoDB Locally
+*******************
+
+The configuration created in the previous step is suitable when
+a MongoDB server is running locally. If you do not already have a
+local MongoDB server, `download and install MongoDB
+<https://docs.mongodb.com/manual/installation/>`_.
+
+While the generated ``mongoid.yml`` will work without modifications,
+we recommend reducing the server selection timeout for development.
+With this change, the uncommented lines of ``mongoid.yml`` should look
+like this:
+
+.. code-block:: none
+
+    development:
+      clients:
+        default:
+          database: blog_development
+          hosts:
+            - localhost:27017
+          options:
+            server_selection_timeout: 1
+
+
 Configure Mongoid
 *****************
 
