@@ -10,74 +10,102 @@ Getting Started (Rails App)
    :depth: 2
    :class: singlecol
 
-Creating a Blog Application with Mongoid and Ruby on Rails
-----------------------------------------------------------
+New Application
+---------------
 
-For this tutorial we will be creating a similar blog as to that described in the `Ruby on Rails Getting Started <https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application>`_ guide, however using Mongoid instead of ActiveRecord as the database adapter.
+This section shows how to create a new Ruby on Rails application using Mongoid
+for data access. The application will be similar to the blog application
+described in the `Ruby on Rails Getting Started
+<https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application>`_
+guide, however using Mongoid instead of ActiveRecord as the database adapter.
 
-Generating a new Rails Application
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install ``rails``
+*****************
+
+We will use a Rails generator to create the application skeleton.
+In order to do so, he first step is to install the ``rails`` gem:
+
+.. code-block:: sh
+
+    gem install rails
+
+Verify that the installed version is 6.x.
+
+
+Create New Application
+**********************
+
+Use the ``rails`` command to create the application skeleton, as follows:
+
+.. code-block:: sh
+
+    rails new blog --skip-active-record --skip-bundle
+    cd blog
+
+We pass ``--skip-active-record`` to request that ActiveRecord is not added
+as a dependency, because we will be using Mongoid instead. Additionaly
+we pass ``--skip-bundle`` because we'll be modifying the ``Gemfile`` to
+add the ``mongoid`` dependency.
+
+If you intend to test your application with RSpec, you can instruct the
+generator to omit default Rails test setup by passing ``--skip-test``
+and ``--skip-system-test`` options:
 
 .. code-block:: sh
 
     rails new blog --skip-bundle --skip-active-record --skip-test --skip-system-test
+    cd blog
 
-Using the standard `Rails generator <https://guides.rubyonrails.org/generators.html>`_ with some additional parameters we can initialize our blog without an ActiveRecord backend.
 
-``--skip-bundle``
+Create Git Repo
+***************
 
-We don't want to run ``bundle install`` as part of the new project generator as we will be modifying the ``Gemfile`` in the next section, after which we will install the bundle.
+While not required, we recommend creating a Git repository for your application:
 
-``--skip-activerecord``
+.. code-block:: sh
 
-`ActiveRecord <https://guides.rubyonrails.org/active_record_basics.html>`_ will not be used as we are using Mongoid as our ODM for this project.
+    git init .
+    git add .
+    git commit
 
-``--skip-test``
-(optional) Skip the generation of test unit files for the new project.
+Commit your changes as you are following this tutorial.
 
-``--skip-system-test``
-(optional) Skip generation of the system test files for the new project.
 
-Initializing the Application with Mongoid
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Add Mongoid
+***********
 
-1. Modify the ``Gemfile`` to include a reference to the
+1. Modify the ``Gemfile`` to add a reference to the
 `mongoid <https://rubygems.org/gems/mongoid/>`_ gem:
 
 .. code-block:: ruby
 
-    gem 'mongoid'
+    gem 'mongoid', '~> 7.0.5'
 
 .. note::
 
-    at the time of writing the latest version of the mongoid gem (7.0.4) does not support Rails
-    6+. Support for this is in the ``master`` branch and can be accessed by updating the ``Gemfile``
-    as follows:
+    Mongoid 7.0.5 or higher is required to use Rails 6.0.
 
-    .. code-block:: ruby
-
-        gem 'mongoid', '~> 7.0.5'
-
-2. Install the ``Gemfile``
+2. Install gem dependencies:
 
 .. code-block:: sh
 
     bundle install
 
-3. Generate the Mongoid configuration
+3. Generate the default Mongoid configuration:
 
 .. code-block:: sh
 
     bin/rails g mongoid:config
 
-This generator will create the `config/mongoid.yml` configuration file, which we will use to
-configure our connection to the cluster. Note that as we are not using ActiveRecord we do not have
-a ``database.yml`` file.
+This generator will create the ``config/mongoid.yml`` configuration file,
+which we will use to configure our connection to the MongoDB deployment.
+Note that as we are not using ActiveRecord we will not have a ``database.yml``
+file.
 
-.. note:: the ``mongoid`` 7.0.5+ gem is required to use the generator with Rails 6.0+
 
-Configuring Mongoid
-~~~~~~~~~~~~~~~~~~~
+Configure Mongoid
+*****************
 
 Before `configuring Mongoid <https://docs.mongodb.com/mongoid/current/tutorials/mongoid-configuration/>`_
 we will first need a running cluster. If one is not currently avaiable please consider creating a
@@ -95,7 +123,7 @@ format which can be used in the ``mongoid.yml`` as follows:
     development:
       clients:
         default:
-          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog?retryWrites=true&w=majority
+          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog-dev?retryWrites=true&w=majority
 
 
 Creating the Post model, controller and views

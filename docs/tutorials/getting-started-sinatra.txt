@@ -11,21 +11,28 @@ Getting Started (Sinatra App)
    :class: singlecol
 
 
-Create Git Repo
+New Application
 ---------------
+
+This section shows how to create a new Sinatra application using Mongoid
+for data access. The process is similar for other Ruby applications not
+using Ruby on Rails.
+
+Create Git Repo
+***************
 
 While not required, we recommend creating a Git repository for your application:
 
 .. code-block:: sh
 
-    git init mongoid-sinatra-demo
-    cd mongoid-sinatra-demo
+    git init blog
+    cd blog
 
 Commit your changes as you are following this tutorial.
 
 
 Create Gemfile
---------------
+**************
 
 Create a file named ``Gemfile`` with the following contents:
 
@@ -38,7 +45,7 @@ Create a file named ``Gemfile`` with the following contents:
 
 
 Install Dependencies
---------------------
+********************
 
 Run the following commands to install the dependencies:
 
@@ -52,7 +59,7 @@ committing to your Git repository.
 
 
 Run MongoDB Locally
--------------------
+*******************
 
 To develop locally with MongoDB, `download and install MongoDB
 <https://docs.mongodb.com/manual/installation/>`_.
@@ -66,7 +73,7 @@ pointing to your deployment. For example, if you launched a standalone
     development:
       clients:
         default:
-          database: mongoid-sinatra-demo
+          database: blog-dev
           hosts:
             - localhost:27017
           options:
@@ -74,7 +81,7 @@ pointing to your deployment. For example, if you launched a standalone
 
 
 Use MongoDB Atlas
------------------
+*****************
 
 Instead of downloading, installing and running MongoDB locally, you can create
 a free MongoDB Atlas account and create a free MongoDB cluster in Atlas.
@@ -88,14 +95,14 @@ contents, replacing the URI with the actual URI for your cluster:
     development:
       clients:
         default:
-          uri: mongodb+srv://username:password@cluster0-ayiee.mongodb.net/test?retryWrites=true&w=majority
+          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog-dev?retryWrites=true&w=majority
           options:
             server_selection_timeout: 5
 
 
 
 Basic Application
------------------
+*****************
 
 Create a file named ``app.rb`` with the following contents. First, some
 requires:
@@ -163,7 +170,7 @@ Now we can define some models:
 
 
 Run Application
----------------
+***************
 
 Launch the application:
 
