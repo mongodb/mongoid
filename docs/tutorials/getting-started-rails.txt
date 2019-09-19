@@ -127,26 +127,30 @@ like this:
             server_selection_timeout: 1
 
 
-Configure Mongoid
+Use MongoDB Atlas
 *****************
 
-Before `configuring Mongoid <https://docs.mongodb.com/mongoid/current/tutorials/mongoid-configuration/>`_
-we will first need a running cluster. If one is not currently avaiable please consider creating a
-`free Atlas cluster <https://docs.mongodb.com/manual/tutorial/atlas-free-tier-setup/>`_ to get up
-and running quickly.
+Instead of downloading, installing and running MongoDB locally, you can create
+a free MongoDB Atlas account and create a `free MongoDB cluster in Atlas
+<https://docs.mongodb.com/manual/tutorial/atlas-free-tier-setup/>`_.
+Once the cluster is created, follow the instructions in `connect to the cluster
+page <https://docs.atlas.mongodb.com/connect-to-cluster/#connect-to-a-cluster>`_
+to obtain the URI. Use the *Ruby driver 2.5 or later* format.
 
-If using an Atlas cluster, we recommend selecting the Ruby driver *2.5 or later* connection
-string format, which will provide a
-`connection string URI <https://docs.mongodb.com/manual/reference/connection-string>`_ in
-a `MONGODB+SRV <https://www.mongodb.com/blog/post/mongodb-3-6-here-to-SRV-you-with-easier-replica-set-connections>`_
-format which can be used in the ``mongoid.yml`` as follows:
+Paste the URI into the ``config/mongoid.yml`` file, and comment out the
+hosts that are defined. We recommend setting the server selection timeout to 5
+seconds for development environment when using Atlas.
+
+The uncommented contents of ``config/mongoid.yml`` should look like this:
 
 .. code-block:: yaml
 
     development:
       clients:
         default:
-          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog-dev?retryWrites=true&w=majority
+          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog_development?retryWrites=true&w=majority
+          options:
+            server_selection_timeout: 5
 
 
 Creating the Post model, controller and views
