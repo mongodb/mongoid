@@ -177,11 +177,6 @@ creating blog posts:
 
     bin/rails g scaffold Post title:string body:text
 
-.. note::
-
-    If using Rails 6.0+, as `Webpacker <https://github.com/rails/webpacker#installation>`_ is
-    enabled by default, some additional steps are require prior to starting the application server.
-
 Navigate to `localhost:3000/posts <http://localhost:3000/posts>`_
 to create posts and see the posts that have already been created.
 
@@ -189,19 +184,20 @@ to create posts and see the posts that have already been created.
   :alt: Screenshot of the new blog
 
 
-Adding Comments
-***************
+Add Comments
+************
 
-Now that our blog application is up and running, we want to introduce the ability for users to add
-comments to our posts.
+To make our application more interactive, let's add the ability for users to
+add comments to our posts.
+
+Create the ``Comment`` model:
 
 .. code-block:: sh
 
-    bin/rails g scaffold Comment name:string message:string post:belongs_to
+    bin/rails g scaffold Comment name:string message:string
 
-Once the scaffolding has been created we need to modify the output slightly as we want to ensure we
-are maintaining a `one-to-many relationship <https://docs.mongodb.com/manual/tutorial/model-embedded-one-to-many-relationships-between-documents/>`_
-between our *Post* and subsequent *Comments*:
+Open the ``Post`` model file, ``app/models/post.rb``, and add an association
+for the comments:
 
 .. code-block:: ruby
    :name: app/models/post.rb
@@ -212,9 +208,11 @@ between our *Post* and subsequent *Comments*:
         field :title, type: String
         field :body, type: String
 
-        # add the relationship to the comments collection
         has_many :comments, dependent: :destroy
     end
+
+Open the ``Comment`` model file, ``app/models/comment.rb``, and add an
+association for the post:
 
 .. code-block:: ruby
    :name: app/models/comment.rb
@@ -226,15 +224,18 @@ between our *Post* and subsequent *Comments*:
         field :name, type: String
         field :message, type: String
 
-        # modify the generated relationship to identify that the
-        # Comment belongs to a Post
         belongs_to :post
     end
 
-All of the code for the views can be found in the `GitHub repository
-<https://github.com/alexbevi/mongoid-demo/tree/master/rails-minimal>`_ for this project, which
-includes the remaining view code for the comments.
+You should now be able to leave comments for the posts:
 
 .. image:: rails-blog-new-comment.png
   :alt: Screenshot of the blog with a new comment being added
 
+
+Source Code
+***********
+
+The complete source code for this application can be found in the
+`mongoid-demo GitHub repository
+<https://github.com/mongoid/mongoid-demo/tree/master/rails-minimal>`_.
