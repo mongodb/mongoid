@@ -1,19 +1,14 @@
 source 'https://rubygems.org'
-gemspec
 
 gem 'rake'
-gem 'actionpack'
-gem 'activemodel'
+gem 'actionpack', '~> 5.1.0'
+gem 'activemodel', '~> 5.1.0'
 
-# https://jira.mongodb.org/browse/MONGOID-4614
 if RUBY_VERSION < '2.3'
-  gem 'i18n', '~> 1.0', '>= 1.1', '< 1.5'
-  # nokogiri does not support 2.2 anymore.
-  # https://github.com/sparklemotion/nokogiri/issues/1841
-  # We are getting it as a transitive dependency
+  gem 'i18n', '~> 1.0', '< 1.5'
   gem 'nokogiri', '<1.10'
 else
-  gem 'i18n', '~> 1.0', '>= 1.1'
+  gem 'i18n', '~> 1.0'
 end
 
 group :test do
@@ -38,3 +33,5 @@ group :development, :testing do
     end
   end
 end
+
+gemspec path: '..'
