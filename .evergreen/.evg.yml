@@ -590,10 +590,14 @@ axes:
         display_name: "Rails-master"
         variables:
            RAILS: "master"
-      - id: "60"
-        display_name: "Rails 6.0"
+      - id: "51"
+        display_name: "Rails 5.1"
         variables:
-           RAILS: "60"
+           RAILS: "51"
+      - id: "52"
+        display_name: "Rails 5.2"
+        variables:
+           RAILS: "52"
   - id: "i18n"
     display_name: I18n version
     values:
@@ -770,13 +774,25 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-60"
+- matrix_name: "rails-51"
+  matrix_spec:
+    driver: "current"
+    ruby: "ruby-2.5"
+    mongodb-version: "4.2"
+    topology: "standalone"
+    rails: '51'
+  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  run_on:
+    - rhel70-small
+  tasks:
+     - name: "test"
+- matrix_name: "rails-52"
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.6"
     mongodb-version: "4.2"
     topology: "standalone"
-    rails: '60'
+    rails: '52'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
