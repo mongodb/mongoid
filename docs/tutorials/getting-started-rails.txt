@@ -41,6 +41,18 @@ Use the ``rails`` command to create the application skeleton, as follows:
     rails new blog --skip-active-record --skip-bundle
     cd blog
 
+.. note::
+
+    You may receive a warning like this:
+
+    .. code-block:: sh
+
+        Could not find gem 'puma (~> 3.11)' in any of the gem sources listed in your Gemfile.
+        Run `bundle install` to install missing gems.
+        
+    Disregard it as we will be taking care of gem installation
+    in a moment.
+
 We pass ``--skip-active-record`` to request that ActiveRecord is not added
 as a dependency, because we will be using Mongoid instead. Additionaly
 we pass ``--skip-bundle`` because we'll be modifying the ``Gemfile`` to
@@ -153,6 +165,23 @@ The uncommented contents of ``config/mongoid.yml`` should look like this:
             server_selection_timeout: 5
 
 
+Other Rails Dependencies
+************************
+
+If this is the first Rails application you are creating, you may need to
+install Node.js on your computer. This can be done via your operating system
+packages or by `downloading a binary <https://nodejs.org/en/download/>`_.
+
+Next, if you do not have Yarn installed, `follow its installation instructions
+<https://yarnpkg.com/lang/en/docs/install/>`_.
+
+Finally, install webpacker:
+
+.. code-block:: sh
+
+    rails webpacker:install 
+
+
 Run Application
 ***************
 
@@ -205,6 +234,7 @@ for the comments:
 
     class Post
         include Mongoid::Document
+        
         field :title, type: String
         field :body, type: String
 
@@ -220,7 +250,7 @@ association for the post:
 
     class Comment
         include Mongoid::Document
-        include Mongoid::Timestamps
+        
         field :name, type: String
         field :message, type: String
 
