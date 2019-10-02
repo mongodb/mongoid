@@ -199,3 +199,15 @@ Try some requests via curl:
 
     curl http://localhost:4567/posts/5d8151ec96fb4f0ed5a7a03f
     # => {"_id":{"$oid":"5d8151ec96fb4f0ed5a7a03f"},"title":"hello","body":"hello world","comments":[{"_id":{"$oid":"5d8157ac96fb4f20c5e45c4d"},"message":"I like","name":"David","post_id":{"$oid":"5d8151ec96fb4f0ed5a7a03f"}}]}
+
+
+Existing Application
+--------------------
+
+To start using Mongoid in an existing Sinatra applications, the steps are
+essentially the same as the one given above for a new application:
+
+1. Add the ``mongoid`` dependency to the ``Gemfile``.
+2. Create a ``mongoid.yml`` configuration file.
+3. Load the configuration file and configure Mongoid in the application.
+4. Define Mongoid models.
