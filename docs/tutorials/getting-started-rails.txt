@@ -1,6 +1,6 @@
-===========================
-Getting Started (Rails App)
-===========================
+=======================
+Getting Started (Rails)
+=======================
 
 .. default-domain:: mongodb
 

@@ -1,6 +1,6 @@
-=============================
-Getting Started (Sinatra App)
-=============================
+=========================
+Getting Started (Sinatra)
+=========================
 
 .. default-domain:: mongodb
 
