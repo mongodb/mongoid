@@ -73,7 +73,7 @@ pointing to your deployment. For example, if you launched a standalone
     development:
       clients:
         default:
-          database: blog-dev
+          database: blog_development
           hosts:
             - localhost:27017
           options:
@@ -98,7 +98,7 @@ contents, replacing the URI with the actual URI for your cluster:
     development:
       clients:
         default:
-          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog-dev?retryWrites=true&w=majority
+          uri: mongodb+srv://user:pass@yourcluster.mongodb.net/blog_development?retryWrites=true&w=majority
           options:
             server_selection_timeout: 5
 
