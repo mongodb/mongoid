@@ -269,3 +269,10 @@ Source Code
 The complete source code for this application can be found in the
 `mongoid-demo GitHub repository
 <https://github.com/mongoid/mongoid-demo/tree/master/rails-minimal>`_.
+
+
+Existing Application
+--------------------
+
+To switch an existing Ruby on Rails application to Mongoid, follow these
+steps:
