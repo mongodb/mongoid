@@ -604,56 +604,158 @@ of the following methods:
   are accessed by the application, eventually eager migration may be needed to convert the
   remaining documents that haven't been accessed.
 
+
 Dynamic Fields
 --------------
 
-By default, Mongoid doesn't support dynamic fields. You can tell Mongoid that you want
-to add dynamic fields by including ``Mongoid::Attributes::Dynamic`` in a model.
-``Mongoid::Attributes::Dynamic`` will allow attributes to get set and persisted on the
-document even if a field was not defined for them. There is a slight 'gotcha' however when
-dealing with dynamic attributes in that Mongoid is not completely lenient about the use of
-``method_missing`` and breaking the public interface of the Document class.
+By default, Mongoid requires all fields that may be set on a document to
+be explicitly defined using ``field`` declarations. Mongoid also supports
+creating fields on the fly from an arbitrary hash or documents stored in
+the database. When a model uses fields not explicitly defined, such fields
+are called *dynamic fields*.
+
+To enable dynamic fields, include ``Mongoid::Attributes::Dynamic`` module
+in the model:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     include Mongoid::Attributes::Dynamic
-   end
+  class Person
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+  end
+  
+  bob = Person.new(name: 'Bob', age: 42)
+  bob.name
+  # => "Bob"
 
-When dealing with dynamic attributes, the following rules apply:
+It is possible to use ``field`` declarations and dynamic fields in the same
+model class. Attributes for which there is a ``field`` declaration will be
+treated according to the ``field`` declaration, with remaining attributes
+being treated as dynamic fields.
 
-If the attribute exists in the document, Mongoid will provide you with your standard
-getter and setter methods. For example, consider a person who has an attribute of
-"gender" set on the document:
+Attribute values in the dynamic fields must initially be set by either
+passing the attribute hash to the constructor, mass assignment via
+``attributes=``, mass assignment via ``[]=``, using ``write_attribute``,
+or they must already be present in the database.
+
+.. code-block:: ruby
+  
+  # OK
+  bob = Person.new(name: 'Bob')
+  
+  # OK
+  bob = Person.new
+  bob.attributes = {age: 42}
+  
+  # OK
+  bob = Person.new
+  bob['age'] = 42
+  
+  # Raises NoMethodError: undefined method age=
+  bob = Person.new
+  bob.age = 42
+  
+  # OK
+  bob = Person.new
+  # OK - string access
+  bob.write_attribute('age', 42)
+  # OK - symbol access
+  bob.write_attribute(:name, 'Bob')
+  
+  # OK, initializes attributes from whatever is in the database
+  bob = Person.find('123')
+
+If an attribute is not present in a particular model instance's attributes
+hash, both the reader and the writer for the corresponding field are not
+defined, and invoking them raises ``NoMethodError``:
+
+.. code-block:: ruby
+  
+  bob = Person.new
+  bob.attributes = {age: 42}
+  
+  bob.age
+  # => 42
+  
+  # raises NoMethodError
+  bob.name
+  
+  # raises NoMethodError
+  bob.name = 'Bob'
+  
+  # OK
+  bob['name'] = 'Bob'
+  
+  bob.name
+  # => "Bob"
+
+Attributes can always be read using mass attribute access or ``read_attribute``
+(this appies to models not using dynamic fields as well):
 
 .. code-block:: ruby
 
-   # Set the person's gender to male.
-   person[:gender] = "Male"
-   person.gender = "Male"
+  bob = Person.new(age: 42)
+  
+  # OK - string access
+  bob['name']
+  # => nil
+  
+  # OK - symbol access
+  bob[:name]
+  # => nil
+  
+  # OK - string access
+  bob['age']
+  # => 42
+  
+  # OK - symbol access
+  bob[:age]
+  # => 42
+  
+  # OK
+  bob.attributes['name']
+  # => nil
+  
+  # OK
+  bob.attributes['age']
+  # => 42
+  
+  # Returns nil - keys are always strings
+  bob.attributes[:age]
+  # => nil
+  
+  # OK
+  bob.read_attribute('name')
+  # => nil
+  
+  # OK
+  bob.read_attribute(:name)
+  # => nil
+  
+  # OK - string access
+  bob.read_attribute('age')
+  # => 42
+  
+  # OK - symbol access
+  bob.read_attribute(:age)
+  # => 42
 
-   # Get the person's gender.
-   person.gender
 
-If the attribute does not already exist on the document, Mongoid will not provide you with
-the getters and setters and will enforce normal ``method_missing`` behavior. In this case you
-must use the other provided accessor methods:
-(``[]`` and ``[]=``) or (``read_attribute`` and ``write_attribute``).
+Special Characters in Field Names
+*********************************
+
+Mongoid permits dynamic field names to include spaces and punctuation:
 
 .. code-block:: ruby
 
-   # Raise a NoMethodError if value isn't set.
-   person.gender
-   person.gender = "Male"
+  bob = Person.new('hello world' => 'MDB')
+  bob.send('hello world')
+  # => "MDB"
+  
+  bob.write_attribute("hello%world", 'MDB')
+  bob[:"hello%world"]
+  # => "MDB"
 
-   # Retrieve a dynamic field safely.
-   person[:gender]
-   person.read_attribute(:gender)
-
-   # Write a dynamic field safely.
-   person[:gender] = "Male"
-   person.write_attribute(:gender, "Male")
 
 Localized Fields
 ----------------
