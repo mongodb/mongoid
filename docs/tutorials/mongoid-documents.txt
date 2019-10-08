@@ -696,11 +696,11 @@ Attributes can always be read using mass attribute access or ``read_attribute``
 
   bob = Person.new(age: 42)
   
-  # OK
+  # OK - string access
   bob['name']
   # => nil
   
-  # OK
+  # OK - symbol access
   bob[:name]
   # => nil
   
