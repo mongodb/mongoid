@@ -257,6 +257,85 @@ generated ``embedded_in`` association to ``belongs_to``:
       belongs_to :post, dependent: :destroy
     end
 
+Open the post show view file, ``app/views/posts/show.html.erb``, and add
+a section rendering existing comments and prompting to leave a new comment:
+
+.. code-block:: html
+  :name: app/views/posts/show.html.erb
+  :caption: app/views/posts/show.html.erb
+
+  <section class="section comments">
+    <div class="container">
+      <h2 class="subtitle is-5">
+        <strong><%= @post.comments.count %></strong> Comments
+      </h2>
+      <%= render @post.comments %>
+      <div class="comment-form">
+        <hr />
+        <h3 class="subtitle is-3">Leave a reply</h3>
+        <%= render partial: 'comments/form', locals: { comment: @post.comments.build } %>
+      </div>
+    </div>
+  </section>
+
+Open the comment form file and change the type of field for ``:message``
+from ``text_field`` to ``text_area``, as well as the type of field for
+``:post_id`` from ``text_field`` to ``hidden_field``. The result
+should look like this:
+
+.. code-block:: html
+  :name: app/views/comments/_form.html.erb
+  :caption: app/views/comments/_form.html.erb
+
+  <%= form_with(model: comment, local: true) do |form| %>
+    <% if comment.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(comment.errors.count, "error") %> prohibited this comment from being saved:</h2>
+
+        <ul>
+          <% comment.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= form.label :name %>
+      <%= form.text_field :name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :message %>
+      <%= form.text_area :message %>
+    </div>
+
+    <div class="field">
+      <%= form.hidden_field :post_id %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit %>
+    </div>
+  <% end %>
+
+Create a partial for the comment view, ``app/view/comments/_comment.html.erb``
+with the following contents:
+
+.. code-block:: html
+  :name: app/views/comments/_comment.html.erb
+  :caption: app/views/comments/_comment.html.erb
+
+  <p>
+    <strong><%= comment.name %>:</strong>
+    <%= comment.message %>
+  <br>
+  <%= link_to 'Delete', [comment],
+    method: :delete,
+    class: "button is-danger",
+    data: { confirm: 'Are you sure?' } %>
+  </p>
+
 You should now be able to leave comments for the posts:
 
 .. image:: rails-blog-new-comment.png
