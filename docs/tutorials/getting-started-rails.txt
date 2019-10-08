@@ -223,38 +223,38 @@ Create the ``Comment`` model:
 
 .. code-block:: sh
 
-    bin/rails g scaffold Comment name:string message:string
+    bin/rails g scaffold Comment name:string message:string post:belongs_to
 
-Open the ``Post`` model file, ``app/models/post.rb``, and add an association
-for the comments:
+Open the ``Post`` model file, ``app/models/post.rb``, and add a ``has_many``
+association for the comments:
 
 .. code-block:: ruby
-   :name: app/models/post.rb
-   :caption: app/models/post.rb
+  :name: app/models/post.rb
+  :caption: app/models/post.rb
 
     class Post
-        include Mongoid::Document
-        
-        field :title, type: String
-        field :body, type: String
+      include Mongoid::Document
+      
+      field :title, type: String
+      field :body, type: String
 
-        has_many :comments, dependent: :destroy
+      has_many :comments, dependent: :destroy
     end
 
-Open the ``Comment`` model file, ``app/models/comment.rb``, and add an
-association for the post:
+Open the ``Comment`` model file, ``app/models/comment.rb``, and change the
+generated ``embedded_in`` association to ``belongs_to``:
 
 .. code-block:: ruby
-   :name: app/models/comment.rb
-   :caption: app/models/comment.rb
+  :name: app/models/comment.rb
+  :caption: app/models/comment.rb
 
     class Comment
-        include Mongoid::Document
-        
-        field :name, type: String
-        field :message, type: String
+      include Mongoid::Document
+      
+      field :name, type: String
+      field :message, type: String
 
-        belongs_to :post
+      belongs_to :post, dependent: :destroy
     end
 
 You should now be able to leave comments for the posts:
