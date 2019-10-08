@@ -48,7 +48,7 @@ module Mongoid
       "$nor" => Nor,
       "$or" => Or,
       "$size" => Size,
-      "$not" => Not
+      "$not" => Not,
     }.with_indifferent_access.freeze
 
     # Determines if this document has the attributes to match the supplied
