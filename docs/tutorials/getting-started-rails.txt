@@ -254,7 +254,7 @@ generated ``embedded_in`` association to ``belongs_to``:
       field :name, type: String
       field :message, type: String
 
-      belongs_to :post, dependent: :destroy
+      belongs_to :post
     end
 
 Open the post show view file, ``app/views/posts/show.html.erb``, and add
