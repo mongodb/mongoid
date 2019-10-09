@@ -435,6 +435,19 @@ Spring must be stopped after changing dependencies or configuration.
 
   ./bin/spring stop
 
+.. note::
+
+    Sometimes running ``./bin/spring stop`` claims to stop Spring, but does
+    not. Verify that all Spring processes are terminated before proceeding.
+
+.. note::
+
+    Sometimes Spring tries to load ActiveRecord even when the application
+    contains no ActiveRecord references. If this happens, add an ActiveRecord
+    adapter dependency such as ``sqlite3`` to your ``Gemfile`` so that
+    ActiveRecord may be completely loaded or remove Spring from your
+    application.
+
 Mongoid Configuration
 *********************
 
