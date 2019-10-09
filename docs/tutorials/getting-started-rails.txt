@@ -89,6 +89,8 @@ Add Mongoid
 `mongoid <https://rubygems.org/gems/mongoid/>`_ gem:
 
 .. code-block:: ruby
+  :name: Gemfile
+  :caption: Gemfile
 
     gem 'mongoid', '~> 7.0.5'
 
@@ -109,7 +111,7 @@ Add Mongoid
     bin/rails g mongoid:config
 
 This generator will create the ``config/mongoid.yml`` configuration file,
-which we will use to configure our connection to the MongoDB deployment.
+which is used to configure the connection to the MongoDB deployment.
 Note that as we are not using ActiveRecord we will not have a ``database.yml``
 file.
 
@@ -353,5 +355,161 @@ The complete source code for this application can be found in the
 Existing Application
 --------------------
 
-To switch an existing Ruby on Rails application to Mongoid, follow these
-steps:
+Follow these steps to switch an existing Ruby on Rails application to use
+Mongoid instead of ActiveRecord.
+
+Dependencies
+************
+
+Remove or comment out any RDBMS libraries like ``sqlite``, ``pg`` etc.
+mentioned in ``Gemfile``, and add ``mongoid``:
+
+.. code-block:: ruby
+  :name: Gemfile
+  :caption: Gemfile
+
+    gem 'mongoid', '~> 7.0.5'
+
+.. note::
+
+    Mongoid 7.0.5 or higher is required to use Rails 6.0.
+
+Install gem dependencies:
+
+.. code-block:: sh
+
+    bundle install
+
+Loaded Frameworks
+*****************
+
+Examine ``config/application.rb``. If it is requiring all components of Rails
+via ``require 'rails/all'``, change it to require individual frameworks:
+
+.. code-block:: ruby
+  :name: config/application.rb
+  :caption: config/application.rb
+
+  # Remove or comment out
+  #require "rails/all"
+
+  # Add this require instead of "rails/all":
+  require "rails"
+  
+  # Pick the frameworks you want:
+  require "active_model/railtie"
+  require "active_job/railtie"
+  require "action_controller/railtie"
+  require "action_mailer/railtie"
+  # require "action_mailbox/engine"
+  # require "action_text/engine"
+  require "action_view/railtie"
+  require "action_cable/engine"
+  require "sprockets/railtie"
+  require "rails/test_unit/railtie"
+  
+  # Remove or comment out ActiveRecord and ActiveStorage:
+  # require "active_record/railtie"
+  # require "active_storage/engine"
+
+.. note::
+
+    At this time ActiveStorage requires ActiveRecord and is not usable with
+    Mongoid.
+
+ActiveRecord Configuration
+**************************
+
+Review all configuration files (``config/application.rb``,
+``config/environments/{development,production.test}.rb``) and remove or
+comment out any references to ``config.active_record`` and
+``config.active_storage``.
+
+Stop Spring
+***********
+
+If your application is using Spring, which is the default on Rails 6,
+Spring must be stopped after changing dependencies or configuration.
+
+.. code-block:: sh
+
+  ./bin/spring stop
+
+Mongoid Configuration
+*********************
+
+Generate the default Mongoid configuration:
+
+.. code-block:: sh
+
+    bin/rails g mongoid:config
+
+This generator will create the ``config/mongoid.yml`` configuration file,
+which is used to configure the connection to the MongoDB deployment.
+
+Review the sections `Run MongoDB Locally`_ and `Use MongoDB Atlas`_
+to decide how you would like to deploy MongoDB, and adjust Mongoid
+configuration (``config/mongoid.yml``) to match.
+
+Adjust Models
+*************
+
+If your application already has models, these will need to be changed when
+migrating from ActiveRecord to Mongoid.
+
+ActiveRecord models derive from ``ApplicationRecord`` and do not have
+column definitions. Mongoid models generally have no superclass but must
+include ``Mongoid::Document``, and usually define the fields explicitly
+(but with `Dynamic Fields`_ may be used instead of explicit field definition).
+
+For example, a barebones Post model may look like this in ActiveRecord:
+
+.. code-block:: ruby
+  :name: app/models/post.rb
+  :caption: app/models/post.rb
+
+class Post < ApplicationRecord
+  has_many :comments, dependent: :destroy
+end
+
+This model may look like this in Mongoid:
+
+.. code-block:: ruby
+  :name: app/models/post.rb
+  :caption: app/models/post.rb
+
+    class Post
+      include Mongoid::Document
+      
+      field :title, type: String
+      field :body, type: String
+
+      has_many :comments, dependent: :destroy
+    end
+
+Or like this with dynamic fields:
+
+    class Post
+      include Mongoid::Document
+      include Mongoid::Attributes::Dynamic
+      
+      has_many :comments, dependent: :destroy
+    end
+
+Mongoid does not utilize ActiveRecord migrations, since MongoDB does not
+require a schema to be defined prior to storing data.
+
+Data Migration
+**************
+
+If you already have data in a relational database that you would like to
+transfer to MongoDB, you will need to perform a data migration. As noted
+above, no schema migration is necessary because MongoDB does not require
+a predefined schema to store the data.
+
+The migration tools are often specific to the data being migrated because,
+even though Mongoid supports a superset of ActiveRecord associations,
+the way that model references are stored in collections differs between
+Mongoid and ActiveRecord. With that said, MongoDB has
+`some resources <https://resources.mongodb.com/migrating-to-mongodb/rdbmstomongodbmigration>`_
+on migrating from an RDBMS to MongoDB.
