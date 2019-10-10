@@ -19,6 +19,13 @@ described in the `Ruby on Rails Getting Started
 <https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application>`_
 guide, however using Mongoid instead of ActiveRecord as the database adapter.
 
+.. note::
+
+  This guide assumes basic familiarity with Ruby on Rails.
+  To learn more about Ruby on Rails, please refer to its `Getting Started
+  guide <https://guides.rubyonrails.org/getting_started.html>`_ or
+  other Rails guides.
+
 
 Install ``rails``
 *****************
