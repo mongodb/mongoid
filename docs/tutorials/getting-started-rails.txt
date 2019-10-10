@@ -349,7 +349,7 @@ Source Code
 
 The complete source code for this application can be found in the
 `mongoid-demo GitHub repository
-<https://github.com/mongoid/mongoid-demo/tree/master/rails-minimal>`_.
+<https://github.com/mongoid/mongoid-demo/tree/master/rails>`_.
 
 
 Existing Application
@@ -526,3 +526,16 @@ the way that model references are stored in collections differs between
 Mongoid and ActiveRecord. With that said, MongoDB has
 `some resources <https://resources.mongodb.com/migrating-to-mongodb/rdbmstomongodbmigration>`_
 on migrating from an RDBMS to MongoDB.
+
+
+Rails API
+---------
+
+The process for creating a Rails API application with Mongoid is the same
+as when creating a regular application, with the only change being the
+``--api`` parameter to ``rails new``. Migrating a Rails API application to
+Mongoid follows the same process described above for regular Rails applications.
+
+A complete Rails API application using Mongoid can be found in the
+`mongoid-demo GitHub repository
+<https://github.com/mongoid/mongoid-demo/tree/master/rails-api>`_.
