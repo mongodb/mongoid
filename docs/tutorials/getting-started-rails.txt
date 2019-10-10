@@ -488,33 +488,37 @@ For example, a barebones Post model may look like this in ActiveRecord:
   :name: app/models/post.rb
   :caption: app/models/post.rb
 
-class Post < ApplicationRecord
-  has_many :comments, dependent: :destroy
-end
+  class Post < ApplicationRecord
+    has_many :comments, dependent: :destroy
+  end
 
-This model may look like this in Mongoid:
+The same model may look like this in Mongoid:
 
 .. code-block:: ruby
   :name: app/models/post.rb
   :caption: app/models/post.rb
 
-    class Post
-      include Mongoid::Document
-      
-      field :title, type: String
-      field :body, type: String
+  class Post
+    include Mongoid::Document
+    
+    field :title, type: String
+    field :body, type: String
 
-      has_many :comments, dependent: :destroy
-    end
+    has_many :comments, dependent: :destroy
+  end
 
 Or like this with dynamic fields:
 
-    class Post
-      include Mongoid::Document
-      include Mongoid::Attributes::Dynamic
-      
-      has_many :comments, dependent: :destroy
-    end
+.. code-block:: ruby
+  :name: app/models/post.rb
+  :caption: app/models/post.rb
+
+  class Post
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+    
+    has_many :comments, dependent: :destroy
+  end
 
 Mongoid does not utilize ActiveRecord migrations, since MongoDB does not
 require a schema to be defined prior to storing data.
