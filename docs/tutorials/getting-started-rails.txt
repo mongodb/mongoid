@@ -24,7 +24,7 @@ Install ``rails``
 *****************
 
 We will use a Rails generator to create the application skeleton.
-In order to do so, he first step is to install the ``rails`` gem:
+In order to do so, the first step is to install the ``rails`` gem:
 
 .. code-block:: sh
 
