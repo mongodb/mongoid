@@ -10,10 +10,19 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Durran Jordan"]
   s.email       = ["mongodb-dev@googlegroups.com"]
-  s.homepage    = "http://mongoid.org"
+  s.homepage    = "https://mongoid.org"
   s.summary     = "Elegant Persistence in Ruby for MongoDB."
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
   s.license     = "MIT"
+
+  s.metadata = {
+    'bug_tracker_uri' => 'https://jira.mongodb.org/projects/MONGOID',
+    'changelog_uri' => 'https://github.com/mongodb/mongoid/releases',
+    'documentation_uri' => 'https://docs.mongodb.com/mongoid/',
+    'homepage_uri' => 'https://mongoid.org/',
+    'mailing_list_uri' => 'https://groups.google.com/group/mongodb-user',
+    'source_code_uri' => 'https://github.com/mongodb/mongoid',
+  }
 
   if File.exist?('gem-private_key.pem')
     s.signing_key = 'gem-private_key.pem'
