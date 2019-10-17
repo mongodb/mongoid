@@ -21,7 +21,7 @@ require "mongoid/matchable/regexp"
 
 module Mongoid
 
-  # This module contains all the behavior for ruby implementations of MongoDB
+  # This module contains all the behavior for Ruby implementations of MongoDB
   # selectors.
   #
   # @since 4.0.0
@@ -66,13 +66,13 @@ module Mongoid
           value.each do |item|
             if item[0].to_s == "$not".freeze
               item = item[1]
-              return false if matcher(self, key, item)._matches?(item)
+              return false if matcher(key, item)._matches?(item)
             else
-              return false unless matcher(self, key, Hash[*item])._matches?(Hash[*item])
+              return false unless matcher(key, Hash[*item])._matches?(Hash[*item])
             end
           end
         else
-          return false unless matcher(self, key, value)._matches?(value)
+          return false unless matcher(key, value)._matches?(value)
         end
       end
       true
@@ -88,15 +88,14 @@ module Mongoid
     # @example Get the matcher.
     #   document.matcher(:title, { "$in" => [ "test" ] })
     #
-    # @param [ Document ] document The document to check.
     # @param [ Symbol, String ] key The field name.
     # @param [ Object, Hash ] value The value or selector.
     #
     # @return [ Matcher ] The matcher.
     #
     # @since 2.0.0.rc.7
-    def matcher(document, key, value)
-      Matchable.matcher(document, key, value)
+    def matcher(key, value)
+      Matchable.matcher(self, key, value)
     end
 
     class << self
@@ -107,7 +106,7 @@ module Mongoid
       # @api private
       #
       # @example Get the matcher.
-      #   document.matcher(:title, { "$in" => [ "test" ] })
+      #   Matchable.matcher(document, :title, { "$in" => [ "test" ] })
       #
       # @param [ Document ] document The document to check.
       # @param [ Symbol, String ] key The field name.
