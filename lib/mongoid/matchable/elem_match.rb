@@ -15,14 +15,14 @@ module Mongoid
       #
       # @return [ true, false ] If the values match.
       def _matches?(value)
-        elem_match = value["$elemMatch"] || value[:$elemMatch]
+        condition = condition_value(value, '$elemMatch')
 
-        if !@attribute.is_a?(Array) || !value.kind_of?(Hash) || !elem_match.kind_of?(Hash)
+        if !@attribute.is_a?(Array) || !condition.kind_of?(Hash)
           return false
         end
 
         return @attribute.any? do |sub_document|
-          elem_match.all? do |k, v|
+          condition.all? do |k, v|
             if v.try(:first).try(:[],0) == "$not".freeze || v.try(:first).try(:[],0) == :$not
               !Matchable.matcher(sub_document, k, v.first[1])._matches?(v.first[1])
             else
