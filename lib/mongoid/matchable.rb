@@ -83,8 +83,6 @@ module Mongoid
     # Get the matcher for the supplied key and value. Will determine the class
     # name from the key.
     #
-    # @api private
-    #
     # @example Get the matcher.
     #   document.matcher(:title, { "$in" => [ "test" ] })
     #
@@ -94,6 +92,7 @@ module Mongoid
     # @return [ Matcher ] The matcher.
     #
     # @since 2.0.0.rc.7
+    # @api private
     def matcher(key, value)
       Matchable.matcher(self, key, value)
     end
@@ -150,6 +149,7 @@ module Mongoid
       # @return [ Object ] The value of the attribute.
       #
       # @since 2.2.1
+      # @api private
       def extract_attribute(document, key)
         if (key_string = key.to_s) =~ /.+\..+/
           key_string.split('.').inject(document.send(:as_attributes)) do |_attribs, _key|
