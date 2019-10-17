@@ -128,10 +128,14 @@ module Mongoid
           Regexp.new(extract_attribute(document, field_name))
         else
           case field_name.to_s
-            when "$or" then Or.new(value, document)
-            when "$and" then And.new(value, document)
-            when "$nor" then Nor.new(value, document)
-            else Default.new(extract_attribute(document, field_name))
+          when "$or"
+            Or.new(value, document)
+          when "$and"
+            And.new(value, document)
+          when "$nor"
+            Nor.new(value, document)
+          else
+            Default.new(extract_attribute(document, field_name))
           end
         end
       end
