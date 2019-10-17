@@ -4,6 +4,7 @@
 require "mongoid/matchable/default"
 require "mongoid/matchable/all"
 require "mongoid/matchable/and"
+require "mongoid/matchable/elem_match"
 require "mongoid/matchable/eq"
 require "mongoid/matchable/exists"
 require "mongoid/matchable/gt"
@@ -13,11 +14,10 @@ require "mongoid/matchable/lt"
 require "mongoid/matchable/lte"
 require "mongoid/matchable/ne"
 require "mongoid/matchable/nin"
-require "mongoid/matchable/or"
 require "mongoid/matchable/nor"
-require "mongoid/matchable/size"
-require "mongoid/matchable/elem_match"
+require "mongoid/matchable/or"
 require "mongoid/matchable/regexp"
+require "mongoid/matchable/size"
 
 module Mongoid
 
@@ -33,8 +33,8 @@ module Mongoid
     # @since 1.0.0
     MATCHERS = {
       "$all" => All,
-      "$elemMatch" => ElemMatch,
       "$and" => And,
+      "$elemMatch" => ElemMatch,
       "$eq" => Eq,
       "$exists" => Exists,
       "$gt" => Gt,
@@ -44,8 +44,8 @@ module Mongoid
       "$lte" => Lte,
       "$ne" => Ne,
       "$nin" => Nin,
-      "$or" => Or,
       "$nor" => Nor,
+      "$or" => Or,
       "$size" => Size,
     }.with_indifferent_access.freeze
 
