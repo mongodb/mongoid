@@ -118,7 +118,7 @@ module Mongoid
       # @since 2.0.0.rc.7
       def matcher(document, key, value)
         if value.is_a?(Hash)
-          if key == :$not || value.keys.first == :$not
+          if key.to_s == '$not' || value.keys.first.to_s == '$not'
             return Not.new(value, document)
           end
           matcher = MATCHERS[value.keys.first]

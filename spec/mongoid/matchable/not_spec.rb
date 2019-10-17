@@ -76,39 +76,65 @@ describe Mongoid::Matchable::Not do
     end
 
     context "when inverting a complex nested expression" do
-      let(:matches) do
-        query = {
-          :not => {
+      shared_examples_for 'negated criterion' do
+
+        context "when the inner expression matches" do
+          before do
+            person.age = 60
+          end
+
+          it "returns false" do
+            expect(matches).to be false
+          end
+        end
+
+        context "when the inner expression does not match" do
+          before do
+            person.age = 40
+          end
+
+          it "returns true" do
+            expect(matches).to be true
+          end
+        end
+      end
+
+      context 'with symbol keys' do
+        let(:matches) do
+          query = {
             :$not => {
               :$not => {
-                :age => {
-                  :$gt => 50
+                :$not => {
+                  :age => {
+                    :$gt => 50
+                  }
                 }
               }
             }
           }
-        }
-        matcher._matches?(query)
+          matcher._matches?(query)
+        end
+
+        it_behaves_like 'negated criterion'
       end
 
-      context "when the inner expression matches" do
-        before do
-          person.age = 60
+      context 'with string keys' do
+        let(:matches) do
+          query = {
+            '$not' => {
+              '$not' => {
+                '$not' => {
+                  'age' => {
+                    '$gt' => 50
+                  }
+                }
+              }
+            }
+          }
+          matcher._matches?(query)
         end
 
-        it "returns false" do
-          expect(matches).to be false
-        end
-      end
-
-      context "when the inner expression does not match" do
-        before do
-          person.age = 40
-        end
-
-        it "returns true" do
-          expect(matches).to be true
-        end
+        it_behaves_like 'negated criterion'
       end
     end
   end
