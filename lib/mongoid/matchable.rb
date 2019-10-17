@@ -120,18 +120,18 @@ module Mongoid
         if value.is_a?(Hash)
           matcher = MATCHERS[value.keys.first]
           if matcher
-            matcher.new(extract_attribute(document, key))
+            matcher.new(extract_attribute(document, field_name))
           else
-            Default.new(extract_attribute(document, key))
+            Default.new(extract_attribute(document, field_name))
           end
         elsif value.regexp?
-          Regexp.new(extract_attribute(document, key))
+          Regexp.new(extract_attribute(document, field_name))
         else
-          case key.to_s
+          case field_name.to_s
             when "$or" then Or.new(value, document)
             when "$and" then And.new(value, document)
             when "$nor" then Nor.new(value, document)
-            else Default.new(extract_attribute(document, key))
+            else Default.new(extract_attribute(document, field_name))
           end
         end
       end
