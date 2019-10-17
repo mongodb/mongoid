@@ -10,11 +10,12 @@ module Mongoid
       # @example Do the values match?
       #   matcher._matches?({ :key => 10 })
       #
-      # @param [ Hash ] value The values to check.
+      # @param [ Hash ] condition The condition to evaluate. This must be
+      #   a one-element hash like {'$gt' => 1}.
       #
       # @return [ true, false ] If the values match.
-      def _matches?(value)
-        first = first(value)
+      def _matches?(condition)
+        first = condition_value(condition)
         return false if first.is_a?(Array) && first.empty?
 
         attribute_array = Array.wrap(@attribute)
