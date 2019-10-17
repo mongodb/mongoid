@@ -15,6 +15,7 @@ require "mongoid/matchable/lte"
 require "mongoid/matchable/ne"
 require "mongoid/matchable/nin"
 require "mongoid/matchable/nor"
+require "mongoid/matchable/not"
 require "mongoid/matchable/or"
 require "mongoid/matchable/regexp"
 require "mongoid/matchable/size"
@@ -45,6 +46,7 @@ module Mongoid
       "$ne" => Ne,
       "$nin" => Nin,
       "$nor" => Nor,
+      "$not" => Not,
       "$or" => Or,
       "$size" => Size,
     }.with_indifferent_access.freeze
