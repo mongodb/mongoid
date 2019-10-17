@@ -64,18 +64,30 @@ module Mongoid
     # @since 1.0.0
     def _matches?(selector)
       selector.each_pair do |key, value|
-        if value.is_a?(Hash)
-          value.each do |item|
-            if item[0].to_s == "$not".freeze
-              item = item[1]
-              return false if matcher(key, item)._matches?(item)
-            else
-              return false unless matcher(key, Hash[*item])._matches?(Hash[*item])
+        if key.is_a?(String) || key.is_a?(Symbol)
+          case key.to_s
+          when '$and'
+            all = value.all? do |elt|
+              _matches?(elt)
             end
+            return false unless all
+          when '$or'
+            any = value.any? do |elt|
+              _matches?(elt)
+            end
+            return false unless any
+          when '$nor'
+            all = value.all? do |elt|
+              _matches?(elt)
+            end
+            return false if all
+          when '$not'
+            ok = _matches?(value)
+            return false if ok
           end
-        else
-          return false unless matcher(key, value)._matches?(value)
         end
+
+        return false unless matcher(key, value)._matches?(value)
       end
       true
     end
