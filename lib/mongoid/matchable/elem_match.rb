@@ -27,7 +27,7 @@ module Mongoid
       def _matches?(value)
         condition = condition_value(value, '$elemMatch')
 
-        if !@attribute.is_a?(Array) || !condition.kind_of?(Hash)
+        if !@attribute.is_a?(Array) || !condition.is_a?(Hash)
           return false
         end
 
