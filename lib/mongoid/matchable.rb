@@ -4,6 +4,7 @@
 require "mongoid/matchable/default"
 require "mongoid/matchable/all"
 require "mongoid/matchable/and"
+require "mongoid/matchable/elem_match"
 require "mongoid/matchable/eq"
 require "mongoid/matchable/exists"
 require "mongoid/matchable/gt"
@@ -13,15 +14,14 @@ require "mongoid/matchable/lt"
 require "mongoid/matchable/lte"
 require "mongoid/matchable/ne"
 require "mongoid/matchable/nin"
-require "mongoid/matchable/or"
 require "mongoid/matchable/nor"
-require "mongoid/matchable/size"
-require "mongoid/matchable/elem_match"
+require "mongoid/matchable/or"
 require "mongoid/matchable/regexp"
+require "mongoid/matchable/size"
 
 module Mongoid
 
-  # This module contains all the behavior for ruby implementations of MongoDB
+  # This module contains all the behavior for Ruby implementations of MongoDB
   # selectors.
   #
   # @since 4.0.0
@@ -33,8 +33,8 @@ module Mongoid
     # @since 1.0.0
     MATCHERS = {
       "$all" => All,
-      "$elemMatch" => ElemMatch,
       "$and" => And,
+      "$elemMatch" => ElemMatch,
       "$eq" => Eq,
       "$exists" => Exists,
       "$gt" => Gt,
@@ -44,8 +44,8 @@ module Mongoid
       "$lte" => Lte,
       "$ne" => Ne,
       "$nin" => Nin,
-      "$or" => Or,
       "$nor" => Nor,
+      "$or" => Or,
       "$size" => Size,
     }.with_indifferent_access.freeze
 
@@ -66,13 +66,13 @@ module Mongoid
           value.each do |item|
             if item[0].to_s == "$not".freeze
               item = item[1]
-              return false if matcher(self, key, item)._matches?(item)
+              return false if matcher(key, item)._matches?(item)
             else
-              return false unless matcher(self, key, Hash[*item])._matches?(Hash[*item])
+              return false unless matcher(key, Hash[*item])._matches?(Hash[*item])
             end
           end
         else
-          return false unless matcher(self, key, value)._matches?(value)
+          return false unless matcher(key, value)._matches?(value)
         end
       end
       true
@@ -83,20 +83,18 @@ module Mongoid
     # Get the matcher for the supplied key and value. Will determine the class
     # name from the key.
     #
-    # @api private
-    #
     # @example Get the matcher.
     #   document.matcher(:title, { "$in" => [ "test" ] })
     #
-    # @param [ Document ] document The document to check.
     # @param [ Symbol, String ] key The field name.
     # @param [ Object, Hash ] value The value or selector.
     #
     # @return [ Matcher ] The matcher.
     #
     # @since 2.0.0.rc.7
-    def matcher(document, key, value)
-      Matchable.matcher(document, key, value)
+    # @api private
+    def matcher(key, value)
+      Matchable.matcher(self, key, value)
     end
 
     class << self
@@ -107,7 +105,7 @@ module Mongoid
       # @api private
       #
       # @example Get the matcher.
-      #   document.matcher(:title, { "$in" => [ "test" ] })
+      #   Matchable.matcher(document, :title, { "$in" => [ "test" ] })
       #
       # @param [ Document ] document The document to check.
       # @param [ Symbol, String ] key The field name.
@@ -151,6 +149,7 @@ module Mongoid
       # @return [ Object ] The value of the attribute.
       #
       # @since 2.2.1
+      # @api private
       def extract_attribute(document, key)
         if (key_string = key.to_s) =~ /.+\..+/
           key_string.split('.').inject(document.send(:as_attributes)) do |_attribs, _key|
