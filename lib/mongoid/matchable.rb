@@ -110,13 +110,13 @@ module Mongoid
       #   Matchable.matcher(document, :title, { "$in" => [ "test" ] })
       #
       # @param [ Document ] document The document to check.
-      # @param [ Symbol, String ] key The field name.
+      # @param [ Symbol, String ] field_name The field name.
       # @param [ Object, Hash ] value The value or selector.
       #
       # @return [ Matcher ] The matcher.
       #
       # @since 2.0.0.rc.7
-      def matcher(document, key, value)
+      def matcher(document, field_name, value)
         if value.is_a?(Hash)
           matcher = MATCHERS[value.keys.first]
           if matcher
