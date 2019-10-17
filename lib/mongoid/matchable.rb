@@ -141,10 +141,13 @@ module Mongoid
         else
           case field_name.to_s
           when "$or"
+        raise 'should have been handled elsewhere'
             Or.new(value, document)
           when "$and"
+        raise 'should have been handled elsewhere'
             And.new(value, document)
           when "$nor"
+        raise 'should have been handled elsewhere'
             Nor.new(value, document)
           else
             Default.new(extract_attribute(document, field_name))
