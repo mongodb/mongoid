@@ -17,7 +17,8 @@ module Mongoid
       #
       # @return [ true, false ] If the values match.
       def _matches?(condition)
-        first = condition_value(condition)
+        #first = condition_value(condition)
+        first = condition
         return false if first.is_a?(Array) && first.empty?
 
         attribute_array = Array.wrap(@attribute)

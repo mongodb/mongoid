@@ -17,7 +17,7 @@ module Mongoid
       # @return [ true, false ] If a value exists.
       def _matches?(value)
         attribute_array = @attribute.nil? ? [nil] : Array.wrap(@attribute)
-        attribute_array.none? { |e| value.values.first.include?(e) }
+        attribute_array.none? { |e| value.include?(e) }
       end
     end
   end
