@@ -19,11 +19,7 @@ module Mongoid
       # @since 2.3.0
       def _matches?(conditions)
         conditions.each do |condition|
-          condition.keys.each do |k|
-            key = k
-            value = condition[k]
-            return false unless document._matches?(key => value)
-          end
+          return false unless document._matches?(condition)
         end
         true
       end

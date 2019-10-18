@@ -14,11 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] True if the value does not match, false otherwise
       def _matches?(condition)
-        if document.is_a?(Document)
-          document._matches?(condition.first[0] => condition.first[1])
-        else
-          !recursive_matches?(document, condition.first[0], condition.first[1])
-        end
+        !document._matches?(condition)
       end
     end
   end
