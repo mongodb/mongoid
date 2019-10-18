@@ -73,10 +73,13 @@ module Mongoid
     def _matches?(selector)
       selector.each_pair do |key, value|
         if key.is_a?(String) || key.is_a?(Symbol)
-          matcher = LOGICAL_MATCHERS[key]
+          matcher_cls = LOGICAL_MATCHERS[key]
 
-          if matcher && !matcher.matches?(value)
-            return false
+          if matcher_cls
+            if !matcher_cls.new(nil, self)._matches?(value)
+              return false
+            end
+            next
           end
         end
 
