@@ -5,7 +5,7 @@ module Mongoid
   module Matchable
 
     # Defines behavior for handling $nor expressions in embedded documents.
-    class Nor < Default
+    class Nor < Logical
 
       # Does the supplied query match the attribute?
       #

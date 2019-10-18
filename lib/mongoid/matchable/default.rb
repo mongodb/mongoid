@@ -8,7 +8,7 @@ module Mongoid
     # given MongoDB expressions.
     class Default
 
-      attr_accessor :attribute, :document
+      attr_accessor :attribute
 
       # Creating a new matcher only requires the value.
       #
@@ -18,8 +18,8 @@ module Mongoid
       # @param [ Object ] attribute The current attribute to check against.
       #
       # @since 1.0.0
-      def initialize(attribute, document = nil)
-        @attribute, @document = attribute, document
+      def initialize(attribute)
+        @attribute = attribute
       end
 
       # Checks whether the attribute matches the value, using the default
