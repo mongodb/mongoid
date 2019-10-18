@@ -126,7 +126,7 @@ module Mongoid
       # @since 1.0.0
       def determine(condition, operator)
         attribute.__array__.any? do |attr|
-          attr && attr.send(operator, condition_value(condition))
+          attr && attr.send(operator, condition)
         end
       end
     end
