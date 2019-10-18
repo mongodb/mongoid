@@ -94,6 +94,50 @@ describe 'Matcher' do
         end
       end
     end
+
+    describe '$eq' do
+
+      let!(:circuit) do
+        Circuit.new(buses: [
+          Bus.new(number: '10'),
+          Bus.new(number: '30'),
+        ])
+      end
+
+      shared_examples_for '$eq' do
+        context 'equal to condition' do
+          let(:found_bus) do
+            circuit.buses.where(number: {operator => 10}).first
+          end
+
+          it 'finds' do
+            expect(found_bus).to be circuit.buses.first
+          end
+        end
+
+        context 'not equal to condition' do
+          let(:found_bus) do
+            circuit.buses.where(number: {operator => 20}).first
+          end
+
+          it 'does not find' do
+            expect(found_bus).to be nil
+          end
+        end
+      end
+
+      context 'as string' do
+        let(:operator) { '$eq' }
+
+        it_behaves_like '$eq'
+      end
+
+      context 'as symbol' do
+        let(:operator) { :$eq }
+
+        it_behaves_like '$eq'
+      end
+    end
   end
 
   context 'when attribute is an array' do
