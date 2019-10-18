@@ -51,6 +51,14 @@ module Mongoid
       "$size" => Size,
     }.with_indifferent_access.freeze
 
+    # @api private
+    LOGICAL_MATCHERS = {
+      "$and" => And,
+      "$nor" => Nor,
+      "$not" => Not,
+      "$or" => Or,
+    }.with_indifferent_access.freeze
+
     # Determines if this document has the attributes to match the supplied
     # MongoDB selector. Used for matching on embedded associations.
     #
@@ -65,25 +73,10 @@ module Mongoid
     def _matches?(selector)
       selector.each_pair do |key, value|
         if key.is_a?(String) || key.is_a?(Symbol)
-          case key.to_s
-          when '$and'
-            all = value.all? do |elt|
-              _matches?(elt)
-            end
-            return false unless all
-          when '$or'
-            any = value.any? do |elt|
-              _matches?(elt)
-            end
-            return false unless any
-          when '$nor'
-            all = value.all? do |elt|
-              _matches?(elt)
-            end
-            return false if all
-          when '$not'
-            ok = _matches?(value)
-            return false if ok
+          matcher = LOGICAL_MATCHERS[key]
+
+          if matcher && !matcher.matches?(value)
+            return false
           end
         end
 
