@@ -161,7 +161,8 @@ describe 'Matcher' do
 
         context 'not matching condition' do
           let(:found_bus) do
-            circuit.buses.where(number: {operator => 35}).first
+            # Intentionally equal to the largest bus number
+            circuit.buses.where(number: {operator => 30}).first
           end
 
           it 'does not find' do
@@ -180,6 +181,51 @@ describe 'Matcher' do
         let(:operator) { :$gt }
 
         it_behaves_like '$gt'
+      end
+    end
+
+    describe '$gte' do
+
+      let!(:circuit) do
+        Circuit.new(buses: [
+          Bus.new(number: '10'),
+          Bus.new(number: '30'),
+        ])
+      end
+
+      shared_examples_for '$gte' do
+        context 'matching condition' do
+          let(:found_bus) do
+            # Intentionally equal to the largest bus number
+            circuit.buses.where(number: {operator => 30}).first
+          end
+
+          it 'finds' do
+            expect(found_bus).to be circuit.buses.last
+          end
+        end
+
+        context 'not matching condition' do
+          let(:found_bus) do
+            circuit.buses.where(number: {operator => 31}).first
+          end
+
+          it 'does not find' do
+            expect(found_bus).to be nil
+          end
+        end
+      end
+
+      context 'as string' do
+        let(:operator) { '$gte' }
+
+        it_behaves_like '$gte'
+      end
+
+      context 'as symbol' do
+        let(:operator) { :$gte }
+
+        it_behaves_like '$gte'
       end
     end
   end
