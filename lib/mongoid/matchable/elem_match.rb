@@ -27,11 +27,11 @@ module Mongoid
       def _matches?(value)
         condition = condition_value(value, '$elemMatch')
 
-        if !@attribute.is_a?(Array) || !condition.is_a?(Hash)
+        if !attribute.is_a?(Array) || !condition.is_a?(Hash)
           return false
         end
 
-        return @attribute.any? do |sub_document|
+        return attribute.any? do |sub_document|
           condition.all? do |k, v|
             if v.try(:first).try(:[],0) == "$not".freeze || v.try(:first).try(:[],0) == :$not
               !Matchable.matcher(sub_document, k, v.first[1])._matches?(v.first[1])

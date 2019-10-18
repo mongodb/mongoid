@@ -16,7 +16,7 @@ module Mongoid
       #
       # @return [ true, false ] True if matches, false if not.
       def _matches?(value)
-        super(value.values.first)
+        super(value)
       end
     end
   end

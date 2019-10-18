@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
+require "mongoid/matchable/expression"
+
 require "mongoid/matchable/default"
 require "mongoid/matchable/all"
-require "mongoid/matchable/and"
 require "mongoid/matchable/elem_match"
 require "mongoid/matchable/eq"
 require "mongoid/matchable/exists"
@@ -14,11 +15,14 @@ require "mongoid/matchable/lt"
 require "mongoid/matchable/lte"
 require "mongoid/matchable/ne"
 require "mongoid/matchable/nin"
+require "mongoid/matchable/regexp"
+require "mongoid/matchable/size"
+
+require "mongoid/matchable/logical"
+require "mongoid/matchable/and"
 require "mongoid/matchable/nor"
 require "mongoid/matchable/not"
 require "mongoid/matchable/or"
-require "mongoid/matchable/regexp"
-require "mongoid/matchable/size"
 
 module Mongoid
 
@@ -34,7 +38,7 @@ module Mongoid
     # @since 1.0.0
     MATCHERS = {
       "$all" => All,
-      "$and" => And,
+      #"$and" => And,
       "$elemMatch" => ElemMatch,
       "$eq" => Eq,
       "$exists" => Exists,
@@ -45,9 +49,9 @@ module Mongoid
       "$lte" => Lte,
       "$ne" => Ne,
       "$nin" => Nin,
-      "$nor" => Nor,
-      "$not" => Not,
-      "$or" => Or,
+      #"$nor" => Nor,
+      #"$not" => Not,
+      #"$or" => Or,
       "$size" => Size,
     }.with_indifferent_access.freeze
 
@@ -71,21 +75,7 @@ module Mongoid
     #
     # @since 1.0.0
     def _matches?(selector)
-      selector.each_pair do |key, value|
-        if key.is_a?(String) || key.is_a?(Symbol)
-          matcher_cls = LOGICAL_MATCHERS[key]
-
-          if matcher_cls
-            if !matcher_cls.new(nil, self)._matches?(value)
-              return false
-            end
-            next
-          end
-        end
-
-        return false unless matcher(key, value)._matches?(value)
-      end
-      true
+      Expression.new(self)._matches?(selector)
     end
 
     private
@@ -137,6 +127,7 @@ module Mongoid
         else
           case field_name.to_s
           when "$or"
+          byebug
         raise 'should have been handled elsewhere'
             Or.new(value, document)
           when "$and"
@@ -151,7 +142,7 @@ module Mongoid
         end
       end
 
-      private
+      #private
 
       # Extract the attribute from the key, being smarter about dot notation.
       #

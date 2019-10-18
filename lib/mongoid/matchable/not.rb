@@ -5,7 +5,7 @@ module Mongoid
   module Matchable
 
     # Performs a logical NOT operation.
-    class Not < Default
+    class Not < Logical
 
       # Return true if the attribute does not match the value.
       #
@@ -14,7 +14,7 @@ module Mongoid
       #
       # @return [ true, false ] True if the value does not match, false otherwise
       def _matches?(condition)
-        !document._matches?(condition)
+        !Expression.new(document)._matches?(condition)
       end
     end
   end

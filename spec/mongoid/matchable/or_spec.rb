@@ -10,7 +10,7 @@ describe Mongoid::Matchable::Or do
   end
 
   let(:matcher) do
-    described_class.new("value", person)
+    described_class.new(person)
   end
 
   describe "#_matches?" do
