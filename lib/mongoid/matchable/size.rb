@@ -16,7 +16,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def _matches?(value)
-        @attribute.size == value.values.first
+        @attribute.size == value
       end
     end
   end

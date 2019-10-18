@@ -25,7 +25,8 @@ module Mongoid
       #
       # @return [ true, false ] If the attribute matches the value.
       def _matches?(value)
-        condition = condition_value(value, '$elemMatch')
+        #condition = condition_value(value, '$elemMatch')
+        condition = value
 
         if !attribute.is_a?(Array) || !condition.is_a?(Hash)
           return false

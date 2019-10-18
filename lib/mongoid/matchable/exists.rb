@@ -18,7 +18,7 @@ module Mongoid
       #
       # @return [ true, false ] If a value exists.
       def _matches?(value)
-        @attribute.nil? != value.values.first
+        @attribute.nil? != value
       end
     end
   end
