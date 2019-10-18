@@ -21,17 +21,14 @@ module Mongoid
       #
       # @since 7.1.0
       def _matches?(conditions)
-        if conditions.length == 0
-          # MongoDB does not allow $nor array to be empty, but
-          # Mongoid accepts an empty array for $or which MongoDB also
-          # prohibits
-          return false
-        end
-        conditions.none? do |condition|
-          condition.all? do |key, value|
-            document._matches?(key => value)
+        # MongoDB prohibits $or with empty condition list.
+        # Mongoid currently accepts such a construct, and returns false.
+        conditions.each do |condition|
+          if document._matches?(condition)
+            return false
           end
         end
+        !conditions.empty?
       end
     end
   end
