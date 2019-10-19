@@ -147,6 +147,29 @@ describe 'Matcher' do
       it_behaves_like 'a field operator', '$eq'
     end
 
+    describe '$ne' do
+
+      let!(:circuit) do
+        Circuit.new(buses: [
+          Bus.new(number: '30'),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        circuit.buses.where(number: {operator => 10}).first
+      end
+
+      let(:expected_object_matching_condition) do
+        circuit.buses.last
+      end
+
+      let(:actual_object_not_matching_condition) do
+        circuit.buses.where(number: {operator => 30}).first
+      end
+
+      it_behaves_like 'a field operator', '$ne'
+    end
+
     describe '$gt' do
 
       let!(:circuit) do
