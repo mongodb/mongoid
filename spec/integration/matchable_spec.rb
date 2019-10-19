@@ -317,6 +317,30 @@ describe 'Matcher' do
 
       it_behaves_like 'a field operator', '$nin'
     end
+
+    describe '$size' do
+
+      let!(:person) do
+        Person.new(addresses: [
+          Address.new(locations: [Location.new]),
+          Address.new(locations: [Location.new, Location.new]),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        person.addresses.where('locations' => {operator => 2}).first
+      end
+
+      let(:expected_object_matching_condition) do
+        person.addresses.last
+      end
+
+      let(:actual_object_not_matching_condition) do
+        person.addresses.where('locations' => {operator => 3}).first
+      end
+
+      it_behaves_like 'a field operator', '$size'
+    end
   end
 
   context 'when attribute is an array' do
