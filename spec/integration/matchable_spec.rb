@@ -196,6 +196,56 @@ describe 'Matcher' do
 
       it_behaves_like 'a field operator', '$gte'
     end
+
+    describe '$lt' do
+
+      let!(:circuit) do
+        Circuit.new(buses: [
+          Bus.new(number: '10'),
+          Bus.new(number: '30'),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        circuit.buses.where(number: {operator => 15}).first
+      end
+
+      let(:expected_object_matching_condition) do
+        circuit.buses.first
+      end
+
+      let(:actual_object_not_matching_condition) do
+        # Intentionally equal to the smallest bus number
+        circuit.buses.where(number: {operator => 10}).first
+      end
+
+      it_behaves_like 'a field operator', '$lt'
+    end
+
+    describe '$lte' do
+
+      let!(:circuit) do
+        Circuit.new(buses: [
+          Bus.new(number: '10'),
+          Bus.new(number: '30'),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        # Intentionally equal to the smallest bus number
+        circuit.buses.where(number: {operator => 10}).first
+      end
+
+      let(:expected_object_matching_condition) do
+        circuit.buses.first
+      end
+
+      let(:actual_object_not_matching_condition) do
+        circuit.buses.where(number: {operator => 9}).first
+      end
+
+      it_behaves_like 'a field operator', '$lte'
+    end
   end
 
   context 'when attribute is an array' do
