@@ -95,6 +95,34 @@ describe 'Matcher' do
       end
     end
 
+    shared_examples_for 'a field operator' do |_operator|
+      shared_examples_for 'behaves as expected' do
+        context 'matching condition' do
+          it 'finds' do
+            expect(actual_object_matching_condition).to be expected_object_matching_condition
+          end
+        end
+
+        context 'not matching condition' do
+          it 'does not find' do
+            expect(actual_object_not_matching_condition).to be nil
+          end
+        end
+      end
+
+      context 'as string' do
+        let(:operator) { _operator.to_s }
+
+        it_behaves_like 'behaves as expected'
+      end
+
+      context 'as symbol' do
+        let(:operator) { _operator.to_sym }
+
+        it_behaves_like 'behaves as expected'
+      end
+    end
+
     describe '$eq' do
 
       let!(:circuit) do
@@ -104,39 +132,19 @@ describe 'Matcher' do
         ])
       end
 
-      shared_examples_for '$eq' do
-        context 'equal to condition' do
-          let(:found_bus) do
-            circuit.buses.where(number: {operator => 10}).first
-          end
-
-          it 'finds' do
-            expect(found_bus).to be circuit.buses.first
-          end
-        end
-
-        context 'not equal to condition' do
-          let(:found_bus) do
-            circuit.buses.where(number: {operator => 20}).first
-          end
-
-          it 'does not find' do
-            expect(found_bus).to be nil
-          end
-        end
+      let(:actual_object_matching_condition) do
+        circuit.buses.where(number: {operator => 10}).first
       end
 
-      context 'as string' do
-        let(:operator) { '$eq' }
-
-        it_behaves_like '$eq'
+      let(:expected_object_matching_condition) do
+        circuit.buses.first
       end
 
-      context 'as symbol' do
-        let(:operator) { :$eq }
-
-        it_behaves_like '$eq'
+      let(:actual_object_not_matching_condition) do
+        circuit.buses.where(number: {operator => 20}).first
       end
+
+      it_behaves_like 'a field operator', '$eq'
     end
 
     describe '$gt' do
@@ -148,40 +156,20 @@ describe 'Matcher' do
         ])
       end
 
-      shared_examples_for '$gt' do
-        context 'matching condition' do
-          let(:found_bus) do
-            circuit.buses.where(number: {operator => 15}).first
-          end
-
-          it 'finds' do
-            expect(found_bus).to be circuit.buses.last
-          end
-        end
-
-        context 'not matching condition' do
-          let(:found_bus) do
-            # Intentionally equal to the largest bus number
-            circuit.buses.where(number: {operator => 30}).first
-          end
-
-          it 'does not find' do
-            expect(found_bus).to be nil
-          end
-        end
+      let(:actual_object_matching_condition) do
+        circuit.buses.where(number: {operator => 15}).first
       end
 
-      context 'as string' do
-        let(:operator) { '$gt' }
-
-        it_behaves_like '$gt'
+      let(:expected_object_matching_condition) do
+        circuit.buses.last
       end
 
-      context 'as symbol' do
-        let(:operator) { :$gt }
-
-        it_behaves_like '$gt'
+      let(:actual_object_not_matching_condition) do
+        # Intentionally equal to the largest bus number
+        circuit.buses.where(number: {operator => 30}).first
       end
+
+      it_behaves_like 'a field operator', '$gt'
     end
 
     describe '$gte' do
@@ -193,40 +181,20 @@ describe 'Matcher' do
         ])
       end
 
-      shared_examples_for '$gte' do
-        context 'matching condition' do
-          let(:found_bus) do
-            # Intentionally equal to the largest bus number
-            circuit.buses.where(number: {operator => 30}).first
-          end
-
-          it 'finds' do
-            expect(found_bus).to be circuit.buses.last
-          end
-        end
-
-        context 'not matching condition' do
-          let(:found_bus) do
-            circuit.buses.where(number: {operator => 31}).first
-          end
-
-          it 'does not find' do
-            expect(found_bus).to be nil
-          end
-        end
+      let(:actual_object_matching_condition) do
+        # Intentionally equal to the largest bus number
+        circuit.buses.where(number: {operator => 30}).first
       end
 
-      context 'as string' do
-        let(:operator) { '$gte' }
-
-        it_behaves_like '$gte'
+      let(:expected_object_matching_condition) do
+        circuit.buses.last
       end
 
-      context 'as symbol' do
-        let(:operator) { :$gte }
-
-        it_behaves_like '$gte'
+      let(:actual_object_not_matching_condition) do
+        circuit.buses.where(number: {operator => 31}).first
       end
+
+      it_behaves_like 'a field operator', '$gte'
     end
   end
 
