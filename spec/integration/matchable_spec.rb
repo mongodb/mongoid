@@ -246,6 +246,54 @@ describe 'Matcher' do
 
       it_behaves_like 'a field operator', '$lte'
     end
+
+    describe '$in' do
+
+      let!(:circuit) do
+        Circuit.new(buses: [
+          Bus.new(number: '10'),
+          Bus.new(number: '30'),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        circuit.buses.where(number: {operator => [10, 20]}).first
+      end
+
+      let(:expected_object_matching_condition) do
+        circuit.buses.first
+      end
+
+      let(:actual_object_not_matching_condition) do
+        circuit.buses.where(number: {operator => [5]}).first
+      end
+
+      it_behaves_like 'a field operator', '$in'
+    end
+
+    describe '$nin' do
+
+      let!(:circuit) do
+        Circuit.new(buses: [
+          Bus.new(number: '10'),
+          Bus.new(number: '30'),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        circuit.buses.where(number: {operator => [5, 10]}).first
+      end
+
+      let(:expected_object_matching_condition) do
+        circuit.buses.last
+      end
+
+      let(:actual_object_not_matching_condition) do
+        circuit.buses.where(number: {operator => [10, 30]}).first
+      end
+
+      it_behaves_like 'a field operator', '$nin'
+    end
   end
 
   context 'when attribute is an array' do
