@@ -437,6 +437,26 @@ describe 'Matcher' do
         it 'finds' do
           expect(actual_object_matching_condition).to eq(expected_object_matching_condition)
         end
+
+        context 'when $and is on field level' do
+          let(:actual_object_matching_condition) do
+            person.addresses.where('locations' => {operator => [
+              {'name' => 'Hall'},
+              {'number' => 1},
+            ]}).first
+          end
+        end
+
+        it 'is prohibited' do
+          # MongoDB prohibits $and operator in values when matching on
+          # fields. Mongoid does not have such a prohibition and
+          # also returns the address where different locations match the
+          # different branches.
+          pending 'Mongoid behavior differs from MongoDB'
+          expect do
+            actual_object_matching_condition
+          end.to raise_error(Mongoid::Errors::InvalidFind)
+        end
       end
     end
   end
