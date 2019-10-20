@@ -170,6 +170,53 @@ describe 'Matcher' do
       it_behaves_like 'a field operator', '$ne'
     end
 
+    describe '$exists' do
+
+      context 'true value' do
+        let!(:circuit) do
+          Circuit.new(buses: [
+            Bus.new(number: '30'),
+          ])
+        end
+
+        let(:actual_object_matching_condition) do
+          circuit.buses.where(number: {operator => true}).first
+        end
+
+        let(:expected_object_matching_condition) do
+          circuit.buses.first
+        end
+
+        let(:actual_object_not_matching_condition) do
+          circuit.buses.where(number: {operator => false}).first
+        end
+
+        it_behaves_like 'a field operator', '$exists'
+      end
+
+      context 'false value' do
+        let!(:circuit) do
+          Circuit.new(buses: [
+            Bus.new,
+          ])
+        end
+
+        let(:actual_object_matching_condition) do
+          circuit.buses.where(number: {operator => false}).first
+        end
+
+        let(:expected_object_matching_condition) do
+          circuit.buses.first
+        end
+
+        let(:actual_object_not_matching_condition) do
+          circuit.buses.where(number: {operator => true}).first
+        end
+
+        it_behaves_like 'a field operator', '$exists'
+      end
+    end
+
     describe '$gt' do
 
       let!(:circuit) do
