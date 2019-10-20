@@ -459,6 +459,63 @@ describe 'Matcher' do
         end
       end
     end
+
+    describe '$or' do
+      let!(:person) do
+        Person.new(addresses: [
+          Address.new(locations: [Location.new(name: 'City')]),
+          Address.new(locations: [
+            # Both criteria are on the same object
+            Location.new(name: 'Hall', number: 1),
+            Location.new(number: 3),
+          ]),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        person.addresses.where(operator => [
+          {'locations.name' => 'Hall'},
+          {'locations.number' => 4},
+        ]).first
+      end
+
+      let(:expected_object_matching_condition) do
+        person.addresses.last
+      end
+
+      let(:actual_object_not_matching_condition) do
+        person.addresses.where(operator => [
+          {'locations.name' => 'Town'},
+          {'locations.number' => 4},
+        ]).first
+      end
+
+      it_behaves_like 'a field operator', '$or'
+
+      context 'when branches match different embedded objects' do
+        let(:operator) { :$or }
+
+        context 'when $or is on field level' do
+          let(:actual_object_matching_condition) do
+            person.addresses.where('locations' => {operator => [
+              {'name' => 'Hall'},
+              {'number' => 1},
+            ]}).first
+          end
+        end
+
+        it 'is prohibited' do
+          # MongoDB prohibits $and operator in values when matching on
+          # fields. Mongoid does not have such a prohibition and
+          # also returns the address where different locations match the
+          # different branches.
+          pending 'Mongoid behavior differs from MongoDB'
+          expect do
+            actual_object_matching_condition
+          end.to raise_error(Mongoid::Errors::InvalidFind)
+        end
+      end
+    end
   end
 
   context 'when attribute is an array' do
