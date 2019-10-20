@@ -388,6 +388,38 @@ describe 'Matcher' do
 
       it_behaves_like 'a field operator', '$size'
     end
+
+    describe '$and' do
+      let!(:person) do
+        Person.new(addresses: [
+          Address.new(locations: [Location.new(name: 'City')]),
+          Address.new(locations: [
+            Location.new(name: 'Hall'),
+            Location.new(number: 1),
+          ]),
+        ])
+      end
+
+      let(:actual_object_matching_condition) do
+        person.addresses.where(operator => [
+          {'locations.name' => 'Hall'},
+          {'locations.number' => 1},
+        ]).first
+      end
+
+      let(:expected_object_matching_condition) do
+        person.addresses.last
+      end
+
+      let(:actual_object_not_matching_condition) do
+        person.addresses.where(operator => [
+          {'locations.name' => 'Hall'},
+          {'locations.number' => 2},
+        ]).first
+      end
+
+      it_behaves_like 'a field operator', '$and'
+    end
   end
 
   context 'when attribute is an array' do
