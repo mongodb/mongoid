@@ -394,8 +394,9 @@ describe 'Matcher' do
         Person.new(addresses: [
           Address.new(locations: [Location.new(name: 'City')]),
           Address.new(locations: [
-            Location.new(name: 'Hall'),
-            Location.new(number: 1),
+            # Both criteria are on the same object
+            Location.new(name: 'Hall', number: 1),
+            Location.new(number: 3),
           ]),
         ])
       end
@@ -419,6 +420,24 @@ describe 'Matcher' do
       end
 
       it_behaves_like 'a field operator', '$and'
+
+      context 'when branches match different embedded objects' do
+        let!(:person) do
+          Person.new(addresses: [
+            Address.new(locations: [Location.new(name: 'City')]),
+            Address.new(locations: [
+              Location.new(name: 'Hall'),
+              Location.new(number: 1),
+            ]),
+          ])
+        end
+
+        let(:operator) { :$and }
+
+        it 'finds' do
+          expect(actual_object_matching_condition).to eq(expected_object_matching_condition)
+        end
+      end
     end
   end
 
