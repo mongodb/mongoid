@@ -13,8 +13,9 @@ module Mongoid
       #   InvalidFind.new
       #
       # @since 2.2.0
-      def initialize
-        super(compose_message("calling_document_find_with_nil_is_invalid", {}))
+      def initialize(msg = nil)
+        msg ||= compose_message("calling_document_find_with_nil_is_invalid", {})
+        super(msg)
       end
     end
   end

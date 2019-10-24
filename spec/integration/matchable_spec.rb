@@ -542,12 +542,26 @@ describe 'Matcher' do
       end
 
       let(:actual_object_not_matching_condition) do
-        person.addresses.where(operator => [
+        person.addresses.where(operator =>
           {'locations.number' => {'$exists' => true}},
-        ]).first
+        ).first
       end
 
       it_behaves_like 'a field operator', '$not'
+
+      context 'when argument is an array' do
+        let(:object) do
+          person.addresses.where('$not' => [
+            {'locations.name' => 'City'},
+          ]).first
+        end
+
+        it 'raises InvalidFind' do
+          expect do
+            object
+          end.to raise_error(Mongoid::Errors::InvalidFind, /\$not operator requires a Hash argument/)
+        end
+      end
 
       context 'when branches match different embedded objects' do
         let!(:person) do
