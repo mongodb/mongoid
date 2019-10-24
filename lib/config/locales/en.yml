@@ -173,6 +173,14 @@ en:
             \_\_\_\_index({ name: 1, label: -1 }, { sparse: true })\n
             \_\_\_\_index({ location: '2d' }, { background: true })\n
             \_\_end\n\n"
+        invalid_not_argument:
+          message: "$not operator requires a Hash argument."
+          summary: "$not operator requires another operator as its argument,
+            which must be provided as a Hash. See
+            https://docs.mongodb.com/manual/reference/operator/query/not/.
+            Provided argument was: %{argument}."
+          resolution: "Rewrite the condition in the form of
+            {\"$not\" => {\"$foo\" => \"bar\"}}."
         invalid_options:
           message: "Invalid option :%{invalid} provided to association :%{name}."
           summary: "Mongoid checks the options that are passed to the association
@@ -462,13 +470,6 @@ en:
             \_\_\_\_\_\_\_\_database: my_app_db\n
             \_\_\_\_\_\_\_\_hosts:\n
             \_\_\_\_\_\_\_\_\_\_- localhost:27017\n\n"
-        not_requires_hash:
-          message: "$not operator requires a Hash argument."
-          summary: "$not operator requires another operator as its argument,
-            which must be provided as a Hash. See
-            https://docs.mongodb.com/manual/reference/operator/query/not/."
-          resolution: "Rewrite the condition in the form of
-            {\"$not\" => {\"$foo\" => \"bar\"}}."
         readonly_attribute:
           message: "Attempted to set the readonly attribute '%{name}' with
             the value: %{value}."

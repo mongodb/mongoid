@@ -15,7 +15,7 @@ module Mongoid
       # @return [ true, false ] True if the value does not match, false otherwise
       def _matches?(condition)
         unless condition.is_a?(Hash)
-          raise Errors::NotRequiresHash
+          raise Errors::InvalidNotArgument, condition
         end
 
         !Expression.new(document)._matches?(condition)

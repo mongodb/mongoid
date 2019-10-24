@@ -6,14 +6,13 @@ module Mongoid
 
     # Raised when something other than a hash is passed as an argument
     # to $not.
-    class NotRequiresHash < InvalidFind
+    class InvalidNotArgument < MongoidError
 
       # Create the new exception.
       #
       # @since 7.1.0
-      def initialize(msg = nil)
-        msg ||= compose_message("not_requires_hash", {})
-        super(msg)
+      def initialize(argument)
+        super(compose_message("invalid_not_argument", {argument: argument}))
       end
     end
   end
