@@ -559,7 +559,7 @@ describe 'Matcher' do
         it 'raises InvalidFind' do
           expect do
             object
-          end.to raise_error(Mongoid::Errors::InvalidFind, /\$not operator requires a Hash argument/)
+          end.to raise_error(Mongoid::Errors::InvalidNotArgument)
         end
       end
 
