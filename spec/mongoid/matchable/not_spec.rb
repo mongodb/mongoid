@@ -4,73 +4,77 @@
 require "spec_helper"
 
 describe Mongoid::Matchable::Not do
-  let(:person) do
-    Person.new
+  let(:matcher) do
+    described_class.new(value)
   end
 
-  let(:matcher) do
-    described_class.new(person)
+  let(:match_result) do
+    matcher._matches?(query)
   end
 
   describe "#_matches?" do
     context "when inverting a simple expression" do
-      let(:matches) do
-        query = {
-          :title => {
-            :$not => {:$eq => "Sir"}
-          }
-        }
-        matcher._matches?(query)
+      let(:query) do
+        {:$eq => "Sir"}
       end
 
       context "when the inner expression matches" do
-        before do
-          person.title = "Sir"
+
+        let(:value) do
+          'Sir'
         end
 
         it "returns false" do
-          expect(matches).to be false
+          expect(match_result).to be false
         end
       end
 
       context "when the inner expression does not match" do
-        before do
-          person.title = "Madam"
+
+        let(:value) do
+          'Madam'
         end
 
         it "returns true" do
-          expect(matches).to be true
+          expect(match_result).to be true
+        end
+      end
+
+      context "when the field is not set" do
+        before do
+          expect(person.title).to be nil
+        end
+
+        it "returns true" do
+          expect(match_result).to be true
         end
       end
     end
 
     context "when inverting a complex expression" do
-      let(:matches) do
-        query = {
-          :age => {
-            :$not => {:$gt => 50}
-          }
-        }
-        matcher._matches?(query)
+      let(:query) do
+        {:$gt => 50}
       end
 
       context "when the inner expression matches" do
-        before do
-          person.age = 60
+
+        let(:value) do
+          60
         end
 
         it "returns false" do
-          expect(matches).to be false
+          expect(match_result).to be false
         end
       end
 
       context "when the inner expression does not match" do
-        before do
-          person.age = 40
+
+        let(:value) do
+          40
         end
 
         it "returns true" do
-          expect(matches).to be true
+          expect(match_result).to be true
         end
       end
     end
@@ -79,59 +83,55 @@ describe Mongoid::Matchable::Not do
       shared_examples_for 'negated criterion' do
 
         context "when the inner expression matches" do
-          before do
-            person.age = 60
+
+          let(:value) do
+            60
           end
 
           it "returns false" do
-            expect(matches).to be false
+            expect(match_result).to be false
           end
         end
 
         context "when the inner expression does not match" do
-          before do
-            person.age = 40
+
+          let(:value) do
+            40
           end
 
           it "returns true" do
-            expect(matches).to be true
+            expect(match_result).to be true
           end
         end
       end
 
       context 'with symbol keys' do
-        let(:matches) do
-          query = {
+        let(:query) do
+          {
             :$not => {
               :$not => {
-                :$not => {
-                  :age => {
-                    :$gt => 50
-                  }
+                :age => {
+                  :$gt => 50,
                 }
               }
             }
           }
-          matcher._matches?(query)
         end
 
         it_behaves_like 'negated criterion'
       end
 
       context 'with string keys' do
-        let(:matches) do
-          query = {
+        let(:query) do
+          {
             '$not' => {
               '$not' => {
-                '$not' => {
-                  'age' => {
-                    '$gt' => 50
-                  }
+                'age' => {
+                  '$gt' => 50,
                 }
               }
             }
           }
-          matcher._matches?(query)
         end
 
         it_behaves_like 'negated criterion'

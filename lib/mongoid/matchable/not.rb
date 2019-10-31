@@ -5,6 +5,8 @@ module Mongoid
   module Matchable
 
     # Performs a logical NOT operation.
+    #
+    # In MongoDB $not is always applied to fields, and never to documents.
     class Not < Logical
 
       # Return true if the attribute does not match the value.
