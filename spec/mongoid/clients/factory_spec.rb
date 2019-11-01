@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+# encoding: utf-8
+
 require "spec_helper"
 
 describe Mongoid::Clients::Factory do
@@ -84,11 +87,11 @@ describe Mongoid::Clients::Factory do
           end
 
           it "sets the cluster's seed ports to 27017" do
-            expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
+            expect(%w(127.0.0.1:27017 localhost:27017)).to include(cluster.addresses.first.to_s)
           end
 
           it "sets ips with no ports to 27017" do
-            expect(default.cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
+            expect(%w(127.0.0.1:27017 localhost:27017)).to include(cluster.addresses.first.to_s)
           end
         end
 
@@ -124,7 +127,7 @@ describe Mongoid::Clients::Factory do
             end
 
             it "sets the cluster's seeds" do
-              expect(cluster.addresses.first.to_s).to eq("127.0.0.1:27017")
+              expect(%w(127.0.0.1:27017 localhost:27017)).to include(cluster.addresses.first.to_s)
             end
 
             it "sets the database" do
@@ -185,7 +188,7 @@ describe Mongoid::Clients::Factory do
     context "when no name is provided" do
 
       let(:config) do
-        { default: { hosts: [SpecConfig.instance.addresses.first], database: database_id }}
+        { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
       end
 
       before do
@@ -204,7 +207,7 @@ describe Mongoid::Clients::Factory do
         client.cluster
       end
 
-      let(:seeds) do
+      let(:cluster_addresses) do
         cluster.addresses.map{ |address| address.to_s }
       end
 
@@ -217,7 +220,7 @@ describe Mongoid::Clients::Factory do
           unless address.include?(':')
             address = "#{address}:27017"
           end
-          expect(seeds).to include(address)
+          expect(cluster_addresses).to include(address)
         end
       end
     end
@@ -239,7 +242,7 @@ describe Mongoid::Clients::Factory do
   describe ".default" do
 
     let(:config) do
-      { default: { hosts: [SpecConfig.instance.addresses.first], database: database_id }}
+      { default: { hosts: SpecConfig.instance.addresses, database: database_id }}
     end
 
     before do
@@ -258,7 +261,7 @@ describe Mongoid::Clients::Factory do
       client.cluster
     end
 
-    let(:seeds) do
+    let(:cluster_addresses) do
       cluster.addresses.map{ |address| address.to_s }
     end
 
@@ -271,7 +274,7 @@ describe Mongoid::Clients::Factory do
         unless address.include?(':')
           address = "#{address}:27017"
         end
-        expect(seeds).to include(address)
+        expect(cluster_addresses).to include(address)
       end
     end
   end
@@ -307,7 +310,7 @@ describe Mongoid::Clients::Factory do
       client.cluster
     end
 
-    let(:seeds) do
+    let(:cluster_addresses) do
       cluster.addresses.map{ |address| address.to_s }
     end
 
@@ -320,7 +323,7 @@ describe Mongoid::Clients::Factory do
         unless address.include?(':')
           address = "#{address}:27017"
         end
-        expect(seeds).to include(address)
+        expect(cluster_addresses).to include(address)
       end
     end
 
