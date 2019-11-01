@@ -396,7 +396,7 @@ describe Mongoid::Clients::Options do
           end
 
           it 'disconnects the new cluster when the block exits' do
-            expect(connections_before).to eq(connections_after)
+            expect(connections_after).to eq(connections_before)
           end
         end
 
