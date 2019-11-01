@@ -16,6 +16,10 @@ else
   gem 'i18n', '~> 1.0', '>= 1.1'
 end
 
+group :development do
+  gem 'yard'
+end
+
 group :test do
   gem 'rspec-retry'
   gem 'benchmark-ips'
@@ -25,12 +29,6 @@ group :test do
   gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
-  end
-end
-
-group :development, :testing do
-  gem 'yard'
-  platforms :mri do
     if RUBY_VERSION < '2.3'
       gem 'byebug', '~> 10.0'
     else

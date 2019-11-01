@@ -15,6 +15,10 @@ else
   gem 'i18n', '~> 1.0'
 end
 
+group :development do
+  gem 'yard'
+end
+
 group :test do
   gem 'rspec-retry'
   gem 'benchmark-ips'
@@ -22,16 +26,6 @@ group :test do
   gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
   gem 'fuubar'
   gem 'rfc'
-  platforms :mri do
-    gem 'timeout-interrupt'
-  end
-end
-
-group :development, :testing do
-  gem 'yard'
-  platforms :mri do
-    gem 'byebug'
-  end
 end
 
 gemspec path: '..'
