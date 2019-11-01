@@ -35,6 +35,7 @@ end
 require 'support/authorization'
 require 'support/expectations'
 require 'support/macros'
+require 'support/spec_config'
 require 'support/cluster_config'
 require 'support/constraints'
 
