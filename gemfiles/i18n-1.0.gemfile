@@ -1,5 +1,4 @@
 source "https://rubygems.org"
-gemspec path: '..'
 
 gem 'rake'
 gem 'actionpack', '~> 5.1'
@@ -7,6 +6,10 @@ gem 'activemodel', '~> 5.1'
 
 # https://jira.mongodb.org/browse/MONGOID-4614
 gem 'i18n', '~> 1.0.0'
+
+group :development do
+  gem 'yard'
+end
 
 group :test do
   gem 'rspec-retry'
@@ -17,12 +20,6 @@ group :test do
   gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
-  end
-end
-
-group :development, :testing do
-  gem 'yard'
-  platforms :mri do
     if RUBY_VERSION < '2.3'
       gem 'byebug', '~> 10.0'
     else
@@ -30,3 +27,5 @@ group :development, :testing do
     end
   end
 end
+
+gemspec path: '..'
