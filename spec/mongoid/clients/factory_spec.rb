@@ -12,8 +12,8 @@ describe Mongoid::Clients::Factory do
 
           let(:config) do
             {
-              default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
-              secondary: { hosts: [ "127.0.0.1:27017" ], database: database_id }
+              default: { hosts: SpecConfig.instance.addresses, database: database_id },
+              secondary: { hosts: SpecConfig.instance.addresses, database: database_id }
             }
           end
 
@@ -185,7 +185,7 @@ describe Mongoid::Clients::Factory do
     context "when no name is provided" do
 
       let(:config) do
-        { default: { hosts: ["127.0.0.1:27017"], database: database_id }}
+        { default: { hosts: [SpecConfig.instance.addresses.first], database: database_id }}
       end
 
       before do
@@ -239,7 +239,7 @@ describe Mongoid::Clients::Factory do
   describe ".default" do
 
     let(:config) do
-      { default: { hosts: ["127.0.0.1:27017"], database: database_id }}
+      { default: { hosts: [SpecConfig.instance.addresses.first], database: database_id }}
     end
 
     before do
@@ -281,7 +281,7 @@ describe Mongoid::Clients::Factory do
     let(:config) do
       {
         default: {
-          hosts: [ "127.0.0.1:27017" ],
+          hosts: SpecConfig.instance.addresses,
           database: database_id,
           options: {
             "server_selection_timeout" => 10,
