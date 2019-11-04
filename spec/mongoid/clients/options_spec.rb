@@ -354,7 +354,7 @@ describe Mongoid::Clients::Options do
           band.mongo_client.database.command(serverStatus: 1).first['connections']['current']
         end
 
-        let!(:connections_and_cluster_during) do
+        let(:connections_and_cluster_during) do
           connections = nil
           cluster = band.with(options) do |b|
             b.reload
