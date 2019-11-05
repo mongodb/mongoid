@@ -1,15 +1,11 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gem 'rake'
-gem 'actionpack', git: 'https://github.com/rails/rails'
-gem 'activemodel', git: 'https://github.com/rails/rails'
+gem 'actionpack', '~> 5.1'
+gem 'activemodel', '~> 5.1'
 
-if RUBY_VERSION < '2.3'
-  gem 'i18n', '~> 1.0', '< 1.5'
-  gem 'nokogiri', '<1.10'
-else
-  gem 'i18n', '~> 1.0'
-end
+# https://jira.mongodb.org/browse/MONGOID-4614
+gem 'i18n', '~> 1.0.0'
 
 group :development do
   gem 'yard'

@@ -34,6 +34,10 @@ end
 
 require 'support/authorization'
 require 'support/expectations'
+require 'support/macros'
+require 'support/spec_config'
+require 'support/cluster_config'
+require 'support/constraints'
 
 # Give MongoDB time to start up on the travis ci environment.
 if (ENV['CI'] == 'travis' || ENV['CI'] == 'evergreen')
@@ -129,6 +133,7 @@ I18n.config.enforce_available_locales = false
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.include(Mongoid::Expectations)
+  config.extend(Constraints)
 
   config.before(:suite) do
     client = Mongo::Client.new(["#{HOST}:#{PORT}"])
