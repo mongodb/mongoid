@@ -22,7 +22,7 @@ module Mongoid
       # Define a configuration option with a default.
       #
       # @example Define the option.
-      #   Options.option(:logger, :default => Logger.new($stdout, :warn))
+      #   Options.option(:logger, :default => Logger.new(STDERR, :warn))
       #
       # @param [ Symbol ] name The name of the configuration option.
       # @param [ Hash ] options Extras for the option.

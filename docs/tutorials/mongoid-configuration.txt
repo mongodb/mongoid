@@ -258,7 +258,7 @@ Mongoid and the MongoDB Ruby driver have separate loggers and log levels.
 
 If Mongoid is loaded in the context of a Rails application, it will
 use Rails' configured logger by default. Otherwise Mongoid will configure
-itself to log to ``STDOUT`` with the default log level of ``INFO``.
+itself to log to ``STDERR`` with the default log level of ``INFO``.
 
 The Ruby driver's default log level is ``DEBUG``, and changing Mongoid's
 log level does not affect the Ruby driver's log level.

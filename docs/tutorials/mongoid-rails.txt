@@ -27,7 +27,7 @@ those set in your ``config/mongoid.yml``.
 
   module MyApplication
     class Application < Rails::Application
-      config.mongoid.logger = Logger.new($stdout, :warn)
+      config.mongoid.logger = Logger.new(STDERR, :warn)
     end
   end
 
