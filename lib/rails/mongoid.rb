@@ -51,7 +51,7 @@ module Rails
       begin
         require_dependency(file)
       rescue Exception => e
-        Logger.new($stdout).warn(e.message)
+        Logger.new(STDERR).warn(e.message)
       end
     end
   end
