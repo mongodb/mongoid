@@ -30,39 +30,30 @@ i.e. ``development``, ``test`` or ``production``. The third level key,
 ``default`` in the above example, refers to the Mongo client name.
 Most applications will use a single client named ``default``.
 
-Rails Applications
-******************
+Generating Default Configuration
+********************************
 
-If you are using Rails, you can have Mongoid generate a default configuration
-file for you by running the following command:
+If you are using Ruby on Rails, you can have Mongoid generate a default
+configuration file for you by running the following command:
 
 .. code-block:: bash
 
-  $ rails g mongoid:config
+  rails g mongoid:config
 
 The configuration file will be placed in ``config/mongoid.yml``.
 
-Environment Determination
-*************************
+If you are not using Ruby on Rails, you can copy the minimal configuration
+given above and save it as ``config/mongoid.yml``.
 
-When Mongoid loads its configuration, it chooses the environment to use
-in the following order:
+Loading Mongoid Configuration
+*****************************
 
-- ``Rails.env`` if using Rails.
-- ``Sinatra::Base.environment`` if using Sinatra.
-- ``RACK_ENV`` environment variable.
-- ``MONGOID_ENV`` environment variable.
+If you are using Ruby on Rails, Mongoid configuration is automatically loaded
+for the current environment as stored in ``Rails.env`` when the application
+loads.
 
-If you are not building a Rack based application and want to override the
-environment programatically, you can pass a second parameter to ``load!``
-as follows:
-
-.. code-block:: ruby
-
-  Mongoid.load!("path/to/your/mongoid.yml", :production)
-
-Depending on your version of Rails, you may also need to configure the ORM
-to be Mongoid in application.rb like so:
+You may need to configure the ORM for your application to be Mongoid by
+adding the following to ``application.rb``:
 
 .. code-block:: ruby
 
@@ -70,12 +61,55 @@ to be Mongoid in application.rb like so:
     g.orm :mongoid
   end
 
-Anatomy of a Mongoid Config
-***************************
+If you are not using Ruby on Rails, Mongoid configuration must be loaded
+manually. This can be done via the ``Mongoid.load!`` method, which takes
+the configuration file path as its argument, as follows:
 
-Let's have a look at a full-blown ``mongoid.yml`` and explain the full power
-of what Mongoid can do. The following configuration has explanation of the
-various options in the comments above each key:
+.. code-block:: ruby
+
+  # Use automatically detected environment name
+  Mongoid.load!("path/to/your/mongoid.yml")
+  
+  # Specify environment name manually
+  Mongoid.load!("path/to/your/mongoid.yml", :production)
+
+When Mongoid is asked to automatically detect the environment name,
+it does so by examining the following sources, in order:
+
+- If ``Rails`` top level constant is defined, ``Rails.env``.
+- If ``Sinatra`` top level constant is defined, ``Sinatra::Base.environment``.
+- The ``RACK_ENV`` environment variable.
+- The ``MONGOID_ENV`` environment variable.
+
+It is also possible to configure Mongoid directly in Ruby, without using
+a configuration file. This configuration style does not support the concept
+of environments - whatever configuration is provided, it is applied to the
+current environment - but it does support defining multiple clients.
+
+.. code-block:: ruby
+
+  Mongoid.configure do |config|
+    config.clients.default = {
+      hosts: ['localhost:27017'],
+      database: 'my_db',
+    }
+    
+    config.log_level = :warn
+  end
+
+.. note::
+
+  Mongoid must be configured *before* any component of it is used or referenced.
+  Once a component is used or referenced, changing configuration may not apply
+  changes to already instantiated components.
+
+.. _configuration-options:
+
+Mongoid Configuration
+*********************
+
+The following annotated example ``mongoid.yml`` demonstrates how Mongoid
+can be configured.
 
 .. code-block:: yaml
 
@@ -224,24 +258,6 @@ various options in the comments above each key:
 
 The Ruby driver options may be found in 
 `the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
-
-Inline Configuration
-********************
-
-It is also possible to configure Mongoid directly in Ruby, without using
-a configuration file. This configuration mechanism does not support defining
-multiple environments, however it does support defining multiple clients.
-
-.. code-block:: ruby
-
-  Mongoid.configure do |config|
-    config.clients.default = {
-      hosts: ['localhost:27017'],
-      database: 'my_db',
-    }
-    
-    config.log_level = :warn
-  end
 
 Logging
 *******
