@@ -257,7 +257,8 @@ can be configured.
       # (default: false)
       use_utc: false
 
-      # Set the Mongoid and Ruby driver log levels. (default: :info)
+      # Set the Mongoid and Ruby driver log levels when Mongoid is not using
+      # Ruby on Rails logger instance. (default: :info)
       log_level: :info
       
       # Whether to join nested persistence contexts for atomic operations
@@ -270,35 +271,150 @@ The Ruby driver options may be found in
 Logging
 *******
 
-Mongoid and the MongoDB Ruby driver have separate loggers and log levels.
+When configuring logging, it is important to keep in mind that Mongoid
+provides a model layer on top of the MongoDB Ruby driver, and the driver
+dispatches the CRUD operations to the MongoDB deployment. Therefore, some
+of the logging output in an application using Mongoid comes from Mongoid
+itself, and some comes from the driver.
 
-If Mongoid is loaded in the context of a Rails application, it will
-use Rails' configured logger by default. Otherwise Mongoid will configure
-itself to log to ``STDERR`` with the default log level of ``INFO``.
-
-The Ruby driver's default log level is ``DEBUG``, and changing Mongoid's
-log level does not affect the Ruby driver's log level.
-However, if Mongoid is configured with a configuration file, the
-log level specified in the configuration file will be applied to both
-the Mongoid and the Ruby driver loggers.
-
-To change the log levels:
-
-.. code-block:: ruby
-
-  # Mongoid
-  Mongoid.logger.level = Logger::DEBUG
-  # Ruby driver
-  Mongo::Logger.logger.level = Logger::INFO
-
-*Note:* The Mongo client is a Ruby driver client instance, therefore
+The Mongo client is a Ruby driver client instance, therefore
 the logger of a Mongo client is the Ruby driver logger, not the Mongoid
 logger. In other words:
 
 .. code-block:: ruby
 
   # Ruby driver logger, not Mongoid logger
-  Mongoid.client(:default).logger == Mongo::Logger.logger
+  Mongoid.client(:default).logger
+
+Depending on whether Mongoid is used in a Ruby on Rails application, and how
+both Mongoid and Ruby driver are configured, they may use the same logger
+instance or different instances, potentially with different configurations.
+
+In Ruby on Rails Application
+''''''''''''''''''''''''''''
+
+When used in a Ruby on Rails application, Mongoid by default inherits
+the logger and the log level from Rails, and sets the driver's logger
+to the same logger instance:
+
+.. code-block:: ruby
+
+  Rails.logger === Mongoid.logger
+  # => true
+  
+  Mongoid.logger === Mongo::Logger.logger
+  # => true
+
+To change the log level, use `standard Rails configuration
+<https://guides.rubyonrails.org/debugging_rails_applications.html#log-levels>`_.
+Place the following in one of environment configuration files, such as
+``config/environments/production.rb``:
+
+.. code-block:: ruby
+
+  Rails.application.configure do
+    config.log_level = :debug
+  end
+
+.. note::
+
+  The ``log_level`` Mongoid `configuration option <configuration-options>`_
+  is not used when Mongoid operates in a Rails application, because Mongoid
+  inherits Rails' log level in this case.
+
+To configure either Mongoid or driver logger differently from the Rails logger,
+use an initializer as follows:
+
+.. code-block:: ruby
+
+  Rails.application.configure do
+    config.after_initialize do
+      # Change Mongoid log destination and/or level
+      Mongoid.logger = Logger.new(STDERR).tap do |logger|
+        logger.level = Logger::DEBUG
+      end
+      
+      # Change driver log destination and/or level
+      Mongo::Logger.logger = Logger.new(STDERR).tap do |logger|
+        logger.level = Logger::DEBUG
+      end
+    end
+  end
+
+.. note::
+
+  There is currently no provision in the Ruby standard library ``Logger``
+  to return the log device (i.e. the ``IO`` object) that a logger is using.
+  To have, for example, Mongoid and/or the Ruby driver log to the
+  standard Rails log file (e.g. ``log/development.log``) but with a
+  different level from standard Rails logger (``Rails.logger``), the
+  file must be opened separately and the resulting ``IO`` object passed to
+  the ``Logger`` constructor.
+
+.. note::
+
+  Since by default Mongoid sets its own logger and the driver's logger to the
+  same instance as the Rails logger, modifying any of the instances affects
+  all of them. For example the following changes log level for all three
+  loggers, unless the application assigned a separate ``Logger`` instance
+  to `Mongo::Logger.logger`` as described above:
+
+  .. code-block:: ruby
+
+    Mongoid::Logger.logger.level = Logger::DEBUG
+
+Standalone
+''''''''''
+
+When not loaded in a Ruby on Rails application, Mongoid respects the
+``log_level`` top level `configuration option <configuration-options>`_.
+It can be given in the configuration file as follows:
+
+.. code-block:: yaml
+
+  development:
+    clients:
+      default:
+        # ...
+    options:
+      log_level: :debug
+
+... or when configuring Mongoid inline:
+
+.. code-block:: ruby
+
+  Mongoid.configure do |config|
+    config.log_level = :debug
+  end
+
+The default log destination in Mongoid 7.1 and higher is standard error.
+The default log destination in Mongoid 7.0 and lower is standard output.
+To change the log destination, create a new logger instance as follows:
+
+.. code-block:: ruby
+
+  Mongoid.logger = Logger.new(STDERR).tap do |logger|
+    logger.level = Logger::DEBUG
+  end
+
+To change the Ruby driver log level or destination:
+
+.. code-block:: ruby
+
+  Mongo::Logger.logger = Logger.new(STDERR).tap do |logger|
+    logger.level = Logger::DEBUG
+  end
+
+To set the driver logger to be the same as the Mongoid logger:
+
+.. code-block:: ruby
+
+  Mongo::Logger.logger = Mongoid.logger
+
+.. note::
+
+  Mongoid does not alter the driver's logger when running in
+  standalone mode.
 
 .. _time-zones:
 
