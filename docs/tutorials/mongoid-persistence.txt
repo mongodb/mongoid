@@ -1,6 +1,6 @@
-===================
-Persistence Methods
-===================
+===========
+Persistence
+===========
 
 .. default-domain:: mongodb
 

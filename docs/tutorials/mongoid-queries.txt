@@ -7,7 +7,7 @@ Queries
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 One of MongoDB's greatest features is its ability to execute dynamic
