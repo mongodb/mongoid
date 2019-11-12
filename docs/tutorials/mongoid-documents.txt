@@ -9,7 +9,7 @@ Documents
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Documents are the core objects in Mongoid and any object that is to be persisted to the
