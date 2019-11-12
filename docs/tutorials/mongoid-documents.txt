@@ -410,6 +410,67 @@ If a time zone is specfied, it is respected:
     ticket.opened_at
     # => Sun, 04 Mar 2018 09:00:00 +0000
 
+Regular Expression Fields
+*************************
+
+MongoDB supports storing regular expressions in documents, and querying using
+regular expressions. Of note for Ruby applications, MongoDB uses
+`Perl-compatible regular expressions (PCRE) <http://pcre.org/>`_
+and Ruby uses `Onigmo <https://github.com/k-takata/Onigmo>`_, which is a
+fork of `Oniguruma regular expression engine <https://github.com/kkos/oniguruma>`_.
+The two regular expression implementations generally provide equivalent
+functionality but have some important syntax differences.
+
+When a field is declared to be of type Regexp, Mongoid converts Ruby regular
+expressions to BSON regular expressions and stores the result in MongoDB.
+Retrieving the field from the database produces a ``BSON::Regexp::Raw``
+instance:
+
+.. code-block:: ruby
+
+  class Token
+    include Mongoid::Document
+    
+    field :pattern, type: Regexp
+  end
+  
+  token = Token.create!(pattern: /hello.world/m)
+  token.pattern
+  # => /hello.world/m
+  
+  token.reload
+  token.pattern
+  # => #<BSON::Regexp::Raw:0x0000555f505e4a20 @pattern="hello.world", @options="ms">
+
+Use ``#compile`` method on ``BSON::Regexp::Raw`` to get back the Ruby regular
+expression:
+
+.. code-block:: ruby
+
+  token.pattern.compile
+  # => /hello.world/m
+
+Note that, if the regular expression was not originally a Ruby one, calling
+``#compile`` on it may produce a different regular expression. For example,
+the following is a PCRE matching a string that ends in "hello":
+
+.. code-block:: ruby
+
+  BSON::Regexp::Raw.new('hello$', 's')   
+  # => #<BSON::Regexp::Raw:0x0000555f51441640 @pattern="hello$", @options="s">
+
+Compiling this regular expression produces a Ruby regular expression that
+matches strings containing "hello" before a newline, besides strings ending in
+"hello":
+
+.. code-block:: ruby
+
+  BSON::Regexp::Raw.new('hello$', 's').compile =~ "hello\nworld"
+  # => 0
+
+This is because the meaning of ``$`` is different between PCRE and Ruby
+regular expressions.
+
 Defaults
 ********
 
