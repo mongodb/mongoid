@@ -437,6 +437,46 @@ associations.
   end
 
 
+Regular Expressions
+*******************
+
+MongoDB, and Mongoid, allow querying documents by regular expressions.
+
+Given the following model definitions:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :description, type: String
+  end
+  
+  Band.create!(name: 'Sun Project', description: "Sun\nProject")
+
+... we can query using simple Ruby regular expressions in a natural way:
+
+.. code-block:: ruby
+
+  Band.where(name: /project/i).first
+  # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
+
+It is also possible to query using PCRE syntax by constructing
+``BSON::Regexp::Raw`` objects explicitly:
+
+.. code-block:: ruby
+
+  Band.where(description: /^Project/).first
+  # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
+  
+  Band.where(description: BSON::Regexp::Raw.new('^Project')).first
+  # => nil
+  
+  Band.where(description: BSON::Regexp::Raw.new('^Project', 'm')).first
+  # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
+
+
 Queries + Persistence
 ---------------------
 
