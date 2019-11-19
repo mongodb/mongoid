@@ -228,25 +228,31 @@ module Mongoid
       #
       # @since 5.0.0
       def each
-        return super if system_collection? || !QueryCache.enabled?
+        return super unless should_cache?
 
-        cursor = fetch_cached_cursor do
+        @cursor = nil
+        @cursor = fetch_cached_cursor do
           session = client.send(:get_session, @options)
+          # Expanded implementation of #read_with_retry_cursor
           read_with_retry(session, server_selector) do |server|
-            CachedCursor.new(view, send_initial_query(server, session), server, session: session)
+            result = send_initial_query(server, session)
+            CachedCursor.new(view, result, server, session: session)
           end
         end
-        cursor.each do |doc|
-          yield doc
-        end if block_given?
-        cursor
+        if block_given?
+          @cursor.each do |doc|
+            yield doc
+          end
+        else
+          @cursor.to_enum
+        end
       end
 
       private
 
       # Returns a currently cached iterable cursor or yields and caches result
-      def fetch_cached_cursor(&_block)
-        iterable_cached_cursor || cache_cursor(yield)
+      def fetch_cached_cursor(&block)
+        iterable_cached_cursor || cache_cursor(&block)
       end
 
       # Returns iterable cursor or nil
@@ -270,8 +276,13 @@ module Mongoid
         [ collection.namespace, selector, limit, skip, sort, projection, collation ]
       end
 
-      def cache_cursor(cursor)
-        QueryCache.cache_table[cache_key(limit: limit)] = cursor
+      # Caches the result of block
+      def cache_cursor(&block)
+        QueryCache.cache_table[cache_key(limit: limit)] = yield
+      end
+
+      def should_cache?
+        QueryCache.enabled? && !system_collection?
       end
 
       def system_collection?
