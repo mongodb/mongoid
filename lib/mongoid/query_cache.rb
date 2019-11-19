@@ -160,17 +160,20 @@ module Mongoid
         "#<Mongoid::QueryCache::CachedCursor:0x#{object_id} @view=#{@view.inspect}>"
       end
 
+      # The cache can be iterated again, if get more was never called
+      def iterable_again?
+        !@get_more_called
+      end
+
       private
 
       def process(result)
-        @remaining -= result.returned_count if limited?
-        @cursor_id = result.cursor_id
-        @coll_name ||= result.namespace.sub("#{database.name}.", '') if result.namespace
-        documents = result.documents
-        if @cursor_id.zero? && !@after_first_batch
-          (@cached_documents ||= []).concat(documents)
+        documents = super
+
+        if @cursor_id.zero?
+          @cached_documents = documents
         end
-        @after_first_batch = true
+
         documents
       end
     end
@@ -225,38 +228,50 @@ module Mongoid
       #
       # @since 5.0.0
       def each
-        if system_collection? || !QueryCache.enabled?
-          super
-        else
-          unless cursor = cached_cursor
-            read_with_retry do
-              server = server_selector.select_server(cluster)
-              cursor = CachedCursor.new(view, send_initial_query(server), server)
-              QueryCache.cache_table[cache_key] = cursor
-            end
+        return super if system_collection? || !QueryCache.enabled?
+
+        cursor = fetch_cached_cursor do
+          read_with_retry do
+            server = server_selector.select_server(cluster)
+            CachedCursor.new(view, send_initial_query(server), server)
           end
-          cursor.each do |doc|
-            yield doc
-          end if block_given?
-          cursor
         end
+        cursor.each do |doc|
+          yield doc
+        end if block_given?
+        cursor
       end
 
       private
 
-      def cached_cursor
-        if limit
-          key = [ collection.namespace, selector, nil, skip, sort, projection, collation  ]
-          cursor = QueryCache.cache_table[key]
-          if cursor
-            cursor.to_a[0...limit.abs]
-          end
-        end
-        cursor || QueryCache.cache_table[cache_key]
+      # Returns a currently cached iterable cursor or yields and caches result
+      def fetch_cached_cursor(&_block)
+        iterable_cached_cursor || cache_cursor(yield)
       end
 
-      def cache_key
+      # Returns iterable cursor or nil
+      # Tries to fetch a cursor without limit first, if a limit is currently set
+      def iterable_cached_cursor
+        if limit
+          iterable_cached_cursor_for_limit(nil) ||
+            iterable_cached_cursor_for_limit(limit)
+        else
+          iterable_cached_cursor_for_limit(limit)
+        end
+      end
+
+      # Returns iterable cursor or nil for given limit
+      def iterable_cached_cursor_for_limit(limit)
+        cursor = QueryCache.cache_table[cache_key(limit: limit)]
+        cursor&.iterable_again? ? cursor : nil
+      end
+
+      def cache_key(limit:)
         [ collection.namespace, selector, limit, skip, sort, projection, collation ]
+      end
+
+      def cache_cursor(cursor)
+        QueryCache.cache_table[cache_key(limit: limit)] = cursor
       end
 
       def system_collection?
