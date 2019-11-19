@@ -231,9 +231,9 @@ module Mongoid
         return super if system_collection? || !QueryCache.enabled?
 
         cursor = fetch_cached_cursor do
-          read_with_retry do
-            server = server_selector.select_server(cluster)
-            CachedCursor.new(view, send_initial_query(server), server)
+          session = client.send(:get_session, @options)
+          read_with_retry(session, server_selector) do |server|
+            CachedCursor.new(view, send_initial_query(server, session), server, session: session)
           end
         end
         cursor.each do |doc|
