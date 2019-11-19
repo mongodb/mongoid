@@ -170,7 +170,7 @@ module Mongoid
       def process(result)
         documents = super
 
-        if @cursor_id.zero?
+        if @cursor_id.zero? && !@get_more_called
           @cached_documents = documents
         end
 
