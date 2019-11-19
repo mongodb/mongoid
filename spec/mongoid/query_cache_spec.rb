@@ -504,6 +504,11 @@ describe Mongoid::QueryCache do
       it 'does not cache the result' do
         expect(Band.batch_size(batch_size).all.map(&:id).size).to eq(10)
       end
+
+      it 'works with repeated accesses' do
+        expect(Band.batch_size(batch_size).pluck(:name).length).to eq(10)
+        expect(Band.batch_size(batch_size).pluck(:name).length).to eq(10)
+      end
     end
   end
 end
