@@ -550,8 +550,15 @@ describe Mongoid::Criteria::Queryable::Selectable do
         expect(selection).to eq(query)
       end
 
-      it "returns a non cloned query" do
-        expect(selection).to equal(query)
+      it "returns a cloned query" do
+        expect(selection).not_to equal(query)
+      end
+
+      it 'does not mutate receiver' do
+        expect(query.negating).to be nil
+
+        selection
+        expect(query.negating).to be nil
       end
 
       context "when the following criteria is a query method" do
