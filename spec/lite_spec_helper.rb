@@ -4,7 +4,6 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 
 require "mongoid"
-require "rspec"
 
 # MRI 2.5 and JRuby 9.2 change visibility of Object#pp when 'pp' is required,
 # which happens when RSpec reports anything. This creates an issue for tests
