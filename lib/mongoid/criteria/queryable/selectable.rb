@@ -434,7 +434,7 @@ module Mongoid
         # @since 1.0.0
         def not(*criterion)
           if criterion.empty?
-            tap { |query| query.negating = true }
+            dup.tap { |query| query.negating = true }
           else
             __override__(criterion.first, "$not")
           end
