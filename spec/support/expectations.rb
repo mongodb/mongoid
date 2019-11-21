@@ -14,12 +14,14 @@ module Mongoid
     end
 
     def expect_query(number)
-      if number > 0
-        expect_any_instance_of(connection_class).to receive(:command_started).exactly(number).times.and_call_original
-      else
-        expect_any_instance_of(connection_class).not_to receive(:command_started)
+      RSpec::Mocks.with_temporary_scope do
+        if number > 0
+          expect_any_instance_of(connection_class).to receive(:command_started).exactly(number).times.and_call_original
+        else
+          expect_any_instance_of(connection_class).not_to receive(:command_started)
+        end
+        yield
       end
-      yield
     end
 
     def expect_no_queries(&block)
