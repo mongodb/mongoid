@@ -366,7 +366,7 @@ describe Mongoid::Extensions::Hash do
     end
   end
 
-  describe "#blank_criteria?" do
+  shared_examples_for 'unsatisfiable criteria method' do
 
     context "when the hash has only an empty _id criteria" do
 
@@ -375,7 +375,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is true" do
-        expect(hash).to be_blank_criteria
+        expect(hash.send(meth)).to be true
       end
     end
 
@@ -386,7 +386,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash).not_to be_blank_criteria
+        expect(hash.send(meth)).to be false
       end
     end
 
@@ -397,7 +397,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is true" do
-        expect(hash).to be_blank_criteria
+        expect(hash.send(meth)).to be true
       end
     end
 
@@ -408,7 +408,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash).not_to be_blank_criteria
+        expect(hash.send(meth)).to be false
       end
     end
 
@@ -419,7 +419,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is true" do
-        expect(hash).to be_blank_criteria
+        expect(hash.send(meth)).to be true
       end
     end
 
@@ -430,7 +430,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash).not_to be_blank_criteria
+        expect(hash.send(meth)).to be false
       end
     end
 
@@ -441,7 +441,7 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash).not_to be_blank_criteria
+        expect(hash.send(meth)).to be false
       end
     end
 
@@ -452,8 +452,20 @@ describe Mongoid::Extensions::Hash do
       end
 
       it "is false" do
-        expect(hash).not_to be_blank_criteria
+        expect(hash.send(meth)).to be false
       end
     end
+  end
+
+  describe "#blank_criteria?" do
+    let(:meth) { :blank_criteria? }
+
+    it_behaves_like 'unsatisfiable criteria method'
+  end
+
+  describe "#_mongoid_unsatisfiable_criteria?" do
+    let(:meth) { :_mongoid_unsatisfiable_criteria? }
+
+    it_behaves_like 'unsatisfiable criteria method'
   end
 end
