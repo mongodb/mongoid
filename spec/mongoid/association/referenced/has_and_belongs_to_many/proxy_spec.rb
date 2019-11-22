@@ -2918,20 +2918,36 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
   describe "#scoped" do
 
-    let(:person) do
-      Person.new
-    end
-
     let(:scoped) do
       person.preferences.scoped
     end
 
-    it "returns the relation criteria" do
-      expect(scoped).to be_a(Mongoid::Criteria)
+    context 'when association is empty' do
+
+      let(:person) do
+        Person.new
+      end
+
+      it "returns the relation criteria" do
+        expect(scoped).to be_a(Mongoid::Criteria)
+      end
+
+      it "returns with an empty selector" do
+        expect(scoped.selector).to eq("_id" => { "$in" => [] })
+      end
     end
 
-    it "returns with an empty selector" do
-      expect(scoped.selector).to eq({ "$and" => [{ "_id" => { "$in" => [] }}]})
+    context 'when association is not empty' do
+
+      let(:person) do
+        Person.create!(preferences: [
+          Preference.new(id: 123),
+        ])
+      end
+
+      it "returns with a selector including association element ids" do
+        expect(scoped.selector).to eq("_id" => { "$in" => [123] })
+      end
     end
   end
 

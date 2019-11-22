@@ -198,6 +198,195 @@ loaded with ``only`` for those associations to be loaded. For example:
   # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
 
 
+Logical Operations
+******************
+
+Mongoid supports ``and``, ``or``, ``nor`` and ``not`` logical operations on
+``Criteria`` objects. These methods take one or more hash of conditions
+or another ``Criteria`` object as their arguments, with ``not`` additionally
+having an argument-free version.
+
+.. code-block:: ruby
+
+  # and with conditions
+  Band.where(label: 'Trust in Trance').and(name: 'Astral Projection')
+  
+  # or with scope
+  Band.where(label: 'Trust in Trance').or(Band.where(name: 'Astral Projection'))
+  
+  # not with conditions
+  Band.not(label: 'Trust in Trance', name: 'Astral Projection')
+  
+  # argument-less not
+  Band.not.where(label: 'Trust in Trance', name: 'Astral Projection')
+
+For backwards compatibility with earlier Mongoid versions, all of the logical
+operation methods also accept arrays of parameters, which will be flattened
+to obtain the criteria. Passing arrays to logical operations is deprecated and
+may be removed in a future version of Mongoid.
+
+The following calls all produce the same query conditions:
+
+.. code-block:: ruby
+
+  # Condition hashes passed to separate and invocations
+  Band.and(name: 'SUN Project').and(member_count: 2)
+  
+  # Multiple condition hashes in the same and invocation
+  Band.and({name: 'SUN Project'}, {member_count: 2})
+  
+  # Multiple condition hashes in an array - deprecated
+  Band.and([{name: 'SUN Project'}, {member_count: 2}])
+
+  # Condition hash in where and a scope
+  Band.where(name: 'SUN Project').and(Band.where(member_count: 2))
+  
+  # Condition hash in and and a scope
+  Band.and({name: 'SUN Project'}, Band.where(member_count: 2))
+  
+  # Scope as an array element, nested arrays - deprecated
+  Band.and([Band.where(name: 'SUN Project'), [{member_count: 2}]])
+  
+  # All produce:
+  # => #<Mongoid::Criteria
+  #   selector: {"name"=>"SUN Project", "member_count"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+
+Operator Combinations
+`````````````````````
+
+As of Mongoid 7.1, logical operators have been changed to have the
+the same semantics as `those of ActiveRecord
+<https://guides.rubyonrails.org/active_record_querying.html>`_.
+
+When conditions are specified on the same field multiple times, all
+conditions are added to the criteria:
+
+.. code-block:: ruby
+
+  Band.where(name: 1).where(name: 2).selector
+  # => {"$and"=>[{"name"=>"1"}], "name"=>"2"}
+
+  Band.where(name: 1).or(name: 2).selector
+  # => {"$or"=>[{"name"=>"1"}, {"name"=>"2"}]}
+
+``nor`` and ``not`` behave similarly, with ``not`` producing different query
+shapes as described later.
+
+When a logical operator is used, it operates on the criteria built up to
+that point and its argument. ``where`` has the same meaning as ``and``:
+
+.. code-block:: ruby
+
+  # or joins the two conditions
+  Band.where(name: 'Sun').or(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}]}
+  
+  # or applies only to the first condition, the second condition is added
+  # to the top level as $and
+  Band.or(name: 'Sun').where(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}], "label"=>"Trust"}
+  
+  # Same as previous example - where and and are aliases
+  Band.or(name: 'Sun').and(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}], "label"=>"Trust"}
+  
+  # Same operator can be stacked any number of times
+  Band.or(name: 'Sun').or(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}]}
+  
+  # The label: Foo condition is added to the top level as $and
+  Band.where(name: 'Sun').or(label: 'Trust').where(label: 'Foo').selector
+  # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}], "label"=>"Foo"}
+
+
+``and`` Behavior
+````````````````
+
+The ``and`` method will add new simple conditions to the top level of the
+criteria, unless the receiving criteria already has a condition on the
+respective fields, in which case the conditions will be combined with ``$and``.
+
+.. code-block:: ruby
+
+  Band.where(label: 'Trust in Trance').and(name: 'Astral Projection').selector
+  # => {"label"=>"Trust in Trance Records", "name"=>"Astral Projection"}
+
+  Band.where(name: /Best/).and(name: 'Astral Projection').selector
+  # => {"name"=>/Best/, "$and"=>[{"name"=>"Astral Projection"}]}
+
+As of Mongoid 7.1, specifying multiple criteria on the same field with ``and``
+combines all criteria so specified, whereas in previous versions of Mongoid
+conditions on a field sometimes replaced previously specified conditions on
+the same field, depending on which form of ``and`` was used.
+
+
+``or``/``nor`` Behavior
+```````````````````````
+
+``or`` and ``nor`` always combine conditions with ``$or`` and ``$nor``
+MongoDB operators, respectively. If the only condition on the receiving
+criteria is another ``or``/``nor``, new conditions are added to the
+existing list, otherwise a new top-level ``$or``/``$nor`` operator is created.
+
+.. code-block:: ruby
+
+  Band.where(name: /Best/).or(name: 'Astral Projection').
+    or(Band.where(label: /Records/)).selector
+  # => {"$or"=>[{"name"=>/Best/}, {"name"=>"Astral Projection"}, {"label"=>/Records/}]}
+
+  Band.where(name: /Best/).and(name: 'Astral Projection').
+    or(Band.where(label: /Records/)).and(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>/Best/, "$and"=>[{"name"=>"Astral Projection"}]}, {"label"=>/Records/}], "label"=>"Trust"}
+
+
+``not`` Behavior
+````````````````
+
+``not`` method can be called without arguments, in which case it will negate
+the next condition that is specified. ``not`` can also be called with one
+or more hash conditions or ``Criteria`` objects, which will all be negated and
+added to the criteria.
+
+.. code-block:: ruby
+
+  # not negates subsequent where
+  Band.not.where(name: 'Best').selector
+  # => {"name"=>{"$ne"=>"Best"}}
+
+  # The second where is added as $and
+  Band.not.where(name: 'Best').where(label: /Records/).selector
+  # => {"name"=>{"$ne"=>"Best"}, "label"=>/Records/}
+
+  # not negates its argument
+  Band.not(name: 'Best').selector
+  # => {"name"=>{"$not"=>"Best"}}
+
+
+Similarly to ``and``, ``not`` will negate individual conditions for simple
+field criteria. For complex conditions and when a field already has a condition
+defined on it, since MongoDB server only supports the ``$not`` operator on
+a per-field basis rather than globally, Mongoid emulates ``$not`` by using
+an ``{'$and' => [{'$nor' => ...}]}`` construct:
+
+.. code-block:: ruby
+
+  # Simple condition
+  Band.not(name: /Best/).selector
+  # => {"name"=>{"$not"=>/Best/}}
+
+  # Complex conditions
+  Band.where(name: /Best/).not(name: 'Astral Projection').selector
+  # => {"name"=>/Best/, "$and"=>[{"$nor"=>[{"name"=>"Astral Projection"}]}]}
+
+If using ``not`` with arrays or regular expressions, please note the
+caveats/limitations of ``$not`` `stated in the MongoDB server documentation
+<https://docs.mongodb.com/manual/reference/operator/query/not/>`_.
+
+
 Query Cache
 ***********
 
