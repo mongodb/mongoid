@@ -67,8 +67,9 @@ module Mongoid
       def blank_criteria?
         unsatisfiable_criteria = { "_id" => { "$in" => [] }}
         self == unsatisfiable_criteria ||
-          self == {'$and' => [unsatisfiable_criteria]} ||
-          self == {'$or' => [unsatisfiable_criteria]}
+          length == 1 &&
+          %w($and $or).include?(keys.first) &&
+          values.first.blank_criteria?
       end
 
       # Deletes an id value from the hash.

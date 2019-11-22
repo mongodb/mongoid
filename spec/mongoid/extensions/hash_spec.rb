@@ -418,6 +418,17 @@ describe Mongoid::Extensions::Hash do
         {'$and' => [{ "_id" => { "$in" => [] }}, {'foo' => 'bar'}]}
       end
 
+      it "is true" do
+        expect(hash).to be_blank_criteria
+      end
+    end
+
+    context "when the hash has an empty _id criteria via $and and another criteria in $and value" do
+
+      let(:hash) do
+        {'$and' => [{ "_id" => { "$in" => [] }, 'foo' => 'bar'}]}
+      end
+
       it "is false" do
         expect(hash).not_to be_blank_criteria
       end
