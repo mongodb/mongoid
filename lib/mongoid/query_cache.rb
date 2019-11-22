@@ -160,9 +160,9 @@ module Mongoid
         "#<Mongoid::QueryCache::CachedCursor:0x#{object_id} @view=#{@view.inspect}>"
       end
 
-      # The cache can be iterated again, if get more was never called
+      # The cache can be iterated again, if the result was completed in one batch
       def iterable_again?
-        !@get_more_called
+        @batch_count.to_i <= 1
       end
 
       private
@@ -170,7 +170,8 @@ module Mongoid
       def process(result)
         documents = super
 
-        if @cursor_id.zero? && !@get_more_called
+        @batch_count = @batch_count.to_i + 1
+        if @cursor_id.zero? && @batch_count == 1
           @cached_documents = documents
         end
 
