@@ -398,8 +398,8 @@ describe Mongoid::Extensions::Array do
           [{ "_id" => { "$in" => [] }}]
         end
 
-        it "returns true" do
-          expect(array).to be_blank_criteria
+        it "is false" do
+          expect(array.blank_criteria?).to be false
         end
       end
 
@@ -409,8 +409,8 @@ describe Mongoid::Extensions::Array do
           [{ "_id" => "test" }, { "_id" => { "$in" => [] }}]
         end
 
-        it "returns true" do
-          expect(array).to be_blank_criteria
+        it "is false" do
+          expect(array.blank_criteria?).to be false
         end
       end
     end
