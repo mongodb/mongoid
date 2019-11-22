@@ -523,7 +523,7 @@ module Mongoid
             end
 
             def unloaded_documents
-              if _unloaded.selector.blank_criteria?
+              if _unloaded.selector._mongoid_unsatisfiable_criteria?
                 []
               else
                 _unloaded
