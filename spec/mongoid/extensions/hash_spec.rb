@@ -440,8 +440,8 @@ describe Mongoid::Extensions::Hash do
         {'$or' => [{ "_id" => { "$in" => [] }}]}
       end
 
-      it "is true" do
-        expect(hash).to be_blank_criteria
+      it "is false" do
+        expect(hash).not_to be_blank_criteria
       end
     end
 

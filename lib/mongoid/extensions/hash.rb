@@ -68,7 +68,7 @@ module Mongoid
         unsatisfiable_criteria = { "_id" => { "$in" => [] }}
         self == unsatisfiable_criteria ||
           length == 1 &&
-          %w($and $or).include?(keys.first) &&
+          keys == %w($and) &&
           values.first.blank_criteria?
       end
 
