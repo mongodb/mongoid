@@ -96,7 +96,7 @@ module Mongoid
         # @since 1.0.0
         def evolve_multi(specs)
           unless specs.is_a?(Array)
-            raise "specs is not an array: #{specs.inspect}"
+            raise ArgumentError, "specs is not an array: #{specs.inspect}"
           end
           specs.map do |spec|
             Hash[spec.map do |key, value|
