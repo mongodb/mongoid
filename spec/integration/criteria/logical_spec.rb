@@ -73,7 +73,7 @@ describe 'Criteria logical operations' do
         {'name' => {'$not' => /test/}}
       end
 
-      it 'expands to use $ne' do
+      it 'expands to use $not' do
         expect(actual).to eq(expected)
       end
     end
