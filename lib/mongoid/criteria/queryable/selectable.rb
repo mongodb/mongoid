@@ -54,14 +54,28 @@ module Mongoid
         # @example Add the criterion.
         #   selectable.and({ field: value }, { other: value })
         #
-        # @param [ Array<Hash> ] criterion Multiple key/value pair matches that
-        #   all must match to return results.
+        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        #   matches or Criteria objects that all must match to return results.
         #
-        # @return [ Selectable ] The cloned selectable.
+        # @return [ Selectable ] The new selectable.
         #
         # @since 1.0.0
-        def and(*criterion)
-          __multi__(criterion, "$and")
+        def and(*criteria)
+          _mongoid_flatten_arrays(criteria).inject(self.clone) do |c, new_s|
+            if new_s.is_a?(Selectable)
+              new_s = new_s.selector
+            end
+            normalized = _mongoid_normalize_expr(new_s)
+            normalized.each do |k, v|
+              k = k.to_s
+              if c.selector[k] || k[0] == ?$
+                c = c.send(:__multi__, [{k => v}], '$and')
+              else
+                c.selector.store(k, v)
+              end
+            end
+            c
+          end
         end
         alias :all_of :and
 
@@ -397,13 +411,14 @@ module Mongoid
         # @example Add the $nor selection.
         #   selectable.nor(field: 1, field: 2)
         #
-        # @param [ Array ] criterion An array of hash criterion.
+        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        #   matches or Criteria objects.
         #
-        # @return [ Selectable ] The cloned selectable.
+        # @return [ Selectable ] The new selectable.
         #
         # @since 1.0.0
-        def nor(*criterion)
-          __multi__(criterion, "$nor")
+        def nor(*criteria)
+          _mongoid_add_top_level_operation('$nor', criteria)
         end
 
         # Is the current selectable negating the next selection?
@@ -418,9 +433,9 @@ module Mongoid
           !!negating
         end
 
-        # Negate the next selection.
+        # Negate the arguments, or the next selection if no arguments are given.
         #
-        # @example Negate the selection.
+        # @example Negate the next selection.
         #   selectable.not.in(field: [ 1, 2 ])
         #
         # @example Add the $not criterion.
@@ -429,16 +444,30 @@ module Mongoid
         # @example Execute a $not in a where query.
         #   selectable.where(:field.not => /Bob/)
         #
-        # @param [ Hash ] criterion The field/value pairs to negate.
+        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        #   matches or Criteria objects to negate.
         #
-        # @return [ Selectable ] The negated selectable.
+        # @return [ Selectable ] The new selectable.
         #
         # @since 1.0.0
-        def not(*criterion)
-          if criterion.empty?
+        def not(*criteria)
+          if criteria.empty?
             dup.tap { |query| query.negating = true }
           else
-            __override__(criterion.first, "$not")
+            criteria.compact.inject(self.clone) do |c, new_s|
+              if new_s.is_a?(Selectable)
+                new_s = new_s.selector
+              end
+              new_s.each do |k, v|
+                k = k.to_s
+                if c.selector[k] || k[0] == ?$
+                  c = c.send(:__multi__, [{'$nor' => [{k => v}]}], '$and')
+                else
+                  c = c.send(:__override__, {k => v}, "$not")
+                end
+              end
+              c
+            end
           end
         end
         key :not, :override, "$not"
@@ -448,13 +477,14 @@ module Mongoid
         # @example Add the $or selection.
         #   selectable.or(field: 1, field: 2)
         #
-        # @param [ Array ] criterion An array of hash criterion.
+        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        #   matches or Criteria objects.
         #
-        # @return [ Selectable ] The cloned selectable.
+        # @return [ Selectable ] The new selectable.
         #
         # @since 1.0.0
-        def or(*criterion)
-          __multi__(criterion, "$or")
+        def or(*criteria)
+          _mongoid_add_top_level_operation('$or', criteria)
         end
         alias :any_of :or
 

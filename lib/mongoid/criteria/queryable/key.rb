@@ -129,9 +129,27 @@ module Mongoid
         #
         # @since 1.0.0
         def __expr_part__(object, negating = false)
-          value = block ? block[object] : object
-          expression = { operator => expanded ? { expanded => value } : value }
-          { name.to_s => (negating && operator != "$not") ? { "$not" => expression } : expression }
+          { name.to_s => transform_value(object, negating) }
+        end
+
+        def transform_value(value, negating = false)
+          if block
+            expr = block[value]
+          else
+            expr = value
+          end
+
+          if expanded
+            expr = {expanded => expr}
+          end
+
+          expr = {operator => expr}
+
+          if negating && operator != '$not'
+            expr = {'$not' => expr}
+          end
+
+          expr
         end
 
         # Get the key as raw Mongo sorting options.
