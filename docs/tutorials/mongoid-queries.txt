@@ -363,8 +363,22 @@ added to the criteria.
 
   # not negates its argument
   Band.not(name: 'Best').selector
-  # => {"name"=>{"$not"=>"Best"}}
+  # => {"name"=>{"$ne"=>"Best"}}
 
+.. note::
+
+  ``$not`` in MongoDB server cannot be used with a string argument.
+  Mongoid uses ``$ne`` operator to achieve such a negation:
+
+  .. code-block:: ruby
+  
+    # String negation - uses $ne
+    Band.not.where(name: 'Best').selector
+    # => {"name"=>{"$ne"=>"Best"}}
+    
+    # Regexp negation - uses $not
+    Band.not.where(name: /Best/).selector
+    # => {"name"=>{"$not"=>/Best/}}
 
 Similarly to ``and``, ``not`` will negate individual conditions for simple
 field criteria. For complex conditions and when a field already has a condition

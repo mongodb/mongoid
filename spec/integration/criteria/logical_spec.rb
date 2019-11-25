@@ -48,4 +48,34 @@ describe 'Criteria logical operations' do
       expect(bands.order_by(name: 1).to_a).to eq([ap, im])
     end
   end
+
+  describe 'not' do
+    context 'hash argument with string value' do
+      let(:actual) do
+        Band.not(name: 'test').selector
+      end
+
+      let(:expected) do
+        {'name' => {'$ne' => 'test'}}
+      end
+
+      it 'expands to use $ne' do
+        expect(actual).to eq(expected)
+      end
+    end
+
+    context 'hash argument with regexp value' do
+      let(:actual) do
+        Band.not(name: /test/).selector
+      end
+
+      let(:expected) do
+        {'name' => {'$not' => /test/}}
+      end
+
+      it 'expands to use $ne' do
+        expect(actual).to eq(expected)
+      end
+    end
+  end
 end
