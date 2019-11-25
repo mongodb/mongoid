@@ -1014,7 +1014,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       let(:result) { query.not(other) }
 
       it 'combines' do
-        expect(result.selector).to eq('hello' => 'world', 'foo' => {'$not' => 'bar'})
+        expect(result.selector).to eq('hello' => 'world', 'foo' => {'$ne' => 'bar'})
       end
     end
 
@@ -1031,7 +1031,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       it 'combines fields into top level criteria' do
         expect(result.selector).to eq('hello' => 'world',
-          'a' => {'$not' => 1}, 'b' => {'$not' => 2})
+          'a' => {'$ne' => 1}, 'b' => {'$ne' => 2})
       end
     end
 
@@ -1073,9 +1073,9 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       it 'combines' do
         expect(result.selector).to eq('hello' => 'world',
-          'foo' => {'$not' => 'bar'},
-          'bar' => {'$not' => 42},
-          'a' => {'$not' => 2},
+          'foo' => {'$ne' => 'bar'},
+          'bar' => {'$ne' => 42},
+          'a' => {'$ne' => 2},
         )
       end
     end
