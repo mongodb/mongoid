@@ -51,7 +51,14 @@ Ruby MongoDB Driver Compatibility
 
 The following compatibility table specifies the versions of `Ruby driver for
 MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
-(the ``mongo`` gem) supported by Mongoid.
+(the ``mongo`` gem) supported by the most recent patch releases of the
+specified Mongoid versions.
+
+.. note::
+
+  Older versions of Mongoid within the same minor release may support older
+  driver versions. For example, Mongoid 7.0.5 supports driver versions 2.5 and
+  newer, whereas Mongoid 7.0.6 requires driver version 2.7 or newer.
 
 .. list-table::
    :header-rows: 1
@@ -59,12 +66,11 @@ MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Driver 2.11
      - Driver 2.10
      - Driver 2.9
      - Driver 2.8
      - Driver 2.7
-     - Driver 2.6
-     - Driver 2.5
 
    * - 7.0
      - |checkmark|
@@ -72,7 +78,6 @@ MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark| [#driver-2.5]_
 
    * - 6.4
      - |checkmark|
@@ -80,9 +85,6 @@ MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
      - |checkmark|
      - |checkmark|
      - |checkmark|
-     - |checkmark| [#driver-2.5]_
-
-.. [#driver-2.5] Driver version 2.5.1 or higher is required.
 
 Ruby Compatibility
 ------------------
