@@ -9,10 +9,40 @@ describe Mongoid::Criteria::Queryable::Selectable do
     Mongoid::Query.new("id" => "_id")
   end
 
-  shared_examples_for "a cloning selection" do
+  shared_examples_for "returns a cloned query" do
 
     it "returns a cloned query" do
       expect(selection).to_not equal(query)
+    end
+  end
+
+  shared_examples_for 'requires an argument' do
+    context "when provided no argument" do
+
+      let(:selection) do
+        query.send(query_method)
+      end
+
+      it "raises ArgumentError" do
+        expect do
+          selection.selector
+        end.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  shared_examples_for 'requires a non-nil argument' do
+    context "when provided nil" do
+
+      let(:selection) do
+        query.send(query_method, nil)
+      end
+
+      it "raises CriteriaArgumentRequired" do
+        expect do
+          selection.selector
+        end.to raise_error(Mongoid::Errors::CriteriaArgumentRequired, /#{query_method}/)
+      end
     end
   end
 
@@ -395,43 +425,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#between" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :between }
 
-      let(:selection) do
-        query.between
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.between(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single range" do
 
@@ -474,43 +471,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#elem_match" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :elem_match }
 
-      let(:selection) do
-        query.elem_match
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.elem_match(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -622,43 +586,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#exists" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :exists }
 
-      let(:selection) do
-        query.exists
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.exists(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -771,39 +702,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#geo_spacial" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :geo_spacial }
 
-      let(:selection) do
-        query.geo_spacial
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to be_empty
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like "a cloning selection"
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.geo_spacial(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to be_empty
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like "a cloning selection"
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -826,7 +728,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           })
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
 
       context "when the geometry is a line intersection" do
@@ -848,7 +750,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           })
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
 
       context "when the geometry is a polygon intersection" do
@@ -872,7 +774,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           })
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
 
       context "when the geometry is within a polygon" do
@@ -916,50 +818,17 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
     end
   end
 
   describe "#gt" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :gt }
 
-      let(:selection) do
-        query.gt
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.gt(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1040,43 +909,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#gte" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :gte }
 
-      let(:selection) do
-        query.gte
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.gte(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1157,43 +993,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#in" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :in }
 
-      let(:selection) do
-        query.in
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.in(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1394,43 +1197,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#lt" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :lt }
 
-      let(:selection) do
-        query.lt
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.lt(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1511,43 +1281,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#lte" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :lte }
 
-      let(:selection) do
-        query.lte
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.lte(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1628,43 +1365,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#max_distance" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :max_distance }
 
-      let(:selection) do
-        query.max_distance
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.max_distance(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -1689,43 +1393,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#mod" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :mod }
 
-      let(:selection) do
-        query.mod
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.mod(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -1794,43 +1465,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#ne" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :ne }
 
-      let(:selection) do
-        query.ne
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.ne(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -1899,43 +1537,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#near" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :near }
 
-      let(:selection) do
-        query.near
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.near(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -2004,43 +1609,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#near_sphere" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :near_sphere }
 
-      let(:selection) do
-        query.near_sphere
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.near_sphere(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -2109,43 +1681,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#nin" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :nin }
 
-      let(:selection) do
-        query.nin
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.nin(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -2346,43 +1885,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#with_size" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :with_size }
 
-      let(:selection) do
-        query.with_size
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.with_size(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -2502,45 +2008,12 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
-  describe "#type" do
+  describe "#with_type" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :with_type }
 
-      let(:selection) do
-        query.with_type
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.with_type(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -2669,7 +2142,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           expect(selection.selector['$text'][:$language]).to eq("fr")
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
     end
 

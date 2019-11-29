@@ -92,7 +92,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def between(criterion = nil)
+        def between(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :between
+          end
+
           selection(criterion) do |selector, field, value|
             selector.store(
               field,
@@ -120,7 +124,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def elem_match(criterion = nil)
+        def elem_match(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :elem_match
+          end
+
           __override__(criterion, "$elemMatch")
         end
         key :elem_match, :override, "$elemMatch"
@@ -141,7 +149,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def exists(criterion = nil)
+        def exists(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :exists
+          end
+
           typed_override(criterion, "$exists") do |value|
             ::Boolean.evolve(value)
           end
@@ -186,7 +198,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 2.0.0
-        def geo_spacial(criterion = nil)
+        def geo_spacial(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :geo_spacial
+          end
+
           __merge__(criterion)
         end
         key :intersects_line, :override, "$geoIntersects", "$geometry" do |value|
@@ -216,7 +232,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def gt(criterion = nil)
+        def gt(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :gt
+          end
+
           __override__(criterion, "$gt")
         end
         key :gt, :override, "$gt"
@@ -234,7 +254,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def gte(criterion = nil)
+        def gte(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :gte
+          end
+
           __override__(criterion, "$gte")
         end
         key :gte, :override, "$gte"
@@ -255,7 +279,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def in(criterion = nil)
+        def in(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :in
+          end
+
           send(strategy || :__intersect__, with_array_values(criterion), "$in")
         end
         alias :any_in :in
@@ -274,7 +302,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def lt(criterion = nil)
+        def lt(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :lt
+          end
+
           __override__(criterion, "$lt")
         end
         key :lt, :override, "$lt"
@@ -292,7 +324,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def lte(criterion = nil)
+        def lte(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :lte
+          end
+
           __override__(criterion, "$lte")
         end
         key :lte, :override, "$lte"
@@ -307,7 +343,12 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def max_distance(criterion = nil)
+        def max_distance(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :max_distance
+          end
+
+          # $maxDistance must be given together with $near
           __add__(criterion, "$maxDistance")
         end
 
@@ -324,7 +365,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def mod(criterion = nil)
+        def mod(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :mod
+          end
+
           __override__(criterion, "$mod")
         end
         key :mod, :override, "$mod"
@@ -342,7 +387,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def ne(criterion = nil)
+        def ne(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :ne
+          end
+
           __override__(criterion, "$ne")
         end
         alias :excludes :ne
@@ -361,7 +410,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def near(criterion = nil)
+        def near(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :near
+          end
+
           __override__(criterion, "$near")
         end
         key :near, :override, "$near"
@@ -379,7 +432,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def near_sphere(criterion = nil)
+        def near_sphere(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :near_sphere
+          end
+
           __override__(criterion, "$nearSphere")
         end
         key :near_sphere, :override, "$nearSphere"
@@ -400,7 +457,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def nin(criterion = nil)
+        def nin(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :nin
+          end
+
           send(strategy || :__intersect__, with_array_values(criterion), "$nin")
         end
         alias :not_in :nin
@@ -509,7 +570,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def with_size(criterion = nil)
+        def with_size(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :with_size
+          end
+
           typed_override(criterion, "$size") do |value|
             ::Integer.evolve(value)
           end
@@ -533,7 +598,11 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def with_type(criterion = nil)
+        def with_type(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :with_type
+          end
+
           typed_override(criterion, "$type") do |value|
             ::Integer.evolve(value)
           end
@@ -564,21 +633,23 @@ module Mongoid
         #
         # @since 2.2.0
         def text_search(terms, opts = nil)
+          if terms.nil?
+            raise Errors::CriteriaArgumentRequired, :terms
+          end
+
           clone.tap do |query|
-            if terms
-              criterion = {'$text' => { '$search' => terms }}
-              criterion['$text'].merge!(opts) if opts
-              if query.selector['$text']
-                # Per https://docs.mongodb.com/manual/reference/operator/query/text/
-                # multiple $text expressions are not currently supported by
-                # MongoDB server, but build the query correctly instead of
-                # overwriting previous text search condition with the currently
-                # given one.
-                Mongoid.logger.warn('Multiple $text expressions per query are not currently supported by the server')
-                query.selector = {'$and' => [query.selector]}.merge(criterion)
-              else
-                query.selector = query.selector.merge(criterion)
-              end
+            criterion = {'$text' => { '$search' => terms }}
+            criterion['$text'].merge!(opts) if opts
+            if query.selector['$text']
+              # Per https://docs.mongodb.com/manual/reference/operator/query/text/
+              # multiple $text expressions are not currently supported by
+              # MongoDB server, but build the query correctly instead of
+              # overwriting previous text search condition with the currently
+              # given one.
+              Mongoid.logger.warn('Multiple $text expressions per query are not currently supported by the server')
+              query.selector = {'$and' => [query.selector]}.merge(criterion)
+            else
+              query.selector = query.selector.merge(criterion)
             end
           end
         end
