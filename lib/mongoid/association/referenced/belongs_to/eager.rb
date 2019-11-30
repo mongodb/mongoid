@@ -12,8 +12,6 @@ module Mongoid
           private
 
           def preload
-            raise Errors::EagerLoad.new(@association.name) if @association.polymorphic?
-
             @docs.each do |d|
               set_relation(d, nil)
             end
@@ -21,6 +19,26 @@ module Mongoid
             each_loaded_document do |doc|
               id = doc.send(key)
               set_on_parent(id, doc)
+            end
+          end
+
+          def each_loaded_document(&block)
+            return super(&block) unless @association.polymorphic?
+
+            keys_by_type_from_docs.each do |type, doc_keys|
+              super(Object.const_get(type), doc_keys, &block)
+            end
+          end
+
+          def keys_by_type_from_docs
+            inverse_type = @association.inverse_type
+
+            @docs.each_with_object({}) do |doc, keys_by_type|
+              next unless doc.respond_to?(inverse_type) && doc.respond_to?(group_by_key)
+              next if doc.send(inverse_type).nil?
+
+              keys_by_type[doc.send(inverse_type)] ||= []
+              keys_by_type[doc.send(inverse_type)].push(doc.send(group_by_key))
             end
           end
 
