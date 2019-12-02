@@ -2251,7 +2251,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when chaninning the criterion" do
+    context "when chaining the criterion" do
 
       context "when the criterion are for different fields" do
 
@@ -3457,7 +3457,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
     context "when using the strategies via methods" do
 
-      context "when the values are a hash" do
+      context "when different operators are specified" do
 
         let(:selection) do
           query.gt(field: 5).lt(field: 10).ne(field: 7)
@@ -3470,7 +3470,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when the values are not hashes" do
+      context "when the same operator is specified" do
 
         let(:selection) do
           query.where(field: 5).where(field: 10)
@@ -3484,7 +3484,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
     context "when using the strategies via #where" do
 
-      context "when the values are a hash" do
+      context "when using complex keys with different operators" do
 
         let(:selection) do
           query.where(:field.gt => 5, :field.lt => 10, :field.ne => 7)

@@ -238,7 +238,7 @@ module Mongoid
         # @example Add the criterion.
         #   mergeable.__override__([ 1, 2 ], "$in")
         #
-        # @param [ Hash ] criterion The criteria.
+        # @param [ Hash | Criteria ] criterion The criteria.
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
@@ -299,7 +299,7 @@ module Mongoid
         # @api private
         #
         # @example Add criterion with a strategy.
-        #   mergeable.with_strategy(:__union__, [ 1, 2, 3 ], "$in")
+        #   mergeable.with_strategy(:__union__, {field_name: [ 1, 2, 3 ]}, "$in")
         #
         # @param [ Symbol ] strategy The name of the strategy method.
         # @param [ Object ] criterion The criterion to add.
