@@ -47,7 +47,7 @@ module Mongoid
           use(:__union__)
         end
 
-        # Reset the stratgies to nil, used after cloning.
+        # Clear the current strategy and negating flag, used after cloning.
         #
         # @example Reset the strategies.
         #   mergeable.reset_strategies!
@@ -56,7 +56,8 @@ module Mongoid
         #
         # @since 1.0.0
         def reset_strategies!
-          self.strategy, self.negating = nil, nil
+          self.strategy = nil
+          self.negating = nil
         end
 
         private
