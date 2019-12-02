@@ -171,10 +171,10 @@ module Mongoid
         #   optional.order_by([[ name, 1 ], [ dob, -1 ]])
         #
         # @example Add sorting options via an array with symbol directions.
-        #   optional.order_by([[ name, :asc ], [ dob, :desc ]])
+        #   optional.order_by([[ :name, :asc ], [ :dob, :desc ]])
         #
         # @example Add sorting options via an array with string directions.
-        #   optional.order_by([[ name, "asc" ], [ dob, "desc" ]])
+        #   optional.order_by([[ "name", "asc" ], [ "dob", "desc" ]])
         #
         # @example Add sorting options with keys.
         #   optional.order_by(:name.asc, :dob.desc)

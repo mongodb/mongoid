@@ -198,6 +198,64 @@ loaded with ``only`` for those associations to be loaded. For example:
   # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
 
 
+Ordering
+````````
+
+Mongoid provides the ``order`` method on ``Criteria`` objects and its alias,
+``order_by``, to specify the ordering of documents. These methods take a
+hash indicating which fields to order the documents by, and whether to use
+ascending or descending order for each field.
+
+.. code-block:: ruby
+
+  Band.order(name: 1)
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.order_by(name: -1, description: 1)
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.order_by(name: :desc, description: 'asc')
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+The direction may be specified as integers ``1`` and ``-1`` for ascending
+and descending, respectively, or as symbols ``:asc`` and ``:desc``, or as
+strings ``"asc"`` and ``"desc"``.
+
+Alternatively, ``order`` accepts an array of two-element arrays specifying
+the ordering. Field names and directions may be strings or symbols.
+
+.. code-block:: ruby
+
+  Band.order([['name', 'desc'], ['description', 'asc']])
+
+  Band.order([[:name, :desc], [:description, :asc]])
+
+Another way of providing the order is to use ``#asc`` and ``#desc`` methods
+on symbols, as follows:
+
+.. code-block:: ruby
+
+  Band.order(:name.desc, :description.asc)
+
+Finally, the arguments can be provided as a string using SQL syntax:
+
+.. code-block:: ruby
+
+  Band.order('name desc, description asc')
+
+
 Logical Operations
 ******************
 
