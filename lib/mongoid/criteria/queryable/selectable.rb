@@ -630,8 +630,6 @@ module Mongoid
         # Take the provided criterion and store it as a selection in the query
         # selector.
         #
-        # @api private
-        #
         # @example Store the selection.
         #   selectable.selection({ field: "value" })
         #
@@ -640,6 +638,7 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
+        # @api private
         def selection(criterion = nil)
           clone.tap do |query|
             if criterion
