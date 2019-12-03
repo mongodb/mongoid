@@ -374,6 +374,56 @@ describe Mongoid::Criteria::Queryable::Selectable do
         expect(query.selector).to eq(expected)
       end
     end
+
+    describe 'query shape' do
+      shared_examples_for 'adds most recent criterion as $and' do
+        let(:selector) { scope.selector }
+
+        it 'adds most recent criterion as $and' do
+          expect(selector).to eq('foo' => 1, '$and' => [{'foo' => 2}])
+        end
+      end
+
+      context 'and/and' do
+        let(:scope) do
+          Band.and(foo: 1).and(foo: 2)
+        end
+
+        it_behaves_like 'adds most recent criterion as $and'
+      end
+
+      context 'and/and' do
+        let(:scope) do
+          Band.and(foo: 1).and(foo: 2)
+        end
+
+        it_behaves_like 'adds most recent criterion as $and'
+      end
+
+      context 'and/where' do
+        let(:scope) do
+          Band.and(foo: 1).where(foo: 2)
+        end
+
+        it_behaves_like 'adds most recent criterion as $and'
+      end
+
+      context 'where/and' do
+        let(:scope) do
+          Band.where(foo: 1).and(foo: 2)
+        end
+
+        it_behaves_like 'adds most recent criterion as $and'
+      end
+
+      context 'where/where' do
+        let(:scope) do
+          Band.where(foo: 1).where(foo: 2)
+        end
+
+        it_behaves_like 'adds most recent criterion as $and'
+      end
+    end
   end
 
   describe "#or" do
@@ -854,6 +904,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it "negates the selection with an operator" do
           expect(selection.selector).to eq(
             { "field" => { "$ne" => 1 }, "other" => { "$not" => /test/ } }
+          )
+        end
+
+        it_behaves_like 'returns a cloned query'
+
+        it "removes the negation on the clone" do
+          expect(selection).to_not be_negating
+        end
+      end
+
+      context 'when the following criteria uses string were form' do
+
+        let(:selection) do
+          query.not.where('hello world')
+        end
+
+        it "negates the selection with an operator" do
+          expect(selection.selector).to eq(
+            '$and' => [{'$nor' => [{'$where' => 'hello world'}]}]
           )
         end
 

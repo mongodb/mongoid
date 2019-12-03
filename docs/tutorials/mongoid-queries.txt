@@ -326,7 +326,7 @@ conditions are added to the criteria:
 .. code-block:: ruby
 
   Band.where(name: 1).where(name: 2).selector
-  # => {"$and"=>[{"name"=>"1"}], "name"=>"2"}
+  # => {"name"=>"1", "$and"=>[{"name"=>"2"}]}
 
   Band.where(name: 1).or(name: 2).selector
   # => {"$or"=>[{"name"=>"1"}, {"name"=>"2"}]}

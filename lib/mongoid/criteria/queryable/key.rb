@@ -103,16 +103,24 @@ module Mongoid
 
         # Instantiate the new key.
         #
-        # @example Instantiate the key.
-        #   Key.new("age", "$gt")
+        # @example Instantiate a key.
+        #   Key.new("age", :__override__, "$gt")
+        #
+        # @example Instantiate a key for sorting.
+        #   Key.new(:field, :__override__, 1)
         #
         # @param [ String, Symbol ] name The field name.
         # @param [ Symbol ] strategy The name of the merge strategy.
-        # @param [ String ] operator The Mongo operator.
+        # @param [ String | Integer ] operator The MongoDB operator,
+        #   or sort direction (1 or -1).
         # @param [ String ] expanded The Mongo expanded operator.
         #
         # @since 1.0.0
         def initialize(name, strategy, operator, expanded = nil, &block)
+          unless operator.is_a?(String) || operator.is_a?(Integer)
+            raise ArgumentError, "Operator must be a string or an integer: #{operator.inspect}"
+          end
+
           @name, @strategy, @operator, @expanded, @block =
             name, strategy, operator, expanded, block
         end

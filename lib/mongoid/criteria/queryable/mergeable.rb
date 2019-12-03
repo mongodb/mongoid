@@ -52,12 +52,13 @@ module Mongoid
         # @example Reset the strategies.
         #   mergeable.reset_strategies!
         #
-        # @return [ nil ] nil.
+        # @return [ Criteria ] self.
         #
         # @since 1.0.0
         def reset_strategies!
           self.strategy = nil
           self.negating = nil
+          self
         end
 
         private

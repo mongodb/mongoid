@@ -669,18 +669,38 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def where(criterion = nil)
-          # We need to save the criterion in an instance variable so Modifiable methods
-          # know how to create a polymorphic object.
-          @criterion = criterion
-          criterion.is_a?(String) ? js_query(criterion) : expr_query(criterion)
+        def where(*criteria)
+          criteria.inject(clone) do |query, criterion|
+            if criterion.nil?
+              raise Errors::CriteriaArgumentRequired, :where
+            end
+
+            # We need to save the criterion in an instance variable so
+            # Modifiable methods know how to create a polymorphic object.
+            # Note that this method in principle accepts multiple criteria,
+            # but only the first one will be stored in @criterion. This
+            # works out to be fine because first_or_create etc. methods
+            # only ever specify one criterion to #where.
+            @criterion = criterion
+            if criterion.is_a?(String)
+              js_query(criterion)
+            else
+              expr_query(criterion)
+            end
+          end.reset_strategies!
         end
 
         private
 
-        # Create the standard expression query.
+        # Adds the specified expression to the query.
         #
-        # @api private
+        # Criterion must be a hash in one of the following forms:
+        # - {field_name: value}
+        # - {'field_name' => value}
+        # - {key_instance: value}
+        # - {'$operator' => operator_value_expression}
+        #
+        # Field name and operator may be given as either strings or symbols.
         #
         # @example Create the selection.
         #   selectable.expr_query(age: 50)
@@ -690,21 +710,24 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
+        # @api private
         def expr_query(criterion)
-          selection(criterion) do |selector, field, value|
-            kv = field.__expr_part__(value.__expand_complex__, negating?)
-            if selector[field]
-              # We already have a restriction by the field we are trying
-              # to restrict, combine the restrictions
-              selector.replace('$and' => [Hash[selector.to_a]])
+          if criterion.nil?
+            raise ArgumentError, 'Criterion cannot be nil here'
+          end
+
+          clone.tap do |query|
+            criterion.each do |field, value|
+              field_s = field.to_s
+              if field_s[0] == ?$
+                # Query expression-level operator, like $and or $where
+                query.add_operator_expression(field_s, value)
+              else
+                exp_field, exp_value = expand_one_condition(field, value)
+                query.add_field_expression(exp_field, exp_value)
+              end
             end
-            # This merge does additional processing on kv, kv isn't written
-            # into the selector as it is.
-            # This is also why we $and only the previous value of the selector,
-            # because we need to pass the new value through serialization logic
-            # otherwise document instances get stored as document instances
-            # and not their ids.
-            selector.merge!(kv)
+            query.reset_strategies!
           end
         end
 
@@ -743,7 +766,13 @@ module Mongoid
         # @since 1.0.0
         def js_query(criterion)
           clone.tap do |query|
-            query.selector.merge!("$where" => criterion)
+            if negating?
+              query.add_operator_expression('$and',
+                [{'$nor' => [{'$where' => criterion}]}])
+            else
+              query.add_operator_expression('$where', criterion)
+            end
+            query.reset_strategies!
           end
         end
 

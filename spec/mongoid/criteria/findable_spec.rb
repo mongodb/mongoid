@@ -1250,7 +1250,7 @@ describe Mongoid::Criteria::Findable do
       let(:criteria) { Mongoid::Criteria.new(Band).where(id: 2) }
 
       it 'adds id' do
-        expect(result.selector).to eq('$and' => [{'_id' => 2}], '_id' => 1)
+        expect(result.selector).to eq('_id' => 2, '$and' => [{'_id' => 1}])
       end
     end
   end
