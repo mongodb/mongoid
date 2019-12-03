@@ -29,6 +29,8 @@ functions:
     - command: git.get_project
       params:
         directory: "src"
+  
+  "create expansions":
     # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
       params:
@@ -395,6 +397,7 @@ functions:
 
 pre:
   - func: "fetch source"
+  - func: "create expansions"
   - func: "prepare resources"
   - func: "windows fix"
   - func: "fix absolute paths"
