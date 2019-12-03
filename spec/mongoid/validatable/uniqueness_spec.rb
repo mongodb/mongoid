@@ -796,20 +796,47 @@ describe Mongoid::Validatable::UniquenessValidator do
           end
         end
 
-        context "when a range scope is provided" do
+        context "when a range condition is provided" do
 
           before do
-            Dictionary.validates_uniqueness_of(:name, :scope => Dictionary.where(:year.gte => 1900, :year.lt => 2000))
-            Dictionary.create(name: "French-English", year: 1950)
-            Dictionary.create(name: "French-English", year: 1960)
+            Dictionary.validates_uniqueness_of(:name,
+              conditions: -> { Dictionary.where(:year.gte => 1900, :year.lt => 2000) })
           end
 
           after do
             Dictionary.reset_callbacks(:validate)
           end
 
-          it "successfully prevents uniqueness violation" do
-            expect(Dictionary.all.size).to eq(1)
+          context 'when multiple documents would match the condition' do
+            it "prevents creation of new document" do
+              Dictionary.create!(name: "French-English", year: 1950)
+
+              expect do
+                Dictionary.create!(name: "French-English", year: 1960)
+              end.to raise_error(Mongoid::Errors::Validations, /Name is already taken/)
+
+              expect(Dictionary.all.size).to eq(1)
+            end
+          end
+
+          context 'when only new document would match the condition' do
+            it 'creates the new document' do
+              Dictionary.create!(name: "French-English", year: 950)
+              expect do
+                Dictionary.create!(name: "French-English", year: 1950)
+              end.not_to raise_error
+            end
+          end
+
+          context 'when only existing document matches the condition' do
+            it 'creates the new document' do
+              pending 'https://jira.mongodb.org/browse/MONGOID-4815'
+
+              Dictionary.create!(name: "French-English", year: 1950)
+              expect do
+                Dictionary.create!(name: "French-English", year: 950)
+              end.not_to raise_error
+            end
           end
         end
 
