@@ -29,9 +29,8 @@ functions:
     - command: git.get_project
       params:
         directory: "src"
-    # Applies the subitted patch, if any
-    # Deprecated. Should be removed. But still needed for certain agents (ZAP)
-    - command: git.apply_patch
+  
+  "create expansions":
     # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
       params:
@@ -98,67 +97,6 @@ functions:
           fi
           echo "{ \"releases\": { \"default\": \"$MONGODB_BINARIES\" }}" > $MONGO_ORCHESTRATION_HOME/orchestration.config
 
-  "upload release":
-    - command: s3.put
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        local_file: ${project}.tar.gz
-        remote_file: ${UPLOAD_BUCKET}/${project}-${CURRENT_VERSION}.tar.gz
-        bucket: mciuploads
-        permissions: public-read
-        content_type: ${content_type|application/x-gzip}
-
-  # Upload build artifacts that other tasks may depend on
-  # Note this URL needs to be totally unique, while predictable for the next task
-  # so it can automatically download the artifacts
-  "upload build":
-    # Compress and upload the entire build directory
-    - command: archive.targz_pack
-      params:
-        # Example: mongo_c_driver_releng_9dfb7d741efbca16faa7859b9349d7a942273e43_16_11_08_19_29_52.tar.gz
-        target: "${build_id}.tar.gz"
-        source_dir: ${PROJECT_DIRECTORY}/
-        include:
-          - "./**"
-    - command: s3.put
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        local_file: ${build_id}.tar.gz
-        # Example: /mciuploads/${UPLOAD_BUCKET}/gcc49/9dfb7d741efbca16faa7859b9349d7a942273e43/debug-compile-nosasl-nossl/mongo_c_driver_releng_9dfb7d741efbca16faa7859b9349d7a942273e43_16_11_08_19_29_52.tar.gz
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${task_name}/${build_id}.tar.gz
-        bucket: mciuploads
-        permissions: public-read
-        content_type: ${content_type|application/x-gzip}
-
-  "fetch build":
-    - command: shell.exec
-      params:
-        continue_on_err: true
-        script: "set -o xtrace && rm -rf ${PROJECT_DIRECTORY}"
-    - command: s3.get
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${BUILD_NAME}/${build_id}.tar.gz
-        bucket: mciuploads
-        local_file: build.tar.gz
-    - command: shell.exec
-      params:
-        continue_on_err: true
-        # EVG-1105: Use s3.get extract_to: ./
-        script: "set -o xtrace && cd .. && rm -rf ${PROJECT_DIRECTORY} && mkdir ${PROJECT_DIRECTORY}/ && tar xf build.tar.gz -C ${PROJECT_DIRECTORY}/"
-
-  "exec compile script" :
-    - command: shell.exec
-      type: test
-      params:
-        working_dir: "src"
-        script: |
-          ${PREPARE_SHELL}
-          [ -f ${PROJECT_DIRECTORY}/${file} ] && BUILDTOOL="${buildtool}" sh ${PROJECT_DIRECTORY}/${file} || echo "${PROJECT_DIRECTORY}/${file} not available, skipping"
-
   "exec script" :
     - command: shell.exec
       type: test
@@ -205,35 +143,6 @@ functions:
         permissions: public-read
         content_type: text/html
         display_name: "Coverage Report"
-
-  "upload scan artifacts" :
-    - command: shell.exec
-      type: test
-      params:
-        script: |
-          cd
-          if find ${PROJECT_DIRECTORY}/scan -name \*.html | grep -q html; then
-            (cd ${PROJECT_DIRECTORY}/scan && find . -name index.html -exec echo "<li><a href='{}'>{}</a></li>" \;) >> scan.html
-          else
-            echo "No issues found" > scan.html
-          fi
-    - command: shell.exec
-      params:
-        silent: true
-        script: |
-           export AWS_ACCESS_KEY_ID=${aws_key}
-           export AWS_SECRET_ACCESS_KEY=${aws_secret}
-           aws s3 cp ${PROJECT_DIRECTORY}/scan s3://mciuploads/${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/scan/ --recursive --acl public-read --region us-east-1
-    - command: s3.put
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        local_file:  ${PROJECT_DIRECTORY}/scan.html
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/scan/index.html
-        bucket: mciuploads
-        permissions: public-read
-        content_type: text/html
-        display_name: "Scan Build Report"
 
   "upload mo artifacts":
     - command: shell.exec
@@ -380,13 +289,6 @@ functions:
             chmod +x $i
           done
 
-  "init test-results":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          echo '{"results": [{ "status": "FAIL", "test_file": "Build", "log_raw": "No test-results.json found was created"  } ]}' > ${PROJECT_DIRECTORY}/test-results.json
-
   "install dependencies":
     type: test
     params:
@@ -398,10 +300,10 @@ functions:
 
 pre:
   - func: "fetch source"
+  - func: "create expansions"
   - func: "prepare resources"
   - func: "windows fix"
   - func: "fix absolute paths"
-  - func: "init test-results"
   - func: "make files executable"
   - func: "install dependencies"
 
