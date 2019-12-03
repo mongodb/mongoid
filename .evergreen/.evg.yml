@@ -289,13 +289,6 @@ functions:
             chmod +x $i
           done
 
-  "init test-results":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          echo '{"results": [{ "status": "FAIL", "test_file": "Build", "log_raw": "No test-results.json found was created"  } ]}' > ${PROJECT_DIRECTORY}/test-results.json
-
   "install dependencies":
     type: test
     params:
@@ -311,7 +304,6 @@ pre:
   - func: "prepare resources"
   - func: "windows fix"
   - func: "fix absolute paths"
-  - func: "init test-results"
   - func: "make files executable"
   - func: "install dependencies"
 
