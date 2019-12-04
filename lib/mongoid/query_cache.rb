@@ -171,7 +171,7 @@ module Mongoid
         documents = super
 
         @batch_count = @batch_count.to_i + 1
-        if @cursor_id.zero? && @batch_count == 1
+        if result.cursor_id.zero? && @batch_count == 1
           @cached_documents = documents
         end
 
