@@ -2189,6 +2189,45 @@ describe Mongoid::Criteria::Queryable::Selectable do
       it "returns a cloned query" do
         expect(selection).to_not equal(query)
       end
+
+      context 'when multiple calls with string argument are made' do
+
+        let(:selection) do
+          query.where("this.value = 10").where('foo.bar')
+        end
+
+        it 'combines conditions' do
+          expect(selection.selector).to eq(
+            "$where" => "this.value = 10", '$and' => [{'$where' => 'foo.bar'}],
+          )
+        end
+      end
+
+      context 'when called with string argument and with hash argument' do
+
+        let(:selection) do
+          query.where("this.value = 10").where(foo: 'bar')
+        end
+
+        it 'combines conditions' do
+          expect(selection.selector).to eq(
+            "$where" => "this.value = 10", 'foo' => 'bar',
+          )
+        end
+      end
+
+      context 'when called with hash argument and with string argument' do
+
+        let(:selection) do
+          query.where(foo: 'bar').where("this.value = 10")
+        end
+
+        it 'combines conditions' do
+          expect(selection.selector).to eq(
+            'foo' => 'bar', "$where" => "this.value = 10",
+          )
+        end
+      end
     end
 
     context "when provided a single criterion" do
