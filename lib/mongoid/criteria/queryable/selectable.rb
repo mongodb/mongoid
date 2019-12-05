@@ -43,8 +43,20 @@ module Mongoid
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def all(criterion = nil)
-          send(strategy || :__union__, with_array_values(criterion), "$all")
+        def all(*criteria)
+          if criteria.empty?
+            return clone.tap do |query|
+              query.reset_strategies!
+            end
+          end
+
+          criteria.inject(clone) do |query, condition|
+            if condition.nil?
+              raise Errors::CriteriaArgumentRequired, :all
+            end
+
+            send(strategy || :__union__, with_array_values(condition), "$all")
+          end
         end
         alias :all_in :all
         key :all, :union, "$all"
@@ -813,7 +825,10 @@ module Mongoid
         #
         # @since 1.0.0
         def with_array_values(criterion)
-          return nil unless criterion
+          if criterion.nil?
+            raise ArgumentError, 'Criterion cannot be nil here'
+          end
+
           criterion.each_pair do |key, value|
             criterion[key] = value.__array__
           end

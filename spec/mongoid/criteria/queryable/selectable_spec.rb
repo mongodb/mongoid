@@ -48,6 +48,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#all" do
 
+    let(:query_method) { :all }
+
     context "when provided no criterion" do
 
       let(:selection) do
@@ -67,24 +69,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when provided nil" do
-
-      let(:selection) do
-        query.all(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
