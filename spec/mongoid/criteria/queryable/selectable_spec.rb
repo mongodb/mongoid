@@ -2168,6 +2168,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#where" do
 
+    let(:query_method) { :where }
+
     context "when provided no criterion" do
 
       let(:selection) do
@@ -2187,24 +2189,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when provided nil" do
-
-      let(:selection) do
-        query.where(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a string" do
 
@@ -2938,7 +2923,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "merges the strategies on the same field" do
           expect(selection.selector).to eq(
-            { "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }}
+            "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }
           )
         end
       end
@@ -2950,7 +2935,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it "combines conditions" do
-          expect(selection.selector).to eq('$and' => [{'field' => 5}], "field" => 10 )
+          expect(selection.selector).to eq("field" => 5, '$and' => [{'field' => 10}] )
         end
       end
     end
@@ -2965,7 +2950,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "merges the strategies on the same field" do
           expect(selection.selector).to eq(
-            { "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }}
+            "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }
           )
         end
       end
