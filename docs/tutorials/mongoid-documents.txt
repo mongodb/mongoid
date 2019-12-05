@@ -853,36 +853,50 @@ You can get and set all the translations at once by using the corresponding ``_t
    product.description_translations =
      { "en" => "Marvelous!", "de" => "Wunderbar!" }
 
+
 Fallbacks
 *********
 
-When using fallbacks, Mongoid will automatically use them when a translation is not available.
+Mongoid integrates with
+`i18n fallbacks <https://github.com/ruby-i18n/i18n/wiki/Fallbacks>`_.
+To use the fallbacks, the respective functionality must be explicitly enabled.
 
-For Rails applications, set the fallbacks configuration setting to true in your environment.
-
-.. code-block:: ruby
-
-   config.i18n.fallbacks = true
-
-For non-Rails applications, you must include the fallbacks module straight to the I18n gem.
+In a Rails application, set the ``config.i18n.fallbacks`` configuration setting
+to ``true`` in your environment and specify the fallback languages:
 
 .. code-block:: ruby
 
-   require "i18n/backend/fallbacks"
-   I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+  config.i18n.fallbacks = true
+  config.after_initialize do
+    I18n.fallbacks[:de] = [ :en, :es ]
+  end
 
-When the fallbacks are defined, if a translation is not present, Mongoid will fallback
-in order of the defined locales.
+In a non-Rails application, include the fallbacks module into the I18n backend
+you are using and specify the fallback languages:
 
 .. code-block:: ruby
 
-   I18n.default_locale = :en
-   I18n.fallbacks = true
-   ::I18n.fallbacks[:de] = [ :de, :en, :es ]
-   product = Product.new
-   product.description = "Marvelous!"
-   I18n.locale = :de
-   product.description # "Marvelous!"
+  require "i18n/backend/fallbacks"
+  I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+  I18n.fallbacks[:de] = [ :en, :es ]
+
+When fallbacks are enabled, if a translation is not present in the active
+language, translations will be looked up in the fallback languages:
+
+.. code-block:: ruby
+
+  product = Product.new
+  I18n.locale = :en
+  product.description = "Marvelous!"
+  I18n.locale = :de
+  product.description # "Marvelous!"
+
+.. note::
+
+  In i18n 1.1, the behavior of fallbacks `changed <https://github.com/ruby-i18n/i18n/pull/415>`_
+  to always require an explicit list of fallback locales rather than falling
+  back to the default locale when no fallback locales have been provided.
+
 
 Querying
 ********

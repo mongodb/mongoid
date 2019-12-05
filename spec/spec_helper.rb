@@ -150,7 +150,9 @@ RSpec.configure do |config|
       # database. This user will need to be authenticated in order to add any
       # more users to any other databases.
       client.database.users.create(MONGOID_ROOT_USER)
-    rescue Exception => e
+    rescue Mongo::Error::OperationFailure => e
+    ensure
+      client.close
     end
     Mongoid.purge!
   end

@@ -243,7 +243,15 @@ functions:
         working_dir: "src"
         script: |
           ${PREPARE_SHELL}
-          MONGODB_URI="${MONGODB_URI}" TOPOLOGY=${TOPOLOGY} RVM_RUBY="${RVM_RUBY}" RAILS="${RAILS}" DRIVER="${DRIVER}" I18N="${I18N}" .evergreen/run-tests.sh
+          env \
+            MONGODB_URI="${MONGODB_URI}" \
+            TOPOLOGY=${TOPOLOGY} \
+            RVM_RUBY="${RVM_RUBY}" \
+            RAILS="${RAILS}" \
+            DRIVER="${DRIVER}" \
+            I18N="${I18N}" \
+            TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
+            .evergreen/run-tests.sh
 
   "cleanup":
     - command: shell.exec
@@ -507,6 +515,15 @@ axes:
         display_name: "i18n-1.0"
         variables:
            I18N: "1.0"
+      - id: current
+        display_name: "i18n-current"
+  - id: "test-i18n-fallbacks"
+    display_name: Test i18n fallbacks
+    values:
+      - id: yes
+        display_name: "i18n-fallbacks"
+        variables:
+           TEST_I18N_FALLBACKS: yes
 
 buildvariants:
 - matrix_name: "topologies"
@@ -715,6 +732,19 @@ buildvariants:
     topology: "standalone"
     i18n: '1.0'
   display_name: "i18n-1.0 ${rails}, ${driver}, ${mongodb-version}"
+  run_on:
+    - rhel70-small
+  tasks:
+     - name: "test"
+- matrix_name: "i18n-fallbacks"
+  matrix_spec:
+    driver: "current"
+    ruby: "ruby-2.6"
+    mongodb-version: "4.2"
+    topology: "standalone"
+    i18n: '*'
+    test-i18n-fallbacks: yes
+  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
   run_on:
     - rhel70-small
   tasks:
