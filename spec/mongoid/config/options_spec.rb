@@ -21,7 +21,7 @@ describe Mongoid::Config::Options do
     context "when a default is provided" do
 
       after do
-        config.preload_models = false
+        config.reset
       end
 
       it "defines a getter" do
@@ -29,11 +29,28 @@ describe Mongoid::Config::Options do
       end
 
       it "defines a setter" do
-        (config.preload_models = expect(true)).to be true
+        expect(config.preload_models = true).to be true
+        expect(config.preload_models).to be true
       end
 
       it "defines a presence check" do
-        expect(config).to_not be_preload_models
+        expect(config.preload_models?).to be false
+      end
+    end
+
+    context 'when option is not a boolean' do
+      before do
+        config.app_name = 'foo'
+      end
+
+      after do
+        config.reset
+      end
+
+      context 'presence check' do
+        it 'is a boolean' do
+          expect(config.app_name?).to be true
+        end
       end
     end
   end

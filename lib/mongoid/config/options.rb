@@ -33,19 +33,19 @@ module Mongoid
       def option(name, options = {})
         defaults[name] = settings[name] = options[:default]
 
-        class_eval <<-RUBY, __FILE__, __LINE__ + 1
-          def #{name}
-            settings[#{name.inspect}]
+        class_eval do
+          define_method(name) do
+            settings[name]
           end
 
-          def #{name}=(value)
-            settings[#{name.inspect}] = value
+          define_method("#{name}=") do |value|
+            settings[name] = value
           end
 
-          def #{name}?
-            #{name}
+          define_method("#{name}?") do
+            !!send(name)
           end
-        RUBY
+        end
       end
 
       # Reset the configuration options to the defaults.
