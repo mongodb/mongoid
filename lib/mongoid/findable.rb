@@ -8,9 +8,11 @@ module Mongoid
   #
   # @since 4.0.0
   module Findable
-    extend Mongoid::Criteria::Queryable::Forwardable
 
-    select_with :with_default_scope
+    delegate *(
+      Criteria::Queryable::Selectable.forwardables +
+      Criteria::Queryable::Optional.forwardables
+    ), to: :with_default_scope
 
     # These are methods defined on the criteria that should also be accessible
     # directly from the class level.
