@@ -459,6 +459,164 @@ caveats/limitations of ``$not`` `stated in the MongoDB server documentation
 <https://docs.mongodb.com/manual/reference/operator/query/not/>`_.
 
 
+Incremental Query Construction
+******************************
+
+By default, when conditions are added to a query, Mongoid considers each
+condition complete and independent from any other conditions potentially
+present in the query. For example, calling ``in`` twice adds two separate
+``$in`` conditions:
+
+.. code-block:: ruby
+
+  Band.in(name: ['a']).in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["a"]}, "$and"=>[{"name"=>{"$in"=>["b"]}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Some operator methods support building the condition incrementally. In this
+case, when an condition on a field which uses one of the supported operators
+is being added, if there already is a condition on the same field using the
+same operator, the operator expressions are combined according to the
+specified *merge strategy*.
+
+Merge Strategies
+````````````````
+
+Mongoid provides three merge strategies:
+
+- **Override**: the new operator instance replaces any existing conditions on
+the same field using the same operator.
+- **Intersect**: if there already is a condition using the same operator on the
+same field, the values of the existing condition are intersected with the
+values of the new condition and the result is stored as the operator value.
+- **Union**: if there already is a condition using the same operator on the
+same field, the values of the new condition are aded to the values of the
+exsting condition and the result is stored as the operator value.
+
+The following snippet demonstrates all of the strategies, using ``in`` as the
+example operator:
+
+.. code-block:: ruby
+
+  Band.in(name: ['a']).override.in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+  Band.in(name: ['a', 'b']).intersect.in(name: ['b', 'c'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+  Band.in(name: ['a']).union.in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["a", "b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+The strategy is requested by calling ``override``, ``intersect`` or ``union``
+on a ``Criteria`` instance. The requested strategy applies to the next
+condition method called on the query. If the next condition method called does
+not support merge strategies, the strategy is reset, as shown in the following
+example:
+
+.. code-block:: ruby
+
+  Band.in(name: ['a']).union.ne(name: 'c').in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["a"], "$ne"=>"c"}, "$and"=>[{"name"=>{"$in"=>["b"]}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Since ``ne`` does not support merge strategies, the ``union`` strategy was
+ignored and reset and when ``in`` was invoked the second time there was no
+strategy active.
+
+Supported Operator Methods
+``````````````````````````
+
+The following operator methods support merge strategies:
+
+- ``all``
+- ``in``
+- ``nin``
+
+The set of methods may be expanded in future releases of Mongoid. For
+future compatibility, only invoke a strategy method when the next method call
+is an operator that supports merge strategies.
+
+Note that the merge strategies are currently only applied when conditions are
+added through the designated methods. In the following example merge strategy
+is not applied because the second condition is added via ``where``, not via
+``in``:
+
+.. code-block:: ruby
+
+  Band.in(foo: ['a']).union.where(foo: {'$in' => 'b'})
+  => #<Mongoid::Criteria
+    selector: {"foo"=>{"$in"=>["a"]}, "$and"=>[{"foo"=>{"$in"=>"b"}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+This behavior may change in a future release of Mongoid and should not be
+relied upon.
+
+In contrast, it does not matter how the existing query was built when a
+merge strategy-supporting operator method is invoked. In the following
+example, the first condition was added through ``where`` but the strategy
+mechanism still applies:
+
+.. code-block:: ruby
+
+  Band.where(foo: {'$in' => ['a']}).union.in(foo: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"foo"=>{"$in"=>["a", "b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Operator Value Expansion
+````````````````````````
+
+Operator methods that support merge strategies all take ``Array`` as their value
+type. Mongoid expands ``Array``-compatible types, such as a ``Range``,
+when they are used with these operator methods:
+
+.. code-block:: ruby
+
+  Band.in(year: 1950..1960)
+  => #<Mongoid::Criteria
+    selector: {"year"=>{"$in"=>[1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Additionally, Mongoid has historically wrapped non-``Array`` values in arrays,
+as the following example demonstrates:
+
+.. code-block:: ruby
+
+  Band.in(year: 1950)
+  => #<Mongoid::Criteria
+    selector: {"year"=>{"$in"=>[1950]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+This wrapping behavior is deprecated and should not be relied on. It may be
+removed in a future release of Mongoid.
+
+
 Query Cache
 ***********
 

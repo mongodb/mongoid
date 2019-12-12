@@ -55,8 +55,20 @@ module Mongoid
               raise Errors::CriteriaArgumentRequired, :all
             end
 
-            send(strategy || :__union__, with_array_values(condition), "$all")
-          end
+            condition = expand_condition_to_array_values(condition)
+
+            if strategy
+              send(strategy, condition, "$all")
+            else
+              condition.inject(query) do |_query, (field, value)|
+                v = {'$all' => value}
+                if negating?
+                  v = {'$not' => v}
+                end
+                _query.add_field_expression(field.to_s, v)
+              end
+            end
+          end.reset_strategies!
         end
         alias :all_in :all
         key :all, :union, "$all"
@@ -286,17 +298,29 @@ module Mongoid
         # @example Execute an $in in a where query.
         #   selectable.where(:field.in => [ 1, 2, 3 ])
         #
-        # @param [ Hash ] criterion The field/value criterion pairs.
+        # @param [ Hash ] condition The field/value criterion pairs.
         #
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def in(criterion)
-          if criterion.nil?
+        def in(condition)
+          if condition.nil?
             raise Errors::CriteriaArgumentRequired, :in
           end
 
-          send(strategy || :__intersect__, with_array_values(criterion), "$in")
+          condition = expand_condition_to_array_values(condition)
+
+          if strategy
+            send(strategy, condition, "$in")
+          else
+            condition.inject(clone) do |query, (field, value)|
+              v = {'$in' => value}
+              if negating?
+                v = {'$not' => v}
+              end
+              query.add_field_expression(field.to_s, v)
+            end.reset_strategies!
+          end
         end
         alias :any_in :in
         key :in, :intersect, "$in"
@@ -464,17 +488,29 @@ module Mongoid
         # @example Execute an $nin in a where query.
         #   selectable.where(:field.nin => [ 1, 2, 3 ])
         #
-        # @param [ Hash ] criterion The field/value criterion pairs.
+        # @param [ Hash ] condition The field/value criterion pairs.
         #
         # @return [ Selectable ] The cloned selectable.
         #
         # @since 1.0.0
-        def nin(criterion)
-          if criterion.nil?
+        def nin(condition)
+          if condition.nil?
             raise Errors::CriteriaArgumentRequired, :nin
           end
 
-          send(strategy || :__intersect__, with_array_values(criterion), "$nin")
+          condition = expand_condition_to_array_values(condition)
+
+          if strategy
+            send(strategy, condition, "$nin")
+          else
+            condition.inject(clone) do |query, (field, value)|
+              v = {'$nin' => value}
+              if negating?
+                v = {'$not' => v}
+              end
+              query.add_field_expression(field.to_s, v)
+            end.reset_strategies!
+          end
         end
         alias :not_in :nin
         key :nin, :intersect, "$nin"
@@ -808,29 +844,6 @@ module Mongoid
               end
             end
             query.reset_strategies!
-          end
-        end
-
-        # Convert the criterion values to $in friendly values. This means you,
-        # array.
-        #
-        # @api private
-        #
-        # @example Convert all the values to arrays.
-        #   selectable.with_array_values({ key: 1...4 })
-        #
-        # @param [ Hash ] criterion The criterion.
-        #
-        # @return [ Hash ] The $in friendly criterion (array values).
-        #
-        # @since 1.0.0
-        def with_array_values(criterion)
-          if criterion.nil?
-            raise ArgumentError, 'Criterion cannot be nil here'
-          end
-
-          criterion.each_pair do |key, value|
-            criterion[key] = value.__array__
           end
         end
 

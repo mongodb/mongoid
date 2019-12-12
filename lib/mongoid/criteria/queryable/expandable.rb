@@ -66,6 +66,27 @@ module Mongoid
           [kv.keys.first.to_s, kv.values.first]
         end
 
+        # Expand criterion values to arrays, to be used with operators that
+        # take an array as argument such as $in.
+        #
+        # @example Convert all the values to arrays.
+        #   selectable.with_array_values({ key: 1...4 })
+        #
+        # @param [ Hash ] criterion The criterion.
+        #
+        # @return [ Hash ] The $in friendly criterion with array values.
+        #
+        # @api private
+        def expand_condition_to_array_values(criterion)
+          if criterion.nil?
+            raise ArgumentError, 'Criterion cannot be nil here'
+          end
+
+          Hash[criterion.map do |key, value|
+            [key, value.__array__]
+          end]
+        end
+
       end
     end
   end
