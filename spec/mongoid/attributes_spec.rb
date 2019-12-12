@@ -1651,6 +1651,61 @@ describe Mongoid::Attributes do
     end
   end
 
+  describe '#unalias_attribute' do
+    let(:shirt) { Shirt.new }
+    let(:id) { '1234' }
+
+    context 'when creating object' do
+      let(:shirt) { Shirt.new(id: id) }
+
+      it 'id and _id are not the same' do
+        expect(shirt.id).to eq(id)
+        expect(shirt._id).not_to eq(id)
+      end
+    end
+
+    context 'update' do
+      before do
+        shirt.update(id: id)
+      end
+
+      it 'updates id but not_id' do
+        expect(shirt.id).to eq(id)
+        expect(shirt._id).not_to eq(id)
+      end
+    end
+
+    context 'id=' do
+      before do
+        shirt.id = id
+      end
+
+      it 'sets id and not _id' do
+        expect(shirt.id).to eq(id)
+        expect(shirt._id).not_to eq(id)
+      end
+    end
+
+    context 'id?' do
+      context 'with null id' do
+        it 'returns false' do
+          expect(shirt.id?).to be false
+          expect(shirt._id?).to be true
+        end
+      end
+
+      context 'with id' do
+        before do
+          shirt.id = id
+        end
+
+        it 'returns true' do
+          expect(shirt.id?).to be true
+        end
+      end
+    end
+  end
+
   describe "#alias_attribute" do
 
     let(:product) do

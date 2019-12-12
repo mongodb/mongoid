@@ -334,7 +334,24 @@ module Mongoid
         alias_method "#{name}_will_change!", "#{original}_will_change!"
         alias_method "#{name}_before_type_cast", "#{original}_before_type_cast"
       end
+
+      # TODO: documentation
+      def unalias_attribute(name)
+        raise "Unaliased field" unless aliased_fields.delete(name.to_s)
+
+        remove_method name
+        remove_method "#{name}="
+        remove_method "#{name}?"
+        remove_method "#{name}_change"
+        remove_method "#{name}_changed?"
+        remove_method "reset_#{name}!"
+        remove_method "reset_#{name}_to_default!"
+        remove_method "#{name}_was"
+        remove_method "#{name}_will_change!"
+        remove_method "#{name}_before_type_cast"
+      end
     end
+
 
     private
 

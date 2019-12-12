@@ -63,6 +63,8 @@ module Mongoid
         type: BSON::ObjectId
       )
 
+      alias_attribute(:id, :_id)
+
       # alias :id :_id
       # alias :id= :_id=
     end
