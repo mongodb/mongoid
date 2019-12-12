@@ -37,7 +37,8 @@ module Mongoid
     # Constant for all names of the id field in a document.
     #
     # @since 5.0.0
-    IDS = [ :_id, :id, '_id', 'id' ].freeze
+    # IDS = [ :_id, :id, '_id', 'id' ].freeze
+    IDS = [ :_id, '_id', ].freeze
 
     included do
       class_attribute :aliased_fields
@@ -46,7 +47,8 @@ module Mongoid
       class_attribute :pre_processed_defaults
       class_attribute :post_processed_defaults
 
-      self.aliased_fields = { "id" => "_id" }
+      # self.aliased_fields = { "id" => "_id" }
+      self.aliased_fields = { }
       self.fields = {}
       self.localized_fields = {}
       self.pre_processed_defaults = []
