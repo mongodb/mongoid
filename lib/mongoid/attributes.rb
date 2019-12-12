@@ -322,18 +322,17 @@ module Mongoid
       # @since 2.3.0
       def alias_attribute(name, original)
         aliased_fields[name.to_s] = original.to_s
-        class_eval <<-RUBY
-          alias #{name}  #{original}
-          alias #{name}= #{original}=
-          alias #{name}? #{original}?
-          alias #{name}_change   #{original}_change
-          alias #{name}_changed? #{original}_changed?
-          alias reset_#{name}!   reset_#{original}!
-          alias reset_#{name}_to_default!   reset_#{original}_to_default!
-          alias #{name}_was      #{original}_was
-          alias #{name}_will_change! #{original}_will_change!
-          alias #{name}_before_type_cast #{original}_before_type_cast
-        RUBY
+
+        alias_method name, original
+        alias_method "#{name}=", "#{original}="
+        alias_method "#{name}?", "#{original}?"
+        alias_method "#{name}_change", "#{original}_change"
+        alias_method "#{name}_changed?", "#{original}_changed?"
+        alias_method "reset_#{name}!", "reset_#{original}!"
+        alias_method "reset_#{name}_to_default!", "reset_#{original}_to_default!"
+        alias_method "#{name}_was", "#{original}_was"
+        alias_method "#{name}_will_change!", "#{original}_will_change!"
+        alias_method "#{name}_before_type_cast", "#{original}_before_type_cast"
       end
     end
 

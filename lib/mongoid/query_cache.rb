@@ -183,12 +183,10 @@ module Mongoid
 
       def alias_query_cache_clear(*method_names)
         method_names.each do |method_name|
-          class_eval <<-CODE, __FILE__, __LINE__ + 1
-              def #{method_name}_with_clear_cache(*args)
-                QueryCache.clear_cache
-                #{method_name}_without_clear_cache(*args)
-              end
-            CODE
+          define_method("#{method_name}_with_clear_cache") do |*args|
+            QueryCache.clear_cache
+            send("#{method_name}_without_clear_cache", *args)
+          end
 
           alias_method "#{method_name}_without_clear_cache", method_name
           alias_method method_name, "#{method_name}_with_clear_cache"

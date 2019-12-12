@@ -89,14 +89,21 @@ module Mongoid
 
       relation_classes.each { |c| c.send(:include, InstanceMethods) }
       method_name = "touch_#{name}_after_create_or_destroy"
-      association.inverse_class.class_eval <<-TOUCH, __FILE__, __LINE__ + 1
-          def #{method_name}
-            without_autobuild do
-              relation = __send__(:#{name})
-              relation.touch #{":#{association.touch_field}" if association.touch_field} if relation
+      association.inverse_class.class_eval do
+        define_method(method_name) do
+          without_autobuild do
+            if relation = __send__(name)
+              if association.touch_field
+                # Note that this looks up touch_field at runtime, rather than
+                # at method definition time.
+                relation.touch association.touch_field
+              else
+                relation.touch
+              end
             end
           end
-      TOUCH
+        end
+      end
       method_name.to_sym
     end
   end
