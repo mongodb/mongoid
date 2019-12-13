@@ -3,6 +3,16 @@
 
 require "spec_helper"
 
+class FieldWithSerializer
+  def evolve(object)
+    Integer.evolve(object)
+  end
+
+  def localized?
+    false
+  end
+end
+
 describe Mongoid::Criteria::Queryable::Selectable do
 
   let(:query) do
@@ -46,9 +56,239 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
+  shared_examples_for 'supports merge strategies' do
+
+    context 'when the field is not aliased' do
+
+      context "when the strategy is not set" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).send(query_method, first: [ 3, 4 ])
+        end
+
+        it "combines the conditions with $and" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 1, 2 ] },
+            '$and' => [{'first' => {operator => [3, 4]}}],
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is intersect" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).intersect.send(query_method, first: [ 2, 3 ])
+        end
+
+        it "intersects the conditions" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 2 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is override" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).override.send(query_method, first: [ 3, 4 ])
+        end
+
+        it "overwrites the first condition" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is union" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).union.send(query_method, first: [ 3, 4 ])
+        end
+
+        it "unions the conditions" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 1, 2, 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+    end
+
+    context 'when the field is aliased' do
+
+      context "when the strategy is not set" do
+
+        let(:selection) do
+          query.send(query_method, id: [ 1, 2 ]).send(query_method, _id: [ 3, 4 ])
+        end
+
+        it "combines the conditions with $and" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 1, 2 ] },
+            '$and' => [{'_id' => {operator => [3, 4]}}],
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is intersect" do
+
+        let(:selection) do
+          query.send(query_method, id: [ 1, 2 ]).intersect.send(query_method, _id: [ 2, 3 ])
+        end
+
+        it "intersects the conditions" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 2 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is override" do
+
+        let(:selection) do
+          query.send(query_method, _id: [ 1, 2 ]).override.send(query_method, id: [ 3, 4 ])
+        end
+
+        it "overwrites the first condition" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is union" do
+
+        let(:selection) do
+          query.send(query_method, _id: [ 1, 2 ]).union.send(query_method, id: [ 3, 4 ])
+        end
+
+        it "unions the conditions" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 1, 2, 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+    end
+
+    context 'when the field uses a serializer' do
+
+      let(:query) do
+        Mongoid::Query.new({}, { "field" => FieldWithSerializer.new })
+      end
+
+
+      context "when the strategy is not set" do
+
+        let(:selection) do
+          query.send(query_method, field: [ '1', '2' ]).send(query_method, field: [ '3', '4' ])
+        end
+
+        it "combines the conditions with $and" do
+          expect(selection.selector).to eq({
+            "field" => { operator => [ 1, 2 ] },
+            '$and' => [{'field' => {operator => [3, 4]}}],
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is set" do
+
+        let(:selection) do
+          query.send(query_method, field: [ '1', '2' ]).intersect.send(query_method, field: [ '2', '3' ])
+        end
+
+        it "intersects the conditions" do
+          expect(selection.selector).to eq({
+            "field" => { operator => [ 2 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+    end
+
+    context 'when operator value is a Range' do
+
+      context "when there is no existing condition and strategy is not specified" do
+
+        let(:selection) do
+          query.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 2, 3, 4 ] }
+          })
+
+        end
+      end
+
+      context "when there is no existing condition and strategy is specified" do
+
+        let(:selection) do
+          query.union.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 2, 3, 4 ] }
+          })
+
+        end
+      end
+
+      context "when existing condition has Array value" do
+
+        let(:selection) do
+          query.send(query_method, foo: [ 1, 2 ]).union.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 1, 2, 3, 4 ] }
+          })
+
+        end
+      end
+
+      context "when existing condition has Range value" do
+
+        let(:selection) do
+          query.send(query_method, foo: 1..2).union.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 1, 2, 3, 4 ] }
+          })
+
+        end
+      end
+    end
+  end
+
   describe "#all" do
 
     let(:query_method) { :all }
+    let(:operator) { '$all' }
 
     context "when provided no criterion" do
 
@@ -84,23 +324,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it "adds the $all selector" do
             expect(selection.selector).to eq({
               "field" => { "$all" => [ 1, 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when providing a range" do
-
-          let(:selection) do
-            query.all(field: 1..3)
-          end
-
-          it "adds the $all selector with converted range" do
-            expect(selection.selector).to eq({
-              "field" => { "$all" => [ 1, 2, 3 ] }
             })
           end
 
@@ -157,23 +380,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it "adds the $all selector" do
             expect(selection.selector).to eq({
               "field" => { "$all" => [ 1, 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when providing a range" do
-
-          let(:selection) do
-            query.all(field: "1".."3")
-          end
-
-          it "adds the $all selector with converted range" do
-            expect(selection.selector).to eq({
-              "field" => { "$all" => [ 1, 2, 3 ] }
             })
           end
 
@@ -244,166 +450,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when no serializers are provided" do
-
-          context "when the strategy is the default (union)" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).all(first: [ 3, 4 ])
-            end
-
-            it "overwrites the first $all selector" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is intersect" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).intersect.all(first: [ 2, 3 ])
-            end
-
-            it "intersects the $all selectors" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 2 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is override" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).override.all(first: [ 3, 4 ])
-            end
-
-            it "overwrites the first $all selector" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is union" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).union.all(first: [ 3, 4 ])
-            end
-
-            it "unions the $all selectors" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-        end
-
-        context "when serializers are provided" do
-
-          before(:all) do
-            class Field
-              def evolve(object)
-                Integer.evolve(object)
-              end
-              def localized?
-                false
-              end
-            end
-          end
-
-          after(:all) do
-            Object.send(:remove_const, :Field)
-          end
-
-          let!(:query) do
-            Mongoid::Query.new({}, { "field" => Field.new })
-          end
-
-          context "when the strategy is the default (union)" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).all(field: [ "3", "4" ])
-            end
-
-            it "overwrites the field $all selector" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is intersect" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).intersect.all(field: [ "2", "3" ])
-            end
-
-            it "intersects the $all selectors" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 2 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is override" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).override.all(field: [ "3", "4" ])
-            end
-
-            it "overwrites the field $all selector" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is union" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).union.all(field: [ "3", "4" ])
-            end
-
-            it "unions the $all selectors" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-        end
+        it_behaves_like 'supports merge strategies'
       end
     end
   end
@@ -979,6 +1026,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
   describe "#in" do
 
     let(:query_method) { :in }
+    let(:operator) { '$in' }
 
     it_behaves_like 'requires an argument'
     it_behaves_like 'requires a non-nil argument'
@@ -994,23 +1042,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it "adds the $in selector" do
           expect(selection.selector).to eq({
             "field" =>  { "$in" => [ 1, 2 ] }
-          })
-        end
-
-        it "returns a cloned query" do
-          expect(selection).to_not equal(query)
-        end
-      end
-
-      context "when providing a range" do
-
-        let(:selection) do
-          query.in(field: 1..3)
-        end
-
-        it "adds the $in selector with converted range" do
-          expect(selection.selector).to eq({
-            "field" =>  { "$in" => [ 1, 2, 3 ] }
           })
         end
 
@@ -1080,102 +1111,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when the strategy is the default (intersection)" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ].freeze).in(first: [ 2, 3 ])
-          end
-
-          it "intersects the $in selectors" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context 'when the field is aliased' do
-
-          before(:all) do
-            class TestModel
-              include Mongoid::Document
-            end
-          end
-
-          after(:all) do
-            Object.send(:remove_const, :TestModel)
-          end
-
-          let(:bson_object_id) do
-            BSON::ObjectId.new
-          end
-
-          let(:selection) do
-            TestModel.in(id: [bson_object_id.to_s]).in(id: [bson_object_id.to_s])
-          end
-
-          it "intersects the $in selectors" do
-            expect(selection.selector).to eq("_id" =>  { "$in" => [ bson_object_id ] })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is intersect" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ]).intersect.in(first: [ 2, 3 ])
-          end
-
-          it "intersects the $in selectors" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the strategy is override" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ]).override.in(first: [ 3, 4 ])
-          end
-
-          it "overwrites the first $in selector" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the strategy is union" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ]).union.in(first: [ 3, 4 ])
-          end
-
-          it "unions the $in selectors" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 1, 2, 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
+        it_behaves_like 'supports merge strategies'
       end
     end
   end
@@ -1667,6 +1603,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
   describe "#nin" do
 
     let(:query_method) { :nin }
+    let(:operator) { '$nin' }
 
     it_behaves_like 'requires an argument'
     it_behaves_like 'requires a non-nil argument'
@@ -1690,23 +1627,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
-      context "when providing a range" do
-
-        let(:selection) do
-          query.nin(field: 1..3)
-        end
-
-        it "adds the $nin selector with converted range" do
-          expect(selection.selector).to eq({
-            "field" =>  { "$nin" => [ 1, 2, 3 ] }
-          })
-        end
-
-        it "returns a cloned query" do
-          expect(selection).to_not equal(query)
-        end
-      end
-
       context "when providing a single value" do
 
         let(:selection) do
@@ -1721,35 +1641,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "returns a cloned query" do
           expect(selection).to_not equal(query)
-        end
-      end
-    end
-
-    context "when unioning on the same field" do
-
-      context "when the field is not aliased" do
-
-        let(:selection) do
-          query.nin(first: [ 1, 2 ]).union.nin(first: [ 3, 4 ])
-        end
-
-        it "unions the selection on the field" do
-          expect(selection.selector).to eq(
-            { "first" => { "$nin" => [ 1, 2, 3, 4 ]}}
-          )
-        end
-      end
-
-      context "when the field is aliased" do
-
-        let(:selection) do
-          query.nin(id: [ 1, 2 ]).union.nin(id: [ 3, 4 ])
-        end
-
-        it "unions the selection on the field" do
-          expect(selection.selector).to eq(
-            { "_id" => { "$nin" => [ 1, 2, 3, 4 ]}}
-          )
         end
       end
     end
@@ -1797,73 +1688,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when the stretegy is the default (intersection)" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).nin(first: [ 2, 3 ])
-          end
-
-          it "intersects the $nin selectors" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is intersect" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).intersect.nin(first: [ 2, 3 ])
-          end
-
-          it "intersects the $nin selectors" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is override" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).override.nin(first: [ 3, 4 ])
-          end
-
-          it "overwrites the first $nin selector" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is union" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).union.nin(first: [ 3, 4 ])
-          end
-
-          it "unions the $nin selectors" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 1, 2, 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
+        it_behaves_like 'supports merge strategies'
       end
     end
   end

@@ -79,6 +79,8 @@ module Mongoid
           else
             selector.store(operator, op_expr)
           end
+
+          self
         end
 
         # Adds a logical operator expression to the selector.

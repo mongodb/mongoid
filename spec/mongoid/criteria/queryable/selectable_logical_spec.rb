@@ -836,15 +836,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
         expect(query.negating).to be nil
       end
 
-      context "when the following criteria is a query method" do
-
+      shared_examples_for 'negates the next condition' do
         let(:selection) do
-          query.not.all(field: [ 1, 2 ])
+          query.not.send(query_method, field: [ 1, 2 ])
         end
 
-        it "negates the all selection" do
+        it "negates the next condition" do
           expect(selection.selector).to eq(
-            { "field" => { "$not" => { "$all" => [ 1, 2 ] }}}
+            { "field" => { "$not" => { operator => [ 1, 2 ] }}}
           )
         end
 
@@ -853,6 +852,27 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it "removes the negation on the clone" do
           expect(selection).to_not be_negating
         end
+      end
+
+      context "when the next condition is #all" do
+        let(:query_method) { :all }
+        let(:operator) { '$all' }
+
+        it_behaves_like 'negates the next condition'
+      end
+
+      context "when the next condition is #in" do
+        let(:query_method) { :in }
+        let(:operator) { '$in' }
+
+        it_behaves_like 'negates the next condition'
+      end
+
+      context "when the next condition is #nin" do
+        let(:query_method) { :nin }
+        let(:operator) { '$nin' }
+
+        it_behaves_like 'negates the next condition'
       end
 
       context "when the following criteria is a gt method" do
@@ -867,9 +887,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           )
         end
 
-        it "returns a coned query" do
-          expect(selection).to_not eq(query)
-        end
+        it_behaves_like 'returns a cloned query'
 
         it "removes the negation on the clone" do
           expect(selection).to_not be_negating
