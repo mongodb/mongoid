@@ -8,7 +8,7 @@ describe Mongoid::Document do
   describe 'BSON::Binary field' do
     context 'when assigned a BSON::Binary instance' do
       let(:data) do
-        BSON::Binary.new('\x00\xfe\xff')
+        BSON::Binary.new("hello world")
       end
 
       let(:registry) do
@@ -33,7 +33,7 @@ describe Mongoid::Document do
       let(:data) do
         # Frozen string literals do not allow setting encoding on a string
         # literal - work around by composing the string at runtime
-        ("\x00\xfe\xff" * 2).force_encoding('BINARY')
+        ([0, 253, 254] * 2).map(&:chr).join.force_encoding('BINARY')
       end
 
       let(:registry) do
