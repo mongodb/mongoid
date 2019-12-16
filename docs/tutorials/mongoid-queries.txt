@@ -249,11 +249,60 @@ on symbols, as follows:
 
   Band.order(:name.desc, :description.asc)
 
-Finally, the arguments can be provided as a string using SQL syntax:
+The arguments can be provided as a string using SQL syntax:
 
 .. code-block:: ruby
 
   Band.order('name desc, description asc')
+
+Finally, there are ``asc`` and ``desc`` methods that can be used instead of
+``order``/``order_by``:
+
+.. code-block:: ruby
+
+  Band.asc('name').desc('description')
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>1, "description"=>-1}}
+    class:    Band
+    embedded: false>
+
+``order`` calls can be chained, in which case the oldest calls define the
+most significant criteria and the newest calls define the least significant
+ones (since in Ruby hashes maintain the order of their keys):
+
+.. code-block:: ruby
+
+  Band.order('name desc').order('description asc')
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>-1, "description"=>1}}
+    class:    Band
+    embedded: false>
+
+This can sometimes lead to surprising results if there are scopes, including
+the default scope, that use ``order``/``order_by``. For example, in the
+following snippet bands are ordered by name first because the order in the
+default scope takes precedence over the order given in the query, due to
+the default scope being evaluated first:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :year, type: Integer
+    
+    default_scope -> { order(name: :asc) }
+  end
+  
+  Band.order(year: :desc)
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>1, "year"=>-1}}
+    class:    Band
+    embedded: false>
 
 
 Logical Operations
