@@ -58,6 +58,42 @@ describe Mongoid::Factory do
         end
       end
 
+      context "when the type is aliased subclass of the provider and alias is not camelized" do
+        Doctor.override_inheritance_type_value "bones"
+
+        let(:person) do
+          described_class.build(Person, { "_type" => "bones" })
+        end
+
+        it "instantiates the subclass" do
+          expect(person.class).to eq(Doctor)
+        end
+      end
+
+      context "additional levels of subclassing" do
+        class Specialist < Doctor
+          override_inheritance_type_value 'bones'
+        end
+
+        class Nephrologist < Specialist; end
+
+        let(:doctor) do
+          described_class.build(Person, { "_type" => "bones" })
+        end
+
+        it "instantiates the subclass" do
+          expect(doctor.class).to eq(Doctor)
+        end
+
+        let(:nephrologist) do
+          described_class.build(Person, { "_type" => "Nephrologist"})
+        end
+
+        it "instantiates the second level subclass" do
+          expect(nephrologist.class).to eq(Nephrologist)
+        end
+      end
+
       context "when type is an empty string" do
 
         let(:attributes) do

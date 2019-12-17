@@ -365,7 +365,7 @@ module Mongoid
       # @returns [ String ] Ruby document type name as camelcased string
       def __type(type)
         klass = (@_type_mappings || {})[type]
-        descendants.each {|d| break if klass ||= d.__type(type) } unless klass
+        descendants.each {|d| break if klass ||= d.__type(type.camelize) } unless klass
         klass
       end
 
@@ -401,7 +401,7 @@ module Mongoid
       #
       # @param [ String ] name The name to store in the type field
       def override_inheritance_type_value(name)
-        c_name = name.to_s.camelize
+        c_name = name.to_s
         @overridden_inheritance_type_value = c_name
         superclass.map_type(self, c_name)
       end
