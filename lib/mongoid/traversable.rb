@@ -207,7 +207,7 @@ module Mongoid
         unless fields.has_key?("_type")
           field(:_type, default: self.name, type: String)
         end
-        subclass_default = subclass.name || ->{ self.class.name }
+        subclass_default = subclass._overridden_inheritance_type_value || subclass.name || ->{ self.class.name }
         subclass.field(:_type, default: subclass_default, type: String, overwrite: true)
       end
     end

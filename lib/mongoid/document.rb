@@ -353,7 +353,57 @@ module Mongoid
       #
       # @since 1.0.0
       def _types
-        @_type ||= (descendants + [ self ]).uniq.map(&:to_s)
+        @_type ||= (descendants + [ self ] + (@_type_mappings || {}).keys + descendants.map{|d| d._types }.flatten).map(&:to_s).uniq
+      end
+
+      # Returns the class name to instantiate after appying
+      # override_inheritance_type_value.
+      #
+      # @param [ String ] type The descendant type name (actual Ruby class name
+      # or arbitrary alias name configured using
+      # override_inheritance_type_value.
+      # @returns [ String ] Ruby document type name as camelcased string
+      def __type(type)
+        klass = (@_type_mappings || {})[type]
+        descendants.each {|d| break if klass ||= d.__type(type) } unless klass
+        klass
+      end
+
+      # Returns the class name to instantiate after appying
+      # override_inheritance_type_value.
+      #
+      # @param [ String ] type The descendant type name (actual Ruby class name
+      # or arbitrary alias name configured using
+      # override_inheritance_type_value.
+      # @eturns [ Class ] Ruby document type to instantiate
+      def _type(type)
+        klass = (__type(type) || type).constantize
+      end
+
+      def map_type(klass, name)
+        @_type_mappings ||= {}
+        @_type_mappings[name] = klass.name
+      end
+
+      def _overridden_inheritance_type_value
+        @overridden_inheritance_type_value
+      end
+
+      # Change the stored type name for single table inheritance. The default
+      # is to use the Ruby class name but that can prove problematic when
+      # there are multiple programs accessing the database with different
+      # class names or source languages.
+      #
+      # @example Override the type name
+      #
+      # class HospitalWorker::Doctor < HospitalWorker::Base
+      #   override_inheritance_type_value 'MD'
+      #
+      # @param [ String ] name The name to store in the type field
+      def override_inheritance_type_value(name)
+        c_name = name.to_s.camelize
+        @overridden_inheritance_type_value = c_name
+        superclass.map_type(self, c_name)
       end
 
       # Set the i18n scope to overwrite ActiveModel.

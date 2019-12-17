@@ -46,6 +46,18 @@ describe Mongoid::Factory do
         end
       end
 
+      context "when the type is aliased subclass of the provider" do
+        Doctor.override_inheritance_type_value "Bones"
+
+        let(:person) do
+          described_class.build(Person, { "_type" => "Bones" })
+        end
+
+        it "instantiates the subclass" do
+          expect(person.class).to eq(Doctor)
+        end
+      end
+
       context "when type is an empty string" do
 
         let(:attributes) do
@@ -73,6 +85,26 @@ describe Mongoid::Factory do
 
         it "instantiates based on the type" do
           expect(person.title).to eq("Sir")
+        end
+      end
+
+      context "when type is aliased subclass name" do
+        Doctor.override_inheritance_type_value 'Bones'
+
+        let(:attributes) do
+          { "title" => "Sir", "_type" => "Bones" }
+        end
+
+        let(:person) do
+          described_class.build(Person, attributes)
+        end
+
+        it "uses the subclass alias for type" do
+          expect(person._type).to eq("Bones")
+        end
+
+        it "instantiates the subclass" do
+          expect(person.class).to eq(Doctor)
         end
       end
     end

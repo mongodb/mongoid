@@ -22,7 +22,7 @@ module Mongoid
       attributes ||= {}
       type = attributes[TYPE] || attributes[TYPE.to_sym]
       if type && klass._types.include?(type)
-        type.constantize.new(attributes)
+        klass._type(type).new(attributes)
       else
         klass.new(attributes)
       end
@@ -66,7 +66,7 @@ module Mongoid
 
         # Check if the class exists
         begin
-          constantized = camelized.constantize
+          constantized = klass._type(camelized)
         rescue NameError
           raise Errors::UnknownModel.new(camelized, type)
         end
