@@ -108,8 +108,7 @@ module Mongoid
         end.compact
       end
 
-      # Shared collection for each model given the provided globs and the class is
-      # not embedded..
+      # Shard collections for models that declare shard keys.
       #
       # @example Shard all collections
       # Mongoid::Tasks::Database.shard_collections
@@ -117,17 +116,29 @@ module Mongoid
       # @return [ Array<Class> ] The sharded models
       def shard_collections(models = ::Mongoid.models)
         models.each do |model|
-          next unless !model.embedded? || model.cyclic?
-          next unless model.collection.cluster.sharded?
-          next if model.shard_config.blank?
+          next if model.shard_config.empty?
 
-          stats = model.collection.database.command(collStats: model.collection.name)
-          next if stats.first[:sharded]
+          if model.embedded? && !model.cyclic?
+            logger.warn("MONGOID: #{model} has shard config but is emdedded")
+            next
+          end
 
-          admin_db = model.collection.client.list_mongo_databases(name: :admin).first
+          unless model.collection.cluster.sharded?
+            logger.warn("MONGOID: #{model} has shard config but is not persisted in a sharded cluster: #{model.collection.cluster.summary}")
+            next
+          end
+
+          stats = model.collection.database.command(collStats: model.collection.name).first
+          if stats[:sharded]
+            logger.info("MONGOID: #{model.collection.namespace} is already sharded for #{model}")
+            next
+          end
+
+          admin_db = model.collection.client.use(:admin).database
           admin_db.command(enableSharding: model.collection.database.name)
           admin_db.command(shardCollection: model.collection.namespace, **model.shard_config)
-          logger.info("MONGOID: Shard for #{model.collection.namespace}")
+
+          logger.info("MONGOID: Sharded collection #{model.collection.namespace} for #{model}")
         end.compact
       end
 
