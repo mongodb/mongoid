@@ -1,6 +1,6 @@
-==========
+========
 Sharding
-==========
+========
 
 .. contents:: On this page
    :local:
@@ -8,59 +8,95 @@ Sharding
    :depth: 1
    :class: singlecol
 
-Specifying Sharding Keys
-------------------------
 
-You can define shard keys on documents using the shard_key macro.
+Mongoid can assist with setting up collection sharding in sharded environments.
 
-.. code-block:: ruby
-    class Person
-      include Mongoid::Document
-      field :ssn
 
-      shard_key ssn: 1
-      index ssn: 1 # the collection must have an index that starts with the shard key
-    end
+Declaring Shard Keys
+--------------------
 
-You cloud define shard_key with old syntax.
+Shard keys can be declared on models using the ``shard_key`` macro:
 
 .. code-block:: ruby
-    class Person
-      include Mongoid::Document
-      field :ssn
 
-      shard_key :ssn # same with shard_key ssn: 1
-      index ssn: 1 # the collection must have an index that starts with the shard key
-    end
+  class Person
+    include Mongoid::Document
+    
+    field :ssn
 
-You can define Hashed shard key as well.
+    shard_key ssn: 1
+    
+    # The collection must also have an index that starts with the shard key.
+    index ssn: 1
+  end
+
+Note that in order to shard a collection, the collection must have an index
+that starts with the shard key. Mongoid provides `index management
+<mongoid-indexes>`_ functionality, which the examples here take
+advantage of.
+
+Mongoid supports two syntaxes for declaring shard keys. The standard syntax
+follows the format of MongoDB `shardCollection shell helper
+<https://docs.mongodb.com/manual/reference/method/sh.shardCollection/#sh.shardCollection>`_
+and allows specifying ranged and hashed shard keys, compound shard keys and
+collection sharding options:
 
 .. code-block:: ruby
-    class Person
-      include Mongoid::Document
-      field :ssn
 
-      shard_key ssn: "hashed"
-      index ssn: 1
-    end
+  shard_key ssn: 1
+  
+  shard_key ssn: 1, country: 1
+  
+  shard_key ssn: :hashed
+  
+  shard_key {ssn: :hashed}, unique: true
 
-You can pass other args in `mongo doc <https://docs.mongodb.com/manual/reference/method/sh.shardCollection/#sh.shardCollection>`_ as well.
+The alternative is the shorthand syntax, in which only the keys are given.
+This syntax only supports ranged shard keys and does not allow options to
+be specified:
 
-.. code block:: ruby
-    class Person
-      include Mongoid::Document
-      field :ssn
+.. code-block:: ruby
 
-      shard_key({ssn: "hashed"}, unique: true)
-      index ssn: 1
-    end
+  shard_key :ssn
+  
+  shard_key :ssn, :country
+
+``shard_key`` macro can take the name of a ``belongs_to`` association in
+place of a field name, in which case Mongoid will use the foreign key
+configured in the association as the field name:
+
+  class Person
+    include Mongoid::Document
+    
+    belongs_to :country
+
+    # Shards by country_id.
+    shard_key country: 1
+    
+    # The collection must also have an index that starts with the shard key.
+    index ssn: 1
+  end
+
 
 Sharding Management Rake Tasks
 ------------------------------
 
-When you want to sharding the collections in the database, use the provided ``db:mongoid:shard_collections`` Rake task:
+To shard collections in the database according to the shard keys defined in
+the models, run the ``db:mongoid:shard_collections`` Rake task.
+If necessary, run the ``db:mongoid:create_indexes`` Rake task prior to
+sharding collections:
 
 .. code-block:: bash
 
-    $ rake db:mongoid:create_indexes # need create indexes before sharding
-    $ rake db:mongoid:shard_collections
+  rake db:mongoid:create_indexes
+  rake db:mongoid:shard_collections
+
+.. note::
+
+  Like with index management rake tasks, sharding management rake tasks
+  generally do not stop and fail when they encounter the problem with a
+  particular model class. Instead they log the problem (to the configured
+  Mongoid logger) at an appropriate level and continue with the next model.
+  When Mongoid is used in a Rails application, this means the results of
+  the rake task execution will generally be found in the per-environment
+  log file like ``log/development.log``.
