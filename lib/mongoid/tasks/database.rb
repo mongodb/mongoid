@@ -128,6 +128,9 @@ module Mongoid
             next
           end
 
+          # Database must exist in order to run collStats
+          model.collection.database.command(create: model.collection.name)
+
           stats = model.collection.database.command(collStats: model.collection.name).first
           if stats[:sharded]
             logger.info("MONGOID: #{model.collection.namespace} is already sharded for #{model}")
