@@ -20,7 +20,20 @@ module Mongoid
       include Threaded::Lifecycle
       include Marshalable
 
-      attr_accessor :_base, :_association, :_target
+      # Model instance for the base of the association.
+      #
+      # For example, if a Post embeds_many Comments, _base is a particular
+      # instance of the Post model.
+      attr_accessor :_base
+
+      attr_accessor :_association
+
+      # Model instance for one to one associations, or array of model instances
+      # for one to many associations, for the target of the association.
+      #
+      # For example, if a Post embeds_many Comments, _target is an array of
+      # Comment models embedded in a particular Post.
+      attr_accessor :_target
 
       # Backwards compatibility with Mongoid beta releases.
       delegate :foreign_key, :inverse_foreign_key, to: :_association
