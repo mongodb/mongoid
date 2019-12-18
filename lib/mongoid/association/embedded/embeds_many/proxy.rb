@@ -364,15 +364,12 @@ module Mongoid
             Binding.new(_base, _target, _association)
           end
 
-          # Returns the "#{criteria}"# object for the target class with its documents set
-          # to target.
-          #
-          # @example Get a criteria for the relation.
-          #   relation.criteria
+          # Returns the +Criteria+ object for the target class with its
+          # documents set to the list of target documents in the association.
           #
           # @return [ Criteria ] A new criteria.
           def criteria
-            @criteria ||= _association.criteria(_base, _target)
+            _association.criteria(_base, _target)
           end
 
           # Deletes one document from the target and unscoped.
@@ -448,8 +445,8 @@ module Mongoid
             end
           end
 
-          # Apply the association ordering or the default scoping to the provided
-          # documents.
+          # Apply the association ordering and default scoping (defined on
+          # association's target class) to the provided documents.
           #
           # @example Apply scoping.
           #   person.addresses.scope(target)
@@ -460,7 +457,10 @@ module Mongoid
           #
           # @since 2.4.0
           def scope(docs)
-            return docs unless _association.order || _association.klass.default_scoping?
+            unless _association.order || _association.klass.default_scoping?
+              return docs
+            end
+
             crit = _association.klass.order_by(_association.order)
             crit.embedded = true
             crit.documents = docs
