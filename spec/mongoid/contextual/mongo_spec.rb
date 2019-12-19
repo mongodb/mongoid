@@ -1830,6 +1830,8 @@ describe Mongoid::Contextual::Mongo do
     end
 
     context "when the output specifies a different db" do
+      # Limit is not supported in sharded clusters
+      require_topology :single, :replica_set
 
       let(:criteria) do
         Band.limit(1)
