@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require "spec_helper"
+require_relative './shardable_models'
 
 describe Mongoid::Shardable do
 
@@ -24,60 +25,82 @@ describe Mongoid::Shardable do
 
   describe ".shard_key" do
 
-    let(:klass) do
-      Band
-    end
+    context 'when full syntax is used' do
+      context 'with symbol value' do
+        it 'sets shard key fields to symbol value' do
+          SmProducer.shard_key_fields.should == %i(age gender)
+        end
 
-    before do
-      Band.shard_key(:name)
-    end
+        it 'sets shard config' do
+          SmProducer.shard_config.should == {
+            key: {age: 1, gender: 'hashed'},
+            options: {
+              unique: true,
+              numInitialChunks: 2,
+            },
+          }
+        end
 
-    it "specifies a shard key on the collection" do
-      expect(klass.shard_key_fields).to eq([:name])
-    end
-
-    context 'when a relation is used as the shard key' do
-
-      let(:klass) do
-        Game
+        it 'keeps hashed as string' do
+          SmProducer.shard_config[:key][:gender].should == 'hashed'
+        end
       end
 
-      before do
-        Game.shard_key(:person)
+      context 'with string value' do
+        it 'sets shard key fields to symbol value' do
+          SmActor.shard_key_fields.should == %i(age gender)
+        end
+
+        it 'sets shard config' do
+          SmActor.shard_config.should == {
+            key: {age: 1, gender: 'hashed'},
+            options: {},
+          }
+        end
+
+        it 'sets hashed to string' do
+          SmActor.shard_config[:key][:gender].should == 'hashed'
+        end
       end
 
-      it "converts the shard key to the foreign key field" do
-        expect(klass.shard_key_fields).to eq([:person_id])
+      context 'when passed association name' do
+        it 'uses foreign key as shard key in shard config' do
+          SmDriver.shard_config.should == {
+            key: {age: 1, agency_id: 'hashed'},
+            options: {},
+          }
+        end
+
+        it 'uses foreign key as shard key in shard key fields' do
+          SmDriver.shard_key_fields.should == %i(age agency_id)
+        end
       end
     end
-  end
 
-  describe ".shard_key new syntax" do
-
-    let(:klass) do
-      Band
-    end
-
-    before do
-      Band.shard_key({ name: 1 }, unique: true)
-    end
-
-    it "specifies a shard key on the collection" do
-      expect(klass.shard_key_fields).to eq([:name])
-    end
-
-    context 'when a relation is used as the shard key' do
-
-      let(:klass) do
-        Game
+    context 'when shorthand syntax is used' do
+      context 'with symbol value' do
+        it 'sets shard key fields to symbol value' do
+          SmMovie.shard_key_fields.should == %i(year)
+        end
       end
 
-      before do
-        Game.shard_key(person: 1)
+      context 'with string value' do
+        it 'sets shard key fields to symbol value' do
+          SmTrailer.shard_key_fields.should == %i(year)
+        end
       end
 
-      it "converts the shard key to the foreign key field" do
-        expect(klass.shard_key_fields).to eq([:person_id])
+      context 'when passed association name' do
+        it 'uses foreign key as shard key in shard config' do
+          SmDirector.shard_config.should == {
+            key: {agency_id: 1},
+            options: {},
+          }
+        end
+
+        it 'uses foreign key as shard key in shard key fields' do
+          SmDirector.shard_key_fields.should == %i(agency_id)
+        end
       end
     end
   end
