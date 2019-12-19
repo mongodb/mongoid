@@ -100,7 +100,11 @@ def transactions_supported?
 end
 
 def testing_transactions?
-  transactions_supported? && testing_replica_set?
+  transactions_supported? && if Gem::Version.new(ClusterConfig.instance.fcv_ish) >= Gem::Version.new('4.2')
+    %i(replica_set sharded).include?(ClusterConfig.instance.topology)
+  else
+    ClusterConfig.instance.topology == :replica_set
+  end
 end
 
 # Set the database that the spec suite connects to.
