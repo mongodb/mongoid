@@ -83,19 +83,38 @@ module Mongoid
       #   end
       #
       # @since 2.0.0
-      def shard_key(name_or_key, *names, unique: false, options: {})
-        key = if name_or_key.is_a?(Hash)
-                name_or_key
-              else
-                Hash[([name_or_key] + names).flatten.map { |f| [f, 1] }]
-              end
-        key = Hash[key.map { |k, v| [self.database_field_name(k).to_sym, v] }]
-        self.shard_key_fields = key.keys
+      def shard_key(*args)
+        unless args.first.is_a?(Hash)
+          # Shorthand syntax
+          if args.last.is_a?(Hash)
+            raise ArgumentError, 'Shorthand shard_key syntax does not permit options'
+          end
+
+          spec = Hash[args.map do |name|
+            [name, 1]
+          end]
+
+          return shard_key(spec)
+        end
+
+        if args.length > 2
+          raise ArgumentError, 'Full shard_key syntax requires 1 or 2 arguments'
+        end
+
+        spec, options = args
+
+        spec = Hash[spec.map do |name, value|
+          if value.is_a?(Symbol)
+            value = value.to_s
+          end
+          [database_field_name(name).to_sym, value]
+        end]
+
+        self.shard_key_fields = spec.keys
         self.shard_config = {
-          key: key,
-          unique: unique,
-          options: options,
-        }
+          key: spec.freeze,
+          options: (options || {}).dup.freeze,
+        }.freeze
       end
     end
   end
