@@ -10,9 +10,32 @@ module Mongoid
     extend ActiveSupport::Concern
 
     included do
-      cattr_accessor :shard_key_fields, :shard_config
+      # Returns the list of shard key fields, if shard key was declared on
+      # this model. If no shard key was declared, returns an empty array.
+      #
+      # @return [ Array<Symbol> ] List of shard key fields.
+      # @api public
+      cattr_accessor :shard_key_fields
       self.shard_key_fields = []
-      self.shard_config = {}
+
+      # Returns the shard configuration, which is a hash with the following
+      # (symbol) keys:
+      #
+      # - keys: A hash mapping (symbol) field names to values, defining the
+      #   shard key. Values can be either the integer 1 for ranged sharding
+      #   or the string "hashed" for hashed sharding.
+      # - options: A hash containing options for shardCollections command.
+      #
+      # If shard key was not declared via the +shard_key+ macro, +shard_config+
+      # attribute is nil.
+      #
+      # @example Get the shard configuration.
+      #   Model.shard_config
+      #   # => {key: {foo: 1, bar: 1}, options: {unique: true}}
+      #
+      # @return [ Hash | nil ] Shard configuration.
+      # @api public
+      cattr_accessor :shard_config
     end
 
     # Get the shard key fields.
