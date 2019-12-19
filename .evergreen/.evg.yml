@@ -531,7 +531,7 @@ buildvariants:
     driver: [current, master, stable]
     ruby: "ruby-2.6"
     mongodb-version: "4.2"
-    topology: ["replica-set"]
+    topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
