@@ -408,8 +408,8 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           it 'creates a new cluster' do
-            expect(connections_before).to be <(connections_during)
-            expect(cluster_before).not_to be(cluster_during)
+            expect(connections_during).to be > connections_before
+            expect(cluster_during).not_to be(cluster_before)
           end
 
           it 'disconnects the new cluster when the block exits' do
