@@ -133,7 +133,7 @@ module Mongoid
           end
 
           # Database must exist in order to run collStats
-          model.collection.database.command(create: model.collection.name)
+          model.collection.create
 
           stats = model.collection.database.command(collStats: model.collection.name).first
           if stats[:sharded]
