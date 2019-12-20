@@ -402,6 +402,7 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         context 'when the options create a new cluster' do
+          require_no_multi_shard
 
           let(:options) do
             { connect_timeout: 2 }
