@@ -100,3 +100,12 @@ sharding collections:
   When Mongoid is used in a Rails application, this means the results of
   the rake task execution will generally be found in the per-environment
   log file like ``log/development.log``.
+
+.. note::
+
+  When performing schema-related operations in a sharded cluster, such as
+  sharding collections as described in this document, or creating or dropping
+  collections or databases, cluster nodes may end up with out of date local
+  configuration-related cache data. Execute the `flushRouterConfig
+  <https://docs.mongodb.com/manual/reference/command/flushRouterConfig/>`_
+  command on each ``mongos`` node to clear these caches.
