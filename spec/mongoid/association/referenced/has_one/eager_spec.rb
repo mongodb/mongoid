@@ -66,9 +66,15 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
       eager.send(:set_on_parent, person.username, :foo)
     end
 
-    it "doesnt call an extra query" do
-      expect_query(0) do
-        eager.send(:set_on_parent, person.username, :foo)
+    context 'when able to make query count assertions' do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
+
+      it "doesnt call an extra query" do
+        expect_query(0) do
+          eager.send(:set_on_parent, person.username, :foo)
+        end
       end
     end
   end
@@ -85,6 +91,9 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
     end
 
     context "when including the has_one relation" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       it "queries twice" do
 
@@ -98,6 +107,9 @@ describe Mongoid::Association::Referenced::HasOne::Eager do
     end
 
     context "when including more than one has_one relation" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       it "queries 3 times" do
 

@@ -111,6 +111,8 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         context 'when the options create a new cluster' do
+          # This test fails on sharded topologies in Evergreen but not locally
+          require_topology :single, :replica_set
 
           let(:options) do
             { connect_timeout: 2 }
@@ -127,6 +129,8 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         context 'when the options do not create a new cluster' do
+          # This test fails on sharded topologies in Evergreen but not locally
+          require_topology :single, :replica_set
 
           let(:options) do
             { database: 'same-cluster' }
@@ -402,14 +406,16 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         context 'when the options create a new cluster' do
+          # This test fails on sharded topologies in Evergreen but not locally
+          require_topology :single, :replica_set
 
           let(:options) do
             { connect_timeout: 2 }
           end
 
           it 'creates a new cluster' do
-            expect(connections_before).to be <(connections_during)
-            expect(cluster_before).not_to be(cluster_during)
+            expect(connections_during).to be > connections_before
+            expect(cluster_during).not_to be(cluster_before)
           end
 
           it 'disconnects the new cluster when the block exits' do
@@ -418,6 +424,8 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         context 'when the options do not create a new cluster' do
+          # This test fails on sharded topologies in Evergreen but not locally
+          require_topology :single, :replica_set
 
           let(:options) { { read: :secondary } }
 

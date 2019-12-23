@@ -46,6 +46,9 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
     end
 
     context "when including the has_and_belongs_to_many association" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       it "queries twice" do
         expect_query(2) do
@@ -65,6 +68,9 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
     end
 
     context "when the association is not polymorphic" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       let(:eager) do
         Person.asc(:_id).includes(:preferences).last
@@ -119,6 +125,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
     end
 
     context "when some related documents no longer exist" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
+
       before do
         # Deleting the first one to meet Builders::Referenced::ManyToMany#query?
         House.collection.find(_id: Person.first.house_ids.first).delete_one
@@ -135,6 +145,9 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Eager do
     end
 
     context "when all the values for the has_and_belongs_to_many association are empty" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       before do
         2.times { |i| HabtmmPerson.create! }

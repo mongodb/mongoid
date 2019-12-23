@@ -66,9 +66,15 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
       eager.send(:set_on_parent, person.id, :foo)
     end
 
-    it "doesnt call an extra query" do
-      expect_query(0) do
-        eager.send(:set_on_parent, person.id, :foo)
+    context 'when able to make query count assertions' do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
+
+      it "doesnt call an extra query" do
+        expect_query(0) do
+          eager.send(:set_on_parent, person.id, :foo)
+        end
       end
     end
   end
@@ -80,6 +86,9 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
     end
 
     context "when including the has_many relation" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       before do
         3.times { Drug.create!(person: person) }
@@ -106,6 +115,9 @@ describe Mongoid::Association::Referenced::HasMany::Eager do
     end
 
     context "when the relation is not polymorphic" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       context "when the eager load has returned documents" do
 

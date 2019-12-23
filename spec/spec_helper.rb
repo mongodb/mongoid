@@ -100,7 +100,11 @@ def transactions_supported?
 end
 
 def testing_transactions?
-  transactions_supported? && testing_replica_set?
+  transactions_supported? && if Gem::Version.new(ClusterConfig.instance.fcv_ish) >= Gem::Version.new('4.2')
+    %i(replica_set sharded).include?(ClusterConfig.instance.topology)
+  else
+    ClusterConfig.instance.topology == :replica_set
+  end
 end
 
 # Set the database that the spec suite connects to.
@@ -137,6 +141,19 @@ end
 
 I18n.config.enforce_available_locales = false
 
+# The user must be created before any of the tests are loaded, until
+# https://jira.mongodb.org/browse/MONGOID-4827 is implemented.
+client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
+begin
+  # Create the root user administrator as the first user to be added to the
+  # database. This user will need to be authenticated in order to add any
+  # more users to any other databases.
+  client.database.users.create(MONGOID_ROOT_USER)
+rescue Mongo::Error::OperationFailure => e
+ensure
+  client.close
+end
+
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.include(Mongoid::Expectations)
@@ -144,16 +161,6 @@ RSpec.configure do |config|
   config.extend(Mongoid::Macros)
 
   config.before(:suite) do
-    client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
-    begin
-      # Create the root user administrator as the first user to be added to the
-      # database. This user will need to be authenticated in order to add any
-      # more users to any other databases.
-      client.database.users.create(MONGOID_ROOT_USER)
-    rescue Mongo::Error::OperationFailure => e
-    ensure
-      client.close
-    end
     Mongoid.purge!
   end
 

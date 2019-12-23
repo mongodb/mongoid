@@ -5,13 +5,13 @@ require "spec_helper"
 
 describe Mongoid::Clients::Sessions do
   before(:all) do
-    unless Mongo::VERSION >= '2.6'
+    if Gem::Version.new(Mongo::VERSION) < Gem::Version.new('2.6')
       skip 'Driver does not support transactions'
     end
   end
 
   before(:all) do
-    if Mongo::VERSION >= '2.6'
+    if Gem::Version.new(Mongo::VERSION) >= Gem::Version.new('2.6')
       CONFIG[:clients][:other] = CONFIG[:clients][:default].dup
       CONFIG[:clients][:other][:database] = 'other'
       Mongoid::Clients.clients.values.each(&:close)
@@ -21,7 +21,7 @@ describe Mongoid::Clients::Sessions do
   end
 
   after(:all) do
-    if Mongo::VERSION >= '2.6'
+    if Gem::Version.new(Mongo::VERSION) >= Gem::Version.new('2.6')
       Mongoid::Clients.with_name(:other).close
       Mongoid::Clients.clients.delete(:other)
     end
