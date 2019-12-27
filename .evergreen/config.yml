@@ -428,6 +428,10 @@ axes:
         display_name: ruby-2.6
         variables:
            RVM_RUBY: "ruby-2.6"
+      - id: "ruby-2.7"
+        display_name: ruby-2.7
+        variables:
+           RVM_RUBY: "ruby-2.7"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -536,7 +540,7 @@ buildvariants:
 - matrix_name: "topologies"
   matrix_spec:
     driver: [current, master, stable]
-    ruby: "ruby-2.6"
+    ruby: "ruby-2.7"
     mongodb-version: "4.2"
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -547,9 +551,9 @@ buildvariants:
 - matrix_name: "rubies"
   matrix_spec:
     driver: "current"
-    ruby: ["ruby-2.5", "ruby-2.4", "ruby-2.3"]
+    ruby: ["ruby-2.6", "ruby-2.5", "ruby-2.4", "ruby-2.3", "ruby-head"]
     mongodb-version: "4.0"
-    topology: "standalone"
+    topology: "replica-set"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - ubuntu1604-test
