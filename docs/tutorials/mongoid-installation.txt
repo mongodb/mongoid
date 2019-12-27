@@ -27,7 +27,7 @@ To install the gem with bundler, include the following in your ``Gemfile``:
 
 .. code-block:: ruby
 
-   gem 'mongoid', '~> 7.0'
+   gem 'mongoid', '~> 7.1.0'
 
 Using Mongoid with a New Rails Application
 ------------------------------------------
@@ -72,6 +72,13 @@ specified Mongoid versions.
      - Driver 2.8
      - Driver 2.7
 
+   * - 7.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
    * - 7.0
      - |checkmark|
      - |checkmark|
@@ -104,7 +111,14 @@ supported by Mongoid.
      - Ruby 2.3
      - Ruby 2.2
      - JRuby 9.2
-     - JRuby 9.1
+
+   * - 7.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#ruby-2.4]_
+     - |checkmark|
+     - |checkmark| [#ruby-2.2]_
+     - |checkmark|
 
    * - 7.0
      - |checkmark|
@@ -113,7 +127,6 @@ supported by Mongoid.
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
      - |checkmark|
-     - |checkmark|
 
    * - 6.4
      - |checkmark|
@@ -121,7 +134,6 @@ supported by Mongoid.
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
-     - |checkmark|
      - |checkmark|
 
 .. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
@@ -153,6 +165,15 @@ for driver compatibility matrices.
      - MongoDB 3.2
      - MongoDB 3.0
      - MongoDB 2.6
+
+   * - 7.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
 
    * - 7.0
      - |checkmark|
@@ -192,6 +213,13 @@ supported by Mongoid.
      - Rails 5.1
      - Rails 5.0
      - Rails 4.2
+
+   * - 7.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
 
    * - 7.0
      - |checkmark| [#rails-6]_
