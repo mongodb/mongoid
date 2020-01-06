@@ -3,7 +3,7 @@ source "https://rubygems.org"
 # Due to https://github.com/jruby/jruby/issues/5292 /
 # https://github.com/bundler/bundler/issues/6678 we cannot test unreleased
 # bson with JRuby, just test the driver then
-gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.7-stable'
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.10-stable'
 
 gem 'rake'
 gem 'actionpack', '~> 5.1'
@@ -15,23 +15,18 @@ else
   gem 'i18n', '~> 1.0'
 end
 
+group :development do
+  gem 'yard'
+end
+
 group :test do
   gem 'rspec-retry'
   gem 'benchmark-ips'
-  gem 'rspec', '~> 3.7'
-  gem 'rspec-expectations', '~> 3.7', '<= 3.8.2'
+  gem 'rspec-core', '~> 3.7'
+  gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
+  gem 'rspec-mocks-diag', '~> 3.0'
   gem 'fuubar'
   gem 'rfc'
-  platforms :mri do
-    gem 'timeout-interrupt'
-  end
-end
-
-group :development, :testing do
-  gem 'yard'
-  platforms :mri do
-    gem 'byebug'
-  end
 end
 
 gemspec path: '..'

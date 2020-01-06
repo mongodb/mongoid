@@ -7,7 +7,7 @@ Queries
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 One of MongoDB's greatest features is its ability to execute dynamic
@@ -196,6 +196,474 @@ loaded with ``only`` for those associations to be loaded. For example:
   
   Band.where(name: 'Astral Projection').only(:name, :manager_ids).first.managers
   # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
+
+
+Ordering
+````````
+
+Mongoid provides the ``order`` method on ``Criteria`` objects and its alias,
+``order_by``, to specify the ordering of documents. These methods take a
+hash indicating which fields to order the documents by, and whether to use
+ascending or descending order for each field.
+
+.. code-block:: ruby
+
+  Band.order(name: 1)
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.order_by(name: -1, description: 1)
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.order_by(name: :desc, description: 'asc')
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+The direction may be specified as integers ``1`` and ``-1`` for ascending
+and descending, respectively, or as symbols ``:asc`` and ``:desc``, or as
+strings ``"asc"`` and ``"desc"``.
+
+Alternatively, ``order`` accepts an array of two-element arrays specifying
+the ordering. Field names and directions may be strings or symbols.
+
+.. code-block:: ruby
+
+  Band.order([['name', 'desc'], ['description', 'asc']])
+
+  Band.order([[:name, :desc], [:description, :asc]])
+
+Another way of providing the order is to use ``#asc`` and ``#desc`` methods
+on symbols, as follows:
+
+.. code-block:: ruby
+
+  Band.order(:name.desc, :description.asc)
+
+The arguments can be provided as a string using SQL syntax:
+
+.. code-block:: ruby
+
+  Band.order('name desc, description asc')
+
+Finally, there are ``asc`` and ``desc`` methods that can be used instead of
+``order``/``order_by``:
+
+.. code-block:: ruby
+
+  Band.asc('name').desc('description')
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>1, "description"=>-1}}
+    class:    Band
+    embedded: false>
+
+``order`` calls can be chained, in which case the oldest calls define the
+most significant criteria and the newest calls define the least significant
+ones (since in Ruby hashes maintain the order of their keys):
+
+.. code-block:: ruby
+
+  Band.order('name desc').order('description asc')
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>-1, "description"=>1}}
+    class:    Band
+    embedded: false>
+
+This can sometimes lead to surprising results if there are scopes, including
+the default scope, that use ``order``/``order_by``. For example, in the
+following snippet bands are ordered by name first because the order in the
+default scope takes precedence over the order given in the query, due to
+the default scope being evaluated first:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :year, type: Integer
+    
+    default_scope -> { order(name: :asc) }
+  end
+  
+  Band.order(year: :desc)
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>1, "year"=>-1}}
+    class:    Band
+    embedded: false>
+
+
+Logical Operations
+******************
+
+Mongoid supports ``and``, ``or``, ``nor`` and ``not`` logical operations on
+``Criteria`` objects. These methods take one or more hash of conditions
+or another ``Criteria`` object as their arguments, with ``not`` additionally
+having an argument-free version.
+
+.. code-block:: ruby
+
+  # and with conditions
+  Band.where(label: 'Trust in Trance').and(name: 'Astral Projection')
+  
+  # or with scope
+  Band.where(label: 'Trust in Trance').or(Band.where(name: 'Astral Projection'))
+  
+  # not with conditions
+  Band.not(label: 'Trust in Trance', name: 'Astral Projection')
+  
+  # argument-less not
+  Band.not.where(label: 'Trust in Trance', name: 'Astral Projection')
+
+For backwards compatibility with earlier Mongoid versions, all of the logical
+operation methods also accept arrays of parameters, which will be flattened
+to obtain the criteria. Passing arrays to logical operations is deprecated and
+may be removed in a future version of Mongoid.
+
+The following calls all produce the same query conditions:
+
+.. code-block:: ruby
+
+  # Condition hashes passed to separate and invocations
+  Band.and(name: 'SUN Project').and(member_count: 2)
+  
+  # Multiple condition hashes in the same and invocation
+  Band.and({name: 'SUN Project'}, {member_count: 2})
+  
+  # Multiple condition hashes in an array - deprecated
+  Band.and([{name: 'SUN Project'}, {member_count: 2}])
+
+  # Condition hash in where and a scope
+  Band.where(name: 'SUN Project').and(Band.where(member_count: 2))
+  
+  # Condition hash in and and a scope
+  Band.and({name: 'SUN Project'}, Band.where(member_count: 2))
+  
+  # Scope as an array element, nested arrays - deprecated
+  Band.and([Band.where(name: 'SUN Project'), [{member_count: 2}]])
+  
+  # All produce:
+  # => #<Mongoid::Criteria
+  #   selector: {"name"=>"SUN Project", "member_count"=>2}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+
+Operator Combinations
+`````````````````````
+
+As of Mongoid 7.1, logical operators have been changed to have the
+the same semantics as `those of ActiveRecord
+<https://guides.rubyonrails.org/active_record_querying.html>`_.
+
+When conditions are specified on the same field multiple times, all
+conditions are added to the criteria:
+
+.. code-block:: ruby
+
+  Band.where(name: 1).where(name: 2).selector
+  # => {"name"=>"1", "$and"=>[{"name"=>"2"}]}
+
+  Band.where(name: 1).or(name: 2).selector
+  # => {"$or"=>[{"name"=>"1"}, {"name"=>"2"}]}
+
+``nor`` and ``not`` behave similarly, with ``not`` producing different query
+shapes as described later.
+
+When a logical operator is used, it operates on the criteria built up to
+that point and its argument. ``where`` has the same meaning as ``and``:
+
+.. code-block:: ruby
+
+  # or joins the two conditions
+  Band.where(name: 'Sun').or(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}]}
+  
+  # or applies only to the first condition, the second condition is added
+  # to the top level as $and
+  Band.or(name: 'Sun').where(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}], "label"=>"Trust"}
+  
+  # Same as previous example - where and and are aliases
+  Band.or(name: 'Sun').and(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}], "label"=>"Trust"}
+  
+  # Same operator can be stacked any number of times
+  Band.or(name: 'Sun').or(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}]}
+  
+  # The label: Foo condition is added to the top level as $and
+  Band.where(name: 'Sun').or(label: 'Trust').where(label: 'Foo').selector
+  # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}], "label"=>"Foo"}
+
+
+``and`` Behavior
+````````````````
+
+The ``and`` method will add new simple conditions to the top level of the
+criteria, unless the receiving criteria already has a condition on the
+respective fields, in which case the conditions will be combined with ``$and``.
+
+.. code-block:: ruby
+
+  Band.where(label: 'Trust in Trance').and(name: 'Astral Projection').selector
+  # => {"label"=>"Trust in Trance Records", "name"=>"Astral Projection"}
+
+  Band.where(name: /Best/).and(name: 'Astral Projection').selector
+  # => {"name"=>/Best/, "$and"=>[{"name"=>"Astral Projection"}]}
+
+As of Mongoid 7.1, specifying multiple criteria on the same field with ``and``
+combines all criteria so specified, whereas in previous versions of Mongoid
+conditions on a field sometimes replaced previously specified conditions on
+the same field, depending on which form of ``and`` was used.
+
+
+``or``/``nor`` Behavior
+```````````````````````
+
+``or`` and ``nor`` always combine conditions with ``$or`` and ``$nor``
+MongoDB operators, respectively. If the only condition on the receiving
+criteria is another ``or``/``nor``, new conditions are added to the
+existing list, otherwise a new top-level ``$or``/``$nor`` operator is created.
+
+.. code-block:: ruby
+
+  Band.where(name: /Best/).or(name: 'Astral Projection').
+    or(Band.where(label: /Records/)).selector
+  # => {"$or"=>[{"name"=>/Best/}, {"name"=>"Astral Projection"}, {"label"=>/Records/}]}
+
+  Band.where(name: /Best/).and(name: 'Astral Projection').
+    or(Band.where(label: /Records/)).and(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>/Best/, "$and"=>[{"name"=>"Astral Projection"}]}, {"label"=>/Records/}], "label"=>"Trust"}
+
+
+``not`` Behavior
+````````````````
+
+``not`` method can be called without arguments, in which case it will negate
+the next condition that is specified. ``not`` can also be called with one
+or more hash conditions or ``Criteria`` objects, which will all be negated and
+added to the criteria.
+
+.. code-block:: ruby
+
+  # not negates subsequent where
+  Band.not.where(name: 'Best').selector
+  # => {"name"=>{"$ne"=>"Best"}}
+
+  # The second where is added as $and
+  Band.not.where(name: 'Best').where(label: /Records/).selector
+  # => {"name"=>{"$ne"=>"Best"}, "label"=>/Records/}
+
+  # not negates its argument
+  Band.not(name: 'Best').selector
+  # => {"name"=>{"$ne"=>"Best"}}
+
+.. note::
+
+  ``$not`` in MongoDB server cannot be used with a string argument.
+  Mongoid uses ``$ne`` operator to achieve such a negation:
+
+  .. code-block:: ruby
+  
+    # String negation - uses $ne
+    Band.not.where(name: 'Best').selector
+    # => {"name"=>{"$ne"=>"Best"}}
+    
+    # Regexp negation - uses $not
+    Band.not.where(name: /Best/).selector
+    # => {"name"=>{"$not"=>/Best/}}
+
+Similarly to ``and``, ``not`` will negate individual conditions for simple
+field criteria. For complex conditions and when a field already has a condition
+defined on it, since MongoDB server only supports the ``$not`` operator on
+a per-field basis rather than globally, Mongoid emulates ``$not`` by using
+an ``{'$and' => [{'$nor' => ...}]}`` construct:
+
+.. code-block:: ruby
+
+  # Simple condition
+  Band.not(name: /Best/).selector
+  # => {"name"=>{"$not"=>/Best/}}
+
+  # Complex conditions
+  Band.where(name: /Best/).not(name: 'Astral Projection').selector
+  # => {"name"=>/Best/, "$and"=>[{"$nor"=>[{"name"=>"Astral Projection"}]}]}
+
+If using ``not`` with arrays or regular expressions, please note the
+caveats/limitations of ``$not`` `stated in the MongoDB server documentation
+<https://docs.mongodb.com/manual/reference/operator/query/not/>`_.
+
+
+Incremental Query Construction
+******************************
+
+By default, when conditions are added to a query, Mongoid considers each
+condition complete and independent from any other conditions potentially
+present in the query. For example, calling ``in`` twice adds two separate
+``$in`` conditions:
+
+.. code-block:: ruby
+
+  Band.in(name: ['a']).in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["a"]}, "$and"=>[{"name"=>{"$in"=>["b"]}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Some operator methods support building the condition incrementally. In this
+case, when an condition on a field which uses one of the supported operators
+is being added, if there already is a condition on the same field using the
+same operator, the operator expressions are combined according to the
+specified *merge strategy*.
+
+Merge Strategies
+````````````````
+
+Mongoid provides three merge strategies:
+
+- **Override**: the new operator instance replaces any existing conditions on
+the same field using the same operator.
+- **Intersect**: if there already is a condition using the same operator on the
+same field, the values of the existing condition are intersected with the
+values of the new condition and the result is stored as the operator value.
+- **Union**: if there already is a condition using the same operator on the
+same field, the values of the new condition are aded to the values of the
+exsting condition and the result is stored as the operator value.
+
+The following snippet demonstrates all of the strategies, using ``in`` as the
+example operator:
+
+.. code-block:: ruby
+
+  Band.in(name: ['a']).override.in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+  Band.in(name: ['a', 'b']).intersect.in(name: ['b', 'c'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+  Band.in(name: ['a']).union.in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["a", "b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+The strategy is requested by calling ``override``, ``intersect`` or ``union``
+on a ``Criteria`` instance. The requested strategy applies to the next
+condition method called on the query. If the next condition method called does
+not support merge strategies, the strategy is reset, as shown in the following
+example:
+
+.. code-block:: ruby
+
+  Band.in(name: ['a']).union.ne(name: 'c').in(name: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"name"=>{"$in"=>["a"], "$ne"=>"c"}, "$and"=>[{"name"=>{"$in"=>["b"]}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Since ``ne`` does not support merge strategies, the ``union`` strategy was
+ignored and reset and when ``in`` was invoked the second time there was no
+strategy active.
+
+Supported Operator Methods
+``````````````````````````
+
+The following operator methods support merge strategies:
+
+- ``all``
+- ``in``
+- ``nin``
+
+The set of methods may be expanded in future releases of Mongoid. For
+future compatibility, only invoke a strategy method when the next method call
+is an operator that supports merge strategies.
+
+Note that the merge strategies are currently only applied when conditions are
+added through the designated methods. In the following example merge strategy
+is not applied because the second condition is added via ``where``, not via
+``in``:
+
+.. code-block:: ruby
+
+  Band.in(foo: ['a']).union.where(foo: {'$in' => 'b'})
+  => #<Mongoid::Criteria
+    selector: {"foo"=>{"$in"=>["a"]}, "$and"=>[{"foo"=>{"$in"=>"b"}}]}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+This behavior may change in a future release of Mongoid and should not be
+relied upon.
+
+In contrast, it does not matter how the existing query was built when a
+merge strategy-supporting operator method is invoked. In the following
+example, the first condition was added through ``where`` but the strategy
+mechanism still applies:
+
+.. code-block:: ruby
+
+  Band.where(foo: {'$in' => ['a']}).union.in(foo: ['b'])
+  => #<Mongoid::Criteria
+    selector: {"foo"=>{"$in"=>["a", "b"]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Operator Value Expansion
+````````````````````````
+
+Operator methods that support merge strategies all take ``Array`` as their value
+type. Mongoid expands ``Array``-compatible types, such as a ``Range``,
+when they are used with these operator methods:
+
+.. code-block:: ruby
+
+  Band.in(year: 1950..1960)
+  => #<Mongoid::Criteria
+    selector: {"year"=>{"$in"=>[1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+Additionally, Mongoid has historically wrapped non-``Array`` values in arrays,
+as the following example demonstrates:
+
+.. code-block:: ruby
+
+  Band.in(year: 1950)
+  => #<Mongoid::Criteria
+    selector: {"year"=>{"$in"=>[1950]}}
+    options:  {}
+    class:    Band
+    embedded: false>
+
+This wrapping behavior is deprecated and should not be relied on. It may be
+removed in a future release of Mongoid.
 
 
 Query Cache
@@ -435,6 +903,46 @@ associations.
   Band.includes(:albums).each do |band|
     p band.albums.first.name # Does not hit the database again.
   end
+
+
+Regular Expressions
+*******************
+
+MongoDB, and Mongoid, allow querying documents by regular expressions.
+
+Given the following model definitions:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :description, type: String
+  end
+  
+  Band.create!(name: 'Sun Project', description: "Sun\nProject")
+
+... we can query using simple Ruby regular expressions in a natural way:
+
+.. code-block:: ruby
+
+  Band.where(name: /project/i).first
+  # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
+
+It is also possible to query using PCRE syntax by constructing
+``BSON::Regexp::Raw`` objects explicitly:
+
+.. code-block:: ruby
+
+  Band.where(description: /^Project/).first
+  # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
+  
+  Band.where(description: BSON::Regexp::Raw.new('^Project')).first
+  # => nil
+  
+  Band.where(description: BSON::Regexp::Raw.new('^Project', 'm')).first
+  # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
 
 
 Queries + Persistence
@@ -872,3 +1380,65 @@ Valid options to ``#out`` are:
   provided name, and merge the results with the existing documents.
 - ``reduce: "name"``: Store in a collection with the
   provided name, and reduce all existing results in that collection.
+
+
+Full Text Search
+----------------
+
+To perform full text search with Mongoid, follow these steps:
+
+1. Define a full text search index on a model.
+2. Create the full text search index on the server.
+3. Build a full text search query.
+
+
+Defining Full Text Search Index
+*******************************
+
+Index definition through Mongoid is described in detail on the `indexes
+<mongoid-indexes>`_ page. Full text search indexes are described in detail on
+under `text indexes <https://docs.mongodb.com/manual/core/index-text/>`_
+in the MongoDB manual. Below is an example definition of a Band model with
+a full text search index specified on the description field:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :description, type: String
+    
+    index description: 'text'
+  end
+
+Note that the index type (``text``) must be given as a string, not as a symbol.
+
+
+Creating Full Text Search Index
+*******************************
+
+To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
+
+.. code-block:: ruby
+
+  bundle exec rake db:mongoid:create_indexes
+
+
+Querying Using Full Text Search Index
+*************************************
+
+To find bands whose description contains "ounces" or its variations, use the
+`$text operator <https://docs.mongodb.com/manual/reference/operator/query/text/#op._S_text>`_:
+
+.. code-block:: ruby
+
+  Band.where('$text' => {'$search' => 'ounces'}).to_a
+  # => [#<Band _id: 5d5341b3ce4ef35d5016746d, name: "foo", description: "ounce">]
+
+Note that the description contains the word "ounce" even though the search
+query was "ounces".
+
+Note also that when performing a full text search, the name of the field is
+not explicitly specified - ``$text`` operator searches all fields indexed with
+full text search indexes.

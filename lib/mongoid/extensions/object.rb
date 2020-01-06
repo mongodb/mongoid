@@ -84,14 +84,18 @@ module Mongoid
         self
       end
 
-      # Check if the object is part of a blank association criteria.
+      # Checks whether conditions given in this object are known to be
+      # unsatisfiable, i.e., querying with this object will always return no
+      # documents.
       #
-      # @example Is the object blank criteria?
-      #   "".blank_criteria?
+      # This method is deprecated. Mongoid now uses
+      # +_mongoid_unsatisfiable_criteria?+ internally; this method is retained
+      # for backwards compatibility only. It always returns false.
       #
-      # @return [ true, false ] If the object is blank criteria.
+      # @return [ false ] Always false.
       #
       # @since 3.1.0
+      # @deprecated
       def blank_criteria?
         false
       end

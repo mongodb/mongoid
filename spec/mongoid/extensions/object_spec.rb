@@ -5,11 +5,11 @@ require "spec_helper"
 
 describe Mongoid::Extensions::Object do
 
-  describe "#__evolve_object_id__" do
+  let(:object) do
+    Object.new
+  end
 
-    let(:object) do
-      Object.new
-    end
+  describe "#__evolve_object_id__" do
 
     it "returns self" do
       expect(object.__evolve_object_id__).to eq(object)
@@ -18,20 +18,12 @@ describe Mongoid::Extensions::Object do
 
   describe "#__find_args__" do
 
-    let(:object) do
-      Object.new
-    end
-
     it "returns self" do
       expect(object.__find_args__).to eq(object)
     end
   end
 
   describe "#__mongoize_object_id__" do
-
-    let(:object) do
-      Object.new
-    end
 
     it "returns self" do
       expect(object.__mongoize_object_id__).to eq(object)
@@ -131,20 +123,12 @@ describe Mongoid::Extensions::Object do
 
   describe "#__mongoize_time__" do
 
-    let(:object) do
-      Object.new
-    end
-
     it "returns self" do
       expect(object.__mongoize_time__).to eq(object)
     end
   end
 
   describe "#__sortable__" do
-
-    let(:object) do
-      Object.new
-    end
 
     it "returns self" do
       expect(object.__sortable__).to eq(object)
@@ -291,12 +275,15 @@ describe Mongoid::Extensions::Object do
 
   describe "#numeric?" do
 
-    let(:object) do
-      Object.new
-    end
-
     it "returns false" do
       expect(object.numeric?).to eq(false)
+    end
+  end
+
+  describe "#blank_criteria?" do
+
+    it "is false" do
+      expect(object.blank_criteria?).to be false
     end
   end
 end

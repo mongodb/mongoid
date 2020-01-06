@@ -9,7 +9,7 @@ module Mongoid
     # Get the logger.
     #
     # @note Will try to grab Rails' logger first before creating a new logger
-    #   with stdout.
+    #   with stderr.
     #
     # @example Get the logger.
     #   Loggable.logger
@@ -25,7 +25,7 @@ module Mongoid
     # Set the logger.
     #
     # @example Set the logger.
-    #   Loggable.logger = Logger.new($stdout)
+    #   Loggable.logger = Logger.new(STDERR)
     #
     # @param [ Logger ] logger The logger to set.
     #
@@ -38,7 +38,7 @@ module Mongoid
 
     private
 
-    # Gets the default Mongoid logger - stdout.
+    # Gets the default Mongoid logger - stderr.
     #
     # @api private
     #
@@ -49,12 +49,12 @@ module Mongoid
     #
     # @since 3.0.0
     def default_logger
-      logger = Logger.new($stdout)
+      logger = Logger.new(STDERR)
       logger.level = Mongoid::Config.log_level
       logger
     end
 
-    # Get the Rails logger if it's defined.
+    # Get the Rails logger if loaded in a Rails application, otherwise nil.
     #
     # @api private
     #
@@ -65,7 +65,11 @@ module Mongoid
     #
     # @since 3.0.0
     def rails_logger
-      defined?(::Rails) && ::Rails.respond_to?(:logger) && ::Rails.logger
+      if defined?(::Rails)
+        ::Rails.logger
+      else
+        nil
+      end
     end
   end
 end

@@ -32,6 +32,7 @@ end
 require 'support/authorization'
 require 'support/expectations'
 require 'support/macros'
+require 'support/cluster_config'
 require 'support/constraints'
 
 # Give MongoDB servers time to start up in CI environments
@@ -93,18 +94,17 @@ def array_filters_supported?
 end
 alias :sessions_supported? :array_filters_supported?
 
-def testing_geo_near?
-  $geo_near_enabled ||= (Mongoid::Clients.default
-                             .command(serverStatus: 1)
-                             .first['version'] < '4.1')
-end
-
 def transactions_supported?
-  Mongoid::Clients.default.cluster.next_primary.features.transactions_enabled?
+  features = Mongoid::Clients.default.cluster.next_primary.features
+  features.respond_to?(:transactions_enabled?) && features.transactions_enabled?
 end
 
 def testing_transactions?
-  transactions_supported? && testing_replica_set?
+  transactions_supported? && if Gem::Version.new(ClusterConfig.instance.fcv_ish) >= Gem::Version.new('4.2')
+    %i(replica_set sharded).include?(ClusterConfig.instance.topology)
+  else
+    ClusterConfig.instance.topology == :replica_set
+  end
 end
 
 # Set the database that the spec suite connects to.
@@ -141,6 +141,19 @@ end
 
 I18n.config.enforce_available_locales = false
 
+# The user must be created before any of the tests are loaded, until
+# https://jira.mongodb.org/browse/MONGOID-4827 is implemented.
+client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
+begin
+  # Create the root user administrator as the first user to be added to the
+  # database. This user will need to be authenticated in order to add any
+  # more users to any other databases.
+  client.database.users.create(MONGOID_ROOT_USER)
+rescue Mongo::Error::OperationFailure => e
+ensure
+  client.close
+end
+
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.include(Mongoid::Expectations)
@@ -148,20 +161,14 @@ RSpec.configure do |config|
   config.extend(Mongoid::Macros)
 
   config.before(:suite) do
-    client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
-    begin
-      # Create the root user administrator as the first user to be added to the
-      # database. This user will need to be authenticated in order to add any
-      # more users to any other databases.
-      client.database.users.create(MONGOID_ROOT_USER)
-    rescue Exception => e
-    end
     Mongoid.purge!
   end
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
-    unless Mongoid.default_client.cluster.connected?
+    cluster = Mongoid.default_client.cluster
+    # Older drivers do not have a #connected? method
+    if cluster.respond_to?(:connected?) && !cluster.connected?
       Mongoid.default_client.reconnect
     end
     Mongoid.default_client.collections.each do |coll|

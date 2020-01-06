@@ -993,6 +993,7 @@ describe Mongoid::Criteria do
   end
 
   describe "#geo_near" do
+    max_server_version '4.0'
 
     before do
       Bar.create_indexes
@@ -3339,6 +3340,8 @@ describe Mongoid::Criteria do
   end
 
   describe "#max_scan" do
+    max_server_version '4.0'
+
     let!(:band) do
       Band.create(name: "Depeche Mode")
     end
@@ -3546,7 +3549,7 @@ describe Mongoid::Criteria do
       let(:criteria) { Band.where(foo: 1).where(foo: 2) }
 
       it 'combines criteria' do
-        expect(criteria.selector).to eq('$and' => [{'foo' => 1}], 'foo' => 2)
+        expect(criteria.selector).to eq('foo' => 1, '$and' => [{'foo' => 2}])
       end
     end
 
@@ -3554,15 +3557,17 @@ describe Mongoid::Criteria do
       let(:criteria) { Band.where(foo: 1, bar: 3).where(foo: 2) }
 
       it 'combines criteria' do
-        expect(criteria.selector).to eq('$and' => [{'foo' => 1, 'bar' => 3}], 'foo' => 2)
+        expect(criteria.selector).to eq(
+          'foo' => 1, '$and' => [{'foo' => 2}], 'bar' => 3)
       end
     end
 
     context 'when given same key in separate calls and other criteria are added later' do
       let(:criteria) { Band.where(foo: 1).where(foo: 2).where(bar: 3) }
 
-      it 'adds other criteria to top level' do
-        expect(criteria.selector).to eq('$and' => [{'foo' => 1}], 'foo' => 2, 'bar' => 3)
+      it 'combines criteria' do
+        expect(criteria.selector).to eq(
+          'foo' => 1, '$and' => [{'foo' => 2}], 'bar' => 3)
       end
     end
   end

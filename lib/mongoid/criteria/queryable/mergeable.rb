@@ -47,16 +47,18 @@ module Mongoid
           use(:__union__)
         end
 
-        # Reset the stratgies to nil, used after cloning.
+        # Clear the current strategy and negating flag, used after cloning.
         #
         # @example Reset the strategies.
         #   mergeable.reset_strategies!
         #
-        # @return [ nil ] nil.
+        # @return [ Criteria ] self.
         #
         # @since 1.0.0
         def reset_strategies!
-          self.strategy, self.negating = nil, nil
+          self.strategy = nil
+          self.negating = nil
+          self
         end
 
         private
@@ -134,31 +136,100 @@ module Mongoid
           with_strategy(:__intersect__, criterion, operator)
         end
 
-        # Adds the criterion to the existing selection.
+        # Adds $and/$or/$nor criteria to a copy of this selection.
+        #
+        # Each of the criteria can be a Hash of key/value pairs or MongoDB
+        # operators (keys beginning with $), or a Selectable object
+        # (which typically will be a Criteria instance).
         #
         # @api private
         #
         # @example Add the criterion.
         #   mergeable.__multi__([ 1, 2 ], "$in")
         #
-        # @param [ Hash ] criterion The criteria.
+        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
+        #   matches or Criteria objects.
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
         #
         # @since 1.0.0
-        def __multi__(criterion, operator)
+        def __multi__(criteria, operator)
           clone.tap do |query|
             sel = query.selector
-            criterion.flatten.each do |expr|
+            criteria.flatten.each do |expr|
               next unless expr
-              criteria = sel[operator] || []
-              normalized = expr.inject({}) do |hash, (field, value)|
-                hash.merge!(field.__expr_part__(value.__expand_complex__))
-                hash
+              result_criteria = sel[operator] || []
+              if expr.is_a?(Selectable)
+                expr = expr.selector
               end
-              sel.store(operator, criteria.push(normalized))
+              normalized = _mongoid_normalize_expr(expr)
+              sel.store(operator, result_criteria.push(normalized))
             end
+          end
+        end
+
+        # Combines criteria into a MongoDB selector.
+        #
+        # Criteria is an array of criterions which will be flattened.
+        #
+        # Each criterion can be:
+        # - A hash
+        # - A Criteria instance
+        # - nil, in which case it is ignored
+        #
+        # @api private
+        private def _mongoid_add_top_level_operation(operator, criteria)
+          # Flatten the criteria. The idea is that predicates in MongoDB
+          # are always hashes and are never arrays. This method additionally
+          # allows Criteria instances as predicates.
+          # The flattening is existing Mongoid behavior but we could possibly
+          # get rid of it as applications can splat their predicates, or
+          # flatten if needed.
+          clone.tap do |query|
+            sel = query.selector
+            _mongoid_flatten_arrays(criteria).each do |criterion|
+              if criterion.is_a?(Selectable)
+                expr = _mongoid_normalize_expr(criterion.selector)
+              else
+                expr = criterion
+              end
+              if sel.empty?
+                sel.store(operator, [expr])
+              elsif sel.keys == [operator]
+                sel.store(operator, sel[operator] + [expr])
+              else
+                operands = [sel.dup] + [expr]
+                sel.clear
+                sel.store(operator, operands)
+              end
+            end
+          end
+        end
+
+        # Calling .flatten on an array which includes a Criteria instance
+        # evaluates the criteria, which we do not want. Hence this method
+        # explicitly only expands Array objects and Array subclasses.
+        private def _mongoid_flatten_arrays(array)
+          out = []
+          pending = array
+          until pending.empty?
+            item = pending.shift
+            if item.nil?
+              # skip
+            elsif item.is_a?(Array)
+              pending += item
+            else
+              out << item
+            end
+          end
+          out
+        end
+
+        # @api private
+        private def _mongoid_normalize_expr(expr)
+          expr.inject({}) do |hash, (field, value)|
+            hash.merge!(field.__expr_part__(value.__expand_complex__))
           end
         end
 
@@ -169,13 +240,16 @@ module Mongoid
         # @example Add the criterion.
         #   mergeable.__override__([ 1, 2 ], "$in")
         #
-        # @param [ Hash ] criterion The criteria.
+        # @param [ Hash | Criteria ] criterion The criteria.
         # @param [ String ] operator The MongoDB operator.
         #
         # @return [ Mergeable ] The new mergeable.
         #
         # @since 1.0.0
         def __override__(criterion, operator)
+          if criterion.is_a?(Selectable)
+            criterion = criterion.selector
+          end
           selection(criterion) do |selector, field, value|
             expression = prepare(field, operator, value)
             existing = selector[field]
@@ -227,7 +301,7 @@ module Mongoid
         # @api private
         #
         # @example Add criterion with a strategy.
-        #   mergeable.with_strategy(:__union__, [ 1, 2, 3 ], "$in")
+        #   mergeable.with_strategy(:__union__, {field_name: [ 1, 2, 3 ]}, "$in")
         #
         # @param [ Symbol ] strategy The name of the strategy method.
         # @param [ Object ] criterion The criterion to add.

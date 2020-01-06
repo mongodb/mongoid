@@ -3,20 +3,292 @@
 
 require "spec_helper"
 
+class FieldWithSerializer
+  def evolve(object)
+    Integer.evolve(object)
+  end
+
+  def localized?
+    false
+  end
+end
+
 describe Mongoid::Criteria::Queryable::Selectable do
 
   let(:query) do
     Mongoid::Query.new("id" => "_id")
   end
 
-  shared_examples_for "a cloning selection" do
+  shared_examples_for "returns a cloned query" do
 
     it "returns a cloned query" do
       expect(selection).to_not equal(query)
     end
   end
 
+  shared_examples_for 'requires an argument' do
+    context "when provided no argument" do
+
+      let(:selection) do
+        query.send(query_method)
+      end
+
+      it "raises ArgumentError" do
+        expect do
+          selection.selector
+        end.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+  shared_examples_for 'requires a non-nil argument' do
+    context "when provided nil" do
+
+      let(:selection) do
+        query.send(query_method, nil)
+      end
+
+      it "raises CriteriaArgumentRequired" do
+        expect do
+          selection.selector
+        end.to raise_error(Mongoid::Errors::CriteriaArgumentRequired, /#{query_method}/)
+      end
+    end
+  end
+
+  shared_examples_for 'supports merge strategies' do
+
+    context 'when the field is not aliased' do
+
+      context "when the strategy is not set" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).send(query_method, first: [ 3, 4 ])
+        end
+
+        it "combines the conditions with $and" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 1, 2 ] },
+            '$and' => [{'first' => {operator => [3, 4]}}],
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is intersect" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).intersect.send(query_method, first: [ 2, 3 ])
+        end
+
+        it "intersects the conditions" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 2 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is override" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).override.send(query_method, first: [ 3, 4 ])
+        end
+
+        it "overwrites the first condition" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is union" do
+
+        let(:selection) do
+          query.send(query_method, first: [ 1, 2 ]).union.send(query_method, first: [ 3, 4 ])
+        end
+
+        it "unions the conditions" do
+          expect(selection.selector).to eq({
+            "first" => { operator => [ 1, 2, 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+    end
+
+    context 'when the field is aliased' do
+
+      context "when the strategy is not set" do
+
+        let(:selection) do
+          query.send(query_method, id: [ 1, 2 ]).send(query_method, _id: [ 3, 4 ])
+        end
+
+        it "combines the conditions with $and" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 1, 2 ] },
+            '$and' => [{'_id' => {operator => [3, 4]}}],
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is intersect" do
+
+        let(:selection) do
+          query.send(query_method, id: [ 1, 2 ]).intersect.send(query_method, _id: [ 2, 3 ])
+        end
+
+        it "intersects the conditions" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 2 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is override" do
+
+        let(:selection) do
+          query.send(query_method, _id: [ 1, 2 ]).override.send(query_method, id: [ 3, 4 ])
+        end
+
+        it "overwrites the first condition" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is union" do
+
+        let(:selection) do
+          query.send(query_method, _id: [ 1, 2 ]).union.send(query_method, id: [ 3, 4 ])
+        end
+
+        it "unions the conditions" do
+          expect(selection.selector).to eq({
+            "_id" => { operator => [ 1, 2, 3, 4 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+    end
+
+    context 'when the field uses a serializer' do
+
+      let(:query) do
+        Mongoid::Query.new({}, { "field" => FieldWithSerializer.new })
+      end
+
+
+      context "when the strategy is not set" do
+
+        let(:selection) do
+          query.send(query_method, field: [ '1', '2' ]).send(query_method, field: [ '3', '4' ])
+        end
+
+        it "combines the conditions with $and" do
+          expect(selection.selector).to eq({
+            "field" => { operator => [ 1, 2 ] },
+            '$and' => [{'field' => {operator => [3, 4]}}],
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+
+      context "when the strategy is set" do
+
+        let(:selection) do
+          query.send(query_method, field: [ '1', '2' ]).intersect.send(query_method, field: [ '2', '3' ])
+        end
+
+        it "intersects the conditions" do
+          expect(selection.selector).to eq({
+            "field" => { operator => [ 2 ] }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+    end
+
+    context 'when operator value is a Range' do
+
+      context "when there is no existing condition and strategy is not specified" do
+
+        let(:selection) do
+          query.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 2, 3, 4 ] }
+          })
+
+        end
+      end
+
+      context "when there is no existing condition and strategy is specified" do
+
+        let(:selection) do
+          query.union.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 2, 3, 4 ] }
+          })
+
+        end
+      end
+
+      context "when existing condition has Array value" do
+
+        let(:selection) do
+          query.send(query_method, foo: [ 1, 2 ]).union.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 1, 2, 3, 4 ] }
+          })
+
+        end
+      end
+
+      context "when existing condition has Range value" do
+
+        let(:selection) do
+          query.send(query_method, foo: 1..2).union.send(query_method, foo: 2..4)
+        end
+
+        it 'expands range to array' do
+          expect(selection.selector).to eq({
+            "foo" => { operator => [ 1, 2, 3, 4 ] }
+          })
+
+        end
+      end
+    end
+  end
+
   describe "#all" do
+
+    let(:query_method) { :all }
+    let(:operator) { '$all' }
 
     context "when provided no criterion" do
 
@@ -37,24 +309,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when provided nil" do
-
-      let(:selection) do
-        query.all(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -69,23 +324,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it "adds the $all selector" do
             expect(selection.selector).to eq({
               "field" => { "$all" => [ 1, 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when providing a range" do
-
-          let(:selection) do
-            query.all(field: 1..3)
-          end
-
-          it "adds the $all selector with converted range" do
-            expect(selection.selector).to eq({
-              "field" => { "$all" => [ 1, 2, 3 ] }
             })
           end
 
@@ -142,23 +380,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it "adds the $all selector" do
             expect(selection.selector).to eq({
               "field" => { "$all" => [ 1, 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when providing a range" do
-
-          let(:selection) do
-            query.all(field: "1".."3")
-          end
-
-          it "adds the $all selector with converted range" do
-            expect(selection.selector).to eq({
-              "field" => { "$all" => [ 1, 2, 3 ] }
             })
           end
 
@@ -229,209 +450,17 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when no serializers are provided" do
-
-          context "when the strategy is the default (union)" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).all(first: [ 3, 4 ])
-            end
-
-            it "overwrites the first $all selector" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is intersect" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).intersect.all(first: [ 2, 3 ])
-            end
-
-            it "intersects the $all selectors" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 2 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is override" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).override.all(first: [ 3, 4 ])
-            end
-
-            it "overwrites the first $all selector" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is union" do
-
-            let(:selection) do
-              query.all(first: [ 1, 2 ]).union.all(first: [ 3, 4 ])
-            end
-
-            it "unions the $all selectors" do
-              expect(selection.selector).to eq({
-                "first" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-        end
-
-        context "when serializers are provided" do
-
-          before(:all) do
-            class Field
-              def evolve(object)
-                Integer.evolve(object)
-              end
-              def localized?
-                false
-              end
-            end
-          end
-
-          after(:all) do
-            Object.send(:remove_const, :Field)
-          end
-
-          let!(:query) do
-            Mongoid::Query.new({}, { "field" => Field.new })
-          end
-
-          context "when the strategy is the default (union)" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).all(field: [ "3", "4" ])
-            end
-
-            it "overwrites the field $all selector" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is intersect" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).intersect.all(field: [ "2", "3" ])
-            end
-
-            it "intersects the $all selectors" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 2 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is override" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).override.all(field: [ "3", "4" ])
-            end
-
-            it "overwrites the field $all selector" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-
-          context "when the strategy is union" do
-
-            let(:selection) do
-              query.all(field: [ "1", "2" ]).union.all(field: [ "3", "4" ])
-            end
-
-            it "unions the $all selectors" do
-              expect(selection.selector).to eq({
-                "field" => { "$all" => [ 1, 2, 3, 4 ] }
-              })
-            end
-
-            it "returns a cloned query" do
-              expect(selection).to_not equal(query)
-            end
-          end
-        end
+        it_behaves_like 'supports merge strategies'
       end
     end
   end
 
   describe "#between" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :between }
 
-      let(:selection) do
-        query.between
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.between(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single range" do
 
@@ -474,43 +503,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#elem_match" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :elem_match }
 
-      let(:selection) do
-        query.elem_match
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.elem_match(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -622,43 +618,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#exists" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :exists }
 
-      let(:selection) do
-        query.exists
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.exists(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -771,39 +734,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#geo_spacial" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :geo_spacial }
 
-      let(:selection) do
-        query.geo_spacial
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to be_empty
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like "a cloning selection"
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.geo_spacial(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to be_empty
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like "a cloning selection"
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -826,7 +760,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           })
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
 
       context "when the geometry is a line intersection" do
@@ -848,7 +782,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           })
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
 
       context "when the geometry is a polygon intersection" do
@@ -872,7 +806,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           })
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
 
       context "when the geometry is within a polygon" do
@@ -916,50 +850,17 @@ describe Mongoid::Criteria::Queryable::Selectable do
           end
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
     end
   end
 
   describe "#gt" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :gt }
 
-      let(:selection) do
-        query.gt
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.gt(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1040,43 +941,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#gte" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :gte }
 
-      let(:selection) do
-        query.gte
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.gte(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1157,43 +1025,11 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#in" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :in }
+    let(:operator) { '$in' }
 
-      let(:selection) do
-        query.in
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.in(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1206,23 +1042,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it "adds the $in selector" do
           expect(selection.selector).to eq({
             "field" =>  { "$in" => [ 1, 2 ] }
-          })
-        end
-
-        it "returns a cloned query" do
-          expect(selection).to_not equal(query)
-        end
-      end
-
-      context "when providing a range" do
-
-        let(:selection) do
-          query.in(field: 1..3)
-        end
-
-        it "adds the $in selector with converted range" do
-          expect(selection.selector).to eq({
-            "field" =>  { "$in" => [ 1, 2, 3 ] }
           })
         end
 
@@ -1292,145 +1111,17 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when the strategy is the default (intersection)" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ].freeze).in(first: [ 2, 3 ])
-          end
-
-          it "intersects the $in selectors" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context 'when the field is aliased' do
-
-          before(:all) do
-            class TestModel
-              include Mongoid::Document
-            end
-          end
-
-          after(:all) do
-            Object.send(:remove_const, :TestModel)
-          end
-
-          let(:bson_object_id) do
-            BSON::ObjectId.new
-          end
-
-          let(:selection) do
-            TestModel.in(id: [bson_object_id.to_s]).in(id: [bson_object_id.to_s])
-          end
-
-          it "intersects the $in selectors" do
-            expect(selection.selector).to eq("_id" =>  { "$in" => [ bson_object_id ] })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is intersect" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ]).intersect.in(first: [ 2, 3 ])
-          end
-
-          it "intersects the $in selectors" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the strategy is override" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ]).override.in(first: [ 3, 4 ])
-          end
-
-          it "overwrites the first $in selector" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the strategy is union" do
-
-          let(:selection) do
-            query.in(first: [ 1, 2 ]).union.in(first: [ 3, 4 ])
-          end
-
-          it "unions the $in selectors" do
-            expect(selection.selector).to eq({
-              "first" =>  { "$in" => [ 1, 2, 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
+        it_behaves_like 'supports merge strategies'
       end
     end
   end
 
   describe "#lt" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :lt }
 
-      let(:selection) do
-        query.lt
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.lt(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1511,43 +1202,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#lte" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :lte }
 
-      let(:selection) do
-        query.lte
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.lte(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -1628,43 +1286,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#max_distance" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :max_distance }
 
-      let(:selection) do
-        query.max_distance
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.max_distance(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -1689,43 +1314,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#mod" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :mod }
 
-      let(:selection) do
-        query.mod
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.mod(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -1794,43 +1386,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#ne" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :ne }
 
-      let(:selection) do
-        query.ne
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.ne(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -1899,43 +1458,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#near" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :near }
 
-      let(:selection) do
-        query.near
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.near(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -2004,43 +1530,10 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#near_sphere" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :near_sphere }
 
-      let(:selection) do
-        query.near_sphere
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.near_sphere(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a criterion" do
 
@@ -2109,43 +1602,11 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#nin" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :nin }
+    let(:operator) { '$nin' }
 
-      let(:selection) do
-        query.nin
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.nin(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -2158,23 +1619,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it "adds the $nin selector" do
           expect(selection.selector).to eq({
             "field" =>  { "$nin" => [ 1, 2 ] }
-          })
-        end
-
-        it "returns a cloned query" do
-          expect(selection).to_not equal(query)
-        end
-      end
-
-      context "when providing a range" do
-
-        let(:selection) do
-          query.nin(field: 1..3)
-        end
-
-        it "adds the $nin selector with converted range" do
-          expect(selection.selector).to eq({
-            "field" =>  { "$nin" => [ 1, 2, 3 ] }
           })
         end
 
@@ -2201,35 +1645,6 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when unioning on the same field" do
-
-      context "when the field is not aliased" do
-
-        let(:selection) do
-          query.nin(first: [ 1, 2 ]).union.nin(first: [ 3, 4 ])
-        end
-
-        it "unions the selection on the field" do
-          expect(selection.selector).to eq(
-            { "first" => { "$nin" => [ 1, 2, 3, 4 ]}}
-          )
-        end
-      end
-
-      context "when the field is aliased" do
-
-        let(:selection) do
-          query.nin(id: [ 1, 2 ]).union.nin(id: [ 3, 4 ])
-        end
-
-        it "unions the selection on the field" do
-          expect(selection.selector).to eq(
-            { "_id" => { "$nin" => [ 1, 2, 3, 4 ]}}
-          )
-        end
-      end
-    end
-
     context "when provided multiple criterion" do
 
       context "when the criterion are for different fields" do
@@ -2251,7 +1666,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when chaninning the criterion" do
+    context "when chaining the criterion" do
 
       context "when the criterion are for different fields" do
 
@@ -2273,116 +1688,17 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion are on the same field" do
 
-        context "when the stretegy is the default (intersection)" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).nin(first: [ 2, 3 ])
-          end
-
-          it "intersects the $nin selectors" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is intersect" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).intersect.nin(first: [ 2, 3 ])
-          end
-
-          it "intersects the $nin selectors" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 2 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is override" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).override.nin(first: [ 3, 4 ])
-          end
-
-          it "overwrites the first $nin selector" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
-
-        context "when the stretegy is union" do
-
-          let(:selection) do
-            query.nin(first: [ 1, 2 ]).union.nin(first: [ 3, 4 ])
-          end
-
-          it "unions the $nin selectors" do
-            expect(selection.selector).to eq({
-              "first" => { "$nin" => [ 1, 2, 3, 4 ] }
-            })
-          end
-
-          it "returns a cloned query" do
-            expect(selection).to_not equal(query)
-          end
-        end
+        it_behaves_like 'supports merge strategies'
       end
     end
   end
 
   describe "#with_size" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :with_size }
 
-      let(:selection) do
-        query.with_size
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.with_size(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -2502,45 +1818,12 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
-  describe "#type" do
+  describe "#with_type" do
 
-    context "when provided no criterion" do
+    let(:query_method) { :with_type }
 
-      let(:selection) do
-        query.with_type
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.with_type(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires an argument'
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a single criterion" do
 
@@ -2669,7 +1952,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
           expect(selection.selector['$text'][:$language]).to eq("fr")
         end
 
-        it_behaves_like "a cloning selection"
+        it_behaves_like "returns a cloned query"
       end
     end
 
@@ -2695,6 +1978,8 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
   describe "#where" do
 
+    let(:query_method) { :where }
+
     context "when provided no criterion" do
 
       let(:selection) do
@@ -2714,24 +1999,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
       end
     end
 
-    context "when provided nil" do
-
-      let(:selection) do
-        query.where(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it "returns a cloned query" do
-        expect(selection).to_not equal(query)
-      end
-    end
+    it_behaves_like 'requires a non-nil argument'
 
     context "when provided a string" do
 
@@ -2745,6 +2013,45 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       it "returns a cloned query" do
         expect(selection).to_not equal(query)
+      end
+
+      context 'when multiple calls with string argument are made' do
+
+        let(:selection) do
+          query.where("this.value = 10").where('foo.bar')
+        end
+
+        it 'combines conditions' do
+          expect(selection.selector).to eq(
+            "$where" => "this.value = 10", '$and' => [{'$where' => 'foo.bar'}],
+          )
+        end
+      end
+
+      context 'when called with string argument and with hash argument' do
+
+        let(:selection) do
+          query.where("this.value = 10").where(foo: 'bar')
+        end
+
+        it 'combines conditions' do
+          expect(selection.selector).to eq(
+            "$where" => "this.value = 10", 'foo' => 'bar',
+          )
+        end
+      end
+
+      context 'when called with hash argument and with string argument' do
+
+        let(:selection) do
+          query.where(foo: 'bar').where("this.value = 10")
+        end
+
+        it 'combines conditions' do
+          expect(selection.selector).to eq(
+            'foo' => 'bar', "$where" => "this.value = 10",
+          )
+        end
       end
     end
 
@@ -3457,7 +2764,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
     context "when using the strategies via methods" do
 
-      context "when the values are a hash" do
+      context "when different operators are specified" do
 
         let(:selection) do
           query.gt(field: 5).lt(field: 10).ne(field: 7)
@@ -3465,26 +2772,26 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "merges the strategies on the same field" do
           expect(selection.selector).to eq(
-            { "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }}
+            "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }
           )
         end
       end
 
-      context "when the values are not hashes" do
+      context "when the same operator is specified" do
 
         let(:selection) do
           query.where(field: 5).where(field: 10)
         end
 
         it "combines conditions" do
-          expect(selection.selector).to eq('$and' => [{'field' => 5}], "field" => 10 )
+          expect(selection.selector).to eq("field" => 5, '$and' => [{'field' => 10}] )
         end
       end
     end
 
     context "when using the strategies via #where" do
 
-      context "when the values are a hash" do
+      context "when using complex keys with different operators" do
 
         let(:selection) do
           query.where(:field.gt => 5, :field.lt => 10, :field.ne => 7)
@@ -3492,7 +2799,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "merges the strategies on the same field" do
           expect(selection.selector).to eq(
-            { "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }}
+            "field" => { "$gt" => 5, "$lt" => 10, "$ne" => 7 }
           )
         end
       end

@@ -5,16 +5,75 @@ module Mongoid
   class Criteria
     module Queryable
 
-      # The key is a representation of a field in a queryable, that can be
-      # expanded to special MongoDB selectors.
+      # Key objects represent specifications for building query expressions
+      # utilizing MongoDB selectors.
+      #
+      # Simple key-value conditions are translated directly into expression
+      # hashes by Mongoid without utilizing Key objects. For example, the
+      # following condition:
+      #
+      #   Foo.where(price: 1)
+      #
+      # ... is translated to the following simple expression:
+      #
+      #   {price: 1}
+      #
+      # More complex conditions would start involving Key objects. For example:
+      #
+      #   Foo.where(:price.gt => 1)
+      #
+      # ... causes a Key instance to be created thusly:
+      #
+      #   Key.new(:price, :__override__, '$gt')
+      #
+      # This Key instance utilizes +operator+ but not +expanded+ nor +block+.
+      # The corresponding MongoDB query expression is:
+      #
+      #    {price: {'$gt' => 1}}
+      #
+      # A yet more more complex example is the following condition:
+      #
+      #   Foo.geo_spacial(:boundary.intersects_point => [1, 10])
+      #
+      # Processing this condition will cause a Key instance to be created as
+      # follows:
+      #
+      #   Key.new(:location, :__override__, '$geoIntersects', '$geometry') do |value|
+      #     { "type" => POINT, "coordinates" => value }
+      #   end
+      #
+      # ... eventually producing the following MongoDB query expression:
+      #
+      # {
+      #   boundary: {
+      #     '$geoIntersects' => {
+      #       '$geometry' => {
+      #         type: "Point" ,
+      #         coordinates: [ 1, 10 ]
+      #       }
+      #     }
+      #   }
+      # }
+      #
+      # Key instances can be thought of as procs that map a value to the
+      # MongoDB query expression required to obtain the key's condition,
+      # given the value.
       class Key
 
-        # @attribute [r] name The name of the field.
-        # @attribute [r] block The optional block to transform values.
-        # @attribute [r] operator The MongoDB query operator.
-        # @attribute [r] expanded The MongoDB expanded query operator.
-        # @attribute [r] strategy The name of the merge strategy.
-        attr_reader :block, :name, :operator, :expanded, :strategy
+        # @return [ String | Symbol ] The name of the field.
+        attr_reader :name
+
+        # @return [ String ] The MongoDB query operator.
+        attr_reader :operator
+
+        # @return [ String ] The MongoDB expanded query operator.
+        attr_reader :expanded
+
+        # @return [ Symbol ] The name of the merge strategy.
+        attr_reader :strategy
+
+        # @return [ Proc ] The optional block to transform values.
+        attr_reader :block
 
         # Does the key equal another object?
         #
@@ -44,16 +103,24 @@ module Mongoid
 
         # Instantiate the new key.
         #
-        # @example Instantiate the key.
-        #   Key.new("age", "$gt")
+        # @example Instantiate a key.
+        #   Key.new("age", :__override__, "$gt")
+        #
+        # @example Instantiate a key for sorting.
+        #   Key.new(:field, :__override__, 1)
         #
         # @param [ String, Symbol ] name The field name.
         # @param [ Symbol ] strategy The name of the merge strategy.
-        # @param [ String ] operator The Mongo operator.
+        # @param [ String | Integer ] operator The MongoDB operator,
+        #   or sort direction (1 or -1).
         # @param [ String ] expanded The Mongo expanded operator.
         #
         # @since 1.0.0
         def initialize(name, strategy, operator, expanded = nil, &block)
+          unless operator.is_a?(String) || operator.is_a?(Integer)
+            raise ArgumentError, "Operator must be a string or an integer: #{operator.inspect}"
+          end
+
           @name, @strategy, @operator, @expanded, @block =
             name, strategy, operator, expanded, block
         end
@@ -70,9 +137,27 @@ module Mongoid
         #
         # @since 1.0.0
         def __expr_part__(object, negating = false)
-          value = block ? block[object] : object
-          expression = { operator => expanded ? { expanded => value } : value }
-          { name.to_s => (negating && operator != "$not") ? { "$not" => expression } : expression }
+          { name.to_s => transform_value(object, negating) }
+        end
+
+        def transform_value(value, negating = false)
+          if block
+            expr = block[value]
+          else
+            expr = value
+          end
+
+          if expanded
+            expr = {expanded => expr}
+          end
+
+          expr = {operator => expr}
+
+          if negating && operator != '$not'
+            expr = {'$not' => expr}
+          end
+
+          expr
         end
 
         # Get the key as raw Mongo sorting options.

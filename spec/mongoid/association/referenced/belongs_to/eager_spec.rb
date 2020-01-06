@@ -78,6 +78,9 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
     end
 
     context "when including the belongs_to association" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       it "queries twice" do
 
@@ -90,6 +93,9 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
     end
 
     context "when the association is not polymorphic" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       let(:eager) do
         Post.includes(:person).last
@@ -165,6 +171,9 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
     end
 
     context "when all the values for the belongs_to association are nil" do
+      # Query count assertions require that all queries are sent using the
+      # same connection object.
+      require_no_multi_shard
 
       before do
         2.times { |i| HmmTicket.create!(person: nil) }

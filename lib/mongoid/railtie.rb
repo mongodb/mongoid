@@ -42,7 +42,7 @@ module Rails
       # @example Set up configuration in the Rails app.
       #   module MyApplication
       #     class Application < Rails::Application
-      #       config.mongoid.logger = Logger.new($stdout, :warn)
+      #       config.mongoid.logger = Logger.new(STDERR, :warn)
       #     end
       #   end
       #

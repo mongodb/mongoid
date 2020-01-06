@@ -27,5 +27,26 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       end.to raise_error(ActiveModel::MissingAttributeError)
       expect(legislator.attributes.keys).to eq(['_id', 'a'])
     end
+
+    context 'when using only with $' do
+      before do
+        Patient.destroy_all
+        Patient.create!(
+          title: 'Steve',
+          addresses: [
+            Address.new(number: '123'),
+            Address.new(number: '456'),
+          ],
+        )
+      end
+
+      let(:patient) do
+        Patient.where('addresses.number' => {'$gt' => 100}).only('addresses.$').first
+      end
+
+      it 'loads embedded association' do
+        expect(patient.addresses.first.number).to eq(123)
+      end
+    end
   end
 end

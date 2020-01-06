@@ -55,10 +55,13 @@ module Mongoid
         def store(key, value)
           name, serializer = storage_pair(key)
           if multi_selection?(name)
-            super(name, evolve_multi(value))
+            store_name = name
+            store_value = evolve_multi(value)
           else
-            super(localized_key(name, serializer), evolve(serializer, value))
+            store_name = localized_key(name, serializer)
+            store_value = evolve(serializer, value)
           end
+          super(store_name, store_value)
         end
         alias :[]= :store
 
@@ -91,12 +94,43 @@ module Mongoid
         # @return [ Array<Hash> ] The serialized values.
         #
         # @since 1.0.0
-        def evolve_multi(value)
-          value.map do |val|
-            Hash[val.map do |key, _value|
-              _value = evolve_multi(_value) if multi_selection?(key)
+        def evolve_multi(specs)
+          unless specs.is_a?(Array)
+            raise ArgumentError, "specs is not an array: #{specs.inspect}"
+          end
+          specs.map do |spec|
+            Hash[spec.map do |key, value|
+              # If an application nests conditionals, e.g.
+              # {'$or' => [{'$or' => {...}}]},
+              # when evolve_multi is called for the top level hash,
+              # this call recursively transforms the bottom level $or.
+              if multi_selection?(key)
+                value = evolve_multi(value)
+              end
+
+              # storage_pair handles field aliases but not localization for
+              # some reason, although per its documentation Smash supposedly
+              # owns both.
               name, serializer = storage_pair(key)
-              [ localized_key(name, serializer), evolve(serializer, _value) ]
+              final_key = localized_key(name, serializer)
+              # This performs type conversions on the value and transformations
+              # that depend on the type of the field that the value is stored
+              # in, but not transformations that have to do with query shape.
+              evolved_value = evolve(serializer, value)
+
+              # This builds a query shape around the value, when the query
+              # involves complex keys. For example, {:foo.lt => 5} produces
+              # {'foo' => {'$lt' => 5}}. This step should be done after all
+              # value-based processing is complete.
+              if key.is_a?(Key)
+                if serializer && evolved_value != value
+                  raise NotImplementedError, "This method is not prepared to handle key being a Key and serializer being not nil"
+                end
+
+                evolved_value = key.transform_value(evolved_value)
+              end
+
+              [ final_key, evolved_value ]
             end]
           end.uniq
         end
@@ -182,23 +216,6 @@ module Mongoid
         # @since 1.0.0
         def multi_selection?(key)
           %w($and $or $nor).include?(key)
-        end
-
-        # Determines if the selection operator takes a list. Returns true for
-        # $in and $nin.
-        #
-        # @api private
-        #
-        # @example Does the selection operator take multiple values?
-        #   selector.multi_value?("$nin")
-        #
-        # @param [ String ] key The key to check.
-        #
-        # @return [ true, false ] If the key is $in or $nin.
-        #
-        # @since 2.1.1
-        def multi_value?(key)
-          %w($in $nin).include?(key)
         end
       end
     end

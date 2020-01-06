@@ -22,52 +22,99 @@ module Mongoid
         @attribute, @document = attribute, document
       end
 
-      # Return true if the attribute and value are equal, or if it is an array
-      # if the value is included.
+      # Checks whether the attribute matches the value, using the default
+      # MongoDB matching logic (i.e., when no operator is specified in the
+      # criteria).
       #
-      # @example Does this value match?
-      #   default._matches?("value")
+      # If attribute and value are both of basic types like string or number,
+      # this method returns true if and only if the attribute equals the value.
       #
-      # @param [ Object ] value The value to check if it matches.
+      # Value can also be of a type like Regexp or Range which defines
+      # more complex matching/inclusion behavior via the === operator.
+      # If so, and attribute is still of a basic type like string or number,
+      # this method returns true if and only if the value's === operator
+      # returns true for the attribute. For example, this method returns true
+      # if attribute is a string and value is a Regexp and attribute matches
+      # the value, of if attribute is a number and value is a Range and
+      # the value includes the attribute.
       #
-      # @return [ true, false ] True if matches, false if not.
+      # If attribute is an array and value is not an array, the checks just
+      # described (i.e. the === operator invocation) are performed on each item
+      # of the attribute array. If any of the items in the attribute match
+      # the value according to the value type's === operator, this method
+      # returns true.
+      #
+      # If attribute and value are both arrays, this method returns true if and
+      # only if the arrays are equal (including the order of the elements).
+      #
+      # @param [ Object ] value The value to check.
+      #
+      # @return [ true, false ] True if attribute matches the value, false if not.
       #
       # @since 1.0.0
       def _matches?(value)
-        attribute.is_a?(Array) && !value.is_a?(Array) ? attribute.any? { |_attribute| value === _attribute } : value === attribute
+        if attribute.is_a?(Array) && !value.is_a?(Array)
+          attribute.any? { |_attribute| value === _attribute }
+        else
+          value === attribute
+        end
       end
 
       protected
 
-      # Convenience method for getting the first value in a hash.
+      # Given a condition, which is a one-element hash consisting of an
+      # operator and a value like {'$gt' => 1}, return the value.
       #
-      # @example Get the first value.
-      #   matcher.first(:test => "value")
+      # @example Get the condition value.
+      #   matcher.condition_value({'$gt' => 1})
+      #   # => 1
       #
-      # @param [ Hash ] hash The has to pull from.
+      # @param [ Hash ] condition The condition.
       #
-      # @return [ Object ] The first value.
+      # @return [ Object ] The value of the condition.
       #
       # @since 1.0.0
-      def first(hash)
-        hash.values.first
+      def condition_value(condition)
+        unless condition.is_a?(Hash)
+          raise ArgumentError, 'Condition must be a hash'
+        end
+
+        unless condition.length == 1
+          raise ArgumentError, 'Condition must have one element'
+        end
+
+        condition.values.first
       end
 
-      # If object exists then compare the two, otherwise return false
+      # Determines whether the attribute value stored in this matcher
+      # satisfies the provided condition using the provided operator.
       #
-      # @example Determine if we can compare.
-      #   matcher.determine("test", "$in")
+      # For example, given an instance of Gt matcher with the @attribute of
+      # 2, the matcher is set up to answer whether the attribute is
+      # greater than some input value. This input value is provided in
+      # the condition, which could be {"$gt" => 1}, and the operator is
+      # provided (somewhat in a duplicate fashion) in the operator argument,
+      # in this case :>.
       #
-      # @param [ Object ] value The value to compare with.
-      # @param [ Symbol, String ] operator The comparison operation.
+      # @example
+      #   matcher = Matchable::Gt.new(2)
+      #   matcher.determine({'$gt' => 1}, :>)
+      #   # => true
       #
-      # @return [ true, false ] The comparison or false.
+      # @param [ Hash ] condition The condition to evaluate. This must be
+      #   a one-element hash; the key is ignored, and the value is passed
+      #   as the argument to the operator.
+      # @param [ Symbol, String ] operator The comparison operator or method.
+      #   The operator is invoked on the attribute stored in the matcher
+      #   instance.
+      #
+      # @return [ true, false ] Result of condition evaluation.
       #
       # @since 1.0.0
-      def determine(value, operator)
-        attribute.__array__.any? {|attr|
-          attr ? attr.send(operator, first(value)) : false
-        }
+      def determine(condition, operator)
+        attribute.__array__.any? do |attr|
+          attr && attr.send(operator, condition_value(condition))
+        end
       end
     end
   end

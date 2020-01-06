@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'actionpack', '~> 5.1'
-gem 'activemodel', '~> 5.1'
+gem 'actionpack'
+gem 'activemodel'
 
 # https://jira.mongodb.org/browse/MONGOID-4614
 if RUBY_VERSION < '2.3'
@@ -16,22 +16,20 @@ else
   gem 'i18n', '~> 1.0', '>= 1.1'
 end
 
+group :development do
+  gem 'yard'
+end
+
 group :test do
   gem 'rspec-retry'
   gem 'benchmark-ips'
-  gem 'rspec', '~> 3.7'
-  gem 'rspec-expectations', '~> 3.7', '<= 3.8.2'
-  #gem 'rspec-expectations', git: 'https://github.com/p-mongo/rspec-expectations', ref: 'pr-1112-3.8'
+  gem 'rspec-core', '~> 3.7'
+  gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
+  gem 'rspec-mocks-diag', '~> 3.0'
   gem 'fuubar'
   gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
-  end
-end
-
-group :development, :testing do
-  gem 'yard'
-  platforms :mri do
     if RUBY_VERSION < '2.3'
       gem 'byebug', '~> 10.0'
     else

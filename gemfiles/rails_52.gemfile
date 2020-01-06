@@ -1,0 +1,36 @@
+source 'https://rubygems.org'
+
+gem 'rake'
+gem 'actionpack', '~> 5.2.0'
+gem 'activemodel', '~> 5.2.0'
+
+if RUBY_VERSION < '2.3'
+  gem 'i18n', '~> 1.0', '< 1.5'
+  gem 'nokogiri', '<1.10'
+else
+  gem 'i18n', '~> 1.0'
+end
+
+group :development do
+  gem 'yard'
+end
+
+group :test do
+  gem 'rspec-retry'
+  gem 'benchmark-ips'
+  gem 'rspec-core', '~> 3.7'
+  gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
+  gem 'rspec-mocks-diag', '~> 3.0'
+  gem 'fuubar'
+  gem 'rfc'
+  platforms :mri do
+    gem 'timeout-interrupt'
+    if RUBY_VERSION < '2.3'
+      gem 'byebug', '~> 10.0'
+    else
+      gem 'byebug'
+    end
+  end
+end
+
+gemspec path: '..'

@@ -115,14 +115,21 @@ describe Mongoid::Matchable::Default do
         described_class.new(["Test1", "Test2", "Test3"])
       end
 
-      context "when the attribute contains the value" do
+      context "when the attribute equals the value" do
 
         it "returns true" do
           expect(matcher._matches?(["Test1", "Test2", "Test3"])).to be true
         end
       end
 
-      context "when the attribute does not contain the value" do
+      context "when the value contains same items as attribute but in different order" do
+
+        it "returns false" do
+          expect(matcher._matches?(["Test1", "Test3", "Test2"])).to be false
+        end
+      end
+
+      context "when the value is a subset of attribute" do
 
         it "returns false" do
           expect(matcher._matches?(["Test1", "Test2"])).to be false

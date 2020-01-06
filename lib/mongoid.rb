@@ -15,6 +15,7 @@ require "active_support/time_with_zone"
 require "active_model"
 
 require "mongo"
+require 'mongo/active_support'
 
 require "mongoid/version"
 require "mongoid/config"

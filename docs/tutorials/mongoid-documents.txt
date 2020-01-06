@@ -9,7 +9,7 @@ Documents
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Documents are the core objects in Mongoid and any object that is to be persisted to the
@@ -410,6 +410,67 @@ If a time zone is specfied, it is respected:
     ticket.opened_at
     # => Sun, 04 Mar 2018 09:00:00 +0000
 
+Regular Expression Fields
+*************************
+
+MongoDB supports storing regular expressions in documents, and querying using
+regular expressions. Of note for Ruby applications, MongoDB uses
+`Perl-compatible regular expressions (PCRE) <http://pcre.org/>`_
+and Ruby uses `Onigmo <https://github.com/k-takata/Onigmo>`_, which is a
+fork of `Oniguruma regular expression engine <https://github.com/kkos/oniguruma>`_.
+The two regular expression implementations generally provide equivalent
+functionality but have some important syntax differences.
+
+When a field is declared to be of type Regexp, Mongoid converts Ruby regular
+expressions to BSON regular expressions and stores the result in MongoDB.
+Retrieving the field from the database produces a ``BSON::Regexp::Raw``
+instance:
+
+.. code-block:: ruby
+
+  class Token
+    include Mongoid::Document
+    
+    field :pattern, type: Regexp
+  end
+  
+  token = Token.create!(pattern: /hello.world/m)
+  token.pattern
+  # => /hello.world/m
+  
+  token.reload
+  token.pattern
+  # => #<BSON::Regexp::Raw:0x0000555f505e4a20 @pattern="hello.world", @options="ms">
+
+Use ``#compile`` method on ``BSON::Regexp::Raw`` to get back the Ruby regular
+expression:
+
+.. code-block:: ruby
+
+  token.pattern.compile
+  # => /hello.world/m
+
+Note that, if the regular expression was not originally a Ruby one, calling
+``#compile`` on it may produce a different regular expression. For example,
+the following is a PCRE matching a string that ends in "hello":
+
+.. code-block:: ruby
+
+  BSON::Regexp::Raw.new('hello$', 's')   
+  # => #<BSON::Regexp::Raw:0x0000555f51441640 @pattern="hello$", @options="s">
+
+Compiling this regular expression produces a Ruby regular expression that
+matches strings containing "hello" before a newline, besides strings ending in
+"hello":
+
+.. code-block:: ruby
+
+  BSON::Regexp::Raw.new('hello$', 's').compile =~ "hello\nworld"
+  # => 0
+
+This is because the meaning of ``$`` is different between PCRE and Ruby
+regular expressions.
+
 Defaults
 ********
 
@@ -604,56 +665,158 @@ of the following methods:
   are accessed by the application, eventually eager migration may be needed to convert the
   remaining documents that haven't been accessed.
 
+
 Dynamic Fields
 --------------
 
-By default, Mongoid doesn't support dynamic fields. You can tell Mongoid that you want
-to add dynamic fields by including ``Mongoid::Attributes::Dynamic`` in a model.
-``Mongoid::Attributes::Dynamic`` will allow attributes to get set and persisted on the
-document even if a field was not defined for them. There is a slight 'gotcha' however when
-dealing with dynamic attributes in that Mongoid is not completely lenient about the use of
-``method_missing`` and breaking the public interface of the Document class.
+By default, Mongoid requires all fields that may be set on a document to
+be explicitly defined using ``field`` declarations. Mongoid also supports
+creating fields on the fly from an arbitrary hash or documents stored in
+the database. When a model uses fields not explicitly defined, such fields
+are called *dynamic fields*.
+
+To enable dynamic fields, include ``Mongoid::Attributes::Dynamic`` module
+in the model:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     include Mongoid::Attributes::Dynamic
-   end
+  class Person
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+  end
+  
+  bob = Person.new(name: 'Bob', age: 42)
+  bob.name
+  # => "Bob"
 
-When dealing with dynamic attributes, the following rules apply:
+It is possible to use ``field`` declarations and dynamic fields in the same
+model class. Attributes for which there is a ``field`` declaration will be
+treated according to the ``field`` declaration, with remaining attributes
+being treated as dynamic fields.
 
-If the attribute exists in the document, Mongoid will provide you with your standard
-getter and setter methods. For example, consider a person who has an attribute of
-"gender" set on the document:
+Attribute values in the dynamic fields must initially be set by either
+passing the attribute hash to the constructor, mass assignment via
+``attributes=``, mass assignment via ``[]=``, using ``write_attribute``,
+or they must already be present in the database.
+
+.. code-block:: ruby
+  
+  # OK
+  bob = Person.new(name: 'Bob')
+  
+  # OK
+  bob = Person.new
+  bob.attributes = {age: 42}
+  
+  # OK
+  bob = Person.new
+  bob['age'] = 42
+  
+  # Raises NoMethodError: undefined method age=
+  bob = Person.new
+  bob.age = 42
+  
+  # OK
+  bob = Person.new
+  # OK - string access
+  bob.write_attribute('age', 42)
+  # OK - symbol access
+  bob.write_attribute(:name, 'Bob')
+  
+  # OK, initializes attributes from whatever is in the database
+  bob = Person.find('123')
+
+If an attribute is not present in a particular model instance's attributes
+hash, both the reader and the writer for the corresponding field are not
+defined, and invoking them raises ``NoMethodError``:
+
+.. code-block:: ruby
+  
+  bob = Person.new
+  bob.attributes = {age: 42}
+  
+  bob.age
+  # => 42
+  
+  # raises NoMethodError
+  bob.name
+  
+  # raises NoMethodError
+  bob.name = 'Bob'
+  
+  # OK
+  bob['name'] = 'Bob'
+  
+  bob.name
+  # => "Bob"
+
+Attributes can always be read using mass attribute access or ``read_attribute``
+(this appies to models not using dynamic fields as well):
 
 .. code-block:: ruby
 
-   # Set the person's gender to male.
-   person[:gender] = "Male"
-   person.gender = "Male"
+  bob = Person.new(age: 42)
+  
+  # OK - string access
+  bob['name']
+  # => nil
+  
+  # OK - symbol access
+  bob[:name]
+  # => nil
+  
+  # OK - string access
+  bob['age']
+  # => 42
+  
+  # OK - symbol access
+  bob[:age]
+  # => 42
+  
+  # OK
+  bob.attributes['name']
+  # => nil
+  
+  # OK
+  bob.attributes['age']
+  # => 42
+  
+  # Returns nil - keys are always strings
+  bob.attributes[:age]
+  # => nil
+  
+  # OK
+  bob.read_attribute('name')
+  # => nil
+  
+  # OK
+  bob.read_attribute(:name)
+  # => nil
+  
+  # OK - string access
+  bob.read_attribute('age')
+  # => 42
+  
+  # OK - symbol access
+  bob.read_attribute(:age)
+  # => 42
 
-   # Get the person's gender.
-   person.gender
 
-If the attribute does not already exist on the document, Mongoid will not provide you with
-the getters and setters and will enforce normal ``method_missing`` behavior. In this case you
-must use the other provided accessor methods:
-(``[]`` and ``[]=``) or (``read_attribute`` and ``write_attribute``).
+Special Characters in Field Names
+*********************************
+
+Mongoid permits dynamic field names to include spaces and punctuation:
 
 .. code-block:: ruby
 
-   # Raise a NoMethodError if value isn't set.
-   person.gender
-   person.gender = "Male"
+  bob = Person.new('hello world' => 'MDB')
+  bob.send('hello world')
+  # => "MDB"
+  
+  bob.write_attribute("hello%world", 'MDB')
+  bob[:"hello%world"]
+  # => "MDB"
 
-   # Retrieve a dynamic field safely.
-   person[:gender]
-   person.read_attribute(:gender)
-
-   # Write a dynamic field safely.
-   person[:gender] = "Male"
-   person.write_attribute(:gender, "Male")
 
 Localized Fields
 ----------------
@@ -690,36 +853,50 @@ You can get and set all the translations at once by using the corresponding ``_t
    product.description_translations =
      { "en" => "Marvelous!", "de" => "Wunderbar!" }
 
+
 Fallbacks
 *********
 
-When using fallbacks, Mongoid will automatically use them when a translation is not available.
+Mongoid integrates with
+`i18n fallbacks <https://github.com/ruby-i18n/i18n/wiki/Fallbacks>`_.
+To use the fallbacks, the respective functionality must be explicitly enabled.
 
-For Rails applications, set the fallbacks configuration setting to true in your environment.
-
-.. code-block:: ruby
-
-   config.i18n.fallbacks = true
-
-For non-Rails applications, you must include the fallbacks module straight to the I18n gem.
+In a Rails application, set the ``config.i18n.fallbacks`` configuration setting
+to ``true`` in your environment and specify the fallback languages:
 
 .. code-block:: ruby
 
-   require "i18n/backend/fallbacks"
-   I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+  config.i18n.fallbacks = true
+  config.after_initialize do
+    I18n.fallbacks[:de] = [ :en, :es ]
+  end
 
-When the fallbacks are defined, if a translation is not present, Mongoid will fallback
-in order of the defined locales.
+In a non-Rails application, include the fallbacks module into the I18n backend
+you are using and specify the fallback languages:
 
 .. code-block:: ruby
 
-   I18n.default_locale = :en
-   I18n.fallbacks = true
-   ::I18n.fallbacks[:de] = [ :de, :en, :es ]
-   product = Product.new
-   product.description = "Marvelous!"
-   I18n.locale = :de
-   product.description # "Marvelous!"
+  require "i18n/backend/fallbacks"
+  I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+  I18n.fallbacks[:de] = [ :en, :es ]
+
+When fallbacks are enabled, if a translation is not present in the active
+language, translations will be looked up in the fallback languages:
+
+.. code-block:: ruby
+
+  product = Product.new
+  I18n.locale = :en
+  product.description = "Marvelous!"
+  I18n.locale = :de
+  product.description # "Marvelous!"
+
+.. note::
+
+  In i18n 1.1, the behavior of fallbacks `changed <https://github.com/ruby-i18n/i18n/pull/415>`_
+  to always require an explicit list of fallback locales rather than falling
+  back to the default locale when no fallback locales have been provided.
+
 
 Querying
 ********
