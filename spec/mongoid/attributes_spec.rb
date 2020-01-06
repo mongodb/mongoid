@@ -1353,6 +1353,10 @@ describe Mongoid::Attributes do
         expect {
           person.map = []
         }.to raise_error(Mongoid::Errors::InvalidValue)
+
+        expect {
+          person.map = false
+        }.to raise_error(Mongoid::Errors::InvalidValue)
       end
 
       it "can set a Hash value" do
@@ -1370,6 +1374,10 @@ describe Mongoid::Attributes do
       it "raises an error when try to set an invalid value" do
         expect {
           person.aliases = {}
+        }.to raise_error(Mongoid::Errors::InvalidValue)
+
+        expect {
+          person.aliases = false
         }.to raise_error(Mongoid::Errors::InvalidValue)
       end
     end

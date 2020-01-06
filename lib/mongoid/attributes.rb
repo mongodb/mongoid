@@ -347,7 +347,7 @@ module Mongoid
     #
     # @since 3.0.10
     def validate_attribute_value(access, value)
-      return unless fields[access] && value
+      return unless fields[access] && !value.nil?
       validatable_types = [ Hash, Array ]
       if validatable_types.include? fields[access].type
         unless value.is_a? fields[access].type
