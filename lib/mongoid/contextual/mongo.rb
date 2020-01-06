@@ -11,6 +11,7 @@ require "mongoid/association/eager_loadable"
 module Mongoid
   module Contextual
     class Mongo
+      extend Forwardable
       include Enumerable
       include Aggregable::Mongo
       include Atomic
@@ -349,7 +350,7 @@ module Mongoid
         apply_options
       end
 
-      delegate(:database_field_name, to: :@klass)
+      def_delegator :@klass, :database_field_name
 
       # Get the last document in the database for the criteria's selector.
       #

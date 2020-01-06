@@ -9,9 +9,10 @@ module Mongoid
         # This class defines the behavior for all associations that are a
         # one-to-many between documents in different collections.
         class Proxy < Association::Many
+          extend Forwardable
 
-          delegate :count, to: :criteria
-          delegate :first, :in_memory, :last, :reset, :uniq, to: :_target
+          def_delegator :criteria, :count
+          def_delegators :_target, :first, :in_memory, :last, :reset, :uniq
 
           # Appends a document or array of documents to the association. Will set
           # the parent and update the index in the process.
