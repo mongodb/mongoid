@@ -159,21 +159,21 @@ module Mongoid
     #
     # @since 1.0.0
     def write_attribute(name, value)
-      access = database_field_name(name)
-      if attribute_writable?(access)
+      field_name = database_field_name(name)
+      if attribute_writable?(field_name)
         _assigning do
-          validate_attribute_value(access, value)
-          localized = fields[access].try(:localized?)
+          validate_attribute_value(field_name, value)
+          localized = fields[field_name].try(:localized?)
           attributes_before_type_cast[name.to_s] = value
-          typed_value = typed_value_for(access, value)
-          unless attributes[access] == typed_value || attribute_changed?(access)
-            attribute_will_change!(access)
+          typed_value = typed_value_for(field_name, value)
+          unless attributes[field_name] == typed_value || attribute_changed?(field_name)
+            attribute_will_change!(field_name)
           end
           if localized
-            attributes[access] ||= {}
-            attributes[access].merge!(typed_value)
+            attributes[field_name] ||= {}
+            attributes[field_name].merge!(typed_value)
           else
-            attributes[access] = typed_value
+            attributes[field_name] = typed_value
           end
           typed_value
         end
@@ -338,20 +338,28 @@ module Mongoid
 
     private
 
-    # Validates an attribute value. This provides validation checking if
-    # the value is valid for given a field.
-    # For now, only Hash and Array fields are validated.
+    # Validates an attribute value as being assignable to the specified field.
     #
-    # @param [ String, Symbol ] access The name of the attribute to validate.
-    # @param [ Object ] value The to be validated.
+    # For now, only Hash and Array fields are validated, and the value is
+    # being checked to be of an appropriate type (i.e. either Hash or Array,
+    # respectively, or nil).
+    #
+    # This method takes the name of the field as stored in the document
+    # in the database, not (necessarily) the Ruby method name used to read/write
+    # the said field.
+    #
+    # @param [ String, Symbol ] field_name The name of the field.
+    # @param [ Object ] value The value to be validated.
     #
     # @since 3.0.10
-    def validate_attribute_value(access, value)
-      return unless fields[access] && !value.nil?
+    def validate_attribute_value(field_name, value)
+      return if value.nil?
+      field = fields[field_name]
+      return unless field
       validatable_types = [ Hash, Array ]
-      if validatable_types.include? fields[access].type
-        unless value.is_a? fields[access].type
-          raise Mongoid::Errors::InvalidValue.new(fields[access].type, value.class)
+      if validatable_types.include?(field.type)
+        unless value.is_a?(field.type)
+          raise Mongoid::Errors::InvalidValue.new(field.type, value.class)
         end
       end
     end
