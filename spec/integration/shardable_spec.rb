@@ -6,6 +6,8 @@ require_relative '../mongoid/shardable_models'
 
 describe 'Sharding helpers' do
   require_topology :sharded
+  # These tests make jruby runs take too long
+  only_mri
 
   describe 'shard_collection rake task' do
     let(:shard_collections) do
