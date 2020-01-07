@@ -123,7 +123,7 @@ supported by Mongoid.
      - |checkmark|
 
    * - 7.0
-     -
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark| [#ruby-2.4]_
