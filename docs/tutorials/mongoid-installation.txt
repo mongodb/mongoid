@@ -98,6 +98,7 @@ supported by Mongoid.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Ruby 2.7
      - Ruby 2.6
      - Ruby 2.5
      - Ruby 2.4
@@ -109,6 +110,7 @@ supported by Mongoid.
    * - 7.0
      - |checkmark|
      - |checkmark|
+     - |checkmark|
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
      - |checkmark| [#ruby-2.2]_
@@ -116,6 +118,7 @@ supported by Mongoid.
      - |checkmark|
 
    * - 6.4
+     -
      - |checkmark|
      - |checkmark|
      - |checkmark| [#ruby-2.4]_
