@@ -2,6 +2,8 @@ en:
   mongoid:
     errors:
       messages:
+        restrict_with_error_dependent_destroy:
+          "Cannot delete record because associated objects exist at %{association}."
         blank_in_locale:
           "can't be blank in %{location}"
         message_title: "message"

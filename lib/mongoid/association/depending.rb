@@ -131,7 +131,9 @@ module Mongoid
 
       def _dependent_restrict_with_error!(association)
         if (relation = send(association.name)) && !relation.blank?
-          errors.add(association.name, RESTRICT_ERROR_MSG)
+          association_name_translated = ::I18n.translate("activerecord.models.#{association.name}", default: association.name.to_s)
+
+          errors.add(:base, :restrict_with_error_dependent_destroy, association: association_name_translated)
           throw(:abort, false)
         end
       end
