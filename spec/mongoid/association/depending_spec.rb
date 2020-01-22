@@ -849,8 +849,11 @@ describe Mongoid::Association::Depending do
 
       it 'adds an error to the parent object' do
         expect(person.delete).to be(false)
-        expect(person.errors[:restrictable_posts].first).to be(
-          Mongoid::Association::Depending::RESTRICT_ERROR_MSG)
+
+        key_message = "#{Mongoid::Errors::MongoidError::BASE_KEY}.restrict_with_error_dependent_destroy"
+        expect(person.errors[:base].first).to eq(
+          ::I18n.translate(key_message, association: :restrictable_posts)
+        )
       end
     end
 
