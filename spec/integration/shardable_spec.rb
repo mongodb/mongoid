@@ -110,5 +110,24 @@ describe 'Sharding helpers' do
       end
 
     end
+
+    context 'when models have no sharded configuration' do
+      let(:model_cls) { SmNotSharded }
+
+      before do
+        model_cls.shard_config.should be nil
+      end
+
+      it 'returns empty array' do
+        shard_collections.should == []
+      end
+
+      it 'does not shards collection' do
+        shard_collections
+
+        stats = model_cls.collection.database.command(collStats: model_cls.collection.name).first
+        stats[:sharded].should be false
+      end
+    end
   end
 end

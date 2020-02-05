@@ -55,3 +55,7 @@ class SmDriver
   index age: 1, agency: 1
   shard_key age: 1, agency: :hashed
 end
+
+class SmNotSharded
+  include Mongoid::Document
+end

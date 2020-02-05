@@ -120,7 +120,7 @@ module Mongoid
       # @return [ Array<Class> ] The sharded models
       def shard_collections(models = ::Mongoid.models)
         models.map do |model|
-          next if model.shard_config.empty?
+          next if model.shard_config.nil?
 
           if model.embedded? && !model.cyclic?
             logger.warn("MONGOID: #{model} has shard config but is emdedded")
