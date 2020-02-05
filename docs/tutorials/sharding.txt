@@ -74,7 +74,7 @@ configured in the association as the field name:
     shard_key country: 1
     
     # The collection must also have an index that starts with the shard key.
-    index ssn: 1
+    index country: 1
   end
 
 
