@@ -1778,6 +1778,8 @@ describe Mongoid::Interceptable do
     end
 
     it 'calls callbacks in the right order' do
+      pending 'MONGOID-3795'
+
       parent.save!
       expect(registry.calls).to eq expected
     end
