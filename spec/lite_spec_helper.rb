@@ -15,6 +15,7 @@ require "mongo"
 require 'pp'
 
 require 'support/spec_config'
+require 'support/lite_constraints'
 
 unless SpecConfig.instance.ci?
   begin
@@ -58,6 +59,8 @@ RSpec.configure do |config|
       end
     end
   end
+
+  config.extend(LiteConstraints)
 end
 
 # require all shared examples

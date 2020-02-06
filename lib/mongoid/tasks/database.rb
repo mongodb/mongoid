@@ -108,6 +108,54 @@ module Mongoid
         end.compact
       end
 
+      # Shard collections for models that declare shard keys.
+      #
+      # Returns the model classes that have had their collections sharded,
+      # including model classes whose collections had already been sharded
+      # prior to the invocation of this method.
+      #
+      # @example Shard all collections
+      #   Mongoid::Tasks::Database.shard_collections
+      #
+      # @return [ Array<Class> ] The sharded models
+      def shard_collections(models = ::Mongoid.models)
+        models.map do |model|
+          next if model.shard_config.nil?
+
+          if model.embedded? && !model.cyclic?
+            logger.warn("MONGOID: #{model} has shard config but is emdedded")
+            next
+          end
+
+          unless model.collection.cluster.sharded?
+            logger.warn("MONGOID: #{model} has shard config but is not persisted in a sharded cluster: #{model.collection.cluster.summary}")
+            next
+          end
+
+          # Database must exist in order to run collStats
+          model.collection.create
+
+          stats = model.collection.database.command(collStats: model.collection.name).first
+          if stats[:sharded]
+            logger.info("MONGOID: #{model.collection.namespace} is already sharded for #{model}")
+            next model
+          end
+
+          admin_db = model.collection.client.use(:admin).database
+          admin_db.command(enableSharding: model.collection.database.name)
+          begin
+            admin_db.command(shardCollection: model.collection.namespace, **model.shard_config)
+          rescue Mongo::Error::OperationFailure => e
+            logger.error("MONGOID: Failed to shard collection #{model.collection.namespace} for #{model}: #{e.class}: #{e}")
+            next
+          end
+
+          logger.info("MONGOID: Sharded collection #{model.collection.namespace} for #{model}")
+
+          model
+        end.compact
+      end
+
       private
 
       def logger

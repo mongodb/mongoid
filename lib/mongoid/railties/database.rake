@@ -60,11 +60,18 @@ namespace :db do
   end
 
   unless Rake::Task.task_defined?("db:create_indexes")
+    desc "Create indexes specified in Mongoid models"
     task :create_indexes => "mongoid:create_indexes"
   end
 
   unless Rake::Task.task_defined?("db:remove_indexes")
+    desc "Remove indexes specified in Mongoid models"
     task :remove_indexes => "mongoid:remove_indexes"
+  end
+
+  unless Rake::Task.task_defined?("db:shard_collections")
+    desc "Shard collections with shard keys specified in Mongoid models"
+    task :shard_collections => "mongoid:shard_collections"
   end
 
   namespace :mongoid do

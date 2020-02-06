@@ -5,27 +5,32 @@ namespace :db do
     task :load_models do
     end
 
-    desc "Create the indexes defined on your mongoid models"
+    desc "Create indexes specified in Mongoid models"
     task :create_indexes => [:environment, :load_models] do
       ::Mongoid::Tasks::Database.create_indexes
     end
 
-    desc "Remove indexes that exist in the database but aren't specified on the models"
+    desc "Remove indexes that exist in the database but are not specified in Mongoid models"
     task :remove_undefined_indexes => [:environment, :load_models] do
       ::Mongoid::Tasks::Database.remove_undefined_indexes
     end
 
-    desc "Remove the indexes defined on your mongoid models without questions!"
+    desc "Remove indexes specified in Mongoid models"
     task :remove_indexes => [:environment, :load_models] do
       ::Mongoid::Tasks::Database.remove_indexes
     end
 
-    desc "Drops the default client database"
+    desc "Shard collections with shard keys specified in Mongoid models"
+    task :shard_collections => [:environment, :load_models] do
+      ::Mongoid::Tasks::Database.shard_collections
+    end
+
+    desc "Drop the database of the default Mongoid client"
     task :drop => :environment do
       ::Mongoid::Clients.default.database.drop
     end
 
-    desc "Drop all collections except the system collections"
+    desc "Drop all non-system collections"
     task :purge => :environment do
       ::Mongoid.purge!
     end
