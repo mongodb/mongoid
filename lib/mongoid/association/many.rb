@@ -7,10 +7,11 @@ module Mongoid
     # This is the superclass for all many to one and many to many association
     # proxies.
     class Many < Association::Proxy
+      extend Forwardable
       include ::Enumerable
 
-      delegate :avg, :max, :min, :sum, to: :criteria
-      delegate :length, :size, to: :_target
+      def_delegators :criteria, :avg, :max, :min, :sum
+      def_delegators :_target, :length, :size
 
       # Is the association empty?
       #

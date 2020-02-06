@@ -13,8 +13,10 @@ module Mongoid
     # We need to redefine where the JSON configuration is getting defined,
     # similar to +ActiveRecord+.
     included do
+      extend Forwardable
+
       undef_method :include_root_in_json
-      delegate :include_root_in_json, to: ::Mongoid
+      def_delegator ::Mongoid, :include_root_in_json
     end
 
     # Gets the document as a serializable hash, used by ActiveModel's JSON

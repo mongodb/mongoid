@@ -11,6 +11,7 @@ module Mongoid
           # target that can be a criteria or array of _loaded documents. This
           # handles both cases or a combination of the two.
           class Enumerable
+            extend Forwardable
             include ::Enumerable
 
             # The three main instance variables are collections of documents.
@@ -20,7 +21,7 @@ module Mongoid
             # @attribute [rw] _unloaded A criteria representing persisted docs.
             attr_accessor :_added, :_loaded, :_unloaded
 
-            delegate :is_a?, :kind_of?, to: []
+            def_delegators [], :is_a?, :kind_of?
 
             # Check if the enumerable is equal to the other object.
             #

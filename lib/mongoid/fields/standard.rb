@@ -4,12 +4,13 @@
 module Mongoid
   module Fields
     class Standard
+      extend Forwardable
 
       # Defines the behavior for defined fields in the document.
       # Set readers for the instance variables.
       attr_accessor :default_val, :label, :name, :options
 
-      delegate :demongoize, :evolve, :mongoize, to: :type
+      def_delegators :type, :demongoize, :evolve, :mongoize
 
       # Adds the atomic changes for this type of resizable field.
       #

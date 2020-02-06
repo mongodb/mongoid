@@ -44,11 +44,13 @@ module Mongoid
       end
 
       class << self
+        extend Forwardable
 
         def timeless_table
           Thread.current['[mongoid]:timeless'] ||= Hash.new
         end
-        delegate :[]=, :[], to: :timeless_table
+
+        def_delegators :timeless_table, :[]=, :[]
       end
 
       private

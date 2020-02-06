@@ -10,11 +10,11 @@ module Mongoid
   # This module defines all the configuration options for Mongoid, including
   # the database connections.
   module Config
-    extend self
+    extend Forwardable
     extend Options
+    extend self
 
-    delegate :logger=, to: ::Mongoid
-    delegate :logger, to: ::Mongoid
+    def_delegators ::Mongoid, :logger, :logger=
 
     LOCK = Mutex.new
 

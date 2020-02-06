@@ -4,11 +4,12 @@
 module Mongoid
   module Contextual
     class MapReduce
+      extend Forwardable
       include Enumerable
       include Command
 
-      delegate :[], to: :results
-      delegate :==, :empty?, to: :entries
+      def_delegators :results, :[]
+      def_delegators :entries, :==, :empty?
 
       # Get all the counts returned by the map/reduce.
       #
