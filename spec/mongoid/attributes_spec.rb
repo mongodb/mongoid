@@ -1346,10 +1346,16 @@ describe Mongoid::Attributes do
     context "when attribute is a Hash" do
       let(:person) { Person.new map: { somekey: "somevalue" } }
 
-      it "raises an error when try to set an invalid value" do
-        expect {
+      it "raises an error when trying to set a value of invalid type - array" do
+        expect do
           person.map = []
-        }.to raise_error(Mongoid::Errors::InvalidValue)
+        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Array cannot be written to a field of type Hash/)
+      end
+
+      it "raises an error when trying to set a value of invalid type - boolean" do
+        expect do
+          person.map = false
+        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Hash/)
       end
 
       it "can set a Hash value" do
@@ -1364,10 +1370,16 @@ describe Mongoid::Attributes do
         expect(person.aliases).to eq([ :alias_1 ])
       end
 
-      it "raises an error when try to set an invalid value" do
-        expect {
+      it "raises an error when trying to set a value of invalid type - hash" do
+        expect do
           person.aliases = {}
-        }.to raise_error(Mongoid::Errors::InvalidValue)
+        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type Hash cannot be written to a field of type Array/)
+      end
+
+      it "raises an error when trying to set a value of invalid type - boolean" do
+        expect do
+          person.aliases = false
+        end.to raise_error(Mongoid::Errors::InvalidValue, /Value of type FalseClass cannot be written to a field of type Array/)
       end
     end
 
@@ -1422,7 +1434,7 @@ describe Mongoid::Attributes do
   end
 
   describe "#typed_attributes"  do
-    
+
     let(:date_time) do
       DateTime.current
     end
