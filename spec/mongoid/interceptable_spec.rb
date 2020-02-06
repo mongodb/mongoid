@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require "spec_helper"
+require_relative './interceptable_spec_models'
 
 describe Mongoid::Interceptable do
 
@@ -1720,6 +1721,67 @@ describe Mongoid::Interceptable do
         expect(callback).to receive(:execute).once
         callback.save
       end
+    end
+  end
+
+  context 'when creating a parent and embedded child' do
+    let(:registry) { InterceptableSpec::CallbackRegistry.new }
+    let(:parent) do
+      InterceptableSpec::CbParent.new(registry).tap do |parent|
+        parent.cb_children << InterceptableSpec::CbChild.new(registry, cb_parent: parent)
+      end
+    end
+
+    let(:expected) do
+      [
+        [InterceptableSpec::CbParent, :before_validation],
+        [InterceptableSpec::CbChild, :before_validation],
+        [InterceptableSpec::CbChild, :after_validation],
+        [InterceptableSpec::CbParent, :after_validation],
+        [InterceptableSpec::CbParent, :before_save],
+        [InterceptableSpec::CbParent, :before_create],
+        [InterceptableSpec::CbParent, :after_create],
+        [InterceptableSpec::CbParent, :after_save],
+      ]
+    end
+
+    it 'calls callbacks in the right order' do
+      parent.save!
+      expect(registry.calls).to eq expected
+    end
+  end
+
+  context 'when creating a parent and embedded child with cascading callbacks' do
+    let(:registry) { InterceptableSpec::CallbackRegistry.new }
+    let(:parent) do
+      InterceptableSpec::CbParent.new(registry).tap do |parent|
+        parent.cb_cascaded_children <<
+          InterceptableSpec::CbCascadedChild.new(registry, cb_parent: parent)
+      end
+    end
+
+    let(:expected) do
+      [
+        [InterceptableSpec::CbParent, :before_validation],
+        [InterceptableSpec::CbCascadedChild, :before_validation],
+        [InterceptableSpec::CbCascadedChild, :after_validation],
+        [InterceptableSpec::CbParent, :after_validation],
+        [InterceptableSpec::CbParent, :before_save],
+        [InterceptableSpec::CbCascadedChild, :before_save],
+        [InterceptableSpec::CbParent, :before_create],
+        [InterceptableSpec::CbCascadedChild, :before_create],
+        [InterceptableSpec::CbParent, :after_create],
+        [InterceptableSpec::CbCascadedChild, :after_create],
+        [InterceptableSpec::CbParent, :after_save],
+        [InterceptableSpec::CbCascadedChild, :after_save],
+      ]
+    end
+
+    it 'calls callbacks in the right order' do
+      pending 'MONGOID-3795'
+
+      parent.save!
+      expect(registry.calls).to eq expected
     end
   end
 end
