@@ -56,4 +56,33 @@ describe Mongoid::Document do
       end
     end
   end
+
+  describe 'Hash field' do
+    context 'with symbol key and value' do
+      let(:church) do
+        Church.create!(location: {state: :ny})
+      end
+
+      let(:found_church) do
+        Church.find(church.id)
+      end
+
+      it 'round-trips the value' do
+        found_church.location[:state].should == :ny
+      end
+
+      it 'stringifies the key' do
+        found_church.location.keys.should == %w(state)
+      end
+
+      it 'retrieves value as symbol via driver' do
+        Church.delete_all
+
+        church
+
+        v = Church.collection.find.first
+        v['location'].should == {'state' => :ny}
+      end
+    end
+  end
 end
