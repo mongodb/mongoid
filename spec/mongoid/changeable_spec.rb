@@ -949,6 +949,29 @@ describe Mongoid::Changeable do
       end
     end
 
+    context 'when habtm association changes' do
+
+      let(:person) do
+        Person.create!(title: "Grand Poobah")
+      end
+
+      let(:user_account) do
+        UserAccount.create!
+      end
+
+      before do
+        person.user_accounts << user_account
+      end
+
+      it 'returns a hash of changes' do
+        pending 'https://jira.mongodb.org/browse/MONGOID-4843'
+
+        person.changes.should == {
+          user_account_ids: [[], [user_account.id]]
+        }
+      end
+    end
+
     context "when the document has not changed" do
 
       let(:acolyte) do
