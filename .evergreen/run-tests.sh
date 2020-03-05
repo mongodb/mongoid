@@ -18,6 +18,16 @@ setup_ruby
 which bundle
 bundle --version
 
+if echo $RVM_RUBY |grep -q jruby && test "$DRIVER" = master-jruby; then
+  # See https://jira.mongodb.org/browse/RUBY-2156
+  git clone https://github.com/mongodb/bson-ruby
+  (cd bson-ruby &&
+    bundle install &&
+    rake compile &&
+    gem build *.gemspec &&
+    gem install *.gem)
+fi
+
 if test "$DRIVER" = "master"; then
   bundle install --gemfile=gemfiles/driver_master.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_master.gemfile
