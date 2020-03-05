@@ -113,6 +113,19 @@ reference to the parent.
     "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
   }
 
+Queries
+~~~~~~~
+
+Use the ``#exists?`` method on the association to efficiently determine whether
+the association contains any documents, without retrieving the entire set
+of documents from the database:
+
+.. code-block:: ruby
+
+  band = Band.first
+  band.members.exists?
+
+
 Belongs To
 **********
 
