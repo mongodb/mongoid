@@ -4,12 +4,7 @@ gem 'rake'
 gem 'actionpack', '~> 5.2.0'
 gem 'activemodel', '~> 5.2.0'
 
-if RUBY_VERSION < '2.3'
-  gem 'i18n', '~> 1.0', '< 1.5'
-  gem 'nokogiri', '<1.10'
-else
-  gem 'i18n', '~> 1.0'
-end
+gem 'i18n', '~> 1.0'
 
 group :development do
   gem 'yard'
@@ -25,11 +20,7 @@ group :test do
   gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
-    if RUBY_VERSION < '2.3'
-      gem 'byebug', '~> 10.0'
-    else
-      gem 'byebug'
-    end
+    gem 'byebug'
   end
 end
 

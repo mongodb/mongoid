@@ -119,7 +119,7 @@ supported by Mongoid.
      - |checkmark|
      - |checkmark| [#ruby-2.4]_
      - |checkmark|
-     - |checkmark| [#ruby-2.2]_
+     -
      - |checkmark|
 
    * - 7.0
