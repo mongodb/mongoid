@@ -5,16 +5,7 @@ gem 'rake'
 gem 'actionpack'
 gem 'activemodel'
 
-# https://jira.mongodb.org/browse/MONGOID-4614
-if RUBY_VERSION < '2.3'
-  gem 'i18n', '~> 1.0', '>= 1.1', '< 1.5'
-  # nokogiri does not support 2.2 anymore.
-  # https://github.com/sparklemotion/nokogiri/issues/1841
-  # We are getting it as a transitive dependency
-  gem 'nokogiri', '<1.10'
-else
-  gem 'i18n', '~> 1.0', '>= 1.1'
-end
+gem 'i18n', '~> 1.0', '>= 1.1'
 
 group :development do
   gem 'yard'
@@ -30,10 +21,6 @@ group :test do
   gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
-    if RUBY_VERSION < '2.3'
-      gem 'byebug', '~> 10.0'
-    else
-      gem 'byebug'
-    end
+    gem 'byebug'
   end
 end
