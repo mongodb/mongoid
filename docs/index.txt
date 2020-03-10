@@ -30,6 +30,7 @@ for MongoDB in Ruby.
    /tutorials/mongoid-rails
    /tutorials/mongoid-upgrade
    API <https://docs.mongodb.com/mongoid/7.0/api/>
+   Releases <https://github.com/mongodb/mongoid/releases/>
 
 
 For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
