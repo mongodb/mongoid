@@ -118,4 +118,13 @@ describe 'embedded associations' do
       it_behaves_like 'an embedded association'
     end
   end
+
+  context 'when a model uses #delegate from ActiveSupport' do
+    it 'delegates the method call without error' do
+      address = Address.new(name: 'ACME Inc.')
+      customer = Customer.create!(address: address)
+
+      expect(customer.name).to eq(address.name)
+    end
+  end
 end

@@ -8,13 +8,11 @@ module Mongoid
   #
   # @since 6.0.0
   class PersistenceContext
-    extend Forwardable
-
     # Delegate the cluster method to the client.
-    def_delegators :client, :cluster
+    delegate :cluster, to: :client
 
     # Delegate the storage options method to the object.
-    def_delegators :@object, :storage_options
+    delegate :storage_options, to: :@object
 
     # The options defining this persistence context.
     #

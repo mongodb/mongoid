@@ -3,7 +3,6 @@
 
 require "support/ruby_version"
 
-require "delegate"
 require "time"
 require "set"
 
@@ -109,5 +108,5 @@ module Mongoid
   #   Mongoid.database = Mongo::Connection.new.db("test")
   #
   # @since 1.0.0
-  delegate(*(Config.public_instance_methods(false) - [ :logger=, :logger ] << { to: Config }))
+  delegate(*(Config.public_instance_methods(false) - [:logger=, :logger]), to: Config)
 end
