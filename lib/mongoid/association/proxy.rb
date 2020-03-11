@@ -9,8 +9,6 @@ module Mongoid
     # This class is the superclass for all association proxy objects, and contains
     # common behavior for all of them.
     class Proxy
-      extend Forwardable
-
       alias :extend_proxy :extend
 
       # We undefine most methods to get them sent through to the target.
@@ -38,9 +36,9 @@ module Mongoid
       attr_accessor :_target
 
       # Backwards compatibility with Mongoid beta releases.
-      def_delegators :_association, :foreign_key, :inverse_foreign_key
-      def_delegators :binding, :bind_one, :unbind_one
-      def_delegator :_base, :collection_name
+      delegate :foreign_key, :inverse_foreign_key, to: :_association
+      delegate :bind_one, :unbind_one, to: :binding
+      delegate :collection_name, to: :_base
 
       # Convenience for setting the target and the association metadata properties since
       # all proxies will need to do this.

@@ -3,7 +3,7 @@
 
 require "support/ruby_version"
 
-require "forwardable"
+require "delegate"
 require "time"
 require "set"
 
@@ -36,7 +36,6 @@ end
 I18n.load_path << File.join(File.dirname(__FILE__), "config", "locales", "en.yml")
 
 module Mongoid
-  extend Forwardable
   extend Loggable
   extend self
 
@@ -110,5 +109,5 @@ module Mongoid
   #   Mongoid.database = Mongo::Connection.new.db("test")
   #
   # @since 1.0.0
-  def_delegators Config, *(Config.public_instance_methods(false) - [ :logger=, :logger ])
+  delegate(*(Config.public_instance_methods(false) - [ :logger=, :logger ] << { to: Config }))
 end

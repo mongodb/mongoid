@@ -8,22 +8,21 @@ require "mongoid/contextual/none"
 
 module Mongoid
   module Contextual
-    extend Forwardable
 
     # The aggregate operations provided in the aggregate module get delegated
     # through to the context from the criteria.
-    def_delegators :context, *Aggregable::Mongo.public_instance_methods(false)
+    delegate(*Aggregable::Mongo.public_instance_methods(false), to: :context)
 
     # The atomic operations provided in the atomic context get delegated
     # through to the context from the criteria.
-    def_delegators :context, *Atomic.public_instance_methods(false)
+    delegate(*Atomic.public_instance_methods(false), to: :context)
 
     # The methods in the contexts themselves should all get delegated to,
     # including destructive, modification, and optional methods.
-    def_delegators :context, *(Mongo.public_instance_methods(false) - [ :skip, :limit ])
+    delegate(*(Mongo.public_instance_methods(false) - [ :skip, :limit ]), to: :context)
 
     # This gets blank and empty included.
-    def_delegators :context, *Queryable.public_instance_methods(false)
+    delegate(*Queryable.public_instance_methods(false), to: :context)
 
     # Get the context in which criteria queries should execute. This is either
     # in memory (for embedded documents) or mongo (for root level documents.)

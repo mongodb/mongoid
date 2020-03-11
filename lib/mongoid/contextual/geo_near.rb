@@ -4,12 +4,11 @@
 module Mongoid
   module Contextual
     class GeoNear
-      extend Forwardable
       include Enumerable
       include Command
 
-      def_delegator :results, :[]
-      def_delegators :entries, :==, :empty?
+      delegate :[], to: :results
+      delegate :==, :empty?, to: :entries
 
       # Get the average distance for all documents from the point in the
       # command.

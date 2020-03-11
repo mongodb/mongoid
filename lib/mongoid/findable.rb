@@ -8,16 +8,15 @@ module Mongoid
   #
   # @since 4.0.0
   module Findable
-    extend Forwardable
 
-    def_delegators :with_default_scope, *(
+    delegate *(
       Criteria::Queryable::Selectable.forwardables +
       Criteria::Queryable::Optional.forwardables
-    )
+    ), to: :with_default_scope
 
     # These are methods defined on the criteria that should also be accessible
     # directly from the class level.
-    def_delegators :with_default_scope,
+    delegate \
       :aggregates,
       :avg,
       :create_with,
@@ -46,7 +45,7 @@ module Mongoid
       :sum,
       :text_search,
       :update,
-      :update_all
+      :update_all, to: :with_default_scope
 
     # Returns a count of records in the database.
     # If you want to specify conditions use where.

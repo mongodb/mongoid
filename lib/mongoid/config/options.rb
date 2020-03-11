@@ -34,11 +34,8 @@ module Mongoid
         defaults[name] = settings[name] = options[:default]
 
         class_eval do
-          # log_level accessor is defined specially below
-          unless name.to_sym == :log_level
-            define_method(name) do
-              settings[name]
-            end
+          define_method(name) do
+            settings[name]
           end
 
           define_method("#{name}=") do |value|
