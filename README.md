@@ -31,7 +31,7 @@ Support
 -------
 
 * [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoid)
-* [Mongoid Google Group](http://groups.google.com/group/mongoid)
+* [MongoDB Community Forum](http://community.mongodb.com)
 * [#mongoid](http://webchat.freenode.net/?channels=mongoid) on Freenode IRC
 
 License
