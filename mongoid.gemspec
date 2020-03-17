@@ -9,7 +9,6 @@ Gem::Specification.new do |s|
   s.version     = Mongoid::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Durran Jordan"]
-  s.email       = ["mongodb-dev@googlegroups.com"]
   s.homepage    = "https://mongoid.org"
   s.summary     = "Elegant Persistence in Ruby for MongoDB."
   s.description = "Mongoid is an ODM (Object Document Mapper) Framework for MongoDB, written in Ruby."
@@ -20,7 +19,6 @@ Gem::Specification.new do |s|
     'changelog_uri' => 'https://github.com/mongodb/mongoid/releases',
     'documentation_uri' => 'https://docs.mongodb.com/mongoid/',
     'homepage_uri' => 'https://mongoid.org/',
-    'mailing_list_uri' => 'https://groups.google.com/group/mongodb-user',
     'source_code_uri' => 'https://github.com/mongodb/mongoid',
   }
 
