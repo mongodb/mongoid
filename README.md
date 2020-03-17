@@ -14,7 +14,7 @@ Project Tracking
 ----------------
 
 * [Mongoid Website and Documentation](http://mongoid.org)
-* [Mongoid Google Group](http://groups.google.com/group/mongoid)
+* [MongoDB Community Forum](http://community.mongodb.com)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/mongoid)
 * [#mongoid](http://webchat.freenode.net/?channels=mongoid) on freenode IRC
 
