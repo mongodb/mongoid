@@ -269,7 +269,7 @@ in order for it to work properly.
      include Mongoid::Document
      embeds_one :label
    end
-  
+
    class Label
      include Mongoid::Document
      field :name, type: String
@@ -372,24 +372,24 @@ children via ``parent_`` and ``child_`` methods.
      field :name, type: String
      recursively_embeds_many
    end
-  
+
    root = Tag.new(name: "programming")
    child_one = root.child_tags.build
    child_two = root.child_tags.build
-  
+
    root.child_tags # [ child_one, child_two ]
    child_one.parent_tag # [ root ]
    child_two.parent_tag # [ root ]
-  
+
    class Node
      include Mongoid::Document
      recursively_embeds_one
    end
-  
+
    root = Node.new
    child = Node.new
    root.child_node = child
-  
+
    root.child_node # child
    child.parent_node # root
 
@@ -424,7 +424,7 @@ help of MongoDB projection operation:
     field :started_on, type: Date
     embeds_one :label
   end
-  
+
   class Label
     include Mongoid::Document
     field :name, type: String
@@ -462,7 +462,7 @@ functionality to the association. They are defined by providing a block to the a
        end
      end
    end
-  
+
    person.addresses.find_by_country("Mongolia") # returns address
    person.addresses.chinese # returns [ address ]
 
@@ -475,14 +475,14 @@ macro with some additional options to tell Mongoid how to hook them up.
 
 .. code-block:: ruby
 
-   class Lush
+   class Car
      include Mongoid::Document
-     embeds_one :whiskey, class_name: "Drink", inverse_of: :alcoholic
+     embeds_one :engine, class_name: "Motor", inverse_of: :machine
    end
-   
-   class Drink
+
+   class Motor
      include Mongoid::Document
-     embedded_in :alcoholic, class_name: "Lush", inverse_of: :whiskey
+     embedded_in :machine, class_name: "Car", inverse_of: :engine
    end
 
 Custom Primary & Foreign Keys
@@ -498,12 +498,12 @@ on the "child" association, for example with a has_many/belongs_to:
     include Mongoid::Document
     has_many :emails
   end
-  
+
   class Email
     include Mongoid::Document
     belongs_to :company
   end
-  
+
   company = Company.find(id)
   # looks up emails where emails.company_id == company.id
   company.emails
@@ -528,7 +528,7 @@ association:
     field :c_ref, type: String
     belongs_to :company, foreign_key: 'c_ref', primary_key: 'c'
   end
-  
+
   company = Company.find(id)
   # looks up emails where emails.c_ref == company.c
   company.emails
@@ -552,37 +552,37 @@ An example might make this more clear:
 
   class Company
     include Mongoid::Document
-    
+
     field :c_id, type: Integer
     field :e_ids, type: Array
-    
+
     has_and_belongs_to_many :employees,
       primary_key: :e_id, foreign_key: :e_ids,
       inverse_primary_key: :c_id, inverse_foreign_key: :c_ids
   end
-  
+
   class Employee
     include Mongoid::Document
-    
+
     field :e_id, type: Integer
     field :c_ids, type: Array
-    
+
     has_and_belongs_to_many :companies,
       primary_key: :c_id, foreign_key: :c_ids,
       inverse_primary_key: :e_id, inverse_foreign_key: :e_ids
   end
-  
+
   company = Company.create!(c_id: 123)
   # => #<Company _id: 5c565ece026d7c461d8a9d4e, c_id: 123, e_ids: nil>
-  
+
   employee = Employee.create!(e_id: 456)
   # => #<Employee _id: 5c565ee8026d7c461d8a9d4f, e_id: 456, c_ids: nil>
 
   company.employees << employee
-  
+
   company
   # => #<Company _id: 5c565ece026d7c461d8a9d4e, c_id: 123, e_ids: [456]>
-  
+
   employee
   # => #<Employee _id: 5c5883ce026d7c4b9e244c0c, e_id: 456, c_ids: [123]>
 
@@ -611,7 +611,7 @@ If you do not want this behavior, you may turn it off when defining the associat
 
    class Person
      include Mongoid::Document
-   
+
      embeds_many :addresses, validate: false
      has_many :posts, validate: false
    end
@@ -629,25 +629,25 @@ have managers as follows:
 
   class Department
     include Mongoid::Document
-    
+
     has_one :manager, as: :unit
   end
-  
+
   class Team
     include Mongoid::Document
-    
+
     has_one :manager, as: :unit
   end
-   
+
   class Manager
     include Mongoid::Document
-    
+
     belongs_to :unit, polymorphic: true
   end
-  
+
   dept = Department.create!
   team = Team.create!
-  
+
   alice = Manager.create!(unit: dept)
   alice.unit == dept
   # => true
@@ -662,13 +662,13 @@ polymorphic association:
 
   class Product
     include Mongoid::Document
-    
+
     field :name, type: String
     has_and_belongs_to_many :bundles
-    
+
     embeds_many :prices, as: :item
   end
-  
+
   class Bundle
     include Mongoid::Document
 
@@ -677,13 +677,13 @@ polymorphic association:
 
     embeds_many :prices, as: :item
   end
-  
+
   class Price
     include Mongoid::Document
-    
+
     embedded_in :item, polymorphic: true
   end
-  
+
   pants = Product.create!(name: 'Pants',
     prices: [Price.new, Price.new])
   costume = Bundle.create!(name: 'Costume', products: [pants],
@@ -696,7 +696,7 @@ parent association.
 Note that Mongoid currently supports polymorphism only in one direction - from
 the child to the parent. For example, polymorphism cannot be used to specify
 that a bundle may contain other bundles or products:
-  
+
 .. code-block:: ruby
 
   class Bundle
@@ -747,21 +747,21 @@ The default behavior of each association when no dependent option is provided is
      has_many :albums, dependent: :delete_all
      belongs_to :label, dependent: :nullify
    end
-  
+
    class Album
      include Mongoid::Document
      belongs_to :band
    end
-  
+
    class Label
      include Mongoid::Document
      has_many :bands, dependent: :restrict
    end
-  
+
    label = Label.first
    label.bands.push(Band.first)
    label.delete # Raises an error since bands is not empty.
-  
+
    Band.first.delete # Will delete all associated albums.
 
 Autosaving
@@ -784,7 +784,7 @@ Note that autosave functionality will automatically be added to an association w
      include Mongoid::Document
      has_many :albums, autosave: true
    end
- 
+
    band = Band.first
    band.albums.build(name: "101")
    band.save # Will save the album as well.
@@ -802,7 +802,7 @@ to check if the association is blank.
      embeds_one :label
      embeds_many :albums
    end
- 
+
    band.label?
    band.has_label?
    band.albums?
@@ -821,7 +821,7 @@ Mongoid to instantiate a new document when the association is accessed and it is
      embeds_one :label, autobuild: true
      has_one :producer, autobuild: true
    end
-  
+
    band = Band.new
    band.label # Returns a new empty label.
    band.producer # Returns a new empty producer.
@@ -839,7 +839,7 @@ when the base document calls ``#touch``.
      include Mongoid::Document
      belongs_to :label, touch: true
    end
-  
+
    band = Band.first
    band.touch # Calls touch on the parent label.
 
@@ -879,7 +879,7 @@ You can access the association metadata of the association in a few different wa
    # Get the metadata for a named association from the class or document.
    Model.reflect_on_association(:association_name)
    model.reflect_on_association(:association_name)
- 
+
    # Get the metadata with a specific association itself on a specific
    # document.
    model.associations[:association_name]
@@ -897,7 +897,7 @@ about the association.
      include Mongoid::Document
      embeds_many :addresses
    end
-   
+
    person.addresses = [ address ]
    person.addresses._target # returns [ address ]
    person.addresses._base # returns person
@@ -1012,13 +1012,13 @@ Given the following models:
     embeds_many :awards
     field :name, type: String
   end
-  
+
   class Tour
     include Mongoid::Document
     embedded_in :band
     field :year, type: Integer
   end
-  
+
   class Award
     include Mongoid::Document
     embedded_in :band
@@ -1057,13 +1057,13 @@ the previous example:
     has_many :awards
     field :name, type: String
   end
-  
+
   class Tour
     include Mongoid::Document
     belongs_to :band
     field :year, type: Integer
   end
-  
+
   class Award
     include Mongoid::Document
     belongs_to :band
@@ -1103,13 +1103,13 @@ referenced associations:
     has_many :awards
     field :name, type: String
   end
-  
+
   class Tour
     include Mongoid::Document
     belongs_to :band
     field :year, type: Integer
   end
-  
+
   class Award
     include Mongoid::Document
     belongs_to :band
