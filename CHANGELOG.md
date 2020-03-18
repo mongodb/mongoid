@@ -1848,18 +1848,18 @@ child elements.
   set a child on a relation without the proper inverse_of definitions
   due to Mongoid not being able to determine it.
 
-        class Dog
+        class Car
           include Mongoid::Document
-          embeds_one :bone, class_name: "Treat"
+          embeds_one :engine, class_name: "Motor"
         end
 
-        class Treat
+        class Motor
           include Mongoid::Document
-          embedded_in :pet, class_name: "Dog"
+          embedded_in :machine, class_name: "Car"
         end
 
-        dog = Dog.new
-        dog.bone = Treat.new # raises an InverseNotFound error.
+        car = Car.new
+        car.engine = Motor.new # raises an InverseNotFound error.
 
 * \#1680 Polymorphic relations now use `*_type` keys in lookup queries.
 

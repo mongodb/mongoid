@@ -475,14 +475,14 @@ macro with some additional options to tell Mongoid how to hook them up.
 
 .. code-block:: ruby
 
-   class Dog
+   class Car
      include Mongoid::Document
-     embeds_one :bone, class_name: "Treat", inverse_of: :pet
+     embeds_one :engine, class_name: "Motor", inverse_of: :machine
    end
 
-   class Treat
+   class Motor
      include Mongoid::Document
-     embedded_in :pet, class_name: "Dog", inverse_of: :bone
+     embedded_in :machine, class_name: "Car", inverse_of: :engine
    end
 
 Custom Primary & Foreign Keys

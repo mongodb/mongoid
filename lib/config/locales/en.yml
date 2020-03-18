@@ -282,13 +282,13 @@ en:
             you will need to explicitly tell Mongoid on the association what
             the inverse is.\n\n
             Example:\n
-            \_\_class Dog\n
+            \_\_class Car\n
             \_\_\_\_include Mongoid::Document\n
-            \_\_\_\_has_one :bone, class_name: \"Treat\", inverse_of: :pet\n
+            \_\_\_\_has_one :engine, class_name: \"Motor\", inverse_of: :machine\n
             \_\_end\n\n
-            \_\_class Treat\n
+            \_\_class Motor\n
             \_\_\_\_include Mongoid::Document\n
-            \_\_\_\_belongs_to :pet, class_name: \"Dog\", inverse_of: :bone\n
+            \_\_\_\_belongs_to :machine, class_name: \"Car\", inverse_of: :engine\n
             \_\_end"
         invalid_set_polymorphic_relation:
           message: "The %{name} attribute can't be set to an instance of
