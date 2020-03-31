@@ -458,7 +458,7 @@ functionality to the association. They are defined by providing a block to the a
          where(country: country).first
        end
        def chinese
-         @target.select { |address| address.country == "China" }
+         _target.select { |address| address.country == "China" }
        end
      end
    end
