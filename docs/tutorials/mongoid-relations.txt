@@ -47,7 +47,7 @@ functionality to the relation. They are defined by providing a block to the rela
          where(country: country).first
        end
        def chinese
-         @target.select { |address| address.country == "China" }
+         _target.select { |address| address.country == "China" }
        end
      end
    end
