@@ -58,6 +58,10 @@ describe Mongoid::Serializable do
           Person.include_root_in_json = true
         end
 
+        after do
+          Person.include_root_in_json = false
+        end
+
         it 'returns true' do
           expect(person.include_root_in_json).to be true
         end
@@ -793,18 +797,19 @@ describe Mongoid::Serializable do
 
   describe "#to_json" do
 
-    let(:person) do
-      Person.new
+    let(:account) do
+      Account.new
     end
 
     context "when including root in json" do
 
       before do
+        account.include_root_in_json.should be false
         Mongoid.include_root_in_json = true
       end
 
       it "uses the mongoid configuration" do
-        expect(person.to_json).to include("person")
+        expect(account.to_json).to include("account")
       end
     end
 
@@ -815,8 +820,12 @@ describe Mongoid::Serializable do
       end
 
       it "uses the mongoid configuration" do
-        expect(person.to_json).to_not include("person")
+        expect(account.to_json).to_not include("account")
       end
+    end
+
+    let(:person) do
+      Person.new
     end
 
     context "when serializing a relation directly" do

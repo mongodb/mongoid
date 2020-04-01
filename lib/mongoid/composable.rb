@@ -32,6 +32,10 @@ module Mongoid
       extend Findable
     end
 
+    def self.include_root_in_jsonx
+      Mongoid.include_root_in_json
+    end
+
     include ActiveModel::Model
     include ActiveModel::ForbiddenAttributesProtection
     include ActiveModel::Serializers::JSON
