@@ -31,6 +31,16 @@ describe Mongoid::Serializable do
       it "returns true" do
         expect(person.include_root_in_json).to be true
       end
+
+      context 'when value is overridden to false for a model class' do
+        before do
+          Person.include_root_in_json = false
+        end
+
+        it 'returns false' do
+          expect(person.include_root_in_json).to be false
+        end
+      end
     end
 
     context "when config set to false" do
@@ -41,6 +51,16 @@ describe Mongoid::Serializable do
 
       it "returns false" do
         expect(person.include_root_in_json).to be false
+      end
+
+      context 'when value is overridden to true for a model class' do
+        before do
+          Person.include_root_in_json = true
+        end
+
+        it 'returns true' do
+          expect(person.include_root_in_json).to be true
+        end
       end
     end
   end
