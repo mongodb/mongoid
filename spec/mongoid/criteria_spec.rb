@@ -3428,6 +3428,38 @@ describe Mongoid::Criteria do
       Band.create(name: "Tool")
     end
 
+    context 'when provided no arguments' do
+      context 'on a model class' do
+        it 'returns an empty criteria' do
+          Band.where.selector.should == {}
+        end
+      end
+
+      context 'on an association' do
+        it 'returns an empty criteria' do
+          match.records.where.selector.should == {}
+        end
+      end
+    end
+
+    context 'when provided multiple arguments' do
+      context 'on a model class' do
+        it 'raises ArgumentError' do
+          lambda do
+            Band.where({foo: 1}, {bar: 2})
+          end.should raise_error(ArgumentError, /where requires zero or one arguments/)
+        end
+      end
+
+      context 'on an association' do
+        it 'raises ArgumentError' do
+          lambda do
+            match.records.where({foo: 1}, {bar: 2})
+          end.should raise_error(ArgumentError, /where requires zero or one arguments/)
+        end
+      end
+    end
+
     context "when provided a string" do
 
       context "when the criteria is embedded" do
