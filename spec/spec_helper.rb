@@ -31,6 +31,7 @@ end
 
 require 'support/authorization'
 require 'support/expectations'
+require 'support/helpers'
 require 'support/macros'
 require 'support/cluster_config'
 require 'support/constraints'
@@ -156,6 +157,7 @@ end
 
 RSpec.configure do |config|
   config.raise_errors_for_deprecations!
+  config.include(Helpers)
   config.include(Mongoid::Expectations)
   config.extend(Constraints)
   config.extend(Mongoid::Macros)
