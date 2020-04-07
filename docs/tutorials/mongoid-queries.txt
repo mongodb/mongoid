@@ -386,7 +386,7 @@ conditions are added to the criteria:
 different query shapes as described below.
 
 When ``and``, ``or`` and ``nor`` logical operators are used, they
-operates on the criteria built up to that point and its argument.
+operate on the criteria built up to that point and its argument.
 ``where`` has the same meaning as ``and``:
 
 .. code-block:: ruby
