@@ -586,13 +586,34 @@ module Mongoid
         end
         key :not, :override, "$not"
 
-        # Adds $or selection to the selectable.
+        # Creates a disjunction using $or from the existing criteria in the
+        # receiver and the provided arguments.
         #
-        # @example Add the $or selection.
+        # This behavior (receiver becoming one of the disjunction operands)
+        # matches ActiveRecord's +or+ behavior.
+        #
+        # Use +any_of+ to add a disjunction of the arguments as an additional
+        # constraint to the criteria already existing in the receiver.
+        #
+        # Each argument can be a Hash, a Criteria object, an array of
+        # Hash or Criteria objects, or a nested array. Nested arrays will be
+        # flattened and can be of any depth. Passing arrays is deprecated.
+        #
+        # @example Add the $or selection where both fields must have the specified values.
         #   selectable.or(field: 1, field: 2)
         #
-        # @param [ Array<Hash | Criteria> ] criteria Multiple key/value pair
-        #   matches or Criteria objects.
+        # @example Add the $or selection where either value match is sufficient.
+        #   selectable.or({field: 1}, {field: 2})
+        #
+        # @example Same as previous example but using the deprecated array wrap.
+        #   selectable.or([{field: 1}, {field: 2}])
+        #
+        # @example Same as previous example, also deprecated.
+        #   selectable.or([{field: 1}], [{field: 2}])
+        #
+        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] criteria
+        #   Multiple key/value pair matches or Criteria objects, or arrays
+        #   thereof. Passing arrays is deprecated.
         #
         # @return [ Selectable ] The new selectable.
         #
@@ -600,7 +621,73 @@ module Mongoid
         def or(*criteria)
           _mongoid_add_top_level_operation('$or', criteria)
         end
-        alias :any_of :or
+
+        # Adds a disjunction of the arguments as an additional constraint
+        # to the criteria already existing in the receiver.
+        #
+        # Use +or+ to make the receiver one of the disjunction operands.
+        #
+        # Each argument can be a Hash, a Criteria object, an array of
+        # Hash or Criteria objects, or a nested array. Nested arrays will be
+        # flattened and can be of any depth. Passing arrays is deprecated.
+        #
+        # @example Add the $or selection where both fields must have the specified values.
+        #   selectable.any_of(field: 1, field: 2)
+        #
+        # @example Add the $or selection where either value match is sufficient.
+        #   selectable.any_of({field: 1}, {field: 2})
+        #
+        # @example Same as previous example but using the deprecated array wrap.
+        #   selectable.any_of([{field: 1}, {field: 2}])
+        #
+        # @example Same as previous example, also deprecated.
+        #   selectable.any_of([{field: 1}], [{field: 2}])
+        #
+        # @param [ Hash | Criteria | Array<Hash | Criteria>, ... ] criteria
+        #   Multiple key/value pair matches or Criteria objects, or arrays
+        #   thereof. Passing arrays is deprecated.
+        #
+        # @return [ Selectable ] The new selectable.
+        #
+        # @since 1.0.0
+        def any_of(*criteria)
+          criteria = _mongoid_flatten_arrays(criteria)
+          case criteria.length
+          when 0
+            clone
+          when 1
+            # When we have a single criteria, any_of behaves like and.
+            # Note: criteria can be a Query object, which #where method does
+            # not support.
+            self.and(*criteria)
+          else
+            # When we have multiple criteria, combine them all with $or
+            # and add the result to self.
+            exprs = criteria.map do |criterion|
+              if criterion.is_a?(Selectable)
+                _mongoid_normalize_expr(criterion.selector)
+              else
+                Hash[criterion.map do |k, v|
+                  if k.is_a?(Symbol)
+                    [k.to_s, v]
+                  else
+                    [k, v]
+                  end
+                end]
+              end
+            end
+            # Should be able to do:
+            #where('$or' => exprs)
+            # But since that is broken do instead:
+            clone.tap do |query|
+              if query.selector['$or']
+                query.selector.store('$or', query.selector['$or'] + exprs)
+              else
+                query.selector.store('$or', exprs)
+              end
+            end
+          end
+        end
 
         # Add a $size selection for array fields.
         #

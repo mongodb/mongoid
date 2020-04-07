@@ -365,9 +365,11 @@ The following calls all produce the same query conditions:
 Operator Combinations
 `````````````````````
 
-As of Mongoid 7.1, logical operators have been changed to have the
-the same semantics as `those of ActiveRecord
+As of Mongoid 7.1, logical operators (``and``, ``or``, ``nor`` and ``not``)
+have been changed to have the the same semantics as `those of ActiveRecord
 <https://guides.rubyonrails.org/active_record_querying.html>`_.
+To obtain the semantics of ``or`` as it behaved in Mongoid 7.0 and earlier,
+use ``any_of`` which is described below.
 
 When conditions are specified on the same field multiple times, all
 conditions are added to the criteria:
@@ -380,11 +382,12 @@ conditions are added to the criteria:
   Band.where(name: 1).or(name: 2).selector
   # => {"$or"=>[{"name"=>"1"}, {"name"=>"2"}]}
 
-``nor`` and ``not`` behave similarly, with ``not`` producing different query
-shapes as described later.
+``any_of``, ``nor`` and ``not`` behave similarly, with ``not`` producing
+different query shapes as described below.
 
-When a logical operator is used, it operates on the criteria built up to
-that point and its argument. ``where`` has the same meaning as ``and``:
+When ``and``, ``or`` and ``nor`` logical operators are used, they
+operate on the criteria built up to that point and its argument.
+``where`` has the same meaning as ``and``:
 
 .. code-block:: ruby
 
@@ -434,10 +437,20 @@ the same field, depending on which form of ``and`` was used.
 ``or``/``nor`` Behavior
 ```````````````````````
 
-``or`` and ``nor`` always combine conditions with ``$or`` and ``$nor``
-MongoDB operators, respectively. If the only condition on the receiving
-criteria is another ``or``/``nor``, new conditions are added to the
-existing list, otherwise a new top-level ``$or``/``$nor`` operator is created.
+``or`` and ``nor`` produce ``$or`` and ``$nor`` MongoDB operators, respectively,
+using the receiver and all of the arguments as operands. For example:
+
+.. code-block:: ruby
+
+  Band.where(name: /Best/).or(name: 'Astral Projection')
+  # => {"$or"=>[{"name"=>/Best/}, {"name"=>"Astral Projection"}]}
+
+  Band.where(name: /Best/).and(name: 'Astral Projection').
+    or(Band.where(label: /Records/)).and(label: 'Trust').selector
+  # => {"$or"=>[{"name"=>/Best/, "$and"=>[{"name"=>"Astral Projection"}]}, {"label"=>/Records/}], "label"=>"Trust"}
+
+If the only condition on the receiver is another ``or``/``nor``, the new
+conditions are added to the existing list:
 
 .. code-block:: ruby
 
@@ -445,9 +458,27 @@ existing list, otherwise a new top-level ``$or``/``$nor`` operator is created.
     or(Band.where(label: /Records/)).selector
   # => {"$or"=>[{"name"=>/Best/}, {"name"=>"Astral Projection"}, {"label"=>/Records/}]}
 
-  Band.where(name: /Best/).and(name: 'Astral Projection').
-    or(Band.where(label: /Records/)).and(label: 'Trust').selector
-  # => {"$or"=>[{"name"=>/Best/, "$and"=>[{"name"=>"Astral Projection"}]}, {"label"=>/Records/}], "label"=>"Trust"}
+Use ``any_of`` to add a disjunction to a Criteria object while maintaining
+all of the conditions built up so far as they are.
+
+
+``any_of`` Behavior
+```````````````````
+
+``any_of`` adds a disjunction built from its arguments to the existing
+conditions in the criteria. For example:
+
+.. code-block:: ruby
+
+  Band.where(label: /Trust/).any_of({name: 'Astral Projection'}, {name: /Best/})
+  # => {"label"=>/Trust/, "$or"=>[{"name"=>"Astral Projection"}, {"name"=>/Best/}]}
+
+The conditions are hoisted to the top level if possible:
+
+.. code-block:: ruby
+
+  Band.where(label: /Trust/).any_of({name: 'Astral Projection'})
+  # => {"label"=>/Trust/, "name"=>"Astral Projection"}
 
 
 ``not`` Behavior
