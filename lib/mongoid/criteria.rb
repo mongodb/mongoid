@@ -400,9 +400,22 @@ module Mongoid
     # @return [ Criteria ] The cloned selectable.
     #
     # @since 1.0.0
-    def where(expression)
-      if expression.is_a?(::String) && embedded?
-        raise Errors::UnsupportedJavascript.new(klass, expression)
+    def where(*args)
+      # Historically this method required exactly one argument.
+      # As of https://jira.mongodb.org/browse/MONGOID-4804 it also accepts
+      # zero arguments.
+      # The underlying where implemetation that super invokes supports
+      # any number of arguments, but we don't presently allow mutiple
+      # arguments through this method. This API can be reconsidered in the
+      # future.
+      if args.length > 1
+        raise ArgumentError, "Criteria#where requires zero or one arguments (given #{args.length})"
+      end
+      if args.length == 1
+        expression = args.first
+        if expression.is_a?(::String) && embedded?
+          raise Errors::UnsupportedJavascript.new(klass, expression)
+        end
       end
       super
     end
