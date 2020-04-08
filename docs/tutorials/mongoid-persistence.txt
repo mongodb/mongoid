@@ -443,6 +443,8 @@ are not invoked.
 
           person.unset(:name)
 
+.. _atomic-operation-grouping:
+
 Atomic Operation Grouping
 *************************
 

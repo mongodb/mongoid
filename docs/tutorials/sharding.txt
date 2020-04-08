@@ -12,6 +12,8 @@ Sharding
 Mongoid can assist with setting up collection sharding in sharded environments.
 
 
+.. _shard-keys:
+
 Declaring Shard Keys
 --------------------
 
@@ -77,6 +79,8 @@ configured in the association as the field name:
     index country: 1
   end
 
+
+.. _sharding-management:
 
 Sharding Management Rake Tasks
 ------------------------------
