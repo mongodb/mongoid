@@ -98,6 +98,66 @@ describe Mongoid::Criteria::Queryable::Storable do
     end
   end
 
+  describe '#add_field_expression' do
+    context 'simple field and value write' do
+      let(:modified) do
+        query.add_field_expression('foo', 'bar')
+      end
+
+      it 'adds the condition' do
+        modified.selector.should == {
+          'foo' => 'bar'
+        }
+      end
+    end
+
+    context 'an operator write' do
+      let(:modified) do
+        query.add_field_expression('$eq', {'foo' => 'bar'})
+      end
+
+      it 'is not allowed' do
+        lambda do
+          modified
+        end.should raise_error(ArgumentError, /Field cannot be an operator/)
+      end
+    end
+
+    context 'when another field exists in destination' do
+      let(:base) do
+        query.add_field_expression('foo', 'bar')
+      end
+
+      let(:modified) do
+        base.add_field_expression('zoom', 'zoom')
+      end
+
+      it 'adds the condition' do
+        modified.selector.should == {
+          'foo' => 'bar',
+          'zoom' => 'zoom',
+        }
+      end
+    end
+
+    context 'when field being added already exists in destination' do
+      let(:base) do
+        query.add_field_expression('foo', 'bar')
+      end
+
+      let(:modified) do
+        base.add_field_expression('foo', 'zoom')
+      end
+
+      it 'adds the new condition using $and' do
+        modified.selector.should == {
+          'foo' => 'bar',
+          '$and' => ['foo' => 'zoom'],
+        }
+      end
+    end
+  end
+
   describe '#add_operator_expression' do
     let(:query_method) { :add_operator_expression }
 
