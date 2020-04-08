@@ -52,6 +52,22 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
+      context '$and to query with $and which already has the given key' do
+        let(:query) do
+          Mongoid::Query.new.where('$and' => [{foo: 'zoom'}])
+        end
+
+        let(:modified) do
+          query.send(query_method, '$and', [{'foo' => 'bar'}])
+        end
+
+        it 'adds to existing $and' do
+          modified.selector.should == {
+            '$and' => [{'foo' => 'zoom'}, {'foo' => 'bar'}],
+          }
+        end
+      end
+
     end
 
     context '$or operator' do
