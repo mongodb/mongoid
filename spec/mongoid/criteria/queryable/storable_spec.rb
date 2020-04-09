@@ -52,6 +52,22 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
+      context '$and to query with $and which already has the given key' do
+        let(:query) do
+          Mongoid::Query.new.where('$and' => [{foo: 'zoom'}])
+        end
+
+        let(:modified) do
+          query.send(query_method, '$and', [{'foo' => 'bar'}])
+        end
+
+        it 'adds to existing $and' do
+          modified.selector.should == {
+            '$and' => [{'foo' => 'zoom'}, {'foo' => 'bar'}],
+          }
+        end
+      end
+
     end
 
     context '$or operator' do
@@ -95,6 +111,66 @@ describe Mongoid::Criteria::Queryable::Storable do
         end
       end
 
+    end
+  end
+
+  describe '#add_field_expression' do
+    context 'simple field and value write' do
+      let(:modified) do
+        query.add_field_expression('foo', 'bar')
+      end
+
+      it 'adds the condition' do
+        modified.selector.should == {
+          'foo' => 'bar'
+        }
+      end
+    end
+
+    context 'an operator write' do
+      let(:modified) do
+        query.add_field_expression('$eq', {'foo' => 'bar'})
+      end
+
+      it 'is not allowed' do
+        lambda do
+          modified
+        end.should raise_error(ArgumentError, /Field cannot be an operator/)
+      end
+    end
+
+    context 'when another field exists in destination' do
+      let(:base) do
+        query.add_field_expression('foo', 'bar')
+      end
+
+      let(:modified) do
+        base.add_field_expression('zoom', 'zoom')
+      end
+
+      it 'adds the condition' do
+        modified.selector.should == {
+          'foo' => 'bar',
+          'zoom' => 'zoom',
+        }
+      end
+    end
+
+    context 'when field being added already exists in destination' do
+      let(:base) do
+        query.add_field_expression('foo', 'bar')
+      end
+
+      let(:modified) do
+        base.add_field_expression('foo', 'zoom')
+      end
+
+      it 'adds the new condition using $and' do
+        modified.selector.should == {
+          'foo' => 'bar',
+          '$and' => ['foo' => 'zoom'],
+        }
+      end
     end
   end
 
