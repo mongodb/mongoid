@@ -2450,6 +2450,61 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
     end
+
+    context 'when using an MQL logical operator manually' do
+      let(:base_query) do
+        query.where(test: 1)
+      end
+
+      let(:selection) do
+        base_query.where(mql_operator => ['hello' => 'world'])
+      end
+
+      shared_examples_for 'adds conditions to existing query' do
+        it 'adds conditions to existing query' do
+          selection.selector.should == {
+            'test' => 1,
+            mql_operator => ['hello' => 'world'],
+          }
+        end
+      end
+
+      shared_examples_for 'adds conditions to existing query with an extra $and' do
+        it 'adds conditions to existing query' do
+          selection.selector.should == {
+            'test' => 1,
+            # The $and here is superfluous but not wrong.
+            # To be addressed as part of
+            # https://jira.mongodb.org/browse/MONGOID-4861.
+            '$and' => [mql_operator => ['hello' => 'world']],
+          }
+        end
+      end
+
+      context '$or' do
+        let(:mql_operator) { '$or' }
+
+        it_behaves_like 'adds conditions to existing query with an extra $and'
+      end
+
+      context '$nor' do
+        let(:mql_operator) { '$nor' }
+
+        it_behaves_like 'adds conditions to existing query with an extra $and'
+      end
+
+      context '$not' do
+        let(:mql_operator) { '$not' }
+
+        it_behaves_like 'adds conditions to existing query'
+      end
+
+      context '$and' do
+        let(:mql_operator) { '$and' }
+
+        it_behaves_like 'adds conditions to existing query'
+      end
+    end
   end
 
   describe Symbol do
