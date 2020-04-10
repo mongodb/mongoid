@@ -76,25 +76,22 @@ module Mongoid
         # separately for callers' convenience. It can be considered to
         # handle storing the hash `{operator => op_expr}`.
         #
-        # If the selector already has the specified operator in it (on the
-        # top level), the new condition given in op_expr is added to the
-        # existing conditions for the specified operator. This is
-        # straightforward for $and; for other logical operators, the behavior
-        # of this method is to add the new conditions to the existing operator.
+        # If the selector consists of a single condition which is the specified
+        # operator (on the top level), the new condition given in op_expr is
+        # added to the existing conditions for the specified operator.
         # For example, if the selector is currently:
         #
-        #     {'foo' => 'bar', '$or' => [{'hello' => 'world'}]}
+        #     {'$or' => [{'hello' => 'world'}]}
         #
         # ... and operator is '$or' and op_expr is `[{'test' => 123'}]`,
         # the resulting selector will be:
         #
-        #     {'foo' => 'bar', '$or' => [{'hello' => 'world'}, {'test' => 123}]}
+        #     {'$or' => [{'hello' => 'world'}, {'test' => 123}]}
         #
-        # This does not implement an OR between the existing selector and the
-        # new operator expression - handling this is the job of upstream
-        # methods. This method simply stores op_expr into the selector on the
-        # assumption that the existing selector is the correct left hand side
-        # of the operation already.
+        # This method always adds the new conditions as additional requirements;
+        # in other words, it does not implement the ActiveRecord or/nor behavior
+        # where the receiver becomes one of the operands. It is expected that
+        # code upstream of this method implements such behavior.
         #
         # This method does not simplify values (i.e. if the selector is
         # currently empty and operator is $and, op_expr is written to the
@@ -129,10 +126,8 @@ module Mongoid
             # with whatever other conditions exist.
             selector.store(operator, op_expr)
           else
-            # Other operators need to operate explicitly on the previous
-            # conditions and the new condition.
-            new_value = [selector.to_hash.dup] + op_expr
-            selector.replace(operator => new_value)
+            # Other operators need to be added separately
+            add_logical_operator_expression('$and', [operator => op_expr])
           end
 
           self
