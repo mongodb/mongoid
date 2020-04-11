@@ -49,7 +49,9 @@ module Mongoid
         # @since 3.0.0
         def demongoize(object)
           return nil if object.blank?
-          object = object.getlocal unless Mongoid::Config.use_utc?
+          unless Mongoid::Config.use_utc?
+            object = ::Time.parse(object.to_s).getlocal
+          end
           if Mongoid::Config.use_activesupport_time_zone?
             object = object.in_time_zone(Mongoid.time_zone)
           end
