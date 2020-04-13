@@ -305,6 +305,8 @@ the default scope being evaluated first:
     embedded: false>
 
 
+.. _logical-operations:
+
 Logical Operations
 ******************
 
@@ -561,6 +563,8 @@ case, when an condition on a field which uses one of the supported operators
 is being added, if there already is a condition on the same field using the
 same operator, the operator expressions are combined according to the
 specified *merge strategy*.
+
+.. _merge-strategies:
 
 Merge Strategies
 ````````````````

@@ -10,8 +10,227 @@ Upgrading Mongoid
    :depth: 1
    :class: singlecol
 
-Upgrading to 7.x Series
-```````````````````````
+
+Upgrading to Mongoid 7.1
+------------------------
+
+The following sections describe major changes in Mongoid 7.1.
+
+Condition Combination
+`````````````````````
+
+**Breaking change:** In Mongoid 7.1, when condition methods are invoked on a
+Criteria object, they always add new conditions to the existing conditions in
+the Criteria object. Previously new conditions could have replaced existing
+conditions in some circumstances.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.where(id: 1).where(id: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"_id"=>1, "$and"=>[{"_id"=>2}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Corresponding Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.where(id: 1).where(id: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"_id"=>2}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Logical Operations
+``````````````````
+
+**Breaking change:** In Mongoid 7.1 logical operator methods ``or`` and
+``nor`` treat the receiver as one of the operands. This behavior matches that
+of ActiveRecord. Previously, ``or`` and ``nor`` added their parameters as
+additional conditions to the receiver.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').or(name: 'Two')
+    # => #<Mongoid::Criteria
+    #   selector: {"$or"=>[{"name"=>"One"}, {"name"=>"Two"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Corresponding Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').or(name: 'Two')
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>"One", "$or"=>[{"name"=>"Two"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+To add ``or`` or ``nor`` parameters to the existing query without disjuncting
+the existing query, create a separate scope:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').and(Band.or({name: 'Two'}, {name: 'Three'}))
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>"One", "$and"=>[{"$or"=>[{"name"=>"Two"}, {"name"=>"Three"}]}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Alternatively, use ``any_of`` which behaves as ``or`` did in Mongoid 7.0:
+
+.. code-block:: ruby
+
+    Band.where(name: 'One').any_of({name: 'Two'}, {name: 'Three'})
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>"One", "$or"=>[{"name"=>"Two"}, {"name"=>"Three"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+For more information, please review the :ref:`logical operations
+<logical-operations>` section of the documentation.
+
+Merge Strategies
+````````````````
+
+**Breaking change:** In Mongoid 7.1, :ref:`Merge strategies <merge-strategies>`
+must be explicitly requested. Previously, ``all`` defaulted to the
+union strategy and ``in`` and ``nin`` defauled to the intersect strategy.
+In Mongoid 7.1, there is no merge strategy applied by default.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.all(a: 1).all(a: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"a"=>{"$all"=>[1]}, "$and"=>[{"a"=>{"$all"=>[2]}}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Default Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.all(a: 1).all(a: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"a"=>{"$all"=>[1, 2]}}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+To achieve the same behavior in Mongoid 7.1, the desired merge strategy must be
+explicitly requested:
+
+.. code-block:: ruby
+
+    Band.all(a: 1).union.all(a: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"a"=>{"$all"=>[1, 2]}}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Required Condition Arguments
+````````````````````````````
+
+**Breaking change:** ``nil`` arguments to Criteria methods are no longer
+accepted. For example, the following invocation is now an error:
+
+.. code-block:: ruby
+
+  Band.where(nil)
+
+**Breaking change:** Most Criteria methods (other than logical operations)
+can no longer be called without arguments. For example, the following
+invocation is now an error:
+
+.. code-block:: ruby
+
+  Band.in
+
+``and``, ``or``, ``nor``, ``not``, ``any_of`` and ``where`` can be called
+without arguments.
+
+Generated Queries
+`````````````````
+
+Minor change: Mongoid 7.1 will simplify the Criteria selectors where possible
+by eliding unnecessary logical operators, typically ``$and``.
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+    Band.where(year: 2000).and(name: 'One')
+    # => #<Mongoid::Criteria
+    #   selector: {"year"=>2000, "name"=>"One"}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Corresponding Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.where(year: 2000).and(name: 'One')
+    # => #<Mongoid::Criteria
+    #   selector: {"year"=>2000, "$and"=>[{"name"=>"One"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Mongoid 7.1 also takes steps to produce the same selector shapes when
+semantically the same query is constructed using different code paths. For
+example, the following two approaches result in the same generated selector:
+
+.. code-block:: ruby
+
+    Band.where(name: /ne/).and(name: 'One')
+
+    Band.and({name: /ne/}, {name: 'One'})
+
+    # => #<Mongoid::Criteria
+    #   selector: {"name"=>/ne/, "$and"=>[{"name"=>"One"}]}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+Atomic Operation Grouping
+`````````````````````````
+
+Improvement: :ref:`Multiple atomic operations can now be grouped
+<atomic-operation-grouping>` to be executed as a single atomic operation.
+
+Sharding
+````````
+
+Improvement: :ref:`Shard key declarations <shard-keys>` now support hashed
+shard keys, and a Rake task to shard collection has been added to the
+:ref:`sharding management Rake tasks <sharding-management>`.
+
+Ruby Version Support
+````````````````````
+
+As of version 7.1, Mongoid supports Ruby 2.3+ and JRuby 9.2.
+Support for Ruby 2.2 and JRuby 9.1 has been dropped.
+
+
+Upgrading to Mongoid 7.0
+------------------------
 
 This major version of Mongoid has a number of significant refactors, bug fixes
 and behavior corrections.
@@ -22,9 +241,11 @@ and version
 `7.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v7.0.0.beta>`_
 for specific changes that might be required in your code.
 
-Upgrading to 6.x Series
-```````````````````````
-Mongoid 6.x is compatible with Rails 5 and requires Ruby 2.2.2 or higher.
+
+Upgrading to Mongoid 6
+----------------------
+
+Mongoid 6 is compatible with Rails 5 and requires Ruby 2.2.2 or higher.
 
 Please see the list of behavior changes for version
 `6.0.0.rc0 <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.rc0>`_
@@ -32,8 +253,9 @@ and version
 `6.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v6.0.0.beta>`_
 for specific changes that might be required in your code.
 
-Upgrading to 5.x Series
-```````````````````````
+
+Upgrading to Mongoid 5
+----------------------
 
 The underlying driver has changed from Moped to the official MongoDB Ruby driver.
 For all users dropping down to the driver level for operations, please see the driver
@@ -57,5 +279,5 @@ MongoDB 2.6 onward.
 provided. In order to guarantee that a document is the first or last, it needs to now
 contain an explicit sort.
 
-Mongoid 5.x supports MongoDB 2.4 and higher only - MongoDB 2.2 is no longer
+Mongoid 5 supports MongoDB 2.4 and higher only - MongoDB 2.2 is no longer
 supported.
