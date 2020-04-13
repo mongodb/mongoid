@@ -105,21 +105,12 @@ For more information, please review the :ref:`logical operations
 Merge Strategies
 ````````````````
 
-**Breaking change:** :ref:`Merge strategies <merge-strategies>` now must be
-explicitly requested. Previously, ``all`` defaulted to the union strategy
-and ``in`` and ``nin`` defaulted to the intersect strategy, leading to
-the following example behavior in Mongoid 7.0:
+**Breaking change:** In Mongoid 7.1, :ref:`Merge strategies <merge-strategies>`
+must be explicitly requested. Previously, ``all`` defaulted to the
+union strategy and ``in`` and ``nin`` defauled to the intersect strategy.
+In Mongoid 7.1, there is no merge strategy applied by default.
 
-.. code-block:: ruby
-
-    Band.all(a: 1).all(a: 2)
-    # => #<Mongoid::Criteria
-    #   selector: {"a"=>{"$all"=>[1, 2]}}
-    #   options:  {}
-    #   class:    Band
-    #   embedded: false>
-
-In Mongoid 7.1, there is no merge strategy applied by default:
+Example Mongoid 7.1 behavior:
 
 .. code-block:: ruby
 
@@ -130,7 +121,19 @@ In Mongoid 7.1, there is no merge strategy applied by default:
     #   class:    Band
     #   embedded: false>
 
-The desired merge strategy must be explicitly requested:
+Default Mongoid 7.0 behavior:
+
+.. code-block:: ruby
+
+    Band.all(a: 1).all(a: 2)
+    # => #<Mongoid::Criteria
+    #   selector: {"a"=>{"$all"=>[1, 2]}}
+    #   options:  {}
+    #   class:    Band
+    #   embedded: false>
+
+To achieve the same behavior in Mongoid 7.1, the desired merge strategy must be
+explicitly requested:
 
 .. code-block:: ruby
 
@@ -197,9 +200,9 @@ example, the following two approaches result in the same generated selector:
 .. code-block:: ruby
 
     Band.where(name: /ne/).and(name: 'One')
-    
+
     Band.and({name: /ne/}, {name: 'One'})
-    
+
     # => #<Mongoid::Criteria
     #   selector: {"name"=>/ne/, "$and"=>[{"name"=>"One"}]}
     #   options:  {}
