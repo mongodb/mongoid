@@ -10,6 +10,13 @@ Upgrading Mongoid
    :depth: 1
    :class: singlecol
 
+This page describes significant changes and improvements in Mongoid releases.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
 
 Upgrading to Mongoid 7.1
 ------------------------
@@ -250,6 +257,10 @@ pipeline builder DSL <aggregation-pipeline-builder-dsl>`.
 
 Mongoid 7.0 requires MongoDB server 2.6 or newer, Ruby 2.2.2 or higher and
 supports Rails 5.1-6.0.
+
+New in version 7.0.3: Embedded matchers now support the ``$eq`` operator.
+
+New in version 7.0.5: Mongoid now officially supports Rails 6.0.
 
 
 Upgrading to Mongoid 6
