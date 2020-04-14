@@ -229,6 +229,26 @@ can be configured.
 
     # Configure Mongoid specific options. (optional)
     options:
+      # Application name that is printed to the mongodb logs upon establishing
+      # a connection in server versions >= 3.4. Note that the name cannot
+      # exceed 128 bytes. It is also used as the database name if the
+      # database name is not explicitly defined. (default: nil)
+      app_name: MyApplicationName
+      
+      # Create indexes in background by default. (default: false)
+      background_indexing: false
+      
+      # Mark belongs_to associations as required by default, so that saving a
+      # model with a missing belongs_to association will trigger a validation
+      # error. (default: true)
+      belongs_to_required_by_default: true
+      
+      # Raise an exception when a field is defined in a model and it has a
+      # method of the same name already defined. Also prevents a field from
+      # being redefined. Use :overwrite option when defining a field to
+      # overwrite existing method/field definition. (default: false)
+      duplicate_fields_exception: false
+      
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
 

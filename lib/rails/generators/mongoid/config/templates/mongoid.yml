@@ -114,12 +114,40 @@ development:
 
   # Configure Mongoid specific options. (optional)
   options:
-    # Includes the root model name in json serialization. (default: false)
+    # Application name that is printed to the mongodb logs upon establishing
+    # a connection in server versions >= 3.4. Note that the name cannot
+    # exceed 128 bytes. It is also used as the database name if the
+    # database name is not explicitly defined. (default: nil)
+    # app_name: MyApplicationName
+    
+    # Create indexes in background by default. (default: false)
+    # background_indexing: false
+    
+    # Mark belongs_to associations as required by default, so that saving a
+    # model with a missing belongs_to association will trigger a validation
+    # error. (default: true)
+    # belongs_to_required_by_default: true
+    
+    # Raise an exception when a field is defined in a model and it has a
+    # method of the same name already defined. Also prevents a field from
+    # being redefined. Use :overwrite option when defining a field to
+    # overwrite existing method/field definition. (default: false)
+    # duplicate_fields_exception: false
+    
+    # Include the root model name in json serialization. (default: false)
     # include_root_in_json: false
 
     # Include the _type field in serialization. (default: false)
     # include_type_for_serialization: false
 
+    # Whether to join nested persistence contexts for atomic operations
+    # to parent contexts by default. (default: false)
+    # join_contexts: false
+
+    # Set the Mongoid and Ruby driver log levels when Mongoid is not using
+    # Ruby on Rails logger instance. (default: :info)
+    # log_level: :info
+    
     # Preload all models in development, needed when models use
     # inheritance. (default: false)
     # preload_models: false
@@ -132,32 +160,16 @@ development:
     # existing method. (default: false)
     # scope_overwrite_exception: false
 
-    # Raise an error when defining a field with the same name as an
-    # existing method. (default: false)
-    # duplicate_fields_exception: false
-
-    # Use Active Support's time zone in conversions. (default: true)
+    # Use ActiveSupport's time zone in time operations instead of
+    # the Ruby default time zone. See the time zone section below for
+    # further information. (default: true)
     # use_activesupport_time_zone: true
 
-    # Ensure all times are UTC in the app side. (default: false)
+    # Return stored times as UTC. See the time zone section below for
+    # further information. Most applications should not use this option.
+    # (default: false)
     # use_utc: false
 
-    # Set the Mongoid and Ruby driver log levels when not in a Rails
-    # environment. The Mongoid logger will be set to the Rails logger
-    # otherwise.(default: :info)
-    # log_level: :info
-
-    # Control whether `belongs_to` association is required. By default
-    # `belongs_to` will trigger a validation error if the association
-    # is not present. (default: true)
-    # belongs_to_required_by_default: true
-
-    # Application name that is printed to the mongodb logs upon establishing a
-    # connection in server versions >= 3.4. Note that the name cannot exceed 128 bytes.
-    # app_name: MyApplicationName
-
-    # Use background indexes by default if `background` option not specified. (default: false)
-    # background_indexing: false
 test:
   clients:
     default:

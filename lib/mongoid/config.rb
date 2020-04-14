@@ -18,14 +18,34 @@ module Mongoid
 
     LOCK = Mutex.new
 
-    option :include_root_in_json, default: false
-    option :include_type_for_serialization, default: false
-    option :preload_models, default: false
-    option :raise_not_found_error, default: true
-    option :scope_overwrite_exception, default: false
+    # Application name that is printed to the mongodb logs upon establishing
+    # a connection in server versions >= 3.4. Note that the name cannot
+    # exceed 128 bytes. It is also used as the database name if the
+    # database name is not explicitly defined.
+    option :app_name, default: nil
+
+    # Create indexes in background by default.
+    option :background_indexing, default: false
+
+    # Mark belongs_to associations as required by default, so that saving a
+    # model with a missing belongs_to association will trigger a validation
+    # error.
+    option :belongs_to_required_by_default, default: true
+
+    # Raise an exception when a field is defined in a model and it has a
+    # method of the same name already defined. Also prevents a field from
+    # being redefined. Use :overwrite option when defining a field to
+    # overwrite existing method/field definition.
     option :duplicate_fields_exception, default: false
-    option :use_activesupport_time_zone, default: true
-    option :use_utc, default: false
+
+    # Include the root model name in json serialization.
+    option :include_root_in_json, default: false
+
+    # # Include the _type field in serialization.
+    option :include_type_for_serialization, default: false
+
+    # Whether to join nested persistence contexts for atomic operations
+    # to parent contexts by default.
     option :join_contexts, default: false
 
     # The log level.
@@ -38,9 +58,22 @@ module Mongoid
     # configuration file is the log level given by this option honored.
     option :log_level, default: :info
 
-    option :belongs_to_required_by_default, default: true
-    option :app_name, default: nil
-    option :background_indexing, default: false
+    # Preload all models in development, needed when models use inheritance.
+    option :preload_models, default: false
+
+    # Raise an error when performing a #find and the document is not found.
+    option :raise_not_found_error, default: true
+
+    # Raise an error when defining a scope with the same name as an
+    # existing method.
+    option :scope_overwrite_exception, default: false
+
+    # Use ActiveSupport's time zone in time operations instead of the
+    # Ruby default time zone.
+    option :use_activesupport_time_zone, default: true
+
+    # Return stored times as UTC.
+    option :use_utc, default: false
 
     # Has Mongoid been configured? This is checking that at least a valid
     # client config exists.
