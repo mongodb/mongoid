@@ -620,9 +620,41 @@ in object is a ``Point`` first, in case we also want to be able to pass in ordin
 Reserved Names
 **************
 
-If you define a field on your document that conflicts with a reserved method name in Mongoid,
-the configuration will raise an error. For a list of these you may look at
-``Mongoid.destructive_fields``.
+Attempting to define a field on a document that conflicts with a reserved
+method name in Mongoid will raise an error. The list of reserved names can
+be obtained by invoking the ``Mongoid.destructive_fields`` method.
+
+Field Redefinition
+******************
+
+By default Mongoid allows redefining fields on a model. To raise an error
+when a field is redefined, set the ``duplicate_fields_exception``
+:ref:`configuration option <configuration-options>` to ``true``.
+
+With the option set to true, the following example will raise an error:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+    
+    field :name
+    
+    field :name, type: String
+  end
+
+To define the field anyway, use the ``overwrite: true`` option:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+    
+    field :name
+    
+    field :name, type: String, overwrite: true
+  end
+
 
 Custom Ids
 **********
@@ -1005,11 +1037,14 @@ calling ``Model#previous_changes``.
    # View the previous changes.
    person.previous_changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
 
-Readonly Attributes
+.. _read-only:
+
+Read-Only Attributes
 -------------------
 
-You can tell Mongoid that certain attributes are readonly. This will allow documents to be
-created with these attributes, but changes to them will be filtered out.
+You can tell Mongoid that certain attributes are read-only. This will allow
+documents to be created with these attributes, but changes to them will be
+ignored when using mass update methods such as ``update_attributes``:
 
 .. code-block:: ruby
 
@@ -1024,8 +1059,8 @@ created with these attributes, but changes to them will be filtered out.
    band = Band.create(name: "Placebo")
    band.update_attributes(name: "Tool") # Filters out the name change.
 
-If you explicitly try to update or remove the attribute by itself, then a ``ReadonlyAttribute``
-error will be raised.
+If you explicitly try to update or remove a read-only attribute by itself,
+a ``ReadonlyAttribute`` exception will be raised:
 
 .. code-block:: ruby
 

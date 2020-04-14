@@ -132,8 +132,10 @@ Belongs To
 A ``belongs_to`` macro is used when a document is the child in a ``has_one``
 or ``has_many`` association. By default, in order for a document to
 be saved, each of its ``belongs_to`` associations must be provided a value.
-To override this requirement, you can use the option ``optional: false``
-on the ``belong_to`` association.
+To override this requirement for a particular association, use the option
+``optional: false`` on the ``belong_to`` association. To override this
+requirement globally, set the ``belongs_to_required_by_default``
+:ref:`configuration option <configuration-options>` to ``false``.
 
 Defining
 ~~~~~~~~
@@ -726,6 +728,8 @@ to the association.
 
   band.save # Fires all save callbacks on the band, albums, and label.
 
+.. _dependent-behavior:
+
 Dependent Behavior
 ******************
 
@@ -1149,3 +1153,115 @@ the ``_id`` field which is then used to load full models. An alternative is
 to not perform such a projection and work with raw fields, which would eliminate
 having to send the list of document ids to Mongoid in the second query
 (which could be large).
+
+.. _aggregation-pipeline-builder-dsl:
+
+Aggregation Pipeline Builder DSL
+********************************
+
+Mongoid provides limited support for constructing the aggregation pipeline
+itself using a high-level DSL. The following aggregation pipeline operators
+are supported:
+
+- `$group <https://docs.mongodb.com/manual/reference/operator/aggregation/group/>`_
+- `$project <https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_
+- `$unwind <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_
+
+To construct a pipeline, call the corresponding aggregation pipeine methods
+on a ``Criteria`` instance. Aggregation pipeline operations are added to the
+``pipeline`` attribute of the ``Criteria`` instance. To execute the pipeline,
+pass the ``pipeline`` attribute value to ``Collection#aggragegate`` method.
+
+For example, given the following models:
+
+.. code-block:: ruby
+
+  class Tour
+    include Mongoid::Document
+    
+    embeds_many :participants
+    
+    field :name, type: String
+    field :states, type: Array
+  end
+  
+  class Participant
+    include Mongoid::Document
+    
+    embedded_in :tour
+    
+    field :name, type: String
+  end
+
+We could find out which states a participant visited:
+
+.. code-block:: ruby
+
+  criteria = Tour.where('participants.name' => 'Serenity',).
+    unwind(:states).
+    group(_id: 'states', :states.add_to_set => '$states').
+    project(_id: 0, states: 1)
+  
+  pp criteria.pipeline
+  # => [{"$match"=>{"participants.name"=>"Serenity"}},
+  #     {"$unwind"=>"$states"},
+  #     {"$group"=>{"_id"=>"states", "states"=>{"$addToSet"=>"$states"}}},
+  #     {"$project"=>{"_id"=>0, "states"=>1}}]
+  
+  Tour.collection.aggregate(criteria.pipeline).to_a
+
+group
+~~~~~
+
+The ``group`` method adds a `$group aggregation pipeline stage
+<https://docs.mongodb.com/manual/reference/operator/aggregation/group/>`_.
+
+The field expressions support Mongoid symbol-operator syntax:
+
+.. code-block:: ruby
+
+    criteria = Tour.all.group(_id: 'states', :states.add_to_set => '$states')
+    criteria.pipeline
+    # => [{"$group"=>{"_id"=>"states", "states"=>{"$addToSet"=>"$states"}}}]
+
+Alternatively, standard MongoDB aggregation pipeline syntax may be used:
+
+.. code-block:: ruby
+
+    criteria = Tour.all.group(_id: 'states', states: {'$addtoSet' => '$states'})
+
+project
+~~~~~~~
+
+The ``project`` method adds a `$project aggregation pipeline stage
+<https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_.
+
+The argument should be a Hash specifying the projection:
+
+.. code-block:: ruby
+
+    criteria = Tour.all.project(_id: 0, states: 1)
+    criteria.pipeline
+    # => [{"$project"=>{"_id"=>0, "states"=>1}}]
+
+.. _unwind-dsl:
+
+unwind
+~~~~~~
+
+The ``unwind`` method adds an `$unwind aggregation pipeline stage
+<https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_.
+
+The argument can be a field name, specifyable as a symbol or a string, or
+a Hash or a ``BSON::Document`` instance:
+
+.. code-block:: ruby
+
+    criteria = Tour.all.unwind(:states)
+    criteria = Tour.all.unwind('states')
+    criteria.pipeline
+    # => [{"$unwind"=>"$states"}]
+    
+    criteria = Tour.all.unwind(path: '$states')
+    criteria.pipeline
+    # => [{"$unwind"=>{:path=>"$states"}}]

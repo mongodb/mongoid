@@ -10,6 +10,13 @@ Upgrading Mongoid
    :depth: 1
    :class: singlecol
 
+This page describes significant changes and improvements in Mongoid releases.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
 
 Upgrading to Mongoid 7.1
 ------------------------
@@ -232,14 +239,28 @@ Support for Ruby 2.2 and JRuby 9.1 has been dropped.
 Upgrading to Mongoid 7.0
 ------------------------
 
-This major version of Mongoid has a number of significant refactors, bug fixes
-and behavior corrections.
+Significant improvements and changes in Mongoid 7.0 are listed below.
+Please note that improvements that have been backported to Mongoid 6.x are
+not included in this list.
 
-Please see the list of behavior changes for version
-`7.0.0 <https://github.com/mongodb/mongoid/releases/tag/v7.0.0>`_
-and version
-`7.0.0.beta <https://github.com/mongodb/mongoid/releases/tag/v7.0.0.beta>`_
-for specific changes that might be required in your code.
+The behavior of :ref:`read-only attributes <read-only>` now matches that of
+ActiveRecord.
+
+Referenced associations now support all :ref:`dependent behaviors <dependent-behavior>`
+that `ActiveRecord supports <http://guides.rubyonrails.org/association_basics.html>`_.
+
+:ref:`$unwind <unwind-dsl>` operator support added to the :ref:`aggregation
+pipeline builder DSL <aggregation-pipeline-builder-dsl>`.
+
+``background_indexing`` Mongoid :ref:`configuration option
+<configuration-options>` added.
+
+Mongoid 7.0 requires MongoDB server 2.6 or newer, Ruby 2.2.2 or higher and
+supports Rails 5.1-6.0.
+
+New in version 7.0.3: Embedded matchers now support the ``$eq`` operator.
+
+New in version 7.0.5: Mongoid now officially supports Rails 6.0.
 
 
 Upgrading to Mongoid 6
