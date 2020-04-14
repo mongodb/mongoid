@@ -235,6 +235,14 @@ can be configured.
       # Include the _type field in serialization. (default: false)
       include_type_for_serialization: false
 
+      # Whether to join nested persistence contexts for atomic operations
+      # to parent contexts by default. (default: false)
+      join_contexts: false
+
+      # Set the Mongoid and Ruby driver log levels when Mongoid is not using
+      # Ruby on Rails logger instance. (default: :info)
+      log_level: :info
+      
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
       preload_models: false
@@ -256,14 +264,6 @@ can be configured.
       # further information. Most applications should not use this option.
       # (default: false)
       use_utc: false
-
-      # Set the Mongoid and Ruby driver log levels when Mongoid is not using
-      # Ruby on Rails logger instance. (default: :info)
-      log_level: :info
-      
-      # Whether to join nested persistence contexts for atomic operations
-      # to parent contexts by default. (default: false)
-      join_contexts: false
 
 The Ruby driver options may be found in 
 `the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
