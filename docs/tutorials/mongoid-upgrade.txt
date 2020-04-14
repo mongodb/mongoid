@@ -240,6 +240,9 @@ ActiveRecord.
 Referenced associations now support all :ref:`dependent behaviors <dependent-behavior>`
 that `ActiveRecord supports <http://guides.rubyonrails.org/association_basics.html>`_.
 
+:ref:`$unwind <unwind-dsl>` operator support added to the :ref:`aggregation
+pipeline builder DSL <aggregation-pipeline-builder-dsl>`.
+
 This major version of Mongoid has a number of significant refactors, bug fixes
 and behavior corrections.
 

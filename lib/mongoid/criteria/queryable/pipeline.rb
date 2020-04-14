@@ -33,7 +33,7 @@ module Mongoid
         # Add a group operation to the aggregation pipeline.
         #
         # @example Add a group operation.
-        #   pipeline.group(:count.sum => 1, :max.max => "likes")
+        #   pipeline.group(:_id => "foo", :count.sum => 1, :max.max => "likes")
         #
         # @param [ Hash ] entry The group entry.
         #
@@ -76,7 +76,8 @@ module Mongoid
         #   pipeline.unwind(:field)
         #   pipeline.unwind(document)
         #
-        # @param [ String, Symbol, Hash ] field_or_doc The name of the field or a document.
+        # @param [ String, Symbol, Hash ] field_or_doc A field name or a
+        #   document.
         #
         # @return [ Pipeline ] The pipeline.
         #
