@@ -232,6 +232,11 @@ Support for Ruby 2.2 and JRuby 9.1 has been dropped.
 Upgrading to Mongoid 7.0
 ------------------------
 
+The following sections describe major changes in Mongoid 7.0.
+
+The behavior of :ref:`read-only attributes <read-only>` now matches that of
+ActiveRecord.
+
 This major version of Mongoid has a number of significant refactors, bug fixes
 and behavior corrections.
 

@@ -1005,11 +1005,14 @@ calling ``Model#previous_changes``.
    # View the previous changes.
    person.previous_changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
 
-Readonly Attributes
+.. _read-only:
+
+Read-Only Attributes
 -------------------
 
-You can tell Mongoid that certain attributes are readonly. This will allow documents to be
-created with these attributes, but changes to them will be filtered out.
+You can tell Mongoid that certain attributes are read-only. This will allow
+documents to be created with these attributes, but changes to them will be
+ignored when using mass update methods such as ``update_attributes``:
 
 .. code-block:: ruby
 
@@ -1024,8 +1027,8 @@ created with these attributes, but changes to them will be filtered out.
    band = Band.create(name: "Placebo")
    band.update_attributes(name: "Tool") # Filters out the name change.
 
-If you explicitly try to update or remove the attribute by itself, then a ``ReadonlyAttribute``
-error will be raised.
+If you explicitly try to update or remove a read-only attribute by itself,
+a ``ReadonlyAttribute`` exception will be raised:
 
 .. code-block:: ruby
 
