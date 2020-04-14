@@ -726,6 +726,8 @@ to the association.
 
   band.save # Fires all save callbacks on the band, albums, and label.
 
+.. _dependent-behavior:
+
 Dependent Behavior
 ******************
 

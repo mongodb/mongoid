@@ -237,6 +237,9 @@ The following sections describe major changes in Mongoid 7.0.
 The behavior of :ref:`read-only attributes <read-only>` now matches that of
 ActiveRecord.
 
+Referenced associations now support all :ref:`dependent behaviors <dependent-behavior>`
+that `ActiveRecord supports <http://guides.rubyonrails.org/association_basics.html>`_.
+
 This major version of Mongoid has a number of significant refactors, bug fixes
 and behavior corrections.
 
