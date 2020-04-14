@@ -775,8 +775,11 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#find``
 
-       *Find a document or multiple documents by their ids. Will raise
-       an error by default if any of the ids do not match.*
+       *Find a document or multiple documents by their ids. If the*
+       ``raise_not_found_error`` *configuration option is set to* ``true``
+       *which is the default and any of the ids are not found, raise an error.
+       If the* ``raise_not_found_error`` *configuration option is set to*
+       ``false``, return an array of documents that have the specified ids.*
 
      -
         .. code-block:: ruby
@@ -792,9 +795,9 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#find_by``
 
-       *Find a document by the provided attributes, and if not found
-       raise an error or return nil depending on the
-       * ``raise_not_found_error`` *configuration option.*
+       *Find a document by the provided attributes. If not found,
+       raise an error or return nil depending on the value of the*
+       ``raise_not_found_error`` *configuration option.*
 
      -
         .. code-block:: ruby
@@ -1186,7 +1189,6 @@ by a provided name. Just like normal criteria, they are lazy and chainable.
 
   Band.english.rock # Get the English rock bands.
 
-
 Named scopes can take procs and blocks for accepting parameters or
 extending functionality.
 
@@ -1212,6 +1214,25 @@ extending functionality.
 
   Band.named("Depeche Mode") # Find Depeche Mode.
   Band.active.deutsch # Find active German bands.
+
+By default, Mongoid allows defining a scope that would shadow an existing
+class method, as the following example shows:
+
+.. code-block:: ruby
+
+  class Product
+    include Mongoid::Document
+    
+    def self.fresh
+      true
+    end
+    
+    scope :fresh, ->{ where(fresh: true) }
+  end
+
+To have Mongoid raise an error when a scope would overwrite an existing class
+method, set the ``scope_overwrite_exception`` :ref:`configuration option
+<configuration-options>` to ``true``.
 
 Default Scopes
 **************

@@ -72,6 +72,10 @@ the collection is large and index creation may take a long time:
       index({ ssn: 1 }, { unique: true, background: true })
     end
 
+If the ``background_indexing`` :ref:`configuration option
+<configuration-options>` is true, the indexes are created in the background
+unless the ``background: false`` option is provided.
+
 *Deprecated:* When using MongoDB 2.6, you can drop the duplicate entries
 for unique indexes that are defined for a column that might
 already have duplicate values by specifying the ``drop_dups`` option:

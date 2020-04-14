@@ -474,10 +474,12 @@ changes performed by each block as soon as the block ends:
   end
 
 This behavior can be changed by specifying the ``join_context: true`` option
-to ``#atomically``. When using this option, nested ``#atomically`` blocks
-are joined with the outer blocks, and only the outermost block (or the
-first block where ``join_contexts`` is false) actually writes changes to
-the cluster. For example:
+to ``#atomically``, or globally by setting the ``join_contexts``
+:ref:`configuration option <configuration-options>` to ``true``. When
+context joining is enabled, nested ``#atomically`` blocks are joined with
+the outer blocks, and only the outermost block (or the first block where
+``join_contexts`` is false) actually writes changes to the cluster.
+For example:
 
 .. code-block:: ruby
 

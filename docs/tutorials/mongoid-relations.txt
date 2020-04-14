@@ -132,8 +132,10 @@ Belongs To
 A ``belongs_to`` macro is used when a document is the child in a ``has_one``
 or ``has_many`` association. By default, in order for a document to
 be saved, each of its ``belongs_to`` associations must be provided a value.
-To override this requirement, you can use the option ``optional: false``
-on the ``belong_to`` association.
+To override this requirement for a particular association, use the option
+``optional: false`` on the ``belong_to`` association. To override this
+requirement globally, set the ``belongs_to_required_by_default``
+:ref:`configuration option <configuration-options>` to ``false``.
 
 Defining
 ~~~~~~~~

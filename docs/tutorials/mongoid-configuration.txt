@@ -243,10 +243,7 @@ can be configured.
       # error. (default: true)
       belongs_to_required_by_default: true
       
-      # Raise an exception when a field is defined in a model and it has a
-      # method of the same name already defined. Also prevents a field from
-      # being redefined. Use :overwrite option when defining a field to
-      # overwrite existing method/field definition. (default: false)
+      # Raise an exception when a field is redefined. (default: false)
       duplicate_fields_exception: false
       
       # Include the root model name in json serialization. (default: false)

@@ -32,10 +32,7 @@ module Mongoid
     # error.
     option :belongs_to_required_by_default, default: true
 
-    # Raise an exception when a field is defined in a model and it has a
-    # method of the same name already defined. Also prevents a field from
-    # being redefined. Use :overwrite option when defining a field to
-    # overwrite existing method/field definition.
+    # Raise an exception when a field is redefined.
     option :duplicate_fields_exception, default: false
 
     # Include the root model name in json serialization.
