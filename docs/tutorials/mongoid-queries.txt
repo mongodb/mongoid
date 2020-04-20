@@ -116,7 +116,8 @@ as the following example shows:
 only
 ````
 
-This method retrieves only the specified fields from the database.
+This method retrieves only the specified fields from the database. This
+operation is sometimes called "projection".
 
 .. code-block:: ruby
 
