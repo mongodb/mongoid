@@ -114,13 +114,13 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         it "does not query when touching the association" do
-          expect_query(0) do
+          expect_no_queries do
             expect(eager.person).to eq(person)
           end
         end
 
         it "does not query when updating the association" do
-          expect_query(0) do
+          expect_no_queries do
             eager.person.username = "arthurnn"
           end
         end
@@ -185,13 +185,13 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
           end
 
           it "does not query when touching the association" do
-            expect_query(0) do
+            expect_no_queries do
               expect(eager.map(&:ratable)).to eq([nil, bar, movie])
             end
           end
 
           it "does not query when updating the association" do
-            expect_query(0) do
+            expect_no_queries do
               eager.last.ratable.name = "Easy rider"
             end
           end
@@ -250,13 +250,13 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
           end
 
           it "does not query when touching the association" do
-            expect_query(0) do
+            expect_no_queries do
               expect(eager.map(&:reviewable)).to eq([nil, encyclopedia, pull_request])
             end
           end
 
           it "does not query when updating the association" do
-            expect_query(0) do
+            expect_no_queries do
               eager.last.reviewable.title = "Load stuff eagerly"
             end
           end
