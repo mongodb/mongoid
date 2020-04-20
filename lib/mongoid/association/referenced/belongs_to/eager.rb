@@ -23,10 +23,12 @@ module Mongoid
           end
 
           def each_loaded_document(&block)
-            return super(&block) unless @association.polymorphic?
-
-            keys_by_type_from_docs.each do |type, doc_keys|
-              super(Object.const_get(type), doc_keys, &block)
+            if @association.polymorphic?
+              keys_by_type_from_docs.each do |type, keys|
+                each_loaded_document_of_class(Object.const_get(type), keys, &block)
+              end
+            else
+              super
             end
           end
 

@@ -65,10 +65,14 @@ module Mongoid
           #   loader.each_loaded_document { |doc| }
           #
           # @since 4.0.0
-          def each_loaded_document(klass = @association.klass, doc_keys = keys_from_docs)
-            return klass.none if doc_keys.all?(&:nil?)
+          def each_loaded_document(&block)
+            each_loaded_document_of_class(@association.klass, keys_from_docs, &block)
+          end
 
-            criteria = klass.any_in(key => doc_keys)
+          def each_loaded_document_of_class(cls, keys)
+            return cls.none if keys.all?(&:nil?)
+
+            criteria = cls.any_in(key => keys)
             criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc
