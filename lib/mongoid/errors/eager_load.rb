@@ -6,6 +6,8 @@ module Mongoid
 
     # This error is raised when attempting to eager load a many to many
     # association.
+    #
+    # @deprecated No longer used by Mongoid per MONGOID-4841.
     class EagerLoad < MongoidError
 
       # Create the new eager load error.
