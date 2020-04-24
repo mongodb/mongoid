@@ -24,7 +24,13 @@ module Mongoid
       def add_to_set(adds)
         prepare_atomic_operation do |ops|
           process_atomic_operations(adds) do |field, value|
-            existing = send(field) || (attributes[field] ||= [])
+            existing = send(field) || attributes[field]
+            if existing.blank?
+              attributes[field] = []
+            else
+              attributes[field] = existing
+            end
+            existing = attributes[field]
             values = [ value ].flatten(1)
             values.each do |val|
               existing.push(val) unless existing.include?(val)

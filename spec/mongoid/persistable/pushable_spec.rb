@@ -23,6 +23,14 @@ describe Mongoid::Persistable::Pushable do
           expect(person.test_array).to eq([ 1 ])
         end
 
+        it "stores changes in memory when loaded from database" do
+          Person.create!
+          person = Person.last
+          person.add_to_set({aliases: 1})
+
+          expect(person.aliases).to eq([1])
+        end
+
         it "returns self objet" do
           expect(add).to eq(person)
         end
