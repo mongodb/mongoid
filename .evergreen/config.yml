@@ -284,25 +284,6 @@ functions:
             perl -p -i -e "s|ABSOLUTE_PATH_REPLACEMENT_TOKEN|${DRIVERS_TOOLS}|g" $filename
           done
 
-  "windows fix":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          for i in $(find ${DRIVERS_TOOLS}/.evergreen ${PROJECT_DIRECTORY}/.evergreen -name \*.sh); do
-            cat $i | tr -d '\r' > $i.new
-            mv $i.new $i
-          done
-
-  "make files executable":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          for i in $(find ${DRIVERS_TOOLS}/.evergreen ${PROJECT_DIRECTORY}/.evergreen -name \*.sh); do
-            chmod +x $i
-          done
-
   "install dependencies":
     - command: shell.exec
       type: test
@@ -317,9 +298,7 @@ pre:
   - func: "fetch source"
   - func: "create expansions"
   - func: "prepare resources"
-  - func: "windows fix"
   - func: "fix absolute paths"
-  - func: "make files executable"
   - func: "install dependencies"
 
 post:
