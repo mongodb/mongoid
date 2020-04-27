@@ -14,7 +14,7 @@ Project Tracking
 ----------------
 
 * [Mongoid Website and Documentation](http://mongoid.org)
-* [MongoDB Community Forum](http://community.mongodb.com)
+* [MongoDB Community Forum](https://developer.mongodb.com/community/forums/tags/c/drivers-odms-connectors/7/mongoid-odm)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/mongoid)
 * [#mongoid](http://webchat.freenode.net/?channels=mongoid) on freenode IRC
 
