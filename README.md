@@ -31,7 +31,7 @@ Support
 -------
 
 * [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoid)
-* [MongoDB Community Forum](http://community.mongodb.com)
+* [MongoDB Community Forum](https://developer.mongodb.com/community/forums/tags/c/drivers-odms-connectors/7/mongoid-odm)
 * [#mongoid](http://webchat.freenode.net/?channels=mongoid) on Freenode IRC
 
 License
