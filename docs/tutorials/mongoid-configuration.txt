@@ -285,6 +285,31 @@ can be configured.
 The Ruby driver options may be found in 
 `the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
 
+ERb Preprocessing
+'''''''''''''''''
+
+When loading a configuration file, Mongoid processes it with ERb before
+parsing it as YAML. This allows, for example, constructing the contents of
+the configuration file at runtime based on environment variables:
+
+.. code-block:: yaml
+
+  development:
+    clients:
+      default:
+        uri: "<%= ENV['MONGODB_URI'] %>"
+
+.. note::
+
+  When outputting values from ERb, ensure the values are valid YAML and
+  escape them as needed.
+
+.. note::
+
+  Since ERb rendering is performed prior to YAML parsing, all ERb directives
+  in the configuration file are evaluated, including those occurring in YAML
+  comments.
+
 Logging
 *******
 
