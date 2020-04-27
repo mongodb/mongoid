@@ -573,13 +573,13 @@ Merge Strategies
 Mongoid provides three merge strategies:
 
 - **Override**: the new operator instance replaces any existing conditions on
-the same field using the same operator.
+  the same field using the same operator.
 - **Intersect**: if there already is a condition using the same operator on the
-same field, the values of the existing condition are intersected with the
-values of the new condition and the result is stored as the operator value.
+  same field, the values of the existing condition are intersected with the
+  values of the new condition and the result is stored as the operator value.
 - **Union**: if there already is a condition using the same operator on the
-same field, the values of the new condition are aded to the values of the
-exsting condition and the result is stored as the operator value.
+  same field, the values of the new condition are aded to the values of the
+  exsting condition and the result is stored as the operator value.
 
 The following snippet demonstrates all of the strategies, using ``in`` as the
 example operator:
