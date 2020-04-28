@@ -23,7 +23,11 @@ group :test do
   gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
-    gem 'byebug'
+    if RUBY_VERSION <= '2.3'
+      gem 'byebug', '~> 10'
+    else
+      gem 'byebug'
+    end
   end
 end
 
