@@ -1,6 +1,6 @@
-========
+********
 Sharding
-========
+********
 
 .. contents:: On this page
    :local:
@@ -15,7 +15,7 @@ Mongoid can assist with setting up collection sharding in sharded environments.
 .. _shard-keys:
 
 Declaring Shard Keys
---------------------
+====================
 
 Shard keys can be declared on models using the ``shard_key`` macro:
 
@@ -83,7 +83,7 @@ configured in the association as the field name:
 .. _sharding-management:
 
 Sharding Management Rake Tasks
-------------------------------
+==============================
 
 To shard collections in the database according to the shard keys defined in
 the models, run the ``db:mongoid:shard_collections`` Rake task.

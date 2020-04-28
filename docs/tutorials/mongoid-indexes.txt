@@ -1,8 +1,8 @@
 .. _mongoid-indexes:
 
-=======
+*******
 Indexes
-=======
+*******
 
 .. default-domain:: mongodb
 
@@ -13,7 +13,7 @@ Indexes
    :class: singlecol
 
 Specifying Indexes
-------------------
+==================
 
 You can define indexes on documents using the index macro. Provide the key for
 the index along with a direction. Additional options can be supplied in the
@@ -124,7 +124,7 @@ This only works on the association macro that the foreign key is stored on:
     end
 
 Index Management Rake Tasks
----------------------------
+===========================
 
 When you want to create the indexes in the database, use the provided
 ``db:mongoid::create_indexes`` Rake task:

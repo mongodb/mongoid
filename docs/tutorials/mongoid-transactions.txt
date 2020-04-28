@@ -1,8 +1,8 @@
 .. _transactions:
 
-============
+************
 Transactions
-============
+************
 
 .. default-domain:: mongodb
 
@@ -19,7 +19,7 @@ versions of MongoDB). Transactions require Mongoid version 6.4 or higher and Rub
 2.6 or higher.
 
 Using Transactions
-------------------
+==================
 
 In order to start a transaction, the application must have a :ref:`session <sessions>`.
 

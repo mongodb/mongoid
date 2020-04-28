@@ -1,8 +1,8 @@
 .. _sessions:
 
-=========
+********
 Sessions
-=========
+********
 
 .. default-domain:: mongodb
 
@@ -28,8 +28,8 @@ Please note the following limitations of sessions:
 
 - All connected MongoDB servers must be version 3.6 or higher.
 
-Using a session via Model#with_session
-***************************************
+Using a Session via Model#with_session
+======================================
 
 Call ``#with_session`` on a model class and pass it session options to execute a block in the context
 of a session.
@@ -44,8 +44,8 @@ of a session.
    end
 
 
-Using a session via model#with_session
-***************************************
+Using a Session via model#with_session
+======================================
 
 Call ``#with_session`` on a model instance and pass it session options to execute a block in the context
 of a session.

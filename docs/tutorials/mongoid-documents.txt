@@ -1,8 +1,8 @@
 .. _mongoid-documents-6.0.0:
 
-=========
+*********
 Documents
-=========
+*********
 
 .. default-domain:: mongodb
 
@@ -18,7 +18,7 @@ is a BSON object that is very similar to a Ruby hash or JSON object. Documents c
 in their own collections in the database, or can be embedded in other Documents n levels deep.
 
 Storage
--------
+=======
 
 Mongoid by default stores documents in a collection that is the pluralized form of the class name.
 For the following ``Person`` class, the collection the document would get stored in would be named ``people``.
@@ -86,7 +86,7 @@ and have a structure like so:
    }
 
 Fields
-------
+======
 
 Even though MongoDB is a schemaless database and allows data to be stored
 as strings, Mongoid permits the application to declare the type of data
@@ -175,7 +175,7 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 
 
 Updating Container Fields
-*************************
+-------------------------
 
 Be aware that, until
 `MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_
@@ -228,7 +228,7 @@ back to the model as follows:
 
 
 Accessing Field Values
-**********************
+----------------------
 
 When a field is defined, Mongoid provides several different ways of accessing the field.
 
@@ -293,7 +293,7 @@ of handling this as well.
    )
 
 Hash Fields
-***********
+-----------
 
 When using a field of type Hash, be wary of adhering to the
 `legal key names for mongoDB <http://docs.mongodb.org/manual/reference/limits/#naming-restrictions>`_,
@@ -322,7 +322,7 @@ or else the values will not store properly.
    end
 
 Date Fields
-***********
+-----------
 
 Mongoid allows assignment of values of several types to ``Date`` fields:
 
@@ -345,7 +345,7 @@ objects to ``Date`` objects before assigning the values to fields of type
 ``Date``.
 
 DateTime Fields
-***************
+---------------
 
 MongoDB stores all times as UTC timestamps. When assigning a value to a
 ``DateTime`` field, or when querying a ``DateTime`` field, Mongoid
@@ -411,7 +411,7 @@ If a time zone is specfied, it is respected:
     # => Sun, 04 Mar 2018 09:00:00 +0000
 
 Regular Expression Fields
-*************************
+-------------------------
 
 MongoDB supports storing regular expressions in documents, and querying using
 regular expressions. Of note for Ruby applications, MongoDB uses
@@ -472,7 +472,7 @@ This is because the meaning of ``$`` is different between PCRE and Ruby
 regular expressions.
 
 Defaults
-********
+--------
 
 You can tell a field in Mongoid to always have a default value if nothing has been provided.
 Defaults are either static values or lambdas/procs.
@@ -505,7 +505,7 @@ When defining a default value as a proc, Mongoid will apply the default after al
 attributes are set. If you want this to happen before the other attributes, set ``pre_processed: true``.
 
 Aliasing Fields
-***************
+---------------
 
 One of the drawbacks of having a schemaless database is that MongoDB must store all field
 information along with every document, meaning that it takes up a lot of storage space in RAM
@@ -528,7 +528,7 @@ performing the conversion for you.
    criteria.selector # { "n" => "Placebo" }
 
 Custom Fields
-*************
+-------------
 
 You can define custom types in Mongoid and determine how they are serialized and deserialized.
 You simply need to provide three methods on it for Mongoid to call to convert your object to
@@ -618,14 +618,14 @@ it is not as well, ``evolve`` is the method that takes care of this. We check if
 in object is a ``Point`` first, in case we also want to be able to pass in ordinary arrays instead.
 
 Reserved Names
-**************
+--------------
 
 Attempting to define a field on a document that conflicts with a reserved
 method name in Mongoid will raise an error. The list of reserved names can
 be obtained by invoking the ``Mongoid.destructive_fields`` method.
 
 Field Redefinition
-******************
+------------------
 
 By default Mongoid allows redefining fields on a model. To raise an error
 when a field is redefined, set the ``duplicate_fields_exception``
@@ -657,7 +657,7 @@ To define the field anyway, use the ``overwrite: true`` option:
 
 
 Custom Ids
-**********
+----------
 
 For cases when you do not want to have ``BSON::ObjectId`` ids, you can override Mongoid's
 ``_id`` field and set them to whatever you like.
@@ -670,8 +670,8 @@ For cases when you do not want to have ``BSON::ObjectId`` ids, you can override 
      field :_id, type: String, default: ->{ name }
    end
 
-A Note about the BSON Symbol type
-*********************************
+BSON Symbol Type
+----------------
 
 Because the BSON specification deprecated the BSON symbol type, the `bson` gem will serialize Ruby
 symbols into BSON strings when used on its own. However, in order to maintain backwards
@@ -699,7 +699,7 @@ of the following methods:
 
 
 Dynamic Fields
---------------
+==============
 
 By default, Mongoid requires all fields that may be set on a document to
 be explicitly defined using ``field`` declarations. Mongoid also supports
@@ -835,7 +835,7 @@ Attributes can always be read using mass attribute access or ``read_attribute``
 
 
 Special Characters in Field Names
-*********************************
+---------------------------------
 
 Mongoid permits dynamic field names to include spaces and punctuation:
 
@@ -851,7 +851,7 @@ Mongoid permits dynamic field names to include spaces and punctuation:
 
 
 Localized Fields
-----------------
+================
 
 Mongoid supports localized fields via `i18n <https://github.com/ruby-i18n/i18n>`_.
 
@@ -887,7 +887,7 @@ You can get and set all the translations at once by using the corresponding ``_t
 
 
 Fallbacks
-*********
+---------
 
 Mongoid integrates with
 `i18n fallbacks <https://github.com/ruby-i18n/i18n/wiki/Fallbacks>`_.
@@ -931,7 +931,7 @@ language, translations will be looked up in the fallback languages:
 
 
 Querying
-********
+--------
 
 When querying for localized fields using Mongoid's criteria API, Mongoid will automatically
 alter the criteria to match the current locale.
@@ -943,7 +943,7 @@ alter the criteria to match the current locale.
    # The resulting MongoDB query filter: { "description.en" : "Marvelous!" }
 
 Indexing
-********
+--------
 
 If you plan to be querying extensively on localized fields, you should index each of the
 locales that you plan on searching on.
@@ -959,14 +959,14 @@ locales that you plan on searching on.
    end
 
 Dirty Tracking
---------------
+==============
 
 Mongoid supports tracking of changed or "dirty" fields with an API that mirrors that of
 Active Model. If a defined field has been modified in a model the model will be marked as
 dirty and some additional behavior comes into play.
 
 Viewing Changes
-***************
+---------------
 
 There are various ways to view what has been altered on a model. Changes are recorded
 from the time a document is instantiated, either as a new document or via loading from
@@ -1001,7 +1001,7 @@ the database up to the time it is saved. Any persistence operation clears the ch
    person.name_was # "Alan Parsons"
 
 Resetting Changes
-*****************
+-----------------
 
 You can reset changes of a field to its previous value by calling the reset method.
 
@@ -1014,8 +1014,8 @@ You can reset changes of a field to its previous value by calling the reset meth
    person.reset_name!
    person.name # "Alan Parsons"
 
-Notes On Persistence
-********************
+Persistence
+-----------
 
 Mongoid uses dirty tracking as the core of its persistence operations. It looks at the
 changes on a document and atomically updates only what has changed, unlike other frameworks
@@ -1023,7 +1023,7 @@ that write the entire document on each save. If no changes have been made, Mongo
 not hit the database on a call to ``Model#save``.
 
 Viewing Previous Changes
-************************
+------------------------
 
 After a document has been persisted, you can see what the changes were previously by
 calling ``Model#previous_changes``.
@@ -1040,7 +1040,7 @@ calling ``Model#previous_changes``.
 .. _read-only:
 
 Read-Only Attributes
--------------------
+====================
 
 You can tell Mongoid that certain attributes are read-only. This will allow
 documents to be created with these attributes, but changes to them will be
@@ -1068,7 +1068,7 @@ a ``ReadonlyAttribute`` exception will be raised:
    band.remove_attribute(:name) # Raises the error.
 
 Inheritance
------------
+===========
 
 Mongoid supports inheritance in both top level and embedded documents. When
 a child document inherits from a parent document, the parent document's
@@ -1112,7 +1112,7 @@ from the database the correct document is returned. This also holds true for the
 documents ``Circle``, ``Rectangle``, and ``Shape``.
 
 Querying Subclasses
-*******************
+-------------------
 
 Querying for subclasses is handled in the normal manner, and although the documents are
 all in the same collection, queries will only return documents of the correct type,
@@ -1126,10 +1126,10 @@ similar to Single Table Inheritance in ActiveRecord.
    Firefox.where(name: "Window 1")
 
 Associations
-************
+------------
 
-You can add any type of subclass to a has one or has many association, through either normal
-setting or through the build and create methods on the association:
+You can add any type of subclass to a has one or has many association, through
+either normal setting or through the build and create methods on the association:
 
 .. code-block:: ruby
 
@@ -1146,7 +1146,7 @@ setting or through the build and create methods on the association:
 
 
 Timestamping
-------------
+============
 
 Mongoid supplies a timestamping module in ``Mongoid::Timestamps`` which
 can be included to get basic behavior for ``created_at`` and

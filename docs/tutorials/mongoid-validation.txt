@@ -1,6 +1,6 @@
-==========
+**********
 Validation
-==========
+**********
 
 .. default-domain:: mongodb
 

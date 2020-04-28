@@ -1,6 +1,6 @@
-=========================
+*************************
 Getting Started (Sinatra)
-=========================
+*************************
 
 .. default-domain:: mongodb
 
@@ -12,14 +12,14 @@ Getting Started (Sinatra)
 
 
 New Application
----------------
+===============
 
 This section shows how to create a new Sinatra application using Mongoid
 for data access. The process is similar for other Ruby applications not
 using Ruby on Rails.
 
 Create Git Repo
-***************
+---------------
 
 While not required, we recommend creating a Git repository for your application:
 
@@ -32,7 +32,7 @@ Commit your changes as you are following this tutorial.
 
 
 Create Gemfile
-**************
+--------------
 
 Create a file named ``Gemfile`` with the following contents:
 
@@ -45,7 +45,7 @@ Create a file named ``Gemfile`` with the following contents:
 
 
 Install Dependencies
-********************
+--------------------
 
 Run the following commands to install the dependencies:
 
@@ -59,7 +59,7 @@ committing to your Git repository.
 
 
 Run MongoDB Locally
-*******************
+-------------------
 
 To develop locally with MongoDB, `download and install MongoDB
 <https://docs.mongodb.com/manual/installation/>`_.
@@ -81,7 +81,7 @@ pointing to your deployment. For example, if you launched a standalone
 
 
 Use MongoDB Atlas
-*****************
+-----------------
 
 Instead of downloading, installing and running MongoDB locally, you can create
 a free MongoDB Atlas account and create a `free MongoDB cluster in Atlas
@@ -105,7 +105,7 @@ contents, replacing the URI with the actual URI for your cluster:
 
 
 Basic Application
-*****************
+-----------------
 
 Create a file named ``app.rb`` with the following contents. First, some
 requires:
@@ -173,7 +173,7 @@ Now we can define some models:
 
 
 Run Application
-***************
+===============
 
 Launch the application:
 
@@ -202,7 +202,7 @@ Try some requests via curl:
 
 
 Existing Application
---------------------
+====================
 
 To start using Mongoid in an existing Sinatra applications, the steps are
 essentially the same as the one given above for a new application:
