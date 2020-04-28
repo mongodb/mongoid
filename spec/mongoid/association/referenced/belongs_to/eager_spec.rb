@@ -275,6 +275,57 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
           end
         end
       end
+
+      context 'when eager loading multiple associations' do
+        let(:reviewable) do
+          Publication::Encyclopedia.create!(title: "Encyclopedia Britannica")
+        end
+
+        let!(:reviewable_review) do
+          Publication::Review.create!(summary: "awful",
+            reviewable: reviewable)
+        end
+
+        let(:reviewer) do
+          Dog.create!
+        end
+
+        let!(:reviewer_review) do
+          Publication::Review.create(summary: "okay",
+            reviewer: reviewer)
+        end
+
+        let(:template) do
+          Template.create!
+        end
+
+        let!(:template_review) do
+          Publication::Review.create(summary: "Looks good to me",
+            template: template)
+        end
+
+        let(:eager) do
+          Publication::Review.includes(:reviewable, :reviewer, :template).entries
+        end
+
+        it 'loads all associations eagerly' do
+          loaded = expect_query(4) do
+            eager
+          end
+
+          expect_no_queries do
+            eager.map(&:reviewable).compact.should == [reviewable]
+          end
+
+          expect_no_queries do
+            eager.map(&:reviewer).compact.should == [reviewer]
+          end
+
+          expect_no_queries do
+            eager.map(&:template).compact.should == [template]
+          end
+        end
+      end
     end
 
     context "when setting the foreign key id directly" do

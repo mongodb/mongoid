@@ -8,5 +8,7 @@ module Publication
     field :summary
 
     belongs_to :reviewable, polymorphic: true
+    belongs_to :reviewer, polymorphic: true
+    belongs_to :template
   end
 end
