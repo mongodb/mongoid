@@ -214,8 +214,43 @@ functions:
         # This is specified in this yaml file earlier.
         local_file: ./src/tmp/rspec.json
         display_name: rspec.json
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/artifacts/${task_id}-${execution}-rspec.json
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json
         content_type: application/json
+        permissions: public-read
+        bucket: mciuploads
+    # AWS does not appear to support on-the-fly gzip encoding; compress
+    # the results manually and upload a compressed file.
+    # Typical size reduction: 50 MB -> 800 KB
+    - command: shell.exec
+      params:
+        script: |
+          gzip <src/tmp/rspec.json >src/tmp/rspec.json.gz
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.json.gz
+        display_name: rspec.json.gz
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json.gz
+        content_type: application/gzip
+        permissions: public-read
+        bucket: mciuploads
+    - command: shell.exec
+      params:
+        script: |
+          xz -9 <src/tmp/rspec.json >src/tmp/rspec.json.xz
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.json.xz
+        display_name: rspec.json.xz
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json.xz
+        content_type: application/x-xz
         permissions: public-read
         bucket: mciuploads
 
