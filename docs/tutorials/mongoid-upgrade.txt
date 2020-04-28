@@ -7,7 +7,7 @@ Upgrading Mongoid
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 This page describes significant changes and improvements in Mongoid releases.

@@ -4,10 +4,12 @@
 Configuration
 *************
 
+.. default-domain:: mongodb
+
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Mongoid is customarily configured through a ``mongoid.yml`` file that specifies

@@ -9,7 +9,7 @@ Sessions
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Versions 3.6 and higher of the MongoDB server support sessions. You can use sessions with Mongoid in a similar way

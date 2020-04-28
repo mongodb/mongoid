@@ -9,7 +9,7 @@ Transactions
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Version 4.0 of the MongoDB server introduces

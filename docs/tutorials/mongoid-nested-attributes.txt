@@ -7,7 +7,7 @@ Nested Attributes
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Nested attributes provide a mechanism for updating documents and their

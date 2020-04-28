@@ -7,7 +7,7 @@ Rails Integration
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Mongoid seamlessly integrates into Ruby on Rails applications.
