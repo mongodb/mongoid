@@ -326,6 +326,22 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
           end
         end
       end
+
+      context 'when eager loading an association that has type but not value set' do
+
+        let!(:reviewer_review) do
+          Publication::Review.create(summary: "okay",
+            reviewer_type: 'Dog')
+        end
+
+        let(:eager) do
+          Publication::Review.includes(:reviewable, :reviewer, :template).entries
+        end
+
+        it 'does not error' do
+          eager.map(&:reviewer).should == [nil]
+        end
+      end
     end
 
     context "when setting the foreign key id directly" do
