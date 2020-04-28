@@ -1,15 +1,15 @@
 .. _transactions:
 
-============
+************
 Transactions
-============
+************
 
 .. default-domain:: mongodb
 
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Version 4.0 of the MongoDB server introduces
@@ -19,7 +19,7 @@ versions of MongoDB). Transactions require Mongoid version 6.4 or higher and Rub
 2.6 or higher.
 
 Using Transactions
-------------------
+==================
 
 In order to start a transaction, the application must have a :ref:`session <sessions>`.
 

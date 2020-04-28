@@ -1,8 +1,14 @@
-==========
+**********
 Validation
-==========
+**********
 
 .. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
 
 Mongoid includes ``ActiveModel::Validations`` to supply the basic
 validation plus an additional associated and uniqueness validator.

@@ -1,6 +1,6 @@
-===========
+***********
 Persistence
-===========
+***********
 
 .. default-domain:: mongodb
 
@@ -20,7 +20,7 @@ The persistence sections will provide examples on what database operation is
 performed when executing the documented command.
 
 Standard
---------
+========
 
 Mongoid's standard persistence methods come in the form of common methods you
 would find in other mapping frameworks. The following table shows all standard
@@ -293,7 +293,7 @@ Mongoid provides the following persistence-related attributes:
 
 
 Atomic
-------
+======
 
 Although Mongoid performs atomic operations under the covers by default,
 there may be cases where you want to do this explicitly without persisting
@@ -446,7 +446,7 @@ are not invoked.
 .. _atomic-operation-grouping:
 
 Atomic Operation Grouping
-*************************
+-------------------------
 
 Atomic operations may be grouped together using the ``#atomically`` method
 on a document. All operations inside the block given to ``#atomically``
@@ -523,14 +523,14 @@ as of server version 4.0 which provide atomic persistence across multiple
 documents.
 
 Custom
-------
+======
 
 There may be cases where you want to persist documents to different sources from their
 defaults, or with different options from the default. Mongoid provides run-time support
 for this as well as support on a per-model basis.
 
-Model Level Persistence Options
-*******************************
+Model-Level Persistence Options
+-------------------------------
 
 On a per-model basis, you can tell it to store in a custom collection name, a different
 database, or a different client. The following example would store the Band class by
@@ -550,7 +550,7 @@ If no ``store_in`` macro would have been provided, Mongoid would store the model
 collection named "bands" in the default database in the default client.
 
 Runtime Persistence Options
-***************************
+---------------------------
 
 You can change at runtime where to store, query, update, or remove documents by prefixing
 any operation with ``#with`` and passing a block.
@@ -629,7 +629,7 @@ secondary reads can be performed as follows:
   end
 
 Client and Collection Access
-****************************
+----------------------------
 
 If you want to drop down to the driver level to perform operations, you can grab
 the Mongo client or collection from the model or document instance.
@@ -656,7 +656,7 @@ You can also override the :read or :write options on the collection using the co
   collection_w_0[:artists].find(...)
 
 Capped Collections
-******************
+------------------
 
 Mongoid does not provide a mechanism for creating capped collections on the fly - you
 will need to create these yourself one time up front either with the driver or via the
@@ -675,7 +675,7 @@ To create a capped collection from the Mongo console:
   db.createCollection("name", { capped: true, size: 1024 });
 
 Set a Default Collation on a Collection
-***************************************
+---------------------------------------
 
 Mongoid does not provide a mechanism for creating a collection with a default collation.
 Like capped collections, you will need to create the collection yourself one time, up-front,

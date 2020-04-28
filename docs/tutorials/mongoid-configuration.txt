@@ -1,13 +1,15 @@
 .. _mongoid-configuration:
 
-=============
+*************
 Configuration
-=============
+*************
+
+.. default-domain:: mongodb
 
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Mongoid is customarily configured through a ``mongoid.yml`` file that specifies
@@ -31,7 +33,7 @@ i.e. ``development``, ``test`` or ``production``. The third level key,
 Most applications will use a single client named ``default``.
 
 Generating Default Configuration
-********************************
+================================
 
 If you are using Ruby on Rails, you can have Mongoid generate a default
 configuration file for you by running the following command:
@@ -46,7 +48,7 @@ If you are not using Ruby on Rails, you can copy the minimal configuration
 given above and save it as ``config/mongoid.yml``.
 
 Loading Mongoid Configuration
-*****************************
+=============================
 
 If you are using Ruby on Rails, Mongoid configuration is automatically loaded
 for the current environment as stored in ``Rails.env`` when the application
@@ -106,7 +108,7 @@ current environment - but it does support defining multiple clients.
 .. _configuration-options:
 
 Mongoid Configuration
-*********************
+---------------------
 
 The following annotated example ``mongoid.yml`` demonstrates how Mongoid
 can be configured.
@@ -286,7 +288,7 @@ The Ruby driver options may be found in
 `the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
 
 ERb Preprocessing
-'''''''''''''''''
+`````````````````
 
 When loading a configuration file, Mongoid processes it with ERb before
 parsing it as YAML. This allows, for example, constructing the contents of
@@ -311,7 +313,7 @@ the configuration file at runtime based on environment variables:
   comments.
 
 Logging
-*******
+=======
 
 When configuring logging, it is important to keep in mind that Mongoid
 provides a model layer on top of the MongoDB Ruby driver, and the driver
@@ -333,7 +335,7 @@ both Mongoid and Ruby driver are configured, they may use the same logger
 instance or different instances, potentially with different configurations.
 
 In Ruby on Rails Application
-''''''''''''''''''''''''''''
+----------------------------
 
 When used in a Ruby on Rails application, Mongoid by default inherits
 the logger and the log level from Rails, and sets the driver's logger
@@ -406,7 +408,7 @@ use an initializer as follows:
     Mongoid::Logger.logger.level = Logger::DEBUG
 
 Standalone
-''''''''''
+----------
 
 When not loaded in a Ruby on Rails application, Mongoid respects the
 ``log_level`` top level `configuration option <configuration-options>`_.
@@ -461,7 +463,7 @@ To set the driver logger to be the same as the Mongoid logger:
 .. _time-zones:
 
 Time Zones
-**********
+==========
 
 Ruby has limited time zone support in the standard library. ActiveSupport
 (which Mongoid depends on) offers more comprehensive time zone support.
@@ -555,7 +557,7 @@ even if it is different from ActiveSupport's configured time zone when
 ``use_activesupport_time_zone`` is true.
 
 Usage with Forking Servers
-**************************
+==========================
 
 When using Mongoid with a forking web server such as Unicorn, worker processes
 need to recreate driver client instances to ensure that background threads
@@ -595,7 +597,7 @@ in the cluster and will continue monitoring the cluster for as long as the
 parent remains alive.
 
 Development Configuration
-*************************
+=========================
 
 Driver's default configuration is suitable for production deployment.
 In development, some settings can be adjusted to provide a better developer

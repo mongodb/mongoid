@@ -1,17 +1,17 @@
-============
+************
 Installation
-============
+************
 
 .. default-domain:: mongodb
 
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Install the Gem
----------------
+===============
 
 Mongoid is bundled as a gem, and is `hosted on Rubygems
 <https://rubygems.org/gems/mongoid>`_.
@@ -30,14 +30,14 @@ To install the gem with bundler, include the following in your ``Gemfile``:
    gem 'mongoid', '~> 7.1.0'
 
 Using Mongoid with a New Rails Application
-------------------------------------------
+==========================================
 
 When creating a new Rails application and wish to use Mongoid for
 data access, give the ``--skip-active-record`` flag to the ``rails new``
 command to avoid depending on and configuring ActiveRecord..
 
 Using Mongoid with an Existing Rails Application
-------------------------------------------------
+================================================
 
 When converting an existing Rails application to use Mongoid for data access,
 the ``config/application.rb`` file needs to be updated to remove the
@@ -47,7 +47,7 @@ ActiveRecord). Any references to ActiveRecord in files in the ``config``
 directory and in the models also need to be removed.
 
 Ruby MongoDB Driver Compatibility
----------------------------------
+=================================
 
 The following compatibility table specifies the versions of `Ruby driver for
 MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
@@ -94,7 +94,7 @@ specified Mongoid versions.
      - |checkmark|
 
 Ruby Compatibility
-------------------
+==================
 
 The following compatibility table specifies the versions of Ruby interpreters
 supported by Mongoid.
@@ -144,11 +144,11 @@ supported by Mongoid.
 
 .. [#ruby-2.2] Ruby version 2.2.2 or higher is required.
 
-MongoDB Compatibility
----------------------
+MongoDB Server Compatibility
+============================
 
 The following compatibility table specifies the recommended
-version(s) of Mongoid for use with a specific version of MongoDB.
+version(s) of Mongoid for use with a specific version of MongoDB server.
 
 Note that in order to use features of a particular MongoDB server version,
 both the driver and Mongoid must support that server version.
@@ -201,10 +201,10 @@ for driver compatibility matrices.
 .. _rails-compatibility:
 
 Rails Compatibility
--------------------
+===================
 
-The following compatibility table specifies which versions of Rails are
-supported by Mongoid.
+The following compatibility table specifies which versions of Ruby on Rails
+are supported by Mongoid.
 
 .. list-table::
    :header-rows: 1

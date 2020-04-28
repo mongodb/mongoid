@@ -1,13 +1,13 @@
-=================
+*****************
 Rails Integration
-=================
+*****************
 
 .. default-domain:: mongodb
 
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Mongoid seamlessly integrates into Ruby on Rails applications.
@@ -17,7 +17,7 @@ manually enabled.
 
 
 Configuration
--------------
+=============
 
 You can set Mongoid configuration options in your ``application.rb`` along with other Rails
 environment specific options by accessing config.mongoid. Options set here will override
@@ -33,7 +33,7 @@ those set in your ``config/mongoid.yml``.
 
 
 Model Preloading
-----------------
+================
 
 In order to properly set up single collection inheritance, Mongoid needs to preload all
 models before every request in development mode. This can get slow, so if you are not
@@ -45,7 +45,7 @@ using any inheritance it is recommended you turn this feature off.
 
 
 Exceptions
-----------
+==========
 
 Similarly to ActiveRecord, Mongoid configures Rails to automatically convert
 certain exceptions to well-known HTTP status codes, as follows:
@@ -57,7 +57,7 @@ certain exceptions to well-known HTTP status codes, as follows:
 
 
 Controller Runtime Instrumentation
-----------------------------------
+==================================
 
 Mongoid provides time spent executing MongoDB commands (obtained via a
 driver command monitoring subscription) to Rails' instrumentation event
@@ -77,7 +77,7 @@ the driver and Mongoid to generate the queries or type cast and otherwise
 process the results.
 
 Rake Tasks
-----------
+==========
 
 Mongoid provides the following rake tasks when used in a Rails environment:
 

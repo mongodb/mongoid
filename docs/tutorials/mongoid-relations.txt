@@ -1,6 +1,6 @@
-============
+************
 Associations
-============
+************
 
 .. default-domain:: mongodb
 
@@ -11,20 +11,20 @@ Associations
    :class: singlecol
 
 Referenced Associations
------------------------
+=======================
 
 Mongoid supports the ``has_one``, ``has_many``, ``belongs_to`` and
 ``has_and_belongs_to_many`` associations familiar to ActiveRecord users.
 
 
 Has One
-*******
+-------
 
 One to one associations where documents are stored in separate collections
 are defined using ``has_one`` and ``belongs_to`` macros.
 
 Defining
-~~~~~~~~
+````````
 
 The parent document of the association should use the ``has_one`` macro to
 indicate is has one referenced child, and the document that is referenced
@@ -47,7 +47,7 @@ Definitions are required on both sides to the association in order for it to
 work properly.
 
 Storage
-~~~~~~~
+```````
 
 When defining an association of this nature, each document is stored in its
 respective collection, and the child document contains a "foreign key"
@@ -66,14 +66,14 @@ reference to the parent:
 
 
 Has Many
-********
+--------
 
 One to many associations where the children are stored in a separate
 collection from the parent document are defined using Mongoid's ``has_many``
 and ``belongs_to`` macros.
 
 Defining
-~~~~~~~~
+````````
 
 The parent document of the association should use the ``has_many`` macro to
 indicate is has n number of referenced children, where the document that is
@@ -96,7 +96,7 @@ Definitions are required on both sides to the association in order for it
 to work properly.
 
 Storage
-~~~~~~~
+```````
 
 When defining an association of this nature, each document is stored in its
 respective collection, and the child document contains a "foreign key"
@@ -114,7 +114,7 @@ reference to the parent.
   }
 
 Queries
-~~~~~~~
+```````
 
 Use the ``#exists?`` method on the association to efficiently determine whether
 the association contains any documents, without retrieving the entire set
@@ -127,7 +127,7 @@ of documents from the database:
 
 
 Belongs To
-**********
+----------
 
 A ``belongs_to`` macro is used when a document is the child in a ``has_one``
 or ``has_many`` association. By default, in order for a document to
@@ -138,7 +138,7 @@ requirement globally, set the ``belongs_to_required_by_default``
 :ref:`configuration option <configuration-options>` to ``false``.
 
 Defining
-~~~~~~~~
+````````
 
 The child document of the association uses the ``belongs_to`` macro to indicate
 it is associated with a parent. The document on the ``belongs_to`` side
@@ -161,7 +161,7 @@ Definitions are required on both sides to the association in order for it to
 work properly.
 
 Storage
-~~~~~~~
+```````
 
 When defining an association of this nature, each document is stored in its respective collection,
 but the child document contains a "foreign key" reference to the parent.
@@ -178,7 +178,7 @@ but the child document contains a "foreign key" reference to the parent.
   }
 
 Has And Belongs To Many
-***********************
+-----------------------
 
 Many to many associations in Mongoid are defined using the
 ``has_and_belongs_to_many`` macro. Unlike ActiveRecord's
@@ -188,7 +188,7 @@ the foreign key ids are stored as arrays on both sides of the association.
 ``has_and_belongs_to_many`` association has no embedded equivalent.
 
 Defining
-~~~~~~~~
+````````
 
 Both sides of the association use the same macro.
 
@@ -221,7 +221,7 @@ that stores the keys as an array on the parent.
   end
 
 Storage
-~~~~~~~
+```````
 
 When defining an association of this nature, each document is stored in its
 respective collection, and each document contains a "foreign key" reference
@@ -242,7 +242,7 @@ to the other in the form of an array.
   }
 
 Embedded Associations
----------------------
+=====================
 
 Thanks to MongoDB's document model, Mongoid also offers embedded associations
 which allow documents of different types to be stored hierarchically
@@ -252,13 +252,13 @@ in the same collection. Embedded associations are defined using
 embedding.
 
 Embeds One
-**********
+----------
 
 One to one associations where the children are embedded in the parent
 document are defined using Mongoid's ``embeds_one`` and ``embedded_in`` macros.
 
 Defining
-~~~~~~~~
+````````
 
 The parent document of the association should use the ``embeds_one`` macro to
 indicate is has one embedded child, where the document that is embedded uses
@@ -279,7 +279,7 @@ in order for it to work properly.
    end
 
 Storage
-~~~~~~~
+```````
 
 Documents that are embedded using the ``embeds_one`` macro are stored as a
 hash inside the parent in the parent's database collection.
@@ -306,13 +306,13 @@ attribute other than the name, by providing the ``:store_as`` option.
 
 
 Embeds Many
-***********
+-----------
 
 One to many relationships where the children are embedded in the parent
 document are defined using Mongoid's ``embeds_many`` and ``embedded_in`` macros.
 
 Defining
-~~~~~~~~
+````````
 
 The parent document of the association should use the ``embeds_many`` macro
 to indicate it has many embedded children, where the document that is
@@ -333,7 +333,7 @@ the association in order for it to work properly.
   end
 
 Storage
-~~~~~~~
+```````
 
 Documents that are embedded using the ``embeds_many`` macro are stored as
 an array of hashes inside the parent in the parent's database collection.
@@ -361,7 +361,7 @@ attribute other than the name, by providing the ``:store_as`` option.
   end
 
 Recursive Embedding
-*******************
+-------------------
 
 A document can recursively embed itself using ``recursively_embeds_one`` or
 ``recursively_embeds_many``, which provides accessors for the parent and
@@ -396,7 +396,7 @@ children via ``parent_`` and ``child_`` methods.
    child.parent_node # root
 
 Referencing Vs Embedding
-************************
+------------------------
 
 While a complete discussion of referencing vs embedding is beyond the scope
 of this tutorial, here are some high level considerations for choosing
@@ -443,10 +443,10 @@ help of MongoDB projection operation:
 
 
 Common Behavior
----------------
+===============
 
 Extensions
-**********
+----------
 
 All associations can have extensions, which provides a way to add application specific
 functionality to the association. They are defined by providing a block to the association definition.
@@ -469,7 +469,7 @@ functionality to the association. They are defined by providing a block to the a
    person.addresses.chinese # returns [ address ]
 
 Custom Association Names
-************************
+------------------------
 
 You can name your associations whatever you like, but if the class cannot be inferred by
 Mongoid from the name, and neither can the opposite side you'll want to provide the
@@ -488,7 +488,7 @@ macro with some additional options to tell Mongoid how to hook them up.
    end
 
 Custom Primary & Foreign Keys
-*****************************
+-----------------------------
 
 The fields used when looking up associations can be explicitly specified.
 The default is to use ``id`` on the "parent" association and ``#{association_name}_id``
@@ -595,7 +595,7 @@ allowed in the field, the field is created with a type of Object. It is a
 good idea to explicitly define the field with the appropriate type.
 
 Validations
-***********
+-----------
 
 It is important to note that by default, Mongoid will validate the children of any
 association that are loaded into memory via a ``validates_associated``. The associations that
@@ -620,7 +620,7 @@ If you do not want this behavior, you may turn it off when defining the associat
 
 
 Polymorphism
-************
+------------
 
 One to one and one to many associations support polymorphism, which is
 having a single association potentially contain objects of different classes.
@@ -712,7 +712,7 @@ that a bundle may contain other bundles or products:
 
 
 Cascading Callbacks
-*******************
+-------------------
 
 If you want the embedded document callbacks to fire when calling a persistence
 operation on its parent, you will need to provide the cascade callbacks option
@@ -731,7 +731,7 @@ to the association.
 .. _dependent-behavior:
 
 Dependent Behavior
-******************
+------------------
 
 You can provide dependent options to referenced associations to instruct Mongoid
 how to handle situations where one side of the association is deleted, or is attempted
@@ -769,7 +769,7 @@ The default behavior of each association when no dependent option is provided is
    Band.first.delete # Will delete all associated albums.
 
 Autosaving
-**********
+----------
 
 One core difference between Mongoid and Active Record from a behavior standpoint
 is that Mongoid does not automatically save associated documents for
@@ -794,7 +794,7 @@ Note that autosave functionality will automatically be added to an association w
    band.save # Will save the album as well.
 
 Existence Predicates
-********************
+--------------------
 
 All associations have existence predicates on them in the form of ``name?`` and ``has_name?``
 to check if the association is blank.
@@ -813,7 +813,7 @@ to check if the association is blank.
    band.has_albums?
 
 Autobuilding
-************
+------------
 
 One to one associations (``embeds_one``, ``has_one``) have an autobuild option which tells
 Mongoid to instantiate a new document when the association is accessed and it is ``nil``.
@@ -831,7 +831,7 @@ Mongoid to instantiate a new document when the association is accessed and it is
    band.producer # Returns a new empty producer.
 
 Touching
-********
+--------
 
 Any ``belongs_to`` association, no matter where it hangs off from, can take an optional ``:touch``
 option which will call the touch method on it and any parent associations with the option defined
@@ -848,7 +848,7 @@ when the base document calls ``#touch``.
    band.touch # Calls touch on the parent label.
 
 The counter_cache Option
-************************
+------------------------
 
 As with ActiveRecord, the ``:counter_cache`` option can be used on an association
 to make finding the number of belonging objects more efficient. Also similar
@@ -870,8 +870,8 @@ For example:
     has_many :orders
   end
 
-Association metadata
---------------------
+Association Metadata
+====================
 
 All associations in Mongoid contain metadata that holds information about the association in
 question, and is a valuable tool for third party developers to use to extend Mongoid.
@@ -889,7 +889,7 @@ You can access the association metadata of the association in a few different wa
    model.associations[:association_name]
 
 Attributes
-**********
+----------
 
 All associations contain a ``_target``, which is the proxied document or documents, a ``_base``
 which is the document the association hangs off, and ``_association`` which provides information
@@ -908,7 +908,7 @@ about the association.
    person.addresses._association # returns the association metadata
 
 The Association Object
-**********************
+----------------------
 
 The association object itself contains more information than one might know what to do
 with, and is useful for developers of extensions to Mongoid.
@@ -997,14 +997,14 @@ with, and is useful for developers of extensions to Mongoid.
 
 
 Querying Associations
----------------------
+=====================
 
 Mongoid supports several forms of efficient querying of documents based on
 associations.
 
 
 Embedded Associations
-*********************
+---------------------
 
 Given the following models:
 
@@ -1047,7 +1047,7 @@ documents, using projection:
 
 
 Referenced Associations
-***********************
+-----------------------
 
 If the associations are referenced rather than embedded, performing queries
 through them takes a bit more work. Given the following models modified from
@@ -1093,7 +1093,7 @@ To find awards for bands that have toured since 2000:
 
 
 Aggregation Pipeline
-********************
+--------------------
 
 Mongoid exposes MongoDB's aggregation pipeline for queries involving multiple
 referenced associations at the same time. Given the same setup as before with
@@ -1157,7 +1157,7 @@ having to send the list of document ids to Mongoid in the second query
 .. _aggregation-pipeline-builder-dsl:
 
 Aggregation Pipeline Builder DSL
-********************************
+--------------------------------
 
 Mongoid provides limited support for constructing the aggregation pipeline
 itself using a high-level DSL. The following aggregation pipeline operators
@@ -1211,7 +1211,7 @@ We could find out which states a participant visited:
   Tour.collection.aggregate(criteria.pipeline).to_a
 
 group
-~~~~~
+`````
 
 The ``group`` method adds a `$group aggregation pipeline stage
 <https://docs.mongodb.com/manual/reference/operator/aggregation/group/>`_.
@@ -1231,7 +1231,7 @@ Alternatively, standard MongoDB aggregation pipeline syntax may be used:
     criteria = Tour.all.group(_id: 'states', states: {'$addtoSet' => '$states'})
 
 project
-~~~~~~~
+```````
 
 The ``project`` method adds a `$project aggregation pipeline stage
 <https://docs.mongodb.com/manual/reference/operator/aggregation/project/>`_.
@@ -1247,7 +1247,7 @@ The argument should be a Hash specifying the projection:
 .. _unwind-dsl:
 
 unwind
-~~~~~~
+``````
 
 The ``unwind`` method adds an `$unwind aggregation pipeline stage
 <https://docs.mongodb.com/manual/reference/operator/aggregation/unwind/>`_.

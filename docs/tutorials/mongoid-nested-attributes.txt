@@ -1,13 +1,13 @@
-=================
+*****************
 Nested Attributes
-=================
+*****************
 
 .. default-domain:: mongodb
 
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Nested attributes provide a mechanism for updating documents and their
@@ -16,7 +16,7 @@ parameters hash. This is useful when wanting to edit multiple documents
 within a single web form.
 
 Behavior
---------
+========
 
 Nested attributes can be enabled for any association, embedded or referenced.
 To enable this for an association, simply provide the association name to the

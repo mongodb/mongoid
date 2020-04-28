@@ -1,17 +1,17 @@
-=========
+*********
 Callbacks
-=========
+*********
 
 .. default-domain:: mongodb
 
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 Document Callbacks
-------------------
+==================
 
 Mongoid supports the following callbacks for :doc:`documents </tutorials/mongoid-documents>`:
 
@@ -83,7 +83,7 @@ syntax as well:
    end
 
 Association Callbacks
----------------------
+=====================
 
 Mongoid has a set of callbacks that are specific to collection based
 associations - these are:

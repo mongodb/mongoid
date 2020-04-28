@@ -1,0 +1,17 @@
+This file is not part of Mongoid documentation proper, it is an internal
+reference for the nesting levels that other files should be using.
+
+Mongoid documentation nesting levels:
+
+**********
+Page Title
+**********
+
+First Level Heading
+===================
+
+Second Level Heading
+--------------------
+
+Third Level Heading
+```````````````````

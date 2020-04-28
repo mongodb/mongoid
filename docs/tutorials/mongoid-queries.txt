@@ -1,6 +1,6 @@
-=======
+*******
 Queries
-=======
+*******
 
 .. default-domain:: mongodb
 
@@ -14,7 +14,7 @@ One of MongoDB's greatest features is its ability to execute dynamic
 queries, provided through a familiar Arel-style DSL.
 
 Queries
--------
+=======
 
 All queries in Mongoid are ``Mongoid::Criteria``, which is a chainable and
 lazily evaluated wrapper to a MongoDB dynamic query. Criteria only
@@ -23,7 +23,7 @@ results, and when executed wrap a cursor in order to keep memory
 management and performance predictable.
 
 Queryable DSL
-*************
+-------------
 
 Query methods are available off a ``Mongoid::Criteria`` object
 *as well as* off the model's class.
@@ -309,7 +309,7 @@ the default scope being evaluated first:
 .. _logical-operations:
 
 Logical Operations
-******************
+------------------
 
 Mongoid supports ``and``, ``or``, ``nor`` and ``not`` logical operations on
 ``Criteria`` objects. These methods take one or more hash of conditions
@@ -543,7 +543,7 @@ caveats/limitations of ``$not`` `stated in the MongoDB server documentation
 
 
 Incremental Query Construction
-******************************
+------------------------------
 
 By default, when conditions are added to a query, Mongoid considers each
 condition complete and independent from any other conditions potentially
@@ -703,7 +703,7 @@ removed in a future release of Mongoid.
 
 
 Query Cache
-***********
+-----------
 
 If Mongoid's QueryCache is enabled, it will cache queries that the server returns in a single batch
 and avoids sending requests to the database for identical queries. Note that if the number of
@@ -718,7 +718,7 @@ To enable the QueryCache:
 
 
 Additional Query Methods
-************************
+------------------------
 
 Mongoid also has some helpful methods on criteria.
 
@@ -919,7 +919,7 @@ Mongoid also has some helpful methods on criteria.
 
 
 Eager Loading
-*************
+-------------
 
 Mongoid provides a facility to eager load documents
 from associations to prevent the n+1 issue when
@@ -945,7 +945,7 @@ associations.
 
 
 Regular Expressions
-*******************
+-------------------
 
 MongoDB, and Mongoid, allow querying documents by regular expressions.
 
@@ -985,7 +985,7 @@ It is also possible to query using PCRE syntax by constructing
 
 
 Queries + Persistence
----------------------
+=====================
 
 Mongoid supports persistence operations off of criteria
 in a light capacity for when you want to expressively perform multi
@@ -1166,13 +1166,13 @@ document inserts, updates, and deletion.
           Band.where(label: "Mute").destroy
 
 Scoping
--------
+=======
 
 Scopes provide a convenient way to reuse common criteria with more
 business domain style syntax.
 
 Named Scopes
-************
+------------
 
 Named scopes are simply criteria defined at class load that are referenced
 by a provided name. Just like normal criteria, they are lazy and chainable.
@@ -1236,7 +1236,7 @@ method, set the ``scope_overwrite_exception`` :ref:`configuration option
 <configuration-options>` to ``true``.
 
 Default Scopes
-**************
+--------------
 
 Default scopes can be useful when you find yourself applying the same
 criteria to most queries, and wish to specify these criteria as the default.
@@ -1364,7 +1364,7 @@ that would affect its visibility within the scoped association.
 
 
 Class Methods
-*************
+-------------
 
 Class methods on models that return criteria objects are also
 treated like scopes, and can be chained as well.
@@ -1384,13 +1384,13 @@ treated like scopes, and can be chained as well.
   Band.active
 
 Map/Reduce
-----------
+==========
 
 Mongoid provides a DSL around MongoDB's map/reduce framework, for performing
 custom map/reduce jobs or simple aggregations.
 
 Execution
-*********
+---------
 
 You can tell Mongoid off the class or a criteria to perform a map/reduce
 by calling ``map_reduce`` and providing map and reduce javascript
@@ -1440,7 +1440,7 @@ Valid options to ``#out`` are:
 
 
 Full Text Search
-----------------
+================
 
 To perform full text search with Mongoid, follow these steps:
 
@@ -1450,7 +1450,7 @@ To perform full text search with Mongoid, follow these steps:
 
 
 Defining Full Text Search Index
-*******************************
+-------------------------------
 
 Index definition through Mongoid is described in detail on the `indexes
 <mongoid-indexes>`_ page. Full text search indexes are described in detail on
@@ -1473,7 +1473,7 @@ Note that the index type (``text``) must be given as a string, not as a symbol.
 
 
 Creating Full Text Search Index
-*******************************
+-------------------------------
 
 To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
 
@@ -1483,7 +1483,7 @@ To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
 
 
 Querying Using Full Text Search Index
-*************************************
+-------------------------------------
 
 To find bands whose description contains "ounces" or its variations, use the
 `$text operator <https://docs.mongodb.com/manual/reference/operator/query/text/#op._S_text>`_:

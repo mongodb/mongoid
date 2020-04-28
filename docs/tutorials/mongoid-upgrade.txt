@@ -1,13 +1,13 @@
-=================
+*****************
 Upgrading Mongoid
-=================
+*****************
 
 .. default-domain:: mongodb
 
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
+   :depth: 2
    :class: singlecol
 
 This page describes significant changes and improvements in Mongoid releases.
@@ -19,12 +19,12 @@ the complete list of issues fixed in each release, including bug fixes.
 
 
 Upgrading to Mongoid 7.1
-------------------------
+========================
 
 The following sections describe major changes in Mongoid 7.1.
 
 Condition Combination
-`````````````````````
+---------------------
 
 **Breaking change:** In Mongoid 7.1, when condition methods are invoked on a
 Criteria object, they always add new conditions to the existing conditions in
@@ -54,7 +54,7 @@ Corresponding Mongoid 7.0 behavior:
     #   embedded: false>
 
 Logical Operations
-``````````````````
+------------------
 
 **Breaking change:** In Mongoid 7.1 logical operator methods ``or`` and
 ``nor`` treat the receiver as one of the operands. This behavior matches that
@@ -110,7 +110,7 @@ For more information, please review the :ref:`logical operations
 <logical-operations>` section of the documentation.
 
 Merge Strategies
-````````````````
+----------------
 
 **Breaking change:** In Mongoid 7.1, :ref:`Merge strategies <merge-strategies>`
 must be explicitly requested. Previously, ``all`` defaulted to the
@@ -152,7 +152,7 @@ explicitly requested:
     #   embedded: false>
 
 Required Condition Arguments
-````````````````````````````
+----------------------------
 
 **Breaking change:** ``nil`` arguments to Criteria methods are no longer
 accepted. For example, the following invocation is now an error:
@@ -173,7 +173,7 @@ invocation is now an error:
 without arguments.
 
 Generated Queries
-`````````````````
+-----------------
 
 Minor change: Mongoid 7.1 will simplify the Criteria selectors where possible
 by eliding unnecessary logical operators, typically ``$and``.
@@ -217,7 +217,7 @@ example, the following two approaches result in the same generated selector:
     #   embedded: false>
 
 Atomic Operation Grouping
-`````````````````````````
+-------------------------
 
 Improvement: :ref:`Multiple atomic operations can now be grouped
 <atomic-operation-grouping>` to be executed as a single atomic operation.
@@ -230,14 +230,14 @@ shard keys, and a Rake task to shard collection has been added to the
 :ref:`sharding management Rake tasks <sharding-management>`.
 
 Ruby Version Support
-````````````````````
+--------------------
 
 As of version 7.1, Mongoid supports Ruby 2.3+ and JRuby 9.2.
 Support for Ruby 2.2 and JRuby 9.1 has been dropped.
 
 
 Upgrading to Mongoid 7.0
-------------------------
+========================
 
 Significant improvements and changes in Mongoid 7.0 are listed below.
 Please note that improvements that have been backported to Mongoid 6.x are
@@ -264,7 +264,7 @@ New in version 7.0.5: Mongoid now officially supports Rails 6.0.
 
 
 Upgrading to Mongoid 6
-----------------------
+======================
 
 Mongoid 6 is compatible with Rails 5 and requires Ruby 2.2.2 or higher.
 
@@ -276,7 +276,7 @@ for specific changes that might be required in your code.
 
 
 Upgrading to Mongoid 5
-----------------------
+======================
 
 The underlying driver has changed from Moped to the official MongoDB Ruby driver.
 For all users dropping down to the driver level for operations, please see the driver
