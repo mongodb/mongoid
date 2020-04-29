@@ -93,10 +93,7 @@ describe Mongoid::Criteria::Queryable::Storable do
         it 'adds the new conditions' do
           modified.selector.should == {
             'zoom' => 'zoom',
-            # The $and here is superfluous but not wrong.
-            # To be addressed as part of
-            # https://jira.mongodb.org/browse/MONGOID-4861.
-            '$and' => ['$or' => ['foo' => 'bar']],
+            '$or' => ['foo' => 'bar'],
           }
         end
       end

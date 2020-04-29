@@ -2473,10 +2473,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it 'adds conditions to existing query' do
           selection.selector.should == {
             'test' => 1,
-            # The $and here is superfluous but not wrong.
-            # To be addressed as part of
-            # https://jira.mongodb.org/browse/MONGOID-4861.
-            '$and' => [mql_operator => ['hello' => 'world']],
+            mql_operator => ['hello' => 'world'],
           }
         end
       end
