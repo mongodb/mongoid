@@ -127,7 +127,11 @@ module Mongoid
             selector.store(operator, op_expr)
           else
             # Other operators need to be added separately
-            add_logical_operator_expression('$and', [operator => op_expr])
+            if selector[operator]
+              add_logical_operator_expression('$and', [operator => op_expr])
+            else
+              selector.store(operator, op_expr)
+            end
           end
 
           self

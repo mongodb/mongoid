@@ -92,8 +92,8 @@ module Mongoid
             normalized = _mongoid_normalize_expr(new_s)
             normalized.each do |k, v|
               k = k.to_s
-              if c.selector[k] || k[0] == ?$
-                c = c.send(:__multi__, [{k => v}], '$and')
+              if c.selector[k]
+                c = c.send(:__multi__, [k => v], '$and')
               else
                 c.selector.store(k, v)
               end

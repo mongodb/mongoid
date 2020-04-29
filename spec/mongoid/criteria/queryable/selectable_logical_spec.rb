@@ -459,6 +459,54 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it_behaves_like 'adds most recent criterion as $and'
       end
     end
+
+    context 'when conditions already exist in criteria' do
+      let(:base_selection) do
+        query.where(foo: 'bar')
+      end
+
+      context 'when hash conditions are given' do
+        let(:selection) do
+          base_selection.and(hello: 'world')
+        end
+
+        it 'adds new conditions to top level' do
+          selection.selector.should == {
+            'foo' => 'bar',
+            'hello' => 'world',
+          }
+        end
+      end
+
+      context 'when criteria conditions are given' do
+        let(:selection) do
+          base_selection.and(query.where(hello: 'world'))
+        end
+
+        it 'adds new conditions to top level' do
+          selection.selector.should == {
+            'foo' => 'bar',
+            'hello' => 'world',
+          }
+        end
+      end
+
+      context 'when complex criteria conditions are given' do
+        let(:selection) do
+          base_selection.and(query.or([one: 'one'], [two: 'two']))
+        end
+
+        it 'adds new conditions to top level' do
+          selection.selector.should == {
+            'foo' => 'bar',
+            '$or' => [
+              {'one' => 'one'},
+              {'two' => 'two'},
+            ],
+          }
+        end
+      end
+    end
   end
 
   describe "#or" do
