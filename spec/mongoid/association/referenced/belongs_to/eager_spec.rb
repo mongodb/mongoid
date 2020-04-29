@@ -114,13 +114,13 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
         end
 
         it "does not query when touching the association" do
-          expect_query(0) do
+          expect_no_queries do
             expect(eager.person).to eq(person)
           end
         end
 
         it "does not query when updating the association" do
-          expect_query(0) do
+          expect_no_queries do
             eager.person.username = "arthurnn"
           end
         end
@@ -146,18 +146,201 @@ describe Mongoid::Association::Referenced::BelongsTo::Eager do
 
     context "when the association is polymorphic" do
 
-      let!(:movie) do
-        Movie.create(name: "Bladerunner")
+      context "without namespaces" do
+
+        let!(:stand_alone_rating) do
+          Rating.create(value: 7)
+        end
+
+        let!(:bar) do
+          Bar.create(name: "FooBar")
+        end
+
+        let(:bar_rating) do
+          bar.create_rating(value: 5)
+        end
+
+        let!(:movie) do
+          Movie.create(name: "Bladerunner")
+        end
+
+        let(:movie_rating) do
+          movie.ratings.create(value: 10)
+        end
+
+        let(:eager) do
+          Rating.includes(:ratable).entries
+        end
+
+        context "when the eager load has returned documents" do
+
+          before do
+            bar_rating
+            movie_rating
+            eager
+          end
+
+          it "puts the documents in the parent document" do
+            expect(eager.map { |e| e.ivar(:ratable) }).to eq([nil, bar, movie])
+          end
+
+          it "does not query when touching the association" do
+            expect_no_queries do
+              expect(eager.map(&:ratable)).to eq([nil, bar, movie])
+            end
+          end
+
+          it "does not query when updating the association" do
+            expect_no_queries do
+              eager.last.ratable.name = "Easy rider"
+            end
+          end
+        end
+
+        context "when the eager load has not returned documents" do
+
+          before { eager }
+
+          it "does not set anything on the parent" do
+            expect(eager.map { |e| e.ivar(:ratable) }).to all(be nil)
+          end
+
+          it "has a nil association" do
+            expect(eager.map(&:ratable)).to all(be nil)
+          end
+        end
       end
 
-      let!(:rating) do
-        movie.ratings.create(value: 10)
+      context "with namespaces" do
+
+        let!(:stand_alone_review) do
+          Publication::Review.create(summary: "awful")
+        end
+
+        let!(:encyclopedia) do
+          Publication::Encyclopedia.create(title: "Encyclopedia Britannica")
+        end
+
+        let(:encyclopedia_review) do
+          encyclopedia.reviews.create(summary: "inspiring")
+        end
+
+        let!(:pull_request) do
+          Coding::PullRequest.create(title: "Add eager loading for polymorphic belongs_to associations")
+        end
+
+        let(:pull_request_review) do
+          pull_request.reviews.create(summary: "Looks good to me")
+        end
+
+        let(:eager) do
+          Publication::Review.includes(:reviewable).entries
+        end
+
+        context "when the eager load has returned documents" do
+
+          before do
+            encyclopedia_review
+            pull_request_review
+            eager
+          end
+
+          it "puts the documents in the parent document" do
+            expect(eager.map { |e| e.ivar(:reviewable) }).to eq([nil, encyclopedia, pull_request])
+          end
+
+          it "does not query when touching the association" do
+            expect_no_queries do
+              expect(eager.map(&:reviewable)).to eq([nil, encyclopedia, pull_request])
+            end
+          end
+
+          it "does not query when updating the association" do
+            expect_no_queries do
+              eager.last.reviewable.title = "Load stuff eagerly"
+            end
+          end
+        end
+
+        context "when the eager load has not returned documents" do
+
+          before { eager }
+
+          it "does not set anything on the parent" do
+            expect(eager.map { |e| e.ivar(:reviewable) }).to all(be nil)
+          end
+
+          it "has a nil association" do
+            expect(eager.map(&:reviewable)).to all(be nil)
+          end
+        end
       end
 
-      it "raises an error" do
-        expect {
-          Rating.includes(:ratable).last
-        }.to raise_error(Mongoid::Errors::EagerLoad)
+      context 'when eager loading multiple associations' do
+        let(:reviewable) do
+          Publication::Encyclopedia.create!(title: "Encyclopedia Britannica")
+        end
+
+        let!(:reviewable_review) do
+          Publication::Review.create!(summary: "awful",
+            reviewable: reviewable)
+        end
+
+        let(:reviewer) do
+          Dog.create!
+        end
+
+        let!(:reviewer_review) do
+          Publication::Review.create(summary: "okay",
+            reviewer: reviewer)
+        end
+
+        let(:template) do
+          Template.create!
+        end
+
+        let!(:template_review) do
+          Publication::Review.create(summary: "Looks good to me",
+            template: template)
+        end
+
+        let(:eager) do
+          Publication::Review.includes(:reviewable, :reviewer, :template).entries
+        end
+
+        it 'loads all associations eagerly' do
+          loaded = expect_query(4) do
+            eager
+          end
+
+          expect_no_queries do
+            eager.map(&:reviewable).compact.should == [reviewable]
+          end
+
+          expect_no_queries do
+            eager.map(&:reviewer).compact.should == [reviewer]
+          end
+
+          expect_no_queries do
+            eager.map(&:template).compact.should == [template]
+          end
+        end
+      end
+
+      context 'when eager loading an association that has type but not value set' do
+
+        let!(:reviewer_review) do
+          Publication::Review.create(summary: "okay",
+            reviewer_type: 'Dog')
+        end
+
+        let(:eager) do
+          Publication::Review.includes(:reviewable, :reviewer, :template).entries
+        end
+
+        it 'does not error' do
+          eager.map(&:reviewer).should == [nil]
+        end
       end
     end
 

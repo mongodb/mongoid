@@ -59,17 +59,29 @@ module Mongoid
             raise NotImplementedError
           end
 
-          # Run the preloader.
-          #
-          # @example Iterate over the documents loaded for the current association
-          #   loader.each_loaded_document { |doc| }
+          # Retrieves the documents referenced by the association, and
+          # yields each one sequentially to the provided block. If the
+          # association is not polymorphic, all documents are retrieved in
+          # a single query. If the association is polymorphic, one query is
+          # issued per association target class.
           #
           # @since 4.0.0
-          def each_loaded_document
-            doc_keys = keys_from_docs
-            return @association.klass.none if doc_keys.all?(&:nil?)
+          def each_loaded_document(&block)
+            each_loaded_document_of_class(@association.klass, keys_from_docs, &block)
+          end
 
-            criteria = @association.klass.any_in(key => doc_keys)
+          # Retrieves the documents of the specified class, that have the
+          # foreign key included in the specified list of keys.
+          #
+          # When the documents are retrieved, the set of inclusions applied
+          # is the set of inclusions applied to the host document minus the
+          # association that is being eagerly loaded.
+          private def each_loaded_document_of_class(cls, keys)
+            # Note: keys should not include nil elements.
+            # Upstream code is responsible for eliminating nils from keys.
+            return cls.none if keys.empty?
+
+            criteria = cls.any_in(key => keys)
             criteria.inclusions = criteria.inclusions - [@association]
             criteria.each do |doc|
               yield doc
@@ -93,6 +105,9 @@ module Mongoid
 
           # Return a hash with the current documents grouped by key.
           #
+          # Documents that do not have a value for the association being loaded
+          # are not returned.
+          #
           # @example Return a hash with the current documents grouped by key.
           #   loader.grouped_docs
           #
@@ -102,10 +117,15 @@ module Mongoid
           def grouped_docs
             @grouped_docs[@association.name] ||= @docs.group_by do |doc|
               doc.send(group_by_key) if doc.respond_to?(group_by_key)
+            end.reject do |k, v|
+              k.nil?
             end
           end
 
-          # Group the documents and return the keys
+          # Group the documents and return the keys.
+          #
+          # This method omits nil keys (i.e. keys from documents that do not
+          # have a value for the association being loaded).
           #
           # @example
           #   loader.keys_from_docs
