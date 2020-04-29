@@ -4,7 +4,7 @@ describe Mongoid::Persistable::Pushable do
 
   describe "#add_to_set" do
 
-    context "when the document is a root document" do
+    context "when the document is a top level document" do
 
       shared_examples_for "a unique pushable root document" do
 
@@ -61,6 +61,60 @@ describe Mongoid::Persistable::Pushable do
         end
 
         it_behaves_like "a unique pushable root document"
+      end
+
+      context 'when the host model is not saved' do
+        context 'when attribute exists' do
+          let(:person) do
+            Person.new(aliases: [2])
+          end
+
+          it 'records the change' do
+            person.add_to_set({aliases: 1})
+
+            expect(person.aliases).to eq([2, 1])
+          end
+        end
+
+        context 'when attribute does not exist' do
+          let(:person) do
+            Person.new
+          end
+
+          it 'records the change' do
+            person.add_to_set({aliases: 1})
+
+            expect(person.aliases).to eq([1])
+          end
+        end
+      end
+
+      context 'when the host model is loaded from database' do
+        context 'when attribute exists' do
+          let(:person) do
+            Person.create!(aliases: [2])
+            person = Person.last
+          end
+
+          it 'records the change' do
+            person.add_to_set({aliases: 1})
+
+            expect(person.aliases).to eq([2, 1])
+          end
+        end
+
+        context 'when attribute does not exist' do
+          let(:person) do
+            Person.create!
+            person = Person.last
+          end
+
+          it 'records the change' do
+            person.add_to_set({aliases: 1})
+
+            expect(person.aliases).to eq([1])
+          end
+        end
       end
     end
 

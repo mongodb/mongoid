@@ -22,7 +22,13 @@ module Mongoid
       def add_to_set(adds)
         prepare_atomic_operation do |ops|
           process_atomic_operations(adds) do |field, value|
-            existing = send(field) || (attributes[field] ||= [])
+            existing = send(field) || attributes[field]
+            if existing.nil?
+              attributes[field] = []
+              # Read the value out of attributes:
+              # https://jira.mongodb.org/browse/MONGOID-4874
+              existing = attributes[field]
+            end
             values = [ value ].flatten(1)
             values.each do |val|
               existing.push(val) unless existing.include?(val)
