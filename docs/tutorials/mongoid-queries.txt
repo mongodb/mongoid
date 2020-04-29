@@ -465,6 +465,8 @@ Use ``any_of`` to add a disjunction to a Criteria object while maintaining
 all of the conditions built up so far as they are.
 
 
+.. _any-of:
+
 ``any_of`` Behavior
 ```````````````````
 
