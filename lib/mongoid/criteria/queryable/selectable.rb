@@ -94,7 +94,23 @@ module Mongoid
               criterion.each do |k, v|
                 k = k.to_s
                 if c.selector[k]
-                  c = c.send(:__multi__, [k => v], '$and')
+                  # There is already a condition on k.
+                  # If v is an operator, and all existing conditions are
+                  # also operators, and v isn't present in existing conditions,
+                  # we can add to existing conditions.
+                  # Otherwise use $and.
+                  if v.is_a?(Hash) &&
+                    v.length == 1 &&
+                    (new_k = v.keys.first).start_with?('$') &&
+                    (existing_kv = c.selector[k]).is_a?(Hash) &&
+                    !existing_kv.key?(new_k) &&
+                    existing_kv.keys.all? { |sub_k| sub_k.start_with?('$') }
+                  then
+                    merged_v = c.selector[k].merge(v)
+                    c.selector.store(k, merged_v)
+                  else
+                    c = c.send(:__multi__, [k => v], '$and')
+                  end
                 else
                   c.selector.store(k, v)
                 end
