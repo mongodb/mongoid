@@ -229,6 +229,11 @@ module Mongoid
         # Takes a criteria hash and expands Key objects into hashes containing
         # MQL corresponding to said key objects.
         #
+        # Ruby does not permit multiple symbol operators. For example,
+        # {:foo.gt => 1, :foo.gt => 2} is collapsed to {:foo.gt => 2} by the
+        # language. Therefore this method never has to deal with multiple
+        # identical operators.
+        #
         # @param [ Hash ] Criteria including Key instances.
         #
         # @return [ Hash ] Expanded criteria.
