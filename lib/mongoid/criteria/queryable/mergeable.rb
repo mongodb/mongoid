@@ -235,7 +235,7 @@ module Mongoid
         # identical operators.
         #
         # Similarly, this method should never need to expand a literal value
-        # and an operator.
+        # and an operator at the same time.
         #
         # @param [ Hash ] Criteria including Key instances.
         #
