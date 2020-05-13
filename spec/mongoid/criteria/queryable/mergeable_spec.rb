@@ -78,10 +78,8 @@ describe Mongoid::Criteria::Queryable::Mergeable do
         'age' => {'$gt' => 42, '$eq' => 50}}
     end
 
-    it 'expands multiple Key instances on the same field with the same operator' do
-      query.send(:_mongoid_expand_keys, {gt => 42, gtp => 50}).should == {
-        'age' => {'$gt' => 42}, '$and' => ['$age' => {'$gt' => 50}],
-      }
+    it 'Ruby does not allow same symbol operator with different values' do
+      {gt => 42, gtp => 50}.should == {gtp => 50}
     end
   end
 end

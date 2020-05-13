@@ -249,6 +249,49 @@ module Mongoid
           expr.each do |field, value|
             field.__expr_part__(value.__expand_complex__).each do |k, v|
               if result[k]
+                if result[k].is_a?(Hash)
+                  # Existing value is an operator.
+                  # If new value is also an operator, ensure there are no
+                  # conflicts and add
+                  if v.is_a?(Hash)
+                    # The new value is also an operator.
+                    # If there are no conflicts, combine the hashes, otherwise
+                    # add new conditions to top level with $and.
+                    if (v.keys & result[k].keys).empty?
+                      result[k].update(v)
+                    else
+                      raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
+                      result['$and'] ||= []
+                      result['$and'] << {k => v}
+                    end
+                  else
+                    # The new value is a simple value.
+                    # If there isn't an $eq operator already in the query,
+                    # transform the new value into an $eq operator and add it
+                    # to the existing hash. Otherwise add the new condition
+                    # with $and to the top level.
+                    if result[k].key?('$eq')
+                      raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
+                      result['$and'] ||= []
+                      result['$and'] << {k => v}
+                    else
+                      result[k].update('$eq' => v)
+                    end
+                  end
+                else
+                  # Existing value is a simple value.
+                  # If we are adding an operator, and the operator is not $eq,
+                  # convert existing value into $eq and add the new operator
+                  # to the same hash. Otherwise add the new condition with $and
+                  # to the top level.
+                  if v.is_a?(Hash) && !v.key?('$eq')
+                    result[k] = {'$eq' => result[k]}.update(v)
+                  else
+                    raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
+                    result['$and'] ||= []
+                    result['$and'] << {k => v}
+                  end
+                end
               else
                 result[k] = v
               end
