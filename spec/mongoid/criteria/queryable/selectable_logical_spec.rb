@@ -85,7 +85,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "adds the conditions to top level" do
           expect(selection.selector).to eq({
-            "field" => {'$gt' => 3 },
+            "field" => {'$gt' => 3},
           })
         end
 
@@ -283,7 +283,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
     context "when provided multiple criteria" do
 
-      context "when the criteria is already included" do
+      context "when the criterion is already included" do
 
         let(:selection) do
           query.and({ first: [ 1, 2 ] }).and({ first: [ 1, 2 ] })
@@ -301,7 +301,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it_behaves_like 'returns a cloned query'
       end
 
-      context "when the new criterion is for different fields" do
+      context "when the new criteria are for different fields" do
 
         let(:selection) do
           query.and({ first: [ 1, 2 ] }, { second: [ 3, 4 ] })
@@ -317,22 +317,137 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it_behaves_like 'returns a cloned query'
       end
 
-      context "when the new criterion is for the same field" do
+      context "when the new criteria are for the same field" do
 
-        let(:selection) do
-          query.and({ first: [ 1, 2 ] }, { first: [ 3, 4 ] })
+        context 'when criteria are simple' do
+          let(:selection) do
+            query.and({ first: [ 1, 2 ] }, { first: [ 3, 4 ] })
+          end
+
+          it "combines via $and operator" do
+            expect(selection.selector).to eq({
+              "first" => [ 1, 2 ],
+              "$and" => [
+                { "first" => [ 3, 4 ] }
+              ]
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
         end
 
-        it "combines via $and operator" do
-          expect(selection.selector).to eq({
-            "first" => [ 1, 2 ],
-            "$and" => [
-              { "first" => [ 3, 4 ] }
-            ]
-          })
+        context 'when criteria are handled via Key' do
+          shared_examples_for 'adds the conditions to top level' do
+
+            it "adds the conditions to top level" do
+              expect(selection.selector).to eq({
+                "field" => {'$gt' => 3, '$lt' => 5},
+              })
+            end
+
+            it_behaves_like 'returns a cloned query'
+          end
+
+          context 'criteria are provided in the same hash' do
+            let(:selection) do
+              query.send(tested_method, :field.gt => 3, :field.lt => 5)
+            end
+
+            it_behaves_like 'adds the conditions to top level'
+          end
+
+          context 'criteria are provided in separate hashes' do
+            let(:selection) do
+              query.send(tested_method, {:field.gt => 3}, {:field.lt => 5})
+            end
+
+            it_behaves_like 'adds the conditions to top level'
+          end
+
+          context 'when the criterion is wrapped in an array' do
+            let(:selection) do
+              query.send(tested_method, [:field.gt => 3], [:field.lt => 5])
+            end
+
+            it_behaves_like 'adds the conditions to top level'
+          end
         end
 
-        it_behaves_like 'returns a cloned query'
+        context 'when criteria are simple and handled via Key' do
+          shared_examples_for 'combines conditions with $and' do
+
+            it "combines conditions with $and" do
+              expect(selection.selector).to eq({
+                "field" => 3,
+                '$and' => ['field' => {'$lt' => 5}],
+              })
+            end
+
+            it_behaves_like 'returns a cloned query'
+          end
+
+          context 'criteria are provided in the same hash' do
+            let(:selection) do
+              query.send(tested_method, :field => 3, :field.lt => 5)
+            end
+
+            it_behaves_like 'combines conditions with $and'
+          end
+
+          context 'criteria are provided in separate hashes' do
+            let(:selection) do
+              query.send(tested_method, {:field => 3}, {:field.lt => 5})
+            end
+
+            it_behaves_like 'combines conditions with $and'
+          end
+
+          context 'when the criterion is wrapped in an array' do
+            let(:selection) do
+              query.send(tested_method, [:field => 3], [:field.lt => 5])
+            end
+
+            it_behaves_like 'combines conditions with $and'
+          end
+        end
+
+        context 'when criteria are handled via Key and simple' do
+          shared_examples_for 'combines conditions with $and' do
+
+            it "combines conditions with $and" do
+              expect(selection.selector).to eq({
+                "field" => {'$gt' => 3},
+                '$and' => ['field' => 5],
+              })
+            end
+
+            it_behaves_like 'returns a cloned query'
+          end
+
+          context 'criteria are provided in the same hash' do
+            let(:selection) do
+              query.send(tested_method, :field.gt => 3, :field => 5)
+            end
+
+            it_behaves_like 'combines conditions with $and'
+          end
+
+          context 'criteria are provided in separate hashes' do
+            let(:selection) do
+              query.send(tested_method, {:field.gt => 3}, {:field => 5})
+            end
+
+            it_behaves_like 'combines conditions with $and'
+          end
+
+          context 'when the criterion is wrapped in an array' do
+            let(:selection) do
+              query.send(tested_method, [:field.gt => 3], [:field => 5])
+            end
+
+            it_behaves_like 'combines conditions with $and'
+          end
+        end
       end
     end
 
