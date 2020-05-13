@@ -234,6 +234,9 @@ module Mongoid
         # language. Therefore this method never has to deal with multiple
         # identical operators.
         #
+        # Similarly, this method should never need to expand a literal value
+        # and an operator.
+        #
         # @param [ Hash ] Criteria including Key instances.
         #
         # @return [ Hash ] Expanded criteria.
