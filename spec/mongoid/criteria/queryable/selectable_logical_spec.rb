@@ -1246,6 +1246,86 @@ describe Mongoid::Criteria::Queryable::Selectable do
         it_behaves_like 'returns a cloned query'
       end
 
+      context 'when criteria are simple and handled via Key' do
+        shared_examples_for 'adds conditions with $or' do
+
+          it "adds conditions with $or" do
+            expect(selection.selector).to eq({
+              '$or' => [
+                {'field' => 3},
+                {'field' => {'$lt' => 5}},
+              ],
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        context 'criteria are provided in the same hash' do
+          let(:selection) do
+            query.send(tested_method, :field => 3, :field.lt => 5)
+          end
+
+          it_behaves_like 'adds conditions with $or'
+        end
+
+        context 'criteria are provided in separate hashes' do
+          let(:selection) do
+            query.send(tested_method, {:field => 3}, {:field.lt => 5})
+          end
+
+          it_behaves_like 'adds conditions with $or'
+        end
+
+        context 'when the criterion is wrapped in an array' do
+          let(:selection) do
+            query.send(tested_method, [:field => 3], [:field.lt => 5])
+          end
+
+          it_behaves_like 'adds conditions with $or'
+        end
+      end
+
+      context 'when criteria are handled via Key and simple' do
+        shared_examples_for 'adds conditions with $or' do
+
+          it "adds conditions with $or" do
+            expect(selection.selector).to eq({
+              '$or' => [
+                {'field' => {'$gt' => 3}},
+                {'field' => 5},
+              ],
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
+
+        context 'criteria are provided in the same hash' do
+          let(:selection) do
+            query.send(tested_method, :field.gt => 3, :field => 5)
+          end
+
+          it_behaves_like 'adds conditions with $or'
+        end
+
+        context 'criteria are provided in separate hashes' do
+          let(:selection) do
+            query.send(tested_method, {:field.gt => 3}, {:field => 5})
+          end
+
+          it_behaves_like 'adds conditions with $or'
+        end
+
+        context 'when the criterion is wrapped in an array' do
+          let(:selection) do
+            query.send(tested_method, [:field.gt => 3], [:field => 5])
+          end
+
+          it_behaves_like 'adds conditions with $or'
+        end
+      end
+
       context "when a criterion has an aliased field" do
 
         let(:selection) do
