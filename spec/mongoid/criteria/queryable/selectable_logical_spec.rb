@@ -845,19 +845,54 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criteria are on the same field" do
 
-        let(:selection) do
-          query.send(tested_method, { first: [ 1, 2 ] }, { first: [ 3, 4 ] })
+        context 'simple criteria' do
+          let(:selection) do
+            query.send(tested_method, { first: [ 1, 2 ] }, { first: [ 3, 4 ] })
+          end
+
+          it_behaves_like 'returns a cloned query'
+
+          it "appends both $or/$nor expressions" do
+            expect(selection.selector).to eq({
+              expected_operator => [
+                { "first" => [ 1, 2 ] },
+                { "first" => [ 3, 4 ] }
+              ]
+            })
+          end
         end
 
-        it_behaves_like 'returns a cloned query'
+        context 'Key criteria as one argument' do
+          let(:selection) do
+            query.send(tested_method, :first.gt => 3, :first.lt => 5)
+          end
 
-        it "appends both $or/$nor expressions" do
-          expect(selection.selector).to eq({
-            expected_operator => [
-              { "first" => [ 1, 2 ] },
-              { "first" => [ 3, 4 ] }
-            ]
-          })
+          it_behaves_like 'returns a cloned query'
+
+          it "adds all criteria" do
+            expect(selection.selector).to eq({
+              expected_operator => [
+                { "first" => {'$gt' => 3, '$lt' => 5} },
+              ]
+            })
+          end
+        end
+
+        context 'Key criteria as multiple arguments' do
+          let(:selection) do
+            query.send(tested_method, {:first.gt => 3}, {:first.lt => 5})
+          end
+
+          it_behaves_like 'returns a cloned query'
+
+          it "adds all criteria" do
+            expect(selection.selector).to eq({
+              expected_operator => [
+                { "first" => {'$gt' => 3} },
+                { "first" => {'$lt' => 5} },
+              ]
+            })
+          end
         end
       end
     end
