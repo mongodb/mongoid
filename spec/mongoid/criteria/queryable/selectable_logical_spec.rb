@@ -657,17 +657,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
-  describe "#or" do
-
-    let(:tested_method) { :or }
-    let(:expected_operator) { '$or' }
+  shared_examples '$or/$nor' do
 
     it_behaves_like 'a non-hoisting logical operation'
 
     context "when provided no arguments" do
 
       let(:selection) do
-        query.or
+        query.send(tested_method)
       end
 
       it_behaves_like 'returns a cloned query'
@@ -684,7 +681,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
     context "when provided nil" do
 
       let(:selection) do
-        query.or(nil)
+        query.send(tested_method, nil)
       end
 
       it_behaves_like 'returns a cloned query'
@@ -701,42 +698,42 @@ describe Mongoid::Criteria::Queryable::Selectable do
     context "when provided a single criterion" do
 
       let(:selection) do
-        query.or(field: [ 1, 2 ])
+        query.send(tested_method, field: [ 1, 2 ])
       end
 
       it_behaves_like 'returns a cloned query'
 
-      it "adds the $or selector" do
+      it "adds the $or/$nor selector" do
         expect(selection.selector).to eq({
-          "$or" => [{ "field" => [ 1, 2 ] }]
+          expected_operator => [{ "field" => [ 1, 2 ] }]
         })
       end
 
       context 'when the criterion is wrapped in array' do
 
         let(:selection) do
-          query.or([{ field: [ 1, 2 ] }])
+          query.send(tested_method, [{ field: [ 1, 2 ] }])
         end
 
         it_behaves_like 'returns a cloned query'
 
-        it "adds the $or selector" do
+        it "adds the $or/$nor selector" do
           expect(selection.selector).to eq({
-            "$or" => [{ "field" => [ 1, 2 ] }]
+            expected_operator => [{ "field" => [ 1, 2 ] }]
           })
         end
 
         context 'when the array has nil as one of the elements' do
 
           let(:selection) do
-            query.or([{ field: [ 1, 2 ] }, nil])
+            query.send(tested_method, [{ field: [ 1, 2 ] }, nil])
           end
 
           it_behaves_like 'returns a cloned query'
 
-          it "adds the $or selector ignoring the nil element" do
+          it "adds the $or/$nor selector ignoring the nil element" do
             expect(selection.selector).to eq({
-              "$or" => [{ "field" => [ 1, 2 ] }]
+              expected_operator => [{ "field" => [ 1, 2 ] }]
             })
           end
         end
@@ -745,27 +742,27 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context 'when query already has a condition on another field' do
 
         let(:selection) do
-          query.where(foo: 'bar').or(field: [ 1, 2 ])
+          query.where(foo: 'bar').send(tested_method, field: [ 1, 2 ])
         end
 
-        it 'moves original conditions under $or' do
+        it 'moves original conditions under $or/$nor' do
           expect(selection.selector).to eq({
-            "$or" => [{'foo' => 'bar'}, { "field" => [ 1, 2 ] }]
+            expected_operator => [{'foo' => 'bar'}, { "field" => [ 1, 2 ] }]
           })
         end
       end
 
-      context 'when query already has an $or condition and another condition' do
+      context 'when query already has an $or/$nor condition and another condition' do
 
         let(:selection) do
-          query.or(field: [ 1, 2 ]).where(foo: 'bar').or(test: 1)
+          query.send(tested_method, field: [ 1, 2 ]).where(foo: 'bar').send(tested_method, test: 1)
         end
 
         it 'unions existing conditions' do
           expect(selection.selector).to eq(
-            '$or' => [
+            expected_operator => [
               {
-                "$or" => [{ "field" => [ 1, 2 ] }],
+                expected_operator => [{ "field" => [ 1, 2 ] }],
                 'foo' => 'bar',
               },
               {'test' => 1},
@@ -780,14 +777,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context "when the criteria are for different fields" do
 
         let(:selection) do
-          query.or({ first: [ 1, 2 ] }, { second: [ 3, 4 ] })
+          query.send(tested_method, { first: [ 1, 2 ] }, { second: [ 3, 4 ] })
         end
 
         it_behaves_like 'returns a cloned query'
 
-        it "adds the $or selector" do
+        it "adds the $or/$nor selector" do
           expect(selection.selector).to eq({
-            "$or" => [
+            expected_operator => [
               { "first" => [ 1, 2 ] },
               { "second" => [ 3, 4 ] }
             ]
@@ -798,12 +795,12 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context "when the criteria uses a Key instance" do
 
         let(:selection) do
-          query.or({ first: [ 1, 2 ] }, { :second.gt => 3 })
+          query.send(tested_method, { first: [ 1, 2 ] }, { :second.gt => 3 })
         end
 
-        it "adds the $or selector" do
+        it "adds the $or/$nor selector" do
           expect(selection.selector).to eq({
-            "$or" => [
+            expected_operator => [
               { "first" => [ 1, 2 ] },
               { "second" => { "$gt" => 3 }}
             ]
@@ -816,12 +813,12 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context "when a criterion has an aliased field" do
 
         let(:selection) do
-          query.or({ id: 1 })
+          query.send(tested_method, { id: 1 })
         end
 
-        it "adds the $or selector and aliases the field" do
+        it "adds the $or/$nor selector and aliases the field" do
           expect(selection.selector).to eq({
-            "$or" => [ { "_id" => 1 } ]
+            expected_operator => [ { "_id" => 1 } ]
           })
         end
 
@@ -831,14 +828,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context "when a criterion is wrapped in an array" do
 
         let(:selection) do
-          query.or([{ first: [ 1, 2 ] }, { :second.gt => 3 }])
+          query.send(tested_method, [{ first: [ 1, 2 ] }, { :second.gt => 3 }])
         end
 
         it_behaves_like 'returns a cloned query'
 
-        it "adds the $or selector" do
+        it "adds the $or/$nor selector" do
           expect(selection.selector).to eq({
-            "$or" => [
+            expected_operator => [
               { "first" => [ 1, 2 ] },
               { "second" => { "$gt" => 3 }}
             ]
@@ -849,14 +846,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context "when the criteria are on the same field" do
 
         let(:selection) do
-          query.or({ first: [ 1, 2 ] }, { first: [ 3, 4 ] })
+          query.send(tested_method, { first: [ 1, 2 ] }, { first: [ 3, 4 ] })
         end
 
         it_behaves_like 'returns a cloned query'
 
-        it "appends both $or expressions" do
+        it "appends both $or/$nor expressions" do
           expect(selection.selector).to eq({
-            "$or" => [
+            expected_operator => [
               { "first" => [ 1, 2 ] },
               { "first" => [ 3, 4 ] }
             ]
@@ -870,14 +867,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context "when the criterion are for different fields" do
 
         let(:selection) do
-          query.or(first: [ 1, 2 ]).or(second: [ 3, 4 ])
+          query.send(tested_method, first: [ 1, 2 ]).send(tested_method, second: [ 3, 4 ])
         end
 
         it_behaves_like 'returns a cloned query'
 
-        it "adds the $or selectors" do
+        it "adds the $or/$nor selectors" do
           expect(selection.selector).to eq({
-            "$or" => [
+            expected_operator => [
               { "first" => [ 1, 2 ] },
               { "second" => [ 3, 4 ] }
             ]
@@ -888,14 +885,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
       context "when the criterion are on the same field" do
 
         let(:selection) do
-          query.or(first: [ 1, 2 ]).or(first: [ 3, 4 ])
+          query.send(tested_method, first: [ 1, 2 ]).send(tested_method, first: [ 3, 4 ])
         end
 
         it_behaves_like 'returns a cloned query'
 
-        it "appends both $or expressions" do
+        it "appends both $or/$nor expressions" do
           expect(selection.selector).to eq({
-            "$or" => [
+            expected_operator => [
               { "first" => [ 1, 2 ] },
               { "first" => [ 3, 4 ] }
             ]
@@ -905,139 +902,20 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
+  describe "#or" do
+
+    let(:tested_method) { :or }
+    let(:expected_operator) { '$or' }
+
+    it_behaves_like '$or/$nor'
+  end
+
   describe "#nor" do
 
     let(:tested_method) { :nor }
     let(:expected_operator) { '$nor' }
 
-    it_behaves_like 'a non-hoisting logical operation'
-
-    context "when provided no criterion" do
-
-      let(:selection) do
-        query.nor
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like 'returns a cloned query'
-    end
-
-    context "when provided nil" do
-
-      let(:selection) do
-        query.nor(nil)
-      end
-
-      it "does not add any criterion" do
-        expect(selection.selector).to eq({})
-      end
-
-      it "returns the query" do
-        expect(selection).to eq(query)
-      end
-
-      it_behaves_like 'returns a cloned query'
-    end
-
-    context "when provided a single criterion" do
-
-      let(:selection) do
-        query.nor(field: [ 1, 2 ])
-      end
-
-      it "adds the $nor selector" do
-        expect(selection.selector).to eq({
-          "$nor" => [{"field" => [ 1, 2 ] }]
-        })
-      end
-
-      it_behaves_like 'returns a cloned query'
-    end
-
-    context "when provided multiple criterion" do
-
-      context "when the criterion are fnor different fields" do
-
-        let(:selection) do
-          query.nor({ first: [ 1, 2 ] }, { second: [ 3, 4 ] })
-        end
-
-        it "adds the $nor selector" do
-          expect(selection.selector).to eq({
-            "$nor" => [
-              { "first" => [ 1, 2 ] },
-              { "second" => [ 3, 4 ] }
-            ]
-          })
-        end
-
-        it_behaves_like 'returns a cloned query'
-      end
-
-      context "when the criterion are on the same field" do
-
-        let(:selection) do
-          query.nor({ first: [ 1, 2 ] }, { first: [ 3, 4 ] })
-        end
-
-        it "appends both $nor expressions" do
-          expect(selection.selector).to eq({
-            "$nor" => [
-              { "first" => [ 1, 2 ] },
-              { "first" => [ 3, 4 ] }
-            ]
-          })
-        end
-
-        it_behaves_like 'returns a cloned query'
-      end
-    end
-
-    context "when chaining the criterion" do
-
-      context "when the criterion are fnor different fields" do
-
-        let(:selection) do
-          query.nor(first: [ 1, 2 ]).nor(second: [ 3, 4 ])
-        end
-
-        it "adds the $nor selectors" do
-          expect(selection.selector).to eq({
-            "$nor" => [
-              { "first" => [ 1, 2 ] },
-              { "second" => [ 3, 4 ] }
-            ]
-          })
-        end
-
-        it_behaves_like 'returns a cloned query'
-      end
-
-      context "when the criterion are on the same field" do
-
-        let(:selection) do
-          query.nor(first: [ 1, 2 ]).nor(first: [ 3, 4 ])
-        end
-
-        it "appends both $nor expressions" do
-          expect(selection.selector).to eq({
-            "$nor" => [
-              { "first" => [ 1, 2 ] },
-              { "first" => [ 3, 4 ] }
-            ]
-          })
-        end
-
-        it_behaves_like 'returns a cloned query'
-      end
-    end
+    it_behaves_like '$or/$nor'
   end
 
   describe "#any_of" do
