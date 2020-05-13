@@ -285,20 +285,53 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
       context "when the criterion is already included" do
 
-        let(:selection) do
-          query.and({ first: [ 1, 2 ] }).and({ first: [ 1, 2 ] })
+        context 'simple criterion' do
+          let(:selection) do
+            query.and({ first: [ 1, 2 ] }).and({ first: [ 1, 2 ] })
+          end
+
+          it "adds all conditions" do
+            expect(selection.selector).to eq({
+              'first' => [1, 2],
+              "$and" => [
+                { "first" => [ 1, 2 ] }
+              ]
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
         end
 
-        it "adds all conditions" do
-          expect(selection.selector).to eq({
-            'first' => [1, 2],
-            "$and" => [
-              { "first" => [ 1, 2 ] }
-            ]
-          })
+        context 'Key criterion' do
+          let(:selection) do
+            query.and({ first: [ 1, 2 ] }).and(:first.gt => 3)
+          end
+
+          it "adds all conditions" do
+            expect(selection.selector).to eq({
+              'first' => [1, 2],
+              "$and" => [
+                { "first" => {'$gt' => 3} }
+              ]
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
         end
 
-        it_behaves_like 'returns a cloned query'
+        context 'Key criterion when existing criterion is an operator' do
+          let(:selection) do
+            query.and(:first.lt => 5).and(:first.gt => 3)
+          end
+
+          it "adds all conditions" do
+            expect(selection.selector).to eq({
+              'first' => {'$lt' => 5, '$gt' => 3},
+            })
+          end
+
+          it_behaves_like 'returns a cloned query'
+        end
       end
 
       context "when the new criteria are for different fields" do
