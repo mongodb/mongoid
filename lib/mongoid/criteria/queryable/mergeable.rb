@@ -163,7 +163,7 @@ module Mongoid
               if expr.is_a?(Selectable)
                 expr = expr.selector
               end
-              normalized = Hash[*_mongoid_expand_keys(expr)]
+              normalized = _mongoid_expand_keys(expr)
               sel.store(operator, result_criteria.push(normalized))
             end
           end
@@ -190,22 +190,19 @@ module Mongoid
             sel = query.selector
             _mongoid_flatten_arrays(criteria).each do |criterion|
               if criterion.is_a?(Selectable)
-                exprs = _mongoid_expand_keys(criterion.selector)
+                expr = _mongoid_expand_keys(criterion.selector)
               else
-                exprs = [criterion]
+                expr = criterion
               end
-              exprs.each do |expr|
-                if sel.empty?
-                  sel.store(operator, [expr])
-                elsif sel.keys == [operator]
-                  sel.store(operator, sel[operator] + [expr])
-                else
-                  operands = [sel.dup] + [expr]
-                  sel.clear
-                  sel.store(operator, operands)
-                end
+              if sel.empty?
+                sel.store(operator, [expr])
+              elsif sel.keys == [operator]
+                sel.store(operator, sel[operator] + [expr])
+              else
+                operands = [sel.dup] + [expr]
+                sel.clear
+                sel.store(operator, operands)
               end
-              sel
             end
           end
         end
@@ -232,14 +229,9 @@ module Mongoid
         # Takes a criteria hash and expands Key objects into hashes containing
         # MQL corresponding to said key objects.
         #
-        # Returns an array of criteria. The array is returned so that when
-        # there are multiple criteria for the same key name (e.g. :foo.gt => 3
-        # and :foo.lt => 5) all of the criteria are preserved as individual
-        # conditions, that may later be combined for conciseness.
-        #
         # @param [ Hash ] Criteria including Key instances.
         #
-        # @return [ Array<Hash> ] Expanded criteria.
+        # @return [ Hash ] Expanded criteria.
         private def _mongoid_expand_keys(expr)
           unless expr.is_a?(Hash)
             raise ArgumentError, 'Argument must be a Hash'
