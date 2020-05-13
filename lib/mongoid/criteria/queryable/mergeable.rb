@@ -192,7 +192,7 @@ module Mongoid
               if criterion.is_a?(Selectable)
                 expr = _mongoid_expand_keys(criterion.selector)
               else
-                expr = criterion
+                expr = _mongoid_expand_keys(criterion)
               end
               if sel.empty?
                 sel.store(operator, [expr])
