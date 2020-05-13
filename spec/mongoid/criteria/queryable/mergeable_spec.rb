@@ -5,11 +5,11 @@ require "spec_helper"
 
 describe Mongoid::Criteria::Queryable::Mergeable do
 
-  describe "#intersect" do
+  let(:query) do
+    Mongoid::Query.new
+  end
 
-    let(:query) do
-      Mongoid::Query.new
-    end
+  describe "#intersect" do
 
     before do
       query.intersect
@@ -22,10 +22,6 @@ describe Mongoid::Criteria::Queryable::Mergeable do
 
   describe "#override" do
 
-    let(:query) do
-      Mongoid::Query.new
-    end
-
     before do
       query.override
     end
@@ -37,16 +33,55 @@ describe Mongoid::Criteria::Queryable::Mergeable do
 
   describe "#union" do
 
-    let(:query) do
-      Mongoid::Query.new
-    end
-
     before do
       query.union
     end
 
     it "sets the strategy to union" do
       expect(query.strategy).to eq(:__union__)
+    end
+  end
+
+  describe '#_mongoid_expand_keys' do
+    it 'expands simple keys' do
+      query.send(:_mongoid_expand_keys, {a: 1}).should == {a: 1}
+    end
+
+    let(:gt) do
+      Mongoid::Criteria::Queryable::Key.new("age", :__override__, "$gt")
+    end
+
+    let(:gtp) do
+      Mongoid::Criteria::Queryable::Key.new("age", :__override__, "$gt")
+    end
+
+    let(:lt) do
+      Mongoid::Criteria::Queryable::Key.new("age", :__override__, "$lt")
+    end
+
+    it 'expands Key instances' do
+      query.send(:_mongoid_expand_keys, {gt => 42}).should == {'age' => {'$gt' => 42}}
+    end
+
+    it 'expands multiple Key instances on the same field' do
+      query.send(:_mongoid_expand_keys, {gt => 42, lt => 50}).should == {
+        'age' => {'$gt' => 42, '$lt' => 50}}
+    end
+
+    it 'expands simple and Key instances on the same field' do
+      query.send(:_mongoid_expand_keys, {'age' => 42, lt => 50}).should == {
+        'age' => {'$eq' => 42, '$lt' => 50}}
+    end
+
+    it 'expands Key and simple instances on the same field' do
+      query.send(:_mongoid_expand_keys, {gt => 42, 'age' => 50}).should == {
+        'age' => {'$gt' => 42, '$eq' => 50}}
+    end
+
+    it 'expands multiple Key instances on the same field with the same operator' do
+      query.send(:_mongoid_expand_keys, {gt => 42, gtp => 50}).should == {
+        'age' => {'$gt' => 42}, '$and' => ['$age' => {'$gt' => 50}],
+      }
     end
   end
 end

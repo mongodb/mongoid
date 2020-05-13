@@ -245,9 +245,16 @@ module Mongoid
             raise ArgumentError, 'Argument must be a Hash'
           end
 
-          expr.map do |field, value|
-            field.__expr_part__(value.__expand_complex__)
+          result = {}
+          expr.each do |field, value|
+            field.__expr_part__(value.__expand_complex__).each do |k, v|
+              if result[k]
+              else
+                result[k] = v
+              end
+            end
           end
+          result
         end
 
         # Adds the criterion to the existing selection.
