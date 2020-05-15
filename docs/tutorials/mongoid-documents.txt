@@ -85,6 +85,9 @@ and have a structure like so:
      ]
    }
 
+
+.. _fields:
+
 Fields
 ======
 
@@ -503,6 +506,9 @@ or proc evaluates to the document instance.
 
 When defining a default value as a proc, Mongoid will apply the default after all other
 attributes are set. If you want this to happen before the other attributes, set ``pre_processed: true``.
+
+
+.. _field-aliases:
 
 Aliasing Fields
 ---------------

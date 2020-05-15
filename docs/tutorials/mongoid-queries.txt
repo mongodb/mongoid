@@ -83,6 +83,169 @@ Criteria instance with the new conditions added to the existing conditions:
   #   embedded: false>
 
 
+Condition Syntax
+----------------
+
+Mongoid supports three ways of specifying individual conditions:
+
+1. Field syntax.
+2. MQL syntax.
+3. Symbol operator syntax.
+
+All syntaxes support querying embedded documents using the dot notation.
+All syntaxes respect field types, if the field being queried is defined in the
+model class, and field aliases.
+
+The examples in this section use the following model definition:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :founded, type: Integer
+    field :m, as: :member_count, type: Integer
+    
+    embeds_one :manager
+  end
+  
+  class Manager
+    include Mongoid::Document
+    
+    embedded_in :band
+    
+    field :name, type: String
+  end
+
+Field Syntax
+````````````
+
+The simplest querying syntax utilizes the basic Ruby hashes. Keys can be
+symbols or strings, and correspond to field names in MongoDB documents:
+
+.. code-block:: ruby
+
+  Band.where(name: "Depeche Mode")
+  #   => #<Mongoid::Criteria
+  #   selector: {"name"=>"Depeche Mode"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  # Equivalent to:
+  
+  Band.where("name" => "Depeche Mode")
+
+MQL Syntax
+``````````
+
+An MQL operator may be specified on any field using the hash syntax:
+
+.. code-block:: ruby
+
+  Band.where(founded: {'$gt' => 1980})
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gt"=>1980}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  # Equivalent to:
+  
+  Band.where('founded' => {'$gt' => 1980})
+
+Symbol Operator Syntax
+``````````````````````
+
+MQL operators may be specified as methods on symbols for the respective field
+name, as follows:
+
+.. code-block:: ruby
+
+  Band.where(:founded.gt => 1980)
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gt"=>1980}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Embedded Documents
+``````````````````
+
+To match values of fields of embedded documents, use the dot notation:
+
+.. code-block:: ruby
+
+  Band.where('manager.name' => 'Smith')
+  # => #<Mongoid::Criteria
+  #   selector: {"manager.name"=>"Smith"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.where(:'manager.name'.ne => 'Smith')
+  # => #<Mongoid::Criteria
+  #   selector: {"manager.name"=>{"$ne"=>"Smith"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+.. note::
+
+  Queries always return top-level model instances, even if all of the
+  conditions are referencing embedded documents.
+
+Field Types
+```````````
+
+In order to query on a field, it is not necessary to add the field to
+:ref:`the model class definition <fields>`. However, if a field is defined in
+the model class, the type of the field is taken into account when constructing
+the query:
+
+.. code-block:: ruby
+  
+  Band.where(name: 2020)
+  #   => #<Mongoid::Criteria
+  #   selector: {"name"=>"2020"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.where(founded: 2020)
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>2020}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Aliases
+```````
+
+Queries take into account :ref:`field aliases <field-aliases>`:
+
+.. code-block:: ruby
+
+  Band.where(name: 'Astral Projection')
+  #   => #<Mongoid::Criteria
+  #   selector: {"n"=>"Astral Projection"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Since `id` and `_id` fields are aliases, either one can be used for queries:
+
+.. code-block:: ruby
+
+  Band.where(id: '5ebdeddfe1b83265a376a760')
+  # => #<Mongoid::Criteria
+  #   selector: {"_id"=>BSON::ObjectId('5ebdeddfe1b83265a376a760')}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+
 .. _logical-operations:
 
 Logical Operations
