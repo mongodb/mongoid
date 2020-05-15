@@ -10,114 +10,93 @@ Queries
    :depth: 2
    :class: singlecol
 
-One of MongoDB's greatest features is its ability to execute dynamic
-queries, provided through a familiar Arel-style DSL.
-
 Queries
 =======
 
-All queries in Mongoid are ``Mongoid::Criteria``, which is a chainable and
-lazily evaluated wrapper to a MongoDB dynamic query. Criteria only
-touch the database when they need to, for example on iteration of the
-results, and when executed wrap a cursor in order to keep memory
-management and performance predictable.
-
-Queryable DSL
--------------
-
-Query methods are available off a ``Mongoid::Criteria`` object
-*as well as* off the model's class.
+Mongoid provides a rich query DSL inspired by ActiveRecord. A trivial query
+looks as follows:
 
 .. code-block:: ruby
 
   Band.where(name: "Depeche Mode")
+
+A more complex query utilizing various Mongoid features could be as follows:
+
+.. code-block:: ruby
+
   Band.
-    where(:founded.gte => "1980-1-1").
+    where(:founded.gte => "1980-01-01").
     in(name: [ "Tool", "Deftones" ]).
     union.
     in(name: [ "Melvins" ])
 
-With each chained method on a criteria, a newly cloned criteria
-is returned with the new query added. This is so that with scoping
-or exposures, for example, the original queries are unmodified
-and remain reusable.
-
-elem_match
-``````````
-
-This matcher finds documents with array fields where one of the array values
-matches all of the conditions. For example:
+The query methods return ``Mongoid::Criteria`` objects, which are chainable
+and lazily evaluated wrappers for MongoDB query language (MQL).
+The queries are executed when their result sets are iterated. For example:
 
 .. code-block:: ruby
 
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-    field :tours, type: Array
-  end
+  # Construct a Criteria object:
+  
+  Band.where(name: 'Deftones')
+  # => #<Mongoid::Criteria
+  #   selector: {"name"=>"Deftones"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+  
+  # Evaluate the query and get matching documents:
 
-  aerosmith = Band.create!(name: 'Aerosmith', tours: [
-    {city: 'London', year: 1995},
-    {city: 'New York', year: 1999},
-  ])
+  Band.where(name: 'Deftones').to_a
+  # => [#<Band _id: 5ebdeddfe1b83265a376a760, name: "Deftones", description: nil>]
 
-  Band.elem_match(tours: {city: 'London'}).to_a # => [aerosmith]
+Methods like ``first`` and ``last`` return the individual documents immediately.
+Otherwise, iterating a Criteria object with methods like ``each`` or ``map``
+retrieves the documents from the server. ``to_a`` can be used to force
+execution of a query that returns an array of documents, literally converting
+a Criteria object to an Array.
 
-``elem_match`` also works with embedded associations:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    field :name, type: String
-    embeds_many :tours
-  end
-
-  class Tour
-    include Mongoid::Document
-    field :city, type: String
-    field :year, type: Integer
-    embedded_in :band
-  end
-
-  dm = Band.create!(name: 'Depeche Mode')
-  aerosmith = Band.create!(name: 'Aerosmith')
-  Tour.create!(band: aerosmith, city: 'London', year: 1995)
-  Tour.create!(band: aerosmith, city: 'New York', year: 1999)
-
-  Band.elem_match(tours: {city: 'London'}).to_a # => [aerosmith]
-
-``elem_match`` does not work with non-embedded associations because MongoDB
-does not have joins - the conditions would be added to the collection
-that is the source of a non-embedded association rather than the collection
-of the association's target.
-
-``elem_match`` can also be used with recursively embedded associations,
-as the following example shows:
+When a query method is called on a Criteria instance, the method returns a new
+Criteria instance with the new conditions added to the existing conditions:
 
 .. code-block:: ruby
 
-  class Tag
-    include Mongoid::Document
-    field :name, type: String
-    recursively_embeds_many
-  end
+  scope = Band.where(:founded.gte => "1980-01-01")
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gte"=>"1980-01-01"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
 
-  root = Tag.create!(name: 'root')
-  sub1 = Tag.new(name: 'sub1', child_tags: [Tag.new(name: 'subsub1')])
-  root.child_tags << sub1
-  root.child_tags << Tag.new(name: 'sub2')
-  root.save!
+  scope.where(:founded.lte => "2020-01-01")
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gte"=>"1980-01-01", "$lte"=>"2020-01-01"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+  
+  scope
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gte"=>"1980-01-01"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
 
-  Tag.elem_match(child_tags: {name: 'sub1'}).to_a # => [root]
 
-  root.child_tags.elem_match(child_tags: {name: 'subsub1'}).to_a # => [sub1]
+Condition Syntax
+----------------
 
-only
-````
+Mongoid supports three ways of specifying individual conditions:
 
-This method retrieves only the specified fields from the database. This
-operation is sometimes called "projection".
+1. Field syntax.
+2. MQL syntax.
+3. Symbol operator syntax.
+
+All syntaxes support querying embedded documents using the dot notation.
+All syntaxes respect field types, if the field being queried is defined in the
+model class, and field aliases.
+
+The examples in this section use the following model definition:
 
 .. code-block:: ruby
 
@@ -125,185 +104,146 @@ operation is sometimes called "projection".
     include Mongoid::Document
     
     field :name, type: String
-    field :label, type: String
+    field :founded, type: Integer
+    field :m, as: :member_count, type: Integer
     
-    embeds_many :tours
+    embeds_one :manager
   end
-
-  class Tour
-    include Mongoid::Document
-    
-    field :city, type: String
-    field :year, type: Integer
-    
-    embedded_in :band
-  end
-
-  band = Band.only(:name).first
-
-Attempting to reference attributes which have not been loaded results in
-``ActiveModel::MissingAttributeError``.
-
-.. code-block:: ruby
-
-  band.label
-  # ActiveModel::MissingAttributeError (Missing attribute: 'label'.)
-
-Even though Mongoid currently allows writing to attributes that have not
-been loaded, such writes will not be persisted
-(`MONGOID-4701 <https://jira.mongodb.org/browse/MONGOID-4701>`_) and
-should therefore be avoided.
-
-``only`` can also be used with embedded associations:
-
-.. code-block:: ruby
-
-  band = Band.only(:name, 'tours.year').last
-  # => #<Band _id: 5c59afb1026d7c034dba46ac, name: "Aerosmith">
-
-  band.tours.first
-  # => #<Tour _id: 5c59afdf026d7c034dba46af, city: nil, year: 1995>
-
-``only`` can be specified with referenced associations (has_one, has_many,
-has_and_belongs_to_many) but is currently ignored for referenced associations -
-all fields of referenced associations will be loaded
-(`MONGOID-4704 <https://jira.mongodb.org/browse/MONGOID-4704>`_).
-
-Note that if a document has ``has_one`` or ``has_and_belongs_to_many`` associations,
-the fields with foreign keys must be included in the list of attributes
-loaded with ``only`` for those associations to be loaded. For example:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    
-    field :name, type: String
-    
-    has_and_belongs_to_many :managers
-  end
-
+  
   class Manager
     include Mongoid::Document
     
-    has_and_belongs_to_many :bands
-  end
-  
-  band = Band.create!(name: 'Astral Projection')
-  band.managers << Manager.new
-  
-  Band.where(name: 'Astral Projection').only(:name).first.managers
-  # => []
-  
-  Band.where(name: 'Astral Projection').only(:name, :manager_ids).first.managers
-  # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
-
-
-Ordering
-````````
-
-Mongoid provides the ``order`` method on ``Criteria`` objects and its alias,
-``order_by``, to specify the ordering of documents. These methods take a
-hash indicating which fields to order the documents by, and whether to use
-ascending or descending order for each field.
-
-.. code-block:: ruby
-
-  Band.order(name: 1)
-  # => #<Mongoid::Criteria
-  #   selector: {}
-  #   options:  {:sort=>{"name"=>1}}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.order_by(name: -1, description: 1)
-  # => #<Mongoid::Criteria
-  #   selector: {}
-  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.order_by(name: :desc, description: 'asc')
-  # => #<Mongoid::Criteria
-  #   selector: {}
-  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
-  #   class:    Band
-  #   embedded: false>
-
-The direction may be specified as integers ``1`` and ``-1`` for ascending
-and descending, respectively, or as symbols ``:asc`` and ``:desc``, or as
-strings ``"asc"`` and ``"desc"``.
-
-Alternatively, ``order`` accepts an array of two-element arrays specifying
-the ordering. Field names and directions may be strings or symbols.
-
-.. code-block:: ruby
-
-  Band.order([['name', 'desc'], ['description', 'asc']])
-
-  Band.order([[:name, :desc], [:description, :asc]])
-
-Another way of providing the order is to use ``#asc`` and ``#desc`` methods
-on symbols, as follows:
-
-.. code-block:: ruby
-
-  Band.order(:name.desc, :description.asc)
-
-The arguments can be provided as a string using SQL syntax:
-
-.. code-block:: ruby
-
-  Band.order('name desc, description asc')
-
-Finally, there are ``asc`` and ``desc`` methods that can be used instead of
-``order``/``order_by``:
-
-.. code-block:: ruby
-
-  Band.asc('name').desc('description')
-  # => #<Mongoid::Criteria
-    selector: {}
-    options:  {:sort=>{"name"=>1, "description"=>-1}}
-    class:    Band
-    embedded: false>
-
-``order`` calls can be chained, in which case the oldest calls define the
-most significant criteria and the newest calls define the least significant
-ones (since in Ruby hashes maintain the order of their keys):
-
-.. code-block:: ruby
-
-  Band.order('name desc').order('description asc')
-  # => #<Mongoid::Criteria
-    selector: {}
-    options:  {:sort=>{"name"=>-1, "description"=>1}}
-    class:    Band
-    embedded: false>
-
-This can sometimes lead to surprising results if there are scopes, including
-the default scope, that use ``order``/``order_by``. For example, in the
-following snippet bands are ordered by name first because the order in the
-default scope takes precedence over the order given in the query, due to
-the default scope being evaluated first:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
+    embedded_in :band
     
     field :name, type: String
-    field :year, type: Integer
-    
-    default_scope -> { order(name: :asc) }
   end
+
+Field Syntax
+````````````
+
+The simplest querying syntax utilizes the basic Ruby hashes. Keys can be
+symbols or strings, and correspond to field names in MongoDB documents:
+
+.. code-block:: ruby
+
+  Band.where(name: "Depeche Mode")
+  #   => #<Mongoid::Criteria
+  #   selector: {"name"=>"Depeche Mode"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  # Equivalent to:
   
-  Band.order(year: :desc)
+  Band.where("name" => "Depeche Mode")
+
+MQL Syntax
+``````````
+
+An MQL operator may be specified on any field using the hash syntax:
+
+.. code-block:: ruby
+
+  Band.where(founded: {'$gt' => 1980})
   # => #<Mongoid::Criteria
-    selector: {}
-    options:  {:sort=>{"name"=>1, "year"=>-1}}
-    class:    Band
-    embedded: false>
+  #   selector: {"founded"=>{"$gt"=>1980}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  # Equivalent to:
+  
+  Band.where('founded' => {'$gt' => 1980})
+
+Symbol Operator Syntax
+``````````````````````
+
+MQL operators may be specified as methods on symbols for the respective field
+name, as follows:
+
+.. code-block:: ruby
+
+  Band.where(:founded.gt => 1980)
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gt"=>1980}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Embedded Documents
+``````````````````
+
+To match values of fields of embedded documents, use the dot notation:
+
+.. code-block:: ruby
+
+  Band.where('manager.name' => 'Smith')
+  # => #<Mongoid::Criteria
+  #   selector: {"manager.name"=>"Smith"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.where(:'manager.name'.ne => 'Smith')
+  # => #<Mongoid::Criteria
+  #   selector: {"manager.name"=>{"$ne"=>"Smith"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+.. note::
+
+  Queries always return top-level model instances, even if all of the
+  conditions are referencing embedded documents.
+
+Field Types
+```````````
+
+In order to query on a field, it is not necessary to add the field to
+:ref:`the model class definition <fields>`. However, if a field is defined in
+the model class, the type of the field is taken into account when constructing
+the query:
+
+.. code-block:: ruby
+  
+  Band.where(name: 2020)
+  #   => #<Mongoid::Criteria
+  #   selector: {"name"=>"2020"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.where(founded: 2020)
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>2020}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Aliases
+```````
+
+Queries take into account :ref:`field aliases <field-aliases>`:
+
+.. code-block:: ruby
+
+  Band.where(name: 'Astral Projection')
+  #   => #<Mongoid::Criteria
+  #   selector: {"n"=>"Astral Projection"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Since `id` and `_id` fields are aliases, either one can be used for queries:
+
+.. code-block:: ruby
+
+  Band.where(id: '5ebdeddfe1b83265a376a760')
+  # => #<Mongoid::Criteria
+  #   selector: {"_id"=>BSON::ObjectId('5ebdeddfe1b83265a376a760')}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
 
 
 .. _logical-operations:
@@ -702,6 +642,274 @@ as the following example demonstrates:
 
 This wrapping behavior is deprecated and should not be relied on. It may be
 removed in a future release of Mongoid.
+
+
+Query Methods
+-------------
+
+elem_match
+``````````
+
+This matcher finds documents with array fields where one of the array values
+matches all of the conditions. For example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    field :tours, type: Array
+  end
+
+  aerosmith = Band.create!(name: 'Aerosmith', tours: [
+    {city: 'London', year: 1995},
+    {city: 'New York', year: 1999},
+  ])
+
+  Band.elem_match(tours: {city: 'London'}).to_a # => [aerosmith]
+
+``elem_match`` also works with embedded associations:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+    embeds_many :tours
+  end
+
+  class Tour
+    include Mongoid::Document
+    field :city, type: String
+    field :year, type: Integer
+    embedded_in :band
+  end
+
+  dm = Band.create!(name: 'Depeche Mode')
+  aerosmith = Band.create!(name: 'Aerosmith')
+  Tour.create!(band: aerosmith, city: 'London', year: 1995)
+  Tour.create!(band: aerosmith, city: 'New York', year: 1999)
+
+  Band.elem_match(tours: {city: 'London'}).to_a # => [aerosmith]
+
+``elem_match`` does not work with non-embedded associations because MongoDB
+does not have joins - the conditions would be added to the collection
+that is the source of a non-embedded association rather than the collection
+of the association's target.
+
+``elem_match`` can also be used with recursively embedded associations,
+as the following example shows:
+
+.. code-block:: ruby
+
+  class Tag
+    include Mongoid::Document
+    field :name, type: String
+    recursively_embeds_many
+  end
+
+  root = Tag.create!(name: 'root')
+  sub1 = Tag.new(name: 'sub1', child_tags: [Tag.new(name: 'subsub1')])
+  root.child_tags << sub1
+  root.child_tags << Tag.new(name: 'sub2')
+  root.save!
+
+  Tag.elem_match(child_tags: {name: 'sub1'}).to_a # => [root]
+
+  root.child_tags.elem_match(child_tags: {name: 'subsub1'}).to_a # => [sub1]
+
+
+Projection
+----------
+
+The ``only`` method retrieves only the specified fields from the database. This
+operation is sometimes called "projection".
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :label, type: String
+    
+    embeds_many :tours
+  end
+
+  class Tour
+    include Mongoid::Document
+    
+    field :city, type: String
+    field :year, type: Integer
+    
+    embedded_in :band
+  end
+
+  band = Band.only(:name).first
+
+Attempting to reference attributes which have not been loaded results in
+``ActiveModel::MissingAttributeError``.
+
+.. code-block:: ruby
+
+  band.label
+  # ActiveModel::MissingAttributeError (Missing attribute: 'label'.)
+
+Even though Mongoid currently allows writing to attributes that have not
+been loaded, such writes will not be persisted
+(`MONGOID-4701 <https://jira.mongodb.org/browse/MONGOID-4701>`_) and
+should therefore be avoided.
+
+``only`` can also be used with embedded associations:
+
+.. code-block:: ruby
+
+  band = Band.only(:name, 'tours.year').last
+  # => #<Band _id: 5c59afb1026d7c034dba46ac, name: "Aerosmith">
+
+  band.tours.first
+  # => #<Tour _id: 5c59afdf026d7c034dba46af, city: nil, year: 1995>
+
+``only`` can be specified with referenced associations (has_one, has_many,
+has_and_belongs_to_many) but is currently ignored for referenced associations -
+all fields of referenced associations will be loaded
+(`MONGOID-4704 <https://jira.mongodb.org/browse/MONGOID-4704>`_).
+
+Note that if a document has ``has_one`` or ``has_and_belongs_to_many`` associations,
+the fields with foreign keys must be included in the list of attributes
+loaded with ``only`` for those associations to be loaded. For example:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    
+    has_and_belongs_to_many :managers
+  end
+
+  class Manager
+    include Mongoid::Document
+    
+    has_and_belongs_to_many :bands
+  end
+  
+  band = Band.create!(name: 'Astral Projection')
+  band.managers << Manager.new
+  
+  Band.where(name: 'Astral Projection').only(:name).first.managers
+  # => []
+  
+  Band.where(name: 'Astral Projection').only(:name, :manager_ids).first.managers
+  # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
+
+
+Ordering
+--------
+
+Mongoid provides the ``order`` method on ``Criteria`` objects and its alias,
+``order_by``, to specify the ordering of documents. These methods take a
+hash indicating which fields to order the documents by, and whether to use
+ascending or descending order for each field.
+
+.. code-block:: ruby
+
+  Band.order(name: 1)
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.order_by(name: -1, description: 1)
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.order_by(name: :desc, description: 'asc')
+  # => #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:sort=>{"name"=>-1, "description"=>1}}
+  #   class:    Band
+  #   embedded: false>
+
+The direction may be specified as integers ``1`` and ``-1`` for ascending
+and descending, respectively, or as symbols ``:asc`` and ``:desc``, or as
+strings ``"asc"`` and ``"desc"``.
+
+Alternatively, ``order`` accepts an array of two-element arrays specifying
+the ordering. Field names and directions may be strings or symbols.
+
+.. code-block:: ruby
+
+  Band.order([['name', 'desc'], ['description', 'asc']])
+
+  Band.order([[:name, :desc], [:description, :asc]])
+
+Another way of providing the order is to use ``#asc`` and ``#desc`` methods
+on symbols, as follows:
+
+.. code-block:: ruby
+
+  Band.order(:name.desc, :description.asc)
+
+The arguments can be provided as a string using SQL syntax:
+
+.. code-block:: ruby
+
+  Band.order('name desc, description asc')
+
+Finally, there are ``asc`` and ``desc`` methods that can be used instead of
+``order``/``order_by``:
+
+.. code-block:: ruby
+
+  Band.asc('name').desc('description')
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>1, "description"=>-1}}
+    class:    Band
+    embedded: false>
+
+``order`` calls can be chained, in which case the oldest calls define the
+most significant criteria and the newest calls define the least significant
+ones (since in Ruby hashes maintain the order of their keys):
+
+.. code-block:: ruby
+
+  Band.order('name desc').order('description asc')
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>-1, "description"=>1}}
+    class:    Band
+    embedded: false>
+
+This can sometimes lead to surprising results if there are scopes, including
+the default scope, that use ``order``/``order_by``. For example, in the
+following snippet bands are ordered by name first because the order in the
+default scope takes precedence over the order given in the query, due to
+the default scope being evaluated first:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    field :year, type: Integer
+    
+    default_scope -> { order(name: :asc) }
+  end
+  
+  Band.order(year: :desc)
+  # => #<Mongoid::Criteria
+    selector: {}
+    options:  {:sort=>{"name"=>1, "year"=>-1}}
+    class:    Band
+    embedded: false>
 
 
 Query Cache
