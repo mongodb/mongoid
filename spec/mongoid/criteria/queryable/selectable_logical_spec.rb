@@ -1446,7 +1446,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it "negates the gt selection" do
           expect(selection.selector).to eq(
-            { "age" => { "$not" => { "$gt" => 50 }}}
+            '$and' => ['$nor' => ['age' => {'$gt' => 50}]]
           )
         end
 
