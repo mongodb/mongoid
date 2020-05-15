@@ -163,7 +163,7 @@ module Mongoid
               if expr.is_a?(Selectable)
                 expr = expr.selector
               end
-              normalized = _mongoid_normalize_expr(expr)
+              normalized = _mongoid_expand_keys(expr)
               sel.store(operator, result_criteria.push(normalized))
             end
           end
@@ -190,9 +190,9 @@ module Mongoid
             sel = query.selector
             _mongoid_flatten_arrays(criteria).each do |criterion|
               if criterion.is_a?(Selectable)
-                expr = _mongoid_normalize_expr(criterion.selector)
+                expr = _mongoid_expand_keys(criterion.selector)
               else
-                expr = criterion
+                expr = _mongoid_expand_keys(criterion)
               end
               if sel.empty?
                 sel.store(operator, [expr])
@@ -212,7 +212,7 @@ module Mongoid
         # explicitly only expands Array objects and Array subclasses.
         private def _mongoid_flatten_arrays(array)
           out = []
-          pending = array
+          pending = array.dup
           until pending.empty?
             item = pending.shift
             if item.nil?
@@ -226,11 +226,78 @@ module Mongoid
           out
         end
 
-        # @api private
-        private def _mongoid_normalize_expr(expr)
-          expr.inject({}) do |hash, (field, value)|
-            hash.merge!(field.__expr_part__(value.__expand_complex__))
+        # Takes a criteria hash and expands Key objects into hashes containing
+        # MQL corresponding to said key objects.
+        #
+        # Ruby does not permit multiple symbol operators. For example,
+        # {:foo.gt => 1, :foo.gt => 2} is collapsed to {:foo.gt => 2} by the
+        # language. Therefore this method never has to deal with multiple
+        # identical operators.
+        #
+        # Similarly, this method should never need to expand a literal value
+        # and an operator at the same time.
+        #
+        # @param [ Hash ] Criteria including Key instances.
+        #
+        # @return [ Hash ] Expanded criteria.
+        private def _mongoid_expand_keys(expr)
+          unless expr.is_a?(Hash)
+            raise ArgumentError, 'Argument must be a Hash'
           end
+
+          result = {}
+          expr.each do |field, value|
+            field.__expr_part__(value.__expand_complex__).each do |k, v|
+              if result[k]
+                if result[k].is_a?(Hash)
+                  # Existing value is an operator.
+                  # If new value is also an operator, ensure there are no
+                  # conflicts and add
+                  if v.is_a?(Hash)
+                    # The new value is also an operator.
+                    # If there are no conflicts, combine the hashes, otherwise
+                    # add new conditions to top level with $and.
+                    if (v.keys & result[k].keys).empty?
+                      result[k].update(v)
+                    else
+                      raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
+                      result['$and'] ||= []
+                      result['$and'] << {k => v}
+                    end
+                  else
+                    # The new value is a simple value.
+                    # If there isn't an $eq operator already in the query,
+                    # transform the new value into an $eq operator and add it
+                    # to the existing hash. Otherwise add the new condition
+                    # with $and to the top level.
+                    if result[k].key?('$eq')
+                      raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
+                      result['$and'] ||= []
+                      result['$and'] << {k => v}
+                    else
+                      result[k].update('$eq' => v)
+                    end
+                  end
+                else
+                  # Existing value is a simple value.
+                  # If we are adding an operator, and the operator is not $eq,
+                  # convert existing value into $eq and add the new operator
+                  # to the same hash. Otherwise add the new condition with $and
+                  # to the top level.
+                  if v.is_a?(Hash) && !v.key?('$eq')
+                    result[k] = {'$eq' => result[k]}.update(v)
+                  else
+                    raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
+                    result['$and'] ||= []
+                    result['$and'] << {k => v}
+                  end
+                end
+              else
+                result[k] = v
+              end
+            end
+          end
+          result
         end
 
         # Adds the criterion to the existing selection.
