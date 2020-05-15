@@ -478,6 +478,14 @@ an ``{'$and' => [{'$nor' => ...}]}`` construct:
   # Complex conditions
   Band.where(name: /Best/).not(name: 'Astral Projection').selector
   # => {"name"=>/Best/, "$and"=>[{"$nor"=>[{"name"=>"Astral Projection"}]}]}
+  
+  # Symbol operator syntax
+  Band.not(:name.ne => 'Astral Projection')
+  # => #<Mongoid::Criteria
+  #   selector: {"$and"=>[{"$nor"=>[{"name"=>{"$ne"=>"Astral Projection"}}]}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
 
 If using ``not`` with arrays or regular expressions, please note the
 caveats/limitations of ``$not`` `stated in the MongoDB server documentation
