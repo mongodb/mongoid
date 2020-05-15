@@ -10,37 +10,80 @@ Queries
    :depth: 2
    :class: singlecol
 
-One of MongoDB's greatest features is its ability to execute dynamic
-queries, provided through a familiar Arel-style DSL.
-
 Queries
 =======
 
-All queries in Mongoid are ``Mongoid::Criteria``, which is a chainable and
-lazily evaluated wrapper to a MongoDB dynamic query. Criteria only
-touch the database when they need to, for example on iteration of the
-results, and when executed wrap a cursor in order to keep memory
-management and performance predictable.
-
-Queryable DSL
--------------
-
-Query methods are available off a ``Mongoid::Criteria`` object
-*as well as* off the model's class.
+Mongoid provides a rich query DSL inspired by ActiveRecord. A trivial query
+looks as follows:
 
 .. code-block:: ruby
 
   Band.where(name: "Depeche Mode")
+
+A more complex query utilizing various Mongoid features could be as follows:
+
+.. code-block:: ruby
+
   Band.
-    where(:founded.gte => "1980-1-1").
+    where(:founded.gte => "1980-01-01").
     in(name: [ "Tool", "Deftones" ]).
     union.
     in(name: [ "Melvins" ])
 
-With each chained method on a criteria, a newly cloned criteria
-is returned with the new query added. This is so that with scoping
-or exposures, for example, the original queries are unmodified
-and remain reusable.
+The query methods return ``Mongoid::Criteria`` objects, which are chainable
+and lazily evaluated wrappers for MongoDB query language (MQL).
+The queries are executed when their result sets are iterated. For example:
+
+.. code-block:: ruby
+
+  # Construct a Criteria object:
+  
+  Band.where(name: 'Deftones')
+  # => #<Mongoid::Criteria
+  #   selector: {"name"=>"Deftones"}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+  
+  # Evaluate the query and get matching documents:
+
+  Band.where(name: 'Deftones').to_a
+  # => [#<Band _id: 5ebdeddfe1b83265a376a760, name: "Deftones", description: nil>]
+
+Methods like ``first`` and ``last`` return the individual documents immediately.
+Otherwise, iterating a Criteria object with methods like ``each`` or ``map``
+retrieves the documents from the server. ``to_a`` can be used to force
+execution of a query that returns an array of documents, literally converting
+a Criteria object to an Array.
+
+When a query method is called on a Criteria instance, the method returns a new
+Criteria instance with the new conditions added to the existing conditions:
+
+.. code-block:: ruby
+
+  scope = Band.where(:founded.gte => "1980-01-01")
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gte"=>"1980-01-01"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  scope.where(:founded.lte => "2020-01-01")
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gte"=>"1980-01-01", "$lte"=>"2020-01-01"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+  
+  scope
+  # => #<Mongoid::Criteria
+  #   selector: {"founded"=>{"$gte"=>"1980-01-01"}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Query Methods
+-------------
 
 elem_match
 ``````````
