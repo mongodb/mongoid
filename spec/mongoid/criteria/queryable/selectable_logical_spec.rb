@@ -1438,6 +1438,25 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
 
+      context "when the criteria uses Key" do
+
+        let(:selection) do
+          query.not(:age.gt => 50)
+        end
+
+        it "negates the gt selection" do
+          expect(selection.selector).to eq(
+            '$and' => ['$nor' => ['age' => {'$gt' => 50}]]
+          )
+        end
+
+        it_behaves_like 'returns a cloned query'
+
+        it "removes the negation on the clone" do
+          expect(selection).to_not be_negating
+        end
+      end
+
       context "when the following criteria is a where" do
 
         let(:selection) do

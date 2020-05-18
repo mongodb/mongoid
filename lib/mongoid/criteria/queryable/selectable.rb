@@ -583,17 +583,21 @@ module Mongoid
               if new_s.is_a?(Selectable)
                 new_s = new_s.selector
               end
-              new_s.each do |k, v|
+              _mongoid_expand_keys(new_s).each do |k, v|
                 k = k.to_s
                 if c.selector[k] || k[0] == ?$
                   c = c.send(:__multi__, [{'$nor' => [{k => v}]}], '$and')
                 else
-                  if v.is_a?(Regexp)
-                    negated_operator = '$not'
+                  if v.is_a?(Hash)
+                    c = c.send(:__multi__, [{'$nor' => [{k => v}]}], '$and')
                   else
-                    negated_operator = '$ne'
+                    if v.is_a?(Regexp)
+                      negated_operator = '$not'
+                    else
+                      negated_operator = '$ne'
+                    end
+                    c = c.send(:__override__, {k => v}, negated_operator)
                   end
-                  c = c.send(:__override__, {k => v}, negated_operator)
                 end
               end
               c
