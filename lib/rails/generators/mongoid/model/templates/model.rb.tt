@@ -13,7 +13,7 @@ class <%= class_name %><%= " < #{options[:parent].classify}" if options[:parent]
   field :<%= attribute.name %>, type: <%= attribute.type_class %>
 <% end -%>
 <% attributes.select{|attr| attr.reference? }.each do |attribute| -%>
-  embedded_in :<%= attribute.name%>
+  belongs_to :<%= attribute.name%>
 <% end -%>
 end
 <% end -%>
