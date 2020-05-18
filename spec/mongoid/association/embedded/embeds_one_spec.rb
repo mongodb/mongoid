@@ -453,8 +453,6 @@ describe Mongoid::Association::Embedded::EmbedsOne do
             end
 
             it 'returns the inverse in an array' do
-              pending 'MONGOID-4751'
-
               inverses = association.inverses
               expect(inverses).to eq([:parent])
             end

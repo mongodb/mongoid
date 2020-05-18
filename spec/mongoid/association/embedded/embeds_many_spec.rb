@@ -646,6 +646,16 @@ describe Mongoid::Association::Embedded::EmbedsMany do
       it 'returns the class name option' do
         expect(association.klass).to eq(_class)
       end
+
+      context 'when the class name is prefixed with ::' do
+        let(:options) do
+          { class_name: '::OtherEmbeddedObject' }
+        end
+
+        it 'returns the class name option' do
+          expect(association.klass).to eq(_class)
+        end
+      end
     end
 
     context 'when the class_name option is not specified' do
