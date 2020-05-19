@@ -3617,6 +3617,8 @@ describe Mongoid::Criteria do
       end
 
       it "returns the matching documents" do
+        skip 'https://jira.mongodb.org/browse/MONGOID-4886'
+
         expect(criteria).to eq([ match ])
       end
     end
@@ -3628,6 +3630,8 @@ describe Mongoid::Criteria do
       end
 
       it "returns the matching documents" do
+        skip 'https://jira.mongodb.org/browse/MONGOID-4886'
+
         expect(criteria).to eq([ match ])
       end
     end
