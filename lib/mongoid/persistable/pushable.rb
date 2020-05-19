@@ -57,7 +57,10 @@ module Mongoid
       def push(pushes)
         prepare_atomic_operation do |ops|
           process_atomic_operations(pushes) do |field, value|
-            existing = send(field) || (attributes[field] ||= [])
+            existing = send(field) || begin
+              attributes[field] ||= []
+              attributes[field]
+            end
             values = [ value ].flatten(1)
             values.each{ |val| existing.push(val) }
             ops[atomic_attribute_name(field)] = { "$each" => values }
