@@ -1192,7 +1192,7 @@ It is also possible to query using PCRE syntax by constructing
 
 .. code-block:: ruby
 
-  Band.where(description: /^Project/).first
+  Band.where(description: /\AProject/).first
   # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
   
   Band.where(description: BSON::Regexp::Raw.new('^Project')).first

@@ -5,7 +5,7 @@ module Constraints
   RAILS_VERSION = ActiveSupport.version.to_s.split('.')[0..1].join('.').freeze
 
   def min_rails_version(version)
-    unless version =~ /^\d+\.\d+$/
+    unless version =~ /\A\d+\.\d+\z/
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 
@@ -17,7 +17,7 @@ module Constraints
   end
 
   def max_rails_version(version)
-    unless version =~ /^\d+\.\d+$/
+    unless version =~ /\A\d+\.\d+\z/
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 
@@ -29,7 +29,7 @@ module Constraints
   end
 
   def min_server_version(version)
-    unless version =~ /^\d+\.\d+$/
+    unless version =~ /\A\d+\.\d+\z/
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 
@@ -41,7 +41,7 @@ module Constraints
   end
 
   def max_server_version(version)
-    unless version =~ /^\d+\.\d+$/
+    unless version =~ /\A\d+\.\d+\z/
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 

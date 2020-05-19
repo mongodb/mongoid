@@ -296,7 +296,7 @@ describe Mongoid::Matchable do
       context 'when a BSON::Regexp::Raw object is used' do
 
         let(:selector) do
-          { street: BSON::Regexp::Raw.new("^Clarkenwell") }
+          { street: BSON::Regexp::Raw.new("\\AClarkenwell") }
         end
 
         it "returns true" do
@@ -307,7 +307,7 @@ describe Mongoid::Matchable do
       context 'when a native Regexp object is used' do
 
         let(:selector) do
-          { street: /^Clarkenwell/ }
+          { street: /\AClarkenwell/ }
         end
 
         it "returns true" do
