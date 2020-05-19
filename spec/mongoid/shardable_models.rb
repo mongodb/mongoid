@@ -19,7 +19,7 @@ class SmActor
 
   # This is not a usable shard configuration for the server.
   # We just have it for unit tests.
-  shard_key age: 1, 'gender' => :hashed
+  shard_key age: 1, 'gender' => :hashed, 'hello' => :hashed
 end
 
 class SmAssistant

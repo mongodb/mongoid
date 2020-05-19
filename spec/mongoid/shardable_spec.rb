@@ -48,12 +48,12 @@ describe Mongoid::Shardable do
 
       context 'with string value' do
         it 'sets shard key fields to symbol value' do
-          SmActor.shard_key_fields.should == %i(age gender)
+          SmActor.shard_key_fields.should == %i(age gender hello)
         end
 
         it 'sets shard config' do
           SmActor.shard_config.should == {
-            key: {age: 1, gender: 'hashed'},
+            key: {age: 1, gender: 'hashed', hello: 'hashed'},
             options: {},
           }
         end
