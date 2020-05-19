@@ -81,10 +81,6 @@ def non_legacy_server?
   Mongoid::Clients.default.cluster.servers.first.features.write_command_enabled?
 end
 
-def testing_replica_set?
-  Mongoid::Clients.default.cluster.replica_set?
-end
-
 def collation_supported?
   Mongoid::Clients.default.cluster.next_primary.features.collation_enabled?
 end
