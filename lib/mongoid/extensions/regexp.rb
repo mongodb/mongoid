@@ -9,7 +9,7 @@ module Mongoid
         # type.
         #
         # @example Mongoize the object.
-        #   Regexp.mongoize(/^[abc]/)
+        #   Regexp.mongoize(/\A[abc]/)
         #
         # @param [ Regexp, String ] object The object to mongoize.
         #

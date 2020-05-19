@@ -7,8 +7,8 @@ module Mongoid
       # Does the supplied query match the attribute?
       #
       # @example Does this match?
-      #   matcher._matches?(/^Em/)
-      #   matcher._matches?(BSON::Regex::Raw.new("^Em"))
+      #   matcher._matches?(/\AEm/)
+      #   matcher._matches?(BSON::Regex::Raw.new("\\AEm"))
       #
       # @param [ BSON::Regexp::Raw, Regexp ] regexp The regular expression object.
       #

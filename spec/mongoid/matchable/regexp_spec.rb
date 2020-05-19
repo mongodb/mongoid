@@ -15,7 +15,7 @@ describe Mongoid::Matchable::Regexp do
     context 'when a BSON::Regexp::Raw object is passed' do
 
       let(:regexp) do
-        BSON::Regexp::Raw.new('^Em')
+        BSON::Regexp::Raw.new("\\AEm")
       end
 
       it 'compiles the regexp object to a native regexp for the matching' do
@@ -37,7 +37,7 @@ describe Mongoid::Matchable::Regexp do
     context 'when a native Regexp object is passed' do
 
       let(:regexp) do
-        /^Em/
+        /\AEm/
       end
 
       it 'calls super with the native regexp' do

@@ -68,7 +68,7 @@ describe Mongoid::Matchable::Default do
         context "when the value is a regexp" do
 
           it "returns true" do
-            expect(matcher._matches?(/^Test[3-5]$/)).to be true
+            expect(matcher._matches?(/\ATest[3-5]\z/)).to be true
           end
         end
       end

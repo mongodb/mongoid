@@ -148,7 +148,7 @@ module Mongoid
       #
       # @since 2.3.0
       def filter(value)
-        !case_sensitive? && value ? /\A#{Regexp.escape(value.to_s)}$/i : value
+        !case_sensitive? && value ? /\A#{Regexp.escape(value.to_s)}\z/i : value
       end
 
       # Scope the criteria to the scope options provided.

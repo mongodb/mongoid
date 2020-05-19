@@ -315,7 +315,7 @@ describe String do
     context "when provided a regex" do
 
       let(:regex) do
-        /^[123]/
+        /\A[123]/.freeze
       end
 
       let(:evolved) do
