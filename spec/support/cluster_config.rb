@@ -99,7 +99,7 @@ class ClusterConfig
         if topology == :sharded
           shards = client.use(:admin).command(listShards: 1).first
           shard = shards['shards'].first
-          address_str = shard['host'].sub(/^.*\//, '').sub(/,.*/, '')
+          address_str = shard['host'].sub(/\A.*\//, '').sub(/,.*/, '')
           client = ClusterTools.instance.direct_client(address_str,
             SpecConfig.instance.test_options.merge(SpecConfig.instance.auth_options).merge(connect: :direct))
         end
@@ -133,8 +133,8 @@ class ClusterConfig
 
     @topology ||= begin
       topology = client.cluster.topology.class.name.sub(/.*::/, '')
-      topology = topology.gsub(/([A-Z])/) { |match| '_' + match.downcase }.sub(/^_/, '')
-      if topology =~ /^replica_set/
+      topology = topology.gsub(/([A-Z])/) { |match| '_' + match.downcase }.sub(/\A_/, '')
+      if topology =~ /\Areplica_set/
         topology = 'replica_set'
       end
       topology.to_sym

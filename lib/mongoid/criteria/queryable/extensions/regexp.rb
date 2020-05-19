@@ -12,7 +12,7 @@ module Mongoid
           # Is the object a regexp?
           #
           # @example Is the object a regex?
-          #   /^[123]/.regexp?
+          #   /\A[123]/.regexp?
           #
           # @return [ true ] Always true.
           #
@@ -24,7 +24,7 @@ module Mongoid
             # Evolve the object into a regex.
             #
             # @example Evolve the object to a regex.
-            #   Regexp.evolve("^[123]")
+            #   Regexp.evolve("\A[123]")
             #
             # @param [ Regexp, String ] object The object to evolve.
             #
@@ -55,7 +55,7 @@ module Mongoid
               # Evolve the object into a raw bson regex.
               #
               # @example Evolve the object to a regex.
-              #   BSON::Regexp::Raw.evolve("^[123]")
+              #   BSON::Regexp::Raw.evolve("\\A[123]")
               #
               # @param [ BSON::Regexp::Raw, String ] object The object to evolve.
               #
