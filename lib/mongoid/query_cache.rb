@@ -166,7 +166,8 @@ module Mongoid
         @coll_name ||= result.namespace.sub("#{database.name}.", '') if result.namespace
         documents = result.documents
         if @cursor_id.zero? && !@after_first_batch
-          (@cached_documents ||= []).concat(documents)
+          @cached_documents ||= []
+          @cached_documents.concat(documents)
         end
         @after_first_batch = true
         documents

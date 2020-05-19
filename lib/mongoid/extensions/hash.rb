@@ -46,9 +46,11 @@ module Mongoid
             value.each_pair do |_key, _value|
               value[_key] = (key == "$rename") ? _value.to_s : mongoize_for(key, klass, _key, _value)
             end
-            (consolidated[key] ||= {}).merge!(value)
+            consolidated[key] ||= {}
+            consolidated[key].update(value)
           else
-            (consolidated["$set"] ||= {}).merge!(key => mongoize_for(key, klass, key, value))
+            consolidated["$set"] ||= {}
+            consolidated["$set"].update(key => mongoize_for(key, klass, key, value))
           end
         end
         consolidated
