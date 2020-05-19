@@ -74,7 +74,8 @@ module Mongoid
       # @since 5.1.0
       def create_with(attrs = {})
         tap do
-          (@create_attrs ||= {}).merge!(attrs)
+          @create_attrs ||= {}
+          @create_attrs.update(attrs)
         end
       end
 
