@@ -1556,6 +1556,10 @@ describe Mongoid::Contextual::Mongo do
       }}
     end
 
+    let(:ordered_results) do
+      results['results'].sort_by { |doc| doc['_id'] }
+    end
+
     context "when no selection is provided" do
 
       let(:criteria) do
@@ -1587,36 +1591,40 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "contains the entire raw results" do
-        expect(results["results"]).to eq([
+        expect(ordered_results).to eq([
           { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
           { "_id" => "Tool", "value" => { "likes" => 100 }}
         ])
       end
 
-      it "contains the execution time" do
-        expect(results.time).to_not be_nil
-      end
+      context 'when statistics are available' do
+        max_server_version '4.2'
 
-      it "contains the count statistics" do
-        expect(results["counts"]).to eq({
-          "input" => 2, "emit" => 2, "reduce" => 0, "output" => 2
-        })
-      end
+        it "contains the execution time" do
+          expect(results.time).to_not be_nil
+        end
 
-      it "contains the input count" do
-        expect(results.input).to eq(2)
-      end
+        it "contains the count statistics" do
+          expect(results["counts"]).to eq({
+            "input" => 2, "emit" => 2, "reduce" => 0, "output" => 2
+          })
+        end
 
-      it "contains the emitted count" do
-        expect(results.emitted).to eq(2)
-      end
+        it "contains the input count" do
+          expect(results.input).to eq(2)
+        end
 
-      it "contains the reduced count" do
-        expect(results.reduced).to eq(0)
-      end
+        it "contains the emitted count" do
+          expect(results.emitted).to eq(2)
+        end
 
-      it "contains the output count" do
-        expect(results.output).to eq(2)
+        it "contains the reduced count" do
+          expect(results.reduced).to eq(0)
+        end
+
+        it "contains the output count" do
+          expect(results.output).to eq(2)
+        end
       end
     end
 
@@ -1645,35 +1653,39 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "contains the entire raw results" do
-        expect(results["results"]).to eq([
+        expect(ordered_results).to eq([
           { "_id" => "Depeche Mode", "value" => { "likes" => 200 }}
         ])
       end
 
-      it "contains the execution time" do
-        expect(results.time).to_not be_nil
-      end
+      context 'when statistics are available' do
+        max_server_version '4.2'
 
-      it "contains the count statistics" do
-        expect(results["counts"]).to eq({
-          "input" => 1, "emit" => 1, "reduce" => 0, "output" => 1
-        })
-      end
+        it "contains the execution time" do
+          expect(results.time).to_not be_nil
+        end
 
-      it "contains the input count" do
-        expect(results.input).to eq(1)
-      end
+        it "contains the count statistics" do
+          expect(results["counts"]).to eq({
+            "input" => 1, "emit" => 1, "reduce" => 0, "output" => 1
+          })
+        end
 
-      it "contains the emitted count" do
-        expect(results.emitted).to eq(1)
-      end
+        it "contains the input count" do
+          expect(results.input).to eq(1)
+        end
 
-      it "contains the reduced count" do
-        expect(results.reduced).to eq(0)
-      end
+        it "contains the emitted count" do
+          expect(results.emitted).to eq(1)
+        end
 
-      it "contains the output count" do
-        expect(results.output).to eq(1)
+        it "contains the reduced count" do
+          expect(results.reduced).to eq(0)
+        end
+
+        it "contains the output count" do
+          expect(results.output).to eq(1)
+        end
       end
     end
 
@@ -1713,7 +1725,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "contains the entire raw results" do
-        expect(results["results"]).to eq([
+        expect(ordered_results).to eq([
           { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
           { "_id" => "Tool", "value" => { "likes" => 100 }}
         ])

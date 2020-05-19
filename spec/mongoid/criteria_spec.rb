@@ -2337,7 +2337,7 @@ describe Mongoid::Criteria do
       end
 
       it "returns the map/reduce results" do
-        expect(map_reduce).to eq([
+        expect(map_reduce.sort_by { |doc| doc['_id'] }).to eq([
           { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
           { "_id" => "Tool", "value" => { "likes" => 100 }}
         ])
