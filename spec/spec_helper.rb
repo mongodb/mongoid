@@ -131,6 +131,10 @@ end
 I18n.config.enforce_available_locales = false
 
 RSpec.configure do |config|
+  config.expect_with(:rspec) do |c|
+    c.syntax = [:should, :expect]
+  end
+
   config.raise_errors_for_deprecations!
   config.include(Mongoid::Expectations)
   config.extend(Constraints)
