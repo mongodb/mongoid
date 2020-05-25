@@ -47,6 +47,19 @@ describe 'Criteria logical operations' do
       bands = Band.where(name: /jecti/).or(Band.where(name: /ush/))
       expect(bands.order_by(name: 1).to_a).to eq([ap, im])
     end
+
+    context 'when using a symbol operator' do
+      context 'when field has a serializer' do
+        let!(:doc) { Dokument.create! }
+
+        it 'works' do
+          scope = Dokument.or(:created_at.lte => DateTime.now).sort(id: 1)
+          # input was converted from DateTime to Time
+          scope.criteria.selector['$or'].first['created_at']['$lte'].should be_a(Time)
+          scope.to_a.should == [doc]
+        end
+      end
+    end
   end
 
   describe 'not' do
