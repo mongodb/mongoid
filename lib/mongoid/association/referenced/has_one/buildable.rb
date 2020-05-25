@@ -46,7 +46,7 @@ module Mongoid
           end
 
           def execute_query(object, base)
-            query_criteria(object, base).limit(-1).first(id_sort: :none)
+            query_criteria(object, base).limit(1).first(id_sort: :none)
           end
 
           def with_polymorphic_criterion(criteria, base)
