@@ -552,42 +552,71 @@ collection named "bands" in the default database in the default client.
 Runtime Persistence Options
 ---------------------------
 
-You can change at runtime where to store, query, update, or remove documents by prefixing
-any operation with ``#with`` and passing a block.
+It is possible to change the client, database and collection, as well as
+any of the MongoDB client options, used for persistence for a group of
+operations by using the ``with`` method on a model class or instance:
 
 .. code-block:: ruby
 
-   Band.with(database: "music-non-stop") do |klass|
-     klass.create
-   end
-   Band.with(collection: "artists") do |klass|
-     klass.delete_all
-   end
-   band.with(client: :tertiary) do |band_object|
-     band_object.save!
-   end
+  Band.with(database: "music-non-stop") do |klass|
+    klass.create(...)
+    
+    band = Band.first
+    
+    Band.create(...)
+  end
+  
+  Band.with(collection: "artists") do |klass|
+    klass.delete_all
+    
+    Band.delete_all
+  end
+  
+  band.with(client: :tertiary) do |band_object|
+    band_object.save!
+    
+    band.save!
+  end
 
-Persisting using with is a one-time switch in the persistence context - it creates a new
-client under the covers which will get closed and garbage collected after use. Mongoid will not remember
-anything specific on the document level regarding how it was saved when using this method.
-A potential gotcha with this is persisting a document via with and then immediately updating it after.
+The ``with`` method creates a temporary persistence context and a MongoDB
+client to be used for operations in the context. For the duration of the block,
+the persistence context on the model class or instance that ``with`` was
+called on is changed to the temporary persistence context. For convenience,
+the model class or instance that ``with`` was called on is yielded to the
+block.
+
+The temporary persistence context applies to both queries and writes.
+
+Care should be taken when performing persistence operations across different
+persistence contexts. For example, if a document is saved in a temporary
+persistence context, it may not exist in the default persistence context,
+failing subsequent updates:
 
 .. code-block:: ruby
 
-   band = Band.new(name: "Scuba")
-   band.with(collection: "artists") do |band_object|
-     band_object.save!
-   end
-   band.update_attribute(likes: 1000) # This will not save - queries the collection "bands"
-   band.with(collection: "artists") do |band_object|
-     band_object.update_attribute(likes: 1000) # This will update the document.
-   end
+  band = Band.new(name: "Scuba")
+  band.with(collection: "artists") do |band_object|
+    band_object.save!
+  end
+  
+  # This will not save - updates the collection "bands" which does not have
+  # the Scuba band
+  band.update_attribute(likes: 1000)
+  
+  # This will update the document.
+  band.with(collection: "artists") do |band_object|
+    band_object.update_attribute(likes: 1000)
+  end
 
-The Mongoid API was changed in version 6.0 to always require that a block be passed to #with. This is because
-a new client is created under the covers with the options passed to #with. A new client may spin up new
-monitor threads for keeping track of the MongoDB cluster, depending on what options are specified. This may in
-turn cause the number of connections to continually grow with each use of #with. Now that a block is required,
-Mongoid can properly stop the monitor threads and close the client after the block is called.
+As of Mongoid 6.0, the ``with`` method must always be called with a block,
+and the temporary persistence context exists only for the duration of the block.
+This is because a new client is created under the covers with the options
+passed to ``with``. To ensure that this client is closed and its associated
+resources are freed, the scope when this client could be used must be
+well-defined.
+
+Global Override
+```````````````
 
 If you want to switch the persistence context for all operations at runtime, but don't want
 to be using with all over your code, Mongoid provides the ability to do this as the client
@@ -632,7 +661,7 @@ Client and Collection Access
 ----------------------------
 
 If you want to drop down to the driver level to perform operations, you can grab
-the Mongo client or collection from the model or document instance.
+the Mongo client or collection from the model or document instance:
 
 .. code-block:: ruby
 
@@ -641,14 +670,14 @@ the Mongo client or collection from the model or document instance.
   Band.collection
   band.collection
 
-From here you also have the same runtime persistence options using the client's ``#with``.
+From here you also have the same runtime persistence options using the client's ``#with``:
 
 .. code-block:: ruby
 
   client = Band.mongo_client.with(write: { w: 0 }, database: "musik")
   client[:artists].find(...)
 
-You can also override the :read or :write options on the collection using the collections ``#with``.
+You can also override the :read or :write options on the collection using the collections ``#with``:
 
 .. code-block:: ruby
 
