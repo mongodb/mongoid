@@ -80,6 +80,7 @@ functions:
               export SINGLE_MONGOS=${SINGLE_MONGOS}
               export AUTH=${AUTH}
               export SSL=${SSL}
+              export APP_TESTS=${APP_TESTS}
            EOT
            # See what we've done
            cat expansion.yml
@@ -533,7 +534,7 @@ axes:
   - id: "i18n"
     display_name: I18n version
     values:
-      - id: 1.0
+      - id: '1.0'
         display_name: "i18n-1.0"
         variables:
            I18N: "1.0"
@@ -546,6 +547,13 @@ axes:
         display_name: "i18n-fallbacks"
         variables:
            TEST_I18N_FALLBACKS: yes
+  - id: app-tests
+    display_name: Mongoid application tests
+    values:
+      - id: yes
+        display_name: Yes
+        variables:
+          APP_TESTS: yes
 
 buildvariants:
 - matrix_name: "topologies"
@@ -755,6 +763,28 @@ buildvariants:
     i18n: '*'
     test-i18n-fallbacks: yes
   display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
+  run_on:
+    - rhel70-small
+  tasks:
+     - name: "test"
+- matrix_name: app-tests
+  matrix_spec:
+    driver: current
+    ruby: ruby-2.7
+    mongodb-version: '4.2'
+    topology: standalone
+    app-tests: yes
+  run_on:
+    - rhel70-small
+  tasks:
+     - name: "test"
+- matrix_name: app-tests-jruby
+  matrix_spec:
+    driver: current
+    jruby: jruby-9.2
+    mongodb-version: '4.2'
+    topology: standalone
+    app-tests: yes
   run_on:
     - rhel70-small
   tasks:
