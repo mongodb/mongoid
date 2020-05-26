@@ -66,6 +66,8 @@ export BUNDLE_GEMFILE
 
 if test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
+elif test -n "$APP_TESTS"; then
+  bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake spec
 fi
