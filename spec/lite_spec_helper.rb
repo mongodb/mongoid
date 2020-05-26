@@ -50,11 +50,18 @@ RSpec.configure do |config|
   end
 
   if SpecConfig.instance.ci?
-    # Allow a max of 30 seconds per test.
-    # Tests should take under 10 seconds ideally but it seems
-    # we have some that run for more than 10 seconds in CI.
+    timeout = if SpecConfig.instance.app_tests?
+      # Allow 5 minutes per test for the app tests, since they install
+      # gems for Rails applications which can take a long time.
+      300
+    else
+      # Allow a max of 30 seconds per test.
+      # Tests should take under 10 seconds ideally but it seems
+      # we have some that run for more than 10 seconds in CI.
+      30
+    end
     config.around(:each) do |example|
-      TimeoutInterrupt.timeout(30) do
+      TimeoutInterrupt.timeout(timeout) do
         example.run
       end
     end

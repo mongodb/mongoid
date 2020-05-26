@@ -8,7 +8,7 @@ TMP_BASE = File.join(BASE, 'tmp')
 
 describe 'Mongoid application tests' do
   before(:all) do
-    unless %w(1 true yes).include?(ENV['APP_TESTS']&.downcase)
+    unless SpecConfig.instance.app_tests?
       skip 'Set APP_TESTS=1 in environment to run application tests'
     end
 
