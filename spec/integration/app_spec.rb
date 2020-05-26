@@ -32,7 +32,8 @@ describe 'Mongoid application tests' do
         process.start
 
         begin
-          wait_for_port(4567, 5)
+          # JRuby needs a long timeout
+          wait_for_port(4567, 20)
           sleep 1
 
           uri = URI.parse('http://localhost:4567/posts')
@@ -65,7 +66,8 @@ describe 'Mongoid application tests' do
             process.start
 
             begin
-              wait_for_port(3000, 5)
+              # JRuby needs a long timeout
+              wait_for_port(3000, 20)
               sleep 1
 
               uri = URI.parse('http://localhost:3000/posts')
