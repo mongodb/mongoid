@@ -108,28 +108,32 @@ module Mongoid
       #   Matchable.matcher(document, :title, { "$in" => [ "test" ] })
       #
       # @param [ Document ] document The document to check.
-      # @param [ Symbol, String ] key The field name.
+      # @param [ Symbol, String ] field_name The field name.
       # @param [ Object, Hash ] value The value or selector.
       #
       # @return [ Matcher ] The matcher.
       #
       # @since 2.0.0.rc.7
-      def matcher(document, key, value)
+      def matcher(document, field_name, value)
         if value.is_a?(Hash)
           matcher = MATCHERS[value.keys.first]
           if matcher
-            matcher.new(extract_attribute(document, key))
+            matcher.new(extract_attribute(document, field_name))
           else
-            Default.new(extract_attribute(document, key))
+            Default.new(extract_attribute(document, field_name))
           end
         elsif value.regexp?
-          Regexp.new(extract_attribute(document, key))
+          Regexp.new(extract_attribute(document, field_name))
         else
-          case key.to_s
-            when "$or" then Or.new(value, document)
-            when "$and" then And.new(value, document)
-            when "$nor" then Nor.new(value, document)
-            else Default.new(extract_attribute(document, key))
+          case field_name.to_s
+          when "$or"
+            Or.new(value, document)
+          when "$and"
+            And.new(value, document)
+          when "$nor"
+            Nor.new(value, document)
+          else
+            Default.new(extract_attribute(document, field_name))
           end
         end
       end

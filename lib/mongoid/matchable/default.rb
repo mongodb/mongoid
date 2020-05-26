@@ -65,22 +65,35 @@ module Mongoid
       # Given a condition, which is a one-element hash consisting of an
       # operator and a value like {'$gt' => 1}, return the value.
       #
+      # If key is given, this method also verifies that the sole key in
+      # the condition is equal to the provided key, using indifferent access
+      # (both provided key and condition key may be either a string or a symbol).
+      #
       # @example Get the condition value.
       #   matcher.condition_value({'$gt' => 1})
       #   # => 1
       #
       # @param [ Hash ] condition The condition.
+      # @param [ String, Symbol ] key The key to verify the condition contains.
       #
       # @return [ Object ] The value of the condition.
       #
       # @since 1.0.0
-      def condition_value(condition)
+      def condition_value(condition, key = nil)
         unless condition.is_a?(Hash)
           raise ArgumentError, 'Condition must be a hash'
         end
 
         unless condition.length == 1
           raise ArgumentError, 'Condition must have one element'
+        end
+
+        if key
+          expected_key = key.to_s
+          actual_key = condition.keys.first.to_s
+          unless actual_key == expected_key
+            raise ArgumentError, "Condition expected to have key '#{expected_key}' but had key '#{actual_key}'"
+          end
         end
 
         condition.values.first

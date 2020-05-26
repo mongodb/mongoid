@@ -18,17 +18,14 @@ module Mongoid
       #
       # @since 2.0.0.rc.7
       def _matches?(conditions)
+        # MongoDB prohibits $or with empty condition list.
+        # Mongoid currently accepts such a construct, and returns false.
         conditions.each do |condition|
-          res = true
-          condition.keys.each do |k|
-            key = k
-            value = condition[k]
-            res &&= document._matches?(key => value)
-            break unless res
+          if document._matches?(condition)
+            return true
           end
-          return res if res
         end
-        return false
+        false
       end
     end
   end
