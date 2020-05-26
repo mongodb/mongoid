@@ -66,6 +66,15 @@ export BUNDLE_GEMFILE
 
 if test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
+elif test -n "$APP_TESTS"; then
+  # Need recent node for rails
+  export N_PREFIX=$HOME/.n
+  curl -o $HOME/n --retry 3 https://raw.githubusercontent.com/tj/n/master/bin/n
+  bash $HOME/n stable
+  export PATH=$HOME/.n/bin:$PATH
+  npm -g install yarn
+  
+  bundle exec rspec spec/integration/app_spec.rb
 else
   bundle exec rake spec
 fi
