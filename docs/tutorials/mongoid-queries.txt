@@ -1106,13 +1106,19 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#for_js``
 
-       *Find documents for a provided javascript expression. This will
-       wrap the javascript in a `BSON::Code` object which is the
-       safe way to avoid javascript injection attacks.**
+       *Find documents for a provided JavaScript expression, optionally with
+       the specified variables added to the evaluation scope. The scope
+       argument is supported in MongoDB 4.2 and lower.*
+       *In MongoDB 3.6 and higher, prefer* :manual:`$expr
+       </reference/operator/query/expr/>` *over* ``for_js``.
 
      -
         .. code-block:: ruby
 
+          # All MongoDB versions
+          Band.for_js("this.name = 'Tool'")
+          
+          # MongoDB 4.2 and lower
           Band.for_js("this.name = param", param: "Tool")
 
    * - ``Criteria#length|size``
