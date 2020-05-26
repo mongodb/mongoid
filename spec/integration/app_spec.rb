@@ -79,7 +79,8 @@ describe 'Mongoid application tests' do
 
             resp.should == []
 
-            [0, 15].should include(status)
+            # 143 = 128 + 15
+            [0, 15, 143].should include(status)
           end
         end
       end
