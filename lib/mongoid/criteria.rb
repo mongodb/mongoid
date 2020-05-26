@@ -450,7 +450,13 @@ module Mongoid
     #
     # @since 3.1.0
     def for_js(javascript, scope = {})
-      js_query(BSON::CodeWithScope.new(javascript, scope))
+      code = if scope.empty?
+        # CodeWithScope is not supported for $where as of MongoDB 4.4
+        BSON::Code.new(javascript)
+      else
+        BSON::CodeWithScope.new(javascript, scope)
+      end
+      js_query(code)
     end
 
     private
