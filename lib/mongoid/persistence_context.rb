@@ -122,6 +122,12 @@ module Mongoid
       end
     end
 
+    def client_name
+      @client_name ||= options[:client] ||
+                         Threaded.client_override ||
+                         storage_options && __evaluate__(storage_options[:client])
+    end
+
     # Determine if this persistence context is equal to another.
     #
     # @example Compare two persistence contexts.
@@ -138,12 +144,6 @@ module Mongoid
     end
 
     private
-
-    def client_name
-      @client_name ||= options[:client] ||
-                         Threaded.client_override ||
-                         storage_options && __evaluate__(storage_options[:client])
-    end
 
     def set_options!(opts)
       @options ||= opts.each.reduce({}) do |_options, (key, value)|

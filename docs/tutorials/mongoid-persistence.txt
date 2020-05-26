@@ -522,6 +522,24 @@ However, MongoDB offers :ref:`multi-document transactions <transactions>`
 as of server version 4.0 which provide atomic persistence across multiple
 documents.
 
+Persistence Context Attributes
+==============================
+
+Mongoid provides ``client_name``, ``database_name`` and ``collection_name``
+methods on model classes to determine the client, database and collection names
+used for persistence:
+
+.. code-block:: ruby
+
+  Band.client_name
+  # => :default
+  
+  Band.database_name
+  # => "mongoid"
+  
+  Band.collection_name
+  # => :bands
+
 Custom
 ======
 
