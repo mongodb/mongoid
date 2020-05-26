@@ -95,7 +95,7 @@ describe 'Mongoid application tests' do
 
           Dir.chdir(TMP_BASE) do
             FileUtils.rm_rf('mongoid-test')
-            ChildProcessHelper.check_call(%w(rails new mongoid-test), env: clean_env)
+            ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring), env: clean_env)
 
             Dir.chdir('mongoid-test') do
               adjust_app_gemfile
@@ -159,6 +159,15 @@ describe 'Mongoid application tests' do
     File.open('Gemfile', 'w') do |f|
       f << gemfile_lines.join
     end
+  end
+
+  def remove_spring
+    # Spring produces this error in Evergreen:
+    # /data/mci/280eb2ecf4fd69208e2106cd3af526f1/src/rubies/ruby-2.7.0/lib/ruby/gems/2.7.0/gems/spring-2.1.0/lib/spring/client/run.rb:26:
+    # in `initialize': too long unix socket path (126bytes given but 108bytes max) (ArgumentError)
+    # Is it trying to create unix sockets in current directory?
+    # https://stackoverflow.com/questions/30302021/rails-runner-without-spring
+    ChildProcessHelper.check_call(%w(bin/spring binstub --remove --all), env: clean_env)
   end
 
   def clean_env
