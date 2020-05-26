@@ -28,6 +28,7 @@ group :test do
   gem 'rspec-mocks-diag', '~> 3.0'
   gem 'fuubar'
   gem 'rfc'
+  gem 'childprocess'
   platforms :mri do
     gem 'timeout-interrupt'
     if RUBY_VERSION < '2.3'
