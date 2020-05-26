@@ -16,7 +16,7 @@ module Mongoid
       # In particular, the condition can be a hash of key-value pairs of
       # literal values which the attribute's elements will be directly
       # compared to, or condition can be a complex condition containing e.g.
-      # $and/$or/$nor/$not logical operators.
+      # $and/$or/$nor logical operators.
       #
       # @example Do the values match?
       #   matcher._matches?({"$elemMatch" => {"a" => 1, "b" => 2}})
