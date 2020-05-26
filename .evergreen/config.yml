@@ -340,6 +340,10 @@ axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
+      - id: "4.4"
+        display_name: "MongoDB 4.4"
+        variables:
+           VERSION: "4.4"
       - id: "4.2"
         display_name: "MongoDB 4.2"
         variables:
@@ -532,8 +536,8 @@ buildvariants:
   matrix_spec:
     driver: [current, master, stable]
     ruby: "ruby-2.7"
-    mongodb-version: "4.2"
-    topology: ["replica-set"]
+    mongodb-version: "4.4"
+    topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
@@ -543,8 +547,8 @@ buildvariants:
   matrix_spec:
     driver: "current"
     # ruby-head temporarily omitted: https://jira.mongodb.org/browse/MONGOID-4833
-    ruby: ["ruby-2.6", "ruby-2.5", "ruby-2.4", "ruby-2.3"]
-    mongodb-version: "4.0"
+    ruby: [ruby-2.6, ruby-2.3]
+    mongodb-version: "4.2"
     topology: "replica-set"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -555,7 +559,7 @@ buildvariants:
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.6"
-    mongodb-version: ["3.6", "3.4", "3.2"]
+    mongodb-version: ["4.0", "3.6", "3.4", "3.2"]
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:

@@ -75,6 +75,7 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#counts" do
+    max_server_version '4.2'
 
     let(:criteria) do
       Band.all
@@ -103,7 +104,8 @@ describe Mongoid::Contextual::MapReduce do
       end
 
       it "iterates over the results" do
-        expect(results.entries).to eq([
+        ordered_results = results.entries.sort_by { |doc| doc['_id'] }
+        expect(ordered_results.entries).to eq([
           { "_id" => "Depeche Mode", "value" => { "likes" => 200 }},
           { "_id" => "Tool", "value" => { "likes" => 100 }}
         ])
@@ -124,7 +126,8 @@ describe Mongoid::Contextual::MapReduce do
       end
 
       it "iterates over the results" do
-        expect(results.entries).to eq(expected_results)
+        ordered_results = results.entries.sort_by { |doc| doc['_id'] }
+        expect(ordered_results).to eq(expected_results)
       end
 
       it 'outputs to the collection' do
@@ -144,6 +147,7 @@ describe Mongoid::Contextual::MapReduce do
       end
 
       context "when the statstics are requested" do
+        max_server_version '4.2'
 
         it "raises an error" do
           expect {
@@ -207,6 +211,7 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#emitted" do
+    max_server_version '4.2'
 
     let(:emitted) do
       map_reduce.out(inline: 1).emitted
@@ -258,6 +263,7 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#input" do
+    max_server_version '4.2'
 
     let(:input) do
       map_reduce.out(inline: 1).input
@@ -308,6 +314,7 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#output" do
+    max_server_version '4.2'
 
     let(:output) do
       map_reduce.out(inline: 1).output
@@ -340,12 +347,16 @@ describe Mongoid::Contextual::MapReduce do
       end
 
       context 'when a read preference is defined' do
+        require_topology :replica_set
+        # On 4.4 it seems the server inserts on the primary, not on the server
+        # that executed the map/reduce.
+        max_server_version '4.2'
 
         let(:criteria) do
           Band.all.read(mode: :secondary)
         end
 
-        it "uses the read preference", if: testing_replica_set? do
+        it "uses the read preference" do
 
           expect {
             replace_map_reduce.raw
@@ -356,6 +367,7 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#reduced" do
+    max_server_version '4.2'
 
     let(:reduced) do
       map_reduce.out(inline: 1).reduced
@@ -386,6 +398,7 @@ describe Mongoid::Contextual::MapReduce do
   end
 
   describe "#time" do
+    max_server_version '4.2'
 
     let(:time) do
       map_reduce.out(inline: 1).time
