@@ -113,6 +113,54 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
         it_behaves_like 'adds the conditions to top level'
       end
+
+      context 'when the criterion is a time' do
+        let(:selection) do
+          query.send(tested_method, :field.gte => Time.new(2020, 1, 1))
+        end
+
+        it 'adds the conditions' do
+          expect(selection.selector).to eq({
+            "field" => {'$gte' => Time.new(2020, 1, 1)},
+          })
+        end
+
+        it 'keeps argument type' do
+          selection.selector['field']['$gte'].should be_a(Time)
+        end
+      end
+
+      context 'when the criterion is a datetime' do
+        let(:selection) do
+          query.send(tested_method, :field.gte => DateTime.new(2020, 1, 1))
+        end
+
+        it 'adds the conditions' do
+          expect(selection.selector).to eq({
+            "field" => {'$gte' => Time.utc(2020, 1, 1)},
+          })
+        end
+
+        it 'converts argument to a time' do
+          selection.selector['field']['$gte'].should be_a(Time)
+        end
+      end
+
+      context 'when the criterion is a date' do
+        let(:selection) do
+          query.send(tested_method, :field.gte => Date.new(2020, 1, 1))
+        end
+
+        it 'adds the conditions' do
+          expect(selection.selector).to eq({
+            "field" => {'$gte' => Time.utc(2020, 1, 1)},
+          })
+        end
+
+        it 'converts argument to a time' do
+          selection.selector['field']['$gte'].should be_a(Time)
+        end
+      end
     end
 
     context "when provided a nested criterion" do
@@ -808,6 +856,54 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
 
         it_behaves_like 'returns a cloned query'
+
+        context 'when the criterion is a time' do
+          let(:selection) do
+            query.send(tested_method, :field.gte => Time.new(2020, 1, 1))
+          end
+
+          it 'adds the conditions' do
+            expect(selection.selector).to eq(expected_operator => [
+              "field" => {'$gte' => Time.new(2020, 1, 1)},
+            ])
+          end
+
+          it 'keeps the type' do
+            selection.selector[expected_operator].first['field']['$gte'].should be_a(Time)
+          end
+        end
+
+        context 'when the criterion is a datetime' do
+          let(:selection) do
+            query.send(tested_method, :field.gte => DateTime.new(2020, 1, 1))
+          end
+
+          it 'adds the conditions' do
+            expect(selection.selector).to eq(expected_operator => [
+              "field" => {'$gte' => Time.utc(2020, 1, 1)},
+            ])
+          end
+
+          it 'converts argument to a time' do
+            selection.selector[expected_operator].first['field']['$gte'].should be_a(Time)
+          end
+        end
+
+        context 'when the criterion is a date' do
+          let(:selection) do
+            query.send(tested_method, :field.gte => Date.new(2020, 1, 1))
+          end
+
+          it 'adds the conditions' do
+            expect(selection.selector).to eq(expected_operator => [
+              "field" => {'$gte' => Time.utc(2020, 1, 1)},
+            ])
+          end
+
+          it 'converts argument to a time' do
+            selection.selector[expected_operator].first['field']['$gte'].should be_a(Time)
+          end
+        end
       end
 
       context "when a criterion has an aliased field" do
