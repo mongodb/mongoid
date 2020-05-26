@@ -258,12 +258,12 @@ module Mongoid
         return documents.first if cached? && cache_loaded?
         try_cache(:first) do
           if sort = view.sort || ({ _id: 1 } unless opts[:id_sort] == :none)
-            if raw_doc = view.sort(sort).limit(-1).first
+            if raw_doc = view.sort(sort).limit(1).first
               doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
           else
-            if raw_doc = view.limit(-1).first
+            if raw_doc = view.limit(1).first
               doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
@@ -372,7 +372,7 @@ module Mongoid
       def last(opts = {})
         try_cache(:last) do
           with_inverse_sorting(opts) do
-            if raw_doc = view.limit(-1).first
+            if raw_doc = view.limit(1).first
               doc = Factory.from_db(klass, raw_doc, criteria)
               eager_load([doc]).first
             end
