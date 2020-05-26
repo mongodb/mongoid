@@ -50,7 +50,6 @@ describe 'Mongoid application tests' do
   end
 
   context 'demo application - rails-api' do
-    #['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
     ['~> 6.0.0'].each do |rails_version|
       context "with rails #{rails_version}" do
         it 'runs' do
@@ -79,6 +78,21 @@ describe 'Mongoid application tests' do
             resp.should == []
 
             [0, 15].should include(status)
+          end
+        end
+      end
+    end
+  end
+
+  context 'new application - rails' do
+    ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
+      context "with rails #{rails_version}" do
+        it 'creates' do
+          ChildProcessHelper.check_call(%w(gem uni rails -a))
+          ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+
+          Dir.chdir(TMP_BASE) do
+            ChildProcessHelper.check_call(%w(rails new mongoid-test), env: clean_env)
           end
         end
       end
