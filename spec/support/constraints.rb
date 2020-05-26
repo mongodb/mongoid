@@ -73,8 +73,22 @@ module Constraints
   end
 
   def require_transaction_support
-    min_server_fcv '4.0'
-    require_topology :replica_set
+    before(:all) do
+      case ClusterConfig.instance.topology
+      when :single
+        skip 'Transactions tests require a replica set (4.0+) or a sharded cluster (4.2+)'
+      when :replica_set
+        unless ClusterConfig.instance.server_version >= '4.0'
+          skip 'Transactions tests in a replica set topology require server 4.0+'
+        end
+      when :sharded
+        unless ClusterConfig.instance.server_version >= '4.2'
+          skip 'Transactions tests in a sharded cluster topology require server 4.2+'
+        end
+      else
+        raise NotImplementedError
+      end
+    end
   end
 
   def require_tls

@@ -14,7 +14,7 @@ describe Mongoid::Clients::Options, retry: 3 do
     Mongoid::Clients.clients.clear
   end
 
-  describe '#with', if: non_legacy_server? do
+  describe '#with' do
 
     context 'when passing some options' do
 
@@ -291,7 +291,7 @@ describe Mongoid::Clients::Options, retry: 3 do
     end
   end
 
-  describe '.with', if: non_legacy_server? do
+  describe '.with' do
 
     context 'when passing some options' do
 

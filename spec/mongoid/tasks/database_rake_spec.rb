@@ -48,7 +48,7 @@ shared_context "rails rake task" do
   end
 end
 
-describe "db:drop", if: non_legacy_server? do
+describe "db:drop" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -61,7 +61,7 @@ describe "db:drop", if: non_legacy_server? do
   end
 end
 
-describe "db:purge", if: non_legacy_server? do
+describe "db:purge" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -74,7 +74,7 @@ describe "db:purge", if: non_legacy_server? do
   end
 end
 
-describe "db:seed", if: non_legacy_server? do
+describe "db:seed" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -88,7 +88,7 @@ describe "db:seed", if: non_legacy_server? do
   end
 end
 
-describe "db:setup", if: non_legacy_server? do
+describe "db:setup" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -120,7 +120,7 @@ describe "db:setup", if: non_legacy_server? do
   end
 end
 
-describe "db:reset", if: non_legacy_server? do
+describe "db:reset" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -138,7 +138,7 @@ describe "db:reset", if: non_legacy_server? do
   end
 end
 
-describe "db:create", if: non_legacy_server? do
+describe "db:create" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -147,7 +147,7 @@ describe "db:create", if: non_legacy_server? do
   end
 end
 
-describe "db:migrate", if: non_legacy_server? do
+describe "db:migrate" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -156,7 +156,7 @@ describe "db:migrate", if: non_legacy_server? do
   end
 end
 
-describe "db:test:prepare", if: non_legacy_server? do
+describe "db:test:prepare" do
   include_context "rake task"
   include_context "rails rake task"
 
@@ -177,7 +177,7 @@ describe "db:test:prepare", if: non_legacy_server? do
   end
 end
 
-describe "db:mongoid:create_indexes", if: non_legacy_server? do
+describe "db:mongoid:create_indexes" do
   include_context "rake task"
 
   it_behaves_like "create_indexes"
@@ -201,7 +201,7 @@ describe "db:mongoid:create_indexes", if: non_legacy_server? do
   end
 end
 
-describe "db:mongoid:remove_undefined_indexes", if: non_legacy_server? do
+describe "db:mongoid:remove_undefined_indexes" do
   include_context "rake task"
 
   it "receives remove_undefined_indexes" do
@@ -227,7 +227,7 @@ describe "db:mongoid:remove_undefined_indexes", if: non_legacy_server? do
   end
 end
 
-describe "db:mongoid:remove_indexes", if: non_legacy_server? do
+describe "db:mongoid:remove_indexes" do
   include_context "rake task"
 
   it "receives remove_indexes" do
@@ -253,7 +253,7 @@ describe "db:mongoid:remove_indexes", if: non_legacy_server? do
   end
 end
 
-describe "db:mongoid:drop", if: non_legacy_server? do
+describe "db:mongoid:drop" do
   include_context "rake task"
 
   it "works" do
@@ -269,7 +269,7 @@ describe "db:mongoid:drop", if: non_legacy_server? do
   end
 end
 
-describe "db:mongoid:purge", if: non_legacy_server? do
+describe "db:mongoid:purge" do
   include_context "rake task"
 
   it "receives a purge" do

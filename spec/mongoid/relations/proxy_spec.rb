@@ -5,7 +5,7 @@
 #
 # describe Mongoid::Relations::Proxy do
 #
-#   describe '#with', if: non_legacy_server? do
+#   describe '#with' do
 #
 #     let(:circus) do
 #       Circus.new
