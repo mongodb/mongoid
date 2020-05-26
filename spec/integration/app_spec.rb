@@ -50,7 +50,6 @@ describe 'Mongoid application tests' do
   end
 
   context 'demo application - rails-api' do
-    #['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
     ['~> 6.0.0'].each do |rails_version|
       context "with rails #{rails_version}" do
         it 'runs' do
@@ -85,25 +84,41 @@ describe 'Mongoid application tests' do
     end
   end
 
+  context 'new application - rails' do
+    ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
+      context "with rails #{rails_version}" do
+        it 'creates' do
+          ChildProcessHelper.check_call(%w(gem uni rails -a))
+          ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+
+          Dir.chdir(TMP_BASE) do
+            FileUtils.rm_rf('mongoid-test')
+            ChildProcessHelper.check_call(%w(rails new mongoid-test), env: clean_env)
+
+            Dir.chdir('mongoid-test') do
+              adjust_app_gemfile
+              ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+
+              ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
+              ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
+
+              # https://jira.mongodb.org/browse/MONGOID-4885
+              comment_text = File.read('app/models/comment.rb')
+              comment_text.should =~ /belongs_to :post/
+              comment_text.should_not =~ /embedded_in :post/
+            end
+          end
+        end
+      end
+    end
+  end
+
   def clone_application(repo_url, subdir: nil, rails_version: nil)
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(File.basename(repo_url))
       ChildProcessHelper.check_call(%w(git clone) + [repo_url])
       Dir.chdir(File.join(*[File.basename(repo_url), subdir].compact)) do
-        gemfile_lines = IO.readlines('Gemfile')
-        gemfile_lines.delete_if do |line|
-          line =~ /mongoid/
-        end
-        gemfile_lines << "gem 'mongoid', path: '#{File.expand_path(BASE)}'\n"
-        if rails_version
-          gemfile_lines.delete_if do |line|
-            line =~ /rails/
-          end
-          gemfile_lines << "gem 'rails', '#{rails_version}'\n"
-        end
-        File.open('Gemfile', 'w') do |f|
-          f << gemfile_lines.join
-        end
+        adjust_app_gemfile(rails_version: rails_version)
         ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
         puts `git diff`
 
@@ -114,6 +129,23 @@ describe 'Mongoid application tests' do
 
         yield
       end
+    end
+  end
+
+  def adjust_app_gemfile(rails_version: nil)
+    gemfile_lines = IO.readlines('Gemfile')
+    gemfile_lines.delete_if do |line|
+      line =~ /mongoid/
+    end
+    gemfile_lines << "gem 'mongoid', path: '#{File.expand_path(BASE)}'\n"
+    if rails_version
+      gemfile_lines.delete_if do |line|
+        line =~ /rails/
+      end
+      gemfile_lines << "gem 'rails', '#{rails_version}'\n"
+    end
+    File.open('Gemfile', 'w') do |f|
+      f << gemfile_lines.join
     end
   end
 
