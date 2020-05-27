@@ -2907,7 +2907,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         expect(posts).to eq([ post_one ])
       end
 
-      context 'when providing a collation', if: collation_supported? do
+      context 'when providing a collation' do
+        min_server_version '3.4'
 
         let(:posts) do
           person.posts.where(title: "FIRST").collation(locale: 'en_US', strength: 2)
