@@ -171,7 +171,8 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context 'when a collation is specified', if: collation_supported? do
+    context 'when a collation is specified' do
+      min_server_version '3.4'
 
       let(:context) do
         described_class.new(criteria)
@@ -232,7 +233,8 @@ describe Mongoid::Contextual::Mongo do
           expect(deleted).to eq(1)
         end
 
-        context 'when the criteria has a collation', if: collation_supported? do
+        context 'when the criteria has a collation' do
+          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -336,7 +338,8 @@ describe Mongoid::Contextual::Mongo do
           expect(destroyed).to eq(1)
         end
 
-        context 'when the criteria has a collation', if: collation_supported? do
+        context 'when the criteria has a collation' do
+          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -458,7 +461,8 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context 'when a collation is specified', if: collation_supported? do
+    context 'when a collation is specified' do
+      min_server_version '3.4'
 
       before do
         Band.create(name: 'DEPECHE MODE')
@@ -496,7 +500,8 @@ describe Mongoid::Contextual::Mongo do
       described_class.new(criteria)
     end
 
-    context 'when the criteria has a collation', if: collation_supported? do
+    context 'when the criteria has a collation' do
+      min_server_version '3.4'
 
       let(:criteria) do
         Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -853,7 +858,8 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context 'when a collation is specified on the criteria', if: collation_supported? do
+      context 'when a collation is specified on the criteria' do
+        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1006,7 +1012,8 @@ describe Mongoid::Contextual::Mongo do
         end
       end
 
-      context 'when a collation is specified on the criteria', if: collation_supported? do
+      context 'when a collation is specified on the criteria' do
+        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1080,7 +1087,8 @@ describe Mongoid::Contextual::Mongo do
         }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
 
-      context 'when a collation is specified on the criteria', if: collation_supported? do
+      context 'when a collation is specified on the criteria' do
+        min_server_version '3.4'
 
         let(:criteria) do
           Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -1152,7 +1160,8 @@ describe Mongoid::Contextual::Mongo do
           expect(context.send(method)).to eq(depeche_mode)
         end
 
-        context 'when the criteria has a collation', if: collation_supported? do
+        context 'when the criteria has a collation' do
+          min_server_version '3.4'
 
           let(:criteria) do
             Band.where(name: "DEPECHE MODE").collation(locale: 'en_US', strength: 2)
@@ -2178,7 +2187,8 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context 'when provided array filters', if: array_filters_supported? do
+    context 'when provided array filters' do
+      min_server_version '3.6'
 
       before do
         Band.delete_all
@@ -2350,7 +2360,8 @@ describe Mongoid::Contextual::Mongo do
       end
     end
 
-    context 'when provided array filters', if: array_filters_supported? do
+    context 'when provided array filters' do
+      min_server_version '3.6'
 
       before do
         Band.delete_all
@@ -2388,7 +2399,7 @@ describe Mongoid::Contextual::Mongo do
 
   describe '#pipeline' do
 
-    context 'when the criteria has a selector', if: non_legacy_server? do
+    context 'when the criteria has a selector' do
 
       before do
         Artist.index(name: "text")

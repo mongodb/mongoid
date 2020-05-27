@@ -195,14 +195,16 @@ describe Mongoid::Contextual::MapReduce do
         Band.where(name: 'DEPECHE MODE').collation(locale: 'en_US', strength: 2)
       end
 
-      context 'when the server supports collations', if: collation_supported? do
+      context 'when the server supports collations' do
+        min_server_version '3.4'
 
         it 'applies the collation' do
           expect(map_reduce.out(inline: 1).count).to eq(1)
         end
       end
 
-      context 'when the server does not support collations', unless: collation_supported? do
+      context 'when the server does not support collations' do
+        max_server_version '3.2'
 
         it 'raises an exception' do
           expect {

@@ -9,7 +9,7 @@ module Constraints
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 
-    before do
+    before(:all) do
       if version > RAILS_VERSION
         skip "Rails version #{version} or higher required, we have #{RAILS_VERSION}"
       end
@@ -21,7 +21,7 @@ module Constraints
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 
-    before do
+    before(:all) do
       if version < RAILS_VERSION
         skip "Rails version #{version} or lower required, we have #{RAILS_VERSION}"
       end
@@ -33,7 +33,7 @@ module Constraints
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 
-    before do
+    before(:all) do
       if version > ClusterConfig.instance.server_version
         skip "Server version #{version} or higher required, we have #{ClusterConfig.instance.server_version}"
       end
@@ -45,7 +45,7 @@ module Constraints
       raise ArgumentError, "Version can only be major.minor: #{version}"
     end
 
-    before do
+    before(:all) do
       if version < ClusterConfig.instance.short_server_version
         skip "Server version #{version} or lower required, we have #{ClusterConfig.instance.server_version}"
       end
@@ -54,9 +54,11 @@ module Constraints
 
   def require_topology(*topologies)
     invalid_topologies = topologies - [:single, :replica_set, :sharded]
+
     unless invalid_topologies.empty?
       raise ArgumentError, "Invalid topologies requested: #{invalid_topologies.join(', ')}"
     end
+
     before(:all) do
       unless topologies.include?(topology = ClusterConfig.instance.topology)
         skip "Topology #{topologies.join(' or ')} required, we have #{topology}"
@@ -73,8 +75,22 @@ module Constraints
   end
 
   def require_transaction_support
-    min_server_fcv '4.0'
-    require_topology :replica_set
+    before(:all) do
+      case ClusterConfig.instance.topology
+      when :single
+        skip 'Transactions tests require a replica set (4.0+) or a sharded cluster (4.2+)'
+      when :replica_set
+        unless ClusterConfig.instance.server_version >= '4.0'
+          skip 'Transactions tests in a replica set topology require server 4.0+'
+        end
+      when :sharded
+        unless ClusterConfig.instance.server_version >= '4.2'
+          skip 'Transactions tests in a sharded cluster topology require server 4.2+'
+        end
+      else
+        raise NotImplementedError
+      end
+    end
   end
 
   def require_tls
