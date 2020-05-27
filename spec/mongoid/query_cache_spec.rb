@@ -180,7 +180,8 @@ describe Mongoid::QueryCache do
         end
       end
 
-      context 'when the first query has a collation', if: collation_supported? do
+      context 'when the first query has a collation' do
+        min_server_version '3.4'
 
         before do
           Band.where(name: 'DEPECHE MODE').collation(locale: 'en_US', strength: 2).to_a

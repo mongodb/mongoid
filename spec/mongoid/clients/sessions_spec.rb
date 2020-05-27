@@ -40,7 +40,8 @@ describe Mongoid::Clients::Sessions do
 
   context 'when a session is used on a model class' do
 
-    context 'when sessions are supported', if: sessions_supported? do
+    context 'when sessions are supported' do
+      min_server_version '3.6'
 
       around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
@@ -169,7 +170,8 @@ describe Mongoid::Clients::Sessions do
       end
     end
 
-    context 'when sessions are not supported', unless: sessions_supported? do
+    context 'when sessions are not supported' do
+      max_server_version '3.4'
 
       let!(:error) do
         e = nil
@@ -196,7 +198,8 @@ describe Mongoid::Clients::Sessions do
       end
     end
 
-    context 'when sessions are supported', if: sessions_supported? do
+    context 'when sessions are supported' do
+      min_server_version '3.6'
 
       around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
@@ -313,7 +316,8 @@ describe Mongoid::Clients::Sessions do
       end
     end
 
-    context 'when sessions are not supported', unless: sessions_supported? do
+    context 'when sessions are not supported' do
+      max_server_version '3.4'
 
       let!(:error) do
         e = nil

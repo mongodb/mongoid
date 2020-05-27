@@ -3499,7 +3499,8 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "when querying on a BSON::Decimal128", if: decimal128_supported? do
+      context "when querying on a BSON::Decimal128" do
+        min_server_version '3.4'
 
         let(:decimal) do
           BSON::Decimal128.new("0.0005")

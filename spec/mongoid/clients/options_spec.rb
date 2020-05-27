@@ -11,7 +11,7 @@ describe Mongoid::Clients::Options do
     Mongoid::Clients.clients.clear
   end
 
-  describe '#with', if: non_legacy_server? do
+  describe '#with' do
 
     context 'when passing some options' do
 
@@ -72,7 +72,7 @@ describe Mongoid::Clients::Options do
         end
       end
 
-      context 'when passing a block', if: testing_locally? do
+      context 'when passing a block' do
 
         let!(:connections_before) do
           Minim.mongo_client.database.command(serverStatus: 1).first['connections']['current']
@@ -284,7 +284,7 @@ describe Mongoid::Clients::Options do
     end
   end
 
-  describe '.with', if: non_legacy_server? do
+  describe '.with' do
 
     context 'when passing some options' do
 
@@ -362,7 +362,7 @@ describe Mongoid::Clients::Options do
         end
       end
 
-      context 'when passing a block', if: testing_locally? do
+      context 'when passing a block' do
 
         let!(:connections_before) do
           test_model.mongo_client.database.command(serverStatus: 1).first['connections']['current']

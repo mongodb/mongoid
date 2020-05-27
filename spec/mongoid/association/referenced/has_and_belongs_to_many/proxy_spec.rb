@@ -2686,7 +2686,8 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         expect(preferences).to eq([ preference_one ])
       end
 
-      context 'when providing a collation', if: collation_supported? do
+      context 'when providing a collation' do
+        min_server_version '3.4'
 
         let(:preferences) do
           person.preferences.where(name: "FIRST").collation(locale: 'en_US', strength: 2).to_a

@@ -75,33 +75,6 @@ CONFIG = {
   }
 }
 
-def non_legacy_server?
-  Mongoid::Clients.default.cluster.servers.first.features.write_command_enabled?
-end
-
-def collation_supported?
-  Mongoid::Clients.default.cluster.next_primary.features.collation_enabled?
-end
-alias :decimal128_supported? :collation_supported?
-
-def array_filters_supported?
-  Mongoid::Clients.default.cluster.next_primary.features.array_filters_enabled?
-end
-alias :sessions_supported? :array_filters_supported?
-
-def transactions_supported?
-  features = Mongoid::Clients.default.cluster.next_primary.features
-  features.respond_to?(:transactions_enabled?) && features.transactions_enabled?
-end
-
-def testing_transactions?
-  transactions_supported? && testing_replica_set?
-end
-
-def testing_locally?
-  !(ENV['CI'] == 'travis')
-end
-
 # Set the database that the spec suite connects to.
 Mongoid.configure do |config|
   config.load_configuration(CONFIG)

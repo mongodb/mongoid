@@ -725,7 +725,7 @@ describe Mongoid::Clients do
     end
   end
 
-  describe ".store_in", if: non_legacy_server? do
+  describe ".store_in" do
 
     context "when provided a non hash" do
 
@@ -762,7 +762,7 @@ describe Mongoid::Clients do
     end
   end
 
-  describe ".with", if: non_legacy_server? do
+  describe ".with" do
 
     context "when changing write concern options" do
 

@@ -45,7 +45,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when database specific options exist", if: non_legacy_server? do
+    context "when database specific options exist" do
 
       let(:klass) do
         Class.new do
@@ -95,7 +95,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when database options are specified", if: non_legacy_server? do
+    context "when database options are specified" do
 
       let(:klass) do
         Class.new do
@@ -133,7 +133,8 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when a collation option is specified", if: collation_supported? do
+    context "when a collation option is specified" do
+      min_server_version '3.4'
 
       let(:klass) do
         Class.new do
@@ -308,7 +309,8 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when providing a collation option", if: collation_supported? do
+    context "when providing a collation option" do
+      min_server_version '3.4'
 
       before do
         klass.index({ name: 1 }, collation: { locale: 'en_US', strength: 2 })

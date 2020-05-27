@@ -133,7 +133,7 @@ describe "Mongoid::Tasks::Database" do
       expect(removed_indexes).to be_empty
     end
 
-    context 'when the index is a text index', if: non_legacy_server? do
+    context 'when the index is a text index' do
 
       before do
         class Band
