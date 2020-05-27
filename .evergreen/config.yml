@@ -29,6 +29,16 @@ functions:
     - command: git.get_project
       params:
         directory: "src"
+
+  "fetch egos":
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+          
+          curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
+          chmod +x ./egos
   
   "create expansions":
     # Make an evergreen exapanstion file with dynamic values
@@ -285,7 +295,15 @@ functions:
         working_dir: "src"
         script: |
           ${PREPARE_SHELL}
-          MONGODB_URI="${MONGODB_URI}" TOPOLOGY=${TOPOLOGY} RVM_RUBY="${RVM_RUBY}" RAILS="${RAILS}" DRIVER="${DRIVER}" I18N="${I18N}" .evergreen/run-tests.sh
+          env \
+            MONGODB_URI="${MONGODB_URI}" \
+            TOPOLOGY=${TOPOLOGY} \
+            RVM_RUBY="${RVM_RUBY}" \
+            RAILS="${RAILS}" \
+            DRIVER="${DRIVER}" \
+            I18N="${I18N}" \
+            TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
+            ./egos .evergreen/run-tests.sh
 
   "cleanup":
     - command: shell.exec
@@ -324,6 +342,7 @@ functions:
 
 pre:
   - func: "fetch source"
+  - func: "fetch egos"
   - func: "create expansions"
   - func: "prepare resources"
   - func: "fix absolute paths"
