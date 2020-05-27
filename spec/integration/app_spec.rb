@@ -67,7 +67,7 @@ describe 'Mongoid application tests' do
 
             begin
               # JRuby needs a long timeout
-              wait_for_port(3000, 20)
+              wait_for_port(3000, 30)
               sleep 1
 
               uri = URI.parse('http://localhost:3000/posts')
