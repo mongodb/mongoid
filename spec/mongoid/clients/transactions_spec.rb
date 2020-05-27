@@ -355,13 +355,18 @@ describe Mongoid::Clients::Sessions do
       # Could also test 4.0 in sharded cluster
       max_server_version '3.6'
 
-      before do
+      around do |example|
         Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
         Mongoid::Clients.with_name(:other).command(create: :people)
-      end
 
-      after do
-        Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
+        begin
+          subscriber.clear_events!
+          person.with(client: :other) do
+            example.run
+          end
+        ensure
+          Mongoid::Clients.with_name(:other).database.collections.each(&:drop)
+        end
       end
 
       let!(:error) do
@@ -380,11 +385,8 @@ describe Mongoid::Clients::Sessions do
       end
 
       it 'raises a sessions not supported error' do
-        subscriber.clear_events!
-        person.with(client: :other) do
-          expect(person.reload.username).not_to be('Emily')
-          expect(error).to be_a(Mongo::Error::OperationFailure)
-        end
+        expect(person.reload.username).not_to be('Emily')
+        expect(error).to be_a(Mongo::Error::OperationFailure)
       end
     end
   end
