@@ -116,6 +116,39 @@ describe 'Mongoid application tests' do
     end
   end
 
+  context 'local test applications' do
+    let(:client) { Mongoid.default_client }
+
+    describe 'create_indexes rake task' do
+      APP_PATH = File.join(File.dirname(__FILE__), '../../test-apps/rails-api')
+
+      before do
+        Dir.chdir(APP_PATH) do
+          ChildProcessHelper.check_call(%w(bundle install))
+          write_mongoid_yml
+        end
+
+        client['posts'].drop
+        client['posts'].create
+      end
+
+      it 'creates an index' do
+        index = client['posts'].indexes.detect do |index|
+          index['key'] == {'subject' => 1}
+        end
+        index.should be nil
+
+        ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
+          cwd: APP_PATH, env: clean_env)
+
+        index = client['posts'].indexes.detect do |index|
+          index['key'] == {'subject' => 1}
+        end
+        index.should be_a(Hash)
+      end
+    end
+  end
+
   def clone_application(repo_url, subdir: nil, rails_version: nil)
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(File.basename(repo_url))
@@ -125,13 +158,21 @@ describe 'Mongoid application tests' do
         ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
         puts `git diff`
 
-        config = {'development' => {'clients' => {'default' => {'uri' => SpecConfig.instance.uri_str}}}}
-        File.open('config/mongoid.yml', 'w') do |f|
-          f << YAML.dump(config)
-        end
+        write_mongoid_yml
 
         yield
       end
+    end
+  end
+
+  def write_mongoid_yml
+    config = {'development' => {'clients' => {'default' => {
+      # TODO massive hack, will fail if uri specifies a database name or
+      # any uri options
+      'uri' => "#{SpecConfig.instance.uri_str}/mongoid_test",
+    }}}}
+    File.open('config/mongoid.yml', 'w') do |f|
+      f << YAML.dump(config)
     end
   end
 
