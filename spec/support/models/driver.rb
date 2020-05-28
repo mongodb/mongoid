@@ -7,4 +7,4 @@ class Driver
   accepts_nested_attributes_for :vehicle
 end
 
-require "app/models/learner"
+require "support/models/learner"

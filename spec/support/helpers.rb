@@ -6,6 +6,6 @@ module Helpers
     Object.class_eval do
       remove_const(name)
     end
-    load "spec/app/models/#{name.to_s.underscore}.rb"
+    load "spec/support/models/#{name.to_s.underscore}.rb"
   end
 end

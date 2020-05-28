@@ -1707,8 +1707,8 @@ describe Mongoid::Interceptable do
   context "when loading a model multiple times" do
 
     before do
-      load "spec/app/models/callback_test.rb"
-      load "spec/app/models/callback_test.rb"
+      load File.join(MODELS, "callback_test.rb")
+      load File.join(MODELS, "callback_test.rb")
     end
 
     let(:callback) do

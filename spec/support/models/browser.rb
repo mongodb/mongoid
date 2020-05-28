@@ -6,4 +6,4 @@ class Browser < Canvas
   def render; end
 end
 
-require "app/models/firefox"
+require "support/models/firefox"

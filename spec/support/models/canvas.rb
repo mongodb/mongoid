@@ -25,4 +25,4 @@ class Canvas
   end
 end
 
-require "app/models/browser"
+require "support/models/browser"

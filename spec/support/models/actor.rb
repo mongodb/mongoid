@@ -18,4 +18,4 @@ class Actor
   end
 end
 
-require "app/models/actress"
+require "support/models/actress"
