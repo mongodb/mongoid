@@ -120,31 +120,41 @@ describe 'Mongoid application tests' do
     let(:client) { Mongoid.default_client }
 
     describe 'create_indexes rake task' do
+
       APP_PATH = File.join(File.dirname(__FILE__), '../../test-apps/rails-api')
 
-      before do
-        Dir.chdir(APP_PATH) do
-          ChildProcessHelper.check_call(%w(bundle install))
-          write_mongoid_yml
+      %w(development production).each do |rails_env|
+        context "in #{rails_env}" do
+
+          let(:env) do
+            clean_env.merge(RAILS_ENV: rails_env)
+          end
+
+          before do
+            Dir.chdir(APP_PATH) do
+              ChildProcessHelper.check_call(%w(bundle install), env: env)
+              write_mongoid_yml
+            end
+
+            client['posts'].drop
+            client['posts'].create
+          end
+
+          it 'creates an index' do
+            index = client['posts'].indexes.detect do |index|
+              index['key'] == {'subject' => 1}
+            end
+            index.should be nil
+
+            ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
+              cwd: APP_PATH, env: env)
+
+            index = client['posts'].indexes.detect do |index|
+              index['key'] == {'subject' => 1}
+            end
+            index.should be_a(Hash)
+          end
         end
-
-        client['posts'].drop
-        client['posts'].create
-      end
-
-      it 'creates an index' do
-        index = client['posts'].indexes.detect do |index|
-          index['key'] == {'subject' => 1}
-        end
-        index.should be nil
-
-        ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
-          cwd: APP_PATH, env: clean_env)
-
-        index = client['posts'].indexes.detect do |index|
-          index['key'] == {'subject' => 1}
-        end
-        index.should be_a(Hash)
       end
     end
   end
@@ -166,11 +176,12 @@ describe 'Mongoid application tests' do
   end
 
   def write_mongoid_yml
-    config = {'development' => {'clients' => {'default' => {
+    env_config = {'clients' => {'default' => {
       # TODO massive hack, will fail if uri specifies a database name or
       # any uri options
       'uri' => "#{SpecConfig.instance.uri_str}/mongoid_test",
-    }}}}
+    }}}
+    config = {'development' => env_config, 'production' => env_config}
     File.open('config/mongoid.yml', 'w') do |f|
       f << YAML.dump(config)
     end
