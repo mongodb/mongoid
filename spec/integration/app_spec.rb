@@ -135,6 +135,7 @@ describe 'Mongoid application tests' do
 
               before do
                 Dir.chdir(APP_PATH) do
+                  remove_bundler_req
                   ChildProcessHelper.check_call(%w(bundle install), env: env)
                   write_mongoid_yml
                 end
@@ -193,15 +194,7 @@ describe 'Mongoid application tests' do
   end
 
   def adjust_app_gemfile(rails_version: nil)
-    lock_lines = IO.readlines('Gemfile.lock')
-    # Get rid of the bundled with line so that whatever bundler is installed
-    # on the system is usable with the application.
-    if i = lock_lines.index("BUNDLED WITH\n")
-      lock_lines.slice!(i, 2)
-      File.open('Gemfile.lock', 'w') do |f|
-        f << lock_lines.join
-      end
-    end
+    remove_bundler_req
 
     gemfile_lines = IO.readlines('Gemfile')
     gemfile_lines.delete_if do |line|
@@ -216,6 +209,18 @@ describe 'Mongoid application tests' do
     end
     File.open('Gemfile', 'w') do |f|
       f << gemfile_lines.join
+    end
+  end
+
+  def remove_bundler_req
+    lock_lines = IO.readlines('Gemfile.lock')
+    # Get rid of the bundled with line so that whatever bundler is installed
+    # on the system is usable with the application.
+    if i = lock_lines.index("BUNDLED WITH\n")
+      lock_lines.slice!(i, 2)
+      File.open('Gemfile.lock', 'w') do |f|
+        f << lock_lines.join
+      end
     end
   end
 
