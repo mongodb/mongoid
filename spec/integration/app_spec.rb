@@ -126,33 +126,38 @@ describe 'Mongoid application tests' do
       %w(development production).each do |rails_env|
         context "in #{rails_env}" do
 
-          let(:env) do
-            clean_env.merge(RAILS_ENV: rails_env)
-          end
+          %w(classic zeitwerk).each do |autoloader|
+            context "with #{autoloader} autoloader" do
 
-          before do
-            Dir.chdir(APP_PATH) do
-              ChildProcessHelper.check_call(%w(bundle install), env: env)
-              write_mongoid_yml
+              let(:env) do
+                clean_env.merge(RAILS_ENV: rails_env, AUTOLOADER: autoloader)
+              end
+
+              before do
+                Dir.chdir(APP_PATH) do
+                  ChildProcessHelper.check_call(%w(bundle install), env: env)
+                  write_mongoid_yml
+                end
+
+                client['posts'].drop
+                client['posts'].create
+              end
+
+              it 'creates an index' do
+                index = client['posts'].indexes.detect do |index|
+                  index['key'] == {'subject' => 1}
+                end
+                index.should be nil
+
+                ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
+                  cwd: APP_PATH, env: env)
+
+                index = client['posts'].indexes.detect do |index|
+                  index['key'] == {'subject' => 1}
+                end
+                index.should be_a(Hash)
+              end
             end
-
-            client['posts'].drop
-            client['posts'].create
-          end
-
-          it 'creates an index' do
-            index = client['posts'].indexes.detect do |index|
-              index['key'] == {'subject' => 1}
-            end
-            index.should be nil
-
-            ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
-              cwd: APP_PATH, env: env)
-
-            index = client['posts'].indexes.detect do |index|
-              index['key'] == {'subject' => 1}
-            end
-            index.should be_a(Hash)
           end
         end
       end
