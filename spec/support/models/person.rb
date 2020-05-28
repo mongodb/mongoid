@@ -210,4 +210,4 @@ class Person
   reset_callbacks(:destroy)
 end
 
-require "app/models/doctor"
+require "support/models/doctor"

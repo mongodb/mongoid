@@ -8,4 +8,4 @@ class Item
   field :user_login, type: String
 end
 
-require "app/models/sub_item"
+require "support/models/sub_item"

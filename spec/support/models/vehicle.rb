@@ -10,5 +10,5 @@ class Vehicle
   accepts_nested_attributes_for :shipping_container
 end
 
-require "app/models/car"
-require "app/models/truck"
+require "support/models/car"
+require "support/models/truck"
