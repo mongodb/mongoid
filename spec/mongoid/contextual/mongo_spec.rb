@@ -451,7 +451,7 @@ describe Mongoid::Contextual::Mongo do
       end
 
       it "returns the distinct field values" do
-        expect(context.distinct(:years)).to eq([ 30, 25 ])
+        expect(context.distinct(:years).sort).to eq([ 25, 30 ])
       end
     end
 
