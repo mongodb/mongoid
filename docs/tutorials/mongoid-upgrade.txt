@@ -267,6 +267,18 @@ Improvement: ``Model.where`` can now be called with no arguments.
 
 Improvement: Polymorphic ``belongs_to`` associations can now be eagerly loaded.
 
+Changes in Mongoid 7.1.2
+------------------------
+
+The model generator now creates a ``belongs_to`` association when a field type
+is specified to be `belongs_to` as the following example shows:
+
+.. code-block:: sh
+
+  rails g model Comment message:text post:belongs_to
+
+Previously, an ``embedded_in`` association was created in this case.
+
 
 Upgrading to Mongoid 7.0
 ========================
