@@ -29,9 +29,18 @@ functions:
     - command: git.get_project
       params:
         directory: "src"
-    # Applies the subitted patch, if any
-    # Deprecated. Should be removed. But still needed for certain agents (ZAP)
-    - command: git.apply_patch
+
+  "fetch egos":
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+          
+          curl -sfLo egos https://raw.githubusercontent.com/p-mongo/egos/master/egos
+          chmod +x ./egos
+  
+  "create expansions":
     # Make an evergreen exapanstion file with dynamic values
     - command: shell.exec
       params:
@@ -75,6 +84,13 @@ functions:
               export TMPDIR="$MONGO_ORCHESTRATION_HOME/db"
               export PATH="$MONGODB_BINARIES:$PATH"
               export PROJECT="${project}"
+              
+              export MONGODB_VERSION=${VERSION}
+              export TOPOLOGY=${TOPOLOGY}
+              export SINGLE_MONGOS=${SINGLE_MONGOS}
+              export AUTH=${AUTH}
+              export SSL=${SSL}
+              export APP_TESTS=${APP_TESTS}
            EOT
            # See what we've done
            cat expansion.yml
@@ -97,67 +113,6 @@ functions:
             git clone git://github.com/mongodb-labs/drivers-evergreen-tools.git $DRIVERS_TOOLS
           fi
           echo "{ \"releases\": { \"default\": \"$MONGODB_BINARIES\" }}" > $MONGO_ORCHESTRATION_HOME/orchestration.config
-
-  "upload release":
-    - command: s3.put
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        local_file: ${project}.tar.gz
-        remote_file: ${UPLOAD_BUCKET}/${project}-${CURRENT_VERSION}.tar.gz
-        bucket: mciuploads
-        permissions: public-read
-        content_type: ${content_type|application/x-gzip}
-
-  # Upload build artifacts that other tasks may depend on
-  # Note this URL needs to be totally unique, while predictable for the next task
-  # so it can automatically download the artifacts
-  "upload build":
-    # Compress and upload the entire build directory
-    - command: archive.targz_pack
-      params:
-        # Example: mongo_c_driver_releng_9dfb7d741efbca16faa7859b9349d7a942273e43_16_11_08_19_29_52.tar.gz
-        target: "${build_id}.tar.gz"
-        source_dir: ${PROJECT_DIRECTORY}/
-        include:
-          - "./**"
-    - command: s3.put
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        local_file: ${build_id}.tar.gz
-        # Example: /mciuploads/${UPLOAD_BUCKET}/gcc49/9dfb7d741efbca16faa7859b9349d7a942273e43/debug-compile-nosasl-nossl/mongo_c_driver_releng_9dfb7d741efbca16faa7859b9349d7a942273e43_16_11_08_19_29_52.tar.gz
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${task_name}/${build_id}.tar.gz
-        bucket: mciuploads
-        permissions: public-read
-        content_type: ${content_type|application/x-gzip}
-
-  "fetch build":
-    - command: shell.exec
-      params:
-        continue_on_err: true
-        script: "set -o xtrace && rm -rf ${PROJECT_DIRECTORY}"
-    - command: s3.get
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${BUILD_NAME}/${build_id}.tar.gz
-        bucket: mciuploads
-        local_file: build.tar.gz
-    - command: shell.exec
-      params:
-        continue_on_err: true
-        # EVG-1105: Use s3.get extract_to: ./
-        script: "set -o xtrace && cd .. && rm -rf ${PROJECT_DIRECTORY} && mkdir ${PROJECT_DIRECTORY}/ && tar xf build.tar.gz -C ${PROJECT_DIRECTORY}/"
-
-  "exec compile script" :
-    - command: shell.exec
-      type: test
-      params:
-        working_dir: "src"
-        script: |
-          ${PREPARE_SHELL}
-          [ -f ${PROJECT_DIRECTORY}/${file} ] && BUILDTOOL="${buildtool}" sh ${PROJECT_DIRECTORY}/${file} || echo "${PROJECT_DIRECTORY}/${file} not available, skipping"
 
   "exec script" :
     - command: shell.exec
@@ -205,35 +160,6 @@ functions:
         permissions: public-read
         content_type: text/html
         display_name: "Coverage Report"
-
-  "upload scan artifacts" :
-    - command: shell.exec
-      type: test
-      params:
-        script: |
-          cd
-          if find ${PROJECT_DIRECTORY}/scan -name \*.html | grep -q html; then
-            (cd ${PROJECT_DIRECTORY}/scan && find . -name index.html -exec echo "<li><a href='{}'>{}</a></li>" \;) >> scan.html
-          else
-            echo "No issues found" > scan.html
-          fi
-    - command: shell.exec
-      params:
-        silent: true
-        script: |
-           export AWS_ACCESS_KEY_ID=${aws_key}
-           export AWS_SECRET_ACCESS_KEY=${aws_secret}
-           aws s3 cp ${PROJECT_DIRECTORY}/scan s3://mciuploads/${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/scan/ --recursive --acl public-read --region us-east-1
-    - command: s3.put
-      params:
-        aws_key: ${aws_key}
-        aws_secret: ${aws_secret}
-        local_file:  ${PROJECT_DIRECTORY}/scan.html
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/scan/index.html
-        bucket: mciuploads
-        permissions: public-read
-        content_type: text/html
-        display_name: "Scan Build Report"
 
   "upload mo artifacts":
     - command: shell.exec
@@ -305,8 +231,43 @@ functions:
         # This is specified in this yaml file earlier.
         local_file: ./src/tmp/rspec.json
         display_name: rspec.json
-        remote_file: ${UPLOAD_BUCKET}/${build_variant}/${revision}/${version_id}/${build_id}/artifacts/${task_id}-${execution}-rspec.json
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json
         content_type: application/json
+        permissions: public-read
+        bucket: mciuploads
+    # AWS does not appear to support on-the-fly gzip encoding; compress
+    # the results manually and upload a compressed file.
+    # Typical size reduction: 50 MB -> 800 KB
+    - command: shell.exec
+      params:
+        script: |
+          gzip <src/tmp/rspec.json >src/tmp/rspec.json.gz
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.json.gz
+        display_name: rspec.json.gz
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json.gz
+        content_type: application/gzip
+        permissions: public-read
+        bucket: mciuploads
+    - command: shell.exec
+      params:
+        script: |
+          xz -9 <src/tmp/rspec.json >src/tmp/rspec.json.xz
+    - command: s3.put
+      params:
+        aws_key: ${aws_key}
+        aws_secret: ${aws_secret}
+        # src is the relative path to repo checkout,
+        # This is specified in this yaml file earlier.
+        local_file: ./src/tmp/rspec.json.xz
+        display_name: rspec.json.xz
+        remote_file: ${UPLOAD_BUCKET}/${version_id}/${build_id}/artifacts/${build_variant}/rspec.json.xz
+        content_type: application/x-xz
         permissions: public-read
         bucket: mciuploads
 
@@ -320,7 +281,7 @@ functions:
       params:
         script: |
           ${PREPARE_SHELL}
-          MONGODB_VERSION=${VERSION} TOPOLOGY=${TOPOLOGY} AUTH=${AUTH} SSL=${SSL} sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
+          sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
     # run-orchestration generates expansion file with the MONGODB_URI for the cluster
     - command: expansions.update
       params:
@@ -334,7 +295,15 @@ functions:
         working_dir: "src"
         script: |
           ${PREPARE_SHELL}
-          MONGODB_URI="${MONGODB_URI}" TOPOLOGY=${TOPOLOGY} RVM_RUBY="${RVM_RUBY}" RAILS="${RAILS}" DRIVER="${DRIVER}" I18N="${I18N}" .evergreen/run-tests.sh
+          env \
+            MONGODB_URI="${MONGODB_URI}" \
+            TOPOLOGY=${TOPOLOGY} \
+            RVM_RUBY="${RVM_RUBY}" \
+            RAILS="${RAILS}" \
+            DRIVER="${DRIVER}" \
+            I18N="${I18N}" \
+            TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
+            ./egos .evergreen/run-tests.sh
 
   "cleanup":
     - command: shell.exec
@@ -361,32 +330,6 @@ functions:
             perl -p -i -e "s|ABSOLUTE_PATH_REPLACEMENT_TOKEN|${DRIVERS_TOOLS}|g" $filename
           done
 
-  "windows fix":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          for i in $(find ${DRIVERS_TOOLS}/.evergreen ${PROJECT_DIRECTORY}/.evergreen -name \*.sh); do
-            cat $i | tr -d '\r' > $i.new
-            mv $i.new $i
-          done
-
-  "make files executable":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          for i in $(find ${DRIVERS_TOOLS}/.evergreen ${PROJECT_DIRECTORY}/.evergreen -name \*.sh); do
-            chmod +x $i
-          done
-
-  "init test-results":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          echo '{"results": [{ "status": "FAIL", "test_file": "Build", "log_raw": "No test-results.json found was created"  } ]}' > ${PROJECT_DIRECTORY}/test-results.json
-
   "install dependencies":
     - command: shell.exec
       type: test
@@ -399,11 +342,10 @@ functions:
 
 pre:
   - func: "fetch source"
+  - func: "fetch egos"
+  - func: "create expansions"
   - func: "prepare resources"
-  - func: "windows fix"
   - func: "fix absolute paths"
-  - func: "init test-results"
-  - func: "make files executable"
   - func: "install dependencies"
 
 post:
@@ -424,6 +366,10 @@ axes:
   - id: "mongodb-version"
     display_name: MongoDB Version
     values:
+      - id: "4.4"
+        display_name: "MongoDB 4.4"
+        variables:
+           VERSION: "4.4"
       - id: "4.2"
         display_name: "MongoDB 4.2"
         variables:
@@ -467,6 +413,7 @@ axes:
         display_name: Sharded Cluster
         variables:
            TOPOLOGY: "sharded_cluster"
+           SINGLE_MONGOS: true
   - id: "auth"
     display_name: Authentication
     values:
@@ -512,6 +459,10 @@ axes:
         display_name: ruby-2.6
         variables:
            RVM_RUBY: "ruby-2.6"
+      - id: "ruby-2.7"
+        display_name: ruby-2.7
+        variables:
+           RVM_RUBY: "ruby-2.7"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -602,10 +553,26 @@ axes:
   - id: "i18n"
     display_name: I18n version
     values:
-      - id: 1.0
+      - id: '1.0'
         display_name: "i18n-1.0"
         variables:
            I18N: "1.0"
+      - id: current
+        display_name: "i18n-current"
+  - id: "test-i18n-fallbacks"
+    display_name: Test i18n fallbacks
+    values:
+      - id: yes
+        display_name: "i18n-fallbacks"
+        variables:
+           TEST_I18N_FALLBACKS: yes
+  - id: app-tests
+    display_name: Mongoid application tests
+    values:
+      - id: yes
+        display_name: Yes
+        variables:
+          APP_TESTS: yes
 
 buildvariants:
 - matrix_name: "topologies"

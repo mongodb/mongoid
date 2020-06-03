@@ -59,6 +59,16 @@ set_env_vars() {
   export CI=evergreen
   # JRUBY_OPTS were initially set for Mongoid
   export JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
+
+  if test -n "$SINGLE_MONGOS"; then
+    # Tests which perform query count assertions are incompatible with 
+    # multi-shard deployments, because of how any_instance_of assertions work
+    # (they must all be invoked on the same connection object, and in
+    # multi-shard deployments server selection rotates through available
+    # mongos nodes).
+    echo Restricting to a single mongos
+    export MONGODB_URI=`echo "$MONGODB_URI" |sed -e 's/,.*//'`
+  fi
 }
 
 setup_ruby() {
