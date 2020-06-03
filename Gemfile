@@ -29,7 +29,7 @@ group :test do
   gem 'rfc'
   platforms :mri do
     gem 'timeout-interrupt'
-    if RUBY_VERSION < '2.3'
+    if RUBY_VERSION < '2.4'
       gem 'byebug', '~> 10.0'
     else
       gem 'byebug'
@@ -39,4 +39,8 @@ end
 
 group :development do
   gem 'yard'
+end
+
+if RUBY_VERSION < '2.4'
+  gem 'rack', '~> 2.1.0'
 end
