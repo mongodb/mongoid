@@ -40,3 +40,7 @@ end
 group :development do
   gem 'yard'
 end
+
+if RUBY_VERSION <= '2.3'
+  gem 'rack', '~> 2.1.0'
+end
