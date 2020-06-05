@@ -96,7 +96,7 @@ describe 'Mongoid application tests' do
 
           Dir.chdir(TMP_BASE) do
             FileUtils.rm_rf('mongoid-test')
-            ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring), env: clean_env)
+            ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
 
             Dir.chdir('mongoid-test') do
               adjust_app_gemfile
@@ -116,6 +116,55 @@ describe 'Mongoid application tests' do
     end
   end
 
+  context 'local test applications' do
+    let(:client) { Mongoid.default_client }
+
+    describe 'create_indexes rake task' do
+
+      APP_PATH = File.join(File.dirname(__FILE__), '../../test-apps/rails-api')
+
+      %w(development production).each do |rails_env|
+        context "in #{rails_env}" do
+
+          %w(classic zeitwerk).each do |autoloader|
+            context "with #{autoloader} autoloader" do
+
+              let(:env) do
+                clean_env.merge(RAILS_ENV: rails_env, AUTOLOADER: autoloader)
+              end
+
+              before do
+                Dir.chdir(APP_PATH) do
+                  remove_bundler_req
+                  ChildProcessHelper.check_call(%w(bundle install), env: env)
+                  write_mongoid_yml
+                end
+
+                client['posts'].drop
+                client['posts'].create
+              end
+
+              it 'creates an index' do
+                index = client['posts'].indexes.detect do |index|
+                  index['key'] == {'subject' => 1}
+                end
+                index.should be nil
+
+                ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
+                  cwd: APP_PATH, env: env)
+
+                index = client['posts'].indexes.detect do |index|
+                  index['key'] == {'subject' => 1}
+                end
+                index.should be_a(Hash)
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
   def clone_application(repo_url, subdir: nil, rails_version: nil)
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(File.basename(repo_url))
@@ -125,26 +174,27 @@ describe 'Mongoid application tests' do
         ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
         puts `git diff`
 
-        config = {'development' => {'clients' => {'default' => {'uri' => SpecConfig.instance.uri_str}}}}
-        File.open('config/mongoid.yml', 'w') do |f|
-          f << YAML.dump(config)
-        end
+        write_mongoid_yml
 
         yield
       end
     end
   end
 
-  def adjust_app_gemfile(rails_version: nil)
-    lock_lines = IO.readlines('Gemfile.lock')
-    # Get rid of the bundled with line so that whatever bundler is installed
-    # on the system is usable with the application.
-    if i = lock_lines.index("BUNDLED WITH\n")
-      lock_lines.slice!(i, 2)
-      File.open('Gemfile.lock', 'w') do |f|
-        f << lock_lines.join
-      end
+  def write_mongoid_yml
+    env_config = {'clients' => {'default' => {
+      # TODO massive hack, will fail if uri specifies a database name or
+      # any uri options
+      'uri' => "#{SpecConfig.instance.uri_str}/mongoid_test",
+    }}}
+    config = {'development' => env_config, 'production' => env_config}
+    File.open('config/mongoid.yml', 'w') do |f|
+      f << YAML.dump(config)
     end
+  end
+
+  def adjust_app_gemfile(rails_version: nil)
+    remove_bundler_req
 
     gemfile_lines = IO.readlines('Gemfile')
     gemfile_lines.delete_if do |line|
@@ -159,6 +209,18 @@ describe 'Mongoid application tests' do
     end
     File.open('Gemfile', 'w') do |f|
       f << gemfile_lines.join
+    end
+  end
+
+  def remove_bundler_req
+    lock_lines = IO.readlines('Gemfile.lock')
+    # Get rid of the bundled with line so that whatever bundler is installed
+    # on the system is usable with the application.
+    if i = lock_lines.index("BUNDLED WITH\n")
+      lock_lines.slice!(i, 2)
+      File.open('Gemfile.lock', 'w') do |f|
+        f << lock_lines.join
+      end
     end
   end
 
