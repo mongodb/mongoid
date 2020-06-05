@@ -1,5 +1,7 @@
-# Mongoid
-[![Code Climate](https://codeclimate.com/github/mongodb/mongoid.svg)](https://codeclimate.com/github/mongodb/mongoid)
+Mongoid
+[![Gem Version][rubygems-img]][rubygems-url]
+[![Inline docs][inch-img]][inch-url]
+====
 
 Mongoid is an ODM (Object-Document Mapper) framework for MongoDB in Ruby.
 
@@ -63,3 +65,8 @@ Credits
 -------
 
 Durran Jordan: durran at gmail dot com
+
+[rubygems-img]: https://badge.fury.io/rb/mongoid.svg
+[rubygems-url]: http://badge.fury.io/rb/mongoid
+[inch-img]: http://inch-ci.org/github/mongodb/mongoid.svg?branch=master
+[inch-url]: http://inch-ci.org/github/mongodb/mongoid
