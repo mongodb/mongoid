@@ -29,6 +29,13 @@ functions:
     - command: git.get_project
       params:
         directory: "src"
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+          
+          git submodule update --init --recursive
 
   "fetch egos":
     - command: shell.exec
