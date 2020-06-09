@@ -322,10 +322,37 @@ describe ActiveSupport::TimeWithZone do
     end
   end
 
+  describe "#__evolve_date__" do
+
+    let(:evolved) do
+      time.__evolve_date__
+    end
+
+    context 'beginning of day' do
+      let(:time) do
+        time_zone.local(2010, 1, 1, 0, 0, 1).freeze
+      end
+
+      it "returns midnight utc" do
+        expect(evolved).to eq(Time.utc(2010, 1, 1, 0, 0, 0))
+      end
+    end
+
+    context 'end of day' do
+      let(:time) do
+        time_zone.local(2010, 1, 1, 23, 59, 59).freeze
+      end
+
+      it "returns midnight utc" do
+        expect(evolved).to eq(Time.utc(2010, 1, 1, 0, 0, 0))
+      end
+    end
+  end
+
   describe "#__evolve_time__" do
 
     let(:date) do
-      time_zone.local(2010, 1, 1, 12, 0, 0)
+      time_zone.local(2010, 1, 1, 12, 0, 0).freeze
     end
 
     let(:evolved) do

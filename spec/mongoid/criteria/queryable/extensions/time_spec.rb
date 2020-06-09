@@ -346,23 +346,35 @@ describe Time do
 
   describe "#__evolve_date__" do
 
-    let(:time) do
-      Time.new(2010, 1, 1, 12, 0, 0)
-    end
-
     let(:evolved) do
       time.__evolve_date__
     end
 
-    it "returns midnight utc" do
-      expect(evolved).to eq(Time.utc(2010, 1, 1, 0, 0, 0))
+    context 'beginning of day' do
+      let(:time) do
+        Time.new(2010, 1, 1, 0, 0, 1).freeze
+      end
+
+      it "returns midnight utc" do
+        expect(evolved).to eq(Time.utc(2010, 1, 1, 0, 0, 0))
+      end
+    end
+
+    context 'end of day' do
+      let(:time) do
+        Time.new(2010, 1, 1, 23, 59, 59).freeze
+      end
+
+      it "returns midnight utc" do
+        expect(evolved).to eq(Time.utc(2010, 1, 1, 0, 0, 0))
+      end
     end
   end
 
   describe "#__evolve_time__" do
 
     let(:time) do
-      Time.new(2010, 1, 1, 12, 0, 0)
+      Time.new(2010, 1, 1, 12, 0, 0).freeze
     end
 
     let(:evolved) do
