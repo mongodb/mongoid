@@ -81,6 +81,31 @@ configured in the association as the field name:
     index country: 1
   end
 
+.. _global-clusters:
+
+MongoDB Atlas Global Clusters
+=============================
+
+When working with MongoDB Atlas Global Clusters, you need to declare a compound
+shard key on the collection. The first key must be the ``location`` field.
+
+.. code-block:: ruby
+
+  field :location, type: String, default: 'US'
+
+
+You can read more about `Global Cluster Sharding here
+<https://docs.atlas.mongodb.com/global-cluster-sharding/>`_
+
+In order to maintain fast write operations to the Global Cluster, you should
+declare at least the ``location`` field as a shard key in your model:
+
+.. code-block:: ruby
+
+  shard_key :location, :_id
+
+When defined correctly, Mongoid will use these keys when performing all document
+writes to the Global Cluster, as well as reloads to the document.
 
 .. _sharding-management:
 
