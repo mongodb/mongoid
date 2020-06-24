@@ -8,12 +8,12 @@ describe Mongoid::Errors::NoClientConfig do
   describe "#message" do
 
     let(:error) do
-      described_class.new(:secondary)
+      described_class.new(:analytics)
     end
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "No configuration could be found for a client named 'secondary'."
+        "No configuration could be found for a client named 'analytics'."
       )
     end
 

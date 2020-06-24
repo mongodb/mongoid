@@ -52,7 +52,7 @@ in from the defaults.
 
    class Person
      include Mongoid::Document
-     store_in collection: "citizens", database: "other", client: "secondary"
+     store_in collection: "citizens", database: "other", client: "analytics"
    end
 
 The ``store_in`` macro can also take lambdas - a common case for this is multi-tenant applications.
