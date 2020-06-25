@@ -353,5 +353,47 @@ describe Mongoid::Reloadable do
         expect(reloaded.readonly?).to be(false)
       end
     end
+
+    context 'on sharded cluster' do
+      require_topology :sharded
+
+      before(:all) do
+        CONFIG[:clients][:other] = CONFIG[:clients][:default].dup
+        CONFIG[:clients][:other][:database] = 'other'
+        Mongoid::Clients.clients.values.each(&:close)
+        Mongoid::Config.send(:clients=, CONFIG[:clients])
+        Mongoid::Clients.with_name(:other).subscribe(Mongo::Monitoring::COMMAND, EventSubscriber.new)
+      end
+
+      let(:subscriber) do
+        client = Mongoid::Clients.with_name(:other)
+        monitoring = if client.respond_to?(:monitoring, true)
+          client.send(:monitoring)
+        else
+          # driver 2.5
+          client.instance_variable_get('@monitoring')
+        end
+        subscriber = monitoring.subscribers['Command'].find do |s|
+          s.is_a?(EventSubscriber)
+        end
+      end
+
+      before do
+        subscriber.clear_events!
+      end
+
+      it 'uses the shard key to reload the document' do
+        Profile.with(client: :other) do |klass|
+          profile = klass.create
+          profile.reload
+        end
+
+        find_events = subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
+        expect(find_events.length). to eq(1)
+
+        event = find_events.first
+        expect(event.command['filter'].keys).to include('name')
+      end
+    end
   end
 end
