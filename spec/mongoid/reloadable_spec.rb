@@ -378,21 +378,56 @@ describe Mongoid::Reloadable do
         end
       end
 
+      let(:find_events) do
+        find_events = subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
+      end
+
       before do
         subscriber.clear_events!
       end
 
-      it 'uses the shard key to reload the document' do
-        Profile.with(client: :other) do |klass|
-          profile = klass.create
-          profile.reload
+      context 'without embedded document' do
+        let(:profile) do
+          Profile.with(client: :other) do |klass|
+            klass.create
+          end
         end
 
-        find_events = subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
-        expect(find_events.length). to eq(1)
+        before do
+          Profile.with(client: :other) do |_|
+            profile.reload
+          end
+        end
 
-        event = find_events.first
-        expect(event.command['filter'].keys).to include('name')
+        it 'uses the shard key to reload the document' do
+          expect(find_events.length). to eq(1)
+
+          event = find_events.first
+          expect(event.command['filter'].keys).to include('name')
+        end
+      end
+
+
+      context 'with embedded document' do
+        let(:profile_image) do
+          Profile.with(client: :other) do |klass|
+            profile = klass.create
+            ProfileImage.create(profile: profile)
+          end
+        end
+
+        before do
+          Profile.with(client: :other) do |_|
+            profile_image.reload
+          end
+        end
+
+        it 'uses the shard key to reload the embedded document' do
+          expect(find_events.length). to eq(1)
+
+          event = find_events.first
+          expect(event.command['filter'].keys).to include('name')
+        end
       end
     end
   end
