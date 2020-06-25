@@ -76,7 +76,7 @@ module Mongoid
           # @since 3.0.0
           def check_polymorphic_inverses!(doc)
             inverses = _association.inverses(doc)
-            if inverses.count > 1 && _base.send(_association.foreign_key).nil?
+            if inverses.length > 1 && _base.send(_association.foreign_key).nil?
               raise Errors::InvalidSetPolymorphicRelation.new(
                   _association.name, _base.class.name, _target.class.name
               )
