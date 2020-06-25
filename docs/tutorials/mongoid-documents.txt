@@ -477,35 +477,65 @@ regular expressions.
 Defaults
 --------
 
-You can tell a field in Mongoid to always have a default value if nothing has been provided.
-Defaults are either static values or lambdas/procs.
+A field can be configured to have a fixed default value:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
-     field :blood_alcohol_level, type: Float, default: 0.40
-     field :last_drink, type: Time, default: ->{ 10.minutes.ago }
-   end
+  class Order
+    include Mongoid::Document
+    
+    field :state, type: String, default: 'created'
+  end
 
-Be wary that default values that are not defined as lambdas or procs are evaluated
-at class load time, so the following 2 definitions are not equivalent.
-(One would probably prefer the second, which is evaluated at document creation time.)
+The default value can also be specified as a ``Proc``:
 
 .. code-block:: ruby
 
-   field :dob, type: Time, default: Time.now
-   field :dob, type: Time, default: ->{ Time.now }
+  class Order
+    include Mongoid::Document
+    
+    field :fulfill_by, type: Time, default: ->{ Time.now + 3.days }
+  end
 
-If you want to set a default with a dependency on the document's state, self inside a lambda
-or proc evaluates to the document instance.
+.. note::
+  
+  Default values that are not ``Proc`` instances are evaluated at class load
+  time, meaning the following two definitions are not equivalent:
+
+  .. code-block:: ruby
+
+    field :submitted_at, type: Time, default: Time.now
+    field :submitted_at, type: Time, default: ->{ Time.now }
+
+  The second definition is most likely the desired one, which causes the
+  time of submission to be set to the current time at the moment of
+  document instantiation.
+
+To set a default which depends on the document's state, use ``self``
+inside the ``Proc`` instance which would evaluate to the document instance
+being operated on:
 
 .. code-block:: ruby
 
-   field :intoxicated_at, type: Time, default: ->{ new_record? ? 2.hours.ago : Time.now }
+  field :fulfill_by, type: Time, default: ->{
+    # Order should be fulfilled in 2 business hours.
+    if (7..8).include?(self.submitted_at.hour)
+      self.submitted_at + 4.hours
+    elsif (9..3).include?(self.submitted_at.hour)
+      self.submitted_at + 2.hours
+    else
+      (self.submitted_at + 1.day).change(hour: 11)
+    end
+  }
 
-When defining a default value as a proc, Mongoid will apply the default after all other
-attributes are set. If you want this to happen before the other attributes, set ``pre_processed: true``.
+When defining a default value as a ``Proc``, Mongoid will apply the default
+after all other attributes are set. To have the default be applied before
+the other attributes are set, use the ``pre_processed: true`` field option:
+
+.. code-block:: ruby
+
+  field :fulfill_by, type: Time, default: ->{ Time.now + 3.days },
+    pre_processed: true
 
 
 .. _field-aliases:
