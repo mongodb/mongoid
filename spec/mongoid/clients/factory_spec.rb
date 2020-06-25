@@ -41,7 +41,7 @@ describe Mongoid::Clients::Factory do
           let(:config) do
             {
               default: { hosts: SpecConfig.instance.addresses, database: database_id },
-              secondary: { hosts: SpecConfig.instance.addresses, database: database_id }
+              analytics: { hosts: SpecConfig.instance.addresses, database: database_id }
             }
           end
 
@@ -54,7 +54,7 @@ describe Mongoid::Clients::Factory do
           end
 
           let(:client) do
-            described_class.create(:secondary)
+            described_class.create(:analytics)
           end
 
           let(:cluster) do
@@ -81,7 +81,7 @@ describe Mongoid::Clients::Factory do
           let(:config) do
             {
               default: { hosts: [ "127.0.0.1" ], database: database_id },
-              secondary: { hosts: [ "127.0.0.1" ], database: database_id }
+              analytics: { hosts: [ "127.0.0.1" ], database: database_id }
             }
           end
 
@@ -94,7 +94,7 @@ describe Mongoid::Clients::Factory do
           end
 
           let(:client) do
-            described_class.create(:secondary)
+            described_class.create(:analytics)
           end
 
           let(:default) do
@@ -125,7 +125,7 @@ describe Mongoid::Clients::Factory do
             let(:config) do
               {
                 default: { hosts: [ "127.0.0.1:27017" ], database: database_id },
-                secondary: { uri: "mongodb://127.0.0.1:27017/mongoid_test" }
+                analytics: { uri: "mongodb://127.0.0.1:27017/mongoid_test" }
               }
             end
 
@@ -138,7 +138,7 @@ describe Mongoid::Clients::Factory do
             end
 
             let(:client) do
-              described_class.create(:secondary)
+              described_class.create(:analytics)
             end
 
             let(:cluster) do
@@ -163,7 +163,7 @@ describe Mongoid::Clients::Factory do
             let(:config) do
               {
                 default: { hosts: [ "127.0.0.1:1234" ], database: database_id, server_selection_timeout: 1 },
-                secondary: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/mongoid_test?serverSelectionTimeoutMS=1000" }
+                analytics: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/mongoid_test?serverSelectionTimeoutMS=1000" }
               }
             end
 
@@ -176,7 +176,7 @@ describe Mongoid::Clients::Factory do
             end
 
             let(:client) do
-              described_class.create(:secondary)
+              described_class.create(:analytics)
             end
 
             let(:cluster) do

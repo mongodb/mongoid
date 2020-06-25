@@ -9,16 +9,16 @@ module Mongoid
       # Change the persistence context for this object during the block.
       #
       # @example Save the current document to a different collection.
-      #   model.with(collection: "secondary") do |m|
+      #   model.with(collection: "bands") do |m|
       #     m.save
       #   end
       #
       # @param [ Hash, Mongoid::PersistenceContext ] options_or_context
       #   The storage options or a persistence context.
       #
-      # @option options [ String, Symbol ] :collection The collection name.
-      # @option options [ String, Symbol ] :database The database name.
-      # @option options [ String, Symbol ] :client The client name.
+      # @option options [ String | Symbol ] :collection The collection name.
+      # @option options [ String | Symbol ] :database The database name.
+      # @option options [ String | Symbol ] :client The client name.
       #
       # @since 6.0.0
       def with(options_or_context, &block)
@@ -83,15 +83,15 @@ module Mongoid
         # Change the persistence context for this class during the block.
         #
         # @example Save the current document to a different collection.
-        #   Model.with(collection: "secondary") do |m|
+        #   Model.with(collection: "bands") do |m|
         #     m.create
         #   end
         #
         # @param [ Hash ] options The storage options.
         #
-        # @option options [ String, Symbol ] :collection The collection name.
-        # @option options [ String, Symbol ] :database The database name.
-        # @option options [ String, Symbol ] :client The client name.
+        # @option options [ String | Symbol ] :collection The collection name.
+        # @option options [ String | Symbol ] :database The database name.
+        # @option options [ String | Symbol ] :client The client name.
         #
         # @since 6.0.0
         def with(options, &block)

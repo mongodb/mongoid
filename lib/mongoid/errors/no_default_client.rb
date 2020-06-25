@@ -10,7 +10,7 @@ module Mongoid
       # Create the new error with the defined client names.
       #
       # @example Create the new error.
-      #   NoDefaultClient.new([ :secondary ])
+      #   NoDefaultClient.new([ :analytics ])
       #
       # @param [ Array<Symbol> ] keys The defined clients.
       #

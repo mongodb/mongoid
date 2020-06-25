@@ -151,7 +151,7 @@ describe Mongoid::Clients::Options, retry: 3 do
           let(:config) do
             {
                 default: { hosts: SpecConfig.instance.addresses, database: database_id },
-                secondary: { uri: "mongodb://#{SpecConfig.instance.addresses.first}/secondary-db?connectTimeoutMS=3000" }
+                analytics: { uri: "mongodb://#{SpecConfig.instance.addresses.first}/analytics-db?connectTimeoutMS=3000" }
             }
           end
 
@@ -164,14 +164,14 @@ describe Mongoid::Clients::Options, retry: 3 do
           end
 
           let(:persistence_context) do
-            Minim.with(client: :secondary) do |klass|
+            Minim.with(client: :analytics) do |klass|
               klass.persistence_context
             end
           end
 
           it 'uses the database specified in the uri' do
-            expect(persistence_context.database_name).to eq('secondary-db')
-            expect(persistence_context.client.database.name).to eq('secondary-db')
+            expect(persistence_context.database_name).to eq('analytics-db')
+            expect(persistence_context.client.database.name).to eq('analytics-db')
           end
 
           it 'uses the options specified in the uri' do
@@ -344,8 +344,8 @@ describe Mongoid::Clients::Options, retry: 3 do
         let(:config) do
           {
               default: { hosts: SpecConfig.instance.addresses, database: database_id },
-              secondary: {
-                uri: "mongodb://#{SpecConfig.instance.addresses.first}/secondary-db",
+              analytics: {
+                uri: "mongodb://#{SpecConfig.instance.addresses.first}/analytics-db",
                 options: {
                   server_selection_timeout: 0.5,
                 },
@@ -358,14 +358,14 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         let(:persistence_context) do
-          test_model.with(client: :secondary) do |object|
+          test_model.with(client: :analytics) do |object|
             object.persistence_context
           end
         end
 
         it 'uses the database specified in the uri' do
-          expect(persistence_context.database_name).to eq('secondary-db')
-          expect(persistence_context.client.database.name).to eq('secondary-db')
+          expect(persistence_context.database_name).to eq('analytics-db')
+          expect(persistence_context.client.database.name).to eq('analytics-db')
         end
       end
 

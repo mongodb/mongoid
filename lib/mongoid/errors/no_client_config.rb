@@ -11,9 +11,9 @@ module Mongoid
       # Create the new error.
       #
       # @example Create the error.
-      #   NoClientConfig.new(:secondary)
+      #   NoClientConfig.new(:analytics)
       #
-      # @param [ String, Symbol ] name The name of the client.
+      # @param [ String | Symbol ] name The name of the client.
       #
       # @since 3.0.0
       def initialize(name)

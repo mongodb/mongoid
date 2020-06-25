@@ -8,12 +8,12 @@ describe Mongoid::Errors::NoClientHosts do
   describe "#message" do
 
     let(:error) do
-      described_class.new(:secondary, { database: "mongoid_test" })
+      described_class.new(:analytics, { database: "mongoid_test" })
     end
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "No hosts provided for client configuration: :secondary."
+        "No hosts provided for client configuration: :analytics."
       )
     end
 
@@ -25,7 +25,7 @@ describe Mongoid::Errors::NoClientHosts do
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "If configuring via a mongoid.yml, ensure that within your :secondary"
+        "If configuring via a mongoid.yml, ensure that within your :analytics"
       )
     end
   end

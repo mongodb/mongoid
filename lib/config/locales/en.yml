@@ -249,7 +249,7 @@ en:
             Example:\n
             \_\_class Band\n
             \_\_\_\_include Mongoid::Document\n
-            \_\_\_\_store_in collection: 'artists', database: 'secondary'\n
+            \_\_\_\_store_in collection: 'artists', database: 'music'\n
             \_\_end\n\n"
         invalid_storage_parent:
           message: "Invalid store_in call on class %{klass}."
