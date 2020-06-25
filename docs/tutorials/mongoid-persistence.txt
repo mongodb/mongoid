@@ -552,7 +552,7 @@ Model-Level Persistence Options
 
 On a per-model basis, you can tell it to store in a custom collection name, a different
 database, or a different client. The following example would store the Band class by
-default into a collection named "artists" in the database named "music", with the client "secondary".
+default into a collection named "artists" in the database named "music", with the client "analytics".
 
 Note that the value supplied to the ``client`` option must be configured under ``clients``
 in your mongoid.yml.
@@ -561,7 +561,7 @@ in your mongoid.yml.
 
   class Band
     include Mongoid::Document
-    store_in collection: "artists", database: "music", client: "secondary"
+    store_in collection: "artists", database: "music", client: "analytics"
   end
 
 If no ``store_in`` macro would have been provided, Mongoid would store the model in a

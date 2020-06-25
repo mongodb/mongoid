@@ -8,12 +8,12 @@ describe Mongoid::Errors::NoClientDatabase do
   describe "#message" do
 
     let(:error) do
-      described_class.new(:secondary, { hosts: [ "127.0.0.1:27017" ] })
+      described_class.new(:analytics, { hosts: [ "127.0.0.1:27017" ] })
     end
 
     it "contains the problem in the message" do
       expect(error.message).to include(
-        "No database provided for client configuration: :secondary."
+        "No database provided for client configuration: :analytics."
       )
     end
 
@@ -25,7 +25,7 @@ describe Mongoid::Errors::NoClientDatabase do
 
     it "contains the resolution in the message" do
       expect(error.message).to include(
-        "If configuring via a mongoid.yml, ensure that within your :secondary"
+        "If configuring via a mongoid.yml, ensure that within your :analytics"
       )
     end
   end

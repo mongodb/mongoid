@@ -32,20 +32,20 @@ module Mongoid
         # @example Store this model by default in a different client.
         #   class Band
         #     include Mongoid::Document
-        #     store_in client: "secondary"
+        #     store_in client: "analytics"
         #   end
         #
         # @example Store this model with a combination of options.
         #   class Band
         #     include Mongoid::Document
-        #     store_in collection: "artists", database: "secondary"
+        #     store_in collection: "artists", database: "music"
         #   end
         #
         # @param [ Hash ] options The storage options.
         #
-        # @option options [ String, Symbol ] :collection The collection name.
-        # @option options [ String, Symbol ] :database The database name.
-        # @option options [ String, Symbol ] :client The client name.
+        # @option options [ String | Symbol ] :collection The collection name.
+        # @option options [ String | Symbol ] :database The database name.
+        # @option options [ String | Symbol ] :client The client name.
         #
         # @return [ Class ] The model class.
         #

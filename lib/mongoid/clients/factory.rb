@@ -12,9 +12,9 @@ module Mongoid
       # raised.
       #
       # @example Create the client.
-      #   Factory.create(:secondary)
+      #   Factory.create(:analytics)
       #
-      # @param [ String, Symbol ] name The named client configuration.
+      # @param [ String | Symbol ] name The named client configuration.
       #
       # @raise [ Errors::NoClientConfig ] If no config could be found.
       #
