@@ -33,7 +33,7 @@ module Mongoid
       #
       # A yet more more complex example is the following condition:
       #
-      #   Foo.geo_spacial(:boundary.intersects_point => [1, 10])
+      #   Foo.geo_spatial(:boundary.intersects_point => [1, 10])
       #
       # Processing this condition will cause a Key instance to be created as
       # follows:
