@@ -81,34 +81,16 @@ configured in the association as the field name:
     index country: 1
   end
 
-When ``reload`` is called on a Mongoid model instance, the method will
-use shard keys defined on the model (if any) to perform the underlying MongoDB query.
+.. note::
 
-.. code-block:: ruby
+  If a model declares a shard key, Mongoid expects the respective collection
+  to be sharded with the specified shard key. When reloading models, Mongoid
+  will provide the shard key in addition to the ``id`` field value to the
+  ``find`` command to improve query performance, especially on `geographically
+  distributed sharded clusters <https://docs.atlas.mongodb.com/global-clusters/>`_.
+  If the collection is not sharded with the specified shard key, queries
+  may produce incorrect results.
 
-
-.. _global-clusters:
-
-MongoDB Atlas Global Clusters
-=============================
-
-On MongoDB Atlast Global Clusters, every document in a collection must include
-the ``location`` field.
-
-.. code-block:: ruby
-
-  field :location, type: String, default: 'US'
-
-The collection must also be sharded using a compound key where the ``location``
-field is the first key.
-
-.. code-block:: ruby
-
-  shard_key :location, :id
-
-See the `Global Cluster Sharding documentation
-<https://docs.atlas.mongodb.com/global-cluster-sharding/>`_ for more information
-about Atlas Global Clusters.
 
 .. _sharding-management:
 
