@@ -367,12 +367,7 @@ describe Mongoid::Reloadable do
 
       let(:subscriber) do
         client = Mongoid::Clients.with_name(:other)
-        monitoring = if client.respond_to?(:monitoring, true)
-          client.send(:monitoring)
-        else
-          # driver 2.5
-          client.instance_variable_get('@monitoring')
-        end
+        monitoring = client.send(:monitoring)
         subscriber = monitoring.subscribers['Command'].find do |s|
           s.is_a?(EventSubscriber)
         end
@@ -394,7 +389,7 @@ describe Mongoid::Reloadable do
         end
 
         before do
-          Profile.with(client: :other) do |_|
+          Profile.with(client: :other) do
             profile.reload
           end
         end
@@ -417,7 +412,7 @@ describe Mongoid::Reloadable do
         end
 
         before do
-          Profile.with(client: :other) do |_|
+          Profile.with(client: :other) do
             profile_image.reload
           end
         end

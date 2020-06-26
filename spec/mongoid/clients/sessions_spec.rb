@@ -20,12 +20,7 @@ describe Mongoid::Clients::Sessions do
 
   let(:subscriber) do
     client = Mongoid::Clients.with_name(:other)
-    monitoring = if client.respond_to?(:monitoring, true)
-      client.send(:monitoring)
-    else
-      # driver 2.5
-      client.instance_variable_get('@monitoring')
-    end
+    monitoring = client.send(:monitoring)
     monitoring.subscribers['Command'].find do |s|
       s.is_a?(EventSubscriber)
     end
