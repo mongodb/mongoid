@@ -245,6 +245,8 @@ module Mongoid
 
           __merge__(criterion)
         end
+        alias :geo_spatial :geo_spacial
+
         key :intersects_line, :override, "$geoIntersects", "$geometry" do |value|
           { "type" => LINE_STRING, "coordinates" => value }
         end
