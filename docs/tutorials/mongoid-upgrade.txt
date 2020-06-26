@@ -221,10 +221,18 @@ Use Shard Key On Reload
 
 Minor change: Mongoid 7.1 modifies the ``reload`` method to perform a find
 command using the model's shard key if one exists. This improves the performance,
-of ``reload`` against sharded clusters, especially those that shard documents
-based on the physical location of the shards.
+of ``reload`` against sharded clusters, especially on Atlas Global Clusters.
 
 Consider a class ``Band`` whose documents are sharded by the ``name`` key.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+
+    shard_key :name
+  end
 
 Example Mongoid 7.1 behavior:
 

@@ -25,11 +25,11 @@ Shard keys can be declared on models using the ``shard_key`` macro:
 
   class Person
     include Mongoid::Document
-    
+
     field :ssn
 
     shard_key ssn: 1
-    
+
     # The collection must also have an index that starts with the shard key.
     index ssn: 1
   end
@@ -48,11 +48,11 @@ collection sharding options:
 .. code-block:: ruby
 
   shard_key ssn: 1
-  
+
   shard_key ssn: 1, country: 1
-  
+
   shard_key ssn: :hashed
-  
+
   shard_key {ssn: :hashed}, unique: true
 
 The alternative is the shorthand syntax, in which only the keys are given.
@@ -62,7 +62,7 @@ be specified:
 .. code-block:: ruby
 
   shard_key :ssn
-  
+
   shard_key :ssn, :country
 
 ``shard_key`` macro can take the name of a ``belongs_to`` association in
@@ -71,41 +71,44 @@ configured in the association as the field name:
 
   class Person
     include Mongoid::Document
-    
+
     belongs_to :country
 
     # Shards by country_id.
     shard_key country: 1
-    
+
     # The collection must also have an index that starts with the shard key.
     index country: 1
   end
+
+When ``reload`` is called on a Mongoid model instance, the method will
+use shard keys defined on the model (if any) to perform the underlying MongoDB query.
+
+.. code-block:: ruby
+
 
 .. _global-clusters:
 
 MongoDB Atlas Global Clusters
 =============================
 
-When working with MongoDB Atlas Global Clusters, you need to declare a compound
-shard key on the collection. The first key must be the ``location`` field.
+On MongoDB Atlast Global Clusters, every document in a collection must include
+the ``location`` field.
 
 .. code-block:: ruby
-  
+
   field :location, type: String, default: 'US'
 
-
-You can read more about `Global Cluster Sharding here
-<https://docs.atlas.mongodb.com/global-cluster-sharding/>`_
-
-In order to maintain fast write operations to the Global Cluster, you should
-declare at least the ``location`` field as a shard key in your model:
+The collection must also be sharded using a compound key where the ``location``
+field is the first key.
 
 .. code-block:: ruby
-  
-  shard_key :location, :_id
 
-When defined correctly, Mongoid will use these keys when performing all document
-writes to the Global Cluster, as well as reloads to the document.
+  shard_key :location, :id
+
+See the `Global Cluster Sharding documentation
+<https://docs.atlas.mongodb.com/global-cluster-sharding/>`_ for more information
+about Atlas Global Clusters.
 
 .. _sharding-management:
 
