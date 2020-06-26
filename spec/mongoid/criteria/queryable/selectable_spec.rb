@@ -855,6 +855,34 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
+  describe "#geo_spatial" do
+    
+    context "when provided a criterion" do
+
+      context "when the geometry is a point intersection" do
+
+        let(:selection) do
+          query.geo_spatial(:location.intersects_point => [ 1, 10 ])
+        end
+
+        it "adds the $geoIntersects expression" do
+          expect(selection.selector).to eq({
+            "location" => {
+              "$geoIntersects" => {
+                "$geometry" => {
+                  "type" => "Point",
+                  "coordinates" => [ 1, 10 ]
+                }
+              }
+            }
+          })
+        end
+
+        it_behaves_like "returns a cloned query"
+      end
+    end
+  end
+
   describe "#gt" do
 
     let(:query_method) { :gt }
