@@ -732,108 +732,89 @@ describe Mongoid::Criteria::Queryable::Selectable do
     end
   end
 
-  describe "#geo_spacial" do
+  %i(geo_spatial geo_spacial).each do |meth|
+    describe "#geo_spacial" do
 
-    let(:query_method) { :geo_spacial }
+      let(:query_method) { meth }
 
-    it_behaves_like 'requires an argument'
-    it_behaves_like 'requires a non-nil argument'
+      it_behaves_like 'requires an argument'
+      it_behaves_like 'requires a non-nil argument'
 
-    context "when provided a criterion" do
+      context "when provided a criterion" do
 
-      context "when the geometry is a point intersection" do
+        context "when the geometry is a point intersection" do
 
-        let(:selection) do
-          query.geo_spacial(:location.intersects_point => [ 1, 10 ])
-        end
-
-        it "adds the $geoIntersects expression" do
-          expect(selection.selector).to eq({
-            "location" => {
-              "$geoIntersects" => {
-                "$geometry" => {
-                  "type" => "Point",
-                  "coordinates" => [ 1, 10 ]
-                }
-              }
-            }
-          })
-        end
-
-        it_behaves_like "returns a cloned query"
-      end
-
-      context "when the geometry is a line intersection" do
-
-        let(:selection) do
-          query.geo_spacial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
-        end
-
-        it "adds the $geoIntersects expression" do
-          expect(selection.selector).to eq({
-            "location" => {
-              "$geoIntersects" => {
-                "$geometry" => {
-                  "type" => "LineString",
-                  "coordinates" => [[ 1, 10 ], [ 2, 10 ]]
-                }
-              }
-            }
-          })
-        end
-
-        it_behaves_like "returns a cloned query"
-      end
-
-      context "when the geometry is a polygon intersection" do
-
-        let(:selection) do
-          query.geo_spacial(
-            :location.intersects_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-          )
-        end
-
-        it "adds the $geoIntersects expression" do
-          expect(selection.selector).to eq({
-            "location" => {
-              "$geoIntersects" => {
-                "$geometry" => {
-                  "type" => "Polygon",
-                  "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-                }
-              }
-            }
-          })
-        end
-
-        it_behaves_like "returns a cloned query"
-      end
-
-      context "when the geometry is within a polygon" do
-
-        let(:selection) do
-          query.geo_spacial(
-            :location.within_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-          )
-        end
-
-        it "adds the $geoIntersects expression" do
-          expect(selection.selector).to eq({
-            "location" => {
-              "$geoWithin" => {
-                "$geometry" => {
-                  "type" => "Polygon",
-                  "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
-                }
-              }
-            }
-          })
-        end
-
-        context "when used with the $box operator ($geoWithin query) " do
           let(:selection) do
-            query.geo_spacial(
-              :location.within_box => [[ 1, 10 ], [ 2, 10 ]]
+            query.public_send(query_method, :location.intersects_point => [ 1, 10 ])
+          end
+
+          it "adds the $geoIntersects expression" do
+            expect(selection.selector).to eq({
+              "location" => {
+                "$geoIntersects" => {
+                  "$geometry" => {
+                    "type" => "Point",
+                    "coordinates" => [ 1, 10 ]
+                  }
+                }
+              }
+            })
+          end
+
+          it_behaves_like "returns a cloned query"
+        end
+
+        context "when the geometry is a line intersection" do
+
+          let(:selection) do
+            query.public_send(query_method, :location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
+          end
+
+          it "adds the $geoIntersects expression" do
+            expect(selection.selector).to eq({
+              "location" => {
+                "$geoIntersects" => {
+                  "$geometry" => {
+                    "type" => "LineString",
+                    "coordinates" => [[ 1, 10 ], [ 2, 10 ]]
+                  }
+                }
+              }
+            })
+          end
+
+          it_behaves_like "returns a cloned query"
+        end
+
+        context "when the geometry is a polygon intersection" do
+
+          let(:selection) do
+            query.public_send(query_method,
+              :location.intersects_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
+            )
+          end
+
+          it "adds the $geoIntersects expression" do
+            expect(selection.selector).to eq({
+              "location" => {
+                "$geoIntersects" => {
+                  "$geometry" => {
+                    "type" => "Polygon",
+                    "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
+                  }
+                }
+              }
+            })
+          end
+
+          it_behaves_like "returns a cloned query"
+        end
+
+        context "when the geometry is within a polygon" do
+
+          let(:selection) do
+            query.public_send(query_method,
+              :location.within_polygon => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
             )
           end
 
@@ -841,44 +822,37 @@ describe Mongoid::Criteria::Queryable::Selectable do
             expect(selection.selector).to eq({
               "location" => {
                 "$geoWithin" => {
-                  "$box" => [
-                    [ 1, 10 ], [ 2, 10 ]
-                  ]
+                  "$geometry" => {
+                    "type" => "Polygon",
+                    "coordinates" => [[[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]]]
+                  }
                 }
               }
             })
           end
-        end
 
-        it_behaves_like "returns a cloned query"
-      end
-    end
-  end
+          context "when used with the $box operator ($geoWithin query) " do
+            let(:selection) do
+              query.public_send(query_method,
+                :location.within_box => [[ 1, 10 ], [ 2, 10 ]]
+              )
+            end
 
-  describe "#geo_spatial" do
-    
-    context "when provided a criterion" do
-
-      context "when the geometry is a point intersection" do
-
-        let(:selection) do
-          query.geo_spatial(:location.intersects_point => [ 1, 10 ])
-        end
-
-        it "adds the $geoIntersects expression" do
-          expect(selection.selector).to eq({
-            "location" => {
-              "$geoIntersects" => {
-                "$geometry" => {
-                  "type" => "Point",
-                  "coordinates" => [ 1, 10 ]
+            it "adds the $geoIntersects expression" do
+              expect(selection.selector).to eq({
+                "location" => {
+                  "$geoWithin" => {
+                    "$box" => [
+                      [ 1, 10 ], [ 2, 10 ]
+                    ]
+                  }
                 }
-              }
-            }
-          })
-        end
+              })
+            end
+          end
 
-        it_behaves_like "returns a cloned query"
+          it_behaves_like "returns a cloned query"
+        end
       end
     end
   end

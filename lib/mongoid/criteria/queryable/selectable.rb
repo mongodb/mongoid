@@ -219,33 +219,43 @@ module Mongoid
         #   Source: https://docs.mongodb.com/manual/reference/operator/query/box/
         #
         # @example Add a geo intersect criterion for a line.
-        #   query.geo_spacial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
+        #   query.geo_spatial(:location.intersects_line => [[ 1, 10 ], [ 2, 10 ]])
         #
         # @example Add a geo intersect criterion for a point.
-        #   query.geo_spacial(:location.intersects_point => [[ 1, 10 ]])
+        #   query.geo_spatial(:location.intersects_point => [[ 1, 10 ]])
         #
         # @example Add a geo intersect criterion for a polygon.
-        #   query.geo_spacial(:location.intersects_polygon => [[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]])
+        #   query.geo_spatial(:location.intersects_polygon => [[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]])
         #
         # @example Add a geo within criterion for a polygon.
-        #   query.geo_spacial(:location.within_polygon => [[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]])
+        #   query.geo_spatial(:location.within_polygon => [[ 1, 10 ], [ 2, 10 ], [ 1, 10 ]])
         #
         # @example Add a geo within criterion for a box.
-        #   query.geo_spacial(:location.within_box => [[ 1, 10 ], [ 2, 10 ])
+        #   query.geo_spatial(:location.within_box => [[ 1, 10 ], [ 2, 10 ])
         #
         # @param [ Hash ] criterion The criterion.
         #
         # @return [ Selectable ] The cloned selectable.
+        def geo_spatial(criterion)
+          if criterion.nil?
+            raise Errors::CriteriaArgumentRequired, :geo_spatial
+          end
+
+          __merge__(criterion)
+        end
+
+        # Alias for +geo_spatial+.
         #
-        # @since 2.0.0
+        # @deprecated
         def geo_spacial(criterion)
+          # Duplicate method body so that we can raise this exception with
+          # geo_spacial as the indicated operator rather than geo_spatial.
           if criterion.nil?
             raise Errors::CriteriaArgumentRequired, :geo_spacial
           end
 
           __merge__(criterion)
         end
-        alias :geo_spatial :geo_spacial
 
         key :intersects_line, :override, "$geoIntersects", "$geometry" do |value|
           { "type" => LINE_STRING, "coordinates" => value }

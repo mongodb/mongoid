@@ -3735,7 +3735,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#geo_spacial" do
+  describe "#geo_spatial" do
 
     context "when checking within a polygon" do
 
@@ -3748,7 +3748,7 @@ describe Mongoid::Criteria do
       end
 
       let(:criteria) do
-        Bar.geo_spacial(
+        Bar.geo_spatial(
           :location.within_polygon => [[[ 50, 10 ], [ 50, 20 ], [ 60, 20 ], [ 60, 10 ], [ 50, 10 ]]]
         )
       end

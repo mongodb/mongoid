@@ -383,7 +383,7 @@ describe Mongoid::Indexable do
       end
     end
 
-    context "when providing a geospacial index" do
+    context "when providing a geospatial index" do
 
       before do
         klass.index({ location: "2d" }, { min: -200, max: 200, bits: 32 })
@@ -393,7 +393,7 @@ describe Mongoid::Indexable do
         klass.index_specification(location: "2d").options
       end
 
-      it "sets the geospacial index" do
+      it "sets the geospatial index" do
         expect(options).to eq({ min: -200, max: 200, bits: 32 })
       end
     end
