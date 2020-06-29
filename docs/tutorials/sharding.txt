@@ -25,11 +25,11 @@ Shard keys can be declared on models using the ``shard_key`` macro:
 
   class Person
     include Mongoid::Document
-    
+
     field :ssn
 
     shard_key ssn: 1
-    
+
     # The collection must also have an index that starts with the shard key.
     index ssn: 1
   end
@@ -48,11 +48,11 @@ collection sharding options:
 .. code-block:: ruby
 
   shard_key ssn: 1
-  
+
   shard_key ssn: 1, country: 1
-  
+
   shard_key ssn: :hashed
-  
+
   shard_key {ssn: :hashed}, unique: true
 
 The alternative is the shorthand syntax, in which only the keys are given.
@@ -62,7 +62,7 @@ be specified:
 .. code-block:: ruby
 
   shard_key :ssn
-  
+
   shard_key :ssn, :country
 
 ``shard_key`` macro can take the name of a ``belongs_to`` association in
@@ -71,15 +71,25 @@ configured in the association as the field name:
 
   class Person
     include Mongoid::Document
-    
+
     belongs_to :country
 
     # Shards by country_id.
     shard_key country: 1
-    
+
     # The collection must also have an index that starts with the shard key.
     index country: 1
   end
+
+.. note::
+
+  If a model declares a shard key, Mongoid expects the respective collection
+  to be sharded with the specified shard key. When reloading models, Mongoid
+  will provide the shard key in addition to the ``id`` field value to the
+  ``find`` command to improve query performance, especially on `geographically
+  distributed sharded clusters <https://docs.atlas.mongodb.com/global-clusters/>`_.
+  If the collection is not sharded with the specified shard key, queries
+  may produce incorrect results.
 
 
 .. _sharding-management:

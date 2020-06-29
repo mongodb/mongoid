@@ -353,5 +353,77 @@ describe Mongoid::Reloadable do
         expect(reloaded.readonly?).to be(false)
       end
     end
+
+    context 'on sharded cluster' do
+      require_topology :sharded
+
+      before(:all) do
+        CONFIG[:clients][:other] = CONFIG[:clients][:default].dup
+        CONFIG[:clients][:other][:database] = 'other'
+        Mongoid::Clients.clients.values.each(&:close)
+        Mongoid::Config.send(:clients=, CONFIG[:clients])
+        Mongoid::Clients.with_name(:other).subscribe(Mongo::Monitoring::COMMAND, EventSubscriber.new)
+      end
+
+      let(:subscriber) do
+        client = Mongoid::Clients.with_name(:other)
+        monitoring = client.send(:monitoring)
+        subscriber = monitoring.subscribers['Command'].find do |s|
+          s.is_a?(EventSubscriber)
+        end
+      end
+
+      let(:find_events) do
+        find_events = subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
+      end
+
+      before do
+        subscriber.clear_events!
+      end
+
+      context 'without embedded document' do
+        let(:profile) do
+          Profile.with(client: :other) do |klass|
+            klass.create
+          end
+        end
+
+        before do
+          Profile.with(client: :other) do
+            profile.reload
+          end
+        end
+
+        it 'uses the shard key to reload the document' do
+          expect(find_events.length). to eq(1)
+
+          event = find_events.first
+          expect(event.command['filter'].keys).to include('name')
+        end
+      end
+
+
+      context 'with embedded document' do
+        let(:profile_image) do
+          Profile.with(client: :other) do |klass|
+            profile = klass.create
+            ProfileImage.create(profile: profile)
+          end
+        end
+
+        before do
+          Profile.with(client: :other) do
+            profile_image.reload
+          end
+        end
+
+        it 'uses the shard key to reload the embedded document' do
+          expect(find_events.length). to eq(1)
+
+          event = find_events.first
+          expect(event.command['filter'].keys).to include('name')
+        end
+      end
+    end
   end
 end

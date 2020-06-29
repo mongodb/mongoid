@@ -18,6 +18,55 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Upgrading to Mongoid 7.2
+========================
+
+The following sections describe major changes in Mongoid 7.2.
+
+Shard Key Used For Reloading
+----------------------------
+
+Minor change: When sharding is used, Mongoid 7.2 expects the shard key declared
+in models to match the shard key in the database for the respective collections.
+In Mongoid 7.2 model reloading (either explicit via the ``reload`` method
+or implicit as part of persistence operations) uses the shard key, if one is
+defined, in the ``find`` command in addition to the ``id`` field value.
+This improves the performance of document reloading, and consequently some
+persistence operations, in sharded clusters, especially those with
+`geographically distributed shards
+<https://docs.atlas.mongodb.com/global-clusters/>`_.
+
+Consider a class ``Band`` whose documents are sharded by the ``name`` key.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+
+    shard_key :name
+  end
+
+Example Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  band = Band.create(name: "Destiny's Child")
+  band.reload
+  # Command logs: { "find"=>"bands", "filter"=>{ "_id"=>BSON::ObjectId('...') "name"=>"Destiny's Child" } }
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+  band = Band.create(name: "Destiny's Child")
+  band.reload
+  # Command logs: { "find"=>"bands", "filter"=>{"_id"=>BSON::ObjectId('...') } }
+
+Mongoid provides :ref:`sharding management Rake tasks <sharding-management>`
+to shard collections according to shard keys declared in models.
+
+
 Upgrading to Mongoid 7.1
 ========================
 
@@ -215,6 +264,7 @@ example, the following two approaches result in the same generated selector:
     #   options:  {}
     #   class:    Band
     #   embedded: false>
+
 
 Ruby Version Support
 --------------------

@@ -60,7 +60,7 @@ module Mongoid
     #
     # @since 2.3.2
     def reload_root_document
-      {}.merge(collection.find({ _id: _id }, session: _session).read(mode: :primary).first || {})
+      {}.merge(collection.find(atomic_selector, session: _session).read(mode: :primary).first || {})
     end
 
     # Reload the embedded document.
@@ -73,7 +73,7 @@ module Mongoid
     # @since 2.3.2
     def reload_embedded_document
       extract_embedded_attributes({}.merge(
-        collection(_root).find(_id: _root._id).read(mode: :primary).first
+        collection(_root).find(_root.atomic_selector).read(mode: :primary).first
       ))
     end
 
