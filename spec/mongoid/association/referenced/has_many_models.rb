@@ -6,6 +6,9 @@ class HmmCompany
 
   field :p, type: Integer
   has_many :emails, primary_key: :p, foreign_key: :f, class_name: 'HmmEmail'
+
+  # The addresses are added with different dependency mechanisms in tests:
+  #has_many :addresses, class_name: 'HmmAddress', dependent: :destroy
 end
 
 class HmmEmail
@@ -13,6 +16,12 @@ class HmmEmail
 
   field :f, type: Integer
   belongs_to :company, primary_key: :p, foreign_key: :f, class_name: 'HmmCompany'
+end
+
+class HmmAddress
+  include Mongoid::Document
+
+  belongs_to :company, class_name: 'HmmCompany'
 end
 
 class HmmSchool
