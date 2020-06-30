@@ -850,10 +850,8 @@ describe Mongoid::Association::Depending do
       it 'adds an error to the parent object' do
         expect(person.delete).to be(false)
 
-        key_message = "#{Mongoid::Errors::MongoidError::BASE_KEY}.destroy_restrict_with_error_dependencies_exist"
-        expect(person.errors[:restrictable_posts].first).to eq(
-          ::I18n.translate(key_message, association: :restrictable_posts)
-        )
+        person.errors[:restrictable_posts].first.should ==
+          "is not empty and prevents the document from being destroyed"
       end
     end
 
