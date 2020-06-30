@@ -72,7 +72,7 @@ expression itself:
   # Mongoid 7.2:
   # => nil
   # Mongoid 7.1:
-  # => #<Task _id: 5ef802762c97a62d577a8379, name: "Clean house", pattern: /test/>
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
   
   job.tasks.where(pattern: {'$eq': /test/}).first
   # Mongoid 7.2:
@@ -87,7 +87,7 @@ without an operator:
   
   job.tasks.where(name: /house/).first
   # Mongoid 7.2 and 7.1:
-  # => #<Task _id: 5ef802902c97a62dce4d5b9e, name: "Clean house", pattern: /test/>
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
 
 ``$ne`` and Regular Expression Values
 `````````````````````````````````````
@@ -100,7 +100,7 @@ of MongoDB server:
   job.tasks.where(name: {'$ne': /apartment/}).first
   # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
   # Mongoid 7.1:
-  # => #<Task _id: 5ef802762c97a62d577a8379, name: "Clean house", pattern: /test/>
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
 
 To perform a negated regular expression match, use the ``not`` method on a
 symbol key:
@@ -112,7 +112,7 @@ symbol key:
   # => nil
   job.tasks.where(:name.not => /office/).first
   # Mongoid 7.2 and 7.1:
-  # => #<Task _id: 5ef802902c97a62dce4d5b9e, name: "Clean house", pattern: /test/>
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
 
 ``$eq``, ``$ne`` and Range Values
 `````````````````````````````````
