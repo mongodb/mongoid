@@ -6,6 +6,9 @@ class HomCollege
 
   has_one :accreditation, class_name: 'HomAccreditation'
 
+  # The address is added with different dependency mechanisms in tests:
+  #has_one :address, class_name: 'HomAddress', dependent: :destroy
+
   field :state, type: String
 end
 
@@ -22,6 +25,12 @@ class HomAccreditation::Child
   include Mongoid::Document
 
   belongs_to :hom_college
+end
+
+class HomAddress
+  include Mongoid::Document
+
+  belongs_to :college, class_name: 'HomCollege'
 end
 
 module HomNs
