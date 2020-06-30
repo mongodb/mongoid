@@ -543,7 +543,7 @@ en:
             the validations."
         delete_restriction:
           message: "Cannot delete %{document} because of dependent '%{relation}'."
-          summary: "When defining '%{relation}' with a :dependent => :restrict,
+          summary: "When defining '%{relation}' with a :dependent => :restrict_with_error,
             Mongoid will raise an error when attempting to delete the
             %{document} when the child '%{relation}' still has documents in it."
           resolution: "Don't attempt to delete the parent %{document} when
