@@ -7,6 +7,7 @@ en:
         message_title: "message"
         summary_title: "summary"
         resolution_title: "resolution"
+        
         ambiguous_relationship:
           message: "Ambiguous associations %{candidates} defined on %{klass}."
           summary:
@@ -105,6 +106,13 @@ en:
           summary: "An invalid dependent strategy was defined for the association:
             %{association}. The valid strategies are: %{valid_strategies}."
           resolution: "Change the dependent strategy to one of the valid types."
+        invalid_expression_operator:
+          message: "Invalid expression operator '%{operator}'."
+          summary: "You misspelled an operator, are using an operator that
+            Mongoid does not support, or are trying to use a field-level
+            operator on expression level."
+          resolution: "Valid expression operators are: %{valid_operators}.
+            Ensure you are using one of these operators."
         invalid_field:
           message: "Defining a field named '%{name}' is not allowed."
           summary: "Defining this field would override the method '%{name}',

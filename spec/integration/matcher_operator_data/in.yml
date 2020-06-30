@@ -1,0 +1,151 @@
+- name: scalar field - matches exact value
+  document:
+    count: 10
+  query:
+    count:
+      $in: [10, 11]
+  matches: true
+
+- name: scalar field - does not match exact value
+  document:
+    count: 8
+  query:
+    count:
+      $in: [10, 11]
+  matches: false
+
+- name: scalar field - matches native regexp
+  document:
+    name: Boris
+  query:
+    name:
+      $in:
+        - !ruby/regexp /..ris/
+  matches: true
+
+- name: scalar field - does not match native regexp
+  document:
+    name: Boris
+  query:
+    name:
+      $in:
+        - !ruby/regexp /ri$/
+  matches: false
+
+- name: scalar field - matches bson regexp
+  document:
+    name: Boris
+  query:
+    name:
+      $in:
+        - !ruby/object:BSON::Regexp::Raw
+          pattern: ..ris
+          options: ''
+  matches: true
+
+- name: scalar field - does not match bson regexp
+  document:
+    name: Boris
+  query:
+    name:
+      $in:
+        - !ruby/object:BSON::Regexp::Raw
+          pattern: ..ri$
+          options: ''
+  matches: false
+
+- name: field value missing
+  document:
+    xcount: 10
+  query:
+    count:
+      $in: [10, 11]
+  matches: false
+
+- name: field value is null
+  document:
+    count: ~
+  query:
+    count:
+      $in: [10, 11]
+  matches: false
+
+- name: condition is a scalar
+  document:
+    count: 10
+  query:
+    count:
+      $in: 10
+  error: true
+
+- name: array field - matches exact value
+  document:
+    count: [10]
+  query:
+    count:
+      $in: [[10], [11]]
+  matches: true
+
+- name: array field - does not match exact value
+  document:
+    count: 8
+  query:
+    count:
+      $in: [[10], [11]]
+  matches: false
+
+- name: array field - matches element value
+  document:
+    count: [10]
+  query:
+    count:
+      $in: [10, 11]
+  matches: true
+
+- name: array field - does not match element value
+  document:
+    count: 8
+  query:
+    count:
+      $in: [10, 11]
+  matches: false
+
+- name: array field - matches native regexp as element value
+  document:
+    name: [Boris]
+  query:
+    count:
+      $in:
+        - !ruby/regexp /..ris/
+  matches: false
+
+- name: array field - does not match native regexp as element value
+  document:
+    name: [Boris]
+  query:
+    count:
+      $in:
+        - !ruby/regexp /ri$/
+  matches: false
+
+- name: array field - matches bson regexp as element value
+  document:
+    name: [Boris]
+  query:
+    count:
+      $in:
+        - !ruby/object:BSON::Regexp::Raw
+          pattern: ..ris
+          options: ''
+  matches: false
+
+- name: array field - does not match bson regexp as element value
+  document:
+    name: [Boris]
+  query:
+    count:
+      $in:
+        - !ruby/object:BSON::Regexp::Raw
+          pattern: ..ri$
+          options: ''
+  matches: false

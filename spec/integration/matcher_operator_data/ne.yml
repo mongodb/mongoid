@@ -1,0 +1,126 @@
+- name: identical string
+  document:
+    name: Angel Share
+  query:
+    name:
+      $ne: Angel Share
+  matches: false
+
+- name: different string
+  document:
+    name: Angel Share
+  query:
+    name:
+      $ne: Angel
+  matches: true
+
+- name: matching native regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      $ne: !ruby/regexp /l.S/
+  error: true
+
+- name: not matching native regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      $ne: !ruby/regexp /l.pirate/
+  error: true
+
+- name: matching bson regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      $ne: !ruby/object:BSON::Regexp::Raw
+        pattern: l.S
+        options: ''
+  error: true
+
+- name: not matching bson regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      $ne: !ruby/object:BSON::Regexp::Raw
+        pattern: l.pirate
+        options: ''
+  error: true
+
+- name: matching array element
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $ne: quick
+  matches: false
+
+- name: not matching array element
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $ne: slow
+  matches: true
+
+- name: different types - query number by string
+  document:
+    count: 1
+  query:
+    count:
+      $ne: '1'
+  matches: true
+
+- name: different types - query string by number
+  document:
+    count: '1'
+  query:
+    count:
+      $ne: 1
+  matches: true
+
+- name: compatible types - query integer by float
+  document:
+    count: 1
+  query:
+    count:
+      $ne: 1.0
+  matches: false
+
+- name: compatible types - query float by integer
+  document:
+    count: 1.0
+  query:
+    count:
+      $ne: 1
+  matches: false
+
+- name: matching range
+  document:
+    age: 10
+  query:
+    age:
+      $ne: !ruby/range
+        begin: 11
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  error: [matcher, driver]
+  # Server matches because the query is negation of a bogus query
+  matches: true
+
+- name: not matching range
+  document:
+    age: 10
+  query:
+    age:
+      $ne: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  error: [matcher, driver]
+  matches: true

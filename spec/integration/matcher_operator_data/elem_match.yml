@@ -1,0 +1,252 @@
+- name: string attribute value matched with operator
+  document:
+    tags: Angel Share
+  query:
+    tags:
+      $elemMatch:
+        $eq: Angel Share
+  matches: false
+
+- name: integer attribute value matched with operator
+  document:
+    tags: 42
+  query:
+    tags:
+      $elemMatch:
+        $eq: 42
+  matches: false
+
+- name: string attribute value matched against hash
+  document:
+    tags: Angel Share
+  query:
+    tags:
+      $elemMatch:
+        foo: Angel Share
+  matches: false
+
+- name: integer attribute value matched against hash
+  document:
+    tags: 42
+  query:
+    tags:
+      $elemMatch:
+        foo: 42
+  matches: false
+
+- name: array attribute string value matched with operator - matches
+  document:
+    tags:
+      - intelligent
+  query:
+    tags:
+      $elemMatch:
+        $eq: intelligent
+  matches: true
+
+- name: array attribute string value matched with operator - does not match
+  document:
+    tags:
+      - intelligent
+  query:
+    tags:
+      $elemMatch:
+        $ne: intelligent
+  matches: false
+
+- name: array attribute integer value matched with operator - matches
+  document:
+    tags:
+      - 42
+  query:
+    tags:
+      $elemMatch:
+        $eq: 42
+  matches: true
+
+- name: array attribute integer value matched with operator - does not match
+  document:
+    tags:
+      - 42
+  query:
+    tags:
+      $elemMatch:
+        $ne: 42
+  matches: false
+
+- name: array attribute value with scalar string value matched with hash
+  document:
+    tags:
+      - intelligent
+  query:
+    tags:
+      $elemMatch:
+        foo: intelligent
+  matches: false
+
+- name: array attribute value with scalar integer value matched with hash
+  document:
+    tags:
+      - 42
+  query:
+    tags:
+      $elemMatch:
+        foo: 42
+  matches: false
+
+- name: hash attribute value
+  document:
+    tags:
+      a: Angel Share
+  query:
+    tags:
+      $elemMatch:
+        a: Angel Share
+  matches: false
+
+- name: array of hashes attribute value - matches
+  document:
+    tags:
+      - a: Angel Share
+  query:
+    tags:
+      $elemMatch:
+        a: Angel Share
+  matches: true
+
+- name: array of hashes attribute value - some of array elements match
+  document:
+    tags:
+      - a: Angel Share
+      - a: Hello
+  query:
+    tags:
+      $elemMatch:
+        a: Angel Share
+  matches: true
+
+- name: array of hashes attribute value - does not match
+  document:
+    tags:
+      - a: Angel Share
+  query:
+    tags:
+      $elemMatch:
+        a: Angel
+  matches: false
+
+- name: array of scalars attribute value matching against scalar
+  document:
+    tags:
+      - mongodb
+  query:
+    tags:
+      $elemMatch:
+        mongodb
+  error: true
+
+- name: array of scalars attribute value matching against array
+  document:
+    tags:
+      - mongodb
+  query:
+    tags:
+      $elemMatch: []
+  error: true
+
+- name: multiple conditions per array element
+  document:
+    tags:
+      - a: 1
+        b: 2
+      - a: 3
+        b: 2
+  query:
+    tags:
+      $elemMatch:
+        a: 1
+        b: 2
+  matches: true
+
+- name: multiple conditions per array element - partial match
+  document:
+    tags:
+      - a: 1
+        b: 1
+      - a: 3
+        b: 3
+  query:
+    tags:
+      $elemMatch:
+        a: 1
+        b: 3
+  matches: false
+
+- name: nested operator - matches
+  document:
+    tags:
+      - a: 1
+  query:
+    tags:
+      $elemMatch:
+        a:
+          $in: [1]
+  matches: true
+
+- name: nested operator - does not match
+  document:
+    tags:
+      - a: 1
+  query:
+    tags:
+      $elemMatch:
+        a:
+          $in: [2]
+  matches: false
+
+- name: multiple nested operators
+  document:
+    tags:
+      - a: 1
+      - a: 2
+        b: 3
+  query:
+    tags:
+      $elemMatch:
+        a:
+          $in: [2]
+        b:
+          $gt: 1
+  matches: true
+
+- name: nested operators with $not - matches
+  document:
+    tags:
+      - a: 1
+      - a: 2
+        b: 3
+  query:
+    tags:
+      $elemMatch:
+        a:
+          $not:
+            $in: [1]
+        b:
+          $gt: 1
+  matches: true
+
+- name: nested operators with $not - does not match
+  document:
+    tags:
+      - a: 1
+      - a: 2
+        b: 3
+  query:
+    tags:
+      $elemMatch:
+        a:
+          $not:
+            $in: [2]
+        b:
+          $gt: 1
+  matches: false

@@ -241,6 +241,68 @@ to the other in the form of an array.
     "band_ids" : [ ObjectId("4d3ed089fb60ab534684b7e9") ]
   }
 
+
+Querying Referenced Associations
+--------------------------------
+
+In most cases, efficient queries across referenced associations (and in general
+involving data or conditions or multiple collections) are performed using
+the aggregation pipeline. Mongoid helpers for constructing aggregation pipeline
+queries are described in the :ref:`aggregation pipeline <aggregation-pipeline>`
+section.
+
+For simple queries, the use of aggregation pipeline may be avoided and
+associations may be queried directly. When querying associations directly,
+all conditions must be on that association's collection only (which typically
+means association in question and any associations embedded in it).
+
+For example, given the following models:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    has_many :tours
+    has_many :awards
+    
+    field :name, type: String
+  end
+
+  class Tour
+    include Mongoid::Document
+    
+    belongs_to :band
+    
+    field :year, type: Integer
+  end
+
+  class Award
+    include Mongoid::Document
+    
+    belongs_to :band
+    
+    field :name, type: String
+  end
+
+One could retrieve all bands that have toured since 2000 as follows:
+
+.. code-block:: ruby
+
+  band_ids = Tour.where(year: {'$gte' => 2000}).pluck(:band_id)
+  bands = Band.find(band_ids)
+
+The conditions on ``Tour`` can be arbitrarily complex, but they must all
+be on the same ``Tour`` document (or documents embedded in ``Tour``).
+
+To find awards for bands that have toured since 2000:
+
+.. code-block:: ruby
+
+  band_ids = Tour.where(year: {'$gte' => 2000}).pluck(:band_id)
+  awards = Award.where(band_id: {'$in' => band_ids})
+
+
 Embedded Associations
 =====================
 
@@ -440,6 +502,92 @@ help of MongoDB projection operation:
   #  "filter"=>{"started_on"=>{"$gt"=>2018-07-01 00:00:00 UTC}},
   #  "projection"=>{"_id"=>1, "label"=>1}}
   Band.where(started_on: {'$gt' => Time.now - 1.year}).only(:label).map(&:label).compact.uniq
+
+
+Querying Embedded Associations
+------------------------------
+
+When querying top-level documents, conditions can be specified on documents
+in embedded associations using the dot notation. For example, given the
+following models:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    embeds_many :tours
+    embeds_many :awards
+    field :name, type: String
+  end
+
+  class Tour
+    include Mongoid::Document
+    embedded_in :band
+    field :year, type: Integer
+  end
+
+  class Award
+    include Mongoid::Document
+    embedded_in :band
+    field :name, type: String
+  end
+
+To retrieve bands based on tour attributes, use the dot notation as follows:
+
+.. code-block:: ruby
+
+  # Get all bands that have toured since 2000
+  Band.where('tours.year' => {'$gte' => 2000})
+
+To retrieve only documents of embedded associations, without retrieving
+top-level documents, use the ``pluck`` projection method:
+
+.. code-block:: ruby
+
+  # Get awards for bands that have toured since 2000
+  Band.where('tours.year' => {'$gte' => 2000}).pluck(:awards)
+
+.. _embedded-matching:
+
+Querying Loaded Associations
+````````````````````````````
+
+Mongoid query methods can be used on embedded associations of documents which
+are already loaded in the application. This mechanism is sometimes called
+"embedded matching" or "embedded document matching" and it is implemented
+entirely in Mongoid - the queries are NOT sent to the server.
+
+Embedded matching is supported for most general-purpose query operators. It
+is not implemented for :ref:`text search <text-search>`, :manual:`geospatial query
+operators </reference/operator/query-geospatial/>`,
+operators that execute JavaScript code (:manual:`$where </reference/operator/query/where/>`)
+and operators that are implemented via other server functionality such as
+:manual:`$expr <https://docs.mongodb.com/manual/reference/operator/query/expr/>`
+and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/>`.
+The following operators are supported:
+
+- :manual:`Comparison operators </reference/operator/query-comparison/>`.
+- :manual:`Logical operators </reference/operator/query-logical/>`.
+- :manual:`$exists </reference/operator/query/exists/>`
+  (:manual:`$type </reference/operator/query/type/>` is not currently supported).
+- :manual:`$regex </reference/operator/query/regex/>` (``$options`` field
+  is not currently supported, the options must be given as part of the
+  regular expression object).
+- :manual:`Array query operators </reference/operator/query-array/>`.
+
+For example, using the model definitions just given, we could query
+tours on a loaded band:
+
+.. code-block:: ruby
+
+  band = Band.where(name: 'Astral Projection').first
+  tours = band.tours.where(year: {'$gte' => 2000})
+
+.. note::
+
+  Mongoid aims to provide the same semantics when performing embedded matching
+  as those of MongoDB server. This means, for example, that embedded matchers
+  generally support arguments of the same types as ``Criteria`` methods do.
 
 
 Common Behavior
@@ -996,104 +1144,10 @@ with, and is useful for developers of extensions to Mongoid.
      - Returns whether the association has an associated validation.
 
 
-Querying Associations
-=====================
-
-Mongoid supports several forms of efficient querying of documents based on
-associations.
-
-
-Embedded Associations
----------------------
-
-Given the following models:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    embeds_many :tours
-    embeds_many :awards
-    field :name, type: String
-  end
-
-  class Tour
-    include Mongoid::Document
-    embedded_in :band
-    field :year, type: Integer
-  end
-
-  class Award
-    include Mongoid::Document
-    embedded_in :band
-    field :name, type: String
-  end
-
-Mongoid allows retrieving bands whose tours have certain attributes via the
-dot notation, as follows:
-
-.. code-block:: ruby
-
-  # Get all bands that have toured since 2000
-  Band.where('tours.year' => {'$gte' => 2000})
-
-Mongoid also can retrieve embedded documents only, without retrieving top-level
-documents, using projection:
-
-.. code-block:: ruby
-
-  # Get awards for bands that have toured since 2000
-  Band.where('tours.year' => {'$gte' => 2000}).pluck(:awards)
-
-
-Referenced Associations
------------------------
-
-If the associations are referenced rather than embedded, performing queries
-through them takes a bit more work. Given the following models modified from
-the previous example:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-    has_many :tours
-    has_many :awards
-    field :name, type: String
-  end
-
-  class Tour
-    include Mongoid::Document
-    belongs_to :band
-    field :year, type: Integer
-  end
-
-  class Award
-    include Mongoid::Document
-    belongs_to :band
-    field :name, type: String
-  end
-
-One could retrieve all bands that have toured since 2000 as follows:
-
-.. code-block:: ruby
-
-  band_ids = Tour.where(year: {'$gte' => 2000}).pluck(:band_id)
-  bands = Band.find(band_ids)
-
-The conditions on ``Tour`` can be arbitrarily complex, but they must all
-be on the same ``Tour`` document (or documents embedded in ``Tour``).
-
-To find awards for bands that have toured since 2000:
-
-.. code-block:: ruby
-
-  band_ids = Tour.where(year: {'$gte' => 2000}).pluck(:band_id)
-  awards = Award.where(band_id: {'$in' => band_ids})
-
+.. _aggregation-pipeline:
 
 Aggregation Pipeline
---------------------
+====================
 
 Mongoid exposes MongoDB's aggregation pipeline for queries involving multiple
 referenced associations at the same time. Given the same setup as before with
@@ -1156,8 +1210,8 @@ having to send the list of document ids to Mongoid in the second query
 
 .. _aggregation-pipeline-builder-dsl:
 
-Aggregation Pipeline Builder DSL
---------------------------------
+Builder DSL
+-----------
 
 Mongoid provides limited support for constructing the aggregation pipeline
 itself using a high-level DSL. The following aggregation pipeline operators

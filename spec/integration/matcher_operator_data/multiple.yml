@@ -1,0 +1,29 @@
+- name: multiple operators on same field - finds
+  document:
+    count: 10
+  query:
+    count:
+      $gte: 9
+      $lte: 11
+  matches: true
+
+- name: multiple operators on same field - does not find
+  document:
+    count: 10
+  query:
+    count:
+      $gte: 2
+      $lte: 9
+  matches: false
+
+- name: multiple operators on same field which are satisfied by different array elements - finds
+  document:
+    teachers:
+      - grade: 5
+      - grade: 10
+  query:
+    teachers.grade:
+      $gte: 7
+      $lte: 9
+  matches: true
+  pending: 'https://jira.mongodb.org/browse/MONGOID-4911'

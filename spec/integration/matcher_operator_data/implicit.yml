@@ -1,0 +1,307 @@
+- name: matching string
+  document:
+    name: Angel Share
+  query:
+    name: Angel Share
+  matches: true
+
+- name: not matching string
+  document:
+    name: Angel Share
+  query:
+    name: Angel
+  matches: false
+
+- name: matching native regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      !ruby/regexp /l.S/
+  matches: true
+
+- name: not matching native regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      !ruby/regexp /l.pirate/
+  matches: false
+
+- name: matching bson regexp
+  document:
+    name: Angel Share
+  query:
+    name: !ruby/object:BSON::Regexp::Raw
+      pattern: l.S
+      options: ''
+  matches: true
+
+- name: not matching bson regexp
+  document:
+    name: Angel Share
+  query:
+    name: !ruby/object:BSON::Regexp::Raw
+      pattern: l.pirate
+      options: ''
+  matches: false
+
+- name: matching ObjectId
+  document:
+    id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        Xt0Zj+G4MlyV5hyJ
+  query:
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        Xt0Zj+G4MlyV5hyJ
+  matches: true
+
+- name: not matching ObjectId
+  document:
+    id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        Xt0Zj+G4MlyV5hyJ
+  query:
+    _id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        Xt0Y3+G4MlyV5hyH
+  matches: false
+
+- name: matching string in array
+  document:
+    airports: [EWR, SFO]
+  query:
+    airports: EWR
+  matches: true
+
+- name: not matching string in array
+  document:
+    airports: [EWR, SFO]
+  query:
+    airports: HELLO
+  matches: false
+
+- name: matching regexp in array
+  document:
+    airports: [EWR, SFO]
+  query:
+    airports: !ruby/regexp /E.R/
+  matches: true
+
+- name: not matching regexp in array
+  document:
+    airports: [EWR, SFO]
+  query:
+    airports: !ruby/regexp /..../
+  matches: false
+
+- name: matching ObjectId in array
+  document:
+    refs:
+      - !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            Xt0Zj+G4MlyV5hyJ
+  query:
+    refs: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        Xt0Zj+G4MlyV5hyJ
+  matches: true
+
+- name: not matching ObjectId in array
+  document:
+    refs:
+      - !ruby/object:BSON::ObjectId
+          raw_data: !binary |-
+            Xt0Zj+G4MlyV5hyJ
+  query:
+    refs: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        Xt0Y3+G4MlyV5hyH
+  matches: false
+
+- name: exact array match
+  document:
+    airports: [EWR, SFO]
+  query:
+    airports: [EWR, SFO]
+  matches: true
+
+- name: array query with elements in different order
+  document:
+    airports: [EWR, SFO]
+  query:
+    airports: [SFO, EWR]
+  matches: false
+
+- name: array query with subset of elements
+  document:
+    airports: [EWR, SFO]
+  query:
+    airports: [EWR]
+  matches: false
+
+- name: exact array match with empty array
+  document:
+    airports: []
+  query:
+    airports: []
+  matches: true
+
+- name: array element match with empty array
+  document:
+    airports: [[]]
+  query:
+    airports: []
+  matches: true
+
+- name: hash path in query - match
+  document:
+    house:
+      price: 100
+  query:
+    house.price: 100
+  matches: true
+
+- name: hash path in query - no path
+  document:
+    house:
+      price: 100
+  query:
+    xhouse.price: 100
+  matches: false
+
+- name: hash path in query - wrong value
+  document:
+    house:
+      price: 100
+  query:
+    house.price: 101
+  matches: false
+
+- name: array path in query - match
+  document:
+    house:
+      - price: 100
+  query:
+    house.0.price: 100
+  matches: true
+
+- name: array path in query - no path
+  document:
+    house:
+      - price: 100
+  query:
+    house.1.price: 100
+  matches: false
+
+- name: array path in query - wrong value
+  document:
+    house:
+      price: 100
+  query:
+    house.0.price: 101
+  matches: false
+
+- name: array path in query - correct array element
+  document:
+    titles:
+      - King
+      - Queen
+  query:
+    titles.1: Queen
+  matches: true
+
+- name: array path in query - wrong array element
+  document:
+    titles:
+      - King
+      - Queen
+  query:
+    titles.1: King
+  matches: false
+
+- name: implicit array path in query - match
+  document:
+    house:
+      - price: 100
+  query:
+    house.price: 100
+  matches: true
+
+- name: implicit array path in query - wrong value
+  document:
+    house:
+      - price: 100
+  query:
+    house.price: 101
+  matches: false
+
+- name: implicit array path in query - nested array as field value
+  document:
+    house:
+      -
+        - price: 100
+  query:
+    house.price: 100
+  matches: false
+
+- name: matching hash - string key
+  document:
+    branch:
+      tree: forest
+  query:
+    branch:
+      tree: forest
+  matches: true
+
+- name: not matching hash - string key
+  document:
+    branch:
+      tree: forest
+  query:
+    branch:
+      seed: forest
+  matches: false
+
+- name: matching hash - symbol key
+  document:
+    branch:
+      tree: forest
+  query:
+    :branch:
+      :tree: forest
+  matches: true
+
+- name: not matching hash - symbol key
+  document:
+    branch:
+      tree: forest
+  query:
+    :branch:
+      :seed: forest
+  matches: false
+
+- name: matching range
+  document:
+    age: 10
+  query:
+    age: !ruby/range
+      begin: 1
+      end: 20
+      excl: false
+  error: [matcher, driver]
+  # DSL expands Range to $gte/$lte pair
+  matches: true
+
+- name: not matching range
+  document:
+    age: 10
+  query:
+    age: !ruby/range
+      begin: 11
+      end: 20
+      excl: false
+  error: [matcher, driver]
+  # DSL expands Range to $gte/$lte pair
+  matches: false
