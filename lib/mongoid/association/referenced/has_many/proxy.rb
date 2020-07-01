@@ -90,7 +90,7 @@ module Mongoid
 
           # Delete the document from the association. This will set the foreign key
           # on the document to nil. If the dependent options on the association are
-          # :delete or :destroy the appropriate removal will occur.
+          # :delete_all or :destroy the appropriate removal will occur.
           #
           # @example Delete the document.
           #   person.posts.delete(post)

@@ -885,10 +885,11 @@ You can provide dependent options to referenced associations to instruct Mongoid
 how to handle situations where one side of the association is deleted, or is attempted
 to be deleted. The options are as follows:
 
-- ``:delete``: Delete the child document without running any of the model callbacks.
-- ``:destroy``: Destroy the child document and run all of the model callbacks.
-- ``:nullify``: Orphan the child document.
-- ``:restrict``: Raise an error if the child is not empty.
+- ``:delete_all``: Delete the child document(s) without running any of the model callbacks.
+- ``:destroy``: Destroy the child document(s) and run all of the model callbacks.
+- ``:nullify``: Orphan the child document(s).
+- ``:restrict_with_exception``: ``raise`` an error if the child is not empty.
+- ``:restrict_with_error``: Cancel operation and return false if the child is not empty.
 
 The default behavior of each association when no dependent option is provided is to nullify.
 
@@ -907,7 +908,7 @@ The default behavior of each association when no dependent option is provided is
 
    class Label
      include Mongoid::Document
-     has_many :bands, dependent: :restrict
+     has_many :bands, dependent: :restrict_with_exception
    end
 
    label = Label.first
