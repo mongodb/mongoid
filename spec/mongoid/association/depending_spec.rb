@@ -489,7 +489,7 @@ describe Mongoid::Association::Depending do
           end
         end
 
-        context "when dependent is restrict_with_error" do
+        context "when dependent is restrict_with_exception" do
 
           context "when restricting a references many" do
 
@@ -864,6 +864,20 @@ describe Mongoid::Association::Depending do
 
       it 'deletes the object and leaves the other one intact' do
         expect(person.delete).to be(true)
+      end
+    end
+
+    context 'when deleted inside a transaction' do
+      before do
+        person.restrictable_posts << post
+      end
+
+      it 'doesn\'t raise an exception' do
+        person.with_session do |session|
+          session.start_transaction
+          person.destroy
+          session.commit_transaction
+        end
       end
     end
   end

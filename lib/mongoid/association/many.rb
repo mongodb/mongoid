@@ -11,7 +11,7 @@ module Mongoid
       include ::Enumerable
 
       def_delegators :criteria, :avg, :max, :min, :sum
-      def_delegators :_target, :length, :size
+      def_delegators :_target, :length, :size, :any?
 
       # Is the association empty?
       #
@@ -22,7 +22,7 @@ module Mongoid
       #
       # @since 2.1.0
       def blank?
-        size == 0
+        !any?
       end
 
       # Creates a new document on the references many association. This will

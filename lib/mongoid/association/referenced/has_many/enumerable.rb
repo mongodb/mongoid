@@ -216,6 +216,21 @@ module Mongoid
               end
             end
 
+            # Does the enumerable have any? Will determine if there exists at least
+            # one element in the enumerable, whether or not it is _loaded.
+            #
+            # @example Doess the enumerable have any?
+            #   enumerable.any?
+            #
+            # @return [ true, false ] If the enumerable has any elements.
+            def any? 
+              if _loaded?
+                in_memory.count > 0
+              else
+                _unloaded.exists? || _added.count > 0
+              end
+            end
+
             # Get the first document in the enumerable. Will check the persisted
             # documents first. Does not load the entire enumerable.
             #
