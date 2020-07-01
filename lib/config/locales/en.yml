@@ -44,6 +44,8 @@ en:
           resolution: "Most likely this is caused by passing parameters directly
             through to the find, and the parameter either is not present or the
             key from which it is accessed is incorrect."
+        destroy_restrict_with_error_dependencies_exist:
+          "is not empty and prevents the document from being destroyed"
         document_not_destroyed:
           message: "%{klass} with id %{id} was not destroyed."
           summary: "When calling %{klass}#destroy! and a callback halts the destroy
