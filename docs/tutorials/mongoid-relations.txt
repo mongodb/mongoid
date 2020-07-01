@@ -742,7 +742,7 @@ to be deleted. The options are as follows:
 - ``:nullify``: Orphan the child document.
 - ``:restrict``: Raise an error if the child is not empty.
 
-The default behavior of each association when no dependent option is provided is to nullify.
+The default behavior of each association when no dependent option is provided is to do nothing with the associated record.
 
 .. code-block:: ruby
 
