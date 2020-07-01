@@ -1,0 +1,42 @@
+module Mongoid
+  module Matcher
+
+    # @api private
+    module FieldOperator
+      MAP = {
+        '$all' => All,
+        '$elemMatch' => ElemMatch,
+        '$eq' => Eq,
+        '$exists' => Exists,
+        '$gt' => Gt,
+        '$gte' => Gte,
+        '$in' => In,
+        '$lt' => Lt,
+        '$lte' => Lte,
+        '$nin' => Nin,
+        '$ne' => Ne,
+        '$not' => Not,
+        '$regex' => Regex,
+        '$size' => Size,
+      }.freeze
+
+      module_function def get(op)
+        MAP.fetch(op)
+      end
+
+      module_function def apply_array_field_operator(exists, value, condition)
+        if Array === value
+          value.any? { |v| yield v }
+        else
+          yield value
+        end
+      end
+
+      module_function def soft_apply_operator(operator, left, right)
+        left&.send(operator, right)
+      rescue ArgumentError
+        false
+      end
+    end
+  end
+end

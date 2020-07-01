@@ -1729,24 +1729,26 @@ The following code illustrates retrieving the statistics:
   from the raw results if multiple statistics are desired.
 
 
-Full Text Search
-================
+.. _text-search:
 
-To perform full text search with Mongoid, follow these steps:
+Text Search
+===========
 
-1. Define a full text search index on a model.
-2. Create the full text search index on the server.
-3. Build a full text search query.
+To perform text search with Mongoid, follow these steps:
+
+1. Define a text index on a model.
+2. Create the text index on the server.
+3. Build a text search query.
 
 
-Defining Full Text Search Index
--------------------------------
+Defining Text Search Index
+--------------------------
 
 Index definition through Mongoid is described in detail on the `indexes
-<mongoid-indexes>`_ page. Full text search indexes are described in detail on
+<mongoid-indexes>`_ page. Text search indexes are described in detail
 under `text indexes <https://docs.mongodb.com/manual/core/index-text/>`_
 in the MongoDB manual. Below is an example definition of a Band model with
-a full text search index specified on the description field:
+a text index utilizing the description field:
 
 .. code-block:: ruby
 
@@ -1762,8 +1764,8 @@ a full text search index specified on the description field:
 Note that the index type (``text``) must be given as a string, not as a symbol.
 
 
-Creating Full Text Search Index
--------------------------------
+Creating Text Index
+-------------------
 
 To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
 
@@ -1772,8 +1774,8 @@ To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
   bundle exec rake db:mongoid:create_indexes
 
 
-Querying Using Full Text Search Index
--------------------------------------
+Querying Using Text Index
+-------------------------
 
 To find bands whose description contains "ounces" or its variations, use the
 `$text operator <https://docs.mongodb.com/manual/reference/operator/query/text/#op._S_text>`_:
@@ -1786,6 +1788,6 @@ To find bands whose description contains "ounces" or its variations, use the
 Note that the description contains the word "ounce" even though the search
 query was "ounces".
 
-Note also that when performing a full text search, the name of the field is
-not explicitly specified - ``$text`` operator searches all fields indexed with
-full text search indexes.
+Note also that when performing text search, the name of the field is not
+explicitly specified - ``$text`` operator searches all fields indexed with
+the text index.

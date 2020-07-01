@@ -1,0 +1,31 @@
+- name: existing field - matches
+  document:
+    name: Angel Share
+  query:
+    name:
+      $exists: true
+  matches: true
+
+- name: existing field - does not match
+  document:
+    name: Angel Share
+  query:
+    name:
+      $exists: false
+  matches: false
+
+- name: missing field - matches
+  document:
+    name: Angel Share
+  query:
+    no_name:
+      $exists: false
+  matches: true
+
+- name: missing field - does not match
+  document:
+    name: Angel Share
+  query:
+    no_name:
+      $exists: true
+  matches: false

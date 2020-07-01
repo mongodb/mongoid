@@ -1,0 +1,35 @@
+- name: native regexp - matches
+  document:
+    title: King
+  query:
+    title:
+      $regex: !ruby/regexp /K..g/
+  matches: true
+
+- name: native regexp - does not match
+  document:
+    title: Queen
+  query:
+    title:
+      $regex: !ruby/regexp /K..g/
+  matches: false
+
+- name: bson regexp - matches
+  document:
+    title: King
+  query:
+    title:
+      $regex: !ruby/object:BSON::Regexp::Raw
+        pattern: K..g
+        options: ''
+  matches: true
+
+- name: bson regexp - does not match
+  document:
+    title: Queen
+  query:
+    title:
+      $regex: !ruby/object:BSON::Regexp::Raw
+        pattern: K..g
+        options: ''
+  matches: false

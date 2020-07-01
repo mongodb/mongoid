@@ -1,0 +1,98 @@
+- name: simple expression - matching
+  document:
+    name: foo
+  query:
+    name:
+      $not:
+        $eq: bar
+  matches: true
+
+- name: simple expression - not matching
+  document:
+    name: foo
+  query:
+    name:
+      $not:
+        $eq: foo
+  matches: false
+
+- name: native regexp - matching
+  document:
+    name: foo
+  query:
+    name:
+      $not: !ruby/regexp /.oo/
+  matches: false
+
+- name: native regexp - not matching
+  document:
+    name: foo
+  query:
+    name:
+      $not: !ruby/regexp /..../
+  matches: true
+
+- name: bson regexp - matching
+  document:
+    name: foo
+  query:
+    name:
+      $not: !ruby/object:BSON::Regexp::Raw
+        pattern: .oo
+        options: ''
+  matches: false
+
+- name: bson regexp - not matching
+  document:
+    name: foo
+  query:
+    name:
+      $not: !ruby/object:BSON::Regexp::Raw
+        pattern: ....
+        options: ''
+  matches: true
+
+- name: operator expression - matching
+  document:
+    age: 42
+  query:
+    age:
+      $not:
+        $lt: 40
+  matches: true
+
+- name: operator expression - not matching
+  document:
+    age: 42
+  query:
+    age:
+      $not:
+        $gt: 40
+  matches: false
+
+- name: operator expression - symbol key - matching
+  document:
+    age: 42
+  query:
+    age:
+      $not:
+        :$lt: 40
+  matches: true
+
+- name: operator expression - symbol key - not matching
+  document:
+    age: 42
+  query:
+    age:
+      $not:
+        :$gt: 40
+  matches: false
+
+- name: argument not an operator
+  document:
+    age: 42
+  query:
+    age:
+      $not:
+        gt: 40
+  error: true
