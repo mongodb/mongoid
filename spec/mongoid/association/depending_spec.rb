@@ -868,6 +868,8 @@ describe Mongoid::Association::Depending do
     end
 
     context 'when deleted inside a transaction' do
+      require_topology :replica_set
+      
       before do
         person.restrictable_posts << post
       end
