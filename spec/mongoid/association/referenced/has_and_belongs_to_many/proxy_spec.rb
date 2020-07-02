@@ -1757,6 +1757,43 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       end
     end
 
+    describe "#any?" do
+
+      let(:person) do
+        Person.create
+      end
+  
+      context "when nothing exists on the relation" do
+        
+        context "when no document is added" do
+
+          let!(:sandwich) do
+            Sandwich.create!
+          end
+
+          it "returns false" do
+            expect(sandwich.meats.any?).to be false
+          end
+        end
+
+        context "when the document is destroyed" do
+  
+          before do
+            Meat.create!
+          end
+  
+          let!(:sandwich) do
+            Sandwich.create!
+          end
+  
+          it "returns false" do
+            sandwich.destroy
+            expect(sandwich.meats.any?).to be false
+          end
+        end
+      end
+    end
+
     context "when documents have been persisted" do
 
       let!(:preference) do

@@ -1431,6 +1431,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         expect(movie.ratings.count).to eq(0)
       end
     end
+    
+    context "when no document is added" do
+
+      it "returns false" do
+        expect(movie.ratings.any?).to be false
+      end
+    end
 
     context "when new documents exist in the database" do
 
@@ -1453,6 +1460,60 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
         it "returns the count from the db" do
           expect(movie.ratings.count).to eq(0)
+        end
+      end
+    end
+  end
+
+  describe "#any?" do
+
+    let(:movie) do
+      Movie.create
+    end
+
+    context "when documents have been persisted" do
+
+      let!(:rating) do
+        movie.ratings.create(value: 1)
+      end
+
+      it "returns true" do
+        expect(movie.ratings.any?).to be true
+      end
+    end
+
+    context "when documents have not been persisted" do
+
+      let!(:rating) do
+        movie.ratings.build(value: 1)
+      end
+
+      it "returns false" do 
+        expect(movie.ratings.any?).to be true
+      end
+    end
+
+    context "when new documents exist in the database" do
+
+      context "when the documents are part of the relation" do
+
+        before do
+          Rating.create(ratable: movie)
+        end
+
+        it "returns true" do
+          expect(movie.ratings.any?).to be true
+        end
+      end
+
+      context "when the documents are not part of the relation" do
+
+        before do
+          Rating.create
+        end
+
+        it "returns false" do
+          expect(movie.ratings.any?).to be false
         end
       end
     end
