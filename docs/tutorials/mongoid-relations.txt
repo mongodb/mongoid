@@ -887,11 +887,13 @@ to be deleted. The options are as follows:
 
 - ``:delete_all``: Delete the child document(s) without running any of the model callbacks.
 - ``:destroy``: Destroy the child document(s) and run all of the model callbacks.
-- ``:nullify``: Orphan the child document(s).
+- ``:nullify``: Set the foreign key field of the child document to nil. The child may become orphaned if it is ordinarily only referenced via the parent.
 - ``:restrict_with_exception``: ``raise`` an error if the child is not empty.
 - ``:restrict_with_error``: Cancel operation and return false if the child is not empty.
 
-The default behavior of each association when no dependent option is provided is to nullify.
+If no ``:dependent`` option is provided, deleting the parent record leaves the child record unmodified 
+(in other words, the child record continues to reference the now deleted parent record via the foreign key field). 
+The child may become orphaned if it is ordinarily only referenced via the parent.
 
 .. code-block:: ruby
 
