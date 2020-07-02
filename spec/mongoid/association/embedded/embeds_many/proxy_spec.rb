@@ -1411,7 +1411,6 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     context "when documents are persisted" do
       before do
         person.addresses.create(street: "Upper")
-        person.addresses.build(street: "Bond")
       end
 
       it "returns true" do

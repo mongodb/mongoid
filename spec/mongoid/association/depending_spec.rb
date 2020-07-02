@@ -905,11 +905,15 @@ describe Mongoid::Association::Depending do
         expect(person.destroy).to be false
       end
 
-      it 'doesn\'t raise an exception' do
-        person.with_session do |session|
-          session.start_transaction
-          expect { person.destroy }.to_not raise_error
-          session.commit_transaction
+      context "when inside a transaction" do
+        require_topology :replica_set
+
+        it 'doesn\'t raise an exception inside a transaction' do
+          person.with_session do |session|
+            session.start_transaction
+            expect { person.destroy }.to_not raise_error
+            session.commit_transaction
+          end
         end
       end
     end
