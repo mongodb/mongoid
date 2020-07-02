@@ -849,8 +849,9 @@ describe Mongoid::Association::Depending do
 
       it 'adds an error to the parent object' do
         expect(person.delete).to be(false)
-        expect(person.errors[:restrictable_posts].first).to be(
-          Mongoid::Association::Depending::RESTRICT_ERROR_MSG)
+
+        person.errors[:restrictable_posts].first.should ==
+          "is not empty and prevents the document from being destroyed"
       end
     end
 

@@ -1,0 +1,167 @@
+- name: identical string
+  document:
+    name: Angel Share
+  query:
+    name:
+      $eq: Angel Share
+  matches: true
+
+- name: different string
+  document:
+    name: Angel Share
+  query:
+    name:
+      $eq: Angel
+  matches: false
+
+- name: matching regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      $eq: !ruby/regexp /l.S/
+  matches: false
+
+- name: not matching regexp
+  document:
+    name: Angel Share
+  query:
+    name:
+      $eq: !ruby/regexp /l.pirate/
+  matches: false
+
+- name: matching array element
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $eq: quick
+  matches: true
+
+- name: not matching array element
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $eq: slow
+  matches: false
+
+- name: different types - query number by string
+  document:
+    count: 1
+  query:
+    count:
+      $eq: '1'
+  matches: false
+
+- name: different types - query string by number
+  document:
+    count: '1'
+  query:
+    count:
+      $eq: 1
+  matches: false
+
+- name: compatible types - query integer by float
+  document:
+    count: 1
+  query:
+    count:
+      $eq: 1.0
+  matches: true
+
+- name: compatible types - query float by integer
+  document:
+    count: 1.0
+  query:
+    count:
+      $eq: 1
+  matches: true
+
+- name: array query for scalar element
+  document:
+    labels: quick
+  query:
+    labels:
+      $eq: [quick]
+  matches: false
+
+- name: array query for array element - no match
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $eq: [quick1]
+  matches: false
+
+- name: array query for nested array element
+  document:
+    labels: [[quick]]
+  query:
+    labels:
+      $eq: [quick]
+  matches: true
+
+- name: array query for nested array element - no match
+  document:
+    labels: [[quick]]
+  query:
+    labels:
+      $eq: [quick1]
+  matches: false
+
+- name: matching range
+  document:
+    age: 10
+  query:
+    age:
+      $eq: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  error: [matcher, driver]
+  # Server does not match because the query is bogus
+  matches: false
+
+- name: not matching range
+  document:
+    age: 10
+  query:
+    age:
+      $eq: !ruby/range
+        begin: 11
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  error: [matcher, driver]
+  matches: false
+
+- name: matching range against array
+  document:
+    ages:
+      - 10
+  query:
+    ages:
+      $eq: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  error: [matcher, driver]
+  # Server does not match because the query is bogus
+  matches: false
+
+- name: not matching range against array
+  document:
+    ages:
+      - 10
+  query:
+    ages:
+      $eq: !ruby/range
+        begin: 11
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  error: [matcher, driver]
+  matches: false

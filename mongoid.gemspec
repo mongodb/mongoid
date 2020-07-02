@@ -35,6 +35,8 @@ Gem::Specification.new do |s|
   s.add_dependency("activemodel", [">= 5.1", "<6.1"])
   s.add_dependency("mongo", ['>=2.7.0', '<3.0.0'])
 
+  s.add_development_dependency("bson", ['>=4.9.4', '<5.0.0'])
+
   s.files        = Dir.glob("lib/**/*") + %w(CHANGELOG.md LICENSE README.md Rakefile)
   s.test_files   = Dir.glob("spec/**/*")
   s.require_path = 'lib'

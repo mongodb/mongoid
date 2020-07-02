@@ -19,7 +19,7 @@ describe Mongoid::Errors::DeleteRestriction do
 
     it "contains the summary in the message" do
       expect(error.message).to include(
-        "When defining 'drugs' with a :dependent => :restrict,"
+        "When defining 'drugs' with a :dependent => :restrict_with_error,"
       )
     end
 

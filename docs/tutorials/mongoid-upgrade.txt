@@ -23,6 +23,220 @@ Upgrading to Mongoid 7.2
 
 The following sections describe major changes in Mongoid 7.2.
 
+Embedded Document Matching
+--------------------------
+
+**Breaking change:** In Mongoid 7.2 :ref:`embedded matchers <embedded-matching>`
+were largely rewritten. Most queries should produce the same results as in
+previous versions of Mongoid but a number of cases changed behavior to make
+Mongoid behave the same way MongoDB server behaves. Note that the changes,
+for the most part, affect queries using manually constructed MQL expressions;
+Mongoid query methods generate MQL that is generally not affected by the
+changes in embedded matching.
+
+To illustrate the differences, the examples below use the following model
+definitions:
+
+.. code-block:: ruby
+
+  class Job
+    include Mongoid::Document
+    
+    embeds_many :tasks
+  end
+  
+  class Task
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+    
+    embedded_in :job
+  end
+
+  job = Job.new(tasks: [
+    Task.new(name: 'Clean house', pattern: /test/, hours: 12),
+  ])
+
+The changes in behavior are as follows:
+
+``$eq`` and Regular Expression Values
+`````````````````````````````````````
+
+``$eq`` now performs exact matching when given regular a expression argument.
+Previously, both operators used regular expression matching, which caused
+Mongoid to not find documents where the field being matched was a regular
+expression itself:
+
+.. code-block:: ruby
+  
+  job.tasks.where(name: {'$eq': /house/}).first
+  # Mongoid 7.2:
+  # => nil
+  # Mongoid 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+  
+  job.tasks.where(pattern: {'$eq': /test/}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+  # Mongoid 7.1:
+  # => nil
+
+To perform a regular expression match, provide the regular expression directly
+without an operator:
+
+.. code-block:: ruby
+  
+  job.tasks.where(name: /house/).first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+``$ne`` and Regular Expression Values
+`````````````````````````````````````
+
+``$ne`` no longer accepts regular expression arguments, which is the behavior
+of MongoDB server:
+
+.. code-block:: ruby
+  
+  job.tasks.where(name: {'$ne': /apartment/}).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+To perform a negated regular expression match, use the ``not`` method on a
+symbol key:
+
+.. code-block:: ruby
+  
+  job.tasks.where(:name.not => /house/).first
+  # Mongoid 7.2 and 7.1:
+  # => nil
+  job.tasks.where(:name.not => /office/).first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+``$eq``, ``$ne`` and Range Values
+`````````````````````````````````
+
+Range values are no longer accepted by ``$eq`` and ``$ne`` operators.
+This change should not be visible to applications since Mongoid generally
+expands Range values to a ``$gte``/``$lte`` pair before they get to the
+embedded matchers.
+
+To query using a range, use the following syntax which works in Mongoid 7.2
+as well as previous versions:
+
+.. code-block:: ruby
+  
+  job.tasks.where(hours: 10..15)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"hours"=>{"$gte"=>10, "$lte"=>15}}
+  #   options:  {}
+  #   class:    Task
+  #   embedded: true>
+
+  job.tasks.where(hours: 10..15).first
+  # => #<Task _id: 5ef8dd4c2c97a6465e8a4ffa, name: "Clean house", pattern: /test/, hours: 12>
+
+Mongoid 7.1 accepted Range values as operator arguments, but generated
+queries that would never match documents. For example, the following
+expression was accepted but never matched any documents:
+
+.. code-block:: ruby
+
+  job.tasks.where(hours: {'$in': 10..15})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"hours"=>{:$in=>{"$gte"=>10, "$lte"=>15}}}
+  #   options:  {}
+  #   class:    Task
+  #   embedded: true>
+
+Mongoid 7.2 raises ``Mongoid::Errors::InvalidQuery`` in this case.
+
+``$elemMatch``
+``````````````
+
+``$elemMatch`` now supports specifying operators as top-level fields:
+
+.. code-block:: ruby
+  
+  mixed_tasks_job = Job.new(tasks: [
+    Task.new(name: 'Clean house', hours: 12, supplies: [{broom: 1}]),
+    Task.new(name: 'Clean office', hours: [8, 16]),
+  ])
+
+  mixed_tasks_job.tasks.where(hours: {'$elemMatch': {'$lt': 20}}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8c7202c97a6465e8a4ff3, name: "Clean office", hours: [8, 16]>
+  # Mongoid 7.1: error
+
+Implicit matching under ``$elemMatch`` has been fixed and now works:
+
+.. code-block:: ruby
+
+  mixed_tasks_job.tasks.where(supplies: {'$elemMatch': {broom: 1}}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8c9162c97a6465e8a4ff6, name: "Clean house", hours: 12, supplies: [{:broom=>1}]>
+  # Mongoid 7.1:
+  # => nil
+
+For compatibility with MongoDB server, ``$elemMatch`` requires a ``Hash``
+argument. Use ``$eq`` or ``$regex`` to perform equality comparisons or
+regular expression matches, respectively:
+
+.. code-block:: ruby
+
+  mixed_tasks_job.tasks.where(hours: {'$elemMatch': 8}).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => nil
+  
+  mixed_tasks_job.tasks.where(hours: {'$elemMatch': {'$eq': 8}}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8ca0b2c97a6465e8a4ff9, name: "Clean office", hours: [8, 16]>
+  # Mongoid 7.1: error
+
+``$and``, ``$nor``, ``$or`` and Empty Argument Arrays
+`````````````````````````````````````````````````````
+
+``$and``, ``$nor`` and ``$or`` operators now raise an exception when given
+empty arrays as arguments. This only applies to raw MQL query expressions;
+the corresponding Mongoid :ref:`query methods <logical-operations>`
+continue to permit being called without arguments. In previous versions
+of Mongoid, ``$and`` would match when given an empty array of conditions
+and ``$nor`` and ``$or`` would not match when given empty arrays of
+conditions.
+
+.. code-block:: ruby
+
+  job.tasks.where('$and': []).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+  job.tasks.where('$nor': []).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => nil
+
+  job.tasks.where('$or': []).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => nil
+  
+  job.tasks.and.first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+  
+  job.tasks.nor.first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+  
+  job.tasks.or.first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
 Shard Key Used For Reloading
 ----------------------------
 

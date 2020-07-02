@@ -1,0 +1,56 @@
+- name: correct size
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $size: 3
+  matches: true
+
+- name: incorrect size
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $size: 2
+  matches: false
+
+- name: empty array - correct size
+  document:
+    products: []
+  query:
+    products:
+      $size: 0
+  matches: true
+
+- name: empty array - incorrect size
+  document:
+    products: []
+  query:
+    products:
+      $size: 1
+  matches: false
+
+- name: condition is an array
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      - $size: 3
+  matches: false
+
+- name: field value is a scalar
+  document:
+    hello: world
+  query:
+    hello:
+      $size: 5
+  matches: false
+
+- name: field value is a hash
+  document:
+    hello:
+      foo: bar
+  query:
+    hello:
+      $size: 1
+  matches: false

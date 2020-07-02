@@ -41,11 +41,6 @@ module Mongoid
           :restrict_with_error
       ]
 
-      # The error message when a strategy cannot delete objects because there are associated objects.
-      #
-      # @since 7.0
-      RESTRICT_ERROR_MSG = 'Cannot delete record because associated objects exist.'.freeze
-
       # Attempt to add the cascading information for the document to know how
       # to handle associated documents on a removal.
       #
@@ -131,7 +126,7 @@ module Mongoid
 
       def _dependent_restrict_with_error!(association)
         if (relation = send(association.name)) && !relation.blank?
-          errors.add(association.name, RESTRICT_ERROR_MSG)
+          errors.add(association.name, :destroy_restrict_with_error_dependencies_exist)
           throw(:abort, false)
         end
       end

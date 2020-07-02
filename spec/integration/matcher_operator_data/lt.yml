@@ -1,0 +1,95 @@
+- name: field value larger than condition
+  document:
+    count: 10
+  query:
+    count:
+      $lt: 9
+  matches: false
+
+- name: field value equal to condition
+  document:
+    count: 10
+  query:
+    count:
+      $lt: 10
+  matches: false
+
+- name: field value smaller than condition
+  document:
+    count: 10
+  query:
+    count:
+      $lt: 11
+  matches: true
+
+- name: field value does not exist
+  document:
+    count: 10
+  query:
+    xcount:
+      $lt: 9
+  matches: false
+
+- name: field value is null
+  document:
+    count: ~
+  query:
+    count:
+      $lt: 9
+  matches: false
+
+- name: field value is non-numeric
+  document:
+    count: '4'
+  query:
+    count:
+      $lt: 5
+  matches: false
+
+- name: field value is an array with element larger than condition
+  document:
+    counts: [10]
+  query:
+    counts:
+      $lt: 9
+  matches: false
+
+- name: field value is an array with element equal to condition
+  document:
+    counts: [10]
+  query:
+    counts:
+      $lt: 10
+  matches: false
+
+- name: field value is an array with element smaller than condition
+  document:
+    counts: [10]
+  query:
+    counts:
+      $lt: 11
+  matches: true
+
+- name: field value is an empty array
+  document:
+    counts: []
+  query:
+    counts:
+      $lt: 11
+  matches: false
+
+- name: field value is an array with element which is null
+  document:
+    counts: [~]
+  query:
+    counts:
+      $lt: 11
+  matches: false
+
+- name: field value is an array with element which non-numeric
+  document:
+    counts: ['4']
+  query:
+    counts:
+      $lt: 5
+  matches: false

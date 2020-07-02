@@ -1,0 +1,105 @@
+- name: scalar - attribute value matches one
+  document:
+    products: [1, 2, 3]
+  query:
+    $or:
+      - products: 1
+  matches: true
+
+- name: scalar - attribute value matches none
+  document:
+    products: [1, 2, 3]
+  query:
+    $or:
+      - products: 4
+  matches: false
+
+- name: one of the hashes matches attributes
+  document:
+    title: Queen
+  query:
+    $or:
+      - title: Sir
+      - title: Queen
+  matches: true
+
+- name: all hashes match attributes
+  document:
+    title: Queen
+    age: 40
+  query:
+    $or:
+      - age: 40
+      - title: Queen
+  matches: true
+
+- name: no hashes match attributes
+  document:
+    title: Queen
+    age: 40
+  query:
+    $or:
+      - age: 41
+      - title: King
+  matches: false
+
+- name: $not in conditions - matches
+  document:
+    age: 40
+  query:
+    $or:
+      - age:
+          $not:
+            $eq: 41
+  matches: true
+
+- name: $not in conditions - does not match
+  document:
+    age: 40
+  query:
+    $or:
+      - age:
+          $not:
+            $eq: 40
+  matches: false
+
+- name: complex expression - matches
+  document:
+    title: Queen
+    age: 40
+  query:
+    $or:
+      - title: !ruby/regexp /King../
+      - age:
+          $in: [40]
+  matches: true
+
+- name: complex expression - matches partially
+  document:
+    title: Queen
+    age: 40
+  query:
+    $or:
+      - title: !ruby/regexp /Que../
+      - age:
+          $in: [41]
+  matches: true
+
+- name: complex expression - does not match
+  document:
+    title: Queen
+    age: 40
+  query:
+    $or:
+      - title: !ruby/regexp /K../
+      - age:
+          $in: [41]
+  matches: false
+
+- name: no expressions (empty array)
+  document:
+    name: foo
+    order: 1
+  query:
+    $or: []
+  error: true

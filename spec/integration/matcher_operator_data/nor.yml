@@ -1,0 +1,94 @@
+- name: scalar - attribute value matches one
+  document:
+    products: [1, 2, 3]
+  query:
+    $nor:
+      - products: 1
+  matches: false
+
+- name: scalar - attribute value matches none
+  document:
+    products: [1, 2, 3]
+  query:
+    $nor:
+      - products: 4
+  matches: true
+
+- name: one of the hashes does not match attributes
+  document:
+    title: Queen
+  query:
+    $nor:
+      - title: Sir
+      - title: Queen
+  matches: false
+
+- name: all hashes match attributes
+  document:
+    title: Queen
+    age: 40
+  query:
+    $nor:
+      - age: 40
+      - title: Queen
+  matches: false
+
+- name: no hashes match attributes
+  document:
+    title: Queen
+    age: 40
+  query:
+    $nor:
+      - age: 41
+      - title: King
+  matches: true
+
+- name: $not in conditions - matches
+  document:
+    age: 40
+  query:
+    $nor:
+      - age:
+          $not:
+            $eq: 40
+  matches: true
+
+- name: $not in conditions - does not match
+  document:
+    age: 40
+  query:
+    $nor:
+      - age:
+          $not:
+            $eq: 41
+  matches: false
+
+- name: complex expression - matches
+  document:
+    title: Queen
+    age: 40
+  query:
+    $nor:
+      - title: !ruby/regexp /King../
+      - age:
+          $in: [41]
+  matches: true
+
+- name: complex expression - does not match
+  document:
+    title: Queen
+    age: 40
+  query:
+    $nor:
+      - title: !ruby/regexp /Que../
+      - age:
+          $in: [41]
+  matches: false
+
+- name: no expressions (empty array)
+  document:
+    name: foo
+    order: 1
+  query:
+    $nor: []
+  error: true

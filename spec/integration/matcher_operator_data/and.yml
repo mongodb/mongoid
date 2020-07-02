@@ -1,0 +1,61 @@
+- name: simple expression - matching
+  document:
+    name: foo
+  query:
+    $and:
+      - name: foo
+  matches: true
+
+- name: simple expression - not matching
+  document:
+    name: foo
+  query:
+    $and:
+      - name: bar
+  matches: false
+
+- name: multiple expressions - matching
+  document:
+    name: foo
+    order: 1
+  query:
+    $and:
+      - name: foo
+      - order: 1
+  matches: true
+
+- name: multiple expressions - not matching
+  document:
+    name: foo
+    order: 1
+  query:
+    $and:
+      - name: bar
+      - order: 2
+  matches: false
+
+- name: no expressions (empty array)
+  document:
+    name: foo
+    order: 1
+  query:
+    $and: []
+  error: true
+
+- name: complex expression - matching
+  document:
+    name: foo
+  query:
+    $and:
+      - name:
+          $in: [foo]
+  matches: true
+
+- name: complex expression - not matching
+  document:
+    name: foo
+  query:
+    $and:
+      - name:
+          $gt: 1
+  matches: false
