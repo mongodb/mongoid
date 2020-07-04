@@ -20,9 +20,11 @@ module Mongoid
   # against the database.
   class Criteria
     include Enumerable
+    alias :_enumerable_find :find
     include Contextual
     include Queryable
     include Findable
+    alias :_findable_find :find
     include Inspectable
     include Includable
     include Marshalable
@@ -53,6 +55,40 @@ module Mongoid
     def ==(other)
       return super if other.respond_to?(:selector)
       entries == other
+    end
+
+    # Call either Findable#find or Enumerable#find based on the given arguments
+    #
+    # If the arguments match Enumerable#find signature, that will be invoked.
+    # Otherwise Findable#find will be invoked
+    #
+    # The signature of Enumerable#find:
+    #
+    #   find(ifnone = nil) { |obj| block } → obj or nil
+    #   find(ifnone = nil) → an_enumerator
+    #
+    # @example Find using a block, invokes Enumerable#find
+    #   criteria.find { |item| item.name == "Depeche Mode" }
+    #
+    # @example Find given a block and a Proc, invokes Enumerable#find
+    #   criteria.find(-> { "Default Band" }) { |item| item.name == "Milwaukee Mode" }
+    #
+    # @example Find given just a Proc, invokes Enumerable#find, returns an Enumerator
+    #   enumerator = criteria.find(-> { "Default Band" })
+    #
+    # @example Find given anything else, invokes Findable#find
+    #   critera.find("1234")
+    #
+    # @return Same return value as either Findable#find or Enumerable#find, depending
+    #   on which one was invoked.
+    #
+    # @since 7.1.1
+    def find(*args, &block)
+      if block_given? || args.first&.is_a?(Proc)
+        _enumerable_find(*args, &block)
+      else
+        _findable_find(*args)
+      end
     end
 
     # Needed to properly get a criteria back as json
