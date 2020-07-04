@@ -815,6 +815,44 @@ describe Mongoid::Criteria do
     end
   end
 
+  describe "#find" do
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    context "when given a block" do
+      it "behaves as enumerable" do
+        result = criteria.find { |c| c.name == "Depeche Mode" }
+        expect(result).to eq(depeche)
+      end
+    end
+
+    context "when given a Proc and a block" do
+      it "behaves as enumerable" do
+        result = criteria.find(-> {"default"}) { |c| c.name == "Not Depeche Mode" }
+        expect(result).to eq("default")
+      end
+    end
+
+    context "when given a Proc" do
+      it "behaves as enumerable" do
+        result = criteria.find(-> {"default"})
+        expect(result).to be_a(Enumerator)
+      end
+    end
+
+    context "when given an id" do
+      it "behaves as findable" do
+        result = criteria.find(depeche.id)
+        expect(result).to eq(depeche)
+      end
+    end
+  end
+
   describe "#find_one_and_update" do
 
     let!(:depeche) do
