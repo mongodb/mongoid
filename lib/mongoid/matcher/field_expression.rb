@@ -10,13 +10,14 @@ module Mongoid
             if k.start_with?('$')
               FieldOperator.get(k).matches?(exists, value, cond_v)
             elsif Hash === value
-              sub_value, expanded = Matcher.extract_attribute(value, k)
+              sub_exists, sub_value, expanded =
+                Matcher.extract_attribute(value, k)
               if expanded
                 sub_value.any? do |sub_v|
                   Eq.matches?(true, sub_v, cond_v)
                 end
               else
-                Eq.matches?(!sub_value.nil?, sub_value, cond_v)
+                Eq.matches?(sub_exists, sub_value, cond_v)
               end
             else
               false
