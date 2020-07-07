@@ -29,3 +29,118 @@
     no_name:
       $exists: true
   matches: false
+
+- name: null field - true - matches
+  document:
+    name: ~
+  query:
+    name:
+      $exists: true
+  matches: true
+
+- name: null field - true - does not match
+  document:
+    name: ~
+  query:
+    no_name:
+      $exists: true
+  matches: false
+
+- name: null field - false - matches
+  document:
+    name: ~
+  query:
+    no_name:
+      $exists: false
+  matches: true
+
+- name: null field - false - does not match
+  document:
+    name: ~
+  query:
+    name:
+      $exists: false
+  matches: false
+
+- name: existing array element - true - matches
+  document:
+    cities:
+      - ny
+  query:
+    cities.0:
+      $exists: true
+  matches: true
+
+- name: existing array element - false - does not matches
+  document:
+    cities:
+      - ny
+  query:
+    cities.0:
+      $exists: false
+  matches: false
+
+- name: missing array element - true - matches
+  document:
+    cities:
+      - ny
+  query:
+    cities.0:
+      $exists: true
+  matches: true
+
+- name: missing array element - false - matches
+  document:
+    cities:
+      - ny
+  query:
+    cities.1:
+      $exists: false
+  matches: true
+
+- name: missing array element - does not match
+  document:
+    cities:
+      - ny
+  query:
+    cities.1:
+      $exists: true
+  matches: false
+
+- name: array contains documents with present and missing fields - hash path - true
+  document:
+    cities:
+      - name: ny
+      - country: us
+  query:
+    cities.name:
+      $exists: true
+  matches: true
+
+- name: array contains documents with present and missing fields - hash path - false
+  document:
+    cities:
+      - name: ny
+      - country: us
+  query:
+    cities.name:
+      $exists: false
+  matches: false
+
+- name: array input with hash path - true - no match
+  document:
+    cities:
+      - country: us
+  query:
+    cities.name:
+      $exists: true
+  matches: false
+
+- name: array input with hash path - false - no match
+  document:
+    cities:
+      - country: us
+  query:
+    cities.name:
+      $exists: false
+  matches: true

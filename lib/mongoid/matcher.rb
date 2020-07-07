@@ -44,24 +44,29 @@ module Mongoid
 
       src = document
       expanded = false
+      exists = true
 
       key.to_s.split('.').each do |field|
         if (index = field.to_i).to_s == field
           # Array indexing
           if Array === src
+            exists = index < src.length
             src = src[index]
           else
             # Trying to index something that is not an array
+            exists = false
             src = nil
           end
         else
-          src = case src
+          case src
           when nil
-            nil
+            exists = false
           when Hash
-            src[field]
+            exists = src.key?(field)
+            src = src[field]
           when Array
             expanded = true
+            exists = false
             new = []
             src.each do |doc|
               case doc
@@ -74,21 +79,23 @@ module Mongoid
                   else
                     new += [v]
                   end
+                  exists = true
                 end
               else
                 # Trying to hash index into a value that is not a hash
               end
             end
-            new
+            src = new
           else
             # Trying to descend into a field that is not a hash using
             # dot notation.
-            nil
+            exists = false
+            src = nil
           end
         end
       end
 
-      [src, expanded]
+      [exists, src, expanded]
     end
   end
 end
