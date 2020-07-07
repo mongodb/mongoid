@@ -71,7 +71,31 @@ module Mongoid
       # @since 3.0.0
       def count(options = {}, &block)
         return super(&block) if block_given?
-        try_cache(:count) { view.count(options) }
+        try_cache(:count) { view.count_documents(options) }
+      end
+
+      # Get the estimated number of documents matching the query.
+      #
+      # @example Get the estimated number of matching documents.
+      #   context.estimated_count
+      #
+      # @example Get the count of documents with the provided options.
+      #   context.estimated_count(limit: 1)
+      #
+      # @example Get the count for where the provided block is true.
+      #   context.estimated_count do |doc|
+      #     doc.likes > 1
+      #   end
+      #
+      # @param [ Hash ] options The options, such as skip and limit to be factored
+      #   into the count.
+      #
+      # @return [ Integer ] The number of matches.
+      #
+      # @since 3.0.0
+      def estimated_count(options = {}, &block)
+        return super(&block) if block_given?
+        try_cache(:count) { view.estimated_document_count(options) }
       end
 
       # Delete all documents in the database that match the selector.
