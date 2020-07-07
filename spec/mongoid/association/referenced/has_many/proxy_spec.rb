@@ -1488,7 +1488,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         movie.ratings.build(value: 1)
       end
 
-      it "returns false" do 
+      it "returns false" do
         expect(movie.ratings.any?).to be true
       end
     end
