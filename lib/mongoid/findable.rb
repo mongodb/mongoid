@@ -60,6 +60,18 @@ module Mongoid
       with_default_scope.count
     end
 
+    # Returns an estimated count of records in the database.
+    # If you want to specify conditions use where.
+    #
+    # @example Get the count of matching documents.
+    #   Person.estimated_count
+    #   Person.where(title: "Sir").estimated_count
+    #
+    # @return [ Integer ] The number of matching documents.
+    def estimated_count
+      with_default_scope.estimated_count
+    end
+
     # Returns true if count is zero
     #
     # @example Are there no saved documents for this model?
