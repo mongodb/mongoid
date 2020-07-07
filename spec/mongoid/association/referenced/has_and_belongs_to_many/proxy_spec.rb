@@ -1906,10 +1906,10 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
       it "returns true" do
         sandwich.with_session do |session|
-          session.start_transaction
-          expect { sandwich.meats << Meat.new }.to_not raise_error
-          expect(sandwich.meats.any?).to be true
-          session.commit_transaction
+          session.with_transaction do 
+            expect{ sandwich.meats << Meat.new }.to_not raise_error
+            expect(sandwich.meats.any?).to be true
+          end
         end
       end
     end

@@ -878,9 +878,9 @@ describe Mongoid::Association::Depending do
 
         it 'doesn\'t raise an exception' do
           person.with_session do |session|
-            session.start_transaction
-            expect { person.destroy }.to_not raise_error
-            session.commit_transaction
+            session.with_transaction do 
+              expect { person.destroy }.to_not raise_error
+            end
           end
         end
       end
@@ -910,9 +910,9 @@ describe Mongoid::Association::Depending do
 
         it 'doesn\'t raise an exception inside a transaction' do
           person.with_session do |session|
-            session.start_transaction
-            expect { person.destroy }.to_not raise_error
-            session.commit_transaction
+            session.with_transaction do
+              expect { person.destroy }.to_not raise_error
+            end
           end
         end
       end

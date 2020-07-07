@@ -1525,10 +1525,10 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       it "returns true" do
         movie.with_session do |session|
-          session.start_transaction
-          expect { movie.ratings << Rating.new }.to_not raise_error
-          expect(movie.ratings.any?).to be true
-          session.commit_transaction
+          session.with_transaction do 
+            expect{ movie.ratings << Rating.new }.to_not raise_error
+            expect(movie.ratings.any?).to be true
+          end
         end
       end
     end
