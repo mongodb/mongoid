@@ -1471,6 +1471,68 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       Movie.create
     end
 
+    context "when nothing exists on the relation" do
+      
+      context "when no document is added" do
+
+        let!(:movie) do
+          Movie.create!
+        end
+
+        it "returns false" do
+          expect(movie.ratings.any?).to be false
+        end
+      end
+
+      context "when the document is destroyed" do
+
+        before do
+          Rating.create!
+        end
+
+        let!(:movie) do
+          Movie.create!
+        end
+
+        it "returns false" do
+          movie.destroy
+          expect(movie.ratings.any?).to be false
+        end
+      end
+    end
+
+    context "when appending to a relation and _loaded/_unloaded are empty" do
+
+      let!(:movie) do
+        Movie.create!
+      end
+
+      before do
+        movie.ratings << Rating.new
+      end
+
+      it "returns true" do
+        expect(movie.ratings.any?).to be true
+      end
+    end
+
+    context "when appending to a relation in a transaction" do
+      require_topology :replica_set, :sharded
+      
+      let!(:movie) do
+        Movie.create!
+      end
+
+      it "returns true" do
+        movie.with_session do |session|
+          session.start_transaction
+          expect { movie.ratings << Rating.new }.to_not raise_error
+          expect(movie.ratings.any?).to be true
+          session.commit_transaction
+        end
+      end
+    end
+
     context "when documents have been persisted" do
 
       let!(:rating) do
@@ -1494,27 +1556,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
 
     context "when new documents exist in the database" do
-
-      context "when the documents are part of the relation" do
-
-        before do
-          Rating.create(ratable: movie)
-        end
-
-        it "returns true" do
-          expect(movie.ratings.any?).to be true
-        end
+      before do
+        Rating.create(ratable: movie)
       end
 
-      context "when the documents are not part of the relation" do
-
-        before do
-          Rating.create
-        end
-
-        it "returns false" do
-          expect(movie.ratings.any?).to be false
-        end
+      it "returns true" do
+        expect(movie.ratings.any?).to be true
       end
     end
   end
