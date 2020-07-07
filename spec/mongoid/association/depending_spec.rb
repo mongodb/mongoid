@@ -870,7 +870,7 @@ describe Mongoid::Association::Depending do
       end
 
       context 'when deleted inside a transaction' do
-        require_topology :replica_set, :sharded
+        require_transaction_support
         
         before do
           person.restrictable_posts << post
@@ -906,8 +906,8 @@ describe Mongoid::Association::Depending do
       end
 
       context "when inside a transaction" do
-        require_topology :replica_set, :sharded
-
+        require_transaction_support
+        
         it 'doesn\'t raise an exception inside a transaction' do
           person.with_session do |session|
             session.with_transaction do

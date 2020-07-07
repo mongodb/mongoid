@@ -1517,7 +1517,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
 
     context "when appending to a relation in a transaction" do
-      require_topology :replica_set, :sharded
+      require_transaction_support
       
       let!(:movie) do
         Movie.create!

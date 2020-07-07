@@ -1935,7 +1935,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
 
     context "when appending to a relation in a transaction" do
-      require_topology :replica_set, :sharded
+      require_transaction_support
       
       let!(:sandwich) do
         Sandwich.create!
