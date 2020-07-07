@@ -223,7 +223,7 @@ module Mongoid
             #   enumerable.any?
             #
             # @return [ true, false ] If the enumerable has any elements.
-            def any? 
+            def any?
               if _loaded?
                 in_memory.count > 0
               else

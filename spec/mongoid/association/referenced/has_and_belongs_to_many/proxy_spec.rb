@@ -1792,6 +1792,38 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
           end
         end
       end
+
+      context "when appending to a relation and _loaded/_unloaded are empty" do
+  
+        let!(:sandwich) do
+          Sandwich.create!
+        end
+
+        before do
+          sandwich.meats << Meat.new
+        end
+  
+        it "returns true" do
+          expect(sandwich.meats.any?).to be true
+        end
+      end
+
+      context "when appending to a relation in a transaction" do
+        require_topology :replica_set
+        
+        let!(:sandwich) do
+          Sandwich.create!
+        end
+
+        it "returns true" do
+          sandwich.with_session do |session|
+            session.start_transaction
+            expect { sandwich.meats << Meat.new }.to_not raise_error
+            expect(sandwich.meats.any?).to be true
+            session.commit_transaction
+          end
+        end
+      end
     end
 
     context "when documents have been persisted" do
