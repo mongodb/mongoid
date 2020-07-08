@@ -144,3 +144,43 @@
     cities.name:
       $exists: false
   matches: true
+
+- name: empty array - true
+  document:
+    cities: []
+  query:
+    cities:
+      $exists: true
+  matches: true
+
+- name: empty array - false
+  document:
+    cities: []
+  query:
+    cities:
+      $exists: false
+  matches: false
+
+- name: true - true
+  document:
+    cities: true
+  query:
+    cities:
+      $exists: true
+  matches: true
+
+- name: false - true
+  document:
+    cities: true
+  query:
+    cities:
+      $exists: true
+  matches: true
+
+- name: empty hash
+  document:
+    cities: {}
+  query:
+    cities:
+      $exists: true
+  matches: true
