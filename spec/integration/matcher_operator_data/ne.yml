@@ -66,6 +66,22 @@
       $ne: slow
   matches: true
 
+- name: array query for itself
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $ne: [quick]
+  matches: false
+
+- name: array query for array - match
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $ne: [quick1]
+  matches: true
+
 - name: different types - query number by string
   document:
     count: 1

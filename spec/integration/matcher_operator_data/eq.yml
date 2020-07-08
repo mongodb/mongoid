@@ -86,6 +86,14 @@
       $eq: [quick]
   matches: false
 
+- name: array query for itself
+  document:
+    labels: [quick]
+  query:
+    labels:
+      $eq: [quick]
+  matches: true
+
 - name: array query for array element - no match
   document:
     labels: [quick]
