@@ -75,6 +75,7 @@ describe 'Matcher operators' do
                     Mop.where(query).any?
                   rescue Mongo::Error::OperationFailure
                   rescue BSON::Error::UnserializableClass
+                  rescue Mongoid::Errors::InvalidQuery
                   else
                     fail "Expected the query to raise an error"
                   end

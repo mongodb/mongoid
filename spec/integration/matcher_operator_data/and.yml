@@ -59,3 +59,25 @@
       - name:
           $gt: 1
   matches: false
+
+- name: nil argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $and: ~
+  error: true
+
+- name: numeric argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $and: 42
+  error: true
+
+- name: hash argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $and:
+      foo: bar
+  error: true
