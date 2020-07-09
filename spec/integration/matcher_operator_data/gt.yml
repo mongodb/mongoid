@@ -93,3 +93,19 @@
     counts:
       $gt: 5
   matches: false
+
+- name: nil argument
+  document:
+    count: 10
+  query:
+    count:
+      $gt: ~
+  matches: false
+
+- name: empty array argument
+  document:
+    count: 10
+  query:
+    count:
+      $gt: []
+  matches: false
