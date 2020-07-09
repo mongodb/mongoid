@@ -140,3 +140,11 @@
   # https://jira.mongodb.org/browse/MONGOID-4908
   error: [matcher, driver]
   matches: true
+
+- name: nil argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $ne: ~
+  matches: true
