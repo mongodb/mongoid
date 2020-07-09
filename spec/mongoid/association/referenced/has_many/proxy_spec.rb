@@ -1431,6 +1431,13 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         expect(movie.ratings.count).to eq(0)
       end
     end
+    
+    context "when no document is added" do
+
+      it "returns false" do
+        expect(movie.ratings.any?).to be false
+      end
+    end
 
     context "when new documents exist in the database" do
 
@@ -1454,6 +1461,107 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         it "returns the count from the db" do
           expect(movie.ratings.count).to eq(0)
         end
+      end
+    end
+  end
+
+  describe "#any?" do
+
+    let(:movie) do
+      Movie.create
+    end
+
+    context "when nothing exists on the relation" do
+      
+      context "when no document is added" do
+
+        let!(:movie) do
+          Movie.create!
+        end
+
+        it "returns false" do
+          expect(movie.ratings.any?).to be false
+        end
+      end
+
+      context "when the document is destroyed" do
+
+        before do
+          Rating.create!
+        end
+
+        let!(:movie) do
+          Movie.create!
+        end
+
+        it "returns false" do
+          movie.destroy
+          expect(movie.ratings.any?).to be false
+        end
+      end
+    end
+
+    context "when appending to a relation and _loaded/_unloaded are empty" do
+
+      let!(:movie) do
+        Movie.create!
+      end
+
+      before do
+        movie.ratings << Rating.new
+      end
+
+      it "returns true" do
+        expect(movie.ratings.any?).to be true
+      end
+    end
+
+    context "when appending to a relation in a transaction" do
+      require_transaction_support
+      
+      let!(:movie) do
+        Movie.create!
+      end
+
+      it "returns true" do
+        movie.with_session do |session|
+          session.with_transaction do 
+            expect{ movie.ratings << Rating.new }.to_not raise_error
+            expect(movie.ratings.any?).to be true
+          end
+        end
+      end
+    end
+
+    context "when documents have been persisted" do
+
+      let!(:rating) do
+        movie.ratings.create(value: 1)
+      end
+
+      it "returns true" do
+        expect(movie.ratings.any?).to be true
+      end
+    end
+
+    context "when documents have not been persisted" do
+
+      let!(:rating) do
+        movie.ratings.build(value: 1)
+      end
+
+      it "returns false" do
+        expect(movie.ratings.any?).to be true
+      end
+    end
+
+    context "when new documents exist in the database" do
+      before do
+        Rating.create(ratable: movie)
+      end
+
+      it "returns true" do
+        expect(movie.ratings.any?).to be true
       end
     end
   end

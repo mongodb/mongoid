@@ -489,7 +489,7 @@ describe Mongoid::Association::Depending do
           end
         end
 
-        context "when dependent is restrict_with_error" do
+        context "when dependent is restrict_with_exception" do
 
           context "when restricting a references many" do
 
@@ -825,45 +825,96 @@ describe Mongoid::Association::Depending do
 
   context 'when the strategy is :restrict_with_error' do
 
-    let(:person) do
-      Person.new
-    end
-
-    let(:post) do
-      Post.new
-    end
-
-    let!(:association) do
-      Person.has_many :restrictable_posts, class_name: "Post", dependent: :restrict_with_error
-    end
-
-    after do
-      Person.dependents.delete(association)
-    end
-
-    context 'when there are related objects' do
-
-      before do
-        person.restrictable_posts << post
+    context "when restricting a one-to-many" do
+      
+      let(:person) do
+        Person.new
+      end
+  
+      let(:post) do
+        Post.new
       end
 
-      it 'adds an error to the parent object' do
-        expect(person.delete).to be(false)
+      let!(:association) do
+        Person.has_many :restrictable_posts, class_name: "Post", dependent: :restrict_with_error
+      end
 
-        person.errors[:restrictable_posts].first.should ==
-          "is not empty and prevents the document from being destroyed"
+      after do
+        Person.dependents.delete(association)
+      end
+
+      context 'when there are related objects' do
+
+        before do
+          person.restrictable_posts << post
+        end
+
+        it 'adds an error to the parent object' do
+          expect(person.delete).to be(false)
+  
+          person.errors[:restrictable_posts].first.should ==
+            "is not empty and prevents the document from being destroyed"
+        end
+      end
+
+      context 'when there are no related objects' do
+
+        before do
+          expect(post).to receive(:delete).never
+          expect(post).to receive(:destroy).never
+        end
+
+        it 'deletes the object and leaves the other one intact' do
+          expect(person.delete).to be(true)
+        end
+      end
+
+      context 'when deleted inside a transaction' do
+        require_transaction_support
+        
+        before do
+          person.restrictable_posts << post
+        end
+
+        it 'doesn\'t raise an exception' do
+          person.with_session do |session|
+            session.with_transaction do 
+              expect { person.destroy }.to_not raise_error
+            end
+          end
+        end
       end
     end
 
-    context 'when there are no related objects' do
+    context "when restricting a many to many" do
 
-      before do
-        expect(post).to receive(:delete).never
-        expect(post).to receive(:destroy).never
+      let!(:association) do
+        Person.has_and_belongs_to_many :houses, dependent: :restrict_with_error
       end
 
-      it 'deletes the object and leaves the other one intact' do
-        expect(person.delete).to be(true)
+      after do
+        Person.dependents.delete(association)
+        Person.has_and_belongs_to_many :houses, validate: false
+      end
+
+      let(:person) do
+        Person.new houses: [House.new]
+      end
+
+      it "returns false" do
+        expect(person.destroy).to be false
+      end
+
+      context "when inside a transaction" do
+        require_transaction_support
+        
+        it 'doesn\'t raise an exception inside a transaction' do
+          person.with_session do |session|
+            session.with_transaction do
+              expect { person.destroy }.to_not raise_error
+            end
+          end
+        end
       end
     end
   end

@@ -1402,6 +1402,39 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     end
   end
 
+  describe "#any?" do
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when documents are persisted" do
+      before do
+        person.addresses.create(street: "Upper")
+      end
+
+      it "returns true" do
+        expect(person.addresses.any?).to be true
+      end
+    end
+    
+    context "when documents are not persisted" do
+      before do
+        person.addresses.build(street: "Bond")
+      end
+      
+      it "returns true" do
+        expect(person.addresses.any?).to be true
+      end
+    end
+
+    context "when documents are not created" do
+      it "returns false" do
+        expect(person.addresses.any?).to be false
+      end
+    end
+  end
+
   describe "#create" do
 
     context "when providing multiple attributes" do
