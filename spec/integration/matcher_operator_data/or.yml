@@ -103,3 +103,25 @@
   query:
     $or: []
   error: true
+
+- name: nil argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $or: ~
+  error: true
+
+- name: numeric argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $or: 42
+  error: true
+
+- name: hash argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $or:
+      foo: bar
+  error: true
