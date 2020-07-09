@@ -69,3 +69,37 @@
           pattern: a.o
           options: ''
   matches: false
+
+- name: nil argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $all: ~
+  error: true
+
+- name: numeric argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $all: 42
+  error: true
+
+- name: hash argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $all:
+        foo: bar
+  error: true
+
+- name: scalar argument that exists in target array
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $all:
+        ceo
+  error: true
