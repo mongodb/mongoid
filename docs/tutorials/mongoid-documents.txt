@@ -900,7 +900,7 @@ down into their child documents, but not vise-versa.
 
    class Browser < Canvas
      field :version, type: Integer
-     scope :recent, where(:version.gt => 3)
+     scope :recent, ->{ where(:version.gt => 3) }
    end
 
    class Firefox < Browser
