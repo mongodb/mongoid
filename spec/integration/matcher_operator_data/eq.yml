@@ -173,3 +173,11 @@
   # https://jira.mongodb.org/browse/MONGOID-4908
   error: [matcher, driver]
   matches: false
+
+- name: nil argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $eq: ~
+  matches: false
