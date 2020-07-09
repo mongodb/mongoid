@@ -205,10 +205,11 @@ module Mongoid
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?("_type")
-          field(:_type, default: self.name, type: String)
+          default_proc = lambda { self.class.name }
+          field(:_type, default: default_proc, type: String)
         end
-        subclass_default = subclass.name || ->{ self.class.name }
-        subclass.field(:_type, default: subclass_default, type: String, overwrite: true)
+        #subclass_default = subclass.name || ->{ self.class.name }
+        #subclass.field(:_type, default: subclass_default, type: String, overwrite: true)
       end
     end
   end
