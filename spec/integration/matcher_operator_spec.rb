@@ -76,6 +76,7 @@ describe 'Matcher operators' do
                   rescue Mongo::Error::OperationFailure
                   rescue BSON::Error::UnserializableClass
                   rescue Mongoid::Errors::InvalidQuery
+                  rescue Mongoid::Errors::CriteriaArgumentRequired
                   else
                     fail "Expected the query to raise an error"
                   end
