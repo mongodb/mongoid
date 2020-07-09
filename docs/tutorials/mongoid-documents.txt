@@ -1120,7 +1120,7 @@ fields, associations, validations and scopes are copied to the child document.
 
    class Browser < Canvas
      field :version, type: Integer
-     scope :recent, where(:version.gt => 3)
+     scope :recent, ->{ where(:version.gt => 3) }
    end
 
    class Firefox < Browser
