@@ -8,7 +8,14 @@ module Mongoid
           # BSON::Regexp::Raw
           condition = condition.compile
         end
-        value =~ condition
+        case condition
+        when Regexp
+          value =~ condition
+        when String
+          value =~ Regexp.new(condition)
+        else
+          raise Errors::InvalidQuery, "$regex requires a regular expression or a string argument: #{Errors::InvalidQuery.truncate_expr(condition)}"
+        end
       end
 
       module_function def matches_array_or_scalar?(value, condition)

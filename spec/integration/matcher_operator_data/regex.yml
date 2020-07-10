@@ -33,3 +33,53 @@
         pattern: K..g
         options: ''
   matches: false
+
+- name: string argument - matches
+  document:
+    title: King
+  query:
+    title:
+      $regex:
+        K..g
+  matches: true
+
+- name: string argument - does not match
+  document:
+    title: King
+  query:
+    title:
+      $regex:
+        K...g
+  matches: false
+
+- name: nil argument
+  document:
+    position: ceo
+  query:
+    position:
+      $regex: ~
+  error: true
+
+- name: empty array argument
+  document:
+    position: ceo
+  query:
+    position:
+      $regex: []
+  error: true
+
+- name: empty hash argument
+  document:
+    position: ceo
+  query:
+    position:
+      $regex: {}
+  error: true
+
+- name: numeric argument
+  document:
+    position: ceo
+  query:
+    position:
+      $regex: 42
+  error: true
