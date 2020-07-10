@@ -115,7 +115,7 @@ module Mongoid
           end
 
           unless op_expr.is_a?(Array)
-            raise Errors::InvalidQuery, "#{operator} argument must be an array: #{op_expr}"
+            raise Errors::InvalidQuery, "#{operator} argument must be an array: #{Errors::InvalidQuery.truncate_expr(op_expr)}"
           end
 
           if selector.length == 1 && selector.keys.first == operator
