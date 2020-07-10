@@ -96,3 +96,35 @@
       $not:
         gt: 40
   error: true
+
+- name: nil argument
+  document:
+    position: ceo
+  query:
+    position:
+      $not: ~
+  error: true
+
+- name: empty array argument
+  document:
+    position: ceo
+  query:
+    position:
+      $not: []
+  error: true
+
+- name: empty hash argument
+  document:
+    position: ceo
+  query:
+    position:
+      $not: {}
+  error: true
+
+- name: numeric argument
+  document:
+    position: ceo
+  query:
+    position:
+      $not: 42
+  error: true
