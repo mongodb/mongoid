@@ -28,6 +28,10 @@ describe 'Matcher operators' do
             end
           end
 
+          if spec['min_server_version']
+            min_server_version spec['min_server_version'].to_s
+          end
+
           let(:query) { spec.fetch('query') }
           let(:result) { spec.fetch('matches') }
 
