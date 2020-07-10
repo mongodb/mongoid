@@ -69,3 +69,35 @@
     count:
       $nin: [10, 11]
   matches: true
+
+- name: nil argument
+  document:
+    position: ceo
+  query:
+    position:
+      $nin: ~
+  error: true
+
+- name: empty array argument
+  document:
+    position: ceo
+  query:
+    position:
+      $nin: []
+  matches: true
+
+- name: empty hash argument
+  document:
+    position: ceo
+  query:
+    position:
+      $nin: {}
+  error: true
+
+- name: numeric argument
+  document:
+    position: ceo
+  query:
+    position:
+      $nin: 42
+  error: true
