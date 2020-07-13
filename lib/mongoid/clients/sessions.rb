@@ -51,7 +51,7 @@ module Mongoid
         if
           # Driver 2.13.0+
           defined?(Mongo::Error::SessionsNotSupported) &&
-            Mongo::Error::SessionsNotSupported === ex or
+            Mongo::Error::SessionsNotSupported === ex ||
           # Legacy drivers
           ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
         then
@@ -110,7 +110,7 @@ module Mongoid
           if
             # Driver 2.13.0+
             defined?(Mongo::Error::SessionsNotSupported) &&
-              Mongo::Error::SessionsNotSupported === ex or
+              Mongo::Error::SessionsNotSupported === ex ||
             # Legacy drivers
             ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
           then
