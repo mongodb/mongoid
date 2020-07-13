@@ -26,7 +26,6 @@ require "mongoid/document"
 require "mongoid/tasks/database"
 require "mongoid/query_cache"
 
-
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
 if defined?(Rails)
