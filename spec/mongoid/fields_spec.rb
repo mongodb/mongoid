@@ -1126,19 +1126,19 @@ describe Mongoid::Fields do
 
     context "on new subclasses" do
       it "all subclasses get the discriminator key" do
-        class Discriminator_Parent
+        class DiscriminatorParent
           include Mongoid::Document
         end
 
-        class Discriminator_Child1 < Discriminator_Parent
+        class DiscriminatorChild1 < DiscriminatorParent
         end
 
-        class Discriminator_Child2 < Discriminator_Parent
+        class DiscriminatorChild2 < DiscriminatorParent
         end
 
-        expect(Discriminator_Parent.fields.keys).to include("_type")
-        expect(Discriminator_Child1.fields.keys).to include("_type")
-        expect(Discriminator_Child2.fields.keys).to include("_type")
+        expect(DiscriminatorParent.fields.keys).to include("_type")
+        expect(DiscriminatorChild1.fields.keys).to include("_type")
+        expect(DiscriminatorChild2.fields.keys).to include("_type")
       end
     end
   end
