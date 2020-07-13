@@ -270,7 +270,6 @@ describe Mongoid::Traversable do
     end
     
     context "when the discriminator key is changed at the global level" do 
-
       before do
         Mongoid.discriminator_key = "hello"
       end
@@ -310,7 +309,6 @@ describe Mongoid::Traversable do
     end 
 
     context "when the discriminator key is changed in the child" do 
-
       it "raises an error" do
         expect do
           Guitar.discriminator_key = "hello3"
