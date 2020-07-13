@@ -5,7 +5,7 @@ module Mongoid
     module Nor
       module_function def matches?(document, expr)
         unless expr.is_a?(Array)
-          raise ArgumentError, "$nor argument must be an array: #{Errors::InvalidQuery.truncate_expr(expr)}"
+          raise Errors::InvalidQuery, "$nor argument must be an array: #{Errors::InvalidQuery.truncate_expr(expr)}"
         end
 
         if expr.empty?

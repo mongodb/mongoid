@@ -92,3 +92,25 @@
   query:
     $nor: []
   error: true
+
+- name: nil argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $nor: ~
+  error: true
+
+- name: numeric argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $nor: 42
+  error: true
+
+- name: hash argument
+  document:
+    positions: [ceo, cto]
+  query:
+    $nor:
+      foo: bar
+  error: true

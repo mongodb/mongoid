@@ -149,3 +149,35 @@
           pattern: ..ri$
           options: ''
   matches: false
+
+- name: nil argument
+  document:
+    position: ceo
+  query:
+    position:
+      $in: ~
+  error: true
+
+- name: empty array argument
+  document:
+    position: ceo
+  query:
+    position:
+      $in: []
+  matches: false
+
+- name: empty hash argument
+  document:
+    position: ceo
+  query:
+    position:
+      $in: {}
+  error: true
+
+- name: numeric argument
+  document:
+    position: ceo
+  query:
+    position:
+      $in: 42
+  error: true

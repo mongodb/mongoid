@@ -184,3 +184,19 @@
     cities:
       $exists: true
   matches: true
+
+- name: nil argument - match
+  document:
+    positions: [ceo, cto]
+  query:
+    no_positions:
+      $exists: ~
+  matches: true
+
+- name: nil argument - no match
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $exists: ~
+  matches: false

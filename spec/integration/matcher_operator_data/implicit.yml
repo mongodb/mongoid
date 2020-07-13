@@ -305,3 +305,11 @@
   error: [matcher, driver]
   # DSL expands Range to $gte/$lte pair
   matches: false
+
+- name: nil input
+  document:
+    name: Angel Share
+  query: ~
+  # Driver sends the query without any conditions, which then succeeds
+  matches: true
+  error: [matcher, dsl]

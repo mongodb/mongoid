@@ -54,3 +54,54 @@
     hello:
       $size: 1
   matches: false
+
+- name: nil argument
+  document:
+    position: ceo
+  query:
+    position:
+      $size: ~
+  error: true
+
+- name: empty array argument
+  document:
+    position: ceo
+  query:
+    position:
+      $size: []
+  error: true
+
+- name: empty hash argument
+  document:
+    position: ceo
+  query:
+    position:
+      $size: {}
+  error: true
+
+- name: string argument
+  document:
+    position: ceo
+  query:
+    position:
+      $size: foo
+  error: true
+  min_server_version: 3.4
+
+- name: floating point argument
+  document:
+    position: ceo
+  query:
+    position:
+      $size: 2.5
+  error: true
+  min_server_version: 3.4
+
+- name: negative integer argument
+  document:
+    position: ceo
+  query:
+    position:
+      $size: -2
+  error: true
+  min_server_version: 3.4

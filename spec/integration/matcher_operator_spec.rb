@@ -28,6 +28,10 @@ describe 'Matcher operators' do
             end
           end
 
+          if spec['min_server_version']
+            min_server_version spec['min_server_version'].to_s
+          end
+
           let(:query) { spec.fetch('query') }
           let(:result) { spec.fetch('matches') }
 
@@ -75,6 +79,8 @@ describe 'Matcher operators' do
                     Mop.where(query).any?
                   rescue Mongo::Error::OperationFailure
                   rescue BSON::Error::UnserializableClass
+                  rescue Mongoid::Errors::InvalidQuery
+                  rescue Mongoid::Errors::CriteriaArgumentRequired
                   else
                     fail "Expected the query to raise an error"
                   end

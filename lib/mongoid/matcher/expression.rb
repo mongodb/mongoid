@@ -4,6 +4,9 @@ module Mongoid
     # @api private
     module Expression
       module_function def matches?(document, expr)
+        if expr.nil?
+          raise Errors::InvalidQuery, "Nil condition in expression context"
+        end
         expr.all? do |k, expr_v|
           k = k.to_s
           if k.start_with?('$')

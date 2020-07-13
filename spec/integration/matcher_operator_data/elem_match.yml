@@ -250,3 +250,27 @@
         b:
           $gt: 1
   matches: false
+
+- name: nil argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $elemMatch: ~
+  error: true
+
+- name: numeric argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $elemMatch: 42
+  error: true
+
+- name: empty array argument
+  document:
+    positions: [ceo, cto]
+  query:
+    positions:
+      $elemMatch: []
+  error: true

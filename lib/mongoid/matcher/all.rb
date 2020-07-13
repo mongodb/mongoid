@@ -4,6 +4,10 @@ module Mongoid
     # @api private
     module All
       module_function def matches?(exists, value, condition)
+        unless Array === condition
+          raise Errors::InvalidQuery, "$all argument must be an array: #{Errors::InvalidQuery.truncate_expr(condition)}"
+        end
+
         condition.any? && condition.all? do |c|
           case c
           when ::Regexp, BSON::Regexp::Raw

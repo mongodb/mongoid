@@ -4,7 +4,8 @@
 module Mongoid
   module Errors
 
-    # Raised when invalid query is passed to an embedded matcher.
+    # Raised when invalid query is passed to an embedded matcher, or an
+    # invalid query fragment is passed to the query builder (Criteria object).
     class InvalidQuery < MongoidError
 
       # Create the new invalid query error.
