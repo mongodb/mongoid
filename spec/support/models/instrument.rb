@@ -3,7 +3,7 @@
 
 class Instrument
     include Mongoid::Document
-    field :owner, type: String, default: 0
+    field :owner, type: String
 end
 
 require "support/models/guitar"
