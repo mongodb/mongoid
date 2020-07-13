@@ -18,16 +18,16 @@
   document:
     name: Boris
   query:
-    count:
+    name:
       $nin:
         - !ruby/regexp /..ris/
-  matches: true
+  matches: false
 
 - name: scalar field - does not match native regexp
   document:
     name: Boris
   query:
-    count:
+    name:
       $nin:
         - !ruby/regexp /ri$/
   matches: true
@@ -36,18 +36,18 @@
   document:
     name: Boris
   query:
-    count:
+    name:
       $nin:
         - !ruby/object:BSON::Regexp::Raw
           pattern: ..ris
           options: ''
-  matches: true
+  matches: false
 
 - name: scalar field - does not match bson regexp
   document:
     name: Boris
   query:
-    count:
+    name:
       $nin:
         - !ruby/object:BSON::Regexp::Raw
           pattern: ..ri$
