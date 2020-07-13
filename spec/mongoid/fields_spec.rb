@@ -1123,7 +1123,26 @@ describe Mongoid::Fields do
         expect(circle.fields.keys).to include("_type")
       end
     end
+
+    context "on new subclasses" do
+      it "all subclasses get the discriminator key" do 
+        class Discriminator_Parent 
+          include Mongoid::Document
+        end
+
+        class Discriminator_Child1 < Discriminator_Parent 
+        end
+          
+        class Discriminator_Child2 < Discriminator_Parent
+        end
+
+        expect(Discriminator_Parent.fields.keys).to include("_type")
+        expect(Discriminator_Child1.fields.keys).to include("_type")
+        expect(Discriminator_Child2.fields.keys).to include("_type")
+      end
+    end
   end
+  
 
   describe ".replace_field" do
 
