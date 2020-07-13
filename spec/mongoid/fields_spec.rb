@@ -810,7 +810,8 @@ describe Mongoid::Fields do
       end
 
       it "does not return subclass defaults" do
-        expect(shape.pre_processed_defaults).to eq([ "_id", "x", "y", "_type" ])
+        expect(shape.pre_processed_defaults).to eq([ "_id", "x", "y" ])
+        expect(shape.post_processed_defaults).to eq([ "_type" ])
       end
     end
 
@@ -821,7 +822,8 @@ describe Mongoid::Fields do
       end
 
       it "has the parent and child defaults" do
-        expect(circle.pre_processed_defaults).to eq([ "_id", "x", "y", "_type", "radius" ])
+        expect(circle.pre_processed_defaults).to eq([ "_id", "x", "y", "radius" ])
+        expect(circle.post_processed_defaults).to eq([ "_type" ])
       end
     end
   end
@@ -1093,6 +1095,10 @@ describe Mongoid::Fields do
       it "does not return subclass fields" do
         expect(shape.fields.keys).to_not include("radius")
       end
+
+      it 'includes _type field' do
+        expect(shape.fields.keys).to include("_type")
+      end
     end
 
     context "on subclasses" do
@@ -1111,6 +1117,28 @@ describe Mongoid::Fields do
 
       it "includes the child fields" do
         expect(circle.fields.keys).to include("radius")
+      end
+
+      it 'includes _type field' do
+        expect(circle.fields.keys).to include("_type")
+      end
+    end
+
+    context "on new subclasses" do
+      it "all subclasses get the discriminator key" do
+        class DiscriminatorParent
+          include Mongoid::Document
+        end
+
+        class DiscriminatorChild1 < DiscriminatorParent
+        end
+
+        class DiscriminatorChild2 < DiscriminatorParent
+        end
+
+        expect(DiscriminatorParent.fields.keys).to include("_type")
+        expect(DiscriminatorChild1.fields.keys).to include("_type")
+        expect(DiscriminatorChild2.fields.keys).to include("_type")
       end
     end
   end
@@ -1326,6 +1354,24 @@ describe Mongoid::Fields do
 
       it "returns the proper predicate result" do
         expect(definition).to be_active
+      end
+    end
+  end
+
+  describe '_type field' do
+    context 'on parent class' do
+      let(:shape) { Shape.new }
+
+      it 'is correctly set' do
+        shape.attributes['_type'].should == 'Shape'
+      end
+    end
+
+    context 'on child class' do
+      let(:circle) { Circle.new }
+
+      it 'is correctly set' do
+        circle.attributes['_type'].should == 'Circle'
       end
     end
   end
