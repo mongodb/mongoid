@@ -1125,14 +1125,14 @@ describe Mongoid::Fields do
     end
 
     context "on new subclasses" do
-      it "all subclasses get the discriminator key" do 
-        class Discriminator_Parent 
+      it "all subclasses get the discriminator key" do
+        class Discriminator_Parent
           include Mongoid::Document
         end
 
-        class Discriminator_Child1 < Discriminator_Parent 
+        class Discriminator_Child1 < Discriminator_Parent
         end
-          
+
         class Discriminator_Child2 < Discriminator_Parent
         end
 
