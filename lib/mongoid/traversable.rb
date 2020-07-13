@@ -2,10 +2,6 @@
 # encoding: utf-8
 
 module Mongoid
-  extend self
-
-  attr_accessor :discriminator_key
-  self.discriminator_key = '_type'
 
   # Provides behavior around traversing the document graph.
   #

@@ -26,6 +26,7 @@ require "mongoid/document"
 require "mongoid/tasks/database"
 require "mongoid/query_cache"
 
+
 # If we are using Rails then we will include the Mongoid railtie. This has all
 # the nifty initializers that Mongoid needs.
 if defined?(Rails)
@@ -111,4 +112,14 @@ module Mongoid
   #
   # @since 1.0.0
   def_delegators Config, *(Config.public_instance_methods(false) - [ :logger=, :logger ])
+
+  # The default discriminator key for Mongoid
+  #
+  # @example get the base discriminator key
+  #   Mongoid.discriminator_key
+  #
+  # @example set the base discriminator key
+  #   Mongoid.discriminator_key = "test"
+  attr_accessor :discriminator_key
+  self.discriminator_key = '_type'
 end
