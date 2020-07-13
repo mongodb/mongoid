@@ -1142,7 +1142,6 @@ describe Mongoid::Fields do
       end
     end
   end
-  
 
   describe ".replace_field" do
 
