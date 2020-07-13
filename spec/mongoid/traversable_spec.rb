@@ -255,7 +255,6 @@ describe Mongoid::Traversable do
   describe "#discriminator_key" do
 
     context "when the discriminator key is not changed" do 
-
       it "equals _type" do
         expect(Instrument.discriminator_key).to eq("_type")
       end
@@ -292,7 +291,6 @@ describe Mongoid::Traversable do
     end
 
     context "when the discriminator key is changed in the parent" do 
-
       before do
         Instrument.discriminator_key = "hello2"
       end
