@@ -260,7 +260,7 @@ describe Mongoid::Traversable do
       end
 
       it "children's discriminator keys equal _type" do
-        expect(Guitar.discriminator_key).to eq("_type")
+        expect(Guitar.discriminator_key).to eq("dkey")
         expect(Piano.discriminator_key).to eq("_type")
       end
 
@@ -284,7 +284,7 @@ describe Mongoid::Traversable do
 
       it "all discriminator keys change" do 
         expect(Instrument.discriminator_key).to eq("hello")
-        expect(Guitar.discriminator_key).to eq("hello")
+        expect(Guitar.discriminator_key).to eq("dkey")
         expect(Piano.discriminator_key).to eq("hello")
       end
     end

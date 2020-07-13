@@ -2,10 +2,6 @@
 # encoding: utf-8
 
 module Mongoid
-  extend self
-
-  attr_accessor :discriminator_key
-  self.discriminator_key = '_type'
 
   # Provides behavior around traversing the document graph.
   #
@@ -28,6 +24,10 @@ module Mongoid
 
       def self.discriminator_key=(value) 
         @discriminator_key = value
+        # unless fields.has_key?(@discriminator_key)
+        #   field(@discriminator_key, default: self.name, type: String)
+        # end 
+
         descendants.each do |child| 
           child.discriminator_key = value
         end
