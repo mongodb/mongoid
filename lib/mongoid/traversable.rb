@@ -18,20 +18,36 @@ module Mongoid
     end
 
     included do 
-      def self.discriminator_key
-        @discriminator_key || Mongoid.discriminator_key
-      end
 
-      def self.discriminator_key=(value) 
-        @discriminator_key = value
-        # unless fields.has_key?(@discriminator_key)
-        #   field(@discriminator_key, default: self.name, type: String)
-        # end 
+      module DiscriminatorKeyAssignment
+        def discriminator_key=(value)
+          if hereditary?
+            raise Errors::SettingDiscriminatorKeyOnChild.new(self.to_s, self.superclass.to_s)
+          end
 
-        descendants.each do |child| 
-          child.discriminator_key = value
+          value = Mongoid.discriminator_key unless value
+          super
         end
       end
+
+      class_attribute :discriminator_key, instance_accessor: false
+      class << self
+        delegate :discriminator_key, to: ::Mongoid
+        prepend DiscriminatorKeyAssignment
+      end
+
+      # def self.discriminator_key
+      #   return @discriminator_key if @discriminator_key
+      #   return superclass.discriminator_key if superclass.respond_to?(:discriminator_key)
+      #   Mongoid.discriminator_key
+      # end
+
+      # def self.discriminator_key=(value)
+      #   if self.hereditary?
+      #     raise NoMethodError.new "You can only set the discriminator key in the parent"
+      #   end
+      #   @discriminator_key = value
+      # end
     end
 
     # Get all child +Documents+ to this +Document+, going n levels deep if

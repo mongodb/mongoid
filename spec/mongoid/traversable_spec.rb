@@ -259,17 +259,17 @@ describe Mongoid::Traversable do
         expect(Instrument.discriminator_key).to eq("_type")
       end
 
-      it "children's discriminator keys equal _type" do
-        expect(Guitar.discriminator_key).to eq("dkey")
-        expect(Piano.discriminator_key).to eq("_type")
-      end
-
-      it "the base discriminator key is _type" do
+      it "the global discriminator key is _type" do
         expect(Mongoid.discriminator_key).to eq("_type")
       end
-    end
 
-    context "when the discriminator key is changed at the base level" do 
+      it "child discriminator keys equal _type" do
+        expect(Piano.discriminator_key).to eq("_type")
+        expect(Guitar.discriminator_key).to eq("_type")
+      end
+    end
+    
+    context "when the discriminator key is changed at the global level" do 
       before do
         Mongoid.discriminator_key = "hello"
       end
@@ -284,8 +284,8 @@ describe Mongoid::Traversable do
 
       it "all discriminator keys change" do 
         expect(Instrument.discriminator_key).to eq("hello")
-        expect(Guitar.discriminator_key).to eq("dkey")
         expect(Piano.discriminator_key).to eq("hello")
+        expect(Guitar.discrdiminator_key).to eq("hello")
       end
     end
 
@@ -295,42 +295,41 @@ describe Mongoid::Traversable do
       end
 
       after do 
-        Instrument.discriminator_key = "_type"
+        Instrument.discriminator_key = nil
+      end
+
+      it "the global discriminator key is _type" do
+        expect(Mongoid.discriminator_key).to eq("_type")
       end
 
       it "changes in the child classes" do 
-        expect(Guitar.discriminator_key).to eq("hello2")
         expect(Piano.discriminator_key).to eq("hello2")
-      end
-
-      it "the base discriminator key is _type" do
-        expect(Mongoid.discriminator_key).to eq("_type")
+        expect(Guitar.discriminator_key).to eq("hello2")
       end
     end 
 
     context "when the discriminator key is changed in the child" do 
-      before do
-        Guitar.discriminator_key = "hello3"
+      
+      it "raises an error" do
+        expect do
+          Guitar.discriminator_key = "hello3"
+        end.to raise_error(Mongoid::Errors::SettingDiscriminatorKeyOnChild)
       end
-
-      after do 
-        Piano.discriminator_key = "_type"
+      
+      it "doesn't change in that class" do 
+        expect(Guitar.discriminator_key).to eq("_type")
       end
-
-      it "changes in the child classes" do 
-        expect(Guitar.discriminator_key).to eq("hello3")
+      
+      it "the global discriminator key is _type" do
+        expect(Mongoid.discriminator_key).to eq("_type")
       end
-
+      
       it "doesn't change in the sibling" do 
         expect(Piano.discriminator_key).to eq("_type")
       end
 
       it "doesn't change in the parent" do 
         expect(Instrument.discriminator_key).to eq("_type")
-      end
-
-      it "the base discriminator key is _type" do
-        expect(Mongoid.discriminator_key).to eq("_type")
       end
     end
   end
