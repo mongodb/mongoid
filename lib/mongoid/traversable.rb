@@ -2,6 +2,10 @@
 # encoding: utf-8
 
 module Mongoid
+  extend self
+
+  attr_accessor :discriminator_key
+  self.discriminator_key = '_type'
 
   # Provides behavior around traversing the document graph.
   #
@@ -15,6 +19,21 @@ module Mongoid
 
     def _parent=(p)
       @__parent = p
+    end
+
+    included do 
+      def self.discriminator_key
+        @discriminator_key || Mongoid.discriminator_key
+      end
+
+      def self.discriminator_key=(value) 
+        @discriminator_key = value
+        descendants.each do |child| 
+          child.discriminator_key = value
+        end
+      end
+
+      
     end
 
     # Get all child +Documents+ to this +Document+, going n levels deep if
