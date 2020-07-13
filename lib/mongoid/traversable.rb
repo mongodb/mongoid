@@ -32,8 +32,6 @@ module Mongoid
           child.discriminator_key = value
         end
       end
-
-      
     end
 
     # Get all child +Documents+ to this +Document+, going n levels deep if
