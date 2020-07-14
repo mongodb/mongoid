@@ -503,7 +503,7 @@ en:
           resolution: "Verify that all servers in your deployment are at least
             version 3.6 or don't attempt to use sessions with older server versions."
         setting_discriminator_key_on_child:
-          message: "Setting the discriminator key on a child class in not allowed."
+          message: "Setting the discriminator key on a child class is not allowed."
           summary: "The discriminator key on the class %{class_name} was attempted
             to be changed. Changing the discriminator key on a child class is not
             allowed."

@@ -246,7 +246,7 @@ can be configured.
       belongs_to_required_by_default: true
       
       # Set the global discriminator key. (default: "_type")
-      discriminator: "_type"
+      discriminator_key: "_type"
 
       # Raise an exception when a field is redefined. (default: false)
       duplicate_fields_exception: false
