@@ -63,34 +63,35 @@ module Mongoid
       entries == other
     end
 
-    # Call either Findable#find or Enumerable#find based on the given arguments
+    # Finds a documents given the provided conditions or filters the scope
+    # using the provided block.
     #
-    # If the arguments match Enumerable#find signature, that will be invoked.
-    # Otherwise Findable#find will be invoked
+    # If this method is not given a block, it delegates to +Findable#find+
+    # and finds one or documents for the provided _id(s).
     #
-    # The signature of Enumerable#find:
+    # If this method is given a block, it delegates to +Enumerable#find+ and
+    # returns the first document of those found by the current Crieria object
+    # for which the block returns a truthy value.
     #
-    #   find(ifnone = nil) { |obj| block } → obj or nil
-    #   find(ifnone = nil) → an_enumerator
+    # Note that the "default proc" argument of Enumerable is not specially
+    # treated by Mongoid - the decision between delegating to +Findable+ vs
+    # +Enumerable+ is made solely based on whether +find+ is passed a block.
     #
-    # @example Find using a block, invokes Enumerable#find
-    #   criteria.find { |item| item.name == "Depeche Mode" }
-    #
-    # @example Find given a block and a Proc, invokes Enumerable#find
-    #   criteria.find(-> { "Default Band" }) { |item| item.name == "Milwaukee Mode" }
-    #
-    # @example Find given just a Proc, invokes Enumerable#find, returns an Enumerator
-    #   enumerator = criteria.find(-> { "Default Band" })
-    #
-    # @example Find given anything else, invokes Findable#find
+    # @example Finds a document by its _id, invokes Findable#find.
     #   critera.find("1234")
     #
-    # @return Same return value as either Findable#find or Enumerable#find, depending
-    #   on which one was invoked.
+    # @example Finds the first matching document using a block, invokes Enumerable#find.
+    #   criteria.find { |item| item.name == "Depeche Mode" }
     #
-    # @since 7.1.1
+    # @example Finds the first matching document using a block using the default Proc, invokes Enumerable#find.
+    #   criteria.find(-> { "Default Band" }) { |item| item.name == "Milwaukee Mode" }
+    #
+    # @example Tries to find a document whose _id is the provided Proc, typically raising DocumentNotFound.
+    #   enumerator = criteria.find(-> { "Default Band" })
+    #
+    # @return [ Document | Array<Document> | nil ] A document or matching documents.
     def find(*args, &block)
-      if block_given? || args.first&.is_a?(Proc)
+      if block_given?
         _enumerable_find(*args, &block)
       else
         _findable_find(*args)
