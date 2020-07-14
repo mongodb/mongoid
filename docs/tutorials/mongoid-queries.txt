@@ -1075,6 +1075,78 @@ results from system collections.
 
 .. _additional-query-methods:
 
+Finding By ``_id``
+------------------
+
+Mongoid provides the ``find`` method on ``Criteria`` objects to find documents
+by their ``_id`` values:
+
+.. code-block:: ruby
+
+  Band.find('5f0e41d92c97a64a26aabd10')
+  # => #<Band _id: 5f0e41d92c97a64a26aabd10, name: "Juno Reactor">
+
+The ``find`` method performs type conversion, if necessary, of the argument
+to the type declared in the model being queried for the ``_id`` field.
+By default, the ``_id`` type is ``BSON::ObjectId``, thus the query above
+is equivalent to:
+
+.. code-block:: ruby
+
+  Band.find(BSON::ObjectId.from_string('5f0e41d92c97a64a26aabd10'))
+  # => #<Band _id: 5f0e41d92c97a64a26aabd10, name: "Juno Reactor">
+
+.. note::
+
+  When querying collections directly using the driver, type conversion is not
+  automatically performed:
+
+.. code-block:: ruby
+
+  Band.collection.find(_id: BSON::ObjectId.from_string('5f0e41d92c97a64a26aabd10')).first
+  # => {"_id"=>BSON::ObjectId('5f0e41d92c97a64a26aabd10'), "name"=>"Juno Reactor"}
+
+  Band.collection.find(_id: '5f0e41d92c97a64a26aabd10').first
+  # => nil
+
+The ``find`` method can accept multiple arguments, or an array of arguments.
+In either case each of the arguments or array elements is taken to be an ``_id``
+value, and documents with all of the specified ``_id`` values are returned in
+an array:
+
+.. code-block:: ruby
+
+  Band.find('5f0e41d92c97a64a26aabd10', '5f0e41b02c97a64a26aabd0e')
+  # => [#<Band _id: 5f0e41b02c97a64a26aabd0e, name: "SUN Project", description: nil, likes: nil>,
+    #<Band _id: 5f0e41d92c97a64a26aabd10, name: "Juno Reactor", description: nil, likes: nil>]
+
+  Band.find(['5f0e41d92c97a64a26aabd10', '5f0e41b02c97a64a26aabd0e'])
+  # => [#<Band _id: 5f0e41b02c97a64a26aabd0e, name: "SUN Project", description: nil, likes: nil>,
+    #<Band _id: 5f0e41d92c97a64a26aabd10, name: "Juno Reactor", description: nil, likes: nil>]
+
+If the same ``_id`` value is given more than once, the corresponding document
+is only returned once:
+
+.. code-block:: ruby
+
+  Band.find('5f0e41b02c97a64a26aabd0e', '5f0e41b02c97a64a26aabd0e')
+  # => [#<Band _id: 5f0e41b02c97a64a26aabd0e, name: "SUN Project", description: nil, likes: nil>]
+
+The documents returned are *not* ordered, and may be returned in a different
+order from the order of provided ``_id`` values, as illustrated in the above
+examples.
+
+If any of the ``_id`` values are not found in the database, the behavior of
+``find`` depends on the value of the ``raise_not_found_error`` configuration
+option. If the option is set to ``true``, ``find`` raises
+``Mongoid::Errors::DocumentNotFound`` if any of the ``_id``s are not found.
+If the option is set to ``false`` and ``find`` is given a single ``_id`` to
+find and there is no matching document, ``find`` returns ``nil``. If the
+option is set to ``false`` and ``find`` is given an array of ``_id``s to find
+and some are not found, the return value is an array of documents that were
+found (which could be empty if no documents were found at all).
+
+
 Additional Query Methods
 ------------------------
 
@@ -1169,26 +1241,6 @@ Mongoid also has some helpful methods on criteria.
 
           Band.exists?
           Band.where(name: "Photek").exists?
-
-   * - ``Criteria#find``
-
-       *Find a document or multiple documents by their ids. If the*
-       ``raise_not_found_error`` *configuration option is set to* ``true``
-       *which is the default and any of the ids are not found, raise an error.
-       If the* ``raise_not_found_error`` *configuration option is set to*
-       ``false``, return an array of documents that have the specified ids.*
-
-     -
-        .. code-block:: ruby
-
-          Band.find("4baa56f1230048567300485c")
-          Band.find(
-            "4baa56f1230048567300485c",
-            "4baa56f1230048567300485d"
-          )
-          Band.where(name: "Photek").find(
-            "4baa56f1230048567300485c"
-          )
 
    * - ``Criteria#find_by``
 
