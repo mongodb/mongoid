@@ -263,8 +263,11 @@ describe Mongoid::Traversable do
         expect(Mongoid.discriminator_key).to eq("_type")
       end
 
-      it "child discriminator keys equal _type" do
+      it "child discriminator keys equal _type: Piano" do
         expect(Piano.discriminator_key).to eq("_type")
+      end
+
+      it "child discriminator keys equal _type: Guitar" do
         expect(Guitar.discriminator_key).to eq("_type")
       end
     end
