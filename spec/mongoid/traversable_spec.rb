@@ -255,6 +255,7 @@ describe Mongoid::Traversable do
   describe "#discriminator_key" do
 
     context "when the discriminator key is not changed" do 
+
       it "equals _type" do
         expect(Instrument.discriminator_key).to eq("_type")
       end
@@ -270,6 +271,7 @@ describe Mongoid::Traversable do
     end
     
     context "when the discriminator key is changed at the global level" do 
+
       before do
         Mongoid.discriminator_key = "hello"
       end
@@ -285,11 +287,12 @@ describe Mongoid::Traversable do
       it "all discriminator keys change" do 
         expect(Instrument.discriminator_key).to eq("hello")
         expect(Piano.discriminator_key).to eq("hello")
-        expect(Guitar.discrdiminator_key).to eq("hello")
+        expect(Guitar.discriminator_key).to eq("hello")
       end
     end
 
     context "when the discriminator key is changed in the parent" do 
+
       before do
         Instrument.discriminator_key = "hello2"
       end
@@ -309,7 +312,7 @@ describe Mongoid::Traversable do
     end 
 
     context "when the discriminator key is changed in the child" do 
-      
+
       it "raises an error" do
         expect do
           Guitar.discriminator_key = "hello3"
@@ -330,6 +333,25 @@ describe Mongoid::Traversable do
 
       it "doesn't change in the parent" do 
         expect(Instrument.discriminator_key).to eq("_type")
+      end
+    end
+
+    context "when discriminator key is called on an instance" do 
+
+      let(:guitar) do
+        Guitar.new
+      end
+
+      it "raises an error on setter" do
+        expect do
+          guitar.discriminator_key = "hello3"
+        end.to raise_error(NoMethodError)
+      end
+
+      it "raises an error on getter" do
+        expect do
+          guitar.discriminator_key
+        end.to raise_error(NoMethodError)
       end
     end
   end
