@@ -197,9 +197,9 @@ describe Mongoid::Config do
     end
   end
 
-  context 'when discriminator_key option' do
+  context 'when discriminator_key override' do
     context 'is not set in the config' do
-      it 'sets the value to _type by default' do
+      it 'has the value _type by default' do
         Mongoid::Config.reset
         configuration = CONFIG.merge(options: {})
 

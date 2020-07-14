@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 class Instrument
-    include Mongoid::Document
+  include Mongoid::Document
 end
 
 require "support/models/guitar"

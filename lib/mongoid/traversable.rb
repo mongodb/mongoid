@@ -17,18 +17,22 @@ module Mongoid
       @__parent = p
     end
 
-    included do 
-      module DiscriminatorKeyAssignment
-        def discriminator_key=(value)
-          if hereditary?
-            raise Errors::SettingDiscriminatorKeyOnChild.new(self.to_s, self.superclass.to_s)
-          end
-
-          value = Mongoid.discriminator_key unless value
-          super
+    # Module used for prepending to the discriminator_key= function
+    #
+    # @api private
+    module DiscriminatorKeyAssignment
+      def discriminator_key=(value)
+        if hereditary?
+          raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
-      end
 
+        value = Mongoid.discriminator_key unless value
+        # delegate :discriminator_key, to: ::Mongoid unless value
+        super
+      end
+    end
+
+    included do 
       class_attribute :discriminator_key, instance_accessor: false
       class << self
         delegate :discriminator_key, to: ::Mongoid

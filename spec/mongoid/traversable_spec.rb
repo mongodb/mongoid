@@ -254,7 +254,7 @@ describe Mongoid::Traversable do
 
   describe "#discriminator_key" do
 
-    context "when the discriminator key is not changed" do 
+    context "when the discriminator key is not set on a class" do 
       it "equals _type" do
         expect(Instrument.discriminator_key).to eq("_type")
       end
@@ -282,9 +282,15 @@ describe Mongoid::Traversable do
         expect(Mongoid.discriminator_key).to eq("hello")
       end
 
-      it "all discriminator keys change" do 
+      it "is changed in the parent" do 
         expect(Instrument.discriminator_key).to eq("hello")
+      end
+
+      it "is changed in the child: Piano" do
         expect(Piano.discriminator_key).to eq("hello")
+      end
+
+      it "is changed in the child: Guitar" do
         expect(Guitar.discriminator_key).to eq("hello")
       end
     end
@@ -312,7 +318,7 @@ describe Mongoid::Traversable do
       it "raises an error" do
         expect do
           Guitar.discriminator_key = "hello3"
-        end.to raise_error(Mongoid::Errors::SettingDiscriminatorKeyOnChild)
+        end.to raise_error(Mongoid::Errors::InvalidDiscriminatorKeyTarget)
       end
       
       it "doesn't change in that class" do 
