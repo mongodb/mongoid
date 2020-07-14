@@ -32,6 +32,9 @@ module Mongoid
     # error.
     option :belongs_to_required_by_default, default: true
 
+    # Set the global discriminator key.
+    option :discriminator_key, default: "_type"
+
     # Raise an exception when a field is redefined.
     option :duplicate_fields_exception, default: false
 

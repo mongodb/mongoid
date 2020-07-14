@@ -18,7 +18,6 @@ module Mongoid
     end
 
     included do 
-
       module DiscriminatorKeyAssignment
         def discriminator_key=(value)
           if hereditary?
@@ -35,19 +34,6 @@ module Mongoid
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorKeyAssignment
       end
-
-      # def self.discriminator_key
-      #   return @discriminator_key if @discriminator_key
-      #   return superclass.discriminator_key if superclass.respond_to?(:discriminator_key)
-      #   Mongoid.discriminator_key
-      # end
-
-      # def self.discriminator_key=(value)
-      #   if self.hereditary?
-      #     raise NoMethodError.new "You can only set the discriminator key in the parent"
-      #   end
-      #   @discriminator_key = value
-      # end
     end
 
     # Get all child +Documents+ to this +Document+, going n levels deep if

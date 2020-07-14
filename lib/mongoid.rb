@@ -111,14 +111,4 @@ module Mongoid
   #
   # @since 1.0.0
   def_delegators Config, *(Config.public_instance_methods(false) - [ :logger=, :logger ])
-
-  # The default discriminator key for Mongoid
-  #
-  # @example get the base discriminator key
-  #   Mongoid.discriminator_key
-  #
-  # @example set the base discriminator key
-  #   Mongoid.discriminator_key = "test"
-  attr_accessor :discriminator_key
-  self.discriminator_key = '_type'
 end

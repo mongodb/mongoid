@@ -22,6 +22,8 @@ module Mongoid
         # functionality and not the Ruby standard library one.
         # See https://jira.mongodb.org/browse/MONGOID-4849.
         delegate :include_root_in_json, to: ::Mongoid
+        delegate :discriminator_key, to: ::Mongoid
+
       end
     end
 
