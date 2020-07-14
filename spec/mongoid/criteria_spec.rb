@@ -817,7 +817,7 @@ describe Mongoid::Criteria do
 
   describe "#find" do
     let!(:depeche) do
-      Band.create(name: "Depeche Mode")
+      Band.create!(name: "Depeche Mode")
     end
 
     let(:criteria) do
@@ -825,28 +825,30 @@ describe Mongoid::Criteria do
     end
 
     context "when given a block" do
-      it "behaves as enumerable" do
+      it "behaves as Enumerable" do
         result = criteria.find { |c| c.name == "Depeche Mode" }
         expect(result).to eq(depeche)
       end
     end
 
     context "when given a Proc and a block" do
-      it "behaves as enumerable" do
+      it "behaves as Enumerable" do
         result = criteria.find(-> {"default"}) { |c| c.name == "Not Depeche Mode" }
         expect(result).to eq("default")
       end
     end
 
     context "when given a Proc" do
-      it "behaves as enumerable" do
-        result = criteria.find(-> {"default"})
-        expect(result).to be_a(Enumerator)
+      it "behaves as Fnumerable" do
+        lambda do
+          criteria.find(-> {"default"})
+        # Proc is not serializable to a BSON type
+        end.should raise_error(BSON::Error::UnserializableClass)
       end
     end
 
     context "when given an id" do
-      it "behaves as findable" do
+      it "behaves as Findable" do
         result = criteria.find(depeche.id)
         expect(result).to eq(depeche)
       end
