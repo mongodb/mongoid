@@ -20,11 +20,17 @@ module Mongoid
   # against the database.
   class Criteria
     include Enumerable
+
+    # @api private
     alias :_enumerable_find :find
+
     include Contextual
     include Queryable
     include Findable
+
+    # @api private
     alias :_findable_find :find
+
     include Inspectable
     include Includable
     include Marshalable
