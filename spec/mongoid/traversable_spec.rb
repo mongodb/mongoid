@@ -308,8 +308,11 @@ describe Mongoid::Traversable do
         expect(Mongoid.discriminator_key).to eq("_type")
       end
 
-      it "changes in the child classes" do 
+      it "changes in the child class: Piano" do 
         expect(Piano.discriminator_key).to eq("hello2")
+      end
+
+      it "changes in the child class: Guitar" do 
         expect(Guitar.discriminator_key).to eq("hello2")
       end
     end 
