@@ -26,13 +26,20 @@ module Mongoid
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
 
-        value = Mongoid.discriminator_key unless value
-        # delegate :discriminator_key, to: ::Mongoid unless value
-        super
+        if value
+          super
+        else
+          # When discriminator key is set to nil, replace the class's definition
+          # of the discriminator key reader (provided by class_attribute earlier)
+          # and re-delegate to Mongoid.
+          class << self
+            delegate :discriminator_key, to: ::Mongoid
+          end
+        end
       end
     end
 
-    included do 
+    included do
       class_attribute :discriminator_key, instance_accessor: false
       class << self
         delegate :discriminator_key, to: ::Mongoid
