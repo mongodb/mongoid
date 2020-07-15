@@ -128,6 +128,13 @@ en:
             allowed, and don't use these names. These include names that also
             conflict with core Ruby methods on Object, Module, Enumerable, or
             included gems that inject methods into these or Mongoid internals."
+        invalid_field_operator:
+          message: "Invalid field operator '%{operator}'."
+          summary: "You misspelled an operator, are using an operator that
+            Mongoid does not support, or are trying to use an expression-level
+            operator on field level."
+          resolution: "Valid field operators are: %{valid_operators}.
+            Ensure you are using one of these operators."
         invalid_field_option:
           message: "Invalid option :%{option} provided for field :%{name}."
           summary: "Mongoid requires that you only provide valid options on each
