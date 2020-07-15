@@ -34,10 +34,18 @@ module Mongoid
         end
       end
 
-      module_function def soft_apply_operator(operator, left, right)
-        left&.send(operator, right)
-      rescue ArgumentError
-        false
+      module_function def apply_comparison_operator(operator, left, right)
+        case left
+        when Numeric
+          case right
+          when Numeric
+            left.send(operator, right)
+          else
+            false
+          end
+        else
+          false
+        end
       end
     end
   end
