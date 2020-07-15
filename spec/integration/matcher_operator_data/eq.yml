@@ -181,3 +181,11 @@
     positions:
       $eq: ~
   matches: false
+
+- name: null field value vs nil argument
+  document:
+    positions: ~
+  query:
+    positions:
+      $eq: ~
+  matches: true
