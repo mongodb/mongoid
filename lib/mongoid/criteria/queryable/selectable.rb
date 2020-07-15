@@ -884,6 +884,9 @@ module Mongoid
           end
 
           clone.tap do |query|
+            unless Hash === criterion
+              raise Errors::InvalidQuery, "Expression must be a Hash: #{Errors::InvalidQuery.truncate_expr(criterion)}"
+            end
             criterion.each do |field, value|
               field_s = field.to_s
               if field_s[0] == ?$
