@@ -1,0 +1,39 @@
+- name: array query
+  document:
+    products: [1, 2, 3]
+  query:
+    []
+  error: true
+
+- name: null query
+  document:
+    products: [1, 2, 3]
+  query: ~
+  error: [matcher, dsl]
+  # Driver appears to accept the null query.
+  matches: true
+
+- name: numeric query
+  document:
+    products: [1, 2, 3]
+  query: 42
+  error: true
+
+- name: string query
+  document:
+    products: [1, 2, 3]
+  query: test
+  error: true
+
+- name: string query with punctuation
+  document:
+    products: [1, 2, 3]
+  query: "!>"
+  error: true
+
+# This one is actually valid.
+- name: query is an empty hash
+  document:
+    products: [1, 2, 3]
+  query: {}
+  matches: true

@@ -60,6 +60,7 @@ describe 'Matcher operators' do
                   begin
                     Mop.collection.find(query).any?
                   rescue Mongo::Error::OperationFailure
+                  rescue Mongo::Error::InvalidDocument
                   rescue BSON::Error::UnserializableClass
                   else
                     fail "Expected an exception to be raised"

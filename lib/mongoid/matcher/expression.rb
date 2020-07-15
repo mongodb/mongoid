@@ -7,6 +7,9 @@ module Mongoid
         if expr.nil?
           raise Errors::InvalidQuery, "Nil condition in expression context"
         end
+        unless Hash === expr
+          raise Errors::InvalidQuery, "MQL query must be provided as a Hash"
+        end
         expr.all? do |k, expr_v|
           k = k.to_s
           if k.start_with?('$')
