@@ -83,3 +83,65 @@
     position:
       $regex: 42
   error: true
+
+- name: numeric field value - matches if stringified
+  document:
+    title: 42
+  query:
+    title:
+      $regex:
+        '42'
+  matches: false
+
+- name: array field value - matches an element
+  document:
+    title:
+      - foo
+  query:
+    title:
+      $regex: foo
+  matches: true
+
+- name: array field value - does not match an element
+  document:
+    title:
+      - foo
+  query:
+    title:
+      $regex: bar
+  matches: false
+
+- name: empty array field value
+  document:
+    title: []
+  query:
+    title:
+      $regex: bar
+  matches: false
+
+- name: true field value
+  document:
+    title: true
+  query:
+    title:
+      $regex:
+        'true'
+  matches: false
+
+- name: false field value
+  document:
+    title: false
+  query:
+    title:
+      $regex:
+        'false'
+  matches: false
+
+- name: nil field value
+  document:
+    title: ~
+  query:
+    title:
+      $regex:
+        ''
+  matches: false
