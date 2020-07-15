@@ -425,15 +425,15 @@ describe Mongoid::Traversable do
 
     context ".fields" do 
       context "when the discriminator key is not changed" do 
-        it "equals _type" do
-          expect(Instrument.discriminator_key).to eq("_type")
+        it "parent has _type field" do
+          expect(Instrument.fields.keys).to include("_type")
         end
   
-        it "child's discriminator key equals _type: Guitar" do
+        it "child has _type field: Guitar" do
           expect(Guitar.fields.keys).to include("_type")
         end
 
-        it "child's discriminator key equals _type: Piano" do
+        it "child has _type field: Piano" do
           expect(Piano.fields.keys).to include("_type")
         end
       end
@@ -455,19 +455,19 @@ describe Mongoid::Traversable do
             Mongoid.discriminator_key = "_type"
           end
     
-          it "parent uses original global value" do 
+          it "parent has original global field name value" do 
             expect(GlobalDiscriminiatorParent.fields.keys).to include("_type")
           end
 
-          it "child uses original global value" do 
+          it "child has original global field name value" do 
             expect(GlobalDiscriminiatorChild.fields.keys).to include("_type")
           end
 
-          it "parent does not use global value" do 
+          it "parent does not have global field name value" do 
             expect(GlobalDiscriminiatorParent.fields.keys).to_not include("test")
           end
 
-          it "child does not use global value" do 
+          it "child does not have global field name value" do 
             expect(GlobalDiscriminiatorChild.fields.keys).to_not include("test")
           end
           
@@ -522,12 +522,11 @@ describe Mongoid::Traversable do
             LocalDiscriminiatorParent.discriminator_key = "test2"
           end
     
-          after do 
-            LocalDiscriminiatorParent.discriminator_key = "_type"
-          end
-    
           it "a new field is added" do 
             expect(LocalDiscriminiatorParent.fields.keys).to include("test2")
+          end
+
+          it "the original field remains" do
             expect(LocalDiscriminiatorParent.fields.keys).to include("_type")
           end
 
@@ -535,7 +534,7 @@ describe Mongoid::Traversable do
             expect(LocalDiscriminiatorChild.fields.keys).to include("_type")
           end
 
-          it "new fields are added in the child classes" do 
+          it "new fields are added in the child class" do 
             expect(LocalDiscriminiatorChild.fields.keys).to include("test2")
           end
         end
@@ -551,12 +550,11 @@ describe Mongoid::Traversable do
             end
           end
     
-          after do 
-            PreLocalDiscriminiatorParent.discriminator_key = "_type"
+          it "new field is added in the parent" do 
+            expect(PreLocalDiscriminiatorParent.fields.keys).to include("test2")
           end
-    
+
           it "_type field is not added" do 
-            expect(PreLocalDiscriminiatorParent.fields.keys).to_not include("_type")
             expect(PreLocalDiscriminiatorParent.fields.keys).to_not include("_type")
           end
 
@@ -571,10 +569,6 @@ describe Mongoid::Traversable do
               include Mongoid::Document
               self.discriminator_key = "test2"
             end
-          end
-    
-          after do 
-            LocalDiscriminiatorNonParent.discriminator_key = "_type"
           end
     
           it "_type field is not added" do 
