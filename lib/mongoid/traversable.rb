@@ -26,6 +26,7 @@ module Mongoid
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
 
+        
         if value
           super
         else
@@ -35,6 +36,11 @@ module Mongoid
           class << self
             delegate :discriminator_key, to: ::Mongoid
           end
+        end 
+
+        unless fields.has_key?(self.discriminator_key) || descendants.length == 0
+          default_proc = lambda { self.class.name }
+          field(self.discriminator_key, default: default_proc, type: String)
         end
       end
     end
@@ -236,7 +242,7 @@ module Mongoid
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?("_type")
           default_proc = lambda { self.class.name }
-          field(:_type, default: default_proc, type: String)
+          field(self.discriminator_key, default: default_proc, type: String)
         end
       end
     end
