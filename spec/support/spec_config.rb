@@ -20,7 +20,7 @@ class SpecConfig
     if @uri
       @uri.servers
     else
-      ['127.0.0.1']
+      ['127.0.0.1:27017']
     end
   end
 
