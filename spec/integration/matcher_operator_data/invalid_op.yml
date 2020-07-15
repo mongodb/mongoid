@@ -1,0 +1,59 @@
+- name: invalid expression-level operator
+  document:
+    products: [1, 2, 3]
+  query:
+    $bogus: [1, 2]
+  error: true
+
+- name: invalid field-level operator
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $bogus: [1, 2]
+  error: true
+
+- name: expression-level operator on field level
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $and:
+        foo: 1
+  error: true
+
+- name: field-level operator on top level
+  document:
+    products: [1, 2, 3]
+  query:
+    $in: [1, 2]
+  error: true
+
+- name: bogus operator in $not
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $not:
+        $bogus: [1, 2]
+  error: true
+
+- name: expression-level operator in $not
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $not:
+        $and:
+          - foo: 1
+  error: true
+
+# This is not an error.
+- name: field-level operator in $not
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $not:
+        $in: [4]
+  matches: true

@@ -22,6 +22,8 @@ module Mongoid
 
       module_function def get(op)
         MAP.fetch(op)
+      rescue KeyError
+        raise Errors::InvalidFieldOperator.new(op)
       end
 
       module_function def apply_array_field_operator(exists, value, condition)
