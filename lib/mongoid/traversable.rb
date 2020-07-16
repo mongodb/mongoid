@@ -26,7 +26,6 @@ module Mongoid
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
 
-        
         if value
           super
         else
