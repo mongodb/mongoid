@@ -255,19 +255,19 @@ describe Mongoid::Traversable do
   describe "#discriminator_key" do
 
     context "when the discriminator key is not set on a class" do
-      it "equals _type" do
+      it "sets the global discriminator key to _type" do
+        expect(Mongoid.discriminator_key).to eq("_type")
+      end
+      
+      it "sets the parent discriminator key to _type" do
         expect(Instrument.discriminator_key).to eq("_type")
       end
 
-      it "the global discriminator key is _type" do
-        expect(Mongoid.discriminator_key).to eq("_type")
-      end
-
-      it "child discriminator keys equal _type: Piano" do
+      it "sets the child discriminator key to _type: Piano" do
         expect(Piano.discriminator_key).to eq("_type")
       end
 
-      it "child discriminator keys equal _type: Guitar" do
+      it "sets the child discriminator key to _type: Guitar" do
         expect(Guitar.discriminator_key).to eq("_type")
       end
     end
@@ -281,7 +281,7 @@ describe Mongoid::Traversable do
         Mongoid.discriminator_key = "_type"
       end
 
-      it "the value changes" do
+      it "sets the correct value globally" do
         expect(Mongoid.discriminator_key).to eq("hello")
       end
 
@@ -307,11 +307,11 @@ describe Mongoid::Traversable do
         Instrument.discriminator_key = nil
       end
 
-      it "the global discriminator key is _type" do
+      it "doesn't change the global setting" do
         expect(Mongoid.discriminator_key).to eq("_type")
       end
 
-      it "the value changes" do
+      it "changes in the parent" do
         expect(Instrument.discriminator_key).to eq("hello2")
       end
 
@@ -328,7 +328,7 @@ describe Mongoid::Traversable do
           Instrument.discriminator_key = nil
         end
 
-        it "the global discriminator key is _type" do
+        it "doesn't change the global setting" do
           expect(Mongoid.discriminator_key).to eq("_type")
         end
 
@@ -347,10 +347,11 @@ describe Mongoid::Traversable do
 
       context "when resetting the discriminator key after nil" do
         before do
+          Instrument.discriminator_key = nil
           Instrument.discriminator_key = "hello4"
         end
 
-        it "the global discriminator key is _type" do
+        it "doesn't change the global setting" do
           expect(Mongoid.discriminator_key).to eq("_type")
         end
 
@@ -369,9 +370,13 @@ describe Mongoid::Traversable do
     end
 
     context "when the discriminator key is changed in the child" do
+      let(:guitar) do 
+        Guitar.discriminator_key = "hello3"
+      end
+
       it "raises an error" do
         expect do
-          Guitar.discriminator_key = "hello3"
+          guitar
         end.to raise_error(Mongoid::Errors::InvalidDiscriminatorKeyTarget)
       end
 
@@ -379,7 +384,7 @@ describe Mongoid::Traversable do
         expect(Guitar.discriminator_key).to eq("_type")
       end
 
-      it "the global discriminator key is _type" do
+      it "doesn't change the global setting" do
         expect(Mongoid.discriminator_key).to eq("_type")
       end
 
