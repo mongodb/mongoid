@@ -370,13 +370,20 @@ describe Mongoid::Traversable do
     end
 
     context "when the discriminator key is changed in the child" do
-      let(:guitar) do 
+      let(:set_discriminator_key) do 
         Guitar.discriminator_key = "hello3"
+      end
+
+      before :each do 
+        begin 
+          set_discriminator_key 
+        rescue 
+        end
       end
 
       it "raises an error" do
         expect do
-          guitar
+          set_discriminator_key
         end.to raise_error(Mongoid::Errors::InvalidDiscriminatorKeyTarget)
       end
 
