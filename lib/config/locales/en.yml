@@ -108,6 +108,13 @@ en:
           summary: "An invalid dependent strategy was defined for the association:
             %{association}. The valid strategies are: %{valid_strategies}."
           resolution: "Change the dependent strategy to one of the valid types."
+        invalid_discriminator_key_target:
+          message: "Setting the discriminator key on a child class is not allowed."
+          summary: "The discriminator key on the class %{class_name} was attempted
+            to be changed. Changing the discriminator key on a child class is not
+            allowed."
+          resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
+            ancestors."
         invalid_expression_operator:
           message: "Invalid expression operator '%{operator}'."
           summary: "You misspelled an operator, are using an operator that

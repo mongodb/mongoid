@@ -197,6 +197,34 @@ describe Mongoid::Config do
     end
   end
 
+  context 'when discriminator_key override' do
+    context 'is not set in the config' do
+      it 'has the value _type by default' do
+        Mongoid::Config.reset
+        configuration = CONFIG.merge(options: {})
+
+        Mongoid.configure { |config| config.load_configuration(configuration) }
+
+        expect(Mongoid::Config.discriminator_key).to be("_type")
+      end
+    end
+
+    context 'is set in the config' do
+      it 'sets the value' do
+        Mongoid::Config.reset
+        configuration = CONFIG.merge(options: {discriminator_key: "test"})
+
+        Mongoid.configure { |config| config.load_configuration(configuration) }
+
+        expect(Mongoid::Config.discriminator_key).to be("test")
+      end
+
+      it 'is set globally' do 
+        expect(Mongoid.discriminator_key).to be("test")
+      end
+    end
+  end
+
   describe "#load!" do
 
     before(:all) do

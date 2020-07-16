@@ -17,6 +17,36 @@ module Mongoid
       @__parent = p
     end
 
+    # Module used for prepending to the discriminator_key= function
+    #
+    # @api private
+    module DiscriminatorKeyAssignment
+      def discriminator_key=(value)
+        if hereditary?
+          raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
+        end
+
+        if value
+          super
+        else
+          # When discriminator key is set to nil, replace the class's definition
+          # of the discriminator key reader (provided by class_attribute earlier)
+          # and re-delegate to Mongoid.
+          class << self
+            delegate :discriminator_key, to: ::Mongoid
+          end
+        end
+      end
+    end
+
+    included do
+      class_attribute :discriminator_key, instance_accessor: false
+      class << self
+        delegate :discriminator_key, to: ::Mongoid
+        prepend DiscriminatorKeyAssignment
+      end
+    end
+
     # Get all child +Documents+ to this +Document+, going n levels deep if
     # necessary. This is used when calling update persistence operations from
     # the root document, where changes in the entire tree need to be
