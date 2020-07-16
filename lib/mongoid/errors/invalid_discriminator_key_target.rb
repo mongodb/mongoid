@@ -16,7 +16,7 @@ module Mongoid
         super(
           compose_message(
             "invalid_discriminator_key_target",
-            { class_name: class_name,  superclass: superclass }
+            { class_name: class_name, superclass: superclass }
           )
         )
       end
