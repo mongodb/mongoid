@@ -274,3 +274,42 @@
     positions:
       $elemMatch: []
   error: true
+
+- name: field value is a number
+  document:
+    tags: 12
+  query:
+    tags:
+      $elemMatch:
+        $eq: 12
+  matches: false
+
+- name: field value is an empty array
+  document:
+    tags: []
+  query:
+    tags:
+      $elemMatch:
+        $not:
+          $eq: y
+  matches: false
+
+- name: field value is an empty hash
+  document:
+    tags: {}
+  query:
+    tags:
+      $elemMatch:
+        $not:
+          $eq: y
+  matches: false
+
+- name: field value is null
+  document:
+    tags: ~
+  query:
+    tags:
+      $elemMatch:
+        $not:
+          $eq: y
+  matches: false

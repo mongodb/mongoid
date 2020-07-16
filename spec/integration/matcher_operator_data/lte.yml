@@ -109,3 +109,11 @@
     count:
       $lte: []
   matches: false
+
+- name: field value is an empty hash
+  document:
+    counts: {}
+  query:
+    counts:
+      $lte: 11
+  matches: false

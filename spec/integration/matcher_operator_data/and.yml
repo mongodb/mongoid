@@ -81,3 +81,13 @@
     $and:
       foo: bar
   error: true
+
+- name: field value is null
+  document:
+    products: ~
+  query:
+    $and:
+      -
+        products:
+          $ne: a
+  matches: true

@@ -8,7 +8,7 @@ module Mongoid
           raise Errors::InvalidQuery, "$all argument must be an array: #{Errors::InvalidQuery.truncate_expr(condition)}"
         end
 
-        condition.any? && condition.all? do |c|
+        !condition.empty? && condition.all? do |c|
           case c
           when ::Regexp, BSON::Regexp::Raw
             Regex.matches_array_or_scalar?(value, c)

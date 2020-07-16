@@ -125,3 +125,13 @@
     $or:
       foo: bar
   error: true
+
+- name: field value is null
+  document:
+    products: ~
+  query:
+    $or:
+      -
+        products:
+          $ne: a
+  matches: true

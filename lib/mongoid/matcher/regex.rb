@@ -4,17 +4,26 @@ module Mongoid
     # @api private
     module Regex
       module_function def matches?(exists, value, condition)
-        if condition.respond_to?(:compile)
-          # BSON::Regexp::Raw
-          condition = condition.compile
-        end
-        case condition
+        condition = case condition
         when Regexp
-          value =~ condition
+          condition
+        when BSON::Regexp::Raw
+          condition.compile
         when String
-          value =~ Regexp.new(condition)
+          Regexp.new(condition)
         else
           raise Errors::InvalidQuery, "$regex requires a regular expression or a string argument: #{Errors::InvalidQuery.truncate_expr(condition)}"
+        end
+
+        case value
+        when Array
+          value.any? do |v|
+            v =~ condition
+          end
+        when String
+          value =~ condition
+        else
+          false
         end
       end
 

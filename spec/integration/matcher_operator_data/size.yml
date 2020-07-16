@@ -105,3 +105,59 @@
       $size: -2
   error: true
   min_server_version: 3.4
+
+- name: empty array field value
+  document:
+    position: []
+  query:
+    position:
+      $size: 1
+  matches: false
+
+- name: empty hash field value
+  document:
+    position: {}
+  query:
+    position:
+      $size: 1
+  matches: false
+
+- name: numeric field value
+  document:
+    position: 42
+  query:
+    position:
+      $size: 1
+  matches: false
+
+- name: string field value
+  document:
+    position: foo
+  query:
+    position:
+      $size: 1
+  matches: false
+
+- name: true field value
+  document:
+    position: true
+  query:
+    position:
+      $size: 0
+  matches: false
+
+- name: false field value
+  document:
+    position: false
+  query:
+    position:
+      $size: 0
+  matches: false
+
+- name: null field value
+  document:
+    position: ~
+  query:
+    position:
+      $size: 0
+  matches: false

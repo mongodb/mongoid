@@ -103,3 +103,27 @@
       $all:
         ceo
   error: true
+
+- name: field value is null
+  document:
+    products: ~
+  query:
+    products:
+      $all: [1, 2]
+  matches: false
+
+- name: field value is numeric
+  document:
+    products: 42
+  query:
+    products:
+      $all: [42]
+  matches: true
+
+- name: field value is null and query is for null value
+  document:
+    products: ~
+  query:
+    products:
+      $all: [~]
+  matches: true

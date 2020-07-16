@@ -109,3 +109,11 @@
     count:
       $gte: []
   matches: false
+
+- name: field value is an empty hash
+  document:
+    counts: {}
+  query:
+    counts:
+      $gte: 11
+  matches: false

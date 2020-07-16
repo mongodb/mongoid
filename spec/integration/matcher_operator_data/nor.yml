@@ -114,3 +114,13 @@
     $nor:
       foo: bar
   error: true
+
+- name: field value is null
+  document:
+    products: ~
+  query:
+    $nor:
+      -
+        products:
+          $eq: a
+  matches: true
