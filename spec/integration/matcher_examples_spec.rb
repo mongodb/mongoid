@@ -466,17 +466,12 @@ describe 'Matcher' do
               {'number' => 1},
             ]}).first
           end
-        end
 
-        it 'is prohibited' do
-          # MongoDB prohibits $and operator in values when matching on
-          # fields. Mongoid does not have such a prohibition and
-          # also returns the address where different locations match the
-          # different branches.
-          pending 'MONGOID-4894 - Mongoid behavior differs from MongoDB'
-          expect do
-            actual_object_matching_condition
-          end.to raise_error(Mongoid::Errors::InvalidFind)
+          it 'is prohibited' do
+            expect do
+              actual_object_matching_condition
+            end.to raise_error(Mongoid::Errors::InvalidFieldOperator)
+          end
         end
       end
     end
@@ -523,17 +518,12 @@ describe 'Matcher' do
               {'number' => 1},
             ]}).first
           end
-        end
 
-        it 'is prohibited' do
-          # MongoDB prohibits $and operator in values when matching on
-          # fields. Mongoid does not have such a prohibition and
-          # also returns the address where different locations match the
-          # different branches.
-          pending 'MONGOID-4894 - Mongoid behavior differs from MongoDB'
-          expect do
-            actual_object_matching_condition
-          end.to raise_error(Mongoid::Errors::InvalidFind)
+          it 'is prohibited' do
+            expect do
+              actual_object_matching_condition
+            end.to raise_error(Mongoid::Errors::InvalidFieldOperator)
+          end
         end
       end
     end
@@ -591,17 +581,12 @@ describe 'Matcher' do
               {'number' => 1},
             ]}).first
           end
-        end
 
-        it 'is prohibited' do
-          # MongoDB prohibits $and operator in values when matching on
-          # fields. Mongoid does not have such a prohibition and
-          # also returns the address where different locations match the
-          # different branches.
-          pending 'MONGOID-4894 - Mongoid behavior differs from MongoDB'
-          expect do
-            actual_object_matching_condition
-          end.to raise_error(Mongoid::Errors::InvalidFind)
+          it 'is prohibited' do
+            expect do
+              actual_object_matching_condition
+            end.to raise_error(Mongoid::Errors::InvalidQuery)
+          end
         end
       end
     end
