@@ -116,7 +116,7 @@ module Mongoid
       #
       # @since 4.0.0
       def inspect_dynamic_fields
-        keys = attributes.keys - fields.keys - relations.keys - ["_id", "_type"]
+        keys = attributes.keys - fields.keys - relations.keys - ["_id", self.class.discriminator_key]
         return keys.map do |name|
           "#{name}: #{attributes[name].inspect}"
         end
