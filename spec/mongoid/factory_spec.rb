@@ -78,28 +78,62 @@ describe Mongoid::Factory do
     end
 
     context "when type is not preset" do
+      context "when using the default discriminator key" do 
+        let(:attributes) do
+          { "title" => "Sir" }
+        end
 
-      let(:attributes) do
-        { "title" => "Sir" }
+        let(:person) do
+          described_class.build(Person, attributes)
+        end
+
+        it "instantiates based on the provided class" do
+          expect(person.title).to eq("Sir")
+        end
+
+        context "when the type is a symbol" do
+
+          let(:person) do
+            described_class.build(Person, { :_type => "Doctor" })
+          end
+
+          it "instantiates the subclass" do
+            expect(person.class).to eq(Doctor)
+          end
+        end
       end
 
-      let(:person) do
-        described_class.build(Person, attributes)
-      end
+      context "when using a custom discriminator key" do 
+        before do 
+          Person.discriminator_key = "dkey"
+        end
 
-      it "instantiates based on the provided class" do
-        expect(person.title).to eq("Sir")
-      end
-    end
+        after do 
+          Person.discriminator_key = nil
+        end
 
-    context "when the type is a symbol" do
+        let(:attributes) do
+          { "title" => "Sir" }
+        end
 
-      let(:person) do
-        described_class.build(Person, { :_type => "Doctor" })
-      end
+        let(:person) do
+          described_class.build(Person, attributes)
+        end
 
-      it "instantiates the subclass" do
-        expect(person.class).to eq(Doctor)
+        it "instantiates based on the provided class" do
+          expect(person.title).to eq("Sir")
+        end
+        
+        context "when the type is a symbol" do
+          
+          let(:person) do
+            described_class.build(Person, { :dkey => "Doctor" })
+          end
+          
+          it "instantiates the subclass" do
+            expect(person.class).to eq(Doctor)
+          end
+        end
       end
     end
   end
@@ -179,20 +213,48 @@ describe Mongoid::Factory do
 
     context "when a type is not in the attributes" do
 
-      let(:attributes) do
-        { "title" => "Sir" }
+      context "when using the default discriminator key" do
+        let(:attributes) do
+          { "title" => "Sir" }
+        end
+
+        let(:document) do
+          described_class.from_db(Person, attributes)
+        end
+
+        it "generates based on the provided class" do
+          expect(document).to be_a(Person)
+        end
+
+        it "sets the attributes" do
+          expect(document.title).to eq("Sir")
+        end
       end
 
-      let(:document) do
-        described_class.from_db(Person, attributes)
-      end
+      context "when using a custom discriminator key" do
+        before do 
+          Person.discriminator_key = "dkey"
+        end
 
-      it "generates based on the provided class" do
-        expect(document).to be_a(Person)
-      end
+        after do 
+          Person.discriminator_key = nil
+        end
 
-      it "sets the attributes" do
-        expect(document.title).to eq("Sir")
+        let(:attributes) do
+          { "title" => "Sir" }
+        end
+
+        let(:document) do
+          described_class.from_db(Person, attributes)
+        end
+
+        it "generates based on the provided class" do
+          expect(document).to be_a(Person)
+        end
+
+        it "sets the attributes" do
+          expect(document.title).to eq("Sir")
+        end
       end
     end
 

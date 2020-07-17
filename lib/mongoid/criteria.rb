@@ -169,7 +169,7 @@ module Mongoid
     # @since 2.0.0
     def field_list
       if options[:fields]
-        options[:fields].keys.reject{ |key| key == "_type" }
+        options[:fields].keys.reject{ |key| key == klass.discriminator_key }
       else
         []
       end
@@ -555,7 +555,8 @@ module Mongoid
     # @since 3.0.3
     def type_selectable?
       klass.hereditary? &&
-        !selector.keys.include?(self.discriminator_key)
+        !selector.keys.include?(self.discriminator_key.to_s) &&
+        !selector.keys.include?(self.discriminator_key.to_sym)
     end
 
     # Get the selector for type selection.
