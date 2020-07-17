@@ -2804,13 +2804,32 @@ describe Mongoid::Criteria do
     end
 
     context "when using inheritance" do
+      context "when using the default discriminator key" do 
+        let(:criteria) do
+          Doctor.only(:_id)
+        end
 
-      let(:criteria) do
-        Doctor.only(:_id)
+        it "adds _type to the fields" do
+          expect(criteria.options[:fields]["_type"]).to eq(1)
+        end
       end
 
-      it "adds _type to the fields" do
-        expect(criteria.options[:fields]["_type"]).to eq(1)
+      context "when setting a custom discriminator key" do 
+        before do 
+          Person.discriminator_key = "dkey"
+        end
+
+        let(:criteria) do
+          Doctor.only(:_id)
+        end
+
+        it "adds custom discriminator key to the fields" do
+          expect(criteria.options[:fields]).to include("dkey")
+        end
+
+        it "does not add _type to the fields" do
+          expect(criteria.options[:fields]).to_not include("_type")
+        end
       end
     end
 
