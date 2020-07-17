@@ -7,6 +7,9 @@ module Mongoid
   module Factory
     extend self
 
+    # @deprecated
+    TYPE = "_type".freeze
+
     # Builds a new +Document+ from the supplied attributes.
     #
     # @example Build the document.

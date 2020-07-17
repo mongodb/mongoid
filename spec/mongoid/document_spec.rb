@@ -901,7 +901,7 @@ describe Mongoid::Document do
           it "raises an error when inappropriate class is provided" do
             expect {
               manager.becomes(String)
-            }.to raise_error(ArgumentError)
+            }.to raise_error(ArgumentError, /A class which includes Mongoid::Document is expected/)
           end
         end
 
@@ -914,26 +914,8 @@ describe Mongoid::Document do
             Person.discriminator_key = nil
           end
 
-          let(:person) do
-            manager.becomes(Person)
-          end
-
-          it "copies attributes" do
-            expect(person.title).to eq('Sir')
-          end
-
-          it "keeps the same object id" do
-            expect(person.id).to eq(manager.id)
-          end
-
           it "sets the class type with new discriminator key" do
             expect(person.dkey).to eq("Person")
-          end
-
-          it "raises an error when inappropriate class is provided" do
-            expect {
-              manager.becomes(String)
-            }.to raise_error(ArgumentError)
           end
         end
       end
