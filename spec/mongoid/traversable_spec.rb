@@ -441,11 +441,11 @@ describe Mongoid::Traversable do
       context "when the discriminator key is changed at the base level" do
         context "after class creation" do
           before do
-            class GlobalDiscriminiatorParent
+            class GlobalDiscriminatorParent
               include Mongoid::Document
             end
             
-            class GlobalDiscriminiatorChild < GlobalDiscriminiatorParent
+            class GlobalDiscriminatorChild < GlobalDiscriminatorParent
             end
             
             Mongoid.discriminator_key = "test"
@@ -456,19 +456,19 @@ describe Mongoid::Traversable do
           end
     
           it "creates a field with the old global value in the parent" do 
-            expect(GlobalDiscriminiatorParent.fields.keys).to include("_type")
+            expect(GlobalDiscriminatorParent.fields.keys).to include("_type")
           end
 
           it "creates a field with the old global value in the child" do 
-            expect(GlobalDiscriminiatorChild.fields.keys).to include("_type")
+            expect(GlobalDiscriminatorChild.fields.keys).to include("_type")
           end
 
           it "does not have the new global value in the parent" do 
-            expect(GlobalDiscriminiatorParent.fields.keys).to_not include("test")
+            expect(GlobalDiscriminatorParent.fields.keys).to_not include("test")
           end
 
           it "does not have the new global value in the child" do 
-            expect(GlobalDiscriminiatorChild.fields.keys).to_not include("test")
+            expect(GlobalDiscriminatorChild.fields.keys).to_not include("test")
           end
           
         end
@@ -477,11 +477,11 @@ describe Mongoid::Traversable do
           before do
             Mongoid.discriminator_key = "test"
 
-            class PreGlobalDiscriminiatorParent
+            class PreGlobalDiscriminatorParent
               include Mongoid::Document
             end
             
-            class PreGlobalDiscriminiatorChild < PreGlobalDiscriminiatorParent
+            class PreGlobalDiscriminatorChild < PreGlobalDiscriminatorParent
             end
             
             Mongoid.discriminator_key = "test"
@@ -492,19 +492,19 @@ describe Mongoid::Traversable do
           end
 
           it "creates a field with new discriminator key in the parent" do 
-            expect(PreGlobalDiscriminiatorParent.fields.keys).to include("test")
+            expect(PreGlobalDiscriminatorParent.fields.keys).to include("test")
           end
 
           it "creates a field with new discriminator key in the child" do 
-            expect(PreGlobalDiscriminiatorChild.fields.keys).to include("test")
+            expect(PreGlobalDiscriminatorChild.fields.keys).to include("test")
           end
 
           it "does not have the original discriminator key in the parent" do 
-            expect(PreGlobalDiscriminiatorParent.fields.keys).to_not include("_type")
+            expect(PreGlobalDiscriminatorParent.fields.keys).to_not include("_type")
           end
 
           it "does not have the original discriminator key in the child" do 
-            expect(PreGlobalDiscriminiatorChild.fields.keys).to_not include("_type")
+            expect(PreGlobalDiscriminatorChild.fields.keys).to_not include("_type")
           end
         end
       end
@@ -512,71 +512,71 @@ describe Mongoid::Traversable do
       context "when the discriminator key is changed in the parent" do 
         context "after child class creation" do
           before do
-            class LocalDiscriminiatorParent
+            class LocalDiscriminatorParent
               include Mongoid::Document
             end
 
-            class LocalDiscriminiatorChild < LocalDiscriminiatorParent
+            class LocalDiscriminatorChild < LocalDiscriminatorParent
             end
 
-            LocalDiscriminiatorParent.discriminator_key = "test2"
+            LocalDiscriminatorParent.discriminator_key = "test2"
           end
     
           it "creates a new field in the parent" do 
-            expect(LocalDiscriminiatorParent.fields.keys).to include("test2")
+            expect(LocalDiscriminatorParent.fields.keys).to include("test2")
           end
 
           it "does not remove the original field in the parent" do
-            expect(LocalDiscriminiatorParent.fields.keys).to include("_type")
+            expect(LocalDiscriminatorParent.fields.keys).to include("_type")
           end
 
           it "still has _type field in the child" do 
-            expect(LocalDiscriminiatorChild.fields.keys).to include("_type")
+            expect(LocalDiscriminatorChild.fields.keys).to include("_type")
           end
 
           it "has the new field in the child" do 
-            expect(LocalDiscriminiatorChild.fields.keys).to include("test2")
+            expect(LocalDiscriminatorChild.fields.keys).to include("test2")
           end
         end
 
         context "before child class creation" do
           before do
-            class PreLocalDiscriminiatorParent
+            class PreLocalDiscriminatorParent
               include Mongoid::Document
               self.discriminator_key = "test2"
             end
 
-            class PreLocalDiscriminiatorChild < PreLocalDiscriminiatorParent
+            class PreLocalDiscriminatorChild < PreLocalDiscriminatorParent
             end
           end
     
           it "creates a new field in the parent" do 
-            expect(PreLocalDiscriminiatorParent.fields.keys).to include("test2")
+            expect(PreLocalDiscriminatorParent.fields.keys).to include("test2")
           end
 
           it "does not create the _type field in the parent" do 
-            expect(PreLocalDiscriminiatorParent.fields.keys).to_not include("_type")
+            expect(PreLocalDiscriminatorParent.fields.keys).to_not include("_type")
           end
 
           it "creates a new field in the child" do 
-            expect(PreLocalDiscriminiatorChild.fields.keys).to include("test2")
+            expect(PreLocalDiscriminatorChild.fields.keys).to include("test2")
           end
         end
 
         context "when there's no child class" do
           before do
-            class LocalDiscriminiatorNonParent
+            class LocalDiscriminatorNonParent
               include Mongoid::Document
               self.discriminator_key = "test2"
             end
           end
     
           it "does not create a _type field" do 
-            expect(LocalDiscriminiatorNonParent.fields.keys).to_not include("_type")
+            expect(LocalDiscriminatorNonParent.fields.keys).to_not include("_type")
           end
 
           it "does not create a new field" do 
-            expect(LocalDiscriminiatorNonParent.fields.keys).to_not include("test2")
+            expect(LocalDiscriminatorNonParent.fields.keys).to_not include("test2")
           end
         end
       end

@@ -37,7 +37,11 @@ module Mongoid
           end
         end 
 
-        unless fields.has_key?(self.discriminator_key) || descendants.length == 0
+        # This condition checks if the new discriminator key would overwrite
+        # an existing field.
+        # This condition also checks if the class has any descendants, because
+        # if it doesn't then it doesn't need a discriminator key. 
+        if !fields.has_key?(self.discriminator_key) && !descendants.empty?
           default_proc = lambda { self.class.name }
           field(self.discriminator_key, default: default_proc, type: String)
         end
