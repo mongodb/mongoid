@@ -179,6 +179,14 @@
     house.price: 101
   matches: false
 
+- name: hash path in query - traversing an array
+  document:
+    house:
+      - 100
+  query:
+    house.price: 100
+  matches: false
+
 - name: array path in query - match
   document:
     house:
@@ -219,6 +227,14 @@
       - Queen
   query:
     titles.1: King
+  matches: false
+
+- name: array path in query - traversing a hash
+  document:
+    title:
+      name: King
+  query:
+    title.1: King
   matches: false
 
 - name: implicit array path in query - match
