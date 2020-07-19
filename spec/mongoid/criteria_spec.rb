@@ -818,13 +818,6 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when given a Proc" do
-      it "behaves as enumerable" do
-        result = criteria.find(-> {"default"})
-        expect(result).to be_a(Enumerator)
-      end
-    end
-
     context "when given an id" do
       it "behaves as findable" do
         result = criteria.find(depeche.id)

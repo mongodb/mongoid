@@ -59,7 +59,7 @@ module Mongoid
 
     # Call either Findable#find or Enumerable#find based on the given arguments
     #
-    # If the arguments match Enumerable#find signature, that will be invoked.
+    # If given a block, Enumerable#find will be invoked.
     # Otherwise Findable#find will be invoked
     #
     # The signature of Enumerable#find can be found in the stdlib documentation:
@@ -72,16 +72,13 @@ module Mongoid
     # @example Find given a block and a Proc, invokes Enumerable#find
     #   criteria.find(-> { "Default Band" }) { |item| item.name == "Milwaukee Mode" }
     #
-    # @example Find given just a Proc, invokes Enumerable#find, returns an Enumerator
-    #   enumerator = criteria.find(-> { "Default Band" })
-    #
     # @example Find given anything else, invokes Findable#find
     #   critera.find("1234")
     #
     # @return Same return value as either Findable#find or Enumerable#find, depending
     #   on which one was invoked.
     def find(*args, &block)
-      if block_given? || args.first&.is_a?(Proc)
+      if block_given?
         _enumerable_find(*args, &block)
       else
         _findable_find(*args)
