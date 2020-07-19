@@ -62,10 +62,9 @@ module Mongoid
     # If the arguments match Enumerable#find signature, that will be invoked.
     # Otherwise Findable#find will be invoked
     #
-    # The signature of Enumerable#find:
+    # The signature of Enumerable#find can be found in the stdlib documentation:
     #
-    #   find(ifnone = nil) { |obj| block } → obj or nil
-    #   find(ifnone = nil) → an_enumerator
+    # https://ruby-doc.org/core/Enumerable.html
     #
     # @example Find using a block, invokes Enumerable#find
     #   criteria.find { |item| item.name == "Depeche Mode" }
