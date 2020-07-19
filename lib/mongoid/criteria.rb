@@ -80,8 +80,6 @@ module Mongoid
     #
     # @return Same return value as either Findable#find or Enumerable#find, depending
     #   on which one was invoked.
-    #
-    # @since 7.1.1
     def find(*args, &block)
       if block_given? || args.first&.is_a?(Proc)
         _enumerable_find(*args, &block)
