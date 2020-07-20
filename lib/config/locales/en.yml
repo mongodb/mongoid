@@ -108,15 +108,6 @@ en:
           summary: "An invalid dependent strategy was defined for the association:
             %{association}. The valid strategies are: %{valid_strategies}."
           resolution: "Change the dependent strategy to one of the valid types."
-        invalid_discriminator_key:
-          message: "Defining a field named '%{name}' is not allowed."
-          summary: "Defining this field would override the method '%{name}',
-            which would cause issues with expectations around the original
-            method and cause extremely hard to debug issues."
-          resolution: "Use Mongoid.destructive_fields to see what names are not
-            allowed, and don't use these names. These include names that also
-            conflict with core Ruby methods on Object, Module, Enumerable, or
-            included gems that inject methods into these or Mongoid internals."
         invalid_discriminator_key_target:
           message: "Setting the discriminator key on a child class is not allowed."
           summary: "The discriminator key on the class %{class_name} was attempted
