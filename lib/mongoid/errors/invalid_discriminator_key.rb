@@ -11,9 +11,8 @@ module Mongoid
         # Create the new error.
         #
         # @example Create the error.
-        #   InvalidDiscriminatorKey.new(person, :crazy_method_name)
+        #   InvalidDiscriminatorKey.new(:invalid)
         #
-        # @param [ Class ] klass The document class.
         # @param [ Symbol ] name The method name.
         def initialize(name)
           super(

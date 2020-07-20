@@ -29,8 +29,6 @@ module Mongoid
         end
 
         if value
-          # I don't need to do any sort of validation here because it will be done
-          # on field creation.
           Mongoid::Fields::Validators::Macro.validate(self, value, {})
           value = value.to_s
           super
