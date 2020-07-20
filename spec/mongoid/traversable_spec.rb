@@ -789,10 +789,10 @@ describe Mongoid::Traversable do
           Mongoid.duplicate_fields_exception = false
         end
 
-        it "raises an error" do
+        it "does not raise an error" do
           expect do 
             DuplicateDiscriminatorKeyParent.discriminator_key = "dkey"
-          end.to raise_error(Mongoid::Errors::InvalidField)
+          end.to_not raise_error(Mongoid::Errors::InvalidField)
         end
       end
 
@@ -853,7 +853,7 @@ describe Mongoid::Traversable do
             it "raises an error" do
               expect {
                 Mongoid.discriminator_key = meth
-              }.to raise_error(Mongoid::Errors::InvalidDiscriminatorKey)
+              }.to raise_error(Mongoid::Errors::InvalidField)
             end
           end
         end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-require "mongoid/fields/validators"
+require "mongoid/fields/validators/macro"
 
 module Mongoid
 
@@ -29,7 +29,7 @@ module Mongoid
         end
 
         if value
-          Mongoid::Fields::Validators::Macro.validate(self, value, {})
+          Mongoid::Fields::Validators::Macro.validate_field_name(self, value)
           value = value.to_s
           super
         else

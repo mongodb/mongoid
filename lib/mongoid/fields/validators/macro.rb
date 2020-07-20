@@ -39,7 +39,8 @@ module Mongoid
         #
         # @since 3.0.0
         def validate(klass, name, options)
-          validate_name(klass, name, options)
+          validate_field_name(klass, name)
+          validate_name_uniqueness(klass, name, options)
           validate_options(klass, name, options)
         end
 
@@ -61,14 +62,12 @@ module Mongoid
           end
         end
 
-        private
-
-        # Determine if the field name is allowed, if not raise an error.
+        # Determine if the field name is valid, if not raise an error.
         #
         # @api private
         #
         # @example Check the field name.
-        #   Macro.validate_name(Model, :name)
+        #   Macro.validate_field_name(Model, :name)
         #
         # @param [ Class ] klass The model class.
         # @param [ Symbol ] name The field name.
@@ -76,13 +75,31 @@ module Mongoid
         # @raise [ Errors::InvalidField ] If the name is not allowed.
         #
         # @since 3.0.0
-        def validate_name(klass, name, options)
+        def validate_field_name(klass, name)
           [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
             if Mongoid.destructive_fields.include?(n)
               raise Errors::InvalidField.new(klass, n)
             end
           end
+        end
 
+        private
+
+        # Determine if the field name is unique, if not raise an error.
+        #
+        # @api private
+        #
+        # @example Check the field name.
+        #   Macro.validate_name_uniqueness(Model, :name, {})
+        #
+        # @param [ Class ] klass The model class.
+        # @param [ Symbol ] name The field name.
+        # @param [ Hash ] options The provided options.
+        #
+        # @raise [ Errors::InvalidField ] If the name is not allowed.
+        #
+        # @since 3.0.0
+        def validate_name_uniqueness(klass, name, options)
           if !options[:overwrite] && klass.fields.keys.include?(name.to_s)
             if Mongoid.duplicate_fields_exception
               raise Errors::InvalidField.new(klass, name)
