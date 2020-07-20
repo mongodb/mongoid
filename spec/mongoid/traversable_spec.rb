@@ -483,8 +483,6 @@ describe Mongoid::Traversable do
             
             class PreGlobalDiscriminatorChild < PreGlobalDiscriminatorParent
             end
-            
-            Mongoid.discriminator_key = "test"
           end
     
           after do
@@ -578,6 +576,134 @@ describe Mongoid::Traversable do
           it "does not create a new field" do 
             expect(LocalDiscriminatorNonParent.fields.keys).to_not include("test2")
           end
+        end
+      end
+    end
+
+    context "when setting the discriminator key as a symbol" do 
+      context "when the discriminator key is changed at the base level" do
+        context "after class creation" do
+          before do
+            class GlobalSymDiscriminatorParent
+              include Mongoid::Document
+            end
+            
+            class GlobalSymDiscriminatorChild < GlobalSymDiscriminatorParent
+            end
+            
+            Mongoid.discriminator_key = :test
+          end
+    
+          after do
+            Mongoid.discriminator_key = "_type"
+          end
+
+          it "gets converted to a string in the parent" do 
+            expect(GlobalSymDiscriminatorParent.fields.keys).to_not include("test")
+          end
+
+          it "gets converted to a string in the child" do 
+            expect(GlobalSymDiscriminatorChild.fields.keys).to_not include("test")
+          end
+          
+        end
+
+        context "before class creation" do
+          before do
+            Mongoid.discriminator_key = :test
+
+            class PreGlobalSymDiscriminatorParent
+              include Mongoid::Document
+            end
+            
+            class PreGlobalSymDiscriminatorChild < PreGlobalSymDiscriminatorParent
+            end
+          end
+    
+          after do
+            Mongoid.discriminator_key = "_type"
+          end
+
+          it "creates a field with new discriminator key in the parent" do 
+            expect(PreGlobalSymDiscriminatorParent.fields.keys).to include("test")
+          end
+
+          it "creates a field with new discriminator key in the child" do 
+            expect(PreGlobalSymDiscriminatorChild.fields.keys).to include("test")
+          end
+        end
+      end
+  
+      context "when the discriminator key is changed in the parent" do 
+        context "after child class creation" do
+          before do
+            class LocalSymDiscriminatorParent
+              include Mongoid::Document
+            end
+
+            class LocalSymDiscriminatorChild < LocalSymDiscriminatorParent
+            end
+
+            LocalSymDiscriminatorParent.discriminator_key = :test2
+          end
+    
+          it "creates a new field in the parent" do 
+            expect(LocalSymDiscriminatorParent.fields.keys).to include("test2")
+          end
+
+          it "has the new field in the child" do 
+            expect(LocalSymDiscriminatorChild.fields.keys).to include("test2")
+          end
+        end
+
+        context "before child class creation" do
+          before do
+            class PreLocalSymDiscriminatorParent
+              include Mongoid::Document
+              self.discriminator_key = :test2
+            end
+
+            class PreLocalSymDiscriminatorChild < PreLocalSymDiscriminatorParent
+            end
+          end
+    
+          it "creates a new field in the parent" do 
+            expect(PreLocalSymDiscriminatorParent.fields.keys).to include("test2")
+          end
+
+          it "creates a new field in the child" do 
+            expect(PreLocalSymDiscriminatorChild.fields.keys).to include("test2")
+          end
+        end
+      end
+    end
+
+    context "when setting the discriminator key as" do 
+      context "a number" do
+        before do 
+          Instrument.discriminator_key = 3
+        end
+
+        after do
+          Instrument.discriminator_key = nil
+        end
+
+        it "gets converted to a string" do 
+          expect(Instrument.fields.keys).to include("3")
+        end
+      end
+
+      context "a boolean" do
+        before do 
+          Instrument.discriminator_key = true
+        end
+
+        after do
+          Instrument.discriminator_key = nil
+        end
+
+        it "gets converted to a string" do 
+          expect(Instrument.fields.keys).to include("true")
         end
       end
     end
