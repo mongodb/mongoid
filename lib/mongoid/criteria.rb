@@ -292,7 +292,7 @@ module Mongoid
         args.unshift(:_id)
       end
       if klass.hereditary?
-        super(*args.push(klass.discriminator_key))
+        super(*args.push(klass.discriminator_key.to_sym))
       else
         super(*args)
       end
@@ -555,7 +555,7 @@ module Mongoid
     # @since 3.0.3
     def type_selectable?
       klass.hereditary? &&
-        !selector.keys.include?(self.discriminator_key.to_s) &&
+        !selector.keys.include?(self.discriminator_key) &&
         !selector.keys.include?(self.discriminator_key.to_sym)
     end
 
