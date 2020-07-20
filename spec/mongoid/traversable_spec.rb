@@ -605,7 +605,18 @@ describe Mongoid::Traversable do
           it "gets converted to a string in the child" do 
             expect(GlobalSymDiscriminatorChild.fields.keys).to_not include("test")
           end
-          
+
+          it "is a string globally" do 
+            expect(Mongoid.discriminator_key).to eq("test")
+          end
+
+          it "is a string in the parent" do 
+            expect(GlobalSymDiscriminatorParent.discriminator_key).to eq("test")
+          end
+
+          it "is a string in the child" do 
+            expect(GlobalSymDiscriminatorChild.discriminator_key).to eq("test")
+          end
         end
 
         context "before class creation" do
@@ -631,6 +642,18 @@ describe Mongoid::Traversable do
           it "creates a field with new discriminator key as a string in the child" do 
             expect(PreGlobalSymDiscriminatorChild.fields.keys).to include("test")
           end
+
+          it "is a string globally" do 
+            expect(Mongoid.discriminator_key).to eq("test")
+          end
+
+          it "is a string in the parent" do 
+            expect(PreGlobalSymDiscriminatorParent.discriminator_key).to eq("test")
+          end
+
+          it "is a string in the child" do 
+            expect(PreGlobalSymDiscriminatorChild.discriminator_key).to eq("test")
+          end
         end
       end
   
@@ -654,6 +677,14 @@ describe Mongoid::Traversable do
           it "creates a new field of type string in the child" do 
             expect(LocalSymDiscriminatorChild.fields.keys).to include("test2")
           end
+
+          it "is a string in the parent" do 
+            expect(LocalSymDiscriminatorParent.discriminator_key).to eq("test2")
+          end
+
+          it "is a string in the child" do 
+            expect(LocalSymDiscriminatorChild.discriminator_key).to eq("test2")
+          end
         end
 
         context "before child class creation" do
@@ -674,6 +705,14 @@ describe Mongoid::Traversable do
           it "creates a new field of type string in the child" do 
             expect(PreLocalSymDiscriminatorChild.fields.keys).to include("test2")
           end
+
+          it "is a string in the parent" do 
+            expect(PreLocalSymDiscriminatorParent.discriminator_key).to eq("test2")
+          end
+
+          it "is a string in the child" do 
+            expect(PreLocalSymDiscriminatorChild.discriminator_key).to eq("test2")
+          end
         end
       end
     end
@@ -691,6 +730,18 @@ describe Mongoid::Traversable do
         it "gets converted to a string" do 
           expect(Instrument.fields.keys).to include("3")
         end
+
+        it "is a string in the parent" do 
+          expect(Instrument.discriminator_key).to eq("3")
+        end
+
+        it "is a string in the child: Guitar" do 
+          expect(Guitar.discriminator_key).to eq("3")
+        end
+
+        it "is a string in the child: Piano" do 
+          expect(Piano.discriminator_key).to eq("3")
+        end
       end
 
       context "a boolean" do
@@ -704,6 +755,18 @@ describe Mongoid::Traversable do
 
         it "gets converted to a string" do 
           expect(Instrument.fields.keys).to include("true")
+        end
+
+        it "is a string in the parent" do 
+          expect(Instrument.discriminator_key).to eq("true")
+        end
+
+        it "is a string in the child: Guitar" do 
+          expect(Guitar.discriminator_key).to eq("true")
+        end
+
+        it "is a string in the child: Piano" do 
+          expect(Piano.discriminator_key).to eq("true")
         end
       end
     end
