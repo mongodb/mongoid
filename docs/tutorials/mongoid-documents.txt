@@ -1180,6 +1180,102 @@ either normal setting or through the build and create methods on the association
    rect = Rectangle.new(width: 100, height: 200)
    firefox.shapes
 
+Changing the Discriminator Key
+==============================
+Mongoid now supports changing the discriminator key from the default ``_type``. Ther are a few
+cases where one might want to do this:
+1. For optimization: The user might want to use a shorter key like ``_t``.
+2. Trying to work with an existing system: It's possible the user is working with 
+and existing system or dataset that already has predefined keys.
+
+On the Class Level
+------------------
+One way to change the discriminator is directly on the parent class. Take the above example:
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+     field :x, type: Integer
+     field :y, type: Integer
+     embedded_in :canvas
+
+     self.discriminator_key = "shape_type"
+   end
+
+   class Circle < Shape
+     field :radius, type: Float
+   end
+
+   class Rectangle < Shape
+     field :width, type: Float
+     field :height, type: Float
+   end
+
+Now, on creation of a Rectangle or Circle, a ``shape_type`` field will be added. 
+
+Note that the discriminator key can only be modified in the parent class, and an error
+will be raised if trying to set it on the child class.
+
+If the discriminator_key is changed after the child class is created, a new field is
+added with the new discriminator_key value, and the old field will remain unchanged. 
+For example: 
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+     field :x, type: Integer
+     field :y, type: Integer
+     embedded_in :canvas
+   end
+
+   class Circle < Shape
+     field :radius, type: Float
+   end
+
+   class Rectangle < Shape
+     field :width, type: Float
+     field :height, type: Float
+   end
+
+   Shape.discriminator_key = "shape_type"
+
+In this case, on creation of a Rectangle or Circle, there will be both a ``shape_type``
+and a ``_type`` field.
+
+On the Global Level
+-------------------
+The discriminator key can also be set on the global level. Meaning, all classes will
+use the globally set discriminator key instead of ``_type``. Take the above example: 
+
+.. code-block:: ruby
+
+   Mongoid.discriminator_key = "_the_type"
+
+   class Shape
+     include Mongoid::Document
+     field :x, type: Integer
+     field :y, type: Integer
+     embedded_in :canvas
+   end
+
+   class Circle < Shape
+     field :radius, type: Float
+   end
+
+   class Rectangle < Shape
+     field :width, type: Float
+     field :height, type: Float
+   end
+
+After setting the global discriminator key, all classes will use ``_the_type`` as
+the discriminator_key and will not contain a `_type` field.
+
+Note that similarly to defining the discriminator key on the class level, when defining
+the discriminator key on the global level, it must be defined before the child class is defined.
+On the global level, however, if not done before the definition of the child class, no discriminator
+field will be created.
 
 Timestamping
 ============
