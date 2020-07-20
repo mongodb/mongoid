@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
+require "mongoid/fields/validators"
+
 module Mongoid
 
   # Provides behavior around traversing the document graph.
@@ -29,6 +31,7 @@ module Mongoid
         if value
           # I don't need to do any sort of validation here because it will be done
           # on field creation.
+          Mongoid::Fields::Validators::Macro.validate(self, value, {})
           value = value.to_s
           super
         else

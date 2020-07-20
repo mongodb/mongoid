@@ -117,6 +117,11 @@ module Mongoid
   # the value assigned to the discriminator key to a string.
   module GlobalDiscriminatorKeyAssignment
     def discriminator_key=(value)
+      [value, "#{value}?".to_sym, "#{value}=".to_sym].each do |n|
+        if Mongoid.destructive_fields.include?(n)
+          raise Errors::InvalidDiscriminatorKey.new(n)
+        end
+      end
       value = value.to_s
       super
     end
