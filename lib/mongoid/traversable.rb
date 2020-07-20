@@ -27,6 +27,9 @@ module Mongoid
         end
 
         if value
+          # I don't need to do any sort of validation here because it will be done
+          # on field creation.
+          value = value.to_s
           super
         else
           # When discriminator key is set to nil, replace the class's definition
