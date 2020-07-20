@@ -87,7 +87,7 @@ module Mongoid
       #     doc.likes > 1
       #   end
       #
-      # @param [ Hash ] options The options, such as skip and limit to be factored
+      # @param [ Hash ] options The options, such as maxTimeMS to be factored
       #   into the count.
       #
       # @return [ Integer ] The number of matches.
