@@ -1184,6 +1184,7 @@ Changing the Discriminator Key
 ==============================
 Mongoid now supports changing the discriminator key from the default ``_type``. Ther are a few
 cases where one might want to do this:
+
 1. For optimization: The user might want to use a shorter key like ``_t``.
 2. Trying to work with an existing system: It's possible the user is working with 
 and existing system or dataset that already has predefined keys.
@@ -1217,8 +1218,8 @@ Now, on creation of a Rectangle or Circle, a ``shape_type`` field will be added.
 Note that the discriminator key can only be modified in the parent class, and an error
 will be raised if trying to set it on the child class.
 
-If the discriminator_key is changed after the child class is created, a new field is
-added with the new discriminator_key value, and the old field will remain unchanged. 
+If the discriminator key is changed after the child class is created, a new field is
+added with the new discriminator key value, and the old field will remain unchanged. 
 For example: 
 
 .. code-block:: ruby
@@ -1270,7 +1271,7 @@ use the globally set discriminator key instead of ``_type``. Take the above exam
    end
 
 After setting the global discriminator key, all classes will use ``_the_type`` as
-the discriminator_key and will not contain a `_type` field.
+the discriminator key and will not contain a ``_type`` field.
 
 Note that similarly to defining the discriminator key on the class level, when defining
 the discriminator key on the global level, it must be defined before the child class is defined.
