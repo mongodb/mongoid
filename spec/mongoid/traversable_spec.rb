@@ -831,6 +831,7 @@ describe Mongoid::Traversable do
 
         after do 
           Mongoid.duplicate_fields_exception = true
+          Mongoid.discriminator_key = "_type"
         end
 
         it "raises an error" do
