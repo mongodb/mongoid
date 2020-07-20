@@ -624,11 +624,11 @@ describe Mongoid::Traversable do
             Mongoid.discriminator_key = "_type"
           end
 
-          it "creates a field with new discriminator key in the parent" do 
+          it "creates a field with new discriminator key as a string in the parent" do 
             expect(PreGlobalSymDiscriminatorParent.fields.keys).to include("test")
           end
 
-          it "creates a field with new discriminator key in the child" do 
+          it "creates a field with new discriminator key as a string in the child" do 
             expect(PreGlobalSymDiscriminatorChild.fields.keys).to include("test")
           end
         end
@@ -647,11 +647,11 @@ describe Mongoid::Traversable do
             LocalSymDiscriminatorParent.discriminator_key = :test2
           end
     
-          it "creates a new field in the parent" do 
+          it "creates a new field of type string in the parent" do 
             expect(LocalSymDiscriminatorParent.fields.keys).to include("test2")
           end
 
-          it "has the new field in the child" do 
+          it "creates a new field of type string in the child" do 
             expect(LocalSymDiscriminatorChild.fields.keys).to include("test2")
           end
         end
@@ -667,11 +667,11 @@ describe Mongoid::Traversable do
             end
           end
     
-          it "creates a new field in the parent" do 
+          it "creates a new field of type string in the parent" do 
             expect(PreLocalSymDiscriminatorParent.fields.keys).to include("test2")
           end
 
-          it "creates a new field in the child" do 
+          it "creates a new field of type string in the child" do 
             expect(PreLocalSymDiscriminatorChild.fields.keys).to include("test2")
           end
         end
