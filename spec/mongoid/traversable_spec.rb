@@ -771,7 +771,7 @@ describe Mongoid::Traversable do
       end
     end
 
-    context "when setting an invalid discriminator key on the class level", :focus do 
+    context "when setting an invalid discriminator key on the class level" do 
       context "when duplicate_fields_exception is true" do
         before do
           Mongoid.duplicate_fields_exception = true
@@ -783,6 +783,10 @@ describe Mongoid::Traversable do
 
           class DuplicateDiscriminatorKeyChild < DuplicateDiscriminatorKeyParent
           end
+        end
+
+        after do 
+          Mongoid.duplicate_fields_exception = false
         end
 
         it "raises an error" do
@@ -811,7 +815,7 @@ describe Mongoid::Traversable do
       end
     end
 
-    context "when setting an invalid discriminator key on the global level", :focus do 
+    context "when setting an invalid discriminator key on the global level" do 
       context "when duplicate_fields_exception is true" do
         before do
           Mongoid.duplicate_fields_exception = true
@@ -823,6 +827,10 @@ describe Mongoid::Traversable do
 
           class GlobalDuplicateDiscriminatorKeyChild < GlobalDuplicateDiscriminatorKeyParent
           end
+        end
+
+        after do 
+          Mongoid.duplicate_fields_exception = true
         end
 
         it "raises an error" do
