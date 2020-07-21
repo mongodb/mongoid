@@ -1149,15 +1149,17 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
 
 Changing the Discriminator Key
 ------------------------------
-Mongoid now supports changing the discriminator key from the default ``_type``. Ther are a few
+Mongoid now supports changing the discriminator key from the default ``_type``. There are a few
 cases where one might want to do this:
 
 1. For optimization: The user might want to use a shorter key like ``_t``.
-2. Trying to work with an existing system: It's possible the user is working with 
-and existing system or dataset that already has predefined keys.
+
+2. When trying to work with an existing system: It's possible the user is working with 
+an existing system or dataset that already has predefined keys.
 
 There are two ways to change the discriminator key, on the class level and on the global level. 
-The first way is to change the discriminator key directly on the parent class. Take the above example:
+To change the discriminator key on the class level the user can set it directly on the parent class. 
+Take the above example:
 
 .. code-block:: ruby
 
@@ -1239,9 +1241,11 @@ After setting the global discriminator key, all classes will use ``_the_type`` a
 the discriminator key and will not contain a ``_type`` field.
 
 Note that similarly to defining the discriminator key on the class level, when defining
-the discriminator key on the global level, it must be defined before the child class is defined.
-On the global level, however, if not done before the definition of the child class, no discriminator
-field will be created.
+the discriminator key on the global level, it must be defined before the child class is defined
+for the new discriminator key to register in that class.
+On the global level, however, if the user does not set the discriminator key before defining a child 
+class, the discriminator field will use the default ``_type`` and not the new global setting in
+that child class.
 
 
 Querying Subclasses
