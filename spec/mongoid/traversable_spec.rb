@@ -827,13 +827,15 @@ describe Mongoid::Traversable do
       end
 
       after do 
-        Mongoid.duplicate_fields_exception = true
+        Mongoid.duplicate_fields_exception = false
         Mongoid.discriminator_key = "_type"
       end
 
       it "raises an error" do
         expect do 
-          GlobalDuplicateDiscriminatorKeyParent.field("dkey")
+          GlobalDuplicateDiscriminatorKeyParent.class_eval do
+            field("dkey") 
+          end
         end.to raise_error(Mongoid::Errors::InvalidField)
       end
     end
