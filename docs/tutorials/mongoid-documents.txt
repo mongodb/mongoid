@@ -1154,7 +1154,7 @@ cases where one might want to do this:
 
 1. For optimization: The user might want to use a shorter key like ``_t``.
 
-2. When trying to work with an existing system: It's possible the user is working with an existing system or dataset that already has predefined keys.
+2. When trying to work with an existing system: It's possible the user is working with an existing system or dataset that has predefined keys.
 
 
 There are two ways to change the discriminator key, on the class level and on the global level. 
@@ -1181,7 +1181,8 @@ Take the above example:
      field :height, type: Float
    end
 
-Now, on creation of a Rectangle or Circle, a ``shape_type`` field will be added. 
+Here a call to the ``discriminator_key=`` setter was added to the parent class. Now, on 
+creation of a Rectangle or Circle, a ``shape_type`` field will be added. 
 
 Note that the discriminator key can only be modified in the parent class, and an error
 will be raised if trying to set it on the child class.
