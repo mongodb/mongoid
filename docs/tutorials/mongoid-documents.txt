@@ -1158,7 +1158,8 @@ cases where one might want to do this:
 
 
 There are two ways to change the discriminator key, on the class level and on the global level. 
-To change the discriminator key on the class level the user can set it directly on the parent class. 
+To change the discriminator key on the class level the user can set it directly on the parent class using 
+the ``discriminator_key=`` function. 
 Take the above example:
 
 .. code-block:: ruby
@@ -1281,6 +1282,7 @@ either normal setting or through the build and create methods on the association
 
    rect = Rectangle.new(width: 100, height: 200)
    firefox.shapes
+
 
 Timestamping
 ============
