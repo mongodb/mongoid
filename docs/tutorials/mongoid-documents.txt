@@ -1147,41 +1147,8 @@ collection. An additional attribute ``_type`` is stored in order to make sure wh
 from the database the correct document is returned. This also holds true for the embedded
 documents ``Circle``, ``Rectangle``, and ``Shape``.
 
-Querying Subclasses
--------------------
-
-Querying for subclasses is handled in the normal manner, and although the documents are
-all in the same collection, queries will only return documents of the correct type,
-similar to Single Table Inheritance in ActiveRecord.
-
-.. code-block:: ruby
-
-   # Returns Canvas documents and subclasses
-   Canvas.where(name: "Paper")
-   # Returns only Firefox documents
-   Firefox.where(name: "Window 1")
-
-Associations
-------------
-
-You can add any type of subclass to a has one or has many association, through
-either normal setting or through the build and create methods on the association:
-
-.. code-block:: ruby
-
-   firefox = Firefox.new
-   # Builds a Shape object
-   firefox.shapes.build({ x: 0, y: 0 })
-   # Builds a Circle object
-   firefox.shapes.build({ x: 0, y: 0 }, Circle)
-   # Creates a Rectangle object
-   firefox.shapes.create({ x: 0, y: 0 }, Rectangle)
-
-   rect = Rectangle.new(width: 100, height: 200)
-   firefox.shapes
-
 Changing the Discriminator Key
-==============================
+------------------------------
 Mongoid now supports changing the discriminator key from the default ``_type``. Ther are a few
 cases where one might want to do this:
 
@@ -1189,9 +1156,8 @@ cases where one might want to do this:
 2. Trying to work with an existing system: It's possible the user is working with 
 and existing system or dataset that already has predefined keys.
 
-On the Class Level
-------------------
-One way to change the discriminator is directly on the parent class. Take the above example:
+There are two ways to change the discriminator key, on the class level and on the global level. 
+The first way is to change the discriminator key directly on the parent class. Take the above example:
 
 .. code-block:: ruby
 
@@ -1243,10 +1209,9 @@ For example:
    Shape.discriminator_key = "shape_type"
 
 In this case, on creation of a Rectangle or Circle, there will be both a ``shape_type``
-and a ``_type`` field.
+and a ``_type`` field that both default to ``Rectangle`` or ``Circle`` respectively.
 
-On the Global Level
--------------------
+
 The discriminator key can also be set on the global level. Meaning, all classes will
 use the globally set discriminator key instead of ``_type``. Take the above example: 
 
@@ -1277,6 +1242,40 @@ Note that similarly to defining the discriminator key on the class level, when d
 the discriminator key on the global level, it must be defined before the child class is defined.
 On the global level, however, if not done before the definition of the child class, no discriminator
 field will be created.
+
+
+Querying Subclasses
+-------------------
+
+Querying for subclasses is handled in the normal manner, and although the documents are
+all in the same collection, queries will only return documents of the correct type,
+similar to Single Table Inheritance in ActiveRecord.
+
+.. code-block:: ruby
+
+   # Returns Canvas documents and subclasses
+   Canvas.where(name: "Paper")
+   # Returns only Firefox documents
+   Firefox.where(name: "Window 1")
+
+Associations
+------------
+
+You can add any type of subclass to a has one or has many association, through
+either normal setting or through the build and create methods on the association:
+
+.. code-block:: ruby
+
+   firefox = Firefox.new
+   # Builds a Shape object
+   firefox.shapes.build({ x: 0, y: 0 })
+   # Builds a Circle object
+   firefox.shapes.build({ x: 0, y: 0 }, Circle)
+   # Creates a Rectangle object
+   firefox.shapes.create({ x: 0, y: 0 }, Rectangle)
+
+   rect = Rectangle.new(width: 100, height: 200)
+   firefox.shapes
 
 Timestamping
 ============
