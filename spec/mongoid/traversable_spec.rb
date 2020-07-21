@@ -791,7 +791,7 @@ describe Mongoid::Traversable do
       it "does not raise an error" do
         expect do 
           DuplicateDiscriminatorKeyParent.discriminator_key = "dkey"
-        end.to_not raise_error(Mongoid::Errors::InvalidField)
+        end.to_not raise_error
       end
     end
 
