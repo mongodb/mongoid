@@ -1,0 +1,17 @@
+- name: hash path in query - traversing an array - with operator
+  document:
+    titles:
+      - King
+  query:
+    titles.name:
+      $eq: King
+  matches: false
+
+- name: array path in query - traversing a hash - with operator
+  document:
+    title:
+      name: King
+  query:
+    title.1:
+      $eq: King
+  matches: false
