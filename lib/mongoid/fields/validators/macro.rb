@@ -64,8 +64,6 @@ module Mongoid
 
         # Determine if the field name is valid, if not raise an error.
         #
-        # @api private
-        #
         # @example Check the field name.
         #   Macro.validate_field_name(Model, :name)
         #
@@ -74,7 +72,7 @@ module Mongoid
         #
         # @raise [ Errors::InvalidField ] If the name is not allowed.
         #
-        # @since 3.0.0
+        # @api private
         def validate_field_name(klass, name)
           [name, "#{name}?".to_sym, "#{name}=".to_sym].each do |n|
             if Mongoid.destructive_fields.include?(n)
@@ -87,8 +85,6 @@ module Mongoid
 
         # Determine if the field name is unique, if not raise an error.
         #
-        # @api private
-        #
         # @example Check the field name.
         #   Macro.validate_name_uniqueness(Model, :name, {})
         #
@@ -98,7 +94,7 @@ module Mongoid
         #
         # @raise [ Errors::InvalidField ] If the name is not allowed.
         #
-        # @since 3.0.0
+        # @api private
         def validate_name_uniqueness(klass, name, options)
           if !options[:overwrite] && klass.fields.keys.include?(name.to_s)
             if Mongoid.duplicate_fields_exception

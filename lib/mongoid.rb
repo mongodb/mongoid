@@ -115,6 +115,8 @@ module Mongoid
 
   # Module used to prepend the discriminator key assignment function to change 
   # the value assigned to the discriminator key to a string.
+  #
+  # @api private
   module GlobalDiscriminatorKeyAssignment
     # This class is used for obtaining the method definition location for
     # Mongoid methods.
