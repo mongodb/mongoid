@@ -1157,6 +1157,7 @@ cases where one might want to do this:
 2. When trying to work with an existing system: It's possible the user is working with 
 an existing system or dataset that already has predefined keys.
 
+
 There are two ways to change the discriminator key, on the class level and on the global level. 
 To change the discriminator key on the class level the user can set it directly on the parent class. 
 Take the above example:
