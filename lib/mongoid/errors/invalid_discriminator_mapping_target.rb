@@ -8,7 +8,6 @@ module Mongoid
     # discriminator mapping on a parent class.
     #
     # @param [ String ] class_name The class name.
-    # @param [ String ] operator The class' superclass.
     #
     # @api private
     class InvalidDiscriminatorMappingTarget < MongoidError
