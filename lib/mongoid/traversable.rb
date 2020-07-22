@@ -22,7 +22,7 @@ module Mongoid
     # Module used for prepending to the discriminator_key= function
     #
     # @api private
-    module DiscriminatorKeyAssignment
+    module DiscriminatorKeyAndMappingAssignment
       def discriminator_key=(value)
         if hereditary?
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
@@ -50,13 +50,23 @@ module Mongoid
           field(self.discriminator_key, default: default_proc, type: String)
         end
       end
+
+      def discriminator_mapping=(value)
+        unless hereditary?
+          raise Errors::InvalidDiscriminatorMappingTarget.new(self)
+        end
+        value ||= self.to_s
+        super
+      end
     end
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
+      class_attribute :discriminator_mapping, default: self.to_s, instance_accessor: false
+      
       class << self
         delegate :discriminator_key, to: ::Mongoid
-        prepend DiscriminatorKeyAssignment
+        prepend DiscriminatorKeyAndMappingAssignment
       end
     end
 
@@ -244,6 +254,7 @@ module Mongoid
         subclass.pre_processed_defaults = pre_processed_defaults.dup
         subclass.post_processed_defaults = post_processed_defaults.dup
         subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
+        subclass.discriminator_mapping = subclass.to_s
 
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.

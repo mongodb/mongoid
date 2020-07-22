@@ -858,4 +858,76 @@ describe Mongoid::Traversable do
       end
     end
   end
+
+  describe "#discriminator_mapping" do 
+    context "when the discriminator mapping is set on the child class" do 
+      before do
+        Guitar.discriminator_mapping = "some string instrument"
+      end
+
+      after do 
+        Guitar.discriminator_mapping = nil
+      end
+
+      it "has the correct discriminator_mapping" do 
+        expect(Guitar.discriminator_mapping).to eq("some string instrument")
+      end
+
+      it "does not change the sibling's discriminator mapping" do 
+        expect(Piano.discriminator_mapping).to eq("Piano")
+      end
+
+      it "does not change the parent's discriminator mapping" do 
+        expect(Instrument.discriminator_mapping).to eq("Instrument")
+      end
+    end
+
+    context "when the discriminator mapping is set on the parent" do 
+      before do
+        begin
+          Instrument.discriminator_mapping = "musical thingy"
+        rescue
+        end
+      end
+
+      it "raises an error" do 
+        expect do 
+          Instrument.discriminator_mapping = "musical thingy"
+        end.to raise_error(Mongoid::Errors::InvalidDiscriminatorMappingTarget)
+      end
+
+      it "is not changed in the parent" do 
+        expect(Instrument.discriminator_mapping).to eq("Instrument")
+      end
+    end
+
+    context "when setting the discriminator mapping to nil" do
+      before do 
+        Guitar.discriminator_mapping = "some string instrument"
+        Guitar.discriminator_mapping = nil
+      end
+
+      it "reverts back to default" do
+        expect(Guitar.discriminator_mapping).to eq("Guitar")
+      end
+    end
+
+    context "when setting discriminator mapping on parent that is also a child" do
+      before do 
+        Browser.discriminator_mapping = "something"
+      end
+
+      after do 
+        Browser.discriminator_mapping = nil
+      end
+
+      it "has the correct value in the parent" do 
+        expect(Browser.discriminator_mapping).to eq("something")
+      end
+
+      it "doesn't set the grandchild's discriminator mapping" do 
+        expect(Firefox.discriminator_mapping).to eq("Firefox")
+      end
+    end
+  end
 end

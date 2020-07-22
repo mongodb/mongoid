@@ -115,6 +115,13 @@ en:
             allowed."
           resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
             ancestors."
+        invalid_discriminator_mapping_target:
+          message: "Setting the discriminator mapping on the parent class is not allowed."
+          summary: "The discriminator mapping on the class %{class_name} was attempted
+            to be changed. Changing the discriminator mapping on a child class is not
+            allowed."
+          resolution: "Try setting the discriminator mapping on one of %{class_name}'s 
+          descendants."
         invalid_expression_operator:
           message: "Invalid expression operator '%{operator}'."
           summary: "You misspelled an operator, are using an operator that
