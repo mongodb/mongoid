@@ -770,5 +770,92 @@ describe Mongoid::Traversable do
         end
       end
     end
+
+    context "when setting a field equal to discriminator key and duplicate_fields_exception is true" do
+      before do
+        Mongoid.duplicate_fields_exception = true
+
+        class DuplicateDiscriminatorKeyParent
+          include Mongoid::Document
+          field :dkey, type: String
+        end
+
+        class DuplicateDiscriminatorKeyChild < DuplicateDiscriminatorKeyParent
+        end
+      end
+
+      after do 
+        Mongoid.duplicate_fields_exception = false
+      end
+
+      it "does not raise an error" do
+        expect do 
+          DuplicateDiscriminatorKeyParent.discriminator_key = "dkey"
+        end.to_not raise_error
+      end
+    end
+
+    context "when the discriminator key conflicts with mongoid's internals" do
+      
+      after do 
+        Person.discriminator_key = nil
+      end
+
+      [:_association, :invalid].each do |meth|
+        context "when the field is named #{meth}" do
+
+          it "raises an error" do
+            expect {
+              Person.discriminator_key = meth
+            }.to raise_error(Mongoid::Errors::InvalidField)
+          end
+        end
+      end
+    end
+
+    context "when setting a field equal to global discriminator key and duplicate_fields_exception is true" do
+      before do
+        Mongoid.duplicate_fields_exception = true
+        Mongoid.discriminator_key = "dkey"
+
+        class GlobalDuplicateDiscriminatorKeyParent
+          include Mongoid::Document
+        end
+
+        class GlobalDuplicateDiscriminatorKeyChild < GlobalDuplicateDiscriminatorKeyParent
+        end
+      end
+
+      after do 
+        Mongoid.duplicate_fields_exception = false
+        Mongoid.discriminator_key = "_type"
+      end
+
+      it "raises an error" do
+        expect do 
+          GlobalDuplicateDiscriminatorKeyParent.class_eval do
+            field("dkey") 
+          end
+        end.to raise_error(Mongoid::Errors::InvalidField)
+      end
+    end
+
+    context "when the global discriminator key conflicts with mongoid's internals" do
+      
+      after do 
+        Mongoid.discriminator_key = "_type"
+      end
+
+      [:_association, :invalid].each do |meth|
+        context "when the field is named #{meth}" do
+
+          it "raises an error" do
+            expect do
+              Mongoid.discriminator_key = meth
+            end.to raise_error(Mongoid::Errors::InvalidField)
+          end
+        end
+      end
+    end
   end
 end
