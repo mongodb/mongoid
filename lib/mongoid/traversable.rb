@@ -52,9 +52,6 @@ module Mongoid
       end
 
       def discriminator_value=(value)
-        unless hereditary?
-          raise Errors::InvalidDiscriminatorValueTarget.new(self)
-        end
         value ||= self.to_s
         super
       end

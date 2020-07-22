@@ -890,14 +890,16 @@ describe Mongoid::Traversable do
         end
       end
 
-      it "raises an error" do 
-        expect do 
-          Instrument.discriminator_value = "musical thingy"
-        end.to raise_error(Mongoid::Errors::InvalidDiscriminatorValueTarget)
+      it "is changed in the parent" do 
+        expect(Instrument.discriminator_value).to eq("musical thingy")
       end
 
-      it "is not changed in the parent" do 
-        expect(Instrument.discriminator_value).to eq("Instrument")
+      it "is not changed in the child: Guitar" do 
+        expect(Guitar.discriminator_value).to eq("Guitar")
+      end
+
+      it "is not changed in the child: Piano" do 
+        expect(Piano.discriminator_value).to eq("Piano")
       end
     end
 
