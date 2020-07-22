@@ -62,7 +62,8 @@ module Mongoid
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
-      class_attribute :discriminator_mapping, default: self.to_s, instance_accessor: false
+      class_attribute :discriminator_mapping, instance_accessor: false
+      self.discriminator_mapping = self.to_s
       
       class << self
         delegate :discriminator_key, to: ::Mongoid
