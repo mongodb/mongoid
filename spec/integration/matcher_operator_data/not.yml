@@ -128,3 +128,45 @@
     position:
       $not: 42
   error: true
+
+- name: double negation - matching
+  document:
+    name: foo
+  query:
+    name:
+      $not:
+        $not:
+          $eq: foo
+  matches: true
+
+- name: double negation - not matching
+  document:
+    name: foo
+  query:
+    name:
+      $not:
+        $not:
+          $eq: bar
+  matches: false
+
+- name: triple negation - matching
+  document:
+    name: foo
+  query:
+    name:
+      $not:
+        $not:
+          $not:
+            $eq: bar
+  matches: true
+
+- name: triple negation - not matching
+  document:
+    name: foo
+  query:
+    name:
+      $not:
+        $not:
+          $not:
+            $eq: foo
+  matches: false
