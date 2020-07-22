@@ -26,11 +26,38 @@ describe Mongoid::Inspectable do
       end
 
       it "displays defined fields" do
-        expect(inspected).to include("title: \"CEO\"")
+        expect(inspected).to include(%q,title: "CEO",)
       end
 
       it "displays field aliases" do
         expect(inspected).to include("t(test):")
+      end
+
+      it "displays the default discriminator key" do 
+        expect(inspected).to include(%q,_type: "Person",)
+      end
+    end
+
+    context "when using a custom discriminator key" do
+
+      before do 
+        Person.discriminator_key = "dkey"
+      end
+
+      after do 
+        Person.discriminator_key = nil
+      end
+
+      let(:person) do
+        Person.new(title: "CEO")
+      end
+
+      let(:inspected) do
+        person.inspect
+      end
+
+      it "displays the new discriminator key" do 
+        expect(inspected).to include(%q,dkey: "Person",)
       end
     end
 
@@ -45,7 +72,7 @@ describe Mongoid::Inspectable do
       end
 
       it "includes dynamic attributes" do
-        expect(inspected).to include("some_attribute: \"foo\"")
+        expect(inspected).to include(%q,some_attribute: "foo",)
       end
     end
   end

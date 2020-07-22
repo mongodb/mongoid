@@ -233,8 +233,8 @@ module Mongoid
       became.errors.instance_variable_set(:@messages, errors.instance_variable_get(:@messages))
       became.instance_variable_set(:@new_record, new_record?)
       became.instance_variable_set(:@destroyed, destroyed?)
-      became.changed_attributes["_type"] = self.class.to_s
-      became._type = klass.to_s
+      became.changed_attributes[klass.discriminator_key] = self.class.to_s
+      became[klass.discriminator_key] = klass.to_s
 
       # mark embedded docs as persisted
       embedded_relations.each_pair do |name, meta|

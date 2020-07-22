@@ -207,7 +207,7 @@ module Mongoid
       #
       # @return [ Document ] A matching document or a new/created one.
       def find_or(method, attrs = {}, type = nil, &block)
-        attrs["_type"] = type.to_s if type
+        attrs[klass.discriminator_key] = type.to_s if type
         where(attrs).first || send(method, attrs, type, &block)
       end
     end

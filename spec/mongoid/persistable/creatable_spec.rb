@@ -143,29 +143,64 @@ describe Mongoid::Persistable::Creatable do
     end
 
     context "when the document is a subclass of a root class" do
+      context "when using the default discriminator key" do 
+        let!(:browser) do
+          Browser.create(version: 3, name: "Test")
+        end
 
-      let!(:browser) do
-        Browser.create(version: 3, name: "Test")
+        let(:collection) do
+          Canvas.collection
+        end
+
+        let(:attributes) do
+          collection.find({ name: "Test"}).first
+        end
+
+        it "persists the versions" do
+          expect(attributes["version"]).to eq(3)
+        end
+
+        it "persists the type" do
+          expect(attributes["_type"]).to eq("Browser")
+        end
+
+        it "persists the attributes" do
+          expect(attributes["name"]).to eq("Test")
+        end
       end
 
-      let(:collection) do
-        Canvas.collection
-      end
+      context "when using a custom discriminator key" do
+        before do 
+          Canvas.discriminator_key = "dkey"
+        end
+        
+        after do 
+          Canvas.discriminator_key = nil
+        end
 
-      let(:attributes) do
-        collection.find({ name: "Test"}).first
-      end
+        let!(:browser) do
+          Browser.create(version: 3, name: "Test")
+        end
 
-      it "persists the versions" do
-        expect(attributes["version"]).to eq(3)
-      end
+        let(:collection) do
+          Canvas.collection
+        end
 
-      it "persists the type" do
-        expect(attributes["_type"]).to eq("Browser")
-      end
+        let(:attributes) do
+          collection.find({ name: "Test"}).first
+        end
 
-      it "persists the attributes" do
-        expect(attributes["name"]).to eq("Test")
+        it "persists the versions" do
+          expect(attributes["version"]).to eq(3)
+        end
+
+        it "persists the new discriminator key" do
+          expect(attributes["dkey"]).to eq("Browser")
+        end
+
+        it "persists the attributes" do
+          expect(attributes["name"]).to eq("Test")
+        end
       end
     end
 
@@ -207,7 +242,7 @@ describe Mongoid::Persistable::Creatable do
         expect(Canvas.where(name: "Testy").first).to eq(firefox)
       end
 
-      it "returnss on of this subclasses if you find by _type" do
+      it "returns on of this subclasses if you find by _type" do
         expect(Canvas.where(:_type.in => ['Firefox']).count).to eq(1)
       end
     end
@@ -343,17 +378,45 @@ describe Mongoid::Persistable::Creatable do
       end
 
       context "#find_or_initialize_by" do
+        context "when using the default discriminator key" do
+          before do
+            container.vehicles.find_or_initialize_by({ driver_id: driver.id }, Car)
+          end
 
-        before do
-          container.vehicles.find_or_initialize_by({ driver_id: driver.id }, Car)
+          it "initializes the given type document" do
+            expect(container.vehicles.map(&:class)).to eq([ Car ])
+          end
+
+          it "initializes with the given attributes" do
+            expect(container.vehicles.map(&:driver)).to eq([ driver ])
+          end
+
+          it "initializes with a type field that equals the class" do 
+            expect(
+              container.vehicles.first.attributes["_type"]
+            ).to eq("Car")
+          end
         end
 
-        it "initializes the given type document" do
-          expect(container.vehicles.map(&:class)).to eq([ Car ])
-        end
+        context "when using a custom discriminator key" do
+          before do
+            Vehicle.discriminator_key = "dkey"
+            container.vehicles.find_or_initialize_by({ driver_id: driver.id }, Car)
+          end
 
-        it "initializes with the given attributes" do
-          expect(container.vehicles.map(&:driver)).to eq([ driver ])
+          it "initializes the given type document" do
+            expect(container.vehicles.map(&:class)).to eq([ Car ])
+          end
+
+          it "initializes with the given attributes" do
+            expect(container.vehicles.map(&:driver)).to eq([ driver ])
+          end
+
+          it "initializes with a dkey field that equals the class" do
+            expect(
+              container.vehicles.first.attributes["dkey"]
+            ).to eq("Car")
+          end
         end
       end
 

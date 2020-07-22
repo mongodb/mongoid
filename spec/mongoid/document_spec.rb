@@ -881,27 +881,42 @@ describe Mongoid::Document do
       end
 
       context "when no embedded documents are present" do
+        context "when using the default discriminator key" do 
+          let(:person) do
+            manager.becomes(Person)
+          end
 
-        let(:person) do
-          manager.becomes(Person)
+          it "copies attributes" do
+            expect(person.title).to eq('Sir')
+          end
+
+          it "keeps the same object id" do
+            expect(person.id).to eq(manager.id)
+          end
+
+          it "sets the class type" do
+            expect(person._type).to eq("Person")
+          end
+
+          it "raises an error when inappropriate class is provided" do
+            expect {
+              manager.becomes(String)
+            }.to raise_error(ArgumentError, /A class which includes Mongoid::Document is expected/)
+          end
         end
 
-        it "copies attributes" do
-          expect(person.title).to eq('Sir')
-        end
+        context "when using a custom discriminator key" do 
+          before do 
+            Person.discriminator_key = "dkey"
+          end
 
-        it "keeps the same object id" do
-          expect(person.id).to eq(manager.id)
-        end
+          after do 
+            Person.discriminator_key = nil
+          end
 
-        it "sets the class type" do
-          expect(person._type).to eq("Person")
-        end
-
-        it "raises an error when inappropriate class is provided" do
-          expect {
-            manager.becomes(String)
-          }.to raise_error(ArgumentError)
+          it "sets the class type with new discriminator key" do
+            expect(person.dkey).to eq("Person")
+          end
         end
       end
 
