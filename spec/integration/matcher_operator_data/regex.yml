@@ -1,3 +1,19 @@
+- name: string - matches
+  document:
+    title: King
+  query:
+    title:
+      $regex: K..g
+  matches: true
+
+- name: string - does not match
+  document:
+    title: Queen
+  query:
+    title:
+      $regex: K..g
+  matches: false
+
 - name: native regexp - matches
   document:
     title: King
