@@ -482,8 +482,8 @@ describe Mongoid::Findable do
   describe '.count' do 
     context 'when the collection is not empty' do 
       before do
-        Band.create(name: "Tool")
-        Band.create(name: "Photek")
+        Band.create!(name: "Tool")
+        Band.create!(name: "Photek")
       end
 
       it 'returns the currect count' do 
