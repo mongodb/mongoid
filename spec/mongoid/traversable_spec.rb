@@ -860,7 +860,7 @@ describe Mongoid::Traversable do
   end
 
   describe "#discriminator_value" do 
-    context "when the discriminator mapping is set on the child class" do 
+    context "when the discriminator value is set on the child class" do 
       before do
         Guitar.discriminator_value = "some string instrument"
       end
@@ -873,16 +873,16 @@ describe Mongoid::Traversable do
         expect(Guitar.discriminator_value).to eq("some string instrument")
       end
 
-      it "does not change the sibling's discriminator mapping" do 
+      it "does not change the sibling's discriminator value" do 
         expect(Piano.discriminator_value).to eq("Piano")
       end
 
-      it "does not change the parent's discriminator mapping" do 
+      it "does not change the parent's discriminator value" do 
         expect(Instrument.discriminator_value).to eq("Instrument")
       end
     end
 
-    context "when the discriminator mapping is set on the parent" do 
+    context "when the discriminator value is set on the parent" do 
       before do
         begin
           Instrument.discriminator_value = "musical thingy"
@@ -901,7 +901,7 @@ describe Mongoid::Traversable do
       end
     end
 
-    context "when setting the discriminator mapping to nil" do
+    context "when setting the discriminator value to nil" do
       before do 
         Guitar.discriminator_value = "some string instrument"
         Guitar.discriminator_value = nil
@@ -912,7 +912,7 @@ describe Mongoid::Traversable do
       end
     end
 
-    context "when setting discriminator mapping on parent that is also a child" do
+    context "when setting discriminator value on parent that is also a child" do
       before do 
         Browser.discriminator_value = "something"
       end
@@ -925,7 +925,7 @@ describe Mongoid::Traversable do
         expect(Browser.discriminator_value).to eq("something")
       end
 
-      it "doesn't set the grandchild's discriminator mapping" do 
+      it "doesn't set the grandchild's discriminator value" do 
         expect(Firefox.discriminator_value).to eq("Firefox")
       end
     end

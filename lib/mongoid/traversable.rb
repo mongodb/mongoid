@@ -22,7 +22,7 @@ module Mongoid
     # Module used for prepending to the discriminator_key= function
     #
     # @api private
-    module DiscriminatorKeyAndMappingAssignment
+    module DiscriminatorAssignment
       def discriminator_key=(value)
         if hereditary?
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
@@ -66,7 +66,7 @@ module Mongoid
       
       class << self
         delegate :discriminator_key, to: ::Mongoid
-        prepend DiscriminatorKeyAndMappingAssignment
+        prepend DiscriminatorAssignment
       end
     end
 

@@ -5,7 +5,7 @@ module Mongoid
   module Errors
 
     # Creates the exception raised when trying to set or get the 
-    # discriminator mapping on a parent class.
+    # discriminator value on a parent class.
     #
     # @param [ String ] class_name The class name.
     #
