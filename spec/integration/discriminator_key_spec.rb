@@ -159,4 +159,147 @@ describe "#discriminator_key" do
       end
     end
   end
+
+  context "documentation tests" do
+
+    context "Example 1" do
+      before do
+        class Example1Shape
+          include Mongoid::Document
+          field :x, type: Integer
+          field :y, type: Integer
+          embedded_in :canvas
+  
+          self.discriminator_key = "shape_type"
+        end
+  
+        class Example1Circle < Example1Shape
+          field :radius, type: Float
+        end
+  
+        class Example1Rectangle < Example1Shape
+          field :width, type: Float
+          field :height, type: Float
+        end
+      end
+  
+      let(:rectangle) do 
+        Example1Rectangle.new
+      end
+  
+      let(:circle) do 
+        Example1Circle.new
+      end
+  
+      it "has the new discriminator key: Rectangle" do 
+        expect(rectangle.shape_type).to eq("Example1Rectangle")
+      end
+  
+      it "does not have the default discriminator key: Rectangle" do
+        expect(defined?(rectangle._type)).to be nil
+      end
+  
+      it "has the new discriminator key: Circle" do 
+        expect(circle.shape_type).to eq("Example1Circle")
+      end
+  
+      it "does not have the default discriminator key: Circle" do
+        expect(defined?(circle._type)).to be nil
+      end
+    end
+  
+    context "Example 2" do
+      before do
+        class Example2Shape
+          include Mongoid::Document
+          field :x, type: Integer
+          field :y, type: Integer
+          embedded_in :canvas
+        end
+  
+        class Example2Circle < Example2Shape
+          field :radius, type: Float
+        end
+  
+        class Example2Rectangle < Example2Shape
+          field :width, type: Float
+          field :height, type: Float
+        end
+  
+        Example2Shape.discriminator_key = "shape_type"
+      end
+  
+      let(:rectangle) do 
+        Example2Rectangle.new
+      end
+  
+      let(:circle) do 
+        Example2Circle.new
+      end
+  
+      it "has the new discriminator key: Rectangle" do 
+        expect(rectangle.shape_type).to eq("Example2Rectangle")
+      end
+  
+      it "has default discriminator key: Rectangle" do
+        expect(rectangle._type).to eq("Example2Rectangle")
+      end
+  
+      it "has the new discriminator key: Circle" do 
+        expect(circle.shape_type).to eq("Example2Circle")
+      end
+  
+      it "has default discriminator key: Circle" do
+        expect(circle._type).to eq("Example2Circle")
+      end
+    end
+  
+    context "Example 3" do
+      before do
+  
+        Mongoid.discriminator_key = "shape_type"
+        
+        class Example3Shape
+          include Mongoid::Document
+          field :x, type: Integer
+          field :y, type: Integer
+          embedded_in :canvas
+        end
+  
+        class Example3Circle < Example3Shape
+          field :radius, type: Float
+        end
+  
+        class Example3Rectangle < Example3Shape
+          field :width, type: Float
+          field :height, type: Float
+        end
+  
+      end
+  
+      let(:rectangle) do 
+        Example3Rectangle.new
+      end
+  
+      let(:circle) do 
+        Example3Circle.new
+      end
+  
+      it "has the new discriminator key: Rectangle" do 
+        expect(rectangle.shape_type).to eq("Example3Rectangle")
+      end
+  
+      it "does not have the default discriminator key: Rectangle" do
+        expect(defined?(rectangle._type)).to be nil
+      end
+  
+      it "has the new discriminator key: Circle" do 
+        expect(circle.shape_type).to eq("Example3Circle")
+      end
+  
+      it "does not have the default discriminator key: Circle" do
+        expect(defined?(circle._type)).to be nil
+      end
+    end
+  end
 end
