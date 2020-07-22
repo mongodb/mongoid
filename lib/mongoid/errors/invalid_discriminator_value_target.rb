@@ -10,11 +10,11 @@ module Mongoid
     # @param [ String ] class_name The class name.
     #
     # @api private
-    class InvalidDiscriminatorMappingTarget < MongoidError
+    class InvalidDiscriminatorValueTarget < MongoidError
       def initialize(class_name)
         super(
           compose_message(
-            "invalid_discriminator_mapping_target",
+            "invalid_discriminator_value_target",
             { class_name: class_name }
           )
         )

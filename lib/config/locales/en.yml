@@ -115,7 +115,7 @@ en:
             allowed."
           resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
             ancestors."
-        invalid_discriminator_mapping_target:
+        invalid_discriminator_value_target:
           message: "Setting the discriminator mapping on the parent class is not allowed."
           summary: "The discriminator mapping on the class %{class_name} was attempted
             to be changed. Changing the discriminator mapping on a parent class is not

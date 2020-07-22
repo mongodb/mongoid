@@ -51,9 +51,9 @@ module Mongoid
         end
       end
 
-      def discriminator_mapping=(value)
+      def discriminator_value=(value)
         unless hereditary?
-          raise Errors::InvalidDiscriminatorMappingTarget.new(self)
+          raise Errors::InvalidDiscriminatorValueTarget.new(self)
         end
         value ||= self.to_s
         super
@@ -62,8 +62,7 @@ module Mongoid
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
-      class_attribute :discriminator_mapping, instance_accessor: false
-      self.discriminator_mapping = self.to_s
+      class_attribute :discriminator_value, default: self.to_s, instance_accessor: false
       
       class << self
         delegate :discriminator_key, to: ::Mongoid
@@ -255,7 +254,7 @@ module Mongoid
         subclass.pre_processed_defaults = pre_processed_defaults.dup
         subclass.post_processed_defaults = post_processed_defaults.dup
         subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
-        subclass.discriminator_mapping = subclass.to_s
+        subclass.discriminator_value = subclass.to_s
 
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
