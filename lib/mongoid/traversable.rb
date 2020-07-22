@@ -52,15 +52,16 @@ module Mongoid
       end
 
       def discriminator_value=(value)
-        value ||= self.to_s
+        value ||= self.name
         super
       end
     end
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
-      class_attribute :discriminator_value, default: self.to_s, instance_accessor: false
-      
+      class_attribute :discriminator_value, instance_accessor: false
+      self.discriminator_value = self.name
+
       class << self
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
@@ -251,7 +252,7 @@ module Mongoid
         subclass.pre_processed_defaults = pre_processed_defaults.dup
         subclass.post_processed_defaults = post_processed_defaults.dup
         subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
-        subclass.discriminator_value = subclass.to_s
+        subclass.discriminator_value = subclass.name
 
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
