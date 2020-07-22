@@ -276,6 +276,10 @@ describe "#discriminator_key" do
         end
   
       end
+
+      after do 
+        Mongoid.discriminator_key = "_type"
+      end
   
       let(:rectangle) do 
         Example3Rectangle.new
