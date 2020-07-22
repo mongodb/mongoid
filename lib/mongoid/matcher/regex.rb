@@ -9,10 +9,10 @@ module Mongoid
           condition
         when BSON::Regexp::Raw
           condition.compile
-        when String
-          Regexp.new(condition)
         else
-          raise Errors::InvalidQuery, "$regex requires a regular expression or a string argument: #{Errors::InvalidQuery.truncate_expr(condition)}"
+          # Note that strings must have been converted to a regular expression
+          # instance already (with $options taken into account, if provided).
+          raise Errors::InvalidQuery, "$regex requires a regular expression argument: #{Errors::InvalidQuery.truncate_expr(condition)}"
         end
 
         case value

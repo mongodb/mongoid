@@ -1,0 +1,72 @@
+- name: string with i option - matches
+  document:
+    title: King
+  query:
+    title:
+      $regex: k..g
+      $options: i
+  matches: true
+
+- name: string with i option - does not match
+  document:
+    title: King
+  query:
+    title:
+      $regex: kkkg
+      $options: i
+  matches: false
+
+- name: string with m option - matches
+  document:
+    title: "King\nSir"
+  query:
+    title:
+      $regex: ^Sir
+      $options: m
+  matches: true
+
+- name: string with m option - does not match
+  document:
+    title: "King\nSir"
+  query:
+    title:
+      $regex: ^ir
+      $options: m
+  matches: false
+
+- name: options given without regex
+  document:
+    title: King
+  query:
+    title:
+      $options: i
+  error: true
+
+- name: options are given first
+  document:
+    title: King
+  query:
+    title:
+      $options: i
+      $regex: k..g
+  matches: true
+
+- name: regex with i option - matches
+  document:
+    title: King
+  query:
+    title:
+      $regex: !ruby/regexp /k..g/
+      $options: i
+  matches: true
+  pending: https://jira.mongodb.org/browse/MONGOID-4936
+
+- name: regex with i option - does not match
+  document:
+    title: King
+  query:
+    title:
+      $regex: !ruby/regexp /kkkg/
+      $options: i
+  matches: false
+  pending: https://jira.mongodb.org/browse/MONGOID-4936
