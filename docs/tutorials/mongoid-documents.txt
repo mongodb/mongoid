@@ -1149,7 +1149,7 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
 
 Changing the Discriminator Key
 ------------------------------
-Mongoid now supports changing the discriminator key from the default ``_type``. There are a few
+Mongoid supports changing the discriminator key from the default ``_type``. There are a few
 cases where one might want to do this:
 
 1. For optimization: The user might want to use a shorter key like ``_t``.
