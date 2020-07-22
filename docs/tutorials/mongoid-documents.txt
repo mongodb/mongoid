@@ -1242,9 +1242,8 @@ use the globally set discriminator key instead of ``_type``. Take the above exam
 After setting the global discriminator key, all classes will use ``_the_type`` as
 the discriminator key and will not contain a ``_type`` field.
 
-Note that similarly to defining the discriminator key on the class level, when defining
-the discriminator key on the global level, it must be defined before the child class is defined
-for the new discriminator key to register in that class.
+Note that when defining the discriminator key on the global level, it must be set before the 
+child class is defined for the child class to use that global value.
 On the global level, however, if the user does not set the discriminator key before defining a child 
 class, the discriminator field will use the default ``_type`` and not the new global setting in
 that child class.
