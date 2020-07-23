@@ -257,7 +257,7 @@ module Mongoid
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?(self.discriminator_key)
-          default_proc = lambda { self.class.name }
+          default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
         end
       end
