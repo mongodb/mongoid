@@ -54,6 +54,7 @@ module Mongoid
 
       def discriminator_value=(value)
         value ||= self.name
+        add_discriminator_mapping(value)
         super
       end
     end
@@ -61,11 +62,37 @@ module Mongoid
     included do
       class_attribute :discriminator_key, instance_accessor: false
       class_attribute :discriminator_value, instance_accessor: false
-      self.discriminator_value = self.name
 
       class << self
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
+
+        # Add a discriminator mapping to the parent class. This mapping is used when
+        # receiving a document to identify its class.
+        #
+        # Should I use the class or the class name? Should I delete old values? 
+        #
+        # @api private
+        def add_discriminator_mapping(discriminator_value, class_name=self.name)
+          if hereditary?
+            superclass.add_discriminator_mapping(discriminator_value, class_name)
+          else
+            @discriminator_mappings ||= {}
+            @discriminator_mappings[discriminator_value] = class_name
+          end
+        end
+        
+        # Get the discriminator mapping from the parent class
+        #
+        # @api private
+        def get_discriminator_mapping(discriminator_value)
+          byebug
+          if hereditary?
+            superclass.get_discriminator_mapping(discriminator_value)
+          else
+            @discriminator_mappings[discriminator_value]
+          end
+        end
       end
     end
 
@@ -258,6 +285,7 @@ module Mongoid
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?(self.discriminator_key)
+          self.discriminator_value = self.name
           default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
         end
