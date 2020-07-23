@@ -1058,6 +1058,26 @@ describe Mongoid::Traversable do
           expect(firefox._type).to eq("Firefox")
         end
       end
+
+      context "when changing the discriminator key" do 
+        before do 
+          Instrument.discriminator_key = "dkey"
+          Guitar.discriminator_value = "string instrument"
+        end
+
+        after do 
+          Instrument.discriminator_key = nil
+          Guitar.discriminator_value = nil
+        end
+
+        let(:guitar) do 
+          Guitar.new
+        end
+
+        it "has the correct discriminator_value for the new discriminator_key" do
+          expect(guitar.dkey).to eq("string instrument")
+        end
+      end
     end
   end
 end
