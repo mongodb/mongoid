@@ -1077,6 +1077,10 @@ describe Mongoid::Traversable do
         it "has the correct discriminator_value for the new discriminator_key" do
           expect(guitar.dkey).to eq("string instrument")
         end
+
+        it "has the correct discriminator_value for the old discriminator_key" do
+          expect(guitar._type).to eq("string instrument")
+        end
       end
     end
   end
