@@ -136,13 +136,13 @@ describe Mongoid::Factory do
         end
       end
 
-      context "when using a custom discriminator key and value" do 
-        before do 
+      context "when using a custom discriminator key and value" do
+        before do
           Person.discriminator_key = "dkey"
           Doctor.discriminator_value = "dvalue"
         end
 
-        after do 
+        after do
           Person.discriminator_key = nil
           Doctor.discriminator_value = nil
         end
@@ -158,7 +158,7 @@ describe Mongoid::Factory do
         it "instantiates based on the provided class" do
           expect(doctor.title).to eq("Sir")
         end
-        
+
         it "generates based on the provided class" do
           expect(doctor).to be_a(Person)
         end
@@ -294,12 +294,12 @@ describe Mongoid::Factory do
       end
 
       context "when using a custom discriminator key and discriminator value" do
-        before do 
-          Person.discriminator_key = "dkey"          
+        before do
+          Person.discriminator_key = "dkey"
           Person.discriminator_value = "dvalue"
         end
 
-        after do 
+        after do
           Person.discriminator_key = nil
           Person.discriminator_value = nil
         end
@@ -349,7 +349,7 @@ describe Mongoid::Factory do
         Person.discriminator_value = "dvalue"
       end
 
-      after do 
+      after do
         Person.discriminator_value = nil
       end
 

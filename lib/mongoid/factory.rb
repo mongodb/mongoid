@@ -21,10 +21,10 @@ module Mongoid
     # @return [ Document ] The instantiated document.
     def build(klass, attributes = nil)
       attributes ||= {}
-      type = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
-      type = klass.get_discriminator_mapping(type).to_s
-      if type && klass._types.include?(type)
-        type.constantize.new(attributes)
+      dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
+      type = klass.get_discriminator_mapping(dvalue)
+      if type && klass._types.include?(type.to_s)
+        type.new(attributes)
       else
         klass.new(attributes)
       end
@@ -65,8 +65,8 @@ module Mongoid
         obj
       else
         constantized = klass.get_discriminator_mapping(type)
-        
-        unless constantized 
+
+        unless constantized
           camelized = type.camelize
 
           # Check if the class exists
@@ -76,7 +76,7 @@ module Mongoid
             raise Errors::UnknownModel.new(camelized, type)
           end
         end
-          
+
         # Check if the class is a Document class
         if !constantized.respond_to?(:instantiate)
           raise Errors::UnknownModel.new(camelized, type)
