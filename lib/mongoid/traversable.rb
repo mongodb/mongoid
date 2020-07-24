@@ -68,7 +68,7 @@ module Mongoid
         
         # @api private
         #
-        # @return [ Hash ] The current mapping of discriminator_values to classes
+        # @return [ Hash<String, Class> ] The current mapping of discriminator_values to classes
         attr_accessor :discriminator_mapping
       end
 
