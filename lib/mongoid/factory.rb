@@ -22,6 +22,7 @@ module Mongoid
     def build(klass, attributes = nil)
       attributes ||= {}
       type = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
+      type = klass.get_discriminator_mapping(type).to_s
       if type && klass._types.include?(type)
         type.constantize.new(attributes)
       else
@@ -63,15 +64,19 @@ module Mongoid
         end
         obj
       else
-        camelized = type.camelize
+        constantized = klass.get_discriminator_mapping(type)
+        
+        unless constantized 
+          camelized = type.camelize
 
-        # Check if the class exists
-        begin
-          constantized = camelized.constantize
-        rescue NameError
-          raise Errors::UnknownModel.new(camelized, type)
+          # Check if the class exists
+          begin
+            constantized = camelized.constantize
+          rescue NameError
+            raise Errors::UnknownModel.new(camelized, type)
+          end
         end
-
+          
         # Check if the class is a Document class
         if !constantized.respond_to?(:instantiate)
           raise Errors::UnknownModel.new(camelized, type)

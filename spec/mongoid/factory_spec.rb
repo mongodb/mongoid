@@ -135,6 +135,42 @@ describe Mongoid::Factory do
           end
         end
       end
+
+      context "when using a custom discriminator key and value" do 
+        before do 
+          Person.discriminator_key = "dkey"
+          Doctor.discriminator_value = "dvalue"
+        end
+
+        after do 
+          Person.discriminator_key = nil
+          Doctor.discriminator_value = nil
+        end
+
+        let(:attributes) do
+          { "title" => "Sir", "dkey" => "dvalue" }
+        end
+
+        let(:doctor) do
+          described_class.build(Person, attributes)
+        end
+
+        it "instantiates based on the provided class" do
+          expect(doctor.title).to eq("Sir")
+        end
+        
+        it "generates based on the provided class" do
+          expect(doctor).to be_a(Person)
+        end
+
+        it "sets the attributes" do
+          expect(doctor.title).to eq("Sir")
+        end
+
+        it "has the correct discriminator key/value" do
+          expect(doctor.dkey).to eq("dvalue")
+        end
+      end
     end
   end
 
@@ -256,6 +292,38 @@ describe Mongoid::Factory do
           expect(document.title).to eq("Sir")
         end
       end
+
+      context "when using a custom discriminator key and discriminator value" do
+        before do 
+          Person.discriminator_key = "dkey"          
+          Person.discriminator_value = "dvalue"
+        end
+
+        after do 
+          Person.discriminator_key = nil
+          Person.discriminator_value = nil
+        end
+
+        let(:attributes) do
+          { "title" => "Sir" }
+        end
+
+        let(:document) do
+          described_class.from_db(Person, attributes)
+        end
+
+        it "generates based on the provided class" do
+          expect(document).to be_a(Person)
+        end
+
+        it "sets the attributes" do
+          expect(document.title).to eq("Sir")
+        end
+
+        it "has the correct discriminator key/value" do
+          expect(document.dkey).to eq("dvalue")
+        end
+      end
     end
 
     context 'when type does not correspond to a Class name' do
@@ -274,6 +342,36 @@ describe Mongoid::Factory do
         }.to raise_exception(Mongoid::Errors::UnknownModel)
       end
 
+    end
+
+    context 'when type does not correspond to a custom discriminator_value' do
+      before do
+        Person.discriminator_value = "dvalue"
+      end
+
+      after do 
+        Person.discriminator_value = nil
+      end
+
+      let(:attributes) do
+        { "title" => "Sir", "_type" => "dvalue" }
+      end
+
+      let(:person) do
+        described_class.from_db(Person, attributes)
+      end
+
+      it "generates based on the provided class" do
+        expect(person).to be_a(Person)
+      end
+
+      it "sets the attributes" do
+        expect(person.title).to eq("Sir")
+      end
+
+      it "has the correct discriminator key/value" do
+        expect(person._type).to eq("dvalue")
+      end
     end
 
     context 'when type is correct but the instantiation raises a NoMethodError' do

@@ -93,7 +93,7 @@ module Mongoid
       #
       # @api private
       def self.get_discriminator_mapping(value)
-        self.discriminator_mapping[value]
+        self.discriminator_mapping[value] if self.discriminator_mapping
       end
     end
 
