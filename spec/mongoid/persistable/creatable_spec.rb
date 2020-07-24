@@ -190,16 +190,36 @@ describe Mongoid::Persistable::Creatable do
           collection.find({ name: "Test"}).first
         end
 
-        it "persists the versions" do
-          expect(attributes["version"]).to eq(3)
-        end
-
         it "persists the new discriminator key" do
           expect(attributes["dkey"]).to eq("Browser")
         end
+      end
 
-        it "persists the attributes" do
-          expect(attributes["name"]).to eq("Test")
+      context "when using a custom discriminator key and discriminator value" do
+        before do 
+          Canvas.discriminator_key = "dkey"
+          Browser.discriminator_value = "dvalue"
+        end
+        
+        after do 
+          Canvas.discriminator_key = nil
+          Canvas.discriminator_value = nil
+        end
+
+        let!(:browser) do
+          Browser.create(version: 3, name: "Test")
+        end
+
+        let(:collection) do
+          Canvas.collection
+        end
+
+        let(:attributes) do
+          collection.find({ name: "Test"}).first
+        end
+
+        it "persists the new discriminator key" do
+          expect(attributes["dkey"]).to eq("dvalue")
         end
       end
     end
