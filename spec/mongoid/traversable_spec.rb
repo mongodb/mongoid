@@ -1002,19 +1002,19 @@ describe Mongoid::Traversable do
         it "retrieves the correct discriminator_mapping from the parent" do 
           expect(
             Instrument.get_discriminator_mapping("some string instrument")
-          ).to eq("Guitar")
+          ).to eq(Guitar)
         end
   
         it "retrieves the correct discriminator_mapping from the child: Guitar" do 
           expect(
             Guitar.get_discriminator_mapping("some string instrument")
-          ).to eq("Guitar")
+          ).to eq(Guitar)
         end
   
-        it "retrieves the correct discriminator_mapping from the child: Piano" do 
+        it "is not retrieved from the sibling" do 
           expect(
             Piano.get_discriminator_mapping("some string instrument")
-          ).to eq("Guitar")
+          ).to be nil
         end
       end
   
@@ -1042,19 +1042,19 @@ describe Mongoid::Traversable do
         it "retrieves the correct discriminator_mapping from the parent" do 
           expect(
             Instrument.get_discriminator_mapping("musical thingy")
-          ).to eq("Instrument")
+          ).to eq(Instrument)
         end
   
-        it "retrieves the correct discriminator_mapping from the child: Guitar" do 
+        it "is not retrieved from the child: Guitar" do 
           expect(
             Guitar.get_discriminator_mapping("musical thingy")
-          ).to eq("Instrument")
+          ).to be nil
         end
   
-        it "retrieves the correct discriminator_mapping from the child: Piano" do 
+        it "is not retrieved from the child: Piano" do 
           expect(
             Piano.get_discriminator_mapping("musical thingy")
-          ).to eq("Instrument")
+          ).to be nil
         end
       end
   
@@ -1071,13 +1071,13 @@ describe Mongoid::Traversable do
         it "retrieves the correct discriminator_mapping" do 
           expect(
             Instrument.get_discriminator_mapping("Guitar")
-          ).to eq("Guitar")
+          ).to eq(Guitar)
         end
 
         it "retrieves the old discriminator_mapping" do 
           expect(
             Instrument.get_discriminator_mapping("some string instrument")
-          ).to eq("Guitar")
+          ).to eq(Guitar)
         end
       end
   
@@ -1109,19 +1109,19 @@ describe Mongoid::Traversable do
         it "retrieves the correct discriminator_mapping from the grandparent" do 
           expect(
             Canvas.get_discriminator_mapping("something")
-          ).to eq("Browser")
+          ).to eq(Browser)
         end
   
         it "retrieves the correct discriminator_mapping from the parent" do 
           expect(
             Browser.get_discriminator_mapping("something")
-          ).to eq("Browser")
+          ).to eq(Browser)
         end
   
-        it "retrieves the correct discriminator_mapping from the grandchild" do 
+        it "is not retrieved from the grandchild" do 
           expect(
             Firefox.get_discriminator_mapping("something")
-          ).to eq("Browser")
+          ).to be nil
         end
       end
 
@@ -1151,19 +1151,19 @@ describe Mongoid::Traversable do
         it "retrieves the correct discriminator_mapping from the parent" do 
           expect(
             Instrument.get_discriminator_mapping("string instrument")
-          ).to eq("Guitar")
+          ).to eq(Guitar)
         end
   
         it "retrieves the correct discriminator_mapping from the child: Guitar" do 
           expect(
             Guitar.get_discriminator_mapping("string instrument")
-          ).to eq("Guitar")
+          ).to eq(Guitar)
         end
   
-        it "retrieves the correct discriminator_mapping from the child: Piano" do 
+        it "is not retrieved from the sibling" do 
           expect(
             Piano.get_discriminator_mapping("string instrument")
-          ).to eq("Guitar")
+          ).to be nil
         end
       end
 
@@ -1192,48 +1192,48 @@ describe Mongoid::Traversable do
         it "retrieves the correct discriminator_mapping from the parent" do 
           expect(
             Instrument.get_discriminator_mapping("musical thingy")
-          ).to eq("Instrument")
+          ).to eq(Instrument)
         end
   
-        it "retrieves the correct discriminator_mapping from the child: Guitar" do 
+        it "is not retrieved from the child: Guitar" do 
           expect(
             Guitar.get_discriminator_mapping("musical thingy")
-          ).to eq("Instrument")
+          ).to be nil
         end
   
-        it "retrieves the correct discriminator_mapping from the child: Piano" do 
+        it "ris not retrieved from the child: Piano" do 
           expect(
             Piano.get_discriminator_mapping("musical thingy")
-          ).to eq("Instrument")
+          ).to be nil
         end
       end
     end
   end
   
-  describe "#add_discriminator_mapping/get_discriminator_mapping" do 
+  describe "#discriminator_mapping" do 
     context "when not changing discriminator_mappings" do 
       it "has the class name as the value: Instrument" do 
         expect(
           Instrument.get_discriminator_mapping("Instrument")
-        ).to eq("Instrument")
+        ).to eq(Instrument)
       end
 
       it "has the class name as the value: Guitar" do 
         expect(
           Guitar.get_discriminator_mapping("Guitar")
-        ).to eq("Guitar")
+        ).to eq(Guitar)
       end
 
       it "has the class name as the value: Piano" do 
         expect(
           Piano.get_discriminator_mapping("Piano")
-        ).to eq("Piano")
+        ).to eq(Piano)
       end
     end
 
     context "when adding to the parent" do 
-      before do 
-        Instrument.add_discriminator_mapping("something") 
+      before do
+        Instrument.add_discriminator_mapping("some_dmap") 
       end
 
       after do 
@@ -1242,20 +1242,20 @@ describe Mongoid::Traversable do
 
       it "can be retrieved from the parent" do 
         expect(
-          Instrument.get_discriminator_mapping("something")
-        ).to eq("Instrument")
+          Instrument.get_discriminator_mapping("some_dmap")
+        ).to eq(Instrument)
       end
 
       it "can be retrieved from the child: Guitar" do 
         expect(
-          Guitar.get_discriminator_mapping("something")
-        ).to eq("Instrument")
+          Guitar.get_discriminator_mapping("some_dmap")
+        ).to be nil
       end
 
       it "can be retrieved from the child: Piano" do 
         expect(
-          Piano.get_discriminator_mapping("something")
-        ).to eq("Instrument")
+          Piano.get_discriminator_mapping("some_dmap")
+        ).to be nil
       end
     end
 
@@ -1271,19 +1271,19 @@ describe Mongoid::Traversable do
       it "can be retrieved from the parent" do 
         expect(
           Instrument.get_discriminator_mapping("something")
-        ).to eq("Guitar")
+        ).to eq(Guitar)
       end
 
       it "can be retrieved from the child: Guitar" do 
         expect(
           Guitar.get_discriminator_mapping("something")
-        ).to eq("Guitar")
+        ).to eq(Guitar)
       end
 
-      it "can be retrieved from the child: Piano" do 
+      it "is not retrieved from the sibling" do 
         expect(
           Piano.get_discriminator_mapping("something")
-        ).to eq("Guitar")
+        ).to be nil
       end
     end
 
@@ -1300,37 +1300,37 @@ describe Mongoid::Traversable do
       it "retrieves the new value from the parent" do 
         expect(
           Instrument.get_discriminator_mapping("something else")
-        ).to eq("Guitar")
+        ).to eq(Guitar)
       end
 
       it "retrieves the new value from the child: Guitar" do 
         expect(
           Guitar.get_discriminator_mapping("something else")
-        ).to eq("Guitar")
+        ).to eq(Guitar)
       end
 
-      it "retrieves the new value from the child: Piano" do 
+      it "is not retrieved from the sibling" do 
         expect(
           Piano.get_discriminator_mapping("something else")
-        ).to eq("Guitar")
+        ).to be nil
       end
 
       it "retrieves the old value from the parent" do 
         expect(
           Instrument.get_discriminator_mapping("something")
-        ).to eq("Guitar")
+        ).to eq(Guitar)
       end
 
       it "retrieves the old value from the child: Guitar" do 
         expect(
           Guitar.get_discriminator_mapping("something")
-        ).to eq("Guitar")
+        ).to eq(Guitar)
       end
 
-      it "retrieves the old value from the child: Piano" do 
+      it "does not retrieves the old value from the sibling" do 
         expect(
           Piano.get_discriminator_mapping("something")
-        ).to eq("Guitar")
+        ).to be nil
       end
     end
   end

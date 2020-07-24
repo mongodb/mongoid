@@ -19,8 +19,7 @@ module Mongoid
       @__parent = p
     end
 
-    # Module used for prepending to the discriminator_key= function
-    # and the discriminator_value= function
+    # Module used for prepending to the various discriminator_*= methods
     # 
     # @api private
     module DiscriminatorAssignment
@@ -62,37 +61,30 @@ module Mongoid
     included do
       class_attribute :discriminator_key, instance_accessor: false
       class_attribute :discriminator_value, instance_accessor: false
-
+            
       class << self
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
-
-        # Add a discriminator mapping to the parent class. This mapping is used when
-        # receiving a document to identify its class.
-        #
-        # Should I use the class or the class name? Should I delete old values? 
-        #
-        # @api private
-        def add_discriminator_mapping(discriminator_value, class_name=self.name)
-          if hereditary?
-            superclass.add_discriminator_mapping(discriminator_value, class_name)
-          else
-            @discriminator_mappings ||= {}
-            @discriminator_mappings[discriminator_value] = class_name
-          end
-        end
         
-        # Get the discriminator mapping from the parent class
-        #
         # @api private
-        def get_discriminator_mapping(discriminator_value)
-          byebug
-          if hereditary?
-            superclass.get_discriminator_mapping(discriminator_value)
-          else
-            @discriminator_mappings[discriminator_value]
-          end
-        end
+        attr_accessor :discriminator_mapping
+      end
+
+      # Add a discriminator mapping to the parent class. This mapping is used when
+      # receiving a document to identify its class.
+      #
+      # @api private
+      def self.add_discriminator_mapping(value, klass=self)
+        self.discriminator_mapping ||= {}
+        self.discriminator_mapping[value] = klass
+        superclass.add_discriminator_mapping(value, klass) if hereditary?
+      end
+      
+      # Get the discriminator mapping from the parent class
+      #
+      # @api private
+      def self.get_discriminator_mapping(value)
+        self.discriminator_mapping[value]
       end
     end
 
