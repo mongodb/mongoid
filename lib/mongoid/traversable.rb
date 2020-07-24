@@ -20,7 +20,8 @@ module Mongoid
     end
 
     # Module used for prepending to the discriminator_key= function
-    #
+    # and the discriminator_value= function
+    # 
     # @api private
     module DiscriminatorAssignment
       def discriminator_key=(value)
@@ -46,7 +47,7 @@ module Mongoid
         # This condition also checks if the class has any descendants, because
         # if it doesn't then it doesn't need a discriminator key. 
         if !fields.has_key?(self.discriminator_key) && !descendants.empty?
-          default_proc = lambda { self.class.name }
+          default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
         end
       end
@@ -257,7 +258,7 @@ module Mongoid
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?(self.discriminator_key)
-          default_proc = lambda { self.class.name }
+          default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
         end
       end
