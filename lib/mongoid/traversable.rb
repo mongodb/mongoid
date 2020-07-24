@@ -67,11 +67,16 @@ module Mongoid
         prepend DiscriminatorAssignment
         
         # @api private
+        #
+        # @return [ Hash ] The current mapping of discriminator_values to classes
         attr_accessor :discriminator_mapping
       end
 
       # Add a discriminator mapping to the parent class. This mapping is used when
       # receiving a document to identify its class.
+      #
+      # @param [ String ] value The discriminator_value that was just set
+      # @param [ Class ] The class the discriminator_value was set on
       #
       # @api private
       def self.add_discriminator_mapping(value, klass=self)
@@ -81,6 +86,10 @@ module Mongoid
       end
       
       # Get the discriminator mapping from the parent class
+      #
+      # @param [ String ] value The discriminator_value to retrieve
+      #
+      # @return [ Class ] klass The class corresponding to the given discriminator_value
       #
       # @api private
       def self.get_discriminator_mapping(value)
