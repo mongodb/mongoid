@@ -20,6 +20,10 @@ describe Mongoid::Serializable do
         Instrument.discriminator_key = "dkey"
       end
 
+      after do 
+        Instrument.discriminator_key = nil
+      end
+
       let(:guitar) do
         Guitar.new
       end
