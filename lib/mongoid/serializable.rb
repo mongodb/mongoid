@@ -80,7 +80,7 @@ module Mongoid
 
       only = Array.wrap(options[:only]).map(&:to_s)
       except = Array.wrap(options[:except]).map(&:to_s)
-      except |= ['_type'] unless Mongoid.include_type_for_serialization
+      except |= [self.class.discriminator_key] unless Mongoid.include_type_for_serialization
 
       if !only.empty?
         names &= only

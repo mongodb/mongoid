@@ -353,6 +353,83 @@ describe Mongoid::Copyable do
             end
           end
         end
+
+        context "when using a custom discriminator_key" do
+          before do 
+            Person.discriminator_key = "dkey"
+          end
+
+          after do 
+            Person.discriminator_key = nil
+          end
+
+          let(:copy) do
+            person.send(method)
+          end
+
+          before do
+            person[:versions] = [ { number: 1 } ]
+          end
+
+          it "copys embeds many documents" do
+            expect(copy.addresses).to eq(person.addresses)
+          end
+
+          it "copys deep embeds many documents" do
+            expect(copy.name.translations).to eq(person.name.translations)
+          end
+
+          it "sets the embedded many documents as new" do
+            expect(copy.addresses.first).to be_new_record
+          end
+
+          it "sets the deep embedded many documents as new" do
+            expect(copy.name.translations.first).to be_new_record
+          end
+
+          it "creates new embeds many instances" do
+            expect(copy.addresses).to_not equal(person.addresses)
+          end
+
+          it "creates new deep embeds many instances" do
+            expect(copy.name.translations).to_not equal(person.name.translations)
+          end
+
+          it "copys embeds one documents" do
+            expect(copy.name).to eq(person.name)
+          end
+
+          it "flags the embeds one documents as new" do
+            expect(copy.name).to be_new_record
+          end
+
+          it "creates a new embeds one instance" do
+            expect(copy.name).to_not equal(person.name)
+          end
+
+          context "when saving the copy" do
+
+            let(:reloaded) do
+              copy.reload
+            end
+
+            before do
+              copy.save(validate: false)
+            end
+
+            it "persists the attributes" do
+              expect(reloaded.title).to eq("Sir")
+            end
+
+            it "persists the embeds many relation" do
+              expect(reloaded.addresses).to eq(person.addresses)
+            end
+
+            it "persists the embeds one relation" do
+              expect(reloaded.name).to eq(person.name)
+            end
+          end
+        end
       end
 
       context "when the document is not new" do

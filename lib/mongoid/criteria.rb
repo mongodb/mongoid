@@ -379,7 +379,7 @@ module Mongoid
     #
     # @return [ Criteria ] The cloned criteria.
     def type(types)
-      any_in(_type: Array(types))
+      any_in(self.discriminator_key.to_sym => Array(types))
     end
 
     # This is the general entry point for most MongoDB queries. This either
@@ -572,9 +572,9 @@ module Mongoid
     def type_selection
       klasses = klass._types
       if klasses.size > 1
-        { _type: { "$in" => klass._types }}
+        { klass.discriminator_key.to_sym => { "$in" => klass._types }}
       else
-        { _type: klass._types[0] }
+        { klass.discriminator_key.to_sym => klass._types[0] }
       end
     end
 

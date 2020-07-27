@@ -82,8 +82,8 @@ module Mongoid
       #
       # @since 1.0.0
       def add_indexes
-        if hereditary? && !index_keys.include?(_type: 1)
-          index({ _type: 1 }, unique: false, background: true)
+        if hereditary? && !index_keys.include?(self.discriminator_key.to_sym => 1)
+          index({ self.discriminator_key.to_sym => 1 }, unique: false, background: true)
         end
         true
       end

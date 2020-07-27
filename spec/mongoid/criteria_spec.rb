@@ -3429,34 +3429,75 @@ describe Mongoid::Criteria do
   end
 
   describe "#type" do
+    context "when using the default discriminator_key" do 
+      context "when the type is a string" do
 
-    context "when the type is a string" do
+        let!(:browser) do
+          Browser.create
+        end
 
-      let!(:browser) do
-        Browser.create
+        let(:criteria) do
+          Canvas.all.type("Browser")
+        end
+
+        it "returns documents with the provided type" do
+          expect(criteria).to eq([ browser ])
+        end
       end
 
-      let(:criteria) do
-        Canvas.all.type("Browser")
-      end
+      context "when the type is an Array of type" do
 
-      it "returns documents with the provided type" do
-        expect(criteria).to eq([ browser ])
+        let!(:browser) do
+          Firefox.create
+        end
+
+        let(:criteria) do
+          Canvas.all.type([ "Browser", "Firefox" ])
+        end
+
+        it "returns documents with the provided types" do
+          expect(criteria).to eq([ browser ])
+        end
       end
     end
 
-    context "when the type is an Array of type" do
-
-      let!(:browser) do
-        Firefox.create
+    context "when using a custom discriminator_key" do 
+      before do 
+        Canvas.discriminator_key = "dkey"
       end
 
-      let(:criteria) do
-        Canvas.all.type([ "Browser", "Firefox" ])
+      after do 
+        Canvas.discriminator_key = nil
       end
 
-      it "returns documents with the provided types" do
-        expect(criteria).to eq([ browser ])
+      context "when the type is a string" do
+
+        let!(:browser) do
+          Browser.create
+        end
+
+        let(:criteria) do
+          Canvas.all.type("Browser")
+        end
+
+        it "returns documents with the provided type" do
+          expect(criteria).to eq([ browser ])
+        end
+      end
+
+      context "when the type is an Array of type" do
+
+        let!(:browser) do
+          Firefox.create
+        end
+
+        let(:criteria) do
+          Canvas.all.type([ "Browser", "Firefox" ])
+        end
+
+        it "returns documents with the provided types" do
+          expect(criteria).to eq([ browser ])
+        end
       end
     end
   end
@@ -3874,36 +3915,77 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#type_selection" do
+  describe "#type_selection", :focus do
+    context "when using the default discriminator_key" do 
+      context "when only one subclass exists" do
 
-    context "when only one subclass exists" do
+        let(:criteria) do
+          described_class.new(Firefox)
+        end
 
-      let(:criteria) do
-        described_class.new(Firefox)
+        let(:selection) do
+          criteria.send(:type_selection)
+        end
+
+        it "does not use an $in query" do
+          expect(selection).to eq({ _type: "Firefox" })
+        end
       end
 
-      let(:selection) do
-        criteria.send(:type_selection)
-      end
+      context "when more than one subclass exists" do
 
-      it "does not use an $in query" do
-        expect(selection).to eq({ _type: "Firefox" })
+        let(:criteria) do
+          described_class.new(Browser)
+        end
+
+        let(:selection) do
+          criteria.send(:type_selection)
+        end
+
+        it "does not use an $in query" do
+          expect(selection).to eq({ _type: { "$in" => [ "Firefox", "Browser" ]}})
+        end
       end
     end
 
-    context "when more than one subclass exists" do
-
-      let(:criteria) do
-        described_class.new(Browser)
+    context "when using a custom discriminator_key" do 
+      before do 
+        Canvas.discriminator_key = "dkey"
       end
 
-      let(:selection) do
-        criteria.send(:type_selection)
+      after do 
+        Canvas.discriminator_key = nil
       end
 
-      it "does not use an $in query" do
-        expect(selection).to eq({ _type: { "$in" => [ "Firefox", "Browser" ]}})
+      context "when only one subclass exists" do
+
+        let(:criteria) do
+          described_class.new(Firefox)
+        end
+
+        let(:selection) do
+          criteria.send(:type_selection)
+        end
+
+        it "does not use an $in query" do
+          expect(selection).to eq({ dkey: "Firefox" })
+        end
       end
-    end
+
+      context "when more than one subclass exists" do
+
+        let(:criteria) do
+          described_class.new(Browser)
+        end
+
+        let(:selection) do
+          criteria.send(:type_selection)
+        end
+
+        it "does not use an $in query" do
+          expect(selection).to eq({ dkey: { "$in" => [ "Firefox", "Browser" ]}})
+        end
+      end
+    end    
   end
 end
