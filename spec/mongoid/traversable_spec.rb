@@ -998,6 +998,24 @@ describe Mongoid::Traversable do
         it "does not change the parent's discriminator value" do 
           expect(instrument._type).to eq("Instrument")
         end
+
+        it "retrieves the correct discriminator_mapping from the parent" do 
+          expect(
+            Instrument.get_discriminator_mapping("some string instrument")
+          ).to eq(Guitar)
+        end
+  
+        it "retrieves the correct discriminator_mapping from the child: Guitar" do 
+          expect(
+            Guitar.get_discriminator_mapping("some string instrument")
+          ).to eq(Guitar)
+        end
+  
+        it "is not retrieved from the sibling" do 
+          expect(
+            Piano.get_discriminator_mapping("some string instrument")
+          ).to be nil
+        end
       end
   
       context "when the discriminator value is set on the parent" do 
@@ -1020,6 +1038,24 @@ describe Mongoid::Traversable do
         it "is not changed in the child: Piano" do 
           expect(piano._type).to eq("Piano")
         end
+
+        it "retrieves the correct discriminator_mapping from the parent" do 
+          expect(
+            Instrument.get_discriminator_mapping("musical thingy")
+          ).to eq(Instrument)
+        end
+  
+        it "is not retrieved from the child: Guitar" do 
+          expect(
+            Guitar.get_discriminator_mapping("musical thingy")
+          ).to be nil
+        end
+  
+        it "is not retrieved from the child: Piano" do 
+          expect(
+            Piano.get_discriminator_mapping("musical thingy")
+          ).to be nil
+        end
       end
   
       context "when setting the discriminator value to nil" do
@@ -1030,6 +1066,18 @@ describe Mongoid::Traversable do
   
         it "reverts back to default" do
           expect(guitar._type).to eq("Guitar")
+        end
+
+        it "retrieves the correct discriminator_mapping" do 
+          expect(
+            Instrument.get_discriminator_mapping("Guitar")
+          ).to eq(Guitar)
+        end
+
+        it "retrieves the old discriminator_mapping" do 
+          expect(
+            Instrument.get_discriminator_mapping("some string instrument")
+          ).to eq(Guitar)
         end
       end
   
@@ -1057,6 +1105,24 @@ describe Mongoid::Traversable do
         it "doesn't set the grandchild's discriminator value" do 
           expect(firefox._type).to eq("Firefox")
         end
+
+        it "retrieves the correct discriminator_mapping from the grandparent" do 
+          expect(
+            Canvas.get_discriminator_mapping("something")
+          ).to eq(Browser)
+        end
+  
+        it "retrieves the correct discriminator_mapping from the parent" do 
+          expect(
+            Browser.get_discriminator_mapping("something")
+          ).to eq(Browser)
+        end
+  
+        it "is not retrieved from the grandchild" do 
+          expect(
+            Firefox.get_discriminator_mapping("something")
+          ).to be nil
+        end
       end
 
       context "when changing the discriminator key" do 
@@ -1081,6 +1147,190 @@ describe Mongoid::Traversable do
         it "has the correct discriminator_value for the old discriminator_key" do
           expect(guitar._type).to eq("string instrument")
         end
+
+        it "retrieves the correct discriminator_mapping from the parent" do 
+          expect(
+            Instrument.get_discriminator_mapping("string instrument")
+          ).to eq(Guitar)
+        end
+  
+        it "retrieves the correct discriminator_mapping from the child: Guitar" do 
+          expect(
+            Guitar.get_discriminator_mapping("string instrument")
+          ).to eq(Guitar)
+        end
+  
+        it "is not retrieved from the sibling" do 
+          expect(
+            Piano.get_discriminator_mapping("string instrument")
+          ).to be nil
+        end
+      end
+
+      context "when the discriminator value is set twice" do 
+        before do
+          Instrument.discriminator_value = "something"
+          Instrument.discriminator_value = "musical thingy"
+        end
+  
+        after do
+          Instrument.discriminator_value = nil
+        end
+
+        it "is changed in the parent" do 
+          expect(instrument._type).to eq("musical thingy")
+        end
+  
+        it "is not changed in the child: Guitar" do 
+          expect(guitar._type).to eq("Guitar")
+        end
+  
+        it "is not changed in the child: Piano" do 
+          expect(piano._type).to eq("Piano")
+        end
+
+        it "retrieves the correct discriminator_mapping from the parent" do 
+          expect(
+            Instrument.get_discriminator_mapping("musical thingy")
+          ).to eq(Instrument)
+        end
+  
+        it "is not retrieved from the child: Guitar" do 
+          expect(
+            Guitar.get_discriminator_mapping("musical thingy")
+          ).to be nil
+        end
+  
+        it "ris not retrieved from the child: Piano" do 
+          expect(
+            Piano.get_discriminator_mapping("musical thingy")
+          ).to be nil
+        end
+      end
+    end
+  end
+  
+  describe "#discriminator_mapping" do 
+    context "when not changing discriminator_mappings" do 
+      it "has the class name as the value: Instrument" do 
+        expect(
+          Instrument.get_discriminator_mapping("Instrument")
+        ).to eq(Instrument)
+      end
+
+      it "has the class name as the value: Guitar" do 
+        expect(
+          Guitar.get_discriminator_mapping("Guitar")
+        ).to eq(Guitar)
+      end
+
+      it "has the class name as the value: Piano" do 
+        expect(
+          Piano.get_discriminator_mapping("Piano")
+        ).to eq(Piano)
+      end
+    end
+
+    context "when adding to the parent" do 
+      before do
+        Instrument.add_discriminator_mapping("some_dmap") 
+      end
+
+      after do 
+        Instrument.add_discriminator_mapping("Instrument")
+      end
+
+      it "can be retrieved from the parent" do 
+        expect(
+          Instrument.get_discriminator_mapping("some_dmap")
+        ).to eq(Instrument)
+      end
+
+      it "can be retrieved from the child: Guitar" do 
+        expect(
+          Guitar.get_discriminator_mapping("some_dmap")
+        ).to be nil
+      end
+
+      it "can be retrieved from the child: Piano" do 
+        expect(
+          Piano.get_discriminator_mapping("some_dmap")
+        ).to be nil
+      end
+    end
+
+    context "when adding to the child" do 
+      before do 
+        Guitar.add_discriminator_mapping("something") 
+      end
+
+      after do 
+        Guitar.add_discriminator_mapping("Guitar")
+      end
+
+      it "can be retrieved from the parent" do 
+        expect(
+          Instrument.get_discriminator_mapping("something")
+        ).to eq(Guitar)
+      end
+
+      it "can be retrieved from the child: Guitar" do 
+        expect(
+          Guitar.get_discriminator_mapping("something")
+        ).to eq(Guitar)
+      end
+
+      it "is not retrieved from the sibling" do 
+        expect(
+          Piano.get_discriminator_mapping("something")
+        ).to be nil
+      end
+    end
+
+    context "when adding to the same class twice" do 
+      before do 
+        Guitar.add_discriminator_mapping("something") 
+        Guitar.add_discriminator_mapping("something else") 
+      end
+
+      after do 
+        Guitar.add_discriminator_mapping("Guitar")
+      end
+
+      it "retrieves the new value from the parent" do 
+        expect(
+          Instrument.get_discriminator_mapping("something else")
+        ).to eq(Guitar)
+      end
+
+      it "retrieves the new value from the child: Guitar" do 
+        expect(
+          Guitar.get_discriminator_mapping("something else")
+        ).to eq(Guitar)
+      end
+
+      it "is not retrieved from the sibling" do 
+        expect(
+          Piano.get_discriminator_mapping("something else")
+        ).to be nil
+      end
+
+      it "retrieves the old value from the parent" do 
+        expect(
+          Instrument.get_discriminator_mapping("something")
+        ).to eq(Guitar)
+      end
+
+      it "retrieves the old value from the child: Guitar" do 
+        expect(
+          Guitar.get_discriminator_mapping("something")
+        ).to eq(Guitar)
+      end
+
+      it "does not retrieves the old value from the sibling" do 
+        expect(
+          Piano.get_discriminator_mapping("something")
+        ).to be nil
       end
     end
   end
