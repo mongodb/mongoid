@@ -101,3 +101,14 @@
     position:
       $nin: 42
   error: true
+
+- name: matching range
+  document:
+    age: 10
+  query:
+    age:
+      $nin: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  error: true

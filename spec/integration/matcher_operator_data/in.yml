@@ -181,3 +181,14 @@
     position:
       $in: 42
   error: true
+
+- name: matching range
+  document:
+    age: 10
+  query:
+    age:
+      $in: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  error: true

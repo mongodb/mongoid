@@ -127,3 +127,14 @@
     products:
       $all: [~]
   matches: true
+
+- name: range - match
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $all: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  error: true

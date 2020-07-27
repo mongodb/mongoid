@@ -161,3 +161,14 @@
       $regex:
         ''
   matches: false
+
+- name: range
+  document:
+    name: 42
+  query:
+    name:
+      $regex: !ruby/range
+        begin: 1
+        end: 2
+        excl: false
+  error: true

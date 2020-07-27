@@ -170,3 +170,27 @@
           $not:
             $eq: foo
   matches: false
+
+- name: range - matching
+  document:
+    name: 42
+  query:
+    name:
+      $not: !ruby/range
+        begin: 1
+        end: 99
+        excl: false
+  matches: false
+  error: [matcher, driver]
+
+- name: range - not matching
+  document:
+    name: 42
+  query:
+    name:
+      $not: !ruby/range
+        begin: 1
+        end: 2
+        excl: false
+  matches: true
+  error: [matcher, driver]

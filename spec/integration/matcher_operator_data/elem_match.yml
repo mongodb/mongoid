@@ -335,3 +335,29 @@
         $not:
           $eq: y
   matches: false
+
+- name: range - match
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $elemMatch: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  matches: true
+  error: [matcher, driver]
+
+- name: range - no match
+  document:
+    products: [1, 2, 3]
+  query:
+    products:
+      $elemMatch: !ruby/range
+        begin: 10
+        end: 20
+        excl: false
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  matches: false
+  error: [matcher, driver]
