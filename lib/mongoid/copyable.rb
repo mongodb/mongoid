@@ -76,7 +76,7 @@ module Mongoid
 
         if association.is_a?(Association::Embedded::EmbedsMany)
           attrs[association.key].each do |attr|
-            embedded_klass = if type = attr['_type']
+            embedded_klass = if type = attr[self.class.discriminator_key]
               type.constantize
             else
               association.relation_class

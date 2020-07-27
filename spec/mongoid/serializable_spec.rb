@@ -7,12 +7,30 @@ describe Mongoid::Serializable do
 
   describe "#field_names" do
 
-    let(:band) do
-      Band.new
+    let(:guitar) do
+      Guitar.new
     end
 
     it "does not duplicate fields" do
-      expect(band.send(:field_names, {})).to eq(band.fields.except("_type").keys.sort)
+      expect(guitar.send(:field_names, {})).to eq(guitar.fields.except("_type").keys.sort)
+    end
+
+    context "when using a custom discriminator_key" do 
+      before do 
+        Instrument.discriminator_key = "dkey"
+      end
+
+      after do 
+        Instrument.discriminator_key = nil
+      end
+
+      let(:guitar) do
+        Guitar.new
+      end
+  
+      it "includes _type but does not include the new discriminator key" do
+        expect(guitar.send(:field_names, {})).to eq(guitar.fields.except("dkey").keys.sort)
+      end
     end
   end
 

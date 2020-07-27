@@ -160,6 +160,51 @@ describe "#discriminator_key" do
     end
   end
 
+  context "when adding to the db" do 
+    context "when changing the discriminator_key" do
+      before do 
+        class DBDiscriminatorParent
+          include Mongoid::Document
+          self.discriminator_key = "dkey"
+        end
+
+        class DBDiscriminatorChild < DBDiscriminatorParent
+        end
+        DBDiscriminatorChild.create!
+      end
+      
+      it "has the correct count" do 
+        expect(DBDiscriminatorChild.count).to eq(1)
+      end
+
+      it "has the correct count in the parent" do 
+        expect(DBDiscriminatorParent.count).to eq(1)
+      end
+    end
+
+    context "when changing the discriminator_key after saving to the db" do
+      before do 
+        class DBDiscriminatorParent
+          include Mongoid::Document
+        end
+        
+        class DBDiscriminatorChild < DBDiscriminatorParent
+        end
+        DBDiscriminatorChild.create!
+        DBDiscriminatorParent.discriminator_key = "dkey2"
+        DBDiscriminatorChild.create!
+      end
+      
+      it "only finds the documents with the new discriminator key" do 
+        expect(DBDiscriminatorChild.count).to eq(1)
+      end
+
+      it "has the correct count in the parent" do 
+        expect(DBDiscriminatorParent.count).to eq(2)
+      end
+    end
+  end
+
   context "documentation tests" do
 
     context "Example 1" do
