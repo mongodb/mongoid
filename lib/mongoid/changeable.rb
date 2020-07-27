@@ -67,7 +67,6 @@ module Mongoid
     # @since 2.4.0
     def changes
       _changes = {}
-      # byebug
       changed.each do |attr|
         change = attribute_change(attr)
         _changes[attr] = change if change

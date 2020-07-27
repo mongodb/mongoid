@@ -1079,7 +1079,6 @@ describe Mongoid::Document do
         end
 
         it "adds the _type change" do
-          # byebug
           expect(person.changes["_type"]).to eq([ "Manager", "Person" ])
         end
       end
