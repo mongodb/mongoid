@@ -1,0 +1,213 @@
+# Tests for non-field-operator expressions in $elemMatch
+
+- name: $and - subkey - matches
+  document:
+    tags:
+      -
+        count: 1
+  query:
+    tags:
+      $elemMatch:
+        $and:
+          -
+            count:
+              $gt: 0
+          -
+            count:
+              $lt: 10
+  matches: true
+
+- name: $and - subkey - does not match
+  document:
+    tags:
+      -
+        count: 1
+  query:
+    tags:
+      $elemMatch:
+        $and:
+          -
+            count:
+              $gt: 1
+          -
+            count:
+              $lt: 10
+  matches: false
+
+- name: $and - subkey - empty array in document
+  document:
+    tags:
+      - []
+  query:
+    tags:
+      $elemMatch:
+        $and:
+          -
+            count:
+              $gt: 0
+  matches: false
+
+- name: literal - matches
+  document:
+    tags:
+      - foo
+  query:
+    tags:
+      $elemMatch:
+        $eq: foo
+  matches: true
+
+- name: $and - literal - matches
+  document:
+    tags:
+      - foo
+  query:
+    tags:
+      $elemMatch:
+        $and:
+          -
+            $eq: foo
+  error: true
+
+- name: $or - matches
+  document:
+    tags:
+      -
+        count: 1
+  query:
+    tags:
+      $elemMatch:
+        $or:
+          -
+            count:
+              $gt: 0
+          -
+            count:
+              $lt: 0
+  matches: true
+
+- name: $or - does not match
+  document:
+    tags:
+      -
+        count: 1
+  query:
+    tags:
+      $elemMatch:
+        $or:
+          -
+            count:
+              $gt: 1
+          -
+            count:
+              $lt: 1
+  matches: false
+
+- name: $not with regexp - matches
+  document:
+    tags:
+      -
+        foo
+  query:
+    tags:
+      $elemMatch:
+        $not: !ruby/regexp /F../
+  matches: true
+
+- name: $not with regexp - does not match
+  document:
+    tags:
+      -
+        foo
+  query:
+    tags:
+      $elemMatch:
+        $not: !ruby/regexp /.../
+  matches: false
+
+- name: $and with primitive value
+  document:
+    tags:
+      - 1
+  query:
+    tags:
+      $elemMatch:
+        $and:
+          - 1
+          - 2
+  error: true
+
+- name: $and with field-level operator
+  document:
+    tags:
+      - 1
+  query:
+    tags:
+      $elemMatch:
+        $and:
+          - $eq: 1
+  error: true
+
+- name: $or with field-level operator
+  document:
+    tags:
+      - 1
+  query:
+    tags:
+      $elemMatch:
+        $or:
+          - $eq: 1
+  error: true
+
+- name: $not with field-level operator - matches
+  document:
+    tags:
+      - 1
+  query:
+    tags:
+      $elemMatch:
+        $not:
+          $ne: 1
+  matches: true
+
+- name: $not with field-level operator - does not match
+  document:
+    tags:
+      - 1
+  query:
+    tags:
+      $elemMatch:
+        $not:
+          $eq: 1
+  matches: false
+
+- name: $not with bogus operator
+  document:
+    tags:
+      - 1
+  query:
+    tags:
+      $elemMatch:
+        $bogus:
+          - a: 1
+  error: true
+
+- name: $not with bogus operator - empty array
+  document:
+    tags: []
+  query:
+    tags:
+      $elemMatch:
+        $bogus:
+          - a: 1
+  error: true
+
+- name: $not with bogus operator - field not an array
+  document:
+    tags: hi
+  query:
+    tags:
+      $elemMatch:
+        $bogus:
+          - a: 1
+  error: true

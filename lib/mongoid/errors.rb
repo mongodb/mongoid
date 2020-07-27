@@ -22,6 +22,7 @@ require "mongoid/errors/invalid_path"
 require "mongoid/errors/invalid_persistence_option"
 require "mongoid/errors/invalid_query"
 # Must be after invalid_query.
+require "mongoid/errors/invalid_elem_match_operator"
 require "mongoid/errors/invalid_expression_operator"
 require "mongoid/errors/invalid_field_operator"
 require "mongoid/errors/invalid_relation"

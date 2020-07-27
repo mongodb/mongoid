@@ -115,6 +115,12 @@ en:
             allowed."
           resolution: "Try setting the discriminator key on %{superclass} or one of %{class_name}'s
             ancestors."
+        invalid_elem_match_operator:
+          message: "Invalid $elemMatch operator '%{operator}'."
+          summary: "You misspelled an operator or are using an operator that
+            Mongoid does not support."
+          resolution: "Valid field operators are: %{valid_operators}.
+            Ensure you are using one of these operators."
         invalid_expression_operator:
           message: "Invalid expression operator '%{operator}'."
           summary: "You misspelled an operator, are using an operator that

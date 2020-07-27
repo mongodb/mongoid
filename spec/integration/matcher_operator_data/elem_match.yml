@@ -135,6 +135,28 @@
         a: Angel
   matches: false
 
+- name: array of hashes attribute value - with operator - matches
+  document:
+    tags:
+      - a: Angel Share
+  query:
+    tags:
+      $elemMatch:
+        a:
+          $eq: Angel Share
+  matches: true
+
+- name: array of hashes attribute value - with operator - does not match
+  document:
+    tags:
+      - a: Angel Share
+  query:
+    tags:
+      $elemMatch:
+        a:
+          $ne: Angel Share
+  matches: false
+
 - name: array of scalars attribute value matching against scalar
   document:
     tags:

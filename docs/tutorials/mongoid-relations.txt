@@ -583,11 +583,24 @@ tours on a loaded band:
   band = Band.where(name: 'Astral Projection').first
   tours = band.tours.where(year: {'$gte' => 2000})
 
-.. note::
+Embedded Matching Vs Server Behavior
+````````````````````````````````````
 
-  Mongoid aims to provide the same semantics when performing embedded matching
-  as those of MongoDB server. This means, for example, that embedded matchers
-  generally support arguments of the same types as ``Criteria`` methods do.
+Mongoid aims to provide the same semantics when performing embedded matching
+as those of MongoDB server. This means, for example, that embedded matchers
+generally support arguments of the same types as ``Criteria`` methods do.
+
+The following deviations are known:
+
+- Mongoid embedded matchers behave identically regardless of the server version
+  that backs persistence operations and server queries. As such, it is
+  possible for Mongoid to deviate from server behavior if the server itself
+  behaves differently in different versions.
+  
+  As of this writing, the only known case of such deviation is 3.2 and
+  earlier server versions not validating ``$size`` arguments as strictly as
+  newer versions do. Mongoid adopts the behavior of current server versions
+  and validates more strictly.
 
 
 Common Behavior
