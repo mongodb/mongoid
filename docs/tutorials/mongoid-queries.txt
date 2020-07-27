@@ -1734,6 +1734,18 @@ The following code illustrates retrieving the statistics:
 Text Search
 ===========
 
+MongoDB provides :manual:`text indexes </core/index-text/>`
+to support text search queries on string content. Text indexes
+can include any field whose value is a string or an array of
+string elements.
+
+.. note::
+
+  MongoDB Atlas also provides
+  `Atlas Search <https://docs.atlas.mongodb.com/atlas-search/>`_
+  which is a more powerful and flexible text search solution.
+  The rest of this section discusses text indexes and not Atlas Search.
+
 To perform text search with Mongoid, follow these steps:
 
 1. Define a text index on a model.
