@@ -117,3 +117,16 @@
     counts:
       $lte: 11
   matches: false
+
+- name: range
+  document:
+    age: 10
+  query:
+    age:
+      $lte: !ruby/range
+        begin: 1
+        end: 20
+        excl: false
+  error: [matcher, driver]
+  # https://jira.mongodb.org/browse/MONGOID-4908
+  matches: false
