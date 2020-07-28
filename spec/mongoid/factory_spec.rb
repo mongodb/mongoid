@@ -341,7 +341,31 @@ describe Mongoid::Factory do
           person
         }.to raise_exception(Mongoid::Errors::UnknownModel)
       end
+    end
 
+    context 'when type does not correspond to a Class name with custom discriminator key' do
+
+      before do 
+        Person.discriminator_key = "dkey"
+      end
+
+      after do 
+        Person.discriminator_key = nil
+      end
+
+      let(:attributes) do
+        { "title" => "Sir", "dkey" => "invalid_class_name" }
+      end
+
+      let(:person) do
+        described_class.from_db(Person, attributes)
+      end
+
+      it 'raises a exception' do
+        expect {
+          person
+        }.to raise_exception(Mongoid::Errors::UnknownModel)
+      end
     end
 
     context 'when type does not correspond to a custom discriminator_value' do

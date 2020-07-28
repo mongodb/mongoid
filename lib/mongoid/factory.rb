@@ -10,7 +10,14 @@ module Mongoid
     # @deprecated
     TYPE = "_type".freeze
 
-    # Builds a new +Document+ from the supplied attributes.
+    # Builds a new +Document+ from the supplied attributes. 
+    #
+    # This method either instantiats klass or a descendant of klass if the attributes include
+    # klass' discriminator key.
+    #
+    # If the attributes contain the discriminator key (which is _type by default) and the 
+    # discriminator value does not correspond to a descendant of klass then this method 
+    # would create an instance of klass.
     #
     # @example Build the document.
     #   Mongoid::Factory.build(Person, { "name" => "Durran" })
@@ -31,7 +38,11 @@ module Mongoid
     end
 
     # Builds a new +Document+ from the supplied attributes loaded from the
-    # database.
+    # database. 
+    #
+    # If the attributes contain the discriminator key (which is _type by default) and the 
+    # discriminator value does not correspond to a descendant of klass then this method 
+    # raises an UnknownModel error.
     #
     # If a criteria object is given, it is used in two ways:
     # 1. If the criteria has a list of fields specified via #only,

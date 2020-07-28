@@ -180,5 +180,28 @@ describe "#discriminator_key" do
         expect(Guitar.count).to eq(0)
       end
     end
+
+    context "when there exists an unrecognizable discriminator value in the database" do 
+      before do 
+        Piano.discriminator_value = "keys"
+        Piano.create!(_type: "dvalue")
+      end
+
+      after do 
+        Piano.discriminator_value = nil
+      end
+
+      it "is not considered a piano" do 
+        expect(Piano.count).to eq(0)
+      end
+
+      it "is considered an Instrument, the parent" do 
+        expect(Instrument.count).to eq(1)
+      end
+
+      it "has zero count in the sibling" do 
+        expect(Guitar.count).to eq(0)
+      end
+    end
   end
 end
