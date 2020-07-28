@@ -919,21 +919,21 @@ describe Mongoid::Document do
           end
         end
 
-        # context "when using a custom discriminator key and discriminator value" do 
-        #   before do 
-        #     Person.discriminator_key = "dkey"
-        #     Person.discriminator_value = "dvalue"
-        #   end
+        context "when using a custom discriminator key and discriminator value" do 
+          before do 
+            Person.discriminator_key = "dkey"
+            Person.discriminator_value = "dvalue"
+          end
 
-        #   after do 
-        #     Person.discriminator_key = nil
-        #     Person.discriminator_value = nil
-        #   end
+          after do 
+            Person.discriminator_key = nil
+            Person.discriminator_value = nil
+          end
 
-        #   it "sets the class type with new discriminator key" do
-        #     expect(person.dkey).to eq("dvalue")
-        #   end
-        # end
+          it "sets the class type with new discriminator key" do
+            expect(person.dkey).to eq("dvalue")
+          end
+        end
       end
 
       context "when the document has embedded documents" do

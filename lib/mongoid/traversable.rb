@@ -95,6 +95,8 @@ module Mongoid
       def self.get_discriminator_mapping(value)
         self.discriminator_mapping[value] if self.discriminator_mapping
       end
+
+      self.discriminator_value = self.name
     end
 
     # Get all child +Documents+ to this +Document+, going n levels deep if
@@ -286,7 +288,6 @@ module Mongoid
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?(self.discriminator_key)
-          self.discriminator_value = self.name
           default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
         end

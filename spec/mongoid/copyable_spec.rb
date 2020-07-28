@@ -595,7 +595,7 @@ describe Mongoid::Copyable do
         end
       end
 
-      context "when cloning a document with polymorphic embedded documents with multiple language field and a custom discriminator value" do
+      context "when cloning a document with an embedded child class and a custom discriminator value" do
 
         before do 
           ShipmentAddress.discriminator_value = "dvalue"

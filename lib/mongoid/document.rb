@@ -353,7 +353,7 @@ module Mongoid
       #
       # @since 1.0.0
       def _types
-        @_type = (descendants + [ self ]).uniq.map(&:discriminator_value)
+        @_type = (descendants + [ self ]).uniq.map { |type| type.discriminator_value || type.to_s }
       end
 
       # Set the i18n scope to overwrite ActiveModel.
