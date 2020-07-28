@@ -1257,6 +1257,7 @@ One can change the discriminator value by using the ``discriminator_value=`` met
 Take the above example: 
 
 .. code-block:: ruby
+
    class Shape
      include Mongoid::Document
      field :x, type: Integer
@@ -1275,11 +1276,11 @@ Take the above example:
      field :height, type: Float
    end
 
-Here a call to the ``discriminator_value=`` setter was added to ``Circle``. 
+Here, a call to the ``discriminator_value=`` setter was added to ``Circle``. 
 Now, on creation of a Circle, the document will contain a field with the key ``_type`` (or whatever the discriminator_key was changed to)
 and the value ``round thing``.
 
-Note that after changing the discriminator value, when searching for ``Circle``s, the query will only return documents in the shape collection
+Note that after changing the discriminator value, when searching for ``Circle`` s, the query will only return documents in the shape collection
 with the discriminator field having the value ``round thing``. All other discriminator values (even ``Circle``) that already exist in the database
 will be considered an object of the ``Shape`` class.
 
