@@ -1277,11 +1277,11 @@ Take the above example:
    end
 
 Here, a call to the ``discriminator_value=`` setter was added to ``Circle``. 
-Now, on creation of a Circle, the document will contain a field with the key ``_type`` (or whatever the discriminator_key was changed to)
-and the value ``round thing``.
+Now, on creation of a ``Circle``, the document will contain a field with the key ``_type`` (or whatever the ``discriminator_key`` was changed to)
+and the value "round thing."
 
-Note that after changing the discriminator value, when searching for ``Circle`` s, the query will only return documents in the shape collection
-with the discriminator field having the value ``round thing``. All other discriminator values (even ``Circle``) that already exist in the database
+Note that after changing the discriminator value, when searching for a ``Circle``, the query will only return documents in the shape collection
+with the discriminator field having the value "round thing." All other discriminator values (even ``Circle``) that already exist in the database
 will be considered an object of the ``Shape`` class.
 
 Querying Subclasses
