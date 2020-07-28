@@ -88,7 +88,6 @@ describe "#discriminator_key" do
       end
 
       after do 
-        Instrument.discriminator_key = nil
         Piano.discriminator_value = nil
       end
 
