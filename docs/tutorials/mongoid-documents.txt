@@ -1250,7 +1250,7 @@ that child class.
 
 Changing the Discriminator Value
 --------------------------------
-Mongoid also supports changing the discriminator value from the default value, which is the class as a string.
+Mongoid also supports changing the discriminator value from the default value, which is the class name.
 One can change the discriminator value by using the ``discriminator_value=`` method on that specific class.
 
 Take the above example: 
