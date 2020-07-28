@@ -23,7 +23,7 @@ module Mongoid
       attributes ||= {}
       dvalue = attributes[klass.discriminator_key] || attributes[klass.discriminator_key.to_sym]
       type = klass.get_discriminator_mapping(dvalue)
-      if type && klass._types.include?(type.to_s)
+      if type && klass._types.include?(dvalue.to_s)
         type.new(attributes)
       else
         klass.new(attributes)

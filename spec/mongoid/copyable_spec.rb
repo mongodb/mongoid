@@ -594,6 +594,37 @@ describe Mongoid::Copyable do
           end
         end
       end
+
+      context "when cloning a document with polymorphic embedded documents with multiple language field and a custom discriminator value" do
+
+        before do 
+          ShipmentAddress.discriminator_value = "dvalue"
+        end
+
+        after do 
+          ShipmentAddress.discriminator_value = nil
+        end
+
+        let!(:shipment_address) do
+          person.addresses.build({}, ShipmentAddress)
+        end
+
+        before do
+          person.save
+        end
+
+        let!(:from_db) do
+          Person.find(person.id)
+        end
+
+        let(:copy) do
+          from_db.send(method)
+        end
+
+        it "copys embeds many documents" do
+          expect(copy.addresses).to eq(person.addresses)
+        end
+      end
     end
   end
 end
