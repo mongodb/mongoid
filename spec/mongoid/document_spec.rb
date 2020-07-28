@@ -116,7 +116,30 @@ describe Mongoid::Document do
       end
 
       it "should clear descendants' cache" do
-        expect(Person._types).to include(descendant.to_s)
+        expect(Person._types).to include(descendant.discriminator_value)
+      end
+    end
+  end
+
+  describe "._clear_types" do
+
+    context "when changing the discriminator_value" do
+
+      let(:types) do
+        Kangaroo._types
+      end
+
+      before do 
+        Kangaroo.discriminator_value = "dvalue"
+        Kangaroo._clear_types
+      end
+
+      after do 
+        Kangaroo.discriminator_key = nil
+      end
+
+      it "returns the document" do
+        expect(types).to eq(["dvalue"])
       end
     end
   end

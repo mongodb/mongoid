@@ -353,7 +353,18 @@ module Mongoid
       #
       # @since 1.0.0
       def _types
-        @_type = (descendants + [ self ]).uniq.map { |type| type.discriminator_value || type.to_s }
+        @_type ||= (descendants + [ self ]).uniq.map(&:discriminator_value)
+      end
+
+      # Clear the @_type cache. This is generally called when changing the discriminator
+      # key/value on a class.
+      #
+      # @example Get the types.
+      #   document._clear_types
+      #
+      # @api private
+      def _clear_types
+        @_type = nil
       end
 
       # Set the i18n scope to overwrite ActiveModel.
