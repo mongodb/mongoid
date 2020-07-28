@@ -3915,7 +3915,7 @@ describe Mongoid::Criteria do
     end
   end
 
-  describe "#type_selection", :focus do
+  describe "#type_selection" do
     context "when using the default discriminator_key" do 
       context "when only one subclass exists" do
 
