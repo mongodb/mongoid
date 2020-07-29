@@ -1159,7 +1159,7 @@ cases where one might want to do this:
 
 There are two ways to change the discriminator key, on the class level and on the global level. 
 To change the discriminator key on the class level the user can set it directly on the parent class using 
-the ``discriminator_key=`` function. 
+the ``discriminator_key=`` method. 
 Take the above example:
 
 .. code-block:: ruby
@@ -1248,6 +1248,40 @@ On the global level, however, if the user does not set the discriminator key bef
 class, the discriminator field will use the default ``_type`` and not the new global setting in
 that child class.
 
+Changing the Discriminator Value
+--------------------------------
+Mongoid also supports changing the discriminator value from the default value, which is the class name.
+One can change the discriminator value by using the ``discriminator_value=`` method on that specific class.
+
+Take the above example: 
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+     field :x, type: Integer
+     field :y, type: Integer
+     embedded_in :canvas
+   end
+
+   class Circle < Shape
+     field :radius, type: Float
+
+     self.discriminator_value = "round thing"
+   end
+
+   class Rectangle < Shape
+     field :width, type: Float
+     field :height, type: Float
+   end
+
+Here, a call to the ``discriminator_value=`` setter was added to ``Circle``. 
+Now, on creation of a ``Circle``, the document will contain a field with the key ``_type`` (or whatever the ``discriminator_key`` was changed to)
+and the value "round thing."
+
+Note that after changing the discriminator value, when searching for a ``Circle``, the query will only return documents in the shape collection
+with the discriminator field having the value "round thing." All other discriminator values (even ``Circle``) that already exist in the database
+will be considered an object of the ``Shape`` class.
 
 Querying Subclasses
 -------------------
