@@ -148,6 +148,12 @@ module Mongoid
           filtered = nil
         end
 
+        # In case __selected_fields contains a key which is the same as assoc_key
+        # the filtered variable will be set to {"" => 1}.
+        if(filtered.keys == [''])
+          filtered = nil
+        end
+
         filtered
       end
 
