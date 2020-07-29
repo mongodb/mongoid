@@ -128,7 +128,6 @@ describe Mongoid::Document do
       before do 
         Kangaroo._types
         Kangaroo.discriminator_value = "dvalue"
-        Kangaroo._clear_types
       end
 
       after do 
@@ -145,7 +144,6 @@ describe Mongoid::Document do
       before do 
         Shape._types
         Circle.discriminator_value = "dvalue"
-        Circle._clear_types
       end
 
       after do 
