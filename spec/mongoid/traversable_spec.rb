@@ -1208,6 +1208,23 @@ describe Mongoid::Traversable do
         end
       end
     end
+
+    context "when using the Class.new syntax" do 
+      context "when assigning to a constant" do
+        before do 
+          NewClassPerson = Class.new(Person)
+          NewClassPerson2 = Class.new(NewClassPerson)
+        end
+
+        it "has the correct discriminator_value when doing one Class.new" do 
+          expect(NewClassPerson.discriminator_value).to eq('NewClassPerson')
+        end
+
+        it "has the correct discriminator_value when doing two Class.new's" do 
+          expect(NewClassPerson2.discriminator_value).to eq('NewClassPerson2')
+        end
+      end
+    end
   end
   
   describe "#discriminator_mapping" do 

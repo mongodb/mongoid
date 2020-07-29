@@ -28,6 +28,8 @@ module Mongoid
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
 
+        self._clear_types if self.respond_to?(:_clear_types)
+
         if value
           Mongoid::Fields::Validators::Macro.validate_field_name(self, value)
           value = value.to_s
@@ -53,8 +55,25 @@ module Mongoid
 
       def discriminator_value=(value)
         value ||= self.name
+        self._clear_types if self.respond_to?(:_clear_types)
         add_discriminator_mapping(value)
         super
+      end
+    end
+
+    # Module used for prepending the discriminator_value method.
+    #
+    # A separate module was needed because the subclasses of this class
+    # need to be manually prepended with the discriminator_value and can't
+    # rely on being a class_attribute because the .discriminator_value
+    # method is overriden by every subclass in the inherited method.
+    # 
+    # @api private
+    module DiscriminatorRetrieval
+
+      # Get the name on the reading side if the discriminator_value is nil
+      def discriminator_value
+        super || self.name
       end
     end
 
@@ -65,7 +84,8 @@ module Mongoid
       class << self
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
-        
+        prepend DiscriminatorRetrieval
+
         # @api private
         #
         # @return [ Hash<String, Class> ] The current mapping of discriminator_values to classes
@@ -284,6 +304,12 @@ module Mongoid
         subclass.post_processed_defaults = post_processed_defaults.dup
         subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
         subclass.discriminator_value = subclass.name
+
+        # We need to do this here because the discriminator_value method is 
+        # overriden in the subclass above.
+        class << subclass 
+          prepend DiscriminatorRetrieval
+        end
 
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
