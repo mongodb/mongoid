@@ -365,6 +365,7 @@ module Mongoid
       # @api private
       def _clear_types
         @_type = nil
+        superclass._clear_types if hereditary?
       end
 
       # Set the i18n scope to overwrite ActiveModel.

@@ -124,22 +124,44 @@ describe Mongoid::Document do
   describe "._clear_types" do
 
     context "when changing the discriminator_value" do
-
-      let(:types) do
-        Kangaroo._types
-      end
-
+      
       before do 
+        Kangaroo._types
         Kangaroo.discriminator_value = "dvalue"
         Kangaroo._clear_types
       end
 
       after do 
-        Kangaroo.discriminator_key = nil
+        Kangaroo.discriminator_value = nil
       end
 
-      it "returns the document" do
-        expect(types).to eq(["dvalue"])
+      it "has the correct _types" do
+        expect(Kangaroo._types).to eq(["dvalue"])
+      end
+    end
+
+    context "when changing the discriminator_value in child" do
+      
+      before do 
+        Shape._types
+        Circle.discriminator_value = "dvalue"
+        Circle._clear_types
+      end
+
+      after do 
+        Circle.discriminator_value = nil
+      end
+
+      it "has the correct _types" do
+        expect(Circle._types).to eq(["dvalue"])
+      end
+
+      it "has the new Circle discriminator value" do
+        expect(Shape._types).to include("dvalue")
+      end
+
+      it "doesn't have the old Circle discriminator value" do
+        expect(Shape._types).to_not include("Cirlce")
       end
     end
   end
