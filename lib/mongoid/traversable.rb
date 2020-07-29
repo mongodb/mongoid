@@ -105,7 +105,8 @@ module Mongoid
         superclass.add_discriminator_mapping(value, klass) if hereditary?
       end
       
-      # Get the discriminator mapping from the parent class
+      # Get the discriminator mapping from the parent class. This method returns nil if there 
+      # is no mapping for the given value.
       #
       # @param [ String ] value The discriminator_value to retrieve
       #
