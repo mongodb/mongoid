@@ -277,17 +277,13 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       context "when a block is given" do
         it "returns true when the predicate is true" do
           expect(
-            enumerable.any? do |doc|
-              doc.person_id == person.id
-            end
+            enumerable.any? { |doc| true }
           ).to be true
         end
 
         it "returns false when the predicate is false" do
           expect(
-            enumerable.any? do |doc|
-              doc.person_id != person.id
-            end
+            enumerable.any? { |doc| false }
           ).to be false
         end
       end
@@ -299,6 +295,14 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
 
         it "returns false when the option is false" do
           expect(enumerable.any?(Sandwich)).to be false
+        end
+      end
+
+      context "when both an option and a block are given" do
+        it "gives precedence to the pattern" do
+          expect(
+            enumerable.any?(Post) { |doc| false }
+          ).to be true
         end
       end
     end
@@ -320,17 +324,13 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       context "when a block is given" do
         it "returns true when the predicate is true" do
           expect(
-            enumerable.any? do |doc|
-              doc.person_id == person.id
-            end
+            enumerable.any? { |doc| true }
           ).to be true
         end
 
         it "returns false when the predicate is false" do
           expect(
-            enumerable.any? do |doc|
-              doc.person_id != person.id
-            end
+            enumerable.any? { |doc| false }
           ).to be false
         end
       end
@@ -342,6 +342,14 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
 
         it "returns false when the option is false" do
           expect(enumerable.any?(Sandwich)).to be false
+        end
+      end
+
+      context "when both an option and a block are given" do
+        it "gives precedence to the pattern" do
+          expect(
+            enumerable.any?(Post) { |doc| false }
+          ).to be true
         end
       end
     end

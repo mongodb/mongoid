@@ -219,12 +219,17 @@ module Mongoid
             # Does the enumerable have any? Will determine if there exists at least
             # one element in the enumerable, whether or not it is _loaded.
             #
+            # Note that in Enumerable's any? method if both a pattern and a block are
+            # passed in, only the pattern is used. I implemented the same functionality
+            # here.
+            #
             # @example Doess the enumerable have any?
             #   enumerable.any?
             #
             # @return [ true, false ] If the enumerable has any elements.
-            def any?
-              return super if block_given?
+            def any?(pattern=nil, &block)
+              return super(pattern) if pattern
+              return super(&block) if block_given?
 
               if _loaded?
                 in_memory.count > 0
