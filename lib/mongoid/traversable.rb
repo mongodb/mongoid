@@ -27,8 +27,8 @@ module Mongoid
         if hereditary?
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
-
-        self._clear_types if self.respond_to?(:_clear_types)
+  
+        _clear_types
 
         if value
           Mongoid::Fields::Validators::Macro.validate_field_name(self, value)
@@ -55,7 +55,7 @@ module Mongoid
 
       def discriminator_value=(value)
         value ||= self.name
-        self._clear_types if self.respond_to?(:_clear_types)
+        _clear_types
         add_discriminator_mapping(value)
         super
       end
