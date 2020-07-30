@@ -20,14 +20,14 @@ module Mongoid
     end
 
     # Module used for prepending to the various discriminator_*= methods
-    # 
+    #
     # @api private
     module DiscriminatorAssignment
       def discriminator_key=(value)
         if hereditary?
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
-  
+
         _mongoid_clear_types
 
         if value
@@ -41,12 +41,12 @@ module Mongoid
           class << self
             delegate :discriminator_key, to: ::Mongoid
           end
-        end 
+        end
 
         # This condition checks if the new discriminator key would overwrite
         # an existing field.
         # This condition also checks if the class has any descendants, because
-        # if it doesn't then it doesn't need a discriminator key. 
+        # if it doesn't then it doesn't need a discriminator key.
         if !fields.has_key?(self.discriminator_key) && !descendants.empty?
           default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
@@ -67,7 +67,7 @@ module Mongoid
     # need to be manually prepended with the discriminator_value and can't
     # rely on being a class_attribute because the .discriminator_value
     # method is overriden by every subclass in the inherited method.
-    # 
+    #
     # @api private
     module DiscriminatorRetrieval
 
@@ -80,7 +80,7 @@ module Mongoid
     included do
       class_attribute :discriminator_key, instance_accessor: false
       class_attribute :discriminator_value, instance_accessor: false
-            
+
       class << self
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
@@ -104,13 +104,14 @@ module Mongoid
         self.discriminator_mapping[value] = klass
         superclass.add_discriminator_mapping(value, klass) if hereditary?
       end
-      
-      # Get the discriminator mapping from the parent class. This method returns nil if there 
+
+      # Get the discriminator mapping from the parent class. This method returns nil if there
       # is no mapping for the given value.
       #
       # @param [ String ] value The discriminator_value to retrieve
       #
-      # @return [ Class ] klass The class corresponding to the given discriminator_value
+      # @return [ Class | nil ] klass The class corresponding to the given discriminator_value. If
+      #                               the value is not in the mapping, this method returns nil.
       #
       # @api private
       def self.get_discriminator_mapping(value)
@@ -304,9 +305,9 @@ module Mongoid
         subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
         subclass.discriminator_value = subclass.name
 
-        # We need to do this here because the discriminator_value method is 
+        # We need to do this here because the discriminator_value method is
         # overriden in the subclass above.
-        class << subclass 
+        class << subclass
           prepend DiscriminatorRetrieval
         end
 
