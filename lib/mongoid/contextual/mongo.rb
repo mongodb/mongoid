@@ -76,26 +76,18 @@ module Mongoid
 
       # Get the estimated number of documents matching the query.
       #
+      # Unlike count, estimated_count does not take a block because it is not
+      # traditionally defined (with a block) on Enumarable like count is.
+      #
       # @example Get the estimated number of matching documents.
       #   context.estimated_count
-      #
-      # @example Get the count of documents with the provided options.
-      #   context.estimated_count(limit: 1)
-      #
-      # @example Get the count for where the provided block is true.
-      #   context.estimated_count do |doc|
-      #     doc.likes > 1
-      #   end
       #
       # @param [ Hash ] options The options, such as maxTimeMS to be factored
       #   into the count.
       #
       # @return [ Integer ] The number of matches.
-      #
-      # @since 3.0.0
-      def estimated_count(options = {}, &block)
-        return super(&block) if block_given?
-        try_cache(:count) { view.estimated_document_count(options) }
+      def estimated_count(options = {})
+        try_cache(:estimated_count) { view.estimated_document_count(options) }
       end
 
       # Delete all documents in the database that match the selector.

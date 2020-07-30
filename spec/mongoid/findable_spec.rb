@@ -499,7 +499,7 @@ describe Mongoid::Findable do
         Band.create(name: "Photek")
       end
 
-      it 'returns the currect count' do 
+      it 'returns the correct count' do 
         expect(Band.estimated_count).to eq(2)
       end
     end

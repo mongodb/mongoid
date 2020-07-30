@@ -195,6 +195,52 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#estimated_count" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create(name: "New Order")
+    end
+
+    let(:criteria) do
+      Band.where
+    end
+
+    context "when not providing options" do 
+      it 'returns the correct count' do 
+        expect(criteria.estimated_count).to eq(2)
+      end
+    end
+
+    context "when providing options" do 
+      it 'returns the correct count' do 
+        expect(criteria.estimated_count(maxTimeMS: 1000)).to eq(2)
+      end
+    end
+
+    context "when context is cached" do
+
+      let(:context) do
+        described_class.new(criteria.cache)
+      end
+
+      before do
+        expect(context.view).to receive(:estimated_document_count).once.and_return(1)
+      end
+
+      it "returns the count cached value after first call" do
+        2.times do 
+          context.estimated_count
+        end
+      end
+    end
+  end
+
+
+
   [ :delete, :delete_all ].each do |method|
 
     describe "##{method}" do
