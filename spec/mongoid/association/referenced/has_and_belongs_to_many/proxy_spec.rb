@@ -1762,9 +1762,9 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
       let(:person) do
         Person.create
       end
-  
+
       context "when nothing exists on the relation" do
-        
+
         context "when no document is added" do
 
           let!(:sandwich) do
@@ -1777,15 +1777,15 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
         end
 
         context "when the document is destroyed" do
-  
+
           before do
             Meat.create!
           end
-  
+
           let!(:sandwich) do
             Sandwich.create!
           end
-  
+
           it "returns false" do
             sandwich.destroy
             expect(sandwich.meats.any?).to be false
@@ -1890,7 +1890,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     end
 
     context "when nothing exists on the relation" do
-      
+
       context "when no document is added" do
 
         let!(:sandwich) do
@@ -1936,14 +1936,14 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
 
     context "when appending to a relation in a transaction" do
       require_transaction_support
-      
+
       let!(:sandwich) do
         Sandwich.create!
       end
 
       it "returns true" do
         sandwich.with_session do |session|
-          session.with_transaction do 
+          session.with_transaction do
             expect{ sandwich.meats << Meat.new }.to_not raise_error
             expect(sandwich.meats.any?).to be true
           end
