@@ -360,12 +360,12 @@ module Mongoid
       # key/value on a class.
       #
       # @example Get the types.
-      #   document._clear_types
+      #   document._mongoid_clear_types
       #
       # @api private
-      def _clear_types
+      def _mongoid_clear_types
         @_type = nil
-        superclass._clear_types if hereditary?
+        superclass._mongoid_clear_types if hereditary?
       end
 
       # Set the i18n scope to overwrite ActiveModel.

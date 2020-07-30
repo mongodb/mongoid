@@ -121,7 +121,7 @@ describe Mongoid::Document do
     end
   end
 
-  describe "._clear_types" do
+  describe "._mongoid_clear_types" do
 
     context "when changing the discriminator_value" do
       
