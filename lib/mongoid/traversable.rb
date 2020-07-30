@@ -116,8 +116,6 @@ module Mongoid
       def self.get_discriminator_mapping(value)
         self.discriminator_mapping[value] if self.discriminator_mapping
       end
-
-      self.discriminator_value = self.name
     end
 
     # Get all child +Documents+ to this +Document+, going n levels deep if
