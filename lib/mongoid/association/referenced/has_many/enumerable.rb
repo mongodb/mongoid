@@ -224,6 +224,8 @@ module Mongoid
             #
             # @return [ true, false ] If the enumerable has any elements.
             def any?
+              return super if block_given?
+
               if _loaded?
                 in_memory.count > 0
               else
