@@ -256,6 +256,95 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         end
       end
     end
+
+    context "when the documents have been loaded", :focus do
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      before do
+        enumerable.load_all!
+      end
+
+      it "is _loaded" do
+        expect(enumerable._loaded?).to be true
+      end
+
+      context "when a block is given" do
+        it "returns true when the predicate is true" do
+          expect(
+            enumerable.any? do |doc|
+              doc.person_id == person.id
+            end
+          ).to be true
+        end
+
+        it "returns false when the predicate is false" do
+          expect(
+            enumerable.any? do |doc|
+              doc.person_id != person.id
+            end
+          ).to be false
+        end
+      end
+
+      context "when an option is given" do
+        it "returns true when the option is true" do
+          expect(enumerable.any?(Post)).to be true
+        end
+
+        it "returns false when the option is false" do
+          expect(enumerable.any?(Sandwich)).to be false
+        end
+      end
+    end
+
+    context "when the documents are not loaded", :focus do
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      it "is not _loaded" do
+        expect(enumerable._loaded?).to be false
+      end
+
+      context "when a block is given" do
+        it "returns true when the predicate is true" do
+          expect(
+            enumerable.any? do |doc|
+              doc.person_id == person.id
+            end
+          ).to be true
+        end
+
+        it "returns false when the predicate is false" do
+          expect(
+            enumerable.any? do |doc|
+              doc.person_id != person.id
+            end
+          ).to be false
+        end
+      end
+
+      context "when an option is given" do
+        it "returns true when the option is true" do
+          expect(enumerable.any?(Post)).to be true
+        end
+
+        it "returns false when the option is false" do
+          expect(enumerable.any?(Sandwich)).to be false
+        end
+      end
+    end
   end
 
   describe "#clear" do
