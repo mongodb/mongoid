@@ -241,6 +241,16 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         expect(enumerable.to_a.length).to eq(2)
       end
 
+      context "when block passed" do
+        let(:any) do
+          enumerable.any? { |post| post.person_id != person.id }
+        end
+
+        it "returns false" do
+          expect(any).to be false
+        end
+      end
+
       context "when iterating over the relation a second time" do
 
         before do
