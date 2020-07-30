@@ -18,7 +18,11 @@ module Mongoid
       #
       # @since 4.0.0
       def cache_table
-        Thread.current["[mongoid]:query_cache"] ||= {}
+        if defined?(Mongo::QueryCache)
+          Mongo::QueryCache.cache_table
+        else
+          Thread.current["[mongoid]:query_cache"] ||= {}
+        end
       end
 
       # Clear the query cache.
@@ -30,7 +34,11 @@ module Mongoid
       #
       # @since 4.0.0
       def clear_cache
-        Thread.current["[mongoid]:query_cache"] = nil
+        if defined?(Mongo::QueryCache)
+          Mongo::QueryCache.clear_cache
+        else
+          Thread.current["[mongoid]:query_cache"] = nil
+        end
       end
 
       # Set whether the cache is enabled.
@@ -42,7 +50,11 @@ module Mongoid
       #
       # @since 4.0.0
       def enabled=(value)
-        Thread.current["[mongoid]:query_cache:enabled"] = value
+        if defined?(Mongo::QueryCache)
+          Mongo::QueryCache.enabled = value
+        else
+          Thread.current["[mongoid]:query_cache:enabled"] = value
+        end
       end
 
       # Is the query cache enabled on the current thread?
@@ -54,7 +66,11 @@ module Mongoid
       #
       # @since 4.0.0
       def enabled?
-        !!Thread.current["[mongoid]:query_cache:enabled"]
+        if defined?(Mongo::QueryCache)
+          Mongo::QueryCache.enabled?
+        else
+          !!Thread.current["[mongoid]:query_cache:enabled"]
+        end
       end
 
       # Execute the block while using the query cache.
@@ -66,9 +82,15 @@ module Mongoid
       #
       # @since 4.0.0
       def cache
-        enabled = QueryCache.enabled?
-        QueryCache.enabled = true
-        yield
+        if defined?(Mongo::QueryCache)
+          if block_given?
+            Mongo::QueryCache.cache { yield }
+          end
+        else
+          enabled = QueryCache.enabled?
+          QueryCache.enabled = true
+          yield
+        end
       ensure
         QueryCache.enabled = enabled
       end
@@ -80,9 +102,15 @@ module Mongoid
       #
       # @return [ Object ] The result of the block.
       def uncached
-        enabled = QueryCache.enabled?
-        QueryCache.enabled = false
-        yield
+        if defined?(Mongo::QueryCache)
+          if block_given?
+            Mongo::QueryCache.uncached { yield }
+          end
+        else
+          enabled = QueryCache.enabled?
+          QueryCache.enabled = false
+          yield
+        end
       ensure
         QueryCache.enabled = enabled
       end

@@ -113,7 +113,7 @@ module Mongoid
   def_delegators Config, *(Config.public_instance_methods(false) - [ :logger=, :logger ])
 
 
-  # Module used to prepend the discriminator key assignment function to change 
+  # Module used to prepend the discriminator key assignment function to change
   # the value assigned to the discriminator key to a string.
   #
   # @api private
@@ -130,8 +130,8 @@ module Mongoid
       super
     end
   end
-  
-  class << self 
+
+  class << self
     prepend GlobalDiscriminatorKeyAssignment
   end
 end

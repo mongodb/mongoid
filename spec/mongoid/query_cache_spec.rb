@@ -85,6 +85,113 @@ describe Mongoid::QueryCache do
     end
   end
 
+  context 'when driver query cache exists' do
+    require_driver_query_cache
+
+    before do
+      Band.all.to_a
+      Band.create!
+    end
+
+    it 'recognizes the driver query cache' do
+      expect(defined?(Mongo::QueryCache)).to_not be_nil
+    end
+
+    context 'when query cache enabled' do
+
+      it 'uses the driver query cache' do
+        expect(Mongo::QueryCache).to receive(:enabled=).and_call_original
+        Mongoid::QueryCache.enabled = true
+
+        expect(Mongoid::QueryCache.enabled?).to be(true)
+        expect(Mongo::QueryCache.enabled?).to be(true)
+      end
+    end
+
+    context 'when query cache disabled' do
+
+      it 'uses the driver query cache' do
+        expect(Mongo::QueryCache).to receive(:enabled=).and_call_original
+        Mongoid::QueryCache.enabled = false
+
+        expect(Mongoid::QueryCache.enabled?).to be(false)
+        expect(Mongo::QueryCache.enabled?).to be(false)
+      end
+    end
+
+    context 'when block is cached' do
+
+      before do
+        Mongoid::QueryCache.enabled = false
+      end
+
+      it 'uses the driver query cache' do
+        expect(Mongo::QueryCache).to receive(:cache).and_call_original
+        Mongoid::QueryCache.cache do
+          expect(Mongo::QueryCache).to receive(:enabled?).exactly(2).and_call_original
+          expect(Mongoid::QueryCache.enabled?).to be(true)
+          expect(Mongo::QueryCache.enabled?).to be(true)
+        end
+      end
+    end
+
+    context 'when block is uncached' do
+
+      before do
+        Mongoid::QueryCache.enabled = true
+      end
+
+      it 'uses the driver query cache' do
+        expect(Mongo::QueryCache).to receive(:uncached).and_call_original
+        Mongoid::QueryCache.uncached do
+          expect(Mongo::QueryCache).to receive(:enabled?).exactly(2).and_call_original
+          expect(Mongoid::QueryCache.enabled?).to be(false)
+          expect(Mongo::QueryCache.enabled?).to be(false)
+        end
+      end
+    end
+
+    context 'when clear_cache is used' do
+
+      before do
+        Band.all.to_a
+      end
+
+      it 'has a nonempty query cache' do
+        expect(Mongoid::QueryCache.cache_table.count).to eq(1)
+        expect(Mongo::QueryCache.cache_table.count).to eq(1)
+      end
+
+      it 'uses the driver query cache' do
+        expect(Mongo::QueryCache).to receive(:clear_cache).and_call_original
+        Mongoid::QueryCache.clear_cache
+        expect(Mongoid::QueryCache.cache_table.count).to eq(0)
+        expect(Mongo::QueryCache.cache_table.count).to eq(0)
+      end
+    end
+
+    context 'when query cache used and cleared' do
+
+      it 'uses the driver query cache' do
+        expect_query(1) do
+          Band.all.to_a
+          Band.all.to_a
+        end
+        expect(Mongo::QueryCache).to receive(:cache_table).exactly(2).and_call_original
+        expect(Mongoid::QueryCache.cache_table.count).to eq(1)
+        expect(Mongo::QueryCache.cache_table.count).to eq(1)
+      end
+    end
+  end
+
+  context 'when drivers query cache does not exist' do
+    require_mongoid_query_cache
+
+    it 'does not recognize the driver query cache' do
+      expect(defined?(Mongo::QueryCache)).to be_nil
+    end
+  end
+
   context "when querying for a single document" do
 
     [ :first, :one, :last ].each do |method|
