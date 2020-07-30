@@ -258,7 +258,7 @@ describe Mongoid::Traversable do
       it "sets the global discriminator key to _type" do
         expect(Mongoid.discriminator_key).to eq("_type")
       end
-      
+
       it "sets the parent discriminator key to _type" do
         expect(Instrument.discriminator_key).to eq("_type")
       end
@@ -339,7 +339,7 @@ describe Mongoid::Traversable do
         it "changes in the child class: Piano" do
           expect(Piano.discriminator_key).to eq("_type")
         end
-  
+
         it "changes in the child class: Guitar" do
           expect(Guitar.discriminator_key).to eq("_type")
         end
@@ -362,7 +362,7 @@ describe Mongoid::Traversable do
         it "changes in the child class: Piano" do
           expect(Piano.discriminator_key).to eq("hello4")
         end
-  
+
         it "changes in the child class: Guitar" do
           expect(Guitar.discriminator_key).to eq("hello4")
         end
@@ -370,14 +370,14 @@ describe Mongoid::Traversable do
     end
 
     context "when the discriminator key is changed in the child" do
-      let(:set_discriminator_key) do 
+      let(:set_discriminator_key) do
         Guitar.discriminator_key = "hello3"
       end
 
-      before :each do 
-        begin 
-          set_discriminator_key 
-        rescue 
+      before :each do
+        begin
+          set_discriminator_key
+        rescue
         end
       end
 
@@ -423,12 +423,12 @@ describe Mongoid::Traversable do
       end
     end
 
-    context ".fields" do 
-      context "when the discriminator key is not changed" do 
+    context ".fields" do
+      context "when the discriminator key is not changed" do
         it "creates a _type field in the parent" do
           expect(Instrument.fields.keys).to include("_type")
         end
-  
+
         it "creates a _type field in the child: Guitar" do
           expect(Guitar.fields.keys).to include("_type")
         end
@@ -437,40 +437,40 @@ describe Mongoid::Traversable do
           expect(Piano.fields.keys).to include("_type")
         end
       end
-  
+
       context "when the discriminator key is changed at the base level" do
         context "after class creation" do
           before do
             class GlobalDiscriminatorParent
               include Mongoid::Document
             end
-            
+
             class GlobalDiscriminatorChild < GlobalDiscriminatorParent
             end
-            
+
             Mongoid.discriminator_key = "test"
           end
-    
+
           after do
             Mongoid.discriminator_key = "_type"
           end
-    
-          it "creates a field with the old global value in the parent" do 
+
+          it "creates a field with the old global value in the parent" do
             expect(GlobalDiscriminatorParent.fields.keys).to include("_type")
           end
 
-          it "creates a field with the old global value in the child" do 
+          it "creates a field with the old global value in the child" do
             expect(GlobalDiscriminatorChild.fields.keys).to include("_type")
           end
 
-          it "does not have the new global value in the parent" do 
+          it "does not have the new global value in the parent" do
             expect(GlobalDiscriminatorParent.fields.keys).to_not include("test")
           end
 
-          it "does not have the new global value in the child" do 
+          it "does not have the new global value in the child" do
             expect(GlobalDiscriminatorChild.fields.keys).to_not include("test")
           end
-          
+
         end
 
         context "before class creation" do
@@ -480,34 +480,34 @@ describe Mongoid::Traversable do
             class PreGlobalDiscriminatorParent
               include Mongoid::Document
             end
-            
+
             class PreGlobalDiscriminatorChild < PreGlobalDiscriminatorParent
             end
           end
-    
+
           after do
             Mongoid.discriminator_key = "_type"
           end
 
-          it "creates a field with new discriminator key in the parent" do 
+          it "creates a field with new discriminator key in the parent" do
             expect(PreGlobalDiscriminatorParent.fields.keys).to include("test")
           end
 
-          it "creates a field with new discriminator key in the child" do 
+          it "creates a field with new discriminator key in the child" do
             expect(PreGlobalDiscriminatorChild.fields.keys).to include("test")
           end
 
-          it "does not have the original discriminator key in the parent" do 
+          it "does not have the original discriminator key in the parent" do
             expect(PreGlobalDiscriminatorParent.fields.keys).to_not include("_type")
           end
 
-          it "does not have the original discriminator key in the child" do 
+          it "does not have the original discriminator key in the child" do
             expect(PreGlobalDiscriminatorChild.fields.keys).to_not include("_type")
           end
         end
       end
-  
-      context "when the discriminator key is changed in the parent" do 
+
+      context "when the discriminator key is changed in the parent" do
         context "after child class creation" do
           before do
             class LocalDiscriminatorParent
@@ -519,8 +519,8 @@ describe Mongoid::Traversable do
 
             LocalDiscriminatorParent.discriminator_key = "test2"
           end
-    
-          it "creates a new field in the parent" do 
+
+          it "creates a new field in the parent" do
             expect(LocalDiscriminatorParent.fields.keys).to include("test2")
           end
 
@@ -528,11 +528,11 @@ describe Mongoid::Traversable do
             expect(LocalDiscriminatorParent.fields.keys).to include("_type")
           end
 
-          it "still has _type field in the child" do 
+          it "still has _type field in the child" do
             expect(LocalDiscriminatorChild.fields.keys).to include("_type")
           end
 
-          it "has the new field in the child" do 
+          it "has the new field in the child" do
             expect(LocalDiscriminatorChild.fields.keys).to include("test2")
           end
         end
@@ -547,16 +547,16 @@ describe Mongoid::Traversable do
             class PreLocalDiscriminatorChild < PreLocalDiscriminatorParent
             end
           end
-    
-          it "creates a new field in the parent" do 
+
+          it "creates a new field in the parent" do
             expect(PreLocalDiscriminatorParent.fields.keys).to include("test2")
           end
 
-          it "does not create the _type field in the parent" do 
+          it "does not create the _type field in the parent" do
             expect(PreLocalDiscriminatorParent.fields.keys).to_not include("_type")
           end
 
-          it "creates a new field in the child" do 
+          it "creates a new field in the child" do
             expect(PreLocalDiscriminatorChild.fields.keys).to include("test2")
           end
         end
@@ -568,53 +568,53 @@ describe Mongoid::Traversable do
               self.discriminator_key = "test2"
             end
           end
-    
-          it "does not create a _type field" do 
+
+          it "does not create a _type field" do
             expect(LocalDiscriminatorNonParent.fields.keys).to_not include("_type")
           end
 
-          it "does not create a new field" do 
+          it "does not create a new field" do
             expect(LocalDiscriminatorNonParent.fields.keys).to_not include("test2")
           end
         end
       end
     end
 
-    context "when setting the discriminator key as a symbol" do 
+    context "when setting the discriminator key as a symbol" do
       context "when the discriminator key is changed at the base level" do
         context "after class creation" do
           before do
             class GlobalSymDiscriminatorParent
               include Mongoid::Document
             end
-            
+
             class GlobalSymDiscriminatorChild < GlobalSymDiscriminatorParent
             end
-            
+
             Mongoid.discriminator_key = :test
           end
-    
+
           after do
             Mongoid.discriminator_key = "_type"
           end
 
-          it "gets converted to a string in the parent" do 
+          it "gets converted to a string in the parent" do
             expect(GlobalSymDiscriminatorParent.fields.keys).to_not include("test")
           end
 
-          it "gets converted to a string in the child" do 
+          it "gets converted to a string in the child" do
             expect(GlobalSymDiscriminatorChild.fields.keys).to_not include("test")
           end
 
-          it "is a string globally" do 
+          it "is a string globally" do
             expect(Mongoid.discriminator_key).to eq("test")
           end
 
-          it "is a string in the parent" do 
+          it "is a string in the parent" do
             expect(GlobalSymDiscriminatorParent.discriminator_key).to eq("test")
           end
 
-          it "is a string in the child" do 
+          it "is a string in the child" do
             expect(GlobalSymDiscriminatorChild.discriminator_key).to eq("test")
           end
         end
@@ -626,38 +626,38 @@ describe Mongoid::Traversable do
             class PreGlobalSymDiscriminatorParent
               include Mongoid::Document
             end
-            
+
             class PreGlobalSymDiscriminatorChild < PreGlobalSymDiscriminatorParent
             end
           end
-    
+
           after do
             Mongoid.discriminator_key = "_type"
           end
 
-          it "creates a field with new discriminator key as a string in the parent" do 
+          it "creates a field with new discriminator key as a string in the parent" do
             expect(PreGlobalSymDiscriminatorParent.fields.keys).to include("test")
           end
 
-          it "creates a field with new discriminator key as a string in the child" do 
+          it "creates a field with new discriminator key as a string in the child" do
             expect(PreGlobalSymDiscriminatorChild.fields.keys).to include("test")
           end
 
-          it "is a string globally" do 
+          it "is a string globally" do
             expect(Mongoid.discriminator_key).to eq("test")
           end
 
-          it "is a string in the parent" do 
+          it "is a string in the parent" do
             expect(PreGlobalSymDiscriminatorParent.discriminator_key).to eq("test")
           end
 
-          it "is a string in the child" do 
+          it "is a string in the child" do
             expect(PreGlobalSymDiscriminatorChild.discriminator_key).to eq("test")
           end
         end
       end
-  
-      context "when the discriminator key is changed in the parent" do 
+
+      context "when the discriminator key is changed in the parent" do
         context "after child class creation" do
           before do
             class LocalSymDiscriminatorParent
@@ -669,20 +669,20 @@ describe Mongoid::Traversable do
 
             LocalSymDiscriminatorParent.discriminator_key = :test2
           end
-    
-          it "creates a new field of type string in the parent" do 
+
+          it "creates a new field of type string in the parent" do
             expect(LocalSymDiscriminatorParent.fields.keys).to include("test2")
           end
 
-          it "creates a new field of type string in the child" do 
+          it "creates a new field of type string in the child" do
             expect(LocalSymDiscriminatorChild.fields.keys).to include("test2")
           end
 
-          it "is a string in the parent" do 
+          it "is a string in the parent" do
             expect(LocalSymDiscriminatorParent.discriminator_key).to eq("test2")
           end
 
-          it "is a string in the child" do 
+          it "is a string in the child" do
             expect(LocalSymDiscriminatorChild.discriminator_key).to eq("test2")
           end
         end
@@ -697,29 +697,29 @@ describe Mongoid::Traversable do
             class PreLocalSymDiscriminatorChild < PreLocalSymDiscriminatorParent
             end
           end
-    
-          it "creates a new field of type string in the parent" do 
+
+          it "creates a new field of type string in the parent" do
             expect(PreLocalSymDiscriminatorParent.fields.keys).to include("test2")
           end
 
-          it "creates a new field of type string in the child" do 
+          it "creates a new field of type string in the child" do
             expect(PreLocalSymDiscriminatorChild.fields.keys).to include("test2")
           end
 
-          it "is a string in the parent" do 
+          it "is a string in the parent" do
             expect(PreLocalSymDiscriminatorParent.discriminator_key).to eq("test2")
           end
 
-          it "is a string in the child" do 
+          it "is a string in the child" do
             expect(PreLocalSymDiscriminatorChild.discriminator_key).to eq("test2")
           end
         end
       end
     end
 
-    context "when setting the discriminator key as" do 
+    context "when setting the discriminator key as" do
       context "a number" do
-        before do 
+        before do
           Instrument.discriminator_key = 3
         end
 
@@ -727,25 +727,25 @@ describe Mongoid::Traversable do
           Instrument.discriminator_key = nil
         end
 
-        it "gets converted to a string" do 
+        it "gets converted to a string" do
           expect(Instrument.fields.keys).to include("3")
         end
 
-        it "is a string in the parent" do 
+        it "is a string in the parent" do
           expect(Instrument.discriminator_key).to eq("3")
         end
 
-        it "is a string in the child: Guitar" do 
+        it "is a string in the child: Guitar" do
           expect(Guitar.discriminator_key).to eq("3")
         end
 
-        it "is a string in the child: Piano" do 
+        it "is a string in the child: Piano" do
           expect(Piano.discriminator_key).to eq("3")
         end
       end
 
       context "a boolean" do
-        before do 
+        before do
           Instrument.discriminator_key = true
         end
 
@@ -753,19 +753,19 @@ describe Mongoid::Traversable do
           Instrument.discriminator_key = nil
         end
 
-        it "gets converted to a string" do 
+        it "gets converted to a string" do
           expect(Instrument.fields.keys).to include("true")
         end
 
-        it "is a string in the parent" do 
+        it "is a string in the parent" do
           expect(Instrument.discriminator_key).to eq("true")
         end
 
-        it "is a string in the child: Guitar" do 
+        it "is a string in the child: Guitar" do
           expect(Guitar.discriminator_key).to eq("true")
         end
 
-        it "is a string in the child: Piano" do 
+        it "is a string in the child: Piano" do
           expect(Piano.discriminator_key).to eq("true")
         end
       end
@@ -784,20 +784,20 @@ describe Mongoid::Traversable do
         end
       end
 
-      after do 
+      after do
         Mongoid.duplicate_fields_exception = false
       end
 
       it "does not raise an error" do
-        expect do 
+        expect do
           DuplicateDiscriminatorKeyParent.discriminator_key = "dkey"
         end.to_not raise_error
       end
     end
 
     context "when the discriminator key conflicts with mongoid's internals" do
-      
-      after do 
+
+      after do
         Person.discriminator_key = nil
       end
 
@@ -826,23 +826,23 @@ describe Mongoid::Traversable do
         end
       end
 
-      after do 
+      after do
         Mongoid.duplicate_fields_exception = false
         Mongoid.discriminator_key = "_type"
       end
 
       it "raises an error" do
-        expect do 
+        expect do
           GlobalDuplicateDiscriminatorKeyParent.class_eval do
-            field("dkey") 
+            field("dkey")
           end
         end.to raise_error(Mongoid::Errors::InvalidField)
       end
     end
 
     context "when the global discriminator key conflicts with mongoid's internals" do
-      
-      after do 
+
+      after do
         Mongoid.discriminator_key = "_type"
       end
 
@@ -859,47 +859,47 @@ describe Mongoid::Traversable do
     end
   end
 
-  describe "#discriminator_value" do 
+  describe "#discriminator_value" do
 
-    context "when the discriminator value is not set" do 
+    context "when the discriminator value is not set" do
 
-      it "has the correct discriminator_value" do 
+      it "has the correct discriminator_value" do
         expect(Guitar.discriminator_value).to eq("Guitar")
       end
 
-      it "has the correct discriminator_value" do 
+      it "has the correct discriminator_value" do
         expect(Piano.discriminator_value).to eq("Piano")
       end
 
-      it "has the correct discriminator_value" do 
+      it "has the correct discriminator_value" do
         expect(Instrument.discriminator_value).to eq("Instrument")
       end
     end
 
 
-    context "when the discriminator value is set on the child class" do 
+    context "when the discriminator value is set on the child class" do
       before do
         Guitar.discriminator_value = "some string instrument"
       end
 
-      after do 
+      after do
         Guitar.discriminator_value = nil
       end
 
-      it "has the correct discriminator_value" do 
+      it "has the correct discriminator_value" do
         expect(Guitar.discriminator_value).to eq("some string instrument")
       end
 
-      it "does not change the sibling's discriminator value" do 
+      it "does not change the sibling's discriminator value" do
         expect(Piano.discriminator_value).to eq("Piano")
       end
 
-      it "does not change the parent's discriminator value" do 
+      it "does not change the parent's discriminator value" do
         expect(Instrument.discriminator_value).to eq("Instrument")
       end
     end
 
-    context "when the discriminator value is set on the parent" do 
+    context "when the discriminator value is set on the parent" do
       before do
         Instrument.discriminator_value = "musical thingy"
       end
@@ -908,21 +908,21 @@ describe Mongoid::Traversable do
         Instrument.discriminator_value = nil
       end
 
-      it "is changed in the parent" do 
+      it "is changed in the parent" do
         expect(Instrument.discriminator_value).to eq("musical thingy")
       end
 
-      it "is not changed in the child: Guitar" do 
+      it "is not changed in the child: Guitar" do
         expect(Guitar.discriminator_value).to eq("Guitar")
       end
 
-      it "is not changed in the child: Piano" do 
+      it "is not changed in the child: Piano" do
         expect(Piano.discriminator_value).to eq("Piano")
       end
     end
 
     context "when setting the discriminator value to nil" do
-      before do 
+      before do
         Guitar.discriminator_value = "some string instrument"
         Guitar.discriminator_value = nil
       end
@@ -933,160 +933,160 @@ describe Mongoid::Traversable do
     end
 
     context "when setting discriminator value on parent that is also a child" do
-      before do 
+      before do
         Browser.discriminator_value = "something"
       end
 
-      after do 
+      after do
         Browser.discriminator_value = nil
       end
 
-      it "has the correct value in the parent" do 
+      it "has the correct value in the parent" do
         expect(Browser.discriminator_value).to eq("something")
       end
 
-      it "doesn't set the grandchild's discriminator value" do 
+      it "doesn't set the grandchild's discriminator value" do
         expect(Firefox.discriminator_value).to eq("Firefox")
       end
     end
 
     describe ".fields" do
 
-      let(:guitar) do 
+      let(:guitar) do
         Guitar.new
       end
 
-      let(:piano) do 
+      let(:piano) do
         Piano.new
       end
 
-      let(:instrument) do 
+      let(:instrument) do
         Instrument.new
       end
-      
+
       context "when the discriminator value is not set" do
-        it "has the correct discriminator_value" do 
+        it "has the correct discriminator_value" do
           expect(guitar._type).to eq("Guitar")
         end
-  
-        it "has the correct discriminator_value" do 
+
+        it "has the correct discriminator_value" do
           expect(piano._type).to eq("Piano")
         end
-  
-        it "has the correct discriminator_value" do 
+
+        it "has the correct discriminator_value" do
           expect(instrument._type).to eq("Instrument")
         end
       end
 
-      context "when the discriminator value is set on the child class" do 
+      context "when the discriminator value is set on the child class" do
         before do
           Guitar.discriminator_value = "some string instrument"
         end
-  
-        after do 
+
+        after do
           Guitar.discriminator_value = nil
         end
-  
-        it "has the correct discriminator_value" do 
+
+        it "has the correct discriminator_value" do
           expect(guitar._type).to eq("some string instrument")
         end
-  
-        it "does not change the sibling's discriminator value" do 
+
+        it "does not change the sibling's discriminator value" do
           expect(piano._type).to eq("Piano")
         end
-  
-        it "does not change the parent's discriminator value" do 
+
+        it "does not change the parent's discriminator value" do
           expect(instrument._type).to eq("Instrument")
         end
 
-        it "retrieves the correct discriminator_mapping from the parent" do 
+        it "retrieves the correct discriminator_mapping from the parent" do
           expect(
             Instrument.get_discriminator_mapping("some string instrument")
           ).to eq(Guitar)
         end
-  
-        it "retrieves the correct discriminator_mapping from the child: Guitar" do 
+
+        it "retrieves the correct discriminator_mapping from the child: Guitar" do
           expect(
             Guitar.get_discriminator_mapping("some string instrument")
           ).to eq(Guitar)
         end
-  
-        it "is not retrieved from the sibling" do 
+
+        it "is not retrieved from the sibling" do
           expect(
             Piano.get_discriminator_mapping("some string instrument")
           ).to be nil
         end
       end
-  
-      context "when the discriminator value is set on the parent" do 
+
+      context "when the discriminator value is set on the parent" do
         before do
           Instrument.discriminator_value = "musical thingy"
         end
-  
+
         after do
           Instrument.discriminator_value = nil
         end
 
-        it "is changed in the parent" do 
+        it "is changed in the parent" do
           expect(instrument._type).to eq("musical thingy")
         end
-  
-        it "is not changed in the child: Guitar" do 
+
+        it "is not changed in the child: Guitar" do
           expect(guitar._type).to eq("Guitar")
         end
-  
-        it "is not changed in the child: Piano" do 
+
+        it "is not changed in the child: Piano" do
           expect(piano._type).to eq("Piano")
         end
 
-        it "retrieves the correct discriminator_mapping from the parent" do 
+        it "retrieves the correct discriminator_mapping from the parent" do
           expect(
             Instrument.get_discriminator_mapping("musical thingy")
           ).to eq(Instrument)
         end
-  
-        it "is not retrieved from the child: Guitar" do 
+
+        it "is not retrieved from the child: Guitar" do
           expect(
             Guitar.get_discriminator_mapping("musical thingy")
           ).to be nil
         end
-  
-        it "is not retrieved from the child: Piano" do 
+
+        it "is not retrieved from the child: Piano" do
           expect(
             Piano.get_discriminator_mapping("musical thingy")
           ).to be nil
         end
       end
-  
+
       context "when setting the discriminator value to nil" do
-        before do 
+        before do
           Guitar.discriminator_value = "some string instrument"
           Guitar.discriminator_value = nil
         end
-  
+
         it "reverts back to default" do
           expect(guitar._type).to eq("Guitar")
         end
 
-        it "retrieves the correct discriminator_mapping" do 
+        it "retrieves the correct discriminator_mapping" do
           expect(
             Instrument.get_discriminator_mapping("Guitar")
           ).to eq(Guitar)
         end
 
-        it "retrieves the old discriminator_mapping" do 
+        it "retrieves the old discriminator_mapping" do
           expect(
             Instrument.get_discriminator_mapping("some string instrument")
           ).to eq(Guitar)
         end
       end
-  
+
       context "when setting discriminator value on parent that is also a child" do
-        before do 
+        before do
           Browser.discriminator_value = "something"
         end
-  
-        after do 
+
+        after do
           Browser.discriminator_value = nil
         end
 
@@ -1098,45 +1098,45 @@ describe Mongoid::Traversable do
           Firefox.new
         end
 
-        it "has the correct value in the parent" do 
+        it "has the correct value in the parent" do
           expect(browser._type).to eq("something")
         end
-  
-        it "doesn't set the grandchild's discriminator value" do 
+
+        it "doesn't set the grandchild's discriminator value" do
           expect(firefox._type).to eq("Firefox")
         end
 
-        it "retrieves the correct discriminator_mapping from the grandparent" do 
+        it "retrieves the correct discriminator_mapping from the grandparent" do
           expect(
             Canvas.get_discriminator_mapping("something")
           ).to eq(Browser)
         end
-  
-        it "retrieves the correct discriminator_mapping from the parent" do 
+
+        it "retrieves the correct discriminator_mapping from the parent" do
           expect(
             Browser.get_discriminator_mapping("something")
           ).to eq(Browser)
         end
-  
-        it "is not retrieved from the grandchild" do 
+
+        it "is not retrieved from the grandchild" do
           expect(
             Firefox.get_discriminator_mapping("something")
           ).to be nil
         end
       end
 
-      context "when changing the discriminator key" do 
-        before do 
+      context "when changing the discriminator key" do
+        before do
           Instrument.discriminator_key = "dkey"
           Guitar.discriminator_value = "string instrument"
         end
 
-        after do 
+        after do
           Instrument.discriminator_key = nil
           Guitar.discriminator_value = nil
         end
 
-        let(:guitar) do 
+        let(:guitar) do
           Guitar.new
         end
 
@@ -1148,60 +1148,60 @@ describe Mongoid::Traversable do
           expect(guitar._type).to eq("string instrument")
         end
 
-        it "retrieves the correct discriminator_mapping from the parent" do 
+        it "retrieves the correct discriminator_mapping from the parent" do
           expect(
             Instrument.get_discriminator_mapping("string instrument")
           ).to eq(Guitar)
         end
-  
-        it "retrieves the correct discriminator_mapping from the child: Guitar" do 
+
+        it "retrieves the correct discriminator_mapping from the child: Guitar" do
           expect(
             Guitar.get_discriminator_mapping("string instrument")
           ).to eq(Guitar)
         end
-  
-        it "is not retrieved from the sibling" do 
+
+        it "is not retrieved from the sibling" do
           expect(
             Piano.get_discriminator_mapping("string instrument")
           ).to be nil
         end
       end
 
-      context "when the discriminator value is set twice" do 
+      context "when the discriminator value is set twice" do
         before do
           Instrument.discriminator_value = "something"
           Instrument.discriminator_value = "musical thingy"
         end
-  
+
         after do
           Instrument.discriminator_value = nil
         end
 
-        it "is changed in the parent" do 
+        it "is changed in the parent" do
           expect(instrument._type).to eq("musical thingy")
         end
-  
-        it "is not changed in the child: Guitar" do 
+
+        it "is not changed in the child: Guitar" do
           expect(guitar._type).to eq("Guitar")
         end
-  
-        it "is not changed in the child: Piano" do 
+
+        it "is not changed in the child: Piano" do
           expect(piano._type).to eq("Piano")
         end
 
-        it "retrieves the correct discriminator_mapping from the parent" do 
+        it "retrieves the correct discriminator_mapping from the parent" do
           expect(
             Instrument.get_discriminator_mapping("musical thingy")
           ).to eq(Instrument)
         end
-  
-        it "is not retrieved from the child: Guitar" do 
+
+        it "is not retrieved from the child: Guitar" do
           expect(
             Guitar.get_discriminator_mapping("musical thingy")
           ).to be nil
         end
-  
-        it "ris not retrieved from the child: Piano" do 
+
+        it "ris not retrieved from the child: Piano" do
           expect(
             Piano.get_discriminator_mapping("musical thingy")
           ).to be nil
@@ -1209,142 +1209,142 @@ describe Mongoid::Traversable do
       end
     end
 
-    context "when using the Class.new syntax" do 
+    context "when using the Class.new syntax" do
       context "when assigning to a constant" do
-        before do 
+        before do
           NewClassPerson = Class.new(Person)
           NewClassPerson2 = Class.new(NewClassPerson)
         end
 
-        it "has the correct discriminator_value when doing one Class.new" do 
+        it "has the correct discriminator_value when doing one Class.new" do
           expect(NewClassPerson.discriminator_value).to eq('NewClassPerson')
         end
 
-        it "has the correct discriminator_value when doing two Class.new's" do 
+        it "has the correct discriminator_value when doing two Class.new's" do
           expect(NewClassPerson2.discriminator_value).to eq('NewClassPerson2')
         end
       end
     end
   end
-  
-  describe "#discriminator_mapping" do 
-    context "when not changing discriminator_mappings" do 
-      it "has the class name as the value: Instrument" do 
+
+  describe "#discriminator_mapping" do
+    context "when not changing discriminator_mappings" do
+      it "has the class name as the value: Instrument" do
         expect(
           Instrument.get_discriminator_mapping("Instrument")
         ).to eq(Instrument)
       end
 
-      it "has the class name as the value: Guitar" do 
+      it "has the class name as the value: Guitar" do
         expect(
           Guitar.get_discriminator_mapping("Guitar")
         ).to eq(Guitar)
       end
 
-      it "has the class name as the value: Piano" do 
+      it "has the class name as the value: Piano" do
         expect(
           Piano.get_discriminator_mapping("Piano")
         ).to eq(Piano)
       end
     end
 
-    context "when adding to the parent" do 
+    context "when adding to the parent" do
       before do
-        Instrument.add_discriminator_mapping("some_dmap") 
+        Instrument.add_discriminator_mapping("some_dmap")
       end
 
-      after do 
+      after do
         Instrument.add_discriminator_mapping("Instrument")
       end
 
-      it "can be retrieved from the parent" do 
+      it "can be retrieved from the parent" do
         expect(
           Instrument.get_discriminator_mapping("some_dmap")
         ).to eq(Instrument)
       end
 
-      it "can be retrieved from the child: Guitar" do 
+      it "can be retrieved from the child: Guitar" do
         expect(
           Guitar.get_discriminator_mapping("some_dmap")
         ).to be nil
       end
 
-      it "can be retrieved from the child: Piano" do 
+      it "can be retrieved from the child: Piano" do
         expect(
           Piano.get_discriminator_mapping("some_dmap")
         ).to be nil
       end
     end
 
-    context "when adding to the child" do 
-      before do 
-        Guitar.add_discriminator_mapping("something") 
+    context "when adding to the child" do
+      before do
+        Guitar.add_discriminator_mapping("something")
       end
 
-      after do 
+      after do
         Guitar.add_discriminator_mapping("Guitar")
       end
 
-      it "can be retrieved from the parent" do 
+      it "can be retrieved from the parent" do
         expect(
           Instrument.get_discriminator_mapping("something")
         ).to eq(Guitar)
       end
 
-      it "can be retrieved from the child: Guitar" do 
+      it "can be retrieved from the child: Guitar" do
         expect(
           Guitar.get_discriminator_mapping("something")
         ).to eq(Guitar)
       end
 
-      it "is not retrieved from the sibling" do 
+      it "is not retrieved from the sibling" do
         expect(
           Piano.get_discriminator_mapping("something")
         ).to be nil
       end
     end
 
-    context "when adding to the same class twice" do 
-      before do 
-        Guitar.add_discriminator_mapping("something") 
-        Guitar.add_discriminator_mapping("something else") 
+    context "when adding to the same class twice" do
+      before do
+        Guitar.add_discriminator_mapping("something")
+        Guitar.add_discriminator_mapping("something else")
       end
 
-      after do 
+      after do
         Guitar.add_discriminator_mapping("Guitar")
       end
 
-      it "retrieves the new value from the parent" do 
+      it "retrieves the new value from the parent" do
         expect(
           Instrument.get_discriminator_mapping("something else")
         ).to eq(Guitar)
       end
 
-      it "retrieves the new value from the child: Guitar" do 
+      it "retrieves the new value from the child: Guitar" do
         expect(
           Guitar.get_discriminator_mapping("something else")
         ).to eq(Guitar)
       end
 
-      it "is not retrieved from the sibling" do 
+      it "is not retrieved from the sibling" do
         expect(
           Piano.get_discriminator_mapping("something else")
         ).to be nil
       end
 
-      it "retrieves the old value from the parent" do 
+      it "retrieves the old value from the parent" do
         expect(
           Instrument.get_discriminator_mapping("something")
         ).to eq(Guitar)
       end
 
-      it "retrieves the old value from the child: Guitar" do 
+      it "retrieves the old value from the child: Guitar" do
         expect(
           Guitar.get_discriminator_mapping("something")
         ).to eq(Guitar)
       end
 
-      it "does not retrieves the old value from the sibling" do 
+      it "does not retrieves the old value from the sibling" do
         expect(
           Piano.get_discriminator_mapping("something")
         ).to be nil
