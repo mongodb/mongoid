@@ -174,13 +174,57 @@ describe Mongoid::Persistable::Deletable do
       end
     end
 
-    context "when deleting all documents with a custom discriminator key" do 
-      before do 
+    context "when deleting all documents with a custom discriminator key" do
+      before do
         Canvas.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Canvas.discriminator_key = nil
+      end
+
+      let!(:firefox) do
+        Firefox.create(name: "firefox")
+      end
+
+      let!(:firefox2) do
+        Firefox.create(name: "firefox 2")
+      end
+
+      let!(:browser) do
+        Browser.create(name: "browser")
+      end
+
+      let!(:canvas) do
+        Canvas.create(name: "canvas")
+      end
+
+      before do
+        Firefox.delete_all
+      end
+
+      it "deletes from the parent class collection" do
+        expect(Canvas.count).to eq(2)
+      end
+
+      it "returns correct counts for child classes" do
+        expect(Firefox.count).to eq(0)
+      end
+
+      it "returns correct counts for root subclasses" do
+        expect(Browser.count).to eq(1)
+      end
+    end
+
+    context "when deleting all documents with a custom discriminator value", :focus do
+      before do
+        Canvas.discriminator_key = "dkey"
+        Firefox.discriminator_value = "dvalue"
+      end
+
+      after do
+        Canvas.discriminator_key = nil
+        Firefox.discriminator_value = nil
       end
 
       let!(:firefox) do
