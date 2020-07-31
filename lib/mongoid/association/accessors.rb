@@ -134,7 +134,8 @@ module Mongoid
         filtered = {}
         __selected_fields.each do |k, v|
           bits = k.split('.')
-          if bits.first == assoc_key
+          # Don't include a field that is exactly the same as the assoc_key
+          if bits.length > 1 && bits.first == assoc_key
             bits.shift
             filtered[bits.join('.')] = v
           end
@@ -145,12 +146,6 @@ module Mongoid
         # fields. See https://docs.mongodb.com/manual/reference/operator/projection/positional/
         # and https://jira.mongodb.org/browse/MONGOID-4769.
         if filtered.keys == %w($)
-          filtered = nil
-        end
-
-        # In case __selected_fields contains a key which is the same as assoc_key
-        # the filtered variable will be set to {"" => 1}.
-        if(filtered.keys == [''])
           filtered = nil
         end
 

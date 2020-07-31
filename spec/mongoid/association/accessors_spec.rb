@@ -265,11 +265,35 @@ describe Mongoid::Association::Accessors do
             expect(person.passport).to eq(passport)
           end
 
-          context "when the record is loaded from the db" do
-            it "allows to access attributes of the embedded document" do
+          context "when the record is queried with the relation projected" do
+            before do
               person.save
-              persistentPerson = Person.only(:passport).first
-              expect(persistentPerson.passport.number).to eq("123123321")
+            end
+
+            let(:persisted_person) { Person.only(:passport).first }
+
+            it "allows to access attributes of the embedded document" do
+              expect(persisted_person.passport.number).to eq("123123321")
+            end
+          end
+        end
+      end
+
+      context 'when the relation is an embeds many' do
+        let!(:phone_numbers) do
+          person.phone_numbers.build(number: '111-111-1111')
+        end
+
+        context 'when the relation exists' do
+          context 'when the record is queried with the relation projected' do
+            before do
+              person.save
+            end
+
+            let(:persisted_person) { Person.only(:phone_numbers).first }
+
+            it 'returns the embedded documents' do
+              expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
             end
           end
         end
