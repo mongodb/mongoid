@@ -1155,7 +1155,7 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
     of the Shape class.
 
     Similarly, when querying any Parent class, even if a document does not have a discriminator value that
-    belongs to any of its descendants, this document is still returned.
+    belongs to any of its descendants (or any discriminator value at all), this document is still returned.
 
 Changing the Discriminator Key
 ------------------------------
