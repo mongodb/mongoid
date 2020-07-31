@@ -216,7 +216,7 @@ describe Mongoid::Persistable::Deletable do
       end
     end
 
-    context "when deleting all documents with a custom discriminator value", :focus do
+    context "when deleting all documents with a custom discriminator value" do
       before do
         Canvas.discriminator_key = "dkey"
         Firefox.discriminator_value = "dvalue"
