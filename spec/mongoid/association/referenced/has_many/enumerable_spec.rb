@@ -257,7 +257,7 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       end
     end
 
-    context "when the documents have been loaded", :focus do
+    context "when the documents have been loaded" do
       let(:criteria) do
         Post.where(person_id: person.id)
       end
@@ -307,7 +307,7 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       end
     end
 
-    context "when the documents are not loaded", :focus do
+    context "when the documents are not loaded" do
 
       let(:criteria) do
         Post.where(person_id: person.id)
