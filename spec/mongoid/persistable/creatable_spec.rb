@@ -143,7 +143,7 @@ describe Mongoid::Persistable::Creatable do
     end
 
     context "when the document is a subclass of a root class" do
-      context "when using the default discriminator key" do 
+      context "when using the default discriminator key" do
         let!(:browser) do
           Browser.create(version: 3, name: "Test")
         end
@@ -170,11 +170,11 @@ describe Mongoid::Persistable::Creatable do
       end
 
       context "when using a custom discriminator key" do
-        before do 
+        before do
           Canvas.discriminator_key = "dkey"
         end
-        
-        after do 
+
+        after do
           Canvas.discriminator_key = nil
         end
 
@@ -196,14 +196,14 @@ describe Mongoid::Persistable::Creatable do
       end
 
       context "when using a custom discriminator key and discriminator value" do
-        before do 
+        before do
           Canvas.discriminator_key = "dkey"
           Browser.discriminator_value = "dvalue"
         end
-        
-        after do 
+
+        after do
           Canvas.discriminator_key = nil
-          Canvas.discriminator_value = nil
+          Browser.discriminator_value = nil
         end
 
         let!(:browser) do
@@ -411,7 +411,7 @@ describe Mongoid::Persistable::Creatable do
             expect(container.vehicles.map(&:driver)).to eq([ driver ])
           end
 
-          it "initializes with a type field that equals the class" do 
+          it "initializes with a type field that equals the class" do
             expect(
               container.vehicles.first.attributes["_type"]
             ).to eq("Car")
