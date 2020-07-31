@@ -268,8 +268,8 @@ describe Mongoid::Association::Accessors do
           context "when the record is loaded from the db" do
             it "allows to access attributes of the embedded document" do
               person.save
-              persitentPerson = Person.only(:passport).first
-              expect(persitentPerson.passport.number).to eq("123123321")
+              persistentPerson = Person.only(:passport).first
+              expect(persistentPerson.passport.number).to eq("123123321")
             end
           end
         end
