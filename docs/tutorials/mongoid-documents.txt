@@ -191,10 +191,10 @@ For example, adding to a set like this does not work:
 
   class Band
     include Mongoid::Document
-    
+
     field :tours, type: Set
   end
-  
+
   band = Band.new
   band.tours
   # => #<Set: {}>
@@ -211,21 +211,21 @@ back to the model as follows:
 
   class Band
     include Mongoid::Document
-    
+
     field :tours, type: Set
   end
-  
+
   band = Band.new
-  
+
   tours = band.tours
   # => #<Set: {}>
 
   tours << 'London'
   # => #<Set: {"London"}>
-  
+
   band.tours = tours
   # => #<Set: {"London"}>
-  
+
   band.tours
   # => #<Set: {"London"}>
 
@@ -366,10 +366,10 @@ returned is defined by the :ref:`configured time zone settings <time-zones>`.
      include Mongoid::Document
      field :opened_at, type: DateTime
    end
-   
+
    Mongoid.use_activesupport_time_zone = true
    Time.zone = 'Berlin'
-   
+
    ticket = Ticket.create!(opened_at: '2018-02-18 07:00:08 -0500')
 
     ticket.opened_at
@@ -380,7 +380,7 @@ returned is defined by the :ref:`configured time zone settings <time-zones>`.
     Time.zone = 'America/New_York'
     ticket.opened_at
     # => Sun, 18 Feb 2018 07:00:08 -0500
-    
+
     Mongoid.use_utc = true
     ticket.opened_at
     # => Sun, 18 Feb 2018 12:00:08 +0000
@@ -433,14 +433,14 @@ instance:
 
   class Token
     include Mongoid::Document
-    
+
     field :pattern, type: Regexp
   end
-  
+
   token = Token.create!(pattern: /hello.world/m)
   token.pattern
   # => /hello.world/m
-  
+
   token.reload
   token.pattern
   # => #<BSON::Regexp::Raw:0x0000555f505e4a20 @pattern="hello.world", @options="ms">
@@ -459,7 +459,7 @@ the following is a PCRE matching a string that ends in "hello":
 
 .. code-block:: ruby
 
-  BSON::Regexp::Raw.new('hello$', 's')   
+  BSON::Regexp::Raw.new('hello$', 's')
   # => #<BSON::Regexp::Raw:0x0000555f51441640 @pattern="hello$", @options="s">
 
 Compiling this regular expression produces a Ruby regular expression that
@@ -483,7 +483,7 @@ A field can be configured to have a fixed default value:
 
   class Order
     include Mongoid::Document
-    
+
     field :state, type: String, default: 'created'
   end
 
@@ -493,12 +493,12 @@ The default value can also be specified as a ``Proc``:
 
   class Order
     include Mongoid::Document
-    
+
     field :fulfill_by, type: Time, default: ->{ Time.now + 3.days }
   end
 
 .. note::
-  
+
   Default values that are not ``Proc`` instances are evaluated at class load
   time, meaning the following two definitions are not equivalent:
 
@@ -673,9 +673,9 @@ With the option set to true, the following example will raise an error:
 
   class Person
     include Mongoid::Document
-    
+
     field :name
-    
+
     field :name, type: String
   end
 
@@ -685,9 +685,9 @@ To define the field anyway, use the ``overwrite: true`` option:
 
   class Person
     include Mongoid::Document
-    
+
     field :name
-    
+
     field :name, type: String, overwrite: true
   end
 
@@ -733,6 +733,17 @@ of the following methods:
   are accessed by the application, eventually eager migration may be needed to convert the
   remaining documents that haven't been accessed.
 
+To override default behaivor and configure the ``mongo`` gem (and thereby Mongoid as well)
+to encode symbol values as strings, include the following code snippet in your project:
+
+.. code-block:: ruby
+
+  class Symbol
+    def bson_type
+      BSON::String::BSON_TYPE
+    end
+  end
+
 
 Dynamic Fields
 ==============
@@ -752,7 +763,7 @@ in the model:
     include Mongoid::Document
     include Mongoid::Attributes::Dynamic
   end
-  
+
   bob = Person.new(name: 'Bob', age: 42)
   bob.name
   # => "Bob"
@@ -768,29 +779,29 @@ passing the attribute hash to the constructor, mass assignment via
 or they must already be present in the database.
 
 .. code-block:: ruby
-  
+
   # OK
   bob = Person.new(name: 'Bob')
-  
+
   # OK
   bob = Person.new
   bob.attributes = {age: 42}
-  
+
   # OK
   bob = Person.new
   bob['age'] = 42
-  
+
   # Raises NoMethodError: undefined method age=
   bob = Person.new
   bob.age = 42
-  
+
   # OK
   bob = Person.new
   # OK - string access
   bob.write_attribute('age', 42)
   # OK - symbol access
   bob.write_attribute(:name, 'Bob')
-  
+
   # OK, initializes attributes from whatever is in the database
   bob = Person.find('123')
 
@@ -799,22 +810,22 @@ hash, both the reader and the writer for the corresponding field are not
 defined, and invoking them raises ``NoMethodError``:
 
 .. code-block:: ruby
-  
+
   bob = Person.new
   bob.attributes = {age: 42}
-  
+
   bob.age
   # => 42
-  
+
   # raises NoMethodError
   bob.name
-  
+
   # raises NoMethodError
   bob.name = 'Bob'
-  
+
   # OK
   bob['name'] = 'Bob'
-  
+
   bob.name
   # => "Bob"
 
@@ -824,47 +835,47 @@ Attributes can always be read using mass attribute access or ``read_attribute``
 .. code-block:: ruby
 
   bob = Person.new(age: 42)
-  
+
   # OK - string access
   bob['name']
   # => nil
-  
+
   # OK - symbol access
   bob[:name]
   # => nil
-  
+
   # OK - string access
   bob['age']
   # => 42
-  
+
   # OK - symbol access
   bob[:age]
   # => 42
-  
+
   # OK
   bob.attributes['name']
   # => nil
-  
+
   # OK
   bob.attributes['age']
   # => 42
-  
+
   # Returns nil - keys are always strings
   bob.attributes[:age]
   # => nil
-  
+
   # OK
   bob.read_attribute('name')
   # => nil
-  
+
   # OK
   bob.read_attribute(:name)
   # => nil
-  
+
   # OK - string access
   bob.read_attribute('age')
   # => 42
-  
+
   # OK - symbol access
   bob.read_attribute(:age)
   # => 42
@@ -880,7 +891,7 @@ Mongoid permits dynamic field names to include spaces and punctuation:
   bob = Person.new('hello world' => 'MDB')
   bob.send('hello world')
   # => "MDB"
-  
+
   bob.write_attribute("hello%world", 'MDB')
   bob[:"hello%world"]
   # => "MDB"
@@ -1157,9 +1168,9 @@ cases where one might want to do this:
 2. When trying to work with an existing system: It's possible the user is working with an existing system or dataset that has predefined keys.
 
 
-There are two ways to change the discriminator key, on the class level and on the global level. 
-To change the discriminator key on the class level the user can set it directly on the parent class using 
-the ``discriminator_key=`` method. 
+There are two ways to change the discriminator key, on the class level and on the global level.
+To change the discriminator key on the class level the user can set it directly on the parent class using
+the ``discriminator_key=`` method.
 Take the above example:
 
 .. code-block:: ruby
@@ -1182,15 +1193,15 @@ Take the above example:
      field :height, type: Float
    end
 
-Here a call to the ``discriminator_key=`` setter was added to the parent class. Now, on 
-creation of a Rectangle or Circle, a ``shape_type`` field will be added. 
+Here a call to the ``discriminator_key=`` setter was added to the parent class. Now, on
+creation of a Rectangle or Circle, a ``shape_type`` field will be added.
 
 Note that the discriminator key can only be modified in the parent class, and an error
 will be raised if trying to set it on the child class.
 
 If the discriminator key is changed after the child class is created, a new field is
-added with the new discriminator key value, and the old field will remain unchanged. 
-For example: 
+added with the new discriminator key value, and the old field will remain unchanged.
+For example:
 
 .. code-block:: ruby
 
@@ -1217,7 +1228,7 @@ and a ``_type`` field that both default to ``Rectangle`` or ``Circle`` respectiv
 
 
 The discriminator key can also be set on the global level. Meaning, all classes will
-use the globally set discriminator key instead of ``_type``. Take the above example: 
+use the globally set discriminator key instead of ``_type``. Take the above example:
 
 .. code-block:: ruby
 
@@ -1242,9 +1253,9 @@ use the globally set discriminator key instead of ``_type``. Take the above exam
 After setting the global discriminator key, all classes will use ``_the_type`` as
 the discriminator key and will not contain a ``_type`` field.
 
-Note that when defining the discriminator key on the global level, it must be set before the 
+Note that when defining the discriminator key on the global level, it must be set before the
 child class is defined for the child class to use that global value.
-On the global level, however, if the user does not set the discriminator key before defining a child 
+On the global level, however, if the user does not set the discriminator key before defining a child
 class, the discriminator field will use the default ``_type`` and not the new global setting in
 that child class.
 
@@ -1253,7 +1264,7 @@ Changing the Discriminator Value
 Mongoid also supports changing the discriminator value from the default value, which is the class name.
 One can change the discriminator value by using the ``discriminator_value=`` method on that specific class.
 
-Take the above example: 
+Take the above example:
 
 .. code-block:: ruby
 
@@ -1275,7 +1286,7 @@ Take the above example:
      field :height, type: Float
    end
 
-Here, a call to the ``discriminator_value=`` setter was added to ``Circle``. 
+Here, a call to the ``discriminator_value=`` setter was added to ``Circle``.
 Now, on creation of a ``Circle``, the document will contain a field with the key ``_type`` (or whatever the ``discriminator_key`` was changed to)
 and the value "round thing."
 
