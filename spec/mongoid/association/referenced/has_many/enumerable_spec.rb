@@ -289,6 +289,8 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       end
 
       context "when an option is given" do
+        ruby_version_gte '2.5'
+
         it "returns true when the option is true" do
           expect(enumerable.any?(Post)).to be true
         end
@@ -299,6 +301,8 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       end
 
       context "when both an option and a block are given" do
+        ruby_version_gte '2.5'
+
         it "gives precedence to the pattern" do
           expect(
             enumerable.any?(Post) { |doc| false }
@@ -336,6 +340,8 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       end
 
       context "when an option is given" do
+        ruby_version_gte '2.5'
+
         it "returns true when the option is true" do
           expect(enumerable.any?(Post)).to be true
         end
@@ -346,6 +352,8 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
       end
 
       context "when both an option and a block are given" do
+        ruby_version_gte '2.5'
+
         it "gives precedence to the pattern" do
           expect(
             enumerable.any?(Post) { |doc| false }
