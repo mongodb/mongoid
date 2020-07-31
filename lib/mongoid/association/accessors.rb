@@ -134,7 +134,7 @@ module Mongoid
         filtered = {}
         __selected_fields.each do |k, v|
           bits = k.split('.')
-          # Don't include a field that is exactly the same as the assoc_key
+          # Don't include the assoc_key in the filtered fields
           if bits.length > 1 && bits.first == assoc_key
             bits.shift
             filtered[bits.join('.')] = v
