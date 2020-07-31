@@ -57,7 +57,7 @@ module Mongoid
         value ||= self.name
         _mongoid_clear_types
         add_discriminator_mapping(value)
-        super
+        @discriminator_value = value
       end
     end
 
@@ -73,18 +73,17 @@ module Mongoid
 
       # Get the name on the reading side if the discriminator_value is nil
       def discriminator_value
-        super || self.name
+        @discriminator_value || self.name
       end
     end
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
-      class_attribute :discriminator_value, instance_accessor: false
 
       class << self
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
-        prepend DiscriminatorRetrieval
+        include DiscriminatorRetrieval
 
         # @api private
         #
@@ -308,7 +307,7 @@ module Mongoid
         # We need to do this here because the discriminator_value method is
         # overriden in the subclass above.
         class << subclass
-          prepend DiscriminatorRetrieval
+          include DiscriminatorRetrieval
         end
 
         # We only need the _type field if inheritance is in play, but need to
