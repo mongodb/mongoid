@@ -1154,6 +1154,9 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
     whatever the discriminator value was set to), all other discriminator values will be considered an object
     of the Shape class.
 
+    Similarly, when querying any Parent class, even if a document does not have a discriminator value that
+    belongs to any of its descendants, this document is still returned.
+
 Changing the Discriminator Key
 ------------------------------
 Mongoid supports changing the discriminator key from the default ``_type``. There are a few
