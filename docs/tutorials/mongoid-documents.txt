@@ -1149,7 +1149,7 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
 
 .. note::
 
-    Note that when searching for a ``Circle``, the query will only return documents in the shape collection
+    When searching for a ``Circle``, the query will only return documents in the shape collection
     where the ``_type`` (or whatever the discriminator key was set to) field has the value ``Circle`` (or
     whatever the discriminator value was set to), all other discriminator values will be considered an object
     of the Shape class.
