@@ -1211,7 +1211,7 @@ describe Mongoid::Traversable do
 
     context "when using the Class.new syntax" do
       context "when assigning to a constant" do
-        before do
+        before :all do
           NewClassPerson = Class.new(Person)
           NewClassPerson2 = Class.new(NewClassPerson)
         end
