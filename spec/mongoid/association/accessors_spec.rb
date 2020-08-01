@@ -586,7 +586,8 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        shared_examples 'allows access to field of projected association' do
+        context 'when the record is queried with a field on the embedded association projected' do
+          let(:persisted_person) { Person.only("pass.number").first }
 
           it 'creates an accessor for the projected field on the embedded document' do
             expect(persisted_person.passport.number).to eq("123123321")
@@ -599,29 +600,53 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context 'when the record is queried with a field on the embedded association projected' do
-          let(:persisted_person) { Person.only("pass.number").first }
-
-          include_examples 'allows access to field of projected association'
-        end
-
         context 'when projecting association and a field in association' do
-          let(:persisted_person) { Person.only(:pass, "pass.number").first }
+          shared_examples 'is prohibited on 4.4+ server' do
+            context '4.4 server and higher' do
+              min_server_version '4.4'
 
-          context '4.2 server and lower' do
-            max_server_version '4.2'
-
-            include_examples 'allows access to field of projected association'
+              it 'is not allowed by server' do
+                lambda do
+                  persisted_person
+                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass/)
+              end
+            end
           end
 
-          context '4.4 server and higher' do
-            min_server_version '4.4'
+          context 'association then field' do
+            let(:persisted_person) { Person.only(:pass, "pass.number").first }
 
-            it 'is not allowed by server' do
-              lambda do
-                persisted_person
-              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass.number/)
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              it 'creates an accessor for the projected field on the embedded document' do
+                expect(persisted_person.passport.number).to eq("123123321")
+              end
+
+              it 'does not retrieve other fields' do
+                persisted_person.passport.country.should be nil
+              end
             end
+
+            include_examples 'is prohibited on 4.4+ server'
+          end
+
+          context 'field then association' do
+            let(:persisted_person) { Person.only('pass.number', :pass).first }
+
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              it 'creates an accessor for the projected field on the embedded document' do
+                expect(persisted_person.passport.number).to eq("123123321")
+              end
+
+              it 'retrieves other fields' do
+                persisted_person.passport.country.should == 'USA'
+              end
+            end
+
+            include_examples 'is prohibited on 4.4+ server'
           end
         end
       end
@@ -651,6 +676,12 @@ describe Mongoid::Association::Accessors do
           it 'creates an accessor for the projected field on the embedded document' do
             expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
           end
+        end
+
+        context 'when the record is queried with a field on the embedded association projected' do
+          let(:persisted_person) { Person.only("phone_numbers.number").first }
+
+          include_examples 'allows access to field of projected association'
 
           it 'does not create an accessor for another field on the embedded document' do
             expect do
@@ -659,29 +690,50 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context 'when the record is queried with a field on the embedded association projected' do
-          let(:persisted_person) { Person.only("phone_numbers.number").first }
-
-          include_examples 'allows access to field of projected association'
-        end
-
         context 'when projecting association and a field in association' do
-          let(:persisted_person) { Person.only(:phone_numbers, 'phone_numbers.number').first }
 
-          context '4.2 server and lower' do
-            max_server_version '4.2'
+          shared_examples 'is prohibited on 4.4+ server' do
+            context '4.4 server and higher' do
+              min_server_version '4.4'
 
-            include_examples 'allows access to field of projected association'
+              it 'is not allowed by server' do
+                lambda do
+                  persisted_person
+                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers/)
+              end
+            end
           end
 
-          context '4.4 server and higher' do
-            min_server_version '4.4'
+          context 'association then field' do
+            let(:persisted_person) { Person.only(:phone_numbers, 'phone_numbers.number').first }
 
-            it 'is not allowed by server' do
-              lambda do
-                persisted_person
-              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers.number/)
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              include_examples 'allows access to field of projected association'
+
+              it 'does not retrieve fields other than the projected one' do
+                persisted_person.phone_numbers.first.landline.should be nil
+              end
             end
+
+            include_examples 'is prohibited on 4.4+ server'
+          end
+
+          context 'field then association' do
+            let(:persisted_person) { Person.only('phone_numbers.number', :phone_numbers).first }
+
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              include_examples 'allows access to field of projected association'
+
+              it 'retrieves all fields of association' do
+                persisted_person.phone_numbers.first.landline.should be true
+              end
+            end
+
+            include_examples 'is prohibited on 4.4+ server'
           end
         end
       end
