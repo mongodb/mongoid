@@ -258,133 +258,13 @@ describe Mongoid::Association::Accessors do
         context "when the association exists" do
 
           let!(:passport) do
-            person.build_passport(number: "123123321", country: "USA")
+            person.build_passport(number: "123123321")
           end
 
           it "does not build a new document" do
             expect(person.passport).to eq(passport)
           end
 
-          context "when the record is queried with the embedded association projected" do
-            before do
-              person.save!
-            end
-
-            let(:persisted_person) { Person.only(:passport).first }
-
-            it 'creates an accessor for the projected embedded document' do
-              expect(persisted_person.passport.number).to eq("123123321")
-              expect(persisted_person.passport.country).to eq("USA")
-            end
-          end
-
-          shared_examples 'allows access to field of projected association' do
-
-            it 'creates an accessor for the projected field on the embedded document' do
-              expect(persisted_person.passport.number).to eq("123123321")
-            end
-
-            it 'does not create an accessor for another field on the embedded document' do
-              expect do
-                persisted_person.passport.country
-              end.to raise_error(ActiveModel::MissingAttributeError)
-            end
-          end
-
-          context 'when the record is queried with a field on the embedded association projected' do
-            before do
-              person.save!
-            end
-
-            let(:persisted_person) { Person.only("pass.number").first }
-
-            it_behaves_like 'allows access to field of projected association' do
-          end
-
-          context 'when projecting association and a field in association'
-            before do
-              person.save!
-            end
-
-            let(:persisted_person) { Person.only(:pass, "pass.number").first }
-
-            context '4.2 server and lower' do
-              max_server_version '4.2'
-
-              it_behaves_like 'allows access to field of projected association'
-            end
-
-            context '4.4 server and higher' do
-              min_server_version '4.4'
-
-              it 'is not allowed by server' do
-                lambda do
-                  persisted_person
-                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass.number/)
-              end
-            end
-          end
-        end
-      end
-
-      context 'when the association is an embeds many' do
-        let!(:phone_numbers) do
-          person.phone_numbers.build(number: '111-111-1111', landline: true)
-        end
-
-        context 'when the association exists' do
-          before do
-            person.save!
-          end
-
-          context 'when the record is queried with the embedded association projected' do
-            let(:persisted_person) { Person.only(:phone_numbers).first }
-
-            it 'creates an accessor for the embedded document' do
-              expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
-              expect(persisted_person.phone_numbers.first.landline).to be true
-            end
-          end
-
-          shared_examples 'allows access to field of projected association' do
-            it 'creates an accessor for the embedded document' do
-              expect(persisted_person.phone_numbers.first).to be_a_kind_of(Phone)
-            end
-
-            it 'creates an accessor for the projected field on the embedded document' do
-              expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
-            end
-
-            it 'does not create an accessor for another field on the embedded document' do
-              expect do
-                persisted_person.phone_numbers.first.landline
-              end.to raise_error(ActiveModel::MissingAttributeError)
-            end
-          end
-
-          context 'when the record is queried with a field on the embedded association projected' do
-            let(:persisted_person) { Person.only("phone_numbers.number").first }
-
-            it_behaves_like 'allows access to field of projected association'
-          end
-
-          context 'when projecting association and a field in association' do
-            let(:persisted_person) { Person.only(:phone_numbers, 'phone_numbers.number').first }
-
-            context '4.2 server and lower' do
-              max_server_version '4.2'
-
-              it_behaves_like 'allows access to field of projected association'
-            end
-
-            context '4.4 server and higher' do
-              it 'is not allowed by server' do
-                lambda do
-                  persisted_person
-                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers.number/)
-              end
-            end
-          end
         end
       end
 
@@ -685,6 +565,123 @@ describe Mongoid::Association::Accessors do
 
           it "returns the correct document" do
             expect(rating).to eq(book_rating)
+          end
+        end
+      end
+    end
+
+    context 'when projecting' do
+      context 'embeds_one' do
+
+        let!(:person) do
+          Person.create!(passport: Passport.new(number: "123123321", country: "USA"))
+        end
+
+        context "when the record is queried with the embedded association projected" do
+          let(:persisted_person) { Person.only(:passport).first }
+
+          it 'creates an accessor for the projected embedded document' do
+            expect(persisted_person.passport.number).to eq("123123321")
+            expect(persisted_person.passport.country).to eq("USA")
+          end
+        end
+
+        shared_examples 'allows access to field of projected association' do
+
+          it 'creates an accessor for the projected field on the embedded document' do
+            expect(persisted_person.passport.number).to eq("123123321")
+          end
+
+          it 'does not create an accessor for another field on the embedded document' do
+            expect do
+              persisted_person.passport.country
+            end.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context 'when the record is queried with a field on the embedded association projected' do
+          let(:persisted_person) { Person.only("pass.number").first }
+
+          include_examples 'allows access to field of projected association'
+        end
+
+        context 'when projecting association and a field in association' do
+          let(:persisted_person) { Person.only(:pass, "pass.number").first }
+
+          context '4.2 server and lower' do
+            max_server_version '4.2'
+
+            include_examples 'allows access to field of projected association'
+          end
+
+          context '4.4 server and higher' do
+            min_server_version '4.4'
+
+            it 'is not allowed by server' do
+              lambda do
+                persisted_person
+              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass.number/)
+            end
+          end
+        end
+      end
+
+      context 'embeds_many' do
+
+        let!(:person) do
+          Person.create!(phone_numbers: [
+            Phone.new(number: '111-111-1111', landline: true),
+          ])
+        end
+
+        context 'when the record is queried with the embedded association projected' do
+          let(:persisted_person) { Person.only(:phone_numbers).first }
+
+          it 'creates an accessor for the embedded document' do
+            expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
+            expect(persisted_person.phone_numbers.first.landline).to be true
+          end
+        end
+
+        shared_examples 'allows access to field of projected association' do
+          it 'creates an accessor for the embedded document' do
+            expect(persisted_person.phone_numbers.first).to be_a_kind_of(Phone)
+          end
+
+          it 'creates an accessor for the projected field on the embedded document' do
+            expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
+          end
+
+          it 'does not create an accessor for another field on the embedded document' do
+            expect do
+              persisted_person.phone_numbers.first.landline
+            end.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context 'when the record is queried with a field on the embedded association projected' do
+          let(:persisted_person) { Person.only("phone_numbers.number").first }
+
+          include_examples 'allows access to field of projected association'
+        end
+
+        context 'when projecting association and a field in association' do
+          let(:persisted_person) { Person.only(:phone_numbers, 'phone_numbers.number').first }
+
+          context '4.2 server and lower' do
+            max_server_version '4.2'
+
+            include_examples 'allows access to field of projected association'
+          end
+
+          context '4.4 server and higher' do
+            min_server_version '4.4'
+
+            it 'is not allowed by server' do
+              lambda do
+                persisted_person
+              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers.number/)
+            end
           end
         end
       end
