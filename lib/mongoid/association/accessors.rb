@@ -131,11 +131,16 @@ module Mongoid
       # @api private
       def _mongoid_filter_selected_fields(assoc_key)
         return nil unless __selected_fields
+
+        # If we are asked to project an association, we need all of that
+        # association's fields, so bypass the rest of this method and return
+        # nil signifying that we want all fields.
+        return nil if __selected_fields[assoc_key]
+
         filtered = {}
         __selected_fields.each do |k, v|
           bits = k.split('.')
-          # Don't include the assoc_key in the filtered fields
-          if bits.length > 1 && bits.first == assoc_key
+          if bits.first == assoc_key
             bits.shift
             filtered[bits.join('.')] = v
           end
