@@ -50,6 +50,10 @@ Articles
 - `How To Create A Ruby API With Sinatra <https://x-team.com/blog/how-to-create-a-ruby-api-with-sinatra>`_
 
   Creating a Sinatra API with Mongoid
+
+- `Converting an existing Ruby on Rails application to MongoDB <https://ibraheem.ca/posts/convert-rails-to-mongodb>`_
+
+  How to Convert an existing Ruby on Rails application to use MongoDB and Mongoid
   
 
 Projects
