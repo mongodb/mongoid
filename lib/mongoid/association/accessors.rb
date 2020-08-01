@@ -132,18 +132,47 @@ module Mongoid
       def _mongoid_filter_selected_fields(assoc_key)
         return nil unless __selected_fields
 
-        # If we are asked to project an association, we need all of that
-        # association's fields, so bypass the rest of this method and return
-        # nil signifying that we want all fields.
-        return nil if __selected_fields[assoc_key]
+        projecting_assoc = false
 
         filtered = {}
         __selected_fields.each do |k, v|
           bits = k.split('.')
+
+          # If we are asked to project an association, we need all of that
+          # association's fields. However, we may be asked to project
+          # an association *and* its fields in the same query. In this case
+          # behavior differs according to server version:
+          #
+          # 4.2 and lower take the most recent projection specification, meaning
+          # projecting foo followed by foo.bar effectively projects foo.bar and
+          # projecting foo.bar followed by foo effectively projects foo.
+          # To match this behavior we need to track when we are being asked
+          # to project the association and when we are asked to project a field,
+          # and if we are asked to project the association last we need to
+          # remove any field projections.
+          #
+          # 4.4 (and presumably higher) do not allow projection to be on an
+          # association and its field, so it doesn't matter what we do. Hence
+          # we just need to handle the 4.2 and lower case correctly.
           if bits.first == assoc_key
-            bits.shift
-            filtered[bits.join('.')] = v
+            # Projecting the entire association OR some of its fields
+            if bits.length > 1
+              # Projecting a field
+              bits.shift
+              filtered[bits.join('.')] = v
+              projecting_assoc = false
+            else
+              # Projecting the entire association
+              projecting_assoc = true
+            end
           end
+        end
+
+        if projecting_assoc
+          # The last projection was of the entire association; we may have
+          # also been projecting fields, but discard the field projections
+          # and return nil indicating we want the entire association.
+          return nil
         end
 
         # Positional projection is specified as "foo.$". In this case the

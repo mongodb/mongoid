@@ -623,8 +623,10 @@ describe Mongoid::Association::Accessors do
                 expect(persisted_person.passport.number).to eq("123123321")
               end
 
-              it 'does not retrieve other fields' do
-                persisted_person.passport.country.should be nil
+              it 'does not create an accessor for another field on the embedded document' do
+                expect do
+                  persisted_person.passport.country
+                end.to raise_error(ActiveModel::MissingAttributeError)
               end
             end
 
@@ -712,9 +714,12 @@ describe Mongoid::Association::Accessors do
 
               include_examples 'allows access to field of projected association'
 
-              it 'does not retrieve fields other than the projected one' do
-                persisted_person.phone_numbers.first.landline.should be nil
+              it 'does not create an accessor for another field on the embedded document' do
+                expect do
+                  persisted_person.phone_numbers.first.landline
+                end.to raise_error(ActiveModel::MissingAttributeError)
               end
+
             end
 
             include_examples 'is prohibited on 4.4+ server'
