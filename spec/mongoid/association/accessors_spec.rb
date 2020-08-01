@@ -278,12 +278,7 @@ describe Mongoid::Association::Accessors do
             end
           end
 
-          context 'when the record is queried with a field on the embedded association projected' do
-            before do
-              person.save!
-            end
-
-            let(:persisted_person) { Person.only("pass.number").first }
+          shared_examples 'allows access to field of projected association' do
 
             it 'creates an accessor for the projected field on the embedded document' do
               expect(persisted_person.passport.number).to eq("123123321")
@@ -296,13 +291,37 @@ describe Mongoid::Association::Accessors do
             end
           end
 
-          context 'when projecting association and a field in association' do
+          context 'when the record is queried with a field on the embedded association projected' do
+            before do
+              person.save!
+            end
+
+            let(:persisted_person) { Person.only("pass.number").first }
+
+            it_behaves_like 'allows access to field of projected association' do
+          end
+
+          context 'when projecting association and a field in association'
+            before do
+              person.save!
+            end
+
             let(:persisted_person) { Person.only(:pass, "pass.number").first }
 
-            it 'is not allowed by server' do
-              lambda do
-                persisted_person
-              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass.number/)
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              it_behaves_like 'allows access to field of projected association'
+            end
+
+            context '4.4 server and higher' do
+              min_server_version '4.4'
+
+              it 'is not allowed by server' do
+                lambda do
+                  persisted_person
+                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass.number/)
+              end
             end
           end
         end
@@ -327,9 +346,7 @@ describe Mongoid::Association::Accessors do
             end
           end
 
-          context 'when the record is queried with a field on the embedded association projected' do
-            let(:persisted_person) { Person.only("phone_numbers.number").first }
-
+          shared_examples 'allows access to field of projected association' do
             it 'creates an accessor for the embedded document' do
               expect(persisted_person.phone_numbers.first).to be_a_kind_of(Phone)
             end
@@ -345,13 +362,27 @@ describe Mongoid::Association::Accessors do
             end
           end
 
+          context 'when the record is queried with a field on the embedded association projected' do
+            let(:persisted_person) { Person.only("phone_numbers.number").first }
+
+            it_behaves_like 'allows access to field of projected association'
+          end
+
           context 'when projecting association and a field in association' do
             let(:persisted_person) { Person.only(:phone_numbers, 'phone_numbers.number').first }
 
-            it 'is not allowed by server' do
-              lambda do
-                persisted_person
-              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers.number/)
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              it_behaves_like 'allows access to field of projected association'
+            end
+
+            context '4.4 server and higher' do
+              it 'is not allowed by server' do
+                lambda do
+                  persisted_person
+                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers.number/)
+              end
             end
           end
         end
