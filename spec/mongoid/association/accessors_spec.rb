@@ -295,6 +295,16 @@ describe Mongoid::Association::Accessors do
               end.to raise_error(ActiveModel::MissingAttributeError)
             end
           end
+
+          context 'when projecting association and a field in association' do
+            let(:persisted_person) { Person.only(:pass, "pass.number").first }
+
+            it 'is not allowed by server' do
+              lambda do
+                persisted_person
+              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass.number/)
+            end
+          end
         end
       end
 
@@ -304,11 +314,11 @@ describe Mongoid::Association::Accessors do
         end
 
         context 'when the association exists' do
-          context 'when the record is queried with the embedded association projected' do
-            before do
-              person.save!
-            end
+          before do
+            person.save!
+          end
 
+          context 'when the record is queried with the embedded association projected' do
             let(:persisted_person) { Person.only(:phone_numbers).first }
 
             it 'creates an accessor for the embedded document' do
@@ -318,10 +328,6 @@ describe Mongoid::Association::Accessors do
           end
 
           context 'when the record is queried with a field on the embedded association projected' do
-            before do
-              person.save!
-            end
-
             let(:persisted_person) { Person.only("phone_numbers.number").first }
 
             it 'creates an accessor for the embedded document' do
@@ -336,6 +342,16 @@ describe Mongoid::Association::Accessors do
               expect do
                 persisted_person.phone_numbers.first.landline
               end.to raise_error(ActiveModel::MissingAttributeError)
+            end
+          end
+
+          context 'when projecting association and a field in association' do
+            let(:persisted_person) { Person.only(:phone_numbers, 'phone_numbers.number').first }
+
+            it 'is not allowed by server' do
+              lambda do
+                persisted_person
+              end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers.number/)
             end
           end
         end
