@@ -267,7 +267,7 @@ describe Mongoid::Association::Accessors do
 
           context "when the record is queried with the embedded relation projected" do
             before do
-              person.save
+              person.save!
             end
 
             let(:persisted_person) { Person.only(:passport).first }
@@ -280,7 +280,7 @@ describe Mongoid::Association::Accessors do
 
           context 'when the record is queried with a field on the embedded relation projected' do
             before do
-              person.save
+              person.save!
             end
 
             let(:persisted_person) { Person.only("pass.number").first }
@@ -306,7 +306,7 @@ describe Mongoid::Association::Accessors do
         context 'when the relation exists' do
           context 'when the record is queried with the embedded relation projected' do
             before do
-              person.save
+              person.save!
             end
 
             let(:persisted_person) { Person.only(:phone_numbers).first }
@@ -319,7 +319,7 @@ describe Mongoid::Association::Accessors do
 
           context 'when the record is queried with a field on the embedded relation projected' do
             before do
-              person.save
+              person.save!
             end
 
             let(:persisted_person) { Person.only("phone_numbers.number").first }
@@ -817,7 +817,7 @@ describe Mongoid::Association::Accessors do
 
       before do
         game.person_id = ""
-        game.save
+        game.save!
       end
 
       it "sets the foreign key to empty" do
@@ -829,7 +829,7 @@ describe Mongoid::Association::Accessors do
 
       before do
         game.person_id = person.id.to_s
-        game.save
+        game.save!
       end
 
       it "sets the foreign key as ObjectID" do
@@ -841,7 +841,7 @@ describe Mongoid::Association::Accessors do
 
       before do
         game.person_id = person.id
-        game.save
+        game.save!
       end
 
       it "keeps the foreign key as ObjectID" do
