@@ -571,8 +571,7 @@ The following operators are supported:
 - :manual:`$exists </reference/operator/query/exists/>`
   (:manual:`$type </reference/operator/query/type/>` is not currently supported).
 - :manual:`$regex </reference/operator/query/regex/>` (``$options`` field
-  is not currently supported, the options must be given as part of the
-  regular expression object).
+  is only supported when the ``$regex`` argument is a string).
 - :manual:`Array query operators </reference/operator/query-array/>`.
 
 For example, using the model definitions just given, we could query
@@ -608,6 +607,10 @@ The following deviations are known:
   this creates bogus queries. Embedded matchers raise the ``InvalidQuery``
   exception in these cases. The operators that are known to be affected are
   ``$elemMatch``, ``$eq``, ``$gt``, ``$gte``, ``$lt``, ``$lte`` and ``$ne``.
+
+- When performing embedded matching with ``$regex``, `it is not currently
+  possible <https://jira.mongodb.org/browse/MONGOID-4936>`_ to specify a
+  regular expression object as the pattern and also provide options.
 
 
 Common Behavior
