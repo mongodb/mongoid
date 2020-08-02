@@ -589,7 +589,7 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: "ruby-2.6"
-    mongodb-version: ["4.2", '4.0', '3.6']
+    mongodb-version: ["4.2", '4.0', '3.6', '2.6']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
