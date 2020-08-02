@@ -603,6 +603,12 @@ The following deviations are known:
   newer versions do. Mongoid adopts the behavior of current server versions
   and validates more strictly.
 
+- Mongoid DSL expands ``Range`` arguments to hashes with ``$gte`` and ``$lte``
+  conditions. `In some cases <https://jira.mongodb.org/browse/MONGOID-4908>`_
+  this creates bogus queries. Embedded matchers raise the ``InvalidQuery``
+  exception in these cases. The operators that are known to be affected are
+  ``$elemMatch``, ``$eq``, ``$gt``, ``$gte``, ``$lt``, ``$lte`` and ``$ne``.
+
 
 Common Behavior
 ===============
