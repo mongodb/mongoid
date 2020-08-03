@@ -132,8 +132,32 @@ module Mongoid
             next
           end
 
-          # Database must exist in order to run collStats
-          model.collection.create
+          # Database of the collection must exist in order to run collStats.
+          # Depending on server version, the collection itself must also
+          # exist.
+          # MongoDB does not have a command to create the database; the best
+          # approximation of it is to create the collection we want.
+          # On older servers, creating a collection that already exists is
+          # an error.
+          # Additionally, 3.6 and potentially older servers do not provide
+          # the error code when they are asked to collStats a non-existent
+          # collection (https://jira.mongodb.org/browse/SERVER-50070).
+          begin
+            stats = model.collection.database.command(collStats: model.collection.name).first
+          rescue Mongo::Error::OperationFailure => exc
+            # Code 26 is database does not exist.
+            # Code 8 is collection does not exist, as of 4.0.
+            # On 3.6 and earlier match the text of exception message.
+            if exc.code == 26 || exc.code == 8 ||
+              exc.code.nil? && exc.message =~ /not found/
+            then
+              model.collection.create
+
+              stats = model.collection.database.command(collStats: model.collection.name).first
+            else
+              raise
+            end
+          end
 
           stats = model.collection.database.command(collStats: model.collection.name).first
           if stats[:sharded]
@@ -142,7 +166,18 @@ module Mongoid
           end
 
           admin_db = model.collection.client.use(:admin).database
-          admin_db.command(enableSharding: model.collection.database.name)
+
+          begin
+            admin_db.command(enableSharding: model.collection.database.name)
+          rescue Mongo::Error::OperationFailure => exc
+            # Server 2.6 fails if sharding is already enabled
+            if exc.code == 23 || exc.code.nil? && exc.message =~ /already enabled/
+              # Nothing
+            else
+              raise
+            end
+          end
+
           begin
             admin_db.command(shardCollection: model.collection.namespace, **model.shard_config)
           rescue Mongo::Error::OperationFailure => e

@@ -574,11 +574,22 @@ axes:
           APP_TESTS: yes
 
 buildvariants:
-- matrix_name: "topologies"
+- matrix_name: "drivers"
   matrix_spec:
     driver: [current, master, stable]
     ruby: "ruby-2.7"
     mongodb-version: "4.4"
+    topology: '*'
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - rhel70-small
+  tasks:
+     - name: "test"
+- matrix_name: "topologies"
+  matrix_spec:
+    driver: current
+    ruby: "ruby-2.6"
+    mongodb-version: '*'
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -612,7 +623,7 @@ buildvariants:
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.5"
-    mongodb-version: ["3.0","2.6"]
+    mongodb-version: ["3.0", "2.6"]
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
@@ -624,7 +635,7 @@ buildvariants:
     driver: "current"
     jruby: "jruby-9.2"
     mongodb-version: "4.2"
-    topology: ["standalone", "replica-set"]
+    topology: '*'
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
