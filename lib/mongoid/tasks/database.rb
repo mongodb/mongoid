@@ -166,7 +166,18 @@ module Mongoid
           end
 
           admin_db = model.collection.client.use(:admin).database
-          admin_db.command(enableSharding: model.collection.database.name)
+
+          begin
+            admin_db.command(enableSharding: model.collection.database.name)
+          rescue Mongo::Error::OperationFailure => exc
+            # Server 2.6 fails if sharding is already enabled
+            if exc.code.nil? && exc.message =~ /already enabled/
+              # Nothing
+            else
+              raise
+            end
+          end
+
           begin
             admin_db.command(shardCollection: model.collection.namespace, **model.shard_config)
           rescue Mongo::Error::OperationFailure => e
