@@ -1158,6 +1158,17 @@ collection. An additional attribute ``_type`` is stored in order to make sure wh
 from the database the correct document is returned. This also holds true for the embedded
 documents ``Circle``, ``Rectangle``, and ``Shape``.
 
+.. note::
+
+    When searching for a ``Circle``, the query will only return documents in the shape collection
+    where the ``_type`` (or whatever the discriminator key was set to) field has the value ``Circle`` (or
+    whatever the discriminator value was set to), all other discriminator values will be considered an object
+    of the Shape class.
+
+    Similarly, when querying by parent classes (``Canvas`` in this example), any documents in the collection
+    that do not have a discriminator value, or whose discriminator value does not map to either the parent
+    or any of its descendants, will be returned as instances of the parent class.
+
 Changing the Discriminator Key
 ------------------------------
 Mongoid supports changing the discriminator key from the default ``_type``. There are a few
@@ -1289,10 +1300,6 @@ Take the above example:
 Here, a call to the ``discriminator_value=`` setter was added to ``Circle``.
 Now, on creation of a ``Circle``, the document will contain a field with the key ``_type`` (or whatever the ``discriminator_key`` was changed to)
 and the value "round thing."
-
-Note that after changing the discriminator value, when searching for a ``Circle``, the query will only return documents in the shape collection
-with the discriminator field having the value "round thing." All other discriminator values (even ``Circle``) that already exist in the database
-will be considered an object of the ``Shape`` class.
 
 Querying Subclasses
 -------------------
