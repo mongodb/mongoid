@@ -46,8 +46,17 @@ describe Mongoid::Contextual::GeoNear do
         described_class.new(collection, criteria, [ 52, 13 ])
       end
 
-      it "returns 0.0" do
-        expect(geo_near.average_distance).to be_nil
+      let(:expected_value) do
+        if ClusterConfig.instance.fcv_ish == '4.0' && ClusterConfig.instance.topology == :sharded
+          # https://jira.mongodb.org/browse/SERVER-50074
+          0.0
+        else
+          nil
+        end
+      end
+
+      it "is nil except for 4.0 sharded when it is 0" do
+        expect(geo_near.average_distance).to be expected_value
       end
     end
   end
