@@ -11,9 +11,9 @@ describe Mongoid::Association::Accessors do
       Person.create
     end
 
-    context "when the relation is a has one" do
+    context "when the association is a has one" do
 
-      context "when the relation exists" do
+      context "when the association exists" do
 
         let!(:game) do
           person.build_game
@@ -24,7 +24,7 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation does not exist" do
+      context "when the association does not exist" do
 
         context "when not autobuilding" do
 
@@ -42,9 +42,9 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is a has many" do
+    context "when the association is a has many" do
 
-      context "when the relation has documents" do
+      context "when the association has documents" do
 
         let!(:post) do
           person.posts.build
@@ -55,7 +55,7 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation does not have documents" do
+      context "when the association does not have documents" do
 
         it "returns false" do
           expect(person).to_not have_posts
@@ -63,9 +63,9 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is a has and belongs to many" do
+    context "when the association is a has and belongs to many" do
 
-      context "when the relation has documents" do
+      context "when the association has documents" do
 
         let!(:preference) do
           person.preferences.build
@@ -76,7 +76,7 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation does not have documents" do
+      context "when the association does not have documents" do
 
         it "returns false" do
           expect(person).to_not have_preferences
@@ -84,9 +84,9 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is a belongs to" do
+    context "when the association is a belongs to" do
 
-      context "when the relation is named next" do
+      context "when the association is named next" do
 
         let(:user) do
           User.create
@@ -97,7 +97,7 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation exists" do
+      context "when the association exists" do
 
         let!(:game) do
           person.build_game
@@ -108,9 +108,9 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation does not exist" do
+      context "when the association does not exist" do
 
-        context "when the relation does not autobuild" do
+        context "when the association does not autobuild" do
 
           let(:game) do
             Game.new
@@ -121,7 +121,7 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context "when the relation autobuilds" do
+        context "when the association autobuilds" do
 
           let(:book) do
             Book.new
@@ -134,9 +134,9 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is an embeds one" do
+    context "when the association is an embeds one" do
 
-      context "when the relation exists" do
+      context "when the association exists" do
 
         let!(:name) do
           person.build_name
@@ -147,16 +147,16 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation does not exist" do
+      context "when the association does not exist" do
 
-        context "when the relation does not autobuild" do
+        context "when the association does not autobuild" do
 
           it "returns false" do
             expect(person).to_not have_name
           end
         end
 
-        context "when the relation autobuilds" do
+        context "when the association autobuilds" do
 
           let(:person) do
             Person.new
@@ -169,9 +169,9 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is an embeds many" do
+    context "when the association is an embeds many" do
 
-      context "when the relation has documents" do
+      context "when the association has documents" do
 
         let!(:address) do
           person.addresses.build
@@ -182,7 +182,7 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation does not have documents" do
+      context "when the association does not have documents" do
 
         it "returns false" do
           expect(person).to_not have_addresses
@@ -190,9 +190,9 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is an embedded in" do
+    context "when the association is an embedded in" do
 
-      context "when the relation exists" do
+      context "when the association exists" do
 
         let!(:name) do
           person.build_name
@@ -203,9 +203,9 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation does not exist" do
+      context "when the association does not exist" do
 
-        context "when the relation does not autobuild" do
+        context "when the association does not autobuild" do
 
           let(:name) do
             Name.new
@@ -216,7 +216,7 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context "when the relation autobuilds" do
+        context "when the association autobuilds" do
 
           let(:passport) do
             Passport.new
@@ -236,11 +236,11 @@ describe Mongoid::Association::Accessors do
       Person.new
     end
 
-    context "when autobuilding the relation" do
+    context "when autobuilding the association" do
 
-      context "when the relation is an embeds one" do
+      context "when the association is an embeds one" do
 
-        context "when the relation does not exist" do
+        context "when the association does not exist" do
 
           let!(:passport) do
             person.passport
@@ -255,7 +255,7 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context "when the relation exists" do
+        context "when the association exists" do
 
           let!(:passport) do
             person.build_passport(number: "123123321")
@@ -264,16 +264,17 @@ describe Mongoid::Association::Accessors do
           it "does not build a new document" do
             expect(person.passport).to eq(passport)
           end
+
         end
       end
 
-      context "when the relation is an embedded in" do
+      context "when the association is an embedded in" do
 
         let(:passport) do
           Passport.new
         end
 
-        context "when the relation does not exist" do
+        context "when the association does not exist" do
 
           let(:person) do
             passport.person
@@ -284,7 +285,7 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context "when the relation exists" do
+        context "when the association exists" do
 
           let!(:person) do
             passport.build_person(title: "sir")
@@ -296,9 +297,9 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation is a has one" do
+      context "when the association is a has one" do
 
-        context "when the relation does not exist" do
+        context "when the association does not exist" do
 
           let(:book) do
             person.book
@@ -309,7 +310,7 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context "when the relation exists" do
+        context "when the association exists" do
 
           let!(:book) do
             person.build_book(title: "art of war")
@@ -321,13 +322,13 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation is a belongs to" do
+      context "when the association is a belongs to" do
 
         let(:book) do
           Book.new
         end
 
-        context "when the relation does not exist" do
+        context "when the association does not exist" do
 
           let(:person) do
             book.person
@@ -338,7 +339,7 @@ describe Mongoid::Association::Accessors do
           end
         end
 
-        context "when the relation exists" do
+        context "when the association exists" do
 
           let!(:person) do
             book.build_person(title: "sir")
@@ -351,13 +352,13 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:person) do
         Person.create
       end
 
-      context "when the relation is a many to many" do
+      context "when the association is a many to many" do
 
         let!(:preference) do
           Preference.create(name: "Setting")
@@ -367,7 +368,7 @@ describe Mongoid::Association::Accessors do
           person.preferences << Preference.last
         end
 
-        context "when reloading the relation directly" do
+        context "when reloading the association directly" do
 
           let(:preferences) do
             person.preferences(true)
@@ -409,7 +410,7 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation is a many to one" do
+      context "when the association is a many to one" do
 
         let!(:post) do
           Post.create(title: "First!")
@@ -419,7 +420,7 @@ describe Mongoid::Association::Accessors do
           person.posts << Post.last
         end
 
-        context "when reloading the relation directly" do
+        context "when reloading the association directly" do
 
           let(:posts) do
             person.posts(true)
@@ -461,7 +462,7 @@ describe Mongoid::Association::Accessors do
         end
       end
 
-      context "when the relation is a references one" do
+      context "when the association is a references one" do
 
         let!(:game) do
           Game.create(name: "Centipeded")
@@ -471,7 +472,7 @@ describe Mongoid::Association::Accessors do
           person.game = Game.last
         end
 
-        context "when reloading the relation directly" do
+        context "when reloading the association directly" do
 
           let(:reloaded_game) do
             person.game(true)
@@ -514,7 +515,7 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       context "when there's a single references many/one" do
 
@@ -568,9 +569,183 @@ describe Mongoid::Association::Accessors do
         end
       end
     end
+
+    context 'when projecting' do
+      context 'embeds_one' do
+
+        let!(:person) do
+          Person.create!(passport: Passport.new(number: "123123321", country: "USA"))
+        end
+
+        context "when the record is queried with the embedded association projected" do
+          let(:persisted_person) { Person.only(:passport).first }
+
+          it 'creates an accessor for the projected embedded document' do
+            expect(persisted_person.passport.number).to eq("123123321")
+            expect(persisted_person.passport.country).to eq("USA")
+          end
+        end
+
+        context 'when the record is queried with a field on the embedded association projected' do
+          let(:persisted_person) { Person.only("pass.number").first }
+
+          it 'creates an accessor for the projected field on the embedded document' do
+            expect(persisted_person.passport.number).to eq("123123321")
+          end
+
+          it 'does not create an accessor for another field on the embedded document' do
+            expect do
+              persisted_person.passport.country
+            end.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context 'when projecting association and a field in association' do
+          shared_examples 'is prohibited on 4.4+ server' do
+            context '4.4 server and higher' do
+              min_server_version '4.4'
+
+              it 'is not allowed by server' do
+                lambda do
+                  persisted_person
+                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at pass/)
+              end
+            end
+          end
+
+          context 'association then field' do
+            let(:persisted_person) { Person.only(:pass, "pass.number").first }
+
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              it 'creates an accessor for the projected field on the embedded document' do
+                expect(persisted_person.passport.number).to eq("123123321")
+              end
+
+              it 'does not create an accessor for another field on the embedded document' do
+                expect do
+                  persisted_person.passport.country
+                end.to raise_error(ActiveModel::MissingAttributeError)
+              end
+            end
+
+            include_examples 'is prohibited on 4.4+ server'
+          end
+
+          context 'field then association' do
+            let(:persisted_person) { Person.only('pass.number', :pass).first }
+
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              it 'creates an accessor for the projected field on the embedded document' do
+                expect(persisted_person.passport.number).to eq("123123321")
+              end
+
+              it 'retrieves other fields' do
+                persisted_person.passport.country.should == 'USA'
+              end
+            end
+
+            include_examples 'is prohibited on 4.4+ server'
+          end
+        end
+      end
+
+      context 'embeds_many' do
+
+        let!(:person) do
+          Person.create!(phone_numbers: [
+            Phone.new(number: '111-111-1111', landline: true),
+          ])
+        end
+
+        context 'when the record is queried with the embedded association projected' do
+          let(:persisted_person) { Person.only(:phone_numbers).first }
+
+          it 'creates an accessor for the embedded document' do
+            expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
+            expect(persisted_person.phone_numbers.first.landline).to be true
+          end
+        end
+
+        shared_examples 'allows access to field of projected association' do
+          it 'creates an accessor for the embedded document' do
+            expect(persisted_person.phone_numbers.first).to be_a_kind_of(Phone)
+          end
+
+          it 'creates an accessor for the projected field on the embedded document' do
+            expect(persisted_person.phone_numbers.first.number).to eq('111-111-1111')
+          end
+        end
+
+        context 'when the record is queried with a field on the embedded association projected' do
+          let(:persisted_person) { Person.only("phone_numbers.number").first }
+
+          include_examples 'allows access to field of projected association'
+
+          it 'does not create an accessor for another field on the embedded document' do
+            expect do
+              persisted_person.phone_numbers.first.landline
+            end.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+
+        context 'when projecting association and a field in association' do
+
+          shared_examples 'is prohibited on 4.4+ server' do
+            context '4.4 server and higher' do
+              min_server_version '4.4'
+
+              it 'is not allowed by server' do
+                lambda do
+                  persisted_person
+                end.should raise_error(Mongo::Error::OperationFailure, /Path collision at phone_numbers/)
+              end
+            end
+          end
+
+          context 'association then field' do
+            let(:persisted_person) { Person.only(:phone_numbers, 'phone_numbers.number').first }
+
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              include_examples 'allows access to field of projected association'
+
+              it 'does not create an accessor for another field on the embedded document' do
+                expect do
+                  persisted_person.phone_numbers.first.landline
+                end.to raise_error(ActiveModel::MissingAttributeError)
+              end
+
+            end
+
+            include_examples 'is prohibited on 4.4+ server'
+          end
+
+          context 'field then association' do
+            let(:persisted_person) { Person.only('phone_numbers.number', :phone_numbers).first }
+
+            context '4.2 server and lower' do
+              max_server_version '4.2'
+
+              include_examples 'allows access to field of projected association'
+
+              it 'retrieves all fields of association' do
+                persisted_person.phone_numbers.first.landline.should be true
+              end
+            end
+
+            include_examples 'is prohibited on 4.4+ server'
+          end
+        end
+      end
+    end
   end
 
-  context "when setting relations to empty values" do
+  context "when setting associations to empty values" do
 
     context "when the document is a referenced in" do
 
@@ -578,7 +753,7 @@ describe Mongoid::Association::Accessors do
         Post.new
       end
 
-      context "when setting the relation directly" do
+      context "when setting the association directly" do
 
         before do
           post.person = ""
@@ -607,7 +782,7 @@ describe Mongoid::Association::Accessors do
         Person.new
       end
 
-      context "when setting the relation directly" do
+      context "when setting the association directly" do
 
         before do
           person.game = ""
@@ -743,7 +918,7 @@ describe Mongoid::Association::Accessors do
 
       before do
         game.person_id = ""
-        game.save
+        game.save!
       end
 
       it "sets the foreign key to empty" do
@@ -755,7 +930,7 @@ describe Mongoid::Association::Accessors do
 
       before do
         game.person_id = person.id.to_s
-        game.save
+        game.save!
       end
 
       it "sets the foreign key as ObjectID" do
@@ -767,7 +942,7 @@ describe Mongoid::Association::Accessors do
 
       before do
         game.person_id = person.id
-        game.save
+        game.save!
       end
 
       it "keeps the foreign key as ObjectID" do
@@ -775,30 +950,30 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context "when setting ids multiple times on the relation itself" do
+    context "when setting ids multiple times on the association itself" do
 
       before do
         game.person = person.id
         game.person = person.id
       end
 
-      it "sets the relation foreign key" do
+      it "sets the association foreign key" do
         expect(game.person_id).to eq(person.id)
       end
 
-      it "sets the appropriate relation" do
+      it "sets the appropriate association" do
         expect(game.person).to eq(person)
       end
     end
   end
 
-  context 'when setting the relation more than once' do
+  context 'when setting the association more than once' do
 
     let(:person) do
       Person.create
     end
 
-    context 'when the relation is a references one' do
+    context 'when the association is a references one' do
 
       let(:game) do
         Game.create
@@ -814,7 +989,7 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context 'when the relation is a references many' do
+    context 'when the association is a references many' do
 
       let!(:preference) do
         Preference.create(name: "Setting")
@@ -829,7 +1004,7 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context 'when the relation is an embeds one' do
+    context 'when the association is an embeds one' do
 
       let!(:name) do
         Name.new
@@ -845,7 +1020,7 @@ describe Mongoid::Association::Accessors do
       end
     end
 
-    context 'when the relation is an embeds many' do
+    context 'when the association is an embeds many' do
 
       let!(:address) do
         Address.new

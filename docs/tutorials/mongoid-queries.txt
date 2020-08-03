@@ -778,6 +778,25 @@ should therefore be avoided.
   band.tours.first
   # => #<Tour _id: 5c59afdf026d7c034dba46af, city: nil, year: 1995>
 
+.. note::
+
+  Server versions 4.2 and lower allowed projecting both an association and
+  the association's fields in the same query, as follows:
+
+  .. code-block:: ruby
+
+    band = Band.only(:tours, 'tours.year').last
+    
+  The most recent projection specification overrided the earlier one.
+  For example, the above query was equivalent to:
+
+  .. code-block:: ruby
+
+    band = Band.only('tours.year').last
+    
+  Server versions 4.4 and higher prohibit specifying an association and its
+  fields in projection in the same query.
+
 ``only`` can be specified with referenced associations (has_one, has_many,
 has_and_belongs_to_many) but is currently ignored for referenced associations -
 all fields of referenced associations will be loaded
