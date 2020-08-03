@@ -20,13 +20,15 @@ module Mongoid
     end
 
     # Module used for prepending to the various discriminator_*= methods
-    # 
+    #
     # @api private
     module DiscriminatorAssignment
       def discriminator_key=(value)
         if hereditary?
           raise Errors::InvalidDiscriminatorKeyTarget.new(self, self.superclass)
         end
+
+        _mongoid_clear_types
 
         if value
           Mongoid::Fields::Validators::Macro.validate_field_name(self, value)
@@ -39,12 +41,12 @@ module Mongoid
           class << self
             delegate :discriminator_key, to: ::Mongoid
           end
-        end 
+        end
 
         # This condition checks if the new discriminator key would overwrite
         # an existing field.
         # This condition also checks if the class has any descendants, because
-        # if it doesn't then it doesn't need a discriminator key. 
+        # if it doesn't then it doesn't need a discriminator key.
         if !fields.has_key?(self.discriminator_key) && !descendants.empty?
           default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
@@ -53,19 +55,36 @@ module Mongoid
 
       def discriminator_value=(value)
         value ||= self.name
+        _mongoid_clear_types
         add_discriminator_mapping(value)
-        super
+        @discriminator_value = value
+      end
+    end
+
+    # Module used for prepending the discriminator_value method.
+    #
+    # A separate module was needed because the subclasses of this class
+    # need to be manually prepended with the discriminator_value and can't
+    # rely on being a class_attribute because the .discriminator_value
+    # method is overriden by every subclass in the inherited method.
+    #
+    # @api private
+    module DiscriminatorRetrieval
+
+      # Get the name on the reading side if the discriminator_value is nil
+      def discriminator_value
+        @discriminator_value || self.name
       end
     end
 
     included do
       class_attribute :discriminator_key, instance_accessor: false
-      class_attribute :discriminator_value, instance_accessor: false
-            
+
       class << self
         delegate :discriminator_key, to: ::Mongoid
         prepend DiscriminatorAssignment
-        
+        include DiscriminatorRetrieval
+
         # @api private
         #
         # @return [ Hash<String, Class> ] The current mapping of discriminator_values to classes
@@ -84,16 +103,18 @@ module Mongoid
         self.discriminator_mapping[value] = klass
         superclass.add_discriminator_mapping(value, klass) if hereditary?
       end
-      
-      # Get the discriminator mapping from the parent class
+
+      # Get the discriminator mapping from the parent class. This method returns nil if there
+      # is no mapping for the given value.
       #
       # @param [ String ] value The discriminator_value to retrieve
       #
-      # @return [ Class ] klass The class corresponding to the given discriminator_value
+      # @return [ Class | nil ] klass The class corresponding to the given discriminator_value. If
+      #                               the value is not in the mapping, this method returns nil.
       #
       # @api private
       def self.get_discriminator_mapping(value)
-        self.discriminator_mapping[value]
+        self.discriminator_mapping[value] if self.discriminator_mapping
       end
     end
 
@@ -283,10 +304,15 @@ module Mongoid
         subclass._declared_scopes = Hash.new { |hash,key| self._declared_scopes[key] }
         subclass.discriminator_value = subclass.name
 
+        # We need to do this here because the discriminator_value method is
+        # overriden in the subclass above.
+        class << subclass
+          include DiscriminatorRetrieval
+        end
+
         # We only need the _type field if inheritance is in play, but need to
         # add to the root class as well for backwards compatibility.
         unless fields.has_key?(self.discriminator_key)
-          self.discriminator_value = self.name
           default_proc = lambda { self.class.discriminator_value }
           field(self.discriminator_key, default: default_proc, type: String)
         end

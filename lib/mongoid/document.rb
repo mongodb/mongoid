@@ -233,8 +233,8 @@ module Mongoid
       became.errors.instance_variable_set(:@messages, errors.instance_variable_get(:@messages))
       became.instance_variable_set(:@new_record, new_record?)
       became.instance_variable_set(:@destroyed, destroyed?)
-      became.changed_attributes[klass.discriminator_key] = self.class.to_s
-      became[klass.discriminator_key] = klass.to_s
+      became.changed_attributes[klass.discriminator_key] = self.class.discriminator_value
+      became[klass.discriminator_key] = klass.discriminator_value
 
       # mark embedded docs as persisted
       embedded_relations.each_pair do |name, meta|
@@ -353,7 +353,19 @@ module Mongoid
       #
       # @since 1.0.0
       def _types
-        @_type ||= (descendants + [ self ]).uniq.map(&:to_s)
+        @_type ||= (descendants + [ self ]).uniq.map(&:discriminator_value)
+      end
+
+      # Clear the @_type cache. This is generally called when changing the discriminator
+      # key/value on a class.
+      #
+      # @example Get the types.
+      #   document._mongoid_clear_types
+      #
+      # @api private
+      def _mongoid_clear_types
+        @_type = nil
+        superclass._mongoid_clear_types if hereditary?
       end
 
       # Set the i18n scope to overwrite ActiveModel.
