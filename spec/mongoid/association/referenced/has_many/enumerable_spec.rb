@@ -253,6 +253,111 @@ describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
         end
       end
     end
+
+    context "when the documents have been loaded" do
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      before do
+        enumerable.load_all!
+      end
+
+      it "is _loaded" do
+        expect(enumerable._loaded?).to be true
+      end
+
+      context "when a block is given" do
+        it "returns true when the predicate is true" do
+          expect(
+            enumerable.any? { |doc| true }
+          ).to be true
+        end
+
+        it "returns false when the predicate is false" do
+          expect(
+            enumerable.any? { |doc| false }
+          ).to be false
+        end
+      end
+
+      context "when an argument is given" do
+        ruby_version_gte '2.5'
+
+        it "returns true when the argument is true" do
+          expect(enumerable.any?(Post)).to be true
+        end
+
+        it "returns false when the argument is false" do
+          expect(enumerable.any?(Sandwich)).to be false
+        end
+      end
+
+      context "when both an argument and a block are given" do
+        ruby_version_gte '2.5'
+
+        it "gives precedence to the pattern" do
+          expect(
+            enumerable.any?(Post) { |doc| false }
+          ).to be true
+        end
+      end
+    end
+
+    context "when the documents are not loaded" do
+
+      let(:criteria) do
+        Post.where(person_id: person.id)
+      end
+
+      let!(:enumerable) do
+        described_class.new(criteria)
+      end
+
+      it "is not _loaded" do
+        expect(enumerable._loaded?).to be false
+      end
+
+      context "when a block is given" do
+        it "returns true when the predicate is true" do
+          expect(
+            enumerable.any? { |doc| true }
+          ).to be true
+        end
+
+        it "returns false when the predicate is false" do
+          expect(
+            enumerable.any? { |doc| false }
+          ).to be false
+        end
+      end
+
+      context "when an argument is given" do
+        ruby_version_gte '2.5'
+
+        it "returns true when the argument is true" do
+          expect(enumerable.any?(Post)).to be true
+        end
+
+        it "returns false when the argument is false" do
+          expect(enumerable.any?(Sandwich)).to be false
+        end
+      end
+
+      context "when both an argument and a block are given" do
+        ruby_version_gte '2.5'
+
+        it "gives precedence to the pattern" do
+          expect(
+            enumerable.any?(Post) { |doc| false }
+          ).to be true
+        end
+      end
+    end
   end
 
   describe "#clear" do
