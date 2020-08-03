@@ -7,7 +7,7 @@ en:
         message_title: "message"
         summary_title: "summary"
         resolution_title: "resolution"
-        
+
         ambiguous_relationship:
           message: "Ambiguous associations %{candidates} defined on %{klass}."
           summary:
@@ -121,6 +121,11 @@ en:
             Mongoid does not support."
           resolution: "Valid field operators are: %{valid_operators}.
             Ensure you are using one of these operators."
+        invalid_estimated_count_criteria:
+          message: "Invalid criteria for estimated_count."
+          summary: "Estimated count is strictly a collection-level operation and cannot be called
+            on a filtered critera."
+          resolution: "Try calling estimated_count directly on the class: %{class_name}.estimated_count."
         invalid_expression_operator:
           message: "Invalid expression operator '%{operator}'."
           summary: "You misspelled an operator, are using an operator that

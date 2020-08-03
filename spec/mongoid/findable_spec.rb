@@ -479,32 +479,38 @@ describe Mongoid::Findable do
     end
   end
 
-  describe '.count' do 
-    context 'when the collection is not empty' do 
+  describe '.count' do
+    context 'when the collection is not empty' do
       before do
         Band.create!(name: "Tool")
         Band.create!(name: "Photek")
       end
 
-      it 'returns the currect count' do 
+      it 'returns the currect count' do
         expect(Band.count).to eq(2)
       end
     end
   end
 
-  describe '.estimated_count' do 
-    context 'when the collection is not empty' do 
+  describe '.estimated_count' do
+    context 'when the collection is not empty' do
       before do
         Band.create(name: "Tool")
         Band.create(name: "Photek")
       end
 
-      it 'returns the correct count' do 
+      it 'returns the correct count' do
         expect(Band.estimated_count).to eq(2)
       end
     end
+
+    context 'when the collection is empty' do
+      it 'returns the correct count' do
+        expect(Band.estimated_count).to eq(0)
+      end
+    end
   end
-  
+
   Mongoid::Criteria::Queryable::Selectable.forwardables.each do |method|
 
     describe "##{method}" do

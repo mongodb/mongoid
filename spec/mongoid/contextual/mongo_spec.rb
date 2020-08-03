@@ -231,6 +231,28 @@ describe Mongoid::Contextual::Mongo do
         end
       end
     end
+
+    context "when the criteria contains a selector", :focus do
+      let(:criteria) do
+        Band.where(name: "New Order")
+      end
+
+      context "when not providing options" do
+        it 'raises an error' do
+          expect do
+            criteria.estimated_count
+          end.to raise_error(Mongoid::Errors::InvalidEstimatedCountCriteria)
+        end
+      end
+
+      context "when providing options" do
+        it 'raises an error' do
+          expect do
+            criteria.estimated_count(maxTimeMS: 1000)
+          end.to raise_error(Mongoid::Errors::InvalidEstimatedCountCriteria)
+        end
+      end
+    end
   end
 
 

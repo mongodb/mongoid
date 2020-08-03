@@ -87,6 +87,9 @@ module Mongoid
       #
       # @return [ Integer ] The number of matches.
       def estimated_count(options = {})
+        unless self.criteria.selector.empty?
+          raise Mongoid::Errors::InvalidEstimatedCountCriteria.new(self.klass)
+        end
         try_cache(:estimated_count) { view.estimated_document_count(options) }
       end
 
