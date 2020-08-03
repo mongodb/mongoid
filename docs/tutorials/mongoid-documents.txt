@@ -1169,6 +1169,8 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
     that do not have a discriminator value, or whose discriminator value does not map to either the parent
     or any of its descendants, will be returned as instances of the parent class.
 
+.. _discriminator-key:
+
 Changing the Discriminator Key
 ------------------------------
 Mongoid supports changing the discriminator key from the default ``_type``. There are a few
@@ -1269,6 +1271,8 @@ child class is defined for the child class to use that global value.
 On the global level, however, if the user does not set the discriminator key before defining a child
 class, the discriminator field will use the default ``_type`` and not the new global setting in
 that child class.
+
+.. _discriminator-value:
 
 Changing the Discriminator Value
 --------------------------------

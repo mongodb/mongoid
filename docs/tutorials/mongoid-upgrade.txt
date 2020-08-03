@@ -237,6 +237,64 @@ conditions.
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
 
+Changing the Discriminator Key
+------------------------------
+
+Mongoid now supports :ref:`changing the default discriminator key <discriminator-key>` from the default ``_type`` when using
+inheritance. This can be done by setting the ``discriminator_key`` field on the parent class or globally.
+To set the discriminator key on the parent class:
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+
+     self.discriminator_key = "shape_type"
+   end
+
+   class Circle < Shape
+   end
+
+   class Rectangle < Shape
+   end
+
+To set the discrminator key globally:
+
+.. code-block:: ruby
+
+   Mongoid.discriminator_key = "global_discriminator"
+
+   class Shape
+     include Mongoid::Document
+   end
+
+   class Circle < Shape
+   end
+
+   class Rectangle < Shape
+   end
+
+Changing the Discriminator Value
+--------------------------------
+
+Mongoid now also supports :ref:`changing the discriminator value <discriminator-value>` from the default value, which is the class name.
+The discriminator value can be changed by setting the ``discriminator_value`` on that class:
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+   end
+
+   class Circle < Shape
+     self.discriminator_value = "round thing"
+   end
+
+   class Rectangle < Shape
+   end
+
+
+
 Shard Key Used For Reloading
 ----------------------------
 
@@ -280,61 +338,6 @@ Example Mongoid 7.1 behavior:
 Mongoid provides :ref:`sharding management Rake tasks <sharding-management>`
 to shard collections according to shard keys declared in models.
 
-Changing the Discriminator Key
-------------------------------
-
-Mongoid now supports changing the default discriminator key from the default ``_type`` when using
-inheritance. This can be done by setting the ``discriminator_key`` field on the parent class or globally.
-To set the discriminator key on the parent class:
-
-.. code-block:: ruby
-
-   class Shape
-     include Mongoid::Document
-
-     self.discriminator_key = "shape_type"
-   end
-
-   class Circle < Shape
-   end
-
-   class Rectangle < Shape
-   end
-
-To set the discrminator key globally:
-
-.. code-block:: ruby
-
-   Mongoid.discriminator_key = "global_discriminator"
-
-   class Shape
-     include Mongoid::Document
-   end
-
-   class Circle < Shape
-   end
-
-   class Rectangle < Shape
-   end
-
-Changing the Discriminator Value
---------------------------------
-
-Mongoid now also supports changing the discriminator value from the default value, which is the class name.
-The discriminator value can be changed by setting the ``discriminator_value`` on that class:
-
-.. code-block:: ruby
-
-   class Shape
-     include Mongoid::Document
-   end
-
-   class Circle < Shape
-     self.discriminator_value = "round thing"
-   end
-
-   class Rectangle < Shape
-   end
 
 Upgrading to Mongoid 7.1
 ========================
