@@ -1154,8 +1154,9 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
     whatever the discriminator value was set to), all other discriminator values will be considered an object
     of the Shape class.
 
-    Similarly, when querying any Parent class, even if a document does not have a discriminator value that
-    belongs to any of its descendants (or any discriminator value at all), this document is still returned.
+    Similarly, when querying by parent classes (``Canvas`` in this example), any documents in the collection
+    that do not have a discriminator value, or whose discriminator value does not map to either the parent
+    or any of its descendants, will be returned as instances of the parent class.
 
 Changing the Discriminator Key
 ------------------------------
