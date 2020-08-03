@@ -571,8 +571,7 @@ The following operators are supported:
 - :manual:`$exists </reference/operator/query/exists/>`
   (:manual:`$type </reference/operator/query/type/>` is not currently supported).
 - :manual:`$regex </reference/operator/query/regex/>` (``$options`` field
-  is not currently supported, the options must be given as part of the
-  regular expression object).
+  is only supported when the ``$regex`` argument is a string).
 - :manual:`Array query operators </reference/operator/query-array/>`.
 
 For example, using the model definitions just given, we could query
@@ -587,20 +586,31 @@ Embedded Matching Vs Server Behavior
 ````````````````````````````````````
 
 Mongoid aims to provide the same semantics when performing embedded matching
-as those of MongoDB server. This means, for example, that embedded matchers
-generally support arguments of the same types as ``Criteria`` methods do.
+as those of MongoDB server. This means, for example, when the server only
+accepts arguments of particular types for a particular operator, Mongoid
+would also only accept arguments of the corresponding types.
 
 The following deviations are known:
 
-- Mongoid embedded matchers behave identically regardless of the server version
-  that backs persistence operations and server queries. As such, it is
-  possible for Mongoid to deviate from server behavior if the server itself
-  behaves differently in different versions.
+- Mongoid embedded matchers, because they are implemented on the client side,
+  behave the same regardless of the server version that backs the application.
+  As such, it is possible for Mongoid to deviate from server behavior if
+  the server itself behaves differently in different versions.
   
   As of this writing, the only known case of such deviation is 3.2 and
-  earlier server versions not validating ``$size`` arguments as strictly as
+  earlier servers not validating ``$size`` arguments as strictly as
   newer versions do. Mongoid adopts the behavior of current server versions
   and validates more strictly.
+
+- Mongoid DSL expands ``Range`` arguments to hashes with ``$gte`` and ``$lte``
+  conditions. `In some cases <https://jira.mongodb.org/browse/MONGOID-4908>`_
+  this creates bogus queries. Embedded matchers raise the ``InvalidQuery``
+  exception in these cases. The operators that are known to be affected are
+  ``$elemMatch``, ``$eq``, ``$gt``, ``$gte``, ``$lt``, ``$lte`` and ``$ne``.
+
+- When performing embedded matching with ``$regex``, `it is not currently
+  possible <https://jira.mongodb.org/browse/MONGOID-4936>`_ to specify a
+  regular expression object as the pattern and also provide options.
 
 
 Common Behavior
