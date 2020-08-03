@@ -227,9 +227,8 @@ module Mongoid
             #   enumerable.any?
             #
             # @return [ true, false ] If the enumerable has any elements.
-            def any?(pattern=nil, &block)
-              return super(pattern) if pattern
-              return super(&block) if block_given?
+            def any?(*args)
+              return super if args.any? || block_given?
 
               if _loaded?
                 in_memory.count > 0
