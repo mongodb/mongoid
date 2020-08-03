@@ -280,7 +280,7 @@ Example Mongoid 7.1 behavior:
 Mongoid provides :ref:`sharding management Rake tasks <sharding-management>`
 to shard collections according to shard keys declared in models.
 
-Changing the discriminator key
+Changing the Discriminator Key
 ------------------------------
 
 Mongoid now supports changing the default discriminator key from the default ``_type`` when using
@@ -317,11 +317,11 @@ To set the discrminator key globally:
    class Rectangle < Shape
    end
 
-Changing the discriminator value
+Changing the Discriminator Value
 --------------------------------
 
 Mongoid now also supports changing the discriminator value from the default value, which is the class name.
-The discriminator value can be changed by setting the ``discrminator_value`` on that class:
+The discriminator value can be changed by setting the ``discriminator_value`` on that class:
 
 .. code-block:: ruby
 
