@@ -41,14 +41,14 @@ definitions:
 
   class Job
     include Mongoid::Document
-    
+
     embeds_many :tasks
   end
-  
+
   class Task
     include Mongoid::Document
     include Mongoid::Attributes::Dynamic
-    
+
     embedded_in :job
   end
 
@@ -67,13 +67,13 @@ Mongoid to not find documents where the field being matched was a regular
 expression itself:
 
 .. code-block:: ruby
-  
+
   job.tasks.where(name: {'$eq': /house/}).first
   # Mongoid 7.2:
   # => nil
   # Mongoid 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
-  
+
   job.tasks.where(pattern: {'$eq': /test/}).first
   # Mongoid 7.2:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
@@ -84,7 +84,7 @@ To perform a regular expression match, provide the regular expression directly
 without an operator:
 
 .. code-block:: ruby
-  
+
   job.tasks.where(name: /house/).first
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
@@ -96,7 +96,7 @@ without an operator:
 of MongoDB server:
 
 .. code-block:: ruby
-  
+
   job.tasks.where(name: {'$ne': /apartment/}).first
   # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
   # Mongoid 7.1:
@@ -106,7 +106,7 @@ To perform a negated regular expression match, use the ``not`` method on a
 symbol key:
 
 .. code-block:: ruby
-  
+
   job.tasks.where(:name.not => /house/).first
   # Mongoid 7.2 and 7.1:
   # => nil
@@ -126,9 +126,9 @@ To query using a range, use the following syntax which works in Mongoid 7.2
 as well as previous versions:
 
 .. code-block:: ruby
-  
+
   job.tasks.where(hours: 10..15)
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {"hours"=>{"$gte"=>10, "$lte"=>15}}
   #   options:  {}
@@ -145,7 +145,7 @@ expression was accepted but never matched any documents:
 .. code-block:: ruby
 
   job.tasks.where(hours: {'$in': 10..15})
-  # => 
+  # =>
   # #<Mongoid::Criteria
   #   selector: {"hours"=>{:$in=>{"$gte"=>10, "$lte"=>15}}}
   #   options:  {}
@@ -160,7 +160,7 @@ Mongoid 7.2 raises ``Mongoid::Errors::InvalidQuery`` in this case.
 ``$elemMatch`` now supports specifying operators as top-level fields:
 
 .. code-block:: ruby
-  
+
   mixed_tasks_job = Job.new(tasks: [
     Task.new(name: 'Clean house', hours: 12, supplies: [{broom: 1}]),
     Task.new(name: 'Clean office', hours: [8, 16]),
@@ -191,7 +191,7 @@ regular expression matches, respectively:
   # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
   # Mongoid 7.1:
   # => nil
-  
+
   mixed_tasks_job.tasks.where(hours: {'$elemMatch': {'$eq': 8}}).first
   # Mongoid 7.2:
   # => #<Task _id: 5ef8ca0b2c97a6465e8a4ff9, name: "Clean office", hours: [8, 16]>
@@ -224,18 +224,76 @@ conditions.
   # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
   # Mongoid 7.1:
   # => nil
-  
+
   job.tasks.and.first
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
-  
+
   job.tasks.nor.first
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
-  
+
   job.tasks.or.first
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+Changing the Discriminator Key
+------------------------------
+
+Mongoid now supports :ref:`changing the default discriminator key <discriminator-key>` from the default ``_type`` when using
+inheritance. This can be done by setting the ``discriminator_key`` field on the parent class or globally.
+To set the discriminator key on the parent class:
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+
+     self.discriminator_key = "shape_type"
+   end
+
+   class Circle < Shape
+   end
+
+   class Rectangle < Shape
+   end
+
+To set the discrminator key globally:
+
+.. code-block:: ruby
+
+   Mongoid.discriminator_key = "global_discriminator"
+
+   class Shape
+     include Mongoid::Document
+   end
+
+   class Circle < Shape
+   end
+
+   class Rectangle < Shape
+   end
+
+Changing the Discriminator Value
+--------------------------------
+
+Mongoid now also supports :ref:`changing the discriminator value <discriminator-value>` from the default value, which is the class name.
+The discriminator value can be changed by setting the ``discriminator_value`` on that class:
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+   end
+
+   class Circle < Shape
+     self.discriminator_value = "round thing"
+   end
+
+   class Rectangle < Shape
+   end
+
+
 
 Shard Key Used For Reloading
 ----------------------------
