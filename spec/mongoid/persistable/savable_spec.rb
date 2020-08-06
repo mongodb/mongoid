@@ -162,6 +162,64 @@ describe Mongoid::Persistable::Savable do
     end
 
     context "when modifying the entire hierarchy" do
+      context 'with multiple insert ops' do
+
+        class A
+          include Mongoid::Document
+          include Mongoid::Timestamps::Short
+
+          embeds_many :bs, cascade_callbacks: true
+
+          accepts_nested_attributes_for :bs
+
+          field :a_name
+        end
+
+        class B
+          include Mongoid::Document
+          include Mongoid::Timestamps::Short
+
+          embedded_in :bable, polymorphic: true
+          embeds_many :cs, cascade_callbacks: true
+
+          accepts_nested_attributes_for :cs
+
+          field :b_name
+        end
+
+        class C
+          include Mongoid::Document
+          include Mongoid::Timestamps::Short
+
+          field :c_name
+        end
+
+        let(:a) { A.create(a_name: "A Name") }
+        let(:b) { a.bs.create(b_name: "B Name") }
+
+        it 'push multiple' do
+          a.bs_attributes = {
+            "0" => {
+              "cs_attributes" => {
+                "0" => {
+                  "c_name" => "C Name"
+                }
+              },
+              "id" => b.id.to_s
+            },
+            "1" => {
+              "b_name" => "New B Name"
+            }
+          }
+
+          expect(a.atomic_updates).to eq({
+            "$push" => {"bs.0.cs"=>{"$each"=>[{"_id"=>b.cs.first.id, "c_name"=>"C Name"}]}},
+            :conflicts => {"$push"=>{"bs"=>{"$each"=>[{"_id"=>a.bs.last.id, "b_name"=>"New B Name"}]}}}
+          })
+
+          expect { a.save }.not_to raise_error
+        end
+      end
 
       context "when performing modification and insert ops" do
 
