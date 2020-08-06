@@ -4,13 +4,15 @@
 module Mongoid
   module Errors
 
-    # Creates the exception raised when trying to call estimated_count
-    # on a filtered criteria.
-    #
-    # @param [ String ] class_name The class name.
-    #
-    # @api private
     class InvalidEstimatedCountCriteria < MongoidError
+
+      # Creates the exception raised when trying to call estimated_count
+      # on a filtered criteria.
+      #
+      # @param [ String ] class_name The klass of the criteria used to call
+      #                              estimated count.
+      #
+      # @api private
       def initialize(class_name)
         super(
           compose_message(
