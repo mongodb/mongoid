@@ -237,6 +237,23 @@ conditions.
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
 
+
+``count`` and ``estimated_count`` Methods
+-----------------------------------------
+
+The ``count`` method on model classes and ``Criteria`` objects is now using
+the ``count_documents`` driver helper. This makes ``count`` seamlessly work
+in transactions.
+
+Model classes now also have the ``estimated_count`` method to obtain an
+approximate number of documents in the collection. This method is roughly
+equivalent to the ``count`` method in Mongoid 7.1 and earlier, except
+``estimated_count`` does not accept filter conditions.
+
+The new behavior is further described in the :ref:`Additional Query Methods
+<additional-query-methods>` section.
+
+
 Changing the Discriminator Key
 ------------------------------
 

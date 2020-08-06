@@ -954,6 +954,8 @@ To enable the QueryCache:
   Mongoid::QueryCache.enabled = true
 
 
+.. _additional-query-methods:
+
 Additional Query Methods
 ------------------------
 
@@ -968,14 +970,52 @@ Mongoid also has some helpful methods on criteria.
 
    * - ``Criteria#count``
 
-       *Get a count of persisted documents. Note this will always hit
+       *Get the total number of documents matching a filter, or the total
+       number of documents in a collection. Note this will always hit
        the database for the count.*
+       
+       *As of Mongoid 7.2, the* ``count`` *method uses the*
+       ``count_documents`` *driver helper to obtain the accurate count.
+       previously the* ``count`` *driver helper was used which used
+       collection metadata and was thus not necessarily accurate (but
+       may have returned the result faster). Use* ``estimated_count``
+       *method to obtain an approximate number of documents in the collection
+       quickly.*
 
      -
         .. code-block:: ruby
 
           Band.count
           Band.where(name: "Photek").count
+
+   * - ``Criteria#estimated_count``
+
+       *Get an approximate number of documents in the collection using the
+       collection metadta. The* ``estimated_count`` *method does not accept
+       query conditions; if any are given, it will raise*
+       ``Mongoid::Errors::InvalidEstimatedCountCriteria``.
+       *If a model defines a default scope,* ``estimated_count`` *must be
+       called on the unscoped model*.
+
+     -
+        .. code-block:: ruby
+
+          Band.count
+          Band.where(name: "Photek").count
+          
+          class Contract
+            include Mongoid::Document
+            
+            field :active, type: Boolean
+            
+            default_scope -> { where(active: true) }
+          end
+          
+          Contract.estimated_count
+          # => raises Mongoid::Errors::InvalidEstimatedCountCriteria
+          
+          Contract.unscoped.estimated_count
+          # => 0
 
    * - ``Criteria#distinct``
 
