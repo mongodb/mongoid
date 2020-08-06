@@ -109,11 +109,8 @@ describe Mongoid::Contextual::Mongo do
         described_class.new(criteria.cache)
       end
 
-      before do
-        expect(context.view).to receive(:count).once.and_return(1)
-      end
-
       it "returns the count cached value after first call" do
+        expect(context.view).to receive(:count_documents).once.and_return(1)
         2.times { expect(context.count).to eq(1) }
       end
     end
@@ -194,6 +191,71 @@ describe Mongoid::Contextual::Mongo do
       end
     end
   end
+
+  describe "#estimated_count" do
+
+    let!(:depeche) do
+      Band.create(name: "Depeche Mode")
+    end
+
+    let!(:new_order) do
+      Band.create(name: "New Order")
+    end
+
+    let(:criteria) do
+      Band.where
+    end
+
+    context "when not providing options" do
+      it 'returns the correct count' do
+        expect(criteria.estimated_count).to eq(2)
+      end
+    end
+
+    context "when providing options" do
+      it 'returns the correct count' do
+        expect(criteria.estimated_count(maxTimeMS: 1000)).to eq(2)
+      end
+    end
+
+    context "when context is cached" do
+
+      let(:context) do
+        described_class.new(criteria.cache)
+      end
+
+      it "returns the count cached value after first call" do
+        expect(context.view).to receive(:estimated_document_count).once.and_return(1)
+        2.times do
+          context.estimated_count
+        end
+      end
+    end
+
+    context "when the criteria contains a selector", :focus do
+      let(:criteria) do
+        Band.where(name: "New Order")
+      end
+
+      context "when not providing options" do
+        it 'raises an error' do
+          expect do
+            criteria.estimated_count
+          end.to raise_error(Mongoid::Errors::InvalidEstimatedCountCriteria)
+        end
+      end
+
+      context "when providing options" do
+        it 'raises an error' do
+          expect do
+            criteria.estimated_count(maxTimeMS: 1000)
+          end.to raise_error(Mongoid::Errors::InvalidEstimatedCountCriteria)
+        end
+      end
+    end
+  end
+
+
 
   [ :delete, :delete_all ].each do |method|
 
@@ -1399,12 +1461,8 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context "when calling more than once" do
-
-          before do
-            expect(context.view).to receive(:count).once.and_return(2)
-          end
-
           it "returns the cached value for subsequent calls" do
+            expect(context.view).to receive(:count_documents).once.and_return(2)
             2.times { expect(context.send(method)).to eq(2) }
           end
         end
@@ -1413,10 +1471,10 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             context.entries
-            expect(context.view).to receive(:count).once.and_return(2)
           end
 
           it "returns the cached value for all calls" do
+            expect(context.view).to receive(:count_documents).once.and_return(2)
             expect(context.send(method)).to eq(2)
           end
 
@@ -1448,12 +1506,8 @@ describe Mongoid::Contextual::Mongo do
         end
 
         context "when calling more than once" do
-
-          before do
-            expect(context.view).to receive(:count).once.and_return(1)
-          end
-
           it "returns the cached value for subsequent calls" do
+            expect(context.view).to receive(:count_documents).once.and_return(1)
             2.times { expect(context.send(method)).to eq(1) }
           end
         end
@@ -1462,10 +1516,10 @@ describe Mongoid::Contextual::Mongo do
 
           before do
             context.entries
-            expect(context.view).to receive(:count).once.and_return(1)
           end
 
           it "returns the cached value for all calls" do
+            expect(context.view).to receive(:count_documents).once.and_return(1)
             expect(context.send(method)).to eq(1)
           end
 
