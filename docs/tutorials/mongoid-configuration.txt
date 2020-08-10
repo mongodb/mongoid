@@ -562,42 +562,94 @@ even if it is different from ActiveSupport's configured time zone when
 Usage with Forking Servers
 ==========================
 
-When using Mongoid with a forking web server such as Unicorn, worker processes
-need to recreate driver client instances to ensure that background threads
-monitoring the MongoDB cluster are recreated as they are not transfered into
-child processes through forks, and file descriptors and synchronization
-primitives are not shared between workers.
+When using Mongoid with a forking web server such as Puma, Unicorn or
+Passenger, it is recommended to not perform any operations on Mongoid models
+in the parent process prior to the fork.
 
-It is recommended to not perform any operations on Mongoid models in the
-parent process prior to the fork. If the parent process needs to perform
-operations on the MongoDB database, reset all clients in an ``after_fork``
-handler which is defined in ``unicorn.rb``:
+When a process forks, Ruby threads are not transfered to the child processes
+and the Ruby driver Client objects lose their background monitoring. The
+application will typically seem to work just fine until the deployment
+state changes (for example due to network errors, a maintenance event) at
+which point the application is likely to start getting ``NoServerAvailable``
+exception when performing MongoDB operations.
+
+If the parent process needs to perform operations on the MongoDB database,
+reset all clients in the workers after they forked. How to do so depends
+on the web server being used.
+
+If the parent process does not need to perform operations on the MongoDB
+database after child processes are forked, close the clients in the parent
+prior to forking children. If the parent process performs operations on a Mongo
+client and does not close it, the parent process will continue consuming a
+connection slot in the cluster and will continue monitoring the cluster for
+as long as the parent remains alive.
+
+.. note::
+
+  The close/reconnect pattern described here should be used with Ruby driver
+  version 2.6.2 or higher. Previous driver versions did not recreate
+  monitoring threads when reconnecting.
+
+Puma
+----
+
+Use the ``on_worker_boot`` hook to reconnect clients in the workers and
+the ``before_fork`` hook to close clients in the parent process
+(`Puma documentation <<https://puma.io/puma/>`_):
 
 .. code-block:: ruby
 
-    after_fork do |server, worker|
+  on_worker_boot do
+    Mongoid::Clients.clients.each do |name, client|
+      client.close
+      client.reconnect
+    end
+  end
+
+  before_fork do
+    Mongoid.disconnect_clients
+  end
+
+Unicorn
+-------
+
+Use the ``after_fork`` hook to reconnect clients in the workers and
+the ``before_fork`` hook to close clients in the parent process
+(`Unicorn documentation <https://yhbt.net/unicorn/Unicorn/Configurator.html>`_):
+
+.. code-block:: ruby
+
+  after_fork do |server, worker|
+    Mongoid::Clients.clients.each do |name, client|
+      client.close
+      client.reconnect
+    end
+  end
+
+  before_fork do |server, worker|
+    Mongoid.disconnect_clients
+  end
+
+Passenger
+---------
+
+Use the ``starting_worker_process`` hook to reconnect clients in the workers
+(`Passenger documentation
+<https://www.phusionpassenger.com/library/indepth/ruby/spawn_methods/#unintentional-file-descriptor-sharing>`_).
+Passenger does not appear to have a hook that is invoked in the parent process
+before the workers are forked.
+
+.. code-block:: ruby
+
+  if defined?(PhusionPassenger)
+    PhusionPassenger.on_event(:starting_worker_process) do |forked|
       Mongoid::Clients.clients.each do |name, client|
         client.close
         client.reconnect
       end
     end
+  end
 
-If the parent process does not need to perform operations on the MongoDB
-cluster after child processes are forked, close the client in the parent:
-
-.. code-block:: ruby
-
-    before_fork do |server, worker|
-      Mongoid.disconnect_clients
-    end
-
-*Note:* This pattern should be used with Ruby driver version 2.6.2 or higher.
-Previous driver versions did not recreate monitoring threads when reconnecting.
-
-*Note:* If the parent process performs operations on the Mongo client and
-does not close it, the parent process will continue consuming a connection slot
-in the cluster and will continue monitoring the cluster for as long as the
-parent remains alive.
 
 Development Configuration
 =========================
