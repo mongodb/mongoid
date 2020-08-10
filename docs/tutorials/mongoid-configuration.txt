@@ -594,7 +594,8 @@ Puma
 ----
 
 Use the ``on_worker_boot`` hook to reconnect clients in the workers and
-the ``before_fork`` hook to close clients in the parent process:
+the ``before_fork`` hook to close clients in the parent process
+(`Puma documentation <<https://puma.io/puma/>`_):
 
 .. code-block:: ruby
 
@@ -613,7 +614,8 @@ Unicorn
 -------
 
 Use the ``after_fork`` hook to reconnect clients in the workers and
-the ``before_fork`` hook to close clients in the parent process:
+the ``before_fork`` hook to close clients in the parent process
+(`Unicorn documentation <https://yhbt.net/unicorn/Unicorn/Configurator.html>`_):
 
 .. code-block:: ruby
 
@@ -631,7 +633,9 @@ the ``before_fork`` hook to close clients in the parent process:
 Passenger
 ---------
 
-Use the ``starting_worker_process`` hook to reconnect clients in the workers.
+Use the ``starting_worker_process`` hook to reconnect clients in the workers
+(`Passenger documentation
+<https://www.phusionpassenger.com/library/indepth/ruby/spawn_methods/#unintentional-file-descriptor-sharing>`_).
 Passenger does not appear to have a hook that is invoked in the parent process
 before the workers are forked.
 
