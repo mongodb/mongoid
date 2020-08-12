@@ -66,7 +66,7 @@ describe Mongoid::Clients::Options, retry: 3 do
         end
 
         it 'does not raise an error' do
-          expect(persistence_context.client).to be_a(Mongo::Client)
+          expect(persistence_context.client).to be_a(Mongoid::Client)
         end
 
         it 'does not include the collection option in the client options' do

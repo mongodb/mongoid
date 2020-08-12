@@ -40,7 +40,7 @@ module Mongoid
     #   context.
     #
     # @since 6.0.0
-    VALID_OPTIONS = ( Mongo::Client::VALID_OPTIONS + EXTRA_OPTIONS ).freeze
+    VALID_OPTIONS = ( Mongoid::Client::VALID_OPTIONS + EXTRA_OPTIONS ).freeze
 
     # Initialize the persistence context object.
     #
@@ -105,7 +105,7 @@ module Mongoid
     # @example Get the client for this persistence context.
     #   context.client
     #
-    # @return [ Mongo::Client ] The client for this persistence
+    # @return [ Mongoid::Client ] The client for this persistence
     #  context.
     #
     # @since 6.0.0
@@ -162,7 +162,7 @@ module Mongoid
     def client_options
       @client_options ||= begin
         opts = options.select do |k, v|
-                              Mongo::Client::VALID_OPTIONS.include?(k.to_sym)
+                              Mongoid::Client::VALID_OPTIONS.include?(k.to_sym)
                             end
         if opts[:read].is_a?(Symbol)
           opts[:read] = {mode: opts[:read]}

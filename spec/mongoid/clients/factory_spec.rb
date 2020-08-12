@@ -62,7 +62,7 @@ describe Mongoid::Clients::Factory do
           end
 
           it "returns a client" do
-            expect(client).to be_a(Mongo::Client)
+            expect(client).to be_a(Mongoid::Client)
           end
 
           let(:cluster_addresses) do
@@ -106,7 +106,7 @@ describe Mongoid::Clients::Factory do
           end
 
           it "returns a client" do
-            expect(client).to be_a(Mongo::Client)
+            expect(client).to be_a(Mongoid::Client)
           end
 
           it "sets the cluster's seed ports to 27017" do
@@ -146,7 +146,7 @@ describe Mongoid::Clients::Factory do
             end
 
             it "returns a client" do
-              expect(client).to be_a(Mongo::Client)
+              expect(client).to be_a(Mongoid::Client)
             end
 
             it "sets the cluster's seeds" do
@@ -188,7 +188,7 @@ describe Mongoid::Clients::Factory do
             end
 
             it "returns a client" do
-              expect(client).to be_a(Mongo::Client)
+              expect(client).to be_a(Mongoid::Client)
             end
 
             it "sets the cluster's seeds" do
@@ -235,7 +235,7 @@ describe Mongoid::Clients::Factory do
       end
 
       it "returns the default client" do
-        expect(client).to be_a(Mongo::Client)
+        expect(client).to be_a(Mongoid::Client)
       end
 
       it_behaves_like 'includes seed address'
@@ -282,7 +282,7 @@ describe Mongoid::Clients::Factory do
     end
 
     it "returns the default client" do
-      expect(client).to be_a(Mongo::Client)
+      expect(client).to be_a(Mongoid::Client)
     end
 
     it_behaves_like 'includes seed address'
@@ -324,7 +324,7 @@ describe Mongoid::Clients::Factory do
     end
 
     it "returns the default client" do
-      expect(client).to be_a(Mongo::Client)
+      expect(client).to be_a(Mongoid::Client)
     end
 
     it_behaves_like 'includes seed address'

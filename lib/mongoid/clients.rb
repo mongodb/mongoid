@@ -33,7 +33,7 @@ module Mongoid
       # @example Get the default client.
       #   Mongoid::Clients.default
       #
-      # @return [ Mongo::Client ] The default client.
+      # @return [ Mongoid::Client ] The default client.
       #
       # @since 3.0.0
       def default
@@ -61,7 +61,7 @@ module Mongoid
       #
       # @param [ Symbol ] name The name of the client.
       #
-      # @return [ Mongo::Client ] The named client.
+      # @return [ Mongoid::Client ] The named client.
       #
       # @since 3.0.0
       def with_name(name)

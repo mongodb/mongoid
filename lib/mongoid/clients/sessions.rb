@@ -40,32 +40,8 @@ module Mongoid
       # @yieldparam [ Mongo::Session ] The session being used for the block.
       #
       # @since 6.4.0
-      def with_session(options = {})
-        if Threaded.get_session
-          raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
-        end
-        session = persistence_context.client.start_session(options)
-        Threaded.set_session(session)
-        yield(session)
-      rescue Mongo::Error::InvalidSession => ex
-        if
-          # Driver 2.13.0+
-          defined?(Mongo::Error::SessionsNotSupported) &&
-            Mongo::Error::SessionsNotSupported === ex ||
-          # Legacy drivers
-          ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
-        then
-          raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
-        end
-        raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
-      ensure
-        Threaded.clear_session
-      end
-
-      private
-
-      def _session
-        Threaded.get_session
+      def with_session(options = {}, &block)
+        persistence_context.client.with_session(options, &block)
       end
 
       module ClassMethods
@@ -99,32 +75,8 @@ module Mongoid
         # @yieldparam [ Mongo::Session ] The session being used for the block.
         #
         # @since 6.4.0
-        def with_session(options = {})
-          if Threaded.get_session
-            raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_nesting)
-          end
-          session = persistence_context.client.start_session(options)
-          Threaded.set_session(session)
-          yield(session)
-        rescue Mongo::Error::InvalidSession => ex
-          if
-            # Driver 2.13.0+
-            defined?(Mongo::Error::SessionsNotSupported) &&
-              Mongo::Error::SessionsNotSupported === ex ||
-            # Legacy drivers
-            ex.message == Mongo::Session::SESSIONS_NOT_SUPPORTED
-          then
-            raise Mongoid::Errors::InvalidSessionUse.new(:sessions_not_supported)
-          end
-          raise Mongoid::Errors::InvalidSessionUse.new(:invalid_session_use)
-        ensure
-          Threaded.clear_session
-        end
-
-        private
-
-        def _session
-          Threaded.get_session
+        def with_session(options = {}, &block)
+          persistence_context.client.with_session(options, &block)
         end
       end
     end

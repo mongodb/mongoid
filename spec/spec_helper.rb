@@ -39,7 +39,7 @@ require 'support/constraints'
 # Give MongoDB servers time to start up in CI environments
 if SpecConfig.instance.ci?
   starting = true
-  client = Mongo::Client.new(SpecConfig.instance.addresses)
+  client = Mongoid::Client.new(SpecConfig.instance.addresses)
   while starting
     begin
       client.command(Mongo::Server::Monitor::Connection::ISMASTER)
@@ -113,7 +113,7 @@ I18n.config.enforce_available_locales = false
 
 # The user must be created before any of the tests are loaded, until
 # https://jira.mongodb.org/browse/MONGOID-4827 is implemented.
-client = Mongo::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
+client = Mongoid::Client.new(SpecConfig.instance.addresses, server_selection_timeout: 3.03)
 begin
   # Create the root user administrator as the first user to be added to the
   # database. This user will need to be authenticated in order to add any

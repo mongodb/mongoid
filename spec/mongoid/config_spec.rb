@@ -241,7 +241,7 @@ describe Mongoid::Config do
     context "when existing clients exist in the configuration" do
 
       let(:client) do
-        Mongo::Client.new([ "127.0.0.1:27017" ])
+        Mongoid::Client.new([ "127.0.0.1:27017" ])
       end
 
       before do

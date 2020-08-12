@@ -18,7 +18,7 @@ module Mongoid
       #
       # @raise [ Errors::NoClientConfig ] If no config could be found.
       #
-      # @return [ Mongo::Client ] The new client.
+      # @return [ Mongoid::Client ] The new client.
       #
       # @since 3.0.0
       def create(name = nil)
@@ -36,7 +36,7 @@ module Mongoid
       # @raise [ Errors::NoClientConfig ] If no default configuration is
       #   found.
       #
-      # @return [ Mongo::Client ] The default client.
+      # @return [ Mongoid::Client ] The default client.
       #
       # @since 3.0.0
       def default
@@ -54,15 +54,15 @@ module Mongoid
       #
       # @param [ Hash ] configuration The client config.
       #
-      # @return [ Mongo::Client ] The client.
+      # @return [ Mongoid::Client ] The client.
       #
       # @since 3.0.0
       def create_client(configuration)
         raise Errors::NoClientsConfig.new unless configuration
         if configuration[:uri]
-          Mongo::Client.new(configuration[:uri], options(configuration))
+          Mongoid::Client.new(configuration[:uri], options(configuration))
         else
-          Mongo::Client.new(
+          Mongoid::Client.new(
             configuration[:hosts],
             options(configuration).merge(database: configuration[:database])
           )
