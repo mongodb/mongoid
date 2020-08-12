@@ -44,6 +44,12 @@ module Mongoid
         persistence_context.client.with_session(options, &block)
       end
 
+      private
+
+      def _session
+        persistence_context.client._session
+      end
+
       module ClassMethods
 
         # Execute a block within the context of a session.
@@ -77,6 +83,12 @@ module Mongoid
         # @since 6.4.0
         def with_session(options = {}, &block)
           persistence_context.client.with_session(options, &block)
+        end
+
+        private
+
+        def _session
+          persistence_context.client._session
         end
       end
     end

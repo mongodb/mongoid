@@ -59,8 +59,6 @@ module Mongoid
       Threaded.clear_session
     end
 
-    private
-
     def _session
       Threaded.get_session
     end
