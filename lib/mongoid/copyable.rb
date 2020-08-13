@@ -21,13 +21,8 @@ module Mongoid
       # @note This next line is here to address #2704, even though having an
       # _id and id field in the document would cause problems with Mongoid
       # elsewhere.
-      attrs = clone_document.except("_id", "id")
-      dynamic_attrs = {}
-      attrs.reject! do |attr_name, value|
-        dynamic_attrs.merge!(attr_name => value) unless self.attribute_names.include?(attr_name)
-      end
-      self.class.new(attrs).tap do |object|
-        dynamic_attrs.each do |attr_name, value|
+      self.class.new.tap do |object|
+        clone_document.except("_id", "id").each do |attr_name, value|
           if object.respond_to?("#{attr_name}=")
             object.send("#{attr_name}=", value)
           else
