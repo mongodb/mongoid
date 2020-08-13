@@ -253,6 +253,13 @@ equivalent to the ``count`` method in Mongoid 7.1 and earlier, except
 The new behavior is further described in the :ref:`Additional Query Methods
 <additional-query-methods>` section.
 
+``any?`` on ``has_many`` Associations
+-------------------------------------
+
+The :ref:`any? method on has_many associations <has-many-any>` was optimized
+to only retrieve the _id field when querying the database, instead of loading
+the entire association.
+
 
 Changing the Discriminator Key
 ------------------------------
