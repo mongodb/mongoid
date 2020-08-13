@@ -31,16 +31,16 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts.send(method, Post.new(person: person))
         end
 
-        it "only adds the relation once" do
+        it "only adds the association once" do
           expect(person.posts.size).to eq(1)
         end
 
-        it "only persists the relation once" do
+        it "only persists the association once" do
           expect(person.reload.posts.size).to eq(1)
         end
       end
 
-      context "when the relations are not polymorphic" do
+      context "when the associations are not polymorphic" do
 
         context "when the parent is a new record" do
 
@@ -58,15 +58,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               person.posts.send(method, post)
             end
 
-            it "sets the foreign key on the relation" do
+            it "sets the foreign key on the association" do
               expect(post.person_id).to eq(person.id)
             end
 
-            it "sets the base on the inverse relation" do
+            it "sets the base on the inverse association" do
               expect(post.person).to eq(person)
             end
 
-            it "sets the same instance on the inverse relation" do
+            it "sets the same instance on the inverse association" do
               expect(post.person).to eql(person)
             end
 
@@ -78,7 +78,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               expect(person.posts.size).to eq(1)
             end
 
-            it "returns the relation" do
+            it "returns the association" do
               expect(added).to eq(person.posts)
             end
           end
@@ -93,15 +93,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               person.posts.send(method, post)
             end
 
-            it "sets the foreign key on the relation" do
+            it "sets the foreign key on the association" do
               expect(post.person_id).to eq(person.id)
             end
 
-            it "sets the base on the inverse relation" do
+            it "sets the base on the inverse association" do
               expect(post.person).to eq(person)
             end
 
-            it "sets the same instance on the inverse relation" do
+            it "sets the same instance on the inverse association" do
               expect(post.person).to eql(person)
             end
 
@@ -120,7 +120,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
                 post.save
               end
 
-              it "returns the correct count of the relation" do
+              it "returns the correct count of the association" do
                 expect(person.posts.count).to eq(1)
               end
             end
@@ -139,11 +139,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             end
           end
 
-          it "adds the documents to the relation" do
+          it "adds the documents to the association" do
             expect(person.posts).to eq([ post ])
           end
 
-          it "sets the foreign key on the inverse relation" do
+          it "sets the foreign key on the inverse association" do
             expect(post.person_id).to eq(person.id)
           end
 
@@ -174,15 +174,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts.send(method, post)
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(post.person_id).to eq(person.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(post.person).to eq(person)
           end
 
-          it "sets the same instance on the inverse relation" do
+          it "sets the same instance on the inverse association" do
             expect(post.person).to eql(person)
           end
 
@@ -203,7 +203,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(person.changed).to eq([])
           end
 
-          context "when the related item has embedded relations" do
+          context "when the related item has embedded associations" do
 
             let!(:user) do
               User.create
@@ -232,7 +232,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             end
           end
 
-          context "when documents already exist on the relation" do
+          context "when documents already exist on the association" do
 
             let(:post_two) do
               Post.new(title: "Test")
@@ -242,15 +242,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               person.posts.send(method, post_two)
             end
 
-            it "sets the foreign key on the relation" do
+            it "sets the foreign key on the association" do
               expect(post_two.person_id).to eq(person.id)
             end
 
-            it "sets the base on the inverse relation" do
+            it "sets the base on the inverse association" do
               expect(post_two.person).to eq(person)
             end
 
-            it "sets the same instance on the inverse relation" do
+            it "sets the same instance on the inverse association" do
               expect(post_two.person).to eql(person)
             end
 
@@ -277,7 +277,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
       end
 
-      context "when.adding to the relation" do
+      context "when.adding to the association" do
 
         let(:person) do
           Person.create
@@ -293,7 +293,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts.send(method, post)
           end
 
-          it "adds the document to the relation" do
+          it "adds the document to the association" do
             expect(person.posts).to eq([ post ])
           end
         end
@@ -318,7 +318,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
       end
 
-      context "when the relations are polymorphic" do
+      context "when the associations are polymorphic" do
 
         context "when the parent is a new record" do
 
@@ -334,11 +334,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             movie.ratings.send(method, rating)
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(rating.ratable_id).to eq(movie.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(rating.ratable).to eq(movie)
           end
 
@@ -365,11 +365,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             movie.ratings.send(method, rating)
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(rating.ratable_id).to eq(movie.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(rating.ratable).to eq(movie)
           end
 
@@ -387,7 +387,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#=" do
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -403,15 +403,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts = [ post ]
         end
 
-        it "sets the target of the relation" do
+        it "sets the target of the association" do
           expect(person.posts._target).to eq([ post ])
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(post.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(post.person).to eq(person)
         end
 
@@ -434,15 +434,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts = [ post ]
         end
 
-        it "sets the target of the relation" do
+        it "sets the target of the association" do
           expect(person.posts._target).to eq([ post ])
         end
 
-        it "sets the foreign key of the relation" do
+        it "sets the foreign key of the association" do
           expect(post.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(post.person).to eq(person)
         end
 
@@ -450,7 +450,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(post).to be_persisted
         end
 
-        context "when replacing the relation with the same documents" do
+        context "when replacing the association with the same documents" do
 
           context "when using the same in memory instance" do
 
@@ -458,11 +458,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               person.posts = [ post ]
             end
 
-            it "keeps the relation intact" do
+            it "keeps the association intact" do
               expect(person.posts).to eq([ post ])
             end
 
-            it "does not delete the relation" do
+            it "does not delete the association" do
               expect(person.reload.posts).to eq([ post ])
             end
           end
@@ -477,11 +477,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               from_db.posts = [ post ]
             end
 
-            it "keeps the relation intact" do
+            it "keeps the association intact" do
               expect(from_db.posts).to eq([ post ])
             end
 
-            it "does not delete the relation" do
+            it "does not delete the association" do
               expect(from_db.reload.posts).to eq([ post ])
             end
           end
@@ -499,7 +499,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               person.posts = [ post, new_post ]
             end
 
-            it "keeps the relation intact" do
+            it "keeps the association intact" do
               expect(person.posts.size).to eq(2)
             end
 
@@ -511,7 +511,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               expect(person.posts).to include(new_post)
             end
 
-            it "does not delete the relation" do
+            it "does not delete the association" do
               expect(person.reload.posts).to eq([ post, new_post ])
             end
           end
@@ -526,11 +526,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               from_db.posts = [ post, new_post ]
             end
 
-            it "keeps the relation intact" do
+            it "keeps the association intact" do
               expect(from_db.posts).to eq([ post, new_post ])
             end
 
-            it "does not delete the relation" do
+            it "does not delete the association" do
               expect(from_db.reload.posts).to eq([ post, new_post ])
             end
           end
@@ -548,11 +548,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               person.posts = [ new_post ]
             end
 
-            it "keeps the relation intact" do
+            it "keeps the association intact" do
               expect(person.posts).to eq([ new_post ])
             end
 
-            it "does not delete the relation" do
+            it "does not delete the association" do
               expect(person.reload.posts).to eq([ new_post ])
             end
           end
@@ -567,11 +567,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
               from_db.posts = [ new_post ]
             end
 
-            it "keeps the relation intact" do
+            it "keeps the association intact" do
               expect(from_db.posts).to eq([ new_post ])
             end
 
-            it "does not delete the relation" do
+            it "does not delete the association" do
               expect(from_db.reload.posts).to eq([ new_post ])
             end
           end
@@ -579,7 +579,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -595,15 +595,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           movie.ratings = [ rating ]
         end
 
-        it "sets the target of the relation" do
+        it "sets the target of the association" do
           expect(movie.ratings._target).to eq([ rating ])
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(rating.ratable_id).to eq(movie.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(rating.ratable).to eq(movie)
         end
 
@@ -626,15 +626,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           movie.ratings = [ rating ]
         end
 
-        it "sets the target of the relation" do
+        it "sets the target of the association" do
           expect(movie.ratings._target).to eq([ rating ])
         end
 
-        it "sets the foreign key of the relation" do
+        it "sets the foreign key of the association" do
           expect(rating.ratable_id).to eq(movie.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(rating.ratable).to eq(movie)
         end
 
@@ -676,7 +676,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#= nil" do
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -693,11 +693,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts = nil
         end
 
-        it "sets the relation to an empty array" do
+        it "sets the association to an empty array" do
           expect(person.posts).to be_empty
         end
 
-        it "removed the inverse relation" do
+        it "removed the inverse association" do
           expect(post.person).to be_nil
         end
 
@@ -723,11 +723,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts = nil
           end
 
-          it "sets the relation to empty" do
+          it "sets the association to empty" do
             expect(person.posts).to be_empty
           end
 
-          it "removed the inverse relation" do
+          it "removed the inverse association" do
             expect(post.person).to be_nil
           end
 
@@ -751,11 +751,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.drugs = nil
           end
 
-          it "sets the relation to empty" do
+          it "sets the association to empty" do
             expect(person.drugs).to be_empty
           end
 
-          it "removed the inverse relation" do
+          it "removed the inverse association" do
             expect(drug.person).to be_nil
           end
 
@@ -763,14 +763,14 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(drug.person_id).to be_nil
           end
 
-          it "nullifies the relation" do
+          it "nullifies the association" do
             expect(drug).to_not be_destroyed
           end
         end
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -787,11 +787,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           movie.ratings = nil
         end
 
-        it "sets the relation to an empty array" do
+        it "sets the association to an empty array" do
           expect(movie.ratings).to be_empty
         end
 
-        it "removed the inverse relation" do
+        it "removed the inverse association" do
           expect(rating.ratable).to be_nil
         end
 
@@ -815,11 +815,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           movie.ratings = nil
         end
 
-        it "sets the relation to empty" do
+        it "sets the association to empty" do
           expect(movie.ratings).to be_empty
         end
 
-        it "removed the inverse relation" do
+        it "removed the inverse association" do
           expect(rating.ratable).to be_nil
         end
 
@@ -870,7 +870,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       Person.create(posts: posts)
     end
 
-    it "returns ids of documents that are in the relation" do
+    it "returns ids of documents that are in the association" do
       expect(person.post_ids).to eq(posts.map(&:id))
     end
   end
@@ -879,7 +879,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     describe "##{method}" do
 
-      context "when the relation is not polymorphic" do
+      context "when the association is not polymorphic" do
 
         context "when the parent is a new record" do
 
@@ -891,11 +891,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts.send(method, title: "$$$")
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(post.person_id).to eq(person.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(post.person).to eq(person)
           end
 
@@ -930,11 +930,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts.send(method, text: "Testing")
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(post.person_id).to eq(person.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(post.person).to eq(person)
           end
 
@@ -952,7 +952,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
       end
 
-      context "when the relation is polymorphic" do
+      context "when the association is polymorphic" do
 
         context "when the parent is a subclass" do
 
@@ -983,11 +983,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             movie.ratings.send(method, value: 3)
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(rating.ratable_id).to eq(movie.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(rating.ratable).to eq(movie)
           end
 
@@ -1018,11 +1018,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             movie.ratings.send(method, value: 4)
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(rating.ratable_id).to eq(movie.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(rating.ratable).to eq(movie)
           end
 
@@ -1044,7 +1044,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#clear" do
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       context "when the parent has been persisted" do
 
@@ -1058,11 +1058,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts.create(title: "Testing")
           end
 
-          let!(:relation) do
+          let!(:association) do
             person.posts.clear
           end
 
-          it "clears out the relation" do
+          it "clears out the association" do
             expect(person.posts).to be_empty
           end
 
@@ -1074,8 +1074,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(person.reload.posts).to be_empty
           end
 
-          it "returns the relation" do
-            expect(relation).to be_empty
+          it "returns the association" do
+            expect(association).to be_empty
           end
         end
 
@@ -1085,11 +1085,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts.build(title: "Testing")
           end
 
-          let!(:relation) do
+          let!(:association) do
             person.posts.clear
           end
 
-          it "clears out the relation" do
+          it "clears out the association" do
             expect(person.posts).to be_empty
           end
         end
@@ -1105,17 +1105,17 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts.build(title: "Testing")
         end
 
-        let!(:relation) do
+        let!(:association) do
           person.posts.clear
         end
 
-        it "clears out the relation" do
+        it "clears out the association" do
           expect(person.posts).to be_empty
         end
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       context "when the parent has been persisted" do
 
@@ -1129,11 +1129,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             movie.ratings.create(value: 1)
           end
 
-          let!(:relation) do
+          let!(:association) do
             movie.ratings.clear
           end
 
-          it "clears out the relation" do
+          it "clears out the association" do
             expect(movie.ratings).to be_empty
           end
 
@@ -1145,8 +1145,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(movie.reload.ratings).to be_empty
           end
 
-          it "returns the relation" do
-            expect(relation).to be_empty
+          it "returns the association" do
+            expect(association).to be_empty
           end
         end
 
@@ -1156,11 +1156,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             movie.ratings.build(value: 3)
           end
 
-          let!(:relation) do
+          let!(:association) do
             movie.ratings.clear
           end
 
-          it "clears out the relation" do
+          it "clears out the association" do
             expect(movie.ratings).to be_empty
           end
         end
@@ -1176,11 +1176,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           movie.ratings.build(value: 2)
         end
 
-        let!(:relation) do
+        let!(:association) do
           movie.ratings.clear
         end
 
-        it "clears out the relation" do
+        it "clears out the association" do
           expect(movie.ratings).to be_empty
         end
       end
@@ -1189,7 +1189,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#concat" do
 
-    context "when the relations are not polymorphic" do
+    context "when the associations are not polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -1205,15 +1205,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts.concat([ post ])
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(post.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(post.person).to eq(person)
         end
 
-        it "sets the same instance on the inverse relation" do
+        it "sets the same instance on the inverse association" do
           expect(post.person).to eql(person)
         end
 
@@ -1238,11 +1238,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           end
         end
 
-        it "adds the documents to the relation" do
+        it "adds the documents to the association" do
           expect(person.posts).to eq([ post ])
         end
 
-        it "sets the foreign key on the inverse relation" do
+        it "sets the foreign key on the inverse association" do
           expect(post.person_id).to eq(person.id)
         end
 
@@ -1277,15 +1277,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts.concat([ post, post_three ])
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(post.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(post.person).to eq(person)
         end
 
-        it "sets the same instance on the inverse relation" do
+        it "sets the same instance on the inverse association" do
           expect(post.person).to eql(person)
         end
 
@@ -1297,7 +1297,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(person.posts.count).to eq(2)
         end
 
-        context "when documents already exist on the relation" do
+        context "when documents already exist on the association" do
 
           let(:post_two) do
             Post.new(title: "Test")
@@ -1307,15 +1307,15 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             person.posts.concat([ post_two ])
           end
 
-          it "sets the foreign key on the relation" do
+          it "sets the foreign key on the association" do
             expect(post_two.person_id).to eq(person.id)
           end
 
-          it "sets the base on the inverse relation" do
+          it "sets the base on the inverse association" do
             expect(post_two.person).to eq(person)
           end
 
-          it "sets the same instance on the inverse relation" do
+          it "sets the same instance on the inverse association" do
             expect(post_two.person).to eql(person)
           end
 
@@ -1339,7 +1339,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
   end
 
-  context "when the relations are polymorphic" do
+  context "when the associations are polymorphic" do
 
     context "when the parent is a new record" do
 
@@ -1355,11 +1355,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         movie.ratings.concat([ rating ])
       end
 
-      it "sets the foreign key on the relation" do
+      it "sets the foreign key on the association" do
         expect(rating.ratable_id).to eq(movie.id)
       end
 
-      it "sets the base on the inverse relation" do
+      it "sets the base on the inverse association" do
         expect(rating.ratable).to eq(movie)
       end
 
@@ -1386,11 +1386,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         movie.ratings.concat([ rating ])
       end
 
-      it "sets the foreign key on the relation" do
+      it "sets the foreign key on the association" do
         expect(rating.ratable_id).to eq(movie.id)
       end
 
-      it "sets the base on the inverse relation" do
+      it "sets the base on the inverse association" do
         expect(rating.ratable).to eq(movie)
       end
 
@@ -1431,7 +1431,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         expect(movie.ratings.count).to eq(0)
       end
     end
-    
+
     context "when no document is added" do
 
       it "returns false" do
@@ -1441,7 +1441,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     context "when new documents exist in the database" do
 
-      context "when the documents are part of the relation" do
+      context "when the documents are part of the association" do
 
         before do
           Rating.create(ratable: movie)
@@ -1452,7 +1452,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
       end
 
-      context "when the documents are not part of the relation" do
+      context "when the documents are not part of the association" do
 
         before do
           Rating.create
@@ -1471,8 +1471,8 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       Movie.create
     end
 
-    context "when nothing exists on the relation" do
-      
+    context "when nothing exists on the association" do
+
       context "when no document is added" do
 
         let!(:movie) do
@@ -1501,7 +1501,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when appending to a relation and _loaded/_unloaded are empty" do
+    context "when appending to a association and _loaded/_unloaded are empty" do
 
       let!(:movie) do
         Movie.create!
@@ -1516,16 +1516,16 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when appending to a relation in a transaction" do
+    context "when appending to a association in a transaction" do
       require_transaction_support
-      
+
       let!(:movie) do
         Movie.create!
       end
 
       it "returns true" do
         movie.with_session do |session|
-          session.with_transaction do 
+          session.with_transaction do
             expect{ movie.ratings << Rating.new }.to_not raise_error
             expect(movie.ratings.any?).to be true
           end
@@ -1595,7 +1595,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -1661,11 +1661,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           end
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(post.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(post.person).to eq(person)
         end
 
@@ -1714,7 +1714,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -1741,11 +1741,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           movie.ratings.create(value: 3)
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(rating.ratable_id).to eq(movie.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(rating.ratable).to eq(movie)
         end
 
@@ -1808,7 +1808,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -1835,11 +1835,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           person.posts.create!(title: "Testing")
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(post.person_id).to eq(person.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(post.person).to eq(person)
         end
 
@@ -1866,7 +1866,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       context "when the parent is a new record" do
 
@@ -1893,11 +1893,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           movie.ratings.create!(value: 4)
         end
 
-        it "sets the foreign key on the relation" do
+        it "sets the foreign key on the association" do
           expect(rating.ratable_id).to eq(movie.id)
         end
 
-        it "sets the base on the inverse relation" do
+        it "sets the base on the inverse association" do
           expect(rating.ratable).to eq(movie)
         end
 
@@ -1931,7 +1931,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       Movie.new
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       let(:association) do
         Movie.relations["ratings"]
@@ -1951,7 +1951,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:association) do
         Person.relations["posts"]
@@ -2022,7 +2022,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(drug.person_id).to be_nil
           end
 
-          it "removes the document from the relation" do
+          it "removes the document from the association" do
             expect(person.drugs).to_not include(drug)
           end
         end
@@ -2045,7 +2045,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(drug.person_id).to be_nil
           end
 
-          it "removes the document from the relation" do
+          it "removes the document from the association" do
             expect(person.drugs).to_not include(drug)
           end
         end
@@ -2071,7 +2071,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(post).to be_destroyed
           end
 
-          it "removes the document from the relation" do
+          it "removes the document from the association" do
             expect(person.posts).to_not include(post)
           end
         end
@@ -2094,7 +2094,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(post).to be_destroyed
           end
 
-          it "removes the document from the relation" do
+          it "removes the document from the association" do
             expect(person.posts).to_not include(post)
           end
         end
@@ -2125,7 +2125,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
     describe "##{method}" do
 
-      context "when the relation is not polymorphic" do
+      context "when the association is not polymorphic" do
 
         context "when conditions are provided" do
 
@@ -2181,7 +2181,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         end
       end
 
-      context "when the relation is polymorphic" do
+      context "when the association is polymorphic" do
 
         context "when conditions are provided" do
 
@@ -2297,7 +2297,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:person) do
         Person.create
@@ -2308,7 +2308,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
 
       let!(:post_two) do
-        person.posts.create(title: "OMG I has relations")
+        person.posts.create(title: "OMG I has associations")
       end
 
       context "when providing an id" do
@@ -2324,7 +2324,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           end
         end
 
-        context "when the id matches but is not scoped to the relation" do
+        context "when the id matches but is not scoped to the association" do
 
           let(:post) do
             Post.create(title: "Unscoped")
@@ -2423,7 +2423,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       let(:movie) do
         Movie.create
@@ -2547,7 +2547,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#find_or_create_by" do
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:person) do
         Person.create
@@ -2567,7 +2567,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(found).to eq(post)
         end
 
-        it "keeps the document in the relation" do
+        it "keeps the document in the association" do
           expect(found.person).to eq(person)
         end
       end
@@ -2594,7 +2594,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(found.content).to eq("The Content")
           end
 
-          it "keeps the document in the relation" do
+          it "keeps the document in the association" do
             expect(found.person).to eq(person)
           end
         end
@@ -2613,14 +2613,14 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(found).to be_persisted
           end
 
-          it "keeps the document in the relation" do
+          it "keeps the document in the association" do
             expect(found.person).to eq(person)
           end
         end
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       let(:movie) do
         Movie.create
@@ -2640,7 +2640,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(found).to eq(rating)
         end
 
-        it "keeps the document in the relation" do
+        it "keeps the document in the association" do
           expect(found.ratable).to eq(movie)
         end
       end
@@ -2659,7 +2659,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(found).to be_persisted
         end
 
-        it "keeps the document in the relation" do
+        it "keeps the document in the association" do
           expect(found.ratable).to eq(movie)
         end
       end
@@ -2668,7 +2668,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#find_or_create_by!" do
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:person) do
         Person.create
@@ -2688,7 +2688,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(found).to eq(post)
         end
 
-        it "keeps the document in the relation" do
+        it "keeps the document in the association" do
           expect(found.person).to eq(person)
         end
       end
@@ -2715,7 +2715,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(found.content).to eq("The Content")
           end
 
-          it "keeps the document in the relation" do
+          it "keeps the document in the association" do
             expect(found.person).to eq(person)
           end
         end
@@ -2734,14 +2734,14 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             expect(found).to be_persisted
           end
 
-          it "keeps the document in the relation" do
+          it "keeps the document in the association" do
             expect(found.person).to eq(person)
           end
         end
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       let(:movie) do
         Movie.create
@@ -2761,7 +2761,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(found).to eq(rating)
         end
 
-        it "keeps the document in the relation" do
+        it "keeps the document in the association" do
           expect(found.ratable).to eq(movie)
         end
       end
@@ -2780,7 +2780,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(found).to be_persisted
         end
 
-        it "keeps the document in the relation" do
+        it "keeps the document in the association" do
           expect(found.ratable).to eq(movie)
         end
 
@@ -2798,7 +2798,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#find_or_initialize_by" do
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:person) do
         Person.create
@@ -2841,7 +2841,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       let(:movie) do
         Movie.create
@@ -2881,7 +2881,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#initialize" do
 
-    context "when an illegal mixed relation exists" do
+    context "when an illegal mixed association exists" do
 
       let(:post) do
         Post.new
@@ -2894,7 +2894,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when a cyclic relation exists" do
+    context "when a cyclic association exists" do
 
       let(:post) do
         Post.new
@@ -3161,7 +3161,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation is not polymorphic" do
+    context "when the association is not polymorphic" do
 
       let(:person) do
         Person.create
@@ -3195,19 +3195,19 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         expect(post_one.reload.person).to be_nil
       end
 
-      context "when adding a nullified document back to the relation" do
+      context "when adding a nullified document back to the association" do
 
         before do
           person.posts.push(post_one)
         end
 
-        it "persists the relation" do
+        it "persists the association" do
           expect(person.posts(true)).to eq([ post_one ])
         end
       end
     end
 
-    context "when the relation is polymorphic" do
+    context "when the association is polymorphic" do
 
       let(:movie) do
         Movie.create(title: "Oldboy")
@@ -3290,7 +3290,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       person.posts.scoped
     end
 
-    it "returns the relation criteria" do
+    it "returns the association criteria" do
       expect(scoped).to be_a(Mongoid::Criteria)
     end
 
@@ -3334,7 +3334,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#unscoped" do
 
-    context "when the relation has no default scope" do
+    context "when the association has no default scope" do
 
       let!(:person) do
         Person.create
@@ -3357,7 +3357,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation has a default scope" do
+    context "when the association has a default scope" do
 
       let!(:church) do
         Church.create
@@ -3421,7 +3421,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
   end
 
-  context "when reloading the relation" do
+  context "when reloading the association" do
 
     let!(:person) do
       Person.create
@@ -3439,7 +3439,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       person.posts << post_one
     end
 
-    context "when the relation references the same documents" do
+    context "when the association references the same documents" do
 
       before do
         Post.collection.find({ _id: post_one.id }).
@@ -3455,7 +3455,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       end
     end
 
-    context "when the relation references different documents" do
+    context "when the association references different documents" do
 
       before do
         person.posts << post_two
@@ -3542,7 +3542,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         expect(album.before_add_called).to be true
       end
 
-      it "adds the document to the relation" do
+      it "adds the document to the association" do
         expect(artist.albums).to eq([ album ])
       end
     end
@@ -3554,7 +3554,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         begin; artist.albums << album; rescue; end
       end
 
-      it "does not add the document to the relation" do
+      it "does not add the document to the association" do
         expect(artist.albums).to be_empty
       end
     end
@@ -3582,12 +3582,12 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         begin; artist.albums << album; rescue; end
       end
 
-      it "adds the document to the relation" do
+      it "adds the document to the association" do
         expect(artist.albums).to eq([ album ])
       end
     end
 
-    context 'when the relation already exists' do
+    context 'when the association already exists' do
 
       before do
         artist.albums << album
@@ -3600,7 +3600,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         Album.where(artist_id: artist.id).first
       end
 
-      it 'does not execute the callback when the relation is accessed' do
+      it 'does not execute the callback when the association is accessed' do
         expect(reloaded_album.artist.after_add_referenced_called).to be(nil)
       end
     end
@@ -3632,7 +3632,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(artist.before_remove_referenced_called).to be true
         end
 
-        it "removes the document from the relation" do
+        it "removes the document from the association" do
           expect(artist.albums).to be_empty
         end
       end
@@ -3647,7 +3647,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           expect(artist.before_remove_referenced_called).to be true
         end
 
-        it "clears the relation" do
+        it "clears the association" do
           expect(artist.albums).to be_empty
         end
       end
@@ -3664,7 +3664,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             begin; artist.albums.delete(album); rescue; end
           end
 
-          it "does not remove the document from the relation" do
+          it "does not remove the document from the association" do
             expect(artist.albums).to eq([ album ])
           end
         end
@@ -3675,7 +3675,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
             begin; artist.albums.clear; rescue; end
           end
 
-          it "does not clear the relation" do
+          it "does not clear the association" do
             expect(artist.albums).to eq([ album ])
           end
         end
@@ -3735,7 +3735,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           begin; artist.albums.delete(album); rescue; end
         end
 
-        it "removes the documents from the relation" do
+        it "removes the documents from the association" do
           expect(artist.albums).to be_empty
         end
       end
@@ -3746,14 +3746,14 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
           begin; artist.albums.clear; rescue; end
         end
 
-        it "removes the documents from the relation" do
+        it "removes the documents from the association" do
           expect(artist.albums).to be_empty
         end
       end
     end
   end
 
-  context "when executing a criteria call on an ordered relation" do
+  context "when executing a criteria call on an ordered association" do
 
     let(:person) do
       Person.create
@@ -3791,7 +3791,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
   end
 
-  context "when accessing a relation named parent" do
+  context "when accessing a association named parent" do
 
     let!(:parent) do
       Odd.create(name: "odd parent")
@@ -3802,7 +3802,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
 
     it "updates the child after accessing the parent" do
-      # Access parent relation on the child to make sure it is loaded
+      # Access parent association on the child to make sure it is loaded
       child.parent
 
       new_child_name = "updated even child"
@@ -3815,7 +3815,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
   end
 
-  context 'when a document has referenced and embedded relations' do
+  context 'when a document has referenced and embedded associations' do
 
     let(:agent) do
       Agent.new
@@ -3839,7 +3839,7 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     end
   end
 
-  context 'when the two models use the same name to refer to the relation' do
+  context 'when the two models use the same name to refer to the association' do
 
     let(:agent) do
       Agent.new
