@@ -1467,6 +1467,55 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
   describe "#any?" do
 
+    shared_examples 'does not query database when association is loaded' do
+
+      let(:fresh_movie) { Movie.find(movie.id) }
+
+      context 'when association is not loaded' do
+        it 'queries database on each call' do
+          fresh_movie
+
+          expect_query(1) do
+            fresh_movie.ratings.any?.should be expected_result
+          end
+
+          expect_query(1) do
+            fresh_movie.ratings.any?.should be expected_result
+          end
+        end
+
+        context 'when using a block' do
+          it 'queries database on first call only' do
+            fresh_movie
+
+            expect_query(1) do
+              fresh_movie.ratings.any? { false }.should be false
+            end
+
+            expect_no_queries do
+              fresh_movie.ratings.any? { false }.should be false
+            end
+          end
+        end
+      end
+
+      context 'when association is loaded' do
+        it 'does not query database' do
+          fresh_movie
+
+          expect_query(1) do
+            fresh_movie.ratings.any?.should be expected_result
+          end
+
+          fresh_movie.ratings.to_a
+
+          expect_no_queries do
+            fresh_movie.ratings.any?.should be expected_result
+          end
+        end
+      end
+    end
+
     let(:movie) do
       Movie.create
     end
@@ -1482,6 +1531,9 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
         it "returns false" do
           expect(movie.ratings.any?).to be false
         end
+
+        let(:expected_result) { false }
+        include_examples 'does not query database when association is loaded'
       end
 
       context "when the document is destroyed" do
@@ -1514,6 +1566,32 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       it "returns true" do
         expect(movie.ratings.any?).to be true
       end
+
+      context 'when association is not loaded' do
+        it 'queries database on each call' do
+          expect_query(1) do
+            movie.ratings.any?.should be true
+          end
+
+          expect_query(1) do
+            movie.ratings.any?.should be true
+          end
+        end
+      end
+
+      context 'when association is loaded' do
+        it 'does not query database' do
+          expect_query(1) do
+            movie.ratings.any?.should be true
+          end
+
+          movie.ratings.to_a
+
+          expect_no_queries do
+            movie.ratings.any?.should be true
+          end
+        end
+      end
     end
 
     context "when appending to a association in a transaction" do
@@ -1542,6 +1620,9 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       it "returns true" do
         expect(movie.ratings.any?).to be true
       end
+
+      let(:expected_result) { true }
+      include_examples 'does not query database when association is loaded'
     end
 
     context "when documents have not been persisted" do
@@ -2260,9 +2341,35 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       it "returns true" do
         expect(person.posts.exists?).to be true
       end
+
+      context 'when association is not loaded' do
+        it 'queries database on each call' do
+          expect_query(1) do
+            person.posts.exists?.should be true
+          end
+
+          expect_query(1) do
+            person.posts.exists?.should be true
+          end
+        end
+      end
+
+      context 'when association is loaded' do
+        it 'queries database on each call' do
+          expect_query(1) do
+            person.posts.exists?.should be true
+          end
+
+          person.posts.to_a
+
+          expect_query(1) do
+            person.posts.exists?.should be true
+          end
+        end
+      end
     end
 
-    context "when no documents exist in the database" do
+    context "when documents exist in application but not in database" do
 
       before do
         person.posts.build
@@ -2270,6 +2377,65 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       it "returns false" do
         expect(person.posts.exists?).to be false
+      end
+
+      context 'when association is not loaded' do
+        it 'queries database on each call' do
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+        end
+      end
+
+      context 'when association is loaded' do
+        it 'queries database on each call' do
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+
+          person.posts.to_a
+
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+        end
+      end
+    end
+
+    context "when no documents exist" do
+
+      it "returns false" do
+        expect(person.posts.exists?).to be false
+      end
+
+      context 'when association is not loaded' do
+        it 'queries database on each call' do
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+        end
+      end
+
+      context 'when association is loaded' do
+        it 'queries database on each call' do
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+
+          person.posts.to_a
+
+          expect_query(1) do
+            person.posts.exists?.should be false
+          end
+        end
       end
     end
   end

@@ -216,24 +216,37 @@ module Mongoid
               end
             end
 
-            # Does the enumerable have any? Will determine if there exists at least
-            # one element in the enumerable, whether or not it is _loaded.
+            # Returns whether the association has any documents, optionally
+            # subject to the provided filters.
             #
-            # Note that in Enumerable's any? method if both a pattern and a block are
-            # passed in, only the pattern is used. I implemented the same functionality
-            # here.
+            # This method returns true if the association has any persisted
+            # documents and if it has any not yet persisted documents.
             #
-            # @example Doess the enumerable have any?
-            #   enumerable.any?
+            # If the association is already loaded, this method inspects the
+            # loaded documents and does not query the database. If the
+            # association is not loaded, the argument-less and block-less
+            # version does not load the association; the other versions
+            # (that delegate to Enumerable) may or may not load the association
+            # completely depending on whether it is iterated to completion.
             #
-            # @return [ true, false ] If the enumerable has any elements.
+            # This method can take a parameter and a block. The behavior with
+            # either the paramater or the block is delegated to the standard
+            # library Enumerable module.
+            #
+            # Note that when Enumerable's any? method is invoked with both
+            # a block and a pattern, it only uses the pattern.
+            #
+            # @param [ Object ] condition The condition that documents
+            #   must satisfy. See Enumerable documentation for details.
+            #
+            # @return [ true, false ] If the association has any documents.
             def any?(*args)
               return super if args.any? || block_given?
 
               if _loaded?
-                in_memory.count > 0
+                in_memory.length > 0
               else
-                _unloaded.exists? || _added.count > 0
+                _unloaded.exists? || _added.length > 0
               end
             end
 
@@ -416,7 +429,8 @@ module Mongoid
             #
             # @since 2.1.0
             def reset
-              _loaded.clear and _added.clear
+              _loaded.clear
+              _added.clear
               @executed = false
             end
 

@@ -170,6 +170,13 @@ module Mongoid
 
           # Determine if any documents in this association exist in the database.
           #
+          # If the association contains documents but all of the documents
+          # exist only in the application, i.e. have not been persisted to the
+          # database, this method returns false.
+          #
+          # This method queries the database on each invocation even if the
+          # association is already loaded into memory.
+          #
           # @example Are there persisted documents?
           #   person.posts.exists?
           #
