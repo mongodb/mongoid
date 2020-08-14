@@ -172,4 +172,98 @@ describe 'embedded associations' do
       end
     end
   end
+
+  describe 'updated_at on parent' do
+    context 'when child is added' do
+      context 'embeds_one' do
+        let(:parent) { EomParent.create! }
+
+        it 'updates' do
+          pending 'https://jira.mongodb.org/browse/MONGOID-3252'
+
+          first_updated_at = parent.updated_at
+
+          parent.child = EomChild.new
+          parent.save!
+
+          parent.updated_at.should > first_updated_at
+        end
+      end
+
+      context 'embeds_many' do
+        let(:parent) { EmmCongress.create! }
+
+        it 'updates' do
+          pending 'https://jira.mongodb.org/browse/MONGOID-3252'
+
+          first_updated_at = parent.updated_at
+
+          parent.legislators << EmmLegislator.new
+          parent.save!
+
+          parent.updated_at.should > first_updated_at
+        end
+      end
+    end
+
+    context 'when child is updated' do
+      context 'embeds_one' do
+        let(:parent) { EomParent.create!(child: EomChild.new) }
+
+        it 'updates' do
+          first_updated_at = parent.updated_at
+
+          parent.child.a = 42
+          parent.save!
+
+          parent.updated_at.should > first_updated_at
+        end
+      end
+
+      context 'embeds_many' do
+        let(:parent) { EmmCongress.create!(legislators: [EmmLegislator.new]) }
+
+        it 'updates' do
+          first_updated_at = parent.updated_at
+
+          parent.legislators.first.a = 42
+          parent.save!
+
+          parent.updated_at.should > first_updated_at
+        end
+      end
+    end
+
+    context 'when child is removed' do
+      context 'embeds_one' do
+        let(:parent) { EomParent.create!(child: EomChild.new) }
+
+        it 'updates' do
+          pending 'https://jira.mongodb.org/browse/MONGOID-3252'
+
+          first_updated_at = parent.updated_at
+
+          parent.child = nil
+          parent.save!
+
+          parent.updated_at.should > first_updated_at
+        end
+      end
+
+      context 'embeds_many' do
+        let(:parent) { EmmCongress.create!(legislators: [EmmLegislator.new]) }
+
+        it 'updates' do
+          pending 'https://jira.mongodb.org/browse/MONGOID-3252'
+
+          first_updated_at = parent.updated_at
+
+          parent.legislators.clear
+          parent.save!
+
+          parent.updated_at.should > first_updated_at
+        end
+      end
+    end
+  end
 end

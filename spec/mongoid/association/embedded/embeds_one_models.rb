@@ -3,6 +3,7 @@
 
 class EomParent
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   embeds_one :child, class_name: 'EomChild'
 

@@ -3,6 +3,7 @@
 
 class EmmCongress
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   embeds_many :legislators, class_name: 'EmmLegislator'
 
