@@ -116,14 +116,88 @@ reference to the parent.
 Queries
 ```````
 
-Use the ``#exists?`` method on the association to efficiently determine whether
+.. _has-many-any:
+
+``any?``
+~~~~~~~~
+
+Use the ``any?`` method on the association to efficiently determine whether
 the association contains any documents, without retrieving the entire set
 of documents from the database:
 
 .. code-block:: ruby
 
   band = Band.first
+  band.members.any?
+
+``any?`` also implements the `Enumerable#any? API
+<https://ruby-doc.org/core/Enumerable.html#method-i-any-3F>`_, allowing
+filtering with a block:
+
+.. code-block:: ruby
+
+  band = Band.first
+  band.members.any? { |member| member.instrument == 'piano' }
+
+... or by a class name which can be useful for polymorphic associations:
+
+.. code-block:: ruby
+
+  class Drummer < Member
+  end
+  
+  band = Band.first
+  band.members.any?(Drummer)
+
+If the association is already loaded, ``any?`` inspects the loaded
+documents and does not query the database:
+
+.. code-block:: ruby
+
+  band = Band.first
+  # Queries the database
+  band.members.any?
+  
+  band.members.to_a
+  
+  # Does not query the database
+  band.members.any?
+
+Note that simply calling ``any?`` would *not* load the association
+(since ``any?`` only retrtieves the _id field of the first matching document).
+
+``exists?``
+~~~~~~~~~~~
+
+The ``exists?`` method on the association determines whether there are
+any *persisted* documents in the association. Unlike the ``any?`` method:
+
+- ``exists?`` always queries the database, even if the association is already
+  loaded.
+- ``exists?`` does not consider non-persisted documents.
+- ``exists?`` does not allow filtering in the application like ``any?`` does,
+  and does not take any arguments.
+
+The following examle illustrates the difference between ``exists?`` and
+``any?``:
+
+.. code-block:: ruby
+  band = Band.create!
+  # Member is not persisted.
+  band.members.build
+  
+  band.members.any?
+  # => true
   band.members.exists?
+  # => false
+  
+  # Persist the member.
+  band.members.map(&:save!)
+  
+  band.members.any?
+  # => true
+  band.members.exists?
+  # => true
 
 
 Belongs To
