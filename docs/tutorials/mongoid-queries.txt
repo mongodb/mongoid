@@ -947,13 +947,17 @@ and avoids sending requests to the database for identical queries. Queries are c
 Note that if the number of results is too large to be returned in a single batch,
 the QueryCache will *not* be used, even if Mongoid::QueryCache.enabled is true.
 
-When using Rails or another Rack-based framework, Mongoid provides middleware
-which clears the QueryCache after each request. To enable the QueryCache via middleware (recommended):
+When using Rails or other Rack-based frameworks, Mongoid provides middleware which clears the QueryCache
+after each request. Below is an example of how to use the QueryCache middleware on Rails (recommended).
+Refer to the `Rails on Rack guide <https://guides.rubyonrails.org/rails_on_rack.html#configuring-middleware-stack>`
+for detailed instructions.
 
 .. code-block:: ruby
 
-  # in an initializer
-  Rails.application.config.middleware.use Mongoid::QueryCache::Middleware
+  # config/application.rb
+
+  # add Mongoid::QueryCache::Middleware at the bottom of the middleware stack
+  config.middleware.use Mongoid::QueryCache::Middleware
 
 Alternatively, to enable the QueryCache directly:
 
