@@ -66,30 +66,22 @@ specified Mongoid versions.
    :class: compatibility-large no-padding
 
    * - Mongoid
-     - Driver 2.11
-     - Driver 2.10
-     - Driver 2.9
-     - Driver 2.8
-     - Driver 2.7
+     - Driver 2.14-2.10
+     - Driver 2.9-2.7
+
+   * - 7.2
+     - |checkmark|
+     -
 
    * - 7.1
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
      - |checkmark|
      - |checkmark|
 
    * - 7.0
      - |checkmark|
      - |checkmark|
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
 
    * - 6.4
-     - |checkmark|
-     - |checkmark|
-     - |checkmark|
      - |checkmark|
      - |checkmark|
 
@@ -112,6 +104,15 @@ supported by Mongoid.
      - Ruby 2.3
      - Ruby 2.2
      - JRuby 9.2
+
+   * - 7.2
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     - D
+     -
+     - |checkmark|
 
    * - 7.1
      - |checkmark|
@@ -162,6 +163,7 @@ for driver compatibility matrices.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - MongoDB 4.4
      - MongoDB 4.2
      - MongoDB 4.0
      - MongoDB 3.6
@@ -170,7 +172,18 @@ for driver compatibility matrices.
      - MongoDB 3.0
      - MongoDB 2.6
 
+   * - 7.2
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
    * - 7.1
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -187,8 +200,10 @@ for driver compatibility matrices.
      - |checkmark|
      - |checkmark|
      - |checkmark|
+     - |checkmark|
 
    * - 6.4
+     - |checkmark|
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -217,6 +232,13 @@ are supported by Mongoid.
      - Rails 5.1
      - Rails 5.0
      - Rails 4.2
+
+   * - 7.2
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
 
    * - 7.1
      - |checkmark|
