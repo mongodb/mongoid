@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require "spec_helper"
+require_relative "./savable_spec_models"
 
 describe Mongoid::Persistable::Savable do
 
@@ -163,61 +164,34 @@ describe Mongoid::Persistable::Savable do
 
     context "when modifying the entire hierarchy" do
       context 'with multiple insert ops' do
-
-        class A
-          include Mongoid::Document
-          include Mongoid::Timestamps::Short
-
-          embeds_many :bs, cascade_callbacks: true
-
-          accepts_nested_attributes_for :bs
-
-          field :a_name
-        end
-
-        class B
-          include Mongoid::Document
-          include Mongoid::Timestamps::Short
-
-          embedded_in :bable, polymorphic: true
-          embeds_many :cs, cascade_callbacks: true
-
-          accepts_nested_attributes_for :cs
-
-          field :b_name
-        end
-
-        class C
-          include Mongoid::Document
-          include Mongoid::Timestamps::Short
-
-          field :c_name
-        end
-
-        let(:a) { A.create(a_name: "A Name") }
-        let(:b) { a.bs.create(b_name: "B Name") }
+        let(:truck) { SavableSpec::Truck.create(capacity: 100) }
+        let(:crate) { truck.crates.create(volume: 0.4) }
 
         it 'push multiple' do
-          a.bs_attributes = {
+          truck.crates_attributes = {
             "0" => {
-              "cs_attributes" => {
+              "toys_attributes" => {
                 "0" => {
-                  "c_name" => "C Name"
+                  "type" => "Soft toy"
                 }
               },
-              "id" => b.id.to_s
+              "id" => crate.id.to_s
             },
             "1" => {
-              "b_name" => "New B Name"
+              "volume" => 0.8
             }
           }
 
-          expect(a.atomic_updates).to eq({
-            "$push" => {"bs.0.cs"=>{"$each"=>[{"_id"=>b.cs.first.id, "c_name"=>"C Name"}]}},
-            :conflicts => {"$push"=>{"bs"=>{"$each"=>[{"_id"=>a.bs.last.id, "b_name"=>"New B Name"}]}}}
+          expect(truck.atomic_updates).to eq({
+            "$push" => {"crates.0.toys"=>{"$each"=>[{"_id"=>crate.toys.first.id, "type"=>"Soft toy"}]}},
+            :conflicts => {"$push"=>{"crates"=>{"$each"=>[{"_id"=>truck.crates.last.id, "volume"=> 0.8}]}}}
           })
 
-          expect { a.save }.not_to raise_error
+          expect { truck.save }.not_to raise_error
+
+          truck.reload
+          expect(truck.crates.map(&:volume)).to match_array([0.8, 0.4])
+          expect(truck.crates.flat_map(&:toys).map(&:type)).to match_array(["Soft toy"])
         end
       end
 
