@@ -342,6 +342,36 @@ describe Mongoid::Atomic::Modifiers do
             }
           )
         end
+
+        context "with deep nested conflicting modification" do
+          let(:nested2) do
+            { "addresses.0.locations" => { "number" => "164" } }
+          end
+
+          before do
+            modifiers.push(nested2)
+          end
+
+          it "adds conflicts to the conflicts hash" do
+            expect(modifiers).to eq(
+              { "$push" => {
+                "addresses.0.locations" => { '$each' => [{ "street" => "Bond St" }] } },
+                conflicts: { "$push" =>
+                  { "addresses" => { '$each' => [
+                      { "street" => "Oxford St" }
+                    ] }
+                  },
+                  conflicts: { "$push" =>
+                    { "addresses.0.locations" => { "$each" => [
+                        { "number" => "164" }
+                      ] }
+                    }
+                  }
+                }
+              }
+            )
+          end
+        end
       end
     end
   end
