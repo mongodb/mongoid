@@ -942,16 +942,49 @@ the default scope being evaluated first:
 Query Cache
 -----------
 
-If Mongoid's QueryCache is enabled, it will cache queries that the server returns in a single batch
-and avoids sending requests to the database for identical queries. Note that if the number of
-results is too large to be returned in a single batch, the QueryCache will *not* be used, even if
-Mongoid::QueryCache.enabled is true.
+When the query cache is enabled, Mongoid will cache results for MongoDB queries
+when the entire result set is returned in a single batch (1000 documents by
+default).
 
-To enable the QueryCache:
+Each thread has its own query cache.
+
+When the query cache is enabled, performing any write operations (insert,
+update, replace or delete) clears the cache of the thread issuing the write.
+
+Mongoid provides a Rack middleware which enables the query cache for the
+duration of each web request. Below is an example of how to enable the query
+cache middleware in a Ruby on Rails application:
+
+.. code-block:: ruby
+
+  # config/application.rb
+
+  # Add Mongoid::QueryCache::Middleware at the bottom of the middleware stack
+  # or before other middleware that queries MongoDB.
+  config.middleware.use Mongoid::QueryCache::Middleware
+
+Please refer to the `Rails on Rack guide
+<https://guides.rubyonrails.org/rails_on_rack.html#configuring-middleware-stack>`
+for more information about using Rack middleware in Rails applications.
+
+Alternatively, to enable the query cache manually for a code segment, use:
+
+.. code-block:: ruby
+
+  Mongoid::QueryCache.cache do
+    # ...
+  end
+
+The query cache can also be explicitly enabled and disabled, although it is
+recommended to use the block form described above:
 
 .. code-block:: ruby
 
   Mongoid::QueryCache.enabled = true
+  
+  # ...
+  
+  Mongoid::QueryCache.enabled = false
 
 
 .. _additional-query-methods:
