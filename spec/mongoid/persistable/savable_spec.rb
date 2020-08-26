@@ -188,9 +188,9 @@ describe Mongoid::Persistable::Savable do
 
           expect { truck.save! }.not_to raise_error
 
-          truck.reload
-          expect(truck.crates.map(&:volume)).to match_array([0.8, 0.4])
-          expect(truck.crates.flat_map(&:toys).map(&:name)).to match_array(["Soft toy"])
+          _truck = Truck.find(truck.id)
+          _truck.crates.map(&:volume).should == [0.4, 0.8]
+          _truck.crates.flat_map(&:toys).map(&:name).should == ["Soft toy"]
         end
       end
 
