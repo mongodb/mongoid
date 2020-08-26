@@ -164,7 +164,7 @@ describe Mongoid::Persistable::Savable do
     context "when modifying the entire hierarchy" do
       context 'with multiple insert ops' do
         let(:truck) { Truck.create! }
-        let(:crate) { truck.crates.create!(volume: 0.4) }
+        let!(:crate) { truck.crates.create!(volume: 0.4) }
 
         it 'push multiple' do
           truck.crates_attributes = {
