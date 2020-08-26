@@ -70,7 +70,7 @@ module Mongoid
         modifications.each_pair do |field, value|
           push_fields[field] = field
           if push_conflict?(field)
-            conflicts.push({field => value})
+            conflicts.push({ field => value })
           else
             add_operation(pushes, field, { '$each' => Array.wrap(value) })
           end
@@ -89,7 +89,7 @@ module Mongoid
         modifications.each_pair do |field, value|
           next if field == "_id"
           if set_conflict?(field)
-            conflicts.set({field => value})
+            conflicts.set({ field => value })
           else
             add_operation(sets, field, value)
             set_fields[field.split(".", 2)[0]] = field
