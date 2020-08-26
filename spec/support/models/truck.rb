@@ -3,4 +3,6 @@
 
 class Truck < Vehicle
   embeds_one :bed
+
+  field :capacity, type: Integer
 end
