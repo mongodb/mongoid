@@ -4,7 +4,7 @@
 class Toy
   include Mongoid::Document
 
-  embedded_in :toyable, polymorphic: true
+  embedded_in :crate
 
   field :type
 end
