@@ -191,10 +191,7 @@ module Mongoid
       private
 
       def process(result)
-        @remaining -= result.returned_count if limited?
-        @cursor_id = result.cursor_id
-        @coll_name ||= result.namespace.sub("#{database.name}.", '') if result.namespace
-        documents = result.documents
+        documents = super
         if @cursor_id.zero? && !@after_first_batch
           @cached_documents ||= []
           @cached_documents.concat(documents)
