@@ -2,7 +2,6 @@
 # encoding: utf-8
 
 require "spec_helper"
-require_relative "./savable_spec_models"
 
 describe Mongoid::Persistable::Savable do
 
@@ -164,7 +163,7 @@ describe Mongoid::Persistable::Savable do
 
     context "when modifying the entire hierarchy" do
       context 'with multiple insert ops' do
-        let(:truck) { SavableSpec::Truck.create(capacity: 100) }
+        let(:truck) { Truck.create(capacity: 100) }
         let(:crate) { truck.crates.create(volume: 0.4) }
 
         it 'push multiple' do
