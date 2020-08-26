@@ -171,7 +171,7 @@ describe Mongoid::Persistable::Savable do
             "0" => {
               "toys_attributes" => {
                 "0" => {
-                  "type" => "Soft toy"
+                  "name" => "Soft toy"
                 }
               },
               "id" => crate.id.to_s
@@ -182,7 +182,7 @@ describe Mongoid::Persistable::Savable do
           }
 
           expect(truck.atomic_updates).to eq({
-            "$push" => {"crates.0.toys"=>{"$each"=>[{"_id"=>crate.toys.first.id, "type"=>"Soft toy"}]}},
+            "$push" => {"crates.0.toys"=>{"$each"=>[{"_id"=>crate.toys.first.id, "name"=>"Soft toy"}]}},
             :conflicts => {"$push"=>{"crates"=>{"$each"=>[{"_id"=>truck.crates.last.id, "volume"=> 0.8}]}}}
           })
 
@@ -190,7 +190,7 @@ describe Mongoid::Persistable::Savable do
 
           truck.reload
           expect(truck.crates.map(&:volume)).to match_array([0.8, 0.4])
-          expect(truck.crates.flat_map(&:toys).map(&:type)).to match_array(["Soft toy"])
+          expect(truck.crates.flat_map(&:toys).map(&:name)).to match_array(["Soft toy"])
         end
       end
 

@@ -6,5 +6,5 @@ class Toy
 
   embedded_in :crate
 
-  field :type
+  field :name
 end
