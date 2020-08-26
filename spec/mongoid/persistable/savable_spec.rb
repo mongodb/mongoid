@@ -162,37 +162,6 @@ describe Mongoid::Persistable::Savable do
     end
 
     context "when modifying the entire hierarchy" do
-      context 'with multiple insert ops' do
-        let(:truck) { Truck.create! }
-        let!(:crate) { truck.crates.create!(volume: 0.4) }
-
-        it 'push multiple' do
-          truck.crates_attributes = {
-            "0" => {
-              "toys_attributes" => {
-                "0" => {
-                  "name" => "Soft toy"
-                }
-              },
-              "id" => crate.id.to_s
-            },
-            "1" => {
-              "volume" => 0.8
-            }
-          }
-
-          expect(truck.atomic_updates).to eq({
-            "$push" => {"crates.0.toys"=>{"$each"=>[{"_id"=>crate.toys.first.id, "name"=>"Soft toy"}]}},
-            :conflicts => {"$push"=>{"crates"=>{"$each"=>[{"_id"=>truck.crates.last.id, "volume"=> 0.8}]}}}
-          })
-
-          expect { truck.save! }.not_to raise_error
-
-          _truck = Truck.find(truck.id)
-          _truck.crates.map(&:volume).should == [0.4, 0.8]
-          _truck.crates.flat_map(&:toys).map(&:name).should == ["Soft toy"]
-        end
-      end
 
       context "when performing modification and insert ops" do
 
