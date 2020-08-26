@@ -163,55 +163,6 @@ describe Mongoid::Persistable::Savable do
 
     context "when modifying the entire hierarchy" do
 
-      context 'with multiple insert ops' do
-        let!(:truck) { Truck.create! }
-        let!(:crate) { truck.crates.create!(volume: 0.4) }
-
-        it 'push multiple' do
-          expect(truck.crates.size).to eq 1
-          expect(truck.crates[0].volume).to eq 0.4
-          expect(truck.crates[0].toys.size).to eq 0
-
-          truck.crates.first.toys.build(name: "Teddy bear")
-          truck.crates.build(volume: 0.8)
-
-          # The following is equivalent to the two lines above:
-          #
-          # truck.crates_attributes = {
-          #   '0' => {
-          #     "toys_attributes" => {
-          #       "0" => {
-          #         "name" => "Teddy bear"
-          #       }
-          #     },
-          #     "id" => crate.id.to_s
-          #   },
-          #   "1" => {
-          #     "volume" => 0.8
-          #   }
-          # }
-
-          expect(truck.crates.size).to eq 2
-          expect(truck.crates[0].volume).to eq 0.4
-          expect(truck.crates[0].toys.size).to eq 1
-          expect(truck.crates[0].toys[0].name).to eq "Teddy bear"
-          expect(truck.crates[1].volume).to eq 0.8
-          expect(truck.crates[1].toys.size).to eq 0
-
-          #expect(truck.atomic_updates[:conflicts]).to eq nil
-
-          expect { truck.save! }.not_to raise_error
-
-          truck = Truck.find(truck.id)
-          expect(truck.crates.size).to eq 2
-          expect(truck.crates[0].volume).to eq 0.4
-          expect(truck.crates[0].toys.size).to eq 1
-          expect(truck.crates[0].toys[0].name).to eq "Teddy bear"
-          expect(truck.crates[1].volume).to eq 0.8
-          expect(truck.crates[1].toys.size).to eq 0
-        end
-      end
-
       context "when performing modification and insert ops" do
 
         let(:person) do
@@ -304,6 +255,55 @@ describe Mongoid::Persistable::Savable do
 
         it "saves modifications to deeply embedded docs" do
           expect(from_db.addresses[0].locations.first.name).to eq('Work')
+        end
+      end
+
+      context 'when adding documents to embedded associations on multiple levels' do
+        let!(:truck) { Truck.create! }
+        let!(:crate) { truck.crates.create!(volume: 0.4) }
+
+        it 'persists the new documents' do
+          expect(truck.crates.size).to eq 1
+          expect(truck.crates[0].volume).to eq 0.4
+          expect(truck.crates[0].toys.size).to eq 0
+
+          truck.crates.first.toys.build(name: "Teddy bear")
+          truck.crates.build(volume: 0.8)
+
+          # The following is equivalent to the two lines above:
+          #
+          # truck.crates_attributes = {
+          #   '0' => {
+          #     "toys_attributes" => {
+          #       "0" => {
+          #         "name" => "Teddy bear"
+          #       }
+          #     },
+          #     "id" => crate.id.to_s
+          #   },
+          #   "1" => {
+          #     "volume" => 0.8
+          #   }
+          # }
+
+          expect(truck.crates.size).to eq 2
+          expect(truck.crates[0].volume).to eq 0.4
+          expect(truck.crates[0].toys.size).to eq 1
+          expect(truck.crates[0].toys[0].name).to eq "Teddy bear"
+          expect(truck.crates[1].volume).to eq 0.8
+          expect(truck.crates[1].toys.size).to eq 0
+
+          #expect(truck.atomic_updates[:conflicts]).to eq nil
+
+          expect { truck.save! }.not_to raise_error
+
+          _truck = Truck.find(truck.id)
+          expect(_truck.crates.size).to eq 2
+          expect(_truck.crates[0].volume).to eq 0.4
+          expect(_truck.crates[0].toys.size).to eq 1
+          expect(_truck.crates[0].toys[0].name).to eq "Teddy bear"
+          expect(_truck.crates[1].volume).to eq 0.8
+          expect(_truck.crates[1].toys.size).to eq 0
         end
       end
 
