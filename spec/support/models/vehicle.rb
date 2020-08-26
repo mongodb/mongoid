@@ -7,7 +7,7 @@ class Vehicle
   belongs_to :shipping_container
   belongs_to :driver
 
-  embeds_many :crates, cascade_callbacks: true
+  embeds_many :crates
 
   accepts_nested_attributes_for :driver
   accepts_nested_attributes_for :shipping_container

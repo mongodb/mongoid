@@ -5,7 +5,7 @@ class Crate
   include Mongoid::Document
 
   embedded_in :crateable, polymorphic: true
-  embeds_many :toys, cascade_callbacks: true
+  embeds_many :toys
 
   accepts_nested_attributes_for :toys
 
