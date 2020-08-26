@@ -163,8 +163,8 @@ describe Mongoid::Persistable::Savable do
 
     context "when modifying the entire hierarchy" do
       context 'with multiple insert ops' do
-        let(:truck) { Truck.create(capacity: 100) }
-        let(:crate) { truck.crates.create(volume: 0.4) }
+        let(:truck) { Truck.create! }
+        let(:crate) { truck.crates.create!(volume: 0.4) }
 
         it 'push multiple' do
           truck.crates_attributes = {
@@ -186,7 +186,7 @@ describe Mongoid::Persistable::Savable do
             :conflicts => {"$push"=>{"crates"=>{"$each"=>[{"_id"=>truck.crates.last.id, "volume"=> 0.8}]}}}
           })
 
-          expect { truck.save }.not_to raise_error
+          expect { truck.save! }.not_to raise_error
 
           truck.reload
           expect(truck.crates.map(&:volume)).to match_array([0.8, 0.4])
