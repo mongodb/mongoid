@@ -75,6 +75,22 @@ module Mongoid
 
       private
 
+      # Initialize the atomic updates.
+      #
+      # @api private
+      #
+      # @example Initialize the atomic updates.
+      #   document.init_atomic_updates
+      #
+      # @return [ Array<Hash> ] The updates and conflicts.
+      #
+      # @since 4.0.0
+      def init_atomic_updates
+        updates = atomic_updates
+        conflicts = updates.delete(:conflicts) || {}
+        [ updates, conflicts ]
+      end
+
       # Prepare the update for execution. Validates and runs callbacks, etc.
       #
       # @api private
@@ -116,16 +132,16 @@ module Mongoid
       # @since 1.0.0
       def update_document(options = {})
         prepare_update(options) do
-          update_modifier(atomic_selector, atomic_updates)
+          updates, conflicts = init_atomic_updates
+          unless updates.empty?
+            coll = collection(_root)
+            selector = atomic_selector
+            coll.find(selector).update_one(positionally(selector, updates), session: _session)
+            conflicts.each_pair do |key, value|
+              coll.find(selector).update_one(positionally(selector, { key => value }), session: _session)
+            end
+          end
         end
-      end
-
-      def update_modifier(selector, updates)
-        conflicts = updates.delete(:conflicts) || {}
-        return if updates.empty?
-
-        collection(_root).find(selector).update_one(positionally(selector, updates), session: _session)
-        update_modifier(selector, conflicts)
       end
     end
   end
