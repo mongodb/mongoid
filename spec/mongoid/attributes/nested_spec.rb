@@ -234,7 +234,7 @@ describe Mongoid::Attributes::Nested do
     end
   end
 
-  describe "##{name}_attributes=" do
+  describe "*_attributes=" do
 
     context "when the parent document is new" do
 
