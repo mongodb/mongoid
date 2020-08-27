@@ -193,7 +193,7 @@ module Mongoid
       def push_conflict?(field)
         name = field.split(".", 2)[0]
         set_fields.has_key?(name) || pull_fields.has_key?(name) ||
-          (push_fields.keys.count { |item| item =~ /\A#{name}(?:\.|\z)/ } > 1)
+          (push_fields.keys.count { |item| item.split('.', 2).first == name } > 1)
       end
 
       # Get the conflicting pull modifications.
