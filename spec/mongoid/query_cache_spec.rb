@@ -10,6 +10,10 @@ describe Mongoid::QueryCache do
     Mongoid::QueryCache.cache { spec.run }
   end
 
+  before do
+    SessionRegistry.instance.verify_sessions_ended!
+  end
+
   context 'when iterating over objects sharing the same base' do
 
     let(:server) do

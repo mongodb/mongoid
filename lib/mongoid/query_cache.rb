@@ -253,8 +253,8 @@ module Mongoid
           super
         else
           @cursor = nil
-          session = client.send(:get_session, @options)
           unless @cursor = cached_cursor
+            session = client.send(:get_session, @options)
             read_with_retry(session, server_selector) do |server|
               result = send_initial_query(server, session)
               @cursor = CachedCursor.new(view, result, server, session: session)
