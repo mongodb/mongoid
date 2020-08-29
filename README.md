@@ -64,7 +64,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Credits
 -------
 
-Durran Jordan: durran at gmail dot com
+Durran Jordan: <durran@gmail.com>
 
 [rubygems-img]: https://badge.fury.io/rb/mongoid.svg
 [rubygems-url]: http://badge.fury.io/rb/mongoid
