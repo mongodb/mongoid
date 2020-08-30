@@ -137,11 +137,13 @@ module Mongoid
             coll = collection(_root)
             selector = atomic_selector
             coll.find(selector).update_one(positionally(selector, updates), session: _session)
+
+            # This causes the issue
             conflicts.each_pair do |key, value|
               coll.find(selector).update_one(positionally(selector, { key => value }), session: _session)
             end
 
-            # This code will fix the issue
+            # This code will fix the issue (replace above)
             # conflicts.each_pair do |modifier, values|
             #   inner_conflicts = values.group_by {|key, _| key.split(".", 2)[0] }.values
             #   while batch = inner_conflicts.map(&:pop).compact.to_h.presence
