@@ -140,6 +140,14 @@ module Mongoid
             conflicts.each_pair do |key, value|
               coll.find(selector).update_one(positionally(selector, { key => value }), session: _session)
             end
+
+            # This code will fix the issue
+            # conflicts.each_pair do |modifier, values|
+            #   inner_conflicts = values.group_by {|key, _| key.split(".", 2)[0] }.values
+            #   while batch = inner_conflicts.map(&:pop).compact.to_h.presence
+            #     coll.find(selector).update_one(positionally(selector, { modifier => batch }), session: _session)
+            #   end
+            # end
           end
         end
       end

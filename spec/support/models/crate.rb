@@ -3,6 +3,7 @@
 
 class Crate
   include Mongoid::Document
+  include Mongoid::Timestamps::Short
 
   embedded_in :vehicle
   embeds_many :toys
