@@ -362,6 +362,29 @@ describe Mongoid::Atomic do
             )
           end
         end
+
+        context 'when adding nested embedded docs and updating top level embedded doc' do
+          let!(:truck) { Truck.create! }
+          let!(:crate) { truck.crates.create!(volume: 1) }
+
+          before do
+            truck.crates.first.volume = 2
+            truck.crates.first.toys.build(name: 'Bear')
+            truck.crates.build
+          end
+
+          it 'correctly distributes the operations' do
+            pending 'https://jira.mongodb.org/browse/MONGOID-4982'
+
+            truck.atomic_updates.should == {
+              '$set' => {'crates.0.volume' => 2},
+              '$push' => {'crates.0.toys' => {'$each' => [crate.toys.first.attributes]}},
+              conflicts: {
+                '$push' => {'crates' => {'$each' => [truck.crates.last.attributes]}},
+              },
+            }
+          end
+        end
       end
     end
   end
