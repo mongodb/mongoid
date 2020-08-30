@@ -321,8 +321,8 @@ describe Mongoid::Persistable::Creatable do
       end
 
       it "does not bleed relations from one subclass to another" do
-        expect(Truck.relations.keys).to eq(%w/ shipping_container driver crates bed /)
-        expect(Car.relations.keys).to eq(%w/ shipping_container driver crates /)
+        expect(Truck.relations.keys).to eq(%w/ shipping_container driver crates seats bed /)
+        expect(Car.relations.keys).to eq(%w/ shipping_container driver crates seats /)
       end
 
       context "when appending new documents" do
