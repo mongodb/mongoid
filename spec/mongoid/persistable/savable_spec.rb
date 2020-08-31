@@ -307,6 +307,115 @@ describe Mongoid::Persistable::Savable do
         end
       end
 
+      context 'when adding documents to embedded association and updating parent fields' do
+        let!(:truck) { Truck.create! }
+        let!(:crate) { truck.crates.create!(volume: 0.4) }
+
+        it 'performs all writes' do
+          truck.crates.build(volume: 1)
+          truck.crates.first.volume = 2
+
+          truck.save!
+
+          _truck = Truck.find(truck.id)
+          _truck.crates.length.should == 2
+          _truck.crates.first.volume.should == 2
+          _truck.crates.last.volume.should == 1
+        end
+      end
+
+      context 'when adding documents to nested embedded association and updating first association fields' do
+        let!(:truck) { Truck.create! }
+        let!(:seat) { truck.seats.create!(rating: 1) }
+
+        it 'performs all writes' do
+          truck.seats.first.armrests.build(side: 'left')
+          truck.seats.first.rating = 2
+
+          truck.save!
+
+          _truck = Truck.find(truck.id)
+          _truck.seats.length.should == 1
+          _truck.seats.first.armrests.length.should == 1
+          _truck.seats.first.armrests.first.side.should == 'left'
+        end
+      end
+
+      context 'when adding documents to nested embedded association and adding another top level association' do
+        let!(:truck) { Truck.create! }
+        let!(:crate) { truck.crates.create!(volume: 1) }
+
+        it 'performs all writes' do
+          truck.crates.first.toys.build(name: 'Bear')
+          truck.crates.build
+
+          truck.save!
+
+          _truck = Truck.find(truck.id)
+          _truck.crates.length.should == 2
+          _truck.crates.first.toys.length.should == 1
+          _truck.crates.first.toys.first.name.should == 'Bear'
+          _truck.crates.last.toys.length.should == 0
+        end
+
+        context 'when also updating first embedded top level association' do
+          it 'performs all writes' do
+            pending 'https://jira.mongodb.org/browse/MONGOID-4982'
+
+            truck.crates.first.volume = 2
+            truck.crates.first.toys.build(name: 'Bear')
+            truck.crates.build
+
+            truck.save!
+
+            _truck = Truck.find(truck.id)
+            _truck.crates.length.should == 2
+            _truck.crates.first.toys.length.should == 1
+            _truck.crates.first.toys.first.name.should == 'Bear'
+            _truck.crates.last.toys.length.should == 0
+          end
+        end
+      end
+
+      context 'when adding documents to embedded associations with cascaded callbacks on update' do
+        let!(:truck) { Truck.create! }
+        let!(:seat) { truck.seats.create!(rating: 1) }
+
+        it 'persists the new documents' do
+          expect(truck.seats.size).to eq 1
+          expect(truck.seats[0].rating).to eq 1
+
+          truck.seats.build
+
+          expect { truck.save! }.not_to raise_error
+
+          _truck = Truck.find(truck.id)
+          expect(_truck.seats.size).to eq 2
+          expect(_truck.seats[0].rating).to eq 1
+          expect(_truck.seats[1].rating).to eq 100
+        end
+
+        context 'when embedded association embeds another association' do
+          it 'persists the new documents' do
+            pending 'https://jira.mongodb.org/browse/MONGOID-4982'
+
+            expect(truck.seats.size).to eq 1
+            expect(truck.seats[0].rating).to eq 1
+
+            truck.seats.first.armrests.build
+            truck.seats.build
+
+            expect { truck.save! }.not_to raise_error
+
+            _truck = Truck.find(truck.id)
+            expect(_truck.seats.size).to eq 2
+            expect(_truck.seats[0].rating).to eq 1
+            expect(_truck.seats[0].armrests.length).to eq 1
+            expect(_truck.seats[1].rating).to eq 100
+          end
+        end
+      end
+
       context "when removing elements without using delete or destroy" do
 
         let!(:person) do

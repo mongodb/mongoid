@@ -9,6 +9,26 @@ describe Mongoid::Atomic::Modifiers do
     described_class.new
   end
 
+  describe "#push_conflict?" do
+    let(:result) { modifiers.send(:push_conflict?, field) }
+
+    context 'for embeds many subdocument' do
+      context 'when another field on subdocument is being set' do
+        before do
+          modifiers.set('foo.0.a' => 1)
+        end
+
+        let(:field) { 'foo' }
+
+        it 'does not conflict' do
+          pending 'https://jira.mongodb.org/browse/MONGOID-4982'
+
+          result.should be false
+        end
+      end
+    end
+  end
+
   describe "#add_to_set" do
 
     context "when the unique adds are empty" do
@@ -342,6 +362,33 @@ describe Mongoid::Atomic::Modifiers do
             }
           )
         end
+      end
+    end
+
+    context 'when there is another operation on a sibling of a key which is nested' do
+
+      let(:first_op) do
+        { "addresses.0.name" => 'test' }
+      end
+
+      let(:push_op) do
+        { "addresses.0.locations" => { "street" => "Oxford St" } }
+      end
+
+      before do
+        modifiers.set(first_op)
+        modifiers.push(push_op)
+      end
+
+      it "does not conflict and adds push to top level" do
+        pending 'https://jira.mongodb.org/browse/MONGOID-4982'
+
+        modifiers.should == {
+          '$set' => { "addresses.0.name" => 'test' },
+          '$push' => {"addresses.0.locations" => {'$each' => [
+            { "street" => "Oxford St" },
+          ]}},
+        }
       end
     end
   end
