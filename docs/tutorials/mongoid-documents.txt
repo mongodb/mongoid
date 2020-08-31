@@ -745,6 +745,8 @@ to encode symbol values as strings, include the following code snippet in your p
   end
 
 
+.. _dynamic-fields:
+
 Dynamic Fields
 ==============
 

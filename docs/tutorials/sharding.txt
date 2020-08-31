@@ -69,6 +69,8 @@ be specified:
 place of a field name, in which case Mongoid will use the foreign key
 configured in the association as the field name:
 
+.. code-block:: ruby
+
   class Person
     include Mongoid::Document
 
