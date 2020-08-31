@@ -182,6 +182,7 @@ The following examle illustrates the difference between ``exists?`` and
 ``any?``:
 
 .. code-block:: ruby
+
   band = Band.create!
   # Member is not persisted.
   band.members.build
@@ -384,7 +385,7 @@ Thanks to MongoDB's document model, Mongoid also offers embedded associations
 which allow documents of different types to be stored hierarchically
 in the same collection. Embedded associations are defined using
 ``embeds_one``, ``embeds_many`` and ``embedded_in`` macros, plus
-``recursively_embeds_one`` and ``recursively_embeds_many``for recursive
+``recursively_embeds_one`` and ``recursively_embeds_many`` for recursive
 embedding.
 
 Embeds One

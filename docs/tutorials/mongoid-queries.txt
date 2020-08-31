@@ -939,6 +939,8 @@ the default scope being evaluated first:
     embedded: false>
 
 
+.. _query-cache:
+
 Query Cache
 -----------
 
@@ -951,23 +953,7 @@ Each thread has its own query cache.
 When the query cache is enabled, performing any write operations (insert,
 update, replace or delete) clears the cache of the thread issuing the write.
 
-Mongoid provides a Rack middleware which enables the query cache for the
-duration of each web request. Below is an example of how to enable the query
-cache middleware in a Ruby on Rails application:
-
-.. code-block:: ruby
-
-  # config/application.rb
-
-  # Add Mongoid::QueryCache::Middleware at the bottom of the middleware stack
-  # or before other middleware that queries MongoDB.
-  config.middleware.use Mongoid::QueryCache::Middleware
-
-Please refer to the `Rails on Rack guide
-<https://guides.rubyonrails.org/rails_on_rack.html#configuring-middleware-stack>`
-for more information about using Rack middleware in Rails applications.
-
-Alternatively, to enable the query cache manually for a code segment, use:
+To enable the query cache manually for a code segment, use:
 
 .. code-block:: ruby
 
@@ -985,6 +971,9 @@ recommended to use the block form described above:
   # ...
   
   Mongoid::QueryCache.enabled = false
+
+Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
+to enable the query cache automatically for each web request.
 
 
 .. _additional-query-methods:

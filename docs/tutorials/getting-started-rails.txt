@@ -480,7 +480,8 @@ migrating from ActiveRecord to Mongoid.
 ActiveRecord models derive from ``ApplicationRecord`` and do not have
 column definitions. Mongoid models generally have no superclass but must
 include ``Mongoid::Document``, and usually define the fields explicitly
-(but with `Dynamic Fields`_ may be used instead of explicit field definition).
+(but :ref:`dynamic fields <dynamic-fields>` may also be used instead of
+explicit field definitions).
 
 For example, a barebones Post model may look like this in ActiveRecord:
 
