@@ -598,7 +598,7 @@ Puma
 
 Use the ``on_worker_boot`` hook to reconnect clients in the workers and
 the ``before_fork`` hook to close clients in the parent process
-(`Puma documentation <<https://puma.io/puma/>`_):
+(`Puma documentation <https://puma.io/puma/>`_):
 
 .. code-block:: ruby
 
@@ -684,9 +684,9 @@ In development, some settings can be adjusted to provide a better developer
 experience.
 
 - ``:server_selection_timeout``: set this to a low value (e.g., ``1``)
-if your MongoDB server is running locally and you start it manually. A low
-server selection timeout will cause the driver to fail quickly when there is
-no server running.
+  if your MongoDB server is running locally and you start it manually. A low
+  server selection timeout will cause the driver to fail quickly when there is
+  no server running.
 
 Sample recommended development configuration:
 
