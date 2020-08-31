@@ -32,6 +32,7 @@ i.e. ``development``, ``test`` or ``production``. The third level key,
 ``default`` in the above example, refers to the Mongo client name.
 Most applications will use a single client named ``default``.
 
+
 Generating Default Configuration
 ================================
 
@@ -46,6 +47,7 @@ The configuration file will be placed in ``config/mongoid.yml``.
 
 If you are not using Ruby on Rails, you can copy the minimal configuration
 given above and save it as ``config/mongoid.yml``.
+
 
 Loading Mongoid Configuration
 =============================
@@ -105,10 +107,11 @@ current environment - but it does support defining multiple clients.
   Once a component is used or referenced, changing configuration may not apply
   changes to already instantiated components.
 
+
 .. _configuration-options:
 
-Mongoid Configuration
----------------------
+Mongoid Configuration Options
+=============================
 
 The following annotated example ``mongoid.yml`` demonstrates how Mongoid
 can be configured.
@@ -291,7 +294,7 @@ The Ruby driver options may be found in
 `the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
 
 ERb Preprocessing
-`````````````````
+=================
 
 When loading a configuration file, Mongoid processes it with ERb before
 parsing it as YAML. This allows, for example, constructing the contents of
@@ -649,6 +652,28 @@ before the workers are forked.
       end
     end
   end
+
+
+.. _query-cache-middleware:
+
+Query Cache Middleware
+======================
+
+Mongoid provides a Rack middleware which enables the :ref:`query cache
+<query-cache>` for the duration of each web request. Below is an example of
+how to enable the query cache middleware in a Ruby on Rails application:
+
+.. code-block:: ruby
+
+  # config/application.rb
+
+  # Add Mongoid::QueryCache::Middleware at the bottom of the middleware stack
+  # or before other middleware that queries MongoDB.
+  config.middleware.use Mongoid::QueryCache::Middleware
+
+Please refer to the `Rails on Rack guide
+<https://guides.rubyonrails.org/rails_on_rack.html#configuring-middleware-stack>`_
+for more information about using Rack middleware in Rails applications.
 
 
 Development Configuration
