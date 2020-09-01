@@ -20,7 +20,7 @@ class SessionRegistry
   end
 
   def register(session)
-    @registry << session
+    @registry << session if session
   end
 
   def verify_sessions_ended!
