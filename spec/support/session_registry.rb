@@ -2,10 +2,10 @@ require 'singleton'
 
 module Mongo
   class Client
-    alias :get_session_without_tracking! :get_session!
+    alias :get_session_without_tracking :get_session
 
-    def get_session!(options = {})
-      get_session_without_tracking!(options).tap do |session|
+    def get_session(options = {})
+      get_session_without_tracking(options).tap do |session|
         SessionRegistry.instance.register(session)
       end
     end
