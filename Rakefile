@@ -34,6 +34,13 @@ RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.pattern = "spec/**/*_spec.rb"
 end
 
+task :ci do
+  $: << File.join(File.dirname(__FILE__), 'spec')
+  require 'support/spec_organizer'
+
+  SpecOrganizer.new.run
+end
+
 task :default => :spec
 
 desc "Generate all documentation"
