@@ -1,4 +1,5 @@
 require 'support/child_process_helper'
+require 'json'
 
 autoload :FileUtils, 'fileutils'
 autoload :Find, 'find'
