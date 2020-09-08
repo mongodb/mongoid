@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-autoload :ChildProcess, 'childprocess'
-autoload :Tempfile, 'tempfile'
+gem 'childprocess'
+require 'childprocess'
+require 'tempfile'
 
 module ChildProcessHelper
+  class SpawnError < StandardError; end
+
   module_function def call(cmd, env: nil, cwd: nil)
     process = ChildProcess.new(*cmd)
     process.io.inherit!

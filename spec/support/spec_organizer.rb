@@ -1,6 +1,7 @@
+require 'support/child_process_helper'
+
 autoload :FileUtils, 'fileutils'
 autoload :Find, 'find'
-autoload :ChildProcessHelper, 'support/child_process_helper'
 
 # Organizes and runs all of the tests in the test suite in batches.
 #

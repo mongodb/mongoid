@@ -35,7 +35,7 @@ RSpec::Core::RakeTask.new('spec:progress') do |spec|
 end
 
 task :ci do
-  $: << File.join(File.dirname(__FILE__), 'spec')
+  $LOAD_PATH.push File.expand_path("../spec", __FILE__)
   require 'support/spec_organizer'
 
   SpecOrganizer.new.run

@@ -23,6 +23,7 @@ group :test do
   gem 'rspec-mocks-diag', '~> 3.0'
   gem 'fuubar'
   gem 'rfc'
+  gem 'childprocess'
 end
 
 gemspec path: '..'
