@@ -84,16 +84,16 @@ module Mongoid
         # Evolves a multi-list selection, like an $and or $or criterion, and
         # performs the necessary serialization.
         #
-        # @api private
-        #
         # @example Evolve the multi-selection.
         #   selector.evolve_multi([{ field: "value" }])
         #
-        # @param [ Array<Hash> ] value The multi-selection.
+        # @param [ Array<Hash> ] specs The multi-selection.
         #
         # @return [ Array<Hash> ] The serialized values.
         #
         # @since 1.0.0
+        #
+        # @api private
         def evolve_multi(specs)
           unless specs.is_a?(Array)
             raise ArgumentError, "specs is not an array: #{specs.inspect}"
