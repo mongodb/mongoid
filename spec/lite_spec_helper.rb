@@ -16,7 +16,7 @@ require 'pp'
 
 require 'support/spec_config'
 require 'support/lite_constraints'
-require 'support/session_registry'
+require "support/session_registry" 
 
 unless SpecConfig.instance.ci?
   begin
