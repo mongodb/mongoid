@@ -1,6 +1,6 @@
-=============
-Mongoid (5.2)
-=============
+=======
+Mongoid
+=======
 
 .. default-domain:: mongodb
 
