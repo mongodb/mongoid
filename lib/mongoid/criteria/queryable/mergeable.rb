@@ -237,9 +237,9 @@ module Mongoid
         # Similarly, this method should never need to expand a literal value
         # and an operator at the same time.
         #
-        # @param [ Hash ] Criteria including Key instances.
+        # @param [ Hash ] expr Criteria including Key instances.
         #
-        # @return [ Hash ] Expanded criteria.
+        # @return [ Hash ] The expanded criteria.
         private def _mongoid_expand_keys(expr)
           unless expr.is_a?(Hash)
             raise ArgumentError, 'Argument must be a Hash'

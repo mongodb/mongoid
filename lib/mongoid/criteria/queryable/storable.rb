@@ -74,7 +74,7 @@ module Mongoid
         #
         # This method takes the operator and the operator value expression
         # separately for callers' convenience. It can be considered to
-        # handle storing the hash `{operator => op_expr}`.
+        # handle storing the hash +{operator => op_expr}+.
         #
         # If the selector consists of a single condition which is the specified
         # operator (on the top level), the new condition given in op_expr is
@@ -141,7 +141,7 @@ module Mongoid
         #
         # This method takes the operator and the operator value expression
         # separately for callers' convenience. It can be considered to
-        # handle storing the hash `{operator => op_expr}`.
+        # handle storing the hash +{operator => op_expr}+.
         #
         # The operator value can be of any type.
         #
