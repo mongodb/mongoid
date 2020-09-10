@@ -24,9 +24,10 @@ class SessionRegistry
   end
 
   def verify_sessions_ended!
-    unless @registry.all? { |session| session.ended? }
-      unended_sessions = @registry.select { |session| !session.ended? }
-      raise "Session registry contains live sessions: #{unended_sessions.join(',')}"
+    @registry.reject! { |session| session.ended? }
+
+    unless @registry.empty?
+      raise "Session registry contains live sessions: #{@registry.join(', ')}"
     end
   end
 
