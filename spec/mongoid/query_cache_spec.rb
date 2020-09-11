@@ -2,7 +2,6 @@
 # encoding: utf-8
 
 require "spec_helper"
-require "support/session_registry" 
 
 describe Mongoid::QueryCache do
 
@@ -21,7 +20,7 @@ describe Mongoid::QueryCache do
     SessionRegistry.instance.clear_registry
   end
 
-  before do
+  after do
     SessionRegistry.instance.verify_sessions_ended!
   end
 
