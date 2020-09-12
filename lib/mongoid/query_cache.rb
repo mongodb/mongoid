@@ -191,10 +191,7 @@ module Mongoid
       private
 
       def process(result)
-        @remaining -= result.returned_count if limited?
-        @cursor_id = result.cursor_id
-        @coll_name ||= result.namespace.sub("#{database.name}.", '') if result.namespace
-        documents = result.documents
+        documents = super
         if @cursor_id.zero? && !@after_first_batch
           @cached_documents ||= []
           @cached_documents.concat(documents)
@@ -252,20 +249,25 @@ module Mongoid
       #
       # @since 5.0.0
       def each
-        if system_collection? || !QueryCache.enabled?
+        if system_collection? || !QueryCache.enabled? || (respond_to?(:write?, true) && write?)
           super
         else
-          unless cursor = cached_cursor
-            read_with_retry do
-              server = server_selector.select_server(cluster)
-              cursor = CachedCursor.new(view, send_initial_query(server), server)
-              QueryCache.cache_table[cache_key] = cursor
+          @cursor = nil
+          unless @cursor = cached_cursor
+            session = client.send(:get_session, @options)
+            read_with_retry(session, server_selector) do |server|
+              result = send_initial_query(server, session)
+              @cursor = CachedCursor.new(view, result, server, session: session)
+              QueryCache.cache_table[cache_key] = @cursor
             end
           end
-          cursor.each do |doc|
-            yield doc
-          end if block_given?
-          cursor
+          if block_given?
+            @cursor.each do |doc|
+              yield doc
+            end
+          else
+            @cursor.to_enum
+          end
         end
       end
 
