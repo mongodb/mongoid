@@ -257,8 +257,12 @@ module Mongoid
             session = client.send(:get_session, @options)
             read_with_retry(session, server_selector) do |server|
               result = send_initial_query(server, session)
-              @cursor = CachedCursor.new(view, result, server, session: session)
-              QueryCache.cache_table[cache_key] = @cursor
+              if result.cursor_id == 0 || result.cursor_id.nil?
+                @cursor = CachedCursor.new(view, result, server, session: session)
+                QueryCache.cache_table[cache_key] = @cursor
+              else
+                @cursor = Mongo::Cursor.new(view, result, server, session: session)
+              end
             end
           end
           if block_given?

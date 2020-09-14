@@ -39,7 +39,8 @@ class SessionRegistry
 
   def verify_sessions_ended!
     unless @registry.empty?
-      raise "Session registry contains live sessions: #{@registry.join(', ')}"
+      sessions = @registry.map { |_, session| session }
+      raise "Session registry contains live sessions: #{sessions.join(', ')}"
     end
   end
 

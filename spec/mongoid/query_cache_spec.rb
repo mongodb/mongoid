@@ -458,6 +458,19 @@ describe Mongoid::QueryCache do
       end
     end
 
+   context 'when querying colleciton larger than the batch size' do
+     before do
+       101.times { Band.create! }
+     end
+ 
+     it 'does not raise an exception when querying multiple times' do
+       expect do
+         Band.all.to_a
+         Band.all.to_a
+       end.not_to raise_error
+     end
+   end
+
     context "when query caching is enabled and the batch_size is set" do
 
       around(:each) do |example|
