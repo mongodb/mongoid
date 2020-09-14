@@ -462,7 +462,7 @@ describe Mongoid::QueryCache do
      before do
        101.times { Band.create! }
      end
- 
+
      it 'does not raise an exception when querying multiple times' do
        expect do
          Band.all.to_a
@@ -624,7 +624,7 @@ describe Mongoid::QueryCache do
       Mongoid::QueryCache.enabled = true
       10.times { Band.create! }
 
-      Band.batch_size(4).all.any?
+      Band.batch_size(4).to_a
     end
 
     it 'does not cache the result' do
