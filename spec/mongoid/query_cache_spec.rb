@@ -277,6 +277,37 @@ describe Mongoid::QueryCache do
     end
   end
 
+  context 'when using a block API' do
+    before do
+      Band.destroy_all
+      5.times { Band.create }
+    end
+
+    context '#any? with no block' do
+      it 'doesn\'t leak sessions' do
+        Band.all.any?
+      end
+    end
+
+    context '#all? with no block' do
+      it 'doesn\'t leak sessions' do
+        Band.all.all?
+      end
+    end
+
+    context '#none? with no block' do
+      it 'doesn\'t leak sessions' do
+        Band.all.none?
+      end
+    end
+
+    context '#one? with no block' do
+      it 'doesn\'t leak sessions' do
+        Band.all.one?
+      end
+    end
+  end
+
   context "when querying in the same collection" do
 
     before do
