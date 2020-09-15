@@ -334,6 +334,25 @@ describe Mongoid::QueryCache do
       end
     end
 
+    context 'when querying colleciton larger than the batch size' do
+      before do
+        Band.destroy_all
+        101.times { |i| Band.create!(_id: i) }
+      end
+
+      it 'does not raise an exception when querying multiple times' do
+        expect do
+          results1 = Band.all.to_a
+          expect(results1.length).to eq(101)
+          expect(results1.map { |band| band["_id"] }).to eq([*0..100])
+
+          results2 = Band.all.to_a
+          expect(results2.length).to eq(101)
+          expect(results2.map { |band| band["_id"] }).to eq([*0..100])
+        end.not_to raise_error
+      end
+    end
+
     context "when query caching is enabled and the batch_size is set" do
 
       around(:each) do |example|
