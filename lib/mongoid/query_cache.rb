@@ -230,8 +230,13 @@ module Mongoid
           unless cursor = cached_cursor
             read_with_retry do
               server = server_selector.select_server(cluster)
-              cursor = CachedCursor.new(view, send_initial_query(server), server)
-              QueryCache.cache_table[cache_key] = cursor
+              result = send_initial_query(server)
+              if result.cursor_id == 0 || result.cursor_id.nil?
+                cursor = CachedCursor.new(view, result, server)
+                QueryCache.cache_table[cache_key] = cursor
+              else
+                cursor = Mongo::Cursor.new(view, result, server)
+              end
             end
           end
           cursor.each do |doc|
