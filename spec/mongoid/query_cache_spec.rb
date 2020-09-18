@@ -377,6 +377,10 @@ describe Mongoid::QueryCache do
         end
 
         before do
+          10.times do |i|
+            game.ratings << Rating.create!(value: i+1)
+          end
+
           game.ratings.where(:value.gt => 5).asc(:id).all.to_a
         end
 
@@ -384,19 +388,24 @@ describe Mongoid::QueryCache do
 
           it "uses the cache" do
             expect_no_queries do
-              game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+              result = game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+              expect(result.length).to eq(2)
+              expect(result.map { |r| r['value'] }).to eq([6, 7])
             end
           end
         end
       end
 
       context "when the first query has a limit" do
-
         let(:game) do
           Game.create!(name: "2048")
         end
 
         before do
+          10.times do |i|
+            game.ratings << Rating.create!(value: i+1)
+          end
+
           game.ratings.where(:value.gt => 5).limit(3).asc(:id).all.to_a
         end
 
@@ -404,7 +413,9 @@ describe Mongoid::QueryCache do
 
           it "queries again" do
             expect_query(1) do
-              game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+              result = game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+              expect(result.length).to eq(2)
+              expect(result.map { |r| r['value'] }).to eq([6, 7])
             end
           end
         end
@@ -413,7 +424,9 @@ describe Mongoid::QueryCache do
 
           it "queries again" do
             expect_query(1) do
-              game.ratings.where(:value.gt => 5).asc(:id).to_a
+              result = game.ratings.where(:value.gt => 5).asc(:id).to_a
+              expect(result.length).to eq(5)
+              expect(result.map { |r| r['value'] }).to eq([6, 7, 8, 9, 10])
             end
           end
         end
@@ -426,21 +439,34 @@ describe Mongoid::QueryCache do
         end
 
         before do
+          10.times do |i|
+            game.ratings << Rating.create!(value: i+1)
+          end
+
           game.ratings.where(:value.gt => 5).asc(:id).all.to_a
         end
 
         it "does not query again" do
           expect_no_queries do
-            game.ratings.where(:value.gt => 5).asc(:id).first
+            result = game.ratings.where(:value.gt => 5).asc(:id).first
+            expect(result['value']).to eq(6)
           end
         end
       end
 
       context "when limiting the result" do
+        before do
+          Band.destroy_all
+
+          5.times { |i| Band.create!(name: "Band #{i}") }
+          Band.all.to_a
+        end
 
         it "does not query again" do
           expect_query(0) do
-            Band.limit(2).all.to_a
+            result = Band.limit(2).all.to_a
+            expect(result.length).to eq(2)
+            expect(result.map { |r| r["name"] }).to eq(["Band 0", "Band 1"])
           end
         end
       end
@@ -448,12 +474,17 @@ describe Mongoid::QueryCache do
       context "when specifying a different skip value" do
 
         before do
+          Band.destroy_all
+
+          5.times { |i| Band.create!(name: "Band #{i}") }
           Band.limit(2).skip(1).all.to_a
         end
 
         it "queries again" do
           expect_query(1) do
-            Band.limit(2).skip(3).all.to_a
+            result = Band.limit(2).skip(3).all.to_a
+            expect(result.length).to eq(2)
+            expect(result.map { |r| r["name"] }).to eq(["Band 3", "Band 4"])
           end
         end
       end

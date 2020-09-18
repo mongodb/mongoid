@@ -266,8 +266,14 @@ module Mongoid
             end
           end
           if block_given?
-            @cursor.each do |doc|
-              yield doc
+            if limit
+              @cursor.to_a[0...limit].each do |doc|
+                yield doc
+              end
+            else
+              @cursor.each do |doc|
+                yield doc
+              end
             end
           else
             @cursor.to_enum
