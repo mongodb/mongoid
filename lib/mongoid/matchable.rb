@@ -154,8 +154,12 @@ module Mongoid
         if (key_string = key.to_s) =~ /.+\..+/
           key_string.split('.').inject(document.send(:as_attributes)) do |_attribs, _key|
             if _attribs.is_a?(::Array)
-              if _key =~ /\A\d+\z/ && _attribs.none? {|doc| doc.is_a?(Hash)}
+              no_hash_key_matches = _attribs.none? {|doc| doc.is_a?(Hash) && doc.has_key?(_key)}
+
+              if _key =~ /\A\d+\z/ && no_hash_key_matches
                 _attribs.try(:[], _key.to_i)
+              elsif no_hash_key_matches
+                nil
               else
                 _attribs.map { |doc| doc.try(:[], _key) }
               end
