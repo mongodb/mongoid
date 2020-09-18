@@ -102,6 +102,40 @@ describe Mongoid::Matchable do
             expect(document.locations.first._matches?(selector)).to be false
           end
         end
+
+        context "when the array contains hashes" do
+          let(:tim) { { "name" => "Tim", "age" => 20 } }
+          let(:logan) { { "name" => "Logan", "age" => 188 } }
+          let(:occupants) { [tim, logan] }
+
+          context "when the contents match" do
+            it "returns true for the first hash" do
+              expect(document.locations.first._matches?({ "occupants.name" => "Tim" })).to be true
+            end
+
+            it "returns true for the second hash" do
+              expect(document.locations.first._matches?({ "occupants.name" => "Logan" })).to be true
+            end
+          end
+
+          context "using $exists" do
+            it "returns true for the 0 index" do
+              expect(document.locations.first._matches?({ "occupants.0" => { "$exists" => true} })).to be true
+            end
+
+            it "returns true for the 1 index" do
+              expect(document.locations.first._matches?({ "occupants.1" => { "$exists" => true} })).to be true
+            end
+
+            it "returns false for the 2 index" do
+              expect(document.locations.first._matches?({ "occupants.2" => { "$exists" => false} })).to be true
+            end
+
+            it "returns false for a non-existent key" do
+              expect(document.locations.first._matches?({ "occupants.nonexistent" => { "$exists" => false} })).to be true
+            end
+          end
+        end
       end
 
       context "when matching values of multiple embedded hashes" do
