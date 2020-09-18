@@ -287,9 +287,6 @@ module Mongoid
         if limit
           key = [ collection.namespace, selector, nil, skip, sort, projection, collation  ]
           cursor = QueryCache.cache_table[key]
-          if cursor
-            cursor.to_a[0...limit.abs]
-          end
         end
         cursor || QueryCache.cache_table[cache_key]
       end

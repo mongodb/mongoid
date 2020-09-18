@@ -410,6 +410,9 @@ describe Mongoid::QueryCache do
         end
 
         context "when the next query has a limit" do
+          # Server versions older than 3.2 also perform a killCursors operation,
+          # which causes this test to fail.
+          min_server_version '3.2'
 
           it "queries again" do
             expect_query(1) do
