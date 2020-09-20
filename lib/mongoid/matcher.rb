@@ -32,7 +32,8 @@ module Mongoid
     # @param [ Document | Hash ] document The document to extract from.
     # @param [ String ] key The key path to extract.
     #
-    # @return [ Array<Object | Array, true | false> ] The extracted value
+    # @return [ Array<true | false, Object | Array, true | false> ]
+    #   Whether the value existed in the document, the extracted value
     #   and the array expansion flag.
     module_function def extract_attribute(document, key)
       if document.respond_to?(:as_attributes, true)
