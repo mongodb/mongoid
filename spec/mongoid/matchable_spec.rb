@@ -139,6 +139,15 @@ describe Mongoid::Matchable do
             end
           end
         end
+
+        context "when extracting attributes through a primitive value that does not implement []" do
+          let(:tim) { { "name" => "Tim", "age" => 20 } }
+          let(:occupants) { [tim] }
+
+          it 'does not match' do
+            document.locations.first._matches?('occupants.0.age.0' => '20').should be false
+          end
+        end
       end
 
       context "when matching values of multiple embedded hashes" do
