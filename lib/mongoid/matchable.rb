@@ -151,9 +151,13 @@ module Mongoid
       # @since 2.2.1
       # @api private
       def extract_attribute(document, key)
-        if (key_string = key.to_s) =~ /.+\..+/
+        if (key_string = key.to_s).include?('.')
+          # The key specified descends into a hash field or an
+          # embedded document.
+          # Traverse the key as a path from the top-level document downward.
           key_string.split('.').inject(document.send(:as_attributes)) do |_attribs, _key|
             if _attribs.is_a?(::Array)
+              # The attributes at this level are an array.
               no_hash_key_matches = _attribs.none? {|doc| doc.is_a?(Hash) && doc.has_key?(_key)}
 
               if _key =~ /\A\d+\z/ && no_hash_key_matches
@@ -164,13 +168,20 @@ module Mongoid
                 _attribs.map { |doc| doc.try(:[], _key) }
               end
             else
+              # The attributes at this level are a hash, a primitive value
+              # or we traversed past the defined attributes (_attribs is nil).
+              # TODO The primitive value case isn't handled and will produce
+              # NoMethodError if invoked.
               _attribs.try(:[], _key)
             end
           end
         else
+          # The key specified is in the top-level document.
           if document.is_a?(Hash)
+            # +document+ is a BSON::Document?
             document[key_string]
           else
+            # +document+ is a Mongoid::Document.
             document.attributes[key_string]
           end
         end
