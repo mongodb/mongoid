@@ -38,9 +38,10 @@ describe Mongoid::QueryCache do
         end
 
         it 'queries for each access to the base' do
-          expect(server).to receive(:with_connection).exactly(relations.size).times.and_call_original
-          relations.each do |object|
-            object.person
+          expect_query(relations.size) do
+            relations.each do |object|
+              object.person
+            end
           end
         end
       end
@@ -52,9 +53,10 @@ describe Mongoid::QueryCache do
         end
 
         it 'queries only once for the base' do
-          expect(server).to receive(:with_connection).exactly(1).times.and_call_original
-          relations.each do |object|
-            object.person
+          expect_query(1) do
+            relations.each do |object|
+              object.person
+            end
           end
         end
       end
@@ -447,15 +449,15 @@ describe Mongoid::QueryCache do
   context "when querying a very large collection" do
 
     before do
-      123.times { Band.create! }
+      100.times { Band.create! }
     end
 
     it "returns the right number of records" do
-      expect(Band.all.to_a.length).to eq(123)
+      expect(Band.all.to_a.length).to eq(100)
     end
 
     it "#pluck returns the same count of objects" do
-      expect(Band.pluck(:name).length).to eq(123)
+      expect(Band.pluck(:name).length).to eq(100)
     end
 
     context "when loading all the documents" do
@@ -466,12 +468,12 @@ describe Mongoid::QueryCache do
 
       it "caches the complete result of the query" do
         expect_no_queries do
-          expect(Band.all.to_a.length).to eq(123)
+          expect(Band.all.to_a.length).to eq(100)
         end
       end
 
       it "returns the same count of objects when using #pluck" do
-        expect(Band.pluck(:name).length).to eq(123)
+        expect(Band.pluck(:name).length).to eq(100)
       end
     end
   end
