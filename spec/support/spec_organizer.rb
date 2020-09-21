@@ -17,7 +17,7 @@ autoload :Find, 'find'
 class SpecOrganizer
   CLASSIFIERS = [
     [%r,^mongoid,, :unit],
-    [%r,^mongoid/associations,, :associations],
+    [%r,^mongoid/association,, :associations],
     [%r,^integration,, :integration],
     [%r,^rails,, :rails],
   ]
