@@ -232,3 +232,28 @@
   exists: false
   value: ~
   expanded: false
+
+- name: mix of arrays and hashes in an array
+  document:
+    foo:
+      -
+        -
+          bar: 1
+      - bar: 2
+  key: foo.bar
+  
+  exists: true
+  value: [2]
+  expanded: true
+
+- name: numeric index through a primitive value not supporting subscription operator
+  document:
+    occupants:
+      -
+        age: 20
+  key:
+    occupants.0.age.0
+    
+  exists: false
+  value: ~
+  expanded: false

@@ -1,0 +1,16 @@
+- name: mix of arrays and hashes in an array - value found in nested array
+  document: &array-hash-mix
+    foo:
+      -
+        -
+          bar: 1
+      - bar: 2
+  query:
+    foo.bar: 1
+  matches: false
+
+- name: mix of arrays and hashes in an array - value found in non-nested array
+  document: *array-hash-mix
+  query:
+    foo.bar: 2
+  matches: true
