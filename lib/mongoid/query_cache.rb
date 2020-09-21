@@ -233,10 +233,20 @@ module Mongoid
               end
             end
           end
-          cursor.each do |doc|
-            yield doc
-          end if block_given?
-          cursor
+
+          if block_given?
+            if limit && limit != -1
+              cursor.to_a[0...limit].each do |doc|
+                yield doc
+              end
+            else
+              cursor.each do |doc|
+                yield doc
+              end
+            end
+          else
+            cursor
+          end
         end
       end
 
@@ -246,10 +256,6 @@ module Mongoid
         if limit
           key = [ collection.namespace, selector, nil, skip, sort, projection, collation  ]
           cursor = QueryCache.cache_table[key]
-          if cursor
-            limited_docs = cursor.to_a[0...limit.abs]
-            cursor.instance_variable_set(:@cached_documents, limited_docs)
-          end
         end
         cursor || QueryCache.cache_table[cache_key]
       end
