@@ -16,8 +16,10 @@ autoload :Find, 'find'
 # This class aggregates RSpec results after the test runs.
 class SpecOrganizer
   CLASSIFIERS = [
-    [%r,^mongoid,, :unit],
+    [%r,^mongoid/attribute,, :attributes],
+    [%r,^mongoid/[b-z],, :unit_1],
     [%r,^mongoid/association,, :associations],
+    [%r,^mongoid,, :unit_2],
     [%r,^integration,, :integration],
     [%r,^rails,, :rails],
   ]
