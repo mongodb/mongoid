@@ -171,7 +171,7 @@ module Mongoid
               # The attributes at this level are a hash, a primitive value
               # or we traversed past the defined attributes (_attribs is nil).
               # TODO The primitive value case isn't handled and will produce
-              # NoMethodError if invoked.
+              # NoMethodError if invoked (this is fixed in Mongoid 7.2).
               _attribs.try(:[], _key)
             end
           end
