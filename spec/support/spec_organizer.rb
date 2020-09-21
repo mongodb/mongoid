@@ -17,16 +17,16 @@ autoload :Find, 'find'
 class SpecOrganizer
   CLASSIFIERS = [
     [%r,^mongoid/attribute,, :attributes],
-    [%r,^mongoid/[b-z],, :unit_1],
-    [%r,^mongoid/association/[or],, :associations_1],
-    [%r,^mongoid/association,, :associations_2],
-    [%r,^mongoid,, :unit_2],
+    [%r,^mongoid/association/[or],, :associations_referenced],
+    [%r,^mongoid/association,, :associations],
+    [%r,^mongoid,, :unit],
     [%r,^integration,, :integration],
     [%r,^rails,, :rails],
   ]
 
-  RUN_PRIORITY = %i(unit
-    associations integration rails
+  RUN_PRIORITY = %i(
+    unit attributes associations_referenced associations
+    integration rails
   )
 
   SPEC_ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
