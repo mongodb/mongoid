@@ -18,7 +18,8 @@ class SpecOrganizer
   CLASSIFIERS = [
     [%r,^mongoid/attribute,, :attributes],
     [%r,^mongoid/[b-z],, :unit_1],
-    [%r,^mongoid/association,, :associations],
+    [%r,^mongoid/association/[or],, :associations_1],
+    [%r,^mongoid/association,, :associations_2],
     [%r,^mongoid,, :unit_2],
     [%r,^integration,, :integration],
     [%r,^rails,, :rails],
