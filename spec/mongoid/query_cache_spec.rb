@@ -177,7 +177,7 @@ describe Mongoid::QueryCache do
       end
 
       it 'uses the driver query cache' do
-        expect(Mongo::QueryCache).to receive(:clear_cache).and_call_original
+        expect(Mongo::QueryCache).to receive(:clear).and_call_original
         Mongoid::QueryCache.clear_cache
         expect(Mongoid::QueryCache.cache_table.count).to eq(0)
         expect(Mongo::QueryCache.cache_table.count).to eq(0)
