@@ -35,7 +35,7 @@ module Mongoid
       # @since 4.0.0
       def clear_cache
         if defined?(Mongo::QueryCache)
-          Mongo::QueryCache.clear_cache
+          Mongo::QueryCache.clear
         else
           Thread.current["[mongoid]:query_cache"] = nil
         end
