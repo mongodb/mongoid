@@ -997,6 +997,10 @@ With driver versions 2.14.0 or newer, Mongoid will use the driver query cache
 instead of its own. When used with older versions of the driver (that do not
 implement the query cache) Mongoid will fall back on the legacy query cache.
 
+Mongoid will retain the interface (described above) for enabling and disabling
+the query cache. When using driver versions 2.14.0 or newer, this interface
+will affect the driver query cache. 
+
 Read more about the Ruby driver query cache `in the driver documentation
 <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
 
