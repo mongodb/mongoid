@@ -944,24 +944,13 @@ the default scope being evaluated first:
 Query Cache
 -----------
 
-.. warning::
-
-  The Mongoid query cache has been deprecated in favor of the query cache
-  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
-  Mongoid query cache will continue to function, the driver query cache is
-  more correct and more effective. If you plan on using the query cache, it is
-  recommended that you upgrade to Ruby driver version 2.14.0 or newer.
-
-  Read more about the Ruby driver query cache `in the driver documentation
-  <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
-
 When the query cache is enabled, Mongoid will cache results for MongoDB queries
 when the entire result set is returned in a single batch (1000 documents by
 default).
 
 Each thread has its own query cache.
 
-When the query cache is enabled, performing any write operations (insert,
+When the query cache is enabled, performing most write operations (insert,
 update, replace or delete) clears the cache of the thread issuing the write.
 
 To enable the query cache manually for a code segment, use:
@@ -993,29 +982,45 @@ The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
 Ruby Driver. The driver query cache is more correct and more effective, and it
 is recmomended that you upgrade to version 2.14.0 of the Ruby driver or newer.
 
+For the purposes of this tutorial, the Mongoid query cache will be called "the
+legacy query cache", and the driver query cache will be referred to as "the
+driver query cache."
+
 With driver versions 2.14.0 or newer, Mongoid will use the driver query cache
-instead of its own. When used with older versions of the driver (that do not
-implement the query cache) Mongoid will fall back on the legacy query cache.
+instead of the legacy query cache. When used with older versions of the driver
+(that do not implement the query cache) Mongoid will fall back on the legacy
+query cache.
 
 Mongoid will retain the interface (described above) for enabling and disabling
 the query cache. When using driver versions 2.14.0 or newer, this interface
-will affect the driver query cache. 
+will affect the driver query cache.
 
-Read more about the Ruby driver query cache `in the driver documentation
-<https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
+Read more about the Ruby driver query cache
+:driver:`in the driver documentation </tutorials/query-cache/>`_.
+
+.. warning::
+
+  The legacy Mongoid query cache has been deprecated in favor of the query cache
+  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
+  query cache will continue to function, the driver query cache is
+  more correct and more effective. If you plan on using the query cache, it is
+  recommended that you upgrade to Ruby driver version 2.14.0 or newer.
+
+  Read more about the Ruby driver query cache
+  :driver:`in the driver documentation </tutorials/query-cache/>`_.
 
 Legacy Query Cache Limitations
 ``````````````````````````````
 
-The following is a list of limitations of the Mongoid query cache:
+The following is a list of limitations of the legacy query cache:
 
-* The query cache does not cache query results that exceed the batch size.
+* The legacy query cache does not cache query results that exceed the batch size.
   The default batch size is 1000 documents.
 
-* The query cache does not take into account read preference or read concern
+* The legacy query cache does not take into account read preference or read concern
   when deciding whether to return cached results. When performing the same
   query with a different read preference or read concern with the query cache
-  enabled, the driver may return incorrect results.
+  enabled, the legacy query cache may return incorrect results.
 
 * Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
   do not invalidate the query cache. Cached results may be stale after performing
@@ -1027,7 +1032,8 @@ A Note on using ``#first``
 ``````````````````````````
 
 Calling the ``first`` method on a model class imposes an ascending sort by
-the ``_id`` field on the underlying query. This may produce unexpected behavior.
+the ``_id`` field on the underlying query. This may produce unexpected behavior
+with query caching.
 
 For example, when calling ``all`` on a model class and then ``first``,
 one would expect the second query to use the cached results from the first.
@@ -1041,6 +1047,16 @@ will query the database and separately cache their results.
 
   Band.first
   #=> Queries the database again because of the sort
+
+To use the cached results, call ``all.to_a.first`` on the model class.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.all.to_a.first
+  #=> Returns the first cached result
 
 .. _additional-query-methods:
 
