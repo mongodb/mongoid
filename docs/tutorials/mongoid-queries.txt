@@ -947,10 +947,13 @@ Query Cache
 ..warning::
 
   The Mongoid query cache has been deprecated in favor of the query cache
-  implemented in version 2.14.0 of the MongoDB Ruby driver. While the
+  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
   Mongoid query cache will continue to function, the driver query cache is
-  more correct and more effective. To use the query cache, it is recommended
-  that you upgrade to Ruby driver version 2.14.0 or newer.
+  more correct and more effective. If you plan on using the query cache, it is
+  recommended that you upgrade to Ruby driver version 2.14.0 or newer.
+
+  Read more about the Ruby driver query cache `in the driver documentation
+  <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`.
 
 When the query cache is enabled, Mongoid will cache results for MongoDB queries
 when the entire result set is returned in a single batch (1000 documents by
@@ -983,12 +986,19 @@ recommended to use the block form described above:
 Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
 to enable the query cache automatically for each web request.
 
-Query Cache Limitations
-```````````````````````
+The Improved Driver Query Cache
+```````````````````````````````
 
 The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
 Ruby Driver. The driver query cache is more correct and more effective, and it
 is recmomended that you upgrade to version 2.14.0 of the Ruby driver or newer.
+
+With driver versions 2.14.0 or newer, Mongoid will use the driver query cache 
+instead of its own. When used with older versions of the driver (that do not 
+implement the query cache) Mongoid will fall back on the legacy query cache.
+
+Legacy Query Cache Limitations
+``````````````````````````````
 
 The following is a list of limitations of the Mongoid query cache:
 
