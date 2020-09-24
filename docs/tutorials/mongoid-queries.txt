@@ -996,7 +996,7 @@ the query cache. When using driver versions 2.14.0 or newer, this interface
 will affect the driver query cache.
 
 Read more about the Ruby driver query cache
-:driver:`in the driver documentation </tutorials/query-cache/>`_.
+:driver:`in the driver documentation </tutorials/query-cache>`.
 
 .. warning::
 
@@ -1007,7 +1007,7 @@ Read more about the Ruby driver query cache
   recommended that you upgrade to Ruby driver version 2.14.0 or newer.
 
   Read more about the Ruby driver query cache
-  :driver:`in the driver documentation </tutorials/query-cache/>`_.
+  :driver:`in the driver documentation </tutorials/query-cache>`.
 
 Legacy Query Cache Limitations
 ``````````````````````````````
