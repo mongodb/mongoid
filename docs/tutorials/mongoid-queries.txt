@@ -37,14 +37,14 @@ The queries are executed when their result sets are iterated. For example:
 .. code-block:: ruby
 
   # Construct a Criteria object:
-  
+
   Band.where(name: 'Deftones')
   # => #<Mongoid::Criteria
   #   selector: {"name"=>"Deftones"}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
-  
+
   # Evaluate the query and get matching documents:
 
   Band.where(name: 'Deftones').to_a
@@ -74,7 +74,7 @@ Criteria instance with the new conditions added to the existing conditions:
   #   options:  {}
   #   class:    Band
   #   embedded: false>
-  
+
   scope
   # => #<Mongoid::Criteria
   #   selector: {"founded"=>{"$gte"=>"1980-01-01"}}
@@ -102,19 +102,19 @@ The examples in this section use the following model definition:
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
     field :founded, type: Integer
     field :m, as: :member_count, type: Integer
-    
+
     embeds_one :manager
   end
-  
+
   class Manager
     include Mongoid::Document
-    
+
     embedded_in :band
-    
+
     field :name, type: String
   end
 
@@ -134,7 +134,7 @@ symbols or strings, and correspond to field names in MongoDB documents:
   #   embedded: false>
 
   # Equivalent to:
-  
+
   Band.where("name" => "Depeche Mode")
 
 MQL Syntax
@@ -152,7 +152,7 @@ An MQL operator may be specified on any field using the hash syntax:
   #   embedded: false>
 
   # Equivalent to:
-  
+
   Band.where('founded' => {'$gt' => 1980})
 
 Symbol Operator Syntax
@@ -205,7 +205,7 @@ the model class, the type of the field is taken into account when constructing
 the query:
 
 .. code-block:: ruby
-  
+
   Band.where(name: 2020)
   #   => #<Mongoid::Criteria
   #   selector: {"name"=>"2020"}
@@ -260,13 +260,13 @@ having an argument-free version.
 
   # and with conditions
   Band.where(label: 'Trust in Trance').and(name: 'Astral Projection')
-  
+
   # or with scope
   Band.where(label: 'Trust in Trance').or(Band.where(name: 'Astral Projection'))
-  
+
   # not with conditions
   Band.not(label: 'Trust in Trance', name: 'Astral Projection')
-  
+
   # argument-less not
   Band.not.where(label: 'Trust in Trance', name: 'Astral Projection')
 
@@ -281,22 +281,22 @@ The following calls all produce the same query conditions:
 
   # Condition hashes passed to separate and invocations
   Band.and(name: 'SUN Project').and(member_count: 2)
-  
+
   # Multiple condition hashes in the same and invocation
   Band.and({name: 'SUN Project'}, {member_count: 2})
-  
+
   # Multiple condition hashes in an array - deprecated
   Band.and([{name: 'SUN Project'}, {member_count: 2}])
 
   # Condition hash in where and a scope
   Band.where(name: 'SUN Project').and(Band.where(member_count: 2))
-  
+
   # Condition hash in and and a scope
   Band.and({name: 'SUN Project'}, Band.where(member_count: 2))
-  
+
   # Scope as an array element, nested arrays - deprecated
   Band.and([Band.where(name: 'SUN Project'), [{member_count: 2}]])
-  
+
   # All produce:
   # => #<Mongoid::Criteria
   #   selector: {"name"=>"SUN Project", "member_count"=>2}
@@ -337,20 +337,20 @@ operate on the criteria built up to that point and its argument.
   # or joins the two conditions
   Band.where(name: 'Sun').or(label: 'Trust').selector
   # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}]}
-  
+
   # or applies only to the first condition, the second condition is added
   # to the top level as $and
   Band.or(name: 'Sun').where(label: 'Trust').selector
   # => {"$or"=>[{"name"=>"Sun"}], "label"=>"Trust"}
-  
+
   # Same as previous example - where and and are aliases
   Band.or(name: 'Sun').and(label: 'Trust').selector
   # => {"$or"=>[{"name"=>"Sun"}], "label"=>"Trust"}
-  
+
   # Same operator can be stacked any number of times
   Band.or(name: 'Sun').or(label: 'Trust').selector
   # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}]}
-  
+
   # The label: Foo condition is added to the top level as $and
   Band.where(name: 'Sun').or(label: 'Trust').where(label: 'Foo').selector
   # => {"$or"=>[{"name"=>"Sun"}, {"label"=>"Trust"}], "label"=>"Foo"}
@@ -454,11 +454,11 @@ added to the criteria.
   Mongoid uses ``$ne`` operator to achieve such a negation:
 
   .. code-block:: ruby
-  
+
     # String negation - uses $ne
     Band.not.where(name: 'Best').selector
     # => {"name"=>{"$ne"=>"Best"}}
-    
+
     # Regexp negation - uses $not
     Band.not.where(name: /Best/).selector
     # => {"name"=>{"$not"=>/Best/}}
@@ -478,7 +478,7 @@ an ``{'$and' => [{'$nor' => ...}]}`` construct:
   # Complex conditions
   Band.where(name: /Best/).not(name: 'Astral Projection').selector
   # => {"name"=>/Best/, "$and"=>[{"$nor"=>[{"name"=>"Astral Projection"}]}]}
-  
+
   # Symbol operator syntax
   Band.not(:name.ne => 'Astral Projection')
   # => #<Mongoid::Criteria
@@ -737,19 +737,19 @@ operation is sometimes called "projection".
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
     field :label, type: String
-    
+
     embeds_many :tours
   end
 
   class Tour
     include Mongoid::Document
-    
+
     field :city, type: String
     field :year, type: Integer
-    
+
     embedded_in :band
   end
 
@@ -786,14 +786,14 @@ should therefore be avoided.
   .. code-block:: ruby
 
     band = Band.only(:tours, 'tours.year').last
-    
+
   The most recent projection specification overrided the earlier one.
   For example, the above query was equivalent to:
 
   .. code-block:: ruby
 
     band = Band.only('tours.year').last
-    
+
   Server versions 4.4 and higher prohibit specifying an association and its
   fields in projection in the same query.
 
@@ -810,24 +810,24 @@ loaded with ``only`` for those associations to be loaded. For example:
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
-    
+
     has_and_belongs_to_many :managers
   end
 
   class Manager
     include Mongoid::Document
-    
+
     has_and_belongs_to_many :bands
   end
-  
+
   band = Band.create!(name: 'Astral Projection')
   band.managers << Manager.new
-  
+
   Band.where(name: 'Astral Projection').only(:name).first.managers
   # => []
-  
+
   Band.where(name: 'Astral Projection').only(:name, :manager_ids).first.managers
   # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
 
@@ -924,13 +924,13 @@ the default scope being evaluated first:
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
     field :year, type: Integer
-    
+
     default_scope -> { order(name: :asc) }
   end
-  
+
   Band.order(year: :desc)
   # => #<Mongoid::Criteria
     selector: {}
@@ -950,7 +950,7 @@ default).
 
 Each thread has its own query cache.
 
-When the query cache is enabled, performing any write operations (insert,
+When the query cache is enabled, performing most write operations (insert,
 update, replace or delete) clears the cache of the thread issuing the write.
 
 To enable the query cache manually for a code segment, use:
@@ -967,14 +967,96 @@ recommended to use the block form described above:
 .. code-block:: ruby
 
   Mongoid::QueryCache.enabled = true
-  
+
   # ...
-  
+
   Mongoid::QueryCache.enabled = false
 
 Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
 to enable the query cache automatically for each web request.
 
+The Improved Driver Query Cache
+```````````````````````````````
+
+The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
+Ruby Driver. The driver query cache is more correct and more effective, and it
+is recmomended that you upgrade to version 2.14.0 of the Ruby driver or newer.
+
+For the purposes of this tutorial, the Mongoid query cache will be called "the
+legacy query cache", and the driver query cache will be referred to as "the
+driver query cache."
+
+With driver versions 2.14.0 or newer, Mongoid will use the driver query cache
+instead of the legacy query cache. When used with older versions of the driver
+(that do not implement the query cache) Mongoid will fall back on the legacy
+query cache.
+
+Mongoid will retain the interface (described above) for enabling and disabling
+the query cache. When using driver versions 2.14.0 or newer, this interface
+will affect the driver query cache.
+
+Read more about the Ruby driver query cache
+`in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
+
+.. warning::
+
+  The legacy Mongoid query cache has been deprecated in favor of the query cache
+  implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
+  query cache will continue to function, the driver query cache is
+  more correct and more effective. If you plan on using the query cache, it is
+  recommended that you upgrade to Ruby driver version 2.14.0 or newer.
+
+  Read more about the Ruby driver query cache
+  `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
+
+Legacy Query Cache Limitations
+``````````````````````````````
+
+The following is a list of limitations of the legacy query cache:
+
+* The legacy query cache does not cache query results that exceed the batch size.
+  The default batch size is 1000 documents.
+
+* The legacy query cache does not take into account read preference or read concern
+  when deciding whether to return cached results. When performing the same
+  query with a different read preference or read concern with the query cache
+  enabled, incorrect results may be returned.
+
+* Bulk writes, as well as ``$out`` and ``$merge`` aggregation pipeline stages
+  do not invalidate the query cache. Cached results may be stale after performing
+  any of these operations.
+
+* Aggregation results are not cached.
+
+A Note on using ``#first``
+``````````````````````````
+
+Calling the ``first`` method on a model class imposes an ascending sort by
+the ``_id`` field on the underlying query. This may produce unexpected behavior
+with query caching.
+
+For example, when calling ``all`` on a model class and then ``first``,
+one would expect the second query to use the cached results from the first.
+However, because of the sort imposed on the second query, both methods
+will query the database and separately cache their results.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.first
+  #=> Queries the database again because of the sort
+
+To use the cached results, call ``all.to_a.first`` on the model class.
+
+.. code-block:: ruby
+
+  Band.all.to_a
+  #=> Queries the database and caches the results
+
+  Band.all.to_a.first
+  #=> Returns the first cached result
 
 .. _additional-query-methods:
 
@@ -995,7 +1077,7 @@ Mongoid also has some helpful methods on criteria.
        *Get the total number of documents matching a filter, or the total
        number of documents in a collection. Note this will always hit
        the database for the count.*
-       
+
        *As of Mongoid 7.2, the* ``count`` *method uses the*
        ``count_documents`` *driver helper to obtain the accurate count.
        previously the* ``count`` *driver helper was used which used
@@ -1024,18 +1106,18 @@ Mongoid also has some helpful methods on criteria.
 
           Band.count
           Band.where(name: "Photek").count
-          
+
           class Contract
             include Mongoid::Document
-            
+
             field :active, type: Boolean
-            
+
             default_scope -> { where(active: true) }
           end
-          
+
           Contract.estimated_count
           # => raises Mongoid::Errors::InvalidEstimatedCountCriteria
-          
+
           Contract.unscoped.estimated_count
           # => 0
 
@@ -1119,11 +1201,11 @@ Mongoid also has some helpful methods on criteria.
 
           Band.find_or_create_by(name: "Photek")
           Band.where(:likes.gt => 10).find_or_create_by(name: "Photek")
-       
+
         ``find_or_create_by`` can be used on any scope, but in this case
         the criteria given by the scope and by ``find_or_create_by`` are
         combined. The following creates three bands:
-        
+
         .. code-block:: ruby
 
           Band.find_or_create_by(name: "Photek")
@@ -1198,7 +1280,7 @@ Mongoid also has some helpful methods on criteria.
 
           # All MongoDB versions
           Band.for_js("this.name = 'Tool'")
-          
+
           # MongoDB 4.2 and lower
           Band.for_js("this.name = param", param: "Tool")
 
@@ -1260,11 +1342,11 @@ Given the following model definitions:
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
     field :description, type: String
   end
-  
+
   Band.create!(name: 'Sun Project', description: "Sun\nProject")
 
 ... we can query using simple Ruby regular expressions in a natural way:
@@ -1281,10 +1363,10 @@ It is also possible to query using PCRE syntax by constructing
 
   Band.where(description: /\AProject/).first
   # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
-  
+
   Band.where(description: BSON::Regexp::Raw.new('^Project')).first
   # => nil
-  
+
   Band.where(description: BSON::Regexp::Raw.new('^Project', 'm')).first
   # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
 
@@ -1528,11 +1610,11 @@ class method, as the following example shows:
 
   class Product
     include Mongoid::Document
-    
+
     def self.fresh
       true
     end
-    
+
     scope :fresh, ->{ where(fresh: true) }
   end
 
@@ -1590,7 +1672,7 @@ in the default scope, the value in the default scope takes precedence:
 
     default_scope ->{ where(active: false) }
   end
-  
+
   Band.new # => #<Band _id: 5c3f74ddce4ef3791abbb088, name: nil, active: false>
 
 Because a default scope initializes fields in new models as just described,
@@ -1606,7 +1688,7 @@ not possible:
 
     default_scope ->{ where('tags.foo' => 'bar') }
   end
-  
+
   Band.create! # exception: BSON::String::IllegalKey ('tags.foo' is an illegal key in MongoDB. Keys may not start with '$' or contain a '.'.)
 
 A workaround is to define the default scope as a complex query:
@@ -1620,7 +1702,7 @@ A workaround is to define the default scope as a complex query:
 
     default_scope ->{ where('tags.foo' => {'$eq' => 'bar'}) }
   end
-  
+
   Band.create!(tags: {hello: 'world'})
   Band.create!(tags: {foo: 'bar'})
   Band.count # => 1
@@ -1752,7 +1834,7 @@ or its aliases ``raw`` and ``results``:
 .. code-block:: ruby
 
   mr = Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
-  
+
   mr.execute
   # => {"results"=>[{"_id"=>"Tool", "value"=>{"likes"=>200.0}}],
         "timeMillis"=>14,
@@ -1783,22 +1865,22 @@ The following code illustrates retrieving the statistics:
 .. code-block:: ruby
 
   mr = Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
-  
+
   mr.counts
   # => {"input"=>4, "emit"=>4, "reduce"=>1, "output"=>1}
-  
+
   mr.input
   # => 4
-  
+
   mr.emitted
   # => 4
-  
+
   mr.reduced
   # => 1
-  
+
   mr.output
   # => 1
-  
+
   mr.time
   # => 14
 
@@ -1847,10 +1929,10 @@ a text index utilizing the description field:
 
   class Band
     include Mongoid::Document
-    
+
     field :name, type: String
     field :description, type: String
-    
+
     index description: 'text'
   end
 
