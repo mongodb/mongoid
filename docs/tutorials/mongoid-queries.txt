@@ -944,7 +944,7 @@ the default scope being evaluated first:
 Query Cache
 -----------
 
-..warning::
+.. warning::
 
   The Mongoid query cache has been deprecated in favor of the query cache
   implemented in version 2.14.0 of the MongoDB Ruby driver. While the legacy
@@ -953,7 +953,7 @@ Query Cache
   recommended that you upgrade to Ruby driver version 2.14.0 or newer.
 
   Read more about the Ruby driver query cache `in the driver documentation
-  <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`.
+  <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
 
 When the query cache is enabled, Mongoid will cache results for MongoDB queries
 when the entire result set is returned in a single batch (1000 documents by
@@ -998,7 +998,7 @@ instead of its own. When used with older versions of the driver (that do not
 implement the query cache) Mongoid will fall back on the legacy query cache.
 
 Read more about the Ruby driver query cache `in the driver documentation
-<https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`.
+<https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
 
 Legacy Query Cache Limitations
 ``````````````````````````````
