@@ -363,13 +363,26 @@ Mongoid provides :ref:`sharding management Rake tasks <sharding-management>`
 to shard collections according to shard keys declared in models.
 
 Query Cache Moved to Driver
-------------------------------------
+---------------------------
 
-Minor change: The Mongoid query cache has been deprecated in favor of a new
-and improved query cache implemented in Ruby driver version 2.14.0. Mongoid
-retains the legacy query cache for use with older versions of the driver, but
-when used with driver versions 2.14.0 and newer, Mongoid will use the driver
-query cache instead.
+Minor change: Ruby driver version 2.14.0 implements a new and improved query
+cache. When using driver version 2.14.0 or newer, Mongoid will use the driver's
+query cache to cache query results.
+
+The driver query cache introduces the following improvements:
+* Caching multi-batch query results
+* Taking a query's read concern and read preference into account when deciding
+  when to return cached results
+* Invalidating the cache after bulk write operations and aggregation operations
+  with ``$out`` and ``$merge`` pipeline stages
+* Invalidating the cache after transaction commit and abort operations
+* Improved performance of queries with limits
+* Caching aggregation results
+* More efficient query cache invalidation
+
+Mongoid's query cache, which will now be referred to as the "legacy query cache,"
+has been deprecated. Mongoid will retain the legacy query cache for use with
+older versions of the driver.
 
 The interface for enabling and disabling the query cache in Mongoid has not
 changed. When using driver versions 2.14.0 and newer, this interface will
@@ -381,6 +394,9 @@ that you upgrade to driver version 2.14.
 
 To read more about the query cache improvements made in the driver, see
 `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/tutorials/query-cache/>`_.
+
+To read more about using the query cache with Mongoid and the limitations
+of the legacy query cache, see :ref:`the Query Cache documentation <query-cache>`_.
 
 Upgrading to Mongoid 7.1
 ========================
