@@ -17,9 +17,10 @@ module Mongoid
       # @return [ Hash ] The hash of cached queries.
       #
       # @since 4.0.0
+      # @api private
       def cache_table
         if defined?(Mongo::QueryCache)
-          raise NotImplementedError
+          raise NotImplementedError, "Mongoid does not expose driver's query cache table"
         else
           Thread.current["[mongoid]:query_cache"] ||= {}
         end
