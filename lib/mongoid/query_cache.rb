@@ -19,7 +19,7 @@ module Mongoid
       # @since 4.0.0
       def cache_table
         if defined?(Mongo::QueryCache)
-          Mongo::QueryCache.cache_table
+          raise NotImplementedError
         else
           Thread.current["[mongoid]:query_cache"] ||= {}
         end
@@ -321,6 +321,8 @@ module Mongoid
   end
 end
 
-Mongo::Collection.__send__(:include, Mongoid::QueryCache::Collection)
-Mongo::Collection::View.__send__(:include, Mongoid::QueryCache::View)
-Mongoid::Document.__send__(:include, Mongoid::QueryCache::Document)
+unless defined?(Mongo::QueryCache)
+  Mongo::Collection.__send__(:include, Mongoid::QueryCache::Collection)
+  Mongo::Collection::View.__send__(:include, Mongoid::QueryCache::View)
+  Mongoid::Document.__send__(:include, Mongoid::QueryCache::Document)
+end
