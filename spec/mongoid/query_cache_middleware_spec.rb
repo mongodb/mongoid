@@ -43,7 +43,7 @@ describe Mongoid::QueryCache::Middleware do
     context 'with driver query cache' do
       require_driver_query_cache
 
-      it "cleans the query cache after reponds" do
+      it "cleans the query cache after it responds" do
         middleware.call({})
         expect(Mongo::QueryCache.send(:cache_table)).to be_empty
       end
@@ -52,7 +52,7 @@ describe Mongoid::QueryCache::Middleware do
     context 'with mongoid query cache' do
       require_mongoid_query_cache
 
-      it "cleans the query cache after reponds" do
+      it "cleans the query cache after it responds" do
         middleware.call({})
         expect(Mongoid::QueryCache.cache_table).to be_empty
       end
