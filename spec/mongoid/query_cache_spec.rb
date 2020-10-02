@@ -171,29 +171,27 @@ describe Mongoid::QueryCache do
         Band.all.to_a
       end
 
-      it 'has a nonempty query cache' do
-        expect(Mongoid::QueryCache.cache_table.count).to eq(1)
-        expect(Mongo::QueryCache.cache_table.count).to eq(1)
-      end
+      it 'requires Mongoid to query again' do
+        expect_no_queries do
+          Band.all.to_a
+        end
 
-      it 'uses the driver query cache' do
-        expect(Mongo::QueryCache).to receive(:clear).and_call_original
         Mongoid::QueryCache.clear_cache
-        expect(Mongoid::QueryCache.cache_table.count).to eq(0)
-        expect(Mongo::QueryCache.cache_table.count).to eq(0)
+
+        expect_query(1) do
+          Band.all.to_a
+        end
       end
     end
 
     context 'when query cache used and cleared' do
-
       it 'uses the driver query cache' do
+        expect(Mongo::QueryCache).to receive(:set).once.and_call_original
+
         expect_query(1) do
           Band.all.to_a
           Band.all.to_a
         end
-        expect(Mongo::QueryCache).to receive(:cache_table).exactly(2).and_call_original
-        expect(Mongoid::QueryCache.cache_table.count).to eq(1)
-        expect(Mongo::QueryCache.cache_table.count).to eq(1)
       end
     end
   end
@@ -440,11 +438,28 @@ describe Mongoid::QueryCache do
           # which causes this test to fail.
           min_server_version '3.2'
 
-          it "queries again" do
-            expect_query(1) do
-              result = game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
-              expect(result.length).to eq(2)
-              expect(result.map { |r| r['value'] }).to eq([6, 7])
+          context 'with driver query cache' do
+            require_driver_query_cache
+
+            # The driver query cache re-uses results with a larger limit
+            it 'does not query again' do
+              expect_no_queries do
+                result = game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+                expect(result.length).to eq(2)
+                expect(result.map { |r| r['value'] }).to eq([6, 7])
+              end
+            end
+          end
+
+          context 'with mongoid query cache' do
+            require_mongoid_query_cache
+
+            it 'queries again' do
+              expect_query(1) do
+                result = game.ratings.where(:value.gt => 5).limit(2).asc(:id).to_a
+                expect(result.length).to eq(2)
+                expect(result.map { |r| r['value'] }).to eq([6, 7])
+              end
             end
           end
         end
@@ -726,9 +741,24 @@ describe Mongoid::QueryCache do
       Band.batch_size(4).to_a
     end
 
-    it 'does not cache the result' do
-      expect_query(1) do
-        expect(Band.all.map(&:id).size).to eq(10)
+    context 'with driver query cache' do
+      require_driver_query_cache
+
+      # The driver query cache caches multi-batch cursors
+      it 'does cache the result' do
+        expect_no_queries do
+          expect(Band.all.map(&:id).size).to eq(10)
+        end
+      end
+    end
+
+    context 'with mongoid query cache' do
+      require_mongoid_query_cache
+
+      it 'does not cache the result' do
+        expect_query(1) do
+          expect(Band.all.map(&:id).size).to eq(10)
+        end
       end
     end
   end
