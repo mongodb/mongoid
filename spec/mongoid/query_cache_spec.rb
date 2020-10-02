@@ -966,4 +966,13 @@ describe Mongoid::QueryCache do
       end
     end
   end
+
+  context 'when storing in system collection' do
+    it 'does not cache the query' do
+      expect_query(2) do
+        SystemRole.all.to_a
+        SystemRole.all.to_a
+      end
+    end
+  end
 end
