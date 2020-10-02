@@ -24,6 +24,210 @@ describe Mongoid::QueryCache do
     SessionRegistry.instance.verify_sessions_ended!
   end
 
+  describe '#cache' do
+    context 'with driver query cache' do
+      require_driver_query_cache
+
+      context 'when query cache is not enabled' do
+        before do
+          Mongoid::QueryCache.enabled = false
+        end
+
+        it 'turns on the query cache within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be false
+
+          Mongoid::QueryCache.cache do
+            expect(Mongoid::QueryCache.enabled?).to be true
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be false
+        end
+      end
+
+      context 'when query cache is enabled' do
+        before do
+          Mongoid::QueryCache.enabled = true
+        end
+
+        it 'keeps the query cache enabled within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be true
+
+          Mongoid::QueryCache.cache do
+            expect(Mongoid::QueryCache.enabled?).to be true
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be true
+        end
+      end
+
+      context 'nested inside #uncached' do
+        it 'turns on the query cache in the block' do
+          Mongoid::QueryCache.uncached do
+            expect(Mongoid::QueryCache.enabled?).to be false
+
+            Mongoid::QueryCache.cache do
+              expect(Mongoid::QueryCache.enabled?).to be true
+            end
+
+            expect(Mongoid::QueryCache.enabled?).to be false
+          end
+        end
+      end
+    end
+
+    context 'with mongoid query cache' do
+      require_mongoid_query_cache
+
+      context 'when query cache is not enabled' do
+        before do
+          Mongoid::QueryCache.enabled = false
+        end
+
+        it 'turns on the query cache within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be false
+
+          Mongoid::QueryCache.cache do
+            expect(Mongoid::QueryCache.enabled?).to be true
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be false
+        end
+      end
+
+      context 'when query cache is enabled' do
+        before do
+          Mongoid::QueryCache.enabled = true
+        end
+
+        it 'keeps the query cache enabled within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be true
+
+          Mongoid::QueryCache.cache do
+            expect(Mongoid::QueryCache.enabled?).to be true
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be true
+        end
+      end
+
+      context 'nested inside #uncached' do
+        it 'turns on the query cache in the block' do
+          Mongoid::QueryCache.uncached do
+            expect(Mongoid::QueryCache.enabled?).to be false
+
+            Mongoid::QueryCache.cache do
+              expect(Mongoid::QueryCache.enabled?).to be true
+            end
+
+            expect(Mongoid::QueryCache.enabled?).to be false
+          end
+        end
+      end
+    end
+  end
+
+  describe '#uncached' do
+    context 'with driver query cache' do
+      require_driver_query_cache
+
+      context 'when query cache is not enabled' do
+        before do
+          Mongoid::QueryCache.enabled = false
+        end
+
+        it 'keeps the query cache turned off within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be false
+
+          Mongoid::QueryCache.uncached do
+            expect(Mongoid::QueryCache.enabled?).to be false
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be false
+        end
+      end
+
+      context 'when query cache is enabled' do
+        before do
+          Mongoid::QueryCache.enabled = true
+        end
+
+        it 'turns off the query cache within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be true
+
+          Mongoid::QueryCache.uncached do
+            expect(Mongoid::QueryCache.enabled?).to be false
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be true
+        end
+      end
+
+      context 'nested inside #cache' do
+        it 'turns on the query cache in the block' do
+          Mongoid::QueryCache.cache do
+            expect(Mongoid::QueryCache.enabled?).to be true
+
+            Mongoid::QueryCache.uncached do
+              expect(Mongoid::QueryCache.enabled?).to be false
+            end
+
+            expect(Mongoid::QueryCache.enabled?).to be true
+          end
+        end
+      end
+    end
+
+    context 'with mongoid query cache' do
+      require_mongoid_query_cache
+
+      context 'when query cache is not enabled' do
+        before do
+          Mongoid::QueryCache.enabled = false
+        end
+
+        it 'keeps the query cache turned off within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be false
+
+          Mongoid::QueryCache.uncached do
+            expect(Mongoid::QueryCache.enabled?).to be false
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be false
+        end
+      end
+
+      context 'when query cache is enabled' do
+        before do
+          Mongoid::QueryCache.enabled = true
+        end
+
+        it 'turns off the query cache within the block' do
+          expect(Mongoid::QueryCache.enabled?).to be true
+
+          Mongoid::QueryCache.uncached do
+            expect(Mongoid::QueryCache.enabled?).to be false
+          end
+
+          expect(Mongoid::QueryCache.enabled?).to be true
+        end
+      end
+
+      context 'nested inside #cache' do
+        it 'turns on the query cache in the block' do
+          Mongoid::QueryCache.cache do
+            expect(Mongoid::QueryCache.enabled?).to be true
+
+            Mongoid::QueryCache.uncached do
+              expect(Mongoid::QueryCache.enabled?).to be false
+            end
+
+            expect(Mongoid::QueryCache.enabled?).to be true
+          end
+        end
+      end
+    end
+  end
+
   context 'when iterating over objects sharing the same base' do
 
     let(:server) do

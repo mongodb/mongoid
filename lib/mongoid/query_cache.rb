@@ -81,18 +81,18 @@ module Mongoid
       # @return [ Object ] The result of the block.
       #
       # @since 4.0.0
-      def cache
+      def cache(&block)
         if defined?(Mongo::QueryCache)
-          if block_given?
-            Mongo::QueryCache.cache { yield }
-          end
+          Mongo::QueryCache.cache(&block)
         else
           enabled = QueryCache.enabled?
           QueryCache.enabled = true
-          yield
+          begin
+            yield
+          ensure
+            QueryCache.enabled = enabled
+          end
         end
-      ensure
-        QueryCache.enabled = enabled
       end
 
       # Execute the block with the query cache disabled.
@@ -101,18 +101,18 @@ module Mongoid
       #   QueryCache.uncached { collection.find }
       #
       # @return [ Object ] The result of the block.
-      def uncached
+      def uncached(&block)
         if defined?(Mongo::QueryCache)
-          if block_given?
-            Mongo::QueryCache.uncached { yield }
-          end
+          Mongo::QueryCache.uncached(&block)
         else
           enabled = QueryCache.enabled?
           QueryCache.enabled = false
-          yield
+          begin
+            yield
+          ensure
+            QueryCache.enabled = enabled
+          end
         end
-      ensure
-        QueryCache.enabled = enabled
       end
     end
 
