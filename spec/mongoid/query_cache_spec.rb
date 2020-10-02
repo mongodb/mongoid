@@ -741,7 +741,7 @@ describe Mongoid::QueryCache do
       Band.batch_size(4).to_a
     end
 
-    context 'with drivre query cache' do
+    context 'with driver query cache' do
       require_driver_query_cache
 
       # The driver query cache caches multi-batch cursors
