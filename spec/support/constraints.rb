@@ -4,20 +4,28 @@
 module Constraints
   RAILS_VERSION = ActiveSupport.version.to_s.split('.')[0..1].join('.').freeze
 
-  def require_driver_query_cache
+  def min_driver_version(version)
+    required_version = version.split('.').map(&:to_i)
+    actual_version = driver_version(required_version.length)
     before(:all) do
-      if !defined?(Mongo::QueryCache)
-        skip "Driver version #{Mongo::VERSION} does not support query cache"
+      if (actual_version <=> required_version) < 0
+        skip "Driver version #{version} or higher is required"
       end
     end
   end
 
-  def require_mongoid_query_cache
-    before (:all) do
-      if defined?(Mongo::QueryCache)
-        skip "Mongoid uses the driver query cache in driver versions that support it"
+  def max_driver_version(version)
+    required_version = version.split('.').map(&:to_i)
+    actual_version = driver_version(required_version.length)
+    before(:all) do
+      if (actual_version <=> required_version) > 0
+        skip "Driver version #{version} or lower is required"
       end
     end
+  end
+
+  def driver_version(precision)
+    Mongo::VERSION.split('.')[0...precision].map(&:to_i)
   end
 
   def min_rails_version(version)

@@ -26,7 +26,7 @@ describe Mongoid::QueryCache do
 
   describe '#cache' do
     context 'with driver query cache' do
-      require_driver_query_cache
+      min_driver_version '2.14'
 
       context 'when query cache is not enabled' do
         before do
@@ -76,7 +76,7 @@ describe Mongoid::QueryCache do
     end
 
     context 'with mongoid query cache' do
-      require_mongoid_query_cache
+      max_driver_version '2.13'
 
       context 'when query cache is not enabled' do
         before do
@@ -128,7 +128,7 @@ describe Mongoid::QueryCache do
 
   describe '#uncached' do
     context 'with driver query cache' do
-      require_driver_query_cache
+      min_driver_version '2.14'
 
       context 'when query cache is not enabled' do
         before do
@@ -178,7 +178,7 @@ describe Mongoid::QueryCache do
     end
 
     context 'with mongoid query cache' do
-      require_mongoid_query_cache
+      max_driver_version '2.13'
 
       context 'when query cache is not enabled' do
         before do
@@ -304,7 +304,7 @@ describe Mongoid::QueryCache do
   end
 
   context 'when driver query cache exists' do
-    require_driver_query_cache
+    min_driver_version '2.14'
 
     before do
       Band.all.to_a
@@ -401,7 +401,7 @@ describe Mongoid::QueryCache do
   end
 
   context 'when drivers query cache does not exist' do
-    require_mongoid_query_cache
+    max_driver_version '2.13'
 
     it 'does not recognize the driver query cache' do
       expect(defined?(Mongo::QueryCache)).to be_nil
@@ -643,7 +643,7 @@ describe Mongoid::QueryCache do
           min_server_version '3.2'
 
           context 'with driver query cache' do
-            require_driver_query_cache
+            min_driver_version '2.14'
 
             # The driver query cache re-uses results with a larger limit
             it 'does not query again' do
@@ -656,7 +656,7 @@ describe Mongoid::QueryCache do
           end
 
           context 'with mongoid query cache' do
-            require_mongoid_query_cache
+            max_driver_version '2.13'
 
             it 'queries again' do
               expect_query(1) do
@@ -946,7 +946,7 @@ describe Mongoid::QueryCache do
     end
 
     context 'with driver query cache' do
-      require_driver_query_cache
+      min_driver_version '2.14'
 
       # The driver query cache caches multi-batch cursors
       it 'does cache the result' do
@@ -957,7 +957,7 @@ describe Mongoid::QueryCache do
     end
 
     context 'with mongoid query cache' do
-      require_mongoid_query_cache
+      max_driver_version '2.13'
 
       it 'does not cache the result' do
         expect_query(1) do
