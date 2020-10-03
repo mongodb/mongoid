@@ -3,6 +3,7 @@
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "shared", "lib"))
 
 # Load byebug before mongoid, to place breakpoints in the lib methods.
 # But SpecConfig needs the driver code - require the driver here.
@@ -15,8 +16,8 @@ require "mongo"
 require 'pp'
 
 require 'support/spec_config'
-require 'support/lite_constraints'
-require "support/session_registry" 
+require 'mrss/lite_constraints'
+require "support/session_registry"
 
 unless SpecConfig.instance.ci?
   begin
@@ -68,7 +69,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.extend(LiteConstraints)
+  config.extend(Mrss::LiteConstraints)
 end
 
 # require all shared examples
