@@ -17,9 +17,10 @@ module Mongoid
       # @return [ Hash ] The hash of cached queries.
       #
       # @since 4.0.0
+      # @api private
       def cache_table
         if defined?(Mongo::QueryCache)
-          raise NotImplementedError
+          raise NotImplementedError, "Mongoid does not expose driver's query cache table"
         else
           Thread.current["[mongoid]:query_cache"] ||= {}
         end
@@ -155,6 +156,7 @@ module Mongoid
     # the database if the same query has already been executed.
     #
     # @since 5.0.0
+    # @deprecated This class is only used with driver versions 2.13 and lower.
     class CachedCursor < Mongo::Cursor
 
       # We iterate over the cached documents if they exist already in the
@@ -205,6 +207,7 @@ module Mongoid
     # operations.
     #
     # @since 4.0.0
+    # @deprecated This module is only used with driver versions 2.13 and lower.
     module Base
 
       def alias_query_cache_clear(*method_names)
@@ -224,6 +227,7 @@ module Mongoid
     # cached cursor or a regular cursor on iteration.
     #
     # @since 5.0.0
+    # @deprecated This module is only used with driver versions 2.13 and lower.
     module View
       extend ActiveSupport::Concern
 
@@ -303,6 +307,7 @@ module Mongoid
     # Adds behavior to the query cache for collections.
     #
     # @since 5.0.0
+    # @deprecated This module is only used with driver versions 2.13 and lower.
     module Collection
       extend ActiveSupport::Concern
 
