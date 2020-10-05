@@ -431,7 +431,9 @@ describe Mongoid::Fields do
     context "when the Symbol type is used" do
 
       before do
-        expect(Mongoid.logger).to receive(:warn)
+        Mongoid::Fields::Validators::Macro.class_eval do
+          @field_type_is_symbol_warned = false
+        end
       end
 
       after do
@@ -439,7 +441,28 @@ describe Mongoid::Fields do
       end
 
       it "warns that the BSON symbol type is deprecated" do
+        expect(Mongoid.logger).to receive(:warn)
+
         Band.field :should_warn, type: Symbol
+      end
+
+      it "warns on first use of Symbol type only" do
+        expect(Mongoid.logger).to receive(:warn).once
+
+        Band.field :should_warn, type: Symbol
+      end
+
+      context 'when using Symbol field type in multiple classes' do
+        after do
+          Truck.fields.delete("should_warn")
+        end
+
+        it "warns on first use of Symbol type only" do
+          expect(Mongoid.logger).to receive(:warn).once
+
+          Band.field :should_warn, type: Symbol
+          Truck.field :should_warn, type: Symbol
+        end
       end
     end
 
