@@ -1050,6 +1050,21 @@ will query the database and separately cache their results.
 
 To use the cached results, call ``all.to_a.first`` on the model class.
 
+System Collections and the Query Cache
+``````````````````````````````````````
+
+MongoDB stores system information in collections that use the ``database.system.*``
+namespace pattern. These are called system collections.
+
+Data in system collections can change due to activity not triggered by the
+application (such as internal server processes) and as a result of a variety of
+database commands issued by the application. Because of the difficulty of
+determining when the cached results for system collections should be expired,
+queries on system collections bypass the query cache.
+
+Neither the legacy query cache nor the driver query cache will cache query
+results from system collections.
+
 .. code-block:: ruby
 
   Band.all.to_a
