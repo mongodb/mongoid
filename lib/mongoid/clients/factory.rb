@@ -69,11 +69,28 @@ module Mongoid
         end
       end
 
+      MONGOID_WRAPPING_LIBRARY = {
+        name: 'Mongoid',
+        version: VERSION,
+      }.freeze
+
+      def driver_version
+        Mongo::VERSION.split('.')[0...2].map(&:to_i)
+      end
+
       def options(configuration)
         config = configuration.dup
         options = config.delete(:options) || {}
         options[:platform] = PLATFORM_DETAILS
         options[:app_name] = Mongoid::Config.app_name if Mongoid::Config.app_name
+        if (driver_version <=> [2, 13]) >= 0
+          wrap_lib = if options[:wrapping_libraries]
+            [MONGOID_WRAPPING_LIBRARY] + options[:wrapping_libraries]
+          else
+            [MONGOID_WRAPPING_LIBRARY]
+          end
+          options[:wrapping_libraries] = wrap_lib
+        end
         options.reject{ |k, v| k == :hosts }.to_hash.symbolize_keys!
       end
     end
