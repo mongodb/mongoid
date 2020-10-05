@@ -41,7 +41,7 @@ describe Mongoid::QueryCache::Middleware do
     end
 
     context 'with driver query cache' do
-      require_driver_query_cache
+      min_driver_version '2.14'
 
       it "cleans the query cache after it responds" do
         middleware.call({})
@@ -50,7 +50,7 @@ describe Mongoid::QueryCache::Middleware do
     end
 
     context 'with mongoid query cache' do
-      require_mongoid_query_cache
+      max_driver_version '2.13'
 
       it "cleans the query cache after it responds" do
         middleware.call({})
