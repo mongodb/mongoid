@@ -91,6 +91,8 @@ module Mongoid
     #   enumerator = criteria.find(-> { "Default Band" })
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
+    #
+    # @see https://ruby-doc.org/core/Enumerable.html#method-i-find
     def find(*args, &block)
       if block_given?
         _enumerable_find(*args, &block)
