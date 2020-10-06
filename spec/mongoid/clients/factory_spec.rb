@@ -65,6 +65,11 @@ describe Mongoid::Clients::Factory do
             expect(client).to be_a(Mongo::Client)
           end
 
+          it 'does not produce driver warnings' do
+            Mongo::Logger.logger.should_not receive(:warn)
+            client
+          end
+
           let(:cluster_addresses) do
             cluster.addresses.map(&:to_s)
           end
@@ -73,6 +78,38 @@ describe Mongoid::Clients::Factory do
 
           it "sets the platform to Mongoid's platform constant" do
             expect(client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
+          end
+
+          context 'driver 2.13+' do
+            min_driver_version '2.13'
+
+            it 'sets Mongoid as a wrapping library' do
+              client.options[:wrapping_libraries].should == [BSON::Document.new(
+                Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY)]
+            end
+
+            context 'when configuration specifies a wrapping library' do
+
+              let(:config) do
+                {
+                  default: { hosts: SpecConfig.instance.addresses, database: database_id },
+                  analytics: {
+                    hosts: SpecConfig.instance.addresses,
+                    database: database_id,
+                    options: {
+                      wrapping_libraries: [{name: 'Foo'}],
+                    },
+                  }
+                }
+              end
+
+              it 'adds Mongoid as another wrapping library' do
+                client.options[:wrapping_libraries].should == [
+                  BSON::Document.new(Mongoid::Clients::Factory::MONGOID_WRAPPING_LIBRARY),
+                  {'name' => 'Foo'},
+                ]
+              end
+            end
           end
         end
 
