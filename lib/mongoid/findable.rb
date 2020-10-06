@@ -91,8 +91,7 @@ module Mongoid
       with_default_scope.exists?
     end
 
-    # Finds a +Document+ or multiple documents by their _id values or using
-    # the provided conditions.
+    # Finds a +Document+ or multiple documents by their _id values.
     #
     # If a single non-Array argument is given, this argument is interpreted
     # as the _id value of a document to find. If there is a matching document
