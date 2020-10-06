@@ -64,7 +64,8 @@ module Mongoid
     end
 
     # Finds documents given the provided conditions or filters the scope
-    # using the provided block.
+    # using the provided block in the application process space, after loading
+    # the base set of documents if needed.
     #
     # If this method is not given a block, it delegates to +Findable#find+
     # and finds one or documents for the provided _id(s).
