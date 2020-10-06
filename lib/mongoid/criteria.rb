@@ -92,6 +92,10 @@ module Mongoid
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
     #
+    # @raise Errors::DocumentNotFound If the parameters were _id values and
+    #   not all documents are found and the +raise_not_found_error+
+    #   Mongoid configuration option is truthy.
+    #
     # @see https://ruby-doc.org/core/Enumerable.html#method-i-find
     def find(*args, &block)
       if block_given?
