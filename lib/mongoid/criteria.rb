@@ -87,7 +87,7 @@ module Mongoid
     # @example Finds the first matching document using a block using the default Proc, invokes Enumerable#find.
     #   criteria.find(-> { "Default Band" }) { |item| item.name == "Milwaukee Mode" }
     #
-    # @example Tries to find a document whose _id is the provided Proc, typically failing.
+    # @example Tries to find a document whose _id is the stringification of the provided Proc, typically failing.
     #   enumerator = criteria.find(-> { "Default Band" })
     #
     # @return [ Document | Array<Document> | nil ] A document or matching documents.
