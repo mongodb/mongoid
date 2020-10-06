@@ -195,7 +195,7 @@ describe Mongoid::Copyable do
           I18n.enforce_available_locales = false
           I18n.locale = 'pt_BR'
           person.addresses.type(ShipmentAddress).each { |address| address.shipping_name = "Título" }
-          person.save
+          person.save!
         end
 
         after do
@@ -355,11 +355,11 @@ describe Mongoid::Copyable do
         end
 
         context "when using a custom discriminator_key" do
-          before do 
+          before do
             Person.discriminator_key = "dkey"
           end
 
-          after do 
+          after do
             Person.discriminator_key = nil
           end
 
@@ -597,11 +597,11 @@ describe Mongoid::Copyable do
 
       context "when cloning a document with an embedded child class and a custom discriminator value" do
 
-        before do 
+        before do
           ShipmentAddress.discriminator_value = "dvalue"
         end
 
-        after do 
+        after do
           ShipmentAddress.discriminator_value = nil
         end
 
@@ -623,6 +623,50 @@ describe Mongoid::Copyable do
 
         it "copys embeds many documents" do
           expect(copy.addresses).to eq(person.addresses)
+        end
+      end
+
+      context 'when cloning a document with embedded child that uses inheritance' do
+        let(:original) do
+          CopyableSpec::A.new(influencers: [child_cls.new])
+        end
+
+        let(:copy) do
+          original.send(method)
+        end
+
+        context 'embedded child is root of hierarchy' do
+          let(:child_cls) do
+            CopyableSpec::Influencer
+          end
+
+          before do
+            # When embedded class is the root in hierarchy, their
+            # discriminator value is not explicitly stored.
+            child_cls.discriminator_mapping[child_cls.name].should be nil
+          end
+
+          it 'works' do
+            copy.class.should be original.class
+            copy.object_id.should_not == original.object_id
+          end
+        end
+
+        context 'embedded child is leaf of hierarchy' do
+          let(:child_cls) do
+            CopyableSpec::Youtuber
+          end
+
+          before do
+            # When embedded class is a leaf in hierarchy, their
+            # discriminator value is explicitly stored.
+            child_cls.discriminator_mapping[child_cls.name].should_not be nil
+          end
+
+          it 'works' do
+            copy.class.should be original.class
+            copy.object_id.should_not == original.object_id
+          end
         end
       end
     end

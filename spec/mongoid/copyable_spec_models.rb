@@ -6,6 +6,7 @@ module CopyableSpec
     include Mongoid::Document
 
     embeds_many :locations
+    embeds_many :influencers
   end
 
   class Location
@@ -15,6 +16,19 @@ module CopyableSpec
   end
 
   class Building
+    include Mongoid::Document
+  end
+
+  class Influencer
+    include Mongoid::Document
+
+    embeds_many :blurbs
+  end
+
+  class Youtuber < Influencer
+  end
+
+  class Blurb
     include Mongoid::Document
   end
 end
