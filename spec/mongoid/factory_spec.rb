@@ -78,7 +78,7 @@ describe Mongoid::Factory do
     end
 
     context "when type is not preset" do
-      context "when using the default discriminator key" do 
+      context "when using the default discriminator key" do
         let(:attributes) do
           { "title" => "Sir" }
         end
@@ -103,12 +103,12 @@ describe Mongoid::Factory do
         end
       end
 
-      context "when using a custom discriminator key" do 
-        before do 
+      context "when using a custom discriminator key" do
+        before do
           Person.discriminator_key = "dkey"
         end
 
-        after do 
+        after do
           Person.discriminator_key = nil
         end
 
@@ -123,13 +123,13 @@ describe Mongoid::Factory do
         it "instantiates based on the provided class" do
           expect(person.title).to eq("Sir")
         end
-        
+
         context "when the type is a symbol" do
-          
+
           let(:person) do
             described_class.build(Person, { :dkey => "Doctor" })
           end
-          
+
           it "instantiates the subclass" do
             expect(person.class).to eq(Doctor)
           end
@@ -179,15 +179,64 @@ describe Mongoid::Factory do
     context "when the attributes are nil" do
 
       let(:document) do
-        described_class.from_db(Address, nil)
+        described_class.from_db(model_cls, nil)
       end
 
-      it "generates based on the provided class" do
-        expect(document).to be_a(Address)
+      context 'when model class does not use inheritance' do
+        context 'when model overwrites _id field to not have a default' do
+          let(:model_cls) { Idnodef }
+
+          it "generates based on the provided class" do
+            expect(document).to be_a(model_cls)
+          end
+
+          it "sets the attributes to empty" do
+            expect(document.attributes).to be_empty
+          end
+        end
+
+        context 'with default _id auto-assignment behavior' do
+          let(:model_cls) { Agency }
+
+          it "generates based on the provided class" do
+            expect(document).to be_a(model_cls)
+          end
+
+          it "sets the attributes to generated _id only" do
+            document.attributes.should == {'_id' => document.id}
+          end
+        end
       end
 
-      it "sets the attributes to empty" do
-        expect(document.attributes).to be_empty
+      context 'when model class is an inheritance root' do
+        let(:model_cls) { Address }
+
+        before do
+          # Ensure a child is defined
+          ShipmentAddress.superclass.should be model_cls
+        end
+
+        it "generates based on the provided class" do
+          expect(document).to be_a(model_cls)
+        end
+
+        it "sets the attributes to _type only" do
+          # Note that Address provides the _id override.
+          document.attributes.should == {'_type' => 'Address'}
+        end
+      end
+
+      context 'when model class is an inheritance leaf' do
+        let(:model_cls) { ShipmentAddress }
+
+        it "generates based on the provided class" do
+          expect(document).to be_a(model_cls)
+        end
+
+        it "sets the attributes to empty" do
+          # Note that Address provides the _id override.
+          document.attributes.should == {'_type' => 'ShipmentAddress'}
+        end
       end
     end
 
@@ -268,11 +317,11 @@ describe Mongoid::Factory do
       end
 
       context "when using a custom discriminator key" do
-        before do 
+        before do
           Person.discriminator_key = "dkey"
         end
 
-        after do 
+        after do
           Person.discriminator_key = nil
         end
 
@@ -345,11 +394,11 @@ describe Mongoid::Factory do
 
     context 'when type does not correspond to a Class name with custom discriminator key' do
 
-      before do 
+      before do
         Person.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Person.discriminator_key = nil
       end
 
