@@ -114,7 +114,7 @@ module Mongoid
     # found are returned; if no documents are found, the return value is an
     # empty array.
     #
-    # Note that MongoDB does not allow _id field to be an array.
+    # Note that MongoDB does not allow the _id field to be an array.
     #
     # The argument undergoes customary Mongoid type conversions based on
     # the type declared for the _id field. By default the _id field is a
