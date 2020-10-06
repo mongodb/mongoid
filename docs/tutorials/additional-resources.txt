@@ -10,10 +10,9 @@ Additional Resources
    :depth: 2
    :class: singlecol
 
-There are a number of good resources appearing all over the web for
-learning about Mongoid. There are also many gems and tools that you 
-can use to improve your development experience. A useful selection 
-is listed below. If you know of others, do let us know.
+Mongoid has an extensive ecosystem. Some of the third-party guides and
+blog posts about Mongoid, as well as libraries integrating with or built
+on top of Mongoid, are listed below.
 
 Screencasts
 ===========
