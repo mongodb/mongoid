@@ -1,5 +1,3 @@
-.. _ruby-external-resources:
-
 ********************
 Additional Resources
 ********************
