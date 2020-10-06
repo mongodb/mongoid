@@ -63,7 +63,7 @@ module Mongoid
       entries == other
     end
 
-    # Finds a documents given the provided conditions or filters the scope
+    # Finds documents given the provided conditions or filters the scope
     # using the provided block.
     #
     # If this method is not given a block, it delegates to +Findable#find+
