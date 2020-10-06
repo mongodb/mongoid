@@ -68,7 +68,7 @@ module Mongoid
     # space after loading them if needed.
     #
     # If this method is not given a block, it delegates to +Findable#find+
-    # and finds one or documents for the provided _id(s).
+    # and finds one or many documents for the provided _id values or conditions.
     #
     # If this method is given a block, it delegates to +Enumerable#find+ and
     # returns the first document of those found by the current Crieria object
