@@ -7,8 +7,8 @@ Additional Resources
 .. contents:: On this page
    :local:
    :backlinks: none
-   :depth: 1
-   :class: twocols
+   :depth: 2
+   :class: singlecol
 
 There are a number of good resources appearing all over the web for
 learning about Mongoid. There are also many gems and tools that you 
