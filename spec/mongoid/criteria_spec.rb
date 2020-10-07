@@ -786,7 +786,7 @@ describe Mongoid::Criteria do
 
   describe "#field_list" do
 
-    context "when using the default discriminator key" do 
+    context "when using the default discriminator key" do
       let(:criteria) do
         Doctor.only(:_id)
       end
@@ -796,12 +796,12 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when using a custom discriminator key" do 
-      before do 
+    context "when using a custom discriminator key" do
+      before do
         Person.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Person.discriminator_key = nil
       end
 
@@ -839,7 +839,7 @@ describe Mongoid::Criteria do
     end
 
     context "when given a Proc" do
-      it "behaves as Fnumerable" do
+      it "behaves as Enumerable" do
         lambda do
           criteria.find(-> {"default"})
         # Proc is not serializable to a BSON type
@@ -2864,7 +2864,7 @@ describe Mongoid::Criteria do
     end
 
     context "when using inheritance" do
-      context "when using the default discriminator key" do 
+      context "when using the default discriminator key" do
         let(:criteria) do
           Doctor.only(:_id)
         end
@@ -2874,15 +2874,15 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "when setting a custom discriminator key" do 
-        before do 
+      context "when setting a custom discriminator key" do
+        before do
           Person.discriminator_key = "dkey"
         end
 
-        after do 
+        after do
           Person.discriminator_key = nil
         end
-        
+
         let(:criteria) do
           Doctor.only(:_id)
         end
@@ -3469,7 +3469,7 @@ describe Mongoid::Criteria do
   end
 
   describe "#type" do
-    context "when using the default discriminator_key" do 
+    context "when using the default discriminator_key" do
       context "when the type is a string" do
 
         let!(:browser) do
@@ -3501,12 +3501,12 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when using a custom discriminator_key" do 
-      before do 
+    context "when using a custom discriminator_key" do
+      before do
         Canvas.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Canvas.discriminator_key = nil
       end
 
@@ -3956,7 +3956,7 @@ describe Mongoid::Criteria do
   end
 
   describe "#type_selection" do
-    context "when using the default discriminator_key" do 
+    context "when using the default discriminator_key" do
       context "when only one subclass exists" do
 
         let(:criteria) do
@@ -3988,12 +3988,12 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when using a custom discriminator_key" do 
-      before do 
+    context "when using a custom discriminator_key" do
+      before do
         Canvas.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Canvas.discriminator_key = nil
       end
 
@@ -4026,6 +4026,6 @@ describe Mongoid::Criteria do
           expect(selection).to eq({ dkey: { "$in" => [ "Firefox", "Browser" ]}})
         end
       end
-    end    
+    end
   end
 end
