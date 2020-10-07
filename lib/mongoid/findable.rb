@@ -91,20 +91,46 @@ module Mongoid
       with_default_scope.exists?
     end
 
-    # Find a +Document+ in several different ways.
+    # Finds a +Document+ or multiple documents by their _id values.
     #
-    # If a +String+ is provided, it will be assumed that it is a
-    # representation of a Mongo::ObjectID and will attempt to find a single
-    # +Document+ based on that id. If a +Symbol+ and +Hash+ is provided then
-    # it will attempt to find either a single +Document+ or multiples based
-    # on the conditions provided and the first parameter.
+    # If a single non-Array argument is given, this argument is interpreted
+    # as the _id value of a document to find. If there is a matching document
+    # in the database, this document is returned; otherwise, if the
+    # +raise_not_found_error+ Mongoid configuration option is truthy
+    # (which is the default), +Errors::DocumentNotFound+ is raised, and if
+    # +raise_not_found_error+ is falsy, +find+ returns +nil+.
     #
-    # @example Find a single document by an id.
-    #   Person.find(BSON::ObjectId)
+    # If multiple arguments are given, or an Array argument is given, the
+    # array is flattened and each array element is interpreted as the _id
+    # value of the document to find. Mongoid then attempts to retrieve all
+    # documents with the provided _id values. The return value is an array
+    # of found documents. Each document appears one time in the returned array,
+    # even if its _id is given multiple times in the argument to +find+.
+    # If the +raise_not_found_error+ Mongoid configuration option is truthy,
+    # +Errors::DocumentNotFound+ exception is raised if any of the specified
+    # _ids were not found in the database. If the ++raise_not_found_error+
+    # Mongoid configuration option is falsy, only those documents which are
+    # found are returned; if no documents are found, the return value is an
+    # empty array.
     #
-    # @param [ Array ] args An assortment of finder options.
+    # Note that MongoDB does not allow the _id field to be an array.
     #
-    # @return [ Document, nil, Criteria ] A document or matching documents.
+    # The argument undergoes customary Mongoid type conversions based on
+    # the type declared for the _id field. By default the _id field is a
+    # +BSON::ObjectId+; this allows strings to be passed to +find+ and the
+    # strings will be transparently converted to +BSON::ObjectId+ instances
+    # during query construction.
+    #
+    # The +find+ method takes into account the default scope defined on the
+    # model class, if any.
+    #
+    # @param [ Object | Array<Object> ] args The _id values to find or an
+    #   array thereof.
+    #
+    # @return [ Document | Array<Document> | nil ] A document or matching documents.
+    #
+    # @raise Errors::DocumentNotFound If not all documents are found and
+    #   the +raise_not_found_error+ Mongoid configuration option is truthy.
     def find(*args)
       with_default_scope.find(*args)
     end

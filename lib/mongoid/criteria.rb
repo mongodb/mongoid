@@ -20,9 +20,17 @@ module Mongoid
   # against the database.
   class Criteria
     include Enumerable
+
+    # @api private
+    alias :_enumerable_find :find
+
     include Contextual
     include Queryable
     include Findable
+
+    # @api private
+    alias :_findable_find :find
+
     include Inspectable
     include Includable
     include Marshalable
@@ -53,6 +61,48 @@ module Mongoid
     def ==(other)
       return super if other.respond_to?(:selector)
       entries == other
+    end
+
+    # Finds one or many documents given the provided _id values, or filters
+    # the documents in the current scope in the application process space
+    # after loading them if needed.
+    #
+    # If this method is not given a block, it delegates to +Findable#find+
+    # and finds one or many documents for the provided _id values.
+    #
+    # If this method is given a block, it delegates to +Enumerable#find+ and
+    # returns the first document of those found by the current Crieria object
+    # for which the block returns a truthy value.
+    #
+    # Note that the "default proc" argument of Enumerable is not specially
+    # treated by Mongoid - the decision between delegating to +Findable+ vs
+    # +Enumerable+ is made solely based on whether +find+ is passed a block.
+    #
+    # @example Finds a document by its _id, invokes Findable#find.
+    #   critera.find("1234")
+    #
+    # @example Finds the first matching document using a block, invokes Enumerable#find.
+    #   criteria.find { |item| item.name == "Depeche Mode" }
+    #
+    # @example Finds the first matching document using a block using the default Proc, invokes Enumerable#find.
+    #   criteria.find(-> { "Default Band" }) { |item| item.name == "Milwaukee Mode" }
+    #
+    # @example Tries to find a document whose _id is the stringification of the provided Proc, typically failing.
+    #   enumerator = criteria.find(-> { "Default Band" })
+    #
+    # @return [ Document | Array<Document> | nil ] A document or matching documents.
+    #
+    # @raise Errors::DocumentNotFound If the parameters were _id values and
+    #   not all documents are found and the +raise_not_found_error+
+    #   Mongoid configuration option is truthy.
+    #
+    # @see https://ruby-doc.org/core/Enumerable.html#method-i-find
+    def find(*args, &block)
+      if block_given?
+        _enumerable_find(*args, &block)
+      else
+        _findable_find(*args)
+      end
     end
 
     # Needed to properly get a criteria back as json

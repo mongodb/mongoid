@@ -786,7 +786,7 @@ describe Mongoid::Criteria do
 
   describe "#field_list" do
 
-    context "when using the default discriminator key" do 
+    context "when using the default discriminator key" do
       let(:criteria) do
         Doctor.only(:_id)
       end
@@ -796,12 +796,12 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when using a custom discriminator key" do 
-      before do 
+    context "when using a custom discriminator key" do
+      before do
         Person.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Person.discriminator_key = nil
       end
 
@@ -811,6 +811,46 @@ describe Mongoid::Criteria do
 
       it "returns the fields with type without dkey" do
         expect(criteria.field_list).to eq([ "_id", "_type" ])
+      end
+    end
+  end
+
+  describe "#find" do
+    let!(:depeche) do
+      Band.create!(name: "Depeche Mode")
+    end
+
+    let(:criteria) do
+      Band.where(name: "Depeche Mode")
+    end
+
+    context "when given a block" do
+      it "behaves as Enumerable" do
+        result = criteria.find { |c| c.name == "Depeche Mode" }
+        expect(result).to eq(depeche)
+      end
+    end
+
+    context "when given a Proc and a block" do
+      it "behaves as Enumerable" do
+        result = criteria.find(-> {"default"}) { |c| c.name == "Not Depeche Mode" }
+        expect(result).to eq("default")
+      end
+    end
+
+    context "when given a Proc" do
+      it "behaves as Enumerable" do
+        lambda do
+          criteria.find(-> {"default"})
+        # Proc is not serializable to a BSON type
+        end.should raise_error(BSON::Error::UnserializableClass)
+      end
+    end
+
+    context "when given an id" do
+      it "behaves as Findable" do
+        result = criteria.find(depeche.id)
+        expect(result).to eq(depeche)
       end
     end
   end
@@ -2824,7 +2864,7 @@ describe Mongoid::Criteria do
     end
 
     context "when using inheritance" do
-      context "when using the default discriminator key" do 
+      context "when using the default discriminator key" do
         let(:criteria) do
           Doctor.only(:_id)
         end
@@ -2834,15 +2874,15 @@ describe Mongoid::Criteria do
         end
       end
 
-      context "when setting a custom discriminator key" do 
-        before do 
+      context "when setting a custom discriminator key" do
+        before do
           Person.discriminator_key = "dkey"
         end
 
-        after do 
+        after do
           Person.discriminator_key = nil
         end
-        
+
         let(:criteria) do
           Doctor.only(:_id)
         end
@@ -3429,7 +3469,7 @@ describe Mongoid::Criteria do
   end
 
   describe "#type" do
-    context "when using the default discriminator_key" do 
+    context "when using the default discriminator_key" do
       context "when the type is a string" do
 
         let!(:browser) do
@@ -3461,12 +3501,12 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when using a custom discriminator_key" do 
-      before do 
+    context "when using a custom discriminator_key" do
+      before do
         Canvas.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Canvas.discriminator_key = nil
       end
 
@@ -3916,7 +3956,7 @@ describe Mongoid::Criteria do
   end
 
   describe "#type_selection" do
-    context "when using the default discriminator_key" do 
+    context "when using the default discriminator_key" do
       context "when only one subclass exists" do
 
         let(:criteria) do
@@ -3948,12 +3988,12 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when using a custom discriminator_key" do 
-      before do 
+    context "when using a custom discriminator_key" do
+      before do
         Canvas.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Canvas.discriminator_key = nil
       end
 
@@ -3986,6 +4026,6 @@ describe Mongoid::Criteria do
           expect(selection).to eq({ dkey: { "$in" => [ "Firefox", "Browser" ]}})
         end
       end
-    end    
+    end
   end
 end
