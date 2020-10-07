@@ -16,14 +16,17 @@ autoload :Find, 'find'
 # This class aggregates RSpec results after the test runs.
 class SpecOrganizer
   CLASSIFIERS = [
+    [%r,^mongoid/attribute,, :attributes],
+    [%r,^mongoid/association/[or],, :associations_referenced],
+    [%r,^mongoid/association,, :associations],
     [%r,^mongoid,, :unit],
-    [%r,^mongoid/associations,, :associations],
     [%r,^integration,, :integration],
     [%r,^rails,, :rails],
   ]
 
-  RUN_PRIORITY = %i(unit
-    associations integration rails
+  RUN_PRIORITY = %i(
+    unit attributes associations_referenced associations
+    integration rails
   )
 
   SPEC_ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))

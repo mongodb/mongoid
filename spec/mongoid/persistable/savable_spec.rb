@@ -165,35 +165,35 @@ describe Mongoid::Persistable::Savable do
 
       context "when performing modification and insert ops" do
 
-        let(:person) do
-          Person.create(title: "Blah")
+        let(:owner) do
+          Owner.create(name: "Blah")
         end
 
-        let!(:address) do
-          person.addresses.build(street: "Bond St")
+        let!(:birthday) do
+          owner.birthdays.build(title: "First")
         end
 
-        let!(:name) do
-          person.create_name(first_name: "Tony")
+        let!(:scribe) do
+          owner.create_scribe(name: "Josh")
         end
 
         let(:from_db) do
-          Person.find(person.id)
+          Owner.find(owner.id)
         end
 
         before do
-          person.title = "King"
-          name.first_name = "Ryan"
+          owner.name = "King"
+          scribe.name = "Tosh"
         end
 
         it "persists with proper set and push modifiers" do
-          expect(person.atomic_updates).to eq({
+          expect(owner.atomic_updates).to eq({
             "$set" => {
-              "title" => "King",
-              "name.first_name" => "Ryan"
+              "name" => "King",
+              "scribe.name" => "Tosh"
             },
             "$push"=> {
-              "addresses" => { '$each' => [ { "_id" => address.id, "street" => "Bond St" } ] }
+              "birthdays" => { '$each' => [ { "_id" => birthday.id, "title" => "First" } ] }
             }
           })
         end
@@ -201,15 +201,15 @@ describe Mongoid::Persistable::Savable do
         context "when saving the document" do
 
           it "saves the root document" do
-            expect(person.title).to eq("King")
+            expect(owner.name).to eq("King")
           end
 
           it "saves embedded many relations" do
-            expect(person.addresses.first.street).to eq("Bond St")
+            expect(owner.birthdays.first.title).to eq("First")
           end
 
           it "saves embedded one relations" do
-            expect(person.name.first_name).to eq("Ryan")
+            expect(owner.scribe.name).to eq("Tosh")
           end
         end
       end
