@@ -422,7 +422,7 @@ regular expressions. Of note for Ruby applications, MongoDB uses
 and Ruby uses `Onigmo <https://github.com/k-takata/Onigmo>`_, which is a
 fork of `Oniguruma regular expression engine <https://github.com/kkos/oniguruma>`_.
 The two regular expression implementations generally provide equivalent
-functionality but have some important syntax differences.
+functionality but have several important syntax differences.
 
 When a field is declared to be of type Regexp, Mongoid converts Ruby regular
 expressions to BSON regular expressions and stores the result in MongoDB.
