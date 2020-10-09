@@ -38,7 +38,7 @@ module Mongoid
             end
           end
 
-          module Raw
+          module Raw_
 
             # Is the object a regexp?
             #
@@ -77,5 +77,5 @@ end
 
 ::Regexp.__send__(:include,Mongoid::Criteria::Queryable::Extensions::Regexp)
 ::Regexp.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Regexp::ClassMethods)
-BSON::Regexp::Raw.__send__(:include,Mongoid::Criteria::Queryable::Extensions::Regexp::Raw)
-BSON::Regexp::Raw.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Regexp::Raw::ClassMethods)
+BSON::Regexp::Raw.__send__(:include,Mongoid::Criteria::Queryable::Extensions::Regexp::Raw_)
+BSON::Regexp::Raw.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Regexp::Raw_::ClassMethods)
