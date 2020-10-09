@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Criteria::Queryable::Extensions::Regexp::Raw do
+describe Mongoid::Criteria::Queryable::Extensions::Regexp::Raw_ do
 
   describe ".evolve" do
 
