@@ -2,5 +2,5 @@
 # encoding: utf-8
 
 module Mongoid
-  VERSION = "7.1.1"
+  VERSION = "7.2.0.rc1"
 end
