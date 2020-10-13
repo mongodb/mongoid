@@ -7,6 +7,9 @@ require "rspec/core/rake_task"
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
 
+tasks = Rake.application.instance_variable_get('@tasks')
+tasks['release:do'] = tasks.delete('release')
+
 task :gem => :build
 task :build do
   system "gem build mongoid.gemspec"
@@ -45,3 +48,13 @@ namespace :docs do
     system "yardoc -o #{out} --title mongoid-#{Mongoid::VERSION}"
   end
 end
+
+namespace :release do
+  task :check_private_key do
+    unless File.exist?('gem-private_key.pem')
+      raise "No private key present, cannot release"
+    end
+  end
+end
+
+task :release => ['release:check_private_key', 'release:do']
