@@ -137,6 +137,10 @@ module Mongoid
         _target.public_send(name, *args, &block)
       end
 
+      def respond_to_missing?(name, *args)
+        _target.respond_to?(name)
+      end
+
       # When the base document illegally references an embedded document this
       # error will get raised.
       #

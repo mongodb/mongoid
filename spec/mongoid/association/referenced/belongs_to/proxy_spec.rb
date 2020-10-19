@@ -131,6 +131,11 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           it "does not expose private methods" do
             expect { game.person.secret_name }.to raise_error(NoMethodError)
           end
+
+          it "properly exposes delegated methods visibility" do
+            expect(defined?(game.person.id)).to eq("method")
+            expect(defined?(game.person.secret_name)).to be_nil
+          end
         end
 
         context "when the child is not a new record" do
