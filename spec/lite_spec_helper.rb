@@ -2,6 +2,7 @@
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "shared", "lib"))
 
 require "mongoid"
 
@@ -12,6 +13,7 @@ require "mongoid"
 require 'pp'
 
 require 'support/spec_config'
+require 'mrss/lite_constraints'
 require "support/session_registry"
 
 unless SpecConfig.instance.ci?
@@ -61,6 +63,8 @@ RSpec.configure do |config|
       end
     end
   end
+
+  config.extend(Mrss::LiteConstraints)
 end
 
 # require all shared examples
