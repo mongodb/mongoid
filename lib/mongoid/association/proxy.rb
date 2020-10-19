@@ -134,7 +134,7 @@ module Mongoid
       # @param [ Array ] args The arguments passed to the method.
       #
       def method_missing(name, *args, &block)
-        _target.send(name, *args, &block)
+        _target.public_send(name, *args, &block)
       end
 
       # When the base document illegally references an embedded document this

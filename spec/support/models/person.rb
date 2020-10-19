@@ -208,6 +208,12 @@ class Person
   reset_callbacks(:create)
   reset_callbacks(:save)
   reset_callbacks(:destroy)
+
+  private
+
+  def secret_name
+    "secret"
+  end
 end
 
 require "support/models/doctor"
