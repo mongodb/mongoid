@@ -35,6 +35,7 @@ require 'support/helpers'
 require 'support/macros'
 require 'support/cluster_config'
 require 'support/constraints'
+require 'mrss/constraints'
 
 # Give MongoDB servers time to start up in CI environments
 if SpecConfig.instance.ci?
@@ -128,6 +129,7 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
   config.include(Helpers)
   config.include(Mongoid::Expectations)
+  config.extend(Mrss::Constraints)
   config.extend(Constraints)
   config.extend(Mongoid::Macros)
 
