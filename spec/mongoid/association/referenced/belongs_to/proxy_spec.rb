@@ -127,6 +127,10 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           it "does not save the target" do
             expect(person).to_not be_persisted
           end
+
+          it "does not expose private methods" do
+            expect { game.person.secret_name }.to raise_error(NoMethodError)
+          end
         end
 
         context "when the child is not a new record" do
