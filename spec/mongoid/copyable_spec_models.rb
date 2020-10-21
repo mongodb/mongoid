@@ -31,4 +31,18 @@ module CopyableSpec
   class Blurb
     include Mongoid::Document
   end
+
+  # Do not include Attributes::Dynamic
+  class Reg
+    include Mongoid::Document
+
+    field :name, type: String
+  end
+
+  class Dyn
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+
+    field :name, type: String
+  end
 end

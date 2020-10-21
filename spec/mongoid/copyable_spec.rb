@@ -65,30 +65,58 @@ describe Mongoid::Copyable do
 
       context "when a document has fields from a legacy schema" do
 
-        let!(:actor) do
-          Actor.create(name: "test")
+        shared_examples 'behaves as expected' do
+          let!(:instance) do
+            cls.create(name: "test")
+          end
+
+          before do
+            legacy_fields = { "this_is_not_a_field" => 1, "this_legacy_field_is_nil" => nil }
+            cls.collection.find(_id: instance.id).update_one("$set" => legacy_fields)
+          end
+
+          let(:cloned) do
+            instance.reload.send(method)
+          end
+
+          it "sets the legacy attribute" do
+            expect(cloned.attributes['this_is_not_a_field']).to eq(1)
+          end
+
+          it "contains legacy attributes that are nil" do
+            expect(cloned.attributes.key?('this_legacy_field_is_nil')).to eq(true)
+          end
+
+          it "copies the known attributes" do
+            expect(cloned.name).to eq('test')
+          end
+
+          it 'calls constructor with explicitly declared attributes only' do
+            expect(cls).to receive(:new).with('name' => 'test').and_call_original
+            cloned
+          end
         end
 
-        before do
-          legacy_fields = { "this_is_not_a_field" => 1, "this_legacy_field_is_nil" => nil }
-          Actor.collection.find(_id: actor.id).update_one("$set" => legacy_fields)
+        context 'without Attributes::Dynamic' do
+          let(:cls) { CopyableSpec::Reg }
+
+          before do
+            cls.should_not include(Mongoid::Attributes::Dynamic)
+          end
+
+          include_examples 'behaves as expected'
         end
 
-        let(:cloned) do
-          actor.reload.send(method)
+        context 'with Attributes::Dynamic' do
+          let(:cls) { CopyableSpec::Dyn }
+
+          before do
+            cls.should include(Mongoid::Attributes::Dynamic)
+          end
+
+          include_examples 'behaves as expected'
         end
 
-        it "sets the legacy attribute" do
-          expect(cloned.attributes['this_is_not_a_field']).to eq(1)
-        end
-
-        it "contains legacy attributes that are nil" do
-          expect(cloned.attributes.key?('this_legacy_field_is_nil')).to eq(true)
-        end
-
-        it "copies the known attributes" do
-          expect(cloned.name).to eq('test')
-        end
       end
 
       context "when using store_as" do
