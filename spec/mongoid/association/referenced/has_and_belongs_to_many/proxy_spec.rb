@@ -1937,6 +1937,11 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Proxy do
     context "when appending to a relation in a transaction" do
       require_transaction_support
 
+      before do
+        Meat.collection.drop
+        Meat.collection.create
+      end
+
       let!(:sandwich) do
         Sandwich.create!
       end

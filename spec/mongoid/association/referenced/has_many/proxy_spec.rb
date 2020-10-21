@@ -1597,6 +1597,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
     context "when appending to a association in a transaction" do
       require_transaction_support
 
+      before do
+        Rating.collection.drop
+        Rating.collection.create
+      end
+
       let!(:movie) do
         Movie.create!
       end
