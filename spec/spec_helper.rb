@@ -145,7 +145,7 @@ RSpec.configure do |config|
       Mongoid.default_client.reconnect
     end
     Mongoid.default_client.collections.each do |coll|
-      coll.delete_many
+      coll.drop
     end
   end
 end
