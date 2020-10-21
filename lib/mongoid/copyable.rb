@@ -23,9 +23,11 @@ module Mongoid
       # elsewhere.
       attrs = clone_document.except("_id", "id")
       dynamic_attrs = {}
+      _attribute_names = self.attribute_names
       attrs.reject! do |attr_name, value|
-        unless self.attribute_names.include?(attr_name)
+        unless _attribute_names.include?(attr_name)
           dynamic_attrs[attr_name] = value
+          true
         end
       end
       self.class.new(attrs).tap do |object|
