@@ -145,7 +145,14 @@ RSpec.configure do |config|
       Mongoid.default_client.reconnect
     end
     Mongoid.default_client.collections.each do |coll|
-      coll.drop
+      if ClusterConfig.instance.short_server_version == '2.6'
+        # 2.6 server for some reason fails with:
+        # collection dropped between getMore calls (17356)
+        # ... when listing collections.
+        coll.drop
+      else
+        coll.delete_many
+      end
     end
   end
 end
