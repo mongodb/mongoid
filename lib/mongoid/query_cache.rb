@@ -164,10 +164,12 @@ module Mongoid
 
       def process(result)
         documents = super
-if @cursor_id.zero? && !@after_first_batch
+
+        if @cursor_id.zero? && !@after_first_batch
           @cached_documents ||= []
           @cached_documents.concat(documents)
         end
+
         @after_first_batch = true
         documents
       end
@@ -226,15 +228,18 @@ if @cursor_id.zero? && !@after_first_batch
         else
           @cursor = nil
           unless @cursor = cached_cursor
-            session = client.send(:get_session, @options)
-            read_with_retry(session, server_selector) do |server|
-              result = send_initial_query(server, session)
-              
-              if result.cursor_id == 0 || result.cursor_id.nil?
-                @cursor = CachedCursor.new(view, result, server, session: session)
-                QueryCache.cache_table[cache_key] = @cursor
-              else
-                @cursor = Mongo::Cursor.new(view, result, server, session: session)
+
+            if driver_supports_cursor_sessions?
+              session = client.send(:get_session, @options)
+              read_with_retry(session, server_selector) do |server|
+                result = send_initial_query(server, session)
+                @cursor = cursor(result, server, session)
+              end
+            else
+              read_with_retry do
+                server = server_selector.select_server(cluster)
+                result = send_initial_query(server)
+                @cursor = cursor(result, server)
               end
             end
           end
@@ -265,12 +270,38 @@ if @cursor_id.zero? && !@after_first_batch
         cursor || QueryCache.cache_table[cache_key]
       end
 
+      def cursor(result, server, session = nil)
+        if result.cursor_id == 0 || result.cursor_id.nil?
+          cursor = if session
+            CachedCursor.new(view, result, server, session: session)
+          else
+            CachedCursor.new(view, result, server)
+          end
+
+          QueryCache.cache_table[cache_key] = cursor
+        else
+          cursor = if session
+            Mongo::Cursor.new(view, result, server, session: session)
+          else
+            Mongo::Cursor.new(view, result, server)
+          end
+        end
+
+        cursor
+      end
+
       def cache_key
         [ collection.namespace, selector, limit, skip, sort, projection, collation ]
       end
 
       def system_collection?
         collection.namespace =~ /\Asystem./
+      end
+
+      def driver_supports_cursor_sessions?
+        # Driver versions 2.9 and newer support passing in a session to the
+        # cursor object.
+        (Mongo::VERSION.split('.').map(&:to_i) <=> [2, 9, 0]) > 0
       end
     end
 
