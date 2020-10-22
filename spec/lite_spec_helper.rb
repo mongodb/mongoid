@@ -15,6 +15,8 @@ require "mongo"
 # https://github.com/jruby/jruby/issues/5599
 require 'pp'
 
+autoload :Timecop, 'timecop'
+
 require 'support/spec_config'
 require 'mrss/lite_constraints'
 require "support/session_registry"

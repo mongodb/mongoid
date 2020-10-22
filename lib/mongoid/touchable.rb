@@ -30,11 +30,30 @@ module Mongoid
         write_attribute(:updated_at, current) if respond_to?("updated_at=")
         write_attribute(field, current) if field
 
-        touches = touch_atomic_updates(field)
-        unless touches["$set"].blank?
-          selector = atomic_selector
-          _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
+        # If the document being touched is embedded, touch its parents
+        # all the way through the composition hierarchy to the root object,
+        # because when an embedded document is changed the write is actually
+        # performed by the composition root. See MONGOID-3468.
+        if _parent
+          # This will persist updated_at on this document as well as parents.
+          # TODO support passing the field name to the parent's touch method;
+          # I believe it should be read out of
+          # _association.inverse_association.options but inverse_association
+          # seems to not always/ever be set here. See MONGOID-5014.
+          _parent.touch
+        else
+          # If the current document is not embedded, it is composition root
+          # and we need to persist the write here.
+          touches = touch_atomic_updates(field)
+          unless touches["$set"].blank?
+            selector = atomic_selector
+            _root.collection.find(selector).update_one(positionally(selector, touches), session: _session)
+          end
         end
+
+        # Callbacks are invoked on the composition root first and on the
+        # leaf-most embedded document last.
+        # TODO add tests, see MONGOID-5015.
         run_callbacks(:touch)
         true
       end

@@ -1082,19 +1082,54 @@ Mongoid to instantiate a new document when the association is accessed and it is
 Touching
 --------
 
-Any ``belongs_to`` association, no matter where it hangs off from, can take an optional ``:touch``
-option which will call the touch method on it and any parent associations with the option defined
-when the base document calls ``#touch``.
+Any ``belongs_to`` association can take an optional ``:touch`` option which
+will cause the parent document be touched whenever the child document is
+touched:
 
 .. code-block:: ruby
 
-   class Band
-     include Mongoid::Document
-     belongs_to :label, touch: true
-   end
+  class Band
+    include Mongoid::Document
+    belongs_to :label, touch: true
+  end
 
-   band = Band.first
-   band.touch # Calls touch on the parent label.
+  band = Band.first
+  band.touch # Calls touch on the parent label.
+
+``:touch`` can also take a string or symbol argument specifying a field to
+be touched on the parent association in addition to updated_at:
+
+.. code-block:: ruby
+
+  class Label
+    include Mongoid::Document
+    include Mongoid::Timestamps
+    field :bands_updated_at, type: Time
+    has_many :bands
+  end
+
+  class Band
+    include Mongoid::Document
+    belongs_to :label, touch: :bands_updated_at
+  end
+  
+  label = Label.create!
+  band = Band.create!(label: label)
+
+  band.touch # Updates updated_at and bands_updated_at on the label.
+
+When an embedded document is touched, its parents are recursively touched
+through the composition root (because all of the parents are necessarily saved
+when the embedded document is saved). The ``:touch`` attribute therefore is
+unnecessary on ``embedded_in`` associations.
+
+Mongoid currently `does not support specifying an additional field to be
+touched on an embedded_in association <https://jira.mongodb.org/browse/MONGOID-5014>`_.
+
+``:touch`` should not be set to ``false`` on an ``embedded_in`` association,
+since composition hierarchy is always updated upon a touch of an embedded
+document. This is currently not enforced but enforcement is `intended in the
+future <https://jira.mongodb.org/browse/MONGOID-5016>`_.
 
 The counter_cache Option
 ------------------------

@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require "spec_helper"
+require_relative './touchable_spec_models'
 
 describe Mongoid::Touchable do
 
@@ -9,7 +10,7 @@ describe Mongoid::Touchable do
 
     context "when the document has no associations" do
       let(:updatable) do
-        Updatable.create
+        Updatable.create!
       end
 
       it "responds to #touch" do
@@ -28,30 +29,117 @@ describe Mongoid::Touchable do
       end
     end
 
-    context "when the document is embedded" do
+    context 'when the document has a parent association' do
 
-      before do
-        Label.send(:include, Mongoid::Touchable::InstanceMethods)
+      let(:building) do
+        parent_cls.create!
       end
 
-      let(:band) do
-        Band.create(name: "Placebo")
+      let(:entrance) do
+        building.entrances.create!
       end
 
-      let(:label) do
-        band.create_label(name: "Mute", updated_at: 10.days.ago)
+      let(:floor) do
+        building.floors.create!
       end
 
-      before do
-        label.touch
+      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
+
+      let(:update_time) do
+        Timecop.freeze(Time.at(Time.now.to_i) + 2)
       end
 
-      it "updates the updated_at timestamp" do
-        expect(label.updated_at).to be_within(1).of(Time.now)
+      after do
+        Timecop.return
       end
 
-      it "persists the changes" do
-        expect(label.reload.updated_at).to be_within(1).of(Time.now)
+      shared_examples 'updates the child' do
+        it "updates the updated_at timestamp" do
+          entrance
+          update_time
+          entrance.touch
+
+          entrance.updated_at.should == update_time
+        end
+
+        it "persists the changes" do
+          entrance
+          update_time
+          entrance.touch
+
+          entrance.reload.updated_at.should == update_time
+        end
+      end
+
+      shared_examples 'updates the parent when :touch is true' do
+
+        it 'updates updated_at on parent' do
+          floor
+          update_time
+          floor.touch
+
+          building.updated_at.should == update_time
+        end
+
+        it 'persists updated updated_at on parent' do
+          floor
+          update_time
+          floor.touch
+
+          building.reload.updated_at.should == update_time
+        end
+      end
+
+      shared_examples 'updates the parent when :touch is not set' do
+        it 'does not update updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.updated_at.should == update_time
+        end
+
+        it 'does not persist updated updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.reload.updated_at.should == update_time
+        end
+      end
+
+      shared_examples 'does not update the parent when :touch is not set' do
+        it 'does not update updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.updated_at.should == start_time
+        end
+
+        it 'does not persist updated updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.reload.updated_at.should == start_time
+        end
+      end
+
+      context "when the document is embedded" do
+        let(:parent_cls) { TouchableSpec::Embedded::Building }
+
+        include_examples 'updates the child'
+        include_examples 'updates the parent when :touch is true'
+        include_examples 'updates the parent when :touch is not set'
+      end
+
+      context "when the document is referenced" do
+        let(:parent_cls) { TouchableSpec::Referenced::Building }
+
+        include_examples 'updates the child'
+        include_examples 'updates the parent when :touch is true'
+        include_examples 'does not update the parent when :touch is not set'
       end
     end
 
@@ -415,11 +503,11 @@ describe Mongoid::Touchable do
       context "when modifying the child" do
 
         let!(:agency) do
-          Agency.create
+          Agency.create!
         end
 
         let!(:agent) do
-          agency.agents.create(number: '1')
+          agency.agents.create!(number: '1')
         end
 
         it "updates the parent's updated at" do
