@@ -29,7 +29,7 @@ describe Mongoid::Touchable do
       end
     end
 
-    shared_examples 'updates child always and parent only when :touch is true' do
+    context 'when the document has a parent association' do
 
       let(:building) do
         parent_cls.create!
@@ -53,23 +53,26 @@ describe Mongoid::Touchable do
         Timecop.return
       end
 
-      it "updates the updated_at timestamp" do
-        entrance
-        update_time
-        entrance.touch
+      shared_examples 'updates the child' do
+        it "updates the updated_at timestamp" do
+          entrance
+          update_time
+          entrance.touch
 
-        entrance.updated_at.should == update_time
+          entrance.updated_at.should == update_time
+        end
+
+        it "persists the changes" do
+          entrance
+          update_time
+          entrance.touch
+
+          entrance.reload.updated_at.should == update_time
+        end
       end
 
-      it "persists the changes" do
-        entrance
-        update_time
-        entrance.touch
+      shared_examples 'updates the parent when :touch is true' do
 
-        entrance.reload.updated_at.should == update_time
-      end
-
-      context 'when association has touch: true' do
         it 'updates updated_at on parent' do
           floor
           update_time
@@ -87,7 +90,25 @@ describe Mongoid::Touchable do
         end
       end
 
-      context 'when association does not have touch: true' do
+      shared_examples 'updates the parent when :touch is not set' do
+        it 'does not update updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.updated_at.should == update_time
+        end
+
+        it 'does not persist updated updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.reload.updated_at.should == update_time
+        end
+      end
+
+      shared_examples 'does not update the parent when :touch is not set' do
         it 'does not update updated_at on parent' do
           entrance
           update_time
@@ -104,18 +125,20 @@ describe Mongoid::Touchable do
           building.reload.updated_at.should == start_time
         end
       end
-    end
 
-    context "when the document is embedded" do
-      let(:parent_cls) { TouchableSpec::Embedded::Building }
+      context "when the document is embedded" do
+        let(:parent_cls) { TouchableSpec::Embedded::Building }
 
-      include_examples 'updates child always and parent only when :touch is true'
-    end
+        include_examples 'updates the child'
+        include_examples 'updates the parent when :touch is not set'
+      end
 
-    context "when the document is referenced" do
-      let(:parent_cls) { TouchableSpec::Referenced::Building }
+      context "when the document is referenced" do
+        let(:parent_cls) { TouchableSpec::Referenced::Building }
 
-      include_examples 'updates child always and parent only when :touch is true'
+        include_examples 'updates the child'
+        include_examples 'does not update the parent when :touch is not set'
+      end
     end
 
     context "when no relations have touch options" do

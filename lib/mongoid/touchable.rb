@@ -36,6 +36,10 @@ module Mongoid
         # performed by the composition root. See MONGOID-3468.
         if _parent
           # This will persist updated_at on this document as well as parents.
+          # TODO support passing the field name to the parent's touch method;
+          # I believe it should be read out of
+          # _association.inverse_association.options but inverse_association
+          # seems to not always/ever be set here. See MONGOID-5014.
           _parent.touch
         else
           # If the current document is not embedded, it is composition root
@@ -49,6 +53,7 @@ module Mongoid
 
         # Callbacks are invoked on the composition root first and on the
         # leaf-most embedded document last.
+        # TODO add tests, see MONGOID-5015.
         run_callbacks(:touch)
         true
       end
