@@ -9,7 +9,7 @@ describe Mongoid::Touchable do
 
     context "when the document has no associations" do
       let(:updatable) do
-        Updatable.create
+        Updatable.create!
       end
 
       it "responds to #touch" do
@@ -30,12 +30,8 @@ describe Mongoid::Touchable do
 
     context "when the document is embedded" do
 
-      before do
-        Label.send(:include, Mongoid::Touchable::InstanceMethods)
-      end
-
       let(:band) do
-        Band.create(name: "Placebo")
+        Band.create!(name: "Placebo")
       end
 
       let(:label) do
@@ -43,15 +39,31 @@ describe Mongoid::Touchable do
       end
 
       before do
-        label.touch
+        Timecop.freeze
+      end
+
+      let(:update_time) do
+        Timecop.freeze(Time.at(Time.now.to_i) + 2)
+      end
+
+      after do
+        Timecop.return
       end
 
       it "updates the updated_at timestamp" do
-        expect(label.updated_at).to be_within(1).of(Time.now)
+        label
+        update_time
+        label.touch
+
+        label.updated_at.should == update_time
       end
 
       it "persists the changes" do
-        expect(label.reload.updated_at).to be_within(1).of(Time.now)
+        label
+        update_time
+        label.touch
+
+        label.reload.updated_at.should == update_time
       end
     end
 
@@ -415,11 +427,11 @@ describe Mongoid::Touchable do
       context "when modifying the child" do
 
         let!(:agency) do
-          Agency.create
+          Agency.create!
         end
 
         let!(:agent) do
-          agency.agents.create(number: '1')
+          agency.agents.create!(number: '1')
         end
 
         it "updates the parent's updated at" do
