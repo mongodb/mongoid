@@ -130,6 +130,7 @@ describe Mongoid::Touchable do
         let(:parent_cls) { TouchableSpec::Embedded::Building }
 
         include_examples 'updates the child'
+        include_examples 'updates the parent when :touch is true'
         include_examples 'updates the parent when :touch is not set'
       end
 
@@ -137,6 +138,7 @@ describe Mongoid::Touchable do
         let(:parent_cls) { TouchableSpec::Referenced::Building }
 
         include_examples 'updates the child'
+        include_examples 'updates the parent when :touch is true'
         include_examples 'does not update the parent when :touch is not set'
       end
     end
