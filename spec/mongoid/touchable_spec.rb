@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require "spec_helper"
+require_relative './touchable_spec_models'
 
 describe Mongoid::Touchable do
 
@@ -28,19 +29,21 @@ describe Mongoid::Touchable do
       end
     end
 
-    context "when the document is embedded" do
+    shared_examples 'updates child always and parent only when :touch is true' do
 
-      let(:band) do
-        Band.create!(name: "Placebo")
+      let(:building) do
+        parent_cls.create!
       end
 
-      let(:label) do
-        band.create_label(name: "Mute", updated_at: 10.days.ago)
+      let(:entrance) do
+        building.entrances.create!
       end
 
-      before do
-        Timecop.freeze
+      let(:floor) do
+        building.floors.create!
       end
+
+      let!(:start_time) { Timecop.freeze(Time.at(Time.now.to_i)) }
 
       let(:update_time) do
         Timecop.freeze(Time.at(Time.now.to_i) + 2)
@@ -51,20 +54,68 @@ describe Mongoid::Touchable do
       end
 
       it "updates the updated_at timestamp" do
-        label
+        entrance
         update_time
-        label.touch
+        entrance.touch
 
-        label.updated_at.should == update_time
+        entrance.updated_at.should == update_time
       end
 
       it "persists the changes" do
-        label
+        entrance
         update_time
-        label.touch
+        entrance.touch
 
-        label.reload.updated_at.should == update_time
+        entrance.reload.updated_at.should == update_time
       end
+
+      context 'when association has touch: true' do
+        it 'updates updated_at on parent' do
+          floor
+          update_time
+          floor.touch
+
+          building.updated_at.should == update_time
+        end
+
+        it 'persists updated updated_at on parent' do
+          floor
+          update_time
+          floor.touch
+
+          building.reload.updated_at.should == update_time
+        end
+      end
+
+      context 'when association does not have touch: true' do
+        it 'does not update updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.updated_at.should == start_time
+        end
+
+        it 'does not persist updated updated_at on parent' do
+          entrance
+          update_time
+          entrance.touch
+
+          building.reload.updated_at.should == start_time
+        end
+      end
+    end
+
+    context "when the document is embedded" do
+      let(:parent_cls) { TouchableSpec::Embedded::Building }
+
+      include_examples 'updates child always and parent only when :touch is true'
+    end
+
+    context "when the document is referenced" do
+      let(:parent_cls) { TouchableSpec::Referenced::Building }
+
+      include_examples 'updates child always and parent only when :touch is true'
     end
 
     context "when no relations have touch options" do
