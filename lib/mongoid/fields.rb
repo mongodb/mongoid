@@ -30,6 +30,7 @@ module Mongoid
       regexp: Regexp,
       set: Set,
       string: String,
+      stringified_symbol: Mongoid::Extensions::StringifiedSymbol,
       symbol: Symbol,
       time: Time
     }.with_indifferent_access
@@ -573,6 +574,8 @@ module Mongoid
       def unmapped_type(options)
         if "Boolean" == options[:type].to_s
           Mongoid::Boolean
+        elsif "StringifiedSymbol" == options[:type].to_s
+          Mongoid::Extensions::StringifiedSymbol
         else
           options[:type] || Object
         end
