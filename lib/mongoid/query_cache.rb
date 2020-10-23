@@ -233,13 +233,13 @@ module Mongoid
               session = client.send(:get_session, @options)
               read_with_retry(session, server_selector) do |server|
                 result = send_initial_query(server, session)
-                @cursor = cursor(result, server, session)
+                @cursor = get_cursor(result, server, session)
               end
             else
               read_with_retry do
                 server = server_selector.select_server(cluster)
                 result = send_initial_query(server)
-                @cursor = cursor(result, server)
+                @cursor = get_cursor(result, server)
               end
             end
           end
@@ -270,7 +270,7 @@ module Mongoid
         cursor || QueryCache.cache_table[cache_key]
       end
 
-      def cursor(result, server, session = nil)
+      def get_cursor(result, server, session = nil)
         if result.cursor_id == 0 || result.cursor_id.nil?
           cursor = if session
             CachedCursor.new(view, result, server, session: session)

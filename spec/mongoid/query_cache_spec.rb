@@ -557,7 +557,7 @@ describe Mongoid::QueryCache do
       Mongoid::QueryCache.enabled = true
       10.times { Band.create! }
 
-      Band.batch_size(4).all
+      Band.batch_size(4).all.to_a
     end
 
     it 'does not cache the result' do
