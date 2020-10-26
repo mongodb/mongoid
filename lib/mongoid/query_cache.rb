@@ -163,14 +163,13 @@ module Mongoid
       private
 
       def process(result)
-        @remaining -= result.returned_count if limited?
-        @cursor_id = result.cursor_id
-        @coll_name ||= result.namespace.sub("#{database.name}.", '') if result.namespace
-        documents = result.documents
+        documents = super
+
         if @cursor_id.zero? && !@after_first_batch
           @cached_documents ||= []
           @cached_documents.concat(documents)
         end
+
         @after_first_batch = true
         documents
       end
@@ -224,34 +223,39 @@ module Mongoid
       #
       # @since 5.0.0
       def each
-        if system_collection? || !QueryCache.enabled?
+        if system_collection? || !QueryCache.enabled? || (respond_to?(:write?, true) && write?)
           super
         else
-          unless cursor = cached_cursor
-            read_with_retry do
-              server = server_selector.select_server(cluster)
-              result = send_initial_query(server)
-              if result.cursor_id == 0 || result.cursor_id.nil?
-                cursor = CachedCursor.new(view, result, server)
-                QueryCache.cache_table[cache_key] = cursor
-              else
-                cursor = Mongo::Cursor.new(view, result, server)
+          @cursor = nil
+          unless @cursor = cached_cursor
+
+            if driver_supports_cursor_sessions?
+              session = client.send(:get_session, @options)
+              read_with_retry(session, server_selector) do |server|
+                result = send_initial_query(server, session)
+                @cursor = get_cursor(result, server, session)
+              end
+            else
+              read_with_retry do
+                server = server_selector.select_server(cluster)
+                result = send_initial_query(server)
+                @cursor = get_cursor(result, server)
               end
             end
           end
 
           if block_given?
             if limit && limit != -1
-              cursor.to_a[0...limit].each do |doc|
+              @cursor.to_a[0...limit].each do |doc|
                 yield doc
               end
             else
-              cursor.each do |doc|
+              @cursor.each do |doc|
                 yield doc
               end
             end
           else
-            cursor
+            @cursor.to_enum
           end
         end
       end
@@ -266,12 +270,38 @@ module Mongoid
         cursor || QueryCache.cache_table[cache_key]
       end
 
+      def get_cursor(result, server, session = nil)
+        if result.cursor_id == 0 || result.cursor_id.nil?
+          cursor = if session
+            CachedCursor.new(view, result, server, session: session)
+          else
+            CachedCursor.new(view, result, server)
+          end
+
+          QueryCache.cache_table[cache_key] = cursor
+        else
+          cursor = if session
+            Mongo::Cursor.new(view, result, server, session: session)
+          else
+            Mongo::Cursor.new(view, result, server)
+          end
+        end
+
+        cursor
+      end
+
       def cache_key
         [ collection.namespace, selector, limit, skip, sort, projection, collation ]
       end
 
       def system_collection?
         collection.namespace =~ /\Asystem./
+      end
+
+      def driver_supports_cursor_sessions?
+        # Driver versions 2.9 and newer support passing in a session to the
+        # cursor object.
+        (Mongo::VERSION.split('.').map(&:to_i) <=> [2, 9, 0]) > 0
       end
     end
 
