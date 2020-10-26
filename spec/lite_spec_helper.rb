@@ -12,6 +12,7 @@ require "mongoid"
 require 'pp'
 
 require 'support/spec_config'
+require "support/session_registry"
 
 unless SpecConfig.instance.ci?
   begin
