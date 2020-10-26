@@ -21,6 +21,14 @@ describe Mongoid::Extensions::StringifiedSymbol do
       end
     end
 
+    context "when the object is a BSON Symbol" do
+
+      it "returns a symbol" do
+        expect(Mongoid::Extensions::StringifiedSymbol.demongoize(BSON::Symbol::Raw.new(:test))).to eq(:test)
+      end
+    end
+
+
     context "when the object cannot be converted" do
 
       it "returns nil" do

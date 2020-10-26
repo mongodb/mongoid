@@ -1,11 +1,12 @@
 require "spec_helper"
 
 describe "StringifiedSymbol fields" do
-  context "when querying the database" do
 
   before do
     StringifiedSymbol.destroy_all
   end
+
+  context "when querying the database" do
 
     let!(:document) do
       StringifiedSymbol.create(stringified_symbol: :test)
@@ -48,11 +49,15 @@ describe "StringifiedSymbol fields" do
   end
 
   let(:find_events) do
-    find_events = subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
+    subscriber.started_events.select { |event| event.command_name.to_s == 'find' }
   end
 
   let(:insert_events) do
-    insert_events = subscriber.started_events.select { |event| event.command_name.to_s == 'insert' }
+    subscriber.started_events.select { |event| event.command_name.to_s == 'insert' }
+  end
+
+  let(:update_events) do
+    subscriber.started_events.select { |event| event.command_name.to_s == 'update' }
   end
 
   before do
@@ -64,15 +69,11 @@ describe "StringifiedSymbol fields" do
   end
 
   let!(:document1) do
-    StringifiedSymbol.with(client: :other) do |klass|
-      klass.create(stringified_symbol: :test)
-    end
+    StringifiedSymbol.create(stringified_symbol: :test)
   end
 
   let!(:document2) do
-    StringifiedSymbol.with(client: :other) do |klass|
-      klass.where(query).first
-    end
+    StringifiedSymbol.where(query).first
   end
 
   context "when inserting document" do
@@ -89,6 +90,26 @@ describe "StringifiedSymbol fields" do
     it "receives the value as a symbol" do
       event = find_events.first
       expect(document2.stringified_symbol).to eq(:test)
+    end
+  end
+
+  context "when reading a BSON Symbol field" do
+
+    before do
+      client = Mongoid::Clients.with_name(:other)
+      client["stringified_symbols"].insert_one(stringified_symbol: BSON::Symbol::Raw.new("test"), _id: 12)
+    end
+
+    it "receives the value as a symbol" do
+      expect(StringifiedSymbol.find(12).stringified_symbol).to eq(:test)
+    end
+
+    it "saves the value as a string" do
+      ss = StringifiedSymbol.find(12)
+      ss.stringified_symbol = :other
+      ss.save
+      event = update_events.first
+      expect(event.command["updates"].first["u"]["$set"]["stringified_symbol"]).to eq("other")
     end
   end
 end
