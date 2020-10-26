@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe "StringifiedSymbol fields" do
-  context 'when querying the database' do
+  context "when querying the database" do
 
   before do
     StringifiedSymbol.destroy_all
@@ -38,6 +38,7 @@ describe "StringifiedSymbol fields" do
     Mongoid::Config.send(:clients=, CONFIG[:clients])
     Mongoid::Clients.with_name(:other).subscribe(Mongo::Monitoring::COMMAND, EventSubscriber.new)
   end
+
   let(:subscriber) do
     client = Mongoid::Clients.with_name(:other)
     monitoring = client.send(:monitoring)
@@ -74,18 +75,18 @@ describe "StringifiedSymbol fields" do
     end
   end
 
-  context 'when inserting document' do
+  context "when inserting document" do
 
-    it 'sends the value as a string' do
+    it "sends the value as a string" do
       event = insert_events.first
       doc = event.command["documents"].first
       expect(doc["stringified_symbol"]).to eq("test")
     end
   end
 
-  context 'when finding document' do
+  context "when finding document" do
 
-    it 'receives the value as a symbol' do
+    it "receives the value as a symbol" do
       event = find_events.first
       expect(document2.stringified_symbol).to eq(:test)
     end

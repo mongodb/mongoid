@@ -70,8 +70,16 @@ describe Mongoid::Extensions::StringifiedSymbol do
   describe ".mongoize" do
 
     context "when the object is not a symbol" do
-      it "returns the symbol" do
+
+      it "returns the object" do
         expect(Mongoid::Extensions::StringifiedSymbol.mongoize("test")).to eq("test")
+      end
+    end
+
+    context "when the object is a symbol" do
+
+      it "returns a string" do
+        expect(Mongoid::Extensions::StringifiedSymbol.mongoize(:test)).to eq("test")
       end
     end
 
@@ -84,6 +92,7 @@ describe Mongoid::Extensions::StringifiedSymbol do
   end
 
   describe "#mongoize" do
+
     it "returns self" do
       expect(:test.mongoize).to eq(:test)
     end
