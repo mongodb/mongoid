@@ -13,6 +13,8 @@ Getting Started (Rails)
 New Application
 ===============
 
+Testing testing
+
 This section shows how to create a new Ruby on Rails application using Mongoid
 for data access. The application will be similar to the blog application
 described in the `Ruby on Rails Getting Started
