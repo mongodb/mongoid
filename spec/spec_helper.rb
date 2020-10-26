@@ -38,6 +38,7 @@ require 'support/macros'
 require 'support/spec_config'
 require 'support/cluster_config'
 require 'support/constraints'
+require 'support/session_registry'
 
 # Give MongoDB time to start up on the travis ci environment.
 if (ENV['CI'] == 'travis' || ENV['CI'] == 'evergreen')
