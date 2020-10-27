@@ -3,28 +3,28 @@
 
 require "spec_helper"
 
-describe Mongoid::Extensions::StringifiedSymbol do
+describe Mongoid::StringifiedSymbol do
 
   describe ".demongoize" do
 
     context "when the object is not a symbol" do
 
       it "returns the symbol" do
-        expect(Mongoid::Extensions::StringifiedSymbol.demongoize("test")).to eq(:test)
+        expect(Mongoid::StringifiedSymbol.demongoize("test")).to eq(:test)
       end
     end
 
     context "when the object is a symbol" do
 
       it "returns the symbol" do
-        expect(Mongoid::Extensions::StringifiedSymbol.demongoize(:test)).to eq(:test)
+        expect(Mongoid::StringifiedSymbol.demongoize(:test)).to eq(:test)
       end
     end
 
     context "when the object is a BSON Symbol" do
 
       it "returns a symbol" do
-        expect(Mongoid::Extensions::StringifiedSymbol.demongoize(BSON::Symbol::Raw.new(:test))).to eq(:test)
+        expect(Mongoid::StringifiedSymbol.demongoize(BSON::Symbol::Raw.new(:test))).to eq(:test)
       end
     end
 
@@ -32,14 +32,14 @@ describe Mongoid::Extensions::StringifiedSymbol do
     context "when the object cannot be converted" do
 
       it "returns nil" do
-        expect(Mongoid::Extensions::StringifiedSymbol.demongoize(14)).to be_nil
+        expect(Mongoid::StringifiedSymbol.demongoize(14)).to be_nil
       end
     end
 
     context "when the object is nil" do
 
       it "returns nil" do
-        expect(Mongoid::Extensions::StringifiedSymbol.demongoize(nil)).to be_nil
+        expect(Mongoid::StringifiedSymbol.demongoize(nil)).to be_nil
       end
     end
   end
@@ -80,21 +80,21 @@ describe Mongoid::Extensions::StringifiedSymbol do
     context "when the object is not a symbol" do
 
       it "returns the object" do
-        expect(Mongoid::Extensions::StringifiedSymbol.mongoize("test")).to eq("test")
+        expect(Mongoid::StringifiedSymbol.mongoize("test")).to eq("test")
       end
     end
 
     context "when the object is a symbol" do
 
       it "returns a string" do
-        expect(Mongoid::Extensions::StringifiedSymbol.mongoize(:test)).to eq("test")
+        expect(Mongoid::StringifiedSymbol.mongoize(:test)).to eq("test")
       end
     end
 
     context "when the object is nil" do
 
       it "returns nil" do
-        expect(Mongoid::Extensions::StringifiedSymbol.mongoize(nil)).to be_nil
+        expect(Mongoid::StringifiedSymbol.mongoize(nil)).to be_nil
       end
     end
   end

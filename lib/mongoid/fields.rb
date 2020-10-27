@@ -30,7 +30,7 @@ module Mongoid
       regexp: Regexp,
       set: Set,
       string: String,
-      stringified_symbol: Mongoid::Extensions::StringifiedSymbol,
+      stringified_symbol: Mongoid::StringifiedSymbol,
       symbol: Symbol,
       time: Time
     }.with_indifferent_access
@@ -575,7 +575,7 @@ module Mongoid
         if "Boolean" == options[:type].to_s
           Mongoid::Boolean
         elsif "StringifiedSymbol" == options[:type].to_s
-          Mongoid::Extensions::StringifiedSymbol
+          Mongoid::StringifiedSymbol
         else
           options[:type] || Object
         end

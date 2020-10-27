@@ -9,25 +9,25 @@ describe "StringifiedSymbol fields" do
   context "when querying the database" do
 
     let!(:document) do
-      StringifiedSymbol.create(stringified_symbol: :test)
+      StringifiedSymbol.create(status: :test)
     end
 
     let(:string_query) do
-      {'stringified_symbol' => {'$eq' => 'test'}}
+      {'status' => {'$eq' => 'test'}}
     end
 
     let(:symbol_query) do
-      {'stringified_symbol' => {'$eq' => :test}}
+      {'status' => {'$eq' => :test}}
     end
 
-    it "finds a symbol" do
+    it "can be queried with a string" do
       doc = StringifiedSymbol.where(string_query).first
-      expect(doc.stringified_symbol).to eq(:test)
+      expect(doc.status).to eq(:test)
     end
 
     it "can be queried with a symbol" do
       doc = StringifiedSymbol.where(symbol_query).first
-      expect(doc.stringified_symbol).to eq(:test)
+      expect(doc.status).to eq(:test)
     end
   end
 
@@ -65,11 +65,11 @@ describe "StringifiedSymbol fields" do
   end
 
   let(:query) do
-    {'stringified_symbol' => {'$eq' => 'test'}}
+    {'status' => {'$eq' => 'test'}}
   end
 
   let!(:document1) do
-    StringifiedSymbol.create(stringified_symbol: :test)
+    StringifiedSymbol.create(status: :test)
   end
 
   let!(:document2) do
@@ -81,7 +81,7 @@ describe "StringifiedSymbol fields" do
     it "sends the value as a string" do
       event = insert_events.first
       doc = event.command["documents"].first
-      expect(doc["stringified_symbol"]).to eq("test")
+      expect(doc["status"]).to eq("test")
     end
   end
 
@@ -89,7 +89,7 @@ describe "StringifiedSymbol fields" do
 
     it "receives the value as a symbol" do
       event = find_events.first
-      expect(document2.stringified_symbol).to eq(:test)
+      expect(document2.status).to eq(:test)
     end
   end
 
@@ -97,19 +97,19 @@ describe "StringifiedSymbol fields" do
 
     before do
       client = Mongoid::Clients.with_name(:other)
-      client["stringified_symbols"].insert_one(stringified_symbol: BSON::Symbol::Raw.new("test"), _id: 12)
+      client["stringified_symbols"].insert_one(status: BSON::Symbol::Raw.new("test"), _id: 12)
     end
 
     it "receives the value as a symbol" do
-      expect(StringifiedSymbol.find(12).stringified_symbol).to eq(:test)
+      expect(StringifiedSymbol.find(12).status).to eq(:test)
     end
 
     it "saves the value as a string" do
       ss = StringifiedSymbol.find(12)
-      ss.stringified_symbol = :other
+      ss.status = :other
       ss.save
       event = update_events.first
-      expect(event.command["updates"].first["u"]["$set"]["stringified_symbol"]).to eq("other")
+      expect(event.command["updates"].first["u"]["$set"]["status"]).to eq("other")
     end
   end
 end
