@@ -82,6 +82,14 @@ describe Mongoid::StringifiedSymbol do
       it "returns the object" do
         expect(Mongoid::StringifiedSymbol.mongoize("test")).to eq("test")
       end
+
+      it "returns the string" do
+        expect(Mongoid::StringifiedSymbol.mongoize([0,1,2])).to eq("[0, 1, 2]")
+      end
+
+      it "returns the string" do
+        expect(Mongoid::StringifiedSymbol.mongoize(2)).to eq("2")
+      end
     end
 
     context "when the object is a symbol" do
