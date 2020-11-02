@@ -77,6 +77,7 @@ let(:client) { Order.collection.client }
   context "when inserting document" do
 
     it "sends the value as a string" do
+      Order.create(status: :test)
       event = insert_events.first
       doc = event.command["documents"].first
       expect(doc["status"]).to eq("test")

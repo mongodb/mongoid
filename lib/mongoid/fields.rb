@@ -574,8 +574,6 @@ module Mongoid
       def unmapped_type(options)
         if "Boolean" == options[:type].to_s
           Mongoid::Boolean
-        elsif "StringifiedSymbol" == options[:type].to_s
-          Mongoid::StringifiedSymbol
         else
           options[:type] || Object
         end
