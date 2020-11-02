@@ -18,7 +18,11 @@ module Mongoid
       #
       # @api private
       def demongoize(object)
-        object.try(:to_sym)
+        if object.nil?
+          object
+        else
+          object.to_s.to_sym
+        end
       end
 
       # Turn the object from the ruby type we deal with to a Mongo friendly
@@ -33,7 +37,11 @@ module Mongoid
       #
       # @api private
       def mongoize(object)
-        object.try(:to_s)
+         if object.nil?
+           object
+         else
+           object.to_s
+         end
       end
 
       # @api private

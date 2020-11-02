@@ -9,7 +9,7 @@ describe "StringifiedSymbol fields" do
   context "when querying the database" do
 
     let!(:document) do
-      Order.create(status: :test)
+      Order.create!(status: :test)
     end
 
     let(:string_query) do
@@ -67,7 +67,7 @@ let(:client) { Order.collection.client }
   end
 
   let!(:document1) do
-    Order.create(status: :test)
+    Order.create!(status: :test)
   end
 
   let!(:document2) do
@@ -77,14 +77,14 @@ let(:client) { Order.collection.client }
   context "when inserting document" do
 
     it "sends the value as a string" do
-      Order.create(status: :test)
+      Order.create!(status: :test)
       event = insert_events.first
       doc = event.command["documents"].first
       expect(doc["status"]).to eq("test")
     end
 
     it "sends the value as a string" do
-      Order.create(status: 42)
+      Order.create!(status: 42)
       event = insert_events.second
       doc = event.command["documents"].first
       expect(doc["status"]).to eq("42")
@@ -119,16 +119,42 @@ let(:client) { Order.collection.client }
     it "saves the value as a string" do
       s = Order.find(12)
       s.status = :other
-      s.save
+      s.save!
       event = update_events.first
       expect(event.command["updates"].first["u"]["$set"]["status"]).to eq("other")
+    end
+  end
+
+  context "when value is nil" do
+
+    before do
+      client["orders"].insert_one(status: nil, _id: 15)
+    end
+
+    it "returns nil" do
+      expect(Order.find(15).status).to be_nil
+    end
+  end
+
+  context "when writing nil" do
+
+    before do
+      client["orders"].insert_one(status: "hello", _id: 16)
+    end
+
+    it "saves the value as nil" do
+      s = Order.find(16)
+      s.status = nil
+      s.save!
+      event = update_events.first
+      expect(event.command["updates"].first["u"]["$set"]["status"]).to be_nil
     end
   end
 
   context "when reading an integer" do
 
     before do
-      Order.create(status: 42, _id: 13)
+      client["orders"].insert_one(status: 42, _id: 13)
     end
 
     it "receives the value as a symbol" do
@@ -138,7 +164,7 @@ let(:client) { Order.collection.client }
     it "saves the value as a string" do
       s = Order.find(13)
       s.status = 24
-      s.save
+      s.save!
       event = update_events.first
       expect(event.command["updates"].first["u"]["$set"]["status"]).to eq("24")
     end
@@ -146,17 +172,17 @@ let(:client) { Order.collection.client }
 
   context "when reading an array" do
     before do
-      Order.create(status: [0, 1, 2], _id: 14)
+      client["orders"].insert_one(status: [0, 1, 2], _id: 14)
     end
 
     it "receives the value as a symbol" do
-      expect(Order.find(14).status).to eq(:"[0, 1, 2]")
+      expect(Order.find(14).status).to be(:"[0, 1, 2]")
     end
 
     it "saves the value as a string" do
       s = Order.find(14)
       s.status = [3, 4, 5]
-      s.save
+      s.save!
       event = update_events.first
       expect(event.command["updates"].first["u"]["$set"]["status"]).to eq("[3, 4, 5]")
     end

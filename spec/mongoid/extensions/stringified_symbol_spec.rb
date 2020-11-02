@@ -29,10 +29,10 @@ describe Mongoid::StringifiedSymbol do
     end
 
 
-    context "when the object cannot be converted" do
+    context "when the object is an integer" do
 
-      it "returns nil" do
-        expect(Mongoid::StringifiedSymbol.demongoize(14)).to be_nil
+      it "returns a symbol" do
+        expect(Mongoid::StringifiedSymbol.demongoize(14)).to eq(:"14")
       end
     end
 
