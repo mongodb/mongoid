@@ -180,11 +180,15 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 The StringifiedSymbol Type
 --------------------------
 
-This type allows users to write Ruby code that makes use of the built-in Ruby Symbol type,
-while ensuring interoperability with other drivers. The StringifiedSymbol type stores all data
-on the MongoDB backend as a String, while returning values to the user as a Symbol.
+When using the built-in Symbol field type, Mongoid defaults to serializing the field into the BSON::Symbol
+type. For more information on the BSON::Symbol type, see
+`here <https://docs.mongodb.com/mongoid/master/tutorials/mongoid-documents/#bson-symbol-type>`_.
+BSON::Symbol is deprecated, so the StringifiedSymbol type allows users to write code
+that makes use of the built-in Symbol type while ensuring interoperability with other drivers.
+The StringifiedSymbol type stores all data on the database as a String, while returning values to the
+user as a Symbol.
 
-For example, when setting a field to a string value:
+An example usage is shown below:
 
 .. code-block:: ruby
 
@@ -198,9 +202,12 @@ For example, when setting a field to a string value:
   post.status # => :hello
 
 All values will be stringified upon being sent to the database, and all values will be converted
-to symbols when returned to the user. So, in the above example, setting ``:status`` to ``42``
-would result in ``"42"`` being stored in the database, and ``:"42"``
-being returned to the user.
+to symbols when returned to the user. This includes values that cannot be converted directly to
+symbols, such as integers and arrays.
+
+This type will lazily migrate any BSON::Symbols already stored in the database to BSON::Strings. If
+the user changes their model to use StringifiedSymbol instead of Symbol, the documents will be saved
+with String values instead of the deprecated Symbol type.
 
 
 Updating Container Fields
