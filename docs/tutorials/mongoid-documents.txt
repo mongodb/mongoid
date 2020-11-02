@@ -147,6 +147,7 @@ Below is a list of valid types for fields.
 - ``Regexp``
 - ``Set``
 - ``String``
+- ``StringifiedSymbol``
 - ``Symbol``
 - ``Time``
 - ``TimeWithZone``
@@ -175,6 +176,30 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 - ``Date``
 - ``DateTime``
 - ``Range``
+
+The StringifiedSymbol Type
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This new type allows users to write Ruby code that makes use of the built-in Ruby Symbol type,
+while ensuring interoperability with other drivers. The StringifiedSymbol type stores all data
+on the MongoDB backend as a String, while returning values to the user as a Symbol.
+
+For example, when setting a field to a string value:
+
+.. code-block:: ruby
+
+  class Post
+    include Mongoid::Document
+
+    field :status, type: StringifiedSymbol
+  end
+
+  post = Post.new(status: "hello")
+  post.status # => :hello
+
+All values will be stringified upon being sent to the database, and all values will be converted
+to symbols when returned to the user. So, in the above example, setting :status to 42 would result
+in "42" being stored in the database, and :"42" being returned to the user.
 
 
 Updating Container Fields
