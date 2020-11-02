@@ -178,7 +178,7 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 - ``Range``
 
 The StringifiedSymbol Type
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
 This new type allows users to write Ruby code that makes use of the built-in Ruby Symbol type,
 while ensuring interoperability with other drivers. The StringifiedSymbol type stores all data
