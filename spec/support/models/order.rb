@@ -7,5 +7,5 @@ class Order
 
   # This is a dummy field that verifies the Mongoid::Fields::StringifiedSymbol
   # alias.
-  field :status, type: StringifiedSymbol
+  field :saved_status, type: StringifiedSymbol
 end
