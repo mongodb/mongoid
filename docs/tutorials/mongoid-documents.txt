@@ -180,13 +180,12 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 The StringifiedSymbol Type
 --------------------------
 
-When using the built-in Symbol field type, Mongoid defaults to serializing the field into the BSON::Symbol
-type. For more information on the BSON::Symbol type, see
+When using the built-in ``Symbol`` field type, Mongoid defaults to serializing the field into the ``BSON::Symbol``
+type. For more information on the ``BSON::Symbol`` type, see
 `here <https://docs.mongodb.com/mongoid/master/tutorials/mongoid-documents/#bson-symbol-type>`_.
-BSON::Symbol is deprecated, so the StringifiedSymbol type allows users to write code
-that makes use of the built-in Symbol type while ensuring interoperability with other drivers.
-The StringifiedSymbol type stores all data on the database as a String, while returning values to the
-user as a Symbol.
+``BSON::Symbol`` is deprecated, so the ``StringifiedSymbol`` type allows the use of the built-in ``Symbol``
+type while ensuring interoperability with other drivers. The ``StringifiedSymbol`` type stores all data
+on the database as a ``String``, while returning values to the application as a ``Symbol``.
 
 An example usage is shown below:
 
@@ -198,16 +197,30 @@ An example usage is shown below:
     field :status, type: StringifiedSymbol
   end
 
-  post = Post.new(status: "hello")
+  post = Post.new(status: :hello)
+  # status is stored as "hello" on the database, but returned as a Symbol
   post.status # => :hello
 
 All values will be stringified upon being sent to the database, and all values will be converted
-to symbols when returned to the user. This includes values that cannot be converted directly to
+to symbols when returned to the application. This includes values that cannot be converted directly to
 symbols, such as integers and arrays.
 
-This type will lazily migrate any BSON::Symbols already stored in the database to BSON::Strings. If
-the user changes their model to use StringifiedSymbol instead of Symbol, the documents will be saved
-with String values instead of the deprecated Symbol type.
+For example, setting an integer as ``status``:
+
+.. code-block:: ruby
+
+  class Post
+    include Mongoid::Document
+
+    field :status, type: StringifiedSymbol
+  end
+
+  post = Post.new(status: 42)
+  post.status # => :"42"
+
+This type will perform a lazy migration for any ``BSON::Symbols`` already stored in the database to
+``BSON::Strings``. If the ``StringifiedSymbol`` type is applied to a field that contains ``BSON::Symbol``
+data, the documents will be saved with ``String`` values instead of the deprecated ``Symbol`` type.
 
 
 Updating Container Fields
@@ -741,6 +754,8 @@ For cases when you do not want to have ``BSON::ObjectId`` ids, you can override 
 
 BSON Symbol Type
 ----------------
+
+TODO: ADD IN INFO ABOUT LAZY MIGRATION USING STRINGIFIEDSYMBOL
 
 Because the BSON specification deprecated the BSON symbol type, the `bson` gem will serialize Ruby
 symbols into BSON strings when used on its own. However, in order to maintain backwards
