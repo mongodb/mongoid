@@ -4,8 +4,13 @@ require "bundler"
 require "bundler/gem_tasks"
 Bundler.setup
 
+ROOT = File.expand_path(File.join(File.dirname(__FILE__)))
+
+$: << File.join(ROOT, 'spec/shared/lib')
+
 require "rake"
 require "rspec/core/rake_task"
+require 'mrss/spec_organizer'
 
 $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 require "mongoid/version"
@@ -33,6 +38,32 @@ end
 RSpec::Core::RakeTask.new('spec:progress') do |spec|
   spec.rspec_opts = %w(--format progress)
   spec.pattern = "spec/**/*_spec.rb"
+end
+
+CLASSIFIERS = [
+  [%r,^mongoid/attribute,, :attributes],
+  [%r,^mongoid/association/[or],, :associations_referenced],
+  [%r,^mongoid/association,, :associations],
+  [%r,^mongoid,, :unit],
+  [%r,^integration,, :integration],
+  [%r,^rails,, :rails],
+]
+
+RUN_PRIORITY = %i(
+  unit attributes associations_referenced associations
+  integration rails
+)
+
+def spec_organizer
+  Mrss::SpecOrganizer.new(
+    root: ROOT,
+    classifiers: CLASSIFIERS,
+    priority_order: RUN_PRIORITY,
+  )
+end
+
+task :ci do
+  spec_organizer.run
 end
 
 task :default => :spec
