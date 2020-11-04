@@ -185,7 +185,7 @@ The StringifiedSymbol Type
 The ``StringifiedSymbol`` field type is the recommended field type for storing
 values that should be exposed as symbols to Ruby applications. When using the ``Symbol`` field type,
 Mongoid defaults to storing values as the ``BSON::Symbol`` type. For more information on the
-``BSON::Symbol`` type, see `here <https://docs.mongodb.com/mongoid/master/tutorials/mongoid-documents/#bson-symbol-type>`_.
+``BSON::Symbol`` type, see :ref:`here <bson-symbol>`.
 However, the ``BSON::Symbol`` type is deprecated and is difficult to work with in programming languages
 without native symbol types, so the ``StringifiedSymbol`` type allows the use of symbols
 while ensuring interoperability with other drivers. The ``StringifiedSymbol`` type stores all data
@@ -757,6 +757,8 @@ For cases when you do not want to have ``BSON::ObjectId`` ids, you can override 
      field :name, type: String
      field :_id, type: String, default: ->{ name }
    end
+
+.. _bson-symbol:
 
 BSON Symbol Type
 ----------------
