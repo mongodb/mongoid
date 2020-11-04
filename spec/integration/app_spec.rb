@@ -13,7 +13,7 @@ describe 'Mongoid application tests' do
     end
 
     require 'fileutils'
-    require 'support/child_process_helper'
+    require 'mrss/child_process_helper'
     require 'open-uri'
 
     FileUtils.mkdir_p(TMP_BASE)
@@ -91,19 +91,19 @@ describe 'Mongoid application tests' do
     ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
       context "with rails #{rails_version}" do
         it 'creates' do
-          ChildProcessHelper.check_call(%w(gem uni rails -a))
-          ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+          Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a))
+          Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
 
           Dir.chdir(TMP_BASE) do
             FileUtils.rm_rf('mongoid-test')
-            ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
+            Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
 
             Dir.chdir('mongoid-test') do
               adjust_app_gemfile
-              ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+              Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
 
-              ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
-              ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
+              Mrss::ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
+              Mrss::ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
 
               # https://jira.mongodb.org/browse/MONGOID-4885
               comment_text = File.read('app/models/comment.rb')
@@ -136,7 +136,7 @@ describe 'Mongoid application tests' do
               before do
                 Dir.chdir(APP_PATH) do
                   remove_bundler_req
-                  ChildProcessHelper.check_call(%w(bundle install), env: env)
+                  Mrss::ChildProcessHelper.check_call(%w(bundle install), env: env)
                   write_mongoid_yml
                 end
 
@@ -150,7 +150,7 @@ describe 'Mongoid application tests' do
                 end
                 index.should be nil
 
-                ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
+                Mrss::ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
                   cwd: APP_PATH, env: env)
 
                 index = client['posts'].indexes.detect do |index|
@@ -168,10 +168,10 @@ describe 'Mongoid application tests' do
   def clone_application(repo_url, subdir: nil, rails_version: nil)
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(File.basename(repo_url))
-      ChildProcessHelper.check_call(%w(git clone) + [repo_url])
+      Mrss::ChildProcessHelper.check_call(%w(git clone) + [repo_url])
       Dir.chdir(File.join(*[File.basename(repo_url), subdir].compact)) do
         adjust_app_gemfile(rails_version: rails_version)
-        ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+        Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
         puts `git diff`
 
         write_mongoid_yml
@@ -230,7 +230,7 @@ describe 'Mongoid application tests' do
     # in `initialize': too long unix socket path (126bytes given but 108bytes max) (ArgumentError)
     # Is it trying to create unix sockets in current directory?
     # https://stackoverflow.com/questions/30302021/rails-runner-without-spring
-    ChildProcessHelper.check_call(%w(bin/spring binstub --remove --all), env: clean_env)
+    Mrss::ChildProcessHelper.check_call(%w(bin/spring binstub --remove --all), env: clean_env)
   end
 
   def clean_env
