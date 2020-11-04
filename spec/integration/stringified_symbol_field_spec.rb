@@ -9,25 +9,25 @@ describe "StringifiedSymbol fields" do
   context "when querying the database" do
 
     let!(:document) do
-      Order.create!(status: :test)
+      Order.create!(saved_status: :test)
     end
 
     let(:string_query) do
-      {'status' => {'$eq' => 'test'}}
+      {'saved_status' => {'$eq' => 'test'}}
     end
 
     let(:symbol_query) do
-      {'status' => {'$eq' => :test}}
+      {'saved_status' => {'$eq' => :test}}
     end
 
     it "can be queried with a string" do
       doc = Order.where(string_query).first
-      expect(doc.status).to eq(:test)
+      expect(doc.saved_status).to eq(:test)
     end
 
     it "can be queried with a symbol" do
       doc = Order.where(symbol_query).first
-      expect(doc.status).to eq(:test)
+      expect(doc.saved_status).to eq(:test)
     end
   end
 
@@ -63,11 +63,11 @@ let(:client) { Order.collection.client }
   end
 
   let(:query) do
-    {'status' => {'$eq' => 'test'}}
+    {'saved_status' => {'$eq' => 'test'}}
   end
 
   let!(:document1) do
-    Order.create!(status: :test)
+    Order.create!(saved_status: :test)
   end
 
   let!(:document2) do
@@ -77,24 +77,24 @@ let(:client) { Order.collection.client }
   context "when inserting document" do
 
     it "sends the value as a string" do
-      Order.create!(status: :test)
+      Order.create!(saved_status: :test)
       event = insert_events.first
       doc = event.command["documents"].first
-      expect(doc["status"]).to eq("test")
+      expect(doc["saved_status"]).to eq("test")
     end
 
     it "sends the value as a string" do
-      Order.create!(status: 42)
+      Order.create!(saved_status: 42)
       event = insert_events.second
       doc = event.command["documents"].first
-      expect(doc["status"]).to eq("42")
+      expect(doc["saved_status"]).to eq("42")
     end
 
     it "sends the value as a string" do
-      Order.create(status: [0, 1, 2])
+      Order.create(saved_status: [0, 1, 2])
       event = insert_events.second
       doc = event.command["documents"].first
-      expect(doc["status"]).to eq("[0, 1, 2]")
+      expect(doc["saved_status"]).to eq("[0, 1, 2]")
     end
   end
 
@@ -102,89 +102,89 @@ let(:client) { Order.collection.client }
 
     it "receives the value as a symbol" do
       event = find_events.first
-      expect(document2.status).to eq(:test)
+      expect(document2.saved_status).to eq(:test)
     end
   end
 
   context "when reading a BSON Symbol field" do
 
     before do
-      client["orders"].insert_one(status: BSON::Symbol::Raw.new("test"), _id: 12)
+      client["orders"].insert_one(saved_status: BSON::Symbol::Raw.new("test"), _id: 12)
     end
 
     it "receives the value as a symbol" do
-      expect(Order.find(12).status).to eq(:test)
+      expect(Order.find(12).saved_status).to eq(:test)
     end
 
     it "saves the value as a string" do
       s = Order.find(12)
-      s.status = :other
+      s.saved_status = :other
       s.save!
       event = update_events.first
-      expect(event.command["updates"].first["u"]["$set"]["status"]).to eq("other")
+      expect(event.command["updates"].first["u"]["$set"]["saved_status"]).to eq("other")
     end
   end
 
   context "when value is nil" do
 
     before do
-      client["orders"].insert_one(status: nil, _id: 15)
+      client["orders"].insert_one(saved_status: nil, _id: 15)
     end
 
     it "returns nil" do
-      expect(Order.find(15).status).to be_nil
+      expect(Order.find(15).saved_status).to be_nil
     end
   end
 
   context "when writing nil" do
 
     before do
-      client["orders"].insert_one(status: "hello", _id: 16)
+      client["orders"].insert_one(saved_status: "hello", _id: 16)
     end
 
     it "saves the value as nil" do
       s = Order.find(16)
-      s.status = nil
+      s.saved_status = nil
       s.save!
       event = update_events.first
-      expect(event.command["updates"].first["u"]["$set"]["status"]).to be_nil
+      expect(event.command["updates"].first["u"]["$set"]["saved_status"]).to be_nil
     end
   end
 
   context "when reading an integer" do
 
     before do
-      client["orders"].insert_one(status: 42, _id: 13)
+      client["orders"].insert_one(saved_status: 42, _id: 13)
     end
 
     it "receives the value as a symbol" do
-      expect(Order.find(13).status).to eq(:"42")
+      expect(Order.find(13).saved_status).to eq(:"42")
     end
 
     it "saves the value as a string" do
       s = Order.find(13)
-      s.status = 24
+      s.saved_status = 24
       s.save!
       event = update_events.first
-      expect(event.command["updates"].first["u"]["$set"]["status"]).to eq("24")
+      expect(event.command["updates"].first["u"]["$set"]["saved_status"]).to eq("24")
     end
   end
 
   context "when reading an array" do
     before do
-      client["orders"].insert_one(status: [0, 1, 2], _id: 14)
+      client["orders"].insert_one(saved_status: [0, 1, 2], _id: 14)
     end
 
     it "receives the value as a symbol" do
-      expect(Order.find(14).status).to be(:"[0, 1, 2]")
+      expect(Order.find(14).saved_status).to be(:"[0, 1, 2]")
     end
 
     it "saves the value as a string" do
       s = Order.find(14)
-      s.status = [3, 4, 5]
+      s.saved_status = [3, 4, 5]
       s.save!
       event = update_events.first
-      expect(event.command["updates"].first["u"]["$set"]["status"]).to eq("[3, 4, 5]")
+      expect(event.command["updates"].first["u"]["$set"]["saved_status"]).to eq("[3, 4, 5]")
     end
   end
 end
