@@ -229,8 +229,6 @@ data, the documents will be stored with ``String`` values instead of the depreca
 on the next save. This permits transparent lazy migration from fields that currently store either
 strings or BSON symbols in MongoDB to the ``StringifiedSymbol`` field type.
 
-
-
 Updating Container Fields
 -------------------------
 
