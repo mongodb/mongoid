@@ -185,8 +185,8 @@ The StringifiedSymbol Type
 The ``StringifiedSymbol`` field type is the recommended field type for storing
 values that should be exposed as symbols to Ruby applications. When using the ``Symbol`` field type,
 Mongoid defaults to storing values as BSON symbols. For more information on the
-``BSON::Symbol`` type, see :ref:`here <bson-symbol>`.
-However, the ``BSON::Symbol`` type is deprecated and is difficult to work with in programming languages
+BSON symbol type, see :ref:`here <bson-symbol>`.
+However, the BSON symbol type is deprecated and is difficult to work with in programming languages
 without native symbol types, so the ``StringifiedSymbol`` type allows the use of symbols
 while ensuring interoperability with other drivers. The ``StringifiedSymbol`` type stores all data
 on the database as strings, while exposing values to the application as symbols.
@@ -225,10 +225,10 @@ For example, setting an integer as ``status``:
   post.status
   # => :"42"
 
-If the ``StringifiedSymbol`` type is applied to a field that contains ``BSON::Symbol``
-data, the documents will be stored with ``String`` values instead of the deprecated ``BSON::Symbol``
-type on the next save. This permits transparent lazy migration from fields that currently store
-either strings or BSON symbols in the database to the ``StringifiedSymbol`` field type.
+If the ``StringifiedSymbol`` type is applied to a field that contains BSON symbols, the values
+will be stored as strings instead of BSON symbols on the next save. This permits transparent lazy
+migration from fields that currently store either strings or BSON symbols in the database to the
+``StringifiedSymbol`` field type.
 
 Updating Container Fields
 -------------------------
