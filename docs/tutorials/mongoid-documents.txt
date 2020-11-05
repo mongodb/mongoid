@@ -147,6 +147,7 @@ Below is a list of valid types for fields.
 - ``Regexp``
 - ``Set``
 - ``String``
+- ``StringifiedSymbol``
 - ``Symbol``
 - ``Time``
 - ``TimeWithZone``
@@ -176,6 +177,58 @@ Types that are not supported as dynamic attributes since they cannot be cast are
 - ``DateTime``
 - ``Range``
 
+.. _stringified-symbol:
+
+The StringifiedSymbol Type
+--------------------------
+
+The ``StringifiedSymbol`` field type is the recommended field type for storing
+values that should be exposed as symbols to Ruby applications. When using the ``Symbol`` field type,
+Mongoid defaults to storing values as BSON symbols. For more information on the
+BSON symbol type, see :ref:`here <bson-symbol>`.
+However, the BSON symbol type is deprecated and is difficult to work with in programming languages
+without native symbol types, so the ``StringifiedSymbol`` type allows the use of symbols
+while ensuring interoperability with other drivers. The ``StringifiedSymbol`` type stores all data
+on the database as strings, while exposing values to the application as symbols.
+
+An example usage is shown below:
+
+.. code-block:: ruby
+
+  class Post
+    include Mongoid::Document
+
+    field :status, type: StringifiedSymbol
+  end
+
+  post = Post.new(status: :hello)
+  # status is stored as "hello" on the database, but returned as a Symbol
+  post.status
+  # => :hello
+
+  # String values can be assigned also:
+  post = Post.new(status: "hello")
+  # status is stored as "hello" on the database, but returned as a Symbol
+  post.status
+  # => :hello
+
+All non-string values will be stringified upon being sent to the database (via ``to_s``), and
+all values will be converted to symbols when returned to the application. Values that cannot be
+converted directly to symbols, such as integers and arrays, will first be converted to strings and
+then symbols before being returned to the application.
+
+For example, setting an integer as ``status``:
+
+.. code-block:: ruby
+
+  post = Post.new(status: 42)
+  post.status
+  # => :"42"
+
+If the ``StringifiedSymbol`` type is applied to a field that contains BSON symbols, the values
+will be stored as strings instead of BSON symbols on the next save. This permits transparent lazy
+migration from fields that currently store either strings or BSON symbols in the database to the
+``StringifiedSymbol`` field type.
 
 Updating Container Fields
 -------------------------
@@ -706,35 +759,27 @@ For cases when you do not want to have ``BSON::ObjectId`` ids, you can override 
      field :_id, type: String, default: ->{ name }
    end
 
+.. _bson-symbol:
+
 BSON Symbol Type
 ----------------
 
-Because the BSON specification deprecated the BSON symbol type, the `bson` gem will serialize Ruby
-symbols into BSON strings when used on its own. However, in order to maintain backwards
-compatibility with older datasets, the `mongo` gem overrides this behavior to serialize Ruby symbols as
-BSON symbols. This is necessary to be able to specify queries for documents which contain BSON
-symbols as fields.
+New applications should use the :ref:`StringifiedSymbol field type <stringified-symbol>`
+to store Ruby symbols in the database. The ``StringifiedSymbol`` field type
+provides maximum compatibility with other applications and programming languages
+and has the same behavior in all circumstances.
 
-Although Mongoid allows applications to define fields with the Symbol type, this could present
-problems when using other MongoDB tools that have removed support for the type. Because of this,
-new applications should not specify model fields with the Symbol type but instead use the String
-type. Existing applications with Symbol model fields may convert those fields to Strings using one
-of the following methods:
+Mongoid also provides the deprecated ``Symbol`` field type for serializing
+Ruby symbols to BSON symbols. Because the BSON specification deprecated the
+BSON symbol type, the `bson` gem will serialize Ruby symbols into BSON strings
+when used on its own. However, in order to maintain backwards compatibility
+with older datasets, the `mongo` gem overrides this behavior to serialize Ruby
+symbols as BSON symbols. This is necessary to be able to specify queries for
+documents which contain BSON symbols as fields.
 
-- Eager migration: write a script or rake task that queries each document and
-  updates any symbols it finds to strings. This will take a long time for larger data sets, and
-  unless the application can handle two different schemas existing in the data at once, it will
-  need to be taken offline while the script runs.
-
-- Lazy migration: rather than updating all of the documents at once, each document received from a
-  query  should be reinserted if it contains a symbol; since the BSON received will have already
-  turned the symbols into strings, this will update the document as necessary. This can be done
-  by simply calling the ``save`` method. Note that this method will only convert documents that
-  are accessed by the application, eventually eager migration may be needed to convert the
-  remaining documents that haven't been accessed.
-
-To override default behaivor and configure the ``mongo`` gem (and thereby Mongoid as well)
-to encode symbol values as strings, include the following code snippet in your project:
+To override the default behavior and configure the ``mongo`` gem (and thereby
+Mongoid as well) to encode symbol values as strings, include the following code
+snippet in your project:
 
 .. code-block:: ruby
 
