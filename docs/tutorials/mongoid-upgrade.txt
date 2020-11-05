@@ -241,9 +241,9 @@ conditions.
 ``count`` and ``estimated_count`` Methods
 -----------------------------------------
 
-The ``count`` method on model classes and ``Criteria`` objects is now using
-the ``count_documents`` driver helper. This makes ``count`` seamlessly work
-in transactions.
+Minor change: the ``count`` method on model classes and ``Criteria`` objects
+is now using the ``count_documents`` driver helper. This makes ``count``
+seamlessly work in transactions.
 
 Model classes now also have the ``estimated_count`` method to obtain an
 approximate number of documents in the collection. This method is roughly
@@ -253,20 +253,30 @@ equivalent to the ``count`` method in Mongoid 7.1 and earlier, except
 The new behavior is further described in the :ref:`Additional Query Methods
 <additional-query-methods>` section.
 
+
 ``any?`` on ``has_many`` Associations
 -------------------------------------
 
-The :ref:`any? method on has_many associations <has-many-any>` was optimized
-to only retrieve the _id field when querying the database, instead of loading
-the entire association.
+Minor change: the :ref:`any? method on has_many associations <has-many-any>`
+was optimized to only retrieve the _id field when querying the database,
+instead of loading the entire association.
+
+
+``StringifiedSymbol`` Field Type
+--------------------------------
+
+New feature: the :ref:`StringifiedSymbol field type <stringified-symbol>`
+was added for storing Ruby symbol values in MongoDB in a manner interoperable
+with other programming languages.
 
 
 Changing the Discriminator Key
 ------------------------------
 
-Mongoid now supports :ref:`changing the default discriminator key <discriminator-key>` from the default ``_type`` when using
-inheritance. This can be done by setting the ``discriminator_key`` field on the parent class or globally.
-To set the discriminator key on the parent class:
+New feature: Mongoid now supports :ref:`changing the default discriminator key
+<discriminator-key>` from the default ``_type`` when using inheritance.
+This can be done by setting the ``discriminator_key`` field on the parent class
+or globally. To set the discriminator key on the parent class:
 
 .. code-block:: ruby
 
@@ -298,11 +308,14 @@ To set the discrminator key globally:
    class Rectangle < Shape
    end
 
+
 Changing the Discriminator Value
 --------------------------------
 
-Mongoid now also supports :ref:`changing the discriminator value <discriminator-value>` from the default value, which is the class name.
-The discriminator value can be changed by setting the ``discriminator_value`` on that class:
+New feature: Mongoid now also supports :ref:`changing the discriminator value
+<discriminator-value>` from the default value, which is the class name.
+The discriminator value can be changed by setting the ``discriminator_value``
+on that class:
 
 .. code-block:: ruby
 
@@ -316,7 +329,6 @@ The discriminator value can be changed by setting the ``discriminator_value`` on
 
    class Rectangle < Shape
    end
-
 
 
 Shard Key Used For Reloading
@@ -362,6 +374,7 @@ Example Mongoid 7.1 behavior:
 Mongoid provides :ref:`sharding management Rake tasks <sharding-management>`
 to shard collections according to shard keys declared in models.
 
+
 Query Cache Moved to Driver
 ---------------------------
 
@@ -398,6 +411,7 @@ To read more about the query cache improvements made in the driver, see
 
 To read more about using the query cache with Mongoid and the limitations
 of the legacy query cache, see :ref:`the query cache documentation <query-cache>`.
+
 
 Upgrading to Mongoid 7.1
 ========================
