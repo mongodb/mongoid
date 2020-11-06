@@ -73,7 +73,7 @@ the configuration file path as its argument, as follows:
 
   # Use automatically detected environment name
   Mongoid.load!("path/to/your/mongoid.yml")
-  
+
   # Specify environment name manually
   Mongoid.load!("path/to/your/mongoid.yml", :production)
 
@@ -97,7 +97,7 @@ current environment - but it does support defining multiple clients.
       hosts: ['localhost:27017'],
       database: 'my_db',
     }
-    
+
     config.log_level = :warn
   end
 
@@ -228,7 +228,7 @@ can be configured.
           # The file containing a set of concatenated certification authority certifications
           # used to validate certs passed from the other end of the connection.
           ssl_ca_cert: /path/to/ca.cert
-          
+
           # Compressors to use. (default is to not use compression)
           compressors: [zlib]
 
@@ -239,21 +239,21 @@ can be configured.
       # exceed 128 bytes. It is also used as the database name if the
       # database name is not explicitly defined. (default: nil)
       app_name: MyApplicationName
-      
+
       # Create indexes in background by default. (default: false)
       background_indexing: false
-      
+
       # Mark belongs_to associations as required by default, so that saving a
       # model with a missing belongs_to association will trigger a validation
       # error. (default: true)
       belongs_to_required_by_default: true
-      
+
       # Set the global discriminator key. (default: "_type")
       discriminator_key: "_type"
 
       # Raise an exception when a field is redefined. (default: false)
       duplicate_fields_exception: false
-      
+
       # Include the root model name in json serialization. (default: false)
       include_root_in_json: false
 
@@ -267,7 +267,7 @@ can be configured.
       # Set the Mongoid and Ruby driver log levels when Mongoid is not using
       # Ruby on Rails logger instance. (default: :info)
       log_level: :info
-      
+
       # Preload all models in development, needed when models use
       # inheritance. (default: false)
       preload_models: false
@@ -290,7 +290,7 @@ can be configured.
       # (default: false)
       use_utc: false
 
-The Ruby driver options may be found in 
+The Ruby driver options may be found in
 `the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/>`_.
 
 ERb Preprocessing
@@ -351,7 +351,7 @@ to the same logger instance:
 
   Rails.logger === Mongoid.logger
   # => true
-  
+
   Mongoid.logger === Mongo::Logger.logger
   # => true
 
@@ -383,7 +383,7 @@ use an initializer as follows:
       Mongoid.logger = Logger.new(STDERR).tap do |logger|
         logger.level = Logger::DEBUG
       end
-      
+
       # Change driver log destination and/or level
       Mongo::Logger.logger = Logger.new(STDERR).tap do |logger|
         logger.level = Logger::DEBUG
@@ -484,12 +484,12 @@ time zone handling is as follows:
 
 .. code-block:: bash
 
-  cp /usr/share/zoneinfo/UTC /etc/localtime 
+  cp /usr/share/zoneinfo/UTC /etc/localtime
 
 2. Set ActiveSupport's time zone to UTC:
 
 .. code-block:: ruby
-  
+
   # If using Rails, in application.rb:
   class Application < Rails::Application
     config.time_zone = 'UTC'
@@ -525,33 +525,33 @@ Mongoid offers the following time zone-related configuration options:
   When parsing times without time zone information (such as when
   mongoizing strings or arrays to time), assume the times are specified
   in ActiveSupport's time zone. This is the default.
-  
+
   If false, prefer to work with times using Ruby standard library ``Time`` class.
   Values in fields of type ``Time`` will be returned as ``Time`` instances.
   When parsing times without time zone information, assume the times
   are specified in the Ruby time zone.
-  
+
   Note that the ``use_activesupport_time_zone`` setting does not affect
   fields of types ``Date`` or ``DateTime``, which use ``Date`` and
   ``DateTime`` classes for their values, respectively.
-  
+
   Also note that Mongoid may still utilize both ``Time`` and
   ``ActiveSupport::TimeWithZone`` classes internally, as appropriate,
   regardless of the ``use_activesupport_time_zone`` setting.
-- ``use_utc``: 
+- ``use_utc``:
   If true, times stored in MongoDB will be returned in UTC.
   If false, times stored in MongoDB will be returned in local time
   (as instances of either ``Time`` or ``ActiveSupport::TimeWithZone``,
   respectively in the Ruby default time zone or the ActiveSupport time zone,
   based on the value of ``use_activesupport_time_zone`` setting).
   The default is false.
-  
+
   The ``use_utc`` setting does not affect how times are parsed - parsing
   is always done in local time when the input being parsed does not
   include time zone information. To parse dates in UTC, set the
   system/Ruby or ActiveSupport time zone to UTC (as mentioned above,
   setting all three to UTC leads to the fewest headaches).
-  
+
   Setting ``use_activesupport_time_zone`` to true and ``Time.zone`` to
   UTC (and using ActiveSupport time machinery for all time-related
   operations) is recommended over setting ``use_utc`` to true.
@@ -561,6 +561,42 @@ throw away time zone information when it is available. For example, a Time
 instance does have an associated time zone, and this time zone will be used
 even if it is different from ActiveSupport's configured time zone when
 ``use_activesupport_time_zone`` is true.
+
+Configuring ``SSLContext``
+==========================
+It may be desirable to further configure TLS options in your application, for
+example by enabling or disabling certain ciphers.
+
+This can be done by setting TLS context hooks on the Ruby driver -- TLS context
+hooks are user-provided ``Proc``s that will be invoked before any TLS socket
+connection in the driver and can be used to modify the underlying
+``OpenSSL::SSL::SSLContext`` object used by the socket.
+
+To set TLS context hooks, add ``Proc``s to the ``Mongo.tls_context_hooks``
+array. This can be done in an initializer. The example below adds a hook
+that only enables the "AES256-SHA" cipher.
+
+.. code-block:: ruby
+
+  Mongo.tls_context_hooks.push(
+    Proc.new { |context|
+      context.ciphers = ["AES256-SHA"]
+    }
+  )
+
+  # Only the AES256-SHA cipher will be enabled from this point forward
+
+Every ``Proc`` in ``Mongo.tls_context_hooks`` will be passed an
+``OpenSSL::SSL::SSLContext`` object as its sole argument. These ``Proc``s will
+be executed sequentially during socket creation.
+
+..warning ::
+
+  TLS context hooks are global and will affect all ``Mongo::Client`` instances
+  in an application.
+
+For more information about TLS context hooks, including best practices for
+assigning and removing them, see `the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/ruby-driver-create-client/#modifying-sslcontext>`_.
 
 Usage with Forking Servers
 ==========================
