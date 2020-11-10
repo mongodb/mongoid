@@ -1,0 +1,63 @@
+- name: existing field - matches
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 1
+  matches: true
+
+- name: existing field - does not match
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 1
+  matches: false
+
+- name: type is 0
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 0
+  matches: true
+
+- name: type is -1
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: -1
+  matches: true
+
+- name: type is too negative
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: -2
+  matches: true
+
+- name: type is too large
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 42
+  matches: true
+
+- name: array argument - matches
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: [1]
+  matches: true
+
+- name: hash argument
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: {}
+  error: true
