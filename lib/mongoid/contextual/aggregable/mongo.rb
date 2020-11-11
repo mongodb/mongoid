@@ -11,17 +11,19 @@ module Mongoid
         #
         # @example Get all the aggregate values.
         #   aggregable.aggregates(:likes)
+        #   # => {
+        #   #   "count" => 2.0,
+        #   #   "max" => 1000.0,
+        #   #   "min" => 500.0,
+        #   #   "sum" => 1500.0,
+        #   #   "avg" => 750.0
+        #   # }
         #
         # @param [ String, Symbol ] field The field name.
         #
-        # @return [ Hash ] count is a number of documents with the provided field. If there're none, then count is 0 and max, min, sum, avg are nil.
-        #   {
-        #     "count" => 2.0,
-        #     "max" => 1000.0,
-        #     "min" => 500.0,
-        #     "sum" => 1500.0,
-        #     "avg" => 750.0
-        #   }
+        # @return [ Hash ] count is a number of documents with the provided
+        #   field. If there're none, then count is 0 and max, min, sum, avg
+        #   are nil.
         #
         # @since 3.0.0
         def aggregates(field)
