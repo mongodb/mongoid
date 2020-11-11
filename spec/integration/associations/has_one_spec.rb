@@ -66,4 +66,22 @@ describe 'has_one associations' do
       end
     end
   end
+
+  context 'when child does not have parent association' do
+    context 'Child.new' do
+      it 'creates a child instance' do
+        HomBusDriver.new.should be_a(HomBusDriver)
+      end
+    end
+
+    context 'assignment to child in parent' do
+      let(:parent) { HomBus.new }
+
+      it 'raises InverseNotFound' do
+        lambda do
+          parent.driver = HomBusDriver.new
+        end.should raise_error(Mongoid::Errors::InverseNotFound)
+      end
+    end
+  end
 end
