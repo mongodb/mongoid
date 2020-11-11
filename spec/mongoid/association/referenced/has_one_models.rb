@@ -58,3 +58,15 @@ class HomPolymorphicChild
 
   belongs_to :p_parent, polymorphic: true
 end
+
+class HomBus
+  include Mongoid::Document
+
+  has_one :driver, class_name: 'HomBusDriver'
+end
+
+class HomBusDriver
+  include Mongoid::Document
+
+  # No belongs_to :bus
+end

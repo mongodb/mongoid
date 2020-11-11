@@ -748,7 +748,7 @@ describe Mongoid::Association::Referenced::HasOne do
     end
   end
 
-  describe '##inverse' do
+  describe '#inverse' do
 
     context 'when polymorphic' do
 

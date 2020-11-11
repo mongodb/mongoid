@@ -47,3 +47,15 @@ class HmmTicket
 
   belongs_to :person
 end
+
+class HmmBus
+  include Mongoid::Document
+
+  has_many :seats, class_name: 'HmmBusSeat'
+end
+
+class HmmBusSeat
+  include Mongoid::Document
+
+  # No belongs_to :bus
+end

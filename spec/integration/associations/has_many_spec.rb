@@ -66,4 +66,22 @@ describe 'has_many associations' do
       end
     end
   end
+
+  context 'when child does not have parent association' do
+    context 'Child.new' do
+      it 'creates a child instance' do
+        HmmBusSeat.new.should be_a(HmmBusSeat)
+      end
+    end
+
+    context 'assignment to child in parent' do
+      let(:parent) { HmmBus.new }
+
+      it 'raises InverseNotFound' do
+        lambda do
+          parent.seats << HmmBusSeat.new
+        end.should raise_error(Mongoid::Errors::InverseNotFound)
+      end
+    end
+  end
 end
