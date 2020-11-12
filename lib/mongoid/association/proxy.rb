@@ -137,6 +137,7 @@ module Mongoid
         _target.public_send(name, *args, &block)
       end
 
+      # @api private
       def respond_to_missing?(name, *args)
         _target.respond_to?(name, *args)
       end
