@@ -84,4 +84,46 @@ describe 'has_one associations' do
       end
     end
   end
+
+  context 're-associating the same object' do
+    context 'with dependent: destroy' do
+      let(:person) do
+        Person.create!
+      end
+
+      let!(:game) do
+        Game.create!(person: person) do
+          person.reload
+        end
+      end
+
+      it 'does not destroy the dependent object' do
+        person.game.should == game
+        person.game = person.game
+        person.save!
+        person.reload
+        person.game.should == game
+      end
+    end
+
+    context 'without dependent: destroy' do
+      let(:person) do
+        Person.create!
+      end
+
+      let!(:account) do
+        Account.create!(person: person, name: 'foo').tap do
+          person.reload
+        end
+      end
+
+      it 'does not destroy the dependent object' do
+        person.account.should == account
+        person.account = person.account
+        person.save!
+        person.reload
+        person.account.should == account
+      end
+    end
+  end
 end

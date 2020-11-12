@@ -80,6 +80,7 @@ class Person
   end
   embeds_one :quiz, validate: false
 
+  # Must have dependent: :destroy
   has_one :game, dependent: :destroy, validate: false do
     def extension
       "Testing"
@@ -105,6 +106,7 @@ class Person
   has_and_belongs_to_many :ordered_preferences, order: :value.desc, validate: false
 
   has_many :drugs, validate: false
+  # Must not have dependent: :destroy
   has_one :account, validate: false
   has_one :cat, dependent: :nullify, validate: false, primary_key: :username
   has_one :book, autobuild: true, validate: false
