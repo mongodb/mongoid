@@ -138,7 +138,7 @@ module Mongoid
       end
 
       def respond_to_missing?(name, *args)
-        _target.respond_to?(name)
+        _target.respond_to?(name, *args)
       end
 
       # When the base document illegally references an embedded document this
