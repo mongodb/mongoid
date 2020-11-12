@@ -1154,6 +1154,50 @@ For example:
     has_many :orders
   end
 
+Association Proxies
+-------------------
+
+Associations employ transparent proxies to the target objects. This can
+cause surprising behavior in some situations.
+
+The method visibility may be lost when methods on association targets are
+accessed, depending on the association:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+    belongs_to :customer
+    
+    private
+    
+    def internal_status
+      'new'
+    end
+  end
+
+  class Customer
+    include Mongoid::Document
+    has_many :orders
+    
+    private
+    
+    def internal_id
+      42
+    end
+  end
+  
+  order = Order.new
+  customer = Customer.create!(orders: [order])
+  
+  # has_many does not permit calling private methods on the target
+  customer.orders.first.internal_status
+  # NoMethodError (private method `internal_status' called for #<Order:0x000055af2ec46c50>)
+  
+  # belongs_to permits calling private methods on the target
+  order.customer.internal_id
+  # => 42
+
 Association Metadata
 ====================
 
