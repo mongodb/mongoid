@@ -1299,14 +1299,14 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it_behaves_like 'returns a cloned query'
         end
 
-        shared_examples_for 'adds one condition' do
+        shared_examples_for 'combines conditions with $eq' do
 
-          it "adds one condition" do
+          it "combines conditions with $eq" do
             expect(selection.selector).to eq({
-              'field' => 3,
-              '$and' => [
-                {'field' => {'$lt' => 5}},
-              ],
+              'field' => {
+                '$eq' => 3,
+                '$lt' => 5,
+              },
             })
           end
 
@@ -1318,7 +1318,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
             query.send(tested_method, :field => 3, :field.lt => 5)
           end
 
-          it_behaves_like 'adds one condition'
+          it_behaves_like 'combines conditions with $eq'
         end
 
         context 'criteria are provided in separate hashes' do
@@ -1353,13 +1353,12 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it_behaves_like 'returns a cloned query'
         end
 
-        shared_examples_for 'adds one condition' do
+        shared_examples_for 'combines conditions with $eq' do
 
-          it "adds one condition" do
-            expect(selection.selector).to eq({
-              'field' => {'$gt' => 3},
-              '$and' => ['field' => 5],
-            })
+          it "combines conditions with $eq" do
+            expect(selection.selector).to eq(
+              'field' => {'$gt' => 3, '$eq' => 5},
+            )
           end
 
           it_behaves_like 'returns a cloned query'
@@ -1370,7 +1369,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
             query.send(tested_method, :field.gt => 3, :field => 5)
           end
 
-          it_behaves_like 'adds one condition'
+          it_behaves_like 'combines conditions with $eq'
         end
 
         context 'criteria are provided in separate hashes' do
