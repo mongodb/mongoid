@@ -496,12 +496,23 @@ describe Mongoid::Criteria::Queryable::Selectable do
             it_behaves_like 'returns a cloned query'
           end
 
+          shared_examples_for 'combines conditions with $eq' do
+
+            it "combines conditions with $eq" do
+              expect(selection.selector).to eq({
+                "field" => {'$eq' => 3, '$lt' => 5},
+              })
+            end
+
+            it_behaves_like 'returns a cloned query'
+          end
+
           context 'criteria are provided in the same hash' do
             let(:selection) do
               query.send(tested_method, :field => 3, :field.lt => 5)
             end
 
-            it_behaves_like 'combines conditions with $and'
+            it_behaves_like 'combines conditions with $eq'
           end
 
           context 'criteria are provided in separate hashes' do
@@ -534,12 +545,23 @@ describe Mongoid::Criteria::Queryable::Selectable do
             it_behaves_like 'returns a cloned query'
           end
 
+          shared_examples_for 'combines conditions with $eq' do
+
+            it "combines conditions with $eq" do
+              expect(selection.selector).to eq({
+                "field" => {'$gt' => 3, '$eq' => 5},
+              })
+            end
+
+            it_behaves_like 'returns a cloned query'
+          end
+
           context 'criteria are provided in the same hash' do
             let(:selection) do
               query.send(tested_method, :field.gt => 3, :field => 5)
             end
 
-            it_behaves_like 'combines conditions with $and'
+            it_behaves_like 'combines conditions with $eq'
           end
 
           context 'criteria are provided in separate hashes' do
