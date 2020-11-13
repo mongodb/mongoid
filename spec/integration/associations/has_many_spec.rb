@@ -31,4 +31,46 @@ describe 'has_many associations' do
       Album.count.should == 0
     end
   end
+
+  context 're-associating the same object' do
+    context 'with dependent: destroy' do
+      let(:wiki_page) do
+        WikiPage.create!
+      end
+
+      let!(:comment) do
+        Comment.create!(wiki_page: wiki_page, title: 'hi') do
+          wiki_page.reload
+        end
+      end
+
+      it 'does not destroy the dependent object' do
+        wiki_page.comments.should == [comment]
+        wiki_page.comments = [comment]
+        wiki_page.save!
+        wiki_page.reload
+        wiki_page.comments.should == [comment]
+      end
+    end
+
+    context 'without dependent: destroy' do
+      let(:series) do
+        Series.create!
+      end
+
+      let!(:book) do
+        Book.create!(series: series).tap do
+          series.reload
+        end
+      end
+
+      it 'does not destroy the dependent object' do
+        series.books.should == [book]
+        series.books = [book]
+        series.save!
+        series.reload
+        series.books.should == [book]
+      end
+    end
+  end
 end
