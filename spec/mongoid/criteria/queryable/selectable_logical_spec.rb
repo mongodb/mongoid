@@ -425,9 +425,9 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
             it "combines via $and operator" do
               expect(selection.selector).to eq({
-                "first" => {operator => [ 1, 2 ]},
+                "first" => {'$in' => [ 1, 2 ]},
                 "$and" => [
-                  { "first" => {operator => [ 3, 4 ] }}
+                  { "first" => {'$in' => [ 3, 4 ] }}
                 ]
               })
             end

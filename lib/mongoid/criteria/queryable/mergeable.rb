@@ -227,7 +227,8 @@ module Mongoid
         end
 
         # Takes a criteria hash and expands Key objects into hashes containing
-        # MQL corresponding to said key objects.
+        # MQL corresponding to said key objects. Also converts the input to
+        # BSON::Document to permit indifferent access.
         #
         # Ruby does not permit multiple symbol operators. For example,
         # {:foo.gt => 1, :foo.gt => 2} is collapsed to {:foo.gt => 2} by the
@@ -237,15 +238,19 @@ module Mongoid
         # Similarly, this method should never need to expand a literal value
         # and an operator at the same time.
         #
+        # This method effectively converts symbol keys to string keys in
+        # the input +expr+, such that the downstream code can assume that
+        # conditions always contain string keys.
+        #
         # @param [ Hash ] expr Criteria including Key instances.
         #
-        # @return [ Hash ] The expanded criteria.
+        # @return [ BSON::Document ] The expanded criteria.
         private def _mongoid_expand_keys(expr)
           unless expr.is_a?(Hash)
             raise ArgumentError, 'Argument must be a Hash'
           end
 
-          result = {}
+          result = BSON::Document.new
           expr.each do |field, value|
             field.__expr_part__(value.__expand_complex__).each do |k, v|
               if result[k]
