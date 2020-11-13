@@ -420,29 +420,34 @@ describe Mongoid::Criteria::Queryable::Selectable do
         context 'when criteria use operators' do
           shared_examples 'behave correctly' do
             let(:selection) do
-              query.and({ first: {operator => [ 1, 2 ] }}, { first: {operator => [ 3, 4 ] }})
+              query.and(
+                { field: {first_operator => [ 1, 2 ] }},
+                { field: {second_operator => [ 3, 4 ] }},
+              )
             end
 
-            it "combines via $and operator" do
+            it "combines via $and operator and stringifies all keys" do
               expect(selection.selector).to eq({
-                "first" => {'$in' => [ 1, 2 ]},
+                "field" => {'$in' => [ 1, 2 ]},
                 "$and" => [
-                  { "first" => {'$in' => [ 3, 4 ] }}
+                  { "field" => {'$in' => [ 3, 4 ] }}
                 ]
               })
             end
           end
 
-          context 'string operator' do
-            let(:operator) { '$in' }
+          [
+            ['$in', '$in'],
+            [:$in, '$in'],
+            ['$in', :$in],
+            [:$in, :$in],
+          ].each do |first_operator, second_operator|
+            context "when first operator is #{first_operator.inspect} and second operator is #{second_operator.inspect}" do
+              let(:first_operator) { first_operator }
+              let(:second_operator) { second_operator }
 
-            include_examples 'behave correctly'
-          end
-
-          context 'symbol operator' do
-            let(:operator) { :$in }
-
-            include_examples 'behave correctly'
+              include_examples 'behave correctly'
+            end
           end
         end
 
