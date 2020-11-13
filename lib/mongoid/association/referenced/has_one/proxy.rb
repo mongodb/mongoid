@@ -54,9 +54,14 @@ module Mongoid
           #
           # @since 2.0.0.rc.1
           def substitute(replacement)
+            # If the same object currently associated is being assigned,
+            # rebind the association and save the target but do not destroy
+            # the target.
+
             unbind_one
             if persistable?
-              if _association.destructive?
+              # TODO can this entire method be skipped if self == replacement?
+              if _association.destructive? && self != replacement
                 send(_association.dependent)
               else
                 save if persisted?
