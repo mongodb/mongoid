@@ -1,0 +1,15 @@
+- name: matches
+  document:
+    name: Angel Share
+  query:
+    name: Angel Share
+    $comment: "foo"
+  matches: true
+
+- name: should fail
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $comment: "hello"
+  error: true

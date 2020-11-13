@@ -5,6 +5,10 @@ module Mongoid
     module FieldOperator
       MAP = {
         '$all' => All,
+        '$bitsAllClear' => BitsAllClear,
+        '$bitsAllSet' => BitsAllSet,
+        '$bitsAnyClear' => BitsAnyClear,
+        '$bitsAnySet' => BitsAnySet,
         '$elemMatch' => ElemMatch,
         '$eq' => Eq,
         '$exists' => Exists,
@@ -13,11 +17,13 @@ module Mongoid
         '$in' => In,
         '$lt' => Lt,
         '$lte' => Lte,
+        '$mod' => Mod,
         '$nin' => Nin,
         '$ne' => Ne,
         '$not' => Not,
         '$regex' => Regex,
         '$size' => Size,
+        '$type' => Type
       }.freeze
 
       module_function def get(op)
