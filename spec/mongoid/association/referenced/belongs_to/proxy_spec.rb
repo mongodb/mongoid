@@ -127,6 +127,23 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           it "does not save the target" do
             expect(person).to_not be_persisted
           end
+
+          it "drops private visibility from private methods" do
+            # This is unfortunate but it appears that Ruby does not
+            # have a way to distinguish how method_missing was invoked
+            # (i.e. via an explicit send or method call).
+            # See https://jira.mongodb.org/browse/MONGOID-5009
+            game.person.secret_name.should == 'secret'
+          end
+
+          it "allows private methods to be invoked" do
+            game.person.send(:secret_name).should == 'secret'
+          end
+
+          it "properly exposes delegated methods visibility" do
+            expect(defined?(game.person.id)).to eq("method")
+            expect(defined?(game.person.secret_name)).to be_nil
+          end
         end
 
         context "when the child is not a new record" do

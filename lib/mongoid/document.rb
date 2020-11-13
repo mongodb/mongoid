@@ -249,6 +249,19 @@ module Mongoid
       became
     end
 
+    # Implement this for calls to flatten on array.
+    #
+    # @example Get the document as an array.
+    #   document.to_ary
+    #
+    # @return [ nil ] Always nil.
+    #
+    # @since 2.1.0
+    # @api private
+    def to_ary
+      nil
+    end
+
     private
 
     # Returns the logger
@@ -270,18 +283,6 @@ module Mongoid
     # @since 2.4.0
     def model_key
       @model_cache_key ||= self.class.model_name.cache_key
-    end
-
-    # Implement this for calls to flatten on array.
-    #
-    # @example Get the document as an array.
-    #   document.to_ary
-    #
-    # @return [ nil ] Always nil.
-    #
-    # @since 2.1.0
-    def to_ary
-      nil
     end
 
     private

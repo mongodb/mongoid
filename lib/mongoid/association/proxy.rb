@@ -16,7 +16,7 @@ module Mongoid
       # We undefine most methods to get them sent through to the target.
       instance_methods.each do |method|
         undef_method(method) unless
-          method =~ /\A(__.*|send|object_id|equal\?|respond_to\?|tap|public_send|extend_proxy|extend_proxies)\z/
+          method =~ /\A(?:__.*|send|object_id|equal\?|respond_to\?|respond_to_missing\?|tap|public_send|extend_proxy|extend_proxies)\z/
       end
 
       include Threaded::Lifecycle
@@ -135,6 +135,11 @@ module Mongoid
       #
       def method_missing(name, *args, &block)
         _target.send(name, *args, &block)
+      end
+
+      # @api private
+      def respond_to_missing?(name, *args)
+        _target.respond_to?(name, *args)
       end
 
       # When the base document illegally references an embedded document this
