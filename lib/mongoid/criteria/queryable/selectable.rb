@@ -100,7 +100,7 @@ module Mongoid
                 # Otherwise use $and.
                 if v.is_a?(Hash) &&
                   v.length == 1 &&
-                  (new_k = v.keys.first).start_with?('$') &&
+                  (new_k = v.keys.first).to_s.start_with?('$') &&
                   (existing_kv = c.selector[k]).is_a?(Hash) &&
                   !existing_kv.key?(new_k) &&
                   existing_kv.keys.all? { |sub_k| sub_k.start_with?('$') }

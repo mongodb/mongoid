@@ -417,6 +417,22 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it_behaves_like 'returns a cloned query'
         end
 
+        context 'when criteria is $in with symbolized keys' do
+          let(:selection) do
+            query.and([
+              { first: { '$in': [ 1, 2 ] } },
+              { first: { '$in': [ 3, 4 ] } }
+            ])
+          end
+
+          it "combines via $and operator" do
+            expect(selection.selector).to eq({
+              "$and" => [ {"first" => { "$in": [ 3, 4 ] } } ],
+              "first" => { :'$in' => [ 1, 2 ] }
+            })
+          end
+        end
+
         context 'when criteria are handled via Key' do
           shared_examples_for 'adds the conditions to top level' do
 
