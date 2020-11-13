@@ -192,3 +192,19 @@
         end: 20
         excl: false
   error: true
+
+- name: scalar field - symbol operator - matches
+  document:
+    count: 10
+  query:
+    count:
+      :$in: [10, 11]
+  matches: true
+
+- name: scalar field - symbol operator - does not match
+  document:
+    count: 8
+  query:
+    count:
+      :$in: [10, 11]
+  matches: false

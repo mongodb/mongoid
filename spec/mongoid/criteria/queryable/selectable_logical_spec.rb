@@ -417,6 +417,35 @@ describe Mongoid::Criteria::Queryable::Selectable do
           it_behaves_like 'returns a cloned query'
         end
 
+        context 'when criteria use operators' do
+          shared_examples 'behave correctly' do
+            let(:selection) do
+              query.and({ first: {operator => [ 1, 2 ] }}, { first: {operator => [ 3, 4 ] }})
+            end
+
+            it "combines via $and operator" do
+              expect(selection.selector).to eq({
+                "first" => {operator => [ 1, 2 ]},
+                "$and" => [
+                  { "first" => {operator => [ 3, 4 ] }}
+                ]
+              })
+            end
+          end
+
+          context 'string operator' do
+            let(:operator) { '$in' }
+
+            include_examples 'behave correctly'
+          end
+
+          context 'symbol operator' do
+            let(:operator) { :$in }
+
+            include_examples 'behave correctly'
+          end
+        end
+
         context 'when criteria are handled via Key' do
           shared_examples_for 'adds the conditions to top level' do
 
