@@ -44,7 +44,7 @@ describe Mongoid::Criteria::Queryable::Mergeable do
 
   describe '#_mongoid_expand_keys' do
     it 'expands simple keys' do
-      query.send(:_mongoid_expand_keys, {a: 1}).should == {a: 1}
+      query.send(:_mongoid_expand_keys, {a: 1}).should == {'a' => 1}
     end
 
     let(:gt) do
