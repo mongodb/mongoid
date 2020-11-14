@@ -69,6 +69,68 @@ It is expected that over time, all operators will stringify the keys in their
 arguments.
 
 
+Condition Combination Using ``$eq``
+-----------------------------------
+
+Minor change: when using the ``and`` method on ``Criteria`` objects and
+providing multiple conditions on the same field in the same argument to
+``and``, conditions may be combined using ``$eq`` instead of ``$and``.
+Mongoid 7.3 behavior:
+
+.. code-block:: ruby
+
+  Band.and(year: 2020, :year.gt => 1960)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$eq"=>2020, "$gt"=>1960}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.and(:year.gt => 1960, year: 2020)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$gt"=>1960, "$eq"=>2020}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  Band.and(year: 2020, :year.gt => 1960)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>2020, "$and"=>[{"year"=>{"$gt"=>1960}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.and(:year.gt => 1960, year: 2020)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$gt"=>1960}, "$and"=>[{"year"=>2020}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+This combination is not yet performed for ``where`` and other query methods:
+
+.. code-block:: ruby
+
+  Band.where(:year.gt => 1960, year: 2020)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$gt"=>1960}, "$and"=>[{"year"=>2020}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Tt is expected that in the future other query methods will also favor
+using ``$eq`` over ``$and``.
+
+
 Upgrading to Mongoid 7.2
 ========================
 
