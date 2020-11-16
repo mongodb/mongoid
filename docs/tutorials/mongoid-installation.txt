@@ -27,7 +27,7 @@ To install the gem with bundler, include the following in your ``Gemfile``:
 
 .. code-block:: ruby
 
-   gem 'mongoid', '~> 7.1.0'
+   gem 'mongoid', '~> 7.2.0'
 
 Using Mongoid with a New Rails Application
 ==========================================
