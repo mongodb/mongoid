@@ -1,0 +1,55 @@
+- name: existing field - matches
+  document:
+    pi: 8
+  query:
+    pi:
+      $mod: [5, 3]
+  matches: true
+
+- name: existing field - does not match
+  document:
+    pi: 9
+  query:
+    pi:
+      $mod: [5, 3]
+  matches: false
+
+- name: invalid condition
+  document:
+    pi: 9
+  query:
+    pi:
+      $mod: 5
+  error: true
+
+- name: invalid field
+  document:
+    pi: [1, 2]
+  query:
+    pi:
+      $mod: 5
+  error: true
+
+- name: array too short
+  document:
+    pi: 3
+  query:
+    pi:
+      $mod: [5]
+  error: true
+
+- name: empty array
+  document:
+    pi: 3
+  query:
+    pi:
+      $mod: []
+  error: true
+
+- name: array too long
+  document:
+    pi: 3
+  query:
+    pi:
+      $mod: [1, 2, 3]
+  error: true
