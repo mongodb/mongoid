@@ -18,10 +18,123 @@ please consult GitHub releases for detailed release notes and JIRA for
 the complete list of issues fixed in each release, including bug fixes.
 
 
+Upgrading to Mongoid 7.3
+========================
+
+The following sections describe significant changes in Mongoid 7.3.
+
+Field Operator Stringification
+------------------------------
+
+Minor change: the ``and`` logical operator now stringifies field operators
+in its arguments. Mongoid 7.3 behavior:
+
+.. code-block:: ruby
+
+  Band.and(year: {'$in': [2020]})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$in"=>[2020]}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  Band.and(year: {'$in': [2020]})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{:$in=>[2020]}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Note that this stringification does not yet happen for all query construction
+paths. For example, ``where`` does not stringify operators in both Mongoid 7.3
+and Mongoid 7.2:
+
+.. code-block:: ruby
+
+  Band.where(year: {'$in': [2020]})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{:$in=>[2020]}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+It is expected that over time, all operators will stringify the keys in their
+arguments.
+
+
+Condition Combination Using ``$eq``
+-----------------------------------
+
+Minor change: when using the ``and`` method on ``Criteria`` objects and
+providing multiple conditions on the same field in the same argument to
+``and``, conditions may be combined using ``$eq`` instead of ``$and``.
+Mongoid 7.3 behavior:
+
+.. code-block:: ruby
+
+  Band.and(year: 2020, :year.gt => 1960)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$eq"=>2020, "$gt"=>1960}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.and(:year.gt => 1960, year: 2020)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$gt"=>1960, "$eq"=>2020}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  Band.and(year: 2020, :year.gt => 1960)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>2020, "$and"=>[{"year"=>{"$gt"=>1960}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.and(:year.gt => 1960, year: 2020)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$gt"=>1960}, "$and"=>[{"year"=>2020}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+This combination is not yet performed for ``where`` and other query methods:
+
+.. code-block:: ruby
+
+  Band.where(:year.gt => 1960, year: 2020)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$gt"=>1960}, "$and"=>[{"year"=>2020}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+Tt is expected that in the future other query methods will also favor
+using ``$eq`` over ``$and``.
+
+
 Upgrading to Mongoid 7.2
 ========================
 
-The following sections describe major changes in Mongoid 7.2.
+The following sections describe significant changes in Mongoid 7.2.
 
 Embedded Document Matching
 --------------------------
@@ -416,7 +529,7 @@ of the legacy query cache, see :ref:`the query cache documentation <query-cache>
 Upgrading to Mongoid 7.1
 ========================
 
-The following sections describe major changes in Mongoid 7.1.
+The following sections describe significant changes in Mongoid 7.1.
 
 Condition Combination
 ---------------------
@@ -447,6 +560,45 @@ Corresponding Mongoid 7.0 behavior:
     #   options:  {}
     #   class:    Band
     #   embedded: false>
+
+**Known issue:** When using Ruby 2.6 and lower, when adding multiple conditions
+on the same field using the same operator, the operator must be given as a
+string, not as a symbol. The following invocations fail:
+
+.. code-block:: ruby
+
+  Band.and({year: {'$in': [2020]}}, {year: {'$in': [2020]}})
+  # Traceback (most recent call last):
+  #         2: from (irb):10
+  #         1: from (irb):10:in `rescue in irb_binding'
+  # NoMethodError (undefined method `start_with?' for :$in:Symbol)
+
+  Band.and(year: {'$in': [2020]}).and(year: {'$in': [2020]})
+  # Traceback (most recent call last):
+  #         2: from (irb):11
+  #         1: from (irb):11:in `rescue in irb_binding'
+  # NoMethodError (undefined method `start_with?' for :$in:Symbol)
+
+Use string keys instead:
+
+.. code-block:: ruby
+
+  # Band.and({year: {'$in' => [2020]}}, {year: {'$in' => [2020]}})
+  # => #<Mongoid::Criteria
+  #   selector: {"year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2020]}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.and(year: {'$in' => [2020]}).and(year: {'$in' => [2020]})
+  # => #<Mongoid::Criteria
+  #   selector: {"year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2020]}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+This issue is rectified in Mongoid 7.3.
+
 
 Logical Operations
 ------------------
