@@ -81,5 +81,73 @@ describe Mongoid::Criteria::Queryable::Mergeable do
     it 'Ruby does not allow same symbol operator with different values' do
       {gt => 42, gtp => 50}.should == {gtp => 50}
     end
+
+    let(:expanded) do
+      query.send(:_mongoid_expand_keys, condition)
+    end
+
+    context 'field name => value' do
+      shared_examples_for 'expands' do
+
+        it 'expands' do
+          expanded.should == {'foo' => 'bar'}
+        end
+      end
+
+      context 'string key' do
+        let(:condition) do
+          {'foo' => 'bar'}
+        end
+
+        it_behaves_like 'expands'
+      end
+
+      context 'symbol key' do
+        let(:condition) do
+          {foo: 'bar'}
+        end
+
+        it_behaves_like 'expands'
+      end
+    end
+
+    context 'Key instance => value' do
+      let(:key) do
+        Mongoid::Criteria::Queryable::Key.new(:foo, :__override__, '$gt')
+      end
+
+      let(:condition) do
+        {key => 'bar'}
+      end
+
+      it 'expands' do
+        expanded.should == {'foo' => {'$gt' => 'bar'}}
+      end
+    end
+
+    context 'operator => operator value expression' do
+      shared_examples_for 'expands' do
+
+        it 'expands' do
+          expanded.should == {'foo' => {'$in' => ['bar']}}
+        end
+      end
+
+      context 'string key' do
+        let(:condition) do
+          {foo: {'$in' => %w(bar)}}
+        end
+
+        it_behaves_like 'expands'
+      end
+
+      context 'symbol key' do
+        let(:condition) do
+          {foo: {:$in => %w(bar)}}
+        end
+
+        it_behaves_like 'expands'
+      end
+    end
   end
 end

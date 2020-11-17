@@ -23,11 +23,13 @@ Upgrading to Mongoid 7.3
 
 The following sections describe significant changes in Mongoid 7.3.
 
-Field Operator Stringification
-------------------------------
+Selector Key Stringification
+----------------------------
 
-Minor change: the ``and`` logical operator now stringifies field operators
-in its arguments. Mongoid 7.3 behavior:
+Minor change: Mongoid now converts symbol keys to string keys in the
+``Criteria`` selectors. This applies to operators as well as hash literals.
+
+Mongoid 7.3 behavior:
 
 .. code-block:: ruby
 
@@ -39,6 +41,14 @@ in its arguments. Mongoid 7.3 behavior:
   #   class:    Band
   #   embedded: false>
 
+  Band.where(tag: {city: 1})
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"tag"=>{"city"=>1}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
 Mongoid 7.2 behavior:
 
 .. code-block:: ruby
@@ -51,46 +61,31 @@ Mongoid 7.2 behavior:
   #   class:    Band
   #   embedded: false>
 
-Note that this stringification does not yet happen for all query construction
-paths. For example, ``where`` does not stringify operators in both Mongoid 7.3
-and Mongoid 7.2:
-
-.. code-block:: ruby
-
-  Band.where(year: {'$in': [2020]})
+  Band.where(tag: {city: 1})
   # => 
   # #<Mongoid::Criteria
-  #   selector: {"year"=>{:$in=>[2020]}}
+  #   selector: {"tag"=>{:city=>1}}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
-
-It is expected that over time, all operators will stringify the keys in their
-arguments.
 
 
 Condition Combination Using ``$eq``
 -----------------------------------
 
-Minor change: when using the ``and`` method on ``Criteria`` objects and
-providing multiple conditions on the same field in the same argument to
-``and``, conditions may be combined using ``$eq`` instead of ``$and``.
+Minor change: when using the ``where``, ``and``, ``or``, and ``nor`` methods
+on ``Criteria`` objects and providing multiple conditions on the same field
+in the same argument using the symbol operator syntax, conditions may be
+combined using ``$eq`` instead of ``$and``.
+
 Mongoid 7.3 behavior:
 
 .. code-block:: ruby
 
-  Band.and(year: 2020, :year.gt => 1960)
+  Band.where(year: 2020, :year.gt => 1960)
   # => 
   # #<Mongoid::Criteria
   #   selector: {"year"=>{"$eq"=>2020, "$gt"=>1960}}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
-
-  Band.and(:year.gt => 1960, year: 2020)
-  # => 
-  # #<Mongoid::Criteria
-  #   selector: {"year"=>{"$gt"=>1960, "$eq"=>2020}}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
@@ -99,7 +94,7 @@ Mongoid 7.2 behavior:
 
 .. code-block:: ruby
 
-  Band.and(year: 2020, :year.gt => 1960)
+  Band.where(year: 2020, :year.gt => 1960)
   # => 
   # #<Mongoid::Criteria
   #   selector: {"year"=>2020, "$and"=>[{"year"=>{"$gt"=>1960}}]}
@@ -107,28 +102,32 @@ Mongoid 7.2 behavior:
   #   class:    Band
   #   embedded: false>
 
-  Band.and(:year.gt => 1960, year: 2020)
-  # => 
-  # #<Mongoid::Criteria
-  #   selector: {"year"=>{"$gt"=>1960}, "$and"=>[{"year"=>2020}]}
-  #   options:  {}
-  #   class:    Band
-  #   embedded: false>
+When using the ``not`` method with multiple conditions provided in the same
+argument, the conditions are kept together and negated as a group.
 
-This combination is not yet performed for ``where`` and other query methods:
+Mongoid 7.3 behavior:
 
 .. code-block:: ruby
 
-  Band.where(:year.gt => 1960, year: 2020)
+  Band.not(year: 2020, :year.gt => 1960)
   # => 
   # #<Mongoid::Criteria
-  #   selector: {"year"=>{"$gt"=>1960}, "$and"=>[{"year"=>2020}]}
+  #   selector: {"$and"=>[{"$nor"=>[{"year"=>{"$eq"=>2020, "$gt"=>1960}}]}]}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
 
-Tt is expected that in the future other query methods will also favor
-using ``$eq`` over ``$and``.
+Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  Band.not(year: 2020, :year.gt => 1960)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"year"=>{"$ne"=>2020}, "$and"=>[{"$nor"=>[{"year"=>{"$gt"=>1960}}]}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
 
 
 Upgrading to Mongoid 7.2
