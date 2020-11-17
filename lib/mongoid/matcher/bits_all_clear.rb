@@ -15,7 +15,7 @@ module Mongoid
           #condition is a binary string
           # TODO: test logic to convert to integer
           int_cond = condition.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
-          value & condition == 0
+          value & int_cond == 0
         when Integer
           value & condition == 0
         else

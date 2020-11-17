@@ -13,6 +13,8 @@ module Mongoid
             condition = v
           end
         when 1
+          #TODO: MATCH BSON TYPES
+
           # Double
           Float === value
         when 2
@@ -59,24 +61,22 @@ module Mongoid
           CodeWithScope === value
         when 16
           # 32-bit int
-          Integer === value
+          BSON::Int32 === value
         when 17
           # Timestamp
           Time === value
         when 18
           # Long
-          Bignum === value
+          BSON::Int64 === value
         when 19
           # Decimal
-          BigDecimal === value
+          BSON::Decimal128 === value
         when -1
-        #  TODO: need to check it's actually the minimum value
-        # minKey
-          true
+          # minKey
+          BSON::MinKey === value
         when 127
-          # TODO: need to check it's actually the maximum value
           # maxKey
-          true
+          BSON::MaxKey === value
         else
           raise Errors::InvalidQuery, "Unknown $type argument #{condition}"
         end
