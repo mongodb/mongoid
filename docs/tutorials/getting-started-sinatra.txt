@@ -18,6 +18,10 @@ This section shows how to create a new Sinatra application using Mongoid
 for data access. The process is similar for other Ruby applications not
 using Ruby on Rails.
 
+The complete source code for this application is available `in the
+mongoid-demo GitHub repository
+<https://github.com/mongoid/mongoid-demo/tree/master/sinatra-minimal>`_.
+
 Create Git Repo
 ---------------
 
