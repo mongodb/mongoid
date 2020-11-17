@@ -8,8 +8,15 @@ module Mongoid
           # TODO
           when Array
           # #  array of bits
-          when Binary
-          when Int
+            condition.any? do |c|
+              value & (1<<c) == 0
+            end
+          # https://www.geeksforgeeks.org/check-whether-bit-given-position-set-unset/
+        when BSON::Binary
+        when Integer
+          # byebug
+          # todo: simplify
+          (value & condition == 0) || (!(value & condition == condition) && (value & condition > 0))
         else
           raise Errors::InvalidQuery, "Unknown $bitsAllClear argument #{condition}"
         end

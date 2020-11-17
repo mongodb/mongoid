@@ -7,6 +7,24 @@
       $bitsAllClear: 35
   matches: true
 
+- name: existing field - matches with array
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: [0, 3]
+  matches: true
+
+- name: existing field - does not match with array
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: [0, 2]
+  matches: false
+
 #- name: existing field - matches with binData
 #  document:
 #    a: 20

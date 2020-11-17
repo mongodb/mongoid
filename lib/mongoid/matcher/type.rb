@@ -26,7 +26,7 @@ module Mongoid
           Array === value
         when 5
           # Binary data
-          Binary === value
+          BSON::Binary === value
         when 6
           # Undefined
           BSON::Undefined === value
@@ -35,7 +35,7 @@ module Mongoid
           BSON::ObjectId === value
         when 8
           # Boolean
-          !!value === value
+          TrueClass === value || FalseClass === value
         when 9
           # Date
           Date === value
@@ -44,7 +44,7 @@ module Mongoid
           NilClass === value
         when 11
           # Regex
-          Regexp::Raw === value
+          Regexp::Raw === value || ::Regexp === value
         when 12
           # DBPointer deprecated
           DBPointer === value
@@ -53,7 +53,7 @@ module Mongoid
           Code === value
         when 14
           # Symbol deprecated
-          Symbol === value
+          Symbol === value || BSON::Symbol::Raw === value
         when 15
           # Javascript with code deprecated
           CodeWithScope === value
@@ -62,7 +62,7 @@ module Mongoid
           Integer === value
         when 17
           # Timestamp
-          ObjectId === value
+          Time === value
         when 18
           # Long
           Bignum === value
