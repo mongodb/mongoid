@@ -1,0 +1,26 @@
+- name: existing field - matches with int
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAnyClear: 35
+  matches: true
+
+- name: existing field - matches with array
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAnyClear: [0, 2]
+  matches: true
+
+- name: existing field - does not match with array
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAnyClear: [2, 4]
+  matches: false

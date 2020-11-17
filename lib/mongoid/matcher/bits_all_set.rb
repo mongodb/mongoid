@@ -7,8 +7,12 @@ module Mongoid
         case condition
         # TODO
         when Array
-        when Binary
-        when Int
+          condition.all? do |c|
+            value & (1<<c) > 0
+          end
+        when BSON::Binary
+        when Integer
+          value & condition == condition
         else
           raise Errors::InvalidQuery, "Unknown $bitsAllClear argument #{condition}"
         end
