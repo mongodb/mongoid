@@ -21,7 +21,7 @@ the complete list of issues fixed in each release, including bug fixes.
 Upgrading to Mongoid 7.1
 ========================
 
-The following sections describe major changes in Mongoid 7.1.
+The following sections describe significant changes in Mongoid 7.1.
 
 Condition Combination
 ---------------------
@@ -52,6 +52,45 @@ Corresponding Mongoid 7.0 behavior:
     #   options:  {}
     #   class:    Band
     #   embedded: false>
+
+**Known issue:** When using Ruby 2.6 and lower, when adding multiple conditions
+on the same field using the same operator, the operator must be given as a
+string, not as a symbol. The following invocations fail:
+
+.. code-block:: ruby
+
+  Band.and({year: {'$in': [2020]}}, {year: {'$in': [2020]}})
+  # Traceback (most recent call last):
+  #         2: from (irb):10
+  #         1: from (irb):10:in `rescue in irb_binding'
+  # NoMethodError (undefined method `start_with?' for :$in:Symbol)
+
+  Band.and(year: {'$in': [2020]}).and(year: {'$in': [2020]})
+  # Traceback (most recent call last):
+  #         2: from (irb):11
+  #         1: from (irb):11:in `rescue in irb_binding'
+  # NoMethodError (undefined method `start_with?' for :$in:Symbol)
+
+Use string keys instead:
+
+.. code-block:: ruby
+
+  # Band.and({year: {'$in' => [2020]}}, {year: {'$in' => [2020]}})
+  # => #<Mongoid::Criteria
+  #   selector: {"year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2020]}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.and(year: {'$in' => [2020]}).and(year: {'$in' => [2020]})
+  # => #<Mongoid::Criteria
+  #   selector: {"year"=>{"$in"=>[2020]}, "$and"=>[{"year"=>{"$in"=>[2020]}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+This issue is rectified in Mongoid 7.3.
+
 
 Logical Operations
 ------------------
