@@ -13,6 +13,7 @@ module Mongoid
         '$in' => In,
         '$lt' => Lt,
         '$lte' => Lte,
+        '$mod' => Mod,
         '$nin' => Nin,
         '$ne' => Ne,
         '$not' => Not,
