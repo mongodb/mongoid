@@ -17,13 +17,11 @@ module Mongoid
         '$in' => In,
         '$lt' => Lt,
         '$lte' => Lte,
-        '$mod' => Mod,
         '$nin' => Nin,
         '$ne' => Ne,
         '$not' => Not,
         '$regex' => Regex,
         '$size' => Size,
-        '$type' => Type
       }.freeze
 
       module_function def get(op)

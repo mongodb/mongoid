@@ -16,7 +16,6 @@
       $bitsAnyClear: 35
   matches: true
 
-
 - name: existing field - matches with binData
   document:
     a: 16

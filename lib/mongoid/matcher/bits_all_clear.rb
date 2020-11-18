@@ -15,7 +15,6 @@ module Mongoid
           end
         when BSON::Binary
           #condition is a binary string
-          # TODO: test logic to convert to integer
           int_cond = condition.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
           value & int_cond == 0
         when Integer
