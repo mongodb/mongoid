@@ -6,7 +6,6 @@ module Mongoid
     # @api private
     module Type
       module_function def matches?(exists, value, condition)
-        p value
         case condition
         when Array
           condition.any? do |v|

@@ -4,6 +4,10 @@ module Mongoid
     # @api private
     module BitsAnySet
       module_function def matches?(exists, value, condition)
+        case value
+        when BSON::Binary
+          value = value.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
+        end
         case condition
         when Array
           #  array of bits
@@ -11,7 +15,8 @@ module Mongoid
             value & (1<<c) > 0
           end
         when BSON::Binary
-          #   value & condition
+          int_cond = condition.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
+          value & int_cond > 0
         when Integer
           value & condition > 0
         else

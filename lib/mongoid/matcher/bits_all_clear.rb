@@ -4,8 +4,10 @@ module Mongoid
     # @api private
     module BitsAllClear
       module_function def matches?(exists, value, condition)
-        # byebug
-        # p condition
+        case value
+        when BSON::Binary
+          value = value.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
+        end
         case condition
         when Array
           condition.all? do |c|

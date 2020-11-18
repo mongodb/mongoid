@@ -66,6 +66,16 @@
   matches: false
 
 # todo: need binary tests
+- name: existing field - matches binData
+  document:
+    prices: !ruby/object:BSON::Binary
+      data: !binary |-
+        IW==
+      type: :generic
+  query:
+    prices:
+      $type: 5
+  matches: true
 
 - name: existing field - matches undefined
   document:

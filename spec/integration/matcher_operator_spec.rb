@@ -52,9 +52,7 @@ describe 'Matcher operators' do
           end
 
           context 'server query' do
-            let!(:document) {
-              byebug
-              Mop.collection.insert_one(spec.fetch('document')) }
+            let!(:document) { Mop.create(spec.fetch('document')) }
 
             context 'via driver' do
               if mop_error?(spec, 'driver')
@@ -70,7 +68,7 @@ describe 'Matcher operators' do
                 end
               else
                 it 'produces the correct result' do
-                  byebug
+                  # byebug
                   Mop.collection.find(query).any?.should be result
                 end
               end

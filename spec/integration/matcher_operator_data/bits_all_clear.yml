@@ -7,6 +7,61 @@
       $bitsAllClear: 35
   matches: true
 
+- name: existing field - does not match with int
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: 24
+  matches: false
+
+- name: existing field - matches with binData
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: !ruby/object:BSON::Binary
+        data: !binary |-
+          IW==
+        type: :generic
+  matches: true
+
+- name: existing field - does not match with binData
+  document:
+    a: 21
+    binaryValueofA: "00010101"
+  query:
+    a:
+      $bitsAllClear: !ruby/object:BSON::Binary
+        data: !binary |-
+          IW==
+        type: :generic
+  matches: false
+
+- name: existing binData field matches
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        IW==
+      type: :generic
+  query:
+    a:
+      $bitsAllClear: 20
+  matches: true
+
+- name: existing binData field does not match
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        IW==
+      type: :generic
+  query:
+    a:
+      $bitsAllClear: 15
+  matches: false
+
 - name: existing field - matches with array
   document:
     a: 20
@@ -24,22 +79,3 @@
     a:
       $bitsAllClear: [0, 2]
   matches: false
-
-#- name: existing field - matches with binData
-#  document:
-#    a: 20
-#    binaryValueofA: "00010100"
-#  query:
-#    a: !ruby/object:BSON::Binary
-#      $bitsAllClear: !binary |-
-#        IW==
-#  matches: true
-#
-#- name: existing field - matches with array
-#  document:
-#    a: 20
-#    binaryValueofA: "00010100"
-#  query:
-#    a:
-#      $bitsAllClear: [ 1, 5 ]
-#  matches: true

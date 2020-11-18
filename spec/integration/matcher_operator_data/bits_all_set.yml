@@ -7,6 +7,61 @@
       $bitsAllSet: 50
   matches: true
 
+- name: existing field - does not match with int
+  document:
+    a: 52
+    binaryValueofA: "00110100"
+  query:
+    a:
+      $bitsAllSet: 50
+  matches: false
+
+- name: existing field - matches with binData
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAllSet: !ruby/object:BSON::Binary
+        data: !binary |-
+          Ng==
+        type: :generic
+  matches: true
+
+- name: existing field - does not match with binData
+  document:
+    a: 21
+    binaryValueofA: "00010101"
+  query:
+    a:
+      $bitsAllSet: !ruby/object:BSON::Binary
+        data: !binary |-
+          MC==
+        type: :generic
+  matches: false
+
+- name: existing binData field matches
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        Ng==
+      type: :generic
+  query:
+    a:
+      $bitsAllSet: 48
+  matches: true
+
+- name: existing binData field does not match
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        MC==
+      type: :generic
+  query:
+    a:
+      $bitsAllSet: 54
+  matches: false
+
 - name: existing field - matches with array
   document:
     a: 20

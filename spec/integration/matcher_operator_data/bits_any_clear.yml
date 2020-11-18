@@ -7,6 +7,62 @@
       $bitsAnyClear: 35
   matches: true
 
+- name: existing field - does not match with int
+  document:
+    a: 7
+    binaryValueofA: "00000011"
+  query:
+    a:
+      $bitsAnyClear: 35
+  matches: true
+
+
+- name: existing field - matches with binData
+  document:
+    a: 16
+    binaryValueofA: "00001000"
+  query:
+    a:
+      $bitsAnyClear: !ruby/object:BSON::Binary
+        data: !binary |-
+          IW==
+        type: :generic
+  matches: true
+
+- name: existing field - does not match with binData
+  document:
+    a: 55
+    binaryValueofA: "00110111"
+  query:
+    a:
+      $bitsAnyClear: !ruby/object:BSON::Binary
+        data: !binary |-
+          IW==
+        type: :generic
+  matches: false
+
+- name: existing binData field matches
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        FA==
+      type: :generic
+  query:
+    a:
+      $bitsAnyClear: 35
+  matches: true
+
+- name: existing binData field does not match
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        IW==
+      type: :generic
+  query:
+    a:
+      $bitsAnyClear: 32
+  matches: false
+
 - name: existing field - matches with array
   document:
     a: 20

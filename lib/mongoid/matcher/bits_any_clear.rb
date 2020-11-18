@@ -4,17 +4,20 @@ module Mongoid
     # @api private
     module BitsAnyClear
       module_function def matches?(exists, value, condition)
+        case value
+        when BSON::Binary
+          value = value.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
+        end
         case condition
-          # TODO
           when Array
-          # #  array of bits
+          # array of bits
             condition.any? do |c|
               value & (1<<c) == 0
             end
-          # https://www.geeksforgeeks.org/check-whether-bit-given-position-set-unset/
         when BSON::Binary
+          int_cond = condition.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
+          (value & int_cond == 0) || (!(value & int_cond == int_cond) && (value & int_cond > 0))
         when Integer
-          # byebug
           # todo: simplify
           (value & condition == 0) || (!(value & condition == condition) && (value & condition > 0))
         else
