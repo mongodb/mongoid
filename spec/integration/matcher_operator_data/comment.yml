@@ -1,0 +1,22 @@
+- name: matches
+  document:
+    name: Angel Share
+  query:
+    name: Angel Share
+    $comment: "foo"
+  matches: true
+
+- name: null query is accepted
+  document:
+    pi: 3.14
+  query:
+    $comment: "hello"
+  matches: true
+
+- name: does not match
+  document:
+    name: Angel Share
+  query:
+    name: Angel Foo
+    $comment: "foo"
+  matches: false

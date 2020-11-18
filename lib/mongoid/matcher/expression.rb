@@ -12,6 +12,10 @@ module Mongoid
         end
         expr.all? do |k, expr_v|
           k = k.to_s
+          if k == "$comment"
+            # Nothing
+            return true
+          end
           if k.start_with?('$')
             ExpressionOperator.get(k).matches?(document, expr_v)
           else
