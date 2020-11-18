@@ -7,13 +7,10 @@ module Mongoid
         unless Array === condition
           raise Errors::InvalidQuery, "Unknown $mod argument #{condition}"
         end
-        if condition.length() != 2
-          raise Errors::InvalidQuery, "BadValue malformed mod, invalid number of elements"
+        if condition.length != 2
+          raise Errors::InvalidQuery, "Malformed $mod argument #{condition}, should have 2 elements"
         end
-        case condition
-        when Array
-          condition[1] == value%condition[0]
-        end
+        condition[1] == value%condition[0]
       end
     end
   end
