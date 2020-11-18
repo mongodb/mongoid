@@ -3,7 +3,7 @@
 
 - name: existing field - matches float
   document:
-    pi: 3.14
+    pi: !ruby/object:BSON::Float 3.14
   query:
     pi:
       $type: 1
@@ -19,7 +19,7 @@
 
 - name: existing field - matches string
   document:
-    name: "bob"
+    name: !ruby/object:BSON::String "bob"
   query:
     name:
       $type: 2
@@ -35,7 +35,7 @@
 
 - name: existing field - matches Object
   document:
-    name: "bob"
+    name: !ruby/object:BSON::Object "bob"
   query:
     name:
       $type: 2
@@ -51,7 +51,7 @@
 
 - name: existing field - matches array
   document:
-    prices: [1, 2, 3]
+    prices: !ruby/object:BSON::Array [1, 2, 3]
   query:
     prices:
       $type: 4
@@ -65,17 +65,24 @@
       $type: 4
   matches: false
 
-# todo: need binary tests
 - name: existing field - matches binData
   document:
-    prices: !ruby/object:BSON::Binary
+    price: !ruby/object:BSON::Binary
       data: !binary |-
         IW==
       type: :generic
   query:
-    prices:
+    price:
       $type: 5
   matches: true
+
+- name: existing field - does not match binData
+  document:
+    price: 5
+  query:
+    price:
+      $type: 5
+  matches: false
 
 - name: existing field - matches undefined
   document:
@@ -97,11 +104,11 @@
 
 - name: existing field - matches ObjectId
   document:
-    id: !ruby/object:BSON::ObjectId
+    new_id: !ruby/object:BSON::ObjectId
       raw_data: !binary |-
         Xt0Zj+G4MlyV5hyJ
   query:
-    _id:
+    new_id:
       $type: 7
   matches: true
 
@@ -115,7 +122,7 @@
 
 - name: existing field - matches boolean
   document:
-    status: true
+    status: !ruby/object:BSON::Boolean true
   query:
     status:
       $type: 8
@@ -129,24 +136,30 @@
       $type: 8
   matches: false
 
-#need date tests
-
+# todo: figure out why this is failing just on embedded
 #- name: existing field - matches date
 #  document:
-#    name: !ruby/object:BSON::Date
-#      pattern: /test/
-#      options: ''
+#    name: !ruby/object:BSON::Date 2010-04-16 16:32:03
 #  query:
 #    name:
-#      $type: 11
+#      $type: 9
 #  matches: true
 
-#- name: existing field - matches null
-#  document:
-#  query:
-#    name:
-#      $type: 10
-#  matches: true
+- name: existing field - does not match date
+  document:
+    name: 3
+  query:
+    name:
+      $type: 9
+  matches: false
+
+- name: existing field - matches null
+  document:
+    name: !ruby/object:BSON::NilClass
+  query:
+    name:
+      $type: 10
+  matches: true
 
 - name: existing field - does not match null
   document:
@@ -182,13 +195,46 @@
       $type: 11
   matches: false
 
-# need dbpointer tests
+- name: existing field - matches DBPointer
+  document:
+    ptr: !ruby/object:BSON::DbPointer
+      ref: "collection"
+      id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          Xt0Zj+G4MlyV5hyJ
+  query:
+    ptr:
+      $type: 12
+  matches: true
 
-# need javascript tests
+- name: existing field - does not match DBPointer
+  document:
+    ptr: 3
+  query:
+    ptr:
+      $type: 12
+  matches: false
+
+- name: existing field - matches Code
+  document:
+    code: !ruby/object:BSON::Code
+      javascript: "var foo = 42;"
+  query:
+    code:
+      $type: 13
+  matches: true
+
+- name: existing field - does not match Code
+  document:
+    code: 42
+  query:
+    code:
+      $type: 13
+  matches: false
 
 - name: existing field - matches symbol
   document:
-   name: :hello
+   name: !ruby/object:BSON::Symbol :hello
   query:
     name:
       $type: 14
@@ -202,33 +248,67 @@
       $type: 14
   matches: false
 
-# need javascript with code tests
+- name: existing field - matches Code with Scope
+  document:
+    code: !ruby/object:BSON::CodeWithScope
+      javascript: "this.value = name"
+      scope: {name: "sid"}
+  query:
+    code:
+      $type: 15
+  matches: true
 
-#- name: existing field - matches int
-#  document:
-#    pi: 3
-#  query:
-#    pi:
-#      $type: 16
-#  matches: true
-#
-#- name: existing field - does not match int
-#  document:
-#    pi: 3.14
-#  query:
-#    pi:
-#      $type: 16
-#  matches: false
+- name: existing field - does not match Code with Scope
+  document:
+    code: 42
+  query:
+    code:
+      $type: 15
+  matches: false
 
-# need timestamp test
+- name: existing field - matches Int32
+  document:
+    pi: !ruby/object:BSON::Int32
+      value: 3
+  query:
+    pi:
+      $type: 16
+  matches: true
 
-#- name: existing field - matches long
-#  document:
-#    number: 1111111111111111111111111
-#  query:
-#    number:
-#      $type: 18
-#  matches: true
+- name: existing field - does not match int
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 16
+  matches: false
+
+- name: existing field - matches timestamp
+  document:
+    time: !ruby/object:BSON::Timestamp
+      seconds: 4
+      increment: 2
+  query:
+    time:
+      $type: 17
+  matches: true
+
+- name: existing field - does not match timestamp
+  document:
+    name: 3
+  query:
+    name:
+      $type: 17
+  matches: false
+
+- name: existing field - matches long
+  document:
+    number: !ruby/object:BSON::Int64
+      value: 392141
+  query:
+    number:
+      $type: 18
+  matches: true
 
 - name: existing field - does not match long
   document:
@@ -238,21 +318,58 @@
       $type: 18
   matches: false
 
-#- name: type is -1
+# todo: fix this test
+#- name: existing field - matches decimal
 #  document:
-#    pi: 3.14
+#    number: !ruby/object:BSON::Decimal128
 #  query:
-#    pi:
-#      $type: -1
+#    number:
+#      $type: 19
 #  matches: true
-#
-#- name: type is 127
-#  document:
-#    pi: 3.14
-#  query:
-#    pi:
-#      $type: 127
-#  matches: true
+
+- name: existing field - does not match decimal
+  document:
+    name: "foo"
+  query:
+    name:
+      $type: 19
+  matches: false
+
+- name: existing field - matches MinKey
+  document:
+    pi: !ruby/object:BSON::MinKey
+      # dummy field so MinKey gets constructed
+      test: 42
+  query:
+    pi:
+      $type: -1
+  matches: true
+
+- name: existing field - does not match MinKey
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: -1
+  matches: false
+
+- name: existing field - matches MinKey
+  document:
+    pi: !ruby/object:BSON::MaxKey
+      # dummy field so MaxKey gets constructed
+      test: 42
+  query:
+    pi:
+      $type: 127
+  matches: true
+
+- name: existing field - does not match MaxKey
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 127
+  matches: false
 
 - name: type is too negative
   document:
