@@ -17,30 +17,6 @@ module Mongoid
 
         # Expands the specified condition to MongoDB syntax.
         #
-        # The condition must be a hash in one of the following forms:
-        # - {field_name: value}
-        # - {'field_name' => value}
-        # - {key_instance: value}
-        # - {'$operator' => operator_value_expression}
-        #
-        # This method expands the key instance form to the the operator form,
-        # and also converts hash key to string.
-        #
-        # The hash may contain multiple items, each representing a separate
-        # condition.
-        #
-        # @param [ Hash ] condition The condition to expand.
-        #
-        # @return [ Hash ] The expanded condition.
-        def expand_condition(condition)
-          mapped = condition.map do |field, value|
-            expand_one_condition(field, value)
-          end
-          Hash[mapped]
-        end
-
-        # Expands the specified condition to MongoDB syntax.
-        #
         # This method is meant to be called when processing the items of
         # a condition hash and the key and the value of each item are
         # already available separately.

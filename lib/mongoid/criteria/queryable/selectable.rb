@@ -882,19 +882,19 @@ module Mongoid
           if criterion.nil?
             raise ArgumentError, 'Criterion cannot be nil here'
           end
+          unless Hash === criterion
+            raise Errors::InvalidQuery, "Expression must be a Hash: #{Errors::InvalidQuery.truncate_expr(criterion)}"
+          end
 
+          normalized = _mongoid_expand_keys(criterion)
           clone.tap do |query|
-            unless Hash === criterion
-              raise Errors::InvalidQuery, "Expression must be a Hash: #{Errors::InvalidQuery.truncate_expr(criterion)}"
-            end
-            criterion.each do |field, value|
+            normalized.each do |field, value|
               field_s = field.to_s
               if field_s[0] == ?$
                 # Query expression-level operator, like $and or $where
                 query.add_operator_expression(field_s, value)
               else
-                exp_field, exp_value = expand_one_condition(field, value)
-                query.add_field_expression(exp_field, exp_value)
+                query.add_field_expression(field, value)
               end
             end
             query.reset_strategies!

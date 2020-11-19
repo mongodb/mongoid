@@ -230,6 +230,14 @@ module Mongoid
         # MQL corresponding to said key objects. Also converts the input to
         # BSON::Document to permit indifferent access.
         #
+        # The argument must be a hash containing key-value pairs of the
+        # following forms:
+        # - {field_name: value}
+        # - {'field_name' => value}
+        # - {key_instance: value}
+        # - {:$operator => operator_value_expression}
+        # - {'$operator' => operator_value_expression}
+        #
         # Ruby does not permit multiple symbol operators. For example,
         # {:foo.gt => 1, :foo.gt => 2} is collapsed to {:foo.gt => 2} by the
         # language. Therefore this method never has to deal with multiple
@@ -252,7 +260,7 @@ module Mongoid
 
           result = BSON::Document.new
           expr.each do |field, value|
-            field.__expr_part__(value.__expand_complex__).each do |k, v|
+            field.__expr_part__(value.__expand_complex__, negating?).each do |k, v|
               if result[k]
                 if result[k].is_a?(Hash)
                   # Existing value is an operator.

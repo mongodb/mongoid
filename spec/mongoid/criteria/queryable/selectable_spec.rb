@@ -2153,7 +2153,7 @@ describe Mongoid::Criteria::Queryable::Selectable do
 
           it "adds the $elemMatch criterion" do
             expect(selection.selector).to eq(
-              { "field" => { "$elemMatch" => { key: 1 } }}
+              { "field" => { "$elemMatch" => { 'key' => 1 } }}
             )
           end
 

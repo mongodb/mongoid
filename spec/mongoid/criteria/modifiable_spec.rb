@@ -705,7 +705,7 @@ describe Mongoid::Criteria::Modifiable do
           end
 
           it 'uses the values from the attributes' do
-            expect(document.map).to eq({ foo: :bar })
+            expect(document.map).to eq('foo' => :bar )
           end
         end
 

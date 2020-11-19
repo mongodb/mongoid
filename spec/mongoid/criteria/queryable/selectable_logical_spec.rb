@@ -1087,6 +1087,21 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
     end
+
+    context 'when giving multiple conditions in one call on the same key with symbol operator' do
+
+      let(:selection) do
+        query.send(tested_method, field: 1, :field.gt => 0)
+      end
+
+      it 'combines conditions with $eq' do
+        selection.selector.should == {
+          expected_operator => [
+            'field' => {'$eq' => 1, '$gt' => 0},
+          ]
+        }
+      end
+    end
   end
 
   describe "#or" do
@@ -1878,6 +1893,21 @@ describe Mongoid::Criteria::Queryable::Selectable do
           'bar' => {'$ne' => 42},
           'a' => {'$ne' => 2},
         )
+      end
+    end
+
+    context 'when giving multiple conditions in one call on the same key with symbol operator' do
+
+      let(:selection) do
+        query.not(field: 1, :field.gt => 0)
+      end
+
+      it 'combines conditions with $eq' do
+        selection.selector.should == {
+          '$and' => ['$nor' => [
+            'field' => {'$eq' => 1, '$gt' => 0},
+          ]]
+        }
       end
     end
   end
