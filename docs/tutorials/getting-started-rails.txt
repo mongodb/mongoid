@@ -19,6 +19,10 @@ described in the `Ruby on Rails Getting Started
 <https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application>`_
 guide, however using Mongoid instead of ActiveRecord as the database adapter.
 
+The complete source code for this application can be found in the
+`mongoid-demo GitHub repository
+<https://github.com/mongoid/mongoid-demo/tree/master/rails>`_.
+
 .. note::
 
   This guide assumes basic familiarity with Ruby on Rails.
@@ -351,14 +355,6 @@ You should now be able to leave comments for the posts:
   :alt: Screenshot of the blog with a new comment being added
 
 
-Source Code
------------
-
-The complete source code for this application can be found in the
-`mongoid-demo GitHub repository
-<https://github.com/mongoid/mongoid-demo/tree/master/rails>`_.
-
-
 Existing Application
 ====================
 
@@ -548,6 +544,6 @@ as when creating a regular application, with the only change being the
 ``--api`` parameter to ``rails new``. Migrating a Rails API application to
 Mongoid follows the same process described above for regular Rails applications.
 
-A complete Rails API application using Mongoid can be found in the
-`mongoid-demo GitHub repository
+A complete Rails API application similar to the one described in this tutorial
+can be found in the `mongoid-demo GitHub repository
 <https://github.com/mongoid/mongoid-demo/tree/master/rails-api>`_.
