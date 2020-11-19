@@ -12,19 +12,17 @@ module Mongoid
             condition = v
           end
         when 1
-          #TODO: MATCH BSON TYPES
-
           # Double
-          Float === value || BSON::Float === value
+          Float === value
         when 2
           # String
-          String === value || BSON::String === value
+          String === value
         when 3
           # Object
-          Object === value || BSON::Object === value
+          Object === value
         when 4
           # Array
-          Array === value || BSON::Array === value
+          Array === value
         when 5
           # Binary data
           BSON::Binary === value
@@ -36,10 +34,10 @@ module Mongoid
           BSON::ObjectId === value
         when 8
           # Boolean
-          TrueClass === value || FalseClass === value || BSON::Boolean === value
+          TrueClass === value || FalseClass === value
         when 9
           # Date
-          BSON::Date === value
+          Date === value || Time === value || DateTime === value
         when 10
           # Null
           BSON::NilClass === value

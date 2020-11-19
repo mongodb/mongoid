@@ -1,6 +1,3 @@
-# todo: test all cases with bson classes
-# then see what server behavior is for ruby types, make mongoid match server behavior
-
 - name: existing field - matches float
   document:
     pi: !ruby/object:BSON::Float 3.14
@@ -136,14 +133,37 @@
       $type: 8
   matches: false
 
-# todo: figure out why this is failing just on embedded
-#- name: existing field - matches date
-#  document:
-#    name: !ruby/object:BSON::Date 2010-04-16 16:32:03
-#  query:
-#    name:
-#      $type: 9
-#  matches: true
+- name: existing field - matches date with date_field
+  document:
+    date_field: 2020-11-19
+  query:
+    date_field:
+      $type: 9
+  matches: true
+
+- name: existing field - matches date with time_field
+  document:
+    time_field: 2020-11-19 00:00:00
+  query:
+    time_field:
+      $type: 9
+  matches: true
+
+- name: existing field - matches date with datetime_field
+  document:
+    datetime_field: 2020-11-19 00:00:00
+  query:
+    datetime_field:
+      $type: 9
+  matches: true
+
+- name: existing field - matches date with default field
+  document:
+    day: 2020-11-19
+  query:
+    day:
+      $type: 9
+  matches: true
 
 - name: existing field - does not match date
   document:
@@ -318,14 +338,15 @@
       $type: 18
   matches: false
 
-# todo: fix this test
-#- name: existing field - matches decimal
-#  document:
-#    number: !ruby/object:BSON::Decimal128
-#  query:
-#    number:
-#      $type: 19
-#  matches: true
+- name: existing field - matches decimal
+  document:
+    number: !ruby/object:BSON::Decimal128
+      low: 4224
+      high: 3475653012423180288
+  query:
+    number:
+      $type: 19
+  matches: true
 
 - name: existing field - does not match decimal
   document:

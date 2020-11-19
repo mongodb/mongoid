@@ -13,4 +13,7 @@ class Mop
   # transformed differently based on the type of field being queried.
   field :int_field, type: Integer
   field :array_field, type: Array
+  field :date_field, type: Date
+  field :time_field, type: Time
+  field :datetime_field, type: DateTime
 end
