@@ -349,6 +349,7 @@
     number:
       $type: 19
   matches: true
+  min_server_version: 3.4
 
 - name: existing field - does not match decimal
   document:
@@ -401,6 +402,7 @@
     pi:
       $type: -2
   error: true
+  min_server_version: 3.2
 
 - name: type is too large
   document:
@@ -409,6 +411,7 @@
     pi:
       $type: 42
   error: true
+  min_server_version: 3.2
 
 - name: array argument for type
   document:
@@ -417,6 +420,7 @@
     pi:
       $type: [1]
   matches: true
+  min_server_version: 3.6
 
 - name: hash argument
   document:
