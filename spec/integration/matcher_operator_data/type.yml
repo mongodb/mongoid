@@ -189,13 +189,13 @@
       $type: 10
   matches: false
 
-- name: type is 0
-  document:
-    pi: 3.14
-  query:
-    pi:
-      $type: 0
-  error: true
+#- name: type is 0
+#  document:
+#    pi: 3.14
+#  query:
+#    pi:
+#      $type: 0
+#  error: true
 
 - name: existing field - matches regex
   document:
