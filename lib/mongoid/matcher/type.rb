@@ -6,11 +6,12 @@ module Mongoid
     # @api private
     module Type
       module_function def matches?(exists, value, condition)
+        if Array === condition && condition.length == 1
+          condition = condition[0]
+        elsif Array === condition && condition.length != 1
+          raise Errors::InvalidQuery, "Unknown $type argument #{condition}"
+        end
         case condition
-        when Array
-          condition.any? do |v|
-            condition = v
-          end
         when 1
           # Double
           Float === value
@@ -19,7 +20,7 @@ module Mongoid
           String === value
         when 3
           # Object
-          Object === value
+          Hash === value
         when 4
           # Array
           Array === value
@@ -40,7 +41,7 @@ module Mongoid
           Date === value || Time === value || DateTime === value
         when 10
           # Null
-          BSON::NilClass === value
+          NilClass === value
         when 11
           # Regex
           Regexp::Raw === value || ::Regexp === value
