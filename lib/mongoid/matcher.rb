@@ -103,6 +103,7 @@ end
 
 require 'mongoid/matcher/all'
 require 'mongoid/matcher/and'
+require 'mongoid/matcher/bits'
 require 'mongoid/matcher/bits_all_clear'
 require 'mongoid/matcher/bits_all_set'
 require 'mongoid/matcher/bits_any_clear'

@@ -87,3 +87,23 @@
       $bitsAllSet: [0, 3]
   matches: false
   min_server_version: 3.2
+
+- name: float condition representable as an integer
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAllSet: 50.0
+  matches: true
+  min_server_version: 3.2
+
+- name: float condition not representable as an integer
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAllSet: 50.1
+  error: true
+  min_server_version: 3.2
