@@ -15,6 +15,9 @@ module Mongoid
           int_cond = condition.data.split('').map { |n| '%02x' % n.ord }.join.to_i(16)
           int_matches?(value, int_cond)
         when Integer
+          if condition < 0
+            raise Errors::InvalidQuery, "Invalid value for $#{operator_name} argument: negative integers are not allowed: #{condition}"
+          end
           int_matches?(value, condition)
         when Float
           if (int_cond = condition.to_i).to_f == condition

@@ -137,3 +137,13 @@
       $bitsAllSet: 0
   matches: true
   min_server_version: 3.2
+
+- name: negative integer condition
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAllSet: -1
+  error: true
+  min_server_version: 3.2
