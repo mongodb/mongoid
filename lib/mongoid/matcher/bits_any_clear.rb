@@ -13,9 +13,7 @@ module Mongoid
       end
 
       def int_matches?(value, condition)
-        # either all clear or not (all set and any set)
-        (value & condition == 0) ||
-          (!(value & condition == condition) && (value & condition > 0))
+        value & condition < condition
       end
     end
   end
