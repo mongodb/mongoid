@@ -53,6 +53,7 @@
     prices:
       $type: 4
   matches: true
+  min_server_version: 3.6
 
 - name: existing field - does not match array
   document:
@@ -189,13 +190,14 @@
       $type: 10
   matches: false
 
-#- name: type is 0
-#  document:
-#    pi: 3.14
-#  query:
-#    pi:
-#      $type: 0
-#  error: true
+- name: type is 0
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 0
+  error: true
+  min_server_version: 4.2
 
 - name: existing field - matches regex
   document:
