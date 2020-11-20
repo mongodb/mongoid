@@ -68,7 +68,6 @@ describe 'Matcher operators' do
                 end
               else
                 it 'produces the correct result' do
-                  # byebug
                   Mop.collection.find(query).any?.should be result
                 end
               end
