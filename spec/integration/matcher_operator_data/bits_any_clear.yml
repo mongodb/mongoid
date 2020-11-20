@@ -6,6 +6,7 @@
     a:
       $bitsAnyClear: 35
   matches: true
+  min_server_version: 3.2
 
 - name: existing field - does not match with int
   document:
@@ -15,6 +16,7 @@
     a:
       $bitsAnyClear: 35
   matches: true
+  min_server_version: 3.2
 
 - name: existing field - matches with binData
   document:
@@ -27,6 +29,7 @@
           IW==
         type: :generic
   matches: true
+  min_server_version: 3.2
 
 - name: existing field - does not match with binData
   document:
@@ -39,6 +42,7 @@
           IW==
         type: :generic
   matches: false
+  min_server_version: 3.2
 
 - name: existing binData field matches
   document:
@@ -50,6 +54,7 @@
     a:
       $bitsAnyClear: 35
   matches: true
+  min_server_version: 3.2
 
 - name: existing binData field does not match
   document:
@@ -61,6 +66,7 @@
     a:
       $bitsAnyClear: 32
   matches: false
+  min_server_version: 3.2
 
 - name: existing field - matches with array
   document:
@@ -70,6 +76,7 @@
     a:
       $bitsAnyClear: [0, 2]
   matches: true
+  min_server_version: 3.2
 
 - name: existing field - does not match with array
   document:
@@ -79,3 +86,4 @@
     a:
       $bitsAnyClear: [2, 4]
   matches: false
+  min_server_version: 3.2
