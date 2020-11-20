@@ -87,3 +87,53 @@
       $bitsAnyClear: [2, 4]
   matches: false
   min_server_version: 3.2
+
+- name: float condition representable as an integer
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAnyClear: 35.0
+  matches: true
+  min_server_version: 3.2
+
+- name: float condition not representable as an integer
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAnyClear: 35.1
+  error: true
+  min_server_version: 3.2
+
+- name: string condition
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAnyClear: 'hello'
+  error: true
+  min_server_version: 3.2
+
+- name: empty array condition
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAnyClear: []
+  matches: false
+  min_server_version: 3.2
+
+- name: integer 0 condition
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAnyClear: 0
+  matches: false
+  min_server_version: 3.2
