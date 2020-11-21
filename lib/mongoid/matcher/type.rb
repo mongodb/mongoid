@@ -41,7 +41,7 @@ module Mongoid
           Date === value || Time === value || DateTime === value
         when 10
           # Null
-          NilClass === value
+          exists && NilClass === value
         when 11
           # Regex
           Regexp::Raw === value || ::Regexp === value

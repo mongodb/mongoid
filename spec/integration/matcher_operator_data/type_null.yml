@@ -1,12 +1,20 @@
-- name: existing field - matches null
+- name: existing field - matches
   document:
-    name: !ruby/object:BSON::NilClass
+    name:
   query:
     name:
       $type: 10
   matches: true
 
-- name: existing field - does not match null
+- name: missing field - does not match
+  document:
+    x:
+  query:
+    name:
+      $type: 10
+  matches: false
+
+- name: existing field - does not match
   document:
     pi: 3
   query:
