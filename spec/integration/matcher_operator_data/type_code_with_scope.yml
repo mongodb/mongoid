@@ -15,3 +15,12 @@
     code:
       $type: 15
   matches: false
+
+- name: Code - does not match
+  document:
+    code: !ruby/object:BSON::Code
+      javascript: "var foo = 42;"
+  query:
+    code:
+      $type: 15
+  matches: false

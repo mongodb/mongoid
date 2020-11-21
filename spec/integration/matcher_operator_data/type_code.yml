@@ -14,3 +14,13 @@
     code:
       $type: 13
   matches: false
+
+- name: Code with Scope - does not match
+  document:
+    code: !ruby/object:BSON::CodeWithScope
+      javascript: "this.value = name"
+      scope: {name: "sid"}
+  query:
+    code:
+      $type: 13
+  matches: false
