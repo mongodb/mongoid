@@ -8,9 +8,17 @@
       $type: 7
   matches: true
 
-- name: existing field - does not match ObjectId
+- name: integer - does not match
   document:
     pi: 3
+  query:
+    pi:
+      $type: 7
+  matches: false
+
+- name: string - does not match
+  document:
+    pi: hello
   query:
     pi:
       $type: 7
