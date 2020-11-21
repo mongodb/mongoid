@@ -14,7 +14,7 @@ describe Mongoid::Association::Referenced::HasAndBelongsToMany::Binding do
   end
 
   let(:target) do
-    Mongoid::Association::Referenced::HasMany::Targets::Enumerable.new([ preference ])
+    Mongoid::Association::Referenced::HasMany::Enumerable.new([ preference ])
   end
 
   let(:association) do

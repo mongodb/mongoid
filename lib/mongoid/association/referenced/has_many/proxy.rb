@@ -220,7 +220,7 @@ module Mongoid
           #
           # @since 2.0.0.beta.1
           def initialize(base, target, association)
-            enum = HasMany::Targets::Enumerable.new(target, base, association)
+            enum = HasMany::Enumerable.new(target, base, association)
             init(base, enum, association) do
               raise_mixed if klass.embedded? && !klass.cyclic?
             end

@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Mongoid::Association::Referenced::HasMany::Targets::Enumerable do
+describe Mongoid::Association::Referenced::HasMany::Enumerable do
 
   describe "#==" do
 
