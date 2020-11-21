@@ -16,4 +16,6 @@ class Mop
   field :date_field, type: Date
   field :time_field, type: Time
   field :datetime_field, type: DateTime
+  field :big_decimal_field, type: BigDecimal
+  field :decimal128_field, type: BSON::Decimal128
 end
