@@ -6,11 +6,23 @@ module Mongoid
     # @api private
     module Type
       module_function def matches?(exists, value, condition)
-        if Array === condition && condition.length == 1
-          condition = condition[0]
-        elsif Array === condition && condition.length != 1
-          raise Errors::InvalidQuery, "Unknown $type argument #{condition}"
+        conditions = case condition
+        when Array
+          condition
+        when Integer
+          [condition]
+        else
+          raise Errors::InvalidQuery, "Unknown $type argument: #{condition}"
         end
+        conditions.each do |condition|
+          if one_matches?(exists, value, condition)
+            return true
+          end
+        end
+        false
+      end
+
+      module_function def one_matches?(exists, value, condition)
         case condition
         when 1
           # Double
@@ -85,4 +97,3 @@ module Mongoid
     end
   end
 end
-

@@ -50,3 +50,21 @@
     pi:
       $type: {}
   error: true
+
+- name: array with multiple elements - matches
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: [1, 2]
+  matches: true
+  min_server_version: 3.6
+
+- name: array with multiple elements - does not match
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: [2, 3]
+  matches: false
+  min_server_version: 3.6
