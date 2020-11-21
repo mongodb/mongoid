@@ -1,6 +1,6 @@
 - name: existing field - matches array
   document:
-    prices: !ruby/object:BSON::Array [1, 2, 3]
+    prices: [1, 2, 3]
   query:
     prices:
       $type: 4
