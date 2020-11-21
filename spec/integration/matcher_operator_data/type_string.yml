@@ -1,6 +1,6 @@
 - name: existing field - matches string
   document:
-    name: !ruby/object:BSON::String "bob"
+    name: bob
   query:
     name:
       $type: 2
