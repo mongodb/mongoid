@@ -1,0 +1,16 @@
+- name: existing field - matches Int32
+  document:
+    pi: !ruby/object:BSON::Int32
+      value: 3
+  query:
+    pi:
+      $type: 16
+  matches: true
+
+- name: existing field - does not match int
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 16
+  matches: false

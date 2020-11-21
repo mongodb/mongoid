@@ -1,0 +1,17 @@
+- name: existing field - matches MaxKey
+  document:
+    pi: !ruby/object:BSON::MaxKey
+      # dummy field so MaxKey gets constructed
+      test: 42
+  query:
+    pi:
+      $type: 127
+  matches: true
+
+- name: existing field - does not match MaxKey
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 127
+  matches: false

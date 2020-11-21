@@ -1,0 +1,15 @@
+- name: existing field - matches symbol
+  document:
+   name: !ruby/object:BSON::Symbol :hello
+  query:
+    name:
+      $type: 14
+  matches: true
+
+- name: existing field - does not match symbol
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 14
+  matches: false

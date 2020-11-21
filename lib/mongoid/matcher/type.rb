@@ -76,7 +76,7 @@ module Mongoid
           # maxKey
           BSON::MaxKey === value
         else
-          raise Errors::InvalidQuery, "Unknown $type argument #{condition}"
+          raise Errors::InvalidQuery, "Unknown $type argument: #{condition}"
         end
       end
     end

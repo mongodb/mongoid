@@ -1,0 +1,17 @@
+- name: existing field - matches regex
+  document:
+    name: !ruby/object:BSON::Regexp::Raw
+      pattern: /test/
+      options: ''
+  query:
+    name:
+      $type: 11
+  matches: true
+
+- name: existing field - does not match regex
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 11
+  matches: false

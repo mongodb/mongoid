@@ -1,0 +1,16 @@
+- name: existing field - matches long
+  document:
+    number: !ruby/object:BSON::Int64
+      value: 392141
+  query:
+    number:
+      $type: 18
+  matches: true
+
+- name: existing field - does not match long
+  document:
+    name: "foo"
+  query:
+    name:
+      $type: 18
+  matches: false

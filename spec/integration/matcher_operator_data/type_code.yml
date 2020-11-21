@@ -1,0 +1,16 @@
+- name: existing field - matches Code
+  document:
+    code: !ruby/object:BSON::Code
+      javascript: "var foo = 42;"
+  query:
+    code:
+      $type: 13
+  matches: true
+
+- name: existing field - does not match Code
+  document:
+    code: 42
+  query:
+    code:
+      $type: 13
+  matches: false
