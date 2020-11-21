@@ -65,7 +65,10 @@ module Mongoid
           BSON::Timestamp === value
         when 18
           # Long
-          BSON::Int64 === value
+          BSON::Int64 === value ||
+            Integer === value &&
+              (-2**64..2**64-1).include?(value) &&
+              !(-2**32..2**32-1).include?(value)
         when 19
           # Decimal
           BSON::Decimal128 === value
