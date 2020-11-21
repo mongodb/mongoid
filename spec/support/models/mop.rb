@@ -18,4 +18,6 @@ class Mop
   field :datetime_field, type: DateTime
   field :big_decimal_field, type: BigDecimal
   field :decimal128_field, type: BSON::Decimal128
+  field :symbol_field, type: Symbol
+  field :bson_symbol_field, type: BSON::Symbol::Raw
 end

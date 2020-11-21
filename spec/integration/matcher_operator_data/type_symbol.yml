@@ -1,14 +1,31 @@
-- name: existing field - matches symbol
+- name: symbol in untyped field - matches
   document:
-   name: !ruby/object:BSON::Symbol :hello
+   name: :hello
   query:
     name:
       $type: 14
   matches: true
 
-- name: existing field - does not match symbol
+- name: symbol field - matches
   document:
-    pi: 3
+    symbol_field: :hello
+  query:
+    symbol_field:
+      $type: 14
+  matches: true
+
+- name: bson symbol - matches
+  document:
+    bson_symbol_field: !ruby/object:BSON::Symbol::Raw
+      symbol: hello
+  query:
+    bson_symbol_field:
+      $type: 14
+  matches: true
+
+- name: string field - does not match
+  document:
+    pi: hello
   query:
     pi:
       $type: 14
