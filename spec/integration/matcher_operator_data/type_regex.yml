@@ -1,10 +1,37 @@
-- name: existing field - matches regex
+- name: bson regexp in untyped field - matches
   document:
     name: !ruby/object:BSON::Regexp::Raw
       pattern: /test/
       options: ''
   query:
     name:
+      $type: 11
+  matches: true
+
+- name: ruby regexp in untyped field - matches
+  document:
+    name: /test/
+  query:
+    name:
+      $type: 11
+  # Regexp is serialized as a string
+  matches: false
+
+- name: ruby regexp field - matches
+  document:
+    regexp_field: /test/
+  query:
+    regexp_field:
+      $type: 11
+  matches: true
+
+- name: bson regexp field - matches
+  document:
+    bson_regexp_field: !ruby/object:BSON::Regexp::Raw
+      pattern: /test/
+      options: ''
+  query:
+    bson_regexp_field:
       $type: 11
   matches: true
 

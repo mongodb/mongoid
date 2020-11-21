@@ -20,4 +20,6 @@ class Mop
   field :decimal128_field, type: BSON::Decimal128
   field :symbol_field, type: Symbol
   field :bson_symbol_field, type: BSON::Symbol::Raw
+  field :regexp_field, type: Regexp
+  field :bson_regexp_field, type: BSON::Regexp::Raw
 end
