@@ -59,7 +59,7 @@ module Mongoid
           BSON::CodeWithScope === value
         when 16
           # 32-bit int
-          BSON::Int32 === value
+          BSON::Int32 === value || Integer === value && (-2**32..2**32-1).include?(value)
         when 17
           # Timestamp
           BSON::Timestamp === value
