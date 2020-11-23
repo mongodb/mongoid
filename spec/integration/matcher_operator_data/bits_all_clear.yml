@@ -1,0 +1,159 @@
+- name: existing field - matches with int
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: 35
+  matches: true
+  min_server_version: 3.2
+
+- name: existing field - does not match with int
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: 24
+  matches: false
+  min_server_version: 3.2
+
+- name: existing field - matches with binData
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: !ruby/object:BSON::Binary
+        data: !binary |-
+          IW==
+        type: :generic
+  matches: true
+  min_server_version: 3.2
+
+- name: existing field - does not match with binData
+  document:
+    a: 21
+    binaryValueofA: "00010101"
+  query:
+    a:
+      $bitsAllClear: !ruby/object:BSON::Binary
+        data: !binary |-
+          IW==
+        type: :generic
+  matches: false
+  min_server_version: 3.2
+
+- name: existing binData field matches
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        IW==
+      type: :generic
+  query:
+    a:
+      $bitsAllClear: 20
+  matches: true
+  min_server_version: 3.2
+
+- name: existing binData field does not match
+  document:
+    a: !ruby/object:BSON::Binary
+      data: !binary |-
+        IW==
+      type: :generic
+  query:
+    a:
+      $bitsAllClear: 15
+  matches: false
+  min_server_version: 3.2
+
+- name: existing field - matches with array
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: [0, 3]
+  matches: true
+  min_server_version: 3.2
+
+- name: existing field - does not match with array
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: [0, 2]
+  matches: false
+  min_server_version: 3.2
+
+- name: float condition representable as an integer
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: 35.0
+  matches: true
+  min_server_version: 3.2
+
+- name: float condition not representable as an integer
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: 35.1
+  error: true
+  min_server_version: 3.2
+
+- name: string condition
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAllClear: hello
+  error: true
+  min_server_version: 3.2
+
+- name: empty array condition
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: []
+  matches: true
+  min_server_version: 3.2
+
+- name: integer 0 condition
+  document:
+    a: 20
+    binaryValueofA: "00010100"
+  query:
+    a:
+      $bitsAllClear: 0
+  matches: true
+  min_server_version: 3.2
+
+- name: negative integer condition
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAllClear: -1
+  error: true
+  min_server_version: 3.2
+
+- name: negative float condition
+  document:
+    a: 54
+    binaryValueofA: "00110110"
+  query:
+    a:
+      $bitsAllClear: -1.0
+  error: true
+  min_server_version: 3.2

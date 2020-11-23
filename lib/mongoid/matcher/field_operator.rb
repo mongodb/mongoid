@@ -5,6 +5,10 @@ module Mongoid
     module FieldOperator
       MAP = {
         '$all' => All,
+        '$bitsAllClear' => BitsAllClear,
+        '$bitsAllSet' => BitsAllSet,
+        '$bitsAnyClear' => BitsAnyClear,
+        '$bitsAnySet' => BitsAnySet,
         '$elemMatch' => ElemMatch,
         '$eq' => Eq,
         '$exists' => Exists,
