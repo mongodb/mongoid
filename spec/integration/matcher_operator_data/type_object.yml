@@ -1,25 +1,23 @@
-- name: existing field - matches ObjectId
+- name: hash value - matches
   document:
-    new_id: !ruby/object:BSON::ObjectId
-      raw_data: !binary |-
-        Xt0Zj+G4MlyV5hyJ
+    name: {first_name: "bob"}
   query:
-    new_id:
-      $type: 7
+    name:
+      $type: 3
   matches: true
 
-- name: integer - does not match
+- name: array value - does not match
+  document:
+    name: [1]
+  query:
+    name:
+      $type: 3
+  matches: false
+
+- name: existing field - does not match Object
   document:
     pi: 3
   query:
     pi:
-      $type: 7
-  matches: false
-
-- name: string - does not match
-  document:
-    pi: hello
-  query:
-    pi:
-      $type: 7
+      $type: 3
   matches: false
