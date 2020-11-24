@@ -29,13 +29,17 @@ def database_id_alt
   "mongoid_test_alt"
 end
 
+require 'mrss/cluster_config'
+require 'support/client_registry'
+require 'mrss/constraints'
+
+ClusterConfig = Mrss::ClusterConfig
+
 require 'support/authorization'
 require 'support/expectations'
 require 'support/helpers'
 require 'support/macros'
-require 'support/cluster_config'
 require 'support/constraints'
-require 'mrss/constraints'
 
 # Give MongoDB servers time to start up in CI environments
 if SpecConfig.instance.ci?
