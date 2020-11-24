@@ -1,0 +1,25 @@
+- name: existing field - matches ObjectId
+  document:
+    new_id: !ruby/object:BSON::ObjectId
+      raw_data: !binary |-
+        Xt0Zj+G4MlyV5hyJ
+  query:
+    new_id:
+      $type: 7
+  matches: true
+
+- name: integer - does not match
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 7
+  matches: false
+
+- name: string - does not match
+  document:
+    pi: hello
+  query:
+    pi:
+      $type: 7
+  matches: false

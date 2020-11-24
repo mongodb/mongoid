@@ -1,0 +1,17 @@
+- name: existing field - matches undefined
+  document:
+    price: !ruby/object:BSON::Undefined
+      # dummy field so Undefined gets constructed
+      test: 42
+  query:
+    price:
+      $type: 6
+  matches: true
+
+- name: existing field - does not match undefined
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 6
+  matches: false

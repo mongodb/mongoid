@@ -1,0 +1,15 @@
+- name: existing field - matches string
+  document:
+    name: bob
+  query:
+    name:
+      $type: 2
+  matches: true
+
+- name: existing field - does not match string
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 2
+  matches: false

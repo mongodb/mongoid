@@ -1,0 +1,16 @@
+- name: existing field - matches array
+  document:
+    prices: [1, 2, 3]
+  query:
+    prices:
+      $type: 4
+  matches: true
+  min_server_version: 3.6
+
+- name: existing field - does not match array
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 4
+  matches: false

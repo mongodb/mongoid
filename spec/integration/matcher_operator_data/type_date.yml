@@ -1,0 +1,39 @@
+- name: existing field - matches date with date_field
+  document:
+    date_field: 2020-11-19
+  query:
+    date_field:
+      $type: 9
+  matches: true
+
+- name: existing field - matches date with time_field
+  document:
+    time_field: 2020-11-19 00:00:00
+  query:
+    time_field:
+      $type: 9
+  matches: true
+
+- name: existing field - matches date with datetime_field
+  document:
+    datetime_field: 2020-11-19 00:00:00
+  query:
+    datetime_field:
+      $type: 9
+  matches: true
+
+- name: existing field - matches date with default field
+  document:
+    day: 2020-11-19
+  query:
+    day:
+      $type: 9
+  matches: true
+
+- name: existing field - does not match date
+  document:
+    name: 3
+  query:
+    name:
+      $type: 9
+  matches: false

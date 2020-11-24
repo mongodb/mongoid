@@ -1,0 +1,19 @@
+- name: existing field - matches DBPointer
+  document:
+    ptr: !ruby/object:BSON::DbPointer
+      ref: "collection"
+      id: !ruby/object:BSON::ObjectId
+        raw_data: !binary |-
+          Xt0Zj+G4MlyV5hyJ
+  query:
+    ptr:
+      $type: 12
+  matches: true
+
+- name: existing field - does not match DBPointer
+  document:
+    ptr: 3
+  query:
+    ptr:
+      $type: 12
+  matches: false

@@ -1,0 +1,25 @@
+- name: existing field - matches timestamp
+  document:
+    time: !ruby/object:BSON::Timestamp
+      seconds: 4
+      increment: 2
+  query:
+    time:
+      $type: 17
+  matches: true
+
+- name: existing field - does not match timestamp
+  document:
+    name: 3
+  query:
+    name:
+      $type: 17
+  matches: false
+
+- name: Ruby Time instance - does not match
+  document:
+    time_field: 2020-11-19 00:00:00
+  query:
+    time_field:
+      $type: 17
+  matches: false

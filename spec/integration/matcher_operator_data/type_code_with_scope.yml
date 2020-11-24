@@ -1,0 +1,26 @@
+- name: existing field - matches Code with Scope
+  document:
+    code: !ruby/object:BSON::CodeWithScope
+      javascript: "this.value = name"
+      scope: {name: "sid"}
+  query:
+    code:
+      $type: 15
+  matches: true
+
+- name: existing field - does not match Code with Scope
+  document:
+    code: 42
+  query:
+    code:
+      $type: 15
+  matches: false
+
+- name: Code - does not match
+  document:
+    code: !ruby/object:BSON::Code
+      javascript: "var foo = 42;"
+  query:
+    code:
+      $type: 15
+  matches: false

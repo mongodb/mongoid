@@ -1,0 +1,32 @@
+- name: symbol in untyped field - matches
+  document:
+   name: :hello
+  query:
+    name:
+      $type: 14
+  matches: true
+
+- name: symbol field - matches
+  document:
+    symbol_field: :hello
+  query:
+    symbol_field:
+      $type: 14
+  matches: true
+
+- name: bson symbol - matches
+  document:
+    bson_symbol_field: !ruby/object:BSON::Symbol::Raw
+      symbol: hello
+  query:
+    bson_symbol_field:
+      $type: 14
+  matches: true
+
+- name: string field - does not match
+  document:
+    pi: hello
+  query:
+    pi:
+      $type: 14
+  matches: false

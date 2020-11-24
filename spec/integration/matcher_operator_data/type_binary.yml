@@ -1,0 +1,18 @@
+- name: existing field - matches binData
+  document:
+    price: !ruby/object:BSON::Binary
+      data: !binary |-
+        IW==
+      type: :generic
+  query:
+    price:
+      $type: 5
+  matches: true
+
+- name: existing field - does not match binData
+  document:
+    price: 5
+  query:
+    price:
+      $type: 5
+  matches: false

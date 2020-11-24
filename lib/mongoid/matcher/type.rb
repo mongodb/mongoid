@@ -6,11 +6,23 @@ module Mongoid
     # @api private
     module Type
       module_function def matches?(exists, value, condition)
-        if Array === condition && condition.length == 1
-          condition = condition[0]
-        elsif Array === condition && condition.length != 1
-          raise Errors::InvalidQuery, "Unknown $type argument #{condition}"
+        conditions = case condition
+        when Array
+          condition
+        when Integer
+          [condition]
+        else
+          raise Errors::InvalidQuery, "Unknown $type argument: #{condition}"
         end
+        conditions.each do |condition|
+          if one_matches?(exists, value, condition)
+            return true
+          end
+        end
+        false
+      end
+
+      module_function def one_matches?(exists, value, condition)
         case condition
         when 1
           # Double
@@ -41,7 +53,7 @@ module Mongoid
           Date === value || Time === value || DateTime === value
         when 10
           # Null
-          NilClass === value
+          exists && NilClass === value
         when 11
           # Regex
           Regexp::Raw === value || ::Regexp === value
@@ -59,13 +71,16 @@ module Mongoid
           BSON::CodeWithScope === value
         when 16
           # 32-bit int
-          BSON::Int32 === value
+          BSON::Int32 === value || Integer === value && (-2**32..2**32-1).include?(value)
         when 17
           # Timestamp
           BSON::Timestamp === value
         when 18
           # Long
-          BSON::Int64 === value
+          BSON::Int64 === value ||
+            Integer === value &&
+              (-2**64..2**64-1).include?(value) &&
+              !(-2**32..2**32-1).include?(value)
         when 19
           # Decimal
           BSON::Decimal128 === value
@@ -76,10 +91,9 @@ module Mongoid
           # maxKey
           BSON::MaxKey === value
         else
-          raise Errors::InvalidQuery, "Unknown $type argument #{condition}"
+          raise Errors::InvalidQuery, "Unknown $type argument: #{condition}"
         end
       end
     end
   end
 end
-
