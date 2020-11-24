@@ -682,7 +682,7 @@ The following deviations are known:
   As of this writing, the known cases of such deviation are:
 
    - 3.2 and earlier servers not validating ``$size`` arguments as strictly as newer versions do.
-   - 4.0 and earlier servers not validating ```$type`` arguments as strictly as as newer versions
+   - 4.0 and earlier servers not validating ``$type`` arguments as strictly as newer versions
      do (allowing invalid arguments like 0, for example).
    - 3.0 and earlier servers not supporting bitwise operators.
 
