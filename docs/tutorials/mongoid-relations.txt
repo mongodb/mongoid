@@ -639,7 +639,6 @@ operators that execute JavaScript code (:manual:`$where </reference/operator/que
 and operators that are implemented via other server functionality such as
 :manual:`$expr <https://docs.mongodb.com/manual/reference/operator/query/expr/>`
 and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/>`.
-.. _embedded-operators:
 
 The following operators are supported:
 
