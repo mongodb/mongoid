@@ -237,6 +237,7 @@ conditions.
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
 
+For a list of new embedded operators supported in 7.2, see :ref:`here <embedded-operators>`.
 
 ``count`` and ``estimated_count`` Methods
 -----------------------------------------
