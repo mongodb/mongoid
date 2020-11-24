@@ -642,6 +642,7 @@ and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/que
 The following operators are supported:
 
 .. _embedded-operators:
+
 - :manual: `Bitwise operators </reference/operator/query-bitwise/`.
 - :manual:`Comparison operators </reference/operator/query-comparison/>`.
 - :manual:`Logical operators </reference/operator/query-logical/>`.
@@ -683,7 +684,8 @@ The following deviations are known:
   newer versions do.
    - 4.0 and earlier servers not validating ```$type`` arguments as strictly as
    as newer versions do (allowing invalid arguments like 0, for example).
-   - 3.0 and earlier servers not supporting bitwise operators
+   - 3.0 and earlier servers not supporting bitwise operators.
+
 
 - Mongoid DSL expands ``Range`` arguments to hashes with ``$gte`` and ``$lte``
   conditions. `In some cases <https://jira.mongodb.org/browse/MONGOID-4908>`_
