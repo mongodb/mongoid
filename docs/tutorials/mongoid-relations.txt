@@ -699,8 +699,8 @@ The following deviations are known:
   possible <https://jira.mongodb.org/browse/MONGOID-4936>`_ to specify a
   regular expression object as the pattern and also provide options.
 
-
 In general, Mongoid adopts the behavior of current server versions and validates more strictly.
+
 
 Common Behavior
 ===============
