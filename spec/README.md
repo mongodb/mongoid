@@ -2,6 +2,13 @@
 
 ## Quick Start
 
+The test suite requires shared tooling that is stored in a separate repository
+and is referenced as a submodule. After checking out the desired driver
+branch, check out the matching submodules:
+
+    git submodule init
+    git submodule update
+
 Spin up a MongoDB deployment against which to run the Mongoid specs.
 Mongoid specs support a variety of MongoDB topologies, but the simplest is
 a single MongoDB instance:
