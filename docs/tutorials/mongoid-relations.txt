@@ -642,7 +642,7 @@ and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/que
 
 The following operators are supported:
 
-- :manual: `Bitwise operators </reference/operator/query-bitwise/`
+- :manual:`Bitwise operators </reference/operator/query-bitwise/`
 - :manual:`Comparison operators </reference/operator/query-comparison/>`
 - :manual:`Logical operators </reference/operator/query-logical/>`
 - :manual:`$comment </reference/operator/query/comment/>`
