@@ -130,6 +130,13 @@ Mongoid 7.2 behavior:
   #   embedded: false>
 
 
+New Embedded Matching Operators
+-------------------------------
+
+Mongoid 7.3 adds support for bitwise operators, ``$comment``, ``$mod`` and
+``$type`` operators when :ref:`embedded matching <embedded-matching>`.
+
+
 Upgrading to Mongoid 7.2
 ========================
 
@@ -348,12 +355,6 @@ conditions.
   job.tasks.or.first
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
-
-Additional Supported Operators
-``````````````````````````````
-
-Mongoid 7.2 adds support for bitwise operators, ``$comment``, ``$mod`` and
-``$type`` operators when embedded matching.
 
 
 ``count`` and ``estimated_count`` Methods
