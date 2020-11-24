@@ -639,20 +639,20 @@ operators that execute JavaScript code (:manual:`$where </reference/operator/que
 and operators that are implemented via other server functionality such as
 :manual:`$expr <https://docs.mongodb.com/manual/reference/operator/query/expr/>`
 and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/>`.
-The following operators are supported:
-
 .. _embedded-operators:
 
-- :manual: `Bitwise operators </reference/operator/query-bitwise/`.
-- :manual:`Comparison operators </reference/operator/query-comparison/>`.
-- :manual:`Logical operators </reference/operator/query-logical/>`.
-- :manual:`$comment </reference/operator/query/comment/>`.
+The following operators are supported:
+
+- :manual: `Bitwise operators </reference/operator/query-bitwise/`
+- :manual:`Comparison operators </reference/operator/query-comparison/>`
+- :manual:`Logical operators </reference/operator/query-logical/>`
+- :manual:`$comment </reference/operator/query/comment/>`
 - :manual:`$exists </reference/operator/query/exists/>`
-- :manual:`$mod </reference/operator/query/mod/>`.
-- :manual:`$type </reference/operator/query/type/>`.
+- :manual:`$mod </reference/operator/query/mod/>`
+- :manual:`$type </reference/operator/query/type/>`
 - :manual:`$regex </reference/operator/query/regex/>` (``$options`` field
-  is only supported when the ``$regex`` argument is a string).
-- :manual:`Array query operators </reference/operator/query-array/>`.
+  is only supported when the ``$regex`` argument is a string)
+- :manual:`Array query operators </reference/operator/query-array/>`
 
 For example, using the model definitions just given, we could query
 tours on a loaded band:
@@ -680,10 +680,10 @@ The following deviations are known:
   Decimal128 and $type).
   
   As of this writing, the known cases of such deviation are:
-   - 3.2 and earlier servers not validating ``$size`` arguments as strictly as
-  newer versions do.
-   - 4.0 and earlier servers not validating ```$type`` arguments as strictly as
-   as newer versions do (allowing invalid arguments like 0, for example).
+
+   - 3.2 and earlier servers not validating ``$size`` arguments as strictly as newer versions do.
+   - 4.0 and earlier servers not validating ```$type`` arguments as strictly as as newer versions
+     do (allowing invalid arguments like 0, for example).
    - 3.0 and earlier servers not supporting bitwise operators.
 
 
