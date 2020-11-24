@@ -27,6 +27,7 @@
     name:
       $type: 19
   matches: false
+  min_server_version: 3.4
 
 - name: BigDecimal field - does not match
   document:
