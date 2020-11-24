@@ -237,7 +237,12 @@ conditions.
   # Mongoid 7.2 and 7.1:
   # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
 
-For a list of new embedded operators supported in 7.2, see :ref:`here <embedded-matching>`.
+Additional Supported Operators
+``````````````````````````````
+
+Mongoid 7.2 adds support for bitwise operators, ``$comment``, ``$mod`` and
+``$type`` operators when embedded matching.
+
 
 ``count`` and ``estimated_count`` Methods
 -----------------------------------------
