@@ -23,6 +23,7 @@ module Mongoid
         '$not' => Not,
         '$regex' => Regex,
         '$size' => Size,
+        '$type' => Type,
       }.freeze
 
       module_function def get(op)

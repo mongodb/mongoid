@@ -639,15 +639,19 @@ operators that execute JavaScript code (:manual:`$where </reference/operator/que
 and operators that are implemented via other server functionality such as
 :manual:`$expr <https://docs.mongodb.com/manual/reference/operator/query/expr/>`
 and :manual:`$jsonSchema <https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/>`.
+
 The following operators are supported:
 
-- :manual:`Comparison operators </reference/operator/query-comparison/>`.
-- :manual:`Logical operators </reference/operator/query-logical/>`.
+- :manual:`Bitwise operators </reference/operator/query-bitwise/>`
+- :manual:`Comparison operators </reference/operator/query-comparison/>`
+- :manual:`Logical operators </reference/operator/query-logical/>`
+- :manual:`$comment </reference/operator/query/comment/>`
 - :manual:`$exists </reference/operator/query/exists/>`
-  (:manual:`$type </reference/operator/query/type/>` is not currently supported).
+- :manual:`$mod </reference/operator/query/mod/>`
+- :manual:`$type </reference/operator/query/type/>`
 - :manual:`$regex </reference/operator/query/regex/>` (``$options`` field
-  is only supported when the ``$regex`` argument is a string).
-- :manual:`Array query operators </reference/operator/query-array/>`.
+  is only supported when the ``$regex`` argument is a string)
+- :manual:`Array query operators </reference/operator/query-array/>`
 
 For example, using the model definitions just given, we could query
 tours on a loaded band:
@@ -670,12 +674,20 @@ The following deviations are known:
 - Mongoid embedded matchers, because they are implemented on the client side,
   behave the same regardless of the server version that backs the application.
   As such, it is possible for Mongoid to deviate from server behavior if
-  the server itself behaves differently in different versions.
+  the server itself behaves differently in different versions. All operators are implemented in
+  Mongoid regardless of backing deployment's server version.
   
-  As of this writing, the only known case of such deviation is 3.2 and
-  earlier servers not validating ``$size`` arguments as strictly as
-  newer versions do. Mongoid adopts the behavior of current server versions
-  and validates more strictly.
+  As of this writing, the known cases of such deviation are:
+
+   - 3.2 and earlier servers not validating ``$size`` arguments as strictly as newer versions do.
+   - 4.0 and earlier servers not validating ``$type`` arguments as strictly as newer versions
+     do (allowing invalid arguments like 0, for example).
+   - 3.2 and earlier servers not supporting ``Decimal128`` for ``$type``, as well as allowing invalid
+     arguments such as negative numbers (smaller than -1) and numbers that are greater than 19
+     (not including 127, the argument for the ``MaxKey`` type).
+   - 3.4 and earlier servers not supporting arrays for ``$type``.
+   - 3.0 and earlier servers not supporting bitwise operators.
+
 
 - Mongoid DSL expands ``Range`` arguments to hashes with ``$gte`` and ``$lte``
   conditions. `In some cases <https://jira.mongodb.org/browse/MONGOID-4908>`_
@@ -686,6 +698,8 @@ The following deviations are known:
 - When performing embedded matching with ``$regex``, `it is not currently
   possible <https://jira.mongodb.org/browse/MONGOID-4936>`_ to specify a
   regular expression object as the pattern and also provide options.
+
+In general, Mongoid adopts the behavior of current server versions and validates more strictly.
 
 
 Common Behavior

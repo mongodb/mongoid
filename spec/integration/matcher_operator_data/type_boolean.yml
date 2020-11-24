@@ -1,0 +1,39 @@
+- name: true value - matches
+  document:
+    status: true
+  query:
+    status:
+      $type: 8
+  matches: true
+
+- name: false value - matches
+  document:
+    status: false
+  query:
+    status:
+      $type: 8
+  matches: true
+
+- name: nil value - does not match
+  document:
+    status:
+  query:
+    status:
+      $type: 8
+  matches: false
+
+- name: integer field - does not match
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 8
+  matches: false
+
+- name: missing value - does not match
+  document:
+    x:
+  query:
+    status:
+      $type: 8
+  matches: false

@@ -1,0 +1,70 @@
+- name: type is 0
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 0
+  error: true
+  min_server_version: 4.2
+
+- name: type is too negative
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: -2
+  error: true
+  min_server_version: 3.2
+
+- name: type is too large
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 42
+  error: true
+  min_server_version: 3.2
+
+- name: array argument for type - matches
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: [1]
+  matches: true
+  min_server_version: 3.6
+
+- name: array argument for type - does not match
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: [2]
+  matches: false
+  min_server_version: 3.6
+
+- name: hash argument
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: {}
+  error: true
+
+- name: array with multiple elements - matches
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: [1, 2]
+  matches: true
+  min_server_version: 3.6
+
+- name: array with multiple elements - does not match
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: [2, 3]
+  matches: false
+  min_server_version: 3.6

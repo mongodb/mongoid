@@ -1,0 +1,15 @@
+- name: float - matches
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 1
+  matches: true
+
+- name: integer - does not match
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 1
+  matches: false

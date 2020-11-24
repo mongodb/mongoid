@@ -1,0 +1,23 @@
+- name: hash value - matches
+  document:
+    name: {first_name: "bob"}
+  query:
+    name:
+      $type: 3
+  matches: true
+
+- name: array value - does not match
+  document:
+    name: [1]
+  query:
+    name:
+      $type: 3
+  matches: false
+
+- name: existing field - does not match Object
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 3
+  matches: false

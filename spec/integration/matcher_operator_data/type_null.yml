@@ -1,0 +1,23 @@
+- name: existing field - matches
+  document:
+    name:
+  query:
+    name:
+      $type: 10
+  matches: true
+
+- name: missing field - does not match
+  document:
+    x:
+  query:
+    name:
+      $type: 10
+  matches: false
+
+- name: existing field - does not match
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 10
+  matches: false

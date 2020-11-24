@@ -1,0 +1,40 @@
+- name: Decimal128 in untyped field - matches
+  document:
+    number: !ruby/object:BSON::Decimal128
+      low: 4224
+      high: 3475653012423180288
+  query:
+    number:
+      $type: 19
+  matches: true
+  min_server_version: 3.4
+
+- name: Decimal128 field - matches
+  document:
+    decimal128_field: !ruby/object:BSON::Decimal128
+      low: 4224
+      high: 3475653012423180288
+  query:
+    decimal128_field:
+      $type: 19
+  matches: true
+  min_server_version: 3.4
+
+- name: existing field - does not match decimal
+  document:
+    name: "foo"
+  query:
+    name:
+      $type: 19
+  matches: false
+  min_server_version: 3.4
+
+- name: BigDecimal field - does not match
+  document:
+    big_decimal_field: !ruby/object:BigDecimal
+      18:0.42e2
+  query:
+    big_decimal_field:
+      $type: 19
+  matches: false
+  min_server_version: 3.4

@@ -1,0 +1,33 @@
+- name: bson int64 - matches
+  document:
+    number: !ruby/object:BSON::Int64
+      value: 392141
+  query:
+    number:
+      $type: 18
+  matches: true
+
+- name: small integer - does not match
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 18
+  matches: false
+
+- name: big integer - matches
+  document:
+    # Exactly 2**32
+    pi: 4294967296
+  query:
+    pi:
+      $type: 18
+  matches: true
+
+- name: existing field - does not match long
+  document:
+    name: "foo"
+  query:
+    name:
+      $type: 18
+  matches: false

@@ -1,0 +1,33 @@
+- name: bson int32 - matches
+  document:
+    pi: !ruby/object:BSON::Int32
+      value: 3
+  query:
+    pi:
+      $type: 16
+  matches: true
+
+- name: small integer - matches
+  document:
+    pi: 3
+  query:
+    pi:
+      $type: 16
+  matches: true
+
+- name: big integer - does not match
+  document:
+    # Exactly 2**32
+    pi: 4294967296
+  query:
+    pi:
+      $type: 16
+  matches: false
+
+- name: float - does not match
+  document:
+    pi: 3.14
+  query:
+    pi:
+      $type: 16
+  matches: false
