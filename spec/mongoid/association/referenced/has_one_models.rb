@@ -19,6 +19,14 @@ class HomAccreditation
 
   field :degree, type: String
   field :year, type: Integer, default: 2012
+
+  def format
+    'fmt'
+  end
+
+  def price
+    42
+  end
 end
 
 class HomAccreditation::Child

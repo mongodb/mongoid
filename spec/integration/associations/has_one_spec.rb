@@ -67,6 +67,54 @@ describe 'has_one associations' do
     end
   end
 
+  context 'when calling methods on target' do
+    let(:parent) do
+      HomCollege.create!.tap do |college|
+        HomAccreditation.create!(college: college)
+      end
+    end
+
+    shared_examples 'delegates to the field' do |reloaded: false|
+      context 'non-conflicting field name' do
+        it 'delegates to the field' do
+          parent.accreditation.price.should == 42
+        end
+
+        context 'using send' do
+          it 'delegates to the field' do
+            parent.accreditation.send(:price).should == 42
+          end
+        end
+      end
+
+      context 'field name that conflicts with Kernel' do
+        it 'delegates to the field' do
+          parent.accreditation.format.should == 'fmt'
+        end
+
+        context 'using send' do
+          it 'delegates to the field' do
+            if reloaded
+              pending 'MONGOID-4018'
+            end
+
+            parent.accreditation.send(:format).should == 'fmt'
+          end
+        end
+      end
+    end
+
+    include_examples 'delegates to the field'
+
+    context 'after reloading parent' do
+      before do
+        parent.reload
+      end
+
+      include_examples 'delegates to the field', reloaded: true
+    end
+  end
+
   context 'when child does not have parent association' do
     context 'Child.new' do
       it 'creates a child instance' do
