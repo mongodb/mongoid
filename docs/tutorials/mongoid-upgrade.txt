@@ -74,6 +74,27 @@ Additionally, in Mongoid 7.2 ``::Boolean`` and ``Mongoid::Boolean`` were
 different classes. In Mongoid 7.3 there is only one class which is
 ``Mongoid::Boolean``.
 
+It is possible to restore the global ``::Boolean`` class by executing in
+your application:
+
+.. code-block:: ruby
+
+  Boolean = Mongoid::Boolean
+
+Note that this aliases ``Mongoid::Boolean`` to ``::Boolean`` such that there
+is still only a single Boolean class:
+
+.. code-block:: ruby
+
+  # With Mongoid 7.3:
+  Boolean = Mongoid::Boolean
+  Boolean == Mongoid::Boolean
+  # => true
+  
+  # With Mongoid 7.2:
+  Boolean == Mongoid::Boolean
+  # => false
+
 
 Selector Key Stringification
 ----------------------------
