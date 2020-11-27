@@ -404,7 +404,7 @@ describe Mongoid::Fields do
       context "when the options are all standard" do
 
         before do
-          Band.field :acceptable, type: Boolean
+          Band.field :acceptable, type: Mongoid::Boolean
         end
 
         after do
@@ -419,7 +419,7 @@ describe Mongoid::Fields do
       context "when a custom option is provided" do
 
         before do
-          Band.field :acceptable, type: Boolean, custom: true
+          Band.field :acceptable, type: Mongoid::Boolean, custom: true
         end
 
         it "adds the field to the model" do
@@ -990,7 +990,7 @@ describe Mongoid::Fields do
       end
 
       before do
-        Person.field :aliased, as: :alias, type: Boolean, overwrite: true
+        Person.field :aliased, as: :alias, type: Mongoid::Boolean, overwrite: true
       end
 
       it "uses the alias to write the attribute" do
