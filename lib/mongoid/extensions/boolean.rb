@@ -16,9 +16,8 @@ module Mongoid
       #
       # @since 3.0.0
       def mongoize(object)
-        ::Boolean.evolve(object)
+        evolve(object)
       end
-      alias :evolve :mongoize
     end
   end
 end

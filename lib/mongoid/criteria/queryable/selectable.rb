@@ -195,11 +195,11 @@ module Mongoid
           end
 
           typed_override(criterion, "$exists") do |value|
-            ::Boolean.evolve(value)
+            Mongoid::Boolean.evolve(value)
           end
         end
         key :exists, :override, "$exists" do |value|
-          ::Boolean.evolve(value)
+          Mongoid::Boolean.evolve(value)
         end
 
         # Add a $geoIntersects or $geoWithin selection. Symbol operators must

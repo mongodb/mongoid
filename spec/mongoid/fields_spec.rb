@@ -322,7 +322,7 @@ describe Mongoid::Fields do
       end
 
       it "converts to Mongoid::Boolean" do
-        expect(klass.field(:test, type: Boolean).type).to be(Mongoid::Boolean)
+        expect(klass.field(:test, type: Mongoid::Boolean).type).to be(Mongoid::Boolean)
       end
     end
 

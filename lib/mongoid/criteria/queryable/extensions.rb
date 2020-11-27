@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 # encoding: utf-8
 
-unless defined?(Boolean)
-  class Boolean; end
-end
-
 if defined?(ActiveSupport)
   unless defined?(ActiveSupport::TimeWithZone)
     require "active_support/time_with_zone"

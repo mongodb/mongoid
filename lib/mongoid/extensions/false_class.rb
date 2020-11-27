@@ -28,7 +28,7 @@ module Mongoid
       #
       # @since 1.0.0
       def is_a?(other)
-        if other == ::Boolean || other.class == ::Boolean
+        if other == Mongoid::Boolean || other.class == Mongoid::Boolean
           return true
         end
         super(other)
