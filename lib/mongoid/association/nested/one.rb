@@ -71,7 +71,7 @@ module Mongoid
         #
         # @since 2.0.0
         def acceptable_id?
-          id = convert_id(existing.class, attributes[:id])
+          id = convert_id(existing.class, attributes[:_id])
           existing._id == id || id.nil? || (existing._id != id && update_only?)
         end
 
@@ -84,7 +84,7 @@ module Mongoid
         #
         # @since 2.0.0
         def delete?
-          destroyable? && !attributes[:id].nil?
+          destroyable? && !attributes[:_id].nil?
         end
 
         # Can the existing association potentially be destroyed?

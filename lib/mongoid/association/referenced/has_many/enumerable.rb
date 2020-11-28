@@ -270,7 +270,7 @@ module Mongoid
           # @since 2.1.0
           def first(opts = {})
             _loaded.try(:values).try(:first) ||
-                _added[(ul = _unloaded.try(:first, opts)).try(:id)] ||
+                _added[(ul = _unloaded.try(:first, opts)).try(:_id)] ||
                 ul ||
                 _added.values.try(:first)
           end
@@ -368,7 +368,7 @@ module Mongoid
           def last(opts = {})
             _added.values.try(:last) ||
                 _loaded.try(:values).try(:last) ||
-                _added[(ul = _unloaded.try(:last, opts)).try(:id)] ||
+                _added[(ul = _unloaded.try(:last, opts)).try(:_id)] ||
                 ul
           end
 

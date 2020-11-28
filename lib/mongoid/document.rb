@@ -151,7 +151,7 @@ module Mongoid
     #
     # @since 2.4.0
     def to_key
-      (persisted? || destroyed?) ? [ id.to_s ] : nil
+      (persisted? || destroyed?) ? [ _id.to_s ] : nil
     end
 
     # Return an array with this +Document+ only in it.

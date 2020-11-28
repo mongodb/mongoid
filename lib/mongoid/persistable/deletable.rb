@@ -47,7 +47,7 @@ module Mongoid
       #
       # @since 4.0.0
       def atomic_deletes
-        { atomic_delete_modifier => { atomic_path => _index ? { "_id" => id } : true }}
+        { atomic_delete_modifier => { atomic_path => _index ? { "_id" => _id } : true }}
       end
 
       # Delete the embedded document.

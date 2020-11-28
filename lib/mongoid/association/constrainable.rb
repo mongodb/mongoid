@@ -36,7 +36,7 @@ module Mongoid
 
       def convert_polymorphic(object)
         if object.is_a?(Mongoid::Document)
-          object.id
+          object._id
         else
           BSON::ObjectId.mongoize(object)
         end
