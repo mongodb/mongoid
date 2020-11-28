@@ -33,18 +33,18 @@ describe Mongoid::Inspectable do
         expect(inspected).to include("t(test):")
       end
 
-      it "displays the default discriminator key" do 
+      it "displays the default discriminator key" do
         expect(inspected).to include(%q,_type: "Person",)
       end
     end
 
     context "when using a custom discriminator key" do
 
-      before do 
+      before do
         Person.discriminator_key = "dkey"
       end
 
-      after do 
+      after do
         Person.discriminator_key = nil
       end
 
@@ -56,7 +56,7 @@ describe Mongoid::Inspectable do
         person.inspect
       end
 
-      it "displays the new discriminator key" do 
+      it "displays the new discriminator key" do
         expect(inspected).to include(%q,dkey: "Person",)
       end
     end
@@ -73,6 +73,14 @@ describe Mongoid::Inspectable do
 
       it "includes dynamic attributes" do
         expect(inspected).to include(%q,some_attribute: "foo",)
+      end
+    end
+
+    context 'when id is unaliased' do
+      let(:shirt) { Shirt.new(id: 1, _id: 2) }
+
+      it 'shows the correct _id and id values' do
+        shirt.inspect.should == "#<Shirt _id: 2, color: nil, id: \"1\">"
       end
     end
   end

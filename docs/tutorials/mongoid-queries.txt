@@ -223,7 +223,8 @@ the query:
 Aliases
 ```````
 
-Queries take into account :ref:`field aliases <field-aliases>`:
+Queries take into account :ref:`storage field names <storage-field-names>`
+and :ref:`field aliases <field-aliases>`:
 
 .. code-block:: ruby
 

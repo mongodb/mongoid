@@ -20,7 +20,7 @@ module Mongoid
     def inspect
       inspection = []
       inspection.concat(inspect_fields).concat(inspect_dynamic_fields)
-      "#<#{self.class.name} _id: #{id}, #{inspection * ', '}>"
+      "#<#{self.class.name} _id: #{_id}, #{inspection * ', '}>"
     end
 
     private
