@@ -37,10 +37,11 @@ module Mongoid
       time: Time
     }.with_indifferent_access
 
-    # Constant for all names of the id field in a document.
+    # Constant for all names of the _id field in a document.
     #
-    # @since 5.0.0
-    # IDS = [ :_id, :id, '_id', 'id' ].freeze
+    # This does not include aliases of _id field.
+    #
+    # @api private
     IDS = [ :_id, '_id', ].freeze
 
     included do
