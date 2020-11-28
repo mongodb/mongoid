@@ -306,4 +306,42 @@ describe Mongoid::Criteria do
       end
     end
   end
+
+  describe "#without" do
+
+    let!(:person) do
+      Person.create!(username: "davinci", age: 50, pets: false)
+    end
+
+    context "when omitting to embedded documents" do
+
+      context "when the embedded documents are aliased" do
+
+        let(:criteria) do
+          Person.without(:phones)
+        end
+
+        it "properly uses the database field name" do
+          expect(criteria.options).to eq(fields: { "mobile_phones" => 0 })
+        end
+      end
+    end
+
+    context "when excluding id" do
+
+      let(:criteria) do
+        Person.without(:_id, :id, "_id", "id")
+      end
+
+      it "does not raise error" do
+        expect {
+          criteria.first.id
+        }.to_not raise_error
+      end
+
+      it "returns id anyway" do
+        expect(criteria.first.id).to_not be_nil
+      end
+    end
+  end
 end
