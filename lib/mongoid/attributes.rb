@@ -356,7 +356,6 @@ module Mongoid
       end
     end
 
-
     private
 
     # Validates an attribute value as being assignable to the specified field.
