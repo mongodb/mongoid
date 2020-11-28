@@ -65,9 +65,6 @@ module Mongoid
       )
 
       alias_attribute(:id, :_id)
-
-      # alias :id :_id
-      # alias :id= :_id=
     end
 
     # Apply all default values to the document which are not procs.
