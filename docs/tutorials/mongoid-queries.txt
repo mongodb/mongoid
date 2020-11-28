@@ -849,6 +849,27 @@ The opposite of ``only``, ``without`` causes the specified fields to be omitted:
   #   class:    Band
   #   embedded: false>
 
+Because Mongoid requires the ``_id`` field for various operations, it (as well
+as its ``id`` alias) cannot be omitted via ``without``:
+
+.. code-block:: ruby
+
+  Band.without(:name, :id)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:fields=>{"name"=>0}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.without(:name, :_id)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:fields=>{"name"=>0}}
+  #   class:    Band
+  #   embedded: false>
+
 
 Ordering
 --------
