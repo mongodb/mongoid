@@ -240,5 +240,70 @@ describe Mongoid::Criteria do
         end
       end
     end
+
+    context 'when restricting to id' do
+
+      context 'when id is aliased to _id' do
+        shared_examples 'requests _id field' do
+          it 'requests _id field' do
+            criteria.options[:fields].should == {'_id' => 1}
+          end
+        end
+
+        ['id', '_id', :id, :_id].each do |field|
+          context "using #{field.inspect}" do
+            let(:criteria) do
+              Band.where.only(field)
+            end
+
+            include_examples 'requests _id field'
+          end
+        end
+
+        context 'using a content field' do
+          let(:criteria) do
+            Band.where.only(:name)
+          end
+
+          it 'requests content field and _id field' do
+            criteria.options[:fields].should == {'_id' => 1, 'name' => 1}
+          end
+        end
+      end
+
+      context 'when id is not aliased to _id' do
+        shared_examples 'requests _id field' do
+          it 'requests _id field' do
+            criteria.options[:fields].should == {'_id' => 1}
+          end
+        end
+
+        shared_examples 'requests id field and _id field' do
+          it 'requests id field and _id field' do
+            criteria.options[:fields].should == {'_id' => 1, 'id' => 1}
+          end
+        end
+
+        ['_id', :_id].each do |field|
+          context "using #{field.inspect}" do
+            let(:criteria) do
+              Shirt.where.only(field)
+            end
+
+            include_examples 'requests _id field'
+          end
+        end
+
+        ['id', :id].each do |field|
+          context "using #{field.inspect}" do
+            let(:criteria) do
+              Shirt.where.only(field)
+            end
+
+            include_examples 'requests id field and _id field'
+          end
+        end
+      end
+    end
   end
 end
