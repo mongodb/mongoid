@@ -654,6 +654,8 @@ method.
     unalias_attribute :n
   end
 
+.. _unalias-id:
+
 Unaliasing ``id``
 `````````````````
 
