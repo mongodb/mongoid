@@ -335,9 +335,13 @@ module Mongoid
         alias_method "#{name}_before_type_cast", "#{original}_before_type_cast"
       end
 
-      # TODO: documentation
+      # Removes a field alias.
+      #
+      # @param [ Symbol ] name The aliased field name to remove.
       def unalias_attribute(name)
-        raise "Unaliased field" unless aliased_fields.delete(name.to_s)
+        unless aliased_fields.delete(name.to_s)
+          raise AttributeError, "Field #{name} is not an aliased field"
+        end
 
         remove_method name
         remove_method "#{name}="
