@@ -208,7 +208,6 @@ describe Mongoid::Fields do
     end
   end
 
-
   describe "#attribute_names" do
 
     context "when the document is a parent class" do
