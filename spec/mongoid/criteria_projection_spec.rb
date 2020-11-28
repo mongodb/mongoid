@@ -332,7 +332,7 @@ describe Mongoid::Criteria do
       shared_examples 'does not raise error' do
         it "does not raise error" do
           expect {
-            criteria.first.id
+            criteria.first._id
           }.to_not raise_error
         end
       end
@@ -344,6 +344,24 @@ describe Mongoid::Criteria do
 
         it "returns id anyway" do
           expect(criteria.first.id).to_not be_nil
+        end
+      end
+
+      shared_examples 'unprojects id' do
+        it 'does not unproject _id' do
+          criteria.options[:fields].should == {'id' => 0}
+        end
+
+        let(:instance) { criteria.first }
+
+        it "returns _id" do
+          instance._id.should == 'foo'
+        end
+
+        it 'does not return id' do
+          lambda do
+            instance.id
+          end.should raise_error(ActiveModel::MissingAttributeError)
         end
       end
 
@@ -360,6 +378,28 @@ describe Mongoid::Criteria do
         context '_id field' do
           let(:criteria) do
             Person.without(:_id, "_id")
+          end
+
+          include_examples 'does not raise error'
+          include_examples 'does not unproject _id'
+        end
+      end
+
+      context 'model without id aliased to _id' do
+        let!(:shirt) { Shirt.create!(id: 1, _id: 'foo') }
+
+        context 'id field' do
+          let(:criteria) do
+            Shirt.without(:id, "id")
+          end
+
+          include_examples 'does not raise error'
+          include_examples 'unprojects id'
+        end
+
+        context '_id field' do
+          let(:criteria) do
+            Shirt.without(:_id, "_id")
           end
 
           include_examples 'does not raise error'
