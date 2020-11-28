@@ -137,20 +137,24 @@ describe Mongoid::Association::Nested::One do
         { allow_destroy: true }
       end
 
-      let(:builder) do
-        described_class.new(association, {
-          id: name.id,
-          last_name: "Lang",
-          _destroy: true
-        }, options)
-      end
+      %i(id _id).each do |id_field|
+        context "#{id_field}" do
+          let(:builder) do
+            described_class.new(association, {
+              id_field => name.id,
+              last_name: "Lang",
+              _destroy: true
+            }, options)
+          end
 
-      before do
-        builder.build(person)
-      end
+          before do
+            builder.build(person)
+          end
 
-      it "deletes the relation" do
-        expect(person.name).to be_nil
+          it "deletes the relation" do
+            expect(person.name).to be_nil
+          end
+        end
       end
     end
   end

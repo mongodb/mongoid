@@ -55,11 +55,28 @@ module Mongoid
         IDS.dup.tap do |id_fields|
           aliased_fields.each do |k, v|
             if v == '_id'
-              id_fields << k
               id_fields << k.to_sym
+              id_fields << k
             end
           end
         end
+      end
+
+      # Extracts the id field from the specified attributes hash based on
+      # aliases defined in this class.
+      #
+      # @param [ Hash ] attributes The attributes to inspect.
+      #
+      # @return [ Object ] The id value.
+      #
+      # @api private
+      def extract_id_field(attributes)
+        id_fields.each do |k|
+          if v = attributes[k]
+            return v
+          end
+        end
+        nil
       end
     end
 
