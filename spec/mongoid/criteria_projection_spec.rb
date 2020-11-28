@@ -327,20 +327,44 @@ describe Mongoid::Criteria do
       end
     end
 
-    context "when excluding id" do
+    context "when excluding id fields" do
 
-      let(:criteria) do
-        Person.without(:_id, :id, "_id", "id")
+      shared_examples 'does not raise error' do
+        it "does not raise error" do
+          expect {
+            criteria.first.id
+          }.to_not raise_error
+        end
       end
 
-      it "does not raise error" do
-        expect {
-          criteria.first.id
-        }.to_not raise_error
+      shared_examples 'does not unproject _id' do
+        it 'does not unproject _id' do
+          criteria.options[:fields].should be nil
+        end
+
+        it "returns id anyway" do
+          expect(criteria.first.id).to_not be_nil
+        end
       end
 
-      it "returns id anyway" do
-        expect(criteria.first.id).to_not be_nil
+      context 'model with id aliased to _id' do
+        context 'id field' do
+          let(:criteria) do
+            Person.without(:id, "id")
+          end
+
+          include_examples 'does not raise error'
+          include_examples 'does not unproject _id'
+        end
+
+        context '_id field' do
+          let(:criteria) do
+            Person.without(:_id, "_id")
+          end
+
+          include_examples 'does not raise error'
+          include_examples 'does not unproject _id'
+        end
       end
     end
   end
