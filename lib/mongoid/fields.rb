@@ -44,6 +44,25 @@ module Mongoid
     # @api private
     IDS = [ :_id, '_id', ].freeze
 
+    module ClassMethods
+      # Returns the list of id fields for this model class, as both strings
+      # and symbols.
+      #
+      # @return [ Array<Symbol | String> ] List of id fields.
+      #
+      # @api private
+      def id_fields
+        IDS.dup.tap do |id_fields|
+          aliased_fields.each do |k, v|
+            if v == '_id'
+              id_fields << k
+              id_fields << k.to_sym
+            end
+          end
+        end
+      end
+    end
+
     included do
       class_attribute :aliased_fields
       class_attribute :localized_fields

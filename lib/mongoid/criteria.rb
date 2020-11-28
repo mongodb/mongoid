@@ -374,13 +374,6 @@ module Mongoid
     #
     # @since 4.0.3
     def without(*args)
-      id_fields = Fields::IDS.dup
-      aliased_fields.each do |k, v|
-        if v == '_id'
-          id_fields << k
-          id_fields << k.to_sym
-        end
-      end
       args -= id_fields
       super(*args)
     end
