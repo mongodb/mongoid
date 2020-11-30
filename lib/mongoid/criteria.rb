@@ -336,16 +336,15 @@ module Mongoid
     #
     # @since 1.0.0
     def only(*args)
-      return clone if args.flatten.empty?
       args = args.flatten
+      return clone if args.empty?
       if (args & Fields::IDS).empty?
         args.unshift(:_id)
       end
       if klass.hereditary?
-        super(*args.push(klass.discriminator_key.to_sym))
-      else
-        super(*args)
+        args.push(klass.discriminator_key.to_sym)
       end
+      super(*args)
     end
 
     # Set the read preference for the criteria.
@@ -375,7 +374,7 @@ module Mongoid
     #
     # @since 4.0.3
     def without(*args)
-      args -= Fields::IDS
+      args -= id_fields
       super(*args)
     end
 

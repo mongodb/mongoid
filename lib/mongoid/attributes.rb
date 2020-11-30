@@ -334,6 +334,26 @@ module Mongoid
         alias_method "#{name}_will_change!", "#{original}_will_change!"
         alias_method "#{name}_before_type_cast", "#{original}_before_type_cast"
       end
+
+      # Removes a field alias.
+      #
+      # @param [ Symbol ] name The aliased field name to remove.
+      def unalias_attribute(name)
+        unless aliased_fields.delete(name.to_s)
+          raise AttributeError, "Field #{name} is not an aliased field"
+        end
+
+        remove_method name
+        remove_method "#{name}="
+        remove_method "#{name}?"
+        remove_method "#{name}_change"
+        remove_method "#{name}_changed?"
+        remove_method "reset_#{name}!"
+        remove_method "reset_#{name}_to_default!"
+        remove_method "#{name}_was"
+        remove_method "#{name}_will_change!"
+        remove_method "#{name}_before_type_cast"
+      end
     end
 
     private

@@ -21,7 +21,7 @@ module Mongoid
       # @note This next line is here to address #2704, even though having an
       # _id and id field in the document would cause problems with Mongoid
       # elsewhere.
-      attrs = clone_document.except("_id", "id")
+      attrs = clone_document.except(*self.class.id_fields)
       dynamic_attrs = {}
       _attribute_names = self.attribute_names
       attrs.reject! do |attr_name, value|

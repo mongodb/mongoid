@@ -117,7 +117,7 @@ module Mongoid
       #
       # @since 3.0.2
       def delete_id
-        delete("_id") || delete("id") || delete(:id) || delete(:_id)
+        delete("_id") || delete(:_id) || delete("id") || delete(:id)
       end
 
       # Get the id attribute from this hash, whether it's prefixed with an
@@ -130,7 +130,7 @@ module Mongoid
       #
       # @since 2.3.2
       def extract_id
-        self["_id"] || self["id"] || self[:id] || self[:_id]
+        self["_id"] || self[:_id] || self["id"] || self[:id]
       end
 
       # Fetch a nested value via dot syntax.

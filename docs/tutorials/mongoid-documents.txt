@@ -591,30 +591,89 @@ the other attributes are set, use the ``pre_processed: true`` field option:
     pre_processed: true
 
 
-.. _field-aliases:
+.. _storage-field-names:
 
-Aliasing Fields
----------------
+Specifying Storage Field Names
+------------------------------
 
-One of the drawbacks of having a schemaless database is that MongoDB must store all field
-information along with every document, meaning that it takes up a lot of storage space in RAM
-and on disk. A common pattern to limit this is to alias fields to a small number of characters,
-while keeping the domain in the application expressive. Mongoid allows you to do this and
-reference the fields in the domain via their long names in getters, setters, and criteria while
-performing the conversion for you.
+One of the drawbacks of having a schemaless database is that MongoDB must
+store all field information along with every document, meaning that it
+takes up a lot of storage space in RAM and on disk. A common pattern to limit
+this is to alias fields to a small number of characters, while keeping the
+domain in the application expressive. Mongoid allows you to do this and
+reference the fields in the domain via their long names in getters, setters,
+and criteria while performing the conversion for you.
 
 .. code-block:: ruby
 
-   class Band
-     include Mongoid::Document
-     field :n, as: :name, type: String
-   end
+  class Band
+    include Mongoid::Document
+    field :n, as: :name, type: String
+  end
 
-   band = Band.new(name: "Placebo")
-   band.attributes # { "n" => "Placebo" }
+  band = Band.new(name: "Placebo")
+  band.attributes # { "n" => "Placebo" }
 
-   criteria = Band.where(name: "Placebo")
-   criteria.selector # { "n" => "Placebo" }
+  criteria = Band.where(name: "Placebo")
+  criteria.selector # { "n" => "Placebo" }
+
+
+.. _field-aliases:
+
+Field Aliases
+-------------
+
+It is possible to define field aliases. The value will be stored in the
+destination field but can be accessed from either the destination field or
+from the aliased field:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    field :name, type: String
+    alias_attribute :n, :name
+  end
+  
+  band = Band.new(n: 'Astral Projection')
+  # => #<Band _id: 5fc1c1ee2c97a64accbeb5e1, name: "Astral Projection">
+  
+  band.attributes
+  # => {"_id"=>BSON::ObjectId('5fc1c1ee2c97a64accbeb5e1'), "name"=>"Astral Projection"}
+  
+  band.n
+  # => "Astral Projection"
+
+Aliases can be removed from model classes using the ``unalias_attribute``
+method.
+
+.. code-block:: ruby
+
+  class Band
+    unalias_attribute :n
+  end
+
+.. _unalias-id:
+
+Unaliasing ``id``
+`````````````````
+
+``unalias_attribute`` can be used to remove the predefined ``id`` alias.
+This is useful for storing different values in ``id`` and ``_id`` fields:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    unalias_attribute :id
+    field :id, type: String
+  end
+  
+  Band.new(id: '42')
+  # => #<Band _id: 5fc1c3f42c97a6590684046c, id: "42">
+
 
 Custom Fields
 -------------

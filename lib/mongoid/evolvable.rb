@@ -15,7 +15,7 @@ module Mongoid
     #
     # @since 3.0.0
     def __evolve_object_id__
-      id
+      _id
     end
   end
 end

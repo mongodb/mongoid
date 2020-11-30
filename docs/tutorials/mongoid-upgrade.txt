@@ -209,6 +209,12 @@ New Embedded Matching Operators
 Mongoid 7.3 adds support for bitwise operators, ``$comment``, ``$mod`` and
 ``$type`` operators when :ref:`embedded matching <embedded-matching>`.
 
+Unaliasing ``id`` Field
+-----------------------
+
+It is now possible to :ref:`remove the id alias in models <unalias-id>`,
+to make ``id`` a regular field.
+
 
 Upgrading to Mongoid 7.2
 ========================

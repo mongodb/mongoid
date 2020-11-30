@@ -132,7 +132,7 @@ module Mongoid
       # @since 3.0.0
       def mongoize_ids(ids)
         ids.map do |id|
-          id = id[:id] if id.respond_to?(:keys) && id[:id]
+          id = id[:_id] if id.respond_to?(:keys) && id[:_id]
           klass.fields["_id"].mongoize(id)
         end
       end

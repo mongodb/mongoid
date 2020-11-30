@@ -223,7 +223,8 @@ the query:
 Aliases
 ```````
 
-Queries take into account :ref:`field aliases <field-aliases>`:
+Queries take into account :ref:`storage field names <storage-field-names>`
+and :ref:`field aliases <field-aliases>`:
 
 .. code-block:: ruby
 
@@ -730,6 +731,9 @@ as the following example shows:
 Projection
 ----------
 
+``only``
+````````
+
 The ``only`` method retrieves only the specified fields from the database. This
 operation is sometimes called "projection".
 
@@ -830,6 +834,42 @@ loaded with ``only`` for those associations to be loaded. For example:
 
   Band.where(name: 'Astral Projection').only(:name, :manager_ids).first.managers
   # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
+
+``without``
+```````````
+
+The opposite of ``only``, ``without`` causes the specified fields to be omitted:
+
+.. code-block:: ruby
+
+  Band.without(:name)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:fields=>{"name"=>0}}
+  #   class:    Band
+  #   embedded: false>
+
+Because Mongoid requires the ``_id`` field for various operations, it (as well
+as its ``id`` alias) cannot be omitted via ``without``:
+
+.. code-block:: ruby
+
+  Band.without(:name, :id)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:fields=>{"name"=>0}}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.without(:name, :_id)
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {}
+  #   options:  {:fields=>{"name"=>0}}
+  #   class:    Band
+  #   embedded: false>
 
 
 Ordering

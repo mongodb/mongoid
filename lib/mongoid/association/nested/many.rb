@@ -181,7 +181,7 @@ module Mongoid
           first = existing.first
           converted = first ? convert_id(first.class, id) : id
 
-          if existing.where(id: converted).exists?
+          if existing.where(_id: converted).exists?
             # document exists in association
             doc = existing.find(converted)
             if destroyable?(attrs)

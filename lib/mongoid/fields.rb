@@ -38,10 +38,48 @@ module Mongoid
       time: Time
     }.with_indifferent_access
 
-    # Constant for all names of the id field in a document.
+    # Constant for all names of the _id field in a document.
     #
-    # @since 5.0.0
-    IDS = [ :_id, :id, '_id', 'id' ].freeze
+    # This does not include aliases of _id field.
+    #
+    # @api private
+    IDS = [ :_id, '_id', ].freeze
+
+    module ClassMethods
+      # Returns the list of id fields for this model class, as both strings
+      # and symbols.
+      #
+      # @return [ Array<Symbol | String> ] List of id fields.
+      #
+      # @api private
+      def id_fields
+        IDS.dup.tap do |id_fields|
+          aliased_fields.each do |k, v|
+            if v == '_id'
+              id_fields << k.to_sym
+              id_fields << k
+            end
+          end
+        end
+      end
+
+      # Extracts the id field from the specified attributes hash based on
+      # aliases defined in this class.
+      #
+      # @param [ Hash ] attributes The attributes to inspect.
+      #
+      # @return [ Object ] The id value.
+      #
+      # @api private
+      def extract_id_field(attributes)
+        id_fields.each do |k|
+          if v = attributes[k]
+            return v
+          end
+        end
+        nil
+      end
+    end
 
     included do
       class_attribute :aliased_fields
@@ -63,8 +101,7 @@ module Mongoid
         type: BSON::ObjectId
       )
 
-      alias :id :_id
-      alias :id= :_id=
+      alias_attribute(:id, :_id)
     end
 
     # Apply all default values to the document which are not procs.
