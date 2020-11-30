@@ -448,7 +448,7 @@ describe Mongoid::Fields::Localized do
         context "when the value is false" do
 
           let(:field) do
-            described_class.new(:boolean_value, localize: true, type: Boolean)
+            described_class.new(:boolean_value, localize: true, type: Mongoid::Boolean)
           end
 
           let(:value) do
@@ -463,7 +463,7 @@ describe Mongoid::Fields::Localized do
         context "when the value is true" do
 
           let(:field) do
-            described_class.new(:boolean_value, localize: true, type: Boolean)
+            described_class.new(:boolean_value, localize: true, type: Mongoid::Boolean)
           end
 
           let(:value) do
@@ -491,7 +491,7 @@ describe Mongoid::Fields::Localized do
               end
 
               let(:field) do
-                described_class.new(:boolean_value, localize: true, type: Boolean)
+                described_class.new(:boolean_value, localize: true, type: Mongoid::Boolean)
               end
 
               let(:value) do
@@ -510,7 +510,7 @@ describe Mongoid::Fields::Localized do
               end
 
               let(:field) do
-                described_class.new(:boolean_value, localize: true, type: Boolean)
+                described_class.new(:boolean_value, localize: true, type: Mongoid::Boolean)
               end
 
               let(:value) do

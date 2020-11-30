@@ -33,4 +33,4 @@ module Mongoid
   end
 end
 
-::Boolean.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Boolean::ClassMethods)
+Mongoid::Boolean.__send__(:extend, Mongoid::Criteria::Queryable::Extensions::Boolean::ClassMethods)

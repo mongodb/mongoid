@@ -13,6 +13,7 @@ module Mongoid
     extend ActiveSupport::Concern
 
     StringifiedSymbol = Mongoid::StringifiedSymbol
+    Boolean = Mongoid::Boolean
 
     # For fields defined with symbols use the correct class.
     #

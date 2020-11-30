@@ -3,7 +3,7 @@
 
 require "spec_helper"
 
-describe Boolean do
+describe Mongoid::Boolean do
 
   describe ".evolve" do
 

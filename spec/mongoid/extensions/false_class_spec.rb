@@ -17,7 +17,7 @@ describe Mongoid::Extensions::FalseClass do
     context "when provided a Boolean" do
 
       it "returns true" do
-        expect(false.is_a?(Boolean)).to be true
+        expect(false.is_a?(Mongoid::Boolean)).to be true
       end
     end
 

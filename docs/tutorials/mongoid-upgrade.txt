@@ -23,6 +23,79 @@ Upgrading to Mongoid 7.3
 
 The following sections describe significant changes in Mongoid 7.3.
 
+``::Boolean`` Removed
+---------------------
+
+**Breaking change:** Mongoid 7.3 removes the global ``::Boolean`` class.
+
+This change should have no impact on classes that simply use ``Boolean``
+fields, as the ``Boolean`` class is aliased from ``Mongoid::Fields``
+(which is included in ``Mongoid::Document``). The following field definition
+continues to work in 7.3 as it did in 7.2:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+
+    field :verified, type: Boolean
+  end
+
+However, code that is not executed in the context of a class including
+``Mongoid::Document`` may need to explicitly qualify ``Boolean`` references.
+The following snippet fails with Mongoid 7.3 due to ``Boolean`` being
+unqualified:
+
+.. code-block:: ruby
+
+  class User
+    include Mongoid::Document
+  end
+  
+  User.field :verified, type: Boolean
+
+To fix it, use the fully-qualified ``Mongoid::Boolean`` class:
+
+.. code-block:: ruby
+  
+  User.field :verified, type: Mongoid::Boolean
+
+Note that ``class_eval`` is executed in the scope of the caller, not in
+the scope of the class being modified. Thus even when using ``class_eval``
+it is necessary to fully qualify ``Mongoid::Boolean``:
+
+.. code-block:: ruby
+  
+  User.class_eval do
+    field :verified, type: Mongoid::Boolean
+  end
+
+Additionally, in Mongoid 7.2 ``::Boolean`` and ``Mongoid::Boolean`` were
+different classes. In Mongoid 7.3 there is only one class which is
+``Mongoid::Boolean``.
+
+It is possible to restore the global ``::Boolean`` class by executing in
+your application:
+
+.. code-block:: ruby
+
+  Boolean = Mongoid::Boolean
+
+Note that this aliases ``Mongoid::Boolean`` to ``::Boolean`` such that there
+is still only a single Boolean class:
+
+.. code-block:: ruby
+
+  # With Mongoid 7.3:
+  Boolean = Mongoid::Boolean
+  Boolean == Mongoid::Boolean
+  # => true
+  
+  # With Mongoid 7.2:
+  Boolean == Mongoid::Boolean
+  # => false
+
+
 Selector Key Stringification
 ----------------------------
 
