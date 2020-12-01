@@ -65,6 +65,9 @@ Integration Libraries
 
   RSpec matchers and macros for Mongoid applications.
 
+- `RailsAdmin <https://github.com/sferik/rails_admin>`_ supports Mongoid out
+  of the box.
+
 - `ActiveAdmin Mongoid <https://github.com/activeadmin/activeadmin-mongoid>`_
 
   ActiveAdmin hacks to support Mongoid.
