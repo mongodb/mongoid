@@ -11,7 +11,9 @@ Additional Resources
    :class: singlecol
 
 This page lists some of the third-party guides and blog posts about Mongoid,
-as well as sample Mongoid applications.
+as well as sample Mongoid applications. Additional resources for the driver
+are listed on the `respective driver page
+<https://docs.mongodb.com/ruby-driver/current/reference/additional-resources/>`_.
 
 
 Screencasts
