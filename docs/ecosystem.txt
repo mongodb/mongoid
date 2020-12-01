@@ -1,0 +1,78 @@
+*********
+Ecosystem
+*********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+Mongoid has an extensive ecosystem of libraries integrating with or built
+on top of Mongoid, are listed below.
+
+
+Projects
+========
+
+- `Workarea Commerce <https://github.com/workarea-commerce/workarea>`_
+
+  Workarea is an enterprise-grade Ruby on Rails commerce platform that uses Mongoid
+
+
+Libraries
+=========
+
+- `Carrierwave Mongoid <https://github.com/carrierwaveuploader/carrierwave-mongoid>`_
+
+  Mongoid Support for the Carrierwave file uploads gem
+
+- `Mongoid RSpec <https://github.com/mongoid/mongoid-rspec>`_
+
+  RSpec matchers and macros for Mongoid.
+
+- `ActiveAdmin Mongoid <https://github.com/activeadmin/activeadmin-mongoid>`_
+
+  ActiveAdmin hacks to support Mongoid
+  
+- `Mongoid History <https://github.com/mongoid/mongoid-history>`_
+
+  Multi-user non-linear history tracking, auditing, undo, redo for mongoid.
+  
+- `Mongo Beautiful Logger <https://github.com/ibraheemdev/mongo_beautiful_logger>`_
+
+  A simple and beautiful logger gem for MongoDB in you Ruby/Rails app.
+  
+- `Mongoid Search <https://github.com/mongoid/mongoid_search>`_
+
+  Simple full text search for Mongoid
+  
+- `Mongoid Taggable <https://github.com/wilkerlucio/mongoid_taggable>`_
+
+  Helpers to create taggable Mongoid documents.
+  
+- `Mongoid Tree <https://github.com/benedikt/mongoid-tree>`_
+
+  A tree structure for Mongoid documents using the materialized path pattern
+  
+- `Mongoid Token <https://github.com/thetron/mongoid_token>`_
+
+  A little random, unique token generator for Mongoid documents.
+  
+- `Delayed Job Mongoid <https://github.com/collectiveidea/delayed_job_mongoid>`_
+
+  Mongoid backend for delayed_job
+  
+- `Mongo Session Store <https://github.com/mongoid/mongo_session_store>`_
+
+  A Rails-compatible session store for Mongoid.
+
+- `Mongoid Collection Snapshot <https://github.com/mongoid/mongoid-collection-snapshot>`_
+
+  Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM
+
+- `Mongoid Locker <https://github.com/mongoid/mongoid-locker>`_
+
+  Document-level locking for MongoDB via Mongoid

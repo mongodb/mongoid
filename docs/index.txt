@@ -31,6 +31,7 @@ for MongoDB in Ruby.
    /tutorials/mongoid-upgrade
    API <https://docs.mongodb.com/mongoid/master/api/>
    /additional-resources
+   /ecosystem
 
 
 For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.
