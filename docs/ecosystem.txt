@@ -19,7 +19,7 @@ Projects
 
 - `Workarea Commerce <https://github.com/workarea-commerce/workarea>`_
 
-  Workarea is an enterprise-grade Ruby on Rails commerce platform that uses Mongoid
+  Workarea is an enterprise-grade Ruby on Rails commerce platform that uses Mongoid.
 
 
 Libraries
@@ -27,7 +27,7 @@ Libraries
 
 - `Carrierwave Mongoid <https://github.com/carrierwaveuploader/carrierwave-mongoid>`_
 
-  Mongoid Support for the Carrierwave file uploads gem
+  Mongoid Support for the Carrierwave file uploads gem.
 
 - `Mongoid RSpec <https://github.com/mongoid/mongoid-rspec>`_
 
@@ -35,7 +35,7 @@ Libraries
 
 - `ActiveAdmin Mongoid <https://github.com/activeadmin/activeadmin-mongoid>`_
 
-  ActiveAdmin hacks to support Mongoid
+  ActiveAdmin hacks to support Mongoid.
   
 - `Mongoid History <https://github.com/mongoid/mongoid-history>`_
 
@@ -47,7 +47,7 @@ Libraries
   
 - `Mongoid Search <https://github.com/mongoid/mongoid_search>`_
 
-  Simple full text search for Mongoid
+  Simple full text search for Mongoid.
   
 - `Mongoid Taggable <https://github.com/wilkerlucio/mongoid_taggable>`_
 
@@ -55,7 +55,7 @@ Libraries
   
 - `Mongoid Tree <https://github.com/benedikt/mongoid-tree>`_
 
-  A tree structure for Mongoid documents using the materialized path pattern
+  A tree structure for Mongoid documents using the materialized path pattern.
   
 - `Mongoid Token <https://github.com/thetron/mongoid_token>`_
 
@@ -63,7 +63,7 @@ Libraries
   
 - `Delayed Job Mongoid <https://github.com/collectiveidea/delayed_job_mongoid>`_
 
-  Mongoid backend for delayed_job
+  Mongoid backend for delayed_job.
   
 - `Mongo Session Store <https://github.com/mongoid/mongo_session_store>`_
 
@@ -71,8 +71,8 @@ Libraries
 
 - `Mongoid Collection Snapshot <https://github.com/mongoid/mongoid-collection-snapshot>`_
 
-  Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM
+  Easy maintenence of collections of processed data in MongoDB with the Mongoid ODM.
 
 - `Mongoid Locker <https://github.com/mongoid/mongoid-locker>`_
 
-  Document-level locking for MongoDB via Mongoid
+  Document-level locking for MongoDB via Mongoid.

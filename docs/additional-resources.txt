@@ -27,12 +27,12 @@ Screencasts
 - `Ruby on Rails Web Services and Integration with MongoDB, Week 3: Mongoid
   <https://www.youtube.com/watch?v=9LylgiMYsUM>`_
 
-  A detailed introduction to Mongoid and Ruby on Rails web services
+  A detailed introduction to Mongoid and Ruby on Rails web services.
   
 - `Create a search bar in Rails with Mongoid
   <https://www.youtube.com/watch?v=zusWR8jS5-A>`_
 
-  A Tutorial explaining how to implement text search with Mongoid
+  A Tutorial explaining how to implement text search with Mongoid.
 
 
 Articles
@@ -40,15 +40,15 @@ Articles
 
 - `A Simple Content Management System in Sinatra <https://www.sitepoint.com/a-simple-content-management-system-in-sinatra>`_
 
-  Building a content management application with Sinatra and Mongoid
+  Building a content management application with Sinatra and Mongoid.
 
 - `How To Create A Ruby API With Sinatra <https://x-team.com/blog/how-to-create-a-ruby-api-with-sinatra>`_
 
-  Creating a Sinatra API with Mongoid
+  Creating a Sinatra API with Mongoid.
 
 - `Converting an existing Ruby on Rails application to MongoDB <https://ibraheem.ca/posts/convert-rails-to-mongodb>`_
 
-  How to Convert an existing Ruby on Rails application to use MongoDB and Mongoid
+  How to Convert an existing Ruby on Rails application to use MongoDB and Mongoid.
   
 
 Sample Applications
