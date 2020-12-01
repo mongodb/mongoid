@@ -38,9 +38,6 @@ Screencasts
 Articles
 ========
 
-- `Setting up Ruby on Rails 5 App with MongoDB in 10 Minutes
-  <https://www.botreetechnologies.com/blog/setting-up-ruby-on-rails-5-app-with-mongodb-in-10-minutes>`_
-
 - `A Simple Content Management System in Sinatra <https://www.sitepoint.com/a-simple-content-management-system-in-sinatra>`_
 
   Building a content management application with Sinatra and Mongoid
