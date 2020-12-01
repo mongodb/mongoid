@@ -22,11 +22,8 @@ task :install => :build do
   system "sudo gem install mongoid-#{Mongoid::VERSION}.gem"
 end
 
-task :release => :build do
-  system "git tag -a v#{Mongoid::VERSION} -m 'Tagging #{Mongoid::VERSION}'"
-  system "git push --tags"
-  system "gem push mongoid-#{Mongoid::VERSION}.gem"
-  system "rm mongoid-#{Mongoid::VERSION}.gem"
+task :release do
+  raise "Please use ./release.sh to release"
 end
 
 RSpec::Core::RakeTask.new("spec") do |spec|
@@ -59,5 +56,3 @@ namespace :release do
     end
   end
 end
-
-task :release => ['release:check_private_key', 'release:do']
