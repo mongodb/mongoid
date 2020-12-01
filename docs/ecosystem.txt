@@ -40,6 +40,18 @@ Extension Libraries
 - `Mongoid Locker <https://github.com/mongoid/mongoid-locker>`_
 
   Document-level locking for MongoDB via Mongoid.
+  
+- `Mongo Beautiful Logger <https://github.com/ibraheemdev/mongo_beautiful_logger>`_
+
+  A simple and beautiful logger library for MongoDB in your Ruby/Rails app.
+  
+- `Mongoid Search <https://github.com/mongoid/mongoid_search>`_
+
+  Simple full text search for Mongoid.
+  
+- `Mongoid Fulltext Search <https://github.com/mongoid/mongoid_fulltext>`_
+
+  Full-text search using n-gram matching for the Mongoid ODM.
 
 
 Integration Libraries
@@ -60,15 +72,6 @@ Integration Libraries
 - `Mongoid History <https://github.com/mongoid/mongoid-history>`_
 
   Multi-user non-linear history tracking, auditing, undo, redo for mongoid.
-  
-- `Mongo Beautiful Logger <https://github.com/ibraheemdev/mongo_beautiful_logger>`_
-
-  A simple and beautiful logger library for MongoDB in you Ruby/Rails app.
-  
-- `Mongoid Search <https://github.com/mongoid/mongoid_search>`_
-
-  Simple full text search for Mongoid.
-  
 - `Delayed Job Mongoid <https://github.com/collectiveidea/delayed_job_mongoid>`_
 
   Mongoid backend for delayed_job.
