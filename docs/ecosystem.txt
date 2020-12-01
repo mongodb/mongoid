@@ -49,10 +49,6 @@ Libraries
 
   Simple full text search for Mongoid.
   
-- `Mongoid Taggable <https://github.com/wilkerlucio/mongoid_taggable>`_
-
-  Helpers to create taggable Mongoid documents.
-  
 - `Mongoid Tree <https://github.com/benedikt/mongoid-tree>`_
 
   A tree structure for Mongoid documents using the materialized path pattern.
