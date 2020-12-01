@@ -25,9 +25,9 @@ Projects
 Libraries
 =========
 
-- `Carrierwave Mongoid <https://github.com/carrierwaveuploader/carrierwave-mongoid>`_
+- `CarrierWave Mongoid <https://github.com/carrierwaveuploader/carrierwave-mongoid>`_
 
-  Mongoid Support for the Carrierwave file uploads gem.
+  Mongoid Support for the Carrierwave file uploads library.
 
 - `Mongoid RSpec <https://github.com/mongoid/mongoid-rspec>`_
 
@@ -43,7 +43,7 @@ Libraries
   
 - `Mongo Beautiful Logger <https://github.com/ibraheemdev/mongo_beautiful_logger>`_
 
-  A simple and beautiful logger gem for MongoDB in you Ruby/Rails app.
+  A simple and beautiful logger library for MongoDB in you Ruby/Rails app.
   
 - `Mongoid Search <https://github.com/mongoid/mongoid_search>`_
 
