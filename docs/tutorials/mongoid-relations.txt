@@ -702,6 +702,39 @@ The following deviations are known:
 In general, Mongoid adopts the behavior of current server versions and validates more strictly.
 
 
+.. _omit-id:
+
+Omitting ``_id`` Fields
+-----------------------
+
+By default, Mongoid adds an ``_id`` field to each embedded document. This
+permits easy referencing of and operations on the embedded documents.
+
+These ``_id`` fields may be omitted to save storage space. To do so,
+:ref:`override the _id field definition in the child documents <custom-id>`
+and remove the default value:
+
+.. code-block:: ruby
+
+  class Order
+    include Mongoid::Document
+    
+    embeds_many :line_items
+  end
+  
+  class LineItem
+    include Mongoid::Document
+    
+    embedded_in :order
+    
+    field :_id, type: Object
+  end
+
+In the current version of Mongoid the field definition is required, but
+without a default value specified no value will be stored in the database.
+A future version of Mongoid may allow removing previously defined fields.
+
+
 Common Behavior
 ===============
 
