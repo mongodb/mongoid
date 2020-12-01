@@ -31,7 +31,7 @@ Libraries
 
 - `Mongoid RSpec <https://github.com/mongoid/mongoid-rspec>`_
 
-  RSpec matchers and macros for Mongoid.
+  RSpec matchers and macros for Mongoid applications.
 
 - `ActiveAdmin Mongoid <https://github.com/activeadmin/activeadmin-mongoid>`_
 
