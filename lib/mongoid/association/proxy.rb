@@ -100,6 +100,14 @@ module Mongoid
         _target
       end
 
+      def send(meth, *args, &block)
+        if respond_to?(meth)
+          super
+        else
+          _target.send(meth, *args, &block)
+        end
+      end
+
       protected
 
       # Get the collection from the root of the hierarchy.
@@ -134,7 +142,7 @@ module Mongoid
       # @param [ Array ] args The arguments passed to the method.
       #
       def method_missing(name, *args, &block)
-        _target.send(name, *args, &block)
+        _target.public_send(name, *args, &block)
       end
 
       # @api private
