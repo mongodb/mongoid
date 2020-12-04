@@ -101,7 +101,7 @@ module Mongoid
       end
 
       def send(meth, *args, &block)
-        if respond_to?(meth)
+        if respond_to?(meth, true)
           super
         else
           _target.send(meth, *args, &block)
