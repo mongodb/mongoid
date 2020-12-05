@@ -128,14 +128,20 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
             expect(person).to_not be_persisted
           end
 
-          it "maintains private visibility from private methods" do
+          it "maintains private visibility for private methods" do
             lambda do
               game.person.secret_name
             end.should raise_error(NoMethodError, /private method `secret_name' called for/)
           end
 
-          it "allows private methods to be invoked" do
+          it "allows private methods to be invoked via send" do
             game.person.send(:secret_name).should == 'secret'
+          end
+
+          it "does not allow private methods to be invoked via public_send" do
+            lambda do
+              game.person.public_send(:secret_name)
+            end.should raise_error(NoMethodError, /private method `secret_name' called for/)
           end
 
           it "properly exposes delegated methods visibility" do
