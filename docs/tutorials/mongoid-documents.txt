@@ -834,8 +834,10 @@ It is possible to omit the default entirely:
 
 If the default on ``_id`` is omitted, and no ``_id`` value is provided by
 your application, Mongoid will persist the document without the ``_id``
-value and one will be assigned by the server. However, Mongoid will
-not automatically retrieve this value when the document is persisted - you
+value. In this case, if the document is a top-level document, an ``_id``
+value will be assigned by the server; if the document is an embedded document,
+no ``_id`` value will be assigned. Mongoid will not automatically retrieve
+this value, if assigned, when the document is persisted - you
 must obtain the persisted value (and the complete persisted document) using
 other means:
 
