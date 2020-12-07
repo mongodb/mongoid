@@ -137,8 +137,24 @@ module Mongoid
             coll = collection(_root)
             selector = atomic_selector
             coll.find(selector).update_one(positionally(selector, updates), session: _session)
-            conflicts.each_pair do |key, value|
-              coll.find(selector).update_one(positionally(selector, { key => value }), session: _session)
+
+            # The following code applies updates which would cause MongoDB-level
+            # conflicts. Each conflicted modifier action is applied using its own command call.
+            #
+            # MONGOID-4982: In complex cases, it is possible for these conflict updates to
+            # have conflicting field keys within themselves, hence inner logic to avoid conflicts
+            # is necessary.
+            conflicts.each_pair do |modifier, changes|
+
+              # Group the changes according to their root field node. Changes from the same group
+              # cannot be applied in the same command, otherwise a database conflict will result.
+              conflicting_change_groups = changes.group_by {|key, _| key.split(".", 2)[0] }.values
+
+              # Apply changes in batches. Pop one change from each field-conflict group
+              # round-robin until all changes have been applied.
+              while batched_changes = conflicting_change_groups.map(&:pop).compact.to_h.presence
+                coll.find(selector).update_one(positionally(selector, { modifier => batched_changes }), session: _session)
+              end
             end
           end
         end
