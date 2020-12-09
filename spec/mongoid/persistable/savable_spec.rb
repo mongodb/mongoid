@@ -405,7 +405,7 @@ describe Mongoid::Persistable::Savable do
 
             _truck = Truck.find(truck.id)
             expect(_truck.seats.size).to eq 2
-            expect(_truck.seats[0].rating).to eq 1
+            expect(_truck.seats[0].rating).to eq 2
             expect(_truck.seats[0].armrests.length).to eq 1
             expect(_truck.seats[1].rating).to eq 100
           end
