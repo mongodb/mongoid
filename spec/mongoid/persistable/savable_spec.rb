@@ -293,6 +293,8 @@ describe Mongoid::Persistable::Savable do
           expect(truck.crates[1].volume).to eq 0.8
           expect(truck.crates[1].toys.size).to eq 0
 
+          # TODO: MONGOID-5026: combine the updates so that there are
+          # no conflicts.
           #expect(truck.atomic_updates[:conflicts]).to eq nil
 
           expect { truck.save! }.not_to raise_error
