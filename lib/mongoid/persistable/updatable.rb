@@ -138,22 +138,34 @@ module Mongoid
             selector = atomic_selector
             coll.find(selector).update_one(positionally(selector, updates), session: _session)
 
-            # The following code applies updates which would cause MongoDB-level
-            # conflicts. Each conflicted modifier action is applied using its own command call.
+            # The following code applies updates which would cause
+            # MongoDB-level conflicts. Each conflicted modifier action
+            # is applied using its own write.
             #
-            # MONGOID-4982: In complex cases, it is possible for these conflict updates to
-            # have conflicting field keys within themselves, hence inner logic to avoid conflicts
-            # is necessary.
+            # MONGOID-4982: In complex cases, it is possible for these
+            # conflict updates to have conflicting field keys within
+            # themselves, hence inner logic to avoid conflicts.
+            #
+            # TODO: MONGOID-5026: reduce the number of writes performed by
+            # more intelligently combining the writes such that there are
+            # fewer conflicts.
             conflicts.each_pair do |modifier, changes|
 
-              # Group the changes according to their root field node. Changes from the same group
-              # cannot be applied in the same command, otherwise a database conflict will result.
-              conflicting_change_groups = changes.group_by {|key, _| key.split(".", 2)[0] }.values
+              # Group the changes according to their root field node.
+              # Changes from the same group cannot be applied in the
+              # same command, otherwise a database conflict will result.
+              conflicting_change_groups = changes.group_by do |key, _|
+                key.split(".", 2).first
+              end.values
 
-              # Apply changes in batches. Pop one change from each field-conflict group
-              # round-robin until all changes have been applied.
+              # Apply changes in batches. Pop one change from each
+              # field-conflict group round-robin until all changes
+              # have been applied.
               while batched_changes = conflicting_change_groups.map(&:pop).compact.to_h.presence
-                coll.find(selector).update_one(positionally(selector, { modifier => batched_changes }), session: _session)
+                coll.find(selector).update_one(
+                  positionally(selector, modifier => batched_changes),
+                  session: _session,
+                )
               end
             end
           end
