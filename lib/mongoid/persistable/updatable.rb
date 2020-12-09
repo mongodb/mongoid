@@ -139,21 +139,18 @@ module Mongoid
             coll.find(selector).update_one(positionally(selector, updates), session: _session)
 
             # The following code applies updates which would cause
-            # MongoDB-level conflicts. Each conflicted modifier action
+            # path conflicts in MongoDB, for example when changing attributes
+            # of foo.0.bars while adding another foo. Each conflicting update
             # is applied using its own write.
-            #
-            # MONGOID-4982: In complex cases, it is possible for these
-            # conflict updates to have conflicting field keys within
-            # themselves, hence inner logic to avoid conflicts.
             #
             # TODO: MONGOID-5026: reduce the number of writes performed by
             # more intelligently combining the writes such that there are
             # fewer conflicts.
             conflicts.each_pair do |modifier, changes|
 
-              # Group the changes according to their root field node.
-              # Changes from the same group cannot be applied in the
-              # same command, otherwise a database conflict will result.
+              # Group the changes according to their root key which is
+              # the top-level association name.
+              # This handles at least the cases described in MONGOID-4982.
               conflicting_change_groups = changes.group_by do |key, _|
                 key.split(".", 2).first
               end.values
