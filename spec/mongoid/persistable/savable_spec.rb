@@ -293,6 +293,8 @@ describe Mongoid::Persistable::Savable do
           expect(truck.crates[1].volume).to eq 0.8
           expect(truck.crates[1].toys.size).to eq 0
 
+          # TODO: MONGOID-5026: combine the updates so that there are
+          # no conflicts.
           #expect(truck.atomic_updates[:conflicts]).to eq nil
 
           expect { truck.save! }.not_to raise_error
@@ -360,8 +362,6 @@ describe Mongoid::Persistable::Savable do
 
         context 'when also updating first embedded top level association' do
           it 'performs all writes' do
-            pending 'https://jira.mongodb.org/browse/MONGOID-4982'
-
             truck.crates.first.volume = 2
             truck.crates.first.toys.build(name: 'Bear')
             truck.crates.build
@@ -397,8 +397,6 @@ describe Mongoid::Persistable::Savable do
 
         context 'when embedded association embeds another association' do
           it 'persists the new documents' do
-            pending 'https://jira.mongodb.org/browse/MONGOID-4982'
-
             expect(truck.seats.size).to eq 1
             expect(truck.seats[0].rating).to eq 1
 
@@ -409,7 +407,7 @@ describe Mongoid::Persistable::Savable do
 
             _truck = Truck.find(truck.id)
             expect(_truck.seats.size).to eq 2
-            expect(_truck.seats[0].rating).to eq 1
+            expect(_truck.seats[0].rating).to eq 2
             expect(_truck.seats[0].armrests.length).to eq 1
             expect(_truck.seats[1].rating).to eq 100
           end
