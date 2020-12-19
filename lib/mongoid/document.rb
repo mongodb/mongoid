@@ -229,8 +229,9 @@ module Mongoid
       became = klass.new(clone_document)
       became._id = _id
       became.instance_variable_set(:@changed_attributes, changed_attributes)
-      became.instance_variable_set(:@errors, ActiveModel::Errors.new(became))
-      became.errors.instance_variable_set(:@messages, errors.instance_variable_get(:@messages))
+      new_errors = ActiveModel::Errors.new(became)
+      new_errors.copy!(errors)
+      became.instance_variable_set(:@errors, new_errors)
       became.instance_variable_set(:@new_record, new_record?)
       became.instance_variable_set(:@destroyed, destroyed?)
       became.changed_attributes[klass.discriminator_key] = self.class.discriminator_value
