@@ -71,7 +71,7 @@ describe 'callbacks integration tests' do
           include_examples 'persists the attribute value'
         end
 
-        context 'set as a attributes on parent' do
+        context 'set as attributes on parent' do
           let(:instance) do
             Galaxy.create!(stars: [
               planets: [{}],
@@ -138,7 +138,7 @@ describe 'callbacks integration tests' do
           include_examples 'persists the attribute value'
         end
 
-        context 'set as a attributes on parent' do
+        context 'set as attributes on parent' do
           before do
             instance.stars = [planets: [{}]]
             instance.save!
@@ -201,7 +201,7 @@ describe 'callbacks integration tests' do
           include_examples 'persists the attribute value'
         end
 
-        context 'set as a attributes on parent' do
+        context 'set as attributes on parent' do
           before do
             instance.update_attributes(stars: [planets: [{}]])
           end
