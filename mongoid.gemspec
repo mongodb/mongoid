@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version     = ">= 2.3"
   s.required_rubygems_version = ">= 1.3.6"
 
-  s.add_dependency("activemodel", [">= 5.1", "<6.1"])
+  s.add_dependency("activemodel", [">= 5.1", "<6.2"])
   s.add_dependency("mongo", ['>=2.10.5', '<3.0.0'])
 
   s.add_development_dependency("bson", ['>=4.9.4', '<5.0.0'])
