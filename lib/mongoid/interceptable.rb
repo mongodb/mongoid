@@ -228,9 +228,11 @@ module Mongoid
     #   document.halted_callback_hook(filter)
     #
     # @param [ Symbol ] filter The callback that halted.
+    # @param [ Symbol ] name The name of the callback that was halted
+    #   (requires Rails 6.1+)
     #
     # @since 3.0.3
-    def halted_callback_hook(filter)
+    def halted_callback_hook(filter, name = nil)
       @before_callback_halted = true
     end
 
