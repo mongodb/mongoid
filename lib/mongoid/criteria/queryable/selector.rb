@@ -123,10 +123,6 @@ module Mongoid
               # {'foo' => {'$lt' => 5}}. This step should be done after all
               # value-based processing is complete.
               if key.is_a?(Key)
-                if serializer && evolved_value != value
-                  raise NotImplementedError, "This method is not prepared to handle key being a Key and serializer being not nil"
-                end
-
                 evolved_value = key.transform_value(evolved_value)
               end
 

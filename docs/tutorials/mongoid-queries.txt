@@ -1478,6 +1478,63 @@ It is also possible to query using PCRE syntax by constructing
   # => #<Band _id: 5dc9f7d5ce4ef34893354323, name: "Sun Project", description: "Sun\nProject">
 
 
+Conditions On Fields
+====================
+
+When a condition uses a field defined in the model, the value being specified
+in the condition is converted according to the rules of the field, if any.
+For example, consider the following model definition that contains a ``Time``
+field, a ``Date`` field and an implicit ``Object`` field, and also
+intentionally does not define a field called ``deregistered_at``:
+
+  .. code-block:: ruby
+  
+    class Voter
+      include Mongoid::Document
+      
+      field :born_on, type: Date
+      field :registered_at, type: Time
+      field :voted_at
+    end
+
+Queries on ``born_on`` and ``registered_at`` fields using ``Date`` and ``Time``
+values, respectively, are straightforward:
+
+  .. code-block:: ruby
+
+    Voter.where(born_on: Date.today).selector
+    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+    
+    Voter.where(registered_at: Time.now).selector
+    # => {"registered_at"=>2020-12-19 04:33:36.939788067 UTC}
+
+But, note the differences in behavior when providing a ``Date`` instance
+in all possible scenarios:
+
+  .. code-block:: ruby
+
+    Voter.where(born_on: Date.today).selector
+    # => {"born_on"=>2020-12-18 00:00:00 UTC}
+    
+    Voter.where(registered_at: Date.today).selector
+    # => {"registered_at"=>2020-12-18 00:00:00 -0500}
+    
+    Voter.where(voted_at: Date.today).selector
+    # => {"voted_at"=>Fri, 18 Dec 2020}
+    
+    Voter.where(deregistered_at: Date.today).selector
+    # => {"deregistered_at"=>2020-12-18 00:00:00 UTC}
+
+When using the ``registered_at`` field which is of type ``Time``, the date
+was interpreted to be in local time (as per the :ref:`configured time zone
+<time-zones>`). When using the ``born_on`` field which is of type ``Date``,
+the date was interpreted to be in UTC. When using the ``voted_at`` field
+which was defined without a type (hence implicitly as an ``Object``),
+the date was used unmodified in the constructed query. When using a
+nonexistent field ``deregistered_at`` the date was interpreted to be in UTC
+and converted to a time, matching the behavior of querying a ``Date`` field.
+
+
 Queries + Persistence
 =====================
 
