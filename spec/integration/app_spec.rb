@@ -150,7 +150,7 @@ describe 'Mongoid application tests' do
                 end
                 index.should be nil
 
-                ChildProcessHelper.check_call(%w(rake db:mongoid:create_indexes),
+                ChildProcessHelper.check_call(%w(bundle exec rake db:mongoid:create_indexes),
                   cwd: APP_PATH, env: env)
 
                 index = client['posts'].indexes.detect do |index|

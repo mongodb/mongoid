@@ -212,6 +212,7 @@ are supported by Mongoid.
    :class: compatibility-large no-padding
 
    * - Mongoid
+     - Rails 6.1
      - Rails 6.0
      - Rails 5.2
      - Rails 5.1
@@ -219,6 +220,7 @@ are supported by Mongoid.
      - Rails 4.2
 
    * - 7.1
+     - |checkmark| [#rails-6.1]_
      - |checkmark|
      - |checkmark|
      - |checkmark|
@@ -226,6 +228,7 @@ are supported by Mongoid.
      -
 
    * - 7.0
+     - |checkmark| [#rails-6.1]_
      - |checkmark| [#rails-6]_
      - |checkmark|
      - |checkmark|
@@ -234,6 +237,7 @@ are supported by Mongoid.
 
    * - 6.4
      -
+     -
      - |checkmark|
      - |checkmark|
      -
@@ -241,12 +245,14 @@ are supported by Mongoid.
 
    * - 6.3
      -
+     -
      - |checkmark|
      - |checkmark|
      -
      -
 
    * - 6.2
+     -
      -
      - |checkmark|
      - |checkmark|
@@ -282,5 +288,8 @@ are supported by Mongoid.
      - |checkmark|
 
 .. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
+
+.. [#rails-6.1] Rails 6.1 requires Mongoid 7.0.12 or 7.1.7 in the
+  respective 7.0 and 7.1 stable branches.
 
 .. include:: /includes/unicode-checkmark.rst
