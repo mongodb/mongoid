@@ -377,6 +377,31 @@ or else the values will not store properly.
      end
    end
 
+
+Time Fields
+-----------
+
+``Time`` fields store values as ``Time`` instances in the :ref:`configured
+time zone <time-zones>`.
+
+``Date`` and ``DateTime`` instances are converted to ``Time`` instances upon
+assignment to a ``Time`` field:
+
+.. code-block:: ruby
+
+  class Voter
+    include Mongoid::Document
+    
+    field :registered_at, type: Time
+  end
+  
+  Voter.new(registered_at: Date.today)
+  # => #<Voter _id: 5fdd80392c97a618f07ba344, registered_at: 2020-12-18 05:00:00 UTC>
+
+In the above example, the value was interpreted as the beginning of today in
+local time, because the application was not configured to use UTC times.
+
+
 Date Fields
 -----------
 

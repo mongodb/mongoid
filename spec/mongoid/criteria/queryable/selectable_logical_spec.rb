@@ -1447,6 +1447,42 @@ describe Mongoid::Criteria::Queryable::Selectable do
         end
       end
     end
+
+    context 'when using multiple criteria and symbol operators' do
+      context 'when using fields that meaningfully evolve values' do
+
+        let(:query) do
+          Dictionary.any_of({a: 1}, :published.gt => Date.new(2020, 2, 3))
+        end
+
+        it 'generates the expected query' do
+          query.selector.should == {'$or' => [
+            {'a' => 1},
+            # Date instance is converted to a Time instance in local time,
+            # because we are querying on a Time field and dates are interpreted
+            # in local time when assigning to Time fields
+            {'published' => {'$gt' => Time.local(2020, 2, 3)}},
+          ]}
+        end
+      end
+
+      context 'when using fields that do not meaningfully evolve values' do
+
+        let(:query) do
+          Dictionary.any_of({a: 1}, :submitted_on.gt => Date.new(2020, 2, 3))
+        end
+
+        it 'generates the expected query' do
+          query.selector.should == {'$or' => [
+            {'a' => 1},
+            # Date instance is converted to a Time instance in UTC,
+            # because we are querying on a Date field and dates are interpreted
+            # in UTC when persisted as dates by Mongoid
+            {'submitted_on' => {'$gt' => Time.utc(2020, 2, 3)}},
+          ]}
+        end
+      end
+    end
   end
 
   describe "#not" do
