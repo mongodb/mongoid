@@ -6,8 +6,8 @@ class Customer
 
   field :name
 
-  embeds_one :home_address, class_name: 'CustomerAddress', as: :addressable, autobuild: true, cascade_callbacks: true
-  embeds_one :work_address, class_name: 'CustomerAddress', as: :addressable, autobuild: true, cascade_callbacks: true
+  embeds_one :home_address, class_name: 'CustomerAddress', as: :addressable
+  embeds_one :work_address, class_name: 'CustomerAddress', as: :addressable
 end
 
 class CustomerAddress

@@ -514,12 +514,36 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
       Customer.new
     end
 
-    it "correctly returns the path for each embedded class" do
-      customer.work_address.addressable = customer
-      expect(customer.home_address._association.store_as).to eq("home_address")
-      expect(customer.work_address._association.store_as).to eq("work_address")
-      expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
-      expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+    context "assignment after saving" do
+
+      it "correctly sets the association for the embedded class" do
+        customer.home_address = CustomerAddress.new
+        customer.work_address = CustomerAddress.new
+        expect(customer.home_address._association.store_as).to eq("home_address")
+        expect(customer.work_address._association.store_as).to eq("work_address")
+        expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
+        expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+
+        customer.save!
+        customer.home_address = CustomerAddress.new
+        customer.work_address = CustomerAddress.new
+        expect(customer.home_address._association.store_as).to eq("home_address")
+        expect(customer.work_address._association.store_as).to eq("work_address")
+        expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
+        expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+      end
+    end
+
+    context "inverse assignment" do
+
+      it "correctly sets the association for the embedded class" do
+        customer.work_address = CustomerAddress.new
+        customer.work_address.addressable = customer
+        expect(customer.home_address._association.store_as).to eq("home_address")
+        expect(customer.work_address._association.store_as).to eq("work_address")
+        expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
+        expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+      end
     end
   end
 end
