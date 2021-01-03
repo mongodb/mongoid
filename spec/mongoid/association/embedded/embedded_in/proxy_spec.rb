@@ -507,4 +507,19 @@ describe Mongoid::Association::Embedded::EmbeddedIn::Proxy do
       end
     end
   end
+
+  context "when the same class is embedded multiple times" do
+
+    let(:customer) do
+      Customer.new
+    end
+
+    it "correctly returns the path for each embedded class" do
+      customer.work_address.addressable = customer
+      expect(customer.home_address._association.store_as).to eq("home_address")
+      expect(customer.work_address._association.store_as).to eq("work_address")
+      expect(customer.home_address.instance_eval { _association.store_as }).to eq("home_address")
+      expect(customer.work_address.instance_eval { _association.store_as }).to eq("work_address")
+    end
+  end
 end

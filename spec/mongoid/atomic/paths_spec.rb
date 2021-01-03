@@ -268,5 +268,18 @@ describe Mongoid::Atomic::Paths do
         end
       end
     end
+
+    context "when the same class is embedded in multiple relations" do
+
+      let(:customer) do
+        Customer.new
+      end
+
+      it "correctly returns the path for each embedded class" do
+        customer.work_address.addressable = customer
+        expect(customer.home_address.atomic_path).to eq("home_address")
+        expect(customer.work_address.atomic_path).to eq("work_address")
+      end
+    end
   end
 end
