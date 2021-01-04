@@ -250,6 +250,8 @@ module Mongoid
       became
     end
 
+    private
+
     # Implement this for calls to flatten on array.
     #
     # @example Get the document as an array.
@@ -258,12 +260,9 @@ module Mongoid
     # @return [ nil ] Always nil.
     #
     # @since 2.1.0
-    # @api private
     def to_ary
       nil
     end
-
-    private
 
     # Returns the logger
     #
@@ -285,8 +284,6 @@ module Mongoid
     def model_key
       @model_cache_key ||= self.class.model_name.cache_key
     end
-
-    private
 
     def as_attributes
       return attributes if frozen?
