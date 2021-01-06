@@ -269,7 +269,7 @@ describe Mongoid::Atomic::Paths do
       end
     end
 
-    context "when the same class is embedded in multiple relations" do
+    context "when the same class is embedded in multiple associations" do
 
       let(:customer) do
         Customer.new
@@ -280,12 +280,15 @@ describe Mongoid::Atomic::Paths do
         it "correctly sets the association for the embedded class" do
           customer.home_address = CustomerAddress.new
           customer.work_address = CustomerAddress.new
+
           expect(customer.home_address.atomic_path).to eq("home_address")
           expect(customer.work_address.atomic_path).to eq("work_address")
 
           customer.save!
+
           customer.home_address = CustomerAddress.new
           customer.work_address = CustomerAddress.new
+
           expect(customer.home_address.atomic_path).to eq("home_address")
           expect(customer.work_address.atomic_path).to eq("work_address")
         end
@@ -296,6 +299,7 @@ describe Mongoid::Atomic::Paths do
         it "correctly returns the path for each embedded class" do
           customer.work_address = CustomerAddress.new
           customer.work_address.addressable = customer
+
           expect(customer.home_address.atomic_path).to eq("home_address")
           expect(customer.work_address.atomic_path).to eq("work_address")
         end
