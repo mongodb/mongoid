@@ -253,11 +253,22 @@ module Mongoid
     private
 
     def selection_excluded?(name, selection, field)
-      selection[name] == 0
+      path = name.split('.')
+
+      selection.find do |k, included|
+        # check that a prefix of the field exists in excluded fields
+        k_path = k.split('.')
+        included == 0 && path[0, k_path.size] == k_path
+      end
     end
 
     def selection_included?(name, selection, field)
-      selection.key?(name) || selection.keys.collect { |k| k.partition('.').first }.include?(name)
+      path = name.split('.')
+      selection.find do |k, included|
+        # check that a prefix of the field exists in included fields
+        k_path = k.split('.')
+        included == 1 && path[0, k_path.size] == k_path
+      end
     end
 
     # Does the string contain dot syntax for accessing hashes?

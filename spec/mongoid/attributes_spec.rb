@@ -288,6 +288,38 @@ describe Mongoid::Attributes do
         end
       end
 
+      context 'when the attribute parent is included in a criteria' do
+        let!(:person) do
+          Person.create(title: 'sir', name: { first_name: 'Jose', language: { name: 'es' } })
+        end
+
+        context 'when excluding with only' do
+          let(:from_db) do
+            Person.only(:name).first
+          end
+
+          it 'does not raise an error' do
+            expect(from_db['name.first_name']).to eq 'Jose'
+            expect(from_db['name.language.name']).to eq 'es'
+          end
+
+        end
+
+        context 'when excluding with nested only' do
+          let(:from_db) do
+            Person.only('name.language').first
+          end
+
+          it 'does not raise an error' do
+            expect(from_db['name.language.name']).to eq 'es'
+          end
+
+          it 'raises error' do
+            expect { from_db['name.first_name'] }.to raise_error(ActiveModel::MissingAttributeError)
+          end
+        end
+      end
+
       context "when the attribute does not exist" do
 
         before do
