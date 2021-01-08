@@ -1323,6 +1323,17 @@ describe Mongoid::Document do
     end
   end
 
+  describe "#to_ary" do
+
+    it "does not publicly respond to #to_ary" do
+      expect(Person.new.respond_to?(:to_ary)).to eq false
+    end
+
+    it "does private respond to #to_ary" do
+      expect(Person.new.send(:to_ary)).to eq nil
+    end
+  end
+
   context "when marshalling the document" do
 
     let(:agency) do
