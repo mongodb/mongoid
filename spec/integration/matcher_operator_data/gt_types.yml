@@ -1,0 +1,63 @@
+- name: Date field - matches
+  document:
+    date_field: 2020-12-22
+  query:
+    date_field:
+      $gt: 2020-12-21
+  matches: true
+
+- name: Date field - does not match
+  document:
+    date_field: 2020-12-21
+  query:
+    date_field:
+      $gt: 2020-12-21
+  matches: false
+
+- name: Date value in generic field - matches
+  document:
+    field: 2020-12-22
+  query:
+    field:
+      $gt: 2020-12-21
+  matches: true
+
+- name: Date field - does not match
+  document:
+    field: 2020-12-21
+  query:
+    field:
+      $gt: 2020-12-21
+  matches: false
+
+- name: Time value in generic field queried by date - matches
+  document:
+    field: 2020-12-22 00:00:00
+  query:
+    field:
+      $gt: 2020-12-21
+  matches: true
+
+- name: Time value in generic field queried by date - does not match
+  document:
+    field: 2020-12-21 00:00:00
+  query:
+    field:
+      $gt: 2020-12-21
+  matches: false
+
+- name: Time value in generic field - matches
+  document:
+    field: 2020-12-22 00:00:00
+  query:
+    field:
+      $gt: 2020-12-21 00:00:00
+  matches: true
+
+- name: Time value in generic field - does not match
+  document:
+    field: 2020-12-21 00:00:00
+  query:
+    field:
+      $gt: 2020-12-21 00:00:00
+  matches: false

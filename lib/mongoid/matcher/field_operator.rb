@@ -35,17 +35,13 @@ module Mongoid
       end
 
       module_function def apply_comparison_operator(operator, left, right)
-        case left
-        when Numeric
-          case right
-          when Numeric
-            left.send(operator, right)
-          else
-            false
-          end
-        else
-          false
-        end
+        left.send(operator, right)
+      rescue ArgumentError, NoMethodError, TypeError
+        # We silence bogus comparison attempts, e.g. number to string
+        # comparisons.
+        # Several different exceptions may be produced depending on the types
+        # involved.
+        false
       end
     end
   end
