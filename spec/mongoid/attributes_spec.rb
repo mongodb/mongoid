@@ -96,6 +96,49 @@ describe Mongoid::Attributes do
             it "does not raise an error" do
               expect(from_db.map).to eq(map)
             end
+
+            context 'when only one of the hash fields is projected' do
+
+              let(:map) do
+                { 'dates' => { 'y' => { '2016' => 'Berlin', '2017' => 'Munich' } } }
+              end
+
+              let(:expected) do
+                { 'dates' => { 'y' => {
+                  '2016' => 'Berlin',
+                } } }
+              end
+
+              it 'retrieves only the projected fields' do
+                expect(from_db.map).to eq(expected)
+              end
+            end
+
+            context 'when several of the hash fields is projected' do
+
+              let(:map) do
+                { 'dates' => { 'y' => {
+                  '2016' => 'Berlin',
+                  '2017' => 'Munich',
+                  '2018' => 'Krakow',
+                } } }
+              end
+
+              let(:expected) do
+                { 'dates' => { 'y' => {
+                  '2016' => 'Berlin',
+                  '2018' => 'Krakow',
+                } } }
+              end
+
+              let(:from_db) do
+                Person.only('map.dates.y.2016', 'map.dates.y.2018').first
+              end
+
+              it 'retrieves only the projected fields' do
+                expect(from_db.map).to eq(expected)
+              end
+            end
           end
         end
 
