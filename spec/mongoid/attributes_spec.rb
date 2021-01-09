@@ -288,34 +288,47 @@ describe Mongoid::Attributes do
         end
       end
 
-      context 'when the attribute parent is included in a criteria' do
+      context 'when projecting with #only' do
         let!(:person) do
           Person.create(title: 'sir', name: { first_name: 'Jose', language: { name: 'es' } })
         end
 
-        context 'when excluding with only' do
+        context 'when projecting an embedded association' do
           let(:from_db) do
             Person.only(:name).first
           end
 
-          it 'does not raise an error' do
-            expect(from_db['name.first_name']).to eq 'Jose'
-            expect(from_db['name.language.name']).to eq 'es'
+          context 'when retrieving a field of the association' do
+
+            it 'retrieves the field' do
+              expect(from_db['name.first_name']).to eq 'Jose'
+            end
           end
 
+          context 'when retrieving a field of a nested association' do
+            it 'retrieves the field' do
+              expect(from_db['name.language.name']).to eq 'es'
+            end
+          end
         end
 
-        context 'when excluding with nested only' do
+        context 'when projecting a field of an embedded association' do
           let(:from_db) do
             Person.only('name.language').first
           end
 
-          it 'does not raise an error' do
-            expect(from_db['name.language.name']).to eq 'es'
+          context 'when retrieving the projected field' do
+            it 'retrieves the field' do
+              expect(from_db['name.language.name']).to eq 'es'
+            end
           end
 
-          it 'raises error' do
-            expect { from_db['name.first_name'] }.to raise_error(ActiveModel::MissingAttributeError)
+          context 'when retrieving a non-projected field' do
+            it 'raises MissingAttributeError' do
+              expect do
+                from_db['name.first_name']
+              end.to raise_error(ActiveModel::MissingAttributeError)
+            end
           end
         end
       end
