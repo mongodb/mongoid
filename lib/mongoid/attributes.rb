@@ -304,14 +304,18 @@ module Mongoid
 
     def read_raw_attribute(name)
       normalized = database_field_name(name.to_s)
-      if attribute_missing?(normalized)
+
+      value = if hash_dot_syntax?(normalized)
+                attributes.__nested__(normalized)
+              else
+                attributes[normalized]
+              end
+
+      if value.nil? && attribute_missing?(normalized)
         raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
       end
-      if hash_dot_syntax?(normalized)
-        attributes.__nested__(normalized)
-      else
-        attributes[normalized]
-      end
+
+      value
     end
 
     module ClassMethods
