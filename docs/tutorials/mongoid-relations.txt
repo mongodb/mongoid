@@ -734,6 +734,11 @@ In the current version of Mongoid the field definition is required, but
 without a default value specified no value will be stored in the database.
 A future version of Mongoid may allow removing previously defined fields.
 
+.. note::
+
+  Removing the ``_id`` field means that embedded documents must be identified
+  by their content attribute values during queries, updates and deletes.
+
 
 Common Behavior
 ===============
