@@ -89,7 +89,8 @@ Ruby Compatibility
 ==================
 
 The following compatibility table specifies the versions of Ruby interpreters
-supported by Mongoid.
+supported by Mongoid. "D" in a column means support for that Ruby version
+is deprecated.
 
 .. list-table::
    :header-rows: 1
