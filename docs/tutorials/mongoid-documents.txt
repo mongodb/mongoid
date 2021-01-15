@@ -1286,6 +1286,7 @@ a ``ReadonlyAttribute`` exception will be raised:
    band.update_attribute(:name, "Tool") # Raises the error.
    band.remove_attribute(:name) # Raises the error.
 
+
 Inheritance
 ===========
 
@@ -1340,6 +1341,7 @@ documents ``Circle``, ``Rectangle``, and ``Shape``.
     Similarly, when querying by parent classes (``Canvas`` in this example), any documents in the collection
     that do not have a discriminator value, or whose discriminator value does not map to either the parent
     or any of its descendants, will be returned as instances of the parent class.
+
 
 .. _discriminator-key:
 
@@ -1444,6 +1446,7 @@ On the global level, however, if the user does not set the discriminator key bef
 class, the discriminator field will use the default ``_type`` and not the new global setting in
 that child class.
 
+
 .. _discriminator-value:
 
 Changing the Discriminator Value
@@ -1477,6 +1480,16 @@ Here, a call to the ``discriminator_value=`` setter was added to ``Circle``.
 Now, on creation of a ``Circle``, the document will contain a field with the key ``_type`` (or whatever the ``discriminator_key`` was changed to)
 and the value "round thing."
 
+.. note::
+
+  Because the discriminator value overrides are declared in child classes,
+  the child classes potentially found by a query must be loaded prior to
+  sending that query. In the above example, the ``Circle`` class definition
+  must be loaded when querying on ``Shape`` if the returned documents could
+  potentially be instances of ``Circle`` (since autoloading wouldn't resolve
+  ``"round thing"`` to ``Circle``).
+
+
 Querying Subclasses
 -------------------
 
@@ -1490,6 +1503,7 @@ similar to Single Table Inheritance in ActiveRecord.
    Canvas.where(name: "Paper")
    # Returns only Firefox documents
    Firefox.where(name: "Window 1")
+
 
 Associations
 ------------
