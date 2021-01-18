@@ -20,98 +20,100 @@ Mongoid supports the ``has_one``, ``has_many``, ``belongs_to`` and
 Has One
 -------
 
-One to one associations where documents are stored in separate collections
-are defined using ``has_one`` and ``belongs_to`` macros.
-
-Defining
-````````
-
-The parent document of the association should use the ``has_one`` macro to
-indicate is has one referenced child, and the document that is referenced
-should use ``belongs_to``.
+Use the ``has_one`` macro to declare that the parent has a child stored in
+a separate collection. The child is optional by default:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+    
     has_one :studio
   end
 
-  class Studio
-    include Mongoid::Document
-    field :name, type: String
-    belongs_to :band
-  end
-
-Definitions are required on both sides to the association in order for it to
-work properly.
-
-Storage
-```````
-
-When defining an association of this nature, each document is stored in its
-respective collection, and the child document contains a "foreign key"
-reference to the parent:
+When using ``has_one``, the child model must use ``belongs_to`` to declare the
+association with the parent:
 
 .. code-block:: ruby
 
-  # The parent band document.
-  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+  class Studio
+    include Mongoid::Document
+    
+    belongs_to :band
+  end
 
-  # The child studio document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
-    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
-  }
+Given the above definitions, every child document contains a reference to
+its respective parent document:
+
+.. code-block:: ruby
+
+  band = Band.create!(studio: Studio.new)
+  # => #<Band _id: 600114fa48966848ad5bd392, >
+
+  band.studio
+  # => #<Studio _id: 600114fa48966848ad5bd391, band_id: BSON::ObjectId('600114fa48966848ad5bd392')>
+
+Use validations to require that the child is present:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    has_one :studio
+    
+    validates_presence_of :studio
+  end
 
 
 Has Many
 --------
 
-One to many associations where the children are stored in a separate
-collection from the parent document are defined using Mongoid's ``has_many``
-and ``belongs_to`` macros.
-
-Defining
-````````
-
-The parent document of the association should use the ``has_many`` macro to
-indicate is has n number of referenced children, where the document that is
-referenced uses ``belongs_to``.
+Use the ``has_many`` association to declare that the parent has zero or more
+children stored in a separate collection:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+    
     has_many :members
   end
 
-  class Member
-    include Mongoid::Document
-    field :name, type: String
-    belongs_to :band
-  end
-
-Definitions are required on both sides to the association in order for it
-to work properly.
-
-Storage
-```````
-
-When defining an association of this nature, each document is stored in its
-respective collection, and the child document contains a "foreign key"
-reference to the parent.
+Like with ``has_one``, the child model must use ``belongs_to`` to declare the
+association with the parent:
 
 .. code-block:: ruby
 
-  # The parent band document.
-  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
+  class Member
+    include Mongoid::Document
+    
+    belongs_to :band
+  end
 
-  # A child member document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
-    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
-  }
+Also as with ``has_one``, the child documents contain references to their
+respective parents:
+
+.. code-block:: ruby
+
+  band = Band.create!(members: [Member.new])
+  # => #<Band _id: 6001166d4896684910b8d1c5, >
+
+  band.members
+  # => [#<Member _id: 6001166d4896684910b8d1c6, band_id: BSON::ObjectId('6001166d4896684910b8d1c5')>]
+
+Use validations to require that at least one child is present:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
+    has_many :members
+    
+    validates_presence_of :members
+  end
+
 
 Queries
 ```````
@@ -204,117 +206,122 @@ The following examle illustrates the difference between ``exists?`` and
 Belongs To
 ----------
 
-A ``belongs_to`` macro is used when a document is the child in a ``has_one``
-or ``has_many`` association. By default, in order for a document to
-be saved, each of its ``belongs_to`` associations must be provided a value.
-To override this requirement for a particular association, use the option
-``optional: false`` on the ``belong_to`` association. To override this
-requirement globally, set the ``belongs_to_required_by_default``
-:ref:`configuration option <configuration-options>` to ``false``.
+Use the ``belongs_to`` macro to associate a child with a parent stored in a
+separate collection. The ``_id`` of the parent (if a parent is associated)
+is stored in the child.
 
-Defining
-````````
-
-The child document of the association uses the ``belongs_to`` macro to indicate
-it is associated with a parent. The document on the ``belongs_to`` side
-stores the reference to the parent.
+By default, if a ``belongs_to`` association is defined on a model, it must be
+provided a value for a model instance to be saved. Use the ``optional: true```
+option to make the instances persistable without specifying the parent:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+    
     has_one :studio
   end
 
   class Studio
     include Mongoid::Document
-    field :name, type: String
-    belongs_to :band
+    
+    belongs_to :band, optional: true
   end
+  
+  studio = Studio.create!
+  # => #<Studio _id: 600118184896684987aa884f, band_id: nil>
 
-Definitions are required on both sides to the association in order for it to
-work properly.
+To change the default behavior of ``belongs_to`` associations to not require
+their respective parents globally, set the ``belongs_to_required_by_default``
+:ref:`configuration option <configuration-options>` to ``false``.
 
-Storage
-```````
-
-When defining an association of this nature, each document is stored in its respective collection,
-but the child document contains a "foreign key" reference to the parent.
-
-.. code-block:: ruby
-
-  # The parent band document.
-  { "_id" : ObjectId("4d3ed089fb60ab534684b7e9") }
-
-  # The child studio document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f1"),
-    "band_id" : ObjectId("4d3ed089fb60ab534684b7e9")
-  }
-
-Has And Belongs To Many
------------------------
-
-Many to many associations in Mongoid are defined using the
-``has_and_belongs_to_many`` macro. Unlike ActiveRecord's
-``has_and_belongs_to_many``, in Mongoid there is no "join collection" -
-the foreign key ids are stored as arrays on both sides of the association.
-
-``has_and_belongs_to_many`` association has no embedded equivalent.
-
-Defining
-````````
-
-Both sides of the association use the same macro.
+Although ``has_one`` and ``has_many`` associations require the
+corresponding ``belongs_to`` association to be defined on the child,
+``belongs_to`` may also be used without a corresponding ``has_one`` or
+``has_many`` macro. In this case the child is not accessible from the parent
+but the parent is accessible from the child:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+  end
+
+  class Studio
+    include Mongoid::Document
+    
+    belongs_to :band
+  end
+
+For clarity it is possible to add the ``inverse_of: nil`` option in cases when
+the parent does not define the association:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+  end
+
+  class Studio
+    include Mongoid::Document
+    
+    belongs_to :band, inverse_of: nil
+  end
+
+
+Has And Belongs To Many
+-----------------------
+
+Use the ``has_and_belongs_to_many`` macro to declare a many-to-many
+association:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    
     has_and_belongs_to_many :tags
   end
 
   class Tag
     include Mongoid::Document
-    field :name, type: String
+    
     has_and_belongs_to_many :bands
   end
 
-You can create a one sided many to many if you want to mimic a has_many
-that stores the keys as an array on the parent.
+Both model instances store a list of ids of the associated models, if any:
+
+.. code-block:: ruby
+
+  band = Band.create!(tags: [Tag.create!])
+  # => #<Band _id: 60011d554896684b8b910a2a, tag_ids: [BSON::ObjectId('60011d554896684b8b910a29')]>
+  
+  band.tags
+  # => [#<Tag _id: 60011d554896684b8b910a29, band_ids: [BSON::ObjectId('60011d554896684b8b910a2a')]>]
+
+You can create a one-sided ``has_and_belongs_to_many`` association to store
+the ids only in one document using the ``inverse_of: nil`` option:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
+    
     has_and_belongs_to_many :tags, inverse_of: nil
   end
 
   class Tag
     include Mongoid::Document
-    field :name, type: String
   end
 
-Storage
-```````
+  band = Band.create!(tags: [Tag.create!])
+  # => #<Band _id: 60011dbc4896684bbbaa9255, tag_ids: [BSON::ObjectId('60011dbc4896684bbbaa9254')]>
 
-When defining an association of this nature, each document is stored in its
-respective collection, and each document contains a "foreign key" reference
-to the other in the form of an array.
+  band.tags
+  # => [#<Tag _id: 60011dbc4896684bbbaa9254, >]
 
-.. code-block:: ruby
-
-  # The band document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7e9"),
-    "tag_ids" : [ ObjectId("4d3ed089fb60ab534684b7f2") ]
-  }
-
-  # The tag document.
-  {
-    "_id" : ObjectId("4d3ed089fb60ab534684b7f2"),
-    "band_ids" : [ ObjectId("4d3ed089fb60ab534684b7e9") ]
-  }
+A one-sided ``has_and_belongs_to_many`` association is, naturally, only
+usable from the model where it is defined.
 
 
 Querying Referenced Associations
