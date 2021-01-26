@@ -96,7 +96,7 @@ describe 'Mongoid application tests' do
 
           Dir.chdir(TMP_BASE) do
             FileUtils.rm_rf('mongoid-test')
-            Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
+            Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record --skip-webpack-install), env: clean_env)
 
             Dir.chdir('mongoid-test') do
               adjust_app_gemfile
