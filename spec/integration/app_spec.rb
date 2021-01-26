@@ -91,7 +91,7 @@ describe 'Mongoid application tests' do
     ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
       context "with rails #{rails_version}" do
         it 'creates' do
-          Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a))
+          Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a --ignore-dependencies))
           Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
 
           Dir.chdir(TMP_BASE) do
