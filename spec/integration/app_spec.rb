@@ -90,6 +90,21 @@ describe 'Mongoid application tests' do
   context 'new application - rails' do
     ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
       context "with rails #{rails_version}" do
+        before(:all) do
+          Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a --ignore-dependencies))
+          Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+
+          Dir.chdir(TMP_BASE) do
+            FileUtils.rm_rf('mongoid-test')
+            Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record --skip-webpack-install), env: clean_env)
+
+            Dir.chdir('mongoid-test') do
+              adjust_app_gemfile
+              Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+            end
+          end
+        end
+
         it 'creates' do
           Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a --ignore-dependencies))
           Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
