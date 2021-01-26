@@ -106,25 +106,14 @@ describe 'Mongoid application tests' do
         end
 
         it 'creates' do
-          Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a --ignore-dependencies))
-          Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+          Dir.chdir(File.join(TMP_BASE,'mongoid-test')) do
+            Mrss::ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
+            Mrss::ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
 
-          Dir.chdir(TMP_BASE) do
-            FileUtils.rm_rf('mongoid-test')
-            Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record --skip-webpack-install), env: clean_env)
-
-            Dir.chdir('mongoid-test') do
-              adjust_app_gemfile
-              Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
-
-              Mrss::ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
-              Mrss::ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
-
-              # https://jira.mongodb.org/browse/MONGOID-4885
-              comment_text = File.read('app/models/comment.rb')
-              comment_text.should =~ /belongs_to :post/
-              comment_text.should_not =~ /embedded_in :post/
-            end
+            # https://jira.mongodb.org/browse/MONGOID-4885
+            comment_text = File.read('app/models/comment.rb')
+            comment_text.should =~ /belongs_to :post/
+            comment_text.should_not =~ /embedded_in :post/
           end
         end
       end
