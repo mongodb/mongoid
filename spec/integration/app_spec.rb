@@ -88,7 +88,7 @@ describe 'Mongoid application tests' do
   end
 
   context 'new application - rails' do
-    ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
+    ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0', '~> 6.1.0'].each do |rails_version|
       context "with rails #{rails_version}" do
         before(:all) do
           Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a --ignore-dependencies))
@@ -114,6 +114,21 @@ describe 'Mongoid application tests' do
             comment_text = File.read('app/models/comment.rb')
             comment_text.should =~ /belongs_to :post/
             comment_text.should_not =~ /embedded_in :post/
+          end
+        end
+
+        # https://jira.mongodb.org/browse/MONGOID-5042
+        it 'generates config' do
+          Dir.chdir(File.join(TMP_BASE,'mongoid-test')) do
+            mongoid_config_file = File.join(TMP_BASE,'mongoid-test/config/mongoid.yml')
+
+            File.exist?(mongoid_config_file).should be false
+            Mrss::ChildProcessHelper.check_call(%w(rails g mongoid:config), env: clean_env)
+            File.exist?(mongoid_config_file).should be true
+
+            config_text = File.read(mongoid_config_file)
+            config_text.should =~ /mongoid_test_development/
+            config_text.should =~ /mongoid_test_test/
           end
         end
       end
