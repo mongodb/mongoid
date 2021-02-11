@@ -181,11 +181,44 @@ describe 'Mongoid application tests' do
     end
   end
 
+  def parse_mongodb_uri(uri)
+    pre, query = uri.split('?', 2)
+    if pre =~ %r,\A(mongodb(?:.*?))://([^/]+)(?:/(.*))?\z,
+      protocol = $1
+      hosts = $2
+      database = $3
+      if database == ''
+        database = nil
+      end
+    else
+      raise ArgumentError, "Invalid MongoDB URI: #{uri}"
+    end
+    if query == ''
+      query = nil
+    end
+    {
+      protocol: protocol,
+      hosts: hosts,
+      database: database,
+      query: query,
+    }
+  end
+
+  def build_mongodb_uri(parts)
+    "#{parts.fetch(:protocol)}://#{parts.fetch(:hosts)}/#{parts[:database]}?#{parts[:query]}"
+  end
+
   def write_mongoid_yml
+    # HACK: the driver does not provide a MongoDB URI parser and assembler,
+    # and the Ruby standard library URI module doesn't handle multiple hosts.
+    parts = parse_mongodb_uri(SpecConfig.instance.uri_str)
+    parts[:database] = 'mongoid_test'
+    uri = build_mongodb_uri(parts)
+    p uri
     env_config = {'clients' => {'default' => {
       # TODO massive hack, will fail if uri specifies a database name or
       # any uri options
-      'uri' => "#{SpecConfig.instance.uri_str}/mongoid_test",
+      'uri' => uri,
     }}}
     config = {'development' => env_config, 'production' => env_config}
     File.open('config/mongoid.yml', 'w') do |f|
