@@ -543,7 +543,18 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: "ruby-2.6"
-    mongodb-version: '*'
+    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
+    topology: ["replica-set", "sharded-cluster"]
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1604-small
+  tasks:
+     - name: "test"
+- matrix_name: "topologies-old"
+  matrix_spec:
+    driver: current
+    ruby: "ruby-2.6"
+    mongodb-version: ['2.6', '3.0', '3.2', '3.4']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
