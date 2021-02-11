@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Patches debuggers to not ask for confirmation on exit.
+# byebug tracking issue: https://github.com/deivid-rodriguez/byebug/issues/404
+# byebug proposed patch: https://github.com/deivid-rodriguez/byebug/pull/605
+
+root="$1"
+if test -z "$root"; then
+  root=$HOME/.rbenv
+fi
+
+find "$root" -name quit.rb -path '*/byebug/*' -exec \
+  sed -e '/quit.confirmations.really/d' -i {} \;
+
+# JRuby ruby-debug
+
+find "$root" -name quit.rb -path '*/ruby-debug/*' -exec \
+  sed -e 's/confirm("Really quit.*")/true/' -i {} \;
