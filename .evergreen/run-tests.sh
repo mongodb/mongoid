@@ -84,7 +84,7 @@ fi
 
 export BUNDLE_GEMFILE
 
-export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite$uri_options"
+export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite&$uri_options"
 
 if test -n "$TEST_CMD"; then
   eval $TEST_CMD
