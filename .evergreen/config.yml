@@ -7,6 +7,9 @@
 # when the task started failing
 stepback: true
 
+# Fail builds when pre tasks fail.
+pre_error_fails_task: true
+
 # Mark a failure as a system/bootstrap failure (purple box) rather then a task
 # failure by default.
 # Actual testing tasks are marked with `type: test`
@@ -14,7 +17,7 @@ command_type: system
 
 # Protect ourself against rogue test case, or curl gone wild, that runs forever
 # jruby runs take over two hours sometimes
-exec_timeout_secs: 20000
+exec_timeout_secs: 10800
 
 # What to do when evergreen hits the timeout (`post:` tasks are run automatically)
 timeout:
@@ -29,6 +32,13 @@ functions:
     - command: git.get_project
       params:
         directory: "src"
+    - command: shell.exec
+      params:
+        working_dir: "src"
+        script: |
+          set -ex
+          
+          git submodule update --init --recursive
 
   "fetch egos":
     - command: shell.exec
@@ -54,11 +64,6 @@ functions:
            fi
 
            export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
-
-           # Python has cygwin path problems on Windows. Detect prospective mongo-orchestration home directory
-           if [ "Windows_NT" = "$OS" ]; then # Magic variable in cygwin
-              export DRIVERS_TOOLS=$(cygpath -m $DRIVERS_TOOLS)
-           fi
 
            export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
            export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
@@ -99,20 +104,6 @@ functions:
     - command: expansions.update
       params:
         file: src/expansion.yml
-
-  "prepare resources":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          rm -rf $DRIVERS_TOOLS
-          if [ "${project}" = "drivers-tools" ]; then
-            # If this was a patch build, doing a fresh clone would not actually test the patch
-            cp -R ${PROJECT_DIRECTORY}/ $DRIVERS_TOOLS
-          else
-            git clone git://github.com/mongodb-labs/drivers-evergreen-tools.git $DRIVERS_TOOLS
-          fi
-          echo "{ \"releases\": { \"default\": \"$MONGODB_BINARIES\" }}" > $MONGO_ORCHESTRATION_HOME/orchestration.config
 
   "exec script" :
     - command: shell.exec
@@ -276,17 +267,6 @@ functions:
       params:
         file: ./src/tmp/rspec.xml
 
-  "bootstrap mongo-orchestration":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          MONGODB_VERSION=${VERSION} TOPOLOGY=${TOPOLOGY} AUTH=${AUTH} SSL=${SSL} sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
-    # run-orchestration generates expansion file with the MONGODB_URI for the cluster
-    - command: expansions.update
-      params:
-        file: mo-expansion.yml
-
   "run tests":
     - command: shell.exec
       type: test
@@ -304,22 +284,6 @@ functions:
             I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             ./egos .evergreen/run-tests.sh
-
-  "cleanup":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          cd "$MONGO_ORCHESTRATION_HOME"
-          # source the mongo-orchestration virtualenv if it exists
-          if [ -f venv/bin/activate ]; then
-            . venv/bin/activate
-          elif [ -f venv/Scripts/activate ]; then
-            . venv/Scripts/activate
-          fi
-          mongo-orchestration stop
-          cd -
-          rm -rf $DRIVERS_TOOLS || true
 
   "fix absolute paths":
     - command: shell.exec
@@ -344,7 +308,6 @@ pre:
   - func: "fetch source"
   - func: "fetch egos"
   - func: "create expansions"
-  - func: "prepare resources"
   - func: "fix absolute paths"
   - func: "install dependencies"
 
@@ -354,12 +317,10 @@ post:
   - func: "upload mo artifacts"
   #- func: "upload test results"
   - func: "upload test results to s3"
-  - func: "cleanup"
 
 tasks:
     - name: "test"
       commands:
-        - func: "bootstrap mongo-orchestration"
         - func: "run tests"
 
 axes:
@@ -413,6 +374,7 @@ axes:
         display_name: Sharded Cluster
         variables:
            TOPOLOGY: "sharded_cluster"
+           SINGLE_MONGOS: true
   - id: "auth"
     display_name: Authentication
     values:
@@ -438,10 +400,6 @@ axes:
   - id: "ruby"
     display_name: Ruby Version
     values:
-      - id: "ruby-2.2"
-        display_name: ruby-2.2
-        variables:
-           RVM_RUBY: "ruby-2.2"
       - id: "ruby-2.3"
         display_name: ruby-2.3
         variables:
@@ -469,10 +427,6 @@ axes:
   - id: "jruby"
     display_name: JRuby Version
     values:
-      - id: "jruby-9.1"
-        display_name: jruby-9.1
-        variables:
-           RVM_RUBY: "jruby-9.1"
       - id: "jruby-9.2"
         display_name: jruby-9.2
         variables:
@@ -480,13 +434,9 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: ubuntu1204-test
-        display_name: "Ubuntu 12.04"
-        run_on: ubuntu1204-test
-
       - id: ubuntu-14.04
         display_name: "Ubuntu 14.04"
-        run_on: ubuntu1404-test
+        run_on: ubuntu1404-small
 
       - id: rhel70
         display_name: "RHEL 7.0"
@@ -533,26 +483,26 @@ axes:
   - id: "rails"
     display_name: Rails Version
     values:
-      - id: current
-        display_name: "Rails-current"
-        variables:
-           RAILS: "current"
       - id: master
-        display_name: "Rails-master"
+        display_name: "Rails master"
         variables:
-           RAILS: "master"
-      - id: "51"
+          RAILS: "master"
+      - id: "5.1"
         display_name: "Rails 5.1"
         variables:
-           RAILS: "51"
-      - id: "52"
+          RAILS: "5.1"
+      - id: "5.2"
         display_name: "Rails 5.2"
         variables:
-           RAILS: "52"
-      - id: "60"
+          RAILS: "5.2"
+      - id: "6.0"
         display_name: "Rails 6.0"
         variables:
-           RAILS: "60"
+          RAILS: "6.0"
+      - id: "6.1"
+        display_name: "Rails 6.1"
+        variables:
+          RAILS: "6.1"
   - id: "i18n"
     display_name: I18n version
     values:
@@ -578,27 +528,49 @@ axes:
           APP_TESTS: yes
 
 buildvariants:
-- matrix_name: "topologies"
+- matrix_name: "drivers"
   matrix_spec:
     driver: [current, master, stable]
     ruby: "ruby-2.7"
     mongodb-version: "4.4"
-    topology: ["replica-set"]
+    topology: '*'
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
+  tasks:
+     - name: "test"
+- matrix_name: "topologies"
+  matrix_spec:
+    driver: current
+    ruby: "ruby-2.6"
+    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
+    topology: ["replica-set", "sharded-cluster"]
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1604-small
+  tasks:
+     - name: "test"
+- matrix_name: "topologies-old"
+  matrix_spec:
+    driver: current
+    ruby: "ruby-2.6"
+    mongodb-version: ['2.6', '3.0', '3.2', '3.4']
+    topology: ["replica-set", "sharded-cluster"]
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "rubies"
   matrix_spec:
     driver: "current"
     # ruby-head temporarily omitted: https://jira.mongodb.org/browse/MONGOID-4833
-    ruby: [ruby-2.6, ruby-2.3]
+    ruby: [ruby-2.3]
     mongodb-version: "4.2"
     topology: "replica-set"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-test
+    - ubuntu1604-small
   tasks:
      - name: "test"
 - matrix_name: "mongodb"
@@ -615,12 +587,12 @@ buildvariants:
 - matrix_name: "mongodb-old"
   matrix_spec:
     driver: "current"
-    ruby: "ruby-2.3"
-    mongodb-version: ["3.0","2.6"]
+    ruby: "ruby-2.5"
+    mongodb-version: ["3.0", "2.6"]
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "jruby-new"
@@ -628,18 +600,7 @@ buildvariants:
     driver: "current"
     jruby: "jruby-9.2"
     mongodb-version: "4.2"
-    topology: ["standalone", "replica-set"]
-  display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
-- matrix_name: "jruby-old"
-  matrix_spec:
-    driver: "current"
-    jruby: "jruby-9.1"
-    mongodb-version: "3.0"
-    topology: "standalone"
+    topology: '*'
   display_name: "${jruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
     - rhel70-small
@@ -681,12 +642,12 @@ buildvariants:
 - matrix_name: "driver-master-old"
   matrix_spec:
     driver: "master"
-    ruby: "ruby-2.3"
+    ruby: "ruby-2.5"
     mongodb-version: "2.6"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "driver-stable-new"
@@ -708,7 +669,7 @@ buildvariants:
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "driver-oldstable"
@@ -734,11 +695,9 @@ buildvariants:
   tasks:
      - name: "test"
 - matrix_name: "driver-min"
-  # Since driver 2.11+ requires Ruby 2.3+, but Mongoid still supports
-  # Ruby 2.2, this is the only configuration which we test on Ruby 2.2
   matrix_spec:
     driver: "min"
-    ruby: "ruby-2.2"
+    ruby: "ruby-2.3"
     mongodb-version: "3.6"
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -746,37 +705,37 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-51"
+- matrix_name: "rails-5.1"
   matrix_spec:
     driver: "current"
-    ruby: "ruby-2.5"
+    ruby: "ruby-2.4"
     mongodb-version: "4.2"
     topology: "standalone"
-    rails: '51'
+    rails: '5.1'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-52"
+- matrix_name: "rails-5.2"
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.6"
     mongodb-version: "4.2"
     topology: "standalone"
-    rails: '52'
+    rails: '5.2'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-60"
+- matrix_name: "rails-6.0"
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.7"
     mongodb-version: "4.4"
     topology: "standalone"
-    rails: '60'
+    rails: '6.0'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
@@ -801,16 +760,31 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
+- matrix_name: "i18n-fallbacks"
+  matrix_spec:
+    driver: "current"
+    ruby: "ruby-2.6"
+    mongodb-version: "4.2"
+    topology: "standalone"
+    i18n: '*'
+    test-i18n-fallbacks: yes
+  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
+  run_on:
+    - rhel70-small
+  tasks:
+     - name: "test"
 - matrix_name: app-tests
   matrix_spec:
     driver: current
     ruby: ruby-2.7
-    mongodb-version: '4.2'
+    mongodb-version: '4.4'
     topology: standalone
     app-tests: yes
-  display_name: "app tests ${driver}, ${ruby}"
+    # Not currently testing rails master
+    rails: ['5.1', '5.2', '6.0', '6.1']
+  display_name: "app tests ${driver}, ${ruby}, ${rails}"
   run_on:
-    - rhel70-small
+    - ubuntu1804-small
   tasks:
      - name: "test"
 - matrix_name: app-tests-jruby
@@ -822,6 +796,6 @@ buildvariants:
     app-tests: yes
   display_name: "app tests ${driver}, ${jruby}"
   run_on:
-    - rhel70-small
+    - ubuntu1804-small
   tasks:
      - name: "test"

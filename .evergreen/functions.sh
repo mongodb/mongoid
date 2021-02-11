@@ -1,40 +1,3 @@
-host_arch() {
-  local arch
-  arch=
-  if test -f /etc/debian_version; then
-    # Debian or Ubuntu
-    if test "`uname -m`" = aarch64; then
-      arch=ubuntu1604-arm
-    elif lsb_release -i |grep -q Debian; then
-      release=`lsb_release -r |awk '{print $2}' |tr -d .`
-      arch="debian$release"
-    elif lsb_release -i |grep -q Ubuntu; then
-      release=`lsb_release -r |awk '{print $2}' |tr -d .`
-      arch="ubuntu$release"
-    else
-      echo 'Unknown Debian flavor' 1>&2
-      return 1
-    fi
-  elif test -f /etc/redhat-release; then
-    # RHEL or CentOS
-    if test "`uname -m`" = s390x; then
-      arch=rhel72-s390x
-    elif test "`uname -m`" = ppc64le; then
-      arch=rhel71-ppc
-    elif lsb_release -i |grep -q RedHat; then
-      release=`lsb_release -r |awk '{print $2}' |tr -d .`
-      arch="rhel$release"
-    else
-      echo 'Unknown RHEL flavor' 1>&2
-      return 1
-    fi
-  else
-    echo 'Unknown distro' 1>&2
-    return 1
-  fi
-  echo $arch
-}
-
 set_fcv() {
   if test -n "$FCV"; then
     mongo --eval 'assert.commandWorked(db.adminCommand( { setFeatureCompatibilityVersion: "'"$FCV"'" } ));' "$MONGODB_URI"
@@ -58,90 +21,16 @@ set_env_vars() {
   fi
   export CI=evergreen
   # JRUBY_OPTS were initially set for Mongoid
-  export JRUBY_OPTS="-J-Xms512m -J-Xmx2G"
-}
+  export JRUBY_OPTS="-J-Xms512m -J-Xmx1G"
 
-setup_ruby() {
-  if test -z "$RVM_RUBY"; then
-    echo "Empty RVM_RUBY, aborting"
-    exit 2
-  fi
-  
-  ls -l /opt
-
-  # Necessary for jruby
-  # Use toolchain java if it exists
-  if [ -f /opt/java/jdk8/bin/java ]; then
-    export JAVACMD=/opt/java/jdk8/bin/java
-    export PATH=$PATH:/opt/java/jdk8/bin
-  fi
-    
-  # ppc64le has it in a different place
-  if test -z "$JAVACMD" && [ -f /usr/lib/jvm/java-1.8.0/bin/java ]; then
-    export JAVACMD=/usr/lib/jvm/java-1.8.0/bin/java
-    export PATH=$PATH:/usr/lib/jvm/java-1.8.0/bin
-  fi
-
-  if [ "$RVM_RUBY" == "ruby-head" ]; then
-    # 12.04, 14.04 and 16.04 are good
-    wget -O ruby-head.tar.bz2 http://rubies.travis-ci.org/ubuntu/`lsb_release -rs`/x86_64/ruby-head.tar.bz2
-    tar xf ruby-head.tar.bz2
-    export PATH=`pwd`/ruby-head/bin:`pwd`/ruby-head/lib/ruby/gems/2.6.0/bin:$PATH
-    ruby --version
-    ruby --version |grep dev
-    
-    #rvm reinstall $RVM_RUBY
-  else
-    if true; then
-    
-    # For testing toolchains:
-    TOOLCHAIN_VERSION=289d4bec7c61e88000cea582c05fd8073b932122
-    toolchain_url=http://boxes.10gen.com/build/toolchain-drivers/mongo-ruby-driver/ruby-toolchain-`host_arch`-$TOOLCHAIN_VERSION.tar.xz
-    curl -fL $toolchain_url |tar Jxf -
-    export PATH=`pwd`/rubies/$RVM_RUBY/bin:$PATH
-    
-    # Attempt to get bundler to report all errors - so far unsuccessful
-    #curl -o bundler-openssl.diff https://github.com/bundler/bundler/compare/v2.0.1...p-mongo:report-errors.diff
-    #find . -path \*/lib/bundler/fetcher.rb -exec patch {} bundler-openssl.diff \;
-    
-    else
-    
-    # Normal operation
-    if ! test -d $HOME/.rubies/$RVM_RUBY/bin; then
-      echo "Ruby directory does not exist: $HOME/.rubies/$RVM_RUBY/bin" 1>&2
-      echo "Contents of /opt:" 1>&2
-      ls -l /opt 1>&2 || true
-      echo ".rubies symlink:" 1>&2
-      ls -ld $HOME/.rubies 1>&2 || true
-      echo "Our rubies:" 1>&2
-      ls -l $HOME/.rubies 1>&2 || true
-      exit 2
-    fi
-    export PATH=$HOME/.rubies/$RVM_RUBY/bin:$PATH
-    
-    fi
-    
-    ruby --version
-
-    # Ensure we're using the right ruby
-    python - <<EOH
-ruby = "${RVM_RUBY}".split("-")[0]
-version = "${RVM_RUBY}".split("-")[1]
-assert(ruby in "`ruby --version`")
-assert(version in "`ruby --version`")
-EOH
-
-    # We shouldn't need to update rubygems, and there is value in
-    # testing on whatever rubygems came with each supported ruby version
-    #echo 'updating rubygems'
-    #gem update --system
-
-    # Only install bundler when not using ruby-head.
-    # ruby-head comes with bundler and gem complains
-    # because installing bundler would overwrite the bundler binary
-    if test "$RVM_RUBY" = ruby-2.2 || echo "$RVM_RUBY" |grep -q jruby; then
-      gem install bundler -v '<2'
-    fi
+  if test -n "$SINGLE_MONGOS"; then
+    # Tests which perform query count assertions are incompatible with 
+    # multi-shard deployments, because of how any_instance_of assertions work
+    # (they must all be invoked on the same connection object, and in
+    # multi-shard deployments server selection rotates through available
+    # mongos nodes).
+    echo Restricting to a single mongos
+    export MONGODB_URI=`echo "$MONGODB_URI" |sed -e 's/,.*//'`
   fi
 }
 
@@ -159,23 +48,4 @@ kill_jruby() {
     echo "terminating remaining jruby processes"
     for pid in $(ps -ef | grep "jruby" | grep -v grep | awk '{print $2}'); do kill -9 $pid; done
   fi
-}
-
-prepare_server() {
-  arch=$1
-  version=$2
-  
-  url=http://downloads.10gen.com/linux/mongodb-linux-x86_64-enterprise-$arch-$version.tgz
-  mongodb_dir="$MONGO_ORCHESTRATION_HOME"/mdb
-  mkdir -p "$mongodb_dir"
-  curl $url |tar xz -C "$mongodb_dir" -f -
-  BINDIR="$mongodb_dir"/`basename $url |sed -e s/.tgz//`/bin
-  export PATH="$BINDIR":$PATH
-}
-
-install_mlaunch() {
-  pythonpath="$MONGO_ORCHESTRATION_HOME"/python
-  pip install -t "$pythonpath" 'mtools[mlaunch]'
-  export PATH="$pythonpath/bin":$PATH
-  export PYTHONPATH="$pythonpath"
 }
