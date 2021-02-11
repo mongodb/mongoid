@@ -547,7 +547,7 @@ buildvariants:
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "rubies"
