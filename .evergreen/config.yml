@@ -554,7 +554,7 @@ buildvariants:
   matrix_spec:
     driver: "current"
     # ruby-head temporarily omitted: https://jira.mongodb.org/browse/MONGOID-4833
-    ruby: [ruby-2.6, ruby-2.3]
+    ruby: [ruby-2.3]
     mongodb-version: "4.2"
     topology: "replica-set"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
