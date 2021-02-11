@@ -10,12 +10,30 @@ set -o errexit  # Exit the script with error if any of the commands fail
 
 . `dirname "$0"`/../spec/shared/shlib/distro.sh
 . `dirname "$0"`/../spec/shared/shlib/set_env.sh
+. `dirname "$0"`/../spec/shared/shlib/server.sh
 . `dirname "$0"`/functions.sh
 . `dirname "$0"`/functions.sh
+
+arch=`host_distro`
 
 set_fcv
 set_env_vars
 set_env_ruby
+
+prepare_server $arch
+
+install_mlaunch_virtualenv
+
+# Launching mongod under $MONGO_ORCHESTRATION_HOME
+# makes its log available through log collecting machinery
+
+export dbdir="$MONGO_ORCHESTRATION_HOME"/db
+mkdir -p "$dbdir"
+
+calculate_server_args
+launch_server "$dbdir"
+
+uri_options="$URI_OPTIONS"
 
 which bundle
 bundle --version
@@ -66,7 +84,11 @@ fi
 
 export BUNDLE_GEMFILE
 
-if test -n "$TEST_I18N_FALLBACKS"; then
+export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite&$uri_options"
+
+if test -n "$TEST_CMD"; then
+  eval $TEST_CMD
+elif test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
 elif test -n "$APP_TESTS"; then
   # Need recent node for rails
@@ -80,3 +102,5 @@ elif test -n "$APP_TESTS"; then
 else
   bundle exec rake ci
 fi
+
+python -m mtools.mlaunch.mlaunch stop --dir "$dbdir"

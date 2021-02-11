@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+$: << File.join(File.dirname(__FILE__), '../spec/shared/lib')
+require 'mrss/docker_runner'
+
+Mrss::DockerRunner.new(
+  image_tag: 'mongoid-test',
+  dockerfile_path: '.evergreen/Dockerfile',
+  default_script: 'bash -x .evergreen/run-tests.sh',
+  project_lib_subdir: 'mongoid',
+).run

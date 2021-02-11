@@ -65,11 +65,6 @@ functions:
 
            export DRIVERS_TOOLS="$(pwd)/../drivers-tools"
 
-           # Python has cygwin path problems on Windows. Detect prospective mongo-orchestration home directory
-           if [ "Windows_NT" = "$OS" ]; then # Magic variable in cygwin
-              export DRIVERS_TOOLS=$(cygpath -m $DRIVERS_TOOLS)
-           fi
-
            export MONGO_ORCHESTRATION_HOME="$DRIVERS_TOOLS/.evergreen/orchestration"
            export MONGODB_BINARIES="$DRIVERS_TOOLS/mongodb/bin"
            export UPLOAD_BUCKET="${project}"
@@ -109,20 +104,6 @@ functions:
     - command: expansions.update
       params:
         file: src/expansion.yml
-
-  "prepare resources":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          rm -rf $DRIVERS_TOOLS
-          if [ "${project}" = "drivers-tools" ]; then
-            # If this was a patch build, doing a fresh clone would not actually test the patch
-            cp -R ${PROJECT_DIRECTORY}/ $DRIVERS_TOOLS
-          else
-            git clone git://github.com/mongodb-labs/drivers-evergreen-tools.git $DRIVERS_TOOLS
-          fi
-          echo "{ \"releases\": { \"default\": \"$MONGODB_BINARIES\" }}" > $MONGO_ORCHESTRATION_HOME/orchestration.config
 
   "exec script" :
     - command: shell.exec
@@ -286,17 +267,6 @@ functions:
       params:
         file: ./src/tmp/rspec.xml
 
-  "bootstrap mongo-orchestration":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          sh ${DRIVERS_TOOLS}/.evergreen/run-orchestration.sh
-    # run-orchestration generates expansion file with the MONGODB_URI for the cluster
-    - command: expansions.update
-      params:
-        file: mo-expansion.yml
-
   "run tests":
     - command: shell.exec
       type: test
@@ -314,22 +284,6 @@ functions:
             I18N="${I18N}" \
             TEST_I18N_FALLBACKS="${TEST_I18N_FALLBACKS}" \
             ./egos .evergreen/run-tests.sh
-
-  "cleanup":
-    - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          cd "$MONGO_ORCHESTRATION_HOME"
-          # source the mongo-orchestration virtualenv if it exists
-          if [ -f venv/bin/activate ]; then
-            . venv/bin/activate
-          elif [ -f venv/Scripts/activate ]; then
-            . venv/Scripts/activate
-          fi
-          mongo-orchestration stop
-          cd -
-          rm -rf $DRIVERS_TOOLS || true
 
   "fix absolute paths":
     - command: shell.exec
@@ -354,7 +308,6 @@ pre:
   - func: "fetch source"
   - func: "fetch egos"
   - func: "create expansions"
-  - func: "prepare resources"
   - func: "fix absolute paths"
   - func: "install dependencies"
 
@@ -364,12 +317,10 @@ post:
   - func: "upload mo artifacts"
   #- func: "upload test results"
   - func: "upload test results to s3"
-  - func: "cleanup"
 
 tasks:
     - name: "test"
       commands:
-        - func: "bootstrap mongo-orchestration"
         - func: "run tests"
 
 axes:
@@ -483,13 +434,9 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: ubuntu1204-test
-        display_name: "Ubuntu 12.04"
-        run_on: ubuntu1204-test
-
       - id: ubuntu-14.04
         display_name: "Ubuntu 14.04"
-        run_on: ubuntu1404-test
+        run_on: ubuntu1404-small
 
       - id: rhel70
         display_name: "RHEL 7.0"
@@ -596,23 +543,34 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: "ruby-2.6"
-    mongodb-version: '*'
+    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1604-small
+  tasks:
+     - name: "test"
+- matrix_name: "topologies-old"
+  matrix_spec:
+    driver: current
+    ruby: "ruby-2.6"
+    mongodb-version: ['2.6', '3.0', '3.2', '3.4']
+    topology: ["replica-set", "sharded-cluster"]
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "rubies"
   matrix_spec:
     driver: "current"
     # ruby-head temporarily omitted: https://jira.mongodb.org/browse/MONGOID-4833
-    ruby: [ruby-2.6, ruby-2.3]
+    ruby: [ruby-2.3]
     mongodb-version: "4.2"
     topology: "replica-set"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-test
+    - ubuntu1604-small
   tasks:
      - name: "test"
 - matrix_name: "mongodb"
@@ -634,7 +592,7 @@ buildvariants:
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "jruby-new"
@@ -689,7 +647,7 @@ buildvariants:
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "driver-stable-new"
@@ -711,7 +669,7 @@ buildvariants:
     topology: "standalone"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - rhel70-small
+    - ubuntu1404-small
   tasks:
      - name: "test"
 - matrix_name: "driver-oldstable"
@@ -824,7 +782,7 @@ buildvariants:
     app-tests: yes
   display_name: "app tests ${driver}, ${ruby}"
   run_on:
-    - rhel70-small
+    - ubuntu1804-small
   tasks:
      - name: "test"
 - matrix_name: app-tests-jruby
@@ -836,6 +794,6 @@ buildvariants:
     app-tests: yes
   display_name: "app tests ${driver}, ${jruby}"
   run_on:
-    - rhel70-small
+    - ubuntu1804-small
   tasks:
      - name: "test"
