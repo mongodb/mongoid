@@ -86,7 +86,9 @@ export BUNDLE_GEMFILE
 
 export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite$uri_options"
 
-if test -n "$TEST_I18N_FALLBACKS"; then
+if test -n "$TEST_CMD"; then
+  eval $TEST_CMD
+elif test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
 elif test -n "$APP_TESTS"; then
   # Need recent node for rails
