@@ -434,13 +434,9 @@ axes:
   - id: "os"
     display_name: OS
     values:
-      - id: ubuntu1204-test
-        display_name: "Ubuntu 12.04"
-        run_on: ubuntu1204-test
-
       - id: ubuntu-14.04
         display_name: "Ubuntu 14.04"
-        run_on: ubuntu1404-test
+        run_on: ubuntu1404-small
 
       - id: rhel70
         display_name: "RHEL 7.0"
@@ -563,7 +559,7 @@ buildvariants:
     topology: "replica-set"
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
   run_on:
-    - ubuntu1604-test
+    - ubuntu1604-small
   tasks:
      - name: "test"
 - matrix_name: "mongodb"
