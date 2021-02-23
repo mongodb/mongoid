@@ -9,7 +9,8 @@ gem 'rake'
 gem 'actionpack', '~> 5.1'
 gem 'activemodel', '~> 5.1'
 
-gem 'i18n', '~> 1.0'
+# https://github.com/jruby/jruby/issues/6573
+gem 'i18n', '~> 1.0', '< 1.8.8'
 
 group :development do
   gem 'yard'
