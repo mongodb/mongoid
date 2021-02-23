@@ -1,34 +1,18 @@
 source 'https://rubygems.org'
+
 gemspec
 
-gem 'rake'
+require_relative './gemfiles/standard'
+
+standard_dependencies
+
 gem 'actionpack'
 gem 'activemodel'
 
-gem 'i18n', '~> 1.0', '>= 1.1'
-
-group :development do
-  gem 'yard'
+i18n_versions = ['~> 1.0', '>= 1.1']
+if RUBY_PLATFORM =~ /java/
+  # https://github.com/jruby/jruby/issues/6573
+  i18n_versions << '< 1.8.8'
 end
 
-group :development, :test do
-  gem 'rspec-core', '~> 3.7'
-  
-  platform :jruby do
-    gem 'ruby-debug'
-  end
-end
-
-group :test do
-  gem 'rspec-retry'
-  gem 'benchmark-ips'
-  gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
-  gem 'rspec-mocks-diag', '~> 3.0'
-  gem 'fuubar'
-  gem 'rfc'
-  gem 'childprocess'
-  platforms :mri do
-    gem 'timeout-interrupt'
-    gem 'byebug'
-  end
-end
+gem 'i18n', *i18n_versions
