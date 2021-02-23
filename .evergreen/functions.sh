@@ -58,7 +58,7 @@ set_env_vars() {
   fi
   export CI=evergreen
   # JRUBY_OPTS were initially set for Mongoid
-  export JRUBY_OPTS="--server -J-Xms512m -J-Xmx1G"
+  export JRUBY_OPTS="-J-Xms512m -J-Xmx1G"
 }
 
 setup_ruby() {
