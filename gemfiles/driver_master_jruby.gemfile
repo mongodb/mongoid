@@ -7,37 +7,14 @@ source "https://rubygems.org"
 # This gemfile only specifies driver git source.
 gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver"
 
-gem 'rake'
 gem 'actionpack', '~> 5.1'
 gem 'activemodel', '~> 5.1'
 
-gem 'i18n', '~> 1.0'
-
-group :development do
-  gem 'yard'
-end
-
-group :development, :test do
-  gem 'rspec-core', '~> 3.7'
-  
-  platform :jruby do
-    gem 'ruby-debug'
-  end
-end
-
-group :test do
-  gem 'timecop'
-  gem 'rspec-retry'
-  gem 'benchmark-ips'
-  gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
-  gem 'rspec-mocks-diag', '~> 3.0'
-  gem 'fuubar'
-  gem 'rfc'
-  gem 'childprocess'
-  platforms :mri do
-    gem 'timeout-interrupt'
-    gem 'byebug'
-  end
-end
+# https://github.com/jruby/jruby/issues/6573
+gem 'i18n', '~> 1.0', '< 1.8.8'
 
 gemspec path: '..'
+
+require_relative './standard'
+
+standard_dependencies
