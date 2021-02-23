@@ -3,44 +3,14 @@ source "https://rubygems.org"
 gem 'bson', git: "https://github.com/mongodb/bson-ruby"
 gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.9-stable'
 
-gem 'rake'
 gem 'actionpack', '~> 5.1'
 gem 'activemodel', '~> 5.1'
 
-if RUBY_VERSION < '2.3'
-  gem 'i18n', '~> 1.0', '< 1.5'
-  gem 'nokogiri', '<1.10'
-else
-  gem 'i18n', '~> 1.0'
-end
-
-group :development do
-  gem 'yard'
-end
-
-group :development, :test do
-  gem 'rspec-core', '~> 3.7'
-  
-  platform :jruby do
-    gem 'ruby-debug'
-  end
-end
-
-group :test do
-  gem 'rspec-retry'
-  gem 'benchmark-ips'
-  gem 'rspec-expectations', '~> 3.7', '>= 3.8.4'
-  gem 'rspec-mocks-diag', '~> 3.0'
-  gem 'fuubar'
-  gem 'rfc'
-  platforms :mri do
-    gem 'timeout-interrupt'
-    if RUBY_VERSION < '2.3'
-      gem 'byebug', '~> 10.0'
-    else
-      gem 'byebug'
-    end
-  end
-end
-
 gemspec path: '..'
+
+require_relative './standard'
+
+standard_dependencies
+nokogiri_dependency
+
+gem 'i18n', *base_i18n_versions
