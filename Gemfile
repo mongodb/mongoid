@@ -22,6 +22,10 @@ end
 
 group :development, :test do
   gem 'rspec-core', '~> 3.7'
+  
+  platform :jruby do
+    gem 'ruby-debug'
+  end
 end
 
 group :test do
