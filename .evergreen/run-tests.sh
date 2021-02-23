@@ -17,8 +17,7 @@ arch=`host_distro`
 
 set_fcv
 set_env_vars
-
-setup_ruby
+set_env_ruby
 
 prepare_server $arch
 
