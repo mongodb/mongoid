@@ -7,6 +7,9 @@
 # when the task started failing
 stepback: true
 
+# Fail builds when pre tasks fail.
+pre_error_fails_task: true
+
 # Mark a failure as a system/bootstrap failure (purple box) rather then a task
 # failure by default.
 # Actual testing tasks are marked with `type: test`
