@@ -95,8 +95,9 @@ setup_ruby() {
     if true; then
     
     # For testing toolchains:
-    toolchain_url=https://s3.amazonaws.com//mciuploads/mongo-ruby-toolchain/`host_arch`/e7cf68d7146c09d54dfbe241c04aad3e3eadbb10/mongo_ruby_driver_toolchain_`host_arch |tr - _`_e7cf68d7146c09d54dfbe241c04aad3e3eadbb10_19_12_27_00_47_13.tar.gz
-    curl -fL $toolchain_url |tar zxf -
+    TOOLCHAIN_VERSION=289d4bec7c61e88000cea582c05fd8073b932122
+    toolchain_url=http://boxes.10gen.com/build/toolchain-drivers/mongo-ruby-driver/ruby-toolchain-`host_arch`-$TOOLCHAIN_VERSION.tar.xz
+    curl -fL $toolchain_url |tar Jxf -
     export PATH=`pwd`/rubies/$RVM_RUBY/bin:$PATH
     
     # Attempt to get bundler to report all errors - so far unsuccessful
