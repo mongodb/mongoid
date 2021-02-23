@@ -14,7 +14,7 @@ command_type: system
 
 # Protect ourself against rogue test case, or curl gone wild, that runs forever
 # jruby runs take over two hours sometimes
-exec_timeout_secs: 10800
+exec_timeout_secs: 20000
 
 # What to do when evergreen hits the timeout (`post:` tasks are run automatically)
 timeout:
