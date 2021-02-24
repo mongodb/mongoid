@@ -43,7 +43,7 @@ gemfile:
 env:
   global:
     - CI="travis"
-    - JRUBY_OPTS="-J-Xms512m -J-Xmx1G"
+    - JRUBY_OPTS="-J-Xms512m -J-Xmx2G"
   matrix:
     - MONGODB=2.6.12
     - MONGODB=3.4.10
