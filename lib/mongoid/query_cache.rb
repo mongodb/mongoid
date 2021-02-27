@@ -117,38 +117,44 @@ module Mongoid
       end
     end
 
-    # The middleware to be added to a rack application in order to activate the
-    # query cache.
-    #
-    # @since 4.0.0
-    class Middleware
-
-      # Instantiate the middleware.
-      #
-      # @example Create the new middleware.
-      #   Middleware.new(app)
-      #
-      # @param [ Object ] app The rack applciation stack.
+    if defined?(Mongo::QueryCache::Middleware)
+      Middleware = Mongo::QueryCache::Middleware
+    else
+      # The middleware to be added to a rack application in order to activate the
+      # query cache.
       #
       # @since 4.0.0
-      def initialize(app)
-        @app = app
-      end
+      class Middleware
 
-      # Execute the request, wrapping in a query cache.
-      #
-      # @example Execute the request.
-      #   middleware.call(env)
-      #
-      # @param [ Object ] env The environment.
-      #
-      # @return [ Object ] The result of the call.
-      #
-      # @since 4.0.0
-      def call(env)
-        QueryCache.cache { @app.call(env) }
-      ensure
-        QueryCache.clear_cache
+        # Instantiate the middleware.
+        #
+        # @example Create the new middleware.
+        #   Middleware.new(app)
+        #
+        # @param [ Object ] app The rack application stack.
+        #
+        # @since 4.0.0
+        def initialize(app)
+          @app = app
+        end
+
+        # Execute the request, wrapping in a query cache.
+        #
+        # @example Execute the request.
+        #   middleware.call(env)
+        #
+        # @param [ Object ] env The environment.
+        #
+        # @return [ Object ] The result of the call.
+        #
+        # @since 4.0.0
+        def call(env)
+          QueryCache.cache do
+            @app.call(env)
+          end
+        ensure
+          QueryCache.clear_cache
+        end
       end
     end
 
