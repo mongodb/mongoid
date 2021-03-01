@@ -58,4 +58,12 @@ describe Mongoid::QueryCache::Middleware do
       end
     end
   end
+
+  context 'when driver implements query cache middleware' do
+    min_driver_version '2.15'
+
+    it 'uses the driver query cache middleware' do
+      Mongoid::QueryCache::Middleware.should be Mongo::QueryCache::Middleware
+    end
+  end
 end
