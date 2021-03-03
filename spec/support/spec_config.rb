@@ -44,4 +44,12 @@ class SpecConfig
   def ci?
     !!ENV['CI']
   end
+
+  def rails_version
+    v = ENV['RAILS']
+    if v == ''
+      v = nil
+    end
+    v || '6.1'
+  end
 end
