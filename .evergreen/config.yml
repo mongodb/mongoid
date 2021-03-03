@@ -483,26 +483,26 @@ axes:
   - id: "rails"
     display_name: Rails Version
     values:
-      - id: current
-        display_name: "Rails-current"
-        variables:
-           RAILS: "current"
       - id: master
-        display_name: "Rails-master"
+        display_name: "Rails master"
         variables:
-           RAILS: "master"
-      - id: "51"
+          RAILS: "master"
+      - id: "5.1"
         display_name: "Rails 5.1"
         variables:
-           RAILS: "51"
-      - id: "52"
+          RAILS: "5.1"
+      - id: "5.2"
         display_name: "Rails 5.2"
         variables:
-           RAILS: "52"
-      - id: "60"
+          RAILS: "5.2"
+      - id: "6.0"
         display_name: "Rails 6.0"
         variables:
-           RAILS: "60"
+          RAILS: "6.0"
+      - id: "6.1"
+        display_name: "Rails 6.1"
+        variables:
+          RAILS: "6.1"
   - id: "i18n"
     display_name: I18n version
     values:
@@ -705,37 +705,37 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-51"
+- matrix_name: "rails-5.1"
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.4"
     mongodb-version: "4.2"
     topology: "standalone"
-    rails: '51'
+    rails: '5.1'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-52"
+- matrix_name: "rails-5.2"
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.6"
     mongodb-version: "4.2"
     topology: "standalone"
-    rails: '52'
+    rails: '5.2'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-60"
+- matrix_name: "rails-6.0"
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.7"
     mongodb-version: "4.4"
     topology: "standalone"
-    rails: '60'
+    rails: '6.0'
   display_name: "${rails}, ${driver}, ${mongodb-version}"
   run_on:
     - rhel70-small
@@ -777,10 +777,12 @@ buildvariants:
   matrix_spec:
     driver: current
     ruby: ruby-2.7
-    mongodb-version: '4.2'
+    mongodb-version: '4.4'
     topology: standalone
     app-tests: yes
-  display_name: "app tests ${driver}, ${ruby}"
+    # Not currently testing rails master
+    rails: ['5.1', '5.2', '6.0', '6.1']
+  display_name: "app tests ${driver}, ${ruby}, ${rails}"
   run_on:
     - ubuntu1804-small
   tasks:
