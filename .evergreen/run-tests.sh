@@ -69,11 +69,11 @@ elif test "$DRIVER" = "min-jruby"; then
   bundle install --gemfile=gemfiles/driver_min_jruby.gemfile
   BUNDLE_GEMFILE=gemfiles/driver_min_jruby.gemfile
 elif test "$RAILS" = "master-jruby"; then
-  bundle install --gemfile=gemfiles/rails_master_jruby.gemfile
-  BUNDLE_GEMFILE=gemfiles/rails_master_jruby.gemfile
-elif test -n "$RAILS"; then
-  bundle install --gemfile=gemfiles/rails_"$RAILS".gemfile
-  BUNDLE_GEMFILE=gemfiles/rails_"$RAILS".gemfile
+  bundle install --gemfile=gemfiles/rails-master_jruby.gemfile
+  BUNDLE_GEMFILE=gemfiles/rails-master_jruby.gemfile
+elif test -n "$RAILS" && test "$RAILS" != 6.1; then
+  bundle install --gemfile=gemfiles/rails-"$RAILS".gemfile
+  BUNDLE_GEMFILE=gemfiles/rails-"$RAILS".gemfile
 elif test "$I18N" = "1.0"; then
   bundle install --gemfile=gemfiles/i18n-1.0.gemfile
   BUNDLE_GEMFILE=gemfiles/i18n-1.0.gemfile

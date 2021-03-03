@@ -19,98 +19,92 @@ describe 'Mongoid application tests' do
     FileUtils.mkdir_p(TMP_BASE)
   end
 
-  context 'demo application - sinatra' do
-    it 'runs' do
-      clone_application(
-        'https://github.com/mongoid/mongoid-demo',
-        subdir: 'sinatra-minimal',
-      ) do
+  context 'demo application' do
+    context 'sinatra' do
+      it 'runs' do
+        clone_application(
+          'https://github.com/mongoid/mongoid-demo',
+          subdir: 'sinatra-minimal',
+        ) do
 
-        process = ChildProcess.build(*%w(bundle exec ruby app.rb))
-        process.environment.update(clean_env)
-        process.io.inherit!
-        process.start
-
-        begin
           # JRuby needs a long timeout
-          wait_for_port(4567, 40)
-          sleep 1
-
-          uri = URI.parse('http://localhost:4567/posts')
-          resp = JSON.parse(uri.open.read)
-        ensure
-          Process.kill('TERM', process.pid)
-          status = process.wait
-        end
-
-        resp.should == []
-
-        status.should == 0
-      end
-    end
-  end
-
-  context 'demo application - rails-api' do
-    ['~> 6.0.0'].each do |rails_version|
-      context "with rails #{rails_version}" do
-        it 'runs' do
-          clone_application(
-            'https://github.com/mongoid/mongoid-demo',
-            subdir: 'rails-api',
-            rails_version: rails_version,
-          ) do
-
-            process = ChildProcess.build(*%w(bundle exec rails s))
-            process.environment.update(clean_env)
-            process.io.inherit!
-            process.start
-
-            begin
-              # JRuby needs a long timeout
-              wait_for_port(3000, 50)
-              sleep 1
-
-              uri = URI.parse('http://localhost:3000/posts')
-              resp = JSON.parse(uri.open.read)
-            ensure
-              Process.kill('TERM', process.pid)
-              status = process.wait
-            end
+          start_app(%w(bundle exec ruby app.rb), 4567, 40) do |port|
+            uri = URI.parse('http://localhost:4567/posts')
+            resp = JSON.parse(uri.open.read)
 
             resp.should == []
 
-            # 143 = 128 + 15
-            [0, 15, 143].should include(status)
+          end
+        end
+      end
+    end
+
+    context 'rails-api' do
+      it 'runs' do
+        clone_application(
+          'https://github.com/mongoid/mongoid-demo',
+          subdir: 'rails-api',
+        ) do
+
+          # JRuby needs a long timeout
+          start_app(%w(bundle exec rails s), 3000, 50) do |port|
+            uri = URI.parse('http://localhost:3000/posts')
+            resp = JSON.parse(uri.open.read)
+
+            resp.should == []
           end
         end
       end
     end
   end
 
+  def start_app(cmd, port, timeout)
+    process = ChildProcess.build(*cmd)
+    process.environment.update(clean_env)
+    process.io.inherit!
+    process.start
+
+    begin
+      wait_for_port(port, timeout, process)
+      sleep 1
+
+      rv = yield port
+    ensure
+      # The process may have already died (due to an error exit) -
+      # in this case killing it will raise an exception.
+      Process.kill('TERM', process.pid) rescue nil
+      status = process.wait
+    end
+
+    # Exit should be either success or SIGTERM
+    [0, 15, 128 + 15].should include(status)
+
+    rv
+  end
+
   context 'new application - rails' do
-    ['~> 5.1.0', '~> 5.2.0', '~> 6.0.0'].each do |rails_version|
-      context "with rails #{rails_version}" do
-        it 'creates' do
-          ChildProcessHelper.check_call(%w(gem uni rails -a))
-          ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+    it 'creates' do
+      Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a))
+      if (rails_version = SpecConfig.instance.rails_version) == 'master'
+      else
+        Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+      end
 
-          Dir.chdir(TMP_BASE) do
-            FileUtils.rm_rf('mongoid-test')
-            ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
+      Dir.chdir(TMP_BASE) do
+        FileUtils.rm_rf('mongoid-test')
+        Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
 
-            Dir.chdir('mongoid-test') do
-              adjust_app_gemfile
-              ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+        Dir.chdir('mongoid-test') do
+          adjust_app_gemfile
+          Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
 
-              ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
-              ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
+          Mrss::ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
+          Mrss::ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
 
-              # https://jira.mongodb.org/browse/MONGOID-4885
-              comment_text = File.read('app/models/comment.rb')
-              comment_text.should =~ /belongs_to :post/
-              comment_text.should_not =~ /embedded_in :post/
-            end
-          end
+          # https://jira.mongodb.org/browse/MONGOID-4885
+          comment_text = File.read('app/models/comment.rb')
+          comment_text.should =~ /belongs_to :post/
+          comment_text.should_not =~ /embedded_in :post/
         end
       end
     end
@@ -165,13 +159,14 @@ describe 'Mongoid application tests' do
     end
   end
 
-  def clone_application(repo_url, subdir: nil, rails_version: nil)
+  def clone_application(repo_url, subdir: nil)
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(File.basename(repo_url))
       ChildProcessHelper.check_call(%w(git clone) + [repo_url])
       Dir.chdir(File.join(*[File.basename(repo_url), subdir].compact)) do
-        adjust_app_gemfile(rails_version: rails_version)
-        ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+        adjust_app_gemfile
+        adjust_rails_defaults
+        Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
         puts `git diff`
 
         write_mongoid_yml
@@ -226,7 +221,7 @@ describe 'Mongoid application tests' do
     end
   end
 
-  def adjust_app_gemfile(rails_version: nil)
+  def adjust_app_gemfile(rails_version: SpecConfig.instance.rails_version)
     remove_bundler_req
 
     gemfile_lines = IO.readlines('Gemfile')
@@ -238,10 +233,38 @@ describe 'Mongoid application tests' do
       gemfile_lines.delete_if do |line|
         line =~ /rails/
       end
-      gemfile_lines << "gem 'rails', '#{rails_version}'\n"
+      if rails_version == 'master'
+        gemfile_lines << "gem 'rails', git: 'https://github.com/rails/rails'\n"
+      else
+        gemfile_lines << "gem 'rails', '~> #{rails_version}.0'\n"
+      end
     end
     File.open('Gemfile', 'w') do |f|
       f << gemfile_lines.join
+    end
+  end
+
+  def adjust_rails_defaults(rails_version: SpecConfig.instance.rails_version)
+    if File.exist?('config/application.rb')
+      lines = IO.readlines('config/application.rb')
+      lines.each do |line|
+        line.gsub!(/config.load_defaults \d\.\d/, "config.load_defaults #{rails_version}")
+      end
+      File.open('config/application.rb', 'w') do |f|
+        f << lines.join
+      end
+    end
+
+    if rails_version == '5.1'
+      secrets = {
+        'development' => {
+          'secret_key_base' => 'abracadabra',
+          'my_secret_token' => 'very_secret',
+        },
+      }
+      File.open('config/secrets.yml', 'w') do |f|
+        f << YAML.dump(secrets)
+      end
     end
   end
 
@@ -270,7 +293,7 @@ describe 'Mongoid application tests' do
     @clean_env ||= Hash[ENV.keys.grep(/BUNDLE|RUBYOPT/).map { |k| [k, nil ] }]
   end
 
-  def wait_for_port(port, timeout)
+  def wait_for_port(port, timeout, process)
     deadline = Time.now + timeout
     loop do
       begin
@@ -278,6 +301,9 @@ describe 'Mongoid application tests' do
           return
         end
       rescue IOError, SystemCallError
+        unless process.alive?
+          raise "Process #{process} died while waiting for port #{port}"
+        end
         if Time.now > deadline
           raise
         end
