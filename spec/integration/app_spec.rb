@@ -84,11 +84,7 @@ describe 'Mongoid application tests' do
 
   context 'new application - rails' do
     it 'creates' do
-      Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a))
-      if (rails_version = SpecConfig.instance.rails_version) == 'master'
-      else
-        Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
-      end
+      install_rails
 
       Dir.chdir(TMP_BASE) do
         FileUtils.rm_rf('mongoid-test')
@@ -107,6 +103,38 @@ describe 'Mongoid application tests' do
           comment_text.should_not =~ /embedded_in :post/
         end
       end
+    end
+
+    it 'generates Mongoid config' do
+      install_rails
+
+      Dir.chdir(TMP_BASE) do
+        FileUtils.rm_rf('mongoid-test-config')
+        Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test-config --skip-spring --skip-active-record), env: clean_env)
+
+        Dir.chdir('mongoid-test-config') do
+          adjust_app_gemfile
+          Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+
+          mongoid_config_file = File.join(TMP_BASE,'mongoid-test-config/config/mongoid.yml')
+
+          File.exist?(mongoid_config_file).should be false
+          Mrss::ChildProcessHelper.check_call(%w(rails g mongoid:config), env: clean_env)
+          File.exist?(mongoid_config_file).should be true
+
+          config_text = File.read(mongoid_config_file)
+          config_text.should =~ /mongoid_test_config_development/
+          config_text.should =~ /mongoid_test_config_test/
+        end
+      end
+    end
+  end
+
+  def install_rails
+    Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a))
+    if (rails_version = SpecConfig.instance.rails_version) == 'master'
+    else
+      Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
     end
   end
 
