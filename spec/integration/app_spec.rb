@@ -88,14 +88,14 @@ describe 'Mongoid application tests' do
 
       Dir.chdir(TMP_BASE) do
         FileUtils.rm_rf('mongoid-test')
-        Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
+        ChildProcessHelper.check_call(%w(rails new mongoid-test --skip-spring --skip-active-record), env: clean_env)
 
         Dir.chdir('mongoid-test') do
           adjust_app_gemfile
-          Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+          ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
 
-          Mrss::ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
-          Mrss::ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
+          ChildProcessHelper.check_call(%w(rails g model post), env: clean_env)
+          ChildProcessHelper.check_call(%w(rails g model comment post:belongs_to), env: clean_env)
 
           # https://jira.mongodb.org/browse/MONGOID-4885
           comment_text = File.read('app/models/comment.rb')
@@ -110,16 +110,16 @@ describe 'Mongoid application tests' do
 
       Dir.chdir(TMP_BASE) do
         FileUtils.rm_rf('mongoid-test-config')
-        Mrss::ChildProcessHelper.check_call(%w(rails new mongoid-test-config --skip-spring --skip-active-record), env: clean_env)
+        ChildProcessHelper.check_call(%w(rails new mongoid-test-config --skip-spring --skip-active-record), env: clean_env)
 
         Dir.chdir('mongoid-test-config') do
           adjust_app_gemfile
-          Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+          ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
 
           mongoid_config_file = File.join(TMP_BASE,'mongoid-test-config/config/mongoid.yml')
 
           File.exist?(mongoid_config_file).should be false
-          Mrss::ChildProcessHelper.check_call(%w(rails g mongoid:config), env: clean_env)
+          ChildProcessHelper.check_call(%w(rails g mongoid:config), env: clean_env)
           File.exist?(mongoid_config_file).should be true
 
           config_text = File.read(mongoid_config_file)
@@ -131,10 +131,10 @@ describe 'Mongoid application tests' do
   end
 
   def install_rails
-    Mrss::ChildProcessHelper.check_call(%w(gem uni rails -a))
+    ChildProcessHelper.check_call(%w(gem uni rails -a))
     if (rails_version = SpecConfig.instance.rails_version) == 'master'
     else
-      Mrss::ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
+      ChildProcessHelper.check_call(%w(gem install rails --no-document -v) + [rails_version])
     end
   end
 
@@ -194,7 +194,7 @@ describe 'Mongoid application tests' do
       Dir.chdir(File.join(*[File.basename(repo_url), subdir].compact)) do
         adjust_app_gemfile
         adjust_rails_defaults
-        Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
+        ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
         puts `git diff`
 
         write_mongoid_yml
