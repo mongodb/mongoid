@@ -15,7 +15,14 @@ module Mongoid
       end
 
       def app_name
-        Rails::Application.subclasses.first.parent.to_s.underscore
+        app_cls = Rails.application.class
+        parent = begin
+          # Rails 6.1+
+          app_cls.module_parent_name
+        rescue NoMethodError
+          app_cls.parent.to_s
+        end
+        parent.underscore
       end
 
       def create_config_file
