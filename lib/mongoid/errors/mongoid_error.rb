@@ -48,7 +48,7 @@ module Mongoid
       #
       # @return [ String ] A localized error message string.
       def translate(key, options)
-        ::I18n.translate("#{BASE_KEY}.#{key}", options)
+        ::I18n.translate("#{BASE_KEY}.#{key}", **options)
       end
 
       # Create the problem.
