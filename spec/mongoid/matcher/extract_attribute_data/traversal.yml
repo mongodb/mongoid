@@ -257,3 +257,14 @@
   exists: false
   value: ~
   expanded: false
+
+- name: numeric hash key matching the split position
+  document:
+    foo:
+      "10":
+        true
+  key: "foo.10"
+
+  exists: true
+  value: true
+  expanded: false
