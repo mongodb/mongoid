@@ -129,6 +129,28 @@ describe Mongoid::Criteria::Queryable::Storable do
       end
     end
 
+    context 'when a String equivalent of an existing Symbol operator is added' do
+      let(:modified) do
+        query.add_field_expression('foo', {:$in=>[1,2]})
+        query.add_field_expression('foo', {"$in"=>[2,3]})
+      end
+
+      it 'connects the equivalent operators with $and' do
+        modified.selector.should == {
+          '$and' => [
+            {
+              "foo"=> {
+                "$in"=>[2, 3]
+              }
+            }
+          ],
+          "foo"=> {
+            :$in=> [1, 2]
+          }
+        }
+      end
+    end
+
     context 'an operator write' do
       let(:modified) do
         query.add_field_expression('$eq', {'foo' => 'bar'})
