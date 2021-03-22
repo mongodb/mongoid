@@ -22,7 +22,7 @@ module Mongoid
         def merge!(other)
           other.each_pair do |key, value|
             if value.is_a?(Hash) && self[key.to_s].is_a?(Hash)
-              value = self[key.to_s].merge(value) do |_key, old_val, new_val|
+              value = self[key.to_s].transform_keys(&:to_s).merge(value.transform_keys(&:to_s)) do |_key, old_val, new_val|
                 case _key
                 when '$in'
                   new_val & old_val
