@@ -298,26 +298,26 @@ describe Mongoid::Attributes do
             Person.only(:name).first
           end
 
-          context 'when retrieving a field of the association' do
+          context 'when retrieving a field of the association using the dot notation' do
 
             it 'retrieves the field' do
               expect(from_db['name.first_name']).to eq 'Jose'
             end
           end
 
-          context 'when retrieving a field of a nested association' do
+          context 'when retrieving a field of a nested association using the dot notation' do
             it 'retrieves the field' do
               expect(from_db['name.language.name']).to eq 'es'
             end
           end
         end
 
-        context 'when projecting a field of an embedded association' do
+        context 'when projecting a sub-association of an embedded association' do
           let(:from_db) do
             Person.only('name.language').first
           end
 
-          context 'when retrieving the projected field' do
+          context 'when retrieving a field under the projected sub-association' do
             it 'retrieves the field' do
               expect(from_db['name.language.name']).to eq 'es'
             end
