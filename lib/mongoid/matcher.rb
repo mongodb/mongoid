@@ -49,8 +49,12 @@ module Mongoid
 
       key.to_s.split('.').each do |field|
         if (index = field.to_i).to_s == field
-          # Array indexing
-          if Array === src
+          case src
+          when Hash
+            exists = src.key?(field)
+            src = src[field]
+          when Array
+            # Array indexing
             exists = index < src.length
             src = src[index]
           else
