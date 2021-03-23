@@ -5,6 +5,7 @@ require "active_model/attribute_methods"
 require "mongoid/attributes/dynamic"
 require "mongoid/attributes/nested"
 require "mongoid/attributes/processing"
+require "mongoid/attributes/projector"
 require "mongoid/attributes/readonly"
 
 module Mongoid
@@ -231,56 +232,7 @@ module Mongoid
     #
     # @since 4.0.0
     def attribute_missing?(name)
-      !attribute_allowed_by_projection?(name)
-    end
-
-    # Determine if the specified attribute, or a dot notation path, is allowed
-    # by the configured projection, if any.
-    #
-    # If there is no configured projection, returns true.
-    #
-    # @param [ String ] name The name of the attribute or a dot notation path.
-    #
-    # @return [ true, false ] Whether the attribute is allowed by projection.
-    #
-    # @api private
-    def attribute_allowed_by_projection?(name)
-      selection = __selected_fields
-      unless selection
-        # No projection
-        return true
-      end
-
-      # Projection rules are rather non-trivial. See
-      # https://docs.mongodb.com/manual/reference/method/db.collection.find/#find-projection
-      # for server documentation.
-      # 4.4 server (and presumably all older ones) requires that a projection
-      # is either exclusionary or inclusionary, i.e. one cannot mix
-      # exclusions and inclusions in the same query.
-      # Integer projection values other than 0 and 1 aren't officially
-      # documented as of this writing; see DOCSP-15266.
-      # 4.4 server also allows nested hash projection specification
-      # in addition to dot notation, which I assume Mongoid doesn't handle yet.
-      projection_value = selection.values.first
-      inclusionary = case projection_value
-      when Integer
-        projection_value >= 1
-      when true
-        true
-      when false
-        false
-      else
-        # The various expressions that are permitted as projection arguments
-        # imply an inclusionary projection.
-        true
-      end
-
-      field = fields[name]
-      if inclusionary
-        selection_included?(name, selection, field)
-      else
-        !selection_excluded?(name, selection, field)
-      end
+      !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
     end
 
     # Return type-casted attributes.
@@ -296,25 +248,6 @@ module Mongoid
     end
 
     private
-
-    def selection_excluded?(name, selection, field)
-      path = name.split('.')
-
-      selection.find do |k, included|
-        # check that a prefix of the field exists in excluded fields
-        k_path = k.split('.')
-        included == 0 && path[0, k_path.size] == k_path
-      end
-    end
-
-    def selection_included?(name, selection, field)
-      path = name.split('.')
-      selection.find do |k, included|
-        # check that a prefix of the field exists in included fields
-        k_path = k.split('.')
-        included == 1 && path[0, k_path.size] == k_path
-      end
-    end
 
     # Does the string contain dot syntax for accessing hashes?
     #
@@ -350,17 +283,15 @@ module Mongoid
     def read_raw_attribute(name)
       normalized = database_field_name(name.to_s)
 
-      value = if hash_dot_syntax?(normalized)
-                attributes.__nested__(normalized)
-              else
-                attributes[normalized]
-              end
-
-      if value.nil? && attribute_missing?(normalized)
+      if attribute_missing?(normalized)
         raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
       end
 
-      value
+      if hash_dot_syntax?(normalized)
+        attributes.__nested__(normalized)
+      else
+        attributes[normalized]
+      end
     end
 
     module ClassMethods
