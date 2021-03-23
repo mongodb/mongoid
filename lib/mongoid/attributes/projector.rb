@@ -48,10 +48,6 @@ module Mongoid
       def attribute_or_path_allowed?(name)
         # Special handling for _id.
         if name == '_id'
-          # TODO this branch is executed and always returning false from here
-          # breaks various tests, but unconditionally returning true does not.
-          # One would assume that _id is handled specially elsewhere in Mongoid.
-          return true
           result = unless id_projection_value.nil?
             value_inclusionary?(id_projection_value)
           else
@@ -61,6 +57,8 @@ module Mongoid
         end
 
         if content_projection.nil?
+          # No projection (as opposed to an empty projection).
+          # All attributes are allowed.
           return true
         end
 
@@ -68,24 +66,26 @@ module Mongoid
         # This handles the case when, for example, the projection was
         # {foo: true} and we want to know if foo.bar is allowed.
         item, value = content_projection.detect do |path, value|
-          (path + '.').start_with?(name + '.')
-        end
-        if item
-          return value_inclusionary?(value)
-        end
-
-        # Find an item which would be a strict child of the requested name/path.
-        # This handles the case when, for example, the projection was
-        # {"foo.bar" => true} and we want to know if foo is allowed.
-        # (It is as a container of bars.)
-        item, value = content_projection.detect do |path, value|
           (name + '.').start_with?(path + '.')
         end
         if item
           return value_inclusionary?(value)
         end
 
-        return !content_inclusionary?
+        if content_inclusionary?
+          # Find an item which would be a strict child of the requested name/path.
+          # This handles the case when, for example, the projection was
+          # {"foo.bar" => true} and we want to know if foo is allowed.
+          # (It is as a container of bars.)
+          item, value = content_projection.detect do |path, value|
+            (path + '.').start_with?(name + '.')
+          end
+          if item
+            return true
+          end
+        end
+
+        !content_inclusionary?
       end
 
       private
