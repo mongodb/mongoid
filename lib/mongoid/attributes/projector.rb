@@ -6,13 +6,30 @@ module Mongoid
 
     # This module defines projection helpers.
     #
+    # Projection rules are rather non-trivial. See
+    # https://docs.mongodb.com/manual/reference/method/db.collection.find/#find-projection
+    # for server documentation.
+    # 4.4 server (and presumably all older ones) requires that a projection
+    # for content fields is either exclusionary or inclusionary, i.e. one
+    # cannot mix exclusions and inclusions in the same query.
+    # However, _id can be excluded in a projection that includes content
+    # fields.
+    # Integer projection values other than 0 and 1 aren't officially
+    # documented as of this writing; see DOCSP-15266.
+    # 4.4 server also allows nested hash projection specification
+    # in addition to dot notation, which I assume Mongoid doesn't handle yet.
+    #
     # @api private
     class Projector
       def initialize(projection)
-        @projection = projection
+        projection = projection || {}
+        @content_projection = projection.dup
+        @content_projection.delete('_id')
+        @id_projection_value = projection['_id']
       end
 
-      attr_reader :projection
+      attr_reader :id_projection_value
+      attr_reader :content_projection
 
       # Determine if the specified attribute, or a dot notation path, is allowed
       # by the configured projection, if any.
@@ -25,25 +42,57 @@ module Mongoid
       #
       # @api private
       def attribute_or_path_allowed?(name)
-        unless projection
-          # No projection
-          return true
+        # Special handling for _id.
+        if name == '_id'
+          result = unless id_projection_value.nil?
+            value_inclusionary?(id_projection_value)
+          else
+            true
+          end
+          return result
         end
 
-        # Projection rules are rather non-trivial. See
-        # https://docs.mongodb.com/manual/reference/method/db.collection.find/#find-projection
-        # for server documentation.
-        # 4.4 server (and presumably all older ones) requires that a projection
-        # is either exclusionary or inclusionary, i.e. one cannot mix
-        # exclusions and inclusions in the same query.
-        # Integer projection values other than 0 and 1 aren't officially
-        # documented as of this writing; see DOCSP-15266.
-        # 4.4 server also allows nested hash projection specification
-        # in addition to dot notation, which I assume Mongoid doesn't handle yet.
-        projection_value = projection.values.first
-        inclusionary = case projection_value
+        # Find an item which matches or is a parent of the requested name/path.
+        # This handles the case when, for example, the projection was
+        # {foo: true} and we want to know if foo.bar is allowed.
+        item, value = content_projection.detect do |path, value|
+          (path + '.').start_with?(name + '.')
+        end
+        if item
+          return value_inclusionary?(value)
+        end
+
+        # Find an item which would be a strict child of the requested name/path.
+        # This handles the case when, for example, the projection was
+        # {"foo.bar" => true} and we want to know if foo is allowed.
+        # (It is as a container of bars.)
+        item, value = content_projection.detect do |path, value|
+          (name + '.').start_with?(path + '.')
+        end
+        if item
+          return value_inclusionary?(value)
+        end
+
+        return !content_inclusionary?
+      end
+
+      private
+
+      # Determines whether the projection for content fields is inclusionary.
+      #
+      # An empty projection is inclusionary.
+      def content_inclusionary?
+        if content_projection.empty?
+          return value_inclusionary?(id_projection_value)
+        end
+
+        value_inclusionary?(content_projection.values.first)
+      end
+
+      def value_inclusionary?(value)
+        case value
         when Integer
-          projection_value >= 1
+          value >= 1
         when true
           true
         when false
@@ -52,31 +101,6 @@ module Mongoid
           # The various expressions that are permitted as projection arguments
           # imply an inclusionary projection.
           true
-        end
-
-        !!if inclusionary
-          selection_included?(name, projection)
-        else
-          !selection_excluded?(name, projection)
-        end
-      end
-
-      def selection_excluded?(name, selection)
-        path = name.split('.')
-
-        selection.find do |k, included|
-          # check that a prefix of the field exists in excluded fields
-          k_path = k.split('.')
-          included == 0 && path[0, k_path.size] == k_path
-        end
-      end
-
-      def selection_included?(name, selection)
-        path = name.split('.')
-        selection.find do |k, included|
-          # check that a prefix of the field exists in included fields
-          k_path = k.split('.')
-          included == 1 && path[0, k_path.size] == k_path
         end
       end
     end

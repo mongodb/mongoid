@@ -1,0 +1,13 @@
+- name: embedded field - inclusion
+  projection:
+    foo.bar: 1
+  
+  queries: &embedded-field-inclusion-expectations
+    - query: foo
+      allowed: true
+    - query: bar
+      allowed: false
+      
+    # A peer to the field isn't allowed
+    - query: foo.buck
+      allowed: false

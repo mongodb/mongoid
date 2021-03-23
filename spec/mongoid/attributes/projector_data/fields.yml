@@ -5,6 +5,8 @@
   queries: &field-inclusion-expectations
     - query: foo
       allowed: true
+    - query: bar
+      allowed: false
 
 - name: simple inclusion - boolean
   projection:
@@ -13,6 +15,8 @@
   queries: &field-inclusion-expectations
     - query: foo
       allowed: true
+    - query: bar
+      allowed: false
 
 - name: positive integer - inclusion
   projection:
@@ -27,6 +31,8 @@
   queries: &field-exclusion-expectations
     - query: foo
       allowed: false
+    - query: bar
+      allowed: true
 
 - name: simple exclusion - boolean
   projection:
@@ -35,6 +41,8 @@
   queries: &field-exclusion-expectations
     - query: foo
       allowed: false
+    - query: bar
+      allowed: true
 
 - name: negative integer - exclusion
   projection:
@@ -63,3 +71,23 @@
     foo: 1
   
   queries: *field-inclusion-with-id-exclusion-expectations
+
+- name: id inclusion
+  projection:
+    _id: 1
+  
+  queries:
+    - query: _id
+      allowed: true
+    - query: foo
+      allowed: false
+
+- name: id exclusion
+  projection:
+    _id: false
+  
+  queries:
+    - query: _id
+      allowed: false
+    - query: foo
+      allowed: true
