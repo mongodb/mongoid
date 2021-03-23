@@ -54,7 +54,7 @@ module Mongoid
           true
         end
 
-        if inclusionary
+        !!if inclusionary
           selection_included?(name, projection)
         else
           !selection_excluded?(name, projection)

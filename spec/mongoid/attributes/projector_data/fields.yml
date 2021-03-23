@@ -1,0 +1,65 @@
+- name: simple inclusion - integer
+  projection:
+    foo: 1
+  
+  queries: &field-inclusion-expectations
+    - query: foo
+      allowed: true
+
+- name: simple inclusion - boolean
+  projection:
+    foo: true
+  
+  queries: &field-inclusion-expectations
+    - query: foo
+      allowed: true
+
+- name: positive integer - inclusion
+  projection:
+    foo: 2
+  
+  queries: *field-inclusion-expectations
+
+- name: simple exclusion - integer
+  projection:
+    foo: 0
+  
+  queries: &field-exclusion-expectations
+    - query: foo
+      allowed: false
+
+- name: simple exclusion - boolean
+  projection:
+    foo: false
+  
+  queries: &field-exclusion-expectations
+    - query: foo
+      allowed: false
+
+- name: negative integer - exclusion
+  projection:
+    foo: -2
+  
+  queries: *field-exclusion-expectations
+
+- name: field inclusion with _id exclusion
+  projection:
+    foo: 1
+    _id: 0
+  
+  queries: &field-inclusion-with-id-exclusion-expectations
+    - query: foo
+      allowed: true
+      
+    - query: bar
+      allowed: false
+      
+    - query: _id
+      allowed: false
+
+- name: _id exclusion with field inclusion
+  projection:
+    _id: 0
+    foo: 1
+  
+  queries: *field-inclusion-with-id-exclusion-expectations
