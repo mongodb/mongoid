@@ -109,6 +109,17 @@
   value: ~
   expanded: false
 
+- name: numeric path component when traversing hash
+  document:
+    foo:
+      "10":
+        42
+  key: "foo.10"
+
+  exists: true
+  value: 42
+  expanded: false
+
 - name: array index - hash leaf
   document: &foo-one-two
     foo:
