@@ -49,8 +49,22 @@ module Mongoid
 
       key.to_s.split('.').each do |field|
         if (index = field.to_i).to_s == field
-          # Array indexing
-          if Array === src
+          case src
+          when Hash
+            exists = src.key?(field)
+            src = src[field]
+          when Array
+            if expanded
+              new_src = extract_attribute_from_nested_hashes(src, field)
+
+              if new_src.length > 0
+                exists = true
+                src = new_src
+                next
+              end
+            end
+
+            # Array indexing
             exists = index < src.length
             src = src[index]
           else
@@ -60,33 +74,13 @@ module Mongoid
           end
         else
           case src
-          when nil
-            exists = false
           when Hash
             exists = src.key?(field)
             src = src[field]
           when Array
             expanded = true
-            exists = false
-            new = []
-            src.each do |doc|
-              case doc
-              when Hash
-                if doc.key?(field)
-                  v = doc[field]
-                  case v
-                  when Array
-                    new += v
-                  else
-                    new += [v]
-                  end
-                  exists = true
-                end
-              else
-                # Trying to hash index into a value that is not a hash
-              end
-            end
-            src = new
+            src = extract_attribute_from_nested_hashes(src, field)
+            exists = src.length > 0
           else
             # Trying to descend into a field that is not a hash using
             # dot notation.
@@ -97,6 +91,31 @@ module Mongoid
       end
 
       [exists, src, expanded]
+    end
+
+    private
+
+    module_function def extract_attribute_from_nested_hashes(src, key)
+      values = []
+
+      src.each do |doc|
+        case doc
+        when Hash
+          if doc.key?(key)
+            v = doc[key]
+            case v
+            when Array
+              values += v
+            else
+              values += [v]
+            end
+          end
+        else
+          # Trying to hash index into a value that is not a hash
+        end
+      end
+
+      values
     end
   end
 end

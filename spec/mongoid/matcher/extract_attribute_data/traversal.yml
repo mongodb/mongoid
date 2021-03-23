@@ -257,3 +257,35 @@
   exists: false
   value: ~
   expanded: false
+
+- name: numeric Hash key inside expanded array
+  document: &numeric-hash-keys-in-expanded-array
+    a:
+      '1':
+        b:
+          -
+            c:
+              '2': 3
+          -
+            d:
+              '4': 5
+          -
+            e: f
+          -
+            d:
+              '4': 6
+
+  key: a.1.b.c.2
+
+  exists: true
+  value: [3]
+  expanded: true
+
+- name: multiple numeric Hash keys inside expanded array
+  document: *numeric-hash-keys-in-expanded-array
+
+  key: a.1.b.d.4
+
+  exists: true
+  value: [5,6]
+  expanded: true
