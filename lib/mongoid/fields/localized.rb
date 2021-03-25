@@ -87,7 +87,7 @@ module Mongoid
         end
         return value unless value.nil?
         if fallbacks? && ::I18n.respond_to?(:fallbacks)
-          object[::I18n.fallbacks[locale].map(&:to_s).find{ |loc| object.has_key?(loc) }]
+          object[::I18n.fallbacks[locale].map(&:to_s).find{ |loc| !object[loc].nil? }]
         end
       end
     end
