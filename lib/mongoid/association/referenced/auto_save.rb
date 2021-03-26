@@ -63,8 +63,8 @@ module Mongoid
                 self.before_callback_halted = false
               else
                 __autosaving__ do
-                  if relation = ivar(association.name)
-                    Array(relation).each do |doc|
+                  if assoc_value = ivar(association.name)
+                    Array(assoc_value).each do |doc|
                       doc.with(persistence_context) do |d|
                         d.save
                       end

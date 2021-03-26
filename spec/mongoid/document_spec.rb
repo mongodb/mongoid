@@ -124,13 +124,13 @@ describe Mongoid::Document do
   describe "._mongoid_clear_types" do
 
     context "when changing the discriminator_value" do
-      
-      before do 
+
+      before do
         Kangaroo._types
         Kangaroo.discriminator_value = "dvalue"
       end
 
-      after do 
+      after do
         Kangaroo.discriminator_value = nil
       end
 
@@ -140,13 +140,13 @@ describe Mongoid::Document do
     end
 
     context "when changing the discriminator_value in child" do
-      
-      before do 
+
+      before do
         Shape._types
         Circle.discriminator_value = "dvalue"
       end
 
-      after do 
+      after do
         Circle.discriminator_value = nil
       end
 
@@ -924,7 +924,7 @@ describe Mongoid::Document do
       end
 
       context "when no embedded documents are present" do
-        context "when using the default discriminator key" do 
+        context "when using the default discriminator key" do
           let(:person) do
             manager.becomes(Person)
           end
@@ -948,12 +948,12 @@ describe Mongoid::Document do
           end
         end
 
-        context "when using a custom discriminator key" do 
-          before do 
+        context "when using a custom discriminator key" do
+          before do
             Person.discriminator_key = "dkey"
           end
 
-          after do 
+          after do
             Person.discriminator_key = nil
           end
 
@@ -962,13 +962,13 @@ describe Mongoid::Document do
           end
         end
 
-        context "when using a custom discriminator key and discriminator value" do 
-          before do 
+        context "when using a custom discriminator key and discriminator value" do
+          before do
             Person.discriminator_key = "dkey"
             Person.discriminator_value = "dvalue"
           end
 
-          after do 
+          after do
             Person.discriminator_key = nil
             Person.discriminator_value = nil
           end
@@ -1320,17 +1320,6 @@ describe Mongoid::Document do
           expect(manager.level).to eq(1)
         end
       end
-    end
-  end
-
-  describe "#to_ary" do
-
-    it "does not publicly respond to #to_ary" do
-      expect(Person.new.respond_to?(:to_ary)).to eq false
-    end
-
-    it "does private respond to #to_ary" do
-      expect(Person.new.send(:to_ary)).to eq nil
     end
   end
 
