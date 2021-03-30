@@ -117,7 +117,6 @@ module Mongoid
       #
       # @since 4.0.0
       def prepare_delete
-        return false unless catch(:abort) { apply_delete_dependencies! }
         yield(self)
         freeze
         self.destroyed = true
