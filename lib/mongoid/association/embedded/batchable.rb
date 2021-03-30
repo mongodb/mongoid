@@ -329,7 +329,7 @@ module Mongoid
             self.path = doc.atomic_path unless path
             execute_callback :before_remove, doc
             unless _assigning?
-              doc.apply_delete_dependencies!
+              doc.apply_destroy_dependencies!
               doc.run_before_callbacks(:destroy) if method == :destroy
             end
             _target.delete_one(doc)

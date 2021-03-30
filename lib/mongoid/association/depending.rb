@@ -78,13 +78,13 @@ module Mongoid
       # the appropriate strategy to perform the operation.
       #
       # @example Execute cascades.
-      #   document.apply_delete_dependencies!
+      #   document.apply_destroy_dependencies!
       #
       # @since 2.0.0.rc.1
-      def apply_delete_dependencies!
+      def apply_destroy_dependencies!
         self.class._all_dependents.each do |association|
-          if association.try(:dependent)
-            send("_dependent_#{association.dependent}!", association)
+          if dependent = association.try(:dependent)
+            send("_dependent_#{dependent}!", association)
           end
         end
       end

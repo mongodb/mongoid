@@ -525,7 +525,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           context "when child is destroyed" do
 
             before do
-              account.delete
+              account.destroy
             end
 
             it "deletes child" do
@@ -565,7 +565,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           context "when child is destroyed" do
 
             before do
-              drug.delete
+              drug.destroy
             end
 
             it "deletes child" do
@@ -617,10 +617,10 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
         context "when parent is persisted" do
 
-          context "when child is deleted" do
+          context "when child is destroyed" do
 
             before do
-              account.delete
+              account.destroy
             end
 
             it "deletes child" do
@@ -660,7 +660,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           context "when child is destroyed" do
 
             before do
-              drug.delete
+              drug.destroy
             end
 
             it "deletes child" do
@@ -707,10 +707,10 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
 
         context "when parent is persisted" do
 
-          context "when child is deleted" do
+          context "when child is destroyed" do
 
             before do
-              account.delete
+              account.destroy
             end
 
             it "deletes child" do
@@ -749,7 +749,7 @@ describe Mongoid::Association::Referenced::BelongsTo::Proxy do
           context "when child is destroyed" do
 
             before do
-              drug.delete
+              drug.destroy
             end
 
             it "deletes child" do

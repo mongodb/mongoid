@@ -145,6 +145,90 @@ describe Mongoid::Persistable::Destroyable do
         end
       end
     end
+
+    context 'when there are dependent documents' do
+      context 'has_one' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!(bolt: Bolt.create!)
+          end
+
+          it 'destroys dependent documents' do
+            Bolt.count.should == 1
+            parent.destroy
+            Bolt.count.should == 0
+          end
+        end
+
+        context 'dependent: :destroy_all' do
+          let!(:parent) do
+            Hole.create!(threadlocker: Threadlocker.create!)
+          end
+
+          it 'deletes dependent documents' do
+            Threadlocker.count.should == 1
+            parent.destroy
+            Threadlocker.count.should == 0
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!(sealer: Sealer.create!)
+          end
+
+          it 'raises an exception' do
+            Sealer.count.should == 1
+            lambda do
+              parent.destroy
+            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            Sealer.count.should == 1
+          end
+        end
+      end
+
+      context 'has_many' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!(nuts: [Nut.create!])
+          end
+
+          it 'destroys dependent documents' do
+            Nut.count.should == 1
+            parent.destroy
+            Nut.count.should == 0
+          end
+        end
+
+        context 'dependent: :destroy_all' do
+          let!(:parent) do
+            Hole.create!(washers: [Washer.create!])
+          end
+
+          it 'deletes dependent documents' do
+            Washer.count.should == 1
+            parent.destroy
+            Washer.count.should == 0
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!(spacers: [Spacer.create!])
+          end
+
+          it 'raises an exception' do
+            Spacer.count.should == 1
+            lambda do
+              parent.destroy
+            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            Spacer.count.should == 1
+          end
+        end
+      end
+    end
   end
 
   describe "#destroy!" do
@@ -261,6 +345,96 @@ describe Mongoid::Persistable::Destroyable do
 
         it 'removes all embedded documents' do
           expect(word.definitions.size).to eq(0)
+        end
+      end
+    end
+
+    context 'when there are dependent documents' do
+      context 'has_one' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!.tap do |hole|
+              Bolt.create!(hole: hole)
+            end
+          end
+
+          it 'destroys dependent documents' do
+            Bolt.count.should == 1
+            Hole.destroy_all
+            Bolt.count.should == 0
+          end
+        end
+
+        context 'dependent: :delete_all' do
+          let!(:parent) do
+            Hole.create!.tap do |hole|
+              Threadlocker.create!(hole: hole)
+            end
+          end
+
+          it 'deletes dependent documents' do
+            Threadlocker.count.should == 1
+            Hole.destroy_all
+            Threadlocker.count.should == 0
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!.tap do |hole|
+              Sealer.create!(hole: hole)
+            end
+          end
+
+          it 'raises an exception' do
+            Sealer.count.should == 1
+            lambda do
+              Hole.destroy_all
+            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            Sealer.count.should == 1
+          end
+        end
+      end
+
+      context 'has_many' do
+
+        context 'dependent: :destroy' do
+          let!(:parent) do
+            Hole.create!(nuts: [Nut.create!])
+          end
+
+          it 'destroys dependent documents' do
+            Nut.count.should == 1
+            Hole.destroy_all
+            Nut.count.should == 0
+          end
+        end
+
+        context 'dependent: :delete_all' do
+          let!(:parent) do
+            Hole.create!(washers: [Washer.create!])
+          end
+
+          it 'deletes dependent documents' do
+            Washer.count.should == 1
+            Hole.destroy_all
+            Washer.count.should == 0
+          end
+        end
+
+        context 'dependent: :restrict_with_exception' do
+          let!(:parent) do
+            Hole.create!(spacers: [Spacer.create!])
+          end
+
+          it 'raises an exception' do
+            Spacer.count.should == 1
+            lambda do
+              Hole.destroy_all
+            end.should raise_error(Mongoid::Errors::DeleteRestriction)
+            Spacer.count.should == 1
+          end
         end
       end
     end
