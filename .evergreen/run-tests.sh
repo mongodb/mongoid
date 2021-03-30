@@ -103,4 +103,8 @@ else
   bundle exec rake ci
 fi
 
+if test -f tmp/rspec-all.json; then
+  mv tmp/rspec-all.json tmp/rspec.json
+fi
+
 python -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
