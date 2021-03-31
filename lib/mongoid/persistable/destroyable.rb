@@ -23,7 +23,13 @@ module Mongoid
       def destroy(options = nil)
         raise Errors::ReadonlyDocument.new(self.class) if readonly?
         self.flagged_for_destroy = true
-        result = run_callbacks(:destroy) { delete(options || {}) }
+        result = run_callbacks(:destroy) do
+          if catch(:abort) { apply_destroy_dependencies! }
+            delete(options || {})
+          else
+            false
+          end
+        end
         self.flagged_for_destroy = false
         result
       end

@@ -158,14 +158,14 @@ describe Mongoid::Extensions::String do
           Time.now.utc_offset
         end
 
-        before do
-          expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
-        end
-
-        let(:expected_time) { Time.parse("2010-11-19 00:24:49.123457 +0000").in_time_zone - utc_offset }
+        let(:expected_time) { Time.parse("2010-11-19 00:24:49.123457 +0000") - Time.parse(string).utc_offset }
 
         let(:mongoized) do
           string.__mongoize_time__
+        end
+
+        it 'test operates in multiple time zones' do
+          expect(utc_offset).not_to eq(Time.zone.now.utc_offset)
         end
 
         it_behaves_like 'mongoizes to Time'

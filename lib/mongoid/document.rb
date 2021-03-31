@@ -252,18 +252,6 @@ module Mongoid
 
     private
 
-    # Implement this for calls to flatten on array.
-    #
-    # @example Get the document as an array.
-    #   document.to_ary
-    #
-    # @return [ nil ] Always nil.
-    #
-    # @since 2.1.0
-    def to_ary
-      nil
-    end
-
     # Returns the logger
     #
     # @return [ Logger ] The configured logger or a default Logger instance.

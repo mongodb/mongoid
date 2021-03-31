@@ -5,6 +5,7 @@ require "active_model/attribute_methods"
 require "mongoid/attributes/dynamic"
 require "mongoid/attributes/nested"
 require "mongoid/attributes/processing"
+require "mongoid/attributes/projector"
 require "mongoid/attributes/readonly"
 
 module Mongoid
@@ -231,11 +232,7 @@ module Mongoid
     #
     # @since 4.0.0
     def attribute_missing?(name)
-      selection = __selected_fields
-      return false unless selection
-      field = fields[name]
-      (selection.values.first == 0 && selection_excluded?(name, selection, field)) ||
-        (selection.values.first == 1 && !selection_included?(name, selection, field))
+      !Projector.new(__selected_fields).attribute_or_path_allowed?(name)
     end
 
     # Return type-casted attributes.
@@ -251,14 +248,6 @@ module Mongoid
     end
 
     private
-
-    def selection_excluded?(name, selection, field)
-      selection[name] == 0
-    end
-
-    def selection_included?(name, selection, field)
-      selection.key?(name) || selection.keys.collect { |k| k.partition('.').first }.include?(name)
-    end
 
     # Does the string contain dot syntax for accessing hashes?
     #
@@ -293,9 +282,11 @@ module Mongoid
 
     def read_raw_attribute(name)
       normalized = database_field_name(name.to_s)
+
       if attribute_missing?(normalized)
         raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
       end
+
       if hash_dot_syntax?(normalized)
         attributes.__nested__(normalized)
       else

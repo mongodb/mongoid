@@ -23,6 +23,48 @@ Upgrading to Mongoid 7.3
 
 The following sections describe significant changes in Mongoid 7.3.
 
+
+``delete`` Method Does Not Trigger Association Dependent Behavior
+----------------------------------------------------------------------
+
+**Breaking change:** In Mongoid 7.3,
+:ref:`dependent behavior <dependent-behavior>` is not invoked
+when the parent association is deleted using the ``delete`` method.
+For example, after the following code snippet executes, in Mongoid 7.3 the
+album will remain in the database:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    has_many :albums, dependent: :destroy
+  end
+  
+  class Album
+    include Mongoid::Document
+
+    belongs_to :band
+  end
+  
+  band = Band.create!
+  album = Album.create!(band: band)
+  
+  # Does not delete the album from the database
+  band.delete
+
+Previous versions of Mongoid invoked dependent behavior when deleting parents.
+
+To invoke dependent behavior, use the ``destroy`` method:
+
+.. code-block:: ruby
+  
+  # Deletes the album from the database
+  band.destroy
+
+The behavior of Mongoid 7.3 is consistent with how ActiveRecord behaves.
+
+
 ``::Boolean`` Removed
 ---------------------
 
@@ -209,6 +251,7 @@ New Embedded Matching Operators
 Mongoid 7.3 adds support for bitwise operators, ``$comment``, ``$mod`` and
 ``$type`` operators when :ref:`embedded matching <embedded-matching>`.
 
+
 Unaliasing ``id`` Field
 -----------------------
 
@@ -220,6 +263,7 @@ Upgrading to Mongoid 7.2
 ========================
 
 The following sections describe significant changes in Mongoid 7.2.
+
 
 Embedded Document Matching
 --------------------------
@@ -741,6 +785,7 @@ Alternatively, use ``any_of`` which behaves as ``or`` did in Mongoid 7.0:
 For more information, please review the :ref:`logical operations
 <logical-operations>` section of the documentation.
 
+
 Merge Strategies
 ----------------
 
@@ -783,6 +828,7 @@ explicitly requested:
     #   class:    Band
     #   embedded: false>
 
+
 Required Condition Arguments
 ----------------------------
 
@@ -803,6 +849,7 @@ invocation is now an error:
 
 ``and``, ``or``, ``nor``, ``not``, ``any_of`` and ``where`` can be called
 without arguments.
+
 
 Generated Queries
 -----------------
@@ -855,6 +902,7 @@ Ruby Version Support
 As of version 7.1, Mongoid supports Ruby 2.3+ and JRuby 9.2.
 Support for Ruby 2.2 and JRuby 9.1 has been dropped.
 
+
 Changes in Mongoid 7.1.0
 ------------------------
 
@@ -864,6 +912,7 @@ Improvement: :ref:`Multiple atomic operations can now be grouped
 Improvement: :ref:`Shard key declarations <shard-keys>` now support hashed
 shard keys, and a Rake task to shard collection has been added to the
 :ref:`sharding management Rake tasks <sharding-management>`.
+
 
 Changes in Mongoid 7.1.1
 ------------------------

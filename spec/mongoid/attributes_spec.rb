@@ -288,6 +288,51 @@ describe Mongoid::Attributes do
         end
       end
 
+      context 'when projecting with #only' do
+        let!(:person) do
+          Person.create(title: 'sir', name: { first_name: 'Jose', language: { name: 'es' } })
+        end
+
+        context 'when projecting an embedded association' do
+          let(:from_db) do
+            Person.only(:name).first
+          end
+
+          context 'when retrieving a field of the association using the dot notation' do
+
+            it 'retrieves the field' do
+              expect(from_db['name.first_name']).to eq 'Jose'
+            end
+          end
+
+          context 'when retrieving a field of a nested association using the dot notation' do
+            it 'retrieves the field' do
+              expect(from_db['name.language.name']).to eq 'es'
+            end
+          end
+        end
+
+        context 'when projecting a sub-association of an embedded association' do
+          let(:from_db) do
+            Person.only('name.language').first
+          end
+
+          context 'when retrieving a field under the projected sub-association' do
+            it 'retrieves the field' do
+              expect(from_db['name.language.name']).to eq 'es'
+            end
+          end
+
+          context 'when retrieving a non-projected field' do
+            it 'raises MissingAttributeError' do
+              expect do
+                from_db['name.first_name']
+              end.to raise_error(ActiveModel::MissingAttributeError)
+            end
+          end
+        end
+      end
+
       context "when the attribute does not exist" do
 
         before do

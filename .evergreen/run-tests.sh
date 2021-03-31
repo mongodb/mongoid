@@ -86,6 +86,7 @@ export BUNDLE_GEMFILE
 
 export MONGODB_URI="mongodb://localhost:27017/?appName=test-suite&$uri_options"
 
+set +e
 if test -n "$TEST_CMD"; then
   eval $TEST_CMD
 elif test -n "$TEST_I18N_FALLBACKS"; then
@@ -103,4 +104,14 @@ else
   bundle exec rake ci
 fi
 
+test_status=$?
+echo "TEST STATUS: ${test_status}"
+set -e
+
+if test -f tmp/rspec-all.json; then
+  mv tmp/rspec-all.json tmp/rspec.json
+fi
+
 python -m mtools.mlaunch.mlaunch stop --dir "$dbdir"
+
+exit ${test_status}
