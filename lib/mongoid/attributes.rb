@@ -161,6 +161,11 @@ module Mongoid
     # @since 1.0.0
     def write_attribute(name, value)
       field_name = database_field_name(name)
+
+      if attribute_missing?(field_name)
+        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'"
+      end
+
       if attribute_writable?(field_name)
         _assigning do
           validate_attribute_value(field_name, value)
@@ -178,6 +183,8 @@ module Mongoid
           end
           typed_value
         end
+      else
+        # TODO: MONGOID-5072
       end
     end
     alias :[]= :write_attribute
@@ -284,7 +291,7 @@ module Mongoid
       normalized = database_field_name(name.to_s)
 
       if attribute_missing?(normalized)
-        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'."
+        raise ActiveModel::MissingAttributeError, "Missing attribute: '#{name}'"
       end
 
       if hash_dot_syntax?(normalized)
