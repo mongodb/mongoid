@@ -17,6 +17,7 @@ database must include ``Mongoid::Document``. The representation of a Document in
 is a BSON object that is very similar to a Ruby hash or JSON object. Documents can be stored
 in their own collections in the database, or can be embedded in other Documents n levels deep.
 
+
 Storage
 =======
 
@@ -286,54 +287,170 @@ back to the model as follows:
 Accessing Field Values
 ----------------------
 
-When a field is defined, Mongoid provides several different ways of accessing the field.
+Mongoid provides several ways of accessing field values.
+
+.. note::
+
+  All of the access methods described below raise
+  ``ActiveModel::MissingAttributeError`` when the field being accessed is
+  :ref:`projected out <projection>`, either by virtue of not being included in
+  :ref:`only <only>` or by virtue of being included in
+  :ref:`without <without>`. This applies to both reads and writes.
+
+
+Getters & Setters
+`````````````````
+
+The recommended way is to use the getter and setter methods generated for
+each declared field:
 
 .. code-block:: ruby
 
-   # Get the value of the first_name field
-   person.first_name
-   person[:first_name]
-   person.read_attribute(:first_name)
+  class Person
+    include Mongoid::Document
+
+    field :first_name
+  end
+  
+  person = Person.new
+  
+  person.first_name = "Artem"
+  person.first_name
+  # => "Artem"
+
+To use this mechanism, each field must be explicitly declared, or the
+model class must enable :ref:`dynamic fields <dynamic-fields>`.
 
 
-   # Set the value for the first_name field
-   person.first_name = "Jean"
-   person[:first_name] = "Jean"
-   person.write_attribute(:first_name, "Jean")
+Custom Getters & Setters
+````````````````````````
 
-You can define getters/setters that will be called when using the dot notation.
+It is possible to explicitly define the getter and setter methods to provide
+custom behavior when reading or writing fields, for example value
+transformations or storing values under different field names. In this case
+``read_attribute`` and ``write_attribute`` methods can be used to read and
+write the values directly into the attributes hash:
 
 .. code-block:: ruby
 
-   class Person
-     include Mongoid::Document
+  class Person
+    include Mongoid::Document
 
-     field :first_name
+    def first_name
+      read_attribute(:fn)
+    end
+    
+    def first_name=(value)
+      write_attribute(:fn, value)
+    end
+  end
+  
+  person = Person.new
+  
+  person.first_name = "Artem"
+  person.first_name
+  # => "Artem"
+  
+  person.attributes
+  # => {"_id"=>BSON::ObjectId('606477dc2c97a628cf47075b'), "fn"=>"Artem"}
 
-     # custom getter
-     def first_name
-       "My name is Johnny"
-     end
 
-     # custom setter
-     def first_name=(value)
-       p 'Setting.. '
-       self.first_name = value
-       p '.. done!'
-     end
-   end
+.. _read-write-attribute:
 
-   # Like this:
-   person.first_name = 'John'
-   # Setting..
-   # .. done!
+``read_attribute`` & ``write_attribute``
+````````````````````````````````````````
 
-   person.first_name                  # My name is Johnny
-   person[:first_name]                # John
-   person.read_attribute(:first_name) # John
+The ``read_attribute`` and ``write_attribute`` methods can be used explicitly
+as well. Note that if a field specifies its :ref:`storage field name
+<storage-field-names>`, both ``read_attribute`` and ``write_attribute``
+accept either the declared field name or the storage field name for operations:
 
-In cases where you want to set multiple field values at once, there are a few different ways
-of handling this as well.
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name, as: :fn
+    field :last_name, as: :ln
+  end
+  
+  person = Person.new(first_name: "Artem")
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): nil>
+
+  person.read_attribute(:first_name)
+  # => "Artem"
+
+  person.read_attribute(:fn)
+  # => "Artem"
+  
+  person.write_attribute(:last_name, "Pushkin")
+  person
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Pushkin">
+  
+  person.write_attribute(:ln, "Medvedev")
+  person
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Medvedev">
+
+``read_attribute`` and ``write_attribute`` do not require that a field with
+the used name is defined, but writing field values with ``write_attribute``
+does not cause the respective field to be defined either:
+
+.. code-block:: ruby
+
+  person.write_attribute(:undefined, "Hello")
+  person
+  # => #<Person _id: 60647b212c97a6292c195b4c, first_name(fn): "Artem", last_name(ln): "Medvedev">
+  person.attributes
+  # => {"_id"=>BSON::ObjectId('60647b212c97a6292c195b4c'), "first_name"=>"Artem", "last_name"=>"Medvedev", "undefined"=>"Hello"}
+  
+  person.read_attribute(:undefined)
+  # => "Hello"
+  person.undefined
+  # raises NoMethodError
+
+When ``read_attribute`` is used to access a missing field, it returns ``nil``.
+
+
+Hash Access
+```````````
+
+Mongoid model instances define the ``[]`` and ``[]=`` methods to provide
+``Hash`` style acccess to the attributes. ``[]`` is an alias for
+``read_attribute`` and ``[]=`` is an alias for ``write_attribute``; see
+the section on :ref:`read_attribute and write_attribute <read-write-attribute>`
+for the detailed description of their behavior.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name, as: :fn
+    field :last_name, as: :ln
+  end
+
+  person = Person.new(first_name: "Artem")
+  
+  person["fn"]
+  # => "Artem"
+  
+  person[:first_name]
+  # => "Artem"
+  
+  person[:ln] = "Medvedev"
+  person
+  # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Medvedev">
+  
+  person["last_name"] = "Pushkin"
+  person
+  # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Pushkin">
+
+
+Bulk Attribute Writes
+`````````````````````
+
+In cases where you want to set multiple field values at once, there are a few
+different ways of accomplishing this as well.
 
 .. code-block:: ruby
 
@@ -345,8 +462,9 @@ of handling this as well.
    person.attributes = { first_name: "Jean-Baptiste", middle_name: "Emmanuel" }
    person.write_attributes(
      first_name: "Jean-Baptiste",
-     middle_name: "Emmanuel"
+     middle_name: "Emmanuel",
    )
+
 
 Hash Fields
 -----------

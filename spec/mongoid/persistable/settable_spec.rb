@@ -512,4 +512,34 @@ describe Mongoid::Persistable::Settable do
       end
     end
   end
+
+  context "when the field being set was projected out" do
+    let(:full_agent) do
+      Agent.create!(title: "Double-Oh Eight")
+    end
+
+    let(:agent) do
+      Agent.where(_id: full_agent.id).only(:dob).first
+    end
+
+    context 'field exists in database' do
+      it "raises MissingAttributeError" do
+        lambda do
+          agent.set(title: '008')
+        end.should raise_error(ActiveModel::MissingAttributeError)
+
+        expect(agent.reload.title).to eq 'Double-Oh Eight'
+      end
+    end
+
+    context 'field does not exist in database' do
+      it "raises MissingAttributeError" do
+        lambda do
+          agent.set(number: '008')
+        end.should raise_error(ActiveModel::MissingAttributeError)
+
+        expect(agent.reload.read_attribute(:number)).to be nil
+      end
+    end
+  end
 end
