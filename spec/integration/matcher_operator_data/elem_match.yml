@@ -361,3 +361,49 @@
   # https://jira.mongodb.org/browse/MONGOID-4908
   matches: false
   error: [matcher, driver]
+
+- name: $elemMatch given as symbol
+  document:
+    tags:
+      - intelligent
+  query:
+    tags:
+      :$elemMatch:
+        $eq: intelligent
+  matches: true
+
+- name: $elemMatch given as symbol - document does not contain the matched field
+  document:
+  query:
+    tags:
+      :$elemMatch:
+        $eq: intelligent
+  matches: false
+
+- name: $elemMatch argument operator given as symbol - matches
+  document:
+    tags:
+      - intelligent
+  query:
+    tags:
+      $elemMatch:
+        :$eq: intelligent
+  matches: true
+
+- name: $elemMatch argument operator given as symbol - does not match
+  document:
+    tags:
+      - intelligent
+  query:
+    tags:
+      $elemMatch:
+        :$eq: intelli
+  matches: false
+
+- name: $elemMatch argument operator given as symbol - document does not contain the matched field
+  document:
+  query:
+    tags:
+      $elemMatch:
+        :$eq: intelli
+  matches: false
