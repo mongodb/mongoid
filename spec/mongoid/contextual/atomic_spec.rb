@@ -753,12 +753,25 @@ describe Mongoid::Contextual::Atomic do
       context.set(name: "Recoil")
     end
 
-    it "sets existing fields" do
-      expect(depeche_mode.reload.name).to eq("Recoil")
+    shared_examples 'writes as expected' do
+      it "sets existing fields" do
+        expect(depeche_mode.reload.name).to eq("Recoil")
+      end
+
+      it "sets non existent fields" do
+        expect(smiths.reload.name).to eq("Recoil")
+      end
     end
 
-    it "sets non existent fields" do
-      expect(smiths.reload.name).to eq("Recoil")
+    include_examples 'writes as expected'
+
+    context 'when fields being set have been projected out' do
+
+      let(:criteria) do
+        Band.only(:genres)
+      end
+
+      include_examples 'writes as expected'
     end
   end
 
