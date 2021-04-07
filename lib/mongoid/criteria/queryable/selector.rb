@@ -211,7 +211,7 @@ module Mongoid
         #
         # @since 1.0.0
         def multi_selection?(key)
-          %w($and $or $nor).include?(key)
+          %w($and $or $nor).include?(key.to_s)
         end
       end
     end

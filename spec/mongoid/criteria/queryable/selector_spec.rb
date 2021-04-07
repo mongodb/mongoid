@@ -213,6 +213,23 @@ describe Mongoid::Criteria::Queryable::Selector do
           })
         end
       end
+
+      context "when merging in a new symbol $and" do
+
+        let(:other) do
+          [{ "value" => 2 }]
+        end
+
+        before do
+          selector.merge!({ :$and => other })
+        end
+
+        it "combines the two $and queries into one" do
+          expect(selector).to eq({
+            "$and" => [{ "value" => 1 }, { "value" => 2 }]
+          })
+        end
+      end
     end
 
     context "when the selector contains a $nor" do
