@@ -15,7 +15,8 @@ module Mongoid
           # Validate the condition is valid, even though we will never attempt
           # matching it.
           condition.each do |k, v|
-            if k.to_s.start_with?('$')
+            k = k.to_s
+            if k.start_with?('$')
               begin
                 ExpressionOperator.get(k)
               rescue Mongoid::Errors::InvalidExpressionOperator

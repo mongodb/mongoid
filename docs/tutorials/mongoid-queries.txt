@@ -728,8 +728,12 @@ as the following example shows:
   root.child_tags.elem_match(child_tags: {name: 'subsub1'}).to_a # => [sub1]
 
 
+.. _projection:
+
 Projection
 ----------
+
+.. _only:
 
 ``only``
 ````````
@@ -834,6 +838,9 @@ loaded with ``only`` for those associations to be loaded. For example:
 
   Band.where(name: 'Astral Projection').only(:name, :manager_ids).first.managers
   # => [#<Manager _id: 5c5dc2f0026d7c1730969843, band_ids: [BSON::ObjectId('5c5dc2f0026d7c1730969842')]>]
+
+
+.. _without:
 
 ``without``
 ```````````
