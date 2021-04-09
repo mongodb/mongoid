@@ -3,9 +3,8 @@
     name: foo
   key: name
   
-  exists: true
-  value: foo
-  expanded: false
+  result: 
+    - foo
 
 - name: scalar leaf
   document: &foo-bar-foo-bar-2
@@ -16,20 +15,26 @@
             2
   key: foo.bar.foo.bar
   
-  exists: true
-  value: 2
-  expanded: false
+  result:
+    - 2
 
 - name: scalar non-leaf
   document: *foo-bar-foo-bar-2
   key: foo.bar
   
-  exists: true
-  value:
-    foo:
-      bar:
-        2
-  expanded: false
+  result:
+    -
+      foo:
+        bar:
+          2
+
+- name: null leaf
+  document:
+    name:
+  key: name
+  
+  result: 
+    - ~
 
 - name: array leaf
   document: &foo-bar-foo-bar-array-2
@@ -40,21 +45,18 @@
             - 2
   key: foo.bar.foo.bar
   
-  exists: true
-  value:
-    - 2
-  expanded: false
+  result:
+    - [2]
 
 - name: scalar non-leaf
   document: *foo-bar-foo-bar-array-2
   key: foo.bar
   
-  exists: true
-  value:
-    foo:
-      bar:
-        - 2
-  expanded: false
+  result:
+    -
+      foo:
+        bar:
+          - 2
 
 - name: array non-leaf
   document: &foo-bar-array-foo-bar-2
@@ -66,30 +68,24 @@
               2
   key: foo.bar.foo.bar
   
-  exists: true
-  value:
+  result:
     - 2
-  expanded: true
 
 - name: array non-leaf with non-leaf query
   document: *foo-bar-array-foo-bar-2
   key: foo.bar
   
-  exists: true
-  value:
+  result:
     -
       foo:
         bar:
           2
-  expanded: true
 
 - name: array non-leaf with query for missing non-leaf key
   document: *foo-bar-array-foo-bar-2
   key: foo.missing
   
-  exists: false
-  value: []
-  expanded: true
+  result: []
 
 - name: path past end of document
   document: &foo-hello-world
@@ -97,17 +93,13 @@
       hello: world
   key: foo.bar.foo.bar
   
-  exists: false
-  value: ~
-  expanded: false
+  result: []
 
 - name: query for missing leaf key
   document: *foo-hello-world
   key: foo.bar
   
-  exists: false
-  value: ~
-  expanded: false
+  result: []
 
 - name: numeric path component when traversing hash
   document:
@@ -116,9 +108,8 @@
         42
   key: "foo.10"
 
-  exists: true
-  value: 42
-  expanded: false
+  result: 
+    - 42
 
 - name: array index - hash leaf
   document: &foo-one-two
@@ -128,42 +119,35 @@
     bar: [3, 4]
   key: foo.1.two
   
-  exists: true
-  value: 2
-  expanded: false
+  result: 
+    - 2
 
 - name: array index - hash non-leaf
   document: *foo-one-two
   key: foo.1
   
-  exists: true
-  value:
-    two: 2
-  expanded: false
+  result:
+    -
+      two: 2
 
 - name: array index - scalar leaf
   document: *foo-one-two
   key: bar.1
   
-  exists: true
-  value: 4
-  expanded: false
+  result: 
+    - 4
 
 - name: array index - scalar leaf - missing
   document: *foo-one-two
   key: bar.2
   
-  exists: false
-  value: ~
-  expanded: false
+  result: []
 
 - name: array index - scalar leaf - missing with further hash subscription
   document: *foo-one-two
   key: bar.2.any
   
-  exists: false
-  value: ~
-  expanded: false
+  result: []
 
 - name: non-sequential nested arrays - hash leaf - one value
   document: &books-authors
@@ -177,30 +161,27 @@
           - name: Pasha
   key: books.0.authors.name
   
-  exists: true
-  value: [Steve]
-  expanded: true
+  result:
+    - Steve
 
 - name: non-sequential nested arrays - hash non-leaf - one value
   document: *books-authors
   key: books.0
   
-  exists: true
-  value:
-    authors:
-      - name: Steve
-  expanded: false
+  result:
+    -
+      authors:
+        - name: Steve
 
 - name: non-sequential nested arrays - hash non-leaf - multiple values
   document: *books-authors
   key: books.1
   
-  exists: true
-  value:
-    authors:
-      - name: Boris
-      - name: Pasha
-  expanded: false
+  result:
+    -
+      authors:
+        - name: Boris
+        - name: Pasha
 
 - name: sequential nested arrays - numerically indexed leaf
   document: &groups
@@ -208,41 +189,32 @@
       - [1]
   key: groups.0.0
   
-  exists: true
-  value: 1
-  expanded: false
+  result: 
+    - 1
 
 - name: sequential nested arrays - numerically indexed leaf - missing
   document: *groups
   key: groups.0.1
   
-  exists: false
-  value: ~
-  expanded: false
+  result: []
 
 - name: sequential nested arrays - missing hash path through non-leaf
   document: *groups
   key: groups.missing
   
-  exists: false
-  value: []
-  expanded: true
+  result: []
 
 - name: sequential nested arrays - missing hash path through leaf
   document: *groups
   key: groups.0.missing
   
-  exists: false
-  value: []
-  expanded: true
+  result: []
 
 - name: sequential nested arrays - missing hash path past leaf
   document: *groups
   key: groups.0.0.missing
   
-  exists: false
-  value: ~
-  expanded: false
+  result: []
 
 - name: mix of arrays and hashes in an array
   document:
@@ -253,9 +225,8 @@
       - bar: 2
   key: foo.bar
   
-  exists: true
-  value: [2]
-  expanded: true
+  result: 
+    - 2
 
 - name: numeric index through a primitive value not supporting subscription operator
   document:
@@ -265,6 +236,4 @@
   key:
     occupants.0.age.0
     
-  exists: false
-  value: ~
-  expanded: false
+  result: []
