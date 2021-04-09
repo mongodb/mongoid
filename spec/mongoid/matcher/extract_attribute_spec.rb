@@ -25,20 +25,10 @@ describe 'Matcher.extract_attribute' do
             Mongoid::Matcher.extract_attribute(document, key)
           end
 
-          let(:expected_exists) { spec['exists'] }
-          let(:expected_value) { spec['value'] }
-          let(:expected_expanded) { spec['expanded'] }
+          let(:expected) { spec.fetch('result') }
 
-          it 'has the expected exists flag' do
-            actual[0].should == expected_exists
-          end
-
-          it 'has the expected value' do
-            actual[1].should == expected_value
-          end
-
-          it 'has the expected expanded flag' do
-            actual[2].should == expected_expanded
+          it 'has the expected result' do
+            actual.should == expected
           end
         end
       end

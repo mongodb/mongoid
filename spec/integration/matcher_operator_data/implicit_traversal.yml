@@ -14,3 +14,99 @@
   query:
     foo.bar: 2
   matches: true
+
+- name: numeric key - matches
+  document: &numeric-key
+    foo:
+      '42':
+        bar: 1
+  query:
+    foo.42.bar: 1
+  matches: true
+
+- name: numeric key - does not match
+  document: *numeric-key
+  query:
+    foo.142.bar: 1
+  matches: false
+
+- name: array under numeric key - matches
+  document: &numeric-key-array
+    foo:
+      '42':
+        -
+          bar: 1
+  query:
+    foo.42.bar: 1
+  matches: true
+
+- name: array under numeric key - does not match
+  document: *numeric-key-array
+  query:
+    foo.142.bar: 1
+  matches: false
+
+- name: numeric key under array - matches
+  document: &array-numeric-key
+    foo:
+      -
+        '42':
+          bar: 1
+  query:
+    foo.42.bar: 1
+  matches: true
+
+- name: numeric key under array - does not match
+  document: *array-numeric-key
+  query:
+    foo.142.bar: 1
+  matches: false
+
+- name: numeric key eligible as both array index and hash key - matches array index
+  document: &numeric-key-mixed
+    foo:
+      -
+        '1':
+          bar: 1
+      -
+        '1':
+          bar: 2
+  query:
+    foo.1:
+      '1':
+        bar: 2
+  matches: true
+
+- name: numeric key eligible as both array index and hash key - does not match array index
+  document: *numeric-key-mixed
+  query:
+    foo.1:
+      # The second array item has bar: 2, bar: 1 is not matched
+      '1':
+        bar: 1
+  matches: false
+
+- name: numeric key eligible as both array index and hash key - matches hash key
+  document: *numeric-key-mixed
+  query:
+    foo.1:
+      # Both bar: 1 and bar: 2 are ok, 1 in query matches the key under each
+      # array element
+      bar: 2
+  matches: true
+
+- name: numeric key eligible as both array index and hash key - matches hash key again
+  document: *numeric-key-mixed
+  query:
+    foo.1:
+      # Both bar: 1 and bar: 2 are ok, 1 in query matches the key under each
+      # array element
+      bar: 1
+  matches: true
+
+- name: numeric key eligible as both array index and hash key - does not match hash key
+  document: *numeric-key-mixed
+  query:
+    foo.0:
+      bar: 2
+  matches: false

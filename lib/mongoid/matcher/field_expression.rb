@@ -36,14 +36,13 @@ module Mongoid
                 FieldOperator.get(k).matches?(exists, value, cond_v)
               end
             elsif Hash === value
-              sub_exists, sub_value, expanded =
-                Matcher.extract_attribute(value, k)
-              if expanded
-                sub_value.any? do |sub_v|
+              sub_values = Matcher.extract_attribute(value, k)
+              if sub_values.length > 0
+                sub_values.any? do |sub_v|
                   Eq.matches?(true, sub_v, cond_v)
                 end
               else
-                Eq.matches?(sub_exists, sub_value, cond_v)
+                Eq.matches?(false, nil, cond_v)
               end
             else
               false
