@@ -21,6 +21,11 @@ module Mongoid
     #
     # @since 1.0.0
     def reload
+      if @atomic_selector
+        # Clear atomic_selector cache for sharded clusters. MONGOID-5076
+        remove_instance_variable('@atomic_selector')
+      end
+
       reloaded = _reload
       if Mongoid.raise_not_found_error && reloaded.empty?
         raise Errors::DocumentNotFound.new(self.class, _id, _id)
