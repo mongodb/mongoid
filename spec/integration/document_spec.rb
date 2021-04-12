@@ -28,4 +28,25 @@ describe Mongoid::Document do
       shirt._id.should == 'foo'
     end
   end
+
+  describe '#reload' do
+    context 'when changing shard key value' do
+      require_topology :sharded
+
+      let(:profile) do
+        # Profile shard_key :name
+        Profile.create!(name: "Alice")
+      end
+
+      it "successfully reloads the document after saving an update to the sharded field" do
+        expect(profile.name).to eq("Alice")
+        profile.name = "Bob"
+        profile.save!
+
+        profile.reload
+
+        expect(profile.name).to eq("Bob")
+      end
+    end
+  end
 end
