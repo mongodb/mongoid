@@ -34,15 +34,15 @@ module Mongoid
             document.errors.add(
               attribute,
               :blank_in_locale,
-              options.merge(location: _locale)
+              **options.merge(location: _locale)
             ) if not_present?(_value)
           end
         elsif document.relations.has_key?(attribute.to_s)
           if relation_or_fk_missing?(document, attribute, value)
-            document.errors.add(attribute, :blank, options)
+            document.errors.add(attribute, :blank, **options)
           end
         else
-          document.errors.add(attribute, :blank, options) if not_present?(value)
+          document.errors.add(attribute, :blank, **options) if not_present?(value)
         end
       end
 
