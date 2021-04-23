@@ -85,4 +85,19 @@ describe Mongoid::Document do
       end
     end
   end
+
+  describe 'Regexp field' do
+    class Template
+      include Mongoid::Document
+
+      field :name, type: String
+      field :pattern, type: Regexp
+    end
+
+    it 'persists strings as regexp' do
+      mop = Mop.create!(regexp_field: 'foo')
+      expect(mop.regexp_field).to be_a Regexp
+      expect(Mop.find(mop.id).regexp_field).to be_a BSON::Regexp::Raw
+    end
+  end
 end
