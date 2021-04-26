@@ -5,6 +5,7 @@ module Mongoid
   module Clients
     module Factory
       extend self
+      extend Loggable
 
       # Create a new client given the named configuration. If no name is
       # provided, return a new client with the default configuration. If a
@@ -59,12 +60,20 @@ module Mongoid
       # @since 3.0.0
       def create_client(configuration)
         raise Errors::NoClientsConfig.new unless configuration
-        if configuration[:uri]
-          Mongo::Client.new(configuration[:uri], options(configuration))
+        config = configuration.dup
+        uri = config.delete(:uri)
+        database = config.delete(:database)
+        hosts = config.delete(:hosts)
+        opts = config.delete(:options) || {}
+        unless config.empty?
+          default_logger.warn("Unknown config options detected: #{config}. Please check your config files.")
+        end
+        if uri
+          Mongo::Client.new(uri, options(opts))
         else
           Mongo::Client.new(
-            configuration[:hosts],
-            options(configuration).merge(database: configuration[:database])
+            hosts,
+            options(opts).merge(database: database)
           )
         end
       end
@@ -78,9 +87,8 @@ module Mongoid
         Mongo::VERSION.split('.')[0...2].map(&:to_i)
       end
 
-      def options(configuration)
-        config = configuration.dup
-        options = config.delete(:options) || {}
+      def options(opts)
+        options = opts.dup
         options[:platform] = PLATFORM_DETAILS
         options[:app_name] = Mongoid::Config.app_name if Mongoid::Config.app_name
         if (driver_version <=> [2, 13]) >= 0

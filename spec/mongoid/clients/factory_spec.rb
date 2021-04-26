@@ -378,4 +378,41 @@ describe Mongoid::Clients::Factory do
       expect(client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
     end
   end
+
+  context "unexpected config options" do
+    let(:unknown_opts) do
+      {
+        bad_one: 1,
+        another_one: "here"
+      }
+    end
+
+    let(:config) do
+      {
+        default: { hosts: [ "127.0.0.1:1234" ], database: database_id},
+        good_one: { hosts: [ "127.0.0.1:1234" ], database: database_id},
+        bad_one: { hosts: [ "127.0.0.1:1234" ], database: database_id}.merge(unknown_opts),
+        good_two: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/#{database_id}?serverSelectionTimeoutMS=1000" },
+        bad_two: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/#{database_id}?serverSelectionTimeoutMS=1000" }.merge(unknown_opts)
+      }
+    end
+
+    before do
+      Mongoid::Config.send(:clients=, config)
+    end
+
+    [:bad_one, :bad_two].each do |env|
+      it 'does not log a warning if none' do
+        expect(described_class.send(:default_logger)).not_to receive(:warn)
+        described_class.create(env).close
+      end
+    end
+
+    [:bad_one, :bad_two].each do |env|
+      it 'logs a warning if provided' do
+        expect(described_class.send(:default_logger)).not_to receive(:warn)
+        described_class.create(env).close
+      end
+    end
+  end
 end
