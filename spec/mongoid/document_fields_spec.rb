@@ -91,6 +91,12 @@ describe Mongoid::Document do
       mop = Mop.create!(regexp_field: 'foo')
       expect(mop.regexp_field).to be_a Regexp
       expect(Mop.find(mop.id).regexp_field).to be_a BSON::Regexp::Raw
+      expect(
+        Mop.collection.find(
+          "_id" => mop.id,
+          "regexp_field" => { "$type" => "regex" }
+        ).count
+      ).to be == 1
     end
   end
 end
