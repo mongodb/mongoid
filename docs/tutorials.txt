@@ -1,0 +1,13 @@
+.. _tutorials:
+
+*********
+Tutorials
+*********
+
+.. default-domain:: mongodb
+
+.. toctree::
+  :titlesonly:
+
+  /tutorials/getting-started-sinatra
+  /tutorials/getting-started-rails
