@@ -83,8 +83,15 @@ module Mongoid
 
           alias :new :build
 
-          # Clear the association. Will delete the documents from the db if they are
-          # already persisted.
+          # Clear the association. Will delete the documents from the db
+          # if they are already persisted.
+          #
+          # If the host document is not persisted but its _id matches a
+          # persisted document, calling #clear on an association will remove
+          # the association's documents from the database even though the
+          # set of documents in the application (as loaded in the host)
+          # is different from what is in the database, and the host may
+          # not contain any persisted documents in the association either.
           #
           # @example Clear the association.
           #   person.addresses.clear

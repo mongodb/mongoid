@@ -8,7 +8,7 @@ describe Mongoid::Persistable::Deletable do
   describe "#delete" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when deleting a readonly document" do
@@ -21,6 +21,20 @@ describe Mongoid::Persistable::Deletable do
         expect {
           from_db.delete
         }.to raise_error(Mongoid::Errors::ReadonlyDocument)
+      end
+    end
+
+    context 'when deleting a document that was not saved' do
+      let(:unsaved_person) { Person.new(id: person.id) }
+
+      before do
+        unsaved_person.delete
+      end
+
+      it 'deletes the matching document from the database' do
+        lambda do
+          person.reload
+        end.should raise_error(Mongoid::Errors::DocumentNotFound)
       end
     end
 

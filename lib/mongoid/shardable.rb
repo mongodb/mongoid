@@ -52,15 +52,27 @@ module Mongoid
       self.class.shard_key_fields
     end
 
-    # Get the document selector with the defined shard keys.
-    #
-    # @example Get the selector for the shard keys.
-    #   person.shard_key_selector
+    # Returns the selector that would match the current version of this
+    # document.
     #
     # @return [ Hash ] The shard key selector.
-    #
-    # @since 2.0.0
     def shard_key_selector
+      selector = {}
+      shard_key_fields.each do |field|
+        selector[field.to_s] = send(field)
+      end
+      selector
+    end
+
+    # Returns the selector that would match the existing version of this
+    # document in the database.
+    #
+    # If the document is not persisted, this method uses the current values
+    # of the shard key fields. If the document is persisted, this method
+    # uses the values retrieved from the database.
+    #
+    # @return [ Hash ] The shard key selector.
+    def shard_key_selector_in_db
       selector = {}
       shard_key_fields.each do |field|
         selector[field.to_s] = new_record? ? send(field) : attribute_was(field)

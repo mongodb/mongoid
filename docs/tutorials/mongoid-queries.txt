@@ -1542,6 +1542,37 @@ nonexistent field ``deregistered_at`` the date was interpreted to be in UTC
 and converted to a time, matching the behavior of querying a ``Date`` field.
 
 
+Reloading
+=========
+
+Use the ``reload`` method to fetch the most recent version of a document from
+the database:
+
+.. code-block:: ruby
+
+  band = Band.find(..)
+  band.reload
+
+If the model has a :ref:`shard key <shard-keys>` defined, the shard key value
+is included in the reloading query.
+
+.. note::
+
+  ``reload`` also works when the document has not been persisted, in which case
+  it performs a query using the ``id`` value (and shard key value, if a shard
+  key is defined):
+
+  .. code-block:: ruby
+
+    existing = Band.create!(name: 'Photek')
+    
+    # Unsaved document
+    band = Band.new(id: existing.id)
+    band.reload
+    band.name
+    # => "Photek"
+
+
 Queries + Persistence
 =====================
 

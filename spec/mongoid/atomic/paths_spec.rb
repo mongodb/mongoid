@@ -113,10 +113,33 @@ describe Mongoid::Atomic::Paths do
         person.addresses << address
       end
 
-      it "returns the association with id.atomic_selector" do
-        expect(address.atomic_selector).to eq(
-          { "_id" => person.id, "addresses._id" => address.id }
-        )
+      context 'when the parent is persisted' do
+
+        let(:person) do
+          Person.create!
+        end
+
+        before do
+          person.should be_persisted
+        end
+
+        it "returns the association with id.atomic_selector" do
+          expect(address.atomic_selector).to eq(
+            { "_id" => person.id, "addresses._id" => address.id }
+          )
+        end
+      end
+
+      context 'when the parent is not persisted' do
+        before do
+          person.should be_new_record
+        end
+
+        it "returns the association with id.atomic_selector" do
+          expect(address.atomic_selector).to eq(
+            { "_id" => person.id, "addresses._id" => address.id }
+          )
+        end
       end
     end
 
@@ -127,14 +150,43 @@ describe Mongoid::Atomic::Paths do
         person.addresses << address
       end
 
-      it "returns the JSON notation to the document with ids" do
-        expect(location.atomic_selector).to eq(
-          {
-            "_id" => person.id,
-            "addresses._id" => address.id,
-            "addresses.locations._id" => location.id
-          }
-        )
+      context 'when the parent is persisted' do
+
+        let(:person) do
+          Person.create!
+        end
+
+        before do
+          person.should be_persisted
+        end
+
+        it "returns the JSON notation to the document with ids" do
+          expect(location.atomic_selector).to eq(
+            {
+              "_id" => person.id,
+              "addresses._id" => address.id,
+              "addresses.0.locations._id" => location.id
+            }
+          )
+        end
+      end
+
+      context 'when the parent is not persisted' do
+        before do
+          person.should be_new_record
+        end
+
+        it "returns the JSON notation to the document with ids" do
+          expect(location.atomic_selector).to eq(
+            {
+              "_id" => person.id,
+              "addresses._id" => address.id,
+              # This condition is technically acceptable for finds
+              # but probably won't work for modifications of 'locations'.
+              "addresses.locations._id" => location.id
+            }
+          )
+        end
       end
     end
   end
