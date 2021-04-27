@@ -56,6 +56,8 @@ module Mongoid
     # document.
     #
     # @return [ Hash ] The shard key selector.
+    #
+    # @api private
     def shard_key_selector
       selector = {}
       shard_key_fields.each do |field|
@@ -72,6 +74,8 @@ module Mongoid
     # uses the values retrieved from the database.
     #
     # @return [ Hash ] The shard key selector.
+    #
+    # @api private
     def shard_key_selector_in_db
       selector = {}
       shard_key_fields.each do |field|
