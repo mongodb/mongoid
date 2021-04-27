@@ -562,16 +562,18 @@ describe Mongoid::Config do
     describe "#purge!" do
       it 'respects persistence context overrides' do
         House.create!(name: '1', model: 'Big')
+        expect(House.count).to eq(1)
         Mongoid.purge!
-        expect(House.count).to be == 0
+        expect(House.count).to eq(0)
       end
     end
 
     describe "#truncate!" do
       it 'respects persistence context overrides' do
         House.create!(name: '1', model: 'Big')
+        expect(House.count).to eq(1)
         Mongoid.truncate!
-        expect(House.count).to be == 0
+        expect(House.count).to eq(0)
       end
     end
   end
