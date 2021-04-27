@@ -545,4 +545,34 @@ describe Mongoid::Config do
       expect(Mongoid::Config.log_level).to eq(2)
     end
   end
+
+  context "with an overridden database" do
+    let(:database) do
+      "test_purge_#{Time.now.to_i}"
+    end
+
+    before do
+      Mongoid.override_database(database)
+    end
+
+    after do
+      Mongoid.override_database(nil)
+    end
+
+    describe "#purge!" do
+      it 'respects persistence context overrides' do
+        House.create!(name: '1', model: 'Big')
+        Mongoid.purge!
+        expect(House.count).to be == 0
+      end
+    end
+
+    describe "#truncate!" do
+      it 'respects persistence context overrides' do
+        House.create!(name: '1', model: 'Big')
+        Mongoid.truncate!
+        expect(House.count).to be == 0
+      end
+    end
+  end
 end
