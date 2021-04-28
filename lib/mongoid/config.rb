@@ -220,7 +220,7 @@ module Mongoid
     #
     # @since 2.0.2
     def purge!
-      Clients.default.database.collections.each(&:drop) and true
+      global_client.database.collections.each(&:drop) and true
     end
 
     # Truncate all data in all collections, but not the indexes.
@@ -234,7 +234,7 @@ module Mongoid
     #
     # @since 2.0.2
     def truncate!
-      Clients.default.database.collections.each do |collection|
+      global_client.database.collections.each do |collection|
         collection.find.delete_many
       end and true
     end
@@ -304,6 +304,23 @@ module Mongoid
       c = clients.with_indifferent_access
       Validators::Client.validate(c)
       @clients = c
+    end
+
+    # Get database client that respects global overrides
+    # Config.override_database and Config.override_client.
+    #
+    # @return [Mongo::Client] Client according to global overrides.
+    def global_client
+      client =  if Threaded.client_override
+                  Clients.with_name(Threaded.client_override)
+                else
+                  Clients.default
+                end
+      if Threaded.database_override
+        client.use(Threaded.database_override)
+      else
+        client
+      end
     end
   end
 end

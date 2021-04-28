@@ -59,7 +59,7 @@ module Mongoid
       # @example Get a client with the name.
       #   Mongoid::Clients.with_name(:replica)
       #
-      # @param [ Symbol ] name The name of the client.
+      # @param [ String | Symbol ] name The name of the client.
       #
       # @return [ Mongo::Client ] The named client.
       #
