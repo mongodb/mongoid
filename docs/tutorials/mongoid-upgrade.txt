@@ -279,6 +279,31 @@ It is now possible to :ref:`remove the id alias in models <unalias-id>`,
 to make ``id`` a regular field.
 
 
+``Mongoid.purge!`` and ``Mongoid.truncate`` take the global overrides into account
+----------------------------------------------------------------------------------
+
+Minor change: ``Mongoid.purge!`` and ``Mongoid.truncate!`` now consider global
+overrides set with ``Mongoid.override_database`` and ``Mongoid.override_client``.
+
+Mongoid 7.3 behavior:
+
+.. code-block:: ruby
+  Mongoid.override_database("some_other_db")
+  Band.create!(name: "Garage")
+  Band.count # => 1
+  Mongoid.purge! # or Mongoid.truncate!
+  Band.count # => 0
+
+Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+  Mongoid.override_database("some_other_db")
+  Band.create!(name: "Garage")
+  Band.count # => 1
+  Mongoid.purge! # or Mongoid.truncate!
+  Band.count # => 1
+
+
 Upgrading to Mongoid 7.2
 ========================
 
