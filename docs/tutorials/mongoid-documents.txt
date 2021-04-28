@@ -609,6 +609,9 @@ If a time zone is specfied, it is respected:
     ticket.opened_at
     # => Sun, 04 Mar 2018 09:00:00 +0000
 
+
+.. _regular-expression-fields:
+
 Regular Expression Fields
 -------------------------
 
