@@ -185,13 +185,14 @@ Mongoid 7.2 behavior:
   #   embedded: false>
 
 
-Condition Combination Using ``$eq``
------------------------------------
+Condition Combination Using ``$eq`` / ``$regex``
+------------------------------------------------
 
 Minor change: when using the ``where``, ``and``, ``or``, and ``nor`` methods
 on ``Criteria`` objects and providing multiple conditions on the same field
 in the same argument using the symbol operator syntax, conditions may be
-combined using ``$eq`` instead of ``$and``.
+combined using ``$eq`` or ``$regex`` operators, as appropriate, instead of
+``$and``.
 
 Mongoid 7.3 behavior:
 
@@ -201,6 +202,14 @@ Mongoid 7.3 behavior:
   # => 
   # #<Mongoid::Criteria
   #   selector: {"year"=>{"$eq"=>2020, "$gt"=>1960}}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+  Band.where(name: /A/, :name.ne => 'Astral')
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"name"=>{"$regex"=>/A/, "$ne"=>"Astral"}}
   #   options:  {}
   #   class:    Band
   #   embedded: false>
@@ -216,6 +225,17 @@ Mongoid 7.2 behavior:
   #   options:  {}
   #   class:    Band
   #   embedded: false>
+
+  Band.where(name: /A/, :name.ne => 'Astral')
+  # => 
+  # #<Mongoid::Criteria
+  #   selector: {"name"=>/A/, "$and"=>[{"name"=>{"$ne"=>"Astral"}}]}
+  #   options:  {}
+  #   class:    Band
+  #   embedded: false>
+
+The ``$regex`` operator is used when the value is a regular expression, i.e.
+an instance of ``Regexp`` or ``BSON::Regexp::Raw`` classes.
 
 When using the ``not`` method with multiple conditions provided in the same
 argument, the conditions are kept together and negated as a group.

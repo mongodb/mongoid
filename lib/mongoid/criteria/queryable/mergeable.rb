@@ -261,8 +261,8 @@ module Mongoid
           result = BSON::Document.new
           expr.each do |field, value|
             field.__expr_part__(value.__expand_complex__, negating?).each do |k, v|
-              if result[k]
-                if result[k].is_a?(Hash)
+              if existing = result[k]
+                if existing.is_a?(Hash)
                   # Existing value is an operator.
                   # If new value is also an operator, ensure there are no
                   # conflicts and add
@@ -270,8 +270,8 @@ module Mongoid
                     # The new value is also an operator.
                     # If there are no conflicts, combine the hashes, otherwise
                     # add new conditions to top level with $and.
-                    if (v.keys & result[k].keys).empty?
-                      result[k].update(v)
+                    if (v.keys & existing.keys).empty?
+                      existing.update(v)
                     else
                       raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
                       result['$and'] ||= []
@@ -279,26 +279,39 @@ module Mongoid
                     end
                   else
                     # The new value is a simple value.
-                    # If there isn't an $eq operator already in the query,
-                    # transform the new value into an $eq operator and add it
-                    # to the existing hash. Otherwise add the new condition
-                    # with $and to the top level.
-                    if result[k].key?('$eq')
+                    # Transform the implicit equality to either $eq or $regexp
+                    # depending on the type of the argument. See
+                    # https://docs.mongodb.com/manual/reference/operator/query/eq/#std-label-eq-usage-examples
+                    # for the description of relevant server behavior.
+                    op = case v
+                    when Regexp, BSON::Regexp::Raw
+                      '$regex'
+                    else
+                      '$eq'
+                    end
+                    # If there isn't an $eq/$regex operator already in the
+                    # query, transform the new value into an operator
+                    # expression and add it to the existing hash. Otherwise
+                    # add the new condition with $and to the top level.
+                    if existing.key?(op)
                       raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
                       result['$and'] ||= []
                       result['$and'] << {k => v}
                     else
-                      result[k].update('$eq' => v)
+                      existing.update(op => v)
                     end
                   end
                 else
                   # Existing value is a simple value.
-                  # If we are adding an operator, and the operator is not $eq,
-                  # convert existing value into $eq and add the new operator
-                  # to the same hash. Otherwise add the new condition with $and
-                  # to the top level.
-                  if v.is_a?(Hash) && !v.key?('$eq')
-                    result[k] = {'$eq' => result[k]}.update(v)
+                  # See the notes above about transformations to $eq/$regex.
+                  op = case existing
+                  when Regexp, BSON::Regexp::Raw
+                    '$regex'
+                  else
+                    '$eq'
+                  end
+                  if v.is_a?(Hash) && !v.key?(op)
+                    result[k] = {op => existing}.update(v)
                   else
                     raise NotImplementedError, 'Ruby does not allow same symbol operator with different values'
                     result['$and'] ||= []
