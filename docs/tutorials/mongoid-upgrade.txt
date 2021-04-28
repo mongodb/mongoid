@@ -655,6 +655,75 @@ To read more about using the query cache with Mongoid and the limitations
 of the legacy query cache, see :ref:`the query cache documentation <query-cache>`.
 
 
+``Regexp`` Fields Store Assigned Strings As Regular Expressions
+---------------------------------------------------------------
+
+Minor change: when a ``String`` value is written in a ``Regexp`` field,
+Mongoid 7.2 stores that value in MongoDB as a regular expression.
+Subsequently it would be retrieved :ref:`as a BSON::Regexp::Raw instance
+<regular-expression-fields>`.
+Previously the value would be stored as a string and would be retrieved as
+a string.
+
+Example Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  class Offer
+    include Mongoid::Document
+    
+    field :constraint, type: Regexp
+  end
+  
+  offer = Offer.create!(constraint: /foo/)
+  # => #<Offer _id: 6082df412c97a66be6ba9970, constraint: /foo/>
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082df412c97a66be6ba9970'),
+  #     "constraint"=>#<BSON::Regexp::Raw:0x000055b4ccdff738 @pattern="foo", @options="m">,
+  #     "type"=>"regex"}
+
+  offer = Offer.create!(constraint: 'foo')
+  # => #<Offer _id: 6082df412c97a66be6ba9971, constraint: /foo/>
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082df412c97a66be6ba9971'),
+  #     "constraint"=>#<BSON::Regexp::Raw:0x000055b4cce11320 @pattern="foo", @options="m">,
+  #     "type"=>"regex"}
+
+Mongoid 7.1 behavior with the same model class:
+
+.. code-block:: ruby
+
+  offer = Offer.create!(constraint: /foo/)
+  # => #<Offer _id: 6082e0182c97a66c21e3f721, constraint: /foo/>
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082e0182c97a66c21e3f721'),
+  #     "constraint"=>#<BSON::Regexp::Raw:0x000055ecf43f4cb0 @pattern="foo", @options="m">,
+  #     "type"=>"regex"}
+
+  offer = Offer.create!(constraint: 'foo')
+  # => #<Offer _id: 6082e05c2c97a66c21e3f723, constraint: "foo">
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082e05c2c97a66c21e3f723'),
+  #     "constraint"=>"foo",
+  #     "type"=>"string"}
+
+
 Upgrading to Mongoid 7.1
 ========================
 
