@@ -21,7 +21,7 @@ module Mongoid
     # @since 1.0.0
     def atomic_selector
       @atomic_selector ||=
-        (embedded? ? embedded_atomic_selector : root_atomic_selector)
+        (embedded? ? embedded_atomic_selector : root_atomic_selector_in_db)
     end
 
     private
@@ -44,18 +44,16 @@ module Mongoid
       end
     end
 
-    # Get the atomic selector for a root document.
+    # Get the atomic selector that would match the existing version of the
+    # root document.
     #
     # @api private
-    #
-    # @example Get the root atomic selector.
-    #   document.root_atomic_selector
     #
     # @return [ Hash ] The root document selector.
     #
     # @since 4.0.0
-    def root_atomic_selector
-      { "_id" => _id }.merge!(shard_key_selector)
+    def root_atomic_selector_in_db
+      { "_id" => _id }.merge!(shard_key_selector_in_db)
     end
   end
 end

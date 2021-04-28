@@ -32,7 +32,7 @@ describe Mongoid::Persistable::Upsertable do
     context "when the document is new" do
 
       let!(:existing) do
-        Band.create(name: "Photek")
+        Band.create!(name: "Photek")
       end
 
       context "when a matching document exists in the db" do

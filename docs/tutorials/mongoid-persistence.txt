@@ -220,18 +220,36 @@ operations with examples.
    * - ``Model#delete``
 
        *Deletes the document from the database without running callbacks.*
+       
+       *If the document is not persisted, Mongoid will attempt to delete from
+       the database any document with the same* ``_id``.
      -
         .. code-block:: ruby
 
           person.delete
+          
+          person = Person.create!(...)
+          unsaved_person = Person.new(id: person.id)
+          unsaved_person.delete
+          person.reload
+          # raises Mongoid::Errors::DocumentNotFound because the person was deleted
 
    * - ``Model#destroy``
 
        *Deletes the document from the database while running destroy callbacks.*
+       
+       *If the document is not persisted, Mongoid will attempt to delete from
+       the database any document with the same* ``_id``.
      -
         .. code-block:: ruby
 
           person.destroy
+          
+          person = Person.create!(...)
+          unsaved_person = Person.new(id: person.id)
+          unsaved_person.destroy
+          person.reload
+          # raises Mongoid::Errors::DocumentNotFound because the person was deleted
 
    * - ``Model.delete_all``
 

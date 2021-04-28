@@ -8,7 +8,7 @@ describe Mongoid::Persistable::Destroyable do
   describe "#destroy" do
 
     let!(:person) do
-      Person.create
+      Person.create!
     end
 
     context "when destroying a readonly document" do
@@ -24,9 +24,23 @@ describe Mongoid::Persistable::Destroyable do
       end
     end
 
+    context 'when destroying a document that was not saved' do
+      let(:unsaved_person) { Person.new(id: person.id) }
+
+      before do
+        unsaved_person.destroy
+      end
+
+      it 'deletes the matching document from the database' do
+        lambda do
+          person.reload
+        end.should raise_error(Mongoid::Errors::DocumentNotFound)
+      end
+    end
+
     context "when removing a root document" do
 
-      let!(:destroyd) do
+      let!(:destroyed) do
         person.destroy
       end
 
@@ -37,7 +51,7 @@ describe Mongoid::Persistable::Destroyable do
       end
 
       it "returns true" do
-        expect(destroyd).to be true
+        expect(destroyed).to be true
       end
 
       it "resets the flagged for destroy flag" do
