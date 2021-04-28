@@ -66,7 +66,7 @@ module Mongoid
         hosts = config.delete(:hosts)
         opts = config.delete(:options) || {}
         unless config.empty?
-          default_logger.warn("Unknown config options detected: #{config}. Please check your config files.")
+          default_logger.warn("Unknown config options detected: #{config}.")
         end
         if uri
           Mongo::Client.new(uri, options(opts))
@@ -87,6 +87,12 @@ module Mongoid
         Mongo::VERSION.split('.')[0...2].map(&:to_i)
       end
 
+      # Prepare options for Mongo::Client based on Mongoid client configuration.
+      #
+      # @param [ Hash ] opts Parameters from options section of Mongoid client configuration.
+      # @return [ Hash ] Options that should be passed to Mongo::Client driver.
+      #
+      # @api private
       def options(opts)
         options = opts.dup
         options[:platform] = PLATFORM_DETAILS
@@ -99,7 +105,7 @@ module Mongoid
           end
           options[:wrapping_libraries] = wrap_lib
         end
-        options.reject{ |k, v| k == :hosts }.to_hash.symbolize_keys!
+        options.reject{ |k, _v| k == :hosts }.to_hash.symbolize_keys!
       end
     end
   end
