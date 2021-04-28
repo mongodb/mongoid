@@ -90,7 +90,7 @@ module Mongoid
       # Prepare options for Mongo::Client based on Mongoid client configuration.
       #
       # @param [ Hash ] opts Parameters from options section of Mongoid client configuration.
-      # @return [ Hash ] Options that should be passed to Mongo::Client driver.
+      # @return [ Hash ] Options that should be passed to Mongo::Client constructor.
       #
       # @api private
       def options(opts)
