@@ -47,6 +47,7 @@ describe Mongoid::Clients::Factory do
 
           before do
             Mongoid::Config.send(:clients=, config)
+            # TODO: We should restore overwritten configuration in after block
           end
 
           after do
@@ -124,6 +125,7 @@ describe Mongoid::Clients::Factory do
 
           before do
             Mongoid::Config.send(:clients=, config)
+            # TODO: We should restore overwritten configuration in after block
           end
 
           after do
@@ -168,6 +170,7 @@ describe Mongoid::Clients::Factory do
 
             before do
               Mongoid::Config.send(:clients=, config)
+              # TODO: We should restore overwritten configuration in after block
             end
 
             after do
@@ -206,6 +209,7 @@ describe Mongoid::Clients::Factory do
 
             before do
               Mongoid::Config.send(:clients=, config)
+              # TODO: We should restore overwritten configuration in after block
             end
 
             after do
@@ -253,6 +257,7 @@ describe Mongoid::Clients::Factory do
 
       before do
         Mongoid::Config.send(:clients=, config)
+        # TODO: We should restore overwritten configuration in after block
       end
 
       after do
@@ -284,6 +289,7 @@ describe Mongoid::Clients::Factory do
 
       before do
         Mongoid.clients[:default] = nil
+        # TODO: We should restore overwritten configuration in after block
       end
 
       it "raises NoClientsConfig error" do
@@ -300,6 +306,7 @@ describe Mongoid::Clients::Factory do
 
     before do
       Mongoid::Config.send(:clients=, config)
+      # TODO: We should restore overwritten configuration in after block
     end
 
     after do
@@ -342,6 +349,7 @@ describe Mongoid::Clients::Factory do
 
     before do
       Mongoid::Config.send(:clients=, config)
+      # TODO: We should restore overwritten configuration in after block
     end
 
     after do
@@ -376,6 +384,46 @@ describe Mongoid::Clients::Factory do
 
     it "sets the platform to Mongoid's platform constant" do
       expect(client.options[:platform]).to eq(Mongoid::PLATFORM_DETAILS)
+    end
+  end
+
+  context "unexpected config options" do
+    let(:unknown_opts) do
+      {
+        bad_one: 1,
+        another_one: "here"
+      }
+    end
+
+    let(:config) do
+      {
+        default: { hosts: SpecConfig.instance.addresses, database: database_id },
+        good_one: { hosts: [ "127.0.0.1:1234" ], database: database_id},
+        bad_one: { hosts: [ "127.0.0.1:1234" ], database: database_id}.merge(unknown_opts),
+        good_two: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/#{database_id}" },
+        bad_two: { uri: "mongodb://127.0.0.1:1234,127.0.0.1:5678/#{database_id}" }.merge(unknown_opts)
+      }
+    end
+
+    around(:each) do |example|
+      old_config = Mongoid::Config.clients
+      Mongoid::Config.send(:clients=, config)
+      example.run
+      Mongoid::Config.send(:clients=, old_config)
+    end
+
+    [:bad_one, :bad_two].each do |env|
+      it 'does not log a warning if none' do
+        expect(described_class.send(:default_logger)).not_to receive(:warn)
+        described_class.create(env).close
+      end
+    end
+
+    [:bad_one, :bad_two].each do |env|
+      it 'logs a warning if some' do
+        expect(described_class.send(:default_logger)).not_to receive(:warn)
+        described_class.create(env).close
+      end
     end
   end
 end
