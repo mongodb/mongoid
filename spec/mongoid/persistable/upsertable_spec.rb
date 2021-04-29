@@ -106,4 +106,104 @@ describe Mongoid::Persistable::Upsertable do
       end
     end
   end
+
+  describe "#during_post_persist" do
+
+    context "when registered model lifecycle callbacks directly/indirectly use Mongoid::Document.during_post_persist_callbacks " do
+
+      context "when the document is sharded" do
+
+        class ShardedProfile
+          include Mongoid::Document
+
+          attr_reader(
+            :before_upsert_called,
+            :before_upsert_val,
+            :after_upsert_called,
+            :after_upsert_val,
+            :around_upsert_called,
+            :around_upsert_val_pre_yield,
+            :around_upsert_val_post_yield,
+          )
+
+          field :name, type: String
+
+          shard_key :name
+
+          before_upsert :beforeUpsertMethod
+
+          around_upsert :aroundUpsertMethod
+
+          after_upsert :afterUpsertMethod
+
+          def beforeUpsertMethod
+            @before_upsert_called = true
+
+            @before_upsert_val = self.during_post_persist_callbacks
+          end
+
+          def aroundUpsertMethod
+            @around_upsert_called = true
+            @around_upsert_val_pre_yield = self.during_post_persist_callbacks
+            yield
+            @around_upsert_val_post_yield = self.during_post_persist_callbacks
+          end
+
+          def afterUpsertMethod
+            @after_upsert_called = true
+
+            @after_upsert_val = self.during_post_persist_callbacks
+          end
+        end
+
+        let!(:profile) do
+          ShardedProfile.create(name: "Alice")
+        end
+
+        context "when before_upsert " do
+
+          it "returns true" do
+            expect(profile.before_upsert_called).to be nil
+            expect(profile.before_upsert_val).to be nil
+
+            profile.name = "Bob"
+            profile.upsert
+
+            expect(profile.before_upsert_called).to be true
+            expect(profile.before_upsert_val).to be false
+          end
+        end
+
+        context "when around_upsert" do
+
+          it "returns true" do
+            expect(profile.around_upsert_called).to be nil
+            expect(profile.around_upsert_val_pre_yield).to be nil
+            expect(profile.around_upsert_val_post_yield).to be nil
+
+            profile.name = "Bob"
+            profile.upsert
+
+            expect(profile.around_upsert_called).to be true
+            expect(profile.around_upsert_val_pre_yield).to be false
+            expect(profile.around_upsert_val_post_yield).to be true
+          end
+        end
+
+        context "when after_upsert" do
+
+          it "returns true" do
+            expect(profile.after_upsert_called).to be nil
+            expect(profile.after_upsert_val).to be nil
+
+            profile.name = "Bob"
+            profile.upsert
+
+            expect(profile.after_upsert_called).to be true
+            expect(profile.after_upsert_val).to be true
+          end
+        end
+      end
+    end
+  end
 end
