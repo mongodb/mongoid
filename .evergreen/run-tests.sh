@@ -12,7 +12,6 @@ set -o errexit  # Exit the script with error if any of the commands fail
 . `dirname "$0"`/../spec/shared/shlib/set_env.sh
 . `dirname "$0"`/../spec/shared/shlib/server.sh
 . `dirname "$0"`/functions.sh
-. `dirname "$0"`/functions.sh
 
 arch=`host_distro`
 
