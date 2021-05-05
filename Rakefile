@@ -44,14 +44,14 @@ CLASSIFIERS = [
   [%r,^mongoid/attribute,, :attributes],
   [%r,^mongoid/association/[or],, :associations_referenced],
   [%r,^mongoid/association,, :associations],
-  [%r,^mongoid/contextual,, :contextual],
+  [%r,^mongoid/contextual/mongo,, :contextual_mongo],
   [%r,^mongoid,, :unit],
   [%r,^integration,, :integration],
   [%r,^rails,, :rails],
 ]
 
 RUN_PRIORITY = %i(
-  unit attributes contextual associations_referenced associations
+  unit attributes contextual_mongo associations_referenced associations
   integration rails
 )
 
