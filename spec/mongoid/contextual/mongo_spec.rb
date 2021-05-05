@@ -1442,8 +1442,8 @@ describe Mongoid::Contextual::Mongo do
     describe "##{method}" do
 
       before do
-        Band.create(name: "Depeche Mode")
-        Band.create(name: "New Order")
+        Band.create!(name: "Depeche Mode")
+        Band.create!(name: "New Order")
       end
 
       context "when the criteria has a limit" do
