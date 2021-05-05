@@ -66,6 +66,22 @@ task :ci do
   spec_organizer.run
 end
 
+task :bucket, %i(buckets) do |task, args|
+  buckets = args[:buckets]
+  buckets = if buckets.nil? || buckets.empty?
+    [nil]
+  else
+    buckets.split(':').map do |bucket|
+      if bucket.empty?
+        nil
+      else
+        bucket.to_sym
+      end
+    end
+  end
+  spec_organizer.run_buckets(*buckets)
+end
+
 task :default => :spec
 
 desc "Generate all documentation"
