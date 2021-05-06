@@ -1457,6 +1457,7 @@ describe Mongoid::Contextual::Mongo do
         end
 
         it "returns the number of documents that match" do
+        p context.send(method)
           expect(context.send(method)).to eq(2)
         end
 
