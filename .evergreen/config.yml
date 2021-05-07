@@ -760,19 +760,6 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "i18n-fallbacks"
-  matrix_spec:
-    driver: "current"
-    ruby: "ruby-2.6"
-    mongodb-version: "4.2"
-    topology: "standalone"
-    i18n: '*'
-    test-i18n-fallbacks: yes
-  display_name: "i18n fallbacks ${rails}, ${driver}, ${mongodb-version}, ${i18n}"
-  run_on:
-    - rhel70-small
-  tasks:
-     - name: "test"
 - matrix_name: app-tests
   matrix_spec:
     driver: current
