@@ -166,8 +166,8 @@ describe Mongoid::Persistable::Savable do
           Person.create(title: "Blah")
         end
 
-        let!(:address) do
-          person.addresses.build(street: "Bond St")
+        let!(:symptom) do
+          person.symptoms.build(name: "Headache")
         end
 
         let!(:name) do
@@ -190,7 +190,7 @@ describe Mongoid::Persistable::Savable do
               "name.first_name" => "Ryan"
             },
             "$push"=> {
-              "addresses" => { '$each' => [ { "_id" => address.id, "street" => "Bond St" } ] }
+              "symptoms" => { '$each' => [ { "_id" => symptom.id, "name" => "Headache" } ] }
             }
           })
         end
@@ -202,7 +202,7 @@ describe Mongoid::Persistable::Savable do
           end
 
           it "saves embedded many relations" do
-            expect(person.addresses.first.street).to eq("Bond St")
+            expect(person.symptoms.first.name).to eq("Headache")
           end
 
           it "saves embedded one relations" do
