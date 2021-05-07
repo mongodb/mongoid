@@ -109,11 +109,11 @@ describe Mongoid::Factory do
     context "when the attributes are nil" do
 
       let(:document) do
-        described_class.from_db(Address, nil)
+        described_class.from_db(Animal, nil)
       end
 
       it "generates based on the provided class" do
-        expect(document).to be_a(Address)
+        expect(document).to be_a(Animal)
       end
 
       it "sets the attributes to empty" do
