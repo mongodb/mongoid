@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem 'bson', git: "https://github.com/mongodb/bson-ruby"
-gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.9-stable'
+gem 'mongo', git: "https://github.com/mongodb/mongo-ruby-driver", branch: '2.13-stable'
 
 gem 'actionpack', '~> 5.1'
 gem 'activemodel', '~> 5.1'
