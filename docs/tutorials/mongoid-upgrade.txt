@@ -288,6 +288,7 @@ overrides set with ``Mongoid.override_database`` and ``Mongoid.override_client``
 Mongoid 7.3 behavior:
 
 .. code-block:: ruby
+
   Mongoid.override_database("some_other_db")
   Band.create!(name: "Garage")
   Band.count # => 1
@@ -297,6 +298,7 @@ Mongoid 7.3 behavior:
 Mongoid 7.2 behavior:
 
 .. code-block:: ruby
+
   Mongoid.override_database("some_other_db")
   Band.create!(name: "Garage")
   Band.count # => 1
