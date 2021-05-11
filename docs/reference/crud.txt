@@ -11,6 +11,540 @@ CRUD Operations
    :class: singlecol
 
 
+Saving Documents
+================
+
+Mongoid supports all expected CRUD operations for those familiar with other
+Ruby mappers like Active Record or Data Mapper. What distinguishes Mongoid
+from other mappers for MongoDB is that the general persistence operations
+perform atomic updates on only the fields that have changed instead of
+writing the entire document to the database each time.
+
+The persistence sections will provide examples on what database operation is
+performed when executing the documented command.
+
+Standard
+--------
+
+Mongoid's standard persistence methods come in the form of common methods you
+would find in other mapping frameworks. The following table shows all standard
+operations with examples.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Operation
+     - Example
+
+   * - ``Model.create!``
+
+       *Insert a document or multiple documents into the database, raising an
+       error if a validation or server error occurs.*
+       
+       *Pass a hash of attributes to create one document with the specified
+       attributes, or an array of hashes to create multiple documents.
+       If a single hash is passed, the corresponding document is returned.
+       If an array of hashes is passed, an array of documents corresponding
+       to the hashes is returned.*
+       
+       *If a block is given to* ``create!`` *, it will be invoked with each
+       document as the argument in turn prior to attempting to save that
+       document.*
+       
+       *If there is a problem saving any of the documents, such as
+       a validation error or a server error, an exception is raised
+       and, consequently, none of the documents are returned.
+       However, if an array of hashes was passed and previous documents were
+       successfully saved, those documents will remain in the database.*
+     -
+        .. code-block:: ruby
+
+          Person.create!(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          ) # => Person instance
+
+          Person.create!([
+            { first_name: "Heinrich", last_name: "Heine" },
+            { first_name: "Willy", last_name: "Brandt" }
+          ]) # => Array of two Person instances
+
+          Person.create!(first_name: "Heinrich") do |doc|
+            doc.last_name = "Heine"
+          end # => Person instance
+
+   * - ``Model.create``
+
+       *Instantiate a document or multiple documents and, if validations pass,
+       insert them into the database.*
+       
+       ``create`` *is similar to* ``create!`` *but does not raise
+       exceptions on validation errors. It still raises errors on server
+       errors, such as trying to insert a document with an* ``_id`` *that
+       already exists in the collection.*
+       
+       *If any validation errors are encountered, the respective document
+       is not inserted but is returned along with documents that were inserted.
+       Use* ``persisted?`` *,* ``new_record?`` *or* ``errors`` *methods
+       to check which of the returned documents were inserted into the
+       database.*
+     -
+        .. code-block:: ruby
+
+          Person.create(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          ) # => Person instance
+
+          Person.create([
+            { first_name: "Heinrich", last_name: "Heine" },
+            { first_name: "Willy", last_name: "Brandt" }
+          ]) # => Array of two Person instances
+
+          Person.create(first_name: "Heinrich") do |doc|
+            doc.last_name = "Heine"
+          end # => Person instance
+          
+          class Post
+            include Mongoid::Document
+            
+            validates_uniqueness_of :title
+          end
+          
+          posts = Post.create([{title: "test"}, {title: "test"}])
+          # => array of two Post instances
+          posts.map { |post| post.persisted? } # => [true, false]
+
+   * - ``Model#save!``
+
+       *Save the changed attributes to the database atomically, or insert the document if
+       new. Raises an exception if validations fail or there is a server error.*
+       
+       *Returns true if the changed attributes were saved, raises an exception otherwise.*
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.save!
+
+          person.first_name = "Christian Johan"
+          person.save!
+
+   * - ``Model#save``
+
+       *Save the changed attributes to the database atomically, or insert the document
+       if new.*
+       
+       *Returns true if the changed attributes were saved. Returns false
+       if there were any validation errors. Raises an exception if
+       the document passed validation but there was a server error during
+       the save.*
+       
+       *Pass* ``validate: false`` *option to bypass validations.*
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.save
+          person.save(validate: false)
+
+          person.first_name = "Christian Johan"
+          person.save
+
+   * - ``Model#update_attributes``
+
+       *Update the document attributes in the database. Will return true if validation passed,
+       false if not.*
+     -
+        .. code-block:: ruby
+
+          person.update_attributes(
+            first_name: "Jean",
+            last_name: "Zorg"
+          )
+
+   * - ``Model#update_attributes!``
+
+       *Update the document attributes in the database and raise an error if validation failed.*
+     -
+        .. code-block:: ruby
+
+          person.update_attributes!(
+            first_name: "Leo",
+            last_name: "Tolstoy"
+          )
+
+   * - ``Model#update_attribute``
+
+       *Update a single attribute, bypassing validations.*
+     -
+        .. code-block:: ruby
+
+          person.update_attribute(:first_name, "Jean")
+
+   * - ``Model#upsert``
+
+       *Performs a MongoDB upsert on the document. If the document exists in the database,
+       it will get overwritten with the current attributes of the document in memory.
+       If the document does not exist in the database, it will be inserted. Note that
+       this only runs the* ``{before|after|around}_upsert`` *callbacks.*
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.upsert
+
+   * - ``Model#touch``
+
+       *Update the document's updated_at timestamp, optionally with one extra
+       provided time field. This will cascade the touch to all*
+       ``belongs_to`` *associations of the document with the option set.
+       This operation skips validations and callbacks.*
+       
+       *Attempting to touch a destroyed document will raise* ``FrozenError``
+       * (as of Ruby 2.5,* ``RuntimeError`` *on previous Ruby versions),
+       same as if attempting to update an attribute on a destroyed
+       document.*
+     -
+        .. code-block:: ruby
+
+          person.touch
+          person.touch(:audited_at)
+
+   * - ``Model#delete``
+
+       *Deletes the document from the database without running callbacks.*
+       
+       *If the document is not persisted, Mongoid will attempt to delete from
+       the database any document with the same* ``_id``.
+     -
+        .. code-block:: ruby
+
+          person.delete
+          
+          person = Person.create!(...)
+          unsaved_person = Person.new(id: person.id)
+          unsaved_person.delete
+          person.reload
+          # raises Mongoid::Errors::DocumentNotFound because the person was deleted
+
+   * - ``Model#destroy``
+
+       *Deletes the document from the database while running destroy callbacks.*
+       
+       *If the document is not persisted, Mongoid will attempt to delete from
+       the database any document with the same* ``_id``.
+     -
+        .. code-block:: ruby
+
+          person.destroy
+          
+          person = Person.create!(...)
+          unsaved_person = Person.new(id: person.id)
+          unsaved_person.destroy
+          person.reload
+          # raises Mongoid::Errors::DocumentNotFound because the person was deleted
+
+   * - ``Model.delete_all``
+
+       *Deletes all documents from the database without running any callbacks.*
+     -
+        .. code-block:: ruby
+
+          Person.delete_all
+
+   * - ``Model.destroy_all``
+
+       *Deletes all documents from the database while running callbacks. This is a
+       potentially expensive operation since all documents will be loaded into memory.*
+     -
+        .. code-block:: ruby
+
+          Person.destroy_all
+
+Mongoid provides the following persistence-related attributes:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Attribute
+     - Example
+
+
+   * - ``Model#new_record?``
+
+       *Returns* ``true`` *if the model instance has not yet been saved
+       to the database. Opposite of* ``persisted?``
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.new_record? # => true
+          person.save!
+          person.new_record? # => false
+
+   * - ``Model#persisted?``
+
+       *Returns* ``true`` *if the model instance has been saved
+       to the database. Opposite of* ``new_record?``
+     -
+        .. code-block:: ruby
+
+          person = Person.new(
+            first_name: "Heinrich",
+            last_name: "Heine"
+          )
+          person.persisted? # => false
+          person.save!
+          person.persisted? # => true
+
+
+
+Atomic
+------
+
+Although Mongoid performs atomic operations under the covers by default,
+there may be cases where you want to do this explicitly without persisting
+other fields. Mongoid provides support for all of these operations as well.
+When executing atomic operations via these methods, callbacks and validations
+are not invoked.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 60
+
+   * - Operation
+     - Example
+
+   * - ``Model#add_to_set``
+
+       *Performs an atomic $addToSet on the field.*
+     -
+        .. code-block:: ruby
+
+          person.add_to_set(aliases: "Bond")
+
+   * - ``Model#bit``
+
+       *Performs an atomic $bit on the field.*
+     -
+        .. code-block:: ruby
+
+          person.bit(age: { and: 10, or: 12 })
+
+   * - ``Model#inc``
+
+       *Performs an atomic $inc on the field.*
+     -
+        .. code-block:: ruby
+
+          person.inc(age: 1)
+
+   * - ``Model#pop``
+
+       *Performs an atomic $pop on the field.*
+     -
+        .. code-block:: ruby
+
+          person.pop(aliases: 1)
+
+   * - ``Model#pull``
+
+       *Performs an atomic $pull on the field.*
+     -
+        .. code-block:: ruby
+
+          person.pull(aliases: "Bond")
+
+   * - ``Model#pull_all``
+
+       *Performs an atomic $pullAll on the field.*
+     -
+        .. code-block:: ruby
+
+          person.pull_all(aliases: [ "Bond", "James" ])
+
+   * - ``Model#push``
+
+       *Performs an atomic $push on the field.*
+     -
+        .. code-block:: ruby
+
+          person.push(aliases: ["007","008"])
+
+   * - ``Model#rename``
+
+       *Performs an atomic $rename on the field.*
+     -
+        .. code-block:: ruby
+
+          person.rename(bday: :dob)
+
+   * - ``Model#set``
+
+       *Updates an attribute on the model instance and, if the instance
+       is already persisted, performs an atomic $set on the field, bypassing
+       validations.*
+       
+       ``set`` *can also deeply set values on Hash fields.*
+       
+       ``set`` *can also deeply set values on* ``embeds_one`` *associations.
+       If such an association's document is nil, one will be created prior
+       to the update.*
+
+       ``set`` *should not be used with* ``has_one`` *associations, as it
+       does not correctly work in such cases.*
+
+     -
+        .. code-block:: ruby
+
+          person = Person.create!(name: "Ricky Bobby")
+          person.set(name: "Tyler Durden") # updates name in the database
+
+
+    	  person = Person.new
+          person.set(name: "Tyler Durden") # does not write to database
+    	  person.name # => "Tyler Durden"
+    	  person.persisted? # => true
+
+
+    	  class Post
+    	    include Mongoid::Document
+    	    
+    	    field :metadata, type: Hash
+    	  end
+    	  
+          post = Post.create!
+          post.set('metadata.published_at' => Time.now)
+          post.metadata['published_at'] # => Time instance
+          
+          post.set('metadata.approved.today' => true)
+          post.metadata['approved'] # => {'today' => true}
+
+
+          class Flight
+            include Mongoid::Document
+
+            embeds_one :plan
+          end
+
+          class Plan
+            include Mongoid::Document
+
+            embedded_in :flight
+
+            field :route, type: String
+          end
+          
+          flight = Flight.create!
+          flight.plan # => nil
+          flight.set('plan.route', 'test route')
+          flight.plan # => Plan instance
+          flight.plan.route # => "test route"
+
+
+   * - ``Model#unset``
+
+       *Performs an atomic $unset on the field.*
+     -
+        .. code-block:: ruby
+
+          person.unset(:name)
+
+.. _atomic-operation-grouping:
+
+Atomic Operation Grouping
+`````````````````````````
+
+Atomic operations may be grouped together using the ``#atomically`` method
+on a document. All operations inside the block given to ``#atomically``
+are sent to the cluster in a single atomic command. For example:
+
+.. code-block:: ruby
+
+  person.atomically do
+    person.inc(age: 1)
+    person.set(name: 'Jake')
+  end
+
+``#atomically`` blocks may be nested. The default behavior is to write
+changes performed by each block as soon as the block ends:
+
+.. code-block:: ruby
+
+  person.atomically do
+    person.atomically do
+      person.inc(age: 1)
+      person.set(name: 'Jake')
+    end
+    raise 'An exception'
+    # name and age changes are still persisted
+  end
+
+This behavior can be changed by specifying the ``join_context: true`` option
+to ``#atomically``, or globally by setting the ``join_contexts``
+:ref:`configuration option <configuration-options>` to ``true``. When
+context joining is enabled, nested ``#atomically`` blocks are joined with
+the outer blocks, and only the outermost block (or the first block where
+``join_contexts`` is false) actually writes changes to the cluster.
+For example:
+
+.. code-block:: ruby
+
+  person.atomically do
+    person.atomically(join_context: true) do
+      person.inc(age: 1)
+      person.set(name: 'Jake')
+    end
+    raise 'An exception'
+    # name and age changes are not persisted
+  end
+
+The context joining behavior can be enabled globally by default by setting
+``join_context`` option in Mongoid configuration. In this case specifying
+``join_context: false`` on an ``#atomically`` block can be used to
+obtain the independent persistence context behavior.
+
+If an exception is raised in an ``#atomically`` block which has not yet
+persisted its changes to the cluster, any pending attribute changes on
+Mongoid models are reverted. For example:
+
+.. code-block:: ruby
+
+  person = Person.new(name: 'Tom')
+  begin
+    person.atomically do
+      person.inc(age: 1)
+      person.set(name: 'Jake')
+      person.name # => 'Jake'
+      raise 'An exception'
+    end
+  rescue Exception
+    person.name # => 'Tom'
+  end
+
+Atomic operations described in this section apply to one document at a time,
+therefore nesting ``#atomically`` blocks invoked on multiple documents does
+not make changes to the different documents be persisted atomically together.
+However, MongoDB offers :ref:`multi-document transactions <transactions>`
+as of server version 4.0 which provide atomic persistence across multiple
+documents.
+
+
 Accessing Field Values
 ======================
 

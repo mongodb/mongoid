@@ -10,10 +10,10 @@ Reference
   :titlesonly:
 
   reference/configuration
+  reference/persistence-configuration
   reference/documents
   reference/fields
   reference/inheritance
-  reference/persistence
   reference/crud
   reference/queries
   reference/text-search
