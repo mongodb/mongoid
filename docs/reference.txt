@@ -9,18 +9,20 @@ Reference
 .. toctree::
   :titlesonly:
 
-  tutorials/installation
-  tutorials/configuration
-  tutorials/documents
-  tutorials/persistence
-  tutorials/queries
-  tutorials/associations
-  tutorials/nested-attributes
-  tutorials/callbacks
-  tutorials/validation
-  tutorials/indexes
-  tutorials/sharding
-  tutorials/sessions
-  tutorials/transactions
-  tutorials/rails
-  tutorials/upgrade
+  reference/installation
+  reference/configuration
+  reference/documents
+  reference/fields
+  reference/inheritance
+  reference/persistence
+  reference/queries
+  reference/associations
+  reference/nested-attributes
+  reference/callbacks
+  reference/validation
+  reference/indexes
+  reference/sharding
+  reference/sessions
+  reference/transactions
+  reference/rails
+  reference/upgrade
