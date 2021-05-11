@@ -1,0 +1,477 @@
+***********
+Mongoid 7.2
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 7.2.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+
+Embedded Document Matching
+--------------------------
+
+**Breaking change:** In Mongoid 7.2 :ref:`embedded matchers <embedded-matching>`
+were largely rewritten. Most queries should produce the same results as in
+previous versions of Mongoid but a number of cases changed behavior to make
+Mongoid behave the same way MongoDB server behaves. Note that the changes,
+for the most part, affect queries using manually constructed MQL expressions;
+Mongoid query methods generate MQL that is generally not affected by the
+changes in embedded matching.
+
+To illustrate the differences, the examples below use the following model
+definitions:
+
+.. code-block:: ruby
+
+  class Job
+    include Mongoid::Document
+
+    embeds_many :tasks
+  end
+
+  class Task
+    include Mongoid::Document
+    include Mongoid::Attributes::Dynamic
+
+    embedded_in :job
+  end
+
+  job = Job.new(tasks: [
+    Task.new(name: 'Clean house', pattern: /test/, hours: 12),
+  ])
+
+The changes in behavior are as follows:
+
+``$eq`` and Regular Expression Values
+`````````````````````````````````````
+
+``$eq`` now performs exact matching when given regular a expression argument.
+Previously, both operators used regular expression matching, which caused
+Mongoid to not find documents where the field being matched was a regular
+expression itself:
+
+.. code-block:: ruby
+
+  job.tasks.where(name: {'$eq': /house/}).first
+  # Mongoid 7.2:
+  # => nil
+  # Mongoid 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+  job.tasks.where(pattern: {'$eq': /test/}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+  # Mongoid 7.1:
+  # => nil
+
+To perform a regular expression match, provide the regular expression directly
+without an operator:
+
+.. code-block:: ruby
+
+  job.tasks.where(name: /house/).first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+``$ne`` and Regular Expression Values
+`````````````````````````````````````
+
+``$ne`` no longer accepts regular expression arguments, which is the behavior
+of MongoDB server:
+
+.. code-block:: ruby
+
+  job.tasks.where(name: {'$ne': /apartment/}).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+To perform a negated regular expression match, use the ``not`` method on a
+symbol key:
+
+.. code-block:: ruby
+
+  job.tasks.where(:name.not => /house/).first
+  # Mongoid 7.2 and 7.1:
+  # => nil
+  job.tasks.where(:name.not => /office/).first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+``$eq``, ``$ne`` and Range Values
+`````````````````````````````````
+
+Range values are no longer accepted by ``$eq`` and ``$ne`` operators.
+This change should not be visible to applications since Mongoid generally
+expands Range values to a ``$gte``/``$lte`` pair before they get to the
+embedded matchers.
+
+To query using a range, use the following syntax which works in Mongoid 7.2
+as well as previous versions:
+
+.. code-block:: ruby
+
+  job.tasks.where(hours: 10..15)
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"hours"=>{"$gte"=>10, "$lte"=>15}}
+  #   options:  {}
+  #   class:    Task
+  #   embedded: true>
+
+  job.tasks.where(hours: 10..15).first
+  # => #<Task _id: 5ef8dd4c2c97a6465e8a4ffa, name: "Clean house", pattern: /test/, hours: 12>
+
+Mongoid 7.1 accepted Range values as operator arguments, but generated
+queries that would never match documents. For example, the following
+expression was accepted but never matched any documents:
+
+.. code-block:: ruby
+
+  job.tasks.where(hours: {'$in': 10..15})
+  # =>
+  # #<Mongoid::Criteria
+  #   selector: {"hours"=>{:$in=>{"$gte"=>10, "$lte"=>15}}}
+  #   options:  {}
+  #   class:    Task
+  #   embedded: true>
+
+Mongoid 7.2 raises ``Mongoid::Errors::InvalidQuery`` in this case.
+
+``$elemMatch``
+``````````````
+
+``$elemMatch`` now supports specifying operators as top-level fields:
+
+.. code-block:: ruby
+
+  mixed_tasks_job = Job.new(tasks: [
+    Task.new(name: 'Clean house', hours: 12, supplies: [{broom: 1}]),
+    Task.new(name: 'Clean office', hours: [8, 16]),
+  ])
+
+  mixed_tasks_job.tasks.where(hours: {'$elemMatch': {'$lt': 20}}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8c7202c97a6465e8a4ff3, name: "Clean office", hours: [8, 16]>
+  # Mongoid 7.1: error
+
+Implicit matching under ``$elemMatch`` has been fixed and now works:
+
+.. code-block:: ruby
+
+  mixed_tasks_job.tasks.where(supplies: {'$elemMatch': {broom: 1}}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8c9162c97a6465e8a4ff6, name: "Clean house", hours: 12, supplies: [{:broom=>1}]>
+  # Mongoid 7.1:
+  # => nil
+
+For compatibility with MongoDB server, ``$elemMatch`` requires a ``Hash``
+argument. Use ``$eq`` or ``$regex`` to perform equality comparisons or
+regular expression matches, respectively:
+
+.. code-block:: ruby
+
+  mixed_tasks_job.tasks.where(hours: {'$elemMatch': 8}).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => nil
+
+  mixed_tasks_job.tasks.where(hours: {'$elemMatch': {'$eq': 8}}).first
+  # Mongoid 7.2:
+  # => #<Task _id: 5ef8ca0b2c97a6465e8a4ff9, name: "Clean office", hours: [8, 16]>
+  # Mongoid 7.1: error
+
+``$and``, ``$nor``, ``$or`` and Empty Argument Arrays
+`````````````````````````````````````````````````````
+
+``$and``, ``$nor`` and ``$or`` operators now raise an exception when given
+empty arrays as arguments. This only applies to raw MQL query expressions;
+the corresponding Mongoid :ref:`query methods <logical-operations>`
+continue to permit being called without arguments. In previous versions
+of Mongoid, ``$and`` would match when given an empty array of conditions
+and ``$nor`` and ``$or`` would not match when given empty arrays of
+conditions.
+
+.. code-block:: ruby
+
+  job.tasks.where('$and': []).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+  job.tasks.where('$nor': []).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => nil
+
+  job.tasks.where('$or': []).first
+  # Mongoid 7.2: raises Mongoid::Errors::InvalidQuery
+  # Mongoid 7.1:
+  # => nil
+
+  job.tasks.and.first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+  job.tasks.nor.first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+  job.tasks.or.first
+  # Mongoid 7.2 and 7.1:
+  # => #<Task _id: 5ef8dc3e2c97a645ec86bb33, name: "Clean house", pattern: /test/, hours: 12>
+
+
+``count`` and ``estimated_count`` Methods
+-----------------------------------------
+
+Minor change: the ``count`` method on model classes and ``Criteria`` objects
+is now using the ``count_documents`` driver helper. This makes ``count``
+seamlessly work in transactions.
+
+Model classes now also have the ``estimated_count`` method to obtain an
+approximate number of documents in the collection. This method is roughly
+equivalent to the ``count`` method in Mongoid 7.1 and earlier, except
+``estimated_count`` does not accept filter conditions.
+
+The new behavior is further described in the :ref:`Additional Query Methods
+<additional-query-methods>` section.
+
+
+``any?`` on ``has_many`` Associations
+-------------------------------------
+
+Minor change: the :ref:`any? method on has_many associations <has-many-any>`
+was optimized to only retrieve the _id field when querying the database,
+instead of loading the entire association.
+
+
+``StringifiedSymbol`` Field Type
+--------------------------------
+
+New feature: the :ref:`StringifiedSymbol field type <stringified-symbol>`
+was added for storing Ruby symbol values in MongoDB in a manner interoperable
+with other programming languages.
+
+
+Changing the Discriminator Key
+------------------------------
+
+New feature: Mongoid now supports :ref:`changing the default discriminator key
+<discriminator-key>` from the default ``_type`` when using inheritance.
+This can be done by setting the ``discriminator_key`` field on the parent class
+or globally. To set the discriminator key on the parent class:
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+
+     self.discriminator_key = "shape_type"
+   end
+
+   class Circle < Shape
+   end
+
+   class Rectangle < Shape
+   end
+
+To set the discrminator key globally:
+
+.. code-block:: ruby
+
+   Mongoid.discriminator_key = "global_discriminator"
+
+   class Shape
+     include Mongoid::Document
+   end
+
+   class Circle < Shape
+   end
+
+   class Rectangle < Shape
+   end
+
+
+Changing the Discriminator Value
+--------------------------------
+
+New feature: Mongoid now also supports :ref:`changing the discriminator value
+<discriminator-value>` from the default value, which is the class name.
+The discriminator value can be changed by setting the ``discriminator_value``
+on that class:
+
+.. code-block:: ruby
+
+   class Shape
+     include Mongoid::Document
+   end
+
+   class Circle < Shape
+     self.discriminator_value = "round thing"
+   end
+
+   class Rectangle < Shape
+   end
+
+
+Shard Key Used For Reloading
+----------------------------
+
+Minor change: When sharding is used, Mongoid 7.2 expects the shard key declared
+in models to match the shard key in the database for the respective collections.
+In Mongoid 7.2 model reloading (either explicit via the ``reload`` method
+or implicit as part of persistence operations) uses the shard key, if one is
+defined, in the ``find`` command in addition to the ``id`` field value.
+This improves the performance of document reloading, and consequently some
+persistence operations, in sharded clusters, especially those with
+`geographically distributed shards
+<https://docs.atlas.mongodb.com/global-clusters/>`_.
+
+Consider a class ``Band`` whose documents are sharded by the ``name`` key.
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+    field :name, type: String
+
+    shard_key :name
+  end
+
+Example Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  band = Band.create(name: "Destiny's Child")
+  band.reload
+  # Command logs: { "find"=>"bands", "filter"=>{ "_id"=>BSON::ObjectId('...') "name"=>"Destiny's Child" } }
+
+Example Mongoid 7.1 behavior:
+
+.. code-block:: ruby
+
+  band = Band.create(name: "Destiny's Child")
+  band.reload
+  # Command logs: { "find"=>"bands", "filter"=>{"_id"=>BSON::ObjectId('...') } }
+
+Mongoid provides :ref:`sharding management Rake tasks <sharding-management>`
+to shard collections according to shard keys declared in models.
+
+
+Query Cache Moved to Driver
+---------------------------
+
+Minor change: Ruby driver version 2.14.0 implements a new and improved query
+cache. When using driver version 2.14.0 or newer, Mongoid will use the driver's
+query cache to cache query results.
+
+The driver query cache introduces the following improvements:
+
+* Caching multi-batch query results
+* Taking a query's read concern and read preference into account when deciding
+  when to return cached results
+* Invalidating the cache after bulk write operations and aggregation operations
+  with ``$out`` and ``$merge`` pipeline stages
+* Invalidating the cache after transaction commit and abort operations
+* Improved performance of queries with limits
+* Caching aggregation results
+* More efficient query cache invalidation
+
+Mongoid's query cache, which will now be referred to as the "legacy query cache,"
+has been deprecated. Mongoid will retain the legacy query cache for use with
+older versions of the driver.
+
+The interface for enabling and disabling the query cache in Mongoid has not
+changed. When using driver versions 2.14.0 and newer, this interface will
+enable or disable the query cache in the driver.
+
+The driver query cache is more correct and more effective than the legacy
+Mongoid query cache. If you plan to use the query cache, it is recommended
+that you upgrade to driver version 2.14.
+
+To read more about the query cache improvements made in the driver, see
+`the Ruby driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
+
+To read more about using the query cache with Mongoid and the limitations
+of the legacy query cache, see :ref:`the query cache documentation <query-cache>`.
+
+
+``Regexp`` Fields Store Assigned Strings As Regular Expressions
+---------------------------------------------------------------
+
+Minor change: when a ``String`` value is written in a ``Regexp`` field,
+Mongoid 7.2 stores that value in MongoDB as a regular expression.
+Subsequently it would be retrieved :ref:`as a BSON::Regexp::Raw instance
+<regular-expression-fields>`.
+Previously the value would be stored as a string and would be retrieved as
+a string.
+
+Example Mongoid 7.2 behavior:
+
+.. code-block:: ruby
+
+  class Offer
+    include Mongoid::Document
+    
+    field :constraint, type: Regexp
+  end
+  
+  offer = Offer.create!(constraint: /foo/)
+  # => #<Offer _id: 6082df412c97a66be6ba9970, constraint: /foo/>
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082df412c97a66be6ba9970'),
+  #     "constraint"=>#<BSON::Regexp::Raw:0x000055b4ccdff738 @pattern="foo", @options="m">,
+  #     "type"=>"regex"}
+
+  offer = Offer.create!(constraint: 'foo')
+  # => #<Offer _id: 6082df412c97a66be6ba9971, constraint: /foo/>
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082df412c97a66be6ba9971'),
+  #     "constraint"=>#<BSON::Regexp::Raw:0x000055b4cce11320 @pattern="foo", @options="m">,
+  #     "type"=>"regex"}
+
+Mongoid 7.1 behavior with the same model class:
+
+.. code-block:: ruby
+
+  offer = Offer.create!(constraint: /foo/)
+  # => #<Offer _id: 6082e0182c97a66c21e3f721, constraint: /foo/>
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082e0182c97a66c21e3f721'),
+  #     "constraint"=>#<BSON::Regexp::Raw:0x000055ecf43f4cb0 @pattern="foo", @options="m">,
+  #     "type"=>"regex"}
+
+  offer = Offer.create!(constraint: 'foo')
+  # => #<Offer _id: 6082e05c2c97a66c21e3f723, constraint: "foo">
+  
+  Offer.collection.aggregate([
+    {'$match' => {_id: offer.id}},
+    {'$set' => {type: {'$type' => '$constraint'}}},
+  ]).first
+  # => {"_id"=>BSON::ObjectId('6082e05c2c97a66c21e3f723'),
+  #     "constraint"=>"foo",
+  #     "type"=>"string"}
