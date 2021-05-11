@@ -1,4 +1,4 @@
-.. _mongoid-configuration:
+.. _configuration:
 
 *************
 Configuration

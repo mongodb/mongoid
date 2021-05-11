@@ -1,4 +1,4 @@
-.. _mongoid-indexes:
+.. _indexes:
 
 *******
 Indexes

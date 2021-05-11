@@ -1,0 +1,26 @@
+.. _reference:
+
+*********
+Reference
+*********
+
+.. default-domain:: mongodb
+
+.. toctree::
+  :titlesonly:
+
+  tutorials/installation
+  tutorials/configuration
+  tutorials/documents
+  tutorials/persistence
+  tutorials/queries
+  tutorials/relations
+  tutorials/nested-attributes
+  tutorials/callbacks
+  tutorials/validation
+  tutorials/indexes
+  tutorials/sharding
+  tutorials/sessions
+  tutorials/transactions
+  tutorials/rails
+  tutorials/upgrade

@@ -1,4 +1,4 @@
-.. _ruby-mongoid-tutorial:
+.. _mongoid:
 
 *******
 Mongoid
@@ -12,26 +12,12 @@ for MongoDB in Ruby.
 .. toctree::
   :titlesonly:
 
-  /tutorials
-  /tutorials/mongoid-installation
-  /tutorials/mongoid-configuration
-  /tutorials/mongoid-documents
-  /tutorials/mongoid-persistence
-  /tutorials/mongoid-queries
-  /tutorials/mongoid-relations
-  /tutorials/mongoid-nested-attributes
-  /tutorials/mongoid-callbacks
-  /tutorials/mongoid-validation
-  /tutorials/mongoid-indexes
-  /tutorials/sharding
-  /tutorials/mongoid-sessions
-  /tutorials/mongoid-transactions
-  /tutorials/mongoid-rails
-  /tutorials/mongoid-upgrade
-  /release-notes
+  tutorials
+  reference
+  release-notes
   API <https://docs.mongodb.com/mongoid/master/api/>
-  /additional-resources
-  /ecosystem
+  additional-resources
+  ecosystem
 
 
 For documentation on Mongoid 3 and 4, see `<http://mongoid.github.io>`_.

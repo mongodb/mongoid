@@ -2122,7 +2122,7 @@ Defining Text Search Index
 --------------------------
 
 Index definition through Mongoid is described in detail on the `indexes
-<mongoid-indexes>`_ page. Text search indexes are described in detail
+<indexes>`_ page. Text search indexes are described in detail
 under `text indexes <https://docs.mongodb.com/manual/core/index-text/>`_
 in the MongoDB manual. Below is an example definition of a Band model with
 a text index utilizing the description field:

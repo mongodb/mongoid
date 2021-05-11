@@ -1,4 +1,4 @@
-.. _mongoid-documents-6.0.0:
+.. _documents:
 
 *********
 Documents

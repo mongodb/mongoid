@@ -27,7 +27,7 @@ documentation for help with that API.
 
 All Mongoid configuration options have changed, as the underlying driver has changed
 from Moped to the official MongoDB Ruby driver. Please see the
-:ref:`configuration section <mongoid-configuration>` for a detailed description
+:ref:`configuration section <configuration>` for a detailed description
 of all the new options.
 
 All references to session are now replaced with client. This includes the ``mongoid.yml``
