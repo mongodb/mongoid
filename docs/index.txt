@@ -12,6 +12,7 @@ for MongoDB in Ruby.
 .. toctree::
   :titlesonly:
 
+  installation
   tutorials
   reference
   release-notes

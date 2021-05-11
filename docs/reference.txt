@@ -9,7 +9,6 @@ Reference
 .. toctree::
   :titlesonly:
 
-  reference/installation
   reference/configuration
   reference/documents
   reference/fields
