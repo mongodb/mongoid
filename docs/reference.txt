@@ -14,7 +14,7 @@ Reference
   tutorials/documents
   tutorials/persistence
   tutorials/queries
-  tutorials/relations
+  tutorials/associations
   tutorials/nested-attributes
   tutorials/callbacks
   tutorials/validation
