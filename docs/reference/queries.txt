@@ -10,8 +10,6 @@ Queries
    :depth: 2
    :class: singlecol
 
-Queries
-=======
 
 Mongoid provides a rich query DSL inspired by ActiveRecord. A trivial query
 looks as follows:
@@ -84,7 +82,7 @@ Criteria instance with the new conditions added to the existing conditions:
 
 
 Condition Syntax
-----------------
+================
 
 Mongoid supports three ways of specifying individual conditions:
 
@@ -119,7 +117,7 @@ The examples in this section use the following model definition:
   end
 
 Field Syntax
-````````````
+------------
 
 The simplest querying syntax utilizes the basic Ruby hashes. Keys can be
 symbols or strings, and correspond to field names in MongoDB documents:
@@ -138,7 +136,7 @@ symbols or strings, and correspond to field names in MongoDB documents:
   Band.where("name" => "Depeche Mode")
 
 MQL Syntax
-``````````
+----------
 
 An MQL operator may be specified on any field using the hash syntax:
 
@@ -156,7 +154,7 @@ An MQL operator may be specified on any field using the hash syntax:
   Band.where('founded' => {'$gt' => 1980})
 
 Symbol Operator Syntax
-``````````````````````
+----------------------
 
 MQL operators may be specified as methods on symbols for the respective field
 name, as follows:
@@ -171,7 +169,7 @@ name, as follows:
   #   embedded: false>
 
 Embedded Documents
-``````````````````
+==================
 
 To match values of fields of embedded documents, use the dot notation:
 
@@ -197,7 +195,7 @@ To match values of fields of embedded documents, use the dot notation:
   conditions are referencing embedded documents.
 
 Field Types
-```````````
+===========
 
 In order to query on a field, it is not necessary to add the field to
 :ref:`the model class definition <fields>`. However, if a field is defined in
@@ -221,7 +219,7 @@ the query:
   #   embedded: false>
 
 Aliases
-```````
+=======
 
 Queries take into account :ref:`storage field names <storage-field-names>`
 and :ref:`field aliases <field-aliases>`:
@@ -250,7 +248,7 @@ Since `id` and `_id` fields are aliases, either one can be used for queries:
 .. _logical-operations:
 
 Logical Operations
-------------------
+==================
 
 Mongoid supports ``and``, ``or``, ``nor`` and ``not`` logical operations on
 ``Criteria`` objects. These methods take one or more hash of conditions
@@ -307,7 +305,7 @@ The following calls all produce the same query conditions:
 
 
 Operator Combinations
-`````````````````````
+---------------------
 
 As of Mongoid 7.1, logical operators (``and``, ``or``, ``nor`` and ``not``)
 have been changed to have the the same semantics as `those of ActiveRecord
@@ -358,7 +356,7 @@ operate on the criteria built up to that point and its argument.
 
 
 ``and`` Behavior
-````````````````
+----------------
 
 The ``and`` method will add new simple conditions to the top level of the
 criteria, unless the receiving criteria already has a condition on the
@@ -379,7 +377,7 @@ the same field, depending on which form of ``and`` was used.
 
 
 ``or``/``nor`` Behavior
-```````````````````````
+_----------------------
 
 ``or`` and ``nor`` produce ``$or`` and ``$nor`` MongoDB operators, respectively,
 using the receiver and all of the arguments as operands. For example:
@@ -409,7 +407,7 @@ all of the conditions built up so far as they are.
 .. _any-of:
 
 ``any_of`` Behavior
-```````````````````
+-------------------
 
 ``any_of`` adds a disjunction built from its arguments to the existing
 conditions in the criteria. For example:
@@ -428,7 +426,7 @@ The conditions are hoisted to the top level if possible:
 
 
 ``not`` Behavior
-````````````````
+----------------
 
 ``not`` method can be called without arguments, in which case it will negate
 the next condition that is specified. ``not`` can also be called with one
@@ -494,7 +492,7 @@ caveats/limitations of ``$not`` `stated in the MongoDB server documentation
 
 
 Incremental Query Construction
-------------------------------
+==============================
 
 By default, when conditions are added to a query, Mongoid considers each
 condition complete and independent from any other conditions potentially
@@ -519,7 +517,7 @@ specified *merge strategy*.
 .. _merge-strategies:
 
 Merge Strategies
-````````````````
+----------------
 
 Mongoid provides three merge strategies:
 
@@ -578,7 +576,7 @@ ignored and reset and when ``in`` was invoked the second time there was no
 strategy active.
 
 Supported Operator Methods
-``````````````````````````
+--------------------------
 
 The following operator methods support merge strategies:
 
@@ -622,7 +620,7 @@ mechanism still applies:
     embedded: false>
 
 Operator Value Expansion
-````````````````````````
+------------------------
 
 Operator methods that support merge strategies all take ``Array`` as their value
 type. Mongoid expands ``Array``-compatible types, such as a ``Range``,
@@ -654,10 +652,10 @@ removed in a future release of Mongoid.
 
 
 Query Methods
--------------
+=============
 
 elem_match
-``````````
+----------
 
 This matcher finds documents with array fields where one of the array values
 matches all of the conditions. For example:
@@ -731,12 +729,15 @@ as the following example shows:
 .. _projection:
 
 Projection
-----------
+==========
+
+Mongoid provides two projection operators: ``only`` and ``without``.
+
 
 .. _only:
 
 ``only``
-````````
+--------
 
 The ``only`` method retrieves only the specified fields from the database. This
 operation is sometimes called "projection".
@@ -843,7 +844,7 @@ loaded with ``only`` for those associations to be loaded. For example:
 .. _without:
 
 ``without``
-```````````
+-----------
 
 The opposite of ``only``, ``without`` causes the specified fields to be omitted:
 
@@ -880,7 +881,7 @@ as its ``id`` alias) cannot be omitted via ``without``:
 
 
 Ordering
---------
+========
 
 Mongoid provides the ``order`` method on ``Criteria`` objects and its alias,
 ``order_by``, to specify the ordering of documents. These methods take a
@@ -989,7 +990,7 @@ the default scope being evaluated first:
 .. _query-cache:
 
 Query Cache
------------
+===========
 
 When the query cache is enabled, Mongoid will cache results for MongoDB queries
 when the entire result set is returned in a single batch (1000 documents by
@@ -1023,7 +1024,7 @@ Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
 to enable the query cache automatically for each web request.
 
 The Improved Driver Query Cache
-```````````````````````````````
+-------------------------------
 
 The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
 Ruby Driver. The driver query cache is more correct and more effective, and it
@@ -1057,7 +1058,7 @@ Read more about the Ruby driver query cache
   `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
 
 Legacy Query Cache Limitations
-``````````````````````````````
+------------------------------
 
 The following is a list of limitations of the legacy query cache:
 
@@ -1076,7 +1077,7 @@ The following is a list of limitations of the legacy query cache:
 * Aggregation results are not cached.
 
 A Note on using ``#first``
-``````````````````````````
+--------------------------
 
 Calling the ``first`` method on a model class imposes an ascending sort by
 the ``_id`` field on the underlying query. This may produce unexpected behavior
@@ -1098,7 +1099,7 @@ will query the database and separately cache their results.
 To use the cached results, call ``all.to_a.first`` on the model class.
 
 System Collections and the Query Cache
-``````````````````````````````````````
+--------------------------------------
 
 MongoDB stores system information in collections that use the ``database.system.*``
 namespace pattern. These are called system collections.
@@ -1120,10 +1121,9 @@ results from system collections.
   Band.all.to_a.first
   #=> Returns the first cached result
 
-.. _additional-query-methods:
 
 Finding By ``_id``
-------------------
+==================
 
 Mongoid provides the ``find`` method on ``Criteria`` objects to find documents
 by their ``_id`` values:
@@ -1194,8 +1194,10 @@ and some are not found, the return value is an array of documents that were
 found (which could be empty if no documents were found at all).
 
 
+.. _additional-query-methods:
+
 Additional Query Methods
-------------------------
+========================
 
 Mongoid also has some helpful methods on criteria.
 
@@ -1420,7 +1422,7 @@ Mongoid also has some helpful methods on criteria.
 
 
 Eager Loading
--------------
+=============
 
 Mongoid provides a facility to eager load documents
 from associations to prevent the n+1 issue when
@@ -1446,7 +1448,7 @@ associations.
 
 
 Regular Expressions
--------------------
+===================
 
 MongoDB, and Mongoid, allow querying documents by regular expressions.
 
