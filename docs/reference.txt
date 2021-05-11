@@ -14,7 +14,10 @@ Reference
   reference/fields
   reference/inheritance
   reference/persistence
+  reference/crud
   reference/queries
+  reference/text-search
+  reference/map-reduce
   reference/associations
   reference/nested-attributes
   reference/callbacks
