@@ -1,0 +1,330 @@
+***************
+CRUD Operations
+***************
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+
+Accessing Field Values
+======================
+
+Mongoid provides several ways of accessing field values.
+
+.. note::
+
+  All of the access methods described below raise
+  ``ActiveModel::MissingAttributeError`` when the field being accessed is
+  :ref:`projected out <projection>`, either by virtue of not being included in
+  :ref:`only <only>` or by virtue of being included in
+  :ref:`without <without>`. This applies to both reads and writes.
+
+
+Getters & Setters
+-----------------
+
+The recommended way is to use the getter and setter methods generated for
+each declared field:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name
+  end
+  
+  person = Person.new
+  
+  person.first_name = "Artem"
+  person.first_name
+  # => "Artem"
+
+To use this mechanism, each field must be explicitly declared, or the
+model class must enable :ref:`dynamic fields <dynamic-fields>`.
+
+
+Custom Getters & Setters
+------------------------
+
+It is possible to explicitly define the getter and setter methods to provide
+custom behavior when reading or writing fields, for example value
+transformations or storing values under different field names. In this case
+``read_attribute`` and ``write_attribute`` methods can be used to read and
+write the values directly into the attributes hash:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    def first_name
+      read_attribute(:fn)
+    end
+    
+    def first_name=(value)
+      write_attribute(:fn, value)
+    end
+  end
+  
+  person = Person.new
+  
+  person.first_name = "Artem"
+  person.first_name
+  # => "Artem"
+  
+  person.attributes
+  # => {"_id"=>BSON::ObjectId('606477dc2c97a628cf47075b'), "fn"=>"Artem"}
+
+
+.. _read-write-attribute:
+
+``read_attribute`` & ``write_attribute``
+----------------------------------------
+
+The ``read_attribute`` and ``write_attribute`` methods can be used explicitly
+as well. Note that if a field specifies its :ref:`storage field name
+<storage-field-names>`, both ``read_attribute`` and ``write_attribute``
+accept either the declared field name or the storage field name for operations:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name, as: :fn
+    field :last_name, as: :ln
+  end
+  
+  person = Person.new(first_name: "Artem")
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): nil>
+
+  person.read_attribute(:first_name)
+  # => "Artem"
+
+  person.read_attribute(:fn)
+  # => "Artem"
+  
+  person.write_attribute(:last_name, "Pushkin")
+  person
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Pushkin">
+  
+  person.write_attribute(:ln, "Medvedev")
+  person
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Medvedev">
+
+``read_attribute`` and ``write_attribute`` do not require that a field with
+the used name is defined, but writing field values with ``write_attribute``
+does not cause the respective field to be defined either:
+
+.. code-block:: ruby
+
+  person.write_attribute(:undefined, "Hello")
+  person
+  # => #<Person _id: 60647b212c97a6292c195b4c, first_name(fn): "Artem", last_name(ln): "Medvedev">
+  person.attributes
+  # => {"_id"=>BSON::ObjectId('60647b212c97a6292c195b4c'), "first_name"=>"Artem", "last_name"=>"Medvedev", "undefined"=>"Hello"}
+  
+  person.read_attribute(:undefined)
+  # => "Hello"
+  person.undefined
+  # raises NoMethodError
+
+When ``read_attribute`` is used to access a missing field, it returns ``nil``.
+
+
+Hash Access
+-----------
+
+Mongoid model instances define the ``[]`` and ``[]=`` methods to provide
+``Hash`` style acccess to the attributes. ``[]`` is an alias for
+``read_attribute`` and ``[]=`` is an alias for ``write_attribute``; see
+the section on :ref:`read_attribute and write_attribute <read-write-attribute>`
+for the detailed description of their behavior.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name, as: :fn
+    field :last_name, as: :ln
+  end
+
+  person = Person.new(first_name: "Artem")
+  
+  person["fn"]
+  # => "Artem"
+  
+  person[:first_name]
+  # => "Artem"
+  
+  person[:ln] = "Medvedev"
+  person
+  # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Medvedev">
+  
+  person["last_name"] = "Pushkin"
+  person
+  # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Pushkin">
+
+
+Bulk Attribute Writes
+---------------------
+
+In cases where you want to set multiple field values at once, there are a few
+different ways of accomplishing this as well.
+
+.. code-block:: ruby
+
+   # Get the field values as a hash.
+   person.attributes
+
+   # Set the field values in the document.
+   Person.new(first_name: "Jean-Baptiste", middle_name: "Emmanuel")
+   person.attributes = { first_name: "Jean-Baptiste", middle_name: "Emmanuel" }
+   person.write_attributes(
+     first_name: "Jean-Baptiste",
+     middle_name: "Emmanuel",
+   )
+
+
+Dirty Tracking
+==============
+
+Mongoid supports tracking of changed or "dirty" fields with an API that mirrors that of
+Active Model. If a defined field has been modified in a model the model will be marked as
+dirty and some additional behavior comes into play.
+
+
+Viewing Changes
+---------------
+
+There are various ways to view what has been altered on a model. Changes are recorded
+from the time a document is instantiated, either as a new document or via loading from
+the database up to the time it is saved. Any persistence operation clears the changes.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     field :name, type: String
+   end
+
+   person = Person.first
+   person.name = "Alan Garner"
+
+   # Check to see if the document has changed.
+   person.changed? # true
+
+   # Get an array of the names of the changed fields.
+   person.changed # [ :name ]
+
+   # Get a hash of the old and changed values for each field.
+   person.changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
+
+   # Check if a specific field has changed.
+   person.name_changed? # true
+
+   # Get the changes for a specific field.
+   person.name_change # [ "Alan Parsons", "Alan Garner" ]
+
+   # Get the previous value for a field.
+   person.name_was # "Alan Parsons"
+
+
+Resetting Changes
+-----------------
+
+You can reset changes of a field to its previous value by calling the reset method.
+
+.. code-block:: ruby
+
+   person = Person.first
+   person.name = "Alan Garner"
+
+   # Reset the changed name back to the original
+   person.reset_name!
+   person.name # "Alan Parsons"
+
+
+Persistence
+-----------
+
+Mongoid uses dirty tracking as the core of its persistence operations. It looks at the
+changes on a document and atomically updates only what has changed, unlike other frameworks
+that write the entire document on each save. If no changes have been made, Mongoid will
+not hit the database on a call to ``Model#save``.
+
+
+Viewing Previous Changes
+------------------------
+
+After a document has been persisted, you can see what the changes were previously by
+calling ``Model#previous_changes``.
+
+.. code-block:: ruby
+
+   person = Person.first
+   person.name = "Alan Garner"
+   person.save # Clears out current changes.
+
+   # View the previous changes.
+   person.previous_changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
+
+
+Updating Container Fields
+=========================
+
+Be aware that, until
+`MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_
+is resolved, all fields including container ones must be assigned to for
+their values to be persisted to the database.
+
+For example, adding to a set like this does not work:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    field :tours, type: Set
+  end
+
+  band = Band.new
+  band.tours
+  # => #<Set: {}>
+
+  band.tours << 'London'
+  # => #<Set: {"London"}>
+  band.tours
+  # => #<Set: {}>
+
+Instead, the field value must be modified outside of the model and assigned
+back to the model as follows:
+
+.. code-block:: ruby
+
+  class Band
+    include Mongoid::Document
+
+    field :tours, type: Set
+  end
+
+  band = Band.new
+
+  tours = band.tours
+  # => #<Set: {}>
+
+  tours << 'London'
+  # => #<Set: {"London"}>
+
+  band.tours = tours
+  # => #<Set: {"London"}>
+
+  band.tours
+  # => #<Set: {"London"}>
