@@ -1,8 +1,8 @@
-.. _mongoid-indexes:
+.. _indexes:
 
-*******
-Indexes
-*******
+****************
+Index Management
+****************
 
 .. default-domain:: mongodb
 

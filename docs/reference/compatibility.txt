@@ -1,6 +1,6 @@
-************
-Installation
-************
+*************
+Compatibility
+*************
 
 .. default-domain:: mongodb
 
@@ -10,41 +10,6 @@ Installation
    :depth: 2
    :class: singlecol
 
-Install the Gem
-===============
-
-Mongoid is bundled as a gem, and is `hosted on Rubygems
-<https://rubygems.org/gems/mongoid>`_.
-It can be installed manually or with bundler.
-
-To install the gem manually:
-
-.. code-block:: sh
-
-    gem install mongoid
-
-To install the gem with bundler, include the following in your ``Gemfile``:
-
-.. code-block:: ruby
-
-   gem 'mongoid', '~> 7.3.0'
-
-Using Mongoid with a New Rails Application
-==========================================
-
-When creating a new Rails application and wish to use Mongoid for
-data access, give the ``--skip-active-record`` flag to the ``rails new``
-command to avoid depending on and configuring ActiveRecord..
-
-Using Mongoid with an Existing Rails Application
-================================================
-
-When converting an existing Rails application to use Mongoid for data access,
-the ``config/application.rb`` file needs to be updated to remove the
-``require 'rails/all'`` line and explicitly include the required frameworks
-(which could be all of the frameworks provided by Rails with the exception of
-ActiveRecord). Any references to ActiveRecord in files in the ``config``
-directory and in the models also need to be removed.
 
 Ruby MongoDB Driver Compatibility
 =================================
@@ -88,6 +53,7 @@ specified Mongoid versions.
    * - 6.4
      - |checkmark|
      - |checkmark|
+
 
 Ruby Compatibility
 ==================
@@ -164,6 +130,7 @@ is deprecated.
 .. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
 
 .. [#ruby-2.2] Ruby version 2.2.2 or higher is required.
+
 
 MongoDB Server Compatibility
 ============================

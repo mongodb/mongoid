@@ -1,0 +1,17 @@
+.. _release-notes:
+
+*************
+Release Notes
+*************
+
+.. default-domain:: mongodb
+
+.. toctree::
+  :titlesonly:
+
+  release-notes/mongoid-7.3
+  release-notes/mongoid-7.2
+  release-notes/mongoid-7.1
+  release-notes/mongoid-7.0
+  release-notes/mongoid-6
+  release-notes/mongoid-5

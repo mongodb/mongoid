@@ -1,0 +1,40 @@
+***********
+Mongoid 7.0
+***********
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+This page describes significant changes and improvements in Mongoid 7.0.
+The complete list of releases is available `on GitHub
+<https://github.com/mongodb/mongoid/releases>`_ and `in JIRA
+<https://jira.mongodb.org/projects/MONGOID?selectedItem=com.atlassian.jira.jira-projects-plugin:release-page>`_;
+please consult GitHub releases for detailed release notes and JIRA for
+the complete list of issues fixed in each release, including bug fixes.
+
+Please note that improvements that have been backported to Mongoid 6.x are
+not included in this list.
+
+The behavior of :ref:`read-only attributes <read-only>` now matches that of
+ActiveRecord.
+
+Referenced associations now support all :ref:`dependent behaviors <dependent-behavior>`
+that `ActiveRecord supports <http://guides.rubyonrails.org/association_basics.html>`_.
+
+:ref:`$unwind <unwind-dsl>` operator support added to the :ref:`aggregation
+pipeline builder DSL <aggregation-pipeline-builder-dsl>`.
+
+``background_indexing`` Mongoid :ref:`configuration option
+<configuration-options>` added.
+
+Mongoid 7.0 requires MongoDB server 2.6 or newer, Ruby 2.2.2 or higher and
+supports Rails 5.1-6.0.
+
+New in version 7.0.3: Embedded matchers now support the ``$eq`` operator.
+
+New in version 7.0.5: Mongoid now officially supports Rails 6.0.

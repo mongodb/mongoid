@@ -1,0 +1,20 @@
+.. _working-with-data:
+
+*****************
+Working With Data
+*****************
+
+.. default-domain:: mongodb
+
+.. toctree::
+  :titlesonly:
+
+  reference/crud
+  reference/queries
+  reference/text-search
+  reference/map-reduce
+  reference/persistence-configuration
+  reference/nested-attributes
+  reference/callbacks
+  reference/sessions
+  reference/transactions

@@ -222,7 +222,7 @@ creating blog posts:
 Navigate to `localhost:3000/posts <http://localhost:3000/posts>`_
 to create posts and see the posts that have already been created.
 
-.. image:: rails-new-blog.png
+.. image:: ../img/rails-new-blog.png
   :alt: Screenshot of the new blog
 
 
@@ -351,7 +351,7 @@ with the following contents:
 
 You should now be able to leave comments for the posts:
 
-.. image:: rails-blog-new-comment.png
+.. image:: ../img/rails-blog-new-comment.png
   :alt: Screenshot of the blog with a new comment being added
 
 

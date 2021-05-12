@@ -1,4 +1,4 @@
-.. _mongoid-configuration:
+.. _configuration:
 
 *************
 Configuration
@@ -587,7 +587,7 @@ that only enables the "AES256-SHA" cipher.
   # Only the AES256-SHA cipher will be enabled from this point forward
 
 Every ``Proc`` in ``Mongo.tls_context_hooks`` will be passed an
-``OpenSSL::SSL::SSLContext`` object as its sole argument. These ``Proc``s will
+``OpenSSL::SSL::SSLContext`` object as its sole argument. These procs will
 be executed sequentially during socket creation.
 
 ..warning ::

@@ -10,8 +10,6 @@ Queries
    :depth: 2
    :class: singlecol
 
-Queries
-=======
 
 Mongoid provides a rich query DSL inspired by ActiveRecord. A trivial query
 looks as follows:
@@ -84,7 +82,7 @@ Criteria instance with the new conditions added to the existing conditions:
 
 
 Condition Syntax
-----------------
+================
 
 Mongoid supports three ways of specifying individual conditions:
 
@@ -119,7 +117,7 @@ The examples in this section use the following model definition:
   end
 
 Field Syntax
-````````````
+------------
 
 The simplest querying syntax utilizes the basic Ruby hashes. Keys can be
 symbols or strings, and correspond to field names in MongoDB documents:
@@ -138,7 +136,7 @@ symbols or strings, and correspond to field names in MongoDB documents:
   Band.where("name" => "Depeche Mode")
 
 MQL Syntax
-``````````
+----------
 
 An MQL operator may be specified on any field using the hash syntax:
 
@@ -156,7 +154,7 @@ An MQL operator may be specified on any field using the hash syntax:
   Band.where('founded' => {'$gt' => 1980})
 
 Symbol Operator Syntax
-``````````````````````
+----------------------
 
 MQL operators may be specified as methods on symbols for the respective field
 name, as follows:
@@ -171,7 +169,7 @@ name, as follows:
   #   embedded: false>
 
 Embedded Documents
-``````````````````
+==================
 
 To match values of fields of embedded documents, use the dot notation:
 
@@ -197,7 +195,7 @@ To match values of fields of embedded documents, use the dot notation:
   conditions are referencing embedded documents.
 
 Field Types
-```````````
+===========
 
 In order to query on a field, it is not necessary to add the field to
 :ref:`the model class definition <fields>`. However, if a field is defined in
@@ -221,7 +219,7 @@ the query:
   #   embedded: false>
 
 Aliases
-```````
+=======
 
 Queries take into account :ref:`storage field names <storage-field-names>`
 and :ref:`field aliases <field-aliases>`:
@@ -250,7 +248,7 @@ Since `id` and `_id` fields are aliases, either one can be used for queries:
 .. _logical-operations:
 
 Logical Operations
-------------------
+==================
 
 Mongoid supports ``and``, ``or``, ``nor`` and ``not`` logical operations on
 ``Criteria`` objects. These methods take one or more hash of conditions
@@ -307,7 +305,7 @@ The following calls all produce the same query conditions:
 
 
 Operator Combinations
-`````````````````````
+---------------------
 
 As of Mongoid 7.1, logical operators (``and``, ``or``, ``nor`` and ``not``)
 have been changed to have the the same semantics as `those of ActiveRecord
@@ -358,7 +356,7 @@ operate on the criteria built up to that point and its argument.
 
 
 ``and`` Behavior
-````````````````
+----------------
 
 The ``and`` method will add new simple conditions to the top level of the
 criteria, unless the receiving criteria already has a condition on the
@@ -379,7 +377,7 @@ the same field, depending on which form of ``and`` was used.
 
 
 ``or``/``nor`` Behavior
-```````````````````````
+_----------------------
 
 ``or`` and ``nor`` produce ``$or`` and ``$nor`` MongoDB operators, respectively,
 using the receiver and all of the arguments as operands. For example:
@@ -409,7 +407,7 @@ all of the conditions built up so far as they are.
 .. _any-of:
 
 ``any_of`` Behavior
-```````````````````
+-------------------
 
 ``any_of`` adds a disjunction built from its arguments to the existing
 conditions in the criteria. For example:
@@ -428,7 +426,7 @@ The conditions are hoisted to the top level if possible:
 
 
 ``not`` Behavior
-````````````````
+----------------
 
 ``not`` method can be called without arguments, in which case it will negate
 the next condition that is specified. ``not`` can also be called with one
@@ -494,7 +492,7 @@ caveats/limitations of ``$not`` `stated in the MongoDB server documentation
 
 
 Incremental Query Construction
-------------------------------
+==============================
 
 By default, when conditions are added to a query, Mongoid considers each
 condition complete and independent from any other conditions potentially
@@ -519,7 +517,7 @@ specified *merge strategy*.
 .. _merge-strategies:
 
 Merge Strategies
-````````````````
+----------------
 
 Mongoid provides three merge strategies:
 
@@ -578,7 +576,7 @@ ignored and reset and when ``in`` was invoked the second time there was no
 strategy active.
 
 Supported Operator Methods
-``````````````````````````
+--------------------------
 
 The following operator methods support merge strategies:
 
@@ -622,7 +620,7 @@ mechanism still applies:
     embedded: false>
 
 Operator Value Expansion
-````````````````````````
+------------------------
 
 Operator methods that support merge strategies all take ``Array`` as their value
 type. Mongoid expands ``Array``-compatible types, such as a ``Range``,
@@ -654,10 +652,10 @@ removed in a future release of Mongoid.
 
 
 Query Methods
--------------
+=============
 
 elem_match
-``````````
+----------
 
 This matcher finds documents with array fields where one of the array values
 matches all of the conditions. For example:
@@ -731,12 +729,15 @@ as the following example shows:
 .. _projection:
 
 Projection
-----------
+==========
+
+Mongoid provides two projection operators: ``only`` and ``without``.
+
 
 .. _only:
 
 ``only``
-````````
+--------
 
 The ``only`` method retrieves only the specified fields from the database. This
 operation is sometimes called "projection".
@@ -843,7 +844,7 @@ loaded with ``only`` for those associations to be loaded. For example:
 .. _without:
 
 ``without``
-```````````
+-----------
 
 The opposite of ``only``, ``without`` causes the specified fields to be omitted:
 
@@ -880,7 +881,7 @@ as its ``id`` alias) cannot be omitted via ``without``:
 
 
 Ordering
---------
+========
 
 Mongoid provides the ``order`` method on ``Criteria`` objects and its alias,
 ``order_by``, to specify the ordering of documents. These methods take a
@@ -989,7 +990,7 @@ the default scope being evaluated first:
 .. _query-cache:
 
 Query Cache
------------
+===========
 
 When the query cache is enabled, Mongoid will cache results for MongoDB queries
 when the entire result set is returned in a single batch (1000 documents by
@@ -1023,7 +1024,7 @@ Mongoid also provides a :ref:`Rack middleware <query-cache-middleware>`
 to enable the query cache automatically for each web request.
 
 The Improved Driver Query Cache
-```````````````````````````````
+-------------------------------
 
 The Mongoid query cache has been reimplemented in version 2.14.0 of the MongoDB
 Ruby Driver. The driver query cache is more correct and more effective, and it
@@ -1057,7 +1058,7 @@ Read more about the Ruby driver query cache
   `in the driver documentation <https://docs.mongodb.com/ruby-driver/current/tutorials/query-cache/>`_.
 
 Legacy Query Cache Limitations
-``````````````````````````````
+------------------------------
 
 The following is a list of limitations of the legacy query cache:
 
@@ -1076,7 +1077,7 @@ The following is a list of limitations of the legacy query cache:
 * Aggregation results are not cached.
 
 A Note on using ``#first``
-``````````````````````````
+--------------------------
 
 Calling the ``first`` method on a model class imposes an ascending sort by
 the ``_id`` field on the underlying query. This may produce unexpected behavior
@@ -1098,7 +1099,7 @@ will query the database and separately cache their results.
 To use the cached results, call ``all.to_a.first`` on the model class.
 
 System Collections and the Query Cache
-``````````````````````````````````````
+--------------------------------------
 
 MongoDB stores system information in collections that use the ``database.system.*``
 namespace pattern. These are called system collections.
@@ -1120,10 +1121,9 @@ results from system collections.
   Band.all.to_a.first
   #=> Returns the first cached result
 
-.. _additional-query-methods:
 
 Finding By ``_id``
-------------------
+==================
 
 Mongoid provides the ``find`` method on ``Criteria`` objects to find documents
 by their ``_id`` values:
@@ -1189,13 +1189,15 @@ option. If the option is set to ``true``, ``find`` raises
 ``Mongoid::Errors::DocumentNotFound`` if any of the ``_id``s are not found.
 If the option is set to ``false`` and ``find`` is given a single ``_id`` to
 find and there is no matching document, ``find`` returns ``nil``. If the
-option is set to ``false`` and ``find`` is given an array of ``_id``s to find
+option is set to ``false`` and ``find`` is given an array of ids to find
 and some are not found, the return value is an array of documents that were
 found (which could be empty if no documents were found at all).
 
 
+.. _additional-query-methods:
+
 Additional Query Methods
-------------------------
+========================
 
 Mongoid also has some helpful methods on criteria.
 
@@ -1420,7 +1422,7 @@ Mongoid also has some helpful methods on criteria.
 
 
 Eager Loading
--------------
+=============
 
 Mongoid provides a facility to eager load documents
 from associations to prevent the n+1 issue when
@@ -1446,7 +1448,7 @@ associations.
 
 
 Regular Expressions
--------------------
+===================
 
 MongoDB, and Mongoid, allow querying documents by regular expressions.
 
@@ -1540,37 +1542,6 @@ which was defined without a type (hence implicitly as an ``Object``),
 the date was used unmodified in the constructed query. When using a
 nonexistent field ``deregistered_at`` the date was interpreted to be in UTC
 and converted to a time, matching the behavior of querying a ``Date`` field.
-
-
-Reloading
-=========
-
-Use the ``reload`` method to fetch the most recent version of a document from
-the database:
-
-.. code-block:: ruby
-
-  band = Band.find(..)
-  band.reload
-
-If the model has a :ref:`shard key <shard-keys>` defined, the shard key value
-is included in the reloading query.
-
-.. note::
-
-  ``reload`` also works when the document has not been persisted, in which case
-  it performs a query using the ``id`` value (and shard key value, if a shard
-  key is defined):
-
-  .. code-block:: ruby
-
-    existing = Band.create!(name: 'Photek')
-    
-    # Unsaved document
-    band = Band.new(id: existing.id)
-    band.reload
-    band.name
-    # => "Photek"
 
 
 Queries + Persistence
@@ -1971,200 +1942,3 @@ treated like scopes, and can be chained as well.
   end
 
   Band.active
-
-Map/Reduce
-==========
-
-Mongoid provides a DSL around MongoDB's map/reduce framework, for performing
-custom map/reduce jobs or simple aggregations.
-
-Execution
----------
-
-You can tell Mongoid off the class or a criteria to perform a map/reduce
-by calling ``map_reduce`` and providing map and reduce javascript
-functions.
-
-.. code-block:: ruby
-
-  map = %Q{
-    function() {
-      emit(this.name, { likes: this.likes });
-    }
-  }
-
-  reduce = %Q{
-    function(key, values) {
-      var result = { likes: 0 };
-      values.forEach(function(value) {
-        result.likes += value.likes;
-      });
-      return result;
-    }
-  }
-
-  Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
-
-Just like criteria, map/reduce calls are lazily evaluated. So nothing will
-hit the database until you iterate over the results, or make a call on the
-wrapper that would need to force a database hit.
-
-.. code-block:: ruby
-
-  Band.map_reduce(map, reduce).out(replace: "mr-results").each do |document|
-    p document # { "_id" => "Tool", "value" => { "likes" => 200 }}
-  end
-
-The only required thing you provide along with a map/reduce is where to
-output the results. If you do not provide this an error will be raised.
-Valid options to ``#out`` are:
-
-- ``inline: 1``: Don't store the output in a collection.
-- ``replace: "name"``: Store in a collection with the
-  provided name, and overwrite any documents that exist in it.
-- ``merge: "name"``: Store in a collection with the
-  provided name, and merge the results with the existing documents.
-- ``reduce: "name"``: Store in a collection with the
-  provided name, and reduce all existing results in that collection.
-
-Raw Results
------------
-
-Results of Map/Reduce execution can be retrieved via the ``execute`` method
-or its aliases ``raw`` and ``results``:
-
-.. code-block:: ruby
-
-  mr = Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
-
-  mr.execute
-  # => {"results"=>[{"_id"=>"Tool", "value"=>{"likes"=>200.0}}],
-        "timeMillis"=>14,
-        "counts"=>{"input"=>4, "emit"=>4, "reduce"=>1, "output"=>1},
-        "ok"=>1.0,
-        "$clusterTime"=>{"clusterTime"=>#<BSON::Timestamp:0x00005633c2c2ad20 @seconds=1590105400, @increment=1>, "signature"=>{"hash"=><BSON::Binary:0x12240 type=generic data=0x0000000000000000...>, "keyId"=>0}},
-        "operationTime"=>#<BSON::Timestamp:0x00005633c2c2aaf0 @seconds=1590105400, @increment=1>}
-
-
-Statistics
-----------
-
-MongoDB servers 4.2 and lower provide Map/Reduce execution statistics. As of
-MongoDB 4.4, Map/Reduce is implemented via the aggregation pipeline and
-statistics described in this section are not available.
-
-The following methods are provided on the ``MapReduce`` object:
-
-- ``counts``: Number of documents read, emitted, reduced and output through
-  the pipeline.
-- ``input``, ``emitted``, ``reduced``, ``output``: individual count methods.
-  Note that ``emitted`` and ``reduced`` methods are named differently from
-  hash keys in ``counts``.
-- ``time``: The time, in milliseconds, that Map/Reduce pipeline took to execute.
-
-The following code illustrates retrieving the statistics:
-
-.. code-block:: ruby
-
-  mr = Band.where(:likes.gt => 100).map_reduce(map, reduce).out(inline: 1)
-
-  mr.counts
-  # => {"input"=>4, "emit"=>4, "reduce"=>1, "output"=>1}
-
-  mr.input
-  # => 4
-
-  mr.emitted
-  # => 4
-
-  mr.reduced
-  # => 1
-
-  mr.output
-  # => 1
-
-  mr.time
-  # => 14
-
-.. note::
-
-  Each statistics method invocation re-executes the Map/Reduce pipeline.
-  The results of execution are not stored by Mongoid. Consider using the
-  ``execute`` method to retrieve the raw results and obtaining the statistics
-  from the raw results if multiple statistics are desired.
-
-
-.. _text-search:
-
-Text Search
-===========
-
-MongoDB provides :manual:`text indexes </core/index-text/>`
-to support text search queries on string content. Text indexes
-can include any field whose value is a string or an array of
-string elements.
-
-.. note::
-
-  MongoDB Atlas also provides
-  `Atlas Search <https://docs.atlas.mongodb.com/atlas-search/>`_
-  which is a more powerful and flexible text search solution.
-  The rest of this section discusses text indexes and not Atlas Search.
-
-To perform text search with Mongoid, follow these steps:
-
-1. Define a text index on a model.
-2. Create the text index on the server.
-3. Build a text search query.
-
-
-Defining Text Search Index
---------------------------
-
-Index definition through Mongoid is described in detail on the `indexes
-<mongoid-indexes>`_ page. Text search indexes are described in detail
-under `text indexes <https://docs.mongodb.com/manual/core/index-text/>`_
-in the MongoDB manual. Below is an example definition of a Band model with
-a text index utilizing the description field:
-
-.. code-block:: ruby
-
-  class Band
-    include Mongoid::Document
-
-    field :name, type: String
-    field :description, type: String
-
-    index description: 'text'
-  end
-
-Note that the index type (``text``) must be given as a string, not as a symbol.
-
-
-Creating Text Index
--------------------
-
-To create the index, invoke the ``db:mongoid:create_indexes`` Rake task:
-
-.. code-block:: ruby
-
-  bundle exec rake db:mongoid:create_indexes
-
-
-Querying Using Text Index
--------------------------
-
-To find bands whose description contains "ounces" or its variations, use the
-`$text operator <https://docs.mongodb.com/manual/reference/operator/query/text/#op._S_text>`_:
-
-.. code-block:: ruby
-
-  Band.where('$text' => {'$search' => 'ounces'}).to_a
-  # => [#<Band _id: 5d5341b3ce4ef35d5016746d, name: "foo", description: "ounce">]
-
-Note that the description contains the word "ounce" even though the search
-query was "ounces".
-
-Note also that when performing text search, the name of the field is not
-explicitly specified - ``$text`` operator searches all fields indexed with
-the text index.

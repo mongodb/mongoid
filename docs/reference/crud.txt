@@ -1,6 +1,6 @@
-***********
-Persistence
-***********
+***************
+CRUD Operations
+***************
 
 .. default-domain:: mongodb
 
@@ -9,6 +9,10 @@ Persistence
    :backlinks: none
    :depth: 2
    :class: singlecol
+
+
+Saving Documents
+================
 
 Mongoid supports all expected CRUD operations for those familiar with other
 Ruby mappers like Active Record or Data Mapper. What distinguishes Mongoid
@@ -20,7 +24,7 @@ The persistence sections will provide examples on what database operation is
 performed when executing the documented command.
 
 Standard
-========
+--------
 
 Mongoid's standard persistence methods come in the form of common methods you
 would find in other mapping frameworks. The following table shows all standard
@@ -311,7 +315,7 @@ Mongoid provides the following persistence-related attributes:
 
 
 Atomic
-======
+------
 
 Although Mongoid performs atomic operations under the covers by default,
 there may be cases where you want to do this explicitly without persisting
@@ -464,7 +468,7 @@ are not invoked.
 .. _atomic-operation-grouping:
 
 Atomic Operation Grouping
--------------------------
+`````````````````````````
 
 Atomic operations may be grouped together using the ``#atomically`` method
 on a document. All operations inside the block given to ``#atomically``
@@ -540,220 +544,352 @@ However, MongoDB offers :ref:`multi-document transactions <transactions>`
 as of server version 4.0 which provide atomic persistence across multiple
 documents.
 
-Persistence Context Attributes
-==============================
 
-Mongoid provides ``client_name``, ``database_name`` and ``collection_name``
-methods on model classes to determine the client, database and collection names
-used for persistence:
+Reloading
+=========
+
+Use the ``reload`` method to fetch the most recent version of a document from
+the database:
 
 .. code-block:: ruby
 
-  Band.client_name
-  # => :default
+  band = Band.find(..)
+  band.reload
+
+If the model has a :ref:`shard key <shard-keys>` defined, the shard key value
+is included in the reloading query.
+
+.. note::
+
+  ``reload`` also works when the document has not been persisted, in which case
+  it performs a query using the ``id`` value (and shard key value, if a shard
+  key is defined):
+
+  .. code-block:: ruby
+
+    existing = Band.create!(name: 'Photek')
+    
+    # Unsaved document
+    band = Band.new(id: existing.id)
+    band.reload
+    band.name
+    # => "Photek"
+
+
+Accessing Field Values
+======================
+
+Mongoid provides several ways of accessing field values.
+
+.. note::
+
+  All of the access methods described below raise
+  ``ActiveModel::MissingAttributeError`` when the field being accessed is
+  :ref:`projected out <projection>`, either by virtue of not being included in
+  :ref:`only <only>` or by virtue of being included in
+  :ref:`without <without>`. This applies to both reads and writes.
+
+
+Getters & Setters
+-----------------
+
+The recommended way is to use the getter and setter methods generated for
+each declared field:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name
+  end
   
-  Band.database_name
-  # => "mongoid"
+  person = Person.new
   
-  Band.collection_name
-  # => :bands
+  person.first_name = "Artem"
+  person.first_name
+  # => "Artem"
 
-Custom
-======
+To use this mechanism, each field must be explicitly declared, or the
+model class must enable :ref:`dynamic fields <dynamic-fields>`.
 
-There may be cases where you want to persist documents to different sources from their
-defaults, or with different options from the default. Mongoid provides run-time support
-for this as well as support on a per-model basis.
 
-Model-Level Persistence Options
--------------------------------
+Custom Getters & Setters
+------------------------
 
-On a per-model basis, you can tell it to store in a custom collection name, a different
-database, or a different client. The following example would store the Band class by
-default into a collection named "artists" in the database named "music", with the client "analytics".
+It is possible to explicitly define the getter and setter methods to provide
+custom behavior when reading or writing fields, for example value
+transformations or storing values under different field names. In this case
+``read_attribute`` and ``write_attribute`` methods can be used to read and
+write the values directly into the attributes hash:
 
-Note that the value supplied to the ``client`` option must be configured under ``clients``
-in your mongoid.yml.
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    def first_name
+      read_attribute(:fn)
+    end
+    
+    def first_name=(value)
+      write_attribute(:fn, value)
+    end
+  end
+  
+  person = Person.new
+  
+  person.first_name = "Artem"
+  person.first_name
+  # => "Artem"
+  
+  person.attributes
+  # => {"_id"=>BSON::ObjectId('606477dc2c97a628cf47075b'), "fn"=>"Artem"}
+
+
+.. _read-write-attribute:
+
+``read_attribute`` & ``write_attribute``
+----------------------------------------
+
+The ``read_attribute`` and ``write_attribute`` methods can be used explicitly
+as well. Note that if a field specifies its :ref:`storage field name
+<storage-field-names>`, both ``read_attribute`` and ``write_attribute``
+accept either the declared field name or the storage field name for operations:
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name, as: :fn
+    field :last_name, as: :ln
+  end
+  
+  person = Person.new(first_name: "Artem")
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): nil>
+
+  person.read_attribute(:first_name)
+  # => "Artem"
+
+  person.read_attribute(:fn)
+  # => "Artem"
+  
+  person.write_attribute(:last_name, "Pushkin")
+  person
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Pushkin">
+  
+  person.write_attribute(:ln, "Medvedev")
+  person
+  # => #<Person _id: 60647a522c97a6292c195b4b, first_name(fn): "Artem", last_name(ln): "Medvedev">
+
+``read_attribute`` and ``write_attribute`` do not require that a field with
+the used name is defined, but writing field values with ``write_attribute``
+does not cause the respective field to be defined either:
+
+.. code-block:: ruby
+
+  person.write_attribute(:undefined, "Hello")
+  person
+  # => #<Person _id: 60647b212c97a6292c195b4c, first_name(fn): "Artem", last_name(ln): "Medvedev">
+  person.attributes
+  # => {"_id"=>BSON::ObjectId('60647b212c97a6292c195b4c'), "first_name"=>"Artem", "last_name"=>"Medvedev", "undefined"=>"Hello"}
+  
+  person.read_attribute(:undefined)
+  # => "Hello"
+  person.undefined
+  # raises NoMethodError
+
+When ``read_attribute`` is used to access a missing field, it returns ``nil``.
+
+
+Hash Access
+-----------
+
+Mongoid model instances define the ``[]`` and ``[]=`` methods to provide
+``Hash`` style acccess to the attributes. ``[]`` is an alias for
+``read_attribute`` and ``[]=`` is an alias for ``write_attribute``; see
+the section on :ref:`read_attribute and write_attribute <read-write-attribute>`
+for the detailed description of their behavior.
+
+.. code-block:: ruby
+
+  class Person
+    include Mongoid::Document
+
+    field :first_name, as: :fn
+    field :last_name, as: :ln
+  end
+
+  person = Person.new(first_name: "Artem")
+  
+  person["fn"]
+  # => "Artem"
+  
+  person[:first_name]
+  # => "Artem"
+  
+  person[:ln] = "Medvedev"
+  person
+  # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Medvedev">
+  
+  person["last_name"] = "Pushkin"
+  person
+  # => #<Person _id: 606483742c97a629bdde5cfc, first_name(fn): "Artem", last_name(ln): "Pushkin">
+
+
+Bulk Attribute Writes
+---------------------
+
+In cases where you want to set multiple field values at once, there are a few
+different ways of accomplishing this as well.
+
+.. code-block:: ruby
+
+   # Get the field values as a hash.
+   person.attributes
+
+   # Set the field values in the document.
+   Person.new(first_name: "Jean-Baptiste", middle_name: "Emmanuel")
+   person.attributes = { first_name: "Jean-Baptiste", middle_name: "Emmanuel" }
+   person.write_attributes(
+     first_name: "Jean-Baptiste",
+     middle_name: "Emmanuel",
+   )
+
+
+Dirty Tracking
+==============
+
+Mongoid supports tracking of changed or "dirty" fields with an API that mirrors that of
+Active Model. If a defined field has been modified in a model the model will be marked as
+dirty and some additional behavior comes into play.
+
+
+Viewing Changes
+---------------
+
+There are various ways to view what has been altered on a model. Changes are recorded
+from the time a document is instantiated, either as a new document or via loading from
+the database up to the time it is saved. Any persistence operation clears the changes.
+
+.. code-block:: ruby
+
+   class Person
+     include Mongoid::Document
+     field :name, type: String
+   end
+
+   person = Person.first
+   person.name = "Alan Garner"
+
+   # Check to see if the document has changed.
+   person.changed? # true
+
+   # Get an array of the names of the changed fields.
+   person.changed # [ :name ]
+
+   # Get a hash of the old and changed values for each field.
+   person.changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
+
+   # Check if a specific field has changed.
+   person.name_changed? # true
+
+   # Get the changes for a specific field.
+   person.name_change # [ "Alan Parsons", "Alan Garner" ]
+
+   # Get the previous value for a field.
+   person.name_was # "Alan Parsons"
+
+
+Resetting Changes
+-----------------
+
+You can reset changes of a field to its previous value by calling the reset method.
+
+.. code-block:: ruby
+
+   person = Person.first
+   person.name = "Alan Garner"
+
+   # Reset the changed name back to the original
+   person.reset_name!
+   person.name # "Alan Parsons"
+
+
+Persistence
+-----------
+
+Mongoid uses dirty tracking as the core of its persistence operations. It looks at the
+changes on a document and atomically updates only what has changed, unlike other frameworks
+that write the entire document on each save. If no changes have been made, Mongoid will
+not hit the database on a call to ``Model#save``.
+
+
+Viewing Previous Changes
+------------------------
+
+After a document has been persisted, you can see what the changes were previously by
+calling ``Model#previous_changes``.
+
+.. code-block:: ruby
+
+   person = Person.first
+   person.name = "Alan Garner"
+   person.save # Clears out current changes.
+
+   # View the previous changes.
+   person.previous_changes # { "name" => [ "Alan Parsons", "Alan Garner" ] }
+
+
+Updating Container Fields
+=========================
+
+Be aware that, until
+`MONGOID-2951 <https://jira.mongodb.org/browse/MONGOID-2951>`_
+is resolved, all fields including container ones must be assigned to for
+their values to be persisted to the database.
+
+For example, adding to a set like this does not work:
 
 .. code-block:: ruby
 
   class Band
     include Mongoid::Document
-    store_in collection: "artists", database: "music", client: "analytics"
+
+    field :tours, type: Set
   end
 
-If no ``store_in`` macro would have been provided, Mongoid would store the model in a
-collection named "bands" in the default database in the default client.
+  band = Band.new
+  band.tours
+  # => #<Set: {}>
 
-Runtime Persistence Options
----------------------------
+  band.tours << 'London'
+  # => #<Set: {"London"}>
+  band.tours
+  # => #<Set: {}>
 
-It is possible to change the client, database and collection, as well as
-any of the MongoDB client options, used for persistence for a group of
-operations by using the ``with`` method on a model class or instance:
+Instead, the field value must be modified outside of the model and assigned
+back to the model as follows:
 
 .. code-block:: ruby
 
-  Band.with(database: "music-non-stop") do |klass|
-    klass.create(...)
-    
-    band = Band.first
-    
-    Band.create(...)
-  end
-  
-  Band.with(collection: "artists") do |klass|
-    klass.delete_all
-    
-    Band.delete_all
-  end
-  
-  band.with(client: :tertiary) do |band_object|
-    band_object.save!
-    
-    band.save!
+  class Band
+    include Mongoid::Document
+
+    field :tours, type: Set
   end
 
-The ``with`` method creates a temporary persistence context and a MongoDB
-client to be used for operations in the context. For the duration of the block,
-the persistence context on the model class or instance that ``with`` was
-called on is changed to the temporary persistence context. For convenience,
-the model class or instance that ``with`` was called on is yielded to the
-block.
+  band = Band.new
 
-The temporary persistence context applies to both queries and writes.
+  tours = band.tours
+  # => #<Set: {}>
 
-Care should be taken when performing persistence operations across different
-persistence contexts. For example, if a document is saved in a temporary
-persistence context, it may not exist in the default persistence context,
-failing subsequent updates:
+  tours << 'London'
+  # => #<Set: {"London"}>
 
-.. code-block:: ruby
+  band.tours = tours
+  # => #<Set: {"London"}>
 
-  band = Band.new(name: "Scuba")
-  band.with(collection: "artists") do |band_object|
-    band_object.save!
-  end
-  
-  # This will not save - updates the collection "bands" which does not have
-  # the Scuba band
-  band.update_attribute(likes: 1000)
-  
-  # This will update the document.
-  band.with(collection: "artists") do |band_object|
-    band_object.update_attribute(likes: 1000)
-  end
-
-As of Mongoid 6.0, the ``with`` method must always be called with a block,
-and the temporary persistence context exists only for the duration of the block.
-This is because a new client is created under the covers with the options
-passed to ``with``. To ensure that this client is closed and its associated
-resources are freed, the scope when this client could be used must be
-well-defined.
-
-Global Override
-```````````````
-
-If you want to switch the persistence context for all operations at runtime, but don't want
-to be using with all over your code, Mongoid provides the ability to do this as the client
-and database level globally. The methods for this are ``Mongoid.override_client`` and
-``Mongoid.override_database``. A useful case for this are internationalized applications
-that store information for different locales in different databases or clients, but the
-schema in each remains the same.
-
-.. code-block:: ruby
-
-  class BandsController < ApplicationController
-    before_filter :switch_database
-    after_filter :reset_database
-
-    private
-
-    def switch_database
-      I18n.locale = params[:locale] || I18n.default_locale
-      Mongoid.override_database("my_db_name_#{I18n.locale}")
-    end
-
-    def reset_database
-      Mongoid.override_database(nil)
-    end
-  end
-
-In the above example, all persistence operations would be stored in the alternative
-database for all remaining operations on this thread. This is why the after request
-set the override back to nil - it ensures subsequent requests with no local params
-use the default option.
-
-Persistence context applies to both read and write operations. For example,
-secondary reads can be performed as follows:
-
-.. code-block:: ruby
-
-  Band.with(read: {mode: :secondary}) do
-    Band.count
-  end
-
-Client and Collection Access
-----------------------------
-
-If you want to drop down to the driver level to perform operations, you can grab
-the Mongo client or collection from the model or document instance:
-
-.. code-block:: ruby
-
-  Band.mongo_client
-  band.mongo_client
-  Band.collection
-  band.collection
-
-From here you also have the same runtime persistence options using the client's ``#with``:
-
-.. code-block:: ruby
-
-  client = Band.mongo_client.with(write: { w: 0 }, database: "musik")
-  client[:artists].find(...)
-
-You can also override the :read or :write options on the collection using the collections ``#with``:
-
-.. code-block:: ruby
-
-  collection_w_0 = Band.collection.with(write: { w: 0 })
-  collection_w_0[:artists].find(...)
-
-Capped Collections
-------------------
-
-Mongoid does not provide a mechanism for creating capped collections on the fly - you
-will need to create these yourself one time up front either with the driver or via the
-Mongo console.
-
-To create a capped collection with the driver:
-
-.. code-block:: ruby
-
-  client["name", :capped => true, :size => 1024].create
-
-To create a capped collection from the Mongo console:
-
-.. code-block:: javascript
-
-  db.createCollection("name", { capped: true, size: 1024 });
-
-Set a Default Collation on a Collection
----------------------------------------
-
-Mongoid does not provide a mechanism for creating a collection with a default collation.
-Like capped collections, you will need to create the collection yourself one time, up-front,
-either with the driver or via the Mongo console.
-
-To create a collection with a default collation with the driver:
-
-.. code-block:: ruby
-
-  client["name", :collation => { :locale => 'fr'}].create
-
-To create a collection with a default collation from the Mongo console:
-
-.. code-block:: javascript
-
-  db.createCollection("name", { collation: { locale: 'fr' } });
+  band.tours
+  # => #<Set: {"London"}>
