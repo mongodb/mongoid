@@ -1,6 +1,6 @@
-********
-Sharding
-********
+**********************
+Sharding Configuration
+**********************
 
 .. default-domain:: mongodb
 

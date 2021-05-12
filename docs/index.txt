@@ -14,7 +14,8 @@ for MongoDB in Ruby.
 
   installation-configuration
   tutorials
-  reference
+  schema-configuration
+  working-with-data
   API <https://docs.mongodb.com/mongoid/master/api/>
   release-notes
   additional-resources
