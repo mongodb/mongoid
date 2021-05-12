@@ -12,7 +12,7 @@ for MongoDB in Ruby.
 .. toctree::
   :titlesonly:
 
-  installation
+  installation-configuration
   tutorials
   reference
   API <https://docs.mongodb.com/mongoid/master/api/>
