@@ -1,0 +1,15 @@
+.. _installation-configuration:
+
+****************************
+Installation & Configuration
+****************************
+
+.. default-domain:: mongodb
+
+.. toctree::
+  :titlesonly:
+
+  installation
+  reference/compatibility
+  reference/configuration
+  reference/rails-integration

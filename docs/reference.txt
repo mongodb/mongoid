@@ -9,7 +9,6 @@ Reference
 .. toctree::
   :titlesonly:
 
-  reference/configuration
   reference/persistence-configuration
   reference/documents
   reference/fields
@@ -27,4 +26,3 @@ Reference
   reference/sharding
   reference/sessions
   reference/transactions
-  reference/rails

@@ -1,0 +1,327 @@
+*************
+Compatibility
+*************
+
+.. default-domain:: mongodb
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+
+Ruby MongoDB Driver Compatibility
+=================================
+
+The following compatibility table specifies the versions of `Ruby driver for
+MongoDB <https://docs.mongodb.com/ruby-driver/current/>`_
+(the ``mongo`` gem) supported by the most recent patch releases of the
+specified Mongoid versions.
+
+.. note::
+
+  Older versions of Mongoid within the same minor release may support older
+  driver versions. For example, Mongoid 7.0.5 supports driver versions 2.5 and
+  newer, whereas Mongoid 7.0.6 requires driver version 2.7 or newer.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - Driver 2.14-2.10
+     - Driver 2.9-2.7
+
+   * - 7.3
+     - |checkmark|
+     -
+
+   * - 7.2
+     - |checkmark|
+     -
+
+   * - 7.1
+     - |checkmark|
+     - |checkmark|
+
+   * - 7.0
+     - |checkmark|
+     - |checkmark|
+
+   * - 6.4
+     - |checkmark|
+     - |checkmark|
+
+
+Ruby Compatibility
+==================
+
+The following compatibility table specifies the versions of Ruby interpreters
+supported by Mongoid. "D" in a column means support for that Ruby version
+is deprecated.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - Ruby 3.0
+     - Ruby 2.7
+     - Ruby 2.6
+     - Ruby 2.5
+     - Ruby 2.4
+     - Ruby 2.3
+     - Ruby 2.2
+     - JRuby 9.2
+
+   * - 7.3
+     -
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     - D
+     -
+     - |checkmark|
+
+   * - 7.2
+     -
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - D
+     - D
+     -
+     - |checkmark|
+
+   * - 7.1
+     -
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#ruby-2.4]_
+     - |checkmark|
+     -
+     - |checkmark|
+
+   * - 7.0
+     -
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#ruby-2.4]_
+     - |checkmark|
+     - |checkmark| [#ruby-2.2]_
+     - |checkmark|
+
+   * - 6.4
+     -
+     -
+     - |checkmark|
+     - |checkmark|
+     - |checkmark| [#ruby-2.4]_
+     - |checkmark|
+     - |checkmark| [#ruby-2.2]_
+     - |checkmark|
+
+.. [#ruby-2.4] Ruby version 2.4.1 or higher is required.
+
+.. [#ruby-2.2] Ruby version 2.2.2 or higher is required.
+
+
+MongoDB Server Compatibility
+============================
+
+The following compatibility table specifies the recommended
+version(s) of Mongoid for use with a specific version of MongoDB server.
+
+Note that in order to use features of a particular MongoDB server version,
+both the driver and Mongoid must support that server version.
+Please refer to `the driver compatibility page
+<https://docs.mongodb.com/ruby-driver/current/reference/driver-compatibility/>`_
+for driver compatibility matrices.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - MongoDB 4.4
+     - MongoDB 4.2
+     - MongoDB 4.0
+     - MongoDB 3.6
+     - MongoDB 3.4
+     - MongoDB 3.2
+     - MongoDB 3.0
+     - MongoDB 2.6
+
+   * - 7.3
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
+   * - 7.2
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
+   * - 7.1
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
+   * - 7.0
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
+   * - 6.4
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+
+
+.. _rails-compatibility:
+
+Rails Compatibility
+===================
+
+The following compatibility table specifies which versions of Ruby on Rails
+are supported by Mongoid.
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+   :class: compatibility-large no-padding
+
+   * - Mongoid
+     - Rails 6.1
+     - Rails 6.0
+     - Rails 5.2
+     - Rails 5.1
+     - Rails 5.0
+     - Rails 4.2
+
+   * - 7.3
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 7.2
+     - |checkmark| [#rails-6.1]_
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 7.1
+     - |checkmark| [#rails-6.1]_
+     - |checkmark|
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 7.0
+     - |checkmark| [#rails-6.1]_
+     - |checkmark| [#rails-6]_
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.4
+     -
+     -
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.3
+     -
+     -
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.2
+     -
+     -
+     - |checkmark|
+     - |checkmark|
+     -
+     -
+
+   * - 6.1
+     -
+     -
+     -
+     -
+     - |checkmark|
+     -
+
+   * - 6.0
+     -
+     -
+     -
+     -
+     - |checkmark|
+     -
+
+   * - 5.4
+     -
+     -
+     -
+     -
+     -
+     - |checkmark|
+
+   * - 5.2
+     -
+     -
+     -
+     -
+     -
+     - |checkmark|
+
+.. [#rails-6] Rails 6.0 requires Mongoid 7.0.5 or later.
+
+.. [#rails-6.1] Rails 6.1 requires Mongoid 7.0.12, 7.1.7 or 7.2.1 in the
+  respective 7.0, 7.1 and 7.2 stable branches.
+
+.. include:: /includes/unicode-checkmark.rst
