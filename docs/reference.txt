@@ -22,9 +22,9 @@ Reference
   reference/nested-attributes
   reference/callbacks
   reference/validation
+  reference/collection-configuration
   reference/indexes
   reference/sharding
   reference/sessions
   reference/transactions
   reference/rails
-  reference/upgrade

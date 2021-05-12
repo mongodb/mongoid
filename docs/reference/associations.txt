@@ -759,7 +759,7 @@ associations: ``clear``, ``destroy_all`` and ``delete_all``.
 The ``clear`` method uses the :manual:`$unset operator
 </reference/operator/update/unset>` to remove the entire association from the
 host document. It does not run destroy callbacks on the documents being removed,
-acting like ``delete_all` in this regard:
+acting like ``delete_all`` in this regard:
 
 .. code-block:: ruby
 

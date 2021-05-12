@@ -13,6 +13,9 @@ Field Definition
    :class: singlecol
 
 
+Field Types
+===========
+
 Even though MongoDB is a schemaless database and allows data to be stored
 as strings, Mongoid permits the application to declare the type of data
 stored in the various fields of a document. Field type declarations affect

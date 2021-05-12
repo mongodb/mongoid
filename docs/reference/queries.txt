@@ -1189,7 +1189,7 @@ option. If the option is set to ``true``, ``find`` raises
 ``Mongoid::Errors::DocumentNotFound`` if any of the ``_id``s are not found.
 If the option is set to ``false`` and ``find`` is given a single ``_id`` to
 find and there is no matching document, ``find`` returns ``nil``. If the
-option is set to ``false`` and ``find`` is given an array of ``_id``s to find
+option is set to ``false`` and ``find`` is given an array of ids to find
 and some are not found, the return value is an array of documents that were
 found (which could be empty if no documents were found at all).
 

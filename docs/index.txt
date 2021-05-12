@@ -15,8 +15,8 @@ for MongoDB in Ruby.
   installation
   tutorials
   reference
-  release-notes
   API <https://docs.mongodb.com/mongoid/master/api/>
+  release-notes
   additional-resources
   ecosystem
 
