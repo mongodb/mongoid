@@ -127,7 +127,7 @@ Index Management Rake Tasks
 ===========================
 
 When you want to create the indexes in the database, use the provided
-``db:mongoid::create_indexes`` Rake task:
+``db:mongoid:create_indexes`` Rake task:
 
 .. code-block:: bash
 
