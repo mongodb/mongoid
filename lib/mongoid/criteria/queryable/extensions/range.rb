@@ -59,7 +59,7 @@ module Mongoid
             # @since 1.0.0
             def evolve(object)
               return object unless object.is_a?(::Range)
-              { "$gte" => object.min, "$lte" => object.max }
+              { "$gte" => object.min.mongoize, "$lte" => object.max.mongoize }
             end
           end
         end
