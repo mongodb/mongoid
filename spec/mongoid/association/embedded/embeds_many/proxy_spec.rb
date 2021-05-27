@@ -1395,10 +1395,23 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
     before do
       person.addresses.create(street: "Upper")
       person.addresses.build(street: "Bond")
+      person.addresses.build(street: "Lower")
     end
 
     it "returns the number of persisted documents" do
       expect(person.addresses.count).to eq(1)
+    end
+
+    it "block form iterates across all documents" do
+      expect(person.addresses.count {|a| a.persisted? }).to eq(1)
+      expect(person.addresses.count {|a| !a.persisted? }).to eq(2)
+      expect(person.addresses.count {|a| a.street.include?('o') }).to eq(2)
+      expect(person.addresses.count {|a| a.street.ends_with?('er') }).to eq(2)
+    end
+
+    it "argument form is supported" do
+      expect(person.addresses.count(person.addresses.first)).to eq(1)
+      expect(person.addresses.count(1)).to eq(0)
     end
   end
 
@@ -1416,6 +1429,16 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       it "returns true" do
         expect(person.addresses.any?).to be true
       end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.any? {|a| a.street == "Upper" }).to be true
+        expect(person.addresses.any? {|a| a.street == "Bond" }).to be false
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.any?(person.addresses.first)).to be true
+        expect(person.addresses.any?(1)).to be false
+      end
     end
     
     context "when documents are not persisted" do
@@ -1426,11 +1449,153 @@ describe Mongoid::Association::Embedded::EmbedsMany::Proxy do
       it "returns true" do
         expect(person.addresses.any?).to be true
       end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.any? {|a| a.street == "Upper" }).to be false
+        expect(person.addresses.any? {|a| a.street == "Bond" }).to be true
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.any?(person.addresses.first)).to be true
+        expect(person.addresses.any?(1)).to be false
+      end
     end
 
-    context "when documents are not created" do
+    context "when documents are not present" do
       it "returns false" do
         expect(person.addresses.any?).to be false
+      end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.any?(&:a)).to be false
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.any?(1)).to be false
+      end
+    end
+  end
+
+  describe "#all?" do
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when documents are persisted" do
+      before do
+        person.addresses.create(street: "Upper")
+      end
+
+      it "returns true" do
+        expect(person.addresses.all?).to be true
+      end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.all? {|a| a.street == "Upper" }).to be true
+        expect(person.addresses.all? {|a| a.street == "Bond" }).to be false
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.all?(person.addresses.first)).to be true
+        expect(person.addresses.all?(1)).to be false
+      end
+    end
+
+    context "when documents are not persisted" do
+      before do
+        person.addresses.build(street: "Bond")
+      end
+
+      it "returns true" do
+        expect(person.addresses.all?).to be true
+      end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.all? {|a| a.street == "Upper" }).to be false
+        expect(person.addresses.all? {|a| a.street == "Bond" }).to be true
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.all?(person.addresses.first)).to be true
+        expect(person.addresses.all?(1)).to be false
+      end
+    end
+
+    context "when documents are not present" do
+      it "returns false" do
+        expect(person.addresses.all?).to be true
+      end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.all?(&:foo)).to be true
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.all?(nil)).to be true
+        expect(person.addresses.all?(1)).to be true
+      end
+    end
+  end
+
+  describe "#none?" do
+
+    let(:person) do
+      Person.create
+    end
+
+    context "when documents are persisted" do
+      before do
+        person.addresses.create(street: "Upper")
+      end
+
+      it "returns true" do
+        expect(person.addresses.none?).to be false
+      end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.none? {|a| a.street == "Upper" }).to be false
+        expect(person.addresses.none? {|a| a.street == "Bond" }).to be true
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.none?(person.addresses.first)).to be false
+        expect(person.addresses.none?(1)).to be true
+      end
+    end
+
+    context "when documents are not persisted" do
+      before do
+        person.addresses.build(street: "Bond")
+      end
+
+      it "returns true" do
+        expect(person.addresses.none?).to be false
+      end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.none? {|a| a.street == "Upper" }).to be true
+        expect(person.addresses.none? {|a| a.street == "Bond" }).to be false
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.none?(person.addresses.first)).to be false
+        expect(person.addresses.none?(1)).to be true
+      end
+    end
+
+    context "when documents are not present" do
+      it "returns false" do
+        expect(person.addresses.none?).to be true
+      end
+
+      it "block form iterates across all documents" do
+        expect(person.addresses.none?(&:a)).to be true
+      end
+
+      it "argument form is supported" do
+        expect(person.addresses.none?(nil)).to be true
+        expect(person.addresses.none?(1)).to be true
       end
     end
   end

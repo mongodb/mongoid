@@ -112,7 +112,9 @@ module Mongoid
           #
           # @return [ Integer ] The total number of persisted embedded docs, as
           #   flagged by the #persisted? method.
-          def count
+          def count(*args, &block)
+            return _target.count(*args, &block) if args.any? || block
+
             _target.select { |doc| doc.persisted? }.size
           end
 

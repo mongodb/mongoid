@@ -1419,6 +1419,11 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
       it "returns the number of persisted documents" do
         expect(movie.ratings.count).to eq(1)
       end
+
+      it "block form includes persisted results" do
+        expect(movie.ratings.count {|r| r.value >= 1 }).to eq(1)
+        expect(movie.ratings.count {|r| r.value >= 2 }).to eq(0)
+      end
     end
 
     context "when documents have not been persisted" do
@@ -1429,6 +1434,27 @@ describe Mongoid::Association::Referenced::HasMany::Proxy do
 
       it "returns 0" do
         expect(movie.ratings.count).to eq(0)
+      end
+
+      it "block form does not include unpersisted results" do
+        expect(movie.ratings.count {|r| r.value == 1 }).to eq(0)
+      end
+    end
+
+    context "when mixed persisted and unpersisted documents" do
+
+      before do
+        movie.ratings.create(value: 1)
+        movie.ratings.build(value: 2)
+      end
+
+      it "returns 1" do
+        expect(movie.ratings.count).to eq(1)
+      end
+
+      it "block form includes only persisted results" do
+        expect(movie.ratings.count {|r| r.value >= 1 }).to eq(1)
+        expect(movie.ratings.count {|r| r.value == 2 }).to eq(0)
       end
     end
 
