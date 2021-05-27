@@ -102,8 +102,19 @@ module Mongoid
           #
           # Use #size if you want the total number of documents.
           #
+          # If args or block are present, #count will delegate to the target and
+          # will include both persisted and non-persisted documents.
+          #
           # @example Get the count of persisted documents.
           #   person.addresses.count
+          #
+          # @example Get the count of all documents matching a block.
+          #   person.addresses.count { |a| a.country == "FR" }
+          #
+          # @example Use #persisted? inside block to count persisted documents.
+          #   person.addresses.count { |a| a.persisted? && a.country == "FR" }
+          #
+          # @param [ Object, Array<Object> ] args Args to delegate to the target.
           #
           # @return [ Integer ] The total number of persisted embedded docs, as
           #   flagged by the #persisted? method.
