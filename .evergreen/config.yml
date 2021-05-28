@@ -420,6 +420,10 @@ axes:
         display_name: ruby-2.7
         variables:
            RVM_RUBY: "ruby-2.7"
+      - id: "ruby-3.0"
+        display_name: ruby-3.0
+        variables:
+          RVM_RUBY: "ruby-3.0"
       - id: "ruby-head"
         display_name: ruby-head
         variables:
@@ -528,7 +532,18 @@ axes:
           APP_TESTS: yes
 
 buildvariants:
-- matrix_name: "drivers"
+- matrix_name: "drivers-ruby-3.0"
+  matrix_spec:
+    driver: [current, master, stable]
+    ruby: "ruby-3.0"
+    mongodb-version: "4.4"
+    topology: '*'
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - rhel70-small
+  tasks:
+    - name: "test"
+- matrix_name: "drivers-ruby-2.7"
   matrix_spec:
     driver: [current, master, stable]
     ruby: "ruby-2.7"
@@ -539,10 +554,21 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "topologies"
+- matrix_name: "topologies-ruby-3.0"
   matrix_spec:
     driver: current
-    ruby: "ruby-2.6"
+    ruby: "ruby-3.0"
+    mongodb-version: ['3.6', '4.0', '4.2', '4.4']
+    topology: ["replica-set", "sharded-cluster"]
+  display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
+  run_on:
+    - ubuntu1604-small
+  tasks:
+    - name: "test"
+- matrix_name: "topologies-ruby-2.7"
+  matrix_spec:
+    driver: current
+    ruby: "ruby-2.7"
     mongodb-version: ['3.6', '4.0', '4.2', '4.4']
     topology: ["replica-set", "sharded-cluster"]
   display_name: "${ruby}, ${driver}, ${mongodb-version}, ${topology}"
@@ -729,7 +755,19 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: "rails-6.0"
+- matrix_name: "rails-6.0-ruby-3.0"
+  matrix_spec:
+    driver: "current"
+    ruby: "ruby-3.0"
+    mongodb-version: "4.4"
+    topology: "standalone"
+    rails: '6.0'
+  display_name: "${rails}, ${driver}, ${mongodb-version}"
+  run_on:
+    - rhel70-small
+  tasks:
+    - name: "test"
+- matrix_name: "rails-6.0-ruby-2.7"
   matrix_spec:
     driver: "current"
     ruby: "ruby-2.7"
@@ -773,7 +811,21 @@ buildvariants:
     - rhel70-small
   tasks:
      - name: "test"
-- matrix_name: app-tests
+- matrix_name: app-tests-ruby-3.0
+  matrix_spec:
+    driver: current
+    ruby: ruby-3.0
+    mongodb-version: '4.4'
+    topology: standalone
+    app-tests: yes
+    # Not currently testing rails master
+    rails: ['6.0', '6.1']
+  display_name: "app tests ${driver}, ${ruby}, ${rails}"
+  run_on:
+    - ubuntu1804-small
+  tasks:
+    - name: "test"
+- matrix_name: app-tests-ruby-2.7
   matrix_spec:
     driver: current
     ruby: ruby-2.7
