@@ -6,7 +6,7 @@ set -o errexit  # Exit the script with error if any of the commands fail
 # Supported/used environment variables:
 #       MONGODB_URI             Set the suggested connection MONGODB_URI (including credentials and topology info)
 #       RVM_RUBY                Define the Ruby version to test with, using its RVM identifier.
-#                               For example: "ruby-2.7" or "jruby-9.2"
+#                               For example: "ruby-3.0" or "jruby-9.2"
 
 . `dirname "$0"`/../spec/shared/shlib/distro.sh
 . `dirname "$0"`/../spec/shared/shlib/set_env.sh
