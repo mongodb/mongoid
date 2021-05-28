@@ -10,14 +10,26 @@ describe Mongoid::Errors::MongoidError do
   let(:options) { {} }
 
   before do
-    {"message_title" => "message", "summary_title" => "summary", "resolution_title" => "resolution"}.each do |key, name|
-      expect(::I18n).to receive(:translate).with("mongoid.errors.messages.#{key}", {}).and_return(name)
-    end
+    if RUBY_VERSION.start_with?('3.', '2.7')
+      {"message_title" => "message", "summary_title" => "summary", "resolution_title" => "resolution"}.each do |key, name|
+        expect(::I18n).to receive(:translate).with("mongoid.errors.messages.#{key}", **{}).and_return(name)
+      end
 
-    ["message", "summary", "resolution"].each do |name|
-      expect(::I18n).to receive(:translate).
-        with("mongoid.errors.messages.#{key}.#{name}", {}).
-      and_return(name)
+      ["message", "summary", "resolution"].each do |name|
+        expect(::I18n).to receive(:translate).
+          with("mongoid.errors.messages.#{key}.#{name}", **{}).
+          and_return(name)
+      end
+    else
+      {"message_title" => "message", "summary_title" => "summary", "resolution_title" => "resolution"}.each do |key, name|
+        expect(::I18n).to receive(:translate).with("mongoid.errors.messages.#{key}", {}).and_return(name)
+      end
+
+      ["message", "summary", "resolution"].each do |name|
+        expect(::I18n).to receive(:translate).
+          with("mongoid.errors.messages.#{key}.#{name}", {}).
+          and_return(name)
+      end
     end
 
     error.compose_message(key, options)
