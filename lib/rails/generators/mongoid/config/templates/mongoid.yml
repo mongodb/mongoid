@@ -57,7 +57,7 @@ development:
         # connect: :direct
 
         # Changes the default time in seconds the server monitors refresh their status
-        # via ismaster commands. (default: 10)
+        # via hello commands. (default: 10)
         # heartbeat_frequency: 10
 
         # The time in seconds for selecting servers for a near read preference. (default: 0.015)
