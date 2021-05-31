@@ -41,7 +41,7 @@ if (ENV['CI'] == 'travis' || ENV['CI'] == 'evergreen')
   client = Mongo::Client.new(SpecConfig.instance.addresses)
   while starting
     begin
-      client.command(Mongo::Server::Monitor::Connection::ISMASTER)
+      client.command(ping: 1)
       break
     rescue Mongo::Error::OperationFailure => e
       sleep(2)
