@@ -97,6 +97,7 @@ module Mongoid
       def post_process_insert
         self.new_record = false
         flag_children_persisted
+        post_persist
         true
       end
 
@@ -117,13 +118,14 @@ module Mongoid
       def prepare_insert(options = {})
         return self if performing_validations?(options) &&
           invalid?(options[:context] || :create)
-        result = run_callbacks(:save) do
+        run_callbacks(:save) do
           run_callbacks(:create) do
             yield(self)
             post_process_insert
           end
         end
-        post_process_persist(result, options) and self
+        errors.clear unless performing_validations?(options)
+        self
       end
 
       module ClassMethods

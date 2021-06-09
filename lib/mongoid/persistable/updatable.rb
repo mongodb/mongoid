@@ -112,10 +112,12 @@ module Mongoid
         result = run_callbacks(:save) do
           run_callbacks(:update) do
             yield(self)
+            post_persist
             true
           end
         end
-        post_process_persist(result, options) and result
+        errors.clear unless performing_validations?(options)
+        result
       end
 
       # Update the document in the database.

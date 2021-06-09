@@ -75,6 +75,28 @@ describe Mongoid::Interceptable do
     end
   end
 
+  describe ".after_save" do
+    class TestAfterSave
+      include Mongoid::Document
+
+      field :age, type: Integer
+
+      attr_reader :age_in_after_save
+
+      after_save do
+        @age_in_after_save = attribute_was(:age)
+      end
+    end
+
+    it 'has updated attribute value' do
+      age = 18
+      subject = TestAfterSave.create!
+      subject.age = 18
+      subject.save!
+      expect(subject.age_in_after_save).to eq(age)
+    end
+  end
+
   describe ".after_find" do
 
     let!(:player) do

@@ -48,10 +48,12 @@ module Mongoid
         return false if performing_validations?(options) && invalid?(:upsert)
         result = run_callbacks(:upsert) do
           yield(self)
+          post_persist
           true
         end
         self.new_record = false
-        post_process_persist(result, options) and result
+        errors.clear unless performing_validations?(options)
+        result
       end
     end
   end
