@@ -51,7 +51,8 @@ module Mongoid
           true
         end
         self.new_record = false
-        post_process_persist(result, options) and result
+        post_process_persist(result, options)
+        result
       end
     end
   end
