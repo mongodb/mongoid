@@ -47,3 +47,15 @@ class Planet
     self.age ||= 2_000
   end
 end
+
+class Emission
+  include Mongoid::Document
+
+  field :frequency
+
+  after_save do
+    @previous = attribute_was(:frequency)
+  end
+
+  attr_reader :previous
+end
