@@ -25,6 +25,7 @@ describe 'Mongoid application tests' do
         clone_application(
           'https://github.com/mongoid/mongoid-demo',
           subdir: 'sinatra-minimal',
+          branch: ENV['MONGOID_DEMO_BRANCH']
         ) do
 
           # JRuby needs a long timeout
@@ -44,6 +45,7 @@ describe 'Mongoid application tests' do
         clone_application(
           'https://github.com/mongoid/mongoid-demo',
           subdir: 'rails-api',
+          branch: ENV['MONGOID_DEMO_BRANCH']
         ) do
 
           # JRuby needs a long timeout
@@ -187,11 +189,12 @@ describe 'Mongoid application tests' do
     end
   end
 
-  def clone_application(repo_url, subdir: nil)
+  def clone_application(repo_url, subdir: nil, branch: nil)
     Dir.chdir(TMP_BASE) do
       FileUtils.rm_rf(File.basename(repo_url))
       Mrss::ChildProcessHelper.check_call(%w(git clone) + [repo_url])
       Dir.chdir(File.join(*[File.basename(repo_url), subdir].compact)) do
+        `git checkout #{branch}` unless branch.nil?
         adjust_app_gemfile
         adjust_rails_defaults
         Mrss::ChildProcessHelper.check_call(%w(bundle install), env: clean_env)
@@ -297,6 +300,9 @@ describe 'Mongoid application tests' do
   end
 
   def remove_bundler_req
+    return unless File.file?('Gemfile.lock')
+    # TODO: Remove this method completely when we get rid of .lock files in
+    # mongoid-demo apps.
     lock_lines = IO.readlines('Gemfile.lock')
     # Get rid of the bundled with line so that whatever bundler is installed
     # on the system is usable with the application.
