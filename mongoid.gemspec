@@ -29,10 +29,14 @@ Gem::Specification.new do |s|
     warn "[#{s.name}] Warning: No private key present, creating unsigned gem."
   end
 
-  s.required_ruby_version     = ">= 2.3"
+  s.required_ruby_version     = ">= 2.5"
   s.required_rubygems_version = ">= 1.3.6"
 
-  s.add_dependency("activemodel", [">= 5.1", "<6.2"])
+  if RUBY_VERSION.start_with?('2.')
+    s.add_dependency("activemodel", [">= 5.2", "<6.0"])
+  elsif RUBY_VERSION.start_with?('3.')
+    s.add_dependency("activemodel", [">= 6.0", "<6.3"])
+  end
   s.add_dependency("mongo", ['>=2.10.5', '<3.0.0'])
 
   s.add_development_dependency("bson", ['>=4.9.4', '<5.0.0'])
