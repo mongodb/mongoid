@@ -369,15 +369,15 @@ axes:
       - id: "standalone"
         display_name: Standalone
         variables:
-           TOPOLOGY: "server"
+           TOPOLOGY: "standalone"
       - id: "replica-set"
         display_name: Replica Set
         variables:
-           TOPOLOGY: "replica_set"
+           TOPOLOGY: "replica-set"
       - id: "sharded-cluster"
         display_name: Sharded Cluster
         variables:
-           TOPOLOGY: "sharded_cluster"
+           TOPOLOGY: "sharded-cluster"
            SINGLE_MONGOS: true
   - id: "auth"
     display_name: Authentication
