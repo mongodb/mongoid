@@ -45,8 +45,26 @@ describe Mongoid::Document do
 
     let(:person) { Person.where(username: 'Dev').without(:title).first }
 
-    it 'allows access to embed fields' do
+    it 'allows access to attributes of embedded documents' do
       expect(person.pet.name).to eq 'Duck'
+    end
+
+    context 'when exclusion starts with association name but is not the association' do
+
+      let(:person) { Person.where(username: 'Dev').without(:pet_).first }
+
+      it 'allows access to attributes of embedded documents' do
+        expect(person.pet.name).to eq 'Duck'
+      end
+    end
+
+    context 'when exclusion starts with prefix of association name' do
+
+      let(:person) { Person.where(username: 'Dev').without(:pe).first }
+
+      it 'allows access to attributes of embedded documents' do
+        expect(person.pet.name).to eq 'Duck'
+      end
     end
   end
 end
