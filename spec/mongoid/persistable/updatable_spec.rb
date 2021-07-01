@@ -458,6 +458,9 @@ describe Mongoid::Persistable::Updatable do
     describe "##{method}" do
 
       context "when saving with a hash field with invalid keys" do
+        # Starting from 5.0 server does not raise an error for
+        # dollar prefixed keys.
+        max_server_version "4.9"
 
         let(:person) do
           Person.create
@@ -494,6 +497,9 @@ describe Mongoid::Persistable::Updatable do
       end
 
       context "when the document has been destroyed" do
+        # Starting from 5.0 server does not raise an error for
+        # dollar prefixed keys.
+        max_server_version "4.9"
 
         let(:person) do
           Person.create
