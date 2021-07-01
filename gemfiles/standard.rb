@@ -6,7 +6,7 @@ def standard_dependencies
   end
 
   group :development, :test do
-    gem 'rspec', '~> 3.10'
+    gem 'rspec-core', '~> 3.9'
 
     platform :mri do
       gem 'byebug'
@@ -21,6 +21,8 @@ def standard_dependencies
     gem 'timecop'
     gem 'rspec-retry'
     gem 'benchmark-ips'
+    gem 'rspec-expectations', '~> 3.9'
+    gem 'rspec-mocks-diag', '~> 3.9'
     gem 'fuubar'
     gem 'rfc'
     gem 'childprocess'
