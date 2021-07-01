@@ -1,4 +1,3 @@
-require 'pry'
 # frozen_string_literal: true
 # encoding: utf-8
 
@@ -28,7 +27,7 @@ module Mongoid
             raise Errors::TooManyNestedAttributeRecords.new(existing, options[:limit])
           end
           attributes.each do |attrs|
-            if attrs.is_a?(Hash)
+            if attrs.is_a?(::Hash)
               process_attributes(parent, attrs.with_indifferent_access)
             else
               process_attributes(parent, attrs[1].with_indifferent_access)
