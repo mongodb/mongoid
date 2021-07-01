@@ -91,7 +91,8 @@ if test -n "$TEST_CMD"; then
 elif test -n "$TEST_I18N_FALLBACKS"; then
   bundle exec rspec spec/integration/i18n_fallbacks_spec.rb
 elif test -n "$APP_TESTS"; then
-  echo "gem: --no-document" > $HOME/.gemrc
+  touch $HOME/.gemrc
+  echo "gem: --no-document" >> $HOME/.gemrc
   # Need recent node for rails
   export N_PREFIX=$HOME/.n
   curl -o $HOME/n --retry 3 https://raw.githubusercontent.com/tj/n/master/bin/n
