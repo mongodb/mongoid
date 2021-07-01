@@ -142,6 +142,26 @@ describe Mongoid::Association::Nested::Many do
         expect(person.addresses.first.street).to eq("Maybachufer")
       end
     end
+
+    context "copes with ActionController::Parameters" do
+
+      let(:attributes) do
+        ActionController::Parameters.new(super()).permit!
+      end
+
+      let(:builder) do
+        described_class.new(association, attributes)
+      end
+
+      before do
+        builder.build(person)
+      end
+
+      it "adds new documents" do
+        expect(person.addresses.first.street).to eq("Maybachufer")
+      end
+
+    end
   end
 
   describe "#initialize" do
